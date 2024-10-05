@@ -33,6 +33,9 @@
       "typedRoutes": true
     },
     "name": "lumen",
-    "slug": "lumen"
+    "slug": "lumen",
+    "android": {
+      "package": "com.falcofemoralis.lumen"
+    }
   }
 }
