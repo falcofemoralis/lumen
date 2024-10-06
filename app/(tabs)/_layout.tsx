@@ -2,10 +2,9 @@ import { Tabs } from 'expo-router';
 import React from 'react';
 import { Pressable } from 'react-native';
 import { BottomTabBarButtonProps } from '@react-navigation/bottom-tabs';
-import { TabBarIcon } from '@/components/navigation/TabBarIcon';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { useTextStyles } from '@/hooks/useTextStyles';
+import { Colors } from 'Constants/Colors';
+import { useColorScheme } from 'Hooks/useColorScheme.web';
+import { useTextStyles } from 'Hooks/useTextStyles';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -32,7 +31,7 @@ export default function TabLayout() {
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         tabBarStyle: {
           height: textStyles.title.lineHeight * 2,
-          marginBottom: 0,
+          marginBottom: 100,
         },
         headerShown: false,
       }}
@@ -43,26 +42,20 @@ export default function TabLayout() {
           title: 'Home',
           tabBarButton,
           tabBarLabelStyle: textStyles.default,
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon
-              name={focused ? 'home' : 'home-outline'}
-              color={color}
-            />
-          ),
+          // tabBarIcon: ({ color, focused }) => (
+          //   <TabBarIcon
+          //     name={focused ? 'home' : 'home-outline'}
+          //     color={color}
+          //   />
+          // ),
         }}
       />
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="explore"
         options={{
           title: 'Explore',
           tabBarButton,
-          tabBarLabelStyle: textStyles.default,
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon
-              name={focused ? 'code-slash' : 'code-slash-outline'}
-              color={color}
-            />
-          ),
+          tabBarLabelStyle: textStyles.default
         }}
       />
       <Tabs.Screen
@@ -70,15 +63,9 @@ export default function TabLayout() {
         options={{
           title: 'TV event demo',
           tabBarButton,
-          tabBarLabelStyle: textStyles.default,
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon
-              name={focused ? 'code-slash' : 'code-slash-outline'}
-              color={color}
-            />
-          ),
+          tabBarLabelStyle: textStyles.default
         }}
-      />
+      /> */}
     </Tabs>
   );
 }

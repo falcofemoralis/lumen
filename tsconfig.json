@@ -3,8 +3,29 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "@/*": [
-        "./*"
+      "Api/*": [
+        "./app/api/*"
+      ],
+      "Component/*": [
+        "./app/component/*"
+      ],
+      "Constants/*": [
+        "./app/constants/*"
+      ],
+      "Hooks/*": [
+        "./app/hooks/*"
+      ],
+      "Route/*": [
+        "./app/route/*"
+      ],
+      "Style/*": [
+        "./app/style/*"
+      ],
+      "Type/*": [
+        "./app/type/*"
+      ],
+      "Util/*": [
+        "./app/util/*"
       ]
     }
   },
