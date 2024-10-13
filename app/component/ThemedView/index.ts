@@ -1,1 +1,1 @@
-export { default } from "./ThemedView.component";
+export { default } from './ThemedView.component';

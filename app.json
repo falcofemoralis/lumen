@@ -27,8 +27,7 @@
           }
         }
       ],
-      "expo-router",
-      "expo-video"
+      "expo-router"
     ],
     "experiments": {
       "typedRoutes": true
@@ -37,6 +36,11 @@
     "slug": "lumen",
     "android": {
       "package": "com.falcofemoralis.lumen"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "ad7c3459-7949-4f54-9d83-5e8a400a0af4"
+      }
     }
   }
 }

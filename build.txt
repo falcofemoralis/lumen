@@ -1,0 +1,3 @@
+//https://docs.expo.dev/build-reference/local-builds/
+
+eas build -p android --profile production_tv

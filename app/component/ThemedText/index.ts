@@ -1,1 +1,1 @@
-export { default } from "./ThemedText.component";
+export { default } from './ThemedText.component';

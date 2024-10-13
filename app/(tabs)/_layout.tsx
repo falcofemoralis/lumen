@@ -1,71 +1,22 @@
-import { Tabs } from 'expo-router';
+import NavigationBar from 'Component/NavigationBar';
+import ThemedView from 'Component/ThemedView';
+import { Slot } from 'expo-router';
 import React from 'react';
-import { Pressable } from 'react-native';
-import { BottomTabBarButtonProps } from '@react-navigation/bottom-tabs';
-import { Colors } from 'Constants/Colors';
-import { useColorScheme } from 'Hooks/useColorScheme.web';
-import { useTextStyles } from 'Hooks/useTextStyles';
+import AppStore from 'Store/App.store';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-  const textStyles = useTextStyles();
-
-  const tabBarButton = (props: BottomTabBarButtonProps) => {
-    const style: any = props.style ?? {};
-    return (
-      <Pressable
-        {...props}
-        style={({ pressed, focused }) => [
-          style,
-          {
-            opacity: pressed || focused ? 0.6 : 1.0,
-          },
-        ]}
-      />
-    );
-  };
-
-  return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        tabBarStyle: {
-          height: textStyles.title.lineHeight * 2,
-          marginBottom: 100,
-        },
-        headerShown: false,
-      }}
-    >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarButton,
-          tabBarLabelStyle: textStyles.default,
-          // tabBarIcon: ({ color, focused }) => (
-          //   <TabBarIcon
-          //     name={focused ? 'home' : 'home-outline'}
-          //     color={color}
-          //   />
-          // ),
-        }}
-      />
-      {/* <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarButton,
-          tabBarLabelStyle: textStyles.default
-        }}
-      />
-      <Tabs.Screen
-        name="tv_focus"
-        options={{
-          title: 'TV event demo',
-          tabBarButton,
-          tabBarLabelStyle: textStyles.default
-        }}
-      /> */}
-    </Tabs>
+  const renderTVLayout = () => (
+    <ThemedView style={{ flex: 1, flexDirection: 'row' }}>
+      <NavigationBar />
+      <Slot />
+    </ThemedView>
   );
+
+  const renderMobileLayout = () => (
+    <ThemedView>
+      <NavigationBar />
+    </ThemedView>
+  );
+
+  return AppStore.isTV ? renderTVLayout() : renderMobileLayout();
 }

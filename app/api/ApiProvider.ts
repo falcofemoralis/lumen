@@ -1,18 +1,20 @@
-import ApiInterface from "./interface/Api.interface";
+import ApiInterface from './interface/Api.interface';
 //import KinoKongApi from "./KinoKongApi";
-import RezkaApi from "./RezkaApi";
+import RezkaApi from './RezkaApi';
 
-export type ApiServiceType = "rezka" | "kinokong";
+export type ApiServiceType = 'rezka' | 'kinokong';
 
 export function ApiProvider(): ApiInterface {
-  const currentService: ApiServiceType = "rezka" as ApiServiceType;
+  const currentService: ApiServiceType = 'rezka' as ApiServiceType;
+
+  // TODO move it to global store
 
   switch (currentService) {
-    case "rezka":
+    case 'rezka':
       return RezkaApi;
     // case "kinokong":
     //   return KinoKongApi;
     default:
-      throw new Error("Unknown service");
+      throw new Error('Unknown service');
   }
 }

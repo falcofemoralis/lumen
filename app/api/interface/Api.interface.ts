@@ -1,4 +1,4 @@
-import FilmApiInterface from "./FilmApi.interface";
+import FilmApiInterface from './FilmApi.interface';
 
 export default interface ApiInterface {
   getFilmApi(): FilmApiInterface;
