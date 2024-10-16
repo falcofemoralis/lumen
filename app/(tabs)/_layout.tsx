@@ -12,11 +12,7 @@ export default function TabLayout() {
     </ThemedView>
   );
 
-  const renderMobileLayout = () => (
-    <ThemedView>
-      <NavigationBar />
-    </ThemedView>
-  );
+  const renderMobileLayout = () => <NavigationBar />;
 
   return AppStore.isTV ? renderTVLayout() : renderMobileLayout();
 }

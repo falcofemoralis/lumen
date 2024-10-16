@@ -1,9 +1,10 @@
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
-import { Text, TouchableOpacity, TVFocusGuideView, View } from 'react-native';
+import { Text, TouchableOpacity, TVFocusGuideView, useTVEventHandler, View } from 'react-native';
 import AppStore from 'Store/App.store';
 import FilmType from 'Type/Film.type';
 import { HomePageProps } from './HomePage.type';
+import { useEffect } from 'react';
 
 export type HomePageComponentType = {
   film: FilmType;
@@ -12,14 +13,23 @@ export type HomePageComponentType = {
 export function HomePageComponent(props: HomePageProps) {
   //const { film } = props;
 
+  useTVEventHandler((evt: any) => {
+    if (!AppStore.isInitiallyFocused) {
+      AppStore.setInitiallyFocused();
+    }
+  });
+
+  //hasTVPreferredFocus is used to set the focus on the Play Now button
+  // use tv handler to remove this focus
   const Hero = () => {
     return (
       <ThemedView>
-        <TVFocusGuideView autoFocus>
-          <TouchableOpacity onPress={() => AppStore.setTV()}>
-            <ThemedText>Play Now</ThemedText>
-          </TouchableOpacity>
-        </TVFocusGuideView>
+        <TouchableOpacity
+          onPress={() => console.log('Play Now')}
+          hasTVPreferredFocus={!AppStore.isInitiallyFocused}
+        >
+          <ThemedText>Play Now</ThemedText>
+        </TouchableOpacity>
       </ThemedView>
     );
   };
@@ -77,7 +87,7 @@ export function HomePageComponent(props: HomePageProps) {
     <ThemedView style={{ flex: 1, flexDirection: 'column' }}>
       <ThemedText>This is a home page</ThemedText>
       <Hero />
-      <Grid />
+      {/* <Grid /> */}
       {/* <ThemedText>{film.info}</ThemedText> */}
       {/* <Player /> */}
     </ThemedView>

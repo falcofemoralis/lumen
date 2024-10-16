@@ -1,4 +1,4 @@
-import { Dimensions, StyleSheet as RNStyleSheet } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 import AppStore from 'Store/App.store';
 
 const { width: W } = Dimensions.get('screen');
@@ -38,12 +38,12 @@ export const scale = (number: any) => {
   return Number(value.toFixed(1));
 };
 
-const CreateStyles = (styleSheet: any, overload = {}) => {
-  return RNStyleSheet.create(
+export default function CreateStyles<
+  T extends StyleSheet.NamedStyles<T> | StyleSheet.NamedStyles<any>,
+>(styleSheet: T & StyleSheet.NamedStyles<any>, overload = {}): T {
+  return StyleSheet.create(
     objectMap(styleSheet, (value: any) => {
-      return objectMap2(value, overload);
-    })
-  );
-};
-
-export default CreateStyles;
+      return objectMap2(value, overload) as T;
+    }),
+  ) as T;
+}

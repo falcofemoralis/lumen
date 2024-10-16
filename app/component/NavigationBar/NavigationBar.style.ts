@@ -1,16 +1,41 @@
+import { withTiming } from 'react-native-reanimated';
+import Colors from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
   container: {
-    backgroundColor: '#808080',
+    backgroundColor: 'transparent',
     height: '100%',
+    width: 80,
+    paddingHorizontal: 12,
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+  },
+  focusedContainer: {
+    width: 256,
   },
   tab: {
-    width: '100%',
-    height: 20,
-    backgroundColor: '#808080',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    borderRadius: 24,
+    marginBottom: 12,
+  },
+  activeTab: {
+    backgroundColor: 'rgba(0, 74, 119, 0.4)',
+  },
+  focusedTab: {
+    backgroundColor: Colors.white,
+  },
+  tabIcon: {
+    opacity: 1,
   },
   tabText: {
-    color: '#fff',
+    display: 'flex',
+    position: 'absolute',
+    left: 24,
+    color: Colors.white,
   },
 });

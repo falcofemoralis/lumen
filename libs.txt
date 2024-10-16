@@ -1,0 +1,24 @@
+Global
+https://github.com/cheeriojs/cheerio - Parsing
+https://docs.swmansion.com/react-native-reanimated/docs/fundamentals/getting-started/ - Animations
+https://icons.expo.fyi/Index - ICONS
+https://github.com/marcocesarato/react-native-big-list - If list will have issues
+https://docs.expo.dev/versions/latest/sdk/video-av/ - Player
+
+TV Only
+https://github.com/react-native-tvos/react-native-tvos
+https://docs.expo.dev/guides/building-for-tv/
+
+Mobile Only
+https://reactnativepaper.com/ - UI
+https://github.com/IjzerenHein/react-native-shared-element
+https://reactnative.dev/docs/refreshcontrol
+Is it possible to create buffer? https://github.com/callstack/react-native-slider
+
+///
+Examples
+https://github.com/react-native-tvos/IgniteTV?tab=readme-ov-file
+
+Reuse
+TV Seekbar\other https://github.com/kosso/VideoPlayerDemo
+Player example https://github.com/itsnubix/react-native-video-controls/blob/master/VideoPlayer.js

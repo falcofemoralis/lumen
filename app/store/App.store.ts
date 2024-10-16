@@ -1,7 +1,8 @@
 import { makeAutoObservable } from 'mobx';
 
 class AppStore {
-  isTV = true;
+  isTV = false;
+  isInitiallyFocused = false;
 
   constructor() {
     makeAutoObservable(this);
@@ -9,6 +10,10 @@ class AppStore {
 
   setTV() {
     this.isTV = true;
+  }
+
+  setInitiallyFocused() {
+    this.isInitiallyFocused = true;
   }
 }
 

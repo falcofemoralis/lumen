@@ -1,57 +1,94 @@
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
-import React, { useState } from 'react';
-import { TouchableOpacity, TVFocusGuideView, useTVEventHandler } from 'react-native';
+import { router } from 'expo-router';
+import React, { createRef, useRef, useState } from 'react';
+import { Pressable, TVFocusGuideView, useTVEventHandler } from 'react-native';
+import { useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { scale } from 'Util/CreateStyles';
+import { DEFAULT_TAB, Tab, TABS, TabType } from './NavigationBar.config';
 import { styles } from './NavigationBar.style';
 
 export function NavigationBarComponent() {
-  const [isFocused, setIsFocused] = useState(false);
+  const [isOpened, setIsOpened] = useState(false);
+  const [selectedTab, setSelectedTab] = useState<TabType>(DEFAULT_TAB);
+  const elementsRef = useRef(TABS.map(() => createRef()));
 
-  const myTVEventHandler = (evt: any) => {
-    if (evt.eventType === 'right' && isFocused) {
-      setIsFocused(false);
+  useTVEventHandler((evt: any) => {
+    const type = evt.eventType;
+
+    if (type === 'right' && isOpened) {
+      setIsOpened(false);
+    }
+  });
+
+  const onFocus = (tab: Tab) => {
+    const { id, route } = tab;
+
+    if (id !== selectedTab) {
+      setSelectedTab(id);
+      router.replace(route);
+    }
+
+    if (!isOpened) {
+      setIsOpened(true);
     }
   };
 
-  useTVEventHandler(myTVEventHandler);
+  const animatedOpening = useAnimatedStyle(() => {
+    return {
+      width: withTiming(isOpened ? styles.focusedContainer.width : styles.container.width, {
+        duration: 500,
+      }),
+    };
+  });
 
-  const onFocus = () => {
-    if (!isFocused) {
-      setIsFocused(true);
-    }
+  const getCurrentRef = () => {
+    const idx = TABS.findIndex((tab) => tab.id === selectedTab);
+
+    return elementsRef.current[idx].current;
   };
 
-  const renderTVBar = () => {
+  const renderTab = (tab: Tab, idx: number) => {
+    const { id, name, icon } = tab;
+
     return (
-      <ThemedView style={{ ...styles.container, width: isFocused ? scale(120) : scale(80) }}>
-        <ThemedView style={styles.tab}>
-          <TVFocusGuideView autoFocus>
-            <TouchableOpacity onFocus={onFocus}>
-              <ThemedText style={styles.tabText}>Home rel</ThemedText>
-            </TouchableOpacity>
-          </TVFocusGuideView>
-          <TouchableOpacity onFocus={onFocus}>
-            <ThemedText style={styles.tabText}>Film</ThemedText>
-          </TouchableOpacity>
-          <TouchableOpacity onFocus={onFocus}>
-            <ThemedText style={styles.tabText}>qwe</ThemedText>
-          </TouchableOpacity>
-          <TouchableOpacity onFocus={onFocus}>
-            <ThemedText style={styles.tabText}>ewe</ThemedText>
-          </TouchableOpacity>
-          <TouchableOpacity onFocus={onFocus}>
-            <ThemedText style={styles.tabText}>wrwr</ThemedText>
-          </TouchableOpacity>
-          <TouchableOpacity onFocus={onFocus}>
-            <ThemedText style={styles.tabText}>wqe</ThemedText>
-          </TouchableOpacity>
-        </ThemedView>
-      </ThemedView>
+      <Pressable
+        key={id}
+        onFocus={() => onFocus(tab)}
+        style={[
+          styles.tab,
+          selectedTab === id && !isOpened && styles.activeTab,
+          selectedTab === id && isOpened && styles.focusedTab,
+        ]}
+        // @ts-ignore
+        ref={elementsRef.current[idx]}
+      >
+        <MaterialCommunityIcons
+          style={styles.tabIcon}
+          // @ts-ignore
+          name={icon}
+          size={scale(24)}
+          color="white"
+        />
+        {/* {isOpened && <ThemedText style={styles.tabText}>{name}</ThemedText>} */}
+        <ThemedText style={styles.tabText}>{name}</ThemedText>
+      </Pressable>
     );
   };
 
-  return renderTVBar();
+  const renderTabs = () => {
+    return TABS.map((tab, idx) => renderTab(tab, idx));
+  };
+
+  return (
+    // @ts-ignore
+    <TVFocusGuideView trapFocusLeft trapFocusUp trapFocusDown destinations={[getCurrentRef()]}>
+      <ThemedView style={[styles.container, animatedOpening]} useAnimations>
+        {renderTabs()}
+      </ThemedView>
+    </TVFocusGuideView>
+  );
 }
 
 export default NavigationBarComponent;

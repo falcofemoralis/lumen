@@ -2,6 +2,7 @@ import { ApiProvider } from 'Api/ApiProvider';
 import HomePageComponent from './HomePage.component';
 import { useEffect, useState } from 'react';
 import FilmType from 'Type/Film.type';
+import { observer } from 'mobx-react-lite';
 
 export function HomePageContainer() {
   const [film, setFilm] = useState<FilmType>({ info: '' });
@@ -31,4 +32,4 @@ export function HomePageContainer() {
   return <HomePageComponent {...containerFunctions} {...containerProps()} />;
 }
 
-export default HomePageContainer;
+export default observer(HomePageContainer);

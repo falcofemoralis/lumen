@@ -1,15 +1,16 @@
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BottomTabBarButtonProps } from '@react-navigation/bottom-tabs';
-import { Colors } from 'Style/Colors';
 import { Tabs } from 'expo-router';
-import { useColorScheme } from 'Hooks/useColorScheme';
 import React from 'react';
 import { Pressable } from 'react-native';
+import { Colors } from 'Style/Colors';
+import { scale } from 'Util/CreateStyles';
+import { Tab, TABS } from './NavigationBar.config';
 
 export function NavigationBarComponent() {
-  const colorScheme = useColorScheme();
-
-  const tabBarButton = (props: BottomTabBarButtonProps) => {
+  const renderBarButton = (props: BottomTabBarButtonProps) => {
     const style: any = props.style ?? {};
+
     return (
       <Pressable
         {...props}
@@ -23,61 +24,44 @@ export function NavigationBarComponent() {
     );
   };
 
-  const renderMobileBar = () => {
+  const renderTab = (tab: Tab, idx: number) => {
+    const { route, name, icon } = tab;
+
+    const formattedRoute = route.toString().replace('./', '');
+
     return (
-      <Tabs
-        screenOptions={{
-          tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-          headerShown: false,
-        }}
-      >
-        <Tabs.Screen
-          name="index"
-          options={{
-            title: 'Home',
-            tabBarButton,
-            // tabBarIcon: ({ color, focused }) => (
-            //   <TabBarIcon
-            //     name={focused ? 'home' : 'home-outline'}
-            //     color={color}
-            //   />
-            // ),
-          }}
-        />
-        <Tabs.Screen
-          name="film"
-          options={{
-            title: 'Home',
-            tabBarButton,
-            // tabBarIcon: ({ color, focused }) => (
-            //   <TabBarIcon
-            //     name={focused ? 'home' : 'home-outline'}
-            //     color={color}
-            //   />
-            // ),
-          }}
-        />
-        {/* <Tabs.Screen
-        name="explore"
+      <Tabs.Screen
+        key={idx}
+        name={formattedRoute === '' ? 'index' : formattedRoute}
         options={{
-          title: 'Explore',
-          tabBarButton,
-          tabBarLabelStyle: textStyles.default
+          title: name,
+          tabBarButton: renderBarButton,
+          tabBarIcon: ({ color, focused }) => (
+            <MaterialCommunityIcons
+              // @ts-ignore
+              name={icon}
+              size={scale(24)}
+              color="black"
+            />
+          ),
         }}
       />
-      <Tabs.Screen
-        name="tv_focus"
-        options={{
-          title: 'TV event demo',
-          tabBarButton,
-          tabBarLabelStyle: textStyles.default
-        }}
-      /> */}
-      </Tabs>
     );
   };
 
-  return renderMobileBar();
+  const renderTabs = () => {
+    return TABS.map((tab, idx) => renderTab(tab, idx));
+  };
+
+  return (
+    <Tabs
+      screenOptions={{
+        tabBarActiveTintColor: Colors.primary,
+      }}
+    >
+      {renderTabs()}
+    </Tabs>
+  );
 }
 
 export default NavigationBarComponent;

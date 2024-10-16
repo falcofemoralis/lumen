@@ -8,6 +8,5 @@
   "semi": true,
   "printWidth": 100,
   "useTabs": false,
-  "tabWidth": 2,
-  "trailingComma": "es5"
+  "tabWidth": 2
 }
