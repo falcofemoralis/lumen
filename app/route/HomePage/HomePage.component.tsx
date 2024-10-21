@@ -4,7 +4,7 @@ import { Text, TouchableOpacity, TVFocusGuideView, useTVEventHandler, View } fro
 import AppStore from 'Store/App.store';
 import FilmType from 'Type/Film.type';
 import { HomePageProps } from './HomePage.type';
-import { useEffect } from 'react';
+import { router } from 'expo-router';
 
 export type HomePageComponentType = {
   film: FilmType;
@@ -25,7 +25,7 @@ export function HomePageComponent(props: HomePageProps) {
     return (
       <ThemedView>
         <TouchableOpacity
-          onPress={() => console.log('Play Now')}
+          onPress={() => router.replace('/player')}
           hasTVPreferredFocus={!AppStore.isInitiallyFocused}
         >
           <ThemedText>Play Now</ThemedText>

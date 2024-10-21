@@ -8,5 +8,8 @@
   "semi": true,
   "printWidth": 100,
   "useTabs": false,
-  "tabWidth": 2
+  "tabWidth": 2,
+  "proseWrap": "always",
+  "trailingComma": "es5",
+  "singleAttributePerLine": true
 }

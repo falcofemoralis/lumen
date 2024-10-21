@@ -1,5 +1,5 @@
 import Player from 'Component/Player';
 
-export default function HomeScreen() {
+export default function PlayerScreen() {
   return <Player />;
 }
