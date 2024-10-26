@@ -1,8 +1,9 @@
 import PlayerProgressBar from 'Component/PlayerProgressBar';
 import ThemedText from 'Component/ThemedText';
 import { ResizeMode, Video } from 'expo-av';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
+  BackHandler,
   HWEvent,
   Pressable,
   TouchableOpacity,
@@ -10,7 +11,7 @@ import {
   useTVEventHandler,
   View,
 } from 'react-native';
-import { SOURCE } from './Player.config';
+import { FocusedElement, SOURCE, TVEventType } from './Player.config';
 import { styles } from './Player.style.atv';
 import { PlayerComponentProps } from './Player.type';
 
@@ -22,30 +23,55 @@ export function PlayerComponentTV(props: PlayerComponentProps) {
     showControls,
     toggleControls,
     togglePlayPause,
+    rewindPosition,
+    seekToPosition,
   } = props;
   const [focusedElement, setFocusedElement] = useState<string>();
 
   useTVEventHandler((evt: HWEvent) => {
     const type = evt.eventType;
-    console.log(type);
 
-    if (type === 'select') {
+    if (type === TVEventType.Select && focusedElement !== FocusedElement.Action) {
+      toggleControls();
+    }
+
+    if (type === TVEventType.Up && focusedElement === FocusedElement.TopBorder) {
       toggleControls();
     }
   });
 
+  useEffect(() => {
+    const backAction = () => {
+      if (showControls) {
+        toggleControls();
+        return true;
+      }
+
+      BackHandler.exitApp();
+
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+
+    return () => backHandler.remove();
+  });
+
+  const renderAction = (text: string, action: any = () => {}) => (
+    <TouchableOpacity
+      onFocus={() => setFocusedElement(FocusedElement.Action)}
+      onPress={action}
+    >
+      <ThemedText style={styles.action}>{text}</ThemedText>
+    </TouchableOpacity>
+  );
+
   const renderActions = () => {
     return (
       <View style={{ flexDirection: 'row', gap: 4 }}>
-        <TouchableOpacity onPress={togglePlayPause}>
-          <ThemedText>Play</ThemedText>
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <ThemedText>Share</ThemedText>
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <ThemedText>Resize</ThemedText>
-        </TouchableOpacity>
+        {renderAction('Play', togglePlayPause)}
+        {renderAction('Share')}
+        {renderAction('Resize')}
       </View>
     );
   };
@@ -62,6 +88,8 @@ export function PlayerComponentTV(props: PlayerComponentProps) {
           playerRef={playerRef}
           focusedElement={focusedElement}
           setFocusedElement={setFocusedElement}
+          rewindPosition={rewindPosition}
+          seekToPosition={seekToPosition}
         />
         {renderActions()}
       </View>
@@ -91,7 +119,7 @@ export function PlayerComponentTV(props: PlayerComponentProps) {
           isTVSelectable={true}
           style={{ width: '100%', height: 10 }}
           onFocus={() => {
-            setFocusedElement('topBorder');
+            setFocusedElement(FocusedElement.TopBorder);
           }}
         />
       </TVFocusGuideView>

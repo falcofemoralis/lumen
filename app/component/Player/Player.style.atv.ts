@@ -19,10 +19,9 @@ export const styles = CreateStyles({
     width: '100%',
     height: 225,
   },
-  playControl: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    backgroundColor: 'red',
+  action: {
+    color: 'red',
+    fontSize: 24,
+    padding: 12,
   },
 });

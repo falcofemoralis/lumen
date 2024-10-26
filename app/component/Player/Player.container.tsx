@@ -3,16 +3,15 @@ import { useRef, useState } from 'react';
 import AppStore from 'Store/App.store';
 import PlayerComponent from './Player.component';
 import PlayerComponentTV from './Player.component.atv';
-import { DEFAULT_STATUS } from './Player.config';
+import { DEFAULT_STATUS, RewindDirection } from './Player.config';
 import { Status } from './Player.type';
 
 export function PlayerContainer() {
   const playerRef = useRef<Video>(null);
   const [status, setStatus] = useState<Status>(DEFAULT_STATUS);
-  const [showControls, setShowControls] = useState(true);
+  const [showControls, setShowControls] = useState(false);
 
   const onPlaybackStatusUpdate = async (newStatus: Status) => {
-    // console.log('newStatus', newStatus)
     if (!newStatus) {
       return;
     }
@@ -25,21 +24,8 @@ export function PlayerContainer() {
     if (!playerRef) {
       return;
     }
-    // if(newStatus?.isBuffering){
-    //     console.log('Buffering')
-    // }
+
     if (newStatus?.isLoaded) {
-      // if (newStatus?.didJustFinish) {
-      //   await player.stopAsync().catch((err) => {});
-      //   await player.setStatusAsync(defaultStatus).catch((err) => {});
-      //   status.current = defaultStatus;
-      //   setStatus(status.current);
-      //   setVideoSource({ uri: null });
-      //   // autoplay another video ...
-
-      //   playNextItem();
-      // }
-
       if (
         newStatus.durationMillis &&
         newStatus.positionMillis &&
@@ -65,6 +51,33 @@ export function PlayerContainer() {
     }
   };
 
+  const rewindPosition = async (type: RewindDirection, ms = 10000) => {
+    const position = status.positionMillis;
+    const duration = status.durationMillis;
+
+    if (!position || !duration) return;
+
+    if (type === RewindDirection.Backward) {
+      if (position < 0) return;
+    } else {
+      if (position >= duration) return;
+    }
+
+    const newPosition = type === RewindDirection.Backward ? position - ms : position + ms;
+
+    playerRef.current?.playFromPositionAsync(newPosition);
+  };
+
+  const seekToPosition = async (percent: number) => {
+    const duration = status.durationMillis;
+
+    if (!duration) return;
+
+    const newPosition = (percent / 100) * duration;
+
+    playerRef.current?.playFromPositionAsync(newPosition);
+  };
+
   const containerProps = () => {
     return {
       playerRef,
@@ -77,6 +90,8 @@ export function PlayerContainer() {
     onPlaybackStatusUpdate,
     toggleControls,
     togglePlayPause,
+    rewindPosition,
+    seekToPosition,
   };
 
   // TODO useKeepAwake();

@@ -1,3 +1,4 @@
+import { RewindDirection } from 'Component/Player/Player.config';
 import { Status } from 'Component/Player/Player.type';
 import { Video } from 'expo-av';
 
@@ -6,6 +7,8 @@ export type PlayerProgressBarContainerProps = {
   playerRef: React.RefObject<Video>;
   focusedElement?: string;
   setFocusedElement?: (element: string) => void;
+  rewindPosition: (type: RewindDirection, ms?: number) => void;
+  seekToPosition: (percent: number) => void;
 };
 
 export type PlayerProgressBarComponentProps = {
@@ -13,4 +16,6 @@ export type PlayerProgressBarComponentProps = {
   playerRef: React.RefObject<Video>;
   focusedElement?: string;
   setFocusedElement?: (element: string) => void;
+  rewindPosition: (type: RewindDirection, ms?: number) => void;
+  seekToPosition: (percent: number) => void;
 };

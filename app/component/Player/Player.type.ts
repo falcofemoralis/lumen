@@ -1,4 +1,5 @@
 import { AVPlaybackStatus, Video } from 'expo-av';
+import { RewindDirection } from './Player.config';
 
 export type Status = Partial<AVPlaybackStatus> & {
   isPlaying?: boolean;
@@ -23,4 +24,6 @@ export type PlayerComponentProps = {
   showControls: boolean;
   toggleControls: () => void;
   togglePlayPause: () => void;
+  rewindPosition: (type: RewindDirection, ms?: number) => void;
+  seekToPosition: (percent: number) => void;
 };

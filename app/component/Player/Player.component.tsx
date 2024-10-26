@@ -8,7 +8,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { SOURCE } from './Player.config';
 import { styles } from './Player.style';
 import { PlayerComponentProps } from './Player.type';
-import Slider from '@react-native-community/slider';
 
 export function PlayerComponent(props: PlayerComponentProps) {
   const {
@@ -18,6 +17,8 @@ export function PlayerComponent(props: PlayerComponentProps) {
     showControls,
     toggleControls,
     togglePlayPause,
+    rewindPosition,
+    seekToPosition,
   } = props;
 
   const renderControls = () => {
@@ -36,6 +37,8 @@ export function PlayerComponent(props: PlayerComponentProps) {
         <PlayerProgressBar
           status={status}
           playerRef={playerRef}
+          rewindPosition={rewindPosition}
+          seekToPosition={seekToPosition}
         />
       </View>
     );
@@ -56,12 +59,12 @@ export function PlayerComponent(props: PlayerComponentProps) {
           useNativeControls={false}
           onPlaybackStatusUpdate={onPlaybackStatusUpdate}
         />
-        <View
+        <Pressable
           style={styles.controlsContainer}
-          // onPress={toggleControls}
+          onPress={toggleControls}
         >
           {renderControls()}
-        </View>
+        </Pressable>
       </ThemedView>
     </SafeAreaView>
   );

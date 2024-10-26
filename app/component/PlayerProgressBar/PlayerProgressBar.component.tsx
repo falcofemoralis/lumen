@@ -4,18 +4,17 @@ import { styles } from './PlayerProgressBar.style';
 import { PlayerProgressBarComponentProps } from './PlayerProgressBar.type';
 
 export function PlayerProgressBarComponent(props: PlayerProgressBarComponentProps) {
-  const { status: { progressPercentage, playablePercentage } = {}, playerRef } = props;
+  const { status: { progressPercentage, playablePercentage } = {}, seekToPosition } = props;
 
   const onProgressChange = (value: number) => {
-    console.log(value);
-    playerRef.current?.playFromPositionAsync(0);
+    seekToPosition(value);
   };
 
   return (
     <View style={styles.container}>
       <Slider
         style={styles.progressBar}
-        // value={progressPercentage}
+        value={progressPercentage}
         minimumValue={0}
         maximumValue={100}
         minimumTrackTintColor="#FFFF00"

@@ -1,21 +1,37 @@
 import { useRef } from 'react';
-import { DimensionValue, Pressable, TVFocusGuideView, useTVEventHandler, View } from 'react-native';
+import {
+  DimensionValue,
+  HWEvent,
+  Pressable,
+  TVFocusGuideView,
+  useTVEventHandler,
+  View,
+} from 'react-native';
 import { PlayerProgressBarComponentProps } from './PlayerProgressBar.type';
 import { styles } from './PlayerProgressBar.style.atv';
+import { FocusedElement, RewindDirection, TVEventType } from 'Component/Player/Player.config';
 
 export function PlayerProgressBarComponentTV(props: PlayerProgressBarComponentProps) {
-  const { status, playerRef, focusedElement, setFocusedElement = () => {} } = props;
+  const { status, focusedElement, setFocusedElement = () => {}, rewindPosition } = props;
   const progressThumbRef = useRef(null);
 
-  useTVEventHandler((evt: any) => {
+  useTVEventHandler((evt: HWEvent) => {
     const type = evt.eventType;
 
-    if (type === 'left' || type === 'right') {
-      if (focusedElement === 'progressThumb') {
-        playerRef.current?.playFromPositionAsync(0);
+    if (focusedElement === FocusedElement.ProgressThumb) {
+      if (type === TVEventType.Left) {
+        rewindPosition(RewindDirection.Backward);
+      }
+
+      if (type === TVEventType.Right) {
+        rewindPosition(RewindDirection.Forward);
       }
     }
   });
+
+  if (!status) {
+    return;
+  }
 
   return (
     <View>
@@ -26,44 +42,41 @@ export function PlayerProgressBarComponentTV(props: PlayerProgressBarComponentPr
         destinations={[progressThumbRef.current]}
         style={styles.container}
       >
-        {status && status.progressPercentage && status.durationMillis && (
-          <>
-            {/* Playable Duration */}
-            {status.playablePercentage && (
-              <View
-                style={{
-                  ...styles.playableBar,
-                  width: (status.playablePercentage + '%') as DimensionValue,
-                }}
-              ></View>
-            )}
+        <>
+          {/* Playable Duration */}
+          <View
+            style={[
+              styles.playableBar,
+              { width: (status.playablePercentage + '%') as DimensionValue },
+            ]}
+          />
 
-            {/* Progress Playback */}
-            {status.progressPercentage && (
-              <View
-                style={[
-                  styles.progressBar,
-                  { width: (status.progressPercentage + '%') as DimensionValue },
-                ]}
-              >
-                {/* Progress Thumb */}
-                <Pressable
-                  style={[styles.thumb, focusedElement === 'progressThumb' && styles.focusedThumb]}
-                  // hasTVPreferredFocus
-                  isTVSelectable={true}
-                  key={'progressThumb'}
-                  ref={progressThumbRef}
-                  onFocus={() => {
-                    setFocusedElement('progressThumb');
-                  }}
-                  onBlur={() => {
-                    setFocusedElement('');
-                  }}
-                ></Pressable>
-              </View>
-            )}
-          </>
-        )}
+          {/* Progress Playback */}
+          <View
+            style={[
+              styles.progressBar,
+              { width: (status.progressPercentage + '%') as DimensionValue },
+            ]}
+          >
+            {/* Progress Thumb */}
+            <Pressable
+              style={[
+                styles.thumb,
+                focusedElement === FocusedElement.ProgressThumb && styles.focusedThumb,
+              ]}
+              // hasTVPreferredFocus
+              isTVSelectable={true}
+              key={FocusedElement.ProgressThumb}
+              ref={progressThumbRef}
+              onFocus={() => {
+                setFocusedElement(FocusedElement.ProgressThumb);
+              }}
+              onBlur={() => {
+                setFocusedElement('');
+              }}
+            />
+          </View>
+        </>
       </TVFocusGuideView>
     </View>
   );
