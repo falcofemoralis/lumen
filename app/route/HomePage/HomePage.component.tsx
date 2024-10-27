@@ -1,10 +1,17 @@
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
-import { Text, TouchableOpacity, TVFocusGuideView, useTVEventHandler, View } from 'react-native';
+import { router } from 'expo-router';
+import {
+  DimensionValue,
+  HWEvent,
+  TouchableOpacity,
+  TVFocusGuideView,
+  useTVEventHandler,
+} from 'react-native';
 import AppStore from 'Store/App.store';
 import FilmType from 'Type/Film.type';
 import { HomePageProps } from './HomePage.type';
-import { router } from 'expo-router';
+import FilmCard from 'Component/FilmCard';
 
 export type HomePageComponentType = {
   film: FilmType;
@@ -13,11 +20,13 @@ export type HomePageComponentType = {
 export function HomePageComponent(props: HomePageProps) {
   //const { film } = props;
 
-  useTVEventHandler((evt: any) => {
+  useTVEventHandler((evt: HWEvent) => {
     if (!AppStore.isInitiallyFocused) {
       AppStore.setInitiallyFocused();
     }
   });
+
+  const films = ['qwe', 'asd', 'zxc', 'rty', 'fgh', 'vbn', 'uio', 'jkl'];
 
   //hasTVPreferredFocus is used to set the focus on the Play Now button
   // use tv handler to remove this focus
@@ -35,51 +44,48 @@ export function HomePageComponent(props: HomePageProps) {
   };
 
   const Grid = () => {
-    return (
-      <View>
-        <TVFocusGuideView trapFocusLeft>
-          <View>
-            <TouchableOpacity>
-              <ThemedText>1</ThemedText>
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <Text>2</Text>
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <Text>3</Text>
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <Text>4</Text>
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <Text>5</Text>
-            </TouchableOpacity>
-          </View>
-          <View>
-            <TouchableOpacity>
-              <Text>6</Text>
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <Text>7</Text>
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <Text>8</Text>
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <Text>9</Text>
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <Text>10</Text>
-            </TouchableOpacity>
-          </View>
-        </TVFocusGuideView>
+    const numberOfColumns = 5;
+    const columns: string[][] = Array.from({ length: numberOfColumns }, () => []);
 
-        <View>
-          <TouchableOpacity>
-            <Text>Outside Button</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+    films.forEach((film, index) => {
+      columns[index % numberOfColumns].push(film);
+    });
+
+    // Now group the columns into rows
+    const rows: string[][] = [];
+    for (let i = 0; i < columns[0].length; i++) {
+      const row: string[] = [];
+      for (let j = 0; j < numberOfColumns; j++) {
+        if (columns[j][i] !== undefined) {
+          row.push(columns[j][i]);
+        }
+      }
+      rows.push(row);
+    }
+
+    console.log(rows);
+    return (
+      <ThemedView style={{ flex: 1, flexDirection: 'column', width: '100%' }}>
+        {rows.map((row, index) => (
+          <ThemedView
+            key={index}
+            style={{
+              flex: 1,
+              flexDirection: 'row',
+              width: '100%',
+            }}
+          >
+            {row.map((film) => (
+              <TouchableOpacity
+                key={film}
+                style={{ width: (100 / numberOfColumns + '%') as DimensionValue }}
+              >
+                <FilmCard film={film} />
+              </TouchableOpacity>
+            ))}
+          </ThemedView>
+        ))}
+      </ThemedView>
     );
   };
 
@@ -87,9 +93,7 @@ export function HomePageComponent(props: HomePageProps) {
     <ThemedView style={{ flex: 1, flexDirection: 'column' }}>
       <ThemedText>This is a home page</ThemedText>
       <Hero />
-      {/* <Grid /> */}
-      {/* <ThemedText>{film.info}</ThemedText> */}
-      {/* <Player /> */}
+      <Grid />
     </ThemedView>
   );
 }

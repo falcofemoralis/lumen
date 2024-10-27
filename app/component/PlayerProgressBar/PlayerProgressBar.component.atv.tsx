@@ -9,7 +9,8 @@ import {
 } from 'react-native';
 import { PlayerProgressBarComponentProps } from './PlayerProgressBar.type';
 import { styles } from './PlayerProgressBar.style.atv';
-import { FocusedElement, RewindDirection, TVEventType } from 'Component/Player/Player.config';
+import { FocusedElement, RewindDirection } from 'Component/Player/Player.config';
+import { TVEventType } from 'Type/TVEvent.type';
 
 export function PlayerProgressBarComponentTV(props: PlayerProgressBarComponentProps) {
   const { status, focusedElement, setFocusedElement = () => {}, rewindPosition } = props;

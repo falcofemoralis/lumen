@@ -3,21 +3,22 @@ import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
 import { router } from 'expo-router';
 import React, { createRef, useRef, useState } from 'react';
-import { Pressable, TVFocusGuideView, useTVEventHandler } from 'react-native';
+import { HWEvent, Pressable, TVFocusGuideView, useTVEventHandler } from 'react-native';
 import { useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { scale } from 'Util/CreateStyles';
 import { DEFAULT_TAB, Tab, TABS, TabType } from './NavigationBar.config';
 import { styles } from './NavigationBar.style';
+import { TVEventType } from 'Type/TVEvent.type';
 
 export function NavigationBarComponent() {
   const [isOpened, setIsOpened] = useState(false);
   const [selectedTab, setSelectedTab] = useState<TabType>(DEFAULT_TAB);
   const elementsRef = useRef(TABS.map(() => createRef()));
 
-  useTVEventHandler((evt: any) => {
+  useTVEventHandler((evt: HWEvent) => {
     const type = evt.eventType;
 
-    if (type === 'right' && isOpened) {
+    if (type === TVEventType.Right && isOpened) {
       setIsOpened(false);
     }
   });
@@ -82,9 +83,17 @@ export function NavigationBarComponent() {
   };
 
   return (
-    // @ts-ignore
-    <TVFocusGuideView trapFocusLeft trapFocusUp trapFocusDown destinations={[getCurrentRef()]}>
-      <ThemedView style={[styles.container, animatedOpening]} useAnimations>
+    <TVFocusGuideView
+      trapFocusLeft
+      trapFocusUp
+      trapFocusDown
+      // @ts-ignore
+      destinations={[getCurrentRef()]}
+    >
+      <ThemedView
+        style={[styles.container, animatedOpening]}
+        useAnimations
+      >
         {renderTabs()}
       </ThemedView>
     </TVFocusGuideView>

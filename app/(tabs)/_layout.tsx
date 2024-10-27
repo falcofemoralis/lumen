@@ -7,13 +7,12 @@ import AppStore from 'Store/App.store';
 export default function TabLayout() {
   const renderTVLayout = () => (
     <ThemedView style={{ flex: 1, flexDirection: 'row' }}>
-      {/* <NavigationBar /> */}
+      <NavigationBar />
       <Slot />
     </ThemedView>
   );
 
-  //const renderMobileLayout = () => <NavigationBar />;
-  const renderMobileLayout = () => <Slot />;
+  const renderMobileLayout = () => <NavigationBar />;
 
   return AppStore.isTV ? renderTVLayout() : renderMobileLayout();
 }

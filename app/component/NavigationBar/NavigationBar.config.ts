@@ -16,19 +16,22 @@ export interface Tab {
   icon: string;
 }
 
+export const DEFAULT_TAB = TabType.Home;
+
 export const TABS: Tab[] = [
-  {
-    id: TabType.Search,
-    route: './film',
-    name: 'Search',
-    icon: 'home-variant-outline',
-  },
   {
     id: TabType.Home,
     route: './',
     name: 'Home',
     icon: 'home-variant-outline',
   },
+  {
+    id: TabType.Search,
+    route: './film',
+    name: 'Search',
+    icon: 'home-variant-outline',
+  },
+
   // {
   //   id: TabType.Bookmarks,
   //   route: './',
@@ -54,5 +57,3 @@ export const TABS: Tab[] = [
   //   icon: 'home-variant-outline',
   // },
 ];
-
-export const DEFAULT_TAB = TabType.Home;

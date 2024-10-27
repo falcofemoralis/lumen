@@ -11,9 +11,10 @@ import {
   useTVEventHandler,
   View,
 } from 'react-native';
-import { FocusedElement, SOURCE, TVEventType } from './Player.config';
+import { FocusedElement, SOURCE } from './Player.config';
 import { styles } from './Player.style.atv';
 import { PlayerComponentProps } from './Player.type';
+import { TVEventType } from 'Type/TVEvent.type';
 
 export function PlayerComponentTV(props: PlayerComponentProps) {
   const {

@@ -29,7 +29,12 @@ export function HomePageContainer() {
     //loadFilm();
   }, []);
 
-  return <HomePageComponent {...containerFunctions} {...containerProps()} />;
+  return (
+    <HomePageComponent
+      {...containerFunctions}
+      {...containerProps()}
+    />
+  );
 }
 
 export default observer(HomePageContainer);
