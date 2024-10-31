@@ -1,33 +1,31 @@
-import { ApiProvider } from 'Api/ApiProvider';
-import HomePageComponent from './HomePage.component';
-import { useEffect, useState } from 'react';
-import FilmType from 'Type/Film.type';
 import { observer } from 'mobx-react-lite';
+import { useEffect, useState } from 'react';
+import AppStore from 'Store/App.store';
+import Film from 'Type/Film.interface';
+import HomePageComponent from './HomePage.component';
 
 export function HomePageContainer() {
-  const [film, setFilm] = useState<FilmType>({ info: '' });
+  const [films, setFilms] = useState<Film[]>([]);
+
+  const loadFilms = async () => {
+    console.log('loadFilms');
+    const filmList = await AppStore.getCurrentService().getFilms(1);
+    const { films } = filmList;
+
+    setFilms(films);
+  };
+
+  useEffect(() => {
+    loadFilms();
+  }, []);
 
   const containerFunctions = {};
 
   const containerProps = () => {
-    const test = 'test2';
-
     return {
-      film,
-      test,
+      films,
     };
   };
-
-  const loadFilm = async () => {
-    console.log('loadFilm');
-    const film = await ApiProvider().getFilmApi().getFilm();
-
-    setFilm(film);
-  };
-
-  useEffect(() => {
-    //loadFilm();
-  }, []);
 
   return (
     <HomePageComponent

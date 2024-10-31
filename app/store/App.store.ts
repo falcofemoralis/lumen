@@ -1,8 +1,11 @@
+import ApiInterface, { ApiServiceType } from 'Api/index';
+import { services } from 'Api/services';
 import { makeAutoObservable } from 'mobx';
 
 class AppStore {
-  isTV = true;
-  isInitiallyFocused = false;
+  public isTV = true;
+  public isInitiallyFocused = false;
+  private currentService = 'rezka' as ApiServiceType;
 
   constructor() {
     makeAutoObservable(this);
@@ -14,6 +17,14 @@ class AppStore {
 
   setInitiallyFocused() {
     this.isInitiallyFocused = true;
+  }
+
+  setCurrentService(service: ApiServiceType) {
+    this.currentService = service;
+  }
+
+  getCurrentService(): ApiInterface {
+    return services[this.currentService];
   }
 }
 

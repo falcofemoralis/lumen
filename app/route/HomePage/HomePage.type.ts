@@ -1,6 +1,5 @@
-import FilmType from 'Type/Film.type';
+import Film from 'Type/Film.interface';
 
 export interface HomePageProps {
-  film: FilmType;
-  test: string;
+  films: Film[];
 }
