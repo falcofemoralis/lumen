@@ -1,9 +1,9 @@
-import Film from 'Type/Film.interface';
+import FilmCard from 'Type/FilmCard.interface';
 
 export interface FilmCardContainerProps {
-  film: Film;
+  filmCard: FilmCard;
 }
 
 export interface FilmCardComponentProps {
-  film: Film;
+  filmCard: FilmCard;
 }

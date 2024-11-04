@@ -1,5 +1,5 @@
-import Film from 'Type/Film.interface';
+import FilmCard from 'Type/FilmCard.interface';
 
 export interface HomePageProps {
-  films: Film[];
+  films: FilmCard[];
 }

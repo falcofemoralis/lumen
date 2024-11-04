@@ -1,15 +1,8 @@
 import Grid from 'Component/Grid';
-import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
-import { router } from 'expo-router';
-import { HWEvent, TouchableOpacity, useTVEventHandler } from 'react-native';
+import { HWEvent, useTVEventHandler, View } from 'react-native';
 import AppStore from 'Store/App.store';
-import Film from 'Type/Film.interface';
 import { HomePageProps } from './HomePage.type';
-
-export type HomePageComponentType = {
-  film: Film;
-};
 
 export function HomePageComponent(props: HomePageProps) {
   const { films } = props;
@@ -36,9 +29,11 @@ export function HomePageComponent(props: HomePageProps) {
   // };
 
   return (
-    <ThemedView style={{ flex: 1, flexDirection: 'column' }}>
+    <ThemedView style={{ flex: 1, flexDirection: 'column', width: '100%' }}>
       {/* <Hero /> */}
-      <Grid films={films} />
+      <View style={{ width: '100%' }}>
+        <Grid films={films} />
+      </View>
     </ThemedView>
   );
 }

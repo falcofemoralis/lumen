@@ -1,5 +1,4 @@
-//import KinoKongApi from "./KinoKongApi";
-import Film from 'Type/Film.interface';
+import FilmCard from 'Type/FilmCard.interface';
 import { FilmList } from 'Type/FilmList.interface';
 import { CheerioAPI } from 'cheerio';
 
@@ -24,6 +23,6 @@ export default interface ApiInterface {
    * Film Api fields
    */
   getFilms(page: number): Promise<FilmList>;
-  getFilm(): Promise<Film>;
+  getFilm(): Promise<FilmCard>;
   getComments(): string;
 }

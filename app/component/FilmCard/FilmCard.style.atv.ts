@@ -2,8 +2,17 @@ import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
   card: {
-    width: 100,
-    height: 100,
-    backgroundColor: 'green',
+    height: 'auto',
+  },
+  poster: {
+    width: '100%',
+    height: 200,
+    overflow: 'hidden',
+  },
+  title: {
+    backgroundColor: 'red',
+    width: '100%',
+    fontSize: 14,
+    fontWeight: 'bold',
   },
 });

@@ -1,9 +1,9 @@
-import Film from 'Type/Film.interface';
+import FilmCard from 'Type/FilmCard.interface';
 
 export interface GridContainerProps {
-  films: Film[];
+  films: FilmCard[];
 }
 
 export interface GridComponentProps {
-  rows: Film[][];
+  rows: FilmCard[][];
 }

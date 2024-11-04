@@ -1,7 +1,9 @@
-import { fetchPage } from 'Util/Request/Query';
-import ApiInterface, { ApiServiceType } from '..';
-import Film from 'Type/Film.interface';
+import FilmCard from 'Type/FilmCard.interface';
 import { FilmList } from 'Type/FilmList.interface';
+import { fetchPage } from 'Util/Request/Query';
+import { CheerioAPI, Element } from 'cheerio';
+import ApiInterface, { ApiServiceType } from '..';
+import { FilmType } from 'Type/FilmType.type';
 
 class RezkaApi implements ApiInterface {
   serviceType = ApiServiceType.rezka;
@@ -40,18 +42,18 @@ class RezkaApi implements ApiInterface {
    * Film Api fields
    */
   async getFilms(page: number): Promise<FilmList> {
-    const films: Film[] = [];
+    const films: FilmCard[] = [];
 
     const $ = await this.makeRequest('/new');
 
     try {
       const filmElements = $('div.b-content__inline_item');
-      filmElements.each(function (idx, el) {
-        films.push({
-          id: $(this).attr('data-id') ?? '',
-          info: $(el).find('.b-content__inline_item-link a').text(),
-        });
+
+      filmElements.each((_idx, el) => {
+        films.push(this.parseFilmCard($, el));
       });
+
+      console.log('loaded');
     } catch (error) {
       console.log(error);
     }
@@ -62,20 +64,48 @@ class RezkaApi implements ApiInterface {
     };
   }
 
-  async getFilm(): Promise<Film> {
-    // const $ = await fetchPage('/');
-
-    // // $( selector, [context], [root] )
-    // const test = $('.b-dwnapp-txt').text();
-
-    return {
-      id: '1',
-      info: '',
-    };
+  async getFilm(): Promise<FilmCard> {
+    throw new Error('Method not implemented.');
   }
 
   getComments(): string {
     throw new Error('Method not implemented.');
+  }
+
+  /**
+   * Utils
+   */
+
+  private parseFilmCard($: CheerioAPI, el: Element): FilmCard {
+    const parseType = (type: string = '') => {
+      if (type.includes('films')) {
+        return FilmType.Film;
+      } else if (type.includes('series')) {
+        return FilmType.Series;
+      } else if (type.includes('cartoons')) {
+        return FilmType.Multfilm;
+      } else if (type.includes('animation')) {
+        return FilmType.Anime;
+      } else if (type.includes('show')) {
+        return FilmType.TVShow;
+      }
+
+      return FilmType.Film;
+    };
+
+    const id = $(el).attr('data-id') ?? '';
+    const link = $(el).find('.b-content__inline_item-link a').attr('href') ?? '';
+    const type = parseType($(el).find('.cat').attr('class'));
+    const title = $(el).find('.b-content__inline_item-link a').text() ?? '';
+    const poster = $(el).find('.b-content__inline_item-cover img').attr('src') ?? '';
+
+    return {
+      id,
+      link,
+      type,
+      title,
+      poster,
+    };
   }
 }
 

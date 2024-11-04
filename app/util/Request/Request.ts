@@ -1,3 +1,6 @@
+import { queryCache } from 'Util/Cache';
+import { hash } from './Hash';
+
 export const formatURI = (
   query: string,
   variables: Record<string, string>,
@@ -84,9 +87,17 @@ export const executeGet = async (
   signal?: AbortSignal
 ): Promise<string> => {
   const uri = formatURI(query, variables, endpoint);
+  const uriHash = hash(uri).toString();
 
   // Fetch only throws on network error, http errors have to be handled manually.
   try {
+    const cachedResult = await queryCache.get(uriHash);
+    if (cachedResult) {
+      console.log('cachedResult ' + uriHash);
+
+      return cachedResult;
+    }
+
     const result = await getFetch(uri, headers, signal);
 
     // if (result.status === HTTP_410_GONE) {
@@ -103,7 +114,11 @@ export const executeGet = async (
     }
 
     // Successful and all other http responses go here:
-    return await parseResponse(result);
+    const parsedRes = await parseResponse(result);
+    queryCache.set(uriHash, parsedRes);
+    console.log('saveToHash ' + uriHash);
+
+    return parsedRes;
   } catch (error) {
     // Network error
     handleConnectionError(error, 'executeGet failed');

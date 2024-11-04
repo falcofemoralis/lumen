@@ -7,7 +7,7 @@ import { HWEvent, Pressable, TVFocusGuideView, useTVEventHandler } from 'react-n
 import { useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { scale } from 'Util/CreateStyles';
 import { DEFAULT_TAB, Tab, TABS, TabType } from './NavigationBar.config';
-import { styles } from './NavigationBar.style';
+import { styles } from './NavigationBar.style.atv';
 import { TVEventType } from 'Type/TVEvent.type';
 
 export function NavigationBarComponent() {
