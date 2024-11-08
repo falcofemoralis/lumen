@@ -3,11 +3,11 @@ import ThemedView from 'Component/ThemedView';
 import { useRef } from 'react';
 import { DimensionValue, ScrollView, TouchableOpacity, TVFocusGuideView } from 'react-native';
 import { NUMBER_OF_COLUMNS } from './Grid.config';
-import { GridComponentProps } from './Grid.type';
 import { styles } from './Grid.style.atv';
+import { GridComponentProps } from './Grid.type';
 
 export function GridComponent(props: GridComponentProps) {
-  const { rows } = props;
+  const { rows, handleOnPress } = props;
   const firstItemRef = useRef();
 
   return (
@@ -33,6 +33,7 @@ export function GridComponent(props: GridComponentProps) {
                     maxWidth: (100 / NUMBER_OF_COLUMNS + '%') as DimensionValue,
                   },
                 ]}
+                onPress={() => handleOnPress(film)}
                 // @ts-ignore
                 ref={colIdx === 0 && rowIdx === 0 ? firstItemRef : undefined}
                 hasTVPreferredFocus={colIdx === 0 && rowIdx === 0}

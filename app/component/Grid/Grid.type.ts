@@ -6,4 +6,5 @@ export interface GridContainerProps {
 
 export interface GridComponentProps {
   rows: FilmCard[][];
+  handleOnPress: (film: FilmCard) => void;
 }

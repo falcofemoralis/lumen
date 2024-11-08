@@ -4,6 +4,7 @@ import GridComponent from './Grid.component';
 import GridComponentTV from './Grid.component.atv';
 import FilmCard from 'Type/FilmCard.interface';
 import { NUMBER_OF_COLUMNS } from './Grid.config';
+import { router } from 'expo-router';
 
 export function PlayerProgressBarContainer(props: GridContainerProps) {
   const { films } = props;
@@ -30,6 +31,20 @@ export function PlayerProgressBarContainer(props: GridContainerProps) {
     return rows;
   };
 
+  const handleOnPress = (film: FilmCard) => {
+    console.log('goToFilm');
+    router.push({
+      pathname: '/film/[link]',
+      params: {
+        link: film.link,
+      },
+    });
+  };
+
+  const containerFunctions = {
+    handleOnPress,
+  };
+
   const containerProps = () => {
     return {
       rows: calculateRows(),
@@ -37,9 +52,15 @@ export function PlayerProgressBarContainer(props: GridContainerProps) {
   };
 
   return AppStore.isTV ? (
-    <GridComponentTV {...containerProps()} />
+    <GridComponentTV
+      {...containerFunctions}
+      {...containerProps()}
+    />
   ) : (
-    <GridComponent {...containerProps()} />
+    <GridComponent
+      {...containerFunctions}
+      {...containerProps()}
+    />
   );
 }
 

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import AppStore from 'Store/App.store';
 import FilmCard from 'Type/FilmCard.interface';
 import HomePageComponent from './HomePage.component';
+import { router } from 'expo-router';
 
 export function HomePageContainer() {
   const [films, setFilms] = useState<FilmCard[]>([]);

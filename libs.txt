@@ -1,19 +1,22 @@
 Global
-https://github.com/cheeriojs/cheerio - Parsing
-https://docs.swmansion.com/react-native-reanimated/docs/fundamentals/getting-started/ - Animations
-https://icons.expo.fyi/Index - ICONS
-https://github.com/marcocesarato/react-native-big-list - If list will have issues
-https://docs.expo.dev/versions/latest/sdk/video-av/ - Player
+Parsing         https://github.com/cheeriojs/cheerio
+Animations      https://docs.swmansion.com/react-native-reanimated/docs/fundamentals/getting-started/
+Icons           https://icons.expo.fyi/Index
+Player          https://docs.expo.dev/versions/latest/sdk/video-av/
+Cache Mechanism https://github.com/timfpark/react-native-cache
+FastEnc Storage https://github.com/ammarahm-ed/react-native-mmkv-storage
+->Smooth trans  https://github.com/IjzerenHein/react-native-shared-element
+//
+If list will have issues https://github.com/marcocesarato/react-native-big-list
 
 TV Only
-https://github.com/react-native-tvos/react-native-tvos
-https://docs.expo.dev/guides/building-for-tv/
+RN TV           https://github.com/react-native-tvos/react-native-tvos
+EXPO TV         https://docs.expo.dev/guides/building-for-tv/
 
 Mobile Only
-https://reactnativepaper.com/ - UI
-https://github.com/IjzerenHein/react-native-shared-element
-https://reactnative.dev/docs/refreshcontrol
-Is it possible to create buffer? https://github.com/callstack/react-native-slider
+Material UI     https://reactnativepaper.com/ - UI
+Refresh list    https://reactnative.dev/docs/refreshcontrol
+Slider          https://github.com/callstack/react-native-slider
 
 ///
 Examples
@@ -21,4 +24,4 @@ https://github.com/react-native-tvos/IgniteTV?tab=readme-ov-file
 
 Reuse
 TV Seekbar\other https://github.com/kosso/VideoPlayerDemo
-Player example https://github.com/itsnubix/react-native-video-controls/blob/master/VideoPlayer.js
+Player example   https://github.com/itsnubix/react-native-video-controls/blob/master/VideoPlayer.js
