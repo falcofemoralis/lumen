@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import AppStore from 'Store/App.store';
 import FilmCard from 'Type/FilmCard.interface';
 import HomePageComponent from './HomePage.component';
-import { router } from 'expo-router';
+import { withTV } from 'Hooks/withTV';
 
 export function HomePageContainer() {
   const [films, setFilms] = useState<FilmCard[]>([]);
@@ -28,12 +28,10 @@ export function HomePageContainer() {
     };
   };
 
-  return (
-    <HomePageComponent
-      {...containerFunctions}
-      {...containerProps()}
-    />
-  );
+  return withTV(HomePageComponent, HomePageComponent, {
+    ...containerFunctions,
+    ...containerProps(),
+  });
 }
 
 export default observer(HomePageContainer);

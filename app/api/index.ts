@@ -1,4 +1,4 @@
-import FilmCard from 'Type/FilmCard.interface';
+import Film from 'Type/Film.interface';
 import { FilmList } from 'Type/FilmList.interface';
 import { CheerioAPI } from 'cheerio';
 
@@ -23,6 +23,6 @@ export default interface ApiInterface {
    * Film Api fields
    */
   getFilms(page: number): Promise<FilmList>;
-  getFilm(): Promise<FilmCard>;
+  getFilm(link: string): Promise<Film>;
   getComments(): string;
 }

@@ -6,6 +6,10 @@ export const formatURI = (
   variables: Record<string, string>,
   url: string
 ): string => {
+  if (query.includes('http')) {
+    return query;
+  }
+
   const stringifyVariables = Object.keys(variables).reduce(
     (acc, variable) => [...acc, `${variable}=${JSON.stringify(variables[variable])}`],
     ['']
@@ -84,6 +88,7 @@ export const executeGet = async (
   endpoint: string,
   headers: HeadersInit,
   variables: Record<string, string>,
+  ignoreCache: boolean = false,
   signal?: AbortSignal
 ): Promise<string> => {
   const uri = formatURI(query, variables, endpoint);
@@ -91,11 +96,14 @@ export const executeGet = async (
 
   // Fetch only throws on network error, http errors have to be handled manually.
   try {
-    const cachedResult = await queryCache.get(uriHash);
-    if (cachedResult) {
-      console.log('cachedResult ' + uriHash);
+    if (!ignoreCache) {
+      const cachedResult = await queryCache.get(uriHash);
 
-      return cachedResult;
+      if (cachedResult) {
+        console.log('cachedResult ' + uriHash);
+
+        return cachedResult;
+      }
     }
 
     const result = await getFetch(uri, headers, signal);
@@ -115,8 +123,11 @@ export const executeGet = async (
 
     // Successful and all other http responses go here:
     const parsedRes = await parseResponse(result);
-    queryCache.set(uriHash, parsedRes);
-    console.log('saveToHash ' + uriHash);
+
+    if (!ignoreCache) {
+      queryCache.set(uriHash, parsedRes);
+      console.log('saveToHash ' + uriHash);
+    }
 
     return parsedRes;
   } catch (error) {

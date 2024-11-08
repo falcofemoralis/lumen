@@ -5,9 +5,10 @@ export const fetchPage = async (
   query: string,
   endpoint: string,
   headers: HeadersInit,
-  variables: Record<string, string> = {}
+  variables: Record<string, string> = {},
+  ignoreCache: boolean = false
 ) => {
-  const response = await executeGet(query, endpoint, headers, variables);
+  const response = await executeGet(query, endpoint, headers, variables, ignoreCache);
 
   return parseHtml(response);
 };

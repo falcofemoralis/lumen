@@ -4,14 +4,16 @@ import { fetchPage } from 'Util/Request/Query';
 import { CheerioAPI, Element } from 'cheerio';
 import ApiInterface, { ApiServiceType } from '..';
 import { FilmType } from 'Type/FilmType.type';
+import Film from 'Type/Film.interface';
 
 class RezkaApi implements ApiInterface {
   serviceType = ApiServiceType.rezka;
   defaultProviders = ['https://rezka-ua.tv'];
 
-  /**
-   * Config fields
-   */
+  /**************************************************************************
+   *                      PROVIDER-RELATED METHODS
+   **************************************************************************/
+
   setProvider(provider: string): void {
     // TODO implement custom provider logic
   }
@@ -26,6 +28,8 @@ class RezkaApi implements ApiInterface {
   }
 
   getAuthorization(): HeadersInit {
+    // TODO need to add Cookie header
+
     const agent =
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36';
 
@@ -34,13 +38,20 @@ class RezkaApi implements ApiInterface {
     };
   }
 
-  async makeRequest(query: string, variables: Record<string, string> = {}) {
-    return await fetchPage(query, this.getProvider(), this.getAuthorization(), variables);
+  async makeRequest(query: string, variables: Record<string, string> = {}, ignoreCache = false) {
+    return await fetchPage(
+      query,
+      this.getProvider(),
+      this.getAuthorization(),
+      variables,
+      ignoreCache
+    );
   }
 
-  /**
-   * Film Api fields
-   */
+  /**************************************************************************
+   *                      FILM API METHODS
+   **************************************************************************/
+
   async getFilms(page: number): Promise<FilmList> {
     const films: FilmCard[] = [];
 
@@ -64,17 +75,29 @@ class RezkaApi implements ApiInterface {
     };
   }
 
-  async getFilm(): Promise<FilmCard> {
-    throw new Error('Method not implemented.');
+  async getFilm(link: string): Promise<Film> {
+    const $ = await this.makeRequest(link);
+
+    const id = $('div.div.b-userset__fav_holder').attr('data-post_id') ?? '';
+    const title = $('div.b-post__title h1').text() ?? '';
+    const poster = $('div.b-sidecover img').attr('src') ?? '';
+
+    return {
+      id,
+      link,
+      type: FilmType.Film,
+      title,
+      poster,
+    };
   }
 
   getComments(): string {
     throw new Error('Method not implemented.');
   }
 
-  /**
-   * Utils
-   */
+  /**************************************************************************
+   *                      UTILITY METHODS
+   **************************************************************************/
 
   private parseFilmCard($: CheerioAPI, el: Element): FilmCard {
     const parseType = (type: string = '') => {
