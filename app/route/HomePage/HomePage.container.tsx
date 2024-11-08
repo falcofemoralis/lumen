@@ -8,15 +8,15 @@ import { withTV } from 'Hooks/withTV';
 export function HomePageContainer() {
   const [films, setFilms] = useState<FilmCard[]>([]);
 
-  const loadFilms = async () => {
-    console.log('loadFilms');
-    const filmList = await AppStore.getCurrentService().getFilms(1);
-    const { films } = filmList;
-
-    setFilms(films);
-  };
-
   useEffect(() => {
+    const loadFilms = async () => {
+      console.log('loadFilms');
+      const filmList = await AppStore.currentService.getFilms(1);
+      const { films } = filmList;
+
+      setFilms(films);
+    };
+
     loadFilms();
   }, []);
 

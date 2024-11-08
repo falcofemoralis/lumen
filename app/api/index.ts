@@ -7,22 +7,20 @@ export enum ApiServiceType {
   //kinokong = 'kinokong',
 }
 
-export default interface ApiInterface {
-  /**
-   * Config fields
-   */
+export interface ConfigApiInterface {
   serviceType: ApiServiceType;
   defaultProviders: string[];
   setProvider(provider: string): void;
   getProvider(): string;
   setAuthorization(auth: string): void;
   getAuthorization(): HeadersInit;
-  makeRequest(query: string, variables: Record<string, string>): Promise<CheerioAPI>;
+  fetchPage(query: string, variables?: Record<string, string>): Promise<CheerioAPI>;
+}
 
-  /**
-   * Film Api fields
-   */
+export interface FilmApiInterface {
   getFilms(page: number): Promise<FilmList>;
   getFilm(link: string): Promise<Film>;
   getComments(): string;
 }
+
+export default interface ApiInterface extends ConfigApiInterface, FilmApiInterface {}

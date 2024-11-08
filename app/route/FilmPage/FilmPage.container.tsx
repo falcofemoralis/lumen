@@ -10,14 +10,14 @@ export function FilmPageContainer(props: FilmPageContainerProps) {
   const { link } = props;
   const [film, setFilm] = useState<Film | null>(null);
 
-  const loadFilm = async () => {
-    console.log('loadFilm');
-    const film = await AppStore.getCurrentService().getFilm(link);
-
-    setFilm(film);
-  };
-
   useEffect(() => {
+    const loadFilm = async () => {
+      console.log('loadFilm');
+      const film = await AppStore.currentService.getFilm(link);
+
+      setFilm(film);
+    };
+
     loadFilm();
   }, [link]);
 
