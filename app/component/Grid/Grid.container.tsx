@@ -5,6 +5,7 @@ import GridComponentTV from './Grid.component.atv';
 import FilmCard from 'Type/FilmCard.interface';
 import { NUMBER_OF_COLUMNS } from './Grid.config';
 import { router } from 'expo-router';
+import { withTV } from 'Hooks/withTV';
 
 export function PlayerProgressBarContainer(props: GridContainerProps) {
   const { films } = props;
@@ -51,17 +52,10 @@ export function PlayerProgressBarContainer(props: GridContainerProps) {
     };
   };
 
-  return AppStore.isTV ? (
-    <GridComponentTV
-      {...containerFunctions}
-      {...containerProps()}
-    />
-  ) : (
-    <GridComponent
-      {...containerFunctions}
-      {...containerProps()}
-    />
-  );
+  return withTV(GridComponentTV, GridComponent, {
+    ...containerFunctions,
+    ...containerProps(),
+  });
 }
 
 export default PlayerProgressBarContainer;

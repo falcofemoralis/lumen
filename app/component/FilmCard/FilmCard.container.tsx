@@ -1,10 +1,10 @@
-import AppStore from 'Store/App.store';
+import { withTV } from 'Hooks/withTV';
 import FilmCardComponent from './FilmCard.component';
 import FilmCardComponentTV from './FilmCard.component.atv';
 import { FilmCardContainerProps } from './FilmCard.type';
 
 export function FilmCardContainer(props: FilmCardContainerProps) {
-  return AppStore.isTV ? <FilmCardComponentTV {...props} /> : <FilmCardComponent {...props} />;
+  return withTV(FilmCardComponentTV, FilmCardComponent, props);
 }
 
 export default FilmCardContainer;

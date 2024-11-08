@@ -5,6 +5,7 @@ import PlayerComponent from './Player.component';
 import PlayerComponentTV from './Player.component.atv';
 import { DEFAULT_STATUS, RewindDirection } from './Player.config';
 import { Status } from './Player.type';
+import { withTV } from 'Hooks/withTV';
 
 export function PlayerContainer() {
   const playerRef = useRef<Video>(null);
@@ -95,17 +96,11 @@ export function PlayerContainer() {
   };
 
   // TODO useKeepAwake();
-  return AppStore.isTV ? (
-    <PlayerComponentTV
-      {...containerProps()}
-      {...containerFunctions}
-    />
-  ) : (
-    <PlayerComponent
-      {...containerProps()}
-      {...containerFunctions}
-    />
-  );
+
+  return withTV(PlayerComponentTV, PlayerComponent, {
+    ...containerProps(),
+    ...containerFunctions,
+  });
 }
 
 export default PlayerContainer;

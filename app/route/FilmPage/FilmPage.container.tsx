@@ -21,7 +21,13 @@ export function FilmPageContainer(props: FilmPageContainerProps) {
     loadFilm();
   }, [link]);
 
-  return withTV(FilmPageComponentTV, FilmPageComponent, { film });
+  const containerProps = () => {
+    return {
+      film,
+    };
+  };
+
+  return withTV(FilmPageComponentTV, FilmPageComponent, { ...containerProps() });
 }
 
 export default FilmPageContainer;

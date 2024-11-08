@@ -44,6 +44,6 @@ export default function CreateStyles<
   return StyleSheet.create(
     objectMap(styleSheet, (value: any) => {
       return objectMap2(value, overload) as T;
-    }),
+    })
   ) as T;
 }

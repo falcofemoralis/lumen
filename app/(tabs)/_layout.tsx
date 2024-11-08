@@ -2,6 +2,7 @@ import NavigationBar from 'Component/NavigationBar';
 import { NAVIGATION_BAR_TV_WIDTH } from 'Component/NavigationBar/NavigationBar.style.atv';
 import ThemedView from 'Component/ThemedView';
 import { Slot } from 'expo-router';
+import { withTV } from 'Hooks/withTV';
 import React from 'react';
 import { Dimensions, View } from 'react-native';
 import AppStore from 'Store/App.store';
@@ -20,5 +21,5 @@ export default function TabLayout() {
 
   const renderMobileLayout = () => <NavigationBar />;
 
-  return AppStore.isTV ? renderTVLayout() : renderMobileLayout();
+  return withTV(renderTVLayout, renderMobileLayout);
 }
