@@ -6,7 +6,7 @@ export const styles = CreateStyles({
   },
   poster: {
     width: '100%',
-    height: 200,
+    aspectRatio: 83 / 125,
     overflow: 'hidden',
   },
   title: {

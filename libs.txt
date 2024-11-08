@@ -6,6 +6,7 @@ Player          https://docs.expo.dev/versions/latest/sdk/video-av/
 Cache Mechanism https://github.com/timfpark/react-native-cache
 FastEnc Storage https://github.com/ammarahm-ed/react-native-mmkv-storage
 ->Smooth trans  https://github.com/IjzerenHein/react-native-shared-element
+Cache image     https://github.com/echowaves/expo-cached-image
 //
 If list will have issues https://github.com/marcocesarato/react-native-big-list
 
