@@ -7,11 +7,7 @@ import { HomePageProps } from './HomePage.type';
 export function HomePageComponent(props: HomePageProps) {
   const { films } = props;
 
-  useTVEventHandler((evt: HWEvent) => {
-    if (!AppStore.isInitiallyFocused) {
-      AppStore.setInitiallyFocused();
-    }
-  });
+  useTVEventHandler((evt: HWEvent) => {});
 
   // //hasTVPreferredFocus is used to set the focus on the Play Now button
   // // use tv handler to remove this focus

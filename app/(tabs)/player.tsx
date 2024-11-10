@@ -1,5 +1,5 @@
-import Player from 'Component/Player';
+import PlayerPage from 'Route/PlayerPage';
 
 export default function PlayerScreen() {
-  return <Player />;
+  return <PlayerPage />;
 }

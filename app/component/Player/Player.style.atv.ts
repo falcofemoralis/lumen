@@ -3,7 +3,7 @@ import CreateStyles from 'Util/CreateStyles';
 export const styles = CreateStyles({
   container: {
     position: 'relative',
-    backgroundColor: 'red',
+    backgroundColor: 'black',
     width: '100%',
     height: '100%',
   },
@@ -13,15 +13,33 @@ export const styles = CreateStyles({
   },
   controls: {
     position: 'absolute',
-    top: 0,
+    bottom: 0,
     left: 0,
+    paddingHorizontal: 36,
+    paddingBottom: 36,
     backgroundColor: 'transparent',
     width: '100%',
-    height: 225,
+    height: 'auto',
+    opacity: 0,
+  },
+  controlsVisible: {
+    opacity: 1,
+  },
+  controlsRow: {
+    flexDirection: 'row',
+    gap: 36,
   },
   action: {
     color: 'red',
     fontSize: 24,
     padding: 12,
+  },
+  invisibleContainer: {
+    height: 16,
+    position: 'absolute',
+    top: -10,
+    left: 10,
+    right: 10,
+    zIndex: 5,
   },
 });

@@ -1,3 +1,4 @@
+import Colors from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
@@ -5,7 +6,7 @@ export const styles = CreateStyles({
     backgroundColor: '#555555aa',
     marginLeft: 'auto',
     marginRight: 'auto',
-    width: '95%',
+    width: '100%',
     height: 4,
     marginTop: 40,
     marginBottom: 20,
@@ -21,7 +22,7 @@ export const styles = CreateStyles({
     left: 0,
   },
   progressBar: {
-    backgroundColor: 'yellow',
+    backgroundColor: Colors.primary,
     display: 'flex',
     alignItems: 'center',
     position: 'absolute',
@@ -35,12 +36,12 @@ export const styles = CreateStyles({
     width: 10,
     height: 10,
     borderRadius: 99,
-    backgroundColor: 'yellow',
+    backgroundColor: Colors.white,
     position: 'absolute',
     top: '-80%',
     right: 0,
   },
   focusedThumb: {
-    backgroundColor: 'green',
+    backgroundColor: Colors.primary,
   },
 });

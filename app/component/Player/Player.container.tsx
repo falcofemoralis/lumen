@@ -1,11 +1,10 @@
 import { Video } from 'expo-av';
+import { withTV } from 'Hooks/withTV';
 import { useRef, useState } from 'react';
-import AppStore from 'Store/App.store';
 import PlayerComponent from './Player.component';
 import PlayerComponentTV from './Player.component.atv';
 import { DEFAULT_STATUS, RewindDirection } from './Player.config';
 import { Status } from './Player.type';
-import { withTV } from 'Hooks/withTV';
 
 export function PlayerContainer() {
   const playerRef = useRef<Video>(null);
@@ -40,7 +39,10 @@ export function PlayerContainer() {
     }
   };
 
-  const toggleControls = () => setShowControls(!showControls);
+  const toggleControls = () => {
+    console.log('toggleControls');
+    setShowControls(!showControls);
+  };
 
   const togglePlayPause = () => {
     const { isPlaying } = status;

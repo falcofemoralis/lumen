@@ -20,5 +20,9 @@ export default function TabLayout() {
 
   const renderMobileLayout = () => <NavigationBar />;
 
+  if (!AppStore.isNavigationVisible) {
+    return <Slot />;
+  }
+
   return AppStore.isTV ? renderTVLayout() : renderMobileLayout();
 }

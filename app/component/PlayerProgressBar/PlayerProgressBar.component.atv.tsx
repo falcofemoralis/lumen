@@ -35,51 +35,50 @@ export function PlayerProgressBarComponentTV(props: PlayerProgressBarComponentPr
   }
 
   return (
-    <View>
-      <TVFocusGuideView
-        autoFocus
-        trapFocusLeft
-        trapFocusRight
-        destinations={[progressThumbRef.current]}
-        style={styles.container}
-      >
-        <>
-          {/* Playable Duration */}
-          <View
-            style={[
-              styles.playableBar,
-              { width: (status.playablePercentage + '%') as DimensionValue },
-            ]}
-          />
+    <TVFocusGuideView
+      autoFocus
+      trapFocusLeft
+      trapFocusRight
+      hasTVPreferredFocus
+      destinations={[progressThumbRef.current]}
+      style={styles.container}
+    >
+      <>
+        {/* Playable Duration */}
+        <View
+          style={[
+            styles.playableBar,
+            { width: (status.playablePercentage + '%') as DimensionValue },
+          ]}
+        />
 
-          {/* Progress Playback */}
-          <View
+        {/* Progress Playback */}
+        <View
+          style={[
+            styles.progressBar,
+            { width: (status.progressPercentage + '%') as DimensionValue },
+          ]}
+        >
+          {/* Progress Thumb */}
+          <Pressable
             style={[
-              styles.progressBar,
-              { width: (status.progressPercentage + '%') as DimensionValue },
+              styles.thumb,
+              focusedElement === FocusedElement.ProgressThumb && styles.focusedThumb,
             ]}
-          >
-            {/* Progress Thumb */}
-            <Pressable
-              style={[
-                styles.thumb,
-                focusedElement === FocusedElement.ProgressThumb && styles.focusedThumb,
-              ]}
-              // hasTVPreferredFocus
-              isTVSelectable={true}
-              key={FocusedElement.ProgressThumb}
-              ref={progressThumbRef}
-              onFocus={() => {
-                setFocusedElement(FocusedElement.ProgressThumb);
-              }}
-              onBlur={() => {
-                setFocusedElement('');
-              }}
-            />
-          </View>
-        </>
-      </TVFocusGuideView>
-    </View>
+            // hasTVPreferredFocus
+            isTVSelectable={true}
+            key={FocusedElement.ProgressThumb}
+            ref={progressThumbRef}
+            onFocus={() => {
+              setFocusedElement(FocusedElement.ProgressThumb);
+            }}
+            onBlur={() => {
+              setFocusedElement('');
+            }}
+          />
+        </View>
+      </>
+    </TVFocusGuideView>
   );
 }
 
