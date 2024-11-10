@@ -1,6 +1,5 @@
 import FilmCard from 'Component/FilmCard';
 import ThemedView from 'Component/ThemedView';
-import { useRef } from 'react';
 import { DimensionValue, ScrollView, TouchableOpacity, TVFocusGuideView } from 'react-native';
 import { NUMBER_OF_COLUMNS } from './Grid.config';
 import { styles } from './Grid.style.atv';
@@ -8,14 +7,11 @@ import { GridComponentProps } from './Grid.type';
 
 export function GridComponent(props: GridComponentProps) {
   const { rows, handleOnPress } = props;
-  const firstItemRef = useRef();
 
   return (
     <ScrollView>
       <TVFocusGuideView
         style={styles.rows}
-        // @ts-ignore
-        destinations={[firstItemRef.current]}
         autoFocus
       >
         {rows.map((row, rowIdx) => (
@@ -34,8 +30,6 @@ export function GridComponent(props: GridComponentProps) {
                   },
                 ]}
                 onPress={() => handleOnPress(film)}
-                // @ts-ignore
-                ref={colIdx === 0 && rowIdx === 0 ? firstItemRef : undefined}
                 hasTVPreferredFocus={colIdx === 0 && rowIdx === 0}
               >
                 <FilmCard filmCard={film} />

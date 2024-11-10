@@ -1,5 +1,6 @@
 import { ApiServiceType, ConfigApiInterface } from 'Api/index';
-import { fetchPage } from 'Util/Request/Query';
+import { parseHtml } from 'Util/Parser';
+import { executeGet } from 'Util/Request';
 
 const configApi: ConfigApiInterface = {
   serviceType: ApiServiceType.rezka,
@@ -30,13 +31,15 @@ const configApi: ConfigApiInterface = {
   },
 
   async fetchPage(query: string, variables: Record<string, string> = {}, ignoreCache = false) {
-    return await fetchPage(
+    const res = await executeGet(
       query,
       this.getProvider(),
       this.getAuthorization(),
       variables,
       ignoreCache
     );
+
+    return parseHtml(res);
   },
 };
 

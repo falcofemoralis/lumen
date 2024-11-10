@@ -6,7 +6,7 @@ import { makeAutoObservable } from 'mobx';
 class AppStore {
   public isTV = true;
   public currentService = RezkaApi as ApiInterface;
-  public isNavigationVisible = false;
+  public isNavigationVisible = true;
 
   constructor() {
     makeAutoObservable(this);

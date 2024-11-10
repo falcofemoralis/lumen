@@ -1,6 +1,6 @@
 import CachedImage from 'expo-cached-image';
 import { ThemedImageProps } from './ThemedImage.type';
-import { hash } from 'Util/Request/Hash';
+import { hash } from 'Util/Hash';
 import { ActivityIndicator } from 'react-native';
 
 export default function ThemedImage({ src, style }: ThemedImageProps) {

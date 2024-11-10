@@ -1,5 +1,5 @@
 import { queryCache } from 'Util/Cache';
-import { hash } from './Hash';
+import { hash } from 'Util/Hash';
 
 export const formatURI = (
   query: string,
