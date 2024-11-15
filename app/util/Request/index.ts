@@ -15,7 +15,9 @@ export const formatURI = (
     ['']
   );
 
-  return `${url}${query}${stringifyVariables.length > 0 ? '?' + stringifyVariables.join('&') : ''}`;
+  const queryVars = stringifyVariables.join('&');
+
+  return `${url}${query}${queryVars !== '' ? '?' + queryVars : ''}`;
 };
 
 export const getFetch = (
@@ -35,16 +37,16 @@ export const getFetch = (
 
 export const postFetch = (
   uri: string,
-  query: string,
   headers: HeadersInit,
-  variables: Record<string, string>
+  variables: FormData,
+  signal?: AbortSignal
 ): Promise<Response> =>
   fetch(uri, {
     method: 'POST',
-    body: JSON.stringify({ query, variables }),
+    body: variables,
+    signal,
     headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
+      'Content-Type': 'multipart/form-data',
       ...headers,
     },
   });
@@ -70,7 +72,23 @@ export const handleConnectionError = (err: unknown, msg: string): void => {
 export const parseResponse = async (response: Response): Promise<string> => {
   try {
     const promiseResponse = await response;
-    const data = await promiseResponse.text(); // .json();
+    const data = await promiseResponse.text();
+
+    return data;
+
+    // TODO handle errors, such as site not available
+    //return await checkForErrors(data);
+  } catch (err) {
+    handleConnectionError(err, 'Can not parse JSON!');
+
+    throw err;
+  }
+};
+
+export const parseJSONResponse = async (response: Response): Promise<string> => {
+  try {
+    const promiseResponse = await response;
+    const data = await promiseResponse.json(); // .json();
 
     return data;
 
@@ -142,11 +160,19 @@ export const executePost = async (
   endpoint: string,
   headers: HeadersInit,
   variables: Record<string, string>
-): Promise<string> => {
-  try {
-    const response = await postFetch(endpoint, query, headers, variables);
+): Promise<any> => {
+  const uri = formatURI(query, {}, endpoint);
 
-    return await parseResponse(response);
+  try {
+    const formData = new FormData();
+
+    Object.entries(variables).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+
+    const response = await postFetch(uri, headers, formData);
+
+    return await parseJSONResponse(response);
   } catch (err) {
     handleConnectionError(err, 'executePost failed');
 

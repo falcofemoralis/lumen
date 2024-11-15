@@ -5,14 +5,45 @@ import FilmPageComponent from './FilmPage.component';
 import FilmPageComponentTV from './FilmPage.component.atv';
 import { FilmPageContainerProps } from './FilmPage.type';
 import { withTV } from 'Hooks/withTV';
+import { FilmVideo } from 'Type/FilmVideo.interface';
+import NavigationStore from 'Store/Navigation.store';
+import { BackHandler } from 'react-native';
 
 export function FilmPageContainer(props: FilmPageContainerProps) {
   const { link } = props;
   const [film, setFilm] = useState<Film | null>(null);
+  const [filmVideo, setFilmVideo] = useState<FilmVideo | null>(null);
+
+  useEffect(() => {
+    const backAction = () => {
+      if (filmVideo) {
+        setFilmVideo(null);
+        NavigationStore.toggleNavigation();
+        return true;
+      }
+
+      return false;
+    };
+
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+
+    return () => backHandler.remove();
+  });
+
+  const playFilm = async () => {
+    if (!film) {
+      return;
+    }
+
+    const video = await AppStore.currentService.getFilmVideo(film);
+
+    NavigationStore.toggleNavigation();
+
+    setFilmVideo(video);
+  };
 
   useEffect(() => {
     const loadFilm = async () => {
-      console.log('loadFilm');
       const film = await AppStore.currentService.getFilm(link);
 
       setFilm(film);
@@ -24,10 +55,18 @@ export function FilmPageContainer(props: FilmPageContainerProps) {
   const containerProps = () => {
     return {
       film,
+      filmVideo,
     };
   };
 
-  return withTV(FilmPageComponentTV, FilmPageComponent, { ...containerProps() });
+  const containerFunctions = {
+    playFilm,
+  };
+
+  return withTV(FilmPageComponentTV, FilmPageComponent, {
+    ...containerProps(),
+    ...containerFunctions,
+  });
 }
 
 export default FilmPageContainer;

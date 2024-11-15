@@ -5,7 +5,7 @@ import { ResizeMode, Video } from 'expo-av';
 import React from 'react';
 import { Pressable, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { SOURCE } from './Player.config';
+import { DEMO_VIDEO } from './Player.config';
 import { styles } from './Player.style';
 import { PlayerComponentProps } from './Player.type';
 
@@ -50,7 +50,7 @@ export function PlayerComponent(props: PlayerComponentProps) {
         <Video
           style={styles.video}
           ref={playerRef}
-          source={{ uri: SOURCE }}
+          source={{ uri: DEMO_VIDEO }}
           shouldPlay={true}
           resizeMode={ResizeMode.CONTAIN}
           onError={(err) => {

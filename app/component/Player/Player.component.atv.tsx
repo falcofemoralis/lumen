@@ -12,12 +12,13 @@ import {
 } from 'react-native';
 import { TVEventType } from 'Type/TVEvent.type';
 import { scale } from 'Util/CreateStyles';
-import { FocusedElement, SOURCE } from './Player.config';
+import { FocusedElement } from './Player.config';
 import { styles } from './Player.style.atv';
 import { PlayerComponentProps } from './Player.type';
 
 export function PlayerComponentTV(props: PlayerComponentProps) {
   const {
+    uri,
     onPlaybackStatusUpdate,
     playerRef,
     status,
@@ -32,32 +33,20 @@ export function PlayerComponentTV(props: PlayerComponentProps) {
   useTVEventHandler((evt: HWEvent) => {
     const type = evt.eventType;
 
-    console.log(type);
-    console.log(focusedElement);
-    console.log('---');
-
     if (type === TVEventType.Select && focusedElement !== FocusedElement.Action) {
       toggleControls();
     }
-
-    // if (type === TVEventType.Up && focusedElement === FocusedElement.TopBorder) {
-    //   toggleControls();
-    // }
   });
 
   useEffect(() => {
     const backAction = () => {
-      console.log('backAction');
-
       if (showControls) {
         setFocusedElement(undefined);
         toggleControls();
         return true;
       }
 
-      BackHandler.exitApp();
-
-      return true;
+      return false;
     };
 
     const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
@@ -149,7 +138,7 @@ export function PlayerComponentTV(props: PlayerComponentProps) {
       <Video
         style={styles.video}
         ref={playerRef}
-        source={{ uri: SOURCE }}
+        source={{ uri }}
         shouldPlay={true}
         resizeMode={ResizeMode.CONTAIN}
         onError={(err) => {
@@ -158,17 +147,6 @@ export function PlayerComponentTV(props: PlayerComponentProps) {
         useNativeControls={false}
         onPlaybackStatusUpdate={onPlaybackStatusUpdate}
       />
-      {/* Invisible TVFocusGuideView to trick the open/close logic */}
-      {/* <TVFocusGuideView style={styles.invisibleContainer}>
-        <Pressable
-          key={'topBorder'}
-          isTVSelectable
-          style={{ width: '100%', height: 10 }}
-          onFocus={() => {
-            setFocusedElement(FocusedElement.TopBorder);
-          }}
-        />
-      </TVFocusGuideView> */}
       {renderControls()}
     </View>
   );

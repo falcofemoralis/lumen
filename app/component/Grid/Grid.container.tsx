@@ -1,4 +1,3 @@
-import AppStore from 'Store/App.store';
 import { GridContainerProps } from './Grid.type';
 import GridComponent from './Grid.component';
 import GridComponentTV from './Grid.component.atv';
@@ -33,7 +32,6 @@ export function PlayerProgressBarContainer(props: GridContainerProps) {
   };
 
   const handleOnPress = (film: FilmCard) => {
-    console.log('goToFilm');
     router.push({
       pathname: '/film/[link]',
       params: {

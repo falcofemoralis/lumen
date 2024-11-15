@@ -1,4 +1,5 @@
 import Film from 'Type/Film.interface';
+import { FilmVideo } from 'Type/FilmVideo.interface';
 
 export interface FilmPageContainerProps {
   link: string;
@@ -6,4 +7,6 @@ export interface FilmPageContainerProps {
 
 export interface FilmPageComponentProps {
   film: Film | null;
+  filmVideo: FilmVideo | null;
+  playFilm: () => void;
 }

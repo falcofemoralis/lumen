@@ -10,7 +10,6 @@ export function HomePageContainer() {
 
   useEffect(() => {
     const loadFilms = async () => {
-      console.log('loadFilms');
       const filmList = await AppStore.currentService.getFilms(1);
       const { films } = filmList;
 

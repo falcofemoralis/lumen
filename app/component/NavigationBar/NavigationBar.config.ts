@@ -27,7 +27,7 @@ export const TABS: Tab[] = [
   },
   {
     id: TabType.Search,
-    route: './film',
+    route: './search',
     name: 'Search',
     icon: 'home-variant-outline',
   },

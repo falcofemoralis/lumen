@@ -4,9 +4,10 @@ import { useRef, useState } from 'react';
 import PlayerComponent from './Player.component';
 import PlayerComponentTV from './Player.component.atv';
 import { DEFAULT_STATUS, RewindDirection } from './Player.config';
-import { Status } from './Player.type';
+import { PlayerContainerProps, Status } from './Player.type';
 
-export function PlayerContainer() {
+export function PlayerContainer(props: PlayerContainerProps) {
+  const { uri } = props;
   const playerRef = useRef<Video>(null);
   const [status, setStatus] = useState<Status>(DEFAULT_STATUS);
   const [showControls, setShowControls] = useState(false);
@@ -40,7 +41,6 @@ export function PlayerContainer() {
   };
 
   const toggleControls = () => {
-    console.log('toggleControls');
     setShowControls(!showControls);
   };
 
@@ -83,6 +83,7 @@ export function PlayerContainer() {
 
   const containerProps = () => {
     return {
+      uri,
       playerRef,
       status,
       showControls,

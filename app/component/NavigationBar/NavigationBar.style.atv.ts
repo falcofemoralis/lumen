@@ -4,6 +4,11 @@ import CreateStyles from 'Util/CreateStyles';
 export const NAVIGATION_BAR_TV_WIDTH = 80;
 
 export const styles = CreateStyles({
+  layout: {
+    flex: 1,
+    flexDirection: 'row',
+    width: '100%',
+  },
   container: {
     backgroundColor: 'transparent',
     height: '100%',

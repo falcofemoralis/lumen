@@ -1,3 +1,4 @@
+import { FilmVideo } from './../../type/FilmVideo.interface';
 import { FilmApiInterface } from 'Api/index';
 import Film from 'Type/Film.interface';
 import FilmCard from 'Type/FilmCard.interface';
@@ -18,8 +19,6 @@ const filmApi: FilmApiInterface = {
       filmElements.each((_idx, el) => {
         films.push(utils.parseFilmCard($, el));
       });
-
-      console.log('loaded');
     } catch (error) {
       console.log(error);
     }
@@ -46,8 +45,42 @@ const filmApi: FilmApiInterface = {
     };
   },
 
-  getComments(): string {
-    throw new Error('Method not implemented.');
+  async getFilmVideo(film: Film): Promise<FilmVideo> {
+    const result = await configApi.postRequest('/ajax/get_cdn_series/?t=1731242387831', {
+      id: '75112',
+      translator_id: '238',
+      is_camrip: '0',
+      is_ads: '0',
+      is_director: '0',
+      favs: '46bf4f1c-984b-4653-a7ae-0593110e9d08',
+      action: 'get_movie',
+    });
+
+    try {
+      console.log(utils.parseStreams(result.url));
+      const streams = utils.parseStreams(result.url);
+
+      // TODO
+      const updatedStreams = streams.map((stream) => {
+        return {
+          ...stream,
+          url: stream.url.replace(
+            'https://stream.voidboost.cc',
+            'https://prx-cogent.ukrtelcdn.net'
+          ),
+        };
+      });
+
+      return {
+        streams: updatedStreams,
+      };
+    } catch (e) {
+      console.log(e);
+    }
+
+    return {
+      streams: [],
+    };
   },
 };
 

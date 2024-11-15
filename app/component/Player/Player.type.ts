@@ -17,7 +17,12 @@ export type Status = Partial<AVPlaybackStatus> & {
   playablePercentage?: number;
 };
 
+export type PlayerContainerProps = {
+  uri: string;
+};
+
 export type PlayerComponentProps = {
+  uri: string;
   onPlaybackStatusUpdate: (newStatus: Status) => void;
   playerRef: React.RefObject<Video>;
   status: Status;

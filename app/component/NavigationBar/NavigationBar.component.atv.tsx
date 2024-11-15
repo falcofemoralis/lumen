@@ -1,25 +1,46 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
-import { router } from 'expo-router';
+import { router, Slot } from 'expo-router';
+import { observer } from 'mobx-react-lite';
 import React, { createRef, useRef, useState } from 'react';
-import { HWEvent, Pressable, TVFocusGuideView, useTVEventHandler } from 'react-native';
+import {
+  Dimensions,
+  HWEvent,
+  Pressable,
+  TVFocusGuideView,
+  useTVEventHandler,
+  View,
+  findNodeHandle,
+} from 'react-native';
 import { useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import NavigationStore from 'Store/Navigation.store';
+import { TVEventType } from 'Type/TVEvent.type';
 import { scale } from 'Util/CreateStyles';
 import { DEFAULT_TAB, Tab, TABS, TabType } from './NavigationBar.config';
-import { styles } from './NavigationBar.style.atv';
-import { TVEventType } from 'Type/TVEvent.type';
+import { NAVIGATION_BAR_TV_WIDTH, styles } from './NavigationBar.style.atv';
 
 export function NavigationBarComponent() {
   const [isOpened, setIsOpened] = useState(false);
   const [selectedTab, setSelectedTab] = useState<TabType>(DEFAULT_TAB);
   const elementsRef = useRef(TABS.map(() => createRef()));
+  const windowWidth = Dimensions.get('window').width;
 
   useTVEventHandler((evt: HWEvent) => {
-    const type = evt.eventType;
+    const { eventType: type, tag } = evt;
 
     if (type === TVEventType.Right && isOpened) {
       setIsOpened(false);
+      NavigationStore.isNavigationOpened = false;
+    }
+
+    if (
+      type === TVEventType.Left &&
+      tag === findNodeHandle(getCurrentRef() as number | null) &&
+      !isOpened
+    ) {
+      setIsOpened(true);
+      NavigationStore.isNavigationOpened = true;
     }
   });
 
@@ -29,10 +50,6 @@ export function NavigationBarComponent() {
     if (id !== selectedTab) {
       setSelectedTab(id);
       router.replace(route);
-    }
-
-    if (!isOpened) {
-      setIsOpened(true);
     }
   };
 
@@ -82,22 +99,47 @@ export function NavigationBarComponent() {
     return TABS.map((tab, idx) => renderTab(tab, idx));
   };
 
-  return (
-    <TVFocusGuideView
-      trapFocusLeft
-      trapFocusUp
-      trapFocusDown
-      // @ts-ignore
-      destinations={[getCurrentRef()]}
-    >
-      <ThemedView
-        style={[styles.container, animatedOpening]}
-        useAnimations
+  const renderBar = () => {
+    if (!NavigationStore.isNavigationVisible) {
+      return null;
+    }
+
+    return (
+      <TVFocusGuideView
+        trapFocusLeft
+        trapFocusUp
+        trapFocusDown
+        // @ts-ignore
+        destinations={[getCurrentRef()]}
       >
-        {renderTabs()}
-      </ThemedView>
-    </TVFocusGuideView>
+        <ThemedView
+          style={[styles.container, animatedOpening]}
+          useAnimations
+        >
+          {renderTabs()}
+        </ThemedView>
+      </TVFocusGuideView>
+    );
+  };
+
+  const renderPageContent = () => {
+    const width = NavigationStore.isNavigationVisible
+      ? windowWidth - NAVIGATION_BAR_TV_WIDTH
+      : windowWidth;
+
+    return (
+      <View style={{ width }}>
+        <Slot />
+      </View>
+    );
+  };
+
+  return (
+    <ThemedView style={styles.layout}>
+      {renderBar()}
+      {renderPageContent()}
+    </ThemedView>
   );
 }
 
-export default NavigationBarComponent;
+export default observer(NavigationBarComponent);

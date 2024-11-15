@@ -1,6 +1,7 @@
 import FilmCard from 'Component/FilmCard';
 import ThemedView from 'Component/ThemedView';
 import { DimensionValue, ScrollView, TouchableOpacity, TVFocusGuideView } from 'react-native';
+import NavigationStore from 'Store/Navigation.store';
 import { NUMBER_OF_COLUMNS } from './Grid.config';
 import { styles } from './Grid.style.atv';
 import { GridComponentProps } from './Grid.type';
@@ -30,7 +31,9 @@ export function GridComponent(props: GridComponentProps) {
                   },
                 ]}
                 onPress={() => handleOnPress(film)}
-                hasTVPreferredFocus={colIdx === 0 && rowIdx === 0}
+                hasTVPreferredFocus={
+                  colIdx === 0 && rowIdx === 0 && !NavigationStore.isNavigationOpened
+                }
               >
                 <FilmCard filmCard={film} />
               </TouchableOpacity>

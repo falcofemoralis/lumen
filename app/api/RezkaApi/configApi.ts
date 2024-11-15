@@ -1,10 +1,11 @@
 import { ApiServiceType, ConfigApiInterface } from 'Api/index';
 import { parseHtml } from 'Util/Parser';
-import { executeGet } from 'Util/Request';
+import { executeGet, executePost } from 'Util/Request';
 
 const configApi: ConfigApiInterface = {
   serviceType: ApiServiceType.rezka,
   defaultProviders: ['https://rezka-ua.tv'],
+  defaultCDNs: ['https://stream.voidboost.cc'],
 
   setProvider(provider: string): void {
     // TODO implement custom provider logic
@@ -40,6 +41,10 @@ const configApi: ConfigApiInterface = {
     );
 
     return parseHtml(res);
+  },
+
+  async postRequest(query: string, variables: Record<string, string> = {}) {
+    return await executePost(query, this.getProvider(), this.getAuthorization(), variables);
   },
 };
 

@@ -7,7 +7,7 @@ export const DEFAULT_STATUS: Status = {
   isPlaying: false,
 };
 
-export const SOURCE =
+export const DEMO_VIDEO =
   'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
 
 export enum RewindDirection {
