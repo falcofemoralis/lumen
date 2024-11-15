@@ -65,7 +65,7 @@ export function PlayerProgressBarComponentTV(props: PlayerProgressBarComponentPr
               styles.thumb,
               focusedElement === FocusedElement.ProgressThumb && styles.focusedThumb,
             ]}
-            // hasTVPreferredFocus
+            hasTVPreferredFocus
             isTVSelectable={true}
             key={FocusedElement.ProgressThumb}
             ref={progressThumbRef}

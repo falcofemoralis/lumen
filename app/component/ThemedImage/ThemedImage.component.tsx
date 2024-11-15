@@ -1,4 +1,4 @@
-import CachedImage from 'expo-cached-image';
+import CachedImage from '../../lib/expo-cached-image';
 import { ThemedImageProps } from './ThemedImage.type';
 import { hash } from 'Util/Hash';
 import { ActivityIndicator } from 'react-native';
