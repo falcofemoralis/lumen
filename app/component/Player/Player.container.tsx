@@ -1,9 +1,10 @@
+import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { Video } from 'expo-av';
 import { withTV } from 'Hooks/withTV';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import PlayerComponent from './Player.component';
 import PlayerComponentTV from './Player.component.atv';
-import { DEFAULT_STATUS, RewindDirection } from './Player.config';
+import { AWAKE_TAG, DEFAULT_STATUS, RewindDirection } from './Player.config';
 import { PlayerContainerProps, Status } from './Player.type';
 
 export function PlayerContainer(props: PlayerContainerProps) {
@@ -11,6 +12,14 @@ export function PlayerContainer(props: PlayerContainerProps) {
   const playerRef = useRef<Video>(null);
   const [status, setStatus] = useState<Status>(DEFAULT_STATUS);
   const [showControls, setShowControls] = useState(false);
+
+  useEffect(() => {
+    activateKeepAwakeAsync(AWAKE_TAG);
+
+    return () => {
+      deactivateKeepAwake(AWAKE_TAG);
+    };
+  }, []);
 
   const onPlaybackStatusUpdate = async (newStatus: Status) => {
     if (!newStatus) {
@@ -97,8 +106,6 @@ export function PlayerContainer(props: PlayerContainerProps) {
     rewindPosition,
     seekToPosition,
   };
-
-  // TODO useKeepAwake();
 
   return withTV(PlayerComponentTV, PlayerComponent, {
     ...containerProps(),

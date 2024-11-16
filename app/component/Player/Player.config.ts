@@ -20,3 +20,5 @@ export enum FocusedElement {
   ProgressThumb = 'progressThumb',
   Action = 'action',
 }
+
+export const AWAKE_TAG = 'player';
