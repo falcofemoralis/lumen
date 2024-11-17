@@ -1,5 +1,6 @@
 {
   "expo": {
+    "scheme": "routertv",
     "plugins": [
       [
         "@react-native-tvos/config-tv",
@@ -19,24 +20,32 @@
       [
         "expo-build-properties",
         {
-          "ios": {
-            "newArchEnabled": false
-          },
           "android": {
-            "newArchEnabled": false,
             "usesCleartextTraffic": true
           }
         }
       ],
-      "expo-router"
+      [
+        "expo-router",
+        {
+          "root": "./app/(tabs)"
+        }
+      ],
+      "expo-font"
     ],
-    "experiments": {
-      "typedRoutes": true
-    },
     "name": "lumen",
     "slug": "lumen",
+    "version": "1.0.0",
     "android": {
-      "package": "com.falcofemoralis.lumen"
+      "package": "com.falcofemoralis.lumen",
+      "versionCode": 1,
+      "splash": {
+        "image": "./assets/images/splash.png"
+      },
+      "newArchEnabled": true
+    },
+    "experiments": {
+      "typedRoutes": true
     },
     "extra": {
       "eas": {
