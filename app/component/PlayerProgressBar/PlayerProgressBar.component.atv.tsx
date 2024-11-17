@@ -1,19 +1,18 @@
-import { useRef } from 'react';
-import {
-  DimensionValue,
-  HWEvent,
-  Pressable,
-  TVFocusGuideView,
-  useTVEventHandler,
-  View,
-} from 'react-native';
-import { PlayerProgressBarComponentProps } from './PlayerProgressBar.type';
-import { styles } from './PlayerProgressBar.style.atv';
 import { FocusedElement, RewindDirection } from 'Component/Player/Player.config';
+import ThemedPressable from 'Component/ThemedPressable';
+import { useRef } from 'react';
+import { DimensionValue, HWEvent, TVFocusGuideView, useTVEventHandler, View } from 'react-native';
 import { TVEventType } from 'Type/TVEvent.type';
+import { styles } from './PlayerProgressBar.style.atv';
+import { PlayerProgressBarComponentProps } from './PlayerProgressBar.type';
 
 export function PlayerProgressBarComponentTV(props: PlayerProgressBarComponentProps) {
-  const { status, focusedElement, setFocusedElement = () => {}, rewindPosition } = props;
+  const {
+    status: { progressPercentage, playablePercentage },
+    focusedElement,
+    setFocusedElement = () => {},
+    rewindPosition,
+  } = props;
   const progressThumbRef = useRef(null);
 
   useTVEventHandler((evt: HWEvent) => {
@@ -30,43 +29,30 @@ export function PlayerProgressBarComponentTV(props: PlayerProgressBarComponentPr
     }
   });
 
-  if (!status) {
-    return;
-  }
-
   return (
     <TVFocusGuideView
       autoFocus
       trapFocusLeft
       trapFocusRight
-      hasTVPreferredFocus
       destinations={[progressThumbRef.current]}
       style={styles.container}
     >
       <>
         {/* Playable Duration */}
         <View
-          style={[
-            styles.playableBar,
-            { width: (status.playablePercentage + '%') as DimensionValue },
-          ]}
+          style={[styles.playableBar, { width: (progressPercentage + '%') as DimensionValue }]}
         />
 
         {/* Progress Playback */}
-        <View
-          style={[
-            styles.progressBar,
-            { width: (status.progressPercentage + '%') as DimensionValue },
-          ]}
-        >
+        <View style={[styles.progressBar, { width: (playablePercentage + '%') as DimensionValue }]}>
           {/* Progress Thumb */}
-          <Pressable
+          <ThemedPressable
             style={[
               styles.thumb,
               focusedElement === FocusedElement.ProgressThumb && styles.focusedThumb,
             ]}
-            hasTVPreferredFocus
             isTVSelectable={true}
+            hasTVPreferredFocus
             key={FocusedElement.ProgressThumb}
             ref={progressThumbRef}
             onFocus={() => {

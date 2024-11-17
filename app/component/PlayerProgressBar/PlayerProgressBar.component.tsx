@@ -4,7 +4,10 @@ import { styles } from './PlayerProgressBar.style';
 import { PlayerProgressBarComponentProps } from './PlayerProgressBar.type';
 
 export function PlayerProgressBarComponent(props: PlayerProgressBarComponentProps) {
-  const { status: { progressPercentage, playablePercentage } = {}, seekToPosition } = props;
+  const {
+    status: { progressPercentage, playablePercentage },
+    seekToPosition,
+  } = props;
 
   const onProgressChange = (value: number) => {
     seekToPosition(value);

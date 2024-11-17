@@ -3,6 +3,7 @@ import { DimensionValue, RefreshControl, ScrollView, TouchableOpacity } from 're
 import { GridComponentProps } from './Grid.type';
 import FilmCard from 'Component/FilmCard';
 import { NUMBER_OF_COLUMNS } from './Grid.config';
+import ThemedTouchableOpacity from 'Component/ThemedTouchableOpacity';
 
 export function GridComponent(props: GridComponentProps) {
   const { rows } = props;
@@ -28,12 +29,12 @@ export function GridComponent(props: GridComponentProps) {
             }}
           >
             {row.map((film) => (
-              <TouchableOpacity
+              <ThemedTouchableOpacity
                 key={film.id}
                 style={{ width: (100 / NUMBER_OF_COLUMNS + '%') as DimensionValue }}
               >
                 <FilmCard film={film} />
-              </TouchableOpacity>
+              </ThemedTouchableOpacity>
             ))}
           </ThemedView>
         ))}

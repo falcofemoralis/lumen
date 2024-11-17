@@ -1,27 +1,25 @@
 import FilmCard from 'Component/FilmCard';
 import ThemedView from 'Component/ThemedView';
-import { DimensionValue, ScrollView, TouchableOpacity, TVFocusGuideView } from 'react-native';
+import { DimensionValue, ScrollView, TVFocusGuideView } from 'react-native';
 import NavigationStore from 'Store/Navigation.store';
 import { NUMBER_OF_COLUMNS } from './Grid.config';
 import { styles } from './Grid.style.atv';
 import { GridComponentProps } from './Grid.type';
+import ThemedTouchableOpacity from 'Component/ThemedTouchableOpacity';
 
 export function GridComponent(props: GridComponentProps) {
   const { rows, handleOnPress } = props;
 
   return (
     <ScrollView>
-      <TVFocusGuideView
-        style={styles.rows}
-        autoFocus
-      >
+      <TVFocusGuideView style={styles.rows}>
         {rows.map((row, rowIdx) => (
           <ThemedView
             key={rowIdx}
             style={styles.row}
           >
             {row.map((film, colIdx) => (
-              <TouchableOpacity
+              <ThemedTouchableOpacity
                 key={film.id}
                 style={[
                   styles.item,
@@ -36,7 +34,7 @@ export function GridComponent(props: GridComponentProps) {
                 }
               >
                 <FilmCard filmCard={film} />
-              </TouchableOpacity>
+              </ThemedTouchableOpacity>
             ))}
           </ThemedView>
         ))}

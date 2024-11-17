@@ -19,6 +19,7 @@ import { TVEventType } from 'Type/TVEvent.type';
 import { scale } from 'Util/CreateStyles';
 import { DEFAULT_TAB, Tab, TABS, TabType } from './NavigationBar.config';
 import { NAVIGATION_BAR_TV_WIDTH, styles } from './NavigationBar.style.atv';
+import ThemedPressable from 'Component/ThemedPressable';
 
 export function NavigationBarComponent() {
   const [isOpened, setIsOpened] = useState(false);
@@ -71,7 +72,7 @@ export function NavigationBarComponent() {
     const { id, name, icon } = tab;
 
     return (
-      <Pressable
+      <ThemedPressable
         key={id}
         onFocus={() => onFocus(tab)}
         style={[
@@ -91,7 +92,7 @@ export function NavigationBarComponent() {
         />
         {/* {isOpened && <ThemedText style={styles.tabText}>{name}</ThemedText>} */}
         <ThemedText style={styles.tabText}>{name}</ThemedText>
-      </Pressable>
+      </ThemedPressable>
     );
   };
 
