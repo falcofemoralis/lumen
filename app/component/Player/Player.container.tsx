@@ -1,4 +1,3 @@
-import { useEventListener } from 'expo';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { useVideoPlayer } from 'expo-video';
 import { withTV } from 'Hooks/withTV';
@@ -24,6 +23,32 @@ export function PlayerContainer(props: PlayerContainerProps) {
       deactivateKeepAwake(AWAKE_TAG);
     };
   }, []);
+
+  useEffect(() => {
+    const playingChangeSubscription = player.addListener('playingChange', (isPlaying) => {
+      setStatus({
+        ...status,
+        isPlaying,
+      });
+    });
+
+    const playingChangeSubscription = player.addListener(
+      'timeUpdate',
+      ({ currentTime, bufferedPosition }) => {
+        const { duration } = player;
+
+        setStatus({
+          ...status,
+          progressPercentage: (currentTime / duration) * 100,
+          playablePercentage: (bufferedPosition / duration) * 100,
+        });
+      }
+    );
+
+    return () => {
+      playingChangeSubscription.remove();
+    };
+  }, [player]);
 
   useEventListener(player, 'timeUpdate', ({ currentTime, bufferedPosition }) => {
     const { duration } = player;
