@@ -28,15 +28,22 @@
           }
         }
       ],
-      "expo-router"
+      [
+        "expo-router",
+        {
+          "root": "./app/(tabs)"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
     },
     "name": "lumen",
     "slug": "lumen",
+    "version": "1.0.0",
     "android": {
-      "package": "com.falcofemoralis.lumen"
+      "package": "com.falcofemoralis.lumen",
+      "versionCode": 1
     },
     "extra": {
       "eas": {

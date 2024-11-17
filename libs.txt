@@ -3,9 +3,11 @@ Parsing         https://github.com/cheeriojs/cheerio
 Animations      https://docs.swmansion.com/react-native-reanimated/docs/fundamentals/getting-started/
 Icons           https://icons.expo.fyi/Index
 Player          https://docs.expo.dev/versions/latest/sdk/video-av/
+   PIP          https://www.npmjs.com/package/expo-pip
 Cache Mechanism https://github.com/timfpark/react-native-cache
 FastEnc Storage https://github.com/ammarahm-ed/react-native-mmkv-storage
-->Smooth trans  https://github.com/IjzerenHein/react-native-shared-element
+[deprecated] Smooth trans  https://github.com/IjzerenHein/react-native-shared-element
+   use https://docs.swmansion.com/react-native-reanimated/docs/shared-element-transitions/overview/
 Cache image     https://github.com/echowaves/expo-cached-image
 //
 If list will have issues https://github.com/marcocesarato/react-native-big-list

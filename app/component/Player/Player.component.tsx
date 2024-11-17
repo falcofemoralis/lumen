@@ -5,7 +5,6 @@ import { ResizeMode, Video } from 'expo-av';
 import React from 'react';
 import { Pressable, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { DEMO_VIDEO } from './Player.config';
 import { styles } from './Player.style';
 import { PlayerComponentProps } from './Player.type';
 
