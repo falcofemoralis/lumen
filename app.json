@@ -49,7 +49,7 @@
       "splash": {
         "image": "./assets/images/splash.png"
       },
-      "newArchEnabled": false
+      "newArchEnabled": true
     },
     "experiments": {
       "typedRoutes": true

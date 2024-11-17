@@ -1,5 +1,13 @@
+rn 0.76
+
 1) react native hasTVPreferredFocus
 https://github.com/react-native-tvos/react-native-tvos/issues/759
 
 2) can't build because \D is invalid
+https://github.com/facebook/react-native/issues/47626
 https://github.com/facebook/react-native/pull/47641/files
+Solved by adding this line
+
+string(REPLACE "\\" "/" REACT_ANDROID_DIR ${REACT_ANDROID_DIR}) on line number 36
+
+\node_modules\react-native\ReactAndroid\cmake-utils\ReactNative-application.cmake
