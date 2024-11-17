@@ -1,13 +1,13 @@
 import PlayerProgressBar from 'Component/PlayerProgressBar';
+import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
 import { VideoView } from 'expo-video';
 import React from 'react';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { styles } from './Player.style';
 import { PlayerComponentProps } from './Player.type';
-import ThemedPressable from 'Component/ThemedPressable';
 
 export function PlayerComponent(props: PlayerComponentProps) {
   const {

@@ -1,21 +1,14 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import PlayerProgressBar from 'Component/PlayerProgressBar';
+import ThemedTouchableOpacity from 'Component/ThemedTouchableOpacity';
+import { VideoView } from 'expo-video';
 import React, { useEffect, useState } from 'react';
-import {
-  BackHandler,
-  HWEvent,
-  TouchableOpacity,
-  TVFocusGuideView,
-  useTVEventHandler,
-  View,
-} from 'react-native';
+import { BackHandler, HWEvent, TVFocusGuideView, useTVEventHandler, View } from 'react-native';
 import { TVEventType } from 'Type/TVEvent.type';
 import { scale } from 'Util/CreateStyles';
 import { FocusedElement } from './Player.config';
 import { styles } from './Player.style.atv';
 import { PlayerComponentProps } from './Player.type';
-import { VideoView } from 'expo-video';
-import ThemedTouchableOpacity from 'Component/ThemedTouchableOpacity';
 
 export function PlayerComponentTV(props: PlayerComponentProps) {
   const {
@@ -32,7 +25,13 @@ export function PlayerComponentTV(props: PlayerComponentProps) {
   useTVEventHandler((evt: HWEvent) => {
     const type = evt.eventType;
 
-    if (type === TVEventType.Select && focusedElement !== FocusedElement.Action) {
+    console.log(focusedElement);
+
+    if (type === TVEventType.Select && focusedElement !== FocusedElement.Action && showControls) {
+      toggleControls();
+    }
+
+    if (type === TVEventType.Select && !showControls) {
       toggleControls();
     }
   });
@@ -70,9 +69,9 @@ export function PlayerComponentTV(props: PlayerComponentProps) {
   const renderTopActions = () => {
     const { isPlaying } = status;
 
-    if (!showControls) {
-      return null;
-    }
+    // if (!showControls) {
+    //   return null;
+    // }
 
     return (
       <TVFocusGuideView
@@ -97,14 +96,15 @@ export function PlayerComponentTV(props: PlayerComponentProps) {
         setFocusedElement={setFocusedElement}
         rewindPosition={rewindPosition}
         seekToPosition={seekToPosition}
+        showControls={showControls}
       />
     );
   };
 
   const renderBottomActions = () => {
-    if (!showControls) {
-      return null;
-    }
+    // if (!showControls) {
+    //   return null;
+    // }
 
     return (
       <TVFocusGuideView

@@ -12,9 +12,9 @@ export enum RewindDirection {
 }
 
 export enum FocusedElement {
-  TopBorder = 'topBorder',
   ProgressThumb = 'progressThumb',
   Action = 'action',
 }
 
 export const AWAKE_TAG = 'player';
+export const TIME_UPDATE_INTERVAL = 1;

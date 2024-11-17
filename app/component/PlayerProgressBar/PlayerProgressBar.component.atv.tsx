@@ -10,6 +10,7 @@ export function PlayerProgressBarComponentTV(props: PlayerProgressBarComponentPr
   const {
     status: { progressPercentage, playablePercentage },
     focusedElement,
+    showControls,
     setFocusedElement = () => {},
     rewindPosition,
   } = props;
@@ -40,11 +41,10 @@ export function PlayerProgressBarComponentTV(props: PlayerProgressBarComponentPr
       <>
         {/* Playable Duration */}
         <View
-          style={[styles.playableBar, { width: (progressPercentage + '%') as DimensionValue }]}
+          style={[styles.playableBar, { width: (playablePercentage + '%') as DimensionValue }]}
         />
-
         {/* Progress Playback */}
-        <View style={[styles.progressBar, { width: (playablePercentage + '%') as DimensionValue }]}>
+        <View style={[styles.progressBar, { width: (progressPercentage + '%') as DimensionValue }]}>
           {/* Progress Thumb */}
           <ThemedPressable
             style={[
@@ -52,7 +52,8 @@ export function PlayerProgressBarComponentTV(props: PlayerProgressBarComponentPr
               focusedElement === FocusedElement.ProgressThumb && styles.focusedThumb,
             ]}
             isTVSelectable={true}
-            hasTVPreferredFocus
+            hasTVPreferredFocus={showControls}
+            alwaysFocus={!showControls}
             key={FocusedElement.ProgressThumb}
             ref={progressThumbRef}
             onFocus={() => {

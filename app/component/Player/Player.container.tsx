@@ -5,14 +5,16 @@ import { withTV } from 'Hooks/withTV';
 import { useEffect, useState } from 'react';
 import PlayerComponent from './Player.component';
 import PlayerComponentTV from './Player.component.atv';
-import { AWAKE_TAG, DEFAULT_STATUS, RewindDirection } from './Player.config';
+import { AWAKE_TAG, DEFAULT_STATUS, RewindDirection, TIME_UPDATE_INTERVAL } from './Player.config';
 import { PlayerContainerProps, Status } from './Player.type';
+import { DEMO_VIDEO } from 'Route/PlayerPage/PlayerPage.config';
 
 export function PlayerContainer(props: PlayerContainerProps) {
   const { uri } = props;
   const [showControls, setShowControls] = useState(false);
   const [status, setStatus] = useState<Status>(DEFAULT_STATUS);
-  const player = useVideoPlayer(uri, (player) => {
+  const player = useVideoPlayer(DEMO_VIDEO, (player) => {
+    player.timeUpdateEventInterval = TIME_UPDATE_INTERVAL;
     player.loop = false;
     player.play();
   });
@@ -36,6 +38,7 @@ export function PlayerContainer(props: PlayerContainerProps) {
   });
 
   useEventListener(player, 'playingChange', ({ isPlaying }) => {
+    console.log('playingChange', isPlaying);
     setStatus({
       ...status,
       isPlaying,
