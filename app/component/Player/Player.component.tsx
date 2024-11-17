@@ -1,18 +1,17 @@
 import PlayerProgressBar from 'Component/PlayerProgressBar';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
-import { ResizeMode, Video } from 'expo-av';
+import { VideoView } from 'expo-video';
 import React from 'react';
 import { Pressable, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { DEMO_VIDEO } from './Player.config';
 import { styles } from './Player.style';
 import { PlayerComponentProps } from './Player.type';
+import ThemedPressable from 'Component/ThemedPressable';
 
 export function PlayerComponent(props: PlayerComponentProps) {
   const {
-    onPlaybackStatusUpdate,
-    playerRef,
+    player,
     status,
     showControls,
     toggleControls,
@@ -22,21 +21,22 @@ export function PlayerComponent(props: PlayerComponentProps) {
   } = props;
 
   const renderControls = () => {
+    const { isPlaying } = status;
+
     if (!showControls) {
       return null;
     }
 
     return (
       <View style={styles.controls}>
-        <Pressable
+        <ThemedPressable
           style={styles.playControl}
           onPress={togglePlayPause}
         >
-          <ThemedText>{status.isPlaying ? 'Pause' : 'Play'}</ThemedText>
-        </Pressable>
+          <ThemedText>{isPlaying ? 'Pause' : 'Play'}</ThemedText>
+        </ThemedPressable>
         <PlayerProgressBar
           status={status}
-          playerRef={playerRef}
           rewindPosition={rewindPosition}
           seekToPosition={seekToPosition}
         />
@@ -47,24 +47,20 @@ export function PlayerComponent(props: PlayerComponentProps) {
   return (
     <SafeAreaView>
       <ThemedView style={styles.container}>
-        <Video
+        <VideoView
           style={styles.video}
-          ref={playerRef}
-          source={{ uri: DEMO_VIDEO }}
-          shouldPlay={true}
-          resizeMode={ResizeMode.CONTAIN}
-          onError={(err) => {
-            console.log('Video ERROR', err);
-          }}
-          useNativeControls={false}
-          onPlaybackStatusUpdate={onPlaybackStatusUpdate}
+          player={player}
+          contentFit="contain"
+          nativeControls={false}
+          allowsFullscreen={false}
+          allowsPictureInPicture={false}
         />
-        <Pressable
+        <ThemedPressable
           style={styles.controlsContainer}
           onPress={toggleControls}
         >
           {renderControls()}
-        </Pressable>
+        </ThemedPressable>
       </ThemedView>
     </SafeAreaView>
   );

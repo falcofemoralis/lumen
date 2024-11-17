@@ -1,34 +1,22 @@
-import { AVPlaybackStatus, Video } from 'expo-av';
 import { RewindDirection } from './Player.config';
+import { VideoPlayer } from 'expo-video';
 
-export type Status = Partial<AVPlaybackStatus> & {
-  isPlaying?: boolean;
-  isLoaded?: boolean;
-  isBuffering?: boolean;
-  didJustFinish?: boolean;
-  uri?: string;
-  rate?: number;
-  positionMillis?: number;
-  playableDurationMillis?: number;
-  durationMillis?: number;
-  error?: string;
-  // custom
-  progressPercentage?: number;
-  playablePercentage?: number;
-};
-
-export type PlayerContainerProps = {
+export interface PlayerContainerProps {
   uri: string;
-};
+}
 
-export type PlayerComponentProps = {
-  uri: string;
-  onPlaybackStatusUpdate: (newStatus: Status) => void;
-  playerRef: React.RefObject<Video>;
+export interface PlayerComponentProps {
+  player: VideoPlayer;
   status: Status;
   showControls: boolean;
   toggleControls: () => void;
   togglePlayPause: () => void;
   rewindPosition: (type: RewindDirection, ms?: number) => void;
   seekToPosition: (percent: number) => void;
+}
+
+export type Status = {
+  progressPercentage: number;
+  playablePercentage: number;
+  isPlaying: boolean;
 };

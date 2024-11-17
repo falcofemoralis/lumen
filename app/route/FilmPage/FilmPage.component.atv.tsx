@@ -1,8 +1,9 @@
 import Player from 'Component/Player';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
+import ThemedTouchableOpacity from 'Component/ThemedTouchableOpacity';
 import ThemedView from 'Component/ThemedView';
-import { TouchableOpacity, View } from 'react-native';
+import { View } from 'react-native';
 import { style } from './FilmPage.style.atv';
 import { FilmPageComponentProps } from './FilmPage.type';
 
@@ -11,12 +12,12 @@ export function FilmPageComponent(props: FilmPageComponentProps) {
 
   const renderAction = (text: string, onPress?: () => void, isDefault: boolean = false) => {
     return (
-      <TouchableOpacity
+      <ThemedTouchableOpacity
         hasTVPreferredFocus={isDefault}
         onPress={onPress}
       >
         <ThemedText>{text}</ThemedText>
-      </TouchableOpacity>
+      </ThemedTouchableOpacity>
     );
   };
 
@@ -36,9 +37,6 @@ export function FilmPageComponent(props: FilmPageComponentProps) {
   if (!film) {
     return (
       <ThemedView>
-        <TouchableOpacity hasTVPreferredFocus>
-          <ThemedText>Im a focused button</ThemedText>
-        </TouchableOpacity>
         <ThemedText>Loading...</ThemedText>
       </ThemedView>
     );

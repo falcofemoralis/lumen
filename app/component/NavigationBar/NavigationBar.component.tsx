@@ -6,13 +6,14 @@ import { Pressable } from 'react-native';
 import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 import { Tab, TABS } from './NavigationBar.config';
+import ThemedPressable from 'Component/ThemedPressable';
 
 export function NavigationBarComponent() {
   const renderBarButton = (props: BottomTabBarButtonProps) => {
     const style: any = props.style ?? {};
 
     return (
-      <Pressable
+      <ThemedPressable
         {...props}
         style={({ pressed, focused }) => [
           style,

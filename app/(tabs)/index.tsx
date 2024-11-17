@@ -1,5 +1,7 @@
+import PlayerPage from 'Route/PlayerPage';
 import HomePage from 'Route/HomePage';
 
 export default function HomeScreen() {
-  return <HomePage />;
+  return <PlayerPage />;
+  //return <HomePage />;
 }

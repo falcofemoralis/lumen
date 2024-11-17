@@ -1,6 +1,5 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import PlayerProgressBar from 'Component/PlayerProgressBar';
-import { ResizeMode, Video } from 'expo-av';
 import React, { useEffect, useState } from 'react';
 import {
   BackHandler,
@@ -15,12 +14,12 @@ import { scale } from 'Util/CreateStyles';
 import { FocusedElement } from './Player.config';
 import { styles } from './Player.style.atv';
 import { PlayerComponentProps } from './Player.type';
+import { VideoView } from 'expo-video';
+import ThemedTouchableOpacity from 'Component/ThemedTouchableOpacity';
 
 export function PlayerComponentTV(props: PlayerComponentProps) {
   const {
-    uri,
-    onPlaybackStatusUpdate,
-    playerRef,
+    player,
     status,
     showControls,
     toggleControls,
@@ -55,7 +54,7 @@ export function PlayerComponentTV(props: PlayerComponentProps) {
   });
 
   const renderAction = (icon: string, _name: string, action: any = () => {}) => (
-    <TouchableOpacity
+    <ThemedTouchableOpacity
       onFocus={() => setFocusedElement(FocusedElement.Action)}
       onPress={action}
     >
@@ -65,7 +64,7 @@ export function PlayerComponentTV(props: PlayerComponentProps) {
         size={scale(36)}
         color="white"
       />
-    </TouchableOpacity>
+    </ThemedTouchableOpacity>
   );
 
   const renderTopActions = () => {
@@ -94,7 +93,6 @@ export function PlayerComponentTV(props: PlayerComponentProps) {
     return (
       <PlayerProgressBar
         status={status}
-        playerRef={playerRef}
         focusedElement={focusedElement}
         setFocusedElement={setFocusedElement}
         rewindPosition={rewindPosition}
@@ -135,17 +133,13 @@ export function PlayerComponentTV(props: PlayerComponentProps) {
 
   return (
     <View style={styles.container}>
-      <Video
+      <VideoView
         style={styles.video}
-        ref={playerRef}
-        source={{ uri }}
-        shouldPlay={true}
-        resizeMode={ResizeMode.CONTAIN}
-        onError={(err) => {
-          console.log('Video ERROR', err);
-        }}
-        useNativeControls={false}
-        onPlaybackStatusUpdate={onPlaybackStatusUpdate}
+        player={player}
+        contentFit="contain"
+        nativeControls={false}
+        allowsFullscreen={false}
+        allowsPictureInPicture={false}
       />
       {renderControls()}
     </View>

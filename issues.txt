@@ -1,0 +1,5 @@
+1) react native hasTVPreferredFocus
+https://github.com/react-native-tvos/react-native-tvos/issues/759
+
+2) can't build because \D is invalid
+https://github.com/facebook/react-native/pull/47641/files
