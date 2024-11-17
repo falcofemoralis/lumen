@@ -2,14 +2,9 @@ import { Cache } from 'react-native-cache';
 import { cacheStorage } from 'Util/Storage';
 
 type KeyValuePair = [string, string | null];
-
-// eslint-disable-next-line @typescript-eslint/ban-types
 type OnMultiResult = Function;
-// eslint-disable-next-line @typescript-eslint/ban-types
 type OnResult = Function;
-
 type MultiCallback = (errors?: readonly (Error | null)[] | null) => void;
-
 type MultiGetCallback = (
   errors?: readonly (Error | null)[] | null,
   result?: readonly KeyValuePair[]

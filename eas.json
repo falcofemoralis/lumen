@@ -11,37 +11,11 @@
         "withoutCredentials": true,
         "gradleCommand": ":app:assembleDebug"
       },
-      "ios": {
-        "buildConfiguration": "Debug",
-        "simulator": true
-      }
-    },
-    "development_tv": {
-      "extends": "development",
       "env": {
         "EXPO_TV": "1"
       }
     },
-    "preview": {
-      "extends": "production",
-      "distribution": "internal",
-      "ios": {
-        "simulator": true
-      },
-      "android": {
-        "buildType": "apk",
-        "withoutCredentials": true
-      }
-    },
-    "preview_tv": {
-      "extends": "preview",
-      "env": {
-        "EXPO_TV": "1"
-      }
-    },
-    "production": {},
-    "production_tv": {
-      "extends": "production",
+    "production": {
       "android": {
         "buildType": "apk",
         "withoutCredentials": true
