@@ -2,6 +2,7 @@ import Colors from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const NAVIGATION_BAR_TV_WIDTH = 80;
+export const NAVIGATION_BAR_TV_WIDTH_EXPANDED = 256;
 
 export const styles = CreateStyles({
   layout: {
@@ -18,9 +19,10 @@ export const styles = CreateStyles({
     alignItems: 'flex-start',
   },
   focusedContainer: {
-    width: 256,
+    width: NAVIGATION_BAR_TV_WIDTH_EXPANDED,
   },
   tab: {
+    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
@@ -41,7 +43,7 @@ export const styles = CreateStyles({
   tabText: {
     display: 'flex',
     position: 'absolute',
-    left: 24,
+    left: 48,
     color: Colors.white,
   },
 });

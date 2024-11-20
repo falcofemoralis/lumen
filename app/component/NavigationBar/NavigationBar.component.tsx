@@ -1,21 +1,20 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BottomTabBarButtonProps } from '@react-navigation/bottom-tabs';
+import Icon from 'Component/Icon';
 import { Tabs } from 'expo-router';
 import React from 'react';
 import { Pressable } from 'react-native';
 import { Colors } from 'Style/Colors';
-import { scale } from 'Util/CreateStyles';
 import { Tab, TABS } from './NavigationBar.config';
+import { styles } from './NavigationBar.style';
+import { scale } from 'Util/CreateStyles';
 
 export function NavigationBarComponent() {
   const renderBarButton = (props: BottomTabBarButtonProps) => {
-    const style: any = props.style ?? {};
-
     return (
       <Pressable
         {...props}
         style={({ pressed, focused }) => [
-          style,
+          styles.button,
           {
             opacity: pressed || focused ? 0.6 : 1.0,
           },
@@ -37,11 +36,11 @@ export function NavigationBarComponent() {
           title: name,
           tabBarButton: renderBarButton,
           tabBarIcon: ({ color, focused }) => (
-            <MaterialCommunityIcons
-              // @ts-ignore
-              name={icon}
+            <Icon
+              style={styles.buttonIcon}
+              icon={icon}
               size={scale(24)}
-              color="black"
+              color="white"
             />
           ),
         }}
@@ -56,6 +55,7 @@ export function NavigationBarComponent() {
   return (
     <Tabs
       screenOptions={{
+        headerShown: false,
         tabBarActiveTintColor: Colors.primary,
       }}
     >

@@ -1,3 +1,4 @@
+import { Icon, IconPackType } from 'Component/Icon/Icon.type';
 import { Href } from 'expo-router';
 
 export enum TabType {
@@ -13,7 +14,17 @@ export interface Tab {
   id: TabType;
   route: Href<string>;
   name: string;
-  icon: string;
+  icon: Icon;
+  options?: {
+    href?: string | null;
+  };
+}
+
+export interface IgnoredTab {
+  name: string;
+  options: {
+    href: null;
+  };
 }
 
 export const DEFAULT_TAB = TabType.Home;
@@ -23,37 +34,78 @@ export const TABS: Tab[] = [
     id: TabType.Home,
     route: './',
     name: 'Home',
-    icon: 'home-variant-outline',
+    icon: {
+      name: 'home-variant-outline',
+      pack: IconPackType.MaterialCommunityIcons,
+    },
   },
   {
     id: TabType.Search,
     route: './search',
     name: 'Search',
-    icon: 'home-variant-outline',
+    icon: {
+      name: 'magnify',
+      pack: IconPackType.MaterialCommunityIcons,
+    },
   },
+  {
+    id: TabType.Bookmarks,
+    route: './bookmarks',
+    name: 'Bookmarks',
+    icon: {
+      name: 'movie-star-outline',
+      pack: IconPackType.MaterialCommunityIcons,
+    },
+  },
+  {
+    id: TabType.Recent,
+    route: './recent',
+    name: 'Recent',
+    icon: {
+      name: 'history',
+      pack: IconPackType.MaterialCommunityIcons,
+    },
+  },
+  {
+    id: TabType.Notifications,
+    route: './notifications',
+    name: 'Notifications',
+    icon: {
+      name: 'bell-outline',
+      pack: IconPackType.MaterialCommunityIcons,
+    },
+  },
+];
 
-  // {
-  //   id: TabType.Bookmarks,
-  //   route: './',
-  //   name: 'Bookmarks',
-  //   icon: 'home-variant-outline',
-  // },
-  // {
-  //   id: TabType.Recent,
-  //   route: './film',
-  //   name: 'Recent',
-  //   icon: 'home-variant-outline',
-  // },
-  // {
-  //   id: TabType.Notifications,
-  //   route: './',
-  //   name: 'Notifications',
-  //   icon: 'home-variant-outline',
-  // },
-  // {
-  //   id: TabType.Settings,
-  //   route: './film',
-  //   name: 'Settings',
-  //   icon: 'home-variant-outline',
-  // },
+export const TABS_TV: Tab[] = [
+  {
+    id: TabType.Settings,
+    route: './settings',
+    name: 'Settings',
+    icon: {
+      name: 'settings',
+      pack: IconPackType.MaterialIcons,
+    },
+  },
+];
+
+export const IGNORED_ROUTES: IgnoredTab[] = [
+  {
+    name: './settings',
+    options: {
+      href: null,
+    },
+  },
+  {
+    name: './film',
+    options: {
+      href: null,
+    },
+  },
+  {
+    name: './player',
+    options: {
+      href: null,
+    },
+  },
 ];

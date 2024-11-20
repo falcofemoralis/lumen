@@ -1,4 +1,4 @@
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import Icon from 'Component/Icon';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
 import { router, Slot } from 'expo-router';
@@ -6,19 +6,19 @@ import { observer } from 'mobx-react-lite';
 import React, { createRef, useRef, useState } from 'react';
 import {
   Dimensions,
+  findNodeHandle,
   HWEvent,
   Pressable,
   TVFocusGuideView,
   useTVEventHandler,
   View,
-  findNodeHandle,
 } from 'react-native';
 import { useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import NavigationStore from 'Store/Navigation.store';
 import { TVEventType } from 'Type/TVEvent.type';
-import { scale } from 'Util/CreateStyles';
-import { DEFAULT_TAB, Tab, TABS, TabType } from './NavigationBar.config';
+import { DEFAULT_TAB, Tab, TABS, TABS_TV, TabType } from './NavigationBar.config';
 import { NAVIGATION_BAR_TV_WIDTH, styles } from './NavigationBar.style.atv';
+import { scale } from 'Util/CreateStyles';
 
 export function NavigationBarComponent() {
   const [isOpened, setIsOpened] = useState(false);
@@ -82,21 +82,19 @@ export function NavigationBarComponent() {
         // @ts-ignore
         ref={elementsRef.current[idx]}
       >
-        <MaterialCommunityIcons
+        <Icon
           style={styles.tabIcon}
-          // @ts-ignore
-          name={icon}
+          icon={icon}
           size={scale(24)}
           color="white"
         />
-        {/* {isOpened && <ThemedText style={styles.tabText}>{name}</ThemedText>} */}
-        <ThemedText style={styles.tabText}>{name}</ThemedText>
+        {isOpened && <ThemedText style={styles.tabText}>{name}</ThemedText>}
       </Pressable>
     );
   };
 
   const renderTabs = () => {
-    return TABS.map((tab, idx) => renderTab(tab, idx));
+    return TABS.concat(TABS_TV).map((tab, idx) => renderTab(tab, idx));
   };
 
   const renderBar = () => {
