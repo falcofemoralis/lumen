@@ -4,9 +4,9 @@ import { Tabs } from 'expo-router';
 import React from 'react';
 import { Pressable } from 'react-native';
 import { Colors } from 'Style/Colors';
-import { Tab, TABS } from './NavigationBar.config';
-import { styles } from './NavigationBar.style';
 import { scale } from 'Util/CreateStyles';
+import { IGNORED_ROUTES, Tab, TABS } from './NavigationBar.config';
+import { styles } from './NavigationBar.style';
 
 export function NavigationBarComponent() {
   const renderBarButton = (props: BottomTabBarButtonProps) => {
@@ -14,7 +14,6 @@ export function NavigationBarComponent() {
       <Pressable
         {...props}
         style={({ pressed, focused }) => [
-          styles.button,
           {
             opacity: pressed || focused ? 0.6 : 1.0,
           },
@@ -34,13 +33,11 @@ export function NavigationBarComponent() {
         name={formattedRoute === '' ? 'index' : formattedRoute}
         options={{
           title: name,
-          tabBarButton: renderBarButton,
           tabBarIcon: ({ color, focused }) => (
             <Icon
-              style={styles.buttonIcon}
               icon={icon}
               size={scale(24)}
-              color="white"
+              color={color}
             />
           ),
         }}
@@ -52,14 +49,28 @@ export function NavigationBarComponent() {
     return TABS.map((tab, idx) => renderTab(tab, idx));
   };
 
+  const renderIgnoredRoutes = () => {
+    return IGNORED_ROUTES.map((route, idx) => (
+      <Tabs.Screen
+        key={route.name}
+        name={route.name}
+        options={route.options}
+      />
+    ));
+  };
+
   return (
     <Tabs
       screenOptions={{
+        tabBarStyle: styles.tabBar,
         headerShown: false,
-        tabBarActiveTintColor: Colors.primary,
+        tabBarActiveTintColor: Colors.secondary,
+        tabBarInactiveTintColor: Colors.white,
+        tabBarHideOnKeyboard: true,
       }}
     >
       {renderTabs()}
+      {renderIgnoredRoutes()}
     </Tabs>
   );
 }

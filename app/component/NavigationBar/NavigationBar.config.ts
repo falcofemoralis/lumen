@@ -91,19 +91,19 @@ export const TABS_TV: Tab[] = [
 
 export const IGNORED_ROUTES: IgnoredTab[] = [
   {
-    name: './settings',
+    name: 'settings',
     options: {
       href: null,
     },
   },
   {
-    name: './film',
+    name: 'film/[link]',
     options: {
       href: null,
     },
   },
   {
-    name: './player',
+    name: 'player',
     options: {
       href: null,
     },

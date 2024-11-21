@@ -32,7 +32,7 @@ export const styles = CreateStyles({
     marginBottom: 12,
   },
   activeTab: {
-    backgroundColor: 'rgba(0, 74, 119, 0.4)',
+    backgroundColor: Colors.secondary,
   },
   focusedTab: {
     backgroundColor: Colors.white,

@@ -3,16 +3,21 @@ import { DimensionValue, RefreshControl, ScrollView, TouchableOpacity } from 're
 import { GridComponentProps } from './Grid.type';
 import FilmCard from 'Component/FilmCard';
 import { NUMBER_OF_COLUMNS } from './Grid.config';
+import { styles } from './Grid.style';
 
 export function GridComponent(props: GridComponentProps) {
   const { rows } = props;
+
+  const onRefresh = () => {
+    console.log('Refresh');
+  };
 
   return (
     <ScrollView
       contentContainerStyle={styles.scrollView}
       refreshControl={
         <RefreshControl
-          refreshing={refreshing}
+          refreshing={false}
           onRefresh={onRefresh}
         />
       }
@@ -32,7 +37,7 @@ export function GridComponent(props: GridComponentProps) {
                 key={film.id}
                 style={{ width: (100 / NUMBER_OF_COLUMNS + '%') as DimensionValue }}
               >
-                <FilmCard film={film} />
+                <FilmCard filmCard={film} />
               </TouchableOpacity>
             ))}
           </ThemedView>
