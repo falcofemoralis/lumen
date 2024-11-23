@@ -120,24 +120,7 @@ export function NavigationBarComponent() {
     );
   };
 
-  const renderPageContent = () => {
-    const width = NavigationStore.isNavigationVisible
-      ? windowWidth - NAVIGATION_BAR_TV_WIDTH
-      : windowWidth;
-
-    return (
-      <View style={{ width }}>
-        <Slot />
-      </View>
-    );
-  };
-
-  return (
-    <ThemedView style={styles.layout}>
-      {renderBar()}
-      {renderPageContent()}
-    </ThemedView>
-  );
+  return <ThemedView>{renderBar()}</ThemedView>;
 }
 
 export default observer(NavigationBarComponent);

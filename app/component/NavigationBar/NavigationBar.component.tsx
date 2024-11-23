@@ -5,7 +5,7 @@ import React from 'react';
 import { Pressable } from 'react-native';
 import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
-import { IGNORED_ROUTES, Tab, TABS } from './NavigationBar.config';
+import { Tab, TABS } from './NavigationBar.config';
 import { styles } from './NavigationBar.style';
 
 export function NavigationBarComponent() {
@@ -49,16 +49,6 @@ export function NavigationBarComponent() {
     return TABS.map((tab, idx) => renderTab(tab, idx));
   };
 
-  const renderIgnoredRoutes = () => {
-    return IGNORED_ROUTES.map((route, idx) => (
-      <Tabs.Screen
-        key={route.name}
-        name={route.name}
-        options={route.options}
-      />
-    ));
-  };
-
   return (
     <Tabs
       screenOptions={{
@@ -70,7 +60,6 @@ export function NavigationBarComponent() {
       }}
     >
       {renderTabs()}
-      {renderIgnoredRoutes()}
     </Tabs>
   );
 }

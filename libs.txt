@@ -15,6 +15,7 @@ If list will have issues https://github.com/marcocesarato/react-native-big-list
 TV Only
 RN TV           https://github.com/react-native-tvos/react-native-tvos
 EXPO TV         https://docs.expo.dev/guides/building-for-tv/
+navigation      https://github.com/bamlab/react-tv-space-navigation?tab=readme-ov-file#api-documentation
 
 Mobile Only
 Material UI     https://reactnativepaper.com/ - UI

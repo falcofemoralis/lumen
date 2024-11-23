@@ -88,24 +88,3 @@ export const TABS_TV: Tab[] = [
     },
   },
 ];
-
-export const IGNORED_ROUTES: IgnoredTab[] = [
-  {
-    name: 'settings',
-    options: {
-      href: null,
-    },
-  },
-  {
-    name: 'film/[link]',
-    options: {
-      href: null,
-    },
-  },
-  {
-    name: 'player',
-    options: {
-      href: null,
-    },
-  },
-];
