@@ -4,7 +4,7 @@ import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
 import { DEMO_VIDEO } from 'Route/PlayerPage/PlayerPage.config';
 import { TouchableOpacity, View } from 'react-native';
-import { style } from './FilmPage.style.atv';
+import { styles } from './FilmPage.style.atv';
 import { FilmPageComponentProps } from './FilmPage.type';
 
 export function FilmPageComponent(props: FilmPageComponentProps) {
@@ -49,7 +49,7 @@ export function FilmPageComponent(props: FilmPageComponentProps) {
     const streams = filmVideo.streams;
 
     return (
-      <View style={style.player}>
+      <View style={styles.player}>
         <Player uri={DEMO_VIDEO ?? streams[0].url} />
       </View>
     );

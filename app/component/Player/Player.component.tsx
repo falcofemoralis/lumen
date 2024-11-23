@@ -10,6 +10,7 @@ import { PlayerComponentProps } from './Player.type';
 
 export function PlayerComponent(props: PlayerComponentProps) {
   const {
+    uri,
     onPlaybackStatusUpdate,
     playerRef,
     status,
@@ -49,7 +50,7 @@ export function PlayerComponent(props: PlayerComponentProps) {
         <Video
           style={styles.video}
           ref={playerRef}
-          source={{ uri: DEMO_VIDEO }}
+          source={{ uri }}
           shouldPlay={true}
           resizeMode={ResizeMode.CONTAIN}
           onError={(err) => {

@@ -18,7 +18,11 @@ export function FilmPageContainer(props: FilmPageContainerProps) {
     const backAction = () => {
       if (filmVideo) {
         setFilmVideo(null);
-        NavigationStore.toggleNavigation();
+
+        if (AppStore.isTV) {
+          NavigationStore.toggleNavigation();
+        }
+
         return true;
       }
 
@@ -37,7 +41,9 @@ export function FilmPageContainer(props: FilmPageContainerProps) {
 
     const video = await AppStore.currentService.getFilmVideo(film);
 
-    NavigationStore.toggleNavigation();
+    if (AppStore.isTV) {
+      NavigationStore.toggleNavigation();
+    }
 
     setFilmVideo(video);
   };

@@ -2,12 +2,15 @@ import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
 import { FilmPageComponentProps } from './FilmPage.type';
 import ThemedImage from 'Component/ThemedImage';
-import { ActivityIndicator, Pressable } from 'react-native';
+import { ActivityIndicator, Pressable, View } from 'react-native';
 import { Button } from 'react-native-paper';
 import Colors from 'Style/Colors';
+import { styles } from './FilmPage.style.';
+import Player from 'Component/Player';
+import { DEMO_VIDEO } from 'Route/PlayerPage/PlayerPage.config';
 
 export function FilmPageComponent(props: FilmPageComponentProps) {
-  const { film } = props;
+  const { film, filmVideo, playFilm } = props;
 
   if (!film) {
     console.log('No film');
@@ -23,6 +26,16 @@ export function FilmPageComponent(props: FilmPageComponentProps) {
     );
   }
 
+  if (filmVideo) {
+    const streams = filmVideo.streams;
+
+    return (
+      <View style={styles.player}>
+        <Player uri={DEMO_VIDEO ?? streams[0].url} />
+      </View>
+    );
+  }
+
   return (
     <ThemedView>
       <ThemedText>Page</ThemedText>
@@ -35,10 +48,7 @@ export function FilmPageComponent(props: FilmPageComponentProps) {
       <ThemedView>
         <ThemedText>{film.title}</ThemedText>
         <ThemedText>{film.id}</ThemedText>
-        <Pressable>
-          <ThemedText>Open film</ThemedText>
-        </Pressable>
-        <Button>Open film</Button>
+        <Button onPress={playFilm}>Open film</Button>
       </ThemedView>
     </ThemedView>
   );

@@ -14,9 +14,6 @@ import AppStore from 'Store/App.store';
 import NavigationStore from 'Store/Navigation.store';
 import Colors from 'Style/Colors';
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
-
 export interface Screen {
   name?: string;
   options?: any;
@@ -36,6 +33,9 @@ export const SCREENS: Screen[] = [
     name: '+not-found',
   },
 ];
+
+// Prevent the splash screen from auto-hiding before asset loading is complete.
+SplashScreen.preventAutoHideAsync();
 
 export function RootLayout() {
   const windowWidth = Dimensions.get('window').width;
@@ -73,7 +73,12 @@ export function RootLayout() {
 
   const renderStack = () => {
     return (
-      <Stack screenOptions={{ contentStyle: { marginTop: Constants.statusBarHeight } }}>
+      <Stack
+        screenOptions={{
+          contentStyle: { marginTop: Constants.statusBarHeight },
+          animation: 'fade',
+        }}
+      >
         {renderScreens()}
       </Stack>
     );

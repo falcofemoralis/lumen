@@ -4,7 +4,7 @@ import { services } from 'Api/services';
 import { makeAutoObservable } from 'mobx';
 
 class AppStore {
-  public isTV = false;
+  public isTV = true;
   public currentService = RezkaApi as ApiInterface;
 
   constructor() {
