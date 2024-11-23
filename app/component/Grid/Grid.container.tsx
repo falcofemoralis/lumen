@@ -5,13 +5,13 @@ import FilmCard from 'Type/FilmCard.interface';
 import { NUMBER_OF_COLUMNS, NUMBER_OF_COLUMNS_TV } from './Grid.config';
 import { router } from 'expo-router';
 import { withTV } from 'Hooks/withTV';
-import AppStore from 'Store/App.store';
+import ConfigStore from 'Store/Config.store';
 
 export function PlayerProgressBarContainer(props: GridContainerProps) {
   const { films } = props;
 
   const calculateRows = () => {
-    const numberOfColumns = AppStore.isTV ? NUMBER_OF_COLUMNS_TV : NUMBER_OF_COLUMNS;
+    const numberOfColumns = ConfigStore.isTV ? NUMBER_OF_COLUMNS_TV : NUMBER_OF_COLUMNS;
 
     const columns: FilmCard[][] = Array.from({ length: numberOfColumns }, () => []);
 

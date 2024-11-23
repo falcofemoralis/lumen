@@ -1,5 +1,5 @@
 import { Dimensions, StyleSheet } from 'react-native';
-import AppStore from 'Store/App.store';
+import ConfigStore from 'Store/Config.store';
 
 const { width: W } = Dimensions.get('screen');
 
@@ -30,7 +30,7 @@ const objectMap2 = (object: any, overload: any) => {
  * ATV always has size 960, so need to convert TVbox to 960
  */
 export const ratio = () => {
-  return AppStore.isTV ? W / 960 : 1;
+  return ConfigStore.isTV ? W / 960 : 1;
 };
 
 export const scale = (number: any) => {

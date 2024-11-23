@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
-import AppStore from 'Store/App.store';
+import ConfigStore from 'Store/Config.store';
 import FilmCard from 'Type/FilmCard.interface';
 import HomePageComponent from './HomePage.component';
 import { withTV } from 'Hooks/withTV';
@@ -10,7 +10,7 @@ export function HomePageContainer() {
 
   useEffect(() => {
     const loadFilms = async () => {
-      const filmList = await AppStore.currentService.getFilms(1);
+      const filmList = await ConfigStore.currentService.getFilms(1);
       const { films } = filmList;
 
       setFilms(films);

@@ -10,7 +10,7 @@ import { StatusBar } from 'expo-status-bar';
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import { Dimensions, useColorScheme, View } from 'react-native';
-import AppStore from 'Store/App.store';
+import ConfigStore from 'Store/Config.store';
 import NavigationStore from 'Store/Navigation.store';
 import Colors from 'Style/Colors';
 
@@ -32,6 +32,9 @@ export const SCREENS: Screen[] = [
   {
     name: '+not-found',
   },
+  {
+    name: 'welcome',
+  },
 ];
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -40,20 +43,23 @@ SplashScreen.preventAutoHideAsync();
 export function RootLayout() {
   const windowWidth = Dimensions.get('window').width;
   const colorScheme = useColorScheme();
-  const [loaded, error] = useFonts({
+  const [fontLoaded, fontError] = useFonts({
     SpaceMono: require('../../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
   useEffect(() => {
-    if (loaded || error) {
+    if (fontLoaded || fontError) {
+      console.log('loaded');
+
       SplashScreen.hideAsync();
-      if (error) {
-        console.warn(`Error in loading fonts: ${error}`);
+
+      if (fontError) {
+        console.warn(`Error in loading fonts: ${fontError}`);
       }
     }
-  }, [loaded, error]);
+  }, [fontLoaded, fontError]);
 
-  if (!loaded && !error) {
+  if (!fontLoaded && !fontError) {
     return null;
   }
 
@@ -101,13 +107,17 @@ export function RootLayout() {
     return renderStack();
   };
 
+  const renderLayout = () => {
+    return ConfigStore.isTV ? renderTVLayout() : renderMobileLayout();
+  };
+
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <StatusBar
         style="light"
         backgroundColor={Colors.background}
       />
-      {AppStore.isTV ? renderTVLayout() : renderMobileLayout()}
+      {renderLayout()}
     </ThemeProvider>
   );
 }

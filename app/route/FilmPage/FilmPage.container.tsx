@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import AppStore from 'Store/App.store';
+import ConfigStore from 'Store/Config.store';
 import Film from 'Type/Film.interface';
 import FilmPageComponent from './FilmPage.component';
 import FilmPageComponentTV from './FilmPage.component.atv';
@@ -19,7 +19,7 @@ export function FilmPageContainer(props: FilmPageContainerProps) {
       if (filmVideo) {
         setFilmVideo(null);
 
-        if (AppStore.isTV) {
+        if (ConfigStore.isTV) {
           NavigationStore.toggleNavigation();
         }
 
@@ -39,9 +39,9 @@ export function FilmPageContainer(props: FilmPageContainerProps) {
       return;
     }
 
-    const video = await AppStore.currentService.getFilmVideo(film);
+    const video = await ConfigStore.currentService.getFilmVideo(film);
 
-    if (AppStore.isTV) {
+    if (ConfigStore.isTV) {
       NavigationStore.toggleNavigation();
     }
 
@@ -50,7 +50,7 @@ export function FilmPageContainer(props: FilmPageContainerProps) {
 
   useEffect(() => {
     const loadFilm = async () => {
-      const film = await AppStore.currentService.getFilm(link);
+      const film = await ConfigStore.currentService.getFilm(link);
 
       setFilm(film);
     };

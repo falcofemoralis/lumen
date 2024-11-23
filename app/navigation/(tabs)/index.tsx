@@ -1,5 +1,13 @@
+import { Redirect } from 'expo-router';
 import HomePage from 'Route/HomePage';
+import ConfigStore from 'Store/Config.store';
 
-export default function HomeScreen() {
+export function HomeScreen() {
+  if (!ConfigStore.isConfigured) {
+    return <Redirect href="/welcome" />;
+  }
+
   return <HomePage />;
 }
+
+export default HomeScreen;
