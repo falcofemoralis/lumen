@@ -6,7 +6,7 @@ import { NUMBER_OF_COLUMNS } from './Grid.config';
 import { styles } from './Grid.style';
 
 export function GridComponent(props: GridComponentProps) {
-  const { rows } = props;
+  const { rows, handleOnPress } = props;
 
   const onRefresh = () => {
     console.log('Refresh');
@@ -36,6 +36,7 @@ export function GridComponent(props: GridComponentProps) {
               <TouchableOpacity
                 key={film.id}
                 style={{ width: (100 / NUMBER_OF_COLUMNS + '%') as DimensionValue }}
+                onPress={() => handleOnPress(film)}
               >
                 <FilmCard filmCard={film} />
               </TouchableOpacity>
