@@ -1,4 +1,6 @@
 import { FilmType } from './FilmType.type';
+import { FilmVideo } from './FilmVideo.interface';
+import { FilmVoice } from './FilmVoice.interface';
 
 export default interface Film {
   // base
@@ -26,12 +28,10 @@ export default interface Film {
   related?: string[];
   bookmarks?: string[];
 
-  // stream
-  series?: string[];
-  translations?: string[];
+  // video
+  video?: FilmVideo; // can be empty for series
+  voices?: FilmVoice[]; // can be empty for movie
   lastVoiceId?: string;
-  lastSeason?: string;
-  lastEpisode?: string;
 
   // flags
   isPendingRelease?: boolean;

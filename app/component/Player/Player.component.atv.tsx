@@ -15,6 +15,7 @@ import { scale } from 'Util/CreateStyles';
 import { FocusedElement } from './Player.config';
 import { styles } from './Player.style.atv';
 import { PlayerComponentProps } from './Player.type';
+import NotificationStore from 'Store/Notification.store';
 
 export function PlayerComponentTV(props: PlayerComponentProps) {
   const {
@@ -142,7 +143,7 @@ export function PlayerComponentTV(props: PlayerComponentProps) {
         shouldPlay={true}
         resizeMode={ResizeMode.CONTAIN}
         onError={(err) => {
-          console.log('Video ERROR', err);
+          NotificationStore.displayError(err);
         }}
         useNativeControls={false}
         onPlaybackStatusUpdate={onPlaybackStatusUpdate}

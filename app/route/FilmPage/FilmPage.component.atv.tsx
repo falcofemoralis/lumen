@@ -1,20 +1,33 @@
+import FilmVideoSelector from 'Component/FilmVideoSelector';
 import Player from 'Component/Player';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
 import { DEMO_VIDEO } from 'Route/PlayerPage/PlayerPage.config';
+import { useState } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import { styles } from './FilmPage.style.atv';
 import { FilmPageComponentProps } from './FilmPage.type';
 
 export function FilmPageComponent(props: FilmPageComponentProps) {
-  const { film, filmVideo, playFilm } = props;
+  const { film, isSelectorVisible, playFilm, hideVideoSelector, handleVideoSelect } = props;
+  const [focusedElement, setFocusedElement] = useState<string | null>('Watch Now');
 
-  const renderAction = (text: string, onPress?: () => void, isDefault: boolean = false) => {
+  const handleHide = () => {
+    setFocusedElement('Watch Now');
+    hideVideoSelector();
+  };
+
+  // set focus element
+  // remove focused element
+  // back? set focus
+  const renderAction = (text: string, onPress?: () => void) => {
     return (
       <TouchableOpacity
-        hasTVPreferredFocus={isDefault}
+        hasTVPreferredFocus={focusedElement === text}
         onPress={onPress}
+        onFocus={() => setFocusedElement(text)}
+        onBlur={() => setFocusedElement(null)}
       >
         <ThemedText>{text}</ThemedText>
       </TouchableOpacity>
@@ -24,13 +37,35 @@ export function FilmPageComponent(props: FilmPageComponentProps) {
   const renderActions = () => {
     return (
       <ThemedView>
-        {renderAction('Watch Now', playFilm, true)}
+        {renderAction('Watch Now', playFilm)}
         {renderAction('Comments')}
         {renderAction('Bookmark')}
         {renderAction('Trailer')}
         {renderAction('Share')}
         {renderAction('Download')}
       </ThemedView>
+    );
+  };
+
+  const renderVideoSelector = () => {
+    if (!film) {
+      return null;
+    }
+
+    const { voices } = film;
+
+    if (!voices) {
+      return null;
+    }
+
+    return (
+      <FilmVideoSelector
+        film={film}
+        voices={voices}
+        visible={isSelectorVisible}
+        onHide={hideVideoSelector}
+        onSelect={handleVideoSelect}
+      />
     );
   };
 
@@ -45,12 +80,10 @@ export function FilmPageComponent(props: FilmPageComponentProps) {
     );
   }
 
-  if (filmVideo) {
-    const streams = filmVideo.streams;
-
+  if (false) {
     return (
       <View style={styles.player}>
-        <Player uri={DEMO_VIDEO ?? streams[0].url} />
+        <Player uri={DEMO_VIDEO} />
       </View>
     );
   }
@@ -65,6 +98,7 @@ export function FilmPageComponent(props: FilmPageComponentProps) {
         src={film.poster}
         style={{ height: 250, width: 140 }}
       />
+      {renderVideoSelector()}
     </ThemedView>
   );
 }

@@ -4,12 +4,13 @@ import { NAVIGATION_BAR_TV_WIDTH } from 'Component/NavigationBar/NavigationBar.s
 import ThemedView from 'Component/ThemedView';
 import Constants from 'expo-constants';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { ErrorBoundary, Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import { Dimensions, useColorScheme, View } from 'react-native';
+import { PaperProvider } from 'react-native-paper';
 import ConfigStore from 'Store/Config.store';
 import NavigationStore from 'Store/Navigation.store';
 import Colors from 'Style/Colors';
@@ -49,8 +50,6 @@ export function RootLayout() {
 
   useEffect(() => {
     if (fontLoaded || fontError) {
-      console.log('loaded');
-
       SplashScreen.hideAsync();
 
       if (fontError) {
@@ -113,11 +112,13 @@ export function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <StatusBar
-        style="light"
-        backgroundColor={Colors.background}
-      />
-      {renderLayout()}
+      <PaperProvider>
+        <StatusBar
+          style="light"
+          backgroundColor={Colors.background}
+        />
+        {renderLayout()}
+      </PaperProvider>
     </ThemeProvider>
   );
 }

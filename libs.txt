@@ -9,16 +9,16 @@ mmkv Storage    https://github.com/ammarahm-ed/react-native-mmkv-storage
 [deprecated] Smooth trans  https://github.com/IjzerenHein/react-native-shared-element
    use https://docs.swmansion.com/react-native-reanimated/docs/shared-element-transitions/overview/
 Cache image     https://github.com/echowaves/expo-cached-image
-//
-If list will have issues https://github.com/marcocesarato/react-native-big-list
+Material UI     https://reactnativepaper.com/ - UI
 
+///
 TV Only
 RN TV           https://github.com/react-native-tvos/react-native-tvos
 EXPO TV         https://docs.expo.dev/guides/building-for-tv/
 navigation      https://github.com/bamlab/react-tv-space-navigation?tab=readme-ov-file#api-documentation
 
+///
 Mobile Only
-Material UI     https://reactnativepaper.com/ - UI
 Refresh list    https://reactnative.dev/docs/refreshcontrol
 Slider          https://github.com/callstack/react-native-slider
 
@@ -26,6 +26,7 @@ Slider          https://github.com/callstack/react-native-slider
 Examples
 https://github.com/react-native-tvos/IgniteTV?tab=readme-ov-file
 
+///
 Reuse
 TV Seekbar\other https://github.com/kosso/VideoPlayerDemo
 Player example   https://github.com/itsnubix/react-native-video-controls/blob/master/VideoPlayer.js

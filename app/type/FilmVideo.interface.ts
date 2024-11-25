@@ -1,10 +1,7 @@
-export interface FilmVideoStream {
-  url: string;
-  quality: string;
-}
+import { FilmStream } from './FilmStream.interface';
 
 export interface FilmVideo {
-  streams: FilmVideoStream[];
+  streams: FilmStream[];
   subtitles?: string[];
   thumbnails?: string[];
 }

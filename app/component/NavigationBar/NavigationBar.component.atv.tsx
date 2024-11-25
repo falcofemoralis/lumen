@@ -1,7 +1,7 @@
 import Icon from 'Component/Icon';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
-import { router, Slot } from 'expo-router';
+import { router } from 'expo-router';
 import { observer } from 'mobx-react-lite';
 import React, { createRef, useRef, useState } from 'react';
 import {
@@ -11,20 +11,18 @@ import {
   Pressable,
   TVFocusGuideView,
   useTVEventHandler,
-  View,
 } from 'react-native';
 import { useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import NavigationStore from 'Store/Navigation.store';
 import { TVEventType } from 'Type/TVEvent.type';
-import { DEFAULT_TAB, Tab, TABS, TABS_TV, TabType } from './NavigationBar.config';
-import { NAVIGATION_BAR_TV_WIDTH, styles } from './NavigationBar.style.atv';
 import { scale } from 'Util/CreateStyles';
+import { DEFAULT_TAB, Tab, TABS, TABS_TV, TabType } from './NavigationBar.config';
+import { styles } from './NavigationBar.style.atv';
 
 export function NavigationBarComponent() {
   const [isOpened, setIsOpened] = useState(false);
   const [selectedTab, setSelectedTab] = useState<TabType>(DEFAULT_TAB);
   const elementsRef = useRef(TABS.map(() => createRef()));
-  const windowWidth = Dimensions.get('window').width;
 
   useTVEventHandler((evt: HWEvent) => {
     const { eventType: type, tag } = evt;

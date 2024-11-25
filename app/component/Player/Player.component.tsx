@@ -7,6 +7,7 @@ import { Pressable, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { styles } from './Player.style';
 import { PlayerComponentProps } from './Player.type';
+import NotificationStore from 'Store/Notification.store';
 
 export function PlayerComponent(props: PlayerComponentProps) {
   const {
@@ -54,7 +55,7 @@ export function PlayerComponent(props: PlayerComponentProps) {
           shouldPlay={true}
           resizeMode={ResizeMode.CONTAIN}
           onError={(err) => {
-            console.log('Video ERROR', err);
+            NotificationStore.displayError(err);
           }}
           useNativeControls={false}
           onPlaybackStatusUpdate={onPlaybackStatusUpdate}

@@ -1,19 +1,29 @@
+import { ErrorBoundaryProps } from 'expo-router';
+import { withTV } from 'Hooks/withTV';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
-import ConfigStore from 'Store/Config.store';
+import ServiceStore from 'Store/Service.store';
 import FilmCard from 'Type/FilmCard.interface';
 import HomePageComponent from './HomePage.component';
-import { withTV } from 'Hooks/withTV';
+import NotificationStore from 'Store/Notification.store';
+
+export function ErrorBoundary(props: ErrorBoundaryProps) {
+  return <ErrorBoundary {...props} />;
+}
 
 export function HomePageContainer() {
   const [films, setFilms] = useState<FilmCard[]>([]);
 
   useEffect(() => {
     const loadFilms = async () => {
-      const filmList = await ConfigStore.currentService.getFilms(1);
-      const { films } = filmList;
+      try {
+        const filmList = await ServiceStore.getCurrentService().getFilms(1);
+        const { films } = filmList;
 
-      setFilms(films);
+        setFilms(films);
+      } catch (error) {
+        NotificationStore.displayError(error);
+      }
     };
 
     loadFilms();

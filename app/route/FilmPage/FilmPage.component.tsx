@@ -1,20 +1,42 @@
+import Player from 'Component/Player';
+import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
-import { FilmPageComponentProps } from './FilmPage.type';
-import ThemedImage from 'Component/ThemedImage';
-import { ActivityIndicator, Pressable, View } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 import { Button } from 'react-native-paper';
+import { DEMO_VIDEO } from 'Route/PlayerPage/PlayerPage.config';
 import Colors from 'Style/Colors';
 import { styles } from './FilmPage.style.';
-import Player from 'Component/Player';
-import { DEMO_VIDEO } from 'Route/PlayerPage/PlayerPage.config';
+import { FilmPageComponentProps } from './FilmPage.type';
+import FilmVideoSelector from 'Component/FilmVideoSelector';
 
 export function FilmPageComponent(props: FilmPageComponentProps) {
-  const { film, filmVideo, playFilm } = props;
+  const { film, isSelectorVisible, filmVideo, playFilm, hideVideoSelector, handleVideoSelect } =
+    props;
+
+  const renderVideoSelector = () => {
+    if (!film) {
+      return null;
+    }
+
+    const { voices } = film;
+
+    if (!voices) {
+      return null;
+    }
+
+    return (
+      <FilmVideoSelector
+        film={film}
+        voices={voices}
+        visible={isSelectorVisible}
+        onHide={hideVideoSelector}
+        onSelect={handleVideoSelect}
+      />
+    );
+  };
 
   if (!film) {
-    console.log('No film');
-
     return (
       <ThemedView>
         <ActivityIndicator
@@ -27,11 +49,10 @@ export function FilmPageComponent(props: FilmPageComponentProps) {
   }
 
   if (filmVideo) {
-    const streams = filmVideo.streams;
-
+    // TODO
     return (
       <View style={styles.player}>
-        <Player uri={DEMO_VIDEO ?? streams[0].url} />
+        <Player uri={DEMO_VIDEO} />
       </View>
     );
   }
@@ -50,6 +71,7 @@ export function FilmPageComponent(props: FilmPageComponentProps) {
         <ThemedText>{film.id}</ThemedText>
         <Button onPress={playFilm}>Open film</Button>
       </ThemedView>
+      {renderVideoSelector()}
     </ThemedView>
   );
 }

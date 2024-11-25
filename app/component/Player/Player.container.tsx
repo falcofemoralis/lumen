@@ -6,6 +6,7 @@ import PlayerComponent from './Player.component';
 import PlayerComponentTV from './Player.component.atv';
 import { AWAKE_TAG, DEFAULT_STATUS, RewindDirection } from './Player.config';
 import { PlayerContainerProps, Status } from './Player.type';
+import NotificationStore from 'Store/Notification.store';
 
 export function PlayerContainer(props: PlayerContainerProps) {
   const { uri } = props;
@@ -27,7 +28,7 @@ export function PlayerContainer(props: PlayerContainerProps) {
     }
 
     if (newStatus?.error) {
-      console.log('VIDEO ERROR!', newStatus?.error);
+      NotificationStore.displayError(newStatus.error);
       return;
     }
 

@@ -51,36 +51,13 @@ export const postFetch = (
     },
   });
 
-// export const checkForErrors = <T>(res: ResponseBody<T>): Promise<T> =>
-//   new Promise((resolve, reject) => {
-//     const { errors, data } = res;
-
-//     if (errors) {
-//       reject(errors);
-
-//       return;
-//     }
-
-//     resolve(data);
-//   });
-
-// TODO: Add to logs pool
-export const handleConnectionError = (err: unknown, msg: string): void => {
-  console.error(msg, err);
-};
-
 export const parseResponse = async (response: Response): Promise<string> => {
   try {
     const promiseResponse = await response;
     const data = await promiseResponse.text();
 
     return data;
-
-    // TODO handle errors, such as site not available
-    //return await checkForErrors(data);
   } catch (err) {
-    handleConnectionError(err, 'Can not parse JSON!');
-
     throw err;
   }
 };
@@ -88,16 +65,11 @@ export const parseResponse = async (response: Response): Promise<string> => {
 export const parseJSONResponse = async (response: Response): Promise<string> => {
   try {
     const promiseResponse = await response;
-    const data = await promiseResponse.json(); // .json();
+    const data = await promiseResponse.json();
 
     return data;
-
-    // TODO handle errors, such as site not available
-    //return await checkForErrors(data);
-  } catch (err) {
-    handleConnectionError(err, 'Can not parse JSON!');
-
-    throw err;
+  } catch (error) {
+    throw new Error(error as string);
   }
 };
 
@@ -112,45 +84,32 @@ export const executeGet = async (
   const uri = formatURI(query, variables, endpoint);
   const uriHash = hash(uri).toString();
 
-  // Fetch only throws on network error, http errors have to be handled manually.
   try {
     if (!ignoreCache) {
       const cachedResult = await queryCache.get(uriHash);
 
       if (cachedResult) {
-        console.log('cachedResult ' + uriHash);
-
+        console.log('GET cache hit');
         return cachedResult;
       }
     }
 
     const result = await getFetch(uri, headers, signal);
 
-    // if (result.status === HTTP_410_GONE) {
-    //   const putResponse = await putPersistedQuery(getGraphqlEndpoint(), query, cacheTTL);
-
-    //   if (putResponse.status === HTTP_201_CREATED) {
-    //     return await parseResponse(await getFetch(uri, name, signal));
-    //   }
-    // }
-
     if (result.status === 503) {
-      handleConnectionError(result.status, result.statusText);
       throw new Error(result.statusText);
     }
 
-    // Successful and all other http responses go here:
     const parsedRes = await parseResponse(result);
 
     if (!ignoreCache) {
       queryCache.set(uriHash, parsedRes);
-      console.log('saveToHash ' + uriHash);
     }
+
+    console.log('GET cache miss');
 
     return parsedRes;
   } catch (error) {
-    // Network error
-    handleConnectionError(error, 'executeGet failed');
     throw new Error(error as string);
   }
 };
@@ -159,7 +118,8 @@ export const executePost = async (
   query: string,
   endpoint: string,
   headers: HeadersInit,
-  variables: Record<string, string>
+  variables: Record<string, string>,
+  signal?: AbortSignal
 ): Promise<any> => {
   const uri = formatURI(query, {}, endpoint);
 
@@ -170,12 +130,10 @@ export const executePost = async (
       formData.append(key, value);
     });
 
-    const response = await postFetch(uri, headers, formData);
+    const response = await postFetch(uri, headers, formData, signal);
 
     return await parseJSONResponse(response);
-  } catch (err) {
-    handleConnectionError(err, 'executePost failed');
-
-    throw err;
+  } catch (error) {
+    throw new Error(error as string);
   }
 };

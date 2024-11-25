@@ -1,30 +1,36 @@
+import { withTV } from 'Hooks/withTV';
 import { useEffect, useState } from 'react';
+import { BackHandler } from 'react-native';
 import ConfigStore from 'Store/Config.store';
 import Film from 'Type/Film.interface';
+import { FilmStream } from 'Type/FilmStream.interface';
+import { FilmVideo } from 'Type/FilmVideo.interface';
+import { FilmVoice } from 'Type/FilmVoice.interface';
 import FilmPageComponent from './FilmPage.component';
 import FilmPageComponentTV from './FilmPage.component.atv';
 import { FilmPageContainerProps } from './FilmPage.type';
-import { withTV } from 'Hooks/withTV';
-import { FilmVideo } from 'Type/FilmVideo.interface';
-import NavigationStore from 'Store/Navigation.store';
-import { BackHandler } from 'react-native';
+import ServiceStore from 'Store/Service.store';
+import NotificationStore from 'Store/Notification.store';
 
 export function FilmPageContainer(props: FilmPageContainerProps) {
   const { link } = props;
   const [film, setFilm] = useState<Film | null>(null);
+  const [selectedVoice, setSelectedVoice] = useState<FilmVoice | null>(null);
+  const [selectedStream, setSelectedStream] = useState<FilmStream | null>(null);
   const [filmVideo, setFilmVideo] = useState<FilmVideo | null>(null);
+  const [isSelectorVisible, setIsSelectorVisible] = useState(false);
 
   useEffect(() => {
     const backAction = () => {
-      if (filmVideo) {
-        setFilmVideo(null);
+      // if (filmVideo) {
+      //   setFilmVideo(null);
 
-        if (ConfigStore.isTV) {
-          NavigationStore.toggleNavigation();
-        }
+      //   if (ConfigStore.isTV) {
+      //     NavigationStore.toggleNavigation();
+      //   }
 
-        return true;
-      }
+      //   return true;
+      // }
 
       return false;
     };
@@ -34,39 +40,68 @@ export function FilmPageContainer(props: FilmPageContainerProps) {
     return () => backHandler.remove();
   });
 
-  const playFilm = async () => {
-    if (!film) {
-      return;
-    }
-
-    const video = await ConfigStore.currentService.getFilmVideo(film);
-
-    if (ConfigStore.isTV) {
-      NavigationStore.toggleNavigation();
-    }
-
-    setFilmVideo(video);
-  };
-
   useEffect(() => {
     const loadFilm = async () => {
-      const film = await ConfigStore.currentService.getFilm(link);
+      try {
+        const film = await ServiceStore.getCurrentService().getFilm(link);
 
-      setFilm(film);
+        setFilm(film);
+      } catch (error) {
+        NotificationStore.displayError(error);
+      }
     };
 
     loadFilm();
   }, [link]);
 
+  const openVideoSelector = async () => {
+    if (!film) {
+      return;
+    }
+
+    setIsSelectorVisible(true);
+  };
+
+  const hideVideoSelector = () => {
+    setIsSelectorVisible(false);
+  };
+
+  const handleVideoSelect = (video: FilmVideo) => {
+    setFilmVideo(video);
+  };
+
+  const playFilm = () => {
+    if (!film) {
+      return;
+    }
+
+    const { video, voices } = film;
+
+    if (video) {
+      setFilmVideo(video);
+      return;
+    }
+
+    if (voices && voices.length > 0) {
+      openVideoSelector();
+      return;
+    }
+
+    NotificationStore.displayMessage('No video streams available');
+  };
+
   const containerProps = () => {
     return {
       film,
       filmVideo,
+      isSelectorVisible,
     };
   };
 
   const containerFunctions = {
     playFilm,
+    hideVideoSelector,
+    handleVideoSelect,
   };
 
   return withTV(FilmPageComponentTV, FilmPageComponent, {

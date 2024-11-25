@@ -31,6 +31,13 @@ const configApi: ConfigApiInterface = {
     };
   },
 
+  /**
+   * Fetch page
+   * @param query
+   * @param variables
+   * @param ignoreCache
+   * @returns DOM doc
+   */
   async fetchPage(query: string, variables: Record<string, string> = {}, ignoreCache = false) {
     const res = await executeGet(
       query,
@@ -43,8 +50,35 @@ const configApi: ConfigApiInterface = {
     return parseHtml(res);
   },
 
-  async postRequest(query: string, variables: Record<string, string> = {}) {
-    return await executePost(query, this.getProvider(), this.getAuthorization(), variables);
+  /**
+   * Get request
+   * @param query
+   * @param variables
+   * @returns text
+   */
+  async getRequest(query: string, variables: Record<string, string> = {}) {
+    return await executeGet(query, this.getProvider(), this.getAuthorization(), variables);
+  },
+
+  /**
+   * Post request
+   * @param query
+   * @param variables
+   * @returns JSON object
+   */
+  async postRequest(query: string, variables: Record<string, string> = {}, ignoreCache = false) {
+    const result = await executePost(
+      `${query}/?t=${Date.now()}`,
+      this.getProvider(),
+      this.getAuthorization(),
+      variables
+    );
+
+    if (!result.success) {
+      throw new Error(result.message);
+    }
+
+    return result;
   },
 };
 

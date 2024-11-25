@@ -8,10 +8,14 @@ export const getDefaultConfig = () => {
   }, {} as Config);
 };
 
-export const loadConfig = (): Config => {
+export const loadConfig = (keys?: CONFIG_KEY_ENUM[]): Config => {
   const mapByType: { [key: string]: ConfigMapping[] } = {};
 
   CONFIG_MAP.forEach((item) => {
+    if (keys && !keys.includes(item.key)) {
+      return;
+    }
+
     if (!mapByType[item.type]) {
       mapByType[item.type] = [];
     }
@@ -31,6 +35,31 @@ export const loadConfig = (): Config => {
     acc[key as keyof Config] = configArr.find(([k]) => k === key)?.[1] ?? defaultValue;
     return acc;
   }, {} as Config);
+};
+
+export const getConfig = async (key: CONFIG_KEY_ENUM): Promise<any> => {
+  const mapping = CONFIG_MAP.find((k) => k.key === key);
+
+  if (!mapping) {
+    throw new Error(`Unknown key: ${key}`);
+  }
+
+  const { key: name, type } = mapping;
+
+  switch (type) {
+    case DATA_TYPE_ENUM.boolean:
+      return configStorage.getBoolAsync(name);
+    case DATA_TYPE_ENUM.number:
+      return configStorage.getIntAsync(name);
+    case DATA_TYPE_ENUM.string:
+      return configStorage.getStringAsync(name);
+    case DATA_TYPE_ENUM.array:
+      return configStorage.getArrayAsync(name);
+    case DATA_TYPE_ENUM.object:
+      return configStorage.getMapAsync(name);
+    default:
+      throw new Error(`Unknown type: ${type}`);
+  }
 };
 
 export const updateConfig = async (
