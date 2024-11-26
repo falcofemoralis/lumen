@@ -23,4 +23,5 @@ export type FilmVideoSelectorComponentProps = {
   setSelectedEpisodeId: (id: string) => void;
   seasons: Season[];
   episodes: Episode[];
+  handleOnPlay: () => void;
 };

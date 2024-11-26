@@ -6,6 +6,8 @@ import { Episode, FilmVoice, Season } from 'Type/FilmVoice.interface';
 import FilmVideoSelectorComponent from './FilmVideoSelector.component';
 import FilmVideoSelectorComponentTV from './FilmVideoSelector.component.atv';
 import { FilmVideoSelectorContainerProps } from './FilmVideoSelector.type';
+import configApi from 'Api/RezkaApi/configApi';
+import RezkaApi from 'Api/RezkaApi';
 
 export function FilmVideoSelectorContainer(props: FilmVideoSelectorContainerProps) {
   const { visible, onHide, film, voices } = props;
@@ -57,6 +59,19 @@ export function FilmVideoSelectorContainer(props: FilmVideoSelectorContainerProp
     }
   };
 
+  const handleOnPlay = async () => {
+    throw new Error('Not implemented');
+    setIsLoading(true);
+
+    try {
+      const video = await ServiceStore.getCurrentService().getFilmStreams(film, selectedVoice);
+    } catch (error) {
+      NotificationStore.displayError(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const containerProps = () => {
     return {
       visible,
@@ -66,16 +81,21 @@ export function FilmVideoSelectorContainer(props: FilmVideoSelectorContainerProp
       selectedVoice,
       selectedSeasonId,
       selectedEpisodeId,
-      handleSelectVoice,
-      setSelectedSeasonId,
-      setSelectedEpisodeId,
       seasons: getSeasons(),
       episodes: getEpisodes(),
     };
   };
 
+  const containerFunctions = {
+    handleSelectVoice,
+    setSelectedSeasonId,
+    setSelectedEpisodeId,
+    handleOnPlay,
+  };
+
   return withTV(FilmVideoSelectorComponentTV, FilmVideoSelectorComponent, {
     ...containerProps(),
+    ...containerFunctions,
   });
 }
 

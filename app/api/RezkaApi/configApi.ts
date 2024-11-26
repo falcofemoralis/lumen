@@ -1,19 +1,30 @@
+import { FilmStream } from 'Type/FilmStream.interface';
 import { ApiServiceType, ConfigApiInterface } from 'Api/index';
 import { parseHtml } from 'Util/Parser';
 import { executeGet, executePost } from 'Util/Request';
+import { updateUrlHost } from 'Util/Url';
 
 const configApi: ConfigApiInterface = {
   serviceType: ApiServiceType.rezka,
   defaultProviders: ['https://rezka-ua.tv'],
-  defaultCDNs: ['https://stream.voidboost.cc'],
+  defaultCDNs: ['https://prx-cogent.ukrtelcdn.net', 'https://stream.voidboost.cc'],
+  selectedProvider: null,
+  selectedCDN: null,
 
   setProvider(provider: string): void {
-    // TODO implement custom provider logic
+    this.selectedProvider = provider;
   },
 
   getProvider(): string {
-    // TODO implement custom provider logic
-    return this.defaultProviders[0];
+    return this.selectedProvider ?? this.defaultProviders[0];
+  },
+
+  setCDN(cdn: string): void {
+    this.selectedCDN = cdn;
+  },
+
+  getCDN(): string {
+    return this.selectedCDN ?? this.defaultCDNs[0];
   },
 
   setAuthorization(auth: string): void {
@@ -79,6 +90,19 @@ const configApi: ConfigApiInterface = {
     }
 
     return result;
+  },
+
+  modifyCDN(streams: FilmStream[]) {
+    console.log(this.selectedCDN);
+
+    return streams.map((stream) => {
+      const { url } = stream;
+
+      return {
+        ...stream,
+        url: updateUrlHost(url, this.getCDN()),
+      };
+    });
   },
 };
 

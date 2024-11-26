@@ -1,10 +1,9 @@
-import ApiInterface, { ApiServiceType } from 'Api/index';
-import RezkaApi from 'Api/RezkaApi';
+import { ApiServiceType } from 'Api/index';
 import { services } from 'Api/services';
 import { makeAutoObservable } from 'mobx';
 
 class ServiceStore {
-  private currentService = RezkaApi as ApiInterface;
+  private currentService = ApiServiceType.rezka;
 
   constructor() {
     makeAutoObservable(this);
@@ -17,11 +16,21 @@ class ServiceStore {
   }
 
   setCurrentService(service: ApiServiceType) {
-    this.currentService = services[service];
+    this.currentService = service;
+    // this.currentService.setProvider(this.provider);
+    // this.currentService.setCDN(this.CDN);
   }
 
   getCurrentService() {
-    return this.currentService;
+    return services[this.currentService];
+  }
+
+  setProvider(provider: string) {
+    this.getCurrentService().setProvider(provider);
+  }
+
+  setCDN(cdn: string) {
+    this.getCurrentService().setCDN(cdn);
   }
 }
 

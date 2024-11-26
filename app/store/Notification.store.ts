@@ -1,6 +1,7 @@
 import { makeAutoObservable } from 'mobx';
 // eslint-disable-next-line react-native/split-platform-components
 import { ToastAndroid } from 'react-native';
+import ErrorBoundary from 'react-native-error-boundary';
 
 class NotificationStore {
   constructor() {

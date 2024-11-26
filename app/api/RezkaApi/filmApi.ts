@@ -1,3 +1,4 @@
+import { FilmVideo } from 'Type/FilmVideo.interface';
 import { FilmApiInterface } from 'Api/index';
 import Film from 'Type/Film.interface';
 import FilmCard from 'Type/FilmCard.interface';
@@ -126,8 +127,24 @@ const filmApi: FilmApiInterface = {
    * Get films streams
    * @param film
    */
-  getFilmStreams(film: Film): Promise<FilmStream[]> {
-    throw new Error('Method not implemented.');
+  async getFilmStreams(film: Film, voice: FilmVoice): Promise<FilmVideo> {
+    const { id: filmId } = film;
+    const { id: voiceId, isCamrip, isAds, isDirector } = voice;
+
+    const result = await configApi.postRequest('/ajax/get_cdn_series', {
+      id: filmId,
+      translator_id: voiceId,
+      is_camrip: isCamrip,
+      is_ads: isAds,
+      is_director: isDirector,
+      action: 'get_movie',
+    });
+
+    const streams = parseStreams(result.url);
+
+    return {
+      streams: configApi.modifyCDN(streams),
+    };
   },
 
   /**
@@ -135,7 +152,12 @@ const filmApi: FilmApiInterface = {
    * @param season
    * @param episode
    */
-  getFilmStreamsByEpisodeId(season: number, episode: number): Promise<FilmStream[]> {
+  getFilmStreamsByEpisodeId(
+    season: number,
+    episode: number,
+    film: Film,
+    voice: FilmVoice
+  ): Promise<FilmVideo> {
     throw new Error('Function not implemented.');
   },
 

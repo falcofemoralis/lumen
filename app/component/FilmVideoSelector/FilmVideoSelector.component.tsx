@@ -17,6 +17,7 @@ export function FilmVideoSelectorComponent(props: FilmVideoSelectorComponentProp
     setSelectedEpisodeId,
     seasons,
     episodes,
+    handleOnPlay,
   } = props;
 
   const renderVoices = () => {
@@ -83,6 +84,7 @@ export function FilmVideoSelectorComponent(props: FilmVideoSelectorComponentProp
         {renderVoices()}
         {renderSeasons()}
         {renderEpisodes()}
+        <Button onPress={handleOnPlay}>Play</Button>
       </Modal>
     </Portal>
   );

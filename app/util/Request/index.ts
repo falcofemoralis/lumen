@@ -73,6 +73,7 @@ export const parseJSONResponse = async (response: Response): Promise<string> => 
   }
 };
 
+// TODO service unavailable?
 export const executeGet = async (
   query: string,
   endpoint: string,

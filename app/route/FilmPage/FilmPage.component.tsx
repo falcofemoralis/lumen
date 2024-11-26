@@ -1,3 +1,4 @@
+import FilmVideoSelector from 'Component/FilmVideoSelector';
 import Player from 'Component/Player';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
@@ -8,7 +9,6 @@ import { DEMO_VIDEO } from 'Route/PlayerPage/PlayerPage.config';
 import Colors from 'Style/Colors';
 import { styles } from './FilmPage.style.';
 import { FilmPageComponentProps } from './FilmPage.type';
-import FilmVideoSelector from 'Component/FilmVideoSelector';
 
 export function FilmPageComponent(props: FilmPageComponentProps) {
   const { film, isSelectorVisible, filmVideo, playFilm, hideVideoSelector, handleVideoSelect } =
