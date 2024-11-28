@@ -33,10 +33,10 @@ export interface FilmApiInterface {
   getFilm(link: string): Promise<Film>;
   getFilmStreams(film: Film, voice: FilmVoice): Promise<FilmVideo>;
   getFilmStreamsByEpisodeId(
-    season: number,
-    episode: number,
     film: Film,
-    voice: FilmVoice
+    voice: FilmVoice,
+    seasonId: string,
+    episodeId: string
   ): Promise<FilmVideo>;
   getFilmSeasons(film: Film, voice: FilmVoice): Promise<FilmVoice>;
 }

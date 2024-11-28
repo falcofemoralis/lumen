@@ -19,16 +19,15 @@ export function FilmPageComponent(props: FilmPageComponentProps) {
       return null;
     }
 
-    const { voices } = film;
+    const { voices = [], hasVoices, hasSeasons } = film;
 
-    if (!voices) {
+    if (!voices.length || (!hasVoices && !hasSeasons)) {
       return null;
     }
 
     return (
       <FilmVideoSelector
         film={film}
-        voices={voices}
         visible={isSelectorVisible}
         onHide={hideVideoSelector}
         onSelect={handleVideoSelect}
@@ -69,7 +68,7 @@ export function FilmPageComponent(props: FilmPageComponentProps) {
       <ThemedView>
         <ThemedText>{film.title}</ThemedText>
         <ThemedText>{film.id}</ThemedText>
-        <Button onPress={playFilm}>Open film</Button>
+        <Button onPress={playFilm}>{film.voices.length > 0 ? 'Select' : 'Play'}</Button>
       </ThemedView>
       {renderVideoSelector()}
     </ThemedView>

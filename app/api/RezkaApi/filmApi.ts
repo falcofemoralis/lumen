@@ -1,14 +1,13 @@
-import { FilmVideo } from 'Type/FilmVideo.interface';
 import { FilmApiInterface } from 'Api/index';
 import Film from 'Type/Film.interface';
 import FilmCard from 'Type/FilmCard.interface';
 import { FilmList } from 'Type/FilmList.interface';
-import { FilmStream } from 'Type/FilmStream.interface';
 import { FilmType } from 'Type/FilmType.type';
-import { FilmVoice, Season } from 'Type/FilmVoice.interface';
+import { FilmVideo } from 'Type/FilmVideo.interface';
+import { FilmVoice } from 'Type/FilmVoice.interface';
+import { parseHtml } from 'Util/Parser';
 import configApi from './configApi';
 import { parseFilmCard, parseSeasons, parseStreams } from './utils';
-import { parseHtml } from 'Util/Parser';
 
 const filmApi: FilmApiInterface = {
   /**
@@ -45,7 +44,7 @@ const filmApi: FilmApiInterface = {
   async getFilm(link: string): Promise<Film> {
     const $ = await configApi.fetchPage(link);
 
-    // basic info
+    // base data
     const id = $('#user-favorites-holder').attr('data-post_id') ?? '';
     const title = $('div.b-post__title h1').text() ?? '';
     const poster = $('div.b-sidecover img').attr('src') ?? '';
@@ -56,11 +55,12 @@ const filmApi: FilmApiInterface = {
       type: FilmType.Film,
       title,
       poster,
+      voices: [],
+      hasVoices: false,
+      hasSeasons: false,
     };
 
-    // voices and streams
-    const voices: FilmVoice[] = [];
-
+    // player data
     $('li.b-translator__item').each((_idx, el) => {
       const voice: FilmVoice = {
         id: $(el).attr('data-translator_id') ?? '',
@@ -73,13 +73,15 @@ const filmApi: FilmApiInterface = {
         isPremium: $(el).hasClass('b-prem_translator'),
       };
 
-      voices.push({
+      film.voices.push({
         ...voice,
         ...(voice.isActive ? parseSeasons($) : {}),
       });
     });
 
-    if (voices.length === 0) {
+    const { voices } = film;
+
+    if (!voices.length) {
       const isMovie = $('meta[property=og:type]').attr('content')?.includes('video.movie');
       const stringedDoc = $.html();
 
@@ -94,9 +96,20 @@ const filmApi: FilmApiInterface = {
         // subtitles = parseSubtitles(jsonObject.subtitle);
         // getThumbnails(jsonObject.thumbnails, trans);
 
-        film.video = {
+        const video: FilmVideo = {
           streams,
         };
+
+        film.voices.push({
+          id: '',
+          title: '',
+          isCamrip: '0',
+          isDirector: '0',
+          isAds: '0',
+          isActive: true,
+          isPremium: false,
+          video,
+        });
       } else {
         const startIndex = stringedDoc.indexOf('initCDNSeriesEvents');
         let endIndex = stringedDoc.indexOf('{"id"', startIndex);
@@ -105,7 +118,7 @@ const filmApi: FilmApiInterface = {
         }
         const subString = stringedDoc.substring(startIndex, endIndex);
 
-        voices.push({
+        film.voices.push({
           id: subString.split(',')[1].replaceAll(' ', ''),
           title: '',
           isCamrip: '0',
@@ -118,7 +131,9 @@ const filmApi: FilmApiInterface = {
       }
     }
 
-    film.voices = voices;
+    const { seasons = [] } = voices.find(({ isActive }) => isActive) ?? {};
+    film.hasSeasons = seasons.length > 0;
+    film.hasVoices = film.voices.length > 1;
 
     return film;
   },
@@ -148,17 +163,32 @@ const filmApi: FilmApiInterface = {
   },
 
   /**
-   * Get film streams by episode and season id
+   * Get film streams by season and episode id
    * @param season
    * @param episode
    */
-  getFilmStreamsByEpisodeId(
-    season: number,
-    episode: number,
+  async getFilmStreamsByEpisodeId(
     film: Film,
-    voice: FilmVoice
+    voice: FilmVoice,
+    seasonId: string,
+    episodeId: string
   ): Promise<FilmVideo> {
-    throw new Error('Function not implemented.');
+    const { id: filmId } = film;
+    const { id: voiceId } = voice;
+
+    const result = await configApi.postRequest('/ajax/get_cdn_series', {
+      id: filmId,
+      translator_id: voiceId,
+      season: seasonId,
+      episode: episodeId,
+      action: 'get_stream',
+    });
+
+    const streams = parseStreams(result.url);
+
+    return {
+      streams: configApi.modifyCDN(streams),
+    };
   },
 
   /**
@@ -186,85 +216,6 @@ const filmApi: FilmApiInterface = {
       ...parseSeasons($),
     };
   },
-
-  /**
-  async getFilmStreams(film: Film): Promise<FilmVideoStream[]> {
-    val data: ArrayMap<String, String> = ArrayMap()
-    data["id"] = filmId.toString()
-    data["translator_id"] = translation.id
-    data["is_camrip"] = translation.isCamrip
-    data["is_ads"] = translation.isAds
-    data["is_director"] = translation.isDirector
-    data["action"] = "get_movie"
-
-    val unixTime = System.currentTimeMillis()
-    val result: Document? = BaseModel.getJsoup(SettingsData.provider + GET_STREAM_POST + "/?t=$unixTime")
-        .data(data)
-        .header("Cookie", CookieManager.getInstance().getCookie(SettingsData.provider) + "; allowed_comments=1; _ym_isad=1; _ym_visorc=b; dle_newpm=0;")
-        .post()
-
-    const result = await configApi.postRequest('/ajax/get_cdn_series/?t=1731242387831', {
-      id: '75112',
-      translator_id: '238',
-      is_camrip: '0',
-      is_ads: '0',
-      is_director: '0',
-      favs: '46bf4f1c-984b-4653-a7ae-0593110e9d08',
-      action: 'get_movie',
-    });
-
-    try {
-      console.log(utils.parseStreams(result.url));
-      const streams = utils.parseStreams(result.url);
-
-      // TODO
-      const updatedStreams = streams.map((stream) => {
-        return {
-          ...stream,
-          url: stream.url.replace(
-            'https://stream.voidboost.cc',
-            'https://prx-cogent.ukrtelcdn.net'
-          ),
-        };
-      });
-
-      return {
-        streams: updatedStreams,
-      };
-    } catch (e) {
-      console.log(e);
-    }
-
-    return {
-      streams: [],
-    };
-  },
-
-  async getFilmStreamsByEpisodeId(): Promise<FilmVideoStream[]> {
-    val data: ArrayMap<String, String> = ArrayMap()
-    data["id"] = filmId.toString()
-    data["translator_id"] = translation.id
-    data["season"] = season
-    data["episode"] = episode
-    data["action"] = "get_stream"
-
-    val unixTime = System.currentTimeMillis()
-    val result: Document? = BaseModel.getJsoup(SettingsData.provider + GET_STREAM_POST + "/?t=$unixTime")
-        .header("Cookie", CookieManager.getInstance().getCookie(SettingsData.provider) + "; allowed_comments=1; _ym_isad=1; _ym_visorc=b; dle_newpm=0;")
-        .data(data)
-        .post()
-  }
-
-  async getFilmSeasons() {
-    val data: ArrayMap<String, String> = ArrayMap()
-    data["id"] = filmId.toString()
-    data["translator_id"] = translation.id
-    data["action"] = "get_episodes"
-
-    val unixTime = System.currentTimeMillis()
-    val result: Document? = BaseModel.getJsoup(SettingsData.provider + GET_STREAM_POST + "/?t=$unixTime").data(data).post()
-  }
-  */
 };
 
 export default filmApi;

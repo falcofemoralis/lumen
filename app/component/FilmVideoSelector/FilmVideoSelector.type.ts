@@ -4,7 +4,6 @@ import { Episode, FilmVoice, Season } from 'Type/FilmVoice.interface';
 
 export type FilmVideoSelectorContainerProps = {
   film: Film;
-  voices: FilmVoice[];
   visible: boolean;
   onHide: () => void;
   onSelect: (video: FilmVideo) => void;

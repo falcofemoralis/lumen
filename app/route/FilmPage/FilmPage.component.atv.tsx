@@ -52,9 +52,9 @@ export function FilmPageComponent(props: FilmPageComponentProps) {
       return null;
     }
 
-    const { voices } = film;
+    const { voices = [] } = film;
 
-    if (!voices) {
+    if (!voices.length) {
       return null;
     }
 

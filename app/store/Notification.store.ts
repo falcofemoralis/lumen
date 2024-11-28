@@ -1,7 +1,6 @@
 import { makeAutoObservable } from 'mobx';
 // eslint-disable-next-line react-native/split-platform-components
 import { ToastAndroid } from 'react-native';
-import ErrorBoundary from 'react-native-error-boundary';
 
 class NotificationStore {
   constructor() {
@@ -15,7 +14,11 @@ class NotificationStore {
 
   async displayError(error: string | unknown) {
     const msg = error instanceof Error ? error.message : String(error);
+
+    // TODO show error screen
+
     console.error(msg);
+
     ToastAndroid.show(msg, ToastAndroid.LONG);
   }
 }

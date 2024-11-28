@@ -1,9 +1,8 @@
 import { FilmType } from './FilmType.type';
-import { FilmVideo } from './FilmVideo.interface';
 import { FilmVoice } from './FilmVoice.interface';
 
 export default interface Film {
-  // base
+  // base data
   id: string;
   link: string;
   type: FilmType;
@@ -14,7 +13,7 @@ export default interface Film {
   genres?: string[];
   seriesInfo?: string;
 
-  // additional
+  // additional data
   largePoster?: string;
   ratings?: string[]; // type = rating + votes
   originalTitle?: string;
@@ -23,15 +22,21 @@ export default interface Film {
   directors?: string[];
   additionalInfo?: string[];
 
-  // page info
+  // collections data
   schedule?: string[];
   related?: string[];
   bookmarks?: string[];
 
-  // video
-  video?: FilmVideo; // can be empty for series
-  voices?: FilmVoice[]; // can be empty for movie
+  // player data
+  voices: FilmVoice[];
   lastVoiceId?: string;
+  hasVoices: boolean;
+  hasSeasons: boolean;
+
+  // onlyMovie; // voices[0] = {...video} hasSeasons: false hasVoices: false
+  // onlyVoices; // voices[0,1,2] = {...}   hasSeasons: false hasVoices: true
+  // onlySeasons; // voices[0] = {...}  hasSeasons: true hasVoices: false
+  // voices+seasons; // voices[0,1,2] = {...}  hasSeasons: true hasVoices: true
 
   // flags
   isPendingRelease?: boolean;

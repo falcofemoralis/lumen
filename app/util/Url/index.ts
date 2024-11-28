@@ -1,5 +1,6 @@
 export const updateUrlHost = (url: string, newHost: string): string => {
   const urlObj = new URL(url);
-  urlObj.host = newHost;
-  return urlObj.toString();
+  const hostObj = new URL(newHost);
+
+  return new URL(urlObj.pathname, hostObj.origin).toString();
 };

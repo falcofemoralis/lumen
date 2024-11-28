@@ -75,19 +75,26 @@ export function FilmPageContainer(props: FilmPageContainerProps) {
       return;
     }
 
-    const { video, voices } = film;
+    const { voices, hasVoices, hasSeasons } = film;
 
-    if (video) {
-      setFilmVideo(video);
+    if (voices.length <= 0) {
+      NotificationStore.displayMessage('No video available');
       return;
     }
 
-    if (voices && voices.length > 0) {
+    if (hasVoices || hasSeasons) {
       openVideoSelector();
       return;
     }
 
-    NotificationStore.displayMessage('No video streams available');
+    const video = voices[0].video;
+
+    if (!video) {
+      NotificationStore.displayMessage('No video streams available');
+      return;
+    }
+
+    setFilmVideo(video);
   };
 
   const containerProps = () => {

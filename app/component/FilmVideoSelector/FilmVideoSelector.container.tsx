@@ -6,11 +6,10 @@ import { Episode, FilmVoice, Season } from 'Type/FilmVoice.interface';
 import FilmVideoSelectorComponent from './FilmVideoSelector.component';
 import FilmVideoSelectorComponentTV from './FilmVideoSelector.component.atv';
 import { FilmVideoSelectorContainerProps } from './FilmVideoSelector.type';
-import configApi from 'Api/RezkaApi/configApi';
-import RezkaApi from 'Api/RezkaApi';
 
 export function FilmVideoSelectorContainer(props: FilmVideoSelectorContainerProps) {
-  const { visible, onHide, film, voices } = props;
+  const { visible, onHide, film } = props;
+  const { voices = [] } = film;
   const [isLoading, setIsLoading] = useState(false);
   const [selectedVoice, setSelectedVoice] = useState<FilmVoice>(
     voices.find(({ isActive }) => isActive) ?? voices[0]
@@ -37,6 +36,17 @@ export function FilmVideoSelectorContainer(props: FilmVideoSelectorContainerProp
   };
 
   const handleSelectVoice = async (voice: FilmVoice) => {
+    const { hasSeasons } = film;
+
+    console.log(hasSeasons);
+
+    if (!hasSeasons) {
+      setSelectedVoice(voice);
+      console.log('voiceSelected');
+
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -60,11 +70,25 @@ export function FilmVideoSelectorContainer(props: FilmVideoSelectorContainerProp
   };
 
   const handleOnPlay = async () => {
-    throw new Error('Not implemented');
+    const { hasSeasons } = film;
+
     setIsLoading(true);
 
     try {
-      const video = await ServiceStore.getCurrentService().getFilmStreams(film, selectedVoice);
+      const currentService = ServiceStore.getCurrentService();
+
+      console.log(!hasSeasons ? 'getFilmStreams' : 'getFilmStreamsByEpisodeId');
+
+      const video = !hasSeasons
+        ? await currentService.getFilmStreams(film, selectedVoice)
+        : await currentService.getFilmStreamsByEpisodeId(
+            film,
+            selectedVoice,
+            selectedSeasonId!,
+            selectedEpisodeId!
+          );
+
+      console.log(video);
     } catch (error) {
       NotificationStore.displayError(error);
     } finally {

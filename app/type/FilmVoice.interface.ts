@@ -1,3 +1,5 @@
+import { FilmVideo } from './FilmVideo.interface';
+
 export interface Episode {
   name: string;
   episodeId: string;
@@ -15,6 +17,7 @@ export interface FilmVoice {
   img?: string;
   //
   seasons?: Season[];
+  video?: FilmVideo;
   //
   isCamrip: string;
   isDirector: string;
