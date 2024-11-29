@@ -34,7 +34,8 @@
         {
           "root": "./app/navigation"
         }
-      ]
+      ],
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true

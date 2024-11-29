@@ -3,6 +3,7 @@ import Player from 'Component/Player';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
+import __ from 'i18n/__';
 import { ActivityIndicator, View } from 'react-native';
 import { Button } from 'react-native-paper';
 import { DEMO_VIDEO } from 'Route/PlayerPage/PlayerPage.config';
@@ -68,7 +69,9 @@ export function FilmPageComponent(props: FilmPageComponentProps) {
       <ThemedView>
         <ThemedText>{film.title}</ThemedText>
         <ThemedText>{film.id}</ThemedText>
-        <Button onPress={playFilm}>{film.voices.length > 0 ? 'Select' : 'Play'}</Button>
+        <Button onPress={playFilm}>
+          {film.hasVoices || film.hasSeasons ? 'Select' : __('Play')}
+        </Button>
       </ThemedView>
       {renderVideoSelector()}
     </ThemedView>

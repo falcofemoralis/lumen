@@ -3,6 +3,7 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
+      "i18n/*": ["./app/util/Translation/*"],
       "Api/*": ["./app/api/*"],
       "Component/*": ["./app/component/*"],
       "Constants/*": ["./app/constants/*"],

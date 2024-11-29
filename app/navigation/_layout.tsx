@@ -4,9 +4,10 @@ import { NAVIGATION_BAR_TV_WIDTH } from 'Component/NavigationBar/NavigationBar.s
 import ThemedView from 'Component/ThemedView';
 import Constants from 'expo-constants';
 import { useFonts } from 'expo-font';
-import { ErrorBoundary, Stack } from 'expo-router';
+import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
+import { useLocale } from 'Hooks/useLocale';
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import { Dimensions, useColorScheme, View } from 'react-native';
@@ -44,21 +45,22 @@ SplashScreen.preventAutoHideAsync();
 export function RootLayout() {
   const windowWidth = Dimensions.get('window').width;
   const colorScheme = useColorScheme();
+  const [languageLoaded] = useLocale();
   const [fontLoaded, fontError] = useFonts({
     SpaceMono: require('../../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
   useEffect(() => {
-    if (fontLoaded || fontError) {
+    if ((fontLoaded || fontError) && languageLoaded) {
       SplashScreen.hideAsync();
 
       if (fontError) {
         console.warn(`Error in loading fonts: ${fontError}`);
       }
     }
-  }, [fontLoaded, fontError]);
+  }, [fontLoaded, fontError, languageLoaded]);
 
-  if (!fontLoaded && !fontError) {
+  if ((!fontLoaded && !fontError) || !languageLoaded) {
     return null;
   }
 

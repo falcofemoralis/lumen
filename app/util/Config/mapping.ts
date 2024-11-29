@@ -15,6 +15,7 @@ export interface ConfigMapping {
 export enum CONFIG_KEY_ENUM {
   isConfigured = 'isConfigured',
   isTV = 'isTV',
+  language = 'language',
 }
 
 export interface Config {
