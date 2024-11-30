@@ -20,14 +20,16 @@ import NotificationStore from 'Store/Notification.store';
 export function PlayerComponentTV(props: PlayerComponentProps) {
   const {
     uri,
-    onPlaybackStatusUpdate,
     playerRef,
     status,
+    isPlaying,
     showControls,
+    onPlaybackStatusUpdate,
     toggleControls,
     togglePlayPause,
-    rewindPosition,
     seekToPosition,
+    rewindPosition,
+    rewindPositionAuto,
   } = props;
   const [focusedElement, setFocusedElement] = useState<string>();
 
@@ -70,8 +72,6 @@ export function PlayerComponentTV(props: PlayerComponentProps) {
   );
 
   const renderTopActions = () => {
-    const { isPlaying } = status;
-
     if (!showControls) {
       return null;
     }
@@ -98,8 +98,9 @@ export function PlayerComponentTV(props: PlayerComponentProps) {
         playerRef={playerRef}
         focusedElement={focusedElement}
         setFocusedElement={setFocusedElement}
-        rewindPosition={rewindPosition}
         seekToPosition={seekToPosition}
+        rewindPosition={rewindPosition}
+        rewindPositionAuto={rewindPositionAuto}
       />
     );
   };
@@ -147,6 +148,7 @@ export function PlayerComponentTV(props: PlayerComponentProps) {
         }}
         useNativeControls={false}
         onPlaybackStatusUpdate={onPlaybackStatusUpdate}
+        progressUpdateIntervalMillis={1000}
       />
       {renderControls()}
     </View>

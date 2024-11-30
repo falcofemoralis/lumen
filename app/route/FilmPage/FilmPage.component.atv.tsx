@@ -10,7 +10,8 @@ import { styles } from './FilmPage.style.atv';
 import { FilmPageComponentProps } from './FilmPage.type';
 
 export function FilmPageComponent(props: FilmPageComponentProps) {
-  const { film, isSelectorVisible, playFilm, hideVideoSelector, handleVideoSelect } = props;
+  const { film, isSelectorVisible, filmVideo, playFilm, hideVideoSelector, handleVideoSelect } =
+    props;
   const [focusedElement, setFocusedElement] = useState<string | null>('Watch Now');
 
   const handleHide = () => {
@@ -61,7 +62,6 @@ export function FilmPageComponent(props: FilmPageComponentProps) {
     return (
       <FilmVideoSelector
         film={film}
-        voices={voices}
         visible={isSelectorVisible}
         onHide={hideVideoSelector}
         onSelect={handleVideoSelect}
@@ -80,7 +80,7 @@ export function FilmPageComponent(props: FilmPageComponentProps) {
     );
   }
 
-  if (false) {
+  if (filmVideo) {
     return (
       <View style={styles.player}>
         <Player uri={DEMO_VIDEO} />

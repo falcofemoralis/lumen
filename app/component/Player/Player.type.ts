@@ -23,12 +23,14 @@ export type PlayerContainerProps = {
 
 export type PlayerComponentProps = {
   uri: string;
-  onPlaybackStatusUpdate: (newStatus: Status) => void;
   playerRef: React.RefObject<Video>;
   status: Status;
+  isPlaying: boolean;
   showControls: boolean;
+  onPlaybackStatusUpdate: (newStatus: Status) => void;
   toggleControls: () => void;
   togglePlayPause: () => void;
-  rewindPosition: (type: RewindDirection, ms?: number) => void;
   seekToPosition: (percent: number) => void;
+  rewindPosition: (type: RewindDirection, ms?: number) => void;
+  rewindPositionAuto: (type: RewindDirection, ms?: number) => void;
 };

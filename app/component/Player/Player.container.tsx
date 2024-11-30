@@ -4,14 +4,23 @@ import { withTV } from 'Hooks/withTV';
 import { useEffect, useRef, useState } from 'react';
 import PlayerComponent from './Player.component';
 import PlayerComponentTV from './Player.component.atv';
-import { AWAKE_TAG, DEFAULT_STATUS, RewindDirection } from './Player.config';
+import {
+  AWAKE_TAG,
+  DEFAULT_AUTO_REWIND_MS,
+  DEFAULT_REWIND_MS,
+  DEFAULT_STATUS,
+  RewindDirection,
+} from './Player.config';
 import { PlayerContainerProps, Status } from './Player.type';
 import NotificationStore from 'Store/Notification.store';
 
 export function PlayerContainer(props: PlayerContainerProps) {
   const { uri } = props;
   const playerRef = useRef<Video>(null);
-  const [status, setStatus] = useState<Status>(DEFAULT_STATUS);
+  const statusRef = useRef<Status | null>(null); // used fur async operation
+  const rewindTimeout = useRef<NodeJS.Timeout | null>(null);
+  const [status, setStatus] = useState<Status>(DEFAULT_STATUS); // used for rendering component
+  const [isPlaying, setIsPlaying] = useState(false);
   const [showControls, setShowControls] = useState(false);
 
   useEffect(() => {
@@ -36,17 +45,26 @@ export function PlayerContainer(props: PlayerContainerProps) {
       return;
     }
 
-    if (newStatus?.isLoaded) {
-      if (
-        newStatus.durationMillis &&
-        newStatus.positionMillis &&
-        newStatus.playableDurationMillis
-      ) {
-        const progressPercentage = (newStatus.positionMillis / newStatus.durationMillis) * 100;
-        const playablePercentage =
-          (newStatus.playableDurationMillis / newStatus.durationMillis) * 100;
-        setStatus({ ...newStatus, progressPercentage, playablePercentage });
+    const {
+      isLoaded = false,
+      isPlaying = false,
+      isBuffering = false,
+      durationMillis,
+      positionMillis,
+      playableDurationMillis,
+    } = newStatus ?? {};
+
+    if (isLoaded) {
+      if (durationMillis && positionMillis && playableDurationMillis) {
+        const progressPercentage = (positionMillis / durationMillis) * 100;
+        const playablePercentage = (playableDurationMillis / durationMillis) * 100;
+        const updatedStatus = { ...newStatus, progressPercentage, playablePercentage };
+
+        setStatus(updatedStatus);
+        statusRef.current = updatedStatus;
       }
+
+      setIsPlaying(isPlaying || isBuffering);
     }
   };
 
@@ -64,9 +82,18 @@ export function PlayerContainer(props: PlayerContainerProps) {
     }
   };
 
-  const rewindPosition = async (type: RewindDirection, ms = 10000) => {
-    const position = status.positionMillis;
-    const duration = status.durationMillis;
+  const seekToPosition = async (percent: number) => {
+    const { durationMillis: duration } = statusRef.current ?? {};
+
+    if (!duration) return;
+
+    const newPosition = (percent / 100) * duration;
+
+    playerRef.current?.playFromPositionAsync(newPosition);
+  };
+
+  const rewindPosition = async (type: RewindDirection, ms = DEFAULT_REWIND_MS) => {
+    const { positionMillis: position, durationMillis: duration } = statusRef.current ?? {};
 
     if (!position || !duration) return;
 
@@ -81,14 +108,16 @@ export function PlayerContainer(props: PlayerContainerProps) {
     playerRef.current?.playFromPositionAsync(newPosition);
   };
 
-  const seekToPosition = async (percent: number) => {
-    const duration = status.durationMillis;
+  const rewindPositionAuto = (direction: RewindDirection, ms = DEFAULT_REWIND_MS) => {
+    if (rewindTimeout.current) {
+      clearInterval(rewindTimeout.current);
+      rewindTimeout.current = null;
+      return;
+    }
 
-    if (!duration) return;
-
-    const newPosition = (percent / 100) * duration;
-
-    playerRef.current?.playFromPositionAsync(newPosition);
+    rewindTimeout.current = setInterval(() => {
+      rewindPosition(direction, ms);
+    }, DEFAULT_AUTO_REWIND_MS);
   };
 
   const containerProps = () => {
@@ -96,6 +125,7 @@ export function PlayerContainer(props: PlayerContainerProps) {
       uri,
       playerRef,
       status,
+      isPlaying,
       showControls,
     };
   };
@@ -105,6 +135,7 @@ export function PlayerContainer(props: PlayerContainerProps) {
     toggleControls,
     togglePlayPause,
     rewindPosition,
+    rewindPositionAuto,
     seekToPosition,
   };
 

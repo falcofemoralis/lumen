@@ -59,6 +59,7 @@ export function PlayerComponent(props: PlayerComponentProps) {
           }}
           useNativeControls={false}
           onPlaybackStatusUpdate={onPlaybackStatusUpdate}
+          progressUpdateIntervalMillis={1000}
         />
         <Pressable
           style={styles.controlsContainer}

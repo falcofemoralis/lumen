@@ -13,7 +13,13 @@ import { FocusedElement, RewindDirection } from 'Component/Player/Player.config'
 import { TVEventType } from 'Type/TVEvent.type';
 
 export function PlayerProgressBarComponentTV(props: PlayerProgressBarComponentProps) {
-  const { status, focusedElement, setFocusedElement = () => {}, rewindPosition } = props;
+  const {
+    status,
+    focusedElement,
+    setFocusedElement = () => {},
+    rewindPosition,
+    rewindPositionAuto,
+  } = props;
   const progressThumbRef = useRef(null);
 
   useTVEventHandler((evt: HWEvent) => {
@@ -26,6 +32,18 @@ export function PlayerProgressBarComponentTV(props: PlayerProgressBarComponentPr
 
       if (type === TVEventType.Right) {
         rewindPosition(RewindDirection.Forward);
+      }
+
+      if (type === TVEventType.LongLeft) {
+        console.log('LongLeft');
+
+        rewindPositionAuto(RewindDirection.Backward);
+      }
+
+      if (type === TVEventType.LongRight) {
+        console.log('LongRight');
+
+        rewindPositionAuto(RewindDirection.Forward);
       }
     }
   });

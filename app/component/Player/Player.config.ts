@@ -19,3 +19,6 @@ export enum FocusedElement {
 }
 
 export const AWAKE_TAG = 'player';
+
+export const DEFAULT_REWIND_MS = 10000;
+export const DEFAULT_AUTO_REWIND_MS = 250;
