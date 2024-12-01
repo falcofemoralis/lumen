@@ -1,10 +1,10 @@
 import { FilmApiInterface } from 'Api/index';
-import Film from 'Type/Film.interface';
-import FilmCard from 'Type/FilmCard.interface';
-import { FilmList } from 'Type/FilmList.interface';
+import FilmInterface from 'Type/Film.interface';
+import FilmCardInterface from 'Type/FilmCard.interface';
+import { FilmListInterface } from 'Type/FilmList.interface';
 import { FilmType } from 'Type/FilmType.type';
-import { FilmVideo } from 'Type/FilmVideo.interface';
-import { FilmVoice } from 'Type/FilmVoice.interface';
+import { FilmVideoInterface } from 'Type/FilmVideo.interface';
+import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { parseHtml } from 'Util/Parser';
 import configApi from './configApi';
 import { parseFilmCard, parseSeasons, parseStreams } from './utils';
@@ -15,8 +15,8 @@ const filmApi: FilmApiInterface = {
    * @param page
    * @returns FilmList
    */
-  async getFilms(page: number): Promise<FilmList> {
-    const films: FilmCard[] = [];
+  async getFilms(page: number): Promise<FilmListInterface> {
+    const films: FilmCardInterface[] = [];
 
     const $ = await configApi.fetchPage('/new');
 
@@ -41,7 +41,7 @@ const filmApi: FilmApiInterface = {
    * @param link
    * @returns Film
    */
-  async getFilm(link: string): Promise<Film> {
+  async getFilm(link: string): Promise<FilmInterface> {
     const $ = await configApi.fetchPage(link);
 
     // base data
@@ -49,7 +49,7 @@ const filmApi: FilmApiInterface = {
     const title = $('div.b-post__title h1').text() ?? '';
     const poster = $('div.b-sidecover img').attr('src') ?? '';
 
-    const film: Film = {
+    const film: FilmInterface = {
       id,
       link,
       type: FilmType.Film,
@@ -62,7 +62,7 @@ const filmApi: FilmApiInterface = {
 
     // player data
     $('li.b-translator__item').each((_idx, el) => {
-      const voice: FilmVoice = {
+      const voice: FilmVoiceInterface = {
         id: $(el).attr('data-translator_id') ?? '',
         title: $(el).attr('title') ?? '',
         img: $(el).find('img').attr('src'),
@@ -96,7 +96,7 @@ const filmApi: FilmApiInterface = {
         // subtitles = parseSubtitles(jsonObject.subtitle);
         // getThumbnails(jsonObject.thumbnails, trans);
 
-        const video: FilmVideo = {
+        const video: FilmVideoInterface = {
           streams,
         };
 
@@ -142,7 +142,10 @@ const filmApi: FilmApiInterface = {
    * Get films streams
    * @param film
    */
-  async getFilmStreams(film: Film, voice: FilmVoice): Promise<FilmVideo> {
+  async getFilmStreams(
+    film: FilmInterface,
+    voice: FilmVoiceInterface
+  ): Promise<FilmVideoInterface> {
     const { id: filmId } = film;
     const { id: voiceId, isCamrip, isAds, isDirector } = voice;
 
@@ -168,11 +171,11 @@ const filmApi: FilmApiInterface = {
    * @param episode
    */
   async getFilmStreamsByEpisodeId(
-    film: Film,
-    voice: FilmVoice,
+    film: FilmInterface,
+    voice: FilmVoiceInterface,
     seasonId: string,
     episodeId: string
-  ): Promise<FilmVideo> {
+  ): Promise<FilmVideoInterface> {
     const { id: filmId } = film;
     const { id: voiceId } = voice;
 
@@ -196,7 +199,10 @@ const filmApi: FilmApiInterface = {
    * @param film
    * @param voice
    */
-  async getFilmSeasons(film: Film, voice: FilmVoice): Promise<FilmVoice> {
+  async getFilmSeasons(
+    film: FilmInterface,
+    voice: FilmVoiceInterface
+  ): Promise<FilmVoiceInterface> {
     const { id: filmId } = film;
     const { id: voiceId } = voice;
 

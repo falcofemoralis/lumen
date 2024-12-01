@@ -1,13 +1,14 @@
 import { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
-import FilmCard from 'Type/FilmCard.interface';
+import FilmCardInterface from 'Type/FilmCard.interface';
 
 export interface GridContainerProps {
-  films: FilmCard[];
+  films: FilmCardInterface[];
   onScrollEnd?: () => void;
 }
 
 export interface GridComponentProps {
-  rows: FilmCard[][];
-  handleOnPress: (film: FilmCard) => void;
+  films: FilmCardInterface[];
+  rows: FilmCardInterface[][];
+  handleOnPress: (film: FilmCardInterface) => void;
   onScroll: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
 }

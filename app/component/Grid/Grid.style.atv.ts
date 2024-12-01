@@ -1,6 +1,10 @@
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
+  rowStyle: {
+    gap: 15,
+    flex: 1,
+  },
   rows: {
     flex: 1,
     flexDirection: 'column',

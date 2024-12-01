@@ -2,17 +2,18 @@ import { ErrorBoundaryProps } from 'expo-router';
 import { withTV } from 'Hooks/withTV';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
-import ServiceStore from 'Store/Service.store';
-import FilmCard from 'Type/FilmCard.interface';
-import HomePageComponent from './HomePage.component';
 import NotificationStore from 'Store/Notification.store';
+import ServiceStore from 'Store/Service.store';
+import FilmCardInterface from 'Type/FilmCard.interface';
+import HomePageComponent from './HomePage.component';
+import HomePageComponentTV from './HomePage.component.atv';
 
 export function ErrorBoundary(props: ErrorBoundaryProps) {
   return <ErrorBoundary {...props} />;
 }
 
 export function HomePageContainer() {
-  const [films, setFilms] = useState<FilmCard[]>([]);
+  const [films, setFilms] = useState<FilmCardInterface[]>([]);
 
   useEffect(() => {
     const loadFilms = async () => {
@@ -49,7 +50,7 @@ export function HomePageContainer() {
     };
   };
 
-  return withTV(HomePageComponent, HomePageComponent, {
+  return withTV(HomePageComponentTV, HomePageComponent, {
     ...containerFunctions,
     ...containerProps(),
   });

@@ -1,21 +1,21 @@
 import Grid from 'Component/Grid';
 import Page from 'Component/Page';
 import React from 'react';
-import { HWEvent, useTVEventHandler } from 'react-native';
-import { ROOT_ROUTE } from '../../navigation/_layout';
+import { DefaultFocus } from 'react-tv-space-navigation';
 import { HomePageProps } from './HomePage.type';
+import { ROOT_ROUTE } from '../../navigation/_layout';
 
 export function HomePageComponent(props: HomePageProps) {
   const { films, onScrollEnd } = props;
 
-  useTVEventHandler((evt: HWEvent) => {});
-
   return (
     <Page name={ROOT_ROUTE}>
-      <Grid
-        films={films}
-        onScrollEnd={onScrollEnd}
-      />
+      <DefaultFocus>
+        <Grid
+          films={films}
+          onScrollEnd={onScrollEnd}
+        />
+      </DefaultFocus>
     </Page>
   );
 }

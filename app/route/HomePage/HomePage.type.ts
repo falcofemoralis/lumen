@@ -1,6 +1,6 @@
-import FilmCard from 'Type/FilmCard.interface';
+import FilmCardInterface from 'Type/FilmCard.interface';
 
 export interface HomePageProps {
-  films: FilmCard[];
+  films: FilmCardInterface[];
   onScrollEnd: () => void;
 }

@@ -28,9 +28,11 @@ export const styles = CreateStyles({
   },
   activeTab: {
     backgroundColor: Colors.secondary,
+    borderRadius: 24,
   },
   focusedTab: {
     backgroundColor: Colors.white,
+    borderRadius: 24,
   },
   tabIcon: {
     opacity: 1,

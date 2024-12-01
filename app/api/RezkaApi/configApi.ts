@@ -1,5 +1,5 @@
 import { ApiServiceType, ConfigApiInterface } from 'Api/index';
-import { FilmStream } from 'Type/FilmStream.interface';
+import { FilmStreamInterface } from 'Type/FilmStream.interface';
 import { parseHtml } from 'Util/Parser';
 import { executeGet, executePost } from 'Util/Request';
 import { updateUrlHost } from 'Util/Url';
@@ -92,7 +92,7 @@ const configApi: ConfigApiInterface = {
     return result;
   },
 
-  modifyCDN(streams: FilmStream[]) {
+  modifyCDN(streams: FilmStreamInterface[]) {
     console.log(this.selectedCDN);
 
     return streams.map((stream) => {

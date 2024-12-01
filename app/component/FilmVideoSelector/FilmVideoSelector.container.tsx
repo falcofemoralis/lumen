@@ -2,7 +2,7 @@ import { withTV } from 'Hooks/withTV';
 import { useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
 import ServiceStore from 'Store/Service.store';
-import { Episode, FilmVoice, Season } from 'Type/FilmVoice.interface';
+import { EpisodeInterface, FilmVoiceInterface, SeasonInterface } from 'Type/FilmVoice.interface';
 import FilmVideoSelectorComponent from './FilmVideoSelector.component';
 import FilmVideoSelectorComponentTV from './FilmVideoSelector.component.atv';
 import { FilmVideoSelectorContainerProps } from './FilmVideoSelector.type';
@@ -11,7 +11,7 @@ export function FilmVideoSelectorContainer(props: FilmVideoSelectorContainerProp
   const { visible, onHide, film } = props;
   const { voices = [] } = film;
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedVoice, setSelectedVoice] = useState<FilmVoice>(
+  const [selectedVoice, setSelectedVoice] = useState<FilmVoiceInterface>(
     voices.find(({ isActive }) => isActive) ?? voices[0]
   );
   const [selectedSeasonId, setSelectedSeasonId] = useState<string | null>(
@@ -21,13 +21,13 @@ export function FilmVideoSelectorContainer(props: FilmVideoSelectorContainerProp
     selectedVoice.lastEpisodeId ?? null
   );
 
-  const getSeasons = (): Season[] => {
+  const getSeasons = (): SeasonInterface[] => {
     const { seasons = [] } = selectedVoice;
 
     return seasons;
   };
 
-  const getEpisodes = (): Episode[] => {
+  const getEpisodes = (): EpisodeInterface[] => {
     const { seasons = [] } = selectedVoice;
 
     const { episodes = [] } = seasons.find(({ seasonId }) => seasonId === selectedSeasonId) ?? {};
@@ -35,7 +35,7 @@ export function FilmVideoSelectorContainer(props: FilmVideoSelectorContainerProp
     return episodes;
   };
 
-  const handleSelectVoice = async (voice: FilmVoice) => {
+  const handleSelectVoice = async (voice: FilmVoiceInterface) => {
     const { hasSeasons } = film;
 
     console.log(hasSeasons);

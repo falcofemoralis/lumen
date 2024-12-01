@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { withTV } from 'Hooks/withTV';
 import { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import ConfigStore from 'Store/Config.store';
-import FilmCard from 'Type/FilmCard.interface';
+import FilmCardInterface from 'Type/FilmCard.interface';
 import GridComponent from './Grid.component';
 import GridComponentTV from './Grid.component.atv';
 import { NUMBER_OF_COLUMNS, NUMBER_OF_COLUMNS_TV, SCROLL_EVENT_END_PADDING } from './Grid.config';
@@ -14,16 +14,16 @@ export function PlayerProgressBarContainer(props: GridContainerProps) {
   const calculateRows = () => {
     const numberOfColumns = ConfigStore.isTV ? NUMBER_OF_COLUMNS_TV : NUMBER_OF_COLUMNS;
 
-    const columns: FilmCard[][] = Array.from({ length: numberOfColumns }, () => []);
+    const columns: FilmCardInterface[][] = Array.from({ length: numberOfColumns }, () => []);
 
     films.forEach((film, index) => {
       columns[index % numberOfColumns].push(film);
     });
 
     // Now group the columns into rows
-    const rows: FilmCard[][] = [];
+    const rows: FilmCardInterface[][] = [];
     for (let i = 0; i < columns[0].length; i++) {
-      const row: FilmCard[] = [];
+      const row: FilmCardInterface[] = [];
       for (let j = 0; j < numberOfColumns; j++) {
         if (columns[j][i] !== undefined) {
           row.push(columns[j][i]);
@@ -35,7 +35,9 @@ export function PlayerProgressBarContainer(props: GridContainerProps) {
     return rows;
   };
 
-  const handleOnPress = (film: FilmCard) => {
+  const handleOnPress = (film: FilmCardInterface) => {
+    console.log('handleOnPress');
+
     router.push({
       pathname: '/film/[link]',
       params: {
@@ -64,6 +66,7 @@ export function PlayerProgressBarContainer(props: GridContainerProps) {
 
   const containerProps = () => {
     return {
+      films,
       rows: calculateRows(),
     };
   };

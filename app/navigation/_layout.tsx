@@ -12,21 +12,26 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import { Dimensions, useColorScheme, View } from 'react-native';
 import { PaperProvider } from 'react-native-paper';
+import { SpatialNavigationDeviceTypeProvider } from 'react-tv-space-navigation';
 import ConfigStore from 'Store/Config.store';
 import NavigationStore from 'Store/Navigation.store';
 import Colors from 'Style/Colors';
+import 'Util/RemoteControl';
 
 export interface Screen {
   name?: string;
   options?: any;
 }
 
+export const ROOT_ROUTE = '(tabs)';
+export const FILM_ROUTE = 'film/[link]';
+
 export const SCREENS: Screen[] = [
   {
-    name: '(tabs)',
+    name: ROOT_ROUTE,
   },
   {
-    name: 'film/[link]',
+    name: FILM_ROUTE,
   },
   {
     name: 'settings',
@@ -115,11 +120,13 @@ export function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <PaperProvider>
-        <StatusBar
-          style="light"
-          backgroundColor={Colors.background}
-        />
-        {renderLayout()}
+        <SpatialNavigationDeviceTypeProvider>
+          <StatusBar
+            style="light"
+            backgroundColor={Colors.background}
+          />
+          {renderLayout()}
+        </SpatialNavigationDeviceTypeProvider>
       </PaperProvider>
     </ThemeProvider>
   );

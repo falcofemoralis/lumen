@@ -1,26 +1,26 @@
-import Film from 'Type/Film.interface';
-import { FilmVideo } from 'Type/FilmVideo.interface';
-import { Episode, FilmVoice, Season } from 'Type/FilmVoice.interface';
+import FilmInterface from 'Type/Film.interface';
+import { FilmVideoInterface } from 'Type/FilmVideo.interface';
+import { EpisodeInterface, FilmVoiceInterface, SeasonInterface } from 'Type/FilmVoice.interface';
 
 export type FilmVideoSelectorContainerProps = {
-  film: Film;
+  film: FilmInterface;
   visible: boolean;
   onHide: () => void;
-  onSelect: (video: FilmVideo) => void;
+  onSelect: (video: FilmVideoInterface) => void;
 };
 
 export type FilmVideoSelectorComponentProps = {
-  voices: FilmVoice[];
+  voices: FilmVoiceInterface[];
   visible: boolean;
   onHide: () => void;
   isLoading: boolean;
-  selectedVoice: FilmVoice;
+  selectedVoice: FilmVoiceInterface;
   selectedSeasonId: string | null;
   selectedEpisodeId: string | null;
-  handleSelectVoice: (voice: FilmVoice) => void;
+  handleSelectVoice: (voice: FilmVoiceInterface) => void;
   setSelectedSeasonId: (id: string) => void;
   setSelectedEpisodeId: (id: string) => void;
-  seasons: Season[];
-  episodes: Episode[];
+  seasons: SeasonInterface[];
+  episodes: EpisodeInterface[];
   handleOnPlay: () => void;
 };

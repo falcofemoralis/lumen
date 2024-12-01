@@ -1,7 +1,7 @@
 import { FilmType } from './FilmType.type';
-import { FilmVoice } from './FilmVoice.interface';
+import { FilmVoiceInterface } from './FilmVoice.interface';
 
-export default interface Film {
+export default interface FilmInterface {
   // base data
   id: string;
   link: string;
@@ -28,7 +28,7 @@ export default interface Film {
   bookmarks?: string[];
 
   // player data
-  voices: FilmVoice[];
+  voices: FilmVoiceInterface[];
   lastVoiceId?: string;
   hasVoices: boolean;
   hasSeasons: boolean;

@@ -1,6 +1,6 @@
 import { FilmType } from './FilmType.type';
 
-export default interface FilmCard {
+export default interface FilmCardInterface {
   id: string;
   link: string;
   type: FilmType;

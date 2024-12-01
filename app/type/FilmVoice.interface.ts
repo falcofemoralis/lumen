@@ -1,23 +1,23 @@
-import { FilmVideo } from './FilmVideo.interface';
+import { FilmVideoInterface } from './FilmVideo.interface';
 
-export interface Episode {
+export interface EpisodeInterface {
   name: string;
   episodeId: string;
 }
 
-export interface Season {
+export interface SeasonInterface {
   name: string;
   seasonId: string;
-  episodes: Episode[];
+  episodes: EpisodeInterface[];
 }
 
-export interface FilmVoice {
+export interface FilmVoiceInterface {
   id: string;
   title: string;
   img?: string;
   //
-  seasons?: Season[];
-  video?: FilmVideo;
+  seasons?: SeasonInterface[];
+  video?: FilmVideoInterface;
   //
   isCamrip: string;
   isDirector: string;

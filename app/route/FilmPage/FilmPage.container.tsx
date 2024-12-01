@@ -2,10 +2,10 @@ import { withTV } from 'Hooks/withTV';
 import { useEffect, useState } from 'react';
 import { BackHandler } from 'react-native';
 import ConfigStore from 'Store/Config.store';
-import Film from 'Type/Film.interface';
-import { FilmStream } from 'Type/FilmStream.interface';
-import { FilmVideo } from 'Type/FilmVideo.interface';
-import { FilmVoice } from 'Type/FilmVoice.interface';
+import FilmInterface from 'Type/Film.interface';
+import { FilmStreamInterface } from 'Type/FilmStream.interface';
+import { FilmVideoInterface } from 'Type/FilmVideo.interface';
+import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import FilmPageComponent from './FilmPage.component';
 import FilmPageComponentTV from './FilmPage.component.atv';
 import { FilmPageContainerProps } from './FilmPage.type';
@@ -14,10 +14,10 @@ import NotificationStore from 'Store/Notification.store';
 
 export function FilmPageContainer(props: FilmPageContainerProps) {
   const { link } = props;
-  const [film, setFilm] = useState<Film | null>(null);
-  const [selectedVoice, setSelectedVoice] = useState<FilmVoice | null>(null);
-  const [selectedStream, setSelectedStream] = useState<FilmStream | null>(null);
-  const [filmVideo, setFilmVideo] = useState<FilmVideo | null>(null);
+  const [film, setFilm] = useState<FilmInterface | null>(null);
+  const [selectedVoice, setSelectedVoice] = useState<FilmVoiceInterface | null>(null);
+  const [selectedStream, setSelectedStream] = useState<FilmStreamInterface | null>(null);
+  const [filmVideo, setFilmVideo] = useState<FilmVideoInterface | null>(null);
   const [isSelectorVisible, setIsSelectorVisible] = useState(false);
 
   useEffect(() => {
@@ -66,7 +66,7 @@ export function FilmPageContainer(props: FilmPageContainerProps) {
     setIsSelectorVisible(false);
   };
 
-  const handleVideoSelect = (video: FilmVideo) => {
+  const handleVideoSelect = (video: FilmVideoInterface) => {
     setFilmVideo(video);
   };
 

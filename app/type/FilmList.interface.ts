@@ -1,6 +1,6 @@
-import FilmCard from './FilmCard.interface';
+import FilmCardInterface from './FilmCard.interface';
 
-export interface FilmList {
-  films: FilmCard[];
+export interface FilmListInterface {
+  films: FilmCardInterface[];
   total: number;
 }

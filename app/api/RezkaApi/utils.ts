@@ -1,10 +1,10 @@
 import { CheerioAPI, Element } from 'cheerio';
-import FilmCard from 'Type/FilmCard.interface';
-import { FilmStream } from 'Type/FilmStream.interface';
+import FilmCardInterface from 'Type/FilmCard.interface';
+import { FilmStreamInterface } from 'Type/FilmStream.interface';
 import { FilmType } from 'Type/FilmType.type';
-import { Episode, Season } from 'Type/FilmVoice.interface';
+import { EpisodeInterface, SeasonInterface } from 'Type/FilmVoice.interface';
 
-export const parseFilmCard = ($: CheerioAPI, el: Element): FilmCard => {
+export const parseFilmCard = ($: CheerioAPI, el: Element): FilmCardInterface => {
   const parseType = (type: string = '') => {
     if (type.includes('films')) {
       return FilmType.Film;
@@ -59,8 +59,8 @@ export const decodeUrl = (str: string): string => {
   }
 };
 
-export const parseStreams = (streams: string | null): FilmStream[] => {
-  const parsedStreams: FilmStream[] = [];
+export const parseStreams = (streams: string | null): FilmStreamInterface[] => {
+  const parsedStreams: FilmStreamInterface[] = [];
 
   if (streams && streams.length > 0) {
     const decodedStreams = decodeUrl(streams);
@@ -91,11 +91,11 @@ export const parseStreams = (streams: string | null): FilmStream[] => {
 export const parseSeasons = (
   $: CheerioAPI
 ): {
-  seasons: Season[];
+  seasons: SeasonInterface[];
   lastSeasonId: string | undefined;
   lastEpisodeId: string | undefined;
 } => {
-  const seasons: Season[] = [];
+  const seasons: SeasonInterface[] = [];
   const lastWatch: {
     lastSeasonId: string | undefined;
     lastEpisodeId: string | undefined;
@@ -106,7 +106,7 @@ export const parseSeasons = (
 
   $('li.b-simple_season__item').each((_idx, el) => {
     const seasonId = $(el).attr('data-tab_id') ?? '';
-    const episodes: Episode[] = [];
+    const episodes: EpisodeInterface[] = [];
 
     $(`#simple-episodes-list-${seasonId}`).each((_idx, list) => {
       $(list)
@@ -124,7 +124,7 @@ export const parseSeasons = (
         });
     });
 
-    const season: Season = {
+    const season: SeasonInterface = {
       name: $(el).text(),
       seasonId: $(el).attr('data-tab_id') ?? '',
       episodes,

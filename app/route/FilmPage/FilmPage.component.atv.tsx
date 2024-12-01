@@ -1,4 +1,5 @@
 import FilmVideoSelector from 'Component/FilmVideoSelector';
+import Page from 'Component/Page';
 import Player from 'Component/Player';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
@@ -6,6 +7,7 @@ import ThemedView from 'Component/ThemedView';
 import { DEMO_VIDEO } from 'Route/PlayerPage/PlayerPage.config';
 import { useState } from 'react';
 import { TouchableOpacity, View } from 'react-native';
+import { FILM_ROUTE } from '../../navigation/_layout';
 import { styles } from './FilmPage.style.atv';
 import { FilmPageComponentProps } from './FilmPage.type';
 
@@ -89,7 +91,7 @@ export function FilmPageComponent(props: FilmPageComponentProps) {
   }
 
   return (
-    <ThemedView>
+    <Page name={FILM_ROUTE}>
       {renderActions()}
       <ThemedText>Loaded!</ThemedText>
       <ThemedText>title={film.title}</ThemedText>
@@ -99,7 +101,7 @@ export function FilmPageComponent(props: FilmPageComponentProps) {
         style={{ height: 250, width: 140 }}
       />
       {renderVideoSelector()}
-    </ThemedView>
+    </Page>
   );
 }
 

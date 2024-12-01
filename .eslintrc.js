@@ -19,6 +19,7 @@ module.exports = {
     'react/react-in-jsx-scope': 'off',
     'react-native/no-inline-styles': 0,
     'react-native/no-raw-text': 0,
+    'react/prop-types': 'off',
   },
   settings: {
     react: {

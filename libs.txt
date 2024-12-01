@@ -15,18 +15,14 @@ Material UI     https://reactnativepaper.com/ - UI
 TV Only
 RN TV           https://github.com/react-native-tvos/react-native-tvos
 EXPO TV         https://docs.expo.dev/guides/building-for-tv/
-navigation      https://github.com/bamlab/react-tv-space-navigation?tab=readme-ov-file#api-documentation
+TV Space nav    https://github.com/bamlab/react-tv-space-navigation?tab=readme-ov-file#api-documentation
 
 ///
 Mobile Only
 Refresh list    https://reactnative.dev/docs/refreshcontrol
 Slider          https://github.com/callstack/react-native-slider
 
-///
-Examples
-https://github.com/react-native-tvos/IgniteTV?tab=readme-ov-file
-
-///
+###
 Reuse
 TV Seekbar\other https://github.com/kosso/VideoPlayerDemo
 Player example   https://github.com/itsnubix/react-native-video-controls/blob/master/VideoPlayer.js

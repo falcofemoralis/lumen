@@ -1,8 +1,8 @@
-import Film from 'Type/Film.interface';
-import { FilmList } from 'Type/FilmList.interface';
-import { FilmStream } from 'Type/FilmStream.interface';
-import { FilmVideo } from 'Type/FilmVideo.interface';
-import { FilmVoice } from 'Type/FilmVoice.interface';
+import FilmInterface from 'Type/Film.interface';
+import { FilmListInterface } from 'Type/FilmList.interface';
+import { FilmStreamInterface } from 'Type/FilmStream.interface';
+import { FilmVideoInterface } from 'Type/FilmVideo.interface';
+import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { CheerioAPI } from 'cheerio';
 
 export enum ApiServiceType {
@@ -25,20 +25,20 @@ export interface ConfigApiInterface {
   fetchPage(query: string, variables?: Record<string, string>): Promise<CheerioAPI>;
   getRequest(query: string, variables?: Record<string, string>): Promise<any>;
   postRequest(query: string, variables?: Record<string, string>): Promise<any>;
-  modifyCDN(streams: FilmStream[]): FilmStream[];
+  modifyCDN(streams: FilmStreamInterface[]): FilmStreamInterface[];
 }
 
 export interface FilmApiInterface {
-  getFilms(page: number): Promise<FilmList>;
-  getFilm(link: string): Promise<Film>;
-  getFilmStreams(film: Film, voice: FilmVoice): Promise<FilmVideo>;
+  getFilms(page: number): Promise<FilmListInterface>;
+  getFilm(link: string): Promise<FilmInterface>;
+  getFilmStreams(film: FilmInterface, voice: FilmVoiceInterface): Promise<FilmVideoInterface>;
   getFilmStreamsByEpisodeId(
-    film: Film,
-    voice: FilmVoice,
+    film: FilmInterface,
+    voice: FilmVoiceInterface,
     seasonId: string,
     episodeId: string
-  ): Promise<FilmVideo>;
-  getFilmSeasons(film: Film, voice: FilmVoice): Promise<FilmVoice>;
+  ): Promise<FilmVideoInterface>;
+  getFilmSeasons(film: FilmInterface, voice: FilmVoiceInterface): Promise<FilmVoiceInterface>;
 }
 
 export default interface ApiInterface extends ConfigApiInterface, FilmApiInterface {}

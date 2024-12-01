@@ -1,7 +1,7 @@
-import { FilmStream } from './FilmStream.interface';
+import { FilmStreamInterface } from './FilmStream.interface';
 
-export interface FilmVideo {
-  streams: FilmStream[];
+export interface FilmVideoInterface {
+  streams: FilmStreamInterface[];
   subtitles?: string[];
   thumbnails?: string[];
 }

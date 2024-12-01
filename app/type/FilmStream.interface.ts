@@ -1,4 +1,4 @@
-export interface FilmStream {
+export interface FilmStreamInterface {
   url: string;
   quality: string;
 }
