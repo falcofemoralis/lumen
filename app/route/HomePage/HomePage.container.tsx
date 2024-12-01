@@ -29,7 +29,19 @@ export function HomePageContainer() {
     loadFilms();
   }, []);
 
-  const containerFunctions = {};
+  const onScrollEnd = async () => {
+    console.log('Scroll end');
+    const filmList = await ServiceStore.getCurrentService().getFilms(2);
+    const { films: newFilms } = filmList;
+
+    const updatedFilms = films.concat(newFilms);
+
+    setFilms(updatedFilms);
+  };
+
+  const containerFunctions = {
+    onScrollEnd,
+  };
 
   const containerProps = () => {
     return {

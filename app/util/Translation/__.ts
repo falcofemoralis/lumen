@@ -6,8 +6,6 @@ export function injectValues(string: string, values: any[]) {
 }
 
 export function translateString(string: string) {
-  console.log(i18n.t(string));
-
   return i18n.t(string) || string;
 }
 

@@ -47,8 +47,8 @@ export function PlayerContainer(props: PlayerContainerProps) {
 
     const {
       isLoaded = false,
-      isPlaying = false,
-      isBuffering = false,
+      isPlaying: statusIsPlaying = false,
+      isBuffering: statusIsBuffering = false,
       durationMillis,
       positionMillis,
       playableDurationMillis,
@@ -64,7 +64,11 @@ export function PlayerContainer(props: PlayerContainerProps) {
         statusRef.current = updatedStatus;
       }
 
-      setIsPlaying(isPlaying || isBuffering);
+      const newIsPlaying = statusIsPlaying || statusIsBuffering;
+
+      if (isPlaying !== newIsPlaying) {
+        setIsPlaying(newIsPlaying);
+      }
     }
   };
 

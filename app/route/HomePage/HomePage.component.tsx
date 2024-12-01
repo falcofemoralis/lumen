@@ -4,14 +4,17 @@ import { HWEvent, useTVEventHandler, View } from 'react-native';
 import { HomePageProps } from './HomePage.type';
 
 export function HomePageComponent(props: HomePageProps) {
-  const { films } = props;
+  const { films, onScrollEnd } = props;
 
   useTVEventHandler((evt: HWEvent) => {});
 
   return (
     <ThemedView style={{ flex: 1, flexDirection: 'column', width: '100%' }}>
       <View style={{ width: '100%' }}>
-        <Grid films={films} />
+        <Grid
+          films={films}
+          onScrollEnd={onScrollEnd}
+        />
       </View>
     </ThemedView>
   );

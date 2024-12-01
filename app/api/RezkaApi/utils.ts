@@ -24,15 +24,17 @@ export const parseFilmCard = ($: CheerioAPI, el: Element): FilmCard => {
   const id = $(el).attr('data-id') ?? '';
   const link = $(el).find('.b-content__inline_item-link a').attr('href') ?? '';
   const type = parseType($(el).find('.cat').attr('class'));
-  const title = $(el).find('.b-content__inline_item-link a').text() ?? '';
   const poster = $(el).find('.b-content__inline_item-cover img').attr('src') ?? '';
+  const title = $(el).find('.b-content__inline_item-link a').text() ?? '';
+  const info = $(el).find('.b-content__inline_item-link dev').text() ?? '';
 
   return {
     id,
     link,
     type,
-    title,
     poster,
+    title,
+    info,
   };
 };
 

@@ -1,12 +1,12 @@
+import FilmCard from 'Component/FilmCard';
 import ThemedView from 'Component/ThemedView';
 import { DimensionValue, RefreshControl, ScrollView, TouchableOpacity } from 'react-native';
-import { GridComponentProps } from './Grid.type';
-import FilmCard from 'Component/FilmCard';
-import { NUMBER_OF_COLUMNS } from './Grid.config';
+import { NUMBER_OF_COLUMNS, SCROLL_EVENT_UPDATES_MS } from './Grid.config';
 import { styles } from './Grid.style';
+import { GridComponentProps } from './Grid.type';
 
 export function GridComponent(props: GridComponentProps) {
-  const { rows, handleOnPress } = props;
+  const { rows, handleOnPress, onScroll } = props;
 
   const onRefresh = () => {
     console.log('Refresh');
@@ -21,6 +21,8 @@ export function GridComponent(props: GridComponentProps) {
           onRefresh={onRefresh}
         />
       }
+      onScroll={onScroll}
+      scrollEventThrottle={SCROLL_EVENT_UPDATES_MS}
     >
       <ThemedView style={{ flex: 1, flexDirection: 'column', width: '100%' }}>
         {rows.map((row, index) => (
