@@ -1,6 +1,6 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import NavigationBar from 'Component/NavigationBar';
-import { NAVIGATION_BAR_TV_WIDTH } from 'Component/NavigationBar/NavigationBar.style.atv';
+import { styles as navigationBarStyles } from 'Component/NavigationBar/NavigationBar.style.atv';
 import ThemedView from 'Component/ThemedView';
 import Constants from 'expo-constants';
 import { useFonts } from 'expo-font';
@@ -10,11 +10,10 @@ import { StatusBar } from 'expo-status-bar';
 import { useLocale } from 'Hooks/useLocale';
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
-import { Dimensions, useColorScheme, View } from 'react-native';
+import { useColorScheme, View } from 'react-native';
 import { PaperProvider } from 'react-native-paper';
 import { SpatialNavigationDeviceTypeProvider } from 'react-tv-space-navigation';
 import ConfigStore from 'Store/Config.store';
-import NavigationStore from 'Store/Navigation.store';
 import Colors from 'Style/Colors';
 import 'Util/RemoteControl';
 
@@ -48,7 +47,6 @@ export const SCREENS: Screen[] = [
 SplashScreen.preventAutoHideAsync();
 
 export function RootLayout() {
-  const windowWidth = Dimensions.get('window').width;
   const colorScheme = useColorScheme();
   const [languageLoaded] = useLocale();
   const [fontLoaded, fontError] = useFonts({
@@ -97,15 +95,13 @@ export function RootLayout() {
   };
 
   const renderTVLayout = () => {
-    const width = NavigationStore.isNavigationVisible
-      ? windowWidth - NAVIGATION_BAR_TV_WIDTH
-      : windowWidth;
-
     return (
-      <ThemedView style={{ flex: 1, flexDirection: 'row', width: '100%' }}>
-        <NavigationBar />
-        <View style={{ width }}>{renderStack()}</View>
-      </ThemedView>
+      <SpatialNavigationDeviceTypeProvider>
+        <ThemedView style={{ flex: 1, flexDirection: 'row', width: '100%', height: '100%' }}>
+          <NavigationBar />
+          <View style={navigationBarStyles.slot}>{renderStack()}</View>
+        </ThemedView>
+      </SpatialNavigationDeviceTypeProvider>
     );
   };
 
@@ -120,13 +116,11 @@ export function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <PaperProvider>
-        <SpatialNavigationDeviceTypeProvider>
-          <StatusBar
-            style="light"
-            backgroundColor={Colors.background}
-          />
-          {renderLayout()}
-        </SpatialNavigationDeviceTypeProvider>
+        <StatusBar
+          style="light"
+          backgroundColor={Colors.background}
+        />
+        {renderLayout()}
       </PaperProvider>
     </ThemeProvider>
   );

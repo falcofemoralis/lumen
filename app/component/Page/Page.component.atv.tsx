@@ -36,7 +36,7 @@ const SpatialNavigationKeyboardLocker = () => {
 
 export function PageComponent(props: PageProps) {
   const { children, name: pageName } = props;
-  const { routes } = useRootNavigationState();
+  const { routes = [] } = useRootNavigationState() ?? {};
   const [isFocused, setIsFocused] = useState(true);
 
   const onDirectionHandledWithoutMovement = (movement: string) => {
@@ -60,7 +60,7 @@ export function PageComponent(props: PageProps) {
   }, [routes, pageName]);
 
   return (
-    <ThemedView>
+    <ThemedView style={{ height: '100%' }}>
       <SpatialNavigationRoot
         isActive={!NavigationStore.isNavigationOpened && isFocused}
         onDirectionHandledWithoutMovement={onDirectionHandledWithoutMovement}

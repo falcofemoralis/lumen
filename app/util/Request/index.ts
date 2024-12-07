@@ -90,7 +90,6 @@ export const executeGet = async (
       const cachedResult = await queryCache.get(uriHash);
 
       if (cachedResult) {
-        console.log('GET cache hit');
         return cachedResult;
       }
     }
@@ -106,8 +105,6 @@ export const executeGet = async (
     if (!ignoreCache) {
       queryCache.set(uriHash, parsedRes);
     }
-
-    console.log('GET cache miss');
 
     return parsedRes;
   } catch (error) {

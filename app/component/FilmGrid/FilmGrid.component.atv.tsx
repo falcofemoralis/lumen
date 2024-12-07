@@ -16,11 +16,6 @@ export function GridComponent(props: FilmGridComponentProps) {
   const { films, handleOnPress, onScrollEnd } = props;
   const windowWidth = Dimensions.get('window').width;
 
-  // TODO GRID RENDERS TWICE, WHY?
-  // TODO IMAGES ARE CACHED, WHY?
-
-  // TODO ADJUST LEFT BAR TO BE ABSOLUTE
-
   const renderItem = ({ item }: { item: FilmCardInterface }) => {
     return (
       <SpatialNavigationFocusableView onSelect={() => handleOnPress(item)}>

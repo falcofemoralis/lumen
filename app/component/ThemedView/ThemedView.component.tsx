@@ -8,7 +8,7 @@ export default function ThemedView({
   lightColor,
   darkColor,
   useAnimation,
-  ...otherProps
+  ...rest
 }: ThemedViewProps) {
   const backgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, 'background');
 
@@ -16,7 +16,7 @@ export default function ThemedView({
     return (
       <Animated.View
         style={[{ backgroundColor }, style]}
-        {...otherProps}
+        {...rest}
       />
     );
   }
@@ -24,7 +24,7 @@ export default function ThemedView({
   return (
     <View
       style={[{ backgroundColor }, style]}
-      {...otherProps}
+      {...rest}
     />
   );
 }

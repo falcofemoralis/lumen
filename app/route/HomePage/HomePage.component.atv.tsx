@@ -8,6 +8,8 @@ import { HomePageProps } from './HomePage.type';
 export function HomePageComponent(props: HomePageProps) {
   const { films, loadFilms } = props;
 
+  console.log('HomePageComponent');
+
   return (
     <Page name={ROOT_ROUTE}>
       <DefaultFocus>

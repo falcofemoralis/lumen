@@ -6,6 +6,7 @@ export const Colors = {
   gray: '#444746', // genres, country badges
   lightGray: '#C4C7C5', // secondary text
   white: '#E3E3E3', // default text
+  black: '#000000', // default text
 };
 
 export const ThemeColors = {

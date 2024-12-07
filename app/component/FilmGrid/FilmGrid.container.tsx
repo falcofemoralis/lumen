@@ -18,6 +18,8 @@ export function GridContainer(props: FilmGridContainerProps) {
     totalPages: DEFAULT_PAGE,
   });
 
+  console.log('render GridContainer');
+
   useEffect(() => {
     console.log('useEffect');
 
