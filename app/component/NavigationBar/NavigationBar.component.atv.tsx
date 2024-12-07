@@ -1,4 +1,4 @@
-import Icon from 'Component/Icon';
+import ThemedIcon from 'Component/ThemedIcon';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
 import { router } from 'expo-router';
@@ -65,7 +65,7 @@ export function NavigationBarComponent() {
               selectedTab === id && isRootActive && styles.focusedTab,
             ]}
           >
-            <Icon
+            <ThemedIcon
               style={styles.tabIcon}
               icon={icon}
               size={scale(24)}

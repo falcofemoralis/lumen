@@ -1,6 +1,10 @@
+import { FilmGridPaginationInterface } from 'Component/FilmGrid/FilmGrid.type';
 import FilmCardInterface from 'Type/FilmCard.interface';
 
 export interface HomePageProps {
   films: FilmCardInterface[];
-  onScrollEnd: () => void;
+  loadFilms: (
+    pagination: FilmGridPaginationInterface,
+    isRefresh?: boolean
+  ) => Promise<FilmGridPaginationInterface>;
 }

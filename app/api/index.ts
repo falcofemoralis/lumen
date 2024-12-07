@@ -29,7 +29,7 @@ export interface ConfigApiInterface {
 }
 
 export interface FilmApiInterface {
-  getFilms(page: number): Promise<FilmListInterface>;
+  getFilms(page: number, path?: string): Promise<FilmListInterface>;
   getFilm(link: string): Promise<FilmInterface>;
   getFilmStreams(film: FilmInterface, voice: FilmVoiceInterface): Promise<FilmVideoInterface>;
   getFilmStreamsByEpisodeId(
@@ -39,6 +39,7 @@ export interface FilmApiInterface {
     episodeId: string
   ): Promise<FilmVideoInterface>;
   getFilmSeasons(film: FilmInterface, voice: FilmVoiceInterface): Promise<FilmVoiceInterface>;
+  getHomePageFilms(page: number): Promise<FilmListInterface>;
 }
 
 export default interface ApiInterface extends ConfigApiInterface, FilmApiInterface {}

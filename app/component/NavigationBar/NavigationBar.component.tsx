@@ -1,5 +1,5 @@
 import { BottomTabBarButtonProps } from '@react-navigation/bottom-tabs';
-import Icon from 'Component/Icon';
+import ThemedIcon from 'Component/ThemedIcon';
 import { Tabs } from 'expo-router';
 import React from 'react';
 import { Pressable } from 'react-native';
@@ -34,7 +34,7 @@ export function NavigationBarComponent() {
         options={{
           title: name,
           tabBarIcon: ({ color, focused }) => (
-            <Icon
+            <ThemedIcon
               icon={icon}
               size={scale(24)}
               color={color}

@@ -6,6 +6,8 @@ import { ActivityIndicator } from 'react-native';
 export default function ThemedImage({ src, style }: ThemedImageProps) {
   const key = hash(src);
 
+  console.log('ThemedImage', src);
+
   return (
     <CachedImage
       source={{
@@ -25,7 +27,7 @@ export default function ThemedImage({ src, style }: ThemedImageProps) {
       }
       resizeMode="contain" // pass-through to <Image /> tag
       style={style}
-      // onError={(e) => console.log(e.nativeEvent.error)}
+      onError={(e) => console.log(e.nativeEvent.error)}
     />
   );
 }

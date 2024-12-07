@@ -1,4 +1,4 @@
-import { Icon, IconPackType } from 'Component/Icon/Icon.type';
+import { IconInterface, IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import { Href } from 'expo-router';
 
 export enum TabType {
@@ -14,7 +14,7 @@ export interface Tab {
   id: TabType;
   route: Href<string>;
   name: string;
-  icon: Icon;
+  icon: IconInterface;
   options?: {
     href?: string | null;
   };

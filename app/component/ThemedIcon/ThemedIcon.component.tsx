@@ -1,8 +1,8 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { IconComponentProps, IconPackType } from './Icon.type';
+import { IconPackType, ThemedIconComponentProps } from './ThemedIcon.type';
 
-export function IconComponent(props: IconComponentProps) {
+export function ThemedIconComponent(props: ThemedIconComponentProps) {
   const { icon, size, color, style } = props;
   const { name, pack } = icon;
 
@@ -32,4 +32,4 @@ export function IconComponent(props: IconComponentProps) {
   }
 }
 
-export default IconComponent;
+export default ThemedIconComponent;

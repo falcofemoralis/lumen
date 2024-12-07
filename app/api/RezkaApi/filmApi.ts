@@ -13,26 +13,31 @@ const filmApi: FilmApiInterface = {
   /**
    * Get films list by params
    * @param page
+   * @param path
    * @returns FilmList
    */
-  async getFilms(page: number): Promise<FilmListInterface> {
+  async getFilms(page: number, path: string = ''): Promise<FilmListInterface> {
     const films: FilmCardInterface[] = [];
 
-    const $ = await configApi.fetchPage('/new');
+    const $ = await configApi.fetchPage(`${path}/page/${page}/`);
 
-    try {
-      const filmElements = $('div.b-content__inline_item');
+    const filmElements = $('div.b-content__inline_item');
 
-      filmElements.each((_idx, el) => {
-        films.push(parseFilmCard($, el));
-      });
-    } catch (error) {
-      console.log(error);
-    }
+    filmElements.each((_idx, el) => {
+      films.push(parseFilmCard($, el));
+    });
+
+    const navs = $('div.b-navigation a');
+    let totalPages = 1;
+    navs.each((idx, el) => {
+      if (idx === navs.length - 2) {
+        totalPages = Number($(el).text());
+      }
+    });
 
     return {
       films,
-      total: 1,
+      totalPages,
     };
   },
 
@@ -221,6 +226,10 @@ const filmApi: FilmApiInterface = {
       ...voice,
       ...parseSeasons($),
     };
+  },
+
+  async getHomePageFilms(page: number): Promise<FilmListInterface> {
+    return this.getFilms(page, '/new');
   },
 };
 

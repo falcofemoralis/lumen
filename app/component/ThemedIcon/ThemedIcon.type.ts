@@ -1,12 +1,12 @@
 import { StyleProp, TextStyle } from 'react-native';
 
-export interface Icon {
+export interface IconInterface {
   name: string;
   pack: IconPackType;
 }
 
-export interface IconComponentProps {
-  icon: Icon;
+export interface ThemedIconComponentProps {
+  icon: IconInterface;
   size: number;
   color: string;
   style?: StyleProp<TextStyle> | undefined;

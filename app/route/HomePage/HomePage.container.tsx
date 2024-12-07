@@ -1,12 +1,13 @@
 import { ErrorBoundaryProps } from 'expo-router';
 import { withTV } from 'Hooks/withTV';
 import { observer } from 'mobx-react-lite';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
 import ServiceStore from 'Store/Service.store';
 import FilmCardInterface from 'Type/FilmCard.interface';
 import HomePageComponent from './HomePage.component';
 import HomePageComponentTV from './HomePage.component.atv';
+import { FilmGridPaginationInterface } from 'Component/FilmGrid/FilmGrid.type';
 
 export function ErrorBoundary(props: ErrorBoundaryProps) {
   return <ErrorBoundary {...props} />;
@@ -15,33 +16,33 @@ export function ErrorBoundary(props: ErrorBoundaryProps) {
 export function HomePageContainer() {
   const [films, setFilms] = useState<FilmCardInterface[]>([]);
 
-  useEffect(() => {
-    const loadFilms = async () => {
-      try {
-        const filmList = await ServiceStore.getCurrentService().getFilms(1);
-        const { films } = filmList;
+  const loadFilms = async (pagination: FilmGridPaginationInterface, isRefresh: boolean = false) => {
+    console.trace();
 
-        setFilms(films);
-      } catch (error) {
-        NotificationStore.displayError(error);
-      }
-    };
+    console.log('load films');
 
-    loadFilms();
-  }, []);
+    const { currentPage } = pagination;
+    console.log('currentPage', currentPage);
 
-  const onScrollEnd = async () => {
-    console.log('Scroll end');
-    const filmList = await ServiceStore.getCurrentService().getFilms(2);
-    const { films: newFilms } = filmList;
+    try {
+      const { films: newFilms, totalPages } =
+        await ServiceStore.getCurrentService().getHomePageFilms(currentPage);
 
-    const updatedFilms = films.concat(newFilms);
+      setFilms(isRefresh ? newFilms : Array.from(films).concat(newFilms));
 
-    setFilms(updatedFilms);
+      return {
+        ...pagination,
+        currentPage,
+        totalPages,
+      };
+    } catch (error) {
+      NotificationStore.displayError(error);
+      throw error;
+    }
   };
 
   const containerFunctions = {
-    onScrollEnd,
+    loadFilms,
   };
 
   const containerProps = () => {
