@@ -1,43 +1,21 @@
+import { router } from 'expo-router';
 import { withTV } from 'Hooks/withTV';
 import { useEffect, useState } from 'react';
-import { BackHandler } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
 import ServiceStore from 'Store/Service.store';
 import FilmInterface from 'Type/Film.interface';
-import { FilmStreamInterface } from 'Type/FilmStream.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
-import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import FilmPageComponent from './FilmPage.component';
 import FilmPageComponentTV from './FilmPage.component.atv';
 import { FilmPageContainerProps } from './FilmPage.type';
+import ConfigStore from 'Store/Config.store';
+import NavigationStore from 'Store/Navigation.store';
 
 export function FilmPageContainer(props: FilmPageContainerProps) {
   const { link } = props;
   const [film, setFilm] = useState<FilmInterface | null>(null);
-  const [selectedVoice, setSelectedVoice] = useState<FilmVoiceInterface | null>(null);
-  const [selectedStream, setSelectedStream] = useState<FilmStreamInterface | null>(null);
   const [filmVideo, setFilmVideo] = useState<FilmVideoInterface | null>(null);
   const [isSelectorVisible, setIsSelectorVisible] = useState(false);
-
-  useEffect(() => {
-    const backAction = () => {
-      // if (filmVideo) {
-      //   setFilmVideo(null);
-
-      //   if (ConfigStore.isTV) {
-      //     NavigationStore.toggleNavigation();
-      //   }
-
-      //   return true;
-      // }
-
-      return false;
-    };
-
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
-
-    return () => backHandler.remove();
-  });
 
   useEffect(() => {
     const loadFilm = async () => {
@@ -66,7 +44,9 @@ export function FilmPageContainer(props: FilmPageContainerProps) {
   };
 
   const handleVideoSelect = (video: FilmVideoInterface) => {
-    setFilmVideo(video);
+    //setFilmVideo(video);
+    hideVideoSelector();
+    openPlayer(video);
   };
 
   const playFilm = () => {
@@ -93,7 +73,19 @@ export function FilmPageContainer(props: FilmPageContainerProps) {
       return;
     }
 
-    setFilmVideo(video);
+    //setFilmVideo(video);
+    openPlayer(video);
+  };
+
+  const openPlayer = (video: FilmVideoInterface) => {
+    if (ConfigStore.isTV) {
+      NavigationStore.hideNavigation();
+    }
+
+    router.push({
+      pathname: '/player/[data]',
+      params: { data: JSON.stringify(video) },
+    });
   };
 
   const containerProps = () => {

@@ -1,41 +1,24 @@
 import FilmVideoSelector from 'Component/FilmVideoSelector';
 import Page from 'Component/Page';
-import Player from 'Component/Player';
+import ThemedButton from 'Component/ThemedButton';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
-import { DEMO_VIDEO } from 'Route/PlayerPage/PlayerPage.config';
+import { scale } from 'Util/CreateStyles';
 import { View } from 'react-native';
 import {
   DefaultFocus,
   SpatialNavigationFocusableView,
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
-import { styles } from './FilmPage.style.atv';
 import { FilmPageComponentProps } from './FilmPage.type';
-import ThemedButton from 'Component/ThemedButton';
 
 export function FilmPageComponent(props: FilmPageComponentProps) {
-  const { film, isSelectorVisible, filmVideo, playFilm, hideVideoSelector, handleVideoSelect } =
-    props;
-  //const [focusedElement, setFocusedElement] = useState<string | null>('Watch Now');
+  const { film, isSelectorVisible, playFilm, hideVideoSelector, handleVideoSelect } = props;
 
-  // const handleHide = () => {
-  //   setFocusedElement('Watch Now');
-  //   hideVideoSelector();
-  // };
-
-  // set focus element
-  // remove focused element
-  // back? set focus
   const renderAction = (text: string, onPress?: () => void) => {
     return (
-      <SpatialNavigationFocusableView
-        //hasTVPreferredFocus={focusedElement === text}
-        onSelect={onPress}
-        // onFocus={() => setFocusedElement(text)}
-        // onBlur={() => setFocusedElement(null)}
-      >
+      <SpatialNavigationFocusableView>
         <ThemedButton
           label={text}
           onPress={onPress}
@@ -48,13 +31,13 @@ export function FilmPageComponent(props: FilmPageComponentProps) {
     return (
       <SpatialNavigationView direction="horizontal">
         <DefaultFocus>
-          <ThemedView style={{ flex: 1, flexDirection: 'row' }}>
+          <ThemedView style={{ flex: 1, flexDirection: 'row', gap: scale(10) }}>
             {renderAction('Watch Now TV', playFilm)}
-            {/* {renderAction('Comments')}
+            {renderAction('Comments')}
             {renderAction('Bookmark')}
             {renderAction('Trailer')}
             {renderAction('Share')}
-            {renderAction('Download')} */}
+            {renderAction('Download')}
           </ThemedView>
         </DefaultFocus>
       </SpatialNavigationView>
@@ -96,7 +79,7 @@ export function FilmPageComponent(props: FilmPageComponentProps) {
     }
 
     return (
-      <>
+      <View>
         <ThemedText>Loaded!</ThemedText>
         <ThemedText>title={film.title}</ThemedText>
         <ThemedText>id={film.id}</ThemedText>
@@ -104,23 +87,19 @@ export function FilmPageComponent(props: FilmPageComponentProps) {
           src={film.poster}
           style={{ height: 250, width: 140 }}
         />
-        {renderVideoSelector()}
-      </>
+      </View>
     );
   };
 
-  if (filmVideo) {
-    return (
-      <View style={styles.player}>
-        <Player uri={DEMO_VIDEO} />
-      </View>
-    );
-  }
+  const renderModals = () => {
+    return renderVideoSelector();
+  };
 
   return (
-    <Page>
+    <Page testId="filmPage">
       {renderActions()}
       {renderContent()}
+      {renderModals()}
     </Page>
   );
 }

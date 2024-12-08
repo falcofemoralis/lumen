@@ -1,5 +1,6 @@
+import ThemedModal from 'Component/ThemedModal';
 import ThemedText from 'Component/ThemedText';
-import { Button, Modal, Portal } from 'react-native-paper';
+import { Button } from 'react-native-paper';
 import { styles } from './FilmVideoSelector.style';
 import { FilmVideoSelectorComponentProps } from './FilmVideoSelector.type';
 
@@ -72,21 +73,18 @@ export function FilmVideoSelectorComponent(props: FilmVideoSelectorComponentProp
   };
 
   return (
-    <Portal>
-      <Modal
-        visible={visible}
-        onDismiss={onHide}
-        contentContainerStyle={styles.container}
-        style={styles.background}
-      >
-        <ThemedText>Example Modal. Click outside this area to dismiss.</ThemedText>
-        {renderLoader()}
-        {renderVoices()}
-        {renderSeasons()}
-        {renderEpisodes()}
-        <Button onPress={handleOnPlay}>Play</Button>
-      </Modal>
-    </Portal>
+    <ThemedModal
+      visible={visible}
+      onHide={onHide}
+      contentContainerStyle={styles.container}
+      style={styles.background}
+    >
+      {renderLoader()}
+      {renderVoices()}
+      {renderSeasons()}
+      {renderEpisodes()}
+      <Button onPress={handleOnPlay}>Play</Button>
+    </ThemedModal>
   );
 }
 

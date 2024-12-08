@@ -8,7 +8,7 @@ export function HomePageComponent(props: HomePageProps) {
   const { films, loadFilms } = props;
 
   return (
-    <Page>
+    <Page testId="homePage">
       <DefaultFocus>
         <FilmGrid
           films={films}

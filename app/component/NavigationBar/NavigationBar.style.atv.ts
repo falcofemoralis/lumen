@@ -13,6 +13,8 @@ export const styles = CreateStyles({
   slot: {
     width: '100%',
     height: '100%',
+  },
+  slotBarVisible: {
     marginLeft: NAVIGATION_BAR_TV_WIDTH,
   },
   bar: {

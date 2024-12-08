@@ -10,12 +10,12 @@ import {
   useTVEventHandler,
   View,
 } from 'react-native';
+import NotificationStore from 'Store/Notification.store';
 import { TVEventType } from 'Type/TVEvent.type';
 import { scale } from 'Util/CreateStyles';
 import { FocusedElement } from './Player.config';
 import { styles } from './Player.style.atv';
 import { PlayerComponentProps } from './Player.type';
-import NotificationStore from 'Store/Notification.store';
 
 export function PlayerComponentTV(props: PlayerComponentProps) {
   const {

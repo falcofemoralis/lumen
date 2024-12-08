@@ -1,39 +1,114 @@
+import ThemedButton from 'Component/ThemedButton';
+import ThemedModal from 'Component/ThemedModal';
 import ThemedText from 'Component/ThemedText';
-import { Modal, Portal } from 'react-native-paper';
+import { DefaultFocus, SpatialNavigationView } from 'react-tv-space-navigation';
 import { styles } from './FilmVideoSelector.style.atv';
 import { FilmVideoSelectorComponentProps } from './FilmVideoSelector.type';
-import { TouchableOpacity, TVFocusGuideView } from 'react-native';
 
 export function FilmVideoSelectorComponent(props: FilmVideoSelectorComponentProps) {
-  const { visible, onHide } = props;
+  const {
+    visible,
+    voices,
+    onHide,
+    isLoading,
+    selectedVoice,
+    selectedSeasonId,
+    selectedEpisodeId,
+    handleSelectVoice,
+    setSelectedSeasonId,
+    setSelectedEpisodeId,
+    seasons,
+    episodes,
+    handleOnPlay,
+  } = props;
+
+  const renderVoices = () => {
+    if (voices.length <= 1) {
+      return null;
+    }
+
+    return (
+      <SpatialNavigationView direction="horizontal">
+        {voices.map((voice) => {
+          const { id, title } = voice;
+
+          return (
+            <ThemedButton
+              key={id}
+              onPress={() => handleSelectVoice(voice)}
+              label={title}
+              selected={selectedVoice.id === id}
+            />
+          );
+        })}
+      </SpatialNavigationView>
+    );
+  };
+
+  const renderSeasons = () => {
+    return (
+      <SpatialNavigationView direction="horizontal">
+        {seasons.map((season) => {
+          const { seasonId, name } = season;
+
+          return (
+            <ThemedButton
+              key={seasonId}
+              selected={selectedSeasonId === seasonId}
+              label={name}
+              onPress={() => setSelectedSeasonId(seasonId)}
+            />
+          );
+        })}
+      </SpatialNavigationView>
+    );
+  };
+
+  const renderEpisodes = () => {
+    return (
+      <SpatialNavigationView direction="horizontal">
+        {episodes.map((episode) => {
+          const { episodeId, name } = episode;
+
+          return (
+            <ThemedButton
+              key={episodeId}
+              selected={selectedEpisodeId === episodeId}
+              label={name}
+              onPress={() => setSelectedEpisodeId(episodeId)}
+            />
+          );
+        })}
+      </SpatialNavigationView>
+    );
+  };
+
+  const renderLoader = () => {
+    if (!isLoading) {
+      return null;
+    }
+
+    return <ThemedText>Loading...</ThemedText>;
+  };
 
   return (
-    <Portal>
-      <Modal
-        visible={visible}
-        onDismiss={onHide}
-        contentContainerStyle={styles.container}
-      >
-        <TVFocusGuideView
-          autoFocus
-          trapFocusLeft
-          trapFocusRight
-          trapFocusUp
-          trapFocusDown
-        >
-          <ThemedText>Example Modal. Click outside this area to dismiss.</ThemedText>
-          <TouchableOpacity hasTVPreferredFocus>
-            <ThemedText>Oopen</ThemedText>
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <ThemedText>qwewqe</ThemedText>
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <ThemedText>qweqwe</ThemedText>
-          </TouchableOpacity>
-        </TVFocusGuideView>
-      </Modal>
-    </Portal>
+    <ThemedModal
+      visible={visible}
+      onHide={onHide}
+      style={styles.container}
+    >
+      <DefaultFocus>
+        <ThemedText>Select series</ThemedText>
+        {renderLoader()}
+        {renderVoices()}
+        {renderSeasons()}
+        {renderEpisodes()}
+        <ThemedButton
+          onPress={handleOnPlay}
+          label="Play"
+        />
+      </DefaultFocus>
+    </ThemedModal>
   );
 }
 

@@ -8,7 +8,7 @@ import FilmVideoSelectorComponentTV from './FilmVideoSelector.component.atv';
 import { FilmVideoSelectorContainerProps } from './FilmVideoSelector.type';
 
 export function FilmVideoSelectorContainer(props: FilmVideoSelectorContainerProps) {
-  const { visible, onHide, film } = props;
+  const { visible, onHide, film, onSelect } = props;
   const { voices = [] } = film;
   const [isLoading, setIsLoading] = useState(false);
   const [selectedVoice, setSelectedVoice] = useState<FilmVoiceInterface>(
@@ -88,7 +88,7 @@ export function FilmVideoSelectorContainer(props: FilmVideoSelectorContainerProp
             selectedEpisodeId!
           );
 
-      console.log(video);
+      onSelect(video);
     } catch (error) {
       NotificationStore.displayError(error);
     } finally {

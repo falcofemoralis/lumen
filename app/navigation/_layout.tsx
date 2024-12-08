@@ -14,6 +14,7 @@ import { useColorScheme, View } from 'react-native';
 import { PaperProvider } from 'react-native-paper';
 import { SpatialNavigationDeviceTypeProvider } from 'react-tv-space-navigation';
 import ConfigStore from 'Store/Config.store';
+import NavigationStore from 'Store/Navigation.store';
 import Colors from 'Style/Colors';
 import 'Util/RemoteControl';
 
@@ -37,6 +38,9 @@ export const SCREENS: Screen[] = [
   },
   {
     name: 'welcome',
+  },
+  {
+    name: 'player/[data]',
   },
 ];
 
@@ -100,7 +104,14 @@ export function RootLayout() {
       <SpatialNavigationDeviceTypeProvider>
         <ThemedView style={{ flex: 1, flexDirection: 'row', width: '100%', height: '100%' }}>
           <NavigationBar />
-          <View style={navigationBarStyles.slot}>{renderStack()}</View>
+          <View
+            style={[
+              navigationBarStyles.slot,
+              NavigationStore.isNavigationVisible && navigationBarStyles.slotBarVisible,
+            ]}
+          >
+            {renderStack()}
+          </View>
         </ThemedView>
       </SpatialNavigationDeviceTypeProvider>
     );

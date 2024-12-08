@@ -1,3 +1,4 @@
+import Colors from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
@@ -12,6 +13,9 @@ export const styles = CreateStyles({
   },
   containerFocused: {
     backgroundColor: '#E3E3E3',
+  },
+  containerSelected: {
+    backgroundColor: Colors.secondary,
   },
   textFocused: {
     color: '#303030',

@@ -8,8 +8,12 @@ class NavigationStore {
     makeAutoObservable(this);
   }
 
-  toggleNavigation() {
-    this.isNavigationVisible = !this.isNavigationVisible;
+  showNavigation() {
+    this.isNavigationVisible = true;
+  }
+
+  hideNavigation() {
+    this.isNavigationVisible = false;
   }
 
   openNavigation() {
