@@ -2,22 +2,6 @@ import { TVEventType } from 'Type/TVEvent.type';
 import { EventSubscription, HWEvent, TVEventHandler } from 'react-native';
 import { Directions, SpatialNavigation } from 'react-tv-space-navigation';
 
-class TVEventHandlerManagerClass {
-  subscription: EventSubscription | undefined;
-
-  addListener(remoteControlListener: (evt: HWEvent) => void) {
-    this.subscription = TVEventHandler.addListener(remoteControlListener);
-  }
-
-  removeListener() {
-    if (this.subscription) {
-      this.subscription.remove();
-    }
-  }
-}
-
-const TVEventHandlerManager = new TVEventHandlerManagerClass();
-
 SpatialNavigation.configureRemoteControl({
   remoteControlSubscriber: (callback) => {
     const mapping: { [key in TVEventType]: Directions | null } = {
@@ -40,10 +24,10 @@ SpatialNavigation.configureRemoteControl({
       return false;
     };
 
-    TVEventHandlerManager.addListener(remoteControlListener);
+    return TVEventHandler.addListener(remoteControlListener);
   },
 
-  remoteControlUnsubscriber: (remoteControlListener) => {
-    TVEventHandlerManager.removeListener();
+  remoteControlUnsubscriber: (eventSubscription: EventSubscription | undefined) => {
+    eventSubscription?.remove();
   },
 });

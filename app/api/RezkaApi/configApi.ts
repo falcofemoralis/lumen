@@ -93,8 +93,6 @@ const configApi: ConfigApiInterface = {
   },
 
   modifyCDN(streams: FilmStreamInterface[]) {
-    console.log(this.selectedCDN);
-
     return streams.map((stream) => {
       const { url } = stream;
 

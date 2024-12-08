@@ -16,14 +16,10 @@ export function ErrorBoundary(props: ErrorBoundaryProps) {
 export function HomePageContainer() {
   const [films, setFilms] = useState<FilmCardInterface[]>([]);
 
-  console.log('render HomePageContainer');
-
   const loadFilms = async (pagination: FilmGridPaginationInterface, isRefresh: boolean = false) => {
     console.log('load films');
 
     const { currentPage } = pagination;
-    console.log('currentPage', currentPage);
-
     try {
       const { films: newFilms, totalPages } =
         await ServiceStore.getCurrentService().getHomePageFilms(currentPage);

@@ -19,6 +19,10 @@ export const styles = CreateStyles({
     flex: 1,
     marginRight: 20,
   },
+  itemFocused: {
+    borderWidth: 2,
+    borderColor: 'blue',
+  },
   lastItem: {
     marginRight: 0,
   },

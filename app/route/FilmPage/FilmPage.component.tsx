@@ -1,4 +1,5 @@
 import FilmVideoSelector from 'Component/FilmVideoSelector';
+import Page from 'Component/Page';
 import Player from 'Component/Player';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
@@ -10,8 +11,6 @@ import { DEMO_VIDEO } from 'Route/PlayerPage/PlayerPage.config';
 import Colors from 'Style/Colors';
 import { styles } from './FilmPage.style.';
 import { FilmPageComponentProps } from './FilmPage.type';
-import Page from 'Component/Page';
-import { FILM_ROUTE } from '../../navigation/_layout';
 
 export function FilmPageComponent(props: FilmPageComponentProps) {
   const { film, isSelectorVisible, filmVideo, playFilm, hideVideoSelector, handleVideoSelect } =
@@ -60,7 +59,7 @@ export function FilmPageComponent(props: FilmPageComponentProps) {
   }
 
   return (
-    <Page name={FILM_ROUTE}>
+    <Page>
       <ThemedText>Page</ThemedText>
       <ThemedView>
         <ThemedImage

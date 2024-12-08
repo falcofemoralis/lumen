@@ -22,15 +22,12 @@ export interface Screen {
   options?: any;
 }
 
-export const ROOT_ROUTE = '(tabs)';
-export const FILM_ROUTE = 'film/[link]';
-
 export const SCREENS: Screen[] = [
   {
-    name: ROOT_ROUTE,
+    name: '(tabs)',
   },
   {
-    name: FILM_ROUTE,
+    name: 'film/[link]',
   },
   {
     name: 'settings',
@@ -75,7 +72,7 @@ export function RootLayout() {
         <Stack.Screen
           key={index}
           name={name}
-          options={{ headerShown: false, ...options }}
+          options={{ ...options }}
         />
       );
     });
@@ -85,9 +82,13 @@ export function RootLayout() {
     return (
       <Stack
         screenOptions={{
-          contentStyle: { marginTop: Constants.statusBarHeight },
+          headerShown: false,
+          contentStyle: {
+            marginTop: Constants.statusBarHeight,
+          },
           animation: 'fade',
         }}
+        initialRouteName="(tabs)"
       >
         {renderScreens()}
       </Stack>

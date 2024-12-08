@@ -18,11 +18,7 @@ export function GridContainer(props: FilmGridContainerProps) {
     totalPages: DEFAULT_PAGE,
   });
 
-  console.log('render GridContainer');
-
   useEffect(() => {
-    console.log('useEffect');
-
     onNextLoad(paginationRef.current).then((pagination) => {
       paginationRef.current = {
         ...pagination,
@@ -55,8 +51,6 @@ export function GridContainer(props: FilmGridContainerProps) {
   };
 
   const handleOnPress = useCallback((film: FilmCardInterface) => {
-    console.log('handleOnPress');
-
     router.push({
       pathname: '/film/[link]',
       params: {
@@ -66,8 +60,6 @@ export function GridContainer(props: FilmGridContainerProps) {
   }, []);
 
   const loadNextPage = async (onLoading: (state: boolean) => void, isRefresh: boolean = false) => {
-    console.trace();
-
     const { currentPage, totalPages } = paginationRef.current;
 
     const newPage = !isRefresh ? currentPage + 1 : DEFAULT_PAGE;

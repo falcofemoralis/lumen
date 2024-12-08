@@ -1,7 +1,8 @@
 import { withTV } from 'Hooks/withTV';
 import { useEffect, useState } from 'react';
 import { BackHandler } from 'react-native';
-import ConfigStore from 'Store/Config.store';
+import NotificationStore from 'Store/Notification.store';
+import ServiceStore from 'Store/Service.store';
 import FilmInterface from 'Type/Film.interface';
 import { FilmStreamInterface } from 'Type/FilmStream.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
@@ -9,8 +10,6 @@ import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import FilmPageComponent from './FilmPage.component';
 import FilmPageComponentTV from './FilmPage.component.atv';
 import { FilmPageContainerProps } from './FilmPage.type';
-import ServiceStore from 'Store/Service.store';
-import NotificationStore from 'Store/Notification.store';
 
 export function FilmPageContainer(props: FilmPageContainerProps) {
   const { link } = props;

@@ -1,12 +1,11 @@
+import { useIsFocused } from '@react-navigation/native';
 import ThemedView from 'Component/ThemedView';
-import { useRootNavigationState } from 'expo-router';
 import { observer } from 'mobx-react-lite';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Keyboard } from 'react-native';
 import { SpatialNavigationRoot, useLockSpatialNavigation } from 'react-tv-space-navigation';
 import NavigationStore from 'Store/Navigation.store';
 import { TVEventType } from 'Type/TVEvent.type';
-import { ROOT_ROUTE } from '../../navigation/_layout';
 import { PageProps } from './Page.type';
 
 /**
@@ -34,10 +33,10 @@ const SpatialNavigationKeyboardLocker = () => {
   return null;
 };
 
-export function PageComponent(props: PageProps) {
-  const { children, name: pageName } = props;
-  const { routes = [] } = useRootNavigationState() ?? {};
-  const [isFocused, setIsFocused] = useState(true);
+export function PageComponent({ children }: PageProps) {
+  const isFocused = useIsFocused();
+
+  const isActive = isFocused && !NavigationStore.isNavigationOpened;
 
   const onDirectionHandledWithoutMovement = (movement: string) => {
     if (movement === TVEventType.Left) {
@@ -45,24 +44,10 @@ export function PageComponent(props: PageProps) {
     }
   };
 
-  useEffect(() => {
-    const hasFocus = () => {
-      if (routes.length <= 1) {
-        return true;
-      }
-
-      const { name = ROOT_ROUTE } = routes[1] ?? {};
-
-      return name === pageName;
-    };
-
-    setIsFocused(hasFocus());
-  }, [routes, pageName]);
-
   return (
     <ThemedView style={{ height: '100%' }}>
       <SpatialNavigationRoot
-        isActive={!NavigationStore.isNavigationOpened && isFocused}
+        isActive={isActive}
         onDirectionHandledWithoutMovement={onDirectionHandledWithoutMovement}
       >
         <SpatialNavigationKeyboardLocker />

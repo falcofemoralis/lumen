@@ -5,48 +5,59 @@ import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
 import { DEMO_VIDEO } from 'Route/PlayerPage/PlayerPage.config';
-import { useState } from 'react';
-import { TouchableOpacity, View } from 'react-native';
-import { FILM_ROUTE } from '../../navigation/_layout';
+import { View } from 'react-native';
+import {
+  DefaultFocus,
+  SpatialNavigationFocusableView,
+  SpatialNavigationView,
+} from 'react-tv-space-navigation';
 import { styles } from './FilmPage.style.atv';
 import { FilmPageComponentProps } from './FilmPage.type';
+import ThemedButton from 'Component/ThemedButton';
 
 export function FilmPageComponent(props: FilmPageComponentProps) {
   const { film, isSelectorVisible, filmVideo, playFilm, hideVideoSelector, handleVideoSelect } =
     props;
-  const [focusedElement, setFocusedElement] = useState<string | null>('Watch Now');
+  //const [focusedElement, setFocusedElement] = useState<string | null>('Watch Now');
 
-  const handleHide = () => {
-    setFocusedElement('Watch Now');
-    hideVideoSelector();
-  };
+  // const handleHide = () => {
+  //   setFocusedElement('Watch Now');
+  //   hideVideoSelector();
+  // };
 
   // set focus element
   // remove focused element
   // back? set focus
   const renderAction = (text: string, onPress?: () => void) => {
     return (
-      <TouchableOpacity
-        hasTVPreferredFocus={focusedElement === text}
-        onPress={onPress}
-        onFocus={() => setFocusedElement(text)}
-        onBlur={() => setFocusedElement(null)}
+      <SpatialNavigationFocusableView
+        //hasTVPreferredFocus={focusedElement === text}
+        onSelect={onPress}
+        // onFocus={() => setFocusedElement(text)}
+        // onBlur={() => setFocusedElement(null)}
       >
-        <ThemedText>{text}</ThemedText>
-      </TouchableOpacity>
+        <ThemedButton
+          label={text}
+          onPress={onPress}
+        />
+      </SpatialNavigationFocusableView>
     );
   };
 
   const renderActions = () => {
     return (
-      <ThemedView>
-        {renderAction('Watch Now', playFilm)}
-        {renderAction('Comments')}
-        {renderAction('Bookmark')}
-        {renderAction('Trailer')}
-        {renderAction('Share')}
-        {renderAction('Download')}
-      </ThemedView>
+      <SpatialNavigationView direction="horizontal">
+        <DefaultFocus>
+          <ThemedView style={{ flex: 1, flexDirection: 'row' }}>
+            {renderAction('Watch Now TV', playFilm)}
+            {/* {renderAction('Comments')}
+            {renderAction('Bookmark')}
+            {renderAction('Trailer')}
+            {renderAction('Share')}
+            {renderAction('Download')} */}
+          </ThemedView>
+        </DefaultFocus>
+      </SpatialNavigationView>
     );
   };
 
@@ -71,16 +82,32 @@ export function FilmPageComponent(props: FilmPageComponentProps) {
     );
   };
 
-  if (!film) {
+  const renderLoadedContent = () => {
     return (
       <ThemedView>
-        <TouchableOpacity hasTVPreferredFocus>
-          <ThemedText>Im a focused button</ThemedText>
-        </TouchableOpacity>
         <ThemedText>Loading...</ThemedText>
       </ThemedView>
     );
-  }
+  };
+
+  const renderContent = () => {
+    if (!film) {
+      return renderLoadedContent();
+    }
+
+    return (
+      <>
+        <ThemedText>Loaded!</ThemedText>
+        <ThemedText>title={film.title}</ThemedText>
+        <ThemedText>id={film.id}</ThemedText>
+        <ThemedImage
+          src={film.poster}
+          style={{ height: 250, width: 140 }}
+        />
+        {renderVideoSelector()}
+      </>
+    );
+  };
 
   if (filmVideo) {
     return (
@@ -91,16 +118,9 @@ export function FilmPageComponent(props: FilmPageComponentProps) {
   }
 
   return (
-    <Page name={FILM_ROUTE}>
+    <Page>
       {renderActions()}
-      <ThemedText>Loaded!</ThemedText>
-      <ThemedText>title={film.title}</ThemedText>
-      <ThemedText>id={film.id}</ThemedText>
-      <ThemedImage
-        src={film.poster}
-        style={{ height: 250, width: 140 }}
-      />
-      {renderVideoSelector()}
+      {renderContent()}
     </Page>
   );
 }
