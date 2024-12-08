@@ -10,6 +10,10 @@ export enum ApiServiceType {
   //kinokong = 'kinokong',
 }
 
+export interface ApiParams {
+  isRefresh?: boolean;
+}
+
 export interface ConfigApiInterface {
   serviceType: ApiServiceType;
   defaultProviders: string[];
@@ -22,14 +26,18 @@ export interface ConfigApiInterface {
   getCDN(): string;
   setAuthorization(auth: string): void;
   getAuthorization(): HeadersInit;
-  fetchPage(query: string, variables?: Record<string, string>): Promise<CheerioAPI>;
+  fetchPage(
+    query: string,
+    variables?: Record<string, string>,
+    ignoreCache?: boolean
+  ): Promise<CheerioAPI>;
   getRequest(query: string, variables?: Record<string, string>): Promise<any>;
   postRequest(query: string, variables?: Record<string, string>): Promise<any>;
   modifyCDN(streams: FilmStreamInterface[]): FilmStreamInterface[];
 }
 
 export interface FilmApiInterface {
-  getFilms(page: number, path?: string): Promise<FilmListInterface>;
+  getFilms(page: number, path?: string, params?: ApiParams): Promise<FilmListInterface>;
   getFilm(link: string): Promise<FilmInterface>;
   getFilmStreams(film: FilmInterface, voice: FilmVoiceInterface): Promise<FilmVideoInterface>;
   getFilmStreamsByEpisodeId(
@@ -39,7 +47,7 @@ export interface FilmApiInterface {
     episodeId: string
   ): Promise<FilmVideoInterface>;
   getFilmSeasons(film: FilmInterface, voice: FilmVoiceInterface): Promise<FilmVoiceInterface>;
-  getHomePageFilms(page: number): Promise<FilmListInterface>;
+  getHomePageFilms(page: number, params?: ApiParams): Promise<FilmListInterface>;
 }
 
 export default interface ApiInterface extends ConfigApiInterface, FilmApiInterface {}

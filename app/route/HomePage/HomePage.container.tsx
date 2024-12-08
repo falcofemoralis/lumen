@@ -22,7 +22,9 @@ export function HomePageContainer() {
     const { currentPage } = pagination;
     try {
       const { films: newFilms, totalPages } =
-        await ServiceStore.getCurrentService().getHomePageFilms(currentPage);
+        await ServiceStore.getCurrentService().getHomePageFilms(currentPage, {
+          isRefresh,
+        });
 
       setFilms(isRefresh ? newFilms : Array.from(films).concat(newFilms));
 

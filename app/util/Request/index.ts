@@ -73,7 +73,6 @@ export const parseJSONResponse = async (response: Response): Promise<string> => 
   }
 };
 
-// TODO service unavailable?
 export const executeGet = async (
   query: string,
   endpoint: string,
@@ -90,8 +89,11 @@ export const executeGet = async (
       const cachedResult = await queryCache.get(uriHash);
 
       if (cachedResult) {
+        console.log('cache HIT');
         return cachedResult;
       }
+
+      console.log('cache MISS');
     }
 
     const result = await getFetch(uri, headers, signal);
@@ -102,9 +104,9 @@ export const executeGet = async (
 
     const parsedRes = await parseResponse(result);
 
-    if (!ignoreCache) {
-      queryCache.set(uriHash, parsedRes);
-    }
+    console.log('cache SET');
+
+    queryCache.set(uriHash, parsedRes);
 
     return parsedRes;
   } catch (error) {

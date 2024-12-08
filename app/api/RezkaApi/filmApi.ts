@@ -1,4 +1,4 @@
-import { FilmApiInterface } from 'Api/index';
+import { ApiParams, FilmApiInterface } from 'Api/index';
 import FilmInterface from 'Type/Film.interface';
 import FilmCardInterface from 'Type/FilmCard.interface';
 import { FilmListInterface } from 'Type/FilmList.interface';
@@ -16,10 +16,10 @@ const filmApi: FilmApiInterface = {
    * @param path
    * @returns FilmList
    */
-  async getFilms(page: number, path: string = ''): Promise<FilmListInterface> {
+  async getFilms(page: number, path: string = '', params?: ApiParams): Promise<FilmListInterface> {
     const films: FilmCardInterface[] = [];
 
-    const $ = await configApi.fetchPage(`${path}/page/${page}/`);
+    const $ = await configApi.fetchPage(`${path}/page/${page}/`, {}, params?.isRefresh ?? false);
 
     const filmElements = $('div.b-content__inline_item');
 
@@ -228,8 +228,8 @@ const filmApi: FilmApiInterface = {
     };
   },
 
-  async getHomePageFilms(page: number): Promise<FilmListInterface> {
-    return this.getFilms(page, '/new');
+  async getHomePageFilms(page: number, params?: ApiParams): Promise<FilmListInterface> {
+    return this.getFilms(page, '/new', params);
   },
 };
 
