@@ -4,18 +4,19 @@ import {
   SpatialNavigationFocusableView,
   SpatialNavigationVirtualizedGrid,
 } from 'react-tv-space-navigation';
-import FilmCardInterface from 'Type/FilmCard.interface';
 import { scale } from 'Util/CreateStyles';
 import { getWindowWidth } from 'Util/Window';
 import { NUMBER_OF_COLUMNS_TV, SCROLL_EVENT_UPDATES_MS_TV } from './FilmGrid.config';
 import { ROW_GAP, styles } from './FilmGrid.style.atv';
-import { FilmGridComponentProps } from './FilmGrid.type';
+import { FilmGridComponentProps, FilmGridItem } from './FilmGrid.type';
 
 export function GridComponent(props: FilmGridComponentProps) {
   const { films, handleOnPress, onScrollEnd } = props;
   const windowWidth = getWindowWidth() - ROW_GAP;
 
-  const renderItem = ({ item }: { item: FilmCardInterface }) => {
+  const renderItem = ({ item }: { item: FilmGridItem }) => {
+    const { isThumbnail } = item;
+
     return (
       <SpatialNavigationFocusableView onSelect={() => handleOnPress(item)}>
         {({ isFocused, isRootActive }) => (
@@ -25,6 +26,7 @@ export function GridComponent(props: FilmGridComponentProps) {
               width: scale(windowWidth / NUMBER_OF_COLUMNS_TV - styles.rowStyle.gap),
             }}
             isFocused={isFocused && isRootActive}
+            isThumbnail={isThumbnail}
           />
         )}
       </SpatialNavigationFocusableView>

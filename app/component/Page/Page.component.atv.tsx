@@ -45,7 +45,7 @@ export function PageComponent({ children, testId }: PageProps) {
     }
   };
 
-  if (testId) {
+  if (testId && false) {
     console.log(`Page ${testId} is ${isActive}`);
   }
 

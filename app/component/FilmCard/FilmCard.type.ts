@@ -5,10 +5,12 @@ export interface FilmCardContainerProps {
   filmCard: FilmCardInterface;
   isFocused?: boolean;
   style?: StyleProp<ViewStyle>;
+  isThumbnail?: boolean;
 }
 
 export interface FilmCardComponentProps {
   filmCard: FilmCardInterface;
   isFocused?: boolean;
   style?: StyleProp<ViewStyle>;
+  isThumbnail?: boolean;
 }

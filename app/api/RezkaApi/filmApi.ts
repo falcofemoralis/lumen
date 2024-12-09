@@ -8,6 +8,7 @@ import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { parseHtml } from 'Util/Parser';
 import configApi from './configApi';
 import { parseFilmCard, parseSeasons, parseStreams } from './utils';
+import { wait } from 'Util/Misc';
 
 const filmApi: FilmApiInterface = {
   /**

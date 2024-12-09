@@ -30,6 +30,10 @@ export function NavigationBarComponent() {
   const onFocus = (tab: Tab) => {
     const { id, route } = tab;
 
+    if (id === selectedTab) {
+      return;
+    }
+
     setSelectedTab(id);
     setTimeout(() => {
       router.replace(route);

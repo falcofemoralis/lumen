@@ -49,6 +49,8 @@ export function HomePageContainer() {
     };
   };
 
+  console.log('render homepage container');
+
   return withTV(HomePageComponentTV, HomePageComponent, {
     ...containerFunctions,
     ...containerProps(),

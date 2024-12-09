@@ -61,6 +61,10 @@ export const styles = CreateStyles({
   subtitleFocused: {
     color: Colors.darkText,
   },
+  cardThumbnail: {
+    backgroundColor: Colors.lightBackground,
+    borderRadius: BORDER_RADIUS,
+  },
 });
 
 export const FocusedAnimation = ({

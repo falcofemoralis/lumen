@@ -3,10 +3,17 @@ import { withTV } from 'Hooks/withTV';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import ConfigStore from 'Store/Config.store';
 import FilmCardInterface from 'Type/FilmCard.interface';
+import { FilmType } from 'Type/FilmType.type';
 import GridComponent from './FilmGrid.component';
 import GridComponentTV from './FilmGrid.component.atv';
-import { DEFAULT_PAGE, NUMBER_OF_COLUMNS, NUMBER_OF_COLUMNS_TV } from './FilmGrid.config';
-import { FilmGridContainerProps, FilmGridPaginationInterface } from './FilmGrid.type';
+import {
+  DEFAULT_PAGE,
+  NUMBER_OF_COLUMNS,
+  NUMBER_OF_COLUMNS_TV,
+  THUMBNAILS_AMOUNT,
+  THUMBNAILS_AMOUNT_TV,
+} from './FilmGrid.config';
+import { FilmGridContainerProps, FilmGridItem, FilmGridPaginationInterface } from './FilmGrid.type';
 
 export function GridContainer(props: FilmGridContainerProps) {
   const { films, onNextLoad } = props;
@@ -26,16 +33,31 @@ export function GridContainer(props: FilmGridContainerProps) {
     });
   }, []);
 
+  const getFilms = (): FilmGridItem[] => {
+    if (!films.length) {
+      return Array(ConfigStore.isTV ? THUMBNAILS_AMOUNT_TV : THUMBNAILS_AMOUNT).fill({
+        id: '',
+        link: '',
+        type: FilmType.Film,
+        poster: '',
+        title: '',
+        subtitle: '',
+        isThumbnail: true,
+      });
+    }
+
+    return films;
+  };
+
   const calculateRows = () => {
     const numberOfColumns = ConfigStore.isTV ? NUMBER_OF_COLUMNS_TV : NUMBER_OF_COLUMNS;
 
     const columns: FilmCardInterface[][] = Array.from({ length: numberOfColumns }, () => []);
 
-    films.forEach((film, index) => {
+    getFilms().forEach((film, index) => {
       columns[index % numberOfColumns].push(film);
     });
 
-    // Now group the columns into rows
     const rows: FilmCardInterface[][] = [];
     for (let i = 0; i < columns[0].length; i++) {
       const row: FilmCardInterface[] = [];
@@ -102,8 +124,8 @@ export function GridContainer(props: FilmGridContainerProps) {
 
   const containerProps = () => {
     return {
-      films,
-      rows: calculateRows(),
+      films: getFilms(),
+      rows: !ConfigStore.isTV ? calculateRows() : [], // TV version do not use rows
       isRefreshing,
       onRefresh,
     };

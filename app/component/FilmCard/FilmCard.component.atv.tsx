@@ -5,8 +5,12 @@ import { FocusedAnimation, styles } from './FilmCard.style.atv';
 import { FilmCardComponentProps } from './FilmCard.type';
 
 export function FilmCardComponent(props: FilmCardComponentProps) {
-  const { filmCard, style, isFocused } = props;
+  const { filmCard, style, isFocused, isThumbnail } = props;
   const { poster, title, subtitle } = filmCard;
+
+  if (isThumbnail) {
+    return <ThemedView style={[styles.card, styles.cardThumbnail, style]} />;
+  }
 
   return (
     <FocusedAnimation isFocused={isFocused}>

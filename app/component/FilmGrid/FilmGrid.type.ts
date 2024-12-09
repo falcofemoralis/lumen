@@ -1,10 +1,4 @@
-import { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import FilmCardInterface from 'Type/FilmCard.interface';
-
-export interface FilmGridPaginationInterface {
-  currentPage: number;
-  totalPages: number;
-}
 
 export interface FilmGridContainerProps {
   films: FilmCardInterface[];
@@ -22,3 +16,12 @@ export interface FilmGridComponentProps {
   onScrollEnd: () => void;
   onRefresh?: () => void;
 }
+
+export interface FilmGridPaginationInterface {
+  currentPage: number;
+  totalPages: number;
+}
+
+export type FilmGridItem = FilmCardInterface & {
+  isThumbnail?: boolean;
+};
