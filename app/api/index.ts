@@ -3,6 +3,7 @@ import { FilmListInterface } from 'Type/FilmList.interface';
 import { FilmStreamInterface } from 'Type/FilmStream.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
+import { MenuItemInterface } from 'Type/MenuItem.interface';
 import { CheerioAPI } from 'cheerio';
 
 export enum ApiServiceType {
@@ -50,4 +51,11 @@ export interface FilmApiInterface {
   getHomePageFilms(page: number, params?: ApiParams): Promise<FilmListInterface>;
 }
 
-export default interface ApiInterface extends ConfigApiInterface, FilmApiInterface {}
+export interface MenuApiInterface {
+  getHomeMenu(): MenuItemInterface[];
+}
+
+export default interface ApiInterface
+  extends ConfigApiInterface,
+    FilmApiInterface,
+    MenuApiInterface {}

@@ -6,6 +6,7 @@ import { Keyboard } from 'react-native';
 import { SpatialNavigationRoot, useLockSpatialNavigation } from 'react-tv-space-navigation';
 import NavigationStore from 'Store/Navigation.store';
 import { TVEventType } from 'Type/TVEvent.type';
+import { getWindowWidth } from 'Util/Window';
 import { PageProps } from './Page.type';
 
 /**
@@ -49,7 +50,7 @@ export function PageComponent({ children, testId }: PageProps) {
   }
 
   return (
-    <ThemedView style={{ height: '100%' }}>
+    <ThemedView style={{ height: '100%', width: getWindowWidth() }}>
       <SpatialNavigationRoot
         isActive={isActive}
         onDirectionHandledWithoutMovement={onDirectionHandledWithoutMovement}

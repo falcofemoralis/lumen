@@ -3,24 +3,8 @@ import { Text } from 'react-native';
 import { ThemedTextProps } from './ThemedText.type';
 import Animated from 'react-native-reanimated';
 
-export default function ThemedText({
-  style,
-  lightColor,
-  darkColor,
-  type = 'default',
-  useAnimation,
-  ...rest
-}: ThemedTextProps) {
+function ThemedText({ style, lightColor, darkColor, type = 'default', ...rest }: ThemedTextProps) {
   const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
-
-  if (useAnimation) {
-    return (
-      <Animated.Text
-        style={[{ color }, style]}
-        {...rest}
-      />
-    );
-  }
 
   return (
     <Text
@@ -29,3 +13,24 @@ export default function ThemedText({
     />
   );
 }
+
+function ThemedTextAnimated({
+  style,
+  lightColor,
+  darkColor,
+  type = 'default',
+  ...rest
+}: ThemedTextProps) {
+  const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
+
+  return (
+    <Animated.Text
+      style={[{ color }, style]}
+      {...rest}
+    />
+  );
+}
+
+ThemedText.Animated = ThemedTextAnimated;
+
+export default ThemedText;

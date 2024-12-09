@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+import { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import Colors from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
@@ -70,7 +72,7 @@ export const styles = CreateStyles({
   },
   tabIcon: {
     opacity: 1,
-    marginLeft: 2,
+    marginLeft: 3,
   },
   tabText: {
     display: 'flex',
@@ -86,3 +88,58 @@ export const styles = CreateStyles({
     color: Colors.black,
   },
 });
+
+export const OpeningAnimation = ({
+  isOpened,
+  children,
+}: {
+  isOpened: boolean;
+  children: (style: any) => React.ReactElement;
+}) => {
+  const duration = 500;
+  const opened = useSharedValue<boolean>(isOpened);
+
+  useEffect(() => {
+    opened.value = isOpened;
+  });
+
+  const animatedOpeningStyle = useAnimatedStyle(() => {
+    return {
+      width: withTiming(opened.value ? styles.tabsOpened.width : styles.tabs.width, {
+        duration,
+      }),
+    };
+  });
+
+  return children({
+    animatedOpeningStyle,
+  });
+};
+
+export const FocusedTabAnimation = ({
+  isOpened,
+  children,
+}: {
+  isOpened: boolean;
+  children: (style: any) => React.ReactElement;
+}) => {
+  const duration = 500;
+
+  const opened = useSharedValue<boolean>(isOpened);
+
+  useEffect(() => {
+    opened.value = isOpened;
+  });
+
+  const animatedTextStyle = useAnimatedStyle(() => {
+    return {
+      opacity: withTiming(opened.value ? styles.tabTextOpened.opacity : styles.tabText.opacity, {
+        duration,
+      }),
+    };
+  });
+
+  return children({
+    animatedTextStyle,
+  });
+};

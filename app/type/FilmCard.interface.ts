@@ -6,6 +6,6 @@ export default interface FilmCardInterface {
   type: FilmType;
   poster: string;
   title: string;
-  info: string;
+  subtitle: string;
   seriesInfo?: string;
 }

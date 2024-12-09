@@ -4,9 +4,8 @@ import ThemedView from 'Component/ThemedView';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { observer } from 'mobx-react-lite';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { View } from 'react-native';
-import { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import {
   DefaultFocus,
   SpatialNavigationFocusableView,
@@ -17,31 +16,10 @@ import NavigationStore from 'Store/Navigation.store';
 import { TVEventType } from 'Type/TVEvent.type';
 import { scale } from 'Util/CreateStyles';
 import { DEFAULT_TAB, Tab, TABS, TABS_TV } from './NavigationBar.config';
-import { styles } from './NavigationBar.style.atv';
+import { FocusedTabAnimation, OpeningAnimation, styles } from './NavigationBar.style.atv';
 
 export function NavigationBarComponent() {
   const [selectedTab, setSelectedTab] = useState(DEFAULT_TAB);
-  const isOpened = useSharedValue<boolean>(NavigationStore.isNavigationOpened);
-
-  const animatedOpeningStyle = useAnimatedStyle(() => {
-    return {
-      width: withTiming(isOpened.value ? styles.tabsOpened.width : styles.tabs.width, {
-        duration: 500,
-      }),
-    };
-  });
-
-  const animatedTabText = useAnimatedStyle(() => {
-    return {
-      opacity: withTiming(isOpened.value ? styles.tabTextOpened.opacity : styles.tabText.opacity, {
-        duration: 500,
-      }),
-    };
-  });
-
-  useEffect(() => {
-    isOpened.value = NavigationStore.isNavigationOpened;
-  });
 
   const onDirectionHandledWithoutMovement = (movement: string) => {
     if (movement === TVEventType.Right) {
@@ -67,33 +45,36 @@ export function NavigationBarComponent() {
         onFocus={() => onFocus(tab)}
       >
         {({ isRootActive }) => (
-          <View
-            style={[
-              styles.tab,
-              selectedTab === id && !isRootActive && styles.tabSelected,
-              selectedTab === id && isRootActive && styles.tabFocused,
-            ]}
-          >
-            <ThemedIcon
-              style={[
-                styles.tabIcon,
-                selectedTab === id && isRootActive && styles.tabContentFocused,
-              ]}
-              icon={icon}
-              size={scale(24)}
-              color="white"
-            />
-            <ThemedText
-              style={[
-                styles.tabText,
-                selectedTab === id && isRootActive && styles.tabContentFocused,
-                animatedTabText,
-              ]}
-              useAnimation
-            >
-              {name}
-            </ThemedText>
-          </View>
+          <FocusedTabAnimation isOpened={NavigationStore.isNavigationOpened}>
+            {({ animatedTextStyle }) => (
+              <View
+                style={[
+                  styles.tab,
+                  selectedTab === id && !isRootActive && styles.tabSelected,
+                  selectedTab === id && isRootActive && styles.tabFocused,
+                ]}
+              >
+                <ThemedIcon
+                  style={[
+                    styles.tabIcon,
+                    selectedTab === id && isRootActive && styles.tabContentFocused,
+                  ]}
+                  icon={icon}
+                  size={scale(24)}
+                  color="white"
+                />
+                <ThemedText.Animated
+                  style={[
+                    styles.tabText,
+                    selectedTab === id && isRootActive && styles.tabContentFocused,
+                    animatedTextStyle,
+                  ]}
+                >
+                  {name}
+                </ThemedText.Animated>
+              </View>
+            )}
+          </FocusedTabAnimation>
         )}
       </SpatialNavigationFocusableView>
     );
@@ -115,12 +96,13 @@ export function NavigationBarComponent() {
       <ThemedView style={styles.bar}>
         <SpatialNavigationView direction="vertical">
           <DefaultFocus>
-            <ThemedView
-              style={[styles.tabs, animatedOpeningStyle]}
-              useAnimation
-            >
-              {renderTabs()}
-            </ThemedView>
+            <OpeningAnimation isOpened={NavigationStore.isNavigationOpened}>
+              {({ animatedOpeningStyle }) => (
+                <ThemedView.Animated style={[styles.tabs, animatedOpeningStyle]}>
+                  {renderTabs()}
+                </ThemedView.Animated>
+              )}
+            </OpeningAnimation>
           </DefaultFocus>
         </SpatialNavigationView>
         <LinearGradient

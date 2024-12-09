@@ -36,9 +36,10 @@ export function FilmVideoSelectorComponent(props: FilmVideoSelectorComponentProp
             <ThemedButton
               key={id}
               onPress={() => handleSelectVoice(voice)}
-              label={title}
-              selected={selectedVoice.id === id}
-            />
+              isSelected={selectedVoice.id === id}
+            >
+              {title}
+            </ThemedButton>
           );
         })}
       </SpatialNavigationView>
@@ -54,10 +55,11 @@ export function FilmVideoSelectorComponent(props: FilmVideoSelectorComponentProp
           return (
             <ThemedButton
               key={seasonId}
-              selected={selectedSeasonId === seasonId}
-              label={name}
+              isSelected={selectedSeasonId === seasonId}
               onPress={() => setSelectedSeasonId(seasonId)}
-            />
+            >
+              {name}
+            </ThemedButton>
           );
         })}
       </SpatialNavigationView>
@@ -73,10 +75,11 @@ export function FilmVideoSelectorComponent(props: FilmVideoSelectorComponentProp
           return (
             <ThemedButton
               key={episodeId}
-              selected={selectedEpisodeId === episodeId}
-              label={name}
+              isSelected={selectedEpisodeId === episodeId}
               onPress={() => setSelectedEpisodeId(episodeId)}
-            />
+            >
+              {name}
+            </ThemedButton>
           );
         })}
       </SpatialNavigationView>
@@ -103,10 +106,7 @@ export function FilmVideoSelectorComponent(props: FilmVideoSelectorComponentProp
         {renderVoices()}
         {renderSeasons()}
         {renderEpisodes()}
-        <ThemedButton
-          onPress={handleOnPlay}
-          label="Play"
-        />
+        <ThemedButton onPress={handleOnPlay}>Play</ThemedButton>
       </DefaultFocus>
     </ThemedModal>
   );

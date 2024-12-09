@@ -1,29 +1,15 @@
+import Colors from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
+export const ROW_GAP = 16;
+
 export const styles = CreateStyles({
+  container: {
+    padding: ROW_GAP,
+    backgroundColor: Colors.background,
+  },
   rowStyle: {
-    gap: 15,
+    gap: ROW_GAP,
     flex: 1,
-  },
-  rows: {
-    flex: 1,
-    flexDirection: 'column',
-    gap: 20,
-  },
-  row: {
-    flex: 1,
-    flexDirection: 'row',
-  },
-  item: {
-    height: 'auto',
-    flex: 1,
-    marginRight: 20,
-  },
-  itemFocused: {
-    borderWidth: 2,
-    borderColor: 'blue',
-  },
-  lastItem: {
-    marginRight: 0,
   },
 });

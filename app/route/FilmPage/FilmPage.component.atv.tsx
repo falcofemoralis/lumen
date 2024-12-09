@@ -19,10 +19,7 @@ export function FilmPageComponent(props: FilmPageComponentProps) {
   const renderAction = (text: string, onPress?: () => void) => {
     return (
       <SpatialNavigationFocusableView>
-        <ThemedButton
-          label={text}
-          onPress={onPress}
-        />
+        <ThemedButton onPress={onPress}>{text}</ThemedButton>
       </SpatialNavigationFocusableView>
     );
   };

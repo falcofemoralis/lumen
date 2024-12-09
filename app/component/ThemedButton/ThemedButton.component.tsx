@@ -1,25 +1,14 @@
-import { Text, View } from 'react-native';
-import { SpatialNavigationFocusableView } from 'react-tv-space-navigation';
-import { styles } from './ThemedButton.style';
+import { Button } from 'react-native-paper';
 import { ThemedButtonProps } from './ThemedButton.type';
 
-export default function ThemedButton({ onPress, label, style, selected }: ThemedButtonProps) {
+export default function ThemedButton({ onPress, children, style }: ThemedButtonProps) {
   return (
-    <SpatialNavigationFocusableView onSelect={onPress}>
-      {({ isFocused, isRootActive }) => (
-        <View
-          style={[
-            styles.container,
-            style,
-            selected && styles.containerSelected,
-            isFocused && isRootActive && styles.containerFocused,
-          ]}
-        >
-          <Text style={[styles.text, isFocused && isRootActive && styles.textFocused]}>
-            {label}
-          </Text>
-        </View>
-      )}
-    </SpatialNavigationFocusableView>
+    <Button
+      // icon="camera"
+      mode="contained"
+      onPress={onPress}
+    >
+      {children}
+    </Button>
   );
 }

@@ -26,7 +26,7 @@ export const parseFilmCard = ($: CheerioAPI, el: Element): FilmCardInterface => 
   const type = parseType($(el).find('.cat').attr('class'));
   const poster = $(el).find('.b-content__inline_item-cover img').attr('src') ?? '';
   const title = $(el).find('.b-content__inline_item-link a').text() ?? '';
-  const info = $(el).find('.b-content__inline_item-link dev').text() ?? '';
+  const subtitle = $(el).find('.b-content__inline_item-link div').text() ?? '';
 
   return {
     id,
@@ -34,7 +34,7 @@ export const parseFilmCard = ($: CheerioAPI, el: Element): FilmCardInterface => 
     type,
     poster,
     title,
-    info,
+    subtitle,
   };
 };
 
