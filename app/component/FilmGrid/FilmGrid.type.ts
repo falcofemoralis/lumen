@@ -4,6 +4,7 @@ export interface FilmGridContainerProps {
   films: FilmCardInterface[];
   onNextLoad: (
     pagination: FilmGridPaginationInterface,
+    isUpdate?: boolean,
     isRefresh?: boolean
   ) => Promise<FilmGridPaginationInterface>;
 }

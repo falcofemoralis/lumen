@@ -5,10 +5,11 @@ import { FilmListInterface } from 'Type/FilmList.interface';
 import { FilmType } from 'Type/FilmType.type';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
+import { MenuItemInterface } from 'Type/MenuItem.interface';
 import { parseHtml } from 'Util/Parser';
+import { Variables } from 'Util/Request';
 import configApi from './configApi';
 import { parseFilmCard, parseSeasons, parseStreams } from './utils';
-import { wait } from 'Util/Misc';
 
 const filmApi: FilmApiInterface = {
   /**
@@ -17,10 +18,19 @@ const filmApi: FilmApiInterface = {
    * @param path
    * @returns FilmList
    */
-  async getFilms(page: number, path: string = '', params?: ApiParams): Promise<FilmListInterface> {
+  async getFilms(
+    page: number,
+    path: string = '',
+    variables?: Variables,
+    params?: ApiParams
+  ): Promise<FilmListInterface> {
     const films: FilmCardInterface[] = [];
 
-    const $ = await configApi.fetchPage(`${path}/page/${page}/`, {}, params?.isRefresh ?? false);
+    const $ = await configApi.fetchPage(
+      `${path === '/' ? '' : path}/page/${page}/`,
+      variables,
+      params?.isRefresh
+    );
 
     const filmElements = $('div.b-content__inline_item');
 
@@ -229,8 +239,52 @@ const filmApi: FilmApiInterface = {
     };
   },
 
-  async getHomePageFilms(page: number, params?: ApiParams): Promise<FilmListInterface> {
-    return this.getFilms(page, '/new', params);
+  async getHomeMenuFilms(menuItem: MenuItemInterface, page: number, params?: ApiParams) {
+    const { path, key, variables } = menuItem;
+
+    if (key === 'slider') {
+      const films: FilmCardInterface[] = [];
+
+      console.log('fetchPage');
+
+      const $ = await configApi.fetchPage(path, variables, params?.isRefresh);
+
+      console.log('finish fetch');
+
+      const slider = $('div.b-newest_slider__wrapper');
+
+      const filmElements = $(slider).find('div.b-content__inline_item');
+
+      filmElements.each((_idx, el) => {
+        films.push(parseFilmCard($, el));
+      });
+
+      console.log('finish preparing');
+
+      return {
+        films,
+        totalPages: 1,
+      };
+    } else if (key === 'last') {
+      const films: FilmCardInterface[] = [];
+
+      const $ = await configApi.fetchPage(path, variables, params?.isRefresh);
+
+      const content = $('div.b-content');
+
+      const filmElements = $(content).find('div.b-content__inline_item');
+
+      filmElements.each((_idx, el) => {
+        films.push(parseFilmCard($, el));
+      });
+
+      return {
+        films,
+        totalPages: 1,
+      };
+    } else {
+      return this.getFilms(page, path, variables, params);
+    }
   },
 };
 

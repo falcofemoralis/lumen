@@ -15,4 +15,5 @@ export interface ThemedIconComponentProps {
 export enum IconPackType {
   MaterialCommunityIcons = 'MaterialCommunityIcons',
   MaterialIcons = 'MaterialIcons',
+  Octicons = 'Octicons',
 }

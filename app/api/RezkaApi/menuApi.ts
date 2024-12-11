@@ -1,15 +1,16 @@
+import { MenuItemInterface } from 'Type/MenuItem.interface';
 import { MenuApiInterface } from '..';
 
 const menuApi: MenuApiInterface = {
   getHomeMenu: () => {
     return [
-      { title: 'Горячие Новинки', path: '/' }, // slider
+      { title: 'Горячие Новинки', path: '/', key: 'slider' },
       { title: 'Новинки', path: '/new' },
-      { title: 'Последние Поступления', path: '/' },
-      { title: 'Популярные', path: '/?filter=last' },
-      { title: 'В ожидании ', path: '/?filter=popular' },
-      { title: 'Сейчас смотрят', path: '/?filter=watching' },
-    ];
+      { title: 'Последние Поступления', path: '/', key: 'root' },
+      { title: 'Популярные', path: '/', variables: { filter: 'popular' }, key: 'root' },
+      { title: 'В ожидании ', path: '/', variables: { filter: 'soon' }, key: 'root' },
+      { title: 'Сейчас смотрят', path: '/', variables: { filter: 'watching' }, key: 'root' },
+    ] as MenuItemInterface[];
   },
 };
 

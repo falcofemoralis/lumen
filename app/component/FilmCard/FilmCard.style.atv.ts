@@ -47,19 +47,20 @@ export const styles = CreateStyles({
     backgroundColor: Colors.white,
   },
   title: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: 'bold',
-    color: Colors.text,
+    color: Colors.white,
+    paddingRight: INFO_PADDING * 2,
   },
   titleFocused: {
-    color: Colors.darkText,
+    color: Colors.darkGray,
   },
   subtitle: {
     fontSize: 10,
-    color: Colors.secondaryText,
+    color: Colors.lightGray,
   },
   subtitleFocused: {
-    color: Colors.darkText,
+    color: Colors.darkGray,
   },
   cardThumbnail: {
     backgroundColor: Colors.lightBackground,
@@ -74,7 +75,7 @@ export const FocusedAnimation = ({
   isFocused?: boolean;
   children: (style: any) => React.ReactElement;
 }) => {
-  const duration = 250;
+  const duration = 200;
 
   const animatedScaleStyle = useAnimatedStyle(() => {
     return {

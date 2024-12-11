@@ -13,17 +13,30 @@ import ServiceStore from 'Store/Service.store';
 import { MenuItemInterface } from 'Type/MenuItem.interface';
 import { styles } from './HomePage.style.atv';
 import { HomePageProps } from './HomePage.type';
+import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 
 export function HomePageComponent(props: HomePageProps) {
-  const { films, loadFilms } = props;
+  const { films, selectedMenuItem, loadFilms, handleMenuItemChange } = props;
 
   const renderMenuItem = (menuItem: MenuItemInterface) => {
     const { title } = menuItem;
 
     return (
-      <SpatialNavigationFocusableView key={title}>
-        {({ isRootActive, isFocused }) => (
-          <ThemedButton isSelected={isRootActive && isFocused}>{title}</ThemedButton>
+      <SpatialNavigationFocusableView
+        key={title}
+        onActive={() => handleMenuItemChange(menuItem)}
+      >
+        {() => (
+          <ThemedButton
+            variant="outlined"
+            isSelected={selectedMenuItem && selectedMenuItem.title === title}
+            icon={{
+              name: 'dot-fill',
+              pack: IconPackType.Octicons,
+            }}
+          >
+            {title}
+          </ThemedButton>
         )}
       </SpatialNavigationFocusableView>
     );
@@ -46,7 +59,6 @@ export function HomePageComponent(props: HomePageProps) {
       >
         <SpatialNavigationView
           direction="horizontal"
-          alignInGrid
           style={styles.menuList}
         >
           {renderMenuItems()}

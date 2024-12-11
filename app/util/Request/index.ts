@@ -1,11 +1,9 @@
 import { queryCache } from 'Util/Cache';
 import { hash } from 'Util/Hash';
 
-export const formatURI = (
-  query: string,
-  variables: Record<string, string>,
-  url: string
-): string => {
+export type Variables = Record<string, string>;
+
+export const formatURI = (query: string, variables: Variables, url: string): string => {
   if (query.includes('http')) {
     return query;
   }
@@ -15,7 +13,11 @@ export const formatURI = (
     ['']
   );
 
-  const queryVars = stringifyVariables.join('&');
+  if (stringifyVariables.length > 0 && stringifyVariables[0] === '') {
+    stringifyVariables.shift();
+  }
+
+  const queryVars = stringifyVariables.join('&').replaceAll('"', '');
 
   return `${url}${query}${queryVars !== '' ? '?' + queryVars : ''}`;
 };
@@ -77,7 +79,7 @@ export const executeGet = async (
   query: string,
   endpoint: string,
   headers: HeadersInit,
-  variables: Record<string, string>,
+  variables: Variables,
   ignoreCache: boolean = false,
   signal?: AbortSignal
 ): Promise<string> => {
@@ -118,7 +120,7 @@ export const executePost = async (
   query: string,
   endpoint: string,
   headers: HeadersInit,
-  variables: Record<string, string>,
+  variables: Variables,
   signal?: AbortSignal
 ): Promise<any> => {
   const uri = formatURI(query, {}, endpoint);

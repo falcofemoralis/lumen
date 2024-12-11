@@ -1,3 +1,4 @@
+import { Variables } from './../../util/Request/index';
 import { ApiServiceType, ConfigApiInterface } from 'Api/index';
 import { FilmStreamInterface } from 'Type/FilmStream.interface';
 import { parseHtml } from 'Util/Parser';
@@ -49,7 +50,7 @@ const configApi: ConfigApiInterface = {
    * @param ignoreCache
    * @returns DOM doc
    */
-  async fetchPage(query: string, variables: Record<string, string> = {}, ignoreCache = false) {
+  async fetchPage(query: string, variables: Variables = {}, ignoreCache = false) {
     const res = await executeGet(
       query,
       this.getProvider(),
@@ -58,7 +59,13 @@ const configApi: ConfigApiInterface = {
       ignoreCache
     );
 
-    return parseHtml(res);
+    console.log('fetched');
+
+    const p = parseHtml(res);
+
+    console.log('parsed html!');
+
+    return p;
   },
 
   /**

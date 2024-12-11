@@ -14,6 +14,7 @@ import {
   THUMBNAILS_AMOUNT_TV,
 } from './FilmGrid.config';
 import { FilmGridContainerProps, FilmGridItem, FilmGridPaginationInterface } from './FilmGrid.type';
+import { noopFn } from 'Util/Function';
 
 export function GridContainer(props: FilmGridContainerProps) {
   const { films, onNextLoad } = props;
@@ -96,6 +97,7 @@ export function GridContainer(props: FilmGridContainerProps) {
             totalPages,
             currentPage: newPage,
           },
+          isRefresh,
           isRefresh
         );
 
@@ -110,7 +112,7 @@ export function GridContainer(props: FilmGridContainerProps) {
   };
 
   const onScrollEnd = async () => {
-    loadNextPage((state) => setIsLoading(state));
+    loadNextPage(noopFn);
   };
 
   const onRefresh = async () => {

@@ -1,18 +1,16 @@
 export const Colors = {
   primary: '#E50000',
-  secondary: '#004A77',
-  background: '#000000', //main bg
-  lightBackground: '#1A1A1A', //cards bg
-  //
-  text: '#E3E3E3',
-  darkText: '#303030',
-  secondaryText: '#C4C7C5',
-  //
+  background: '#000000',
+  lightBackground: '#1A1A1A',
   white: '#E3E3E3',
   black: '#000000',
   transparent: 'transparent',
-  gray: '#444746', // badges (country, genre)
-  lightGray: '#C4C7C5', // unselected tabs text
+  gray: '#444746',
+  lightGray: '#C4C7C5',
+  darkGray: '#303030',
+  blue: '#004A77',
+  lightBlue: '#C2E7FF',
+  darkBlue: '#001E30',
 };
 
 export const ThemeColors = {

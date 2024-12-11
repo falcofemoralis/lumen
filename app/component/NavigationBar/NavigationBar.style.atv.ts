@@ -63,7 +63,7 @@ export const styles = CreateStyles({
     marginBottom: 12,
   },
   tabSelected: {
-    backgroundColor: Colors.secondary,
+    backgroundColor: Colors.darkBlue,
     borderRadius: 24,
   },
   tabFocused: {

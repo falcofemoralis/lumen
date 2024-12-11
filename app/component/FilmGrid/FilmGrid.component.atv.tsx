@@ -9,6 +9,7 @@ import { getWindowWidth } from 'Util/Window';
 import { NUMBER_OF_COLUMNS_TV, SCROLL_EVENT_UPDATES_MS_TV } from './FilmGrid.config';
 import { ROW_GAP, styles } from './FilmGrid.style.atv';
 import { FilmGridComponentProps, FilmGridItem } from './FilmGrid.type';
+import { useMemo } from 'react';
 
 export function GridComponent(props: FilmGridComponentProps) {
   const { films, handleOnPress, onScrollEnd } = props;
@@ -33,9 +34,11 @@ export function GridComponent(props: FilmGridComponentProps) {
     );
   };
 
+  const filmsData = useMemo(() => films.map((element, index) => ({ ...element, index })), [films]);
+
   return (
     <SpatialNavigationVirtualizedGrid
-      data={films}
+      data={filmsData}
       renderItem={renderItem}
       itemHeight={scale(CARD_HEIGHT_TV + ROW_GAP)}
       numberOfColumns={NUMBER_OF_COLUMNS_TV}

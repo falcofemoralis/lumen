@@ -2,12 +2,13 @@ import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
   menuListWrapper: {
-    height: 60,
+    height: 50,
+    paddingHorizontal: 16,
     zIndex: 1,
   },
   menuListScroll: {},
   menuList: {
-    gap: 15,
+    gap: 8,
   },
   gridWrapper: {
     zIndex: 2,

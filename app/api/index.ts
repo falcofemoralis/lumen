@@ -1,3 +1,4 @@
+import { Variables } from './../util/Request/index';
 import FilmInterface from 'Type/Film.interface';
 import { FilmListInterface } from 'Type/FilmList.interface';
 import { FilmStreamInterface } from 'Type/FilmStream.interface';
@@ -27,18 +28,19 @@ export interface ConfigApiInterface {
   getCDN(): string;
   setAuthorization(auth: string): void;
   getAuthorization(): HeadersInit;
-  fetchPage(
-    query: string,
-    variables?: Record<string, string>,
-    ignoreCache?: boolean
-  ): Promise<CheerioAPI>;
-  getRequest(query: string, variables?: Record<string, string>): Promise<any>;
-  postRequest(query: string, variables?: Record<string, string>): Promise<any>;
+  fetchPage(query: string, variables?: Variables, ignoreCache?: boolean): Promise<CheerioAPI>;
+  getRequest(query: string, variables?: Variables): Promise<any>;
+  postRequest(query: string, variables?: Variables): Promise<any>;
   modifyCDN(streams: FilmStreamInterface[]): FilmStreamInterface[];
 }
 
 export interface FilmApiInterface {
-  getFilms(page: number, path?: string, params?: ApiParams): Promise<FilmListInterface>;
+  getFilms(
+    page: number,
+    path?: string,
+    variables?: Variables,
+    params?: ApiParams
+  ): Promise<FilmListInterface>;
   getFilm(link: string): Promise<FilmInterface>;
   getFilmStreams(film: FilmInterface, voice: FilmVoiceInterface): Promise<FilmVideoInterface>;
   getFilmStreamsByEpisodeId(
@@ -48,7 +50,11 @@ export interface FilmApiInterface {
     episodeId: string
   ): Promise<FilmVideoInterface>;
   getFilmSeasons(film: FilmInterface, voice: FilmVoiceInterface): Promise<FilmVoiceInterface>;
-  getHomePageFilms(page: number, params?: ApiParams): Promise<FilmListInterface>;
+  getHomeMenuFilms(
+    menuItem: MenuItemInterface,
+    page: number,
+    params?: ApiParams
+  ): Promise<FilmListInterface>;
 }
 
 export interface MenuApiInterface {

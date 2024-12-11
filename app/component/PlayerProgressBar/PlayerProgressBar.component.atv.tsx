@@ -35,14 +35,10 @@ export function PlayerProgressBarComponentTV(props: PlayerProgressBarComponentPr
       }
 
       if (type === TVEventType.LongLeft) {
-        console.log('LongLeft');
-
         rewindPositionAuto(RewindDirection.Backward);
       }
 
       if (type === TVEventType.LongRight) {
-        console.log('LongRight');
-
         rewindPositionAuto(RewindDirection.Forward);
       }
     }
