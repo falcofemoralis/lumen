@@ -245,11 +245,7 @@ const filmApi: FilmApiInterface = {
     if (key === 'slider') {
       const films: FilmCardInterface[] = [];
 
-      console.log('fetchPage');
-
       const $ = await configApi.fetchPage(path, variables, params?.isRefresh);
-
-      console.log('finish fetch');
 
       const slider = $('div.b-newest_slider__wrapper');
 
@@ -259,13 +255,11 @@ const filmApi: FilmApiInterface = {
         films.push(parseFilmCard($, el));
       });
 
-      console.log('finish preparing');
-
       return {
         films,
         totalPages: 1,
       };
-    } else if (key === 'last') {
+    } else if (key === 'root') {
       const films: FilmCardInterface[] = [];
 
       const $ = await configApi.fetchPage(path, variables, params?.isRefresh);

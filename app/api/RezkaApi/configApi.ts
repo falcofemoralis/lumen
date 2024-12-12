@@ -59,13 +59,7 @@ const configApi: ConfigApiInterface = {
       ignoreCache
     );
 
-    console.log('fetched');
-
-    const p = parseHtml(res);
-
-    console.log('parsed html!');
-
-    return p;
+    return parseHtml(res);
   },
 
   /**

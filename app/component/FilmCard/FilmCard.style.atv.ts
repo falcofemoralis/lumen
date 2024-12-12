@@ -29,6 +29,7 @@ export const styles = CreateStyles({
     width: '100%',
     borderRadius: BORDER_RADIUS,
     overflow: 'hidden',
+    position: 'relative',
   },
   poster: {
     height: '100%',
@@ -65,6 +66,27 @@ export const styles = CreateStyles({
   cardThumbnail: {
     backgroundColor: Colors.lightBackground,
     borderRadius: BORDER_RADIUS,
+  },
+  typeText: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    backgroundColor: 'red',
+    zIndex: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 1,
+    fontSize: 12,
+  },
+  infoText: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    backgroundColor: 'red',
+    zIndex: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 1,
+    fontSize: 12,
+    borderBottomRightRadius: 8,
   },
 });
 
@@ -116,22 +138,10 @@ export const FocusedAnimation = ({
     };
   });
 
-  const animatedPosterStyle = useAnimatedStyle(() => {
-    const borderRadius = withTiming(isFocused ? 0 : BORDER_RADIUS, {
-      duration,
-    });
-
-    return {
-      borderEndEndRadius: borderRadius,
-      borderStartEndRadius: borderRadius,
-    };
-  });
-
   return children({
     animatedScaleStyle,
     animatedInfoStyle,
     animatedTitleStyle,
     animatedSubtitleStyle,
-    animatedPosterStyle,
   });
 };

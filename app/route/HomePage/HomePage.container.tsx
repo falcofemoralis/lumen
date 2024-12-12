@@ -25,8 +25,6 @@ export function HomePageContainer() {
   );
   const debounce = useRef<NodeJS.Timeout | undefined>();
 
-  console.log('render container');
-
   const loadFilms = async (
     pagination: FilmGridPaginationInterface,
     isUpdate = false,
@@ -47,8 +45,6 @@ export function HomePageContainer() {
             isRefresh,
           }
         );
-
-      console.log('set films');
 
       setFilms(isUpdate ? newFilms : Array.from(films).concat(newFilms));
       setIsLoading(false);
