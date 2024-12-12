@@ -50,7 +50,12 @@ export function PageComponent({ children, testId }: PageProps) {
   }
 
   return (
-    <ThemedView style={{ height: '100%', width: getWindowWidth() }}>
+    <ThemedView
+      style={{
+        height: '100%',
+        width: getWindowWidth(),
+      }}
+    >
       <SpatialNavigationRoot
         isActive={isActive}
         onDirectionHandledWithoutMovement={onDirectionHandledWithoutMovement}

@@ -1,7 +1,7 @@
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
-import { FocusedAnimation, styles } from './FilmCard.style.atv';
+import { CARD_HEIGHT_TV, FocusedAnimation, INFO_HEIGHT, styles } from './FilmCard.style.atv';
 import { FilmCardComponentProps } from './FilmCard.type';
 import { FilmType } from 'Type/FilmType.type';
 
@@ -18,7 +18,9 @@ export function FilmCardComponent(props: FilmCardComponentProps) {
   const { type, poster, title, subtitle, info } = filmCard;
 
   if (isThumbnail) {
-    return <ThemedView style={[styles.card, styles.cardThumbnail, style]} />;
+    return (
+      <ThemedView style={[styles.card, { height: CARD_HEIGHT_TV }, styles.cardThumbnail, style]} />
+    );
   }
 
   const renderType = () => {
@@ -40,8 +42,10 @@ export function FilmCardComponent(props: FilmCardComponentProps) {
   return (
     <FocusedAnimation isFocused={isFocused}>
       {({ animatedScaleStyle, animatedInfoStyle, animatedTitleStyle, animatedSubtitleStyle }) => (
-        <ThemedView.Animated style={[styles.card, animatedScaleStyle, style]}>
-          <ThemedView style={styles.posterWrapper}>
+        <ThemedView.Animated
+          style={[styles.card, { height: CARD_HEIGHT_TV }, animatedScaleStyle, style]}
+        >
+          <ThemedView style={(styles.posterWrapper, { height: CARD_HEIGHT_TV - INFO_HEIGHT })}>
             {renderType()}
             <ThemedImage
               style={styles.poster}
@@ -49,7 +53,7 @@ export function FilmCardComponent(props: FilmCardComponentProps) {
             />
             {renderInfoText()}
           </ThemedView>
-          <ThemedView.Animated style={[styles.info, animatedInfoStyle]}>
+          <ThemedView.Animated style={[styles.info, { height: INFO_HEIGHT }, animatedInfoStyle]}>
             <ThemedText.Animated
               style={[styles.title, animatedTitleStyle, style]}
               numberOfLines={2}

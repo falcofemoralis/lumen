@@ -2,16 +2,16 @@ import { NUMBER_OF_COLUMNS_TV } from 'Component/FilmGrid/FilmGrid.config';
 import { ROW_GAP } from 'Component/FilmGrid/FilmGrid.style.atv';
 import { useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import Colors from 'Style/Colors';
-import CreateStyles from 'Util/CreateStyles';
+import CreateStyles, { scale } from 'Util/CreateStyles';
 import { getWindowWidth } from 'Util/Window';
 
-const windowWidth = getWindowWidth() - ROW_GAP;
-const cardWidth = windowWidth / NUMBER_OF_COLUMNS_TV - ROW_GAP;
+const windowWidth = getWindowWidth() - scale(ROW_GAP);
+const cardWidth = windowWidth / NUMBER_OF_COLUMNS_TV - scale(ROW_GAP);
 
 export const POSTER_HEIGHT = cardWidth * (250 / 166);
 export const INFO_PADDING = 8;
 export const INFO_PADDING_TOP = 4;
-export const INFO_HEIGHT = 60 + INFO_PADDING + INFO_PADDING_TOP;
+export const INFO_HEIGHT = scale(60) + scale(INFO_PADDING) + scale(INFO_PADDING_TOP);
 export const CARD_HEIGHT_TV = POSTER_HEIGHT + INFO_HEIGHT;
 export const DEFAULT_SCALE = 1;
 export const FOCUSED_SCALE = 1.1;
@@ -22,10 +22,8 @@ export const styles = CreateStyles({
     flex: 1,
     flexDirection: 'column',
     width: '100%',
-    height: CARD_HEIGHT_TV,
   },
   posterWrapper: {
-    height: CARD_HEIGHT_TV - INFO_HEIGHT,
     width: '100%',
     borderRadius: BORDER_RADIUS,
     overflow: 'hidden',
@@ -37,7 +35,6 @@ export const styles = CreateStyles({
   },
   info: {
     width: '100%',
-    height: INFO_HEIGHT,
     backgroundColor: Colors.transparent,
     borderEndEndRadius: BORDER_RADIUS,
     borderStartEndRadius: BORDER_RADIUS,
