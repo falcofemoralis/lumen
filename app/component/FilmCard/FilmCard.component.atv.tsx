@@ -1,17 +1,9 @@
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
+import { FILM_TYPE_COLORS, TYPE_LABELS } from './FilmCard.config';
 import { CARD_HEIGHT_TV, FocusedAnimation, INFO_HEIGHT, styles } from './FilmCard.style.atv';
 import { FilmCardComponentProps } from './FilmCard.type';
-import { FilmType } from 'Type/FilmType.type';
-
-const TYPE_LABELS = {
-  [FilmType.Film]: 'Movie',
-  [FilmType.Series]: 'Series',
-  [FilmType.Multfilm]: 'Cartoon',
-  [FilmType.Anime]: 'Anime',
-  [FilmType.TVShow]: 'TV Show',
-};
 
 export function FilmCardComponent(props: FilmCardComponentProps) {
   const { filmCard, style, isFocused, isThumbnail } = props;
@@ -28,7 +20,11 @@ export function FilmCardComponent(props: FilmCardComponentProps) {
       return null;
     }
 
-    return <ThemedText style={styles.typeText}>{TYPE_LABELS[type]}</ThemedText>;
+    return (
+      <ThemedText style={[styles.typeText, { backgroundColor: FILM_TYPE_COLORS[type] }]}>
+        {TYPE_LABELS[type]}
+      </ThemedText>
+    );
   };
 
   const renderInfoText = () => {
@@ -36,7 +32,11 @@ export function FilmCardComponent(props: FilmCardComponentProps) {
       return null;
     }
 
-    return <ThemedText style={styles.infoText}>{info}</ThemedText>;
+    return (
+      <ThemedText style={[styles.infoText, { backgroundColor: FILM_TYPE_COLORS[type] }]}>
+        {info}
+      </ThemedText>
+    );
   };
 
   return (

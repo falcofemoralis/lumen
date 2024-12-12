@@ -75,6 +75,8 @@ export function HomePageContainer() {
 
       debounce.current = setTimeout(() => {
         selectedMenuItemRef.current = menuItem;
+        // TODO PAGINATION DOESN'T WORK
+        // NEED to use different component for this
         loadFilms({ currentPage: 1, totalPages: 1 }, true);
       }, 1000);
     }

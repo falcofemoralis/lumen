@@ -25,13 +25,13 @@ export const styles = CreateStyles({
   },
   posterWrapper: {
     width: '100%',
-    borderRadius: BORDER_RADIUS,
     overflow: 'hidden',
     position: 'relative',
   },
   poster: {
     height: '100%',
     width: '100%',
+    borderRadius: BORDER_RADIUS,
   },
   info: {
     width: '100%',
@@ -68,17 +68,16 @@ export const styles = CreateStyles({
     position: 'absolute',
     top: 0,
     right: 0,
-    backgroundColor: 'red',
     zIndex: 10,
     paddingHorizontal: 8,
     paddingVertical: 1,
     fontSize: 12,
+    borderTopLeftRadius: 8,
   },
   infoText: {
     position: 'absolute',
     bottom: 0,
     left: 0,
-    backgroundColor: 'red',
     zIndex: 10,
     paddingHorizontal: 8,
     paddingVertical: 1,
