@@ -20,11 +20,7 @@
       [
         "expo-build-properties",
         {
-          "ios": {
-            "newArchEnabled": false
-          },
           "android": {
-            "newArchEnabled": false,
             "usesCleartextTraffic": true
           }
         }
@@ -35,18 +31,23 @@
           "root": "./app/navigation"
         }
       ],
-      "expo-localization"
+      "expo-localization",
+      "expo-font"
     ],
-    "experiments": {
-      "typedRoutes": true
-    },
-    "name": "lumen",
-    "slug": "lumen",
-    "version": "1.0.0",
     "android": {
+      "splash": {
+        "image": "./assets/images/splash.png"
+      },
       "package": "com.falcofemoralis.lumen",
       "versionCode": 1
     },
+    "experiments": {
+      "typedRoutes": true
+    },
+    "newArchEnabled": true,
+    "name": "lumen",
+    "slug": "lumen",
+    "version": "1.0.0",
     "extra": {
       "eas": {
         "projectId": "ad7c3459-7949-4f54-9d83-5e8a400a0af4"
