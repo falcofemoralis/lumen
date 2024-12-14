@@ -1,4 +1,5 @@
-import { CheerioAPI, Element } from 'cheerio';
+import { CheerioAPI } from 'cheerio';
+import type { Element } from 'domhandler';
 import FilmCardInterface from 'Type/FilmCard.interface';
 import { FilmStreamInterface } from 'Type/FilmStream.interface';
 import { FilmType } from 'Type/FilmType.type';

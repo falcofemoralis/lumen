@@ -30,8 +30,6 @@ export function HomePageContainer() {
     isUpdate = false,
     isRefresh = false
   ) => {
-    console.log('load films');
-
     const { currentPage } = pagination;
 
     setIsLoading(true);

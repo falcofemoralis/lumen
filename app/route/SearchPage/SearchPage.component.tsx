@@ -5,7 +5,7 @@ import { Button } from 'react-native-paper';
 export function SearchPageComponent() {
   return (
     <Page>
-      <Button>Button</Button>
+      <Button>Button on mobile</Button>
     </Page>
   );
 }

@@ -112,8 +112,6 @@ export function GridContainer(props: FilmGridContainerProps) {
   };
 
   const onScrollEnd = async () => {
-    console.log('onScrollEnd');
-
     loadNextPage(noopFn);
   };
 

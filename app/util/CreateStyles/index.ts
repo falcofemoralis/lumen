@@ -35,7 +35,7 @@ export const ratio = () => {
 
 export const scale = (number: any) => {
   const value = number * Number(ratio().toFixed(1));
-  return Number(value.toFixed(1));
+  return Number(value.toFixed(0));
 };
 
 export default function CreateStyles<

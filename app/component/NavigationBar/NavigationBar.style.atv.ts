@@ -12,6 +12,12 @@ export const NAVIGATION_BAR_TV_TAB_WIDTH =
 export const NAVIGATION_BAR_TV_TAB_WIDTH_EXPANDED = NAVIGATION_BAR_TV_TAB_WIDTH + 100;
 
 export const styles = CreateStyles({
+  layout: {
+    flex: 1,
+    flexDirection: 'row',
+    width: '100%',
+    height: '100%',
+  },
   slot: {
     width: '100%',
     height: '100%',

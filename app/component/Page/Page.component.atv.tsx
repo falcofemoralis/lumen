@@ -45,9 +45,9 @@ export function PageComponent({ children, testId }: PageProps) {
     }
   };
 
-  if (testId && false) {
-    console.log(`Page ${testId} is ${isActive}`);
-  }
+  // if (testId) {
+  //   console.log(`Page ${testId} is ${isActive}`);
+  // }
 
   return (
     <ThemedView

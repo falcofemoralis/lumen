@@ -2,4 +2,4 @@
 
 eas build -p android --profile production
 
-cd android && ./gradlew assembleRelease
+cd android && gradlew assembleRelease

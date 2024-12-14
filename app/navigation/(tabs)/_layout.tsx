@@ -1,10 +1,13 @@
 import NavigationBar from 'Component/NavigationBar';
-import { Slot } from 'expo-router';
-import React from 'react';
+import { Redirect } from 'expo-router';
 import ConfigStore from 'Store/Config.store';
 
-export function TabLayout() {
-  return ConfigStore.isTV ? <Slot /> : <NavigationBar />;
+export function TabsTVLayout() {
+  if (!ConfigStore.isConfigured) {
+    return <Redirect href="/welcome" />;
+  }
+
+  return <NavigationBar />;
 }
 
-export default TabLayout;
+export default TabsTVLayout;

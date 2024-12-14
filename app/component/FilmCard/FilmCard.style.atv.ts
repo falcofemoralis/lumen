@@ -86,7 +86,7 @@ export const styles = CreateStyles({
   },
 });
 
-export const FocusedAnimation = ({
+export const ScaleAnimation = ({
   isFocused = false,
   children,
 }: {
@@ -107,37 +107,7 @@ export const FocusedAnimation = ({
     };
   });
 
-  const animatedInfoStyle = useAnimatedStyle(() => {
-    return {
-      backgroundColor: withTiming(
-        isFocused ? styles.infoFocused.backgroundColor : styles.info.backgroundColor,
-        {
-          duration,
-        }
-      ),
-    };
-  });
-
-  const animatedTitleStyle = useAnimatedStyle(() => {
-    return {
-      color: withTiming(isFocused ? styles.titleFocused.color : styles.title.color, {
-        duration,
-      }),
-    };
-  });
-
-  const animatedSubtitleStyle = useAnimatedStyle(() => {
-    return {
-      color: withTiming(isFocused ? styles.subtitleFocused.color : styles.subtitle.color, {
-        duration,
-      }),
-    };
-  });
-
   return children({
     animatedScaleStyle,
-    animatedInfoStyle,
-    animatedTitleStyle,
-    animatedSubtitleStyle,
   });
 };

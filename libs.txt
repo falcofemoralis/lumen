@@ -10,6 +10,8 @@ mmkv Storage    https://github.com/ammarahm-ed/react-native-mmkv-storage
    use https://docs.swmansion.com/react-native-reanimated/docs/shared-element-transitions/overview/
 Cache image     https://github.com/echowaves/expo-cached-image
 Material UI     https://reactnativepaper.com/ - UI
+Layouts         https://github.com/EvanBacon/expo-router-layouts-example
+Pager view      https://github.com/callstack/react-native-pager-view
 
 ///
 TV Only

@@ -1,11 +1,11 @@
 import { BottomTabBarButtonProps } from '@react-navigation/bottom-tabs';
+import { Tabs } from 'Component/Layouts/tabs';
 import ThemedIcon from 'Component/ThemedIcon';
-import { Tabs } from 'expo-router';
 import React from 'react';
 import { Pressable } from 'react-native';
 import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
-import { Tab, TABS } from './NavigationBar.config';
+import { Tab, TABS_MOBILE_CONFIG } from './NavigationBar.config';
 import { styles } from './NavigationBar.style';
 
 export function NavigationBarComponent() {
@@ -22,31 +22,31 @@ export function NavigationBarComponent() {
     );
   };
 
-  const renderTab = (tab: Tab, idx: number) => {
-    const { route, name, icon } = tab;
-
-    const formattedRoute = route.toString().replace('./', '');
+  const renderTab = (tab: Tab<string>, idx: number) => {
+    const { route: name, title, icon, options } = tab;
 
     return (
       <Tabs.Screen
-        key={idx}
-        name={formattedRoute === '' ? 'index' : formattedRoute}
+        key={name}
+        name={name}
         options={{
-          title: name,
-          tabBarIcon: ({ color, focused }) => (
-            <ThemedIcon
-              icon={icon}
-              size={scale(24)}
-              color={color}
-            />
-          ),
+          title: title,
+          tabBarIcon: ({ color, focused }) =>
+            icon && (
+              <ThemedIcon
+                icon={icon}
+                size={scale(24)}
+                color={color}
+              />
+            ),
+          ...options,
         }}
       />
     );
   };
 
   const renderTabs = () => {
-    return TABS.map((tab, idx) => renderTab(tab, idx));
+    return TABS_MOBILE_CONFIG.map((tab, idx) => renderTab(tab, idx));
   };
 
   return (

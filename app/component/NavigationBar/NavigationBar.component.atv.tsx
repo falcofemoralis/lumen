@@ -2,7 +2,7 @@ import ThemedIcon from 'Component/ThemedIcon';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
 import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
+import { Href, router, Slot } from 'expo-router';
 import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
 import { View } from 'react-native';
@@ -15,11 +15,13 @@ import {
 import NavigationStore from 'Store/Navigation.store';
 import { TVEventType } from 'Type/TVEvent.type';
 import { scale } from 'Util/CreateStyles';
-import { DEFAULT_TAB, Tab, TABS, TABS_TV } from './NavigationBar.config';
+import { Tab, TABS_TV_CONFIG } from './NavigationBar.config';
 import { FocusedTabAnimation, OpeningAnimation, styles } from './NavigationBar.style.atv';
 
 export function NavigationBarComponent() {
-  const [selectedTab, setSelectedTab] = useState(DEFAULT_TAB);
+  const [selectedTab, setSelectedTab] = useState(
+    TABS_TV_CONFIG.find((tab) => tab.isDefault)?.route ?? ''
+  );
 
   const onDirectionHandledWithoutMovement = (movement: string) => {
     if (movement === TVEventType.Right) {
@@ -27,25 +29,25 @@ export function NavigationBarComponent() {
     }
   };
 
-  const onFocus = (tab: Tab) => {
-    const { id, route } = tab;
+  const onFocus = (tab: Tab<Href>) => {
+    const { route } = tab;
 
-    if (id === selectedTab) {
+    if (route === selectedTab) {
       return;
     }
 
-    setSelectedTab(id);
+    setSelectedTab(route);
     setTimeout(() => {
       router.replace(route);
     });
   };
 
-  const renderTab = (tab: Tab, idx: number) => {
-    const { id, name, icon } = tab;
+  const renderTab = (tab: Tab<Href>, idx: number) => {
+    const { route, title, icon } = tab;
 
     return (
       <SpatialNavigationFocusableView
-        key={id}
+        key={title}
         onFocus={() => onFocus(tab)}
       >
         {({ isRootActive }) => (
@@ -54,27 +56,29 @@ export function NavigationBarComponent() {
               <View
                 style={[
                   styles.tab,
-                  selectedTab === id && !isRootActive && styles.tabSelected,
-                  selectedTab === id && isRootActive && styles.tabFocused,
+                  selectedTab === route && !isRootActive && styles.tabSelected,
+                  selectedTab === route && isRootActive && styles.tabFocused,
                 ]}
               >
-                <ThemedIcon
-                  style={[
-                    styles.tabIcon,
-                    selectedTab === id && isRootActive && styles.tabContentFocused,
-                  ]}
-                  icon={icon}
-                  size={scale(24)}
-                  color="white"
-                />
+                {icon && (
+                  <ThemedIcon
+                    style={[
+                      styles.tabIcon,
+                      selectedTab === route && isRootActive && styles.tabContentFocused,
+                    ]}
+                    icon={icon}
+                    size={scale(24)}
+                    color="white"
+                  />
+                )}
                 <ThemedText.Animated
                   style={[
                     styles.tabText,
-                    selectedTab === id && isRootActive && styles.tabContentFocused,
+                    selectedTab === route && isRootActive && styles.tabContentFocused,
                     animatedTextStyle,
                   ]}
                 >
-                  {name}
+                  {title}
                 </ThemedText.Animated>
               </View>
             )}
@@ -85,7 +89,7 @@ export function NavigationBarComponent() {
   };
 
   const renderTabs = () => {
-    return TABS.concat(TABS_TV).map((tab, idx) => renderTab(tab, idx));
+    return TABS_TV_CONFIG.map((tab, idx) => renderTab(tab, idx));
   };
 
   if (!NavigationStore.isNavigationVisible) {
@@ -93,33 +97,38 @@ export function NavigationBarComponent() {
   }
 
   return (
-    <SpatialNavigationRoot
-      isActive={NavigationStore.isNavigationOpened}
-      onDirectionHandledWithoutMovement={onDirectionHandledWithoutMovement}
-    >
-      <ThemedView style={styles.bar}>
-        <SpatialNavigationView direction="vertical">
-          <DefaultFocus>
-            <OpeningAnimation isOpened={NavigationStore.isNavigationOpened}>
-              {({ animatedOpeningStyle }) => (
-                <ThemedView.Animated style={[styles.tabs, animatedOpeningStyle]}>
-                  {renderTabs()}
-                </ThemedView.Animated>
-              )}
-            </OpeningAnimation>
-          </DefaultFocus>
-        </SpatialNavigationView>
-        <LinearGradient
-          style={[
-            styles.barBackground,
-            NavigationStore.isNavigationOpened && styles.barBackgroundOpened,
-          ]}
-          colors={['rgba(0, 0, 0, 0.8)', 'transparent']}
-          start={{ x: 0.5, y: 0 }}
-          end={{ x: 1, y: 0 }}
-        />
-      </ThemedView>
-    </SpatialNavigationRoot>
+    <ThemedView style={styles.layout}>
+      <SpatialNavigationRoot
+        isActive={NavigationStore.isNavigationOpened}
+        onDirectionHandledWithoutMovement={onDirectionHandledWithoutMovement}
+      >
+        <ThemedView style={styles.bar}>
+          <SpatialNavigationView direction="vertical">
+            <DefaultFocus>
+              <OpeningAnimation isOpened={NavigationStore.isNavigationOpened}>
+                {({ animatedOpeningStyle }) => (
+                  <ThemedView.Animated style={[styles.tabs, animatedOpeningStyle]}>
+                    {renderTabs()}
+                  </ThemedView.Animated>
+                )}
+              </OpeningAnimation>
+            </DefaultFocus>
+          </SpatialNavigationView>
+          <LinearGradient
+            style={[
+              styles.barBackground,
+              NavigationStore.isNavigationOpened && styles.barBackgroundOpened,
+            ]}
+            colors={['rgba(0, 0, 0, 0.8)', 'transparent']}
+            start={{ x: 0.5, y: 0 }}
+            end={{ x: 1, y: 0 }}
+          />
+        </ThemedView>
+      </SpatialNavigationRoot>
+      <View style={[styles.slot, NavigationStore.isNavigationVisible && styles.slotBarVisible]}>
+        <Slot />
+      </View>
+    </ThemedView>
   );
 }
 

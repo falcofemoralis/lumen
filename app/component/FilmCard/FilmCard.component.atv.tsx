@@ -2,7 +2,7 @@ import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
 import { FILM_TYPE_COLORS, TYPE_LABELS } from './FilmCard.config';
-import { CARD_HEIGHT_TV, FocusedAnimation, INFO_HEIGHT, styles } from './FilmCard.style.atv';
+import { CARD_HEIGHT_TV, INFO_HEIGHT, ScaleAnimation, styles } from './FilmCard.style.atv';
 import { FilmCardComponentProps } from './FilmCard.type';
 
 export function FilmCardComponent(props: FilmCardComponentProps) {
@@ -40,8 +40,8 @@ export function FilmCardComponent(props: FilmCardComponentProps) {
   };
 
   return (
-    <FocusedAnimation isFocused={isFocused}>
-      {({ animatedScaleStyle, animatedInfoStyle, animatedTitleStyle, animatedSubtitleStyle }) => (
+    <ScaleAnimation isFocused={isFocused}>
+      {({ animatedScaleStyle }) => (
         <ThemedView.Animated
           style={[styles.card, { height: CARD_HEIGHT_TV }, animatedScaleStyle, style]}
         >
@@ -53,23 +53,29 @@ export function FilmCardComponent(props: FilmCardComponentProps) {
             />
             {renderInfoText()}
           </ThemedView>
-          <ThemedView.Animated style={[styles.info, { height: INFO_HEIGHT }, animatedInfoStyle]}>
-            <ThemedText.Animated
-              style={[styles.title, animatedTitleStyle, style]}
+          <ThemedView.Animated
+            style={[
+              styles.info,
+              { height: INFO_HEIGHT },
+              isFocused ? styles.infoFocused : styles.info,
+            ]}
+          >
+            <ThemedText
+              style={[styles.title, isFocused ? styles.titleFocused : styles.title]}
               numberOfLines={2}
             >
               {title}
-            </ThemedText.Animated>
-            <ThemedText.Animated
-              style={[styles.subtitle, animatedSubtitleStyle]}
+            </ThemedText>
+            <ThemedText
+              style={[styles.subtitle, isFocused ? styles.subtitleFocused : styles.subtitle]}
               numberOfLines={2}
             >
               {subtitle}
-            </ThemedText.Animated>
+            </ThemedText>
           </ThemedView.Animated>
         </ThemedView.Animated>
       )}
-    </FocusedAnimation>
+    </ScaleAnimation>
   );
 }
 

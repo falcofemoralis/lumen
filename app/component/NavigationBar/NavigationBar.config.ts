@@ -1,90 +1,122 @@
 import { IconInterface, IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
-import { Href } from 'expo-router';
+import { Href, RelativePathString } from 'expo-router';
 
-export enum TabType {
-  Search = 'search',
-  Home = 'home',
-  Bookmarks = 'bookmarks',
-  Recent = 'recent',
-  Notifications = 'notifications',
-  Settings = 'settings',
-}
-
-export interface Tab {
-  id: TabType;
-  route: Href<string>;
-  name: string;
-  icon: IconInterface;
+export interface Tab<T> {
+  route: T;
+  title: string;
+  icon?: IconInterface;
+  isDefault?: boolean;
   options?: {
-    href?: string | null;
+    href?: RelativePathString | null;
   };
 }
 
-export interface IgnoredTab {
-  name: string;
-  options: {
-    href: null;
-  };
-}
-
-export const DEFAULT_TAB = TabType.Home;
-
-export const TABS: Tab[] = [
+export const TABS_TV_CONFIG: Tab<Href>[] = [
   {
-    id: TabType.Home,
-    route: './',
-    name: 'Home',
+    isDefault: true,
+    route: './(index)',
+    title: 'Home',
     icon: {
       name: 'home-variant-outline',
       pack: IconPackType.MaterialCommunityIcons,
     },
   },
   {
-    id: TabType.Search,
     route: './search',
-    name: 'Search',
+    title: 'Search',
     icon: {
       name: 'magnify',
       pack: IconPackType.MaterialCommunityIcons,
     },
   },
   {
-    id: TabType.Bookmarks,
     route: './bookmarks',
-    name: 'Bookmarks',
+    title: 'Bookmarks',
     icon: {
       name: 'movie-star-outline',
       pack: IconPackType.MaterialCommunityIcons,
     },
   },
   {
-    id: TabType.Recent,
     route: './recent',
-    name: 'Recent',
+    title: 'Recent',
     icon: {
       name: 'history',
       pack: IconPackType.MaterialCommunityIcons,
     },
   },
   {
-    id: TabType.Notifications,
     route: './notifications',
-    name: 'Notifications',
+    title: 'Notifications',
     icon: {
       name: 'bell-outline',
       pack: IconPackType.MaterialCommunityIcons,
     },
   },
-];
-
-export const TABS_TV: Tab[] = [
   {
-    id: TabType.Settings,
     route: './settings',
-    name: 'Settings',
+    title: 'Settings',
     icon: {
       name: 'settings',
       pack: IconPackType.MaterialIcons,
     },
   },
+];
+
+const TABS_MOBILE_IGNORED_TABS: string[] = [
+  'player/[data]',
+  'settings',
+  'notifications',
+  'film/[link]',
+  'index',
+];
+
+export const TABS_MOBILE_CONFIG: Tab<string>[] = [
+  {
+    route: '(index)',
+    title: 'Home',
+    icon: {
+      name: 'home-variant-outline',
+      pack: IconPackType.MaterialCommunityIcons,
+    },
+  },
+  {
+    route: 'search',
+    title: 'Search',
+    icon: {
+      name: 'magnify',
+      pack: IconPackType.MaterialCommunityIcons,
+    },
+  },
+  {
+    route: 'bookmarks',
+    title: 'Bookmarks',
+    icon: {
+      name: 'movie-star-outline',
+      pack: IconPackType.MaterialCommunityIcons,
+    },
+  },
+  {
+    route: 'recent',
+    title: 'Recent',
+    icon: {
+      name: 'history',
+      pack: IconPackType.MaterialCommunityIcons,
+    },
+  },
+  {
+    route: 'account',
+    title: 'Account',
+    icon: {
+      name: 'bell-outline',
+      pack: IconPackType.MaterialCommunityIcons,
+    },
+  },
+  ...TABS_MOBILE_IGNORED_TABS.map((route) => ({
+    route,
+    title: route,
+    options: {
+      href: null,
+    },
+  })),
 ];

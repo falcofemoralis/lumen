@@ -8,7 +8,6 @@ class NotificationStore {
   }
 
   async displayMessage(msg: any | string) {
-    console.error(msg);
     ToastAndroid.show(msg, ToastAndroid.SHORT);
   }
 

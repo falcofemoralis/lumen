@@ -3,6 +3,7 @@ import { StyleSheet } from 'react-native';
 
 import ThemedView from 'Component/ThemedView';
 import ThemedText from 'Component/ThemedText';
+import React from 'react';
 
 export default function NotFoundScreen() {
   return (
@@ -11,7 +12,7 @@ export default function NotFoundScreen() {
       <ThemedView style={styles.container}>
         <ThemedText type="title">This screen doesnt exist.</ThemedText>
         <Link
-          href="/"
+          href="./(tabs)"
           style={styles.link}
         >
           <ThemedText type="link">Go to home screen!</ThemedText>

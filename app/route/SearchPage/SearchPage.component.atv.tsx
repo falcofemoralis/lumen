@@ -7,7 +7,7 @@ export function SearchPageComponent() {
   return (
     <Page>
       <DefaultFocus>
-        <ThemedButton>Button</ThemedButton>
+        <ThemedButton>Button on TV</ThemedButton>
       </DefaultFocus>
     </Page>
   );
