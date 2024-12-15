@@ -10,7 +10,7 @@
     "reset-project": "./scripts/reset-project.js",
     "test": "jest --watchAll",
     "lint": "expo lint",
-    "prebuild": "EXPO_TV=1 expo prebuild --clean"
+    "build": "cd android && gradlew assembleRelease"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.4",

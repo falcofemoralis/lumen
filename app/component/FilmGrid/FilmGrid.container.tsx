@@ -1,38 +1,24 @@
 import { router } from 'expo-router';
 import { withTV } from 'Hooks/withTV';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import ConfigStore from 'Store/Config.store';
 import FilmCardInterface from 'Type/FilmCard.interface';
 import { FilmType } from 'Type/FilmType.type';
+import { noopFn } from 'Util/Function';
 import GridComponent from './FilmGrid.component';
 import GridComponentTV from './FilmGrid.component.atv';
 import {
-  DEFAULT_PAGE,
   NUMBER_OF_COLUMNS,
   NUMBER_OF_COLUMNS_TV,
   THUMBNAILS_AMOUNT,
   THUMBNAILS_AMOUNT_TV,
 } from './FilmGrid.config';
-import { FilmGridContainerProps, FilmGridItem, FilmGridPaginationInterface } from './FilmGrid.type';
-import { noopFn } from 'Util/Function';
+import { FilmGridContainerProps, FilmGridItem } from './FilmGrid.type';
 
 export function GridContainer(props: FilmGridContainerProps) {
-  const { films, onNextLoad } = props;
-  const [isLoading, setIsLoading] = useState(false);
+  const { films, pagination, onNextLoad } = props;
   const [isRefreshing, setIsRefreshing] = useState(false);
   const updatingStateRef = useRef(false);
-  const paginationRef = useRef<FilmGridPaginationInterface>({
-    currentPage: DEFAULT_PAGE,
-    totalPages: DEFAULT_PAGE,
-  });
-
-  useEffect(() => {
-    onNextLoad(paginationRef.current).then((pagination) => {
-      paginationRef.current = {
-        ...pagination,
-      };
-    });
-  }, []);
 
   const getFilms = (): FilmGridItem[] => {
     if (!films.length) {
@@ -83,16 +69,16 @@ export function GridContainer(props: FilmGridContainerProps) {
   }, []);
 
   const loadNextPage = async (onLoading: (state: boolean) => void, isRefresh: boolean = false) => {
-    const { currentPage, totalPages } = paginationRef.current;
+    const { currentPage, totalPages } = pagination;
 
-    const newPage = !isRefresh ? currentPage + 1 : DEFAULT_PAGE;
+    const newPage = !isRefresh ? currentPage + 1 : 1;
 
-    if (newPage < totalPages && !updatingStateRef.current) {
+    if (!updatingStateRef.current) {
       updatingStateRef.current = true;
       onLoading(true);
 
       try {
-        const newPagination = await onNextLoad(
+        await onNextLoad(
           {
             totalPages,
             currentPage: newPage,
@@ -100,10 +86,6 @@ export function GridContainer(props: FilmGridContainerProps) {
           isRefresh,
           isRefresh
         );
-
-        paginationRef.current = {
-          ...newPagination,
-        };
       } finally {
         updatingStateRef.current = false;
         onLoading(false);

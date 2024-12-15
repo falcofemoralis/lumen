@@ -13,6 +13,7 @@ export enum ApiServiceType {
 }
 
 export interface ApiParams {
+  key?: string;
   isRefresh?: boolean;
 }
 

@@ -1,35 +1,74 @@
 import FilmGrid from 'Component/FilmGrid';
 import Page from 'Component/Page';
 import ThemedButton from 'Component/ThemedButton';
+import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedView from 'Component/ThemedView';
 import React from 'react';
+import { View } from 'react-native';
+import PagerView from 'react-native-pager-view';
 import {
   DefaultFocus,
   SpatialNavigationFocusableView,
   SpatialNavigationScrollView,
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
-import ServiceStore from 'Store/Service.store';
-import { MenuItemInterface } from 'Type/MenuItem.interface';
+import { PagerItemInterface } from 'Type/PagerItem.interface';
 import { styles } from './HomePage.style.atv';
 import { HomePageProps } from './HomePage.type';
-import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
+import { ActivityIndicator } from 'react-native-paper';
+import Colors from 'Style/Colors';
 
 export function HomePageComponent(props: HomePageProps) {
-  const { films, selectedMenuItem, loadFilms, handleMenuItemChange } = props;
+  const {
+    pagerViewRef,
+    pagerItems,
+    selectedPagerItem,
+    isLoading,
+    onNextLoad,
+    handleMenuItemChange,
+  } = props;
 
-  const renderMenuItem = (menuItem: MenuItemInterface) => {
-    const { title } = menuItem;
+  const renderPage = () => {
+    const { films, pagination } = selectedPagerItem;
+
+    console.log('home films ', films?.length);
+
+    return (
+      <ThemedView style={styles.gridWrapper}>
+        <DefaultFocus>
+          <FilmGrid
+            films={films ?? []}
+            pagination={pagination}
+            onNextLoad={onNextLoad}
+          />
+        </DefaultFocus>
+      </ThemedView>
+    );
+  };
+
+  // const renderPages = () => {
+  //   return pagerItems.map((item) => {
+  //     return <View key={item.key}>{renderPage(item)}</View>;
+  //   });
+  // };
+
+  const renderMenuItem = (item: PagerItemInterface) => {
+    const {
+      menuItem: { title },
+    } = item;
+    const {
+      menuItem: { title: selectedTitle },
+    } = selectedPagerItem;
 
     return (
       <SpatialNavigationFocusableView
         key={title}
-        onActive={() => handleMenuItemChange(menuItem)}
+        onActive={() => handleMenuItemChange(item)}
       >
-        {() => (
+        {({ isFocused, isActive }) => (
           <ThemedButton
             variant="outlined"
-            isSelected={selectedMenuItem && selectedMenuItem.title === title}
+            isSelected={isFocused || (isActive && selectedTitle === title)}
             icon={{
               name: 'dot-fill',
               pack: IconPackType.Octicons,
@@ -43,11 +82,7 @@ export function HomePageComponent(props: HomePageProps) {
   };
 
   const renderMenuItems = () => {
-    return ServiceStore.getCurrentService()
-      .getHomeMenu()
-      .map((item) => {
-        return renderMenuItem(item);
-      });
+    return pagerItems.map((item) => renderMenuItem(item));
   };
 
   const renderTopMenu = () => {
@@ -67,17 +102,29 @@ export function HomePageComponent(props: HomePageProps) {
     );
   };
 
+  const renderLoader = () => {
+    return (
+      <ActivityIndicator
+        style={styles.loader}
+        animating={isLoading}
+        size="large"
+        color={Colors.primary}
+      />
+    );
+  };
+
   return (
     <Page testId="homePage">
+      {renderLoader()}
       <ThemedView style={styles.menuListWrapper}>{renderTopMenu()}</ThemedView>
-      <ThemedView style={styles.gridWrapper}>
-        <DefaultFocus>
-          <FilmGrid
-            films={films}
-            onNextLoad={loadFilms}
-          />
-        </DefaultFocus>
-      </ThemedView>
+      {/* <PagerView
+        ref={pagerViewRef}
+        style={styles.pagerView}
+        initialPage={0}
+        scrollEnabled={false}
+      > */}
+      {renderPage()}
+      {/* </PagerView> */}
     </Page>
   );
 }

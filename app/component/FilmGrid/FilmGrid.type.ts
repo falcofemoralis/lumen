@@ -1,12 +1,14 @@
 import FilmCardInterface from 'Type/FilmCard.interface';
+import { PaginationInterface } from 'Type/Pagination.interface';
 
 export interface FilmGridContainerProps {
   films: FilmCardInterface[];
+  pagination: PaginationInterface;
   onNextLoad: (
-    pagination: FilmGridPaginationInterface,
-    isUpdate?: boolean,
-    isRefresh?: boolean
-  ) => Promise<FilmGridPaginationInterface>;
+    pagination: PaginationInterface,
+    isUpdate?: boolean, // flag to rewrite current data
+    isRefresh?: boolean // flag to load new data from server
+  ) => Promise<void>;
 }
 
 export interface FilmGridComponentProps {
@@ -16,11 +18,6 @@ export interface FilmGridComponentProps {
   handleOnPress: (film: FilmCardInterface) => void;
   onScrollEnd: () => void;
   onRefresh?: () => void;
-}
-
-export interface FilmGridPaginationInterface {
-  currentPage: number;
-  totalPages: number;
 }
 
 export type FilmGridItem = FilmCardInterface & {

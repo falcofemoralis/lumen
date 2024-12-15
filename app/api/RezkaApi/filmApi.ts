@@ -24,15 +24,20 @@ const filmApi: FilmApiInterface = {
     variables?: Variables,
     params?: ApiParams
   ): Promise<FilmListInterface> {
+    const { key, isRefresh } = params || {};
     const films: FilmCardInterface[] = [];
 
     const $ = await configApi.fetchPage(
       `${path === '/' ? '' : path}/page/${page}/`,
       variables,
-      params?.isRefresh
+      isRefresh
     );
 
-    const filmElements = $('div.b-content__inline_item');
+    const content = $(key);
+
+    const filmElements = key
+      ? $(content).find('div.b-content__inline_item')
+      : $('div.b-content__inline_item');
 
     filmElements.each((_idx, el) => {
       films.push(parseFilmCard($, el));
@@ -242,43 +247,18 @@ const filmApi: FilmApiInterface = {
   async getHomeMenuFilms(menuItem: MenuItemInterface, page: number, params?: ApiParams) {
     const { path, key, variables } = menuItem;
 
-    if (key === 'slider') {
-      const films: FilmCardInterface[] = [];
+    const filmsList = await this.getFilms(page, path, variables, {
+      ...params,
+      key,
+    });
 
-      const $ = await configApi.fetchPage(path, variables, params?.isRefresh);
-
-      const slider = $('div.b-newest_slider__wrapper');
-
-      const filmElements = $(slider).find('div.b-content__inline_item');
-
-      filmElements.each((_idx, el) => {
-        films.push(parseFilmCard($, el));
-      });
-
-      return {
-        films,
-        totalPages: 1,
-      };
-    } else if (key === 'root') {
-      const films: FilmCardInterface[] = [];
-
-      const $ = await configApi.fetchPage(path, variables, params?.isRefresh);
-
-      const content = $('div.b-content');
-
-      const filmElements = $(content).find('div.b-content__inline_item');
-
-      filmElements.each((_idx, el) => {
-        films.push(parseFilmCard($, el));
-      });
-
-      return {
-        films,
-        totalPages: 1,
-      };
-    } else {
-      return this.getFilms(page, path, variables, params);
+    if (key === '.b-newest_slider__wrapper') {
+      filmsList.totalPages = 1;
     }
+
+    console.log(filmsList.films.length);
+
+    return filmsList;
   },
 };
 

@@ -1,14 +1,16 @@
-import { FilmGridPaginationInterface } from 'Component/FilmGrid/FilmGrid.type';
-import FilmCardInterface from 'Type/FilmCard.interface';
-import { MenuItemInterface } from 'Type/MenuItem.interface';
+import PagerView from 'react-native-pager-view';
+import { PagerItemInterface } from 'Type/PagerItem.interface';
+import { PaginationInterface } from 'Type/Pagination.interface';
 
 export interface HomePageProps {
-  films: FilmCardInterface[];
-  loadFilms: (
-    pagination: FilmGridPaginationInterface,
-    isRefresh?: boolean
-  ) => Promise<FilmGridPaginationInterface>;
-  handleMenuItemChange: (menuItem: MenuItemInterface) => void;
+  pagerItems: PagerItemInterface[];
+  selectedPagerItem: PagerItemInterface;
+  pagerViewRef: React.RefObject<PagerView>;
   isLoading: boolean;
-  selectedMenuItem: MenuItemInterface;
+  onNextLoad: (
+    pagination: PaginationInterface,
+    isRefresh?: boolean,
+    isUpdate?: boolean
+  ) => Promise<void>;
+  handleMenuItemChange: (pagerItem: PagerItemInterface) => void;
 }

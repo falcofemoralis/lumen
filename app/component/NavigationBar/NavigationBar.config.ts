@@ -14,7 +14,7 @@ export interface Tab<T> {
 export const TABS_TV_CONFIG: Tab<Href>[] = [
   {
     isDefault: true,
-    route: './(index)',
+    route: './',
     title: 'Home',
     icon: {
       name: 'home-variant-outline',
@@ -68,12 +68,11 @@ const TABS_MOBILE_IGNORED_TABS: string[] = [
   'settings',
   'notifications',
   'film/[link]',
-  'index',
 ];
 
 export const TABS_MOBILE_CONFIG: Tab<string>[] = [
   {
-    route: '(index)',
+    route: 'index',
     title: 'Home',
     icon: {
       name: 'home-variant-outline',

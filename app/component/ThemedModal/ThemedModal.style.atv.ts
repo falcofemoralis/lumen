@@ -1,4 +1,5 @@
 import { NAVIGATION_BAR_TV_WIDTH } from 'Component/NavigationBar/NavigationBar.style.atv';
+import Colors from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
@@ -9,7 +10,7 @@ export const styles = CreateStyles({
     right: NAVIGATION_BAR_TV_WIDTH,
     bottom: 0,
     justifyContent: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: Colors.modal,
     zIndex: 1000,
   },
   container: {

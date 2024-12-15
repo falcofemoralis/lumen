@@ -1,6 +1,5 @@
 import { NUMBER_OF_COLUMNS_TV } from 'Component/FilmGrid/FilmGrid.config';
 import { ROW_GAP } from 'Component/FilmGrid/FilmGrid.style.atv';
-import { useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import Colors from 'Style/Colors';
 import CreateStyles, { scale } from 'Util/CreateStyles';
 import { getWindowWidth } from 'Util/Window';
@@ -71,43 +70,17 @@ export const styles = CreateStyles({
     zIndex: 10,
     paddingHorizontal: 8,
     paddingVertical: 1,
-    fontSize: 12,
+    fontSize: 10,
     borderTopLeftRadius: 8,
   },
-  infoText: {
+  filmAdditionalText: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     zIndex: 10,
     paddingHorizontal: 8,
     paddingVertical: 1,
-    fontSize: 12,
+    fontSize: 10,
     borderBottomRightRadius: 8,
   },
 });
-
-export const ScaleAnimation = ({
-  isFocused = false,
-  children,
-}: {
-  isFocused?: boolean;
-  children: (style: any) => React.ReactElement;
-}) => {
-  const duration = 200;
-
-  const animatedScaleStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        {
-          scale: withTiming(isFocused ? FOCUSED_SCALE : DEFAULT_SCALE, {
-            duration,
-          }),
-        },
-      ],
-    };
-  });
-
-  return children({
-    animatedScaleStyle,
-  });
-};

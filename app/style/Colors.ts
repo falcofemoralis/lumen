@@ -1,5 +1,5 @@
 export const Colors = {
-  primary: '#E50000',
+  primary: '#004A77', //'#E50000',
   background: '#000000',
   lightBackground: '#1A1A1A',
   white: '#E3E3E3',
@@ -11,6 +11,7 @@ export const Colors = {
   blue: '#004A77',
   lightBlue: '#C2E7FF',
   darkBlue: '#001E30',
+  modal: 'rgba(0, 0, 0, 0.6)',
 };
 
 export const ThemeColors = {

@@ -11,5 +11,6 @@ export const styles = CreateStyles({
   rowStyle: {
     gap: ROW_GAP,
     flex: 1,
+    backgroundColor: Colors.background,
   },
 });

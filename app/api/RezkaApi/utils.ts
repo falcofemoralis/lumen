@@ -28,7 +28,10 @@ export const parseFilmCard = ($: CheerioAPI, el: Element): FilmCardInterface => 
   const poster = $(el).find('.b-content__inline_item-cover img').attr('src') ?? '';
   const title = $(el).find('.b-content__inline_item-link a').text() ?? '';
   const subtitle = $(el).find('.b-content__inline_item-link div').text() ?? '';
-  const info = $(el).find('.b-content__inline_item-cover .info').text();
+  const info = ($(el).find('.b-content__inline_item-cover .info').html() ?? '').replaceAll(
+    '<br/>',
+    ', '
+  );
 
   return {
     id,
