@@ -1,7 +1,7 @@
 import { withTV } from 'Hooks/withTV';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useRef, useState } from 'react';
-import PagerView from 'react-native-pager-view';
+import { PagerViewOnPageSelectedEvent } from 'react-native-pager-view';
 import NotificationStore from 'Store/Notification.store';
 import ServiceStore from 'Store/Service.store';
 import { PagerItemInterface } from 'Type/PagerItem.interface';
@@ -11,8 +11,6 @@ import HomePageComponentTV from './HomePage.component.atv';
 
 export function HomePageContainer() {
   const [isLoading, setIsLoading] = useState(false);
-  const debounce = useRef<NodeJS.Timeout | undefined>();
-  const pagerViewRef = useRef<PagerView>(null);
   const [pagerItems, setPagerItems] = useState<PagerItemInterface[]>(
     ServiceStore.getCurrentService()
       .getHomeMenu()
@@ -27,6 +25,7 @@ export function HomePageContainer() {
       }))
   );
   const [selectedPageItemId, setSelectedPageItemId] = useState<number>(pagerItems[0].key);
+  const debounce = useRef<NodeJS.Timeout | undefined>();
 
   useEffect(() => {
     console.log('use effect');
@@ -64,8 +63,6 @@ export function HomePageContainer() {
           isRefresh,
         });
 
-      console.log('isUpdate');
-
       const updatedFilms = isUpdate ? newFilms : Array.from(films ?? []).concat(newFilms);
 
       const newPagerItems = Array.from(pagerItems);
@@ -101,24 +98,9 @@ export function HomePageContainer() {
   };
 
   const handleMenuItemChange = (pagerItem: PagerItemInterface) => {
-    const { key, films } = pagerItem;
+    const { key } = pagerItem;
 
     if (key !== selectedPageItemId) {
-      //setSelectedPageItemId(key);
-      //pagerViewRef.current?.setPage(key - 1);
-
-      // if (!films) {
-      //   setTimeout(() => {
-      //     const newPagerItems = Array.from(pagerItems);
-      //     newPagerItems[key - 1] = {
-      //       ...newPagerItems[key - 1],
-      //       films: [],
-      //     };
-
-      //     setPagerItems(newPagerItems);
-      //   }, 0);
-      // }
-
       clearTimeout(debounce.current);
 
       debounce.current = setTimeout(() => {
@@ -128,16 +110,42 @@ export function HomePageContainer() {
     }
   };
 
+  const handlePagerScroll = (e: PagerViewOnPageSelectedEvent) => {
+    const {
+      nativeEvent: { position },
+    } = e;
+    const pagerItem = pagerItems[position];
+    const { key, films } = pagerItem;
+
+    if (key !== selectedPageItemId) {
+      if (!films) {
+        console.log('handlePagerScroll');
+
+        const newPagerItems = Array.from(pagerItems);
+        newPagerItems[key - 1] = {
+          ...newPagerItems[key - 1],
+          films: [],
+        };
+
+        setPagerItems(newPagerItems);
+
+        loadFilms(pagerItem, { currentPage: 1, totalPages: 1 }, true);
+      }
+
+      setSelectedPageItemId(key);
+    }
+  };
+
   const containerFunctions = {
-    handleMenuItemChange,
     onNextLoad,
+    handleMenuItemChange,
+    handlePagerScroll,
   };
 
   const containerProps = () => {
     return {
       pagerItems,
       selectedPagerItem: getSelectedPagerItem(),
-      pagerViewRef,
       isLoading,
     };
   };

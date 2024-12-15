@@ -20,6 +20,11 @@ export interface FilmGridComponentProps {
   onRefresh?: () => void;
 }
 
+export interface FilmGridRowProps {
+  item: FilmCardInterface[];
+  handleOnPress: (film: FilmCardInterface) => void;
+}
+
 export type FilmGridItem = FilmCardInterface & {
   isThumbnail?: boolean;
 };

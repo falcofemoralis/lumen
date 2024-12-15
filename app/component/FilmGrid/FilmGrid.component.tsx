@@ -1,80 +1,101 @@
-import ThemedView from 'Component/ThemedView';
+import FilmCard from 'Component/FilmCard';
+import FilmCardInterface from 'Type/FilmCard.interface';
 import { noopFn } from 'Util/Function';
-import { useMemo } from 'react';
+import React, { memo, useCallback } from 'react';
 import {
   DimensionValue,
+  FlatList,
+  ListRenderItem,
   NativeScrollEvent,
   NativeSyntheticEvent,
   RefreshControl,
-  ScrollView,
   TouchableOpacity,
+  View,
 } from 'react-native';
 import {
   NUMBER_OF_COLUMNS,
   SCROLL_EVENT_END_PADDING,
   SCROLL_EVENT_UPDATES_MS,
 } from './FilmGrid.config';
-import { styles } from './FilmGrid.style';
-import { FilmGridComponentProps } from './FilmGrid.type';
-import FilmCard from 'Component/FilmCard';
-import ThemedText from 'Component/ThemedText';
+import { FilmGridComponentProps, FilmGridRowProps } from './FilmGrid.type';
+
+function GridRow({ item, handleOnPress }: FilmGridRowProps) {
+  console.log('render row ', item[0].title);
+
+  return (
+    <View
+      style={{
+        flex: 1,
+        flexDirection: 'row',
+        width: '100%',
+      }}
+    >
+      {item.map((film, idx) => (
+        <TouchableOpacity
+          key={`${film.id}-item-${idx}`}
+          style={{ width: (100 / NUMBER_OF_COLUMNS + '%') as DimensionValue }}
+          onPress={() => handleOnPress(film)}
+        >
+          <FilmCard filmCard={film} />
+        </TouchableOpacity>
+      ))}
+    </View>
+  );
+}
+
+function rowPropsAreEqual(prevProps: FilmGridRowProps, props: FilmGridRowProps) {
+  return prevProps.item[0].id === props.item[0].id;
+}
+
+const MemoizedGridRow = memo(GridRow, rowPropsAreEqual);
 
 export function GridComponent(props: FilmGridComponentProps) {
   const { rows, handleOnPress, onScrollEnd, onRefresh = noopFn, isRefreshing = false } = props;
 
-  const isCloseToBottom = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
-    const paddingToBottom = SCROLL_EVENT_END_PADDING;
+  const onScroll = useCallback(
+    async (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const isCloseToBottom = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+        const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
+        const paddingToBottom = SCROLL_EVENT_END_PADDING;
 
-    return layoutMeasurement.height + contentOffset.y >= contentSize.height - paddingToBottom;
-  };
+        return layoutMeasurement.height + contentOffset.y >= contentSize.height - paddingToBottom;
+      };
 
-  const onScroll = async (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    if (isCloseToBottom(event)) {
-      onScrollEnd();
-    }
-  };
+      if (isCloseToBottom(event)) {
+        onScrollEnd();
+      }
+    },
+    [onScrollEnd]
+  );
 
-  const memoizedRows = useMemo(() => {
-    return rows.map((row, index) => (
-      <ThemedView
-        key={index}
-        style={{
-          flex: 1,
-          flexDirection: 'row',
-          width: '100%',
-        }}
-      >
-        {row.map((film) => (
-          <TouchableOpacity
-            key={film.id}
-            style={{ width: (100 / NUMBER_OF_COLUMNS + '%') as DimensionValue }}
-            onPress={() => handleOnPress(film)}
-          >
-            <FilmCard filmCard={film} />
-          </TouchableOpacity>
-        ))}
-      </ThemedView>
-    ));
-  }, [rows, handleOnPress]);
+  const renderRow: ListRenderItem<FilmCardInterface[]> = useCallback(
+    ({ item }) => {
+      return (
+        <MemoizedGridRow
+          item={item}
+          handleOnPress={handleOnPress}
+        />
+      );
+    },
+    [handleOnPress]
+  );
 
   return (
-    <ScrollView
-      contentContainerStyle={styles.scrollView}
+    <FlatList
+      data={rows}
+      renderItem={renderRow}
+      keyExtractor={(item, idx) => `${item[0].id}-row-${idx}`}
+      onScroll={onScroll}
+      scrollEventThrottle={SCROLL_EVENT_UPDATES_MS}
       refreshControl={
         <RefreshControl
           refreshing={isRefreshing}
           onRefresh={onRefresh}
         />
       }
-      onScroll={onScroll}
-      scrollEventThrottle={SCROLL_EVENT_UPDATES_MS}
-    >
-      <ThemedView style={{ flex: 1, flexDirection: 'column', width: '100%' }}>
-        {memoizedRows}
-      </ThemedView>
-      <ThemedText>Loading...</ThemedText>
-    </ScrollView>
+      removeClippedSubviews={true}
+      initialNumToRender={5}
+    />
   );
 }
 

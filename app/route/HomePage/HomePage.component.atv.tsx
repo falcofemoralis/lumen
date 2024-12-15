@@ -4,29 +4,20 @@ import ThemedButton from 'Component/ThemedButton';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedView from 'Component/ThemedView';
 import React from 'react';
-import { View } from 'react-native';
-import PagerView from 'react-native-pager-view';
+import { ActivityIndicator } from 'react-native-paper';
 import {
   DefaultFocus,
   SpatialNavigationFocusableView,
   SpatialNavigationScrollView,
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
+import Colors from 'Style/Colors';
 import { PagerItemInterface } from 'Type/PagerItem.interface';
 import { styles } from './HomePage.style.atv';
 import { HomePageProps } from './HomePage.type';
-import { ActivityIndicator } from 'react-native-paper';
-import Colors from 'Style/Colors';
 
 export function HomePageComponent(props: HomePageProps) {
-  const {
-    pagerViewRef,
-    pagerItems,
-    selectedPagerItem,
-    isLoading,
-    onNextLoad,
-    handleMenuItemChange,
-  } = props;
+  const { pagerItems, selectedPagerItem, isLoading, onNextLoad, handleMenuItemChange } = props;
 
   const renderPage = () => {
     const { films, pagination } = selectedPagerItem;
@@ -45,12 +36,6 @@ export function HomePageComponent(props: HomePageProps) {
       </ThemedView>
     );
   };
-
-  // const renderPages = () => {
-  //   return pagerItems.map((item) => {
-  //     return <View key={item.key}>{renderPage(item)}</View>;
-  //   });
-  // };
 
   const renderMenuItem = (item: PagerItemInterface) => {
     const {
