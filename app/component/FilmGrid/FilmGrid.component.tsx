@@ -8,8 +8,8 @@ import {
   ListRenderItem,
   NativeScrollEvent,
   NativeSyntheticEvent,
+  Pressable,
   RefreshControl,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import {
@@ -31,13 +31,16 @@ function GridRow({ item, handleOnPress }: FilmGridRowProps) {
       }}
     >
       {item.map((film, idx) => (
-        <TouchableOpacity
+        <Pressable
           key={`${film.id}-item-${idx}`}
           style={{ width: (100 / NUMBER_OF_COLUMNS + '%') as DimensionValue }}
           onPress={() => handleOnPress(film)}
         >
-          <FilmCard filmCard={film} />
-        </TouchableOpacity>
+          <FilmCard
+            filmCard={film}
+            isThumbnail={film.isThumbnail}
+          />
+        </Pressable>
       ))}
     </View>
   );

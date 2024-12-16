@@ -13,7 +13,7 @@ export interface FilmGridContainerProps {
 
 export interface FilmGridComponentProps {
   films: FilmCardInterface[];
-  rows: FilmCardInterface[][];
+  rows: FilmGridItem[][];
   isRefreshing?: boolean;
   handleOnPress: (film: FilmCardInterface) => void;
   onScrollEnd: () => void;
@@ -21,7 +21,7 @@ export interface FilmGridComponentProps {
 }
 
 export interface FilmGridRowProps {
-  item: FilmCardInterface[];
+  item: FilmGridItem[];
   handleOnPress: (film: FilmCardInterface) => void;
 }
 

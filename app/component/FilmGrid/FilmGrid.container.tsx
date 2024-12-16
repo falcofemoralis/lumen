@@ -39,15 +39,15 @@ export function GridContainer(props: FilmGridContainerProps) {
   const calculateRows = () => {
     const numberOfColumns = ConfigStore.isTV ? NUMBER_OF_COLUMNS_TV : NUMBER_OF_COLUMNS;
 
-    const columns: FilmCardInterface[][] = Array.from({ length: numberOfColumns }, () => []);
+    const columns: FilmGridItem[][] = Array.from({ length: numberOfColumns }, () => []);
 
     getFilms().forEach((film, index) => {
       columns[index % numberOfColumns].push(film);
     });
 
-    const rows: FilmCardInterface[][] = [];
+    const rows: FilmGridItem[][] = [];
     for (let i = 0; i < columns[0].length; i++) {
-      const row: FilmCardInterface[] = [];
+      const row: FilmGridItem[] = [];
       for (let j = 0; j < numberOfColumns; j++) {
         if (columns[j][i] !== undefined) {
           row.push(columns[j][i]);

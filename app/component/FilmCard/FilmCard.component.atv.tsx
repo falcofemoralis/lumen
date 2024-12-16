@@ -37,37 +37,61 @@ export function FilmCardComponent(props: FilmCardComponentProps) {
     }
 
     return (
-      <ThemedText style={[styles.filmAdditionalText, { backgroundColor: FILM_TYPE_COLORS[type] }]}>
+      <ThemedText
+        style={[
+          styles.filmAdditionalText,
+          { backgroundColor: FILM_TYPE_COLORS[type] },
+          isFocused && styles.posterFocused,
+        ]}
+      >
         {info}
+      </ThemedText>
+    );
+  };
+
+  const renderPoster = () => {
+    return (
+      <ThemedView style={{ height: CARD_HEIGHT_TV - INFO_HEIGHT }}>
+        {renderType()}
+        <ThemedImage
+          style={[styles.poster, isFocused && styles.posterFocused]}
+          src={poster}
+        />
+        {renderFilmAdditionalText()}
+      </ThemedView>
+    );
+  };
+
+  const renderTitle = () => {
+    return (
+      <ThemedText
+        style={[styles.title, isFocused ? styles.titleFocused : styles.title]}
+        numberOfLines={2}
+      >
+        {title}
+      </ThemedText>
+    );
+  };
+
+  const renderSubtitle = () => {
+    return (
+      <ThemedText
+        style={[styles.subtitle, isFocused ? styles.subtitleFocused : styles.subtitle]}
+        numberOfLines={2}
+      >
+        {subtitle}
       </ThemedText>
     );
   };
 
   return (
     <Animated.View style={[styles.card, { height: CARD_HEIGHT_TV }, scaleAnimation, style]}>
-      <ThemedView style={(styles.posterWrapper, { height: CARD_HEIGHT_TV - INFO_HEIGHT })}>
-        {renderType()}
-        <ThemedImage
-          style={styles.poster}
-          src={poster}
-        />
-        {renderFilmAdditionalText()}
-      </ThemedView>
+      {renderPoster()}
       <ThemedView
         style={[styles.info, { height: INFO_HEIGHT }, isFocused ? styles.infoFocused : styles.info]}
       >
-        <ThemedText
-          style={[styles.title, isFocused ? styles.titleFocused : styles.title]}
-          numberOfLines={2}
-        >
-          {title}
-        </ThemedText>
-        <ThemedText
-          style={[styles.subtitle, isFocused ? styles.subtitleFocused : styles.subtitle]}
-          numberOfLines={2}
-        >
-          {subtitle}
-        </ThemedText>
+        {renderTitle()}
+        {renderSubtitle()}
       </ThemedView>
     </Animated.View>
   );

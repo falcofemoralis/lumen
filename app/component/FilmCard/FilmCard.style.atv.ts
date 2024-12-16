@@ -14,29 +14,33 @@ export const INFO_HEIGHT = scale(60) + scale(INFO_PADDING) + scale(INFO_PADDING_
 export const CARD_HEIGHT_TV = POSTER_HEIGHT + INFO_HEIGHT;
 export const DEFAULT_SCALE = 1;
 export const FOCUSED_SCALE = 1.1;
-export const BORDER_RADIUS = 15;
+export const BORDER_RADIUS = 10;
 
 export const styles = CreateStyles({
   card: {
     flex: 1,
     flexDirection: 'column',
     width: '100%',
-  },
-  posterWrapper: {
-    width: '100%',
+    borderRadius: BORDER_RADIUS,
     overflow: 'hidden',
-    position: 'relative',
+  },
+  cardThumbnail: {
+    backgroundColor: Colors.lightBackground,
+    borderRadius: BORDER_RADIUS,
   },
   poster: {
     height: '100%',
     width: '100%',
     borderRadius: BORDER_RADIUS,
+    overflow: 'hidden',
+  },
+  posterFocused: {
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
   },
   info: {
     width: '100%',
     backgroundColor: Colors.transparent,
-    borderEndEndRadius: BORDER_RADIUS,
-    borderStartEndRadius: BORDER_RADIUS,
     padding: INFO_PADDING,
     paddingTop: INFO_PADDING_TOP,
   },
@@ -59,10 +63,6 @@ export const styles = CreateStyles({
   subtitleFocused: {
     color: Colors.darkGray,
   },
-  cardThumbnail: {
-    backgroundColor: Colors.lightBackground,
-    borderRadius: BORDER_RADIUS,
-  },
   typeText: {
     position: 'absolute',
     top: 0,
@@ -71,16 +71,17 @@ export const styles = CreateStyles({
     paddingHorizontal: 8,
     paddingVertical: 1,
     fontSize: 10,
-    borderTopLeftRadius: 8,
+    borderBottomLeftRadius: 8,
   },
   filmAdditionalText: {
     position: 'absolute',
-    bottom: 0,
+    bottom: -1,
     left: 0,
     zIndex: 10,
     paddingHorizontal: 8,
     paddingVertical: 1,
     fontSize: 10,
-    borderBottomRightRadius: 8,
+    borderTopRightRadius: 8,
+    borderBottomLeftRadius: BORDER_RADIUS,
   },
 });
