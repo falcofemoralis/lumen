@@ -10,4 +10,15 @@ export const styles = CreateStyles({
     width: '100%',
     height: 200,
   },
+  menuListWrapper: {
+    flex: 1,
+  },
+  menuItem: {
+    padding: 10,
+  },
+  menuItemSelected: {
+    backgroundColor: 'red',
+  },
+  menuItemText: {},
+  menuItemTextSelected: {},
 });

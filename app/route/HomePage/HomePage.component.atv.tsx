@@ -72,18 +72,20 @@ export function HomePageComponent(props: HomePageProps) {
 
   const renderTopMenu = () => {
     return (
-      <SpatialNavigationScrollView
-        horizontal
-        offsetFromStart={20}
-        style={styles.menuListScroll}
-      >
-        <SpatialNavigationView
-          direction="horizontal"
-          style={styles.menuList}
+      <ThemedView style={styles.menuListWrapper}>
+        <SpatialNavigationScrollView
+          horizontal
+          offsetFromStart={20}
+          style={styles.menuListScroll}
         >
-          {renderMenuItems()}
-        </SpatialNavigationView>
-      </SpatialNavigationScrollView>
+          <SpatialNavigationView
+            direction="horizontal"
+            style={styles.menuList}
+          >
+            {renderMenuItems()}
+          </SpatialNavigationView>
+        </SpatialNavigationScrollView>
+      </ThemedView>
     );
   };
 
@@ -101,15 +103,8 @@ export function HomePageComponent(props: HomePageProps) {
   return (
     <Page testId="homePage">
       {renderLoader()}
-      <ThemedView style={styles.menuListWrapper}>{renderTopMenu()}</ThemedView>
-      {/* <PagerView
-        ref={pagerViewRef}
-        style={styles.pagerView}
-        initialPage={0}
-        scrollEnabled={false}
-      > */}
+      {renderTopMenu()}
       {renderPage()}
-      {/* </PagerView> */}
     </Page>
   );
 }
