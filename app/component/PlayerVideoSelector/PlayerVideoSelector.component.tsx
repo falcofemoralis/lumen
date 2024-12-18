@@ -1,10 +1,10 @@
 import ThemedModal from 'Component/ThemedModal';
 import ThemedText from 'Component/ThemedText';
 import { Button } from 'react-native-paper';
-import { styles } from './FilmVideoSelector.style';
-import { FilmVideoSelectorComponentProps } from './FilmVideoSelector.type';
+import { styles } from './PlayerVideoSelector.style';
+import { PlayerVideoSelectorComponentProps } from './PlayerVideoSelector.type';
 
-export function FilmVideoSelectorComponent(props: FilmVideoSelectorComponentProps) {
+export function PlayerVideoSelectorComponent(props: PlayerVideoSelectorComponentProps) {
   const {
     visible,
     voices,
@@ -88,4 +88,4 @@ export function FilmVideoSelectorComponent(props: FilmVideoSelectorComponentProp
   );
 }
 
-export default FilmVideoSelectorComponent;
+export default PlayerVideoSelectorComponent;

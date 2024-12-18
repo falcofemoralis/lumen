@@ -2,10 +2,10 @@ import ThemedButton from 'Component/ThemedButton';
 import ThemedModal from 'Component/ThemedModal';
 import ThemedText from 'Component/ThemedText';
 import { DefaultFocus, SpatialNavigationView } from 'react-tv-space-navigation';
-import { styles } from './FilmVideoSelector.style.atv';
-import { FilmVideoSelectorComponentProps } from './FilmVideoSelector.type';
+import { styles } from './PlayerVideoSelector.style.atv';
+import { PlayerVideoSelectorComponentProps } from './PlayerVideoSelector.type';
 
-export function FilmVideoSelectorComponent(props: FilmVideoSelectorComponentProps) {
+export function PlayerVideoSelectorComponent(props: PlayerVideoSelectorComponentProps) {
   const {
     visible,
     voices,
@@ -112,4 +112,4 @@ export function FilmVideoSelectorComponent(props: FilmVideoSelectorComponentProp
   );
 }
 
-export default FilmVideoSelectorComponent;
+export default PlayerVideoSelectorComponent;

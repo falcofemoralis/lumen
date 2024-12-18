@@ -3,11 +3,11 @@ import { useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
 import ServiceStore from 'Store/Service.store';
 import { EpisodeInterface, FilmVoiceInterface, SeasonInterface } from 'Type/FilmVoice.interface';
-import FilmVideoSelectorComponent from './FilmVideoSelector.component';
-import FilmVideoSelectorComponentTV from './FilmVideoSelector.component.atv';
-import { FilmVideoSelectorContainerProps } from './FilmVideoSelector.type';
+import PlayerVideoSelectorComponent from './PlayerVideoSelector.component';
+import FilmVideoSelectorComponentTV from './PlayerVideoSelector.component.atv';
+import { PlayerVideoSelectorContainerProps } from './PlayerVideoSelector.type';
 
-export function FilmVideoSelectorContainer(props: FilmVideoSelectorContainerProps) {
+export function PlayerVideoSelectorContainer(props: PlayerVideoSelectorContainerProps) {
   const { visible, onHide, film, onSelect } = props;
   const { voices = [] } = film;
   const [isLoading, setIsLoading] = useState(false);
@@ -117,10 +117,10 @@ export function FilmVideoSelectorContainer(props: FilmVideoSelectorContainerProp
     handleOnPlay,
   };
 
-  return withTV(FilmVideoSelectorComponentTV, FilmVideoSelectorComponent, {
+  return withTV(FilmVideoSelectorComponentTV, PlayerVideoSelectorComponent, {
     ...containerProps(),
     ...containerFunctions,
   });
 }
 
-export default FilmVideoSelectorContainer;
+export default PlayerVideoSelectorContainer;

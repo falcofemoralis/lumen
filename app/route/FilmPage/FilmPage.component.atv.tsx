@@ -1,4 +1,4 @@
-import FilmVideoSelector from 'Component/FilmVideoSelector';
+import PlayerVideoSelector from 'Component/PlayerVideoSelector';
 import Page from 'Component/Page';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedImage from 'Component/ThemedImage';
@@ -41,7 +41,7 @@ export function FilmPageComponent(props: FilmPageComponentProps) {
     );
   };
 
-  const renderVideoSelector = () => {
+  const renderPlayerVideoSelector = () => {
     if (!film) {
       return null;
     }
@@ -53,7 +53,7 @@ export function FilmPageComponent(props: FilmPageComponentProps) {
     }
 
     return (
-      <FilmVideoSelector
+      <PlayerVideoSelector
         film={film}
         visible={isSelectorVisible}
         onHide={hideVideoSelector}
@@ -89,7 +89,7 @@ export function FilmPageComponent(props: FilmPageComponentProps) {
   };
 
   const renderModals = () => {
-    return renderVideoSelector();
+    return renderPlayerVideoSelector();
   };
 
   return (

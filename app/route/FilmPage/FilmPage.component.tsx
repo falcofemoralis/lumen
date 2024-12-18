@@ -1,4 +1,4 @@
-import FilmVideoSelector from 'Component/FilmVideoSelector';
+import FilmVideoSelector from 'Component/PlayerVideoSelector';
 import Page from 'Component/Page';
 import Player from 'Component/Player';
 import ThemedImage from 'Component/ThemedImage';

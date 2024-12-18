@@ -2,14 +2,14 @@ import FilmInterface from 'Type/Film.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { EpisodeInterface, FilmVoiceInterface, SeasonInterface } from 'Type/FilmVoice.interface';
 
-export type FilmVideoSelectorContainerProps = {
+export type PlayerVideoSelectorContainerProps = {
   film: FilmInterface;
   visible: boolean;
   onHide: () => void;
   onSelect: (video: FilmVideoInterface) => void;
 };
 
-export type FilmVideoSelectorComponentProps = {
+export type PlayerVideoSelectorComponentProps = {
   voices: FilmVoiceInterface[];
   visible: boolean;
   onHide: () => void;
