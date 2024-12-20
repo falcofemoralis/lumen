@@ -1,5 +1,5 @@
 Global
-Parsing         https://github.com/cheeriojs/cheerio
+Parsing         https://github.com/ashi009/node-fast-html-parser
 Animations      https://docs.swmansion.com/react-native-reanimated/docs/fundamentals/getting-started/
 Icons           https://icons.expo.fyi/Index
 Player          https://docs.expo.dev/versions/latest/sdk/video-av/

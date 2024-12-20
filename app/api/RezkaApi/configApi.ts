@@ -1,9 +1,9 @@
-import { Variables } from './../../util/Request/index';
 import { ApiServiceType, ConfigApiInterface } from 'Api/index';
 import { FilmStreamInterface } from 'Type/FilmStream.interface';
 import { parseHtml } from 'Util/Parser';
 import { executeGet, executePost } from 'Util/Request';
 import { updateUrlHost } from 'Util/Url';
+import { Variables } from './../../util/Request/index';
 
 const configApi: ConfigApiInterface = {
   serviceType: ApiServiceType.rezka,
@@ -48,7 +48,7 @@ const configApi: ConfigApiInterface = {
    * @param query
    * @param variables
    * @param ignoreCache
-   * @returns DOM doc
+   * @returns HTMLElement
    */
   async fetchPage(query: string, variables: Variables = {}, ignoreCache = false) {
     const res = await executeGet(

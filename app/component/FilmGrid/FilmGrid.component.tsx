@@ -20,8 +20,6 @@ import {
 import { FilmGridComponentProps, FilmGridRowProps } from './FilmGrid.type';
 
 function GridRow({ item, handleOnPress }: FilmGridRowProps) {
-  console.log('render row ', item[0].title);
-
   return (
     <View
       style={{

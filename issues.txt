@@ -1,2 +1,0 @@
-1. Fix "attempted to import the Node standard library module "node:stream"."
-https://github.com/cheeriojs/cheerio/pull/4033

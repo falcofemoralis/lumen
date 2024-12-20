@@ -10,6 +10,7 @@ import { parseHtml } from 'Util/Parser';
 import { Variables } from 'Util/Request';
 import configApi from './configApi';
 import { parseFilmCard, parseSeasons, parseStreams } from './utils';
+import NotificationStore from 'Store/Notification.store';
 
 const filmApi: FilmApiInterface = {
   /**
@@ -27,27 +28,40 @@ const filmApi: FilmApiInterface = {
     const { key, isRefresh } = params || {};
     const films: FilmCardInterface[] = [];
 
-    const $ = await configApi.fetchPage(
+    const t0 = performance.now();
+    const root = await configApi.fetchPage(
       `${path === '/' ? '' : path}/page/${page}/`,
       variables,
       isRefresh
     );
 
-    const content = $(key);
+    const content = key ? root.querySelector(key) : root;
 
-    const filmElements = key
-      ? $(content).find('div.b-content__inline_item')
-      : $('div.b-content__inline_item');
+    if (!content) {
+      return {
+        films,
+        totalPages: 1,
+      };
+    }
 
-    filmElements.each((_idx, el) => {
-      films.push(parseFilmCard($, el));
+    const filmElements = content.querySelectorAll('.b-content__inline_item');
+
+    filmElements.forEach((el) => {
+      const film = parseFilmCard(el);
+
+      if (film) {
+        films.push(film);
+      }
     });
+    const t1 = performance.now();
+    NotificationStore.displayMessage('Fetch films took ' + (t1 - t0) + ' milliseconds.');
 
-    const navs = $('div.b-navigation a');
+    const navs = content.querySelectorAll('.b-navigation a');
+
     let totalPages = 1;
-    navs.each((idx, el) => {
+    navs.forEach((el, idx) => {
       if (idx === navs.length - 2) {
-        totalPages = Number($(el).text());
+        totalPages = Number(el.rawText);
       }
     });
 
@@ -62,101 +76,103 @@ const filmApi: FilmApiInterface = {
    * @param link
    * @returns Film
    */
-  async getFilm(link: string): Promise<FilmInterface> {
-    const $ = await configApi.fetchPage(link);
+  async getFilm(link: string): Promise<FilmInterface | null> {
+    return null;
 
-    // base data
-    const id = $('#user-favorites-holder').attr('data-post_id') ?? '';
-    const title = $('div.b-post__title h1').text() ?? '';
-    const poster = $('div.b-sidecover img').attr('src') ?? '';
+    // const $ = await configApi.fetchPage(link);
 
-    const film: FilmInterface = {
-      id,
-      link,
-      type: FilmType.Film,
-      title,
-      poster,
-      voices: [],
-      hasVoices: false,
-      hasSeasons: false,
-    };
+    // // base data
+    // const id = $('#user-favorites-holder').attr('data-post_id') ?? '';
+    // const title = $('div.b-post__title h1').text() ?? '';
+    // const poster = $('div.b-sidecover img').attr('src') ?? '';
 
-    // player data
-    $('li.b-translator__item').each((_idx, el) => {
-      const voice: FilmVoiceInterface = {
-        id: $(el).attr('data-translator_id') ?? '',
-        title: $(el).attr('title') ?? '',
-        img: $(el).find('img').attr('src'),
-        isCamrip: $(el).attr('data-camrip') ?? '0',
-        isDirector: $(el).attr('data-director') ?? '0',
-        isAds: $(el).attr('data-ads') ?? '0',
-        isActive: $(el).attr('class')?.includes('active') ?? false,
-        isPremium: $(el).hasClass('b-prem_translator'),
-      };
+    // const film: FilmInterface = {
+    //   id,
+    //   link,
+    //   type: FilmType.Film,
+    //   title,
+    //   poster,
+    //   voices: [],
+    //   hasVoices: false,
+    //   hasSeasons: false,
+    // };
 
-      film.voices.push({
-        ...voice,
-        ...(voice.isActive ? parseSeasons($) : {}),
-      });
-    });
+    // // player data
+    // $('li.b-translator__item').each((_idx, el) => {
+    //   const voice: FilmVoiceInterface = {
+    //     id: $(el).attr('data-translator_id') ?? '',
+    //     title: $(el).attr('title') ?? '',
+    //     img: $(el).find('img').attr('src'),
+    //     isCamrip: $(el).attr('data-camrip') ?? '0',
+    //     isDirector: $(el).attr('data-director') ?? '0',
+    //     isAds: $(el).attr('data-ads') ?? '0',
+    //     isActive: $(el).attr('class')?.includes('active') ?? false,
+    //     isPremium: $(el).hasClass('b-prem_translator'),
+    //   };
 
-    const { voices } = film;
+    //   film.voices.push({
+    //     ...voice,
+    //     ...(voice.isActive ? parseSeasons($) : {}),
+    //   });
+    // });
 
-    if (!voices.length) {
-      const isMovie = $('meta[property=og:type]').attr('content')?.includes('video.movie');
-      const stringedDoc = $.html();
+    // const { voices } = film;
 
-      if (isMovie) {
-        const index = stringedDoc.indexOf('initCDNMoviesEvents');
-        const subString = stringedDoc.substring(
-          stringedDoc.indexOf('{"id"', index),
-          stringedDoc.indexOf('});', index) + 1
-        );
-        const jsonObject = JSON.parse(subString);
-        const streams = parseStreams(jsonObject.streams);
-        // subtitles = parseSubtitles(jsonObject.subtitle);
-        // getThumbnails(jsonObject.thumbnails, trans);
+    // if (!voices.length) {
+    //   const isMovie = $('meta[property=og:type]').attr('content')?.includes('video.movie');
+    //   const stringedDoc = $.html();
 
-        const video: FilmVideoInterface = {
-          streams,
-        };
+    //   if (isMovie) {
+    //     const index = stringedDoc.indexOf('initCDNMoviesEvents');
+    //     const subString = stringedDoc.substring(
+    //       stringedDoc.indexOf('{"id"', index),
+    //       stringedDoc.indexOf('});', index) + 1
+    //     );
+    //     const jsonObject = JSON.parse(subString);
+    //     const streams = parseStreams(jsonObject.streams);
+    //     // subtitles = parseSubtitles(jsonObject.subtitle);
+    //     // getThumbnails(jsonObject.thumbnails, trans);
 
-        film.voices.push({
-          id: '',
-          title: '',
-          isCamrip: '0',
-          isDirector: '0',
-          isAds: '0',
-          isActive: true,
-          isPremium: false,
-          video,
-        });
-      } else {
-        const startIndex = stringedDoc.indexOf('initCDNSeriesEvents');
-        let endIndex = stringedDoc.indexOf('{"id"', startIndex);
-        if (endIndex === -1) {
-          endIndex = stringedDoc.indexOf('{"url"', startIndex);
-        }
-        const subString = stringedDoc.substring(startIndex, endIndex);
+    //     const video: FilmVideoInterface = {
+    //       streams,
+    //     };
 
-        film.voices.push({
-          id: subString.split(',')[1].replaceAll(' ', ''),
-          title: '',
-          isCamrip: '0',
-          isDirector: '0',
-          isAds: '0',
-          isActive: true,
-          isPremium: false,
-          ...parseSeasons($),
-        });
-      }
-    }
+    //     film.voices.push({
+    //       id: '',
+    //       title: '',
+    //       isCamrip: '0',
+    //       isDirector: '0',
+    //       isAds: '0',
+    //       isActive: true,
+    //       isPremium: false,
+    //       video,
+    //     });
+    //   } else {
+    //     const startIndex = stringedDoc.indexOf('initCDNSeriesEvents');
+    //     let endIndex = stringedDoc.indexOf('{"id"', startIndex);
+    //     if (endIndex === -1) {
+    //       endIndex = stringedDoc.indexOf('{"url"', startIndex);
+    //     }
+    //     const subString = stringedDoc.substring(startIndex, endIndex);
 
-    const { seasons = [] } = voices.find(({ isActive }) => isActive) ?? {};
-    film.hasSeasons = seasons.length > 0;
-    film.hasVoices = film.voices.length > 1;
+    //     film.voices.push({
+    //       id: subString.split(',')[1].replaceAll(' ', ''),
+    //       title: '',
+    //       isCamrip: '0',
+    //       isDirector: '0',
+    //       isAds: '0',
+    //       isActive: true,
+    //       isPremium: false,
+    //       ...parseSeasons($),
+    //     });
+    //   }
+    // }
 
-    return film;
+    // const { seasons = [] } = voices.find(({ isActive }) => isActive) ?? {};
+    // film.hasSeasons = seasons.length > 0;
+    // film.hasVoices = film.voices.length > 1;
+
+    // return film;
   },
 
   /**
@@ -240,7 +256,7 @@ const filmApi: FilmApiInterface = {
 
     return {
       ...voice,
-      ...parseSeasons($),
+      // ...parseSeasons($),
     };
   },
 

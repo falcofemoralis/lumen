@@ -1,11 +1,11 @@
-import { Variables } from './../util/Request/index';
 import FilmInterface from 'Type/Film.interface';
 import { FilmListInterface } from 'Type/FilmList.interface';
 import { FilmStreamInterface } from 'Type/FilmStream.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { MenuItemInterface } from 'Type/MenuItem.interface';
-import { CheerioAPI } from 'cheerio';
+import { Variables } from './../util/Request/index';
+import { HTMLElementInterface } from 'Util/Parser';
 
 export enum ApiServiceType {
   rezka = 'rezka',
@@ -29,7 +29,11 @@ export interface ConfigApiInterface {
   getCDN(): string;
   setAuthorization(auth: string): void;
   getAuthorization(): HeadersInit;
-  fetchPage(query: string, variables?: Variables, ignoreCache?: boolean): Promise<CheerioAPI>;
+  fetchPage(
+    query: string,
+    variables?: Variables,
+    ignoreCache?: boolean
+  ): Promise<HTMLElementInterface>;
   getRequest(query: string, variables?: Variables): Promise<any>;
   postRequest(query: string, variables?: Variables): Promise<any>;
   modifyCDN(streams: FilmStreamInterface[]): FilmStreamInterface[];
@@ -42,7 +46,7 @@ export interface FilmApiInterface {
     variables?: Variables,
     params?: ApiParams
   ): Promise<FilmListInterface>;
-  getFilm(link: string): Promise<FilmInterface>;
+  getFilm(link: string): Promise<FilmInterface | null>;
   getFilmStreams(film: FilmInterface, voice: FilmVoiceInterface): Promise<FilmVideoInterface>;
   getFilmStreamsByEpisodeId(
     film: FilmInterface,
