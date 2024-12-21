@@ -34,7 +34,7 @@ const SpatialNavigationKeyboardLocker = () => {
   return null;
 };
 
-export function PageComponent({ children, testId }: PageProps) {
+export function PageComponent({ children }: PageProps) {
   const isFocused = useIsFocused();
 
   const isActive = isFocused && !NavigationStore.isNavigationOpened;
@@ -44,10 +44,6 @@ export function PageComponent({ children, testId }: PageProps) {
       NavigationStore.openNavigation();
     }
   };
-
-  // if (testId) {
-  //   console.log(`Page ${testId} is ${isActive}`);
-  // }
 
   return (
     <ThemedView

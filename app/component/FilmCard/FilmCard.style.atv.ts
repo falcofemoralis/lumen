@@ -14,30 +14,21 @@ export const INFO_HEIGHT = scale(60) + scale(INFO_PADDING) + scale(INFO_PADDING_
 export const CARD_HEIGHT_TV = POSTER_HEIGHT + INFO_HEIGHT;
 export const DEFAULT_SCALE = 1;
 export const FOCUSED_SCALE = 1.1;
-export const BORDER_RADIUS = 10;
 
 export const styles = CreateStyles({
   card: {
     flex: 1,
     flexDirection: 'column',
     width: '100%',
-    borderRadius: BORDER_RADIUS,
-    overflow: 'hidden',
   },
   cardThumbnail: {
     backgroundColor: Colors.lightBackground,
-    borderRadius: BORDER_RADIUS,
   },
   poster: {
     height: '100%',
     width: '100%',
-    borderRadius: BORDER_RADIUS,
-    overflow: 'hidden',
   },
-  posterFocused: {
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 0,
-  },
+  posterFocused: {},
   info: {
     width: '100%',
     backgroundColor: Colors.transparent,
@@ -82,6 +73,5 @@ export const styles = CreateStyles({
     paddingVertical: 1,
     fontSize: 10,
     borderTopRightRadius: 8,
-    borderBottomLeftRadius: BORDER_RADIUS,
   },
 });

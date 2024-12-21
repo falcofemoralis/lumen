@@ -51,15 +51,21 @@ const configApi: ConfigApiInterface = {
    * @returns HTMLElement
    */
   async fetchPage(query: string, variables: Variables = {}, ignoreCache = false) {
-    const res = await executeGet(
-      query,
-      this.getProvider(),
-      this.getAuthorization(),
-      variables,
-      ignoreCache
-    );
+    const res = await this.getRequest(query, variables, ignoreCache);
 
     return parseHtml(res);
+  },
+
+  async fetchJson(query: string, variables: Variables = {}) {
+    const result = await this.postRequest(query, variables);
+
+    const json = JSON.parse(result);
+
+    if (!json.success) {
+      throw new Error(json.message);
+    }
+
+    return json;
   },
 
   /**
@@ -68,8 +74,8 @@ const configApi: ConfigApiInterface = {
    * @param variables
    * @returns text
    */
-  async getRequest(query: string, variables: Record<string, string> = {}) {
-    return await executeGet(query, this.getProvider(), this.getAuthorization(), variables);
+  async getRequest(query: string, variables: Variables = {}, ignoreCache = false) {
+    return executeGet(query, this.getProvider(), this.getAuthorization(), variables, ignoreCache);
   },
 
   /**
@@ -78,19 +84,14 @@ const configApi: ConfigApiInterface = {
    * @param variables
    * @returns JSON object
    */
-  async postRequest(query: string, variables: Record<string, string> = {}, ignoreCache = false) {
-    const result = await executePost(
+  async postRequest(query: string, variables: Record<string, string> = {}, ignoreCache = true) {
+    return executePost(
       `${query}/?t=${Date.now()}`,
       this.getProvider(),
       this.getAuthorization(),
-      variables
+      variables,
+      ignoreCache
     );
-
-    if (!result.success) {
-      throw new Error(result.message);
-    }
-
-    return result;
   },
 
   modifyCDN(streams: FilmStreamInterface[]) {

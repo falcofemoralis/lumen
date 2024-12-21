@@ -12,7 +12,7 @@ export function useLocale() {
         i18n.locale = language;
       })
       .catch(() => {
-        //console.log('Error loading language');
+        //console.error('Error loading language');
       })
       .finally(() => {
         setLoaded(true);

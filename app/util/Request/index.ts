@@ -95,13 +95,17 @@ export const executeGet = async (
       }
     }
 
-    const result = await getFetch(uri, headers, signal);
+    const response = await getFetch(uri, headers, signal);
 
-    if (result.status === 503) {
-      throw new Error(result.statusText);
+    if (response.status === 503) {
+      throw new Error(response.statusText);
     }
 
-    const parsedRes = await parseResponse(result);
+    if (response.status === 403) {
+      throw new Error('You are blocked');
+    }
+
+    const parsedRes = await parseResponse(response);
 
     queryCache.set(uriHash, parsedRes);
 
@@ -116,11 +120,21 @@ export const executePost = async (
   endpoint: string,
   headers: HeadersInit,
   variables: Variables,
+  ignoreCache?: boolean,
   signal?: AbortSignal
 ): Promise<any> => {
   const uri = formatURI(query, {}, endpoint);
+  const uriHash = hash(uri).toString();
 
   try {
+    if (!ignoreCache) {
+      const cachedResult = await queryCache.get(uriHash);
+
+      if (cachedResult) {
+        return cachedResult;
+      }
+    }
+
     const formData = new FormData();
 
     Object.entries(variables).forEach(([key, value]) => {
@@ -129,7 +143,11 @@ export const executePost = async (
 
     const response = await postFetch(uri, headers, formData, signal);
 
-    return await parseJSONResponse(response);
+    const parsedRes = await parseResponse(response);
+
+    queryCache.set(uriHash, parsedRes);
+
+    return parsedRes;
   } catch (error) {
     throw new Error(error as string);
   }

@@ -1,8 +1,6 @@
 import Colors from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
-export const BORDER_RADIUS = 12;
-
 export const styles = CreateStyles({
   card: {
     padding: 4,
@@ -13,12 +11,9 @@ export const styles = CreateStyles({
     margin: 2,
     backgroundColor: Colors.lightBackground,
     aspectRatio: '166 / 250',
-    borderRadius: BORDER_RADIUS,
   },
   posterWrapper: {
     width: '100%',
-    overflow: 'hidden',
-    borderRadius: BORDER_RADIUS,
   },
   poster: {
     aspectRatio: '166 / 250',

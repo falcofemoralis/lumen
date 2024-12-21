@@ -1,16 +1,11 @@
-import { PagerViewOnPageSelectedEvent } from 'react-native-pager-view';
-import { PagerItemInterface } from 'Type/PagerItem.interface';
-import { PaginationInterface } from 'Type/Pagination.interface';
+import { FilmListInterface } from 'Type/FilmList.interface';
+import { MenuItemInterface } from 'Type/MenuItem.interface';
 
 export interface HomePageProps {
-  pagerItems: PagerItemInterface[];
-  selectedPagerItem: PagerItemInterface;
-  isLoading: boolean;
-  onNextLoad: (
-    pagination: PaginationInterface,
-    isRefresh?: boolean,
-    isUpdate?: boolean
-  ) => Promise<void>;
-  handleMenuItemChange: (pagerItem: PagerItemInterface) => void;
-  handlePagerScroll: (e: PagerViewOnPageSelectedEvent) => void;
+  menuItems: MenuItemInterface[];
+  onLoadFilms: (
+    menuItem: MenuItemInterface,
+    currentPage: number,
+    isRefresh: boolean
+  ) => Promise<FilmListInterface>;
 }

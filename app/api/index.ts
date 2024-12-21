@@ -34,8 +34,9 @@ export interface ConfigApiInterface {
     variables?: Variables,
     ignoreCache?: boolean
   ): Promise<HTMLElementInterface>;
-  getRequest(query: string, variables?: Variables): Promise<any>;
-  postRequest(query: string, variables?: Variables): Promise<any>;
+  fetchJson(query: string, variables: Variables): Promise<any>;
+  getRequest(query: string, variables?: Variables, ignoreCache?: boolean): Promise<any>;
+  postRequest(query: string, variables?: Variables, ignoreCache?: boolean): Promise<any>;
   modifyCDN(streams: FilmStreamInterface[]): FilmStreamInterface[];
 }
 

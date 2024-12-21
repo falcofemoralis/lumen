@@ -11,7 +11,7 @@ export default function ThemedImage({ src, style }: ThemedImageProps) {
       contentFit="cover"
       placeholderContentFit="cover"
       transition={1000}
-      // onError={(e) => console.log(e.error)}
+      // onError={(e) => console.error(e.error)}
     />
   );
 }

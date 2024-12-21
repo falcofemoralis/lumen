@@ -263,16 +263,30 @@ const filmApi: FilmApiInterface = {
   async getHomeMenuFilms(menuItem: MenuItemInterface, page: number, params?: ApiParams) {
     const { path, key, variables } = menuItem;
 
+    if (key === '.b-newest_slider__wrapper') {
+      const films: FilmCardInterface[] = [];
+      const res = await configApi.postRequest(path, variables, false);
+      const root = parseHtml(`<div>${res}</div>`);
+      const filmElements = root.querySelectorAll('.b-content__inline_item');
+
+      filmElements.forEach((el) => {
+        const film = parseFilmCard(el);
+
+        if (film) {
+          films.push(film);
+        }
+      });
+
+      return {
+        films,
+        totalPages: 1,
+      };
+    }
+
     const filmsList = await this.getFilms(page, path, variables, {
       ...params,
       key,
     });
-
-    if (key === '.b-newest_slider__wrapper') {
-      filmsList.totalPages = 1;
-    }
-
-    console.log(filmsList.films.length);
 
     return filmsList;
   },
