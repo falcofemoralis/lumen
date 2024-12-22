@@ -7,7 +7,7 @@ export function HomePageComponent(props: HomePageProps) {
   const { menuItems, onLoadFilms } = props;
 
   return (
-    <Page testId="homePage">
+    <Page>
       <FilmPager
         menuItems={menuItems}
         onLoadFilms={onLoadFilms}

@@ -8,19 +8,20 @@ export default interface FilmInterface {
   type: FilmType;
   title: string;
   poster: string;
-  year?: string;
+
+  // additional data
+  originalTitle?: string;
+  releaseDate?: string;
   countries?: string[];
   genres?: string[];
   seriesInfo?: string;
-
-  // additional data
   largePoster?: string;
   ratings?: string[]; // type = rating + votes
-  originalTitle?: string;
   description?: string;
   actors?: string[];
   directors?: string[];
   additionalInfo?: string[];
+  duration?: string;
 
   // collections data
   schedule?: string[];

@@ -7,6 +7,7 @@ import { SpatialNavigationRoot, useLockSpatialNavigation } from 'react-tv-space-
 import NavigationStore from 'Store/Navigation.store';
 import { TVEventType } from 'Type/TVEvent.type';
 import { getWindowWidth } from 'Util/Window';
+import { styles } from './Page.style.atv';
 import { PageProps } from './Page.type';
 
 /**
@@ -34,7 +35,8 @@ const SpatialNavigationKeyboardLocker = () => {
   return null;
 };
 
-export function PageComponent({ children }: PageProps) {
+export function PageComponent(props: PageProps) {
+  const { children, style } = props;
   const isFocused = useIsFocused();
 
   const isActive = isFocused && !NavigationStore.isNavigationOpened;
@@ -47,10 +49,13 @@ export function PageComponent({ children }: PageProps) {
 
   return (
     <ThemedView
-      style={{
-        height: '100%',
-        width: getWindowWidth(),
-      }}
+      style={[
+        styles.container,
+        {
+          width: getWindowWidth(),
+        },
+        style,
+      ]}
     >
       <SpatialNavigationRoot
         isActive={isActive}

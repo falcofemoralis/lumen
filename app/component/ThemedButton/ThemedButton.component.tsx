@@ -7,6 +7,7 @@ export default function ThemedButton({ onPress, children, style }: ThemedButtonP
       // icon="camera"
       mode="contained"
       onPress={onPress}
+      style={style}
     >
       {children}
     </Button>

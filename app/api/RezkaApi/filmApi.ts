@@ -2,15 +2,14 @@ import { ApiParams, FilmApiInterface } from 'Api/index';
 import FilmInterface from 'Type/Film.interface';
 import FilmCardInterface from 'Type/FilmCard.interface';
 import { FilmListInterface } from 'Type/FilmList.interface';
-import { FilmType } from 'Type/FilmType.type';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { MenuItemInterface } from 'Type/MenuItem.interface';
 import { parseHtml } from 'Util/Parser';
 import { Variables } from 'Util/Request';
 import configApi from './configApi';
-import { parseFilmCard, parseSeasons, parseStreams } from './utils';
-import NotificationStore from 'Store/Notification.store';
+import { parseFilmCard, parseStreams } from './utils';
+import { FilmType } from 'Type/FilmType.type';
 
 const filmApi: FilmApiInterface = {
   /**
@@ -28,7 +27,6 @@ const filmApi: FilmApiInterface = {
     const { key, isRefresh } = params || {};
     const films: FilmCardInterface[] = [];
 
-    const t0 = performance.now();
     const root = await configApi.fetchPage(
       `${path === '/' ? '' : path}/page/${page}/`,
       variables,
@@ -53,8 +51,6 @@ const filmApi: FilmApiInterface = {
         films.push(film);
       }
     });
-    const t1 = performance.now();
-    NotificationStore.displayMessage('Fetch films took ' + (t1 - t0) + ' milliseconds.');
 
     const navs = content.querySelectorAll('.b-navigation a');
 
@@ -77,27 +73,87 @@ const filmApi: FilmApiInterface = {
    * @returns Film
    */
   async getFilm(link: string): Promise<FilmInterface | null> {
-    return null;
+    const root = await configApi.fetchPage(link);
 
-    // const $ = await configApi.fetchPage(link);
+    // base data
+    const id = root.querySelector('#user-favorites-holder')?.attributes['data-post_id'] ?? '';
+    const title = root.querySelector('.b-post__title h1')?.rawText ?? '';
+    const poster = root.querySelector('.b-sidecover img')?.attributes['src'] ?? '';
 
-    // // base data
-    // const id = $('#user-favorites-holder').attr('data-post_id') ?? '';
-    // const title = $('div.b-post__title h1').text() ?? '';
-    // const poster = $('div.b-sidecover img').attr('src') ?? '';
+    const film: FilmInterface = {
+      id,
+      link,
+      type: FilmType.Film,
+      title,
+      poster,
+      voices: [],
+      hasVoices: false,
+      hasSeasons: false,
+    };
 
-    // const film: FilmInterface = {
-    //   id,
-    //   link,
-    //   type: FilmType.Film,
-    //   title,
-    //   poster,
-    //   voices: [],
-    //   hasVoices: false,
-    //   hasSeasons: false,
-    // };
+    // originalTitle?: string;
+    // year?: string;
+    // countries?: string[];
+    // genres?: string[];
+    // seriesInfo?: string;
+    // largePoster?: string;
+    // ratings?: string[]; // type = rating + votes
+    // description?: string;
+    // actors?: string[];
+    // directors?: string[];
+    // additionalInfo?: string[];
+    // additional data
+    film.originalTitle = root.querySelector('.b-post__origtitle')?.rawText;
 
-    // // player data
+    const infoTable = root.querySelectorAll('.b-post__info tr');
+    infoTable.forEach((el) => {
+      el.childNodes = el.childNodes.filter((node) => node.rawTagName === 'td');
+      const key = el.firstChild?.rawText?.replace(':', '');
+      const value = el.lastChild;
+
+      if (key && value) {
+        switch (key) {
+          case 'Рейтинги':
+            break;
+          case 'Входит в списки':
+            break;
+          case 'Дата выхода':
+            film.releaseDate = value.rawText;
+            break;
+          case 'Страна':
+            film.countries = value.childNodes
+              .filter((node) => node.rawTagName === 'a')
+              .map((node) => node.rawText);
+            break;
+          case 'Режиссер':
+            break;
+          case 'Жанр':
+            film.genres = value.childNodes
+              .filter((node) => node.rawTagName === 'a')
+              .map((node) => node.rawText);
+            break;
+          case 'В качестве':
+            break;
+          case 'В переводе':
+            break;
+          case 'Возраст':
+            break;
+          case 'Время':
+            film.duration = value.rawText;
+            break;
+          case 'Из серии':
+            break;
+          case 'В ролях актеры':
+            break;
+          default:
+            break;
+        }
+      }
+    });
+
+    film.description = root.querySelector('.b-post__description_text')?.rawText;
+
+    // player data
     // $('li.b-translator__item').each((_idx, el) => {
     //   const voice: FilmVoiceInterface = {
     //     id: $(el).attr('data-translator_id') ?? '',
@@ -172,7 +228,7 @@ const filmApi: FilmApiInterface = {
     // film.hasSeasons = seasons.length > 0;
     // film.hasVoices = film.voices.length > 1;
 
-    // return film;
+    return film;
   },
 
   /**

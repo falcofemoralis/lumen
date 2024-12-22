@@ -31,7 +31,7 @@ export function PlayerPageComponent(props: PlayerPageProps) {
   });
 
   return (
-    <Page testId="playerPage">
+    <Page>
       <Player uri={video.streams[0].url ?? DEMO_VIDEO} />
     </Page>
   );

@@ -93,7 +93,7 @@ export function FilmPageComponent(props: FilmPageComponentProps) {
   };
 
   return (
-    <Page testId="filmPage">
+    <Page>
       {renderActions()}
       {renderContent()}
       {renderModals()}

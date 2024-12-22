@@ -17,6 +17,8 @@ export function FilmPageContainer(props: FilmPageContainerProps) {
   const [filmVideo, setFilmVideo] = useState<FilmVideoInterface | null>(null);
   const [isSelectorVisible, setIsSelectorVisible] = useState(false);
 
+  console.log(`FilmPageContainer render ${!!film}`);
+
   useEffect(() => {
     const loadFilm = async () => {
       try {
@@ -29,6 +31,10 @@ export function FilmPageContainer(props: FilmPageContainerProps) {
     };
 
     loadFilm();
+
+    return () => {
+      console.log('FilmPageContainer unmount');
+    };
   }, [link]);
 
   const openVideoSelector = async () => {

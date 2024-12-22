@@ -1,19 +1,11 @@
 import ThemedView from 'Component/ThemedView';
 import { PageProps } from './Page.type';
+import { styles } from './Page.style';
 
 export function PageComponent(props: PageProps) {
-  const { children } = props;
+  const { children, style } = props;
 
-  return (
-    <ThemedView
-      style={{
-        height: '100%',
-        width: '100%',
-      }}
-    >
-      {children}
-    </ThemedView>
-  );
+  return <ThemedView style={[styles.container, style]}>{children}</ThemedView>;
 }
 
 export default PageComponent;
