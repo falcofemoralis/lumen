@@ -3,16 +3,16 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "i18n/*": ["./app/util/Translation/*"],
-      "Api/*": ["./app/api/*"],
-      "Component/*": ["./app/component/*"],
-      "Constants/*": ["./app/constants/*"],
-      "Hooks/*": ["./app/hooks/*"],
-      "Route/*": ["./app/route/*"],
-      "Style/*": ["./app/style/*"],
-      "Store/*": ["./app/store/*"],
-      "Type/*": ["./app/type/*"],
-      "Util/*": ["./app/util/*"]
+      "i18n/*": ["./src/util/Translation/*"],
+      "Api/*": ["./src/api/*"],
+      "Component/*": ["./src/component/*"],
+      "Constants/*": ["./src/constants/*"],
+      "Hooks/*": ["./src/hooks/*"],
+      "Route/*": ["./src/route/*"],
+      "Style/*": ["./src/style/*"],
+      "Store/*": ["./src/store/*"],
+      "Type/*": ["./src/type/*"],
+      "Util/*": ["./src/util/*"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"]

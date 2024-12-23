@@ -1,0 +1,23 @@
+{
+  "extends": "stylelint-config-sass-guidelines",
+  "plugins": [
+    "stylelint-scss"
+  ],
+  "rules": {
+    "max-nesting-depth": null,
+    "selector-max-compound-selectors": null,
+    "scss/dollar-variable-pattern": [
+      "[a-z][a-zA-Z]"
+    ],
+    "selector-class-pattern": [
+      "[a-z][a-zA-Z]"
+    ],
+    "scss/at-mixin-pattern": [
+      "[a-z][a-zA-Z]"
+    ],
+    "selector-pseudo-element-no-unknown": null,
+    "selector-no-qualifying-type": null,
+    "selector-max-id": null,
+    "color-named": null
+  }
+}

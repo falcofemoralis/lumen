@@ -28,7 +28,7 @@
       [
         "expo-router",
         {
-          "root": "./app/navigation"
+          "root": "./src/navigation"
         }
       ],
       "expo-localization",

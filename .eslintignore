@@ -1,0 +1,8 @@
+node_modules/
+build/*.js
+config/*.js
+coverage/*.js
+coverage/*
+jest/*.js
+__tests__/*
+__tests__/*.js
