@@ -4,14 +4,15 @@ import ThemedButton from 'Component/ThemedButton';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
+import __ from 'i18n/__';
 import { View } from 'react-native';
 import {
   DefaultFocus,
   SpatialNavigationFocusableView,
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
-import { scale } from 'Util/CreateStyles';
 
+import { styles } from './FilmPage.style.atv';
 import { FilmPageComponentProps } from './FilmPage.type';
 
 export function FilmPageComponent({
@@ -21,17 +22,30 @@ export function FilmPageComponent({
   hideVideoSelector,
   handleVideoSelect,
 }: FilmPageComponentProps) {
+  if (!film) {
+    return (
+      <ThemedView>
+        <ThemedText>Loading...</ThemedText>
+      </ThemedView>
+    );
+  }
+
   const renderAction = (text: string, onPress?: () => void) => (
     <SpatialNavigationFocusableView>
-      <ThemedButton onPress={ onPress }>{ text }</ThemedButton>
+      <ThemedButton
+        variant="outlined"
+        onPress={ onPress }
+      >
+        { text }
+      </ThemedButton>
     </SpatialNavigationFocusableView>
   );
 
   const renderActions = () => (
     <SpatialNavigationView direction="horizontal">
       <DefaultFocus>
-        <ThemedView style={ { flex: 1, flexDirection: 'row', gap: scale(10) } }>
-          { renderAction('Watch Now TV', playFilm) }
+        <ThemedView style={ styles.actions }>
+          { renderAction(__('Watch Now'), playFilm) }
           { renderAction('Comments') }
           { renderAction('Bookmark') }
           { renderAction('Trailer') }
@@ -43,10 +57,6 @@ export function FilmPageComponent({
   );
 
   const renderPlayerVideoSelector = () => {
-    if (!film) {
-      return null;
-    }
-
     const { voices = [] } = film;
 
     if (!voices.length) {
@@ -63,32 +73,42 @@ export function FilmPageComponent({
     );
   };
 
-  const renderLoadedContent = () => (
-    <ThemedView>
-      <ThemedText>Loading...</ThemedText>
-    </ThemedView>
+  const renderMainContent = () => (
+    <View style={ styles.mainContent }>
+      { renderPoster() }
+      { renderMainInfo() }
+    </View>
   );
 
-  const renderContent = () => {
-    if (!film) {
-      return renderLoadedContent();
-    }
+  const renderPoster = () => {
+    const { poster } = film;
 
     return (
-      <View>
-        <ThemedText>Loaded!</ThemedText>
-        <ThemedText>
-          title=
-          { film.title }
-        </ThemedText>
-        <ThemedText>
-          id=
-          { film.id }
-        </ThemedText>
-        <ThemedImage
-          src={ film.poster }
-          style={ { height: 250, width: 140 } }
-        />
+      <ThemedImage
+        src={ poster }
+        style={ styles.poster }
+      />
+    );
+  };
+
+  const renderMainInfo = () => {
+    const {
+      title,
+      originalTitle,
+      releaseDate,
+      genres = [],
+      countries = [],
+      duration,
+    } = film;
+
+    return (
+      <View style={ styles.mainInfo }>
+        <ThemedText style={ styles.title }>{ title }</ThemedText>
+        { originalTitle && (
+          <ThemedText style={ styles.originalTitle }>
+            { originalTitle }
+          </ThemedText>
+        ) }
       </View>
     );
   };
@@ -98,7 +118,7 @@ export function FilmPageComponent({
   return (
     <Page>
       { renderActions() }
-      { renderContent() }
+      { renderMainContent() }
       { renderModals() }
     </Page>
   );

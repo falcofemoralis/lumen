@@ -4,9 +4,10 @@ import { TouchableOpacity } from 'react-native';
 
 import { WelcomePageComponentProps } from './WelcomePage.type';
 
-export function WelcomePageComponent(props: WelcomePageComponentProps) {
-  const { handleSelectTV, handleSelectMobile } = props;
-
+export function WelcomePageComponent({
+  handleSelectTV,
+  handleSelectMobile,
+}: WelcomePageComponentProps) {
   return (
     <ThemedView>
       <ThemedText>Welcome!!!</ThemedText>

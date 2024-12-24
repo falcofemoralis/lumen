@@ -6,7 +6,6 @@ export const styles = CreateStyles({
   },
   menuListWrapper: {
     height: 50,
-    paddingHorizontal: 16,
     zIndex: 1,
   },
   menuListScroll: {},

@@ -5,7 +5,6 @@ export const ROW_GAP = 16;
 
 export const styles = CreateStyles({
   container: {
-    padding: ROW_GAP,
     backgroundColor: Colors.background,
   },
   rowStyle: {

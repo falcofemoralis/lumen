@@ -5,23 +5,48 @@ export const styles = CreateStyles({
   container: {
     paddingInline: 16,
   },
-  mainContent: { flexDirection: 'row', gap: 16, width: '100%' },
-  poster: { width: '40%', aspectRatio: '166 / 250', borderRadius: 16 },
+  mainContent: {
+    flexDirection: 'row',
+    gap: 16,
+    width: '100%',
+  },
+  poster: {
+    width: '40%',
+    aspectRatio: '166 / 250',
+    borderRadius: 16,
+  },
   mainInfo: {
     width: '55%',
-    backgroundColor: 'red',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-start',
   },
-  title: { fontSize: 24, fontWeight: 'bold' },
-  originalTitle: { fontSize: 16, color: Colors.gray },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  originalTitle: {
+    fontSize: 16,
+    color: Colors.gray,
+  },
+  releaseDate: {
+
+  },
+  mainInfoRow: {
+    flexDirection: 'column',
+  },
+  mainInfoItem: {
+    width: '100%',
+  },
   playBtn: {
     width: '100%',
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.secondary,
     borderRadius: 8,
     color: Colors.white,
     fontSize: 16,
     marginBlockStart: 16,
   },
-  description: { fontSize: 16, marginTop: 16 },
+  description: {
+    color: Colors.lightGray,
+    fontSize: 16,
+    marginTop: 16,
+  },
 });

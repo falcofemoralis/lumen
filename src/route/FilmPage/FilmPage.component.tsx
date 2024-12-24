@@ -8,6 +8,7 @@ import __ from 'i18n/__';
 import { ActivityIndicator, View } from 'react-native';
 import Colors from 'Style/Colors';
 
+import { formatInfoLabel, INFO_LABELS } from './FilmPage.config';
 import { styles } from './FilmPage.style.';
 import { FilmPageComponentProps } from './FilmPage.type';
 
@@ -30,7 +31,69 @@ export function FilmPageComponent({
     );
   }
 
-  const renderVideoSelector = () => {
+  const renderPoster = () => {
+    const { poster } = film;
+
+    return (
+      <ThemedImage
+        src={ poster }
+        style={ styles.poster }
+      />
+    );
+  };
+
+  const renderMainInfo = () => {
+    const {
+      title,
+      originalTitle,
+      releaseDate,
+      genres = [],
+      countries = [],
+      duration,
+    } = film;
+
+    return (
+      <View style={ styles.mainInfo }>
+        <ThemedText style={ styles.title }>{ title }</ThemedText>
+        { originalTitle && (
+          <ThemedText style={ styles.originalTitle }>
+            { originalTitle }
+          </ThemedText>
+        ) }
+        { releaseDate && (
+          <ThemedText style={ styles.releaseDate }>
+            { formatInfoLabel(INFO_LABELS.releaseDate, releaseDate) }
+          </ThemedText>
+        ) }
+        <View style={ styles.mainInfoRow }>
+          { genres.length > 0 && (
+            <ThemedText style={ styles.mainInfoItem }>
+              { formatInfoLabel(INFO_LABELS.genre, genres[0]) }
+            </ThemedText>
+          ) }
+          { countries.length > 0 && (
+            <ThemedText style={ styles.mainInfoItem }>
+              { formatInfoLabel(INFO_LABELS.country, countries[0]) }
+            </ThemedText>
+          ) }
+          { duration && (
+            <ThemedText style={ styles.mainInfoItem }>
+              { formatInfoLabel(INFO_LABELS.duration, duration) }
+            </ThemedText>
+          ) }
+        </View>
+      </View>
+    );
+  };
+
+  const renderMainContent = () => (
+    <View style={ styles.mainContent }>
+      { renderPoster() }
+      { renderMainInfo() }
+    </View>
+  );
+
+  const renderPlayerVideoSelector = () => {
     const { voices = [], hasVoices, hasSeasons } = film;
 
     if (!voices.length || (!hasVoices && !hasSeasons)) {
@@ -52,57 +115,8 @@ export function FilmPageComponent({
       style={ styles.playBtn }
       onPress={ playFilm }
     >
-      { __('Play') }
+      { __('Watch Now') }
     </ThemedButton>
-  );
-
-  const renderPoster = () => {
-    const { poster } = film;
-
-    return (
-      <ThemedImage
-        src={ poster }
-        style={ styles.poster }
-      />
-    );
-  };
-
-  const renderMainInfo = () => {
-    const {
-      title, originalTitle, releaseDate, genres = [], countries = [], duration,
-    } = film;
-
-    return (
-      <View style={ styles.mainInfo }>
-        <ThemedText style={ styles.title }>{ title }</ThemedText>
-        { originalTitle && (
-          <ThemedText style={ styles.originalTitle }>
-            { originalTitle }
-          </ThemedText>
-        ) }
-        { releaseDate && (
-          <ThemedText style={ styles.originalTitle }>
-            { releaseDate }
-          </ThemedText>
-        ) }
-        { genres.length > 0 && (
-          <ThemedText style={ styles.originalTitle }>
-            { genres[0] }
-          </ThemedText>
-        ) }
-        { countries.length > 0 && (
-          <ThemedText style={ styles.originalTitle }>{ countries[0] }</ThemedText>
-        ) }
-        { duration && <ThemedText style={ styles.originalTitle }>{ duration }</ThemedText> }
-      </View>
-    );
-  };
-
-  const renderMainContent = () => (
-    <View style={ styles.mainContent }>
-      { renderPoster() }
-      { renderMainInfo() }
-    </View>
   );
 
   const renderDescription = () => {
@@ -111,19 +125,14 @@ export function FilmPageComponent({
     return <ThemedText style={ styles.description }>{ description }</ThemedText>;
   };
 
+  const renderModals = () => renderPlayerVideoSelector();
+
   return (
-    <Page style={ styles.container }>
+    <Page>
       { renderMainContent() }
       { renderPlayFilmButton() }
       { renderDescription() }
-      { /* <ThemedView>
-        <ThemedText>{film.title}</ThemedText>
-        <ThemedText>{film.id}</ThemedText>
-        <Button onPress={playFilm}>
-          {film.hasVoices || film.hasSeasons ? 'Select' : __('Play')}
-        </Button>
-      </ThemedView>
-      {renderVideoSelector()} */ }
+      { renderModals() }
     </Page>
   );
 }
