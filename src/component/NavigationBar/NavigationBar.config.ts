@@ -11,10 +11,10 @@ export interface Tab<T> {
   };
 }
 
-export const TABS_TV_CONFIG: Tab<Href>[] = [
+export const TABS_TV_CONFIG: Tab<string>[] = [
   {
     isDefault: true,
-    route: './',
+    route: 'index',
     title: 'Home',
     icon: {
       name: 'home-variant-outline',
@@ -22,7 +22,7 @@ export const TABS_TV_CONFIG: Tab<Href>[] = [
     },
   },
   {
-    route: './search',
+    route: 'search',
     title: 'Search',
     icon: {
       name: 'magnify',
@@ -30,7 +30,7 @@ export const TABS_TV_CONFIG: Tab<Href>[] = [
     },
   },
   {
-    route: './bookmarks',
+    route: 'bookmarks',
     title: 'Bookmarks',
     icon: {
       name: 'movie-star-outline',
@@ -38,7 +38,7 @@ export const TABS_TV_CONFIG: Tab<Href>[] = [
     },
   },
   {
-    route: './recent',
+    route: 'recent',
     title: 'Recent',
     icon: {
       name: 'history',
@@ -46,7 +46,7 @@ export const TABS_TV_CONFIG: Tab<Href>[] = [
     },
   },
   {
-    route: './notifications',
+    route: 'notifications',
     title: 'Notifications',
     icon: {
       name: 'bell-outline',
@@ -54,7 +54,7 @@ export const TABS_TV_CONFIG: Tab<Href>[] = [
     },
   },
   {
-    route: './settings',
+    route: 'settings',
     title: 'Settings',
     icon: {
       name: 'settings',

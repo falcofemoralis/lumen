@@ -23,7 +23,10 @@ export function NavigationBarComponent() {
 
   const renderTab = (tab: Tab<string>, idx: number) => {
     const {
-      route: name, title, icon, options,
+      route: name,
+      title,
+      icon,
+      options,
     } = tab;
 
     return (

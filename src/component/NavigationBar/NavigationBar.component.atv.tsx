@@ -1,10 +1,14 @@
+import { BottomTabNavigationEventMap } from '@react-navigation/bottom-tabs';
+import {
+  CommonActions, NavigationHelpers, ParamListBase, TabNavigationState,
+} from '@react-navigation/native';
 import ThemedIcon from 'Component/ThemedIcon';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Href, router, Slot } from 'expo-router';
+import { Tabs } from 'expo-router';
 import { observer } from 'mobx-react-lite';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { View } from 'react-native';
 import {
   DefaultFocus,
@@ -13,6 +17,7 @@ import {
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
 import NavigationStore from 'Store/Navigation.store';
+import Colors from 'Style/Colors';
 import { TVEventType } from 'Type/TVEvent.type';
 import { scale } from 'Util/CreateStyles';
 
@@ -20,6 +25,11 @@ import { Tab, TABS_TV_CONFIG } from './NavigationBar.config';
 import { FocusedTabAnimation, OpeningAnimation, styles } from './NavigationBar.style.atv';
 
 export function NavigationBarComponent() {
+  const navigationRef = useRef<NavigationHelpers<ParamListBase, BottomTabNavigationEventMap>|null>(
+    null,
+  );
+  const navigationStateRef = useRef<TabNavigationState<ParamListBase>|null>(null);
+
   const [selectedTab, setSelectedTab] = useState(
     TABS_TV_CONFIG.find((tab) => tab.isDefault)?.route ?? '',
   );
@@ -30,7 +40,7 @@ export function NavigationBarComponent() {
     }
   };
 
-  const onFocus = (tab: Tab<Href>) => {
+  const onFocus = (tab: Tab<string>) => {
     const { route } = tab;
 
     if (route === selectedTab) {
@@ -39,11 +49,32 @@ export function NavigationBarComponent() {
 
     setSelectedTab(route);
     setTimeout(() => {
-      router.replace(route);
+      // router.navigate(route);
+      const routes = Array.from(navigationStateRef.current?.routes ?? []);
+      const rn = routes.find((r) => r.name === route);
+
+      if (!navigationRef.current || !rn) {
+        return;
+      }
+
+      const event = navigationRef.current.emit({
+        type: 'tabPress',
+        target: rn.key,
+        canPreventDefault: true,
+      });
+
+      console.log(event);
+
+      if (!event.defaultPrevented) {
+        navigationRef.current.dispatch({
+          ...CommonActions.navigate(route),
+          target: navigationStateRef.current?.key,
+        });
+      }
     });
   };
 
-  const renderTab = (tab: Tab<Href>, idx: number) => {
+  const renderTab = (tab: Tab<string>, idx: number) => {
     const { route, title, icon } = tab;
 
     return (
@@ -91,6 +122,7 @@ export function NavigationBarComponent() {
 
   const renderTabs = () => TABS_TV_CONFIG.map((tab, idx) => renderTab(tab, idx));
 
+  // TODO won't work
   if (!NavigationStore.isNavigationVisible) {
     return null;
   }
@@ -125,7 +157,20 @@ export function NavigationBarComponent() {
         </ThemedView>
       </SpatialNavigationRoot>
       <View style={ [styles.slot, NavigationStore.isNavigationVisible && styles.slotBarVisible] }>
-        <Slot />
+        <Tabs
+          screenOptions={ {
+            headerShown: false,
+            tabBarActiveTintColor: Colors.blue,
+            tabBarInactiveTintColor: Colors.white,
+            tabBarHideOnKeyboard: true,
+          } }
+          tabBar={ ({ navigation: nv, state }) => {
+            navigationRef.current = nv;
+            navigationStateRef.current = state;
+
+            return null;
+          } }
+        />
       </View>
     </ThemedView>
   );
