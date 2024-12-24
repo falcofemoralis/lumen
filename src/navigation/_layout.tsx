@@ -7,7 +7,6 @@ import {
 } from '@react-navigation/native';
 import { Stack } from 'Component/Layouts/stack';
 import Constants from 'expo-constants';
-import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useLocale } from 'Hooks/useLocale';
@@ -25,21 +24,14 @@ SplashScreen.preventAutoHideAsync();
 export function RootLayout() {
   const colorScheme = useColorScheme();
   const [languageLoaded] = useLocale();
-  const [fontLoaded, fontError] = useFonts({
-    SpaceMono: require('../../assets/fonts/SpaceMono-Regular.ttf'),
-  });
 
   useEffect(() => {
-    if ((fontLoaded || fontError) && languageLoaded) {
+    if (languageLoaded) {
       SplashScreen.hideAsync();
-
-      if (fontError) {
-        console.warn(`Error in loading fonts: ${fontError}`);
-      }
     }
-  }, [fontLoaded, fontError, languageLoaded]);
+  }, [languageLoaded]);
 
-  if ((!fontLoaded && !fontError) || !languageLoaded) {
+  if (!languageLoaded) {
     return null;
   }
 
