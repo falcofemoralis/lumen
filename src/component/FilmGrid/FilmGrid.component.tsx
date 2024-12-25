@@ -64,7 +64,7 @@ export function FilmGridComponent({
   isRefreshing = false,
 }: FilmGridComponentProps) {
   const onScroll = useCallback(
-    async (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
       if (isCloseToBottom(event, SCROLL_EVENT_END_PADDING)) {
         onScrollEnd();
       }

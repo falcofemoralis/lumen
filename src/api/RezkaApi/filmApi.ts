@@ -10,7 +10,9 @@ import { parseHtml } from 'Util/Parser';
 import { Variables } from 'Util/Request';
 
 import configApi from './configApi';
-import { parseFilmCard, parseStreams } from './utils';
+import {
+  parseFilmCard, parseSeasons, parseStreams,
+} from './utils';
 
 const filmApi: FilmApiInterface = {
   /**
@@ -92,18 +94,6 @@ const filmApi: FilmApiInterface = {
       hasSeasons: false,
     };
 
-    // originalTitle?: string;
-    // year?: string;
-    // countries?: string[];
-    // genres?: string[];
-    // seriesInfo?: string;
-    // largePoster?: string;
-    // ratings?: string[]; // type = rating + votes
-    // description?: string;
-    // actors?: string[];
-    // directors?: string[];
-    // additionalInfo?: string[];
-    // additional data
     film.originalTitle = root.querySelector('.b-post__origtitle')?.rawText;
 
     const infoTable = root.querySelectorAll('.b-post__info tr');
@@ -155,170 +145,90 @@ const filmApi: FilmApiInterface = {
     film.description = root.querySelector('.b-post__description_text')?.rawText;
 
     // player data
-    // $('li.b-translator__item').each((_idx, el) => {
-    //   const voice: FilmVoiceInterface = {
-    //     id: $(el).attr('data-translator_id') ?? '',
-    //     title: $(el).attr('title') ?? '',
-    //     img: $(el).find('img').attr('src'),
-    //     isCamrip: $(el).attr('data-camrip') ?? '0',
-    //     isDirector: $(el).attr('data-director') ?? '0',
-    //     isAds: $(el).attr('data-ads') ?? '0',
-    //     isActive: $(el).attr('class')?.includes('active') ?? false,
-    //     isPremium: $(el).hasClass('b-prem_translator'),
-    //   };
+    root.querySelectorAll('.b-translator__item').forEach((el) => {
+      const voice: FilmVoiceInterface = {
+        id: el.attributes['data-translator_id'],
+        title: el.attributes.title,
+        img: el.querySelector('img')?.attributes.src,
+        isCamrip: el.attributes['data-camrip'],
+        isDirector: el.attributes['data-director'],
+        isAds: el.attributes['data-ad'],
+        isActive: el.attributes.class.includes('active'),
+        isPremium: Boolean(el.attributes['b-prem_translator']),
+      };
 
-    //   film.voices.push({
-    //     ...voice,
-    //     ...(voice.isActive ? parseSeasons($) : {}),
-    //   });
-    // });
+      film.voices.push({
+        ...voice,
+        ...(voice.isActive ? parseSeasons(root) : {}),
+      });
+    });
 
-    // const { voices } = film;
+    const { voices } = film;
 
-    // if (!voices.length) {
-    //   const isMovie = $('meta[property=og:type]').attr('content')?.includes('video.movie');
-    //   const stringedDoc = $.html();
+    if (!voices.length) {
+      const isMovie = root.querySelector('meta[property=og:type]')?.attributes.content?.includes('video.movie');
+      const stringedDoc = root.innerHTML;
 
-    //   if (isMovie) {
-    //     const index = stringedDoc.indexOf('initCDNMoviesEvents');
-    //     const subString = stringedDoc.substring(
-    //       stringedDoc.indexOf('{"id"', index),
-    //       stringedDoc.indexOf('});', index) + 1
-    //     );
-    //     const jsonObject = JSON.parse(subString);
-    //     const streams = parseStreams(jsonObject.streams);
-    //     // subtitles = parseSubtitles(jsonObject.subtitle);
-    //     // getThumbnails(jsonObject.thumbnails, trans);
+      if (isMovie) {
+        const index = stringedDoc.indexOf('initCDNMoviesEvents');
+        const subString = stringedDoc.substring(
+          stringedDoc.indexOf('{"id"', index),
+          stringedDoc.indexOf('});', index) + 1,
+        );
+        const jsonObject = JSON.parse(subString);
+        const streams = parseStreams(jsonObject.streams);
+        // subtitles = parseSubtitles(jsonObject.subtitle);
+        // getThumbnails(jsonObject.thumbnails, trans);
 
-    //     const video: FilmVideoInterface = {
-    //       streams,
-    //     };
+        const video: FilmVideoInterface = {
+          streams,
+        };
 
-    //     film.voices.push({
-    //       id: '',
-    //       title: '',
-    //       isCamrip: '0',
-    //       isDirector: '0',
-    //       isAds: '0',
-    //       isActive: true,
-    //       isPremium: false,
-    //       video,
-    //     });
-    //   } else {
-    //     const startIndex = stringedDoc.indexOf('initCDNSeriesEvents');
-    //     let endIndex = stringedDoc.indexOf('{"id"', startIndex);
-    //     if (endIndex === -1) {
-    //       endIndex = stringedDoc.indexOf('{"url"', startIndex);
-    //     }
-    //     const subString = stringedDoc.substring(startIndex, endIndex);
+        film.voices.push({
+          id: '',
+          title: '',
+          isCamrip: '0',
+          isDirector: '0',
+          isAds: '0',
+          isActive: true,
+          isPremium: false,
+          video,
+        });
+      } else {
+        const startIndex = stringedDoc.indexOf('initCDNSeriesEvents');
+        let endIndex = stringedDoc.indexOf('{"id"', startIndex);
+        if (endIndex === -1) {
+          endIndex = stringedDoc.indexOf('{"url"', startIndex);
+        }
+        const subString = stringedDoc.substring(startIndex, endIndex);
 
-    //     film.voices.push({
-    //       id: subString.split(',')[1].replaceAll(' ', ''),
-    //       title: '',
-    //       isCamrip: '0',
-    //       isDirector: '0',
-    //       isAds: '0',
-    //       isActive: true,
-    //       isPremium: false,
-    //       ...parseSeasons($),
-    //     });
-    //   }
-    // }
+        film.voices.push({
+          id: subString.split(',')[1].replaceAll(' ', ''),
+          title: '',
+          isCamrip: '0',
+          isDirector: '0',
+          isAds: '0',
+          isActive: true,
+          isPremium: false,
+          ...parseSeasons(root),
+        });
+      }
+    }
 
-    // const { seasons = [] } = voices.find(({ isActive }) => isActive) ?? {};
-    // film.hasSeasons = seasons.length > 0;
-    // film.hasVoices = film.voices.length > 1;
+    const { seasons = [] } = voices.find(({ isActive }) => isActive) ?? {};
+    film.hasSeasons = seasons.length > 0;
+    film.hasVoices = film.voices.length > 1;
 
     return film;
   },
 
   /**
-   * Get films streams
-   * @param film
+   * Get films from home menu
+   * @param menuItem
+   * @param page
+   * @param params
+   * @returns FilmList
    */
-  async getFilmStreams(
-    film: FilmInterface,
-    voice: FilmVoiceInterface,
-  ): Promise<FilmVideoInterface> {
-    const { id: filmId } = film;
-    const {
-      id: voiceId, isCamrip, isAds, isDirector,
-    } = voice;
-
-    const result = await configApi.postRequest('/ajax/get_cdn_series', {
-      id: filmId,
-      translator_id: voiceId,
-      is_camrip: isCamrip,
-      is_ads: isAds,
-      is_director: isDirector,
-      action: 'get_movie',
-    });
-
-    const streams = parseStreams(result.url);
-
-    return {
-      streams: configApi.modifyCDN(streams),
-    };
-  },
-
-  /**
-   * Get film streams by season and episode id
-   * @param season
-   * @param episode
-   */
-  async getFilmStreamsByEpisodeId(
-    film: FilmInterface,
-    voice: FilmVoiceInterface,
-    seasonId: string,
-    episodeId: string,
-  ): Promise<FilmVideoInterface> {
-    const { id: filmId } = film;
-    const { id: voiceId } = voice;
-
-    const result = await configApi.postRequest('/ajax/get_cdn_series', {
-      id: filmId,
-      translator_id: voiceId,
-      season: seasonId,
-      episode: episodeId,
-      action: 'get_stream',
-    });
-
-    const streams = parseStreams(result.url);
-
-    return {
-      streams: configApi.modifyCDN(streams),
-    };
-  },
-
-  /**
-   * Get film seasons
-   * @param film
-   * @param voice
-   */
-  async getFilmSeasons(
-    film: FilmInterface,
-    voice: FilmVoiceInterface,
-  ): Promise<FilmVoiceInterface> {
-    const { id: filmId } = film;
-    const { id: voiceId } = voice;
-
-    const result = await configApi.postRequest('/ajax/get_cdn_series', {
-      id: filmId,
-      translator_id: voiceId,
-      action: 'get_episodes',
-    });
-
-    const { seasons } = result;
-    const { episodes } = result;
-
-    const $ = parseHtml(`<div>${seasons}${episodes}</div>`);
-
-    return {
-      ...voice,
-      // ...parseSeasons($),
-    };
-  },
-
   async getHomeMenuFilms(menuItem: MenuItemInterface, page: number, params?: ApiParams) {
     const { path, key, variables } = menuItem;
 

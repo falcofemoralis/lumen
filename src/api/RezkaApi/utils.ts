@@ -1,7 +1,7 @@
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { FilmStreamInterface } from 'Type/FilmStream.interface';
 import { FilmType } from 'Type/FilmType.type';
-import { SeasonInterface } from 'Type/FilmVoice.interface';
+import { EpisodeInterface, SeasonInterface } from 'Type/FilmVoice.interface';
 import { HTMLElementInterface } from 'Util/Parser';
 
 export interface JSONResult {
@@ -101,9 +101,7 @@ export const parseStreams = (streams: string | null): FilmStreamInterface[] => {
   return parsedStreams;
 };
 
-export const parseSeasons = (
-  root: HTMLElementInterface,
-): {
+export const parseSeasons = (root: HTMLElementInterface): {
   seasons: SeasonInterface[];
   lastSeasonId: string | undefined;
   lastEpisodeId: string | undefined;
@@ -117,34 +115,32 @@ export const parseSeasons = (
     lastEpisodeId: undefined,
   };
 
-  // root.querySelectorAll('li.b-simple_season__item').forEach((el, idx) => {
-  //   const seasonId = el.attributes['data-tab_id'] ?? '';
-  //   const episodes: EpisodeInterface[] = [];
+  root.querySelectorAll('li.b-simple_season__item').forEach((el) => {
+    const seasonId = el.attributes['data-tab_id'];
+    const episodes: EpisodeInterface[] = [];
 
-  //   $(`#simple-episodes-list-${seasonId}`).each((_idx, list) => {
-  //     $(list)
-  //       .find('li.b-simple_episode__item')
-  //       .each((_idx, ep) => {
-  //         if ($(ep).hasClass('active')) {
-  //           lastWatch.lastSeasonId = $(ep).attr('data-season_id') ?? '1';
-  //           lastWatch.lastEpisodeId = $(ep).attr('data-episode_id') ?? '1';
-  //         }
+    root.querySelectorAll(`#simple-episodes-list-${seasonId}`).forEach((list) => {
+      list.querySelectorAll('.b-simple_episode__item').forEach((ep) => {
+        if (ep.classList.contains('active')) {
+          lastWatch.lastSeasonId = ep.attributes['data-season_id'];
+          lastWatch.lastEpisodeId = ep.attributes['data-episode_id'];
+        }
 
-  //         episodes.push({
-  //           name: $(ep).text(),
-  //           episodeId: $(ep).attr('data-episode_id') ?? '',
-  //         });
-  //       });
-  //   });
+        episodes.push({
+          name: ep.rawText,
+          episodeId: ep.attributes['data-episode_id'],
+        });
+      });
+    });
 
-  //   const season: SeasonInterface = {
-  //     name: $(el).text(),
-  //     seasonId: $(el).attr('data-tab_id') ?? '',
-  //     episodes,
-  //   };
+    const season: SeasonInterface = {
+      name: el.rawText,
+      seasonId: el.attributes['data-tab_id'],
+      episodes,
+    };
 
-  //   seasons.push(season);
-  // });
+    seasons.push(season);
+  });
 
   return {
     seasons,

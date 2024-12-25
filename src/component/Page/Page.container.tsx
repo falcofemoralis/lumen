@@ -14,6 +14,12 @@ export function PageContainer(props: PageContainerProps) {
 
   useEffect(() => {
     const backAction = () => {
+      if (router.canDismiss()) {
+        router.dismiss();
+
+        return true;
+      }
+
       if (router.canGoBack()) {
         const state = navigation.getState();
         const history = state?.history ?? [];

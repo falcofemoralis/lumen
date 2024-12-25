@@ -5,32 +5,25 @@ import { BackHandler } from 'react-native';
 import ConfigStore from 'Store/Config.store';
 import NavigationStore from 'Store/Navigation.store';
 
+import { DEMO_VIDEO } from './PlayerPage.config';
 import { PlayerPageComponentProps } from './PlayerPage.type';
 
 export function PlayerPageComponent({ video }: PlayerPageComponentProps) {
   useEffect(() => {
-    if (ConfigStore.isTV && NavigationStore.isNavigationVisible) {
-      NavigationStore.hideNavigation();
+    if (ConfigStore.isTV && !NavigationStore.isNavigationLocked) {
+      NavigationStore.lockNavigation();
     }
-  }, []);
 
-  useEffect(() => {
-    const backAction = () => {
+    return () => {
       if (ConfigStore.isTV) {
-        NavigationStore.showNavigation();
+        NavigationStore.unlockNavigation();
       }
-
-      return false;
     };
-
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
-
-    return () => backHandler.remove();
-  });
+  }, []);
 
   return (
     <Page>
-      <Player uri={ video.streams[0].url } />
+      <Player uri={ DEMO_VIDEO ?? video.streams[0]?.url } />
     </Page>
   );
 }

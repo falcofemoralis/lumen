@@ -64,7 +64,6 @@ export const TABS_TV_CONFIG: Tab<string>[] = [
 ];
 
 const TABS_MOBILE_IGNORED_TABS: string[] = [
-  'player/[data]',
   'settings',
   'notifications',
   'film/[link]',

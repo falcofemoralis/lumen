@@ -43,7 +43,7 @@ export function PageComponent(props: PageComponentProps) {
   const isActive = isFocused && !NavigationStore.isNavigationOpened;
 
   const onDirectionHandledWithoutMovement = (movement: string) => {
-    if (movement === TVEventType.Left) {
+    if (movement === TVEventType.Left && !NavigationStore.isNavigationLocked) {
       NavigationStore.openNavigation();
     }
   };
@@ -52,9 +52,9 @@ export function PageComponent(props: PageComponentProps) {
     <ThemedView
       style={ [
         styles.container,
-        {
-          width: getWindowWidth(),
-        },
+        NavigationStore.isNavigationLocked
+          ? styles.fullContainer
+          : { width: getWindowWidth() },
         style,
       ] }
     >

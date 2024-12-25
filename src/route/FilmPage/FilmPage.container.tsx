@@ -85,10 +85,6 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
   };
 
   const openPlayer = (video: FilmVideoInterface) => {
-    if (ConfigStore.isTV) {
-      NavigationStore.hideNavigation();
-    }
-
     router.push({
       pathname: '/player/[data]',
       params: { data: JSON.stringify(video) },

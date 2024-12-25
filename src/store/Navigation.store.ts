@@ -1,7 +1,7 @@
 import { makeAutoObservable } from 'mobx';
 
 class NavigationStore {
-  public isNavigationVisible = true;
+  public isNavigationLocked = false;
 
   public isNavigationOpened = false;
 
@@ -9,12 +9,12 @@ class NavigationStore {
     makeAutoObservable(this);
   }
 
-  showNavigation() {
-    this.isNavigationVisible = true;
+  lockNavigation() {
+    this.isNavigationLocked = true;
   }
 
-  hideNavigation() {
-    this.isNavigationVisible = false;
+  unlockNavigation() {
+    this.isNavigationLocked = false;
   }
 
   openNavigation() {

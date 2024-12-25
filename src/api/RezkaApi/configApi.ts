@@ -57,14 +57,10 @@ const configApi: ConfigApiInterface = {
     return parseHtml(res);
   },
 
-  async fetchJson(query: string, variables: Variables = {}) {
+  async fetchJson<T>(query: string, variables: Variables = {}) {
     const result = await this.postRequest(query, variables);
 
-    const json = JSON.parse(result) as JSONResult;
-
-    if (!json.success) {
-      throw new Error(json.message);
-    }
+    const json = JSON.parse(result) as T;
 
     return json;
   },

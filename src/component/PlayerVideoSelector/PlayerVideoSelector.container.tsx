@@ -43,11 +43,8 @@ export function PlayerVideoSelectorContainer({
   const handleSelectVoice = async (voice: FilmVoiceInterface) => {
     const { hasSeasons } = film;
 
-    console.log(hasSeasons);
-
     if (!hasSeasons) {
       setSelectedVoice(voice);
-      console.log('voiceSelected');
 
       return;
     }
@@ -82,15 +79,13 @@ export function PlayerVideoSelectorContainer({
     try {
       const currentService = ServiceStore.getCurrentService();
 
-      console.log(!hasSeasons ? 'getFilmStreams' : 'getFilmStreamsByEpisodeId');
-
       const video = !hasSeasons
-        ? await currentService.getFilmStreams(film, selectedVoice)
+        ? await currentService.getFilmStreamsByVoice(film, selectedVoice)
         : await currentService.getFilmStreamsByEpisodeId(
           film,
           selectedVoice,
-          selectedSeasonId!,
-          selectedEpisodeId!,
+          selectedSeasonId ?? '1',
+          selectedEpisodeId ?? '1',
         );
 
       onSelect(video);

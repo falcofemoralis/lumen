@@ -35,7 +35,7 @@ export interface ConfigApiInterface {
     variables?: Variables,
     ignoreCache?: boolean
   ): Promise<HTMLElementInterface>;
-  fetchJson(query: string, variables: Variables): Promise<any>;
+  fetchJson<T>(query: string, variables: Variables): Promise<T>;
   getRequest(query: string, variables?: Variables, ignoreCache?: boolean): Promise<any>;
   postRequest(query: string, variables?: Variables, ignoreCache?: boolean): Promise<any>;
   modifyCDN(streams: FilmStreamInterface[]): FilmStreamInterface[];
@@ -49,19 +49,28 @@ export interface FilmApiInterface {
     params?: ApiParams
   ): Promise<FilmListInterface>;
   getFilm(link: string): Promise<FilmInterface | null>;
-  getFilmStreams(film: FilmInterface, voice: FilmVoiceInterface): Promise<FilmVideoInterface>;
+  getHomeMenuFilms(
+    menuItem: MenuItemInterface,
+    page: number,
+    params?: ApiParams
+  ): Promise<FilmListInterface>;
+}
+
+export interface PlayerApiInterface {
+  getFilmStreamsByVoice(
+    film: FilmInterface,
+    voice: FilmVoiceInterface
+  ): Promise<FilmVideoInterface>;
   getFilmStreamsByEpisodeId(
     film: FilmInterface,
     voice: FilmVoiceInterface,
     seasonId: string,
     episodeId: string
   ): Promise<FilmVideoInterface>;
-  getFilmSeasons(film: FilmInterface, voice: FilmVoiceInterface): Promise<FilmVoiceInterface>;
-  getHomeMenuFilms(
-    menuItem: MenuItemInterface,
-    page: number,
-    params?: ApiParams
-  ): Promise<FilmListInterface>;
+  getFilmSeasons(
+    film: FilmInterface,
+    voice: FilmVoiceInterface
+  ): Promise<FilmVoiceInterface>;
 }
 
 export interface MenuApiInterface {
@@ -71,4 +80,5 @@ export interface MenuApiInterface {
 export interface ApiInterface extends
   ConfigApiInterface,
   FilmApiInterface,
-  MenuApiInterface {}
+  MenuApiInterface,
+  PlayerApiInterface {}
