@@ -1,5 +1,5 @@
 import { IconInterface, IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
-import { Href, RelativePathString } from 'expo-router';
+import { RelativePathString } from 'expo-router';
 
 export interface Tab<T> {
   route: T;

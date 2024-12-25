@@ -17,8 +17,6 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
   const [filmVideo, setFilmVideo] = useState<FilmVideoInterface | null>(null);
   const [isSelectorVisible, setIsSelectorVisible] = useState(false);
 
-  console.log(`FilmPageContainer render ${!!film}`);
-
   useEffect(() => {
     const loadFilm = async () => {
       try {

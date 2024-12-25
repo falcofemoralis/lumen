@@ -1,4 +1,6 @@
-import { BottomTabBarButtonProps } from '@react-navigation/bottom-tabs';
+import {
+  BottomTabBarButtonProps,
+} from '@react-navigation/bottom-tabs';
 import { Tabs } from 'Component/Layouts/tabs';
 import ThemedIcon from 'Component/ThemedIcon';
 import React from 'react';
@@ -23,10 +25,7 @@ export function NavigationBarComponent() {
 
   const renderTab = (tab: Tab<string>, idx: number) => {
     const {
-      route: name,
-      title,
-      icon,
-      options,
+      route: name, title, icon, options,
     } = tab;
 
     return (

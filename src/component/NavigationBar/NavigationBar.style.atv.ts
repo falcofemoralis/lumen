@@ -26,10 +26,10 @@ export const styles = CreateStyles({
     marginLeft: NAVIGATION_BAR_TV_WIDTH,
   },
   bar: {
-    position: 'absolute',
+    // position: 'absolute',
     left: 0,
     top: 0,
-    backgroundColor: 'transparent',
+    // backgroundColor: 'transparent',
     height: '100%',
     width: NAVIGATION_BAR_TV_WIDTH,
     paddingHorizontal: NAVIGATION_BAR_TV_WIDTH_PADDING,
@@ -102,7 +102,7 @@ export const OpeningAnimation = ({
   isOpened: boolean;
   children: (style: any) => React.ReactElement;
 }) => {
-  const duration = 500;
+  const duration = 350;
   const opened = useSharedValue<boolean>(isOpened);
 
   useEffect(() => {
@@ -115,26 +115,6 @@ export const OpeningAnimation = ({
     }),
   }));
 
-  return children({
-    animatedOpeningStyle,
-  });
-};
-
-export const FocusedTabAnimation = ({
-  isOpened,
-  children,
-}: {
-  isOpened: boolean;
-  children: (style: any) => React.ReactElement;
-}) => {
-  const duration = 500;
-
-  const opened = useSharedValue<boolean>(isOpened);
-
-  useEffect(() => {
-    opened.value = isOpened;
-  });
-
   const animatedTextStyle = useAnimatedStyle(() => ({
     opacity: withTiming(opened.value ? styles.tabTextOpened.opacity : styles.tabText.opacity, {
       duration,
@@ -142,6 +122,7 @@ export const FocusedTabAnimation = ({
   }));
 
   return children({
+    animatedOpeningStyle,
     animatedTextStyle,
   });
 };
