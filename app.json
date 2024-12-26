@@ -2,6 +2,7 @@
   "expo": {
     "scheme": "routertv",
     "plugins": [
+      "@bam.tech/react-native-keyevent-expo-config-plugin",
       [
         "@react-native-tvos/config-tv",
         {

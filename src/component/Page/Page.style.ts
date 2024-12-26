@@ -6,4 +6,7 @@ export const styles = CreateStyles({
     width: '100%',
     padding: 8,
   },
+  fullContainer: {
+    padding: 0,
+  },
 });

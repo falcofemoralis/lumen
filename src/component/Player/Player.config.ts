@@ -13,7 +13,6 @@ export enum RewindDirection {
 }
 
 export enum FocusedElement {
-  TopBorder = 'topBorder',
   ProgressThumb = 'progressThumb',
   Action = 'action',
 }

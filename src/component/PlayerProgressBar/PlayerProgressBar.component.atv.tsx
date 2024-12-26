@@ -8,6 +8,7 @@ import {
   useTVEventHandler,
   View,
 } from 'react-native';
+import { SpatialNavigationFocusableView, SpatialNavigationNode, SpatialNavigationView } from 'react-tv-space-navigation';
 import { TVEventType } from 'Type/TVEvent.type';
 
 import { styles } from './PlayerProgressBar.style.atv';
@@ -19,77 +20,87 @@ export function PlayerProgressBarComponent({
   setFocusedElement = () => {},
   rewindPosition,
   rewindPositionAuto,
+  toggleControls,
 }: PlayerProgressBarComponentProps) {
   const progressThumbRef = useRef(null);
 
   useTVEventHandler((evt: HWEvent) => {
     const type = evt.eventType;
 
-    if (focusedElement === FocusedElement.ProgressThumb) {
-      if (type === TVEventType.Left) {
-        rewindPosition(RewindDirection.Backward);
-      }
+    if (type === TVEventType.Left) {
+      rewindPosition(RewindDirection.Backward);
+    }
 
-      if (type === TVEventType.Right) {
-        rewindPosition(RewindDirection.Forward);
-      }
+    if (type === TVEventType.Right) {
+      rewindPosition(RewindDirection.Forward);
+    }
 
-      if (type === TVEventType.LongLeft) {
-        rewindPositionAuto(RewindDirection.Backward);
-      }
+    if (type === TVEventType.LongLeft) {
+      rewindPositionAuto(RewindDirection.Backward);
+    }
 
-      if (type === TVEventType.LongRight) {
-        rewindPositionAuto(RewindDirection.Forward);
-      }
+    if (type === TVEventType.LongRight) {
+      rewindPositionAuto(RewindDirection.Forward);
     }
   });
 
-  if (!status) {
-    return;
-  }
+  // if (!status) {
+  //   return;
+  // }
 
   return (
-    <TVFocusGuideView
-      autoFocus
-      trapFocusLeft
-      trapFocusRight
-      hasTVPreferredFocus
-      destinations={ [progressThumbRef.current] }
+    <View
+      // autoFocus
+      // trapFocusLeft
+      // trapFocusRight
+      // hasTVPreferredFocus
+      // destinations={ [progressThumbRef.current] }
       style={ styles.container }
     >
-      { /* Playable Duration */ }
-      <View
-        style={ [
-          styles.playableBar,
-          { width: (`${status.playablePercentage}%`) as DimensionValue },
-        ] }
-      />
-      { /* Progress Playback */ }
-      <View
-        style={ [
-          styles.progressBar,
-          { width: (`${status.progressPercentage}%`) as DimensionValue },
-        ] }
-      >
-        { /* Progress Thumb */ }
-        <Pressable
+      <SpatialNavigationView direction="horizontal">
+        { /* Playable Duration */ }
+        <View
           style={ [
-            styles.thumb,
-            focusedElement === FocusedElement.ProgressThumb && styles.focusedThumb,
+            styles.playableBar,
+            { width: (`${status.playablePercentage}%`) as DimensionValue },
           ] }
-          hasTVPreferredFocus
-          isTVSelectable
-          key={ FocusedElement.ProgressThumb }
-          ref={ progressThumbRef }
-          onFocus={ () => {
-            setFocusedElement(FocusedElement.ProgressThumb);
-          } }
-          onBlur={ () => {
-            setFocusedElement('');
-          } }
         />
-      </View>
-    </TVFocusGuideView>
+        { /* Progress Playback */ }
+        <View
+          style={ [
+            styles.progressBar,
+            { width: (`${status.progressPercentage}%`) as DimensionValue },
+          ] }
+        >
+          { /* Progress Thumb */ }
+          <SpatialNavigationFocusableView
+            onSelect={ () => {
+              console.log('onSelect2');
+              toggleControls();
+            } }
+            onFocus={ () => {
+              setFocusedElement(FocusedElement.ProgressThumb);
+            } }
+            onBlur={ () => {
+              setFocusedElement('');
+            } }
+          >
+            { ({ isFocused }) => (
+              <View
+                style={ [
+                  styles.thumb,
+                  isFocused && styles.focusedThumb,
+                ] }
+              // hasTVPreferredFocus
+              // isTVSelectable
+              // key={ FocusedElement.ProgressThumb }
+              // ref={ progressThumbRef }
+              />
+            ) }
+          </SpatialNavigationFocusableView>
+        </View>
+      </SpatialNavigationView>
+    </View>
   );
 }
 

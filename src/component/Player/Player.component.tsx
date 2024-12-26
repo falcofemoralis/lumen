@@ -34,13 +34,13 @@ export function PlayerComponent({
         >
           <ThemedText>{ status.isPlaying ? 'Pause' : 'Play' }</ThemedText>
         </Pressable>
-        <PlayerProgressBar
+        { /* <PlayerProgressBar
           status={ status }
           playerRef={ playerRef }
           rewindPosition={ rewindPosition }
           seekToPosition={ seekToPosition }
           rewindPositionAuto={ () => {} }
-        />
+        /> */ }
       </View>
     );
   };

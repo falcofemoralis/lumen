@@ -15,13 +15,13 @@ import React, { useCallback, useState } from 'react';
 import { StyleProp, TextStyle, View } from 'react-native';
 import {
   DefaultFocus,
+  Directions,
   SpatialNavigationFocusableView,
   SpatialNavigationRoot,
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
 import NavigationStore from 'Store/Navigation.store';
 import Colors from 'Style/Colors';
-import { TVEventType } from 'Type/TVEvent.type';
 import { scale } from 'Util/CreateStyles';
 
 import { Tab, TABS_TV_CONFIG } from './NavigationBar.config';
@@ -36,7 +36,7 @@ export function NavigationBarComponent() {
   );
 
   const onDirectionHandledWithoutMovement = useCallback((movement: string) => {
-    if (movement === TVEventType.Right) {
+    if (movement === Directions.RIGHT) {
       NavigationStore.closeNavigation();
     }
   }, []);

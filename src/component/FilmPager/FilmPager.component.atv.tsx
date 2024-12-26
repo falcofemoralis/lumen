@@ -5,7 +5,6 @@ import ThemedView from 'Component/ThemedView';
 import { ActivityIndicator } from 'react-native';
 import {
   DefaultFocus,
-  SpatialNavigationFocusableView,
   SpatialNavigationScrollView,
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
@@ -46,23 +45,18 @@ export function FilmPagerComponent({
     } = selectedPagerItem;
 
     return (
-      <SpatialNavigationFocusableView
+      <ThemedButton
         key={ title }
-        onActive={ () => handleMenuItemChange(item) }
+        variant="outlined"
+        isSelected={ selectedTitle === title }
+        icon={ {
+          name: 'dot-fill',
+          pack: IconPackType.Octicons,
+        } }
+        onFocus={ () => handleMenuItemChange(item) }
       >
-        { ({ isFocused, isActive }) => (
-          <ThemedButton
-            variant="outlined"
-            isSelected={ isFocused || (isActive && selectedTitle === title) }
-            icon={ {
-              name: 'dot-fill',
-              pack: IconPackType.Octicons,
-            } }
-          >
-            { title }
-          </ThemedButton>
-        ) }
-      </SpatialNavigationFocusableView>
+        { title }
+      </ThemedButton>
     );
   };
 

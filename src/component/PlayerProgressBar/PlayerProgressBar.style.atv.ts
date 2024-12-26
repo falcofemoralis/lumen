@@ -42,6 +42,6 @@ export const styles = CreateStyles({
     right: 0,
   },
   focusedThumb: {
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.secondary,
   },
 });

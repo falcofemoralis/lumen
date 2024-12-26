@@ -2,6 +2,7 @@ import { Video } from 'expo-av';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { withTV } from 'Hooks/withTV';
 import { useEffect, useRef, useState } from 'react';
+import { HWEvent, useTVEventHandler } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
 
 import PlayerComponent from './Player.component';
@@ -111,6 +112,7 @@ export function PlayerContainer({ uri }: PlayerContainerProps) {
     playerRef.current?.playFromPositionAsync(newPosition);
   };
 
+  // TODO deprecated
   const rewindPositionAuto = (direction: RewindDirection, ms = DEFAULT_REWIND_MS) => {
     if (rewindTimeout.current) {
       clearInterval(rewindTimeout.current);

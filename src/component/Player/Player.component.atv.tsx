@@ -1,20 +1,22 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import PlayerProgressBar from 'Component/PlayerProgressBar';
 import { ResizeMode, Video } from 'expo-av';
 import React, { useEffect, useState } from 'react';
 import {
   BackHandler,
-  HWEvent,
-  TouchableOpacity,
-  TVFocusGuideView,
-  useTVEventHandler,
+  DimensionValue,
   View,
 } from 'react-native';
+import {
+  DefaultFocus,
+  SpatialNavigationFocusableView,
+  SpatialNavigationView,
+} from 'react-tv-space-navigation';
 import NotificationStore from 'Store/Notification.store';
-import { TVEventType } from 'Type/TVEvent.type';
 import { scale } from 'Util/CreateStyles';
+import RemoteControlManager from 'Util/RemoteControl/RemoteControlManager';
+import { SupportedKeys } from 'Util/RemoteControl/SupportedKeys';
 
-import { FocusedElement } from './Player.config';
+import { FocusedElement, RewindDirection } from './Player.config';
 import { styles } from './Player.style.atv';
 import { PlayerComponentProps } from './Player.type';
 
@@ -23,29 +25,60 @@ export function PlayerComponent({
   playerRef,
   status,
   isPlaying,
-  showControls,
   onPlaybackStatusUpdate,
-  toggleControls,
   togglePlayPause,
-  seekToPosition,
   rewindPosition,
-  rewindPositionAuto,
 }: PlayerComponentProps) {
-  const [focusedElement, setFocusedElement] = useState<string>();
-
-  useTVEventHandler((evt: HWEvent) => {
-    const type = evt.eventType;
-
-    if (type === TVEventType.Select && focusedElement !== FocusedElement.Action) {
-      toggleControls();
-    }
-  });
+  const [focusedElement, setFocusedElement] = useState<FocusedElement>(
+    FocusedElement.ProgressThumb,
+  );
+  const [showControls, setShowControls] = useState(false);
+  const [hideActions, setHideActions] = useState(false);
 
   useEffect(() => {
+    const keyListener = (type: SupportedKeys) => {
+      if (type === SupportedKeys.Enter && !showControls) {
+        setShowControls(true);
+
+        return true;
+      }
+
+      if (focusedElement === FocusedElement.ProgressThumb) {
+        if (type === SupportedKeys.Enter) {
+          togglePlayPause();
+        }
+
+        if (type === SupportedKeys.Left) {
+          rewindPosition(RewindDirection.Backward);
+          setHideActions(true);
+        }
+
+        if (type === SupportedKeys.Right) {
+          rewindPosition(RewindDirection.Forward);
+          setHideActions(true);
+        }
+
+        // if (type === Directions.LongLeft) {
+        //   rewindPositionAuto(RewindDirection.Backward);
+        // }
+
+        // if (type === TVEventType.LongRight) {
+        //   rewindPositionAuto(RewindDirection.Forward);
+        // }
+
+        if ((type === SupportedKeys.Up || type === SupportedKeys.Down) && hideActions) {
+          setHideActions(false);
+        }
+      }
+
+      return false;
+    };
+
     const backAction = () => {
       if (showControls) {
-        setFocusedElement(undefined);
-        toggleControls();
+        setShowControls(false);
+        setHideActions(false);
+        setFocusedElement(FocusedElement.ProgressThumb);
 
         return true;
       }
@@ -53,85 +86,126 @@ export function PlayerComponent({
       return false;
     };
 
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+    const remoteControlListener = RemoteControlManager.addKeydownListener(keyListener);
 
-    return () => backHandler.remove();
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+
+    return () => {
+      backHandler.remove();
+      RemoteControlManager.removeKeydownListener(remoteControlListener);
+    };
   });
 
-  const renderAction = (icon: string, _name: string, action: any = () => {}) => (
-    <TouchableOpacity
+  const renderAction = (
+    icon: string,
+    _name: string,
+    action?: () => void,
+  ) => (
+    <SpatialNavigationFocusableView
+      onSelect={ action }
       onFocus={ () => setFocusedElement(FocusedElement.Action) }
-      onPress={ action }
     >
-      <MaterialIcons
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- This is okay
-        // @ts-ignore -- It was handled in the code above
-        name={ icon }
-        size={ scale(36) }
-        color="white"
-      />
-    </TouchableOpacity>
+      { ({ isFocused }) => (
+        <MaterialIcons
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- This is okay
+          // @ts-ignore -- It was handled in the code above
+          name={ icon }
+          size={ scale(36) }
+          color={ isFocused ? 'black' : 'white' }
+        />
+      ) }
+    </SpatialNavigationFocusableView>
   );
 
-  const renderTopActions = () => {
-    if (!showControls) {
-      return null;
-    }
-
-    return (
-      <TVFocusGuideView
-        style={ styles.controlsRow }
-        autoFocus
-        focusable={ showControls }
-      >
-        { renderAction(isPlaying ? 'pause' : 'play-arrow', 'Play', togglePlayPause) }
-        { renderAction('skip-previous', 'Previous') }
-        { renderAction('skip-next', 'Next') }
-        { renderAction('speed', 'Speed') }
-        { renderAction('comment', 'Comments') }
-      </TVFocusGuideView>
-    );
-  };
+  const renderTopActions = () => (
+    <SpatialNavigationView
+      direction="horizontal"
+      style={ {
+        ...styles.controlsRow,
+        ...(hideActions ? styles.controlsRowHidden : {}),
+      } }
+    >
+      { renderAction(
+        isPlaying ? 'pause' : 'play-arrow',
+        'Play',
+        togglePlayPause,
+      ) }
+      { renderAction('skip-previous', 'Previous') }
+      { renderAction('skip-next', 'Next') }
+      { renderAction('speed', 'Speed') }
+      { renderAction('comment', 'Comments') }
+    </SpatialNavigationView>
+  );
 
   const renderProgressBar = () => (
-    <PlayerProgressBar
-      status={ status }
-      playerRef={ playerRef }
-      focusedElement={ focusedElement }
-      setFocusedElement={ setFocusedElement }
-      seekToPosition={ seekToPosition }
-      rewindPosition={ rewindPosition }
-      rewindPositionAuto={ rewindPositionAuto }
-    />
+    <View style={ styles.progressBarContainer }>
+      <SpatialNavigationView direction="horizontal">
+        { /* Playable Duration */ }
+        <View
+          style={ [
+            styles.playableBar,
+            { width: (`${status.playablePercentage}%`) as DimensionValue },
+          ] }
+        />
+        { /* Progress Playback */ }
+        <View
+          style={ [
+            styles.progressBar,
+            { width: (`${status.progressPercentage}%`) as DimensionValue },
+          ] }
+        >
+          { /* Progress Thumb */ }
+          <SpatialNavigationFocusableView
+            onFocus={ () => setFocusedElement(FocusedElement.ProgressThumb) }
+          >
+            { ({ isFocused }) => (
+              <View
+                style={ [
+                  styles.thumb,
+                  isFocused && styles.focusedThumb,
+                ] }
+              />
+            ) }
+          </SpatialNavigationFocusableView>
+        </View>
+      </SpatialNavigationView>
+    </View>
   );
 
-  const renderBottomActions = () => {
+  const renderBottomActions = () => (
+    <SpatialNavigationView
+      direction="horizontal"
+      style={ {
+        ...styles.controlsRow,
+        ...(hideActions ? styles.controlsRowHidden : {}),
+      } }
+    >
+      { renderAction('high-quality', 'Quality') }
+      { renderAction('playlist-play', 'Series') }
+      { renderAction('subtitles', 'Subtitles') }
+      { renderAction('bookmarks', 'Bookmarks') }
+      { renderAction('share', 'Share') }
+    </SpatialNavigationView>
+  );
+
+  const renderControls = () => {
     if (!showControls) {
       return null;
     }
 
     return (
-      <TVFocusGuideView
-        style={ styles.controlsRow }
-        autoFocus
-        focusable={ showControls }
-      >
-        { renderAction('high-quality', 'Quality') }
-        { renderAction('playlist-play', 'Series') }
-        { renderAction('subtitles', 'Subtitles') }
-        { renderAction('bookmarks', 'Bookmarks') }
-        { renderAction('share', 'Share') }
-      </TVFocusGuideView>
+      <View style={ styles.controls }>
+        { renderTopActions() }
+        <DefaultFocus>
+          { renderProgressBar() }
+        </DefaultFocus>
+        { renderBottomActions() }
+      </View>
     );
   };
-
-  const renderControls = () => (
-    <View style={ [styles.controls, showControls ? styles.controlsVisible : undefined] }>
-      { renderTopActions() }
-      { renderProgressBar() }
-      { renderBottomActions() }
-    </View>
-  );
 
   return (
     <View style={ styles.container }>

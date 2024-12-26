@@ -1,34 +1,32 @@
-import { EventSubscription, HWEvent, TVEventHandler } from 'react-native';
 import { Directions, SpatialNavigation } from 'react-tv-space-navigation';
-import { TVEventType } from 'Type/TVEvent.type';
+
+import RemoteControlManager from './RemoteControlManager';
+import { SupportedKeys } from './SupportedKeys';
 
 SpatialNavigation.configureRemoteControl({
   remoteControlSubscriber: (callback) => {
-    const mapping: { [key in TVEventType]: Directions | null } = {
-      [TVEventType.Right]: Directions.RIGHT,
-      [TVEventType.Left]: Directions.LEFT,
-      [TVEventType.Up]: Directions.UP,
-      [TVEventType.Down]: Directions.DOWN,
-      [TVEventType.Select]: Directions.ENTER,
-      [TVEventType.LongUp]: null,
-      [TVEventType.LongDown]: null,
-      [TVEventType.LongRight]: null,
-      [TVEventType.LongLeft]: null,
-      [TVEventType.Pan]: null,
-      [TVEventType.Blur]: null,
-      [TVEventType.Focus]: null,
+    const mapping: { [key in SupportedKeys]: Directions | null } = {
+      [SupportedKeys.Right]: Directions.RIGHT,
+      [SupportedKeys.Left]: Directions.LEFT,
+      [SupportedKeys.Up]: Directions.UP,
+      [SupportedKeys.Down]: Directions.DOWN,
+      [SupportedKeys.Enter]: Directions.ENTER,
+      [SupportedKeys.LongEnter]: Directions.LONG_ENTER,
+      [SupportedKeys.Back]: null,
     };
 
-    const remoteControlListener = (evt: HWEvent) => {
-      callback(mapping[evt.eventType as TVEventType]);
+    const remoteControlListener = (keyEvent: SupportedKeys) => {
+      console.log('remoteControlListener', keyEvent);
+
+      callback(mapping[keyEvent]);
 
       return false;
     };
 
-    return TVEventHandler.addListener(remoteControlListener);
+    return RemoteControlManager.addKeydownListener(remoteControlListener);
   },
 
-  remoteControlUnsubscriber: (eventSubscription: EventSubscription | undefined) => {
-    eventSubscription?.remove();
+  remoteControlUnsubscriber: (remoteControlListener) => {
+    RemoteControlManager.removeKeydownListener(remoteControlListener);
   },
 });

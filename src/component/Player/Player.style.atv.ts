@@ -1,9 +1,10 @@
+import Colors from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
   container: {
     position: 'relative',
-    backgroundColor: 'black',
+    backgroundColor: Colors.background,
     width: '100%',
     height: '100%',
   },
@@ -20,14 +21,14 @@ export const styles = CreateStyles({
     backgroundColor: 'transparent',
     width: '100%',
     height: 'auto',
-    opacity: 0,
-  },
-  controlsVisible: {
-    opacity: 1,
   },
   controlsRow: {
     flexDirection: 'row',
     gap: 36,
+    opacity: 1,
+  },
+  controlsRowHidden: {
+    opacity: 0,
   },
   action: {
     color: 'red',
@@ -41,5 +42,47 @@ export const styles = CreateStyles({
     left: 10,
     right: 10,
     zIndex: 5,
+  },
+  progressBarContainer: {
+    backgroundColor: '#555555aa',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    width: '100%',
+    height: 4,
+    marginTop: 40,
+    marginBottom: 20,
+  },
+  playableBar: {
+    backgroundColor: '#888888aa',
+    display: 'flex',
+    alignItems: 'center',
+    position: 'absolute',
+    zIndex: 0,
+    top: 0,
+    bottom: 0,
+    left: 0,
+  },
+  progressBar: {
+    backgroundColor: Colors.primary,
+    display: 'flex',
+    alignItems: 'center',
+    position: 'absolute',
+    zIndex: 1,
+    top: 0,
+    bottom: 0,
+    left: 0,
+  },
+  thumb: {
+    zIndex: 3,
+    width: 10,
+    height: 10,
+    borderRadius: 99,
+    backgroundColor: Colors.white,
+    position: 'absolute',
+    top: '-80%',
+    right: 0,
+  },
+  focusedThumb: {
+    backgroundColor: Colors.secondary,
   },
 });

@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.4",
+    "@bam.tech/react-native-keyevent-expo-config-plugin": "^1.0.52",
     "@react-native-community/slider": "^4.5.5",
     "@react-navigation/bottom-tabs": "^7.2.0",
     "@react-navigation/material-top-tabs": "^7.1.0",
@@ -41,6 +42,7 @@
     "react-native": "npm:react-native-tvos@~0.76.5-0",
     "react-native-cache": "^2.0.3",
     "react-native-gesture-handler": "~2.20.2",
+    "react-native-keyevent": "^0.3.2",
     "react-native-mmkv-storage": "^0.11.2",
     "react-native-pager-view": "^6.6.1",
     "react-native-paper": "^5.12.5",

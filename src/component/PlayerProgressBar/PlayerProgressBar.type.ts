@@ -10,6 +10,7 @@ export type PlayerProgressBarContainerProps = {
   seekToPosition: (percent: number) => void;
   rewindPosition: (type: RewindDirection, ms?: number) => void;
   rewindPositionAuto: (type: RewindDirection, ms?: number) => void;
+  toggleControls? : () => void;
 };
 
 export type PlayerProgressBarComponentProps = {
@@ -20,4 +21,5 @@ export type PlayerProgressBarComponentProps = {
   seekToPosition: (percent: number) => void;
   rewindPosition: (type: RewindDirection, ms?: number) => void;
   rewindPositionAuto: (type: RewindDirection, ms?: number) => void;
+  toggleControls? : () => void;
 };

@@ -3,9 +3,8 @@ import ThemedView from 'Component/ThemedView';
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import { Keyboard } from 'react-native';
-import { SpatialNavigationRoot, useLockSpatialNavigation } from 'react-tv-space-navigation';
+import { Directions, SpatialNavigationRoot, useLockSpatialNavigation } from 'react-tv-space-navigation';
 import NavigationStore from 'Store/Navigation.store';
-import { TVEventType } from 'Type/TVEvent.type';
 import { getWindowWidth } from 'Util/Window';
 
 import { styles } from './Page.style.atv';
@@ -36,17 +35,17 @@ const SpatialNavigationKeyboardLocker = () => {
   return null;
 };
 
+const onDirectionHandledWithoutMovement = (movement: string) => {
+  if (movement === Directions.LEFT && !NavigationStore.isNavigationLocked) {
+    NavigationStore.openNavigation();
+  }
+};
+
 export function PageComponent(props: PageComponentProps) {
   const { children, style } = props;
   const isFocused = useIsFocused();
 
   const isActive = isFocused && !NavigationStore.isNavigationOpened;
-
-  const onDirectionHandledWithoutMovement = (movement: string) => {
-    if (movement === TVEventType.Left && !NavigationStore.isNavigationLocked) {
-      NavigationStore.openNavigation();
-    }
-  };
 
   return (
     <ThemedView

@@ -8,6 +8,7 @@ import { ThemedButtonProps } from './ThemedButton.type';
 
 export default function ThemedButton({
   onPress,
+  onFocus,
   children,
   style,
   isSelected,
@@ -15,8 +16,11 @@ export default function ThemedButton({
   variant = 'filled',
 }: ThemedButtonProps) {
   return (
-    <SpatialNavigationFocusableView onSelect={ onPress }>
-      { ({ isFocused }) => (
+    <SpatialNavigationFocusableView
+      onSelect={ onPress }
+      onFocus={ onFocus }
+    >
+      { ({ isFocused, isActive }) => (
         <View
           style={ [
             styles.container,
@@ -25,7 +29,7 @@ export default function ThemedButton({
             isFocused && styles.containerFocused,
             variant === 'outlined' && {
               ...styles.containerOutlined,
-              ...(isSelected && styles.containerOutlinedSelected),
+              ...(isSelected && isActive && styles.containerOutlinedSelected),
               ...(isFocused && styles.containerOutlinedFocused),
             },
           ] }
@@ -37,7 +41,7 @@ export default function ThemedButton({
                 isFocused && styles.iconFocused,
                 variant === 'outlined' && {
                   ...styles.iconOutlined,
-                  ...(isSelected && styles.iconOutlinedSelected),
+                  ...(isSelected && isActive && styles.iconOutlinedSelected),
                   ...(isFocused && styles.iconOutlinedFocused),
                 },
               ] }
@@ -52,7 +56,7 @@ export default function ThemedButton({
               isFocused && styles.textFocused,
               variant === 'outlined' && {
                 ...styles.textOutlined,
-                ...(isSelected && styles.textOutlinedSelected),
+                ...(isSelected && isActive && styles.textOutlinedSelected),
                 ...(isFocused && styles.textOutlinedFocused),
               },
             ] }
