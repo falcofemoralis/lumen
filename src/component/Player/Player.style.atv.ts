@@ -50,7 +50,7 @@ export const styles = CreateStyles({
     left: 0,
   },
   progressBar: {
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.secondary,
     display: 'flex',
     alignItems: 'center',
     position: 'absolute',
@@ -75,5 +75,28 @@ export const styles = CreateStyles({
   },
   focusedThumb: {
     backgroundColor: Colors.secondary,
+  },
+  topInfo: {
+  },
+  title: {
+    fontSize: 36,
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 24,
+    marginBottom: 20,
+  },
+  bottomActions: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  duration: {
+    width: 'auto',
+  },
+  durationText: {
+    fontSize: 16,
+    textAlign: 'right',
   },
 });

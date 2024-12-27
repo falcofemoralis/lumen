@@ -1,4 +1,6 @@
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import ThemedIcon from 'Component/ThemedIcon';
+import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
+import ThemedText from 'Component/ThemedText';
 import { VideoView } from 'expo-video';
 import React, { useEffect, useState } from 'react';
 import {
@@ -22,6 +24,7 @@ import { PlayerComponentProps } from './Player.type';
 export function PlayerComponent({
   player,
   status,
+  film,
   togglePlayPause,
   rewindPosition,
   rewindPositionAuto,
@@ -103,6 +106,35 @@ export function PlayerComponent({
     };
   });
 
+  const renderTitle = () => {
+    const { title } = film;
+
+    return (
+      <ThemedText style={ styles.title }>{ title }</ThemedText>
+    );
+  };
+
+  const renderSubtitle = () => {
+    const { releaseDate, countries } = film;
+
+    return (
+      <ThemedText style={ styles.subtitle }>{ `${releaseDate} ${countries ? countries[0] : ''}` }</ThemedText>
+    );
+  };
+
+  const renderTopInfo = () => {
+    if (hideActions) {
+      return null;
+    }
+
+    return (
+      <View style={ styles.topInfo }>
+        { renderTitle() }
+        { renderSubtitle() }
+      </View>
+    );
+  };
+
   const renderAction = (
     icon: string,
     _name: string,
@@ -113,10 +145,11 @@ export function PlayerComponent({
       onFocus={ () => setFocusedElement(FocusedElement.Action) }
     >
       { ({ isFocused }) => (
-        <MaterialIcons
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- This is okay
-          // @ts-ignore -- It was handled in the code above
-          name={ icon }
+        <ThemedIcon
+          icon={ {
+            name: icon,
+            pack: IconPackType.MaterialIcons,
+          } }
           size={ scale(36) }
           color={ isFocused ? 'black' : 'white' }
         />
@@ -178,20 +211,38 @@ export function PlayerComponent({
     </View>
   );
 
+  const renderDuration = () => {
+    const { currentTime, durationTime, remainingTime } = status;
+
+    return (
+      <View style={ styles.duration }>
+        <ThemedText style={ styles.durationText }>
+          { `Remaining: ${remainingTime}` }
+        </ThemedText>
+        <ThemedText style={ styles.durationText }>
+          { `${currentTime} / ${durationTime}` }
+        </ThemedText>
+      </View>
+    );
+  };
+
   const renderBottomActions = () => (
-    <SpatialNavigationView
-      direction="horizontal"
-      style={ {
-        ...styles.controlsRow,
-        ...(hideActions ? styles.controlsRowHidden : {}),
-      } }
-    >
-      { renderAction('high-quality', 'Quality') }
-      { renderAction('playlist-play', 'Series') }
-      { renderAction('subtitles', 'Subtitles') }
-      { renderAction('bookmarks', 'Bookmarks') }
-      { renderAction('share', 'Share') }
-    </SpatialNavigationView>
+    <View style={ styles.bottomActions }>
+      <SpatialNavigationView
+        direction="horizontal"
+        style={ {
+          ...styles.controlsRow,
+          ...(hideActions ? styles.controlsRowHidden : {}),
+        } }
+      >
+        { renderAction('high-quality', 'Quality') }
+        { renderAction('playlist-play', 'Series') }
+        { renderAction('subtitles', 'Subtitles') }
+        { renderAction('bookmarks', 'Bookmarks') }
+        { renderAction('share', 'Share') }
+      </SpatialNavigationView>
+      { renderDuration() }
+    </View>
   );
 
   const renderControls = () => {
@@ -201,6 +252,7 @@ export function PlayerComponent({
 
     return (
       <View style={ styles.controls }>
+        { renderTopInfo() }
         { renderTopActions() }
         <DefaultFocus>
           { renderProgressBar() }

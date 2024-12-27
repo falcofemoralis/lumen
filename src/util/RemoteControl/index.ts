@@ -16,8 +16,6 @@ SpatialNavigation.configureRemoteControl({
     };
 
     const remoteControlListener = (keyEvent: SupportedKeys) => {
-      console.log('remoteControlListener', keyEvent);
-
       callback(mapping[keyEvent]);
 
       return false;

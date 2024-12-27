@@ -1,14 +1,18 @@
 import { VideoPlayer } from 'expo-video';
+import { FilmInterface } from 'Type/Film.interface';
+import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 
 import { RewindDirection } from './Player.config';
 
 export interface PlayerContainerProps {
-  uri: string;
+  video: FilmVideoInterface;
+  film: FilmInterface
 }
 
 export interface PlayerComponentProps {
   player: VideoPlayer;
   status: Status;
+  film: FilmInterface;
   togglePlayPause: () => void;
   rewindPosition: (type: RewindDirection, ms?: number) => void;
   rewindPositionAuto: (type: RewindDirection, ms?: number) => void;
@@ -19,4 +23,7 @@ export type Status = {
   progressPercentage: number;
   playablePercentage: number;
   isPlaying: boolean;
+  currentTime: string;
+  durationTime: string;
+  remainingTime: string;
 };

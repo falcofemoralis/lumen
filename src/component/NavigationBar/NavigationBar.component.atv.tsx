@@ -163,7 +163,8 @@ export function NavigationBarComponent() {
         tabBarHideOnKeyboard: true,
         tabBarPosition: 'left',
       } }
-      tabBar={ renderTabBar }
+      tabBar={ () => null }
+      // tabBar={ renderTabBar }
     />
   );
 }

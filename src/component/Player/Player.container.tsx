@@ -4,6 +4,7 @@ import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { useVideoPlayer } from 'expo-video';
 import { withTV } from 'Hooks/withTV';
 import { useEffect, useRef, useState } from 'react';
+import { convertSecondsToTime } from 'Util/Date';
 
 import PlayerComponent from './Player.component';
 import PlayerComponentTV from './Player.component.atv';
@@ -16,11 +17,14 @@ import {
 } from './Player.config';
 import { PlayerContainerProps, Status } from './Player.type';
 
-export function PlayerContainer({ uri }: PlayerContainerProps) {
+export function PlayerContainer({
+  video,
+  film,
+}: PlayerContainerProps) {
   const rewindTimeout = useRef<NodeJS.Timeout | null>(null);
   const [status, setStatus] = useState<Status>(DEFAULT_STATUS); // used for rendering component
 
-  const player = useVideoPlayer(uri, (p) => {
+  const player = useVideoPlayer(video.streams[0].url, (p) => {
     p.loop = false;
     p.timeUpdateEventInterval = 1;
     p.play();
@@ -41,6 +45,9 @@ export function PlayerContainer({ uri }: PlayerContainerProps) {
       ...status,
       progressPercentage: (currentTime / duration) * 100,
       playablePercentage: (bufferedPosition / duration) * 100,
+      currentTime: convertSecondsToTime(currentTime),
+      durationTime: convertSecondsToTime(duration),
+      remainingTime: convertSecondsToTime(duration - currentTime),
     });
   });
 
@@ -89,6 +96,7 @@ export function PlayerContainer({ uri }: PlayerContainerProps) {
   const containerProps = () => ({
     player,
     status,
+    film,
   });
 
   const containerFunctions = {
