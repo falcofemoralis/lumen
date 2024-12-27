@@ -1,5 +1,7 @@
 import { withTV } from 'Hooks/withTV';
 import { useEffect, useRef, useState } from 'react';
+import { useLockSpatialNavigation } from 'react-tv-space-navigation';
+import ConfigStore from 'Store/Config.store';
 import NotificationStore from 'Store/Notification.store';
 import { PaginationInterface } from 'Type/Pagination.interface';
 
@@ -26,6 +28,7 @@ export function FilmPagerContainer({
   );
   const [selectedPageItemId, setSelectedPageItemId] = useState<string>(pagerItems[0].key);
   const debounce = useRef<NodeJS.Timeout | undefined>();
+  const { lock, unlock } = useLockSpatialNavigation();
 
   useEffect(() => {
     loadFilms(pagerItems[0], { currentPage: 1, totalPages: 1 });
@@ -93,9 +96,18 @@ export function FilmPagerContainer({
     if (key !== selectedPageItemId) {
       clearTimeout(debounce.current);
 
-      debounce.current = setTimeout(() => {
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      debounce.current = setTimeout(async () => {
+        if (ConfigStore.isTV) lock();
+
         setSelectedPageItemId(key);
-        loadFilms(pagerItem, { currentPage: 1, totalPages: 1 }, true);
+        await loadFilms(pagerItem, { currentPage: 1, totalPages: 1 }, true);
+
+        if (ConfigStore.isTV) {
+          setTimeout(() => {
+            unlock();
+          }, 0);
+        }
       }, 1000);
     }
   };

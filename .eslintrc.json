@@ -57,7 +57,7 @@
     "no-restricted-exports": "off",
     "react/style-prop-object": "off",
     "linebreak-style": "off",
-    "eslint-comments/require-description": ["warn", { "ignore": [] }],
+    "eslint-comments/require-description": ["off", { "ignore": [] }],
     "functional/no-let": [
       "warn",
       {

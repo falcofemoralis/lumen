@@ -1,28 +1,30 @@
-import { Video } from 'expo-av';
+/* eslint-disable react-compiler/react-compiler */
+import { useEventListener } from 'expo';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
+import { useVideoPlayer } from 'expo-video';
 import { withTV } from 'Hooks/withTV';
 import { useEffect, useRef, useState } from 'react';
-import { HWEvent, useTVEventHandler } from 'react-native';
-import NotificationStore from 'Store/Notification.store';
 
 import PlayerComponent from './Player.component';
 import PlayerComponentTV from './Player.component.atv';
 import {
   AWAKE_TAG,
   DEFAULT_AUTO_REWIND_MS,
-  DEFAULT_REWIND_MS,
+  DEFAULT_REWIND,
   DEFAULT_STATUS,
   RewindDirection,
 } from './Player.config';
 import { PlayerContainerProps, Status } from './Player.type';
 
 export function PlayerContainer({ uri }: PlayerContainerProps) {
-  const playerRef = useRef<Video>(null);
-  const statusRef = useRef<Status | null>(null); // used fur async operation
   const rewindTimeout = useRef<NodeJS.Timeout | null>(null);
   const [status, setStatus] = useState<Status>(DEFAULT_STATUS); // used for rendering component
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [showControls, setShowControls] = useState(false);
+
+  const player = useVideoPlayer(uri, (p) => {
+    p.loop = false;
+    p.timeUpdateEventInterval = 1;
+    p.play();
+  });
 
   useEffect(() => {
     activateKeepAwakeAsync(AWAKE_TAG);
@@ -32,88 +34,46 @@ export function PlayerContainer({ uri }: PlayerContainerProps) {
     };
   }, []);
 
-  const onPlaybackStatusUpdate = async (newStatus: Status) => {
-    if (!newStatus) {
-      return;
-    }
+  useEventListener(player, 'timeUpdate', ({ currentTime, bufferedPosition }) => {
+    const { duration } = player;
 
-    if (newStatus.error) {
-      NotificationStore.displayError(newStatus.error);
+    setStatus({
+      ...status,
+      progressPercentage: (currentTime / duration) * 100,
+      playablePercentage: (bufferedPosition / duration) * 100,
+    });
+  });
 
-      return;
-    }
-
-    if (!playerRef) {
-      return;
-    }
-
-    const {
-      isLoaded = false,
-      isPlaying: statusIsPlaying = false,
-      isBuffering: statusIsBuffering = false,
-      durationMillis,
-      positionMillis,
-      playableDurationMillis,
-    } = newStatus ?? {};
-
-    if (isLoaded) {
-      if (durationMillis && positionMillis && playableDurationMillis) {
-        const progressPercentage = (positionMillis / durationMillis) * 100;
-        const playablePercentage = (playableDurationMillis / durationMillis) * 100;
-        const updatedStatus = { ...newStatus, progressPercentage, playablePercentage };
-
-        setStatus(updatedStatus);
-        statusRef.current = updatedStatus;
-      }
-
-      const newIsPlaying = statusIsPlaying || statusIsBuffering;
-
-      if (isPlaying !== newIsPlaying) {
-        setIsPlaying(newIsPlaying);
-      }
-    }
-  };
-
-  const toggleControls = () => {
-    setShowControls(!showControls);
-  };
+  useEventListener(player, 'playingChange', ({ isPlaying }) => {
+    setStatus({
+      ...status,
+      isPlaying,
+    });
+  });
 
   const togglePlayPause = () => {
-    const { isPlaying: playing } = status;
+    const { playing } = player;
 
     if (playing) {
-      playerRef.current?.pauseAsync();
+      player.pause();
     } else {
-      playerRef.current?.playAsync();
+      player.play();
     }
   };
 
   const seekToPosition = async (percent: number) => {
-    const { durationMillis: duration } = statusRef.current ?? {};
+    const { duration } = player;
 
     if (!duration) return;
 
-    const newPosition = (percent / 100) * duration;
-
-    playerRef.current?.playFromPositionAsync(newPosition);
+    player.currentTime = (percent / 100) * duration;
   };
 
-  const rewindPosition = async (type: RewindDirection, ms = DEFAULT_REWIND_MS) => {
-    const { positionMillis: position, durationMillis: duration } = statusRef.current ?? {};
-
-    if (!position || !duration) return;
-
-    if (type === RewindDirection.Backward) {
-      if (position < 0) return;
-    } else if (position >= duration) return;
-
-    const newPosition = type === RewindDirection.Backward ? position - ms : position + ms;
-
-    playerRef.current?.playFromPositionAsync(newPosition);
+  const rewindPosition = async (type: RewindDirection, seconds = DEFAULT_REWIND) => {
+    player.seekBy(type === RewindDirection.Backward ? seconds * -1 : seconds);
   };
 
-  // TODO deprecated
-  const rewindPositionAuto = (direction: RewindDirection, ms = DEFAULT_REWIND_MS) => {
+  const rewindPositionAuto = (direction: RewindDirection, seconds = DEFAULT_REWIND) => {
     if (rewindTimeout.current) {
       clearInterval(rewindTimeout.current);
       rewindTimeout.current = null;
@@ -122,21 +82,16 @@ export function PlayerContainer({ uri }: PlayerContainerProps) {
     }
 
     rewindTimeout.current = setInterval(() => {
-      rewindPosition(direction, ms);
+      rewindPosition(direction, seconds);
     }, DEFAULT_AUTO_REWIND_MS);
   };
 
   const containerProps = () => ({
-    uri,
-    playerRef,
+    player,
     status,
-    isPlaying,
-    showControls,
   });
 
   const containerFunctions = {
-    onPlaybackStatusUpdate,
-    toggleControls,
     togglePlayPause,
     rewindPosition,
     rewindPositionAuto,

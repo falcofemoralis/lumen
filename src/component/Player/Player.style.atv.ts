@@ -30,19 +30,6 @@ export const styles = CreateStyles({
   controlsRowHidden: {
     opacity: 0,
   },
-  action: {
-    color: 'red',
-    fontSize: 24,
-    padding: 12,
-  },
-  invisibleContainer: {
-    height: 16,
-    position: 'absolute',
-    top: -10,
-    left: 10,
-    right: 10,
-    zIndex: 5,
-  },
   progressBarContainer: {
     backgroundColor: '#555555aa',
     marginLeft: 'auto',
@@ -72,15 +59,19 @@ export const styles = CreateStyles({
     bottom: 0,
     left: 0,
   },
-  thumb: {
+  thumbContainer: {
     zIndex: 3,
     width: 10,
     height: 10,
-    borderRadius: 99,
-    backgroundColor: Colors.white,
     position: 'absolute',
     top: '-80%',
     right: 0,
+  },
+  thumb: {
+    height: '100%',
+    width: '100%',
+    borderRadius: 99,
+    backgroundColor: Colors.white,
   },
   focusedThumb: {
     backgroundColor: Colors.secondary,

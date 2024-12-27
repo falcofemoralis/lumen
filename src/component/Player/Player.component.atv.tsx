@@ -1,5 +1,5 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { ResizeMode, Video } from 'expo-av';
+import { VideoView } from 'expo-video';
 import React, { useEffect, useState } from 'react';
 import {
   BackHandler,
@@ -11,7 +11,6 @@ import {
   SpatialNavigationFocusableView,
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
-import NotificationStore from 'Store/Notification.store';
 import { scale } from 'Util/CreateStyles';
 import RemoteControlManager from 'Util/RemoteControl/RemoteControlManager';
 import { SupportedKeys } from 'Util/RemoteControl/SupportedKeys';
@@ -21,19 +20,22 @@ import { styles } from './Player.style.atv';
 import { PlayerComponentProps } from './Player.type';
 
 export function PlayerComponent({
-  uri,
-  playerRef,
+  player,
   status,
-  isPlaying,
-  onPlaybackStatusUpdate,
   togglePlayPause,
   rewindPosition,
+  rewindPositionAuto,
 }: PlayerComponentProps) {
   const [focusedElement, setFocusedElement] = useState<FocusedElement>(
     FocusedElement.ProgressThumb,
   );
   const [showControls, setShowControls] = useState(false);
   const [hideActions, setHideActions] = useState(false);
+
+  const toggleSeekMode = () => {
+    setHideActions(true);
+    setShowControls(true);
+  };
 
   useEffect(() => {
     const keyListener = (type: SupportedKeys) => {
@@ -50,21 +52,23 @@ export function PlayerComponent({
 
         if (type === SupportedKeys.Left) {
           rewindPosition(RewindDirection.Backward);
-          setHideActions(true);
+          toggleSeekMode();
         }
 
         if (type === SupportedKeys.Right) {
           rewindPosition(RewindDirection.Forward);
-          setHideActions(true);
+          toggleSeekMode();
         }
 
-        // if (type === Directions.LongLeft) {
-        //   rewindPositionAuto(RewindDirection.Backward);
-        // }
+        if (type === SupportedKeys.LongLeft) {
+          rewindPositionAuto(RewindDirection.Backward);
+          toggleSeekMode();
+        }
 
-        // if (type === TVEventType.LongRight) {
-        //   rewindPositionAuto(RewindDirection.Forward);
-        // }
+        if (type === SupportedKeys.LongRight) {
+          rewindPositionAuto(RewindDirection.Forward);
+          toggleSeekMode();
+        }
 
         if ((type === SupportedKeys.Up || type === SupportedKeys.Down) && hideActions) {
           setHideActions(false);
@@ -129,7 +133,7 @@ export function PlayerComponent({
       } }
     >
       { renderAction(
-        isPlaying ? 'pause' : 'play-arrow',
+        status.isPlaying ? 'pause' : 'play-arrow',
         'Play',
         togglePlayPause,
       ) }
@@ -142,36 +146,35 @@ export function PlayerComponent({
 
   const renderProgressBar = () => (
     <View style={ styles.progressBarContainer }>
-      <SpatialNavigationView direction="horizontal">
-        { /* Playable Duration */ }
-        <View
-          style={ [
-            styles.playableBar,
-            { width: (`${status.playablePercentage}%`) as DimensionValue },
-          ] }
-        />
-        { /* Progress Playback */ }
-        <View
-          style={ [
-            styles.progressBar,
-            { width: (`${status.progressPercentage}%`) as DimensionValue },
-          ] }
+      { /* Playable Duration */ }
+      <View
+        style={ [
+          styles.playableBar,
+          { width: (`${status.playablePercentage}%`) as DimensionValue },
+        ] }
+      />
+      { /* Progress Playback */ }
+      <View
+        style={ [
+          styles.progressBar,
+          { width: (`${status.progressPercentage}%`) as DimensionValue },
+        ] }
+      >
+        { /* Progress Thumb */ }
+        <SpatialNavigationFocusableView
+          style={ styles.thumbContainer }
+          onFocus={ () => setFocusedElement(FocusedElement.ProgressThumb) }
         >
-          { /* Progress Thumb */ }
-          <SpatialNavigationFocusableView
-            onFocus={ () => setFocusedElement(FocusedElement.ProgressThumb) }
-          >
-            { ({ isFocused }) => (
-              <View
-                style={ [
-                  styles.thumb,
-                  isFocused && styles.focusedThumb,
-                ] }
-              />
-            ) }
-          </SpatialNavigationFocusableView>
-        </View>
-      </SpatialNavigationView>
+          { ({ isFocused }) => (
+            <View
+              style={ [
+                styles.thumb,
+                isFocused && styles.focusedThumb,
+              ] }
+            />
+          ) }
+        </SpatialNavigationFocusableView>
+      </View>
     </View>
   );
 
@@ -209,18 +212,13 @@ export function PlayerComponent({
 
   return (
     <View style={ styles.container }>
-      <Video
+      <VideoView
         style={ styles.video }
-        ref={ playerRef }
-        source={ { uri } }
-        shouldPlay
-        resizeMode={ ResizeMode.CONTAIN }
-        onError={ (err) => {
-          NotificationStore.displayError(err);
-        } }
-        useNativeControls={ false }
-        onPlaybackStatusUpdate={ onPlaybackStatusUpdate }
-        progressUpdateIntervalMillis={ 1000 }
+        player={ player }
+        contentFit="contain"
+        nativeControls={ false }
+        allowsFullscreen={ false }
+        allowsPictureInPicture={ false }
       />
       { renderControls() }
     </View>
