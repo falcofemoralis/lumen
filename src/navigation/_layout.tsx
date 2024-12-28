@@ -12,6 +12,7 @@ import { useLocale } from 'Hooks/useLocale';
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { PaperProvider } from 'react-native-paper';
 import { SpatialNavigationDeviceTypeProvider } from 'react-tv-space-navigation';
 import ConfigStore from 'Store/Config.store';
@@ -68,7 +69,9 @@ export function RootLayout() {
     <SpatialNavigationDeviceTypeProvider>{ renderStack() }</SpatialNavigationDeviceTypeProvider>
   );
 
-  const renderMobileLayout = () => renderStack();
+  const renderMobileLayout = () => (
+    <GestureHandlerRootView>{ renderStack() }</GestureHandlerRootView>
+  );
 
   const renderLayout = () => (ConfigStore.isTV ? renderTVLayout() : renderMobileLayout());
 

@@ -21,7 +21,7 @@ TV Space nav    https://github.com/bamlab/react-tv-space-navigation?tab=readme-o
 ///
 Mobile Only
 Refresh list    https://reactnative.dev/docs/refreshcontrol
-Slider          https://github.com/callstack/react-native-slider
+Slider          https://github.com/alantoa/react-native-awesome-slider
 
 ###
 Reuse

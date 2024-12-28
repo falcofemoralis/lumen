@@ -1,4 +1,3 @@
-import Slider from '@react-native-community/slider';
 import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedText from 'Component/ThemedText';
@@ -8,11 +7,14 @@ import * as ScreenOrientation from 'expo-screen-orientation';
 import { OrientationLock } from 'expo-screen-orientation';
 import { StatusBar } from 'expo-status-bar';
 import { VideoView } from 'expo-video';
-import React, { useEffect, useState } from 'react';
-import { DimensionValue, Pressable, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Pressable, View } from 'react-native';
+import { Slider } from 'react-native-awesome-slider';
+import { useSharedValue } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Colors from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
+import { convertSecondsToTime } from 'Util/Date';
 
 import { styles } from './Player.style';
 import { PlayerComponentProps } from './Player.type';
@@ -24,8 +26,14 @@ export function PlayerComponent({
   togglePlayPause,
   rewindPosition,
   seekToPosition,
+  calculateCurrentTime,
 }: PlayerComponentProps) {
   const [showControls, setShowControls] = useState(false);
+  const progress = useSharedValue(0);
+  const cache = useSharedValue(0);
+  const minimumValue = useSharedValue(0);
+  const maximumValue = useSharedValue(100);
+  const isSliding = useRef(false);
 
   useEffect(() => {
     ScreenOrientation.lockAsync(OrientationLock.LANDSCAPE);
@@ -36,6 +44,17 @@ export function PlayerComponent({
       NavigationBar.setVisibilityAsync('visible');
     };
   }, []);
+
+  useEffect(() => {
+    const { progressPercentage, playablePercentage } = status;
+
+    if (isSliding.current) {
+      return;
+    }
+
+    progress.value = progressPercentage;
+    cache.value = playablePercentage;
+  }, [status]);
 
   const renderAction = (
     icon: string,
@@ -133,33 +152,30 @@ export function PlayerComponent({
     );
   };
 
-  const renderProgressBar = () => {
-    const {
-      progressPercentage,
-      playablePercentage,
-    } = status;
-
-    return (
-      <View style={ styles.progressBarContainer }>
-        <Slider
-          style={ styles.progressBar }
-          value={ progressPercentage }
-          minimumValue={ 0 }
-          maximumValue={ 100 }
-          minimumTrackTintColor={ Colors.secondary }
-          maximumTrackTintColor={ Colors.transparent }
-          thumbTintColor={ Colors.secondary }
-          onSlidingComplete={ seekToPosition }
-        />
-        <View
-          style={ {
-            ...styles.playableBar,
-            width: (`${playablePercentage}%`) as DimensionValue,
-          } }
-        />
-      </View>
-    );
-  };
+  const renderProgressBar = () => (
+    <Slider
+      progress={ progress }
+      cache={ cache }
+      minimumValue={ minimumValue }
+      maximumValue={ maximumValue }
+      bubble={
+        (value) => convertSecondsToTime(calculateCurrentTime(value))
+      }
+      onSlidingStart={ () => {
+        isSliding.current = true;
+      } }
+      onSlidingComplete={ (value) => {
+        isSliding.current = false;
+        seekToPosition(value);
+      } }
+      theme={ {
+        minimumTrackTintColor: Colors.secondary,
+        cacheTrackTintColor: '#888888aa',
+        maximumTrackTintColor: '#555555aa',
+        bubbleBackgroundColor: Colors.secondary,
+      } }
+    />
+  );
 
   const renderBottomActions = () => (
     <View style={ styles.bottomActions }>

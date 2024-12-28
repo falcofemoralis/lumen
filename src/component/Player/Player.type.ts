@@ -17,6 +17,7 @@ export interface PlayerComponentProps {
   rewindPosition: (type: RewindDirection, ms?: number) => void;
   rewindPositionAuto: (type: RewindDirection, ms?: number) => void;
   seekToPosition: (percent: number) => void;
+  calculateCurrentTime: (percent: number) => number;
 }
 
 export type Status = {

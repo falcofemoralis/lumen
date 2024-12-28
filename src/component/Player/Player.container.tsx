@@ -39,7 +39,11 @@ export function PlayerContainer({
   }, []);
 
   useEventListener(player, 'timeUpdate', ({ currentTime, bufferedPosition }) => {
-    const { duration } = player;
+    const { duration, playing } = player;
+
+    if (!playing) {
+      return;
+    }
 
     setStatus({
       ...status,
@@ -72,12 +76,16 @@ export function PlayerContainer({
     }
   };
 
-  const seekToPosition = async (percent: number) => {
+  const calculateCurrentTime = (percent: number) => {
     const { duration } = player;
 
-    if (!duration) return;
+    if (!duration) return 0;
 
-    player.currentTime = (percent / 100) * duration;
+    return (percent / 100) * duration;
+  };
+
+  const seekToPosition = async (percent: number) => {
+    player.currentTime = calculateCurrentTime(percent);
   };
 
   const rewindPosition = async (type: RewindDirection, seconds = DEFAULT_REWIND) => {
@@ -118,6 +126,7 @@ export function PlayerContainer({
     rewindPosition,
     rewindPositionAuto,
     seekToPosition,
+    calculateCurrentTime,
   };
 
   return withTV(PlayerComponentTV, PlayerComponent, {
