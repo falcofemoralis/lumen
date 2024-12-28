@@ -2,7 +2,7 @@ import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedText from 'Component/ThemedText';
 import { VideoView } from 'expo-video';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   BackHandler,
   DimensionValue,
@@ -17,9 +17,9 @@ import { scale } from 'Util/CreateStyles';
 import RemoteControlManager from 'Util/RemoteControl/RemoteControlManager';
 import { SupportedKeys } from 'Util/RemoteControl/SupportedKeys';
 
-import { FocusedElement, RewindDirection } from './Player.config';
+import { FocusedElement, LONG_PRESS_DURATION, RewindDirection } from './Player.config';
 import { styles } from './Player.style.atv';
-import { PlayerComponentProps } from './Player.type';
+import { LongEvent, PlayerComponentProps } from './Player.type';
 
 export function PlayerComponent({
   player,
@@ -34,14 +34,64 @@ export function PlayerComponent({
   );
   const [showControls, setShowControls] = useState(false);
   const [hideActions, setHideActions] = useState(false);
+  const longEvent = useRef<{[key: string]: LongEvent}>({
+    [SupportedKeys.Left]: {
+      isKeyDownPressed: false,
+      longTimeout: null,
+      isLongFired: false,
+    },
+    [SupportedKeys.Right]: {
+      isKeyDownPressed: false,
+      longTimeout: null,
+      isLongFired: false,
+    },
+  });
 
   const toggleSeekMode = () => {
     setHideActions(true);
     setShowControls(true);
   };
 
+  const handleProgressThumbKeyDown = (key: SupportedKeys, direction: RewindDirection) => {
+    const e = longEvent.current[key];
+
+    if (!e.isKeyDownPressed) {
+      e.isKeyDownPressed = true;
+      e.longTimeout = setTimeout(() => {
+        // Long button press
+        rewindPositionAuto(direction);
+        toggleSeekMode();
+        e.longTimeout = null;
+        e.isLongFired = true;
+      }, LONG_PRESS_DURATION);
+    }
+
+    return true;
+  };
+
+  const handleProgressThumbKeyUp = (key: SupportedKeys, direction: RewindDirection) => {
+    const e = longEvent.current[key];
+    e.isKeyDownPressed = false;
+
+    if (e.isLongFired) {
+      // Long button unpress
+      e.isLongFired = false;
+      rewindPositionAuto(direction);
+      toggleSeekMode();
+    }
+
+    if (e.longTimeout) {
+      // Button press
+      clearTimeout(e.longTimeout);
+      rewindPosition(direction);
+      toggleSeekMode();
+    }
+  };
+
   useEffect(() => {
-    const keyListener = (type: SupportedKeys) => {
+    const keyDownListener = (type: SupportedKeys) => {
+      console.log(focusedElement, type);
+
       if (type === SupportedKeys.Enter && !showControls) {
         setShowControls(true);
 
@@ -54,23 +104,11 @@ export function PlayerComponent({
         }
 
         if (type === SupportedKeys.Left) {
-          rewindPosition(RewindDirection.Backward);
-          toggleSeekMode();
+          handleProgressThumbKeyDown(type, RewindDirection.Backward);
         }
 
         if (type === SupportedKeys.Right) {
-          rewindPosition(RewindDirection.Forward);
-          toggleSeekMode();
-        }
-
-        if (type === SupportedKeys.LongLeft) {
-          rewindPositionAuto(RewindDirection.Backward);
-          toggleSeekMode();
-        }
-
-        if (type === SupportedKeys.LongRight) {
-          rewindPositionAuto(RewindDirection.Forward);
-          toggleSeekMode();
+          handleProgressThumbKeyDown(type, RewindDirection.Forward);
         }
 
         if ((type === SupportedKeys.Up || type === SupportedKeys.Down) && hideActions) {
@@ -79,6 +117,20 @@ export function PlayerComponent({
       }
 
       return false;
+    };
+
+    const keyUpListener = (type: SupportedKeys) => {
+      if (focusedElement === FocusedElement.ProgressThumb) {
+        if (type === SupportedKeys.Left) {
+          handleProgressThumbKeyUp(type, RewindDirection.Backward);
+        }
+
+        if (type === SupportedKeys.Right) {
+          handleProgressThumbKeyUp(type, RewindDirection.Forward);
+        }
+      }
+
+      return true;
     };
 
     const backAction = () => {
@@ -93,7 +145,8 @@ export function PlayerComponent({
       return false;
     };
 
-    // const remoteControlListener = RemoteControlManager.addKeydownListener(keyListener);
+    const remoteControlDownListener = RemoteControlManager.addKeydownListener(keyDownListener);
+    const remoteControlUpListener = RemoteControlManager.addKeyupListener(keyUpListener);
 
     const backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
@@ -102,7 +155,8 @@ export function PlayerComponent({
 
     return () => {
       backHandler.remove();
-      RemoteControlManager.removeKeydownListener(remoteControlListener);
+      RemoteControlManager.removeKeydownListener(remoteControlDownListener);
+      RemoteControlManager.removeKeyupListener(remoteControlUpListener);
     };
   });
 

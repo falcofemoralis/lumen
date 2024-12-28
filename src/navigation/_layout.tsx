@@ -11,7 +11,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useLocale } from 'Hooks/useLocale';
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
-import { NativeEventEmitter, useColorScheme } from 'react-native';
+import { useColorScheme } from 'react-native';
 import { PaperProvider } from 'react-native-paper';
 import { SpatialNavigationDeviceTypeProvider } from 'react-tv-space-navigation';
 import ConfigStore from 'Store/Config.store';
@@ -26,38 +26,17 @@ export function RootLayout() {
   const [languageLoaded] = useLocale();
 
   useEffect(() => {
+    if (ConfigStore.isTV) {
+      configureRemoteControl();
+    }
+  }, []);
+
+  useEffect(() => {
     if (languageLoaded) {
       SplashScreen.hideAsync();
       NavigationBar.setBackgroundColorAsync(Colors.background);
-
-      if (ConfigStore.isTV) {
-        configureRemoteControl();
-      }
     }
   }, [languageLoaded]);
-
-  useEffect(() => {
-    const volumeControlEvents = new NativeEventEmitter();
-
-    const volumeUpListener = volumeControlEvents.addListener(
-      'VolumeUpButtonPressed',
-      () => {
-        console.log('Volume Up Pressed');
-      },
-    );
-
-    const volumeDownListener = volumeControlEvents.addListener(
-      'VolumeDownButtonPressed',
-      () => {
-        console.log('Volume Down Pressed');
-      },
-    );
-
-    return () => {
-      volumeUpListener.remove();
-      volumeDownListener.remove();
-    };
-  }, []);
 
   if (!languageLoaded) {
     return null;
@@ -75,7 +54,7 @@ export function RootLayout() {
       initialRouteName="(tabs)"
     >
       <Stack.Screen
-        name="player/[data]"
+        name="(tabs)" // player/[data]
         options={ {
           contentStyle: {
             marginTop: 0,

@@ -23,3 +23,5 @@ export const AWAKE_TAG = 'player';
 
 export const DEFAULT_REWIND = 10;
 export const DEFAULT_AUTO_REWIND_MS = 250;
+
+export const LONG_PRESS_DURATION = 500;

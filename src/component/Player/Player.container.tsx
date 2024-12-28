@@ -1,7 +1,7 @@
 /* eslint-disable react-compiler/react-compiler */
 import { useEventListener } from 'expo';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
-import { useVideoPlayer, VideoView } from 'expo-video';
+import { useVideoPlayer } from 'expo-video';
 import { withTV } from 'Hooks/withTV';
 import { useEffect, useRef, useState } from 'react';
 import { convertSecondsToTime } from 'Util/Date';
@@ -23,8 +23,6 @@ export function PlayerContainer({
 }: PlayerContainerProps) {
   const rewindTimeout = useRef<NodeJS.Timeout | null>(null);
   const [status, setStatus] = useState<Status>(DEFAULT_STATUS); // used for rendering component
-  // TODO UNUSED
-  const playerRef = useRef<VideoView | null>(null);
 
   const player = useVideoPlayer(video.streams[0].url, (p) => {
     p.loop = false;
@@ -45,11 +43,7 @@ export function PlayerContainer({
 
     setStatus({
       ...status,
-      progressPercentage: (currentTime / duration) * 100,
-      playablePercentage: (bufferedPosition / duration) * 100,
-      currentTime: convertSecondsToTime(currentTime),
-      durationTime: convertSecondsToTime(duration),
-      remainingTime: convertSecondsToTime(duration - currentTime),
+      ...calculateProgress(currentTime, bufferedPosition, duration),
     });
   });
 
@@ -58,6 +52,14 @@ export function PlayerContainer({
       ...status,
       isPlaying,
     });
+  });
+
+  const calculateProgress = (currentTime: number, bufferedPosition: number, duration: number) => ({
+    progressPercentage: (currentTime / duration) * 100,
+    playablePercentage: (bufferedPosition / duration) * 100,
+    currentTime: convertSecondsToTime(currentTime),
+    durationTime: convertSecondsToTime(duration),
+    remainingTime: convertSecondsToTime(duration - currentTime),
   });
 
   const togglePlayPause = () => {
@@ -79,7 +81,17 @@ export function PlayerContainer({
   };
 
   const rewindPosition = async (type: RewindDirection, seconds = DEFAULT_REWIND) => {
-    player.seekBy(type === RewindDirection.Backward ? seconds * -1 : seconds);
+    const { currentTime, bufferedPosition, duration } = player;
+
+    const seekTime = type === RewindDirection.Backward ? seconds * -1 : seconds;
+    const newTime = currentTime + seekTime;
+
+    setStatus({
+      ...status,
+      ...calculateProgress(newTime, bufferedPosition, duration),
+    });
+
+    player.seekBy(seekTime);
   };
 
   const rewindPositionAuto = (direction: RewindDirection, seconds = DEFAULT_REWIND) => {
@@ -97,7 +109,6 @@ export function PlayerContainer({
 
   const containerProps = () => ({
     player,
-    playerRef,
     status,
     film,
   });

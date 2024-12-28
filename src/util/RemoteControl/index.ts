@@ -19,8 +19,6 @@ export const configureRemoteControl = () => {
       };
 
       const remoteControlListener = (keyEvent: SupportedKeys) => {
-        console.log('RemoteControlManager', keyEvent);
-
         callback(mapping[keyEvent]);
 
         return false;

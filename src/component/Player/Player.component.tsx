@@ -1,4 +1,6 @@
 import Slider from '@react-native-community/slider';
+import ThemedIcon from 'Component/ThemedIcon';
+import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
 import * as NavigationBar from 'expo-navigation-bar';
@@ -9,13 +11,14 @@ import { VideoView } from 'expo-video';
 import React, { useEffect, useState } from 'react';
 import { DimensionValue, Pressable, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Colors from 'Style/Colors';
+import { scale } from 'Util/CreateStyles';
 
 import { styles } from './Player.style';
 import { PlayerComponentProps } from './Player.type';
 
 export function PlayerComponent({
   player,
-  playerRef,
   status,
   film,
   togglePlayPause,
@@ -34,6 +37,102 @@ export function PlayerComponent({
     };
   }, []);
 
+  const renderAction = (
+    icon: string,
+    _name: string,
+    action?: () => void,
+  ) => (
+    <Pressable onPress={ action }>
+      <ThemedIcon
+        icon={ {
+          name: icon,
+          pack: IconPackType.MaterialIcons,
+        } }
+        size={ scale(36) }
+        color="white"
+      />
+    </Pressable>
+  );
+
+  const renderTopInfo = () => {
+    const { title } = film;
+
+    return (
+      <ThemedText>
+        { title }
+      </ThemedText>
+    );
+  };
+
+  const renderTopActions = () => (
+    <View style={ styles.topActions }>
+      { renderTopInfo() }
+      <View style={ styles.actionsRow }>
+        { renderAction('speed', 'Speed') }
+        { renderAction('comment', 'Comments') }
+      </View>
+    </View>
+  );
+
+  const renderMiddleControls = () => {
+    const { isPlaying } = status;
+
+    return (
+      <View style={ styles.middleActions }>
+        <Pressable
+          style={ styles.control }
+        >
+          <ThemedIcon
+            style={ styles.controlIcon }
+            icon={ {
+              name: 'skip-backward',
+              pack: IconPackType.MaterialCommunityIcons,
+            } }
+            size={ scale(24) }
+            color="white"
+          />
+        </Pressable>
+        <Pressable
+          style={ styles.control }
+          onPress={ togglePlayPause }
+        >
+          <ThemedIcon
+            style={ styles.controlIcon }
+            icon={ {
+              name: isPlaying ? 'pause' : 'play',
+              pack: IconPackType.MaterialCommunityIcons,
+            } }
+            size={ scale(36) }
+            color="white"
+          />
+        </Pressable>
+        <Pressable
+          style={ styles.control }
+        >
+          <ThemedIcon
+            style={ styles.controlIcon }
+            icon={ {
+              name: 'skip-forward',
+              pack: IconPackType.MaterialCommunityIcons,
+            } }
+            size={ scale(24) }
+            color="white"
+          />
+        </Pressable>
+      </View>
+    );
+  };
+
+  const renderDuration = () => {
+    const { currentTime, durationTime, remainingTime } = status;
+
+    return (
+      <ThemedText>
+        { `${currentTime} / ${durationTime} (${remainingTime})` }
+      </ThemedText>
+    );
+  };
+
   const renderProgressBar = () => {
     const {
       progressPercentage,
@@ -47,8 +146,9 @@ export function PlayerComponent({
           value={ progressPercentage }
           minimumValue={ 0 }
           maximumValue={ 100 }
-          minimumTrackTintColor="#FFFF00"
-          maximumTrackTintColor="#ffffff00"
+          minimumTrackTintColor={ Colors.secondary }
+          maximumTrackTintColor={ Colors.transparent }
+          thumbTintColor={ Colors.secondary }
           onSlidingComplete={ seekToPosition }
         />
         <View
@@ -61,6 +161,24 @@ export function PlayerComponent({
     );
   };
 
+  const renderBottomActions = () => (
+    <View style={ styles.bottomActions }>
+      <View style={ styles.durationRow }>
+        { renderDuration() }
+      </View>
+      <View style={ styles.progressBarRow }>
+        { renderProgressBar() }
+      </View>
+      <View style={ styles.actionsRow }>
+        { renderAction('high-quality', 'Quality') }
+        { renderAction('playlist-play', 'Series') }
+        { renderAction('subtitles', 'Subtitles') }
+        { renderAction('bookmarks', 'Bookmarks') }
+        { renderAction('share', 'Share') }
+      </View>
+    </View>
+  );
+
   const renderControls = () => {
     if (!showControls) {
       return null;
@@ -68,13 +186,9 @@ export function PlayerComponent({
 
     return (
       <View style={ styles.controls }>
-        <Pressable
-          style={ styles.playControl }
-          onPress={ togglePlayPause }
-        >
-          <ThemedText>{ status.isPlaying ? 'Pause' : 'Play' }</ThemedText>
-        </Pressable>
-        { renderProgressBar() }
+        { renderTopActions() }
+        { renderMiddleControls() }
+        { renderBottomActions() }
       </View>
     );
   };
@@ -87,7 +201,6 @@ export function PlayerComponent({
       />
       <ThemedView style={ styles.container }>
         <VideoView
-          ref={ playerRef }
           style={ styles.video }
           player={ player }
           contentFit="contain"
