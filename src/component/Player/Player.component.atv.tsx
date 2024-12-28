@@ -93,7 +93,7 @@ export function PlayerComponent({
       return false;
     };
 
-    const remoteControlListener = RemoteControlManager.addKeydownListener(keyListener);
+    // const remoteControlListener = RemoteControlManager.addKeydownListener(keyListener);
 
     const backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
@@ -269,7 +269,6 @@ export function PlayerComponent({
         player={ player }
         contentFit="contain"
         nativeControls={ false }
-        allowsFullscreen={ false }
         allowsPictureInPicture={ false }
       />
       { renderControls() }

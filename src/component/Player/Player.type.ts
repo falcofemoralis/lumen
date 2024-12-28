@@ -1,4 +1,4 @@
-import { VideoPlayer } from 'expo-video';
+import { VideoPlayer, VideoView } from 'expo-video';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 
@@ -11,6 +11,7 @@ export interface PlayerContainerProps {
 
 export interface PlayerComponentProps {
   player: VideoPlayer;
+  playerRef: React.MutableRefObject<VideoView | null>;
   status: Status;
   film: FilmInterface;
   togglePlayPause: () => void;

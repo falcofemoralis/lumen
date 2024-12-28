@@ -1,7 +1,7 @@
 /* eslint-disable react-compiler/react-compiler */
 import { useEventListener } from 'expo';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
-import { useVideoPlayer } from 'expo-video';
+import { useVideoPlayer, VideoView } from 'expo-video';
 import { withTV } from 'Hooks/withTV';
 import { useEffect, useRef, useState } from 'react';
 import { convertSecondsToTime } from 'Util/Date';
@@ -23,6 +23,8 @@ export function PlayerContainer({
 }: PlayerContainerProps) {
   const rewindTimeout = useRef<NodeJS.Timeout | null>(null);
   const [status, setStatus] = useState<Status>(DEFAULT_STATUS); // used for rendering component
+  // TODO UNUSED
+  const playerRef = useRef<VideoView | null>(null);
 
   const player = useVideoPlayer(video.streams[0].url, (p) => {
     p.loop = false;
@@ -95,6 +97,7 @@ export function PlayerContainer({
 
   const containerProps = () => ({
     player,
+    playerRef,
     status,
     film,
   });

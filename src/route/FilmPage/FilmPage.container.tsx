@@ -87,7 +87,12 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
   const openPlayer = (video: FilmVideoInterface) => {
     router.push({
       pathname: '/player/[data]',
-      params: { data: JSON.stringify(video) },
+      params: {
+        data: JSON.stringify({
+          video,
+          film,
+        }),
+      },
     });
   };
 

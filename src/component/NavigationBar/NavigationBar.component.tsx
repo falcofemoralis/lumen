@@ -58,6 +58,7 @@ export function NavigationBarComponent() {
         tabBarInactiveTintColor: Colors.white,
         tabBarHideOnKeyboard: true,
       } }
+      // tabBar={ () => null }
     >
       { renderTabs() }
     </Tabs>

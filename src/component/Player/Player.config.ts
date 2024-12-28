@@ -4,6 +4,9 @@ export const DEFAULT_STATUS: Status = {
   progressPercentage: 0,
   playablePercentage: 0,
   isPlaying: false,
+  currentTime: '-',
+  durationTime: '-',
+  remainingTime: '-',
 };
 
 export enum RewindDirection {

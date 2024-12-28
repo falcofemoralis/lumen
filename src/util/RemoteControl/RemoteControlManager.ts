@@ -7,11 +7,6 @@ import { SupportedKeys } from './SupportedKeys';
 const LONG_PRESS_DURATION = 500;
 
 class RemoteControlManager implements RemoteControlManagerInterface {
-  constructor() {
-    KeyEvent.onKeyDownListener(this.handleKeyDown);
-    KeyEvent.onKeyUpListener(this.handleKeyUp);
-  }
-
   private eventEmitter = new CustomEventEmitter<{ keyDown: SupportedKeys }>();
 
   /**
@@ -60,6 +55,11 @@ class RemoteControlManager implements RemoteControlManagerInterface {
       this.longRightTimeout = null;
       this.isLongRightFired = true;
     }, LONG_PRESS_DURATION);
+  };
+
+  public subscribe = () => {
+    KeyEvent.onKeyDownListener(this.handleKeyDown);
+    KeyEvent.onKeyUpListener(this.handleKeyUp);
   };
 
   private handleKeyDown = (keyEvent: { keyCode: number }) => {

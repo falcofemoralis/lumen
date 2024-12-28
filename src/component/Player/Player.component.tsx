@@ -1,26 +1,66 @@
-import PlayerProgressBar from 'Component/PlayerProgressBar';
+import Slider from '@react-native-community/slider';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
-import { ResizeMode, Video } from 'expo-av';
-import React from 'react';
-import { Pressable, View } from 'react-native';
+import * as NavigationBar from 'expo-navigation-bar';
+import * as ScreenOrientation from 'expo-screen-orientation';
+import { OrientationLock } from 'expo-screen-orientation';
+import { StatusBar } from 'expo-status-bar';
+import { VideoView } from 'expo-video';
+import React, { useEffect, useState } from 'react';
+import { DimensionValue, Pressable, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import NotificationStore from 'Store/Notification.store';
 
 import { styles } from './Player.style';
 import { PlayerComponentProps } from './Player.type';
 
 export function PlayerComponent({
-  uri,
-  onPlaybackStatusUpdate,
+  player,
   playerRef,
   status,
-  showControls,
-  toggleControls,
+  film,
   togglePlayPause,
   rewindPosition,
   seekToPosition,
 }: PlayerComponentProps) {
+  const [showControls, setShowControls] = useState(false);
+
+  useEffect(() => {
+    ScreenOrientation.lockAsync(OrientationLock.LANDSCAPE);
+    NavigationBar.setVisibilityAsync('hidden');
+
+    return () => {
+      ScreenOrientation.unlockAsync();
+      NavigationBar.setVisibilityAsync('visible');
+    };
+  }, []);
+
+  const renderProgressBar = () => {
+    const {
+      progressPercentage,
+      playablePercentage,
+    } = status;
+
+    return (
+      <View style={ styles.progressBarContainer }>
+        <Slider
+          style={ styles.progressBar }
+          value={ progressPercentage }
+          minimumValue={ 0 }
+          maximumValue={ 100 }
+          minimumTrackTintColor="#FFFF00"
+          maximumTrackTintColor="#ffffff00"
+          onSlidingComplete={ seekToPosition }
+        />
+        <View
+          style={ {
+            ...styles.playableBar,
+            width: (`${playablePercentage}%`) as DimensionValue,
+          } }
+        />
+      </View>
+    );
+  };
+
   const renderControls = () => {
     if (!showControls) {
       return null;
@@ -34,36 +74,29 @@ export function PlayerComponent({
         >
           <ThemedText>{ status.isPlaying ? 'Pause' : 'Play' }</ThemedText>
         </Pressable>
-        { /* <PlayerProgressBar
-          status={ status }
-          playerRef={ playerRef }
-          rewindPosition={ rewindPosition }
-          seekToPosition={ seekToPosition }
-          rewindPositionAuto={ () => {} }
-        /> */ }
+        { renderProgressBar() }
       </View>
     );
   };
 
   return (
     <SafeAreaView>
+      <StatusBar
+        hidden
+        animated
+      />
       <ThemedView style={ styles.container }>
-        <Video
-          style={ styles.video }
+        <VideoView
           ref={ playerRef }
-          source={ { uri } }
-          shouldPlay
-          resizeMode={ ResizeMode.CONTAIN }
-          onError={ (err) => {
-            NotificationStore.displayError(err);
-          } }
-          useNativeControls={ false }
-          onPlaybackStatusUpdate={ onPlaybackStatusUpdate }
-          progressUpdateIntervalMillis={ 1000 }
+          style={ styles.video }
+          player={ player }
+          contentFit="contain"
+          nativeControls={ false }
+          allowsPictureInPicture={ false }
         />
         <Pressable
           style={ styles.controlsContainer }
-          onPress={ toggleControls }
+          onPress={ () => setShowControls(!showControls) }
         >
           { renderControls() }
         </Pressable>
