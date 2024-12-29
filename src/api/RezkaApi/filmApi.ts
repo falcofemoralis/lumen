@@ -154,8 +154,12 @@ const filmApi: FilmApiInterface = {
         isDirector: el.attributes['data-director'],
         isAds: el.attributes['data-ad'],
         isActive: el.attributes.class.includes('active'),
-        isPremium: Boolean(el.attributes['b-prem_translator']),
+        isPremium: el.attributes.class.includes('b-prem_translator'),
       };
+
+      if (voice.isPremium) {
+        voice.premiumIcon = 'https://rezka-ua.tv/templates/hdrezka/images/prem-icon.svg';
+      }
 
       film.voices.push({
         ...voice,

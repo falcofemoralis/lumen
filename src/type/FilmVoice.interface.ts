@@ -15,6 +15,7 @@ export interface FilmVoiceInterface {
   id: string;
   title: string;
   img?: string;
+  premiumIcon?: string;
   //
   seasons?: SeasonInterface[];
   video?: FilmVideoInterface;

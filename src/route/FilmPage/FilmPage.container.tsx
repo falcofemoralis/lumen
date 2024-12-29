@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { withTV } from 'Hooks/withTV';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import ConfigStore from 'Store/Config.store';
 import NavigationStore from 'Store/Navigation.store';
 import NotificationStore from 'Store/Notification.store';
@@ -28,11 +28,9 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
       }
     };
 
-    loadFilm();
+    setFilm(null);
 
-    return () => {
-      console.log('FilmPageContainer unmount');
-    };
+    loadFilm();
   }, [link]);
 
   const openVideoSelector = async () => {
@@ -43,9 +41,9 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
     setIsSelectorVisible(true);
   };
 
-  const hideVideoSelector = () => {
+  const hideVideoSelector = useCallback(() => {
     setIsSelectorVisible(false);
-  };
+  }, []);
 
   const handleVideoSelect = (video: FilmVideoInterface) => {
     // setFilmVideo(video);

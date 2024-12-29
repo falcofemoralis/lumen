@@ -1,5 +1,10 @@
+import ThemedButton from 'Component/ThemedButton';
+import ThemedDropdown from 'Component/ThemedDropdown';
 import ThemedModal from 'Component/ThemedModal';
 import ThemedText from 'Component/ThemedText';
+import ThemedView from 'Component/ThemedView';
+import { ScrollView } from 'react-native';
+import { Dropdown } from 'react-native-element-dropdown';
 import { Button } from 'react-native-paper';
 
 import { styles } from './PlayerVideoSelector.style';
@@ -25,33 +30,72 @@ export function PlayerVideoSelectorComponent({
       return null;
     }
 
-    return voices.map((voice) => (
-      <Button
-        key={ voice.id }
-        onPress={ () => handleSelectVoice(voice) }
-      >
-        <ThemedText style={ selectedVoice.id === voice.id ? { color: 'green' } : {} }>
-          { voice.title }
-        </ThemedText>
-      </Button>
-    ));
+    return (
+      <ThemedView style={ styles.voicesContainer }>
+        <ThemedDropdown
+          data={ voices.map((voice) => ({
+            label: voice.title,
+            value: voice.id,
+            startIcon: voice.premiumIcon,
+            endIcon: voice.img,
+          })) }
+          value={ selectedVoice.id }
+          onChange={ (item) => handleSelectVoice(item.value) }
+        />
+      </ThemedView>
+    );
   };
 
-  const renderSeasons = () => seasons.map((season) => (
-    <Button key={ season.seasonId }>
-      <ThemedText style={ selectedSeasonId === season.seasonId ? { color: 'green' } : {} }>
-        { season.name }
-      </ThemedText>
-    </Button>
-  ));
+  const renderSeasons = () => (
+    <ThemedView style={ styles.seasonsContainer }>
+      { seasons.map((season) => (
+        <Button
+          key={ season.seasonId }
+          style={ styles.season }
+          onPress={ () => setSelectedSeasonId(season.seasonId) }
+        >
+          <ThemedText style={ [
+            styles.seasonText,
+            selectedSeasonId === season.seasonId ? styles.seasonTextSelected : undefined,
+          ] }
+          >
+            { season.name }
+          </ThemedText>
+        </Button>
+      )) }
+    </ThemedView>
+  );
 
-  const renderEpisodes = () => episodes.map((episode) => (
-    <Button key={ episode.episodeId }>
-      <ThemedText style={ selectedEpisodeId === episode.episodeId ? { color: 'green' } : {} }>
-        { episode.name }
-      </ThemedText>
-    </Button>
-  ));
+  const renderEpisodes = () => (
+    <ThemedView style={ styles.episodesContainer }>
+      { episodes.map((episode) => (
+        <Button
+          key={ episode.episodeId }
+          style={ styles.episode }
+          onPress={ () => setSelectedEpisodeId(episode.episodeId) }
+        >
+          <ThemedText style={ [
+            styles.episodeText,
+            selectedEpisodeId === episode.episodeId ? styles.episodeTextSelected : undefined,
+          ] }
+          >
+            { episode.name }
+          </ThemedText>
+        </Button>
+      )) }
+    </ThemedView>
+  );
+
+  const renderPlayButton = () => (
+    <ThemedView style={ styles.playContainer }>
+      <ThemedButton
+        style={ styles.playBtn }
+        onPress={ handleOnPlay }
+      >
+        Play
+      </ThemedButton>
+    </ThemedView>
+  );
 
   const renderLoader = () => {
     if (!isLoading) {
@@ -68,11 +112,13 @@ export function PlayerVideoSelectorComponent({
       contentContainerStyle={ styles.container }
       style={ styles.background }
     >
-      { renderLoader() }
-      { renderVoices() }
-      { renderSeasons() }
-      { renderEpisodes() }
-      <Button onPress={ handleOnPlay }>Play</Button>
+      <ScrollView>
+        { renderLoader() }
+        { renderVoices() }
+        { renderSeasons() }
+        { renderEpisodes() }
+        { renderPlayButton() }
+      </ScrollView>
     </ThemedModal>
   );
 }

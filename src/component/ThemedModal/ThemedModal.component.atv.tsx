@@ -8,6 +8,7 @@ export default function ThemedModalComponent({
   visible,
   onHide,
   style,
+  contentContainerStyle,
   children,
 }: ThemedModalProps) {
   if (!visible) return null;
@@ -19,7 +20,9 @@ export default function ThemedModalComponent({
           isModalVisible={ visible }
           hideModal={ onHide }
         >
-          { children }
+          <View style={ contentContainerStyle }>
+            { children }
+          </View>
         </SpatialNavigationOverlay>
       </View>
     </View>

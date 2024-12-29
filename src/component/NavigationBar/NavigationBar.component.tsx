@@ -1,10 +1,6 @@
-import {
-  BottomTabBarButtonProps,
-} from '@react-navigation/bottom-tabs';
 import { Tabs } from 'Component/Layouts/tabs';
 import ThemedIcon from 'Component/ThemedIcon';
 import React from 'react';
-import { Pressable } from 'react-native';
 import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 
@@ -12,20 +8,36 @@ import { Tab, TABS_MOBILE_CONFIG } from './NavigationBar.config';
 import { styles } from './NavigationBar.style';
 
 export function NavigationBarComponent() {
-  const renderBarButton = (props: BottomTabBarButtonProps) => (
-    <Pressable
-      { ...props }
-      style={ ({ pressed, focused }) => [
-        {
-          opacity: pressed || focused ? 0.6 : 1.0,
-        },
-      ] }
-    />
-  );
+  // const handlePress = (e: GestureResponderEvent, props: BottomTabBarButtonProps) => {
+  //   goBack();
+  //   if (props.onPress) {
+  //     // props.onPress(e);
+  //   }
+  // };
 
-  const renderTab = (tab: Tab<string>, idx: number) => {
+  // const tabBarButton = (props: BottomTabBarButtonProps) => {
+  //   const style: StyleProp<ViewStyle> = props.style ?? {};
+
+  //   return (
+  //     <Pressable
+  //       { ...props }
+  //       onPress={ (e) => handlePress(e, props) }
+  //       style={ ({ pressed, focused }) => [
+  //         style,
+  //         {
+  //           opacity: pressed || focused ? 0.6 : 1.0,
+  //         },
+  //       ] }
+  //     />
+  //   );
+  // };
+
+  const renderTab = (tab: Tab<string>) => {
     const {
-      route: name, title, icon, options,
+      route: name,
+      title,
+      icon,
+      options,
     } = tab;
 
     return (
@@ -34,6 +46,7 @@ export function NavigationBarComponent() {
         name={ name }
         options={ {
           title,
+          // tabBarButton,
           tabBarIcon: ({ color, focused }) => icon && (
             <ThemedIcon
               icon={ icon }
@@ -47,7 +60,7 @@ export function NavigationBarComponent() {
     );
   };
 
-  const renderTabs = () => TABS_MOBILE_CONFIG.map((tab, idx) => renderTab(tab, idx));
+  const renderTabs = () => TABS_MOBILE_CONFIG.map((tab) => renderTab(tab));
 
   return (
     <Tabs
@@ -57,8 +70,9 @@ export function NavigationBarComponent() {
         tabBarActiveTintColor: Colors.blue,
         tabBarInactiveTintColor: Colors.white,
         tabBarHideOnKeyboard: true,
+        // tabBarButton,
       } }
-      tabBar={ () => null }
+      // tabBar={ () => null }
     >
       { renderTabs() }
     </Tabs>

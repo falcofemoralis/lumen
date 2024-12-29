@@ -40,8 +40,13 @@ export function PlayerVideoSelectorContainer({
     return episodes;
   };
 
-  const handleSelectVoice = async (voice: FilmVoiceInterface) => {
+  const handleSelectVoice = async (voiceId: string) => {
     const { hasSeasons } = film;
+    const voice = voices.find(({ id }) => id === voiceId);
+
+    if (!voice) {
+      return;
+    }
 
     if (!hasSeasons) {
       setSelectedVoice(voice);

@@ -1,5 +1,8 @@
-// TV dropdown list on the right side
-// mobile dropdown list (in separate window)
+export { default } from './ThemedDropdown.container';
 
-// title, backbutton, simple list
+// ##### TV
+// dropdown list on the right side
 // for example quality selector
+
+// ##### Mobile
+// just a dropdown list

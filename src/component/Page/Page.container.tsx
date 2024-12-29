@@ -3,7 +3,6 @@ import { useNavigation, useRouter } from 'expo-router';
 import { withTV } from 'Hooks/withTV';
 import { useEffect } from 'react';
 import { BackHandler } from 'react-native';
-import VolumeControl, { VolumeControlEvents } from 'react-native-volume-control';
 
 import PageComponent from './Page.component';
 import PageComponentTV from './Page.component.atv';

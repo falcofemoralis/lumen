@@ -55,7 +55,7 @@ export function RootLayout() {
       initialRouteName="(tabs)"
     >
       <Stack.Screen
-        name="(tabs)" // player/[data]
+        name="player/[data]" // player/[data]
         options={ {
           contentStyle: {
             marginTop: 0,
