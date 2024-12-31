@@ -1,18 +1,18 @@
 import { Modal, Portal } from 'react-native-paper';
 
-import { ThemedModalProps } from './ThemedModal.type';
+import { ThemedModalComponentProps } from './ThemedModal.type';
 
 export default function ThemedModalComponent({
-  visible,
+  isVisible,
   onHide,
   contentContainerStyle,
   style,
   children,
-}: ThemedModalProps) {
+}: ThemedModalComponentProps) {
   return (
     <Portal>
       <Modal
-        visible={ visible }
+        visible={ isVisible }
         onDismiss={ onHide }
         contentContainerStyle={ contentContainerStyle }
         style={ style }

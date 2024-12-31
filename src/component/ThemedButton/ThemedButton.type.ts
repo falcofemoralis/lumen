@@ -5,10 +5,10 @@ export type Variant = 'filled' | 'outlined';
 
 export interface ThemedButtonProps {
   children?: React.ReactNode;
-  onPress?: () => void;
   style?: StyleProp<ViewStyle>;
   isSelected?: boolean;
   icon?: IconInterface;
   variant?: Variant;
+  onPress?: () => void;
   onFocus?: () => void;
 }

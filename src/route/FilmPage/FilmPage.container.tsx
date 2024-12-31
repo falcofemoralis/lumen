@@ -1,9 +1,9 @@
+import { PLAYER_VIDEO_SELECTOR_OVERLAY_ID } from 'Component/PlayerVideoSelector/PlayerVideoSelector.config';
 import { router } from 'expo-router';
 import { withTV } from 'Hooks/withTV';
 import { useCallback, useEffect, useState } from 'react';
-import ConfigStore from 'Store/Config.store';
-import NavigationStore from 'Store/Navigation.store';
 import NotificationStore from 'Store/Notification.store';
+import OverlayStore from 'Store/Overlay.store';
 import ServiceStore from 'Store/Service.store';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
@@ -15,7 +15,6 @@ import { FilmPageContainerProps } from './FilmPage.type';
 export function FilmPageContainer({ link }: FilmPageContainerProps) {
   const [film, setFilm] = useState<FilmInterface | null>(null);
   const [filmVideo, setFilmVideo] = useState<FilmVideoInterface | null>(null);
-  const [isSelectorVisible, setIsSelectorVisible] = useState(false);
 
   useEffect(() => {
     const loadFilm = async () => {
@@ -33,16 +32,16 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
     loadFilm();
   }, [link]);
 
-  const openVideoSelector = async () => {
+  const openVideoSelector = useCallback(async () => {
     if (!film) {
       return;
     }
 
-    setIsSelectorVisible(true);
-  };
+    OverlayStore.openOverlay(PLAYER_VIDEO_SELECTOR_OVERLAY_ID);
+  }, [film]);
 
   const hideVideoSelector = useCallback(() => {
-    setIsSelectorVisible(false);
+    OverlayStore.goToPreviousOverlay();
   }, []);
 
   const handleVideoSelect = (video: FilmVideoInterface) => {
@@ -97,7 +96,6 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
   const containerProps = () => ({
     film,
     filmVideo,
-    isSelectorVisible,
   });
 
   const containerFunctions = {

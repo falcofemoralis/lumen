@@ -9,7 +9,6 @@ import FilmVideoSelectorComponentTV from './PlayerVideoSelector.component.atv';
 import { PlayerVideoSelectorContainerProps } from './PlayerVideoSelector.type';
 
 export function PlayerVideoSelectorContainer({
-  visible,
   onHide,
   film,
   onSelect,
@@ -102,7 +101,6 @@ export function PlayerVideoSelectorContainer({
   };
 
   const containerProps = () => ({
-    visible,
     voices,
     onHide,
     isLoading,

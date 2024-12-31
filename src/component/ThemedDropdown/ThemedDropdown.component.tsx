@@ -6,6 +6,11 @@ import { Dropdown } from 'react-native-element-dropdown';
 import { styles } from './ThemedDropdown.style';
 import { DropdownItem, ThemedDropdownProps } from './ThemedDropdown.type';
 
+/**
+ * https://github.com/hoaphantn7604/react-native-element-dropdown#readme
+ * @param props
+ * @returns
+ */
 export const ThemedDropdownComponent = ({
   style,
   selectedTextStyle,

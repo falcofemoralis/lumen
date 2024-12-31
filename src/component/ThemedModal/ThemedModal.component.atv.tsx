@@ -1,30 +1,45 @@
+import { observer } from 'mobx-react-lite';
 import { View } from 'react-native';
+import { Portal } from 'react-native-paper';
 
 import { SpatialNavigationOverlay } from './SpatialNavigationOverlay';
 import { styles } from './ThemedModal.style.atv';
-import { ThemedModalProps } from './ThemedModal.type';
+import { ThemedModalComponentProps } from './ThemedModal.type';
 
-export default function ThemedModalComponent({
-  visible,
+export function ThemedModalComponent({
   onHide,
   style,
+  containerStyle,
   contentContainerStyle,
   children,
-}: ThemedModalProps) {
-  if (!visible) return null;
+  isOpened,
+  isVisible,
+}: ThemedModalComponentProps) {
+  if (!isOpened) return null;
 
   return (
-    <View style={ [styles.modal, style] }>
-      <View style={ styles.container }>
-        <SpatialNavigationOverlay
-          isModalVisible={ visible }
-          hideModal={ onHide }
-        >
-          <View style={ contentContainerStyle }>
-            { children }
+    <Portal>
+      <SpatialNavigationOverlay
+        isModalVisible={ isOpened }
+        hideModal={ onHide }
+      >
+        <Portal.Host>
+          <View style={ [
+            styles.modal,
+            style,
+            isVisible && styles.modalVisible,
+          ] }
+          >
+            <View style={ [styles.container, containerStyle] }>
+              <View style={ [styles.contentContainer, contentContainerStyle] }>
+                { children }
+              </View>
+            </View>
           </View>
-        </SpatialNavigationOverlay>
-      </View>
-    </View>
+        </Portal.Host>
+      </SpatialNavigationOverlay>
+    </Portal>
   );
 }
+
+export default observer(ThemedModalComponent);

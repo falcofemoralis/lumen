@@ -9,6 +9,8 @@ export const useFocusAnimation = (isFocused: boolean) => {
     Animated.spring(scaleAnimation, {
       toValue: isFocused ? 1.1 : 1,
       useNativeDriver: true,
+      speed: 6,
+      bounciness: 0,
     }).start();
   }, [isFocused, scaleAnimation]);
 

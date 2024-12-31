@@ -4,14 +4,13 @@ import ThemedModal from 'Component/ThemedModal';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
 import { ScrollView } from 'react-native';
-import { Dropdown } from 'react-native-element-dropdown';
 import { Button } from 'react-native-paper';
 
+import { PLAYER_VIDEO_SELECTOR_OVERLAY_ID } from './PlayerVideoSelector.config';
 import { styles } from './PlayerVideoSelector.style';
 import { PlayerVideoSelectorComponentProps } from './PlayerVideoSelector.type';
 
 export function PlayerVideoSelectorComponent({
-  visible,
   voices,
   onHide,
   isLoading,
@@ -107,7 +106,7 @@ export function PlayerVideoSelectorComponent({
 
   return (
     <ThemedModal
-      visible={ visible }
+      id={ PLAYER_VIDEO_SELECTOR_OVERLAY_ID }
       onHide={ onHide }
       contentContainerStyle={ styles.container }
       style={ styles.background }

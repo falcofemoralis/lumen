@@ -158,7 +158,7 @@ export function NavigationBarComponent() {
     <Tabs
       screenOptions={ {
         headerShown: false,
-        tabBarActiveTintColor: Colors.blue,
+        tabBarActiveTintColor: Colors.primary,
         tabBarInactiveTintColor: Colors.white,
         tabBarHideOnKeyboard: true,
         tabBarPosition: 'left',

@@ -1,9 +1,20 @@
 import { StyleProp, ViewStyle } from 'react-native';
 
-export interface ThemedModalProps {
-  visible: boolean;
+export interface ThemedModalContainerProps {
+  id: string;
   onHide: () => void;
-  contentContainerStyle?: StyleProp<ViewStyle>;
-  style?: StyleProp<ViewStyle>;
   children: React.ReactNode;
+  style?: StyleProp<ViewStyle>;
+  containerStyle?: StyleProp<ViewStyle>;
+  contentContainerStyle?: StyleProp<ViewStyle>;
+}
+
+export interface ThemedModalComponentProps {
+  isOpened: boolean;
+  isVisible: boolean;
+  onHide: () => void;
+  children: React.ReactNode;
+  style?: StyleProp<ViewStyle>;
+  containerStyle?: StyleProp<ViewStyle>;
+  contentContainerStyle?: StyleProp<ViewStyle>;
 }

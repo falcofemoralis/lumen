@@ -1,13 +1,16 @@
 import ThemedButton from 'Component/ThemedButton';
+import ThemedDropdown from 'Component/ThemedDropdown';
+import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedModal from 'Component/ThemedModal';
 import ThemedText from 'Component/ThemedText';
+import { View } from 'react-native';
 import { DefaultFocus, SpatialNavigationView } from 'react-tv-space-navigation';
 
+import { PLAYER_VIDEO_SELECTOR_OVERLAY_ID } from './PlayerVideoSelector.config';
 import { styles } from './PlayerVideoSelector.style.atv';
 import { PlayerVideoSelectorComponentProps } from './PlayerVideoSelector.type';
 
 export function PlayerVideoSelectorComponent({
-  visible,
   voices,
   onHide,
   isLoading,
@@ -27,21 +30,18 @@ export function PlayerVideoSelectorComponent({
     }
 
     return (
-      <SpatialNavigationView direction="horizontal">
-        { voices.map((voice) => {
-          const { id, title } = voice;
-
-          return (
-            <ThemedButton
-              key={ id }
-              onPress={ () => handleSelectVoice(voice) }
-              isSelected={ selectedVoice.id === id }
-            >
-              { title }
-            </ThemedButton>
-          );
-        }) }
-      </SpatialNavigationView>
+      <ThemedDropdown
+        data={ voices.map((voice) => ({
+          label: voice.title,
+          value: voice.id,
+          startIcon: voice.premiumIcon,
+          endIcon: voice.img,
+        })) }
+        value={ selectedVoice.id }
+        onChange={ (item) => handleSelectVoice(item.value) }
+        searchPlaceholder="Search voice"
+        style={ styles.voicesInput }
+      />
     );
   };
 
@@ -55,6 +55,7 @@ export function PlayerVideoSelectorComponent({
             key={ seasonId }
             isSelected={ selectedSeasonId === seasonId }
             onPress={ () => setSelectedSeasonId(seasonId) }
+            style={ styles.button }
           >
             { name }
           </ThemedButton>
@@ -73,12 +74,27 @@ export function PlayerVideoSelectorComponent({
             key={ episodeId }
             isSelected={ selectedEpisodeId === episodeId }
             onPress={ () => setSelectedEpisodeId(episodeId) }
+            style={ styles.button }
           >
             { name }
           </ThemedButton>
         );
       }) }
     </SpatialNavigationView>
+  );
+
+  const renderPlay = () => (
+    <View style={ styles.play }>
+      <ThemedButton
+        icon={ {
+          name: 'play-outline',
+          pack: IconPackType.MaterialCommunityIcons,
+        } }
+        onPress={ handleOnPlay }
+      >
+        Play
+      </ThemedButton>
+    </View>
   );
 
   const renderLoader = () => {
@@ -91,7 +107,7 @@ export function PlayerVideoSelectorComponent({
 
   return (
     <ThemedModal
-      visible={ visible }
+      id={ PLAYER_VIDEO_SELECTOR_OVERLAY_ID }
       onHide={ onHide }
       style={ styles.container }
     >
@@ -101,7 +117,7 @@ export function PlayerVideoSelectorComponent({
         { renderVoices() }
         { renderSeasons() }
         { renderEpisodes() }
-        <ThemedButton onPress={ handleOnPlay }>Play</ThemedButton>
+        { renderPlay() }
       </DefaultFocus>
     </ThemedModal>
   );

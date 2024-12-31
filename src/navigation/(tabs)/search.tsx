@@ -1,5 +1,10 @@
-import SearchPage from 'Route/SearchPage';
+import Page from 'Component/Page';
+import ThemedText from 'Component/ThemedText';
 
 export default function SearchScreen() {
-  return <SearchPage />;
+  return (
+    <Page>
+      <ThemedText>Search page</ThemedText>
+    </Page>
+  );
 }

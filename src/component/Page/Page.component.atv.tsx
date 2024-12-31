@@ -3,6 +3,7 @@ import ThemedView from 'Component/ThemedView';
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import { Keyboard } from 'react-native';
+import { Portal } from 'react-native-paper';
 import { Directions, SpatialNavigationRoot, useLockSpatialNavigation } from 'react-tv-space-navigation';
 import NavigationStore from 'Store/Navigation.store';
 import { getWindowWidth } from 'Util/Window';
@@ -62,7 +63,9 @@ export function PageComponent(props: PageComponentProps) {
         onDirectionHandledWithoutMovement={ onDirectionHandledWithoutMovement }
       >
         <SpatialNavigationKeyboardLocker />
-        { children }
+        <Portal.Host>
+          { children }
+        </Portal.Host>
       </SpatialNavigationRoot>
     </ThemedView>
   );

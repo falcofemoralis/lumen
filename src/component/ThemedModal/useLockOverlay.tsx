@@ -16,6 +16,7 @@ export const useLockOverlay = ({ isModalVisible, hideModal }: UseLockProps) => {
 
 const useLockParentSpatialNavigator = (isModalVisible: boolean) => {
   const { lock, unlock } = useLockSpatialNavigation();
+
   useEffect(() => {
     if (isModalVisible) {
       lock();
@@ -24,6 +25,8 @@ const useLockParentSpatialNavigator = (isModalVisible: boolean) => {
         unlock();
       };
     }
+
+    return () => {};
   }, [isModalVisible, lock, unlock]);
 };
 

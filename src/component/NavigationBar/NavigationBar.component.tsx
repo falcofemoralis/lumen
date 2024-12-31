@@ -67,7 +67,7 @@ export function NavigationBarComponent() {
       screenOptions={ {
         tabBarStyle: styles.tabBar,
         headerShown: false,
-        tabBarActiveTintColor: Colors.blue,
+        tabBarActiveTintColor: Colors.primary,
         tabBarInactiveTintColor: Colors.white,
         tabBarHideOnKeyboard: true,
         // tabBarButton,

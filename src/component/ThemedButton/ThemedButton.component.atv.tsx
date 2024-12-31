@@ -15,55 +15,89 @@ export default function ThemedButton({
   icon,
   variant = 'filled',
 }: ThemedButtonProps) {
+  const renderFilled = (isFocused: boolean) => (
+    <View
+      style={ [
+        styles.container,
+        styles.containerFilled,
+        style,
+        isSelected && styles.containerFilledSelected,
+        isFocused && styles.containerFilledFocused,
+      ] }
+    >
+      { icon && (
+        <ThemedIcon
+          style={ [
+            styles.iconFilled,
+            isSelected && styles.iconFilledSelected,
+            isFocused && styles.iconFilledFocused,
+          ] }
+          icon={ icon }
+          size={ scale(18) }
+          color={ isFocused ? 'black' : 'gray' }
+        />
+      ) }
+      <Text
+        style={ [
+          styles.textFilled,
+          isSelected && styles.textFilledSelected,
+          isFocused && styles.textFilledFocused,
+        ] }
+      >
+        { children }
+      </Text>
+    </View>
+  );
+
+  const renderOutlined = (isFocused: boolean) => (
+    <View
+      style={ [
+        styles.container,
+        styles.containerOutlined,
+        style,
+        isSelected && styles.containerOutlinedSelected,
+        isFocused && styles.containerOutlinedFocused,
+      ] }
+    >
+      { icon && (
+        <ThemedIcon
+          style={ [
+            styles.iconOutlined,
+            isSelected && styles.iconOutlinedSelected,
+            isFocused && styles.iconOutlinedFocused,
+          ] }
+          icon={ icon }
+          size={ scale(18) }
+          color={ isFocused ? 'black' : 'gray' }
+        />
+      ) }
+      <Text
+        style={ [
+          styles.textOutlined,
+          isSelected && styles.textOutlinedSelected,
+          isFocused && styles.textOutlinedFocused,
+        ] }
+      >
+        { children }
+      </Text>
+    </View>
+  );
+
+  const renderButton = (isFocused: boolean) => {
+    if (variant === 'outlined') {
+      return renderOutlined(isFocused);
+    }
+
+    return renderFilled(isFocused);
+  };
+
   return (
     <SpatialNavigationFocusableView
       onSelect={ onPress }
       onFocus={ onFocus }
     >
-      { ({ isFocused, isActive }) => (
-        <View
-          style={ [
-            styles.container,
-            style,
-            isSelected && styles.containerSelected,
-            isFocused && styles.containerFocused,
-            variant === 'outlined' && {
-              ...styles.containerOutlined,
-              ...(isSelected && isActive && styles.containerOutlinedSelected),
-              ...(isFocused && styles.containerOutlinedFocused),
-            },
-          ] }
-        >
-          { icon && (
-            <ThemedIcon
-              style={ [
-                styles.icon,
-                isFocused && styles.iconFocused,
-                variant === 'outlined' && {
-                  ...styles.iconOutlined,
-                  ...(isSelected && isActive && styles.iconOutlinedSelected),
-                  ...(isFocused && styles.iconOutlinedFocused),
-                },
-              ] }
-              icon={ icon }
-              size={ scale(18) }
-              color={ isFocused ? 'black' : 'gray' }
-            />
-          ) }
-          <Text
-            style={ [
-              styles.text,
-              isFocused && styles.textFocused,
-              variant === 'outlined' && {
-                ...styles.textOutlined,
-                ...(isSelected && isActive && styles.textOutlinedSelected),
-                ...(isFocused && styles.textOutlinedFocused),
-              },
-            ] }
-          >
-            { children }
-          </Text>
-        </View>
+      { ({ isFocused }) => (
+        renderButton(isFocused)
       ) }
     </SpatialNavigationFocusableView>
   );

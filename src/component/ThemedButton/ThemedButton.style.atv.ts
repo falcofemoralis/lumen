@@ -10,26 +10,28 @@ export const styles = CreateStyles({
     flexDirection: 'row',
     gap: 6,
   },
-  containerSelected: {
+  // filled
+  containerFilled: {},
+  containerFilledSelected: {
     backgroundColor: Colors.white,
   },
-  containerFocused: {
-    backgroundColor: Colors.darkBlue,
+  containerFilledFocused: {
+    backgroundColor: Colors.primary,
   },
-  text: {
+  textFilled: {
     color: Colors.white,
   },
-  textSelected: {
+  textFilledSelected: {
     color: Colors.black,
   },
-  textFocused: {
-    color: Colors.darkGray,
+  textFilledFocused: {
+    color: Colors.lightBlue,
   },
-  icon: {
+  iconFilled: {
     color: Colors.white,
   },
-  iconSelected: {},
-  iconFocused: {},
+  iconFilledSelected: {},
+  iconFilledFocused: {},
   // outlined
   containerOutlined: {
     backgroundColor: Colors.transparent,

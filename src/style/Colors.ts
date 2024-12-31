@@ -9,7 +9,6 @@ export const Colors = {
   gray: '#444746',
   lightGray: '#C4C7C5',
   darkGray: '#303030',
-  blue: '#004A77',
   lightBlue: '#C2E7FF',
   darkBlue: '#001E30',
   modal: 'rgba(0, 0, 0, 0.6)',

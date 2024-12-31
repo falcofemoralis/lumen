@@ -4,14 +4,12 @@ import { EpisodeInterface, FilmVoiceInterface, SeasonInterface } from 'Type/Film
 
 export type PlayerVideoSelectorContainerProps = {
   film: FilmInterface;
-  visible: boolean;
   onHide: () => void;
   onSelect: (video: FilmVideoInterface) => void;
 };
 
 export type PlayerVideoSelectorComponentProps = {
   voices: FilmVoiceInterface[];
-  visible: boolean;
   onHide: () => void;
   isLoading: boolean;
   selectedVoice: FilmVoiceInterface;
