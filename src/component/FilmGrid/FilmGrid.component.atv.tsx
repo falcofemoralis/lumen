@@ -51,6 +51,7 @@ export function FilmGridComponent({
       onEndReached={ onScrollEnd }
       onEndReachedThresholdRowsNumber={ 2 }
       style={ styles.container }
+      additionalRenderedRows={ 1 }
     />
   );
 }

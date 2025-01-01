@@ -90,8 +90,6 @@ export function PlayerComponent({
 
   useEffect(() => {
     const keyDownListener = (type: SupportedKeys) => {
-      console.log(focusedElement, type);
-
       if (type === SupportedKeys.Enter && !showControls) {
         setShowControls(true);
 

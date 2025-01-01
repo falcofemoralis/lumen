@@ -24,10 +24,7 @@ export const styles = CreateStyles({
   cardThumbnail: {
     backgroundColor: Colors.lightBackground,
   },
-  poster: {
-    height: '100%',
-    width: '100%',
-  },
+  poster: {},
   posterFocused: {},
   info: {
     width: '100%',
@@ -54,24 +51,34 @@ export const styles = CreateStyles({
   subtitleFocused: {
     color: Colors.darkGray,
   },
+  additionContainer: {
+    backgroundColor: Colors.transparent,
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+  },
+  additionItemContainer: {
+    width: '100%',
+    flexDirection: 'column',
+    flexWrap: 'wrap',
+  },
   typeText: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    zIndex: 10,
-    paddingHorizontal: 8,
+    // position: 'absolute',
+    // top: 0,
+    // right: 0,
+    // zIndex: 10,
+    paddingHorizontal: 4,
     paddingVertical: 1,
     fontSize: 10,
-    borderBottomLeftRadius: 8,
+    // borderBottomLeftRadius: 8,
   },
   filmAdditionalText: {
-    position: 'absolute',
-    bottom: -1,
-    left: 0,
-    zIndex: 10,
-    paddingHorizontal: 8,
+    // position: 'absolute',
+    // bottom: -1,
+    // left: 0,
+    // zIndex: 10,
+    paddingHorizontal: 4,
     paddingVertical: 1,
     fontSize: 10,
-    borderTopRightRadius: 8,
+    // borderTopRightRadius: 8,
   },
 });

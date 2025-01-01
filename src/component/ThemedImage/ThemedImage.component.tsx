@@ -11,7 +11,8 @@ export default function ThemedImage({ src, style }: ThemedImageProps) {
       placeholder={ { blurhash: 'L03IYJj[fQj[j[fQfQfQfQfQfQfQ' } }
       contentFit="cover"
       placeholderContentFit="cover"
-      transition={ 1000 }
+      transition={ 500 }
+      recyclingKey={ src }
       // onError={(e) => console.error(e.error)}
     />
   );
