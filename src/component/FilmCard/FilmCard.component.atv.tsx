@@ -1,6 +1,7 @@
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
+import Thumbnail from 'Component/Thumbnail';
 import { Animated, View } from 'react-native';
 
 import { FILM_TYPE_COLORS, TYPE_LABELS } from './FilmCard.config';
@@ -22,11 +23,10 @@ export function FilmCardComponent({
 
   if (isThumbnail) {
     return (
-      <ThemedView
+      <Thumbnail
         style={ [
           styles.card,
           { height: CARD_HEIGHT_TV },
-          styles.cardThumbnail,
           style,
         ] }
       />

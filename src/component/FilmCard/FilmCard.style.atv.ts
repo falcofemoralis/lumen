@@ -21,9 +21,6 @@ export const styles = CreateStyles({
     flexDirection: 'column',
     width: '100%',
   },
-  cardThumbnail: {
-    backgroundColor: Colors.lightBackground,
-  },
   poster: {},
   posterFocused: {},
   info: {

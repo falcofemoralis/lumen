@@ -112,7 +112,6 @@ export function PlayerVideoSelectorComponent({
       style={ styles.container }
     >
       <DefaultFocus>
-        <ThemedText>Select series</ThemedText>
         { renderLoader() }
         { renderVoices() }
         { renderSeasons() }

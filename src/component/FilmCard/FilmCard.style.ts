@@ -9,7 +9,6 @@ export const styles = CreateStyles({
   cardThumbnail: {
     padding: 0,
     margin: 2,
-    backgroundColor: Colors.lightBackground,
     aspectRatio: '166 / 250',
   },
   posterWrapper: {

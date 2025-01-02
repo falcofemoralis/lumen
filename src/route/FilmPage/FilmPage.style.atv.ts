@@ -21,7 +21,6 @@ export const styles = CreateStyles({
   },
   mainInfo: {
     width: '65%',
-    backgroundColor: Colors.lightBackground,
     padding: 16,
   },
   title: {

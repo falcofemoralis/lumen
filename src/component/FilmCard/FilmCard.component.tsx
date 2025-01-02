@@ -1,6 +1,8 @@
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
+import Thumbnail from 'Component/Thumbnail';
+import React from 'react';
 
 import { FILM_TYPE_COLORS, TYPE_LABELS } from './FilmCard.config';
 import { styles } from './FilmCard.style';
@@ -20,22 +22,16 @@ export function FilmCardComponent({
   } = filmCard;
 
   if (isThumbnail) {
-    return <ThemedView style={ [styles.card, styles.cardThumbnail, style] } />;
+    return <Thumbnail style={ [styles.card, styles.cardThumbnail, style] } />;
   }
 
-  const renderType = () => {
-    if (!type) {
-      return null;
-    }
-
-    return (
-      <ThemedText
-        style={ [styles.typeText, { backgroundColor: FILM_TYPE_COLORS[type] }] }
-      >
-        { TYPE_LABELS[type] }
-      </ThemedText>
-    );
-  };
+  const renderType = () => (
+    <ThemedText
+      style={ [styles.typeText, { backgroundColor: FILM_TYPE_COLORS[type] }] }
+    >
+      { TYPE_LABELS[type] }
+    </ThemedText>
+  );
 
   const renderFilmAdditionalText = () => {
     if (!info) {

@@ -14,7 +14,6 @@ import { FilmPageComponentProps } from './FilmPage.type';
 
 export function FilmPageComponent({
   film,
-  isSelectorVisible,
   playFilm,
   hideVideoSelector,
   handleVideoSelect,
@@ -103,7 +102,6 @@ export function FilmPageComponent({
     return (
       <FilmVideoSelector
         film={ film }
-        visible={ isSelectorVisible }
         onHide={ hideVideoSelector }
         onSelect={ handleVideoSelect }
       />
