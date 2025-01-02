@@ -1,6 +1,7 @@
 import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedText from 'Component/ThemedText';
+import { LinearGradient } from 'expo-linear-gradient';
 import { VideoView } from 'expo-video';
 import React, { useEffect, useRef, useState } from 'react';
 import {
@@ -202,7 +203,7 @@ export function PlayerComponent({
             name: icon,
             pack: IconPackType.MaterialIcons,
           } }
-          size={ scale(36) }
+          size={ scale(32) }
           color={ isFocused ? 'black' : 'white' }
         />
       ) }
@@ -297,6 +298,21 @@ export function PlayerComponent({
     </View>
   );
 
+  const renderBackground = () => {
+    if (!showControls) {
+      return null;
+    }
+
+    return (
+      <LinearGradient
+        style={ styles.background }
+        colors={ ['rgba(0, 0, 0, 0.8)', 'transparent'] }
+        start={ { x: 0, y: 1 } }
+        end={ { x: 0, y: 0 } }
+      />
+    );
+  };
+
   const renderControls = () => {
     if (!showControls) {
       return null;
@@ -323,6 +339,7 @@ export function PlayerComponent({
         nativeControls={ false }
         allowsPictureInPicture={ false }
       />
+      { renderBackground() }
       { renderControls() }
     </View>
   );

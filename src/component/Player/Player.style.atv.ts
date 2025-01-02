@@ -12,19 +12,28 @@ export const styles = CreateStyles({
     width: '100%',
     height: '100%',
   },
+  background: {
+    position: 'absolute',
+    left: 0,
+    bottom: 0,
+    height: '50%',
+    width: '100%',
+    zIndex: 1,
+  },
   controls: {
     position: 'absolute',
     bottom: 0,
     left: 0,
-    paddingHorizontal: 36,
-    paddingBottom: 36,
+    paddingHorizontal: 48,
+    paddingBottom: 32,
     backgroundColor: 'transparent',
     width: '100%',
     height: 'auto',
+    zIndex: 2,
   },
   controlsRow: {
     flexDirection: 'row',
-    gap: 36,
+    gap: 32,
     opacity: 1,
   },
   controlsRowHidden: {
@@ -36,7 +45,7 @@ export const styles = CreateStyles({
     marginRight: 'auto',
     width: '100%',
     height: 4,
-    marginTop: 40,
+    marginTop: 26,
     marginBottom: 20,
   },
   playableBar: {
@@ -83,7 +92,7 @@ export const styles = CreateStyles({
     marginBottom: 4,
   },
   subtitle: {
-    fontSize: 24,
+    fontSize: 18,
     marginBottom: 20,
   },
   bottomActions: {
