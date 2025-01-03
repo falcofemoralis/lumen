@@ -1,7 +1,10 @@
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
-  container: {},
+  container: {
+    minWidth: '30%',
+    maxWidth: '40%',
+  },
   voicesInput: {
     marginBottom: 10,
   },

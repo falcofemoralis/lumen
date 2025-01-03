@@ -15,7 +15,9 @@ export const styles = CreateStyles({
 
   },
   icon: {
-
+    marginRight: 5,
+    height: 20,
+    width: 20,
   },
   iconFocused: {
 
@@ -37,7 +39,10 @@ export const styles = CreateStyles({
     color: Colors.lightGray,
     fontSize: 12,
     lineHeight: 16,
-    fontWeight: 'medium',
+    fontWeight: '500',
+  },
+  itemContainer: {
+    flexDirection: 'row',
   },
   item: {
     flexDirection: 'row',
@@ -57,7 +62,7 @@ export const styles = CreateStyles({
     color: Colors.white,
     fontSize: 14,
     lineHeight: 20,
-    fontWeight: 'medium',
+    fontWeight: '500',
   },
   textFocused: {
     color: Colors.black,

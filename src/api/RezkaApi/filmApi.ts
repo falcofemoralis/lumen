@@ -6,7 +6,8 @@ import { FilmType } from 'Type/FilmType.type';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { MenuItemInterface } from 'Type/MenuItem.interface';
-import { parseHtml } from 'Util/Parser';
+import { RatingInterface } from 'Type/Rating.interface';
+import { HTMLElementInterface, parseHtml } from 'Util/Parser';
 import { Variables } from 'Util/Request';
 
 import configApi from './configApi';
@@ -100,11 +101,19 @@ const filmApi: FilmApiInterface = {
     infoTable.forEach((el) => {
       el.childNodes = el.childNodes.filter((node) => node.rawTagName === 'td');
       const key = el.firstChild?.rawText.replace(':', '');
-      const value = el.lastChild;
+      const value = el.lastChild as HTMLElementInterface|undefined;
 
       if (key && value) {
         switch (key) {
           case 'Рейтинги':
+            film.ratingsScale = 10;
+            film.ratings = value.childNodes.filter((node) => node.rawTagName === 'span').map((node) => (
+              {
+                text: node.rawText,
+                rating: Number(node.childNodes[2]?.rawText),
+                votes: Number(node.childNodes[4]?.rawText.replace('(', '').replace(')', '').replaceAll(' ', '')),
+              } as RatingInterface
+            ));
             break;
           case 'Входит в списки':
             break;
@@ -117,6 +126,9 @@ const filmApi: FilmApiInterface = {
               .map((node) => node.rawText);
             break;
           case 'Режиссер':
+            film.directors = value
+              .querySelectorAll('.person-name-item')
+              .map((node) => node.rawText);
             break;
           case 'Жанр':
             film.genres = value.childNodes
@@ -128,6 +140,7 @@ const filmApi: FilmApiInterface = {
           case 'В переводе':
             break;
           case 'Возраст':
+            // film.age = value.rawText;
             break;
           case 'Время':
             film.duration = value.rawText;
@@ -142,7 +155,7 @@ const filmApi: FilmApiInterface = {
       }
     });
 
-    film.description = root.querySelector('.b-post__description_text')?.rawText;
+    film.description = root.querySelector('.b-post__description_text')?.rawText.trim();
 
     // player data
     root.querySelectorAll('.b-translator__item').forEach((el) => {

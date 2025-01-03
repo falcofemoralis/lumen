@@ -11,6 +11,8 @@ export default function ThemedButton({
   onFocus,
   children,
   style,
+  iconStyle,
+  textStyle,
   isSelected,
   icon,
   variant = 'filled',
@@ -29,6 +31,7 @@ export default function ThemedButton({
         <ThemedIcon
           style={ [
             styles.iconFilled,
+            iconStyle,
             isSelected && styles.iconFilledSelected,
             isFocused && styles.iconFilledFocused,
           ] }
@@ -40,6 +43,7 @@ export default function ThemedButton({
       <Text
         style={ [
           styles.textFilled,
+          textStyle,
           isSelected && styles.textFilledSelected,
           isFocused && styles.textFilledFocused,
         ] }
@@ -63,6 +67,7 @@ export default function ThemedButton({
         <ThemedIcon
           style={ [
             styles.iconOutlined,
+            iconStyle,
             isSelected && styles.iconOutlinedSelected,
             isFocused && styles.iconOutlinedFocused,
           ] }
@@ -74,6 +79,7 @@ export default function ThemedButton({
       <Text
         style={ [
           styles.textOutlined,
+          textStyle,
           isSelected && styles.textOutlinedSelected,
           isFocused && styles.textOutlinedFocused,
         ] }

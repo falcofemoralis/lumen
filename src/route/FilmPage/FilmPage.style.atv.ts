@@ -8,6 +8,14 @@ export const styles = CreateStyles({
     justifyContent: 'center',
     gap: 10,
   },
+  actionButton: {
+    paddingVertical: 6,
+  },
+  actionButtonText: {
+    fontSize: 14,
+  },
+  actionButtonIcon: {
+  },
   mainContent: {
     flexDirection: 'row',
     gap: 24,
@@ -20,16 +28,57 @@ export const styles = CreateStyles({
     borderRadius: 16,
   },
   mainInfo: {
-    width: '65%',
+    flex: 1,
     padding: 16,
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    lineHeight: 32,
+    fontWeight: '700',
     color: Colors.white,
   },
   originalTitle: {
     fontSize: 16,
+    lineHeight: 16,
     color: Colors.lightGray,
+    opacity: 0.6,
+    marginTop: 4,
+  },
+  rating: {
+    marginTop: 8,
+  },
+  textContainer: {
+    marginTop: 8,
+  },
+  text: {
+    fontSize: 14,
+    lineHeight: 20,
+    opacity: 0.8,
+  },
+  collectionContainer: {
+    marginTop: 8,
+    gap: 6,
+  },
+  collectionTitle: {
+    fontSize: 12,
+    lineHeight: 20,
+  },
+  collection: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  collectionButton: {
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+  },
+  collectionButtonText: {
+    fontSize: 12,
+    lineHeight: 20,
+  },
+  description: {
+    fontSize: 14,
+    lineHeight: 24,
+    marginTop: 8,
   },
 });

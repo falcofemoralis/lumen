@@ -65,7 +65,10 @@ export function PlayerVideoSelectorComponent({
   );
 
   const renderEpisodes = () => (
-    <SpatialNavigationView direction="horizontal">
+    <SpatialNavigationView
+      direction="horizontal"
+      style={ { flexWrap: 'wrap' } }
+    >
       { episodes.map((episode) => {
         const { episodeId, name } = episode;
 
@@ -85,15 +88,17 @@ export function PlayerVideoSelectorComponent({
 
   const renderPlay = () => (
     <View style={ styles.play }>
-      <ThemedButton
-        icon={ {
-          name: 'play-outline',
-          pack: IconPackType.MaterialCommunityIcons,
-        } }
-        onPress={ handleOnPlay }
-      >
-        Play
-      </ThemedButton>
+      <DefaultFocus>
+        <ThemedButton
+          icon={ {
+            name: 'play-outline',
+            pack: IconPackType.MaterialCommunityIcons,
+          } }
+          onPress={ handleOnPlay }
+        >
+          Play
+        </ThemedButton>
+      </DefaultFocus>
     </View>
   );
 
@@ -109,15 +114,13 @@ export function PlayerVideoSelectorComponent({
     <ThemedModal
       id={ PLAYER_VIDEO_SELECTOR_OVERLAY_ID }
       onHide={ onHide }
-      style={ styles.container }
+      contentContainerStyle={ styles.container }
     >
-      <DefaultFocus>
-        { renderLoader() }
-        { renderVoices() }
-        { renderSeasons() }
-        { renderEpisodes() }
-        { renderPlay() }
-      </DefaultFocus>
+      { renderLoader() }
+      { renderVoices() }
+      { renderSeasons() }
+      { renderEpisodes() }
+      { renderPlay() }
     </ThemedModal>
   );
 }

@@ -26,10 +26,8 @@ export const styles = CreateStyles({
     marginLeft: NAVIGATION_BAR_TV_WIDTH,
   },
   bar: {
-    // position: 'absolute',
     left: 0,
     top: 0,
-    // backgroundColor: 'transparent',
     height: '100%',
     width: NAVIGATION_BAR_TV_WIDTH,
     paddingHorizontal: NAVIGATION_BAR_TV_WIDTH_PADDING,

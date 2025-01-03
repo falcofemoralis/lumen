@@ -1,6 +1,7 @@
 import ThemedButton from 'Component/ThemedButton';
 import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
+import ThemedImage from 'Component/ThemedImage';
 import ThemedModal from 'Component/ThemedModal';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
@@ -52,14 +53,28 @@ export const ThemedDropdownComponent = ({
             isFocused && styles.itemFocused,
           ] }
           >
-            <Text style={ [
-              styles.text,
-              isSelected && styles.textSelected,
-              isFocused && styles.textFocused,
-            ] }
-            >
-              { item.label }
-            </Text>
+            <View style={ styles.itemContainer }>
+              { item.startIcon && (
+                <ThemedImage
+                  style={ styles.icon }
+                  src={ item.startIcon }
+                />
+              ) }
+              <Text style={ [
+                styles.text,
+                isSelected && styles.textSelected,
+                isFocused && styles.textFocused,
+              ] }
+              >
+                { item.label }
+              </Text>
+              { item.endIcon && (
+                <ThemedImage
+                  style={ styles.icon }
+                  src={ item.endIcon }
+                />
+              ) }
+            </View>
             { isSelected && !isFocused && (
               <ThemedIcon
                 style={ styles.iconSelected }

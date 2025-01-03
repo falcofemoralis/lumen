@@ -34,7 +34,7 @@ export const styles = CreateStyles({
   },
   title: {
     fontSize: 12,
-    fontWeight: 'bold',
+    fontWeight: '700',
     color: Colors.white,
     paddingRight: INFO_PADDING * 2,
   },

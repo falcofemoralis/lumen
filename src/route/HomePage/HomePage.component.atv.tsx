@@ -6,7 +6,7 @@ import { HomePageComponentProps } from './HomePage.type';
 
 export function HomePageComponent({ menuItems, onLoadFilms }: HomePageComponentProps) {
   return (
-    <Page>
+    <Page testID="home-page">
       <FilmPager
         menuItems={ menuItems }
         onLoadFilms={ onLoadFilms }

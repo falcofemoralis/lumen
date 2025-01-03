@@ -10,12 +10,13 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useLocale } from 'Hooks/useLocale';
 import { observer } from 'mobx-react-lite';
-import { useEffect } from 'react';
-import { useColorScheme } from 'react-native';
+import { useEffect, useState } from 'react';
+import { BackHandler, useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { PaperProvider } from 'react-native-paper';
 import { SpatialNavigationDeviceTypeProvider } from 'react-tv-space-navigation';
 import ConfigStore from 'Store/Config.store';
+import NotificationStore from 'Store/Notification.store';
 import Colors from 'Style/Colors';
 import { configureRemoteControl } from 'Util/RemoteControl';
 
@@ -23,6 +24,7 @@ import { configureRemoteControl } from 'Util/RemoteControl';
 SplashScreen.preventAutoHideAsync();
 
 export function RootLayout() {
+  const [backPressedOnce, setBackPressedOnce] = useState(false);
   const colorScheme = useColorScheme();
   const [languageLoaded] = useLocale();
 
@@ -38,6 +40,33 @@ export function RootLayout() {
       NavigationBar.setBackgroundColorAsync(Colors.background);
     }
   }, [languageLoaded]);
+
+  useEffect(() => {
+    const backAction = () => {
+      if (ConfigStore.isTV) {
+        if (backPressedOnce) {
+          BackHandler.exitApp();
+
+          return true;
+        }
+
+        setBackPressedOnce(true);
+        NotificationStore.displayMessage('Press back again to exit');
+
+        setTimeout(() => {
+          setBackPressedOnce(false);
+        }, 2000);
+
+        return true;
+      }
+
+      return false;
+    };
+
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+
+    return () => backHandler.remove();
+  });
 
   if (!languageLoaded) {
     return null;

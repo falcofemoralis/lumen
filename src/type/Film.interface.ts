@@ -1,5 +1,6 @@
 import { FilmType } from './FilmType.type';
 import { FilmVoiceInterface } from './FilmVoice.interface';
+import { RatingInterface } from './Rating.interface';
 
 export interface FilmInterface {
   // base data
@@ -16,12 +17,14 @@ export interface FilmInterface {
   genres?: string[];
   seriesInfo?: string;
   largePoster?: string;
-  ratings?: string[]; // type = rating + votes
+  ratings?: RatingInterface[]; // type = rating + votes
+  ratingsScale?: number;
   description?: string;
   actors?: string[];
   directors?: string[];
   additionalInfo?: string[];
   duration?: string;
+  age?: string;
 
   // collections data
   schedule?: string[];

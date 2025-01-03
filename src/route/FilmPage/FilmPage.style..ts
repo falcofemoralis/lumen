@@ -21,7 +21,7 @@ export const styles = CreateStyles({
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: '700',
   },
   originalTitle: {
     fontSize: 16,

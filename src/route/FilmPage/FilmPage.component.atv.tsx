@@ -1,8 +1,9 @@
-// @ts-nocheck
+import { Rating } from '@kolking/react-native-rating';
 import Page from 'Component/Page';
 import PlayerVideoSelector from 'Component/PlayerVideoSelector';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedCard from 'Component/ThemedCard';
+import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
@@ -14,6 +15,8 @@ import {
   SpatialNavigationFocusableView,
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
+import Colors from 'Style/Colors';
+import { scale } from 'Util/CreateStyles';
 
 import { styles } from './FilmPage.style.atv';
 import { FilmPageComponentProps } from './FilmPage.type';
@@ -24,11 +27,41 @@ export function FilmPageComponent({
   hideVideoSelector,
   handleVideoSelect,
 }: FilmPageComponentProps) {
-  const renderAction = (text: string, onPress?: () => void) => (
+  if (!film) {
+    return (
+      <Page>
+        <SpatialNavigationView direction="horizontal">
+          <ThemedView style={ styles.actions }>
+            { Array(5).fill(0).map((_, i) => (
+              <Thumbnail
+                // eslint-disable-next-line react/no-array-index-key
+                key={ `${i}-thumb` }
+                height={ 32 }
+                width={ 110 }
+              />
+            )) }
+          </ThemedView>
+        </SpatialNavigationView>
+        <View style={ styles.mainContent }>
+          <Thumbnail style={ styles.poster } />
+          <Thumbnail style={ styles.mainInfo } />
+        </View>
+      </Page>
+    );
+  }
+
+  const renderAction = (text: string, icon: string, onPress?: () => void) => (
     <SpatialNavigationFocusableView>
       <ThemedButton
         variant="outlined"
         onPress={ onPress }
+        icon={ {
+          name: icon,
+          pack: IconPackType.MaterialCommunityIcons,
+        } }
+        style={ styles.actionButton }
+        textStyle={ styles.actionButtonText }
+        iconStyle={ styles.actionButtonIcon }
       >
         { text }
       </ThemedButton>
@@ -39,15 +72,109 @@ export function FilmPageComponent({
     <SpatialNavigationView direction="horizontal">
       <DefaultFocus>
         <ThemedView style={ styles.actions }>
-          { renderAction(__('Watch Now'), playFilm) }
-          { renderAction('Comments') }
-          { renderAction('Bookmark') }
-          { renderAction('Trailer') }
-          { renderAction('Share') }
-          { renderAction('Download') }
+          { renderAction(__('Watch Now'), 'play-outline', playFilm) }
+          { renderAction('Comments', 'comment-text-multiple-outline') }
+          { renderAction('Bookmark', 'movie-star-outline') }
+          { renderAction('Trailer', 'movie-open-check-outline') }
+          { renderAction('Share', 'share-variant-outline') }
+          { renderAction('Download', 'folder-download-outline') }
         </ThemedView>
       </DefaultFocus>
     </SpatialNavigationView>
+  );
+
+  const renderPoster = () => {
+    const { poster } = film;
+
+    return (
+      <ThemedImage
+        src={ poster }
+        style={ styles.poster }
+      />
+    );
+  };
+
+  const renderInfoText = (text: string | undefined, title?: string) => {
+    if (!text) {
+      return null;
+    }
+
+    return (
+      <ThemedText style={ styles.text }>
+        { title ? `${title}: ${text}` : text }
+      </ThemedText>
+    );
+  };
+
+  const renderCollection = (collection: string[], title: string) => (
+    <View style={ styles.collectionContainer }>
+      <ThemedText style={ styles.collectionTitle }>
+        { title }
+      </ThemedText>
+      <View style={ styles.collection }>
+        { collection.map((item) => (
+          <ThemedButton
+            key={ item }
+            style={ styles.collectionButton }
+            textStyle={ styles.collectionButtonText }
+          >
+            { item }
+          </ThemedButton>
+        )) }
+      </View>
+    </View>
+  );
+
+  const renderMainInfo = () => {
+    const {
+      title,
+      originalTitle,
+      releaseDate,
+      genres = [],
+      countries = [],
+      ratings = [],
+      ratingsScale,
+      directors = [],
+      duration,
+      description,
+    } = film;
+
+    return (
+      <ThemedCard style={ styles.mainInfo }>
+        <ThemedText style={ styles.title }>{ title }</ThemedText>
+        { originalTitle && (
+          <ThemedText style={ styles.originalTitle }>
+            { originalTitle }
+          </ThemedText>
+        ) }
+        <Rating
+          style={ styles.rating }
+          size={ scale(12) }
+          rating={ ratings[0]?.rating || 0 }
+          scale={ 1 }
+          spacing={ scale(2) }
+          maxRating={ ratingsScale || 10 }
+          fillColor={ Colors.secondary }
+        />
+        <View style={ styles.textContainer }>
+          { renderInfoText(`${releaseDate} • ${duration}`) }
+          { renderInfoText(ratings.reduce((acc, { text }) => `${acc}${acc !== '' ? ' • ' : ''}${text}`, ''), 'Рейтинги') }
+          { renderInfoText(directors.length > 0 ? directors[0] : undefined, 'Режиссер') }
+        </View>
+        { renderCollection(genres, 'Жанры') }
+        { renderCollection(countries, 'Страны') }
+        <ThemedText style={ styles.description }>
+          { description }
+        </ThemedText>
+      </ThemedCard>
+    );
+  };
+
+  const renderMainContent = () => (
+    <View style={ styles.mainContent }>
+      { renderPoster() }
+      { renderMainInfo() }
+    </View>
   );
 
   const renderPlayerVideoSelector = () => {
@@ -66,49 +193,9 @@ export function FilmPageComponent({
     );
   };
 
-  const renderMainContent = () => (
-    <View style={ styles.mainContent }>
-      { renderPoster() }
-      { renderMainInfo() }
-    </View>
-  );
-
-  const renderPoster = () => {
-    const { poster } = film;
-
-    return (
-      <ThemedImage
-        src={ poster }
-        style={ styles.poster }
-      />
-    );
-  };
-
-  const renderMainInfo = () => {
-    const {
-      title,
-      originalTitle,
-      releaseDate,
-      genres = [],
-      countries = [],
-      duration,
-    } = film;
-
-    return (
-      <ThemedCard style={ styles.mainInfo }>
-        <ThemedText style={ styles.title }>{ title }</ThemedText>
-        { originalTitle && (
-          <ThemedText style={ styles.originalTitle }>
-            { originalTitle }
-          </ThemedText>
-        ) }
-      </ThemedCard>
-    );
-  };
-
   const renderModals = () => renderPlayerVideoSelector();
 
-  const renderPage = () => (
+  const renderContent = () => (
     <View>
       { renderActions() }
       { renderMainContent() }
@@ -116,37 +203,8 @@ export function FilmPageComponent({
     </View>
   );
 
-  const renderPreview = () => (
-    <View>
-      <SpatialNavigationView direction="horizontal">
-        <ThemedView style={ styles.actions }>
-          { Array(5).fill(0).map((_, i) => (
-            <Thumbnail
-              // eslint-disable-next-line react/no-array-index-key
-              key={ `${i}-thumb` }
-              height={ 32 }
-              width={ 110 }
-            />
-          )) }
-        </ThemedView>
-      </SpatialNavigationView>
-      <View style={ styles.mainContent }>
-        <Thumbnail style={ styles.poster } />
-        <Thumbnail style={ styles.mainInfo } />
-      </View>
-    </View>
-  );
-
-  const renderContent = () => {
-    if (!film) {
-      return renderPreview();
-    }
-
-    return renderPage();
-  };
-
   return (
-    <Page>
+    <Page testID="film-page">
       { renderContent() }
     </Page>
   );
