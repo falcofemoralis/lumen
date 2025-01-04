@@ -1,5 +1,6 @@
 import { Button } from 'react-native-paper';
 
+import { styles } from './ThemedButton.style';
 import { ThemedButtonProps } from './ThemedButton.type';
 
 export default function ThemedButton({ onPress, children, style }: ThemedButtonProps) {
@@ -7,7 +8,7 @@ export default function ThemedButton({ onPress, children, style }: ThemedButtonP
     <Button
       mode="contained"
       onPress={ onPress }
-      style={ style }
+      style={ [styles.container, style] }
     >
       { children }
     </Button>

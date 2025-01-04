@@ -1,6 +1,6 @@
 import { useNavigation, useRouter } from 'expo-router';
 import { withTV } from 'Hooks/withTV';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { BackHandler } from 'react-native';
 import ConfigStore from 'Store/Config.store';
 import OverlayStore from 'Store/Overlay.store';

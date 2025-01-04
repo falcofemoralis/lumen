@@ -2,8 +2,18 @@ import Colors from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
-  container: {
-    paddingInline: 16,
+  topActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignContent: 'center',
+    width: '100%',
+  },
+  topActionsButton: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 32,
+    margin: 8,
   },
   mainContent: {
     flexDirection: 'row',
@@ -27,14 +37,57 @@ export const styles = CreateStyles({
     fontSize: 16,
     color: Colors.gray,
   },
-  releaseDate: {
+  rating: {
 
   },
-  mainInfoRow: {
-    flexDirection: 'column',
+  textContainer: {
+    marginTop: 8,
   },
-  mainInfoItem: {
-    width: '100%',
+  text: {
+    fontSize: 14,
+  },
+  quickInfo: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 16,
+    gap: 8,
+  },
+  quickInfoTextWrapper: {
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  quickInfoUpperText: {
+    fontSize: 16,
+    color: Colors.white,
+    fontWeight: '700',
+  },
+  quickInfoLowerText: {
+    fontSize: 16,
+    color: Colors.white,
+  },
+  collectionContainer: {
+    marginTop: 8,
+    gap: 6,
+  },
+  collectionTitle: {
+    fontSize: 14,
+    lineHeight: 20,
+    fontWeight: '700',
+  },
+  collection: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  collectionButton: {
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    backgroundColor: Colors.gray,
+  },
+  collectionButtonText: {
+    fontSize: 12,
+    lineHeight: 20,
   },
   playBtn: {
     width: '100%',
@@ -43,6 +96,30 @@ export const styles = CreateStyles({
     color: Colors.white,
     fontSize: 16,
     marginBlockStart: 16,
+  },
+  actions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 16,
+    gap: 16,
+  },
+  action: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: Colors.gravel,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: Colors.lightGravel,
+    padding: 8,
+  },
+  actionIcon: {
+
+  },
+  actionText: {
+
   },
   description: {
     color: Colors.lightGray,

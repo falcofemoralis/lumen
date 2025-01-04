@@ -6,13 +6,9 @@ export const styles = CreateStyles({
     padding: 4,
     overflow: 'hidden',
   },
-  cardThumbnail: {
-    padding: 0,
-    margin: 2,
-    aspectRatio: '166 / 250',
-  },
   posterWrapper: {
     width: '100%',
+    height: 'auto',
   },
   poster: {
     aspectRatio: '166 / 250',
@@ -38,19 +34,17 @@ export const styles = CreateStyles({
     top: 0,
     right: 0,
     zIndex: 10,
-    paddingHorizontal: 8,
+    paddingHorizontal: 4,
     paddingVertical: 1,
     fontSize: 10,
-    borderBottomLeftRadius: 8,
   },
   filmAdditionalText: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     zIndex: 10,
-    paddingHorizontal: 8,
+    paddingHorizontal: 4,
     paddingVertical: 1,
     fontSize: 10,
-    borderTopRightRadius: 8,
   },
 });

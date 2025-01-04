@@ -3,6 +3,8 @@ import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
 import Thumbnail from 'Component/Thumbnail';
 import React from 'react';
+import { View } from 'react-native';
+import { scale } from 'Util/CreateStyles';
 
 import { FILM_TYPE_COLORS, TYPE_LABELS } from './FilmCard.config';
 import { styles } from './FilmCard.style';
@@ -22,7 +24,19 @@ export function FilmCardComponent({
   } = filmCard;
 
   if (isThumbnail) {
-    return <Thumbnail style={ [styles.card, styles.cardThumbnail, style] } />;
+    return (
+      <View style={ [styles.card, { gap: 8 }, style] }>
+        <Thumbnail style={ [styles.posterWrapper, styles.poster, style] } />
+        <Thumbnail
+          height={ scale(24) }
+          width="100%"
+        />
+        <Thumbnail
+          height={ scale(16) }
+          width="50%"
+        />
+      </View>
+    );
   }
 
   const renderType = () => (

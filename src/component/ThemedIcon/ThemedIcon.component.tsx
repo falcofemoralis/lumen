@@ -4,6 +4,9 @@ import Octicons from '@expo/vector-icons/Octicons';
 
 import { IconPackType, ThemedIconComponentProps } from './ThemedIcon.type';
 
+/**
+ * https://icons.expo.fyi/Index
+ */
 export function ThemedIconComponent({
   icon,
   size,

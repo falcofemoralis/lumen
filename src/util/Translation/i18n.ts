@@ -7,6 +7,8 @@ import uk from '../../../i18n/uk-UA.json';
 const i18n = new I18n({
   en,
   uk,
+}, {
+  missingBehavior: 'guess',
 });
 
 i18n.locale = getLocales()[0].languageCode ?? 'en';

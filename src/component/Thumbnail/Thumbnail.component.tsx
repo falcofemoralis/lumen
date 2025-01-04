@@ -5,9 +5,9 @@ import { ThumbnailComponentProps } from './Thumbnail.type';
 
 export const ThumbnailComponent = ({ style, height = '100%', width = '100%' }: ThumbnailComponentProps) => (
   <View style={ [
-    styles.thumbnail,
     { height, width },
     style,
+    styles.thumbnail,
   ] }
   />
 );
