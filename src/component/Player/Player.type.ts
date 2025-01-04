@@ -1,3 +1,4 @@
+import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import { VideoPlayer } from 'expo-video';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
@@ -12,12 +13,15 @@ export interface PlayerContainerProps {
 export interface PlayerComponentProps {
   player: VideoPlayer;
   status: Status;
+  video: FilmVideoInterface;
   film: FilmInterface;
+  selectedQuality: string;
   togglePlayPause: () => void;
   rewindPosition: (type: RewindDirection, ms?: number) => void;
   rewindPositionAuto: (type: RewindDirection, ms?: number) => void;
   seekToPosition: (percent: number) => void;
   calculateCurrentTime: (percent: number) => number;
+  handleQualityChange: (item: DropdownItem) => void;
 }
 
 export type Status = {

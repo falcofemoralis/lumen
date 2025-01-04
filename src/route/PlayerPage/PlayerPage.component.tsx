@@ -16,20 +16,20 @@ export function PlayerPageComponent({ video, film }: PlayerPageComponentProps) {
     };
   }, []);
 
-  const testVideo = {
-    ...video,
-    streams: [
-      {
-        url: DEMO_VIDEO,
-        quality: '360p',
-      },
-    ],
-  } as FilmVideoInterface;
+  // const testVideo = {
+  //   ...video,
+  //   streams: [
+  //     {
+  //       url: DEMO_VIDEO,
+  //       quality: '360p',
+  //     },
+  //   ],
+  // } as FilmVideoInterface;
 
   return (
     <Page>
       <Player
-        video={ testVideo }
+        video={ video }
         film={ film }
       />
     </Page>

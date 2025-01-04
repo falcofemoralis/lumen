@@ -4,7 +4,9 @@ import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedModal from 'Component/ThemedModal';
 import ThemedText from 'Component/ThemedText';
 import { View } from 'react-native';
-import { DefaultFocus, SpatialNavigationView } from 'react-tv-space-navigation';
+import { DefaultFocus, SpatialNavigationView, SpatialNavigationVirtualizedGrid } from 'react-tv-space-navigation';
+import { EpisodeInterface } from 'Type/FilmVoice.interface';
+import { scale } from 'Util/CreateStyles';
 
 import { PLAYER_VIDEO_SELECTOR_OVERLAY_ID } from './PlayerVideoSelector.config';
 import { styles } from './PlayerVideoSelector.style.atv';
@@ -64,10 +66,35 @@ export function PlayerVideoSelectorComponent({
     </SpatialNavigationView>
   );
 
+  const renderEpisodeDepr = ({ item: episode }: {item: EpisodeInterface}) => {
+    const { episodeId, name } = episode;
+
+    return (
+      <ThemedButton
+        key={ episodeId }
+        isSelected={ selectedEpisodeId === episodeId }
+        onPress={ () => setSelectedEpisodeId(episodeId) }
+        style={ styles.button }
+      >
+        { name }
+      </ThemedButton>
+    );
+  };
+
+  const renderEpisodesDepr = () => (
+    <SpatialNavigationVirtualizedGrid
+      style={ styles.episodesContainer }
+      data={ episodes }
+      renderItem={ renderEpisodeDepr }
+      itemHeight={ scale(48) }
+      numberOfColumns={ 4 }
+    />
+  );
+
   const renderEpisodes = () => (
     <SpatialNavigationView
       direction="horizontal"
-      style={ { flexWrap: 'wrap' } }
+      style={ styles.episodesContainer }
     >
       { episodes.map((episode) => {
         const { episodeId, name } = episode;

@@ -7,7 +7,6 @@ export interface FilmPageContainerProps {
 
 export interface FilmPageComponentProps {
   film: FilmInterface | null;
-  filmVideo: FilmVideoInterface | null;
   playFilm: () => void;
   hideVideoSelector: () => void;
   handleVideoSelect: (video: FilmVideoInterface) => void;

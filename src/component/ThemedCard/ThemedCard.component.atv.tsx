@@ -1,16 +1,15 @@
-import { Card } from 'react-native-paper';
+import { View } from 'react-native';
 
+import { styles } from './ThemedCard.style.atv';
 import { ThemedCardComponentProps } from './ThemedCard.type';
 
 export const ThemedCardComponent = ({
   style,
   children,
 }: ThemedCardComponentProps) => (
-  <Card style={ style }>
-    <Card.Content>
-      { children }
-    </Card.Content>
-  </Card>
+  <View style={ [styles.card, style] }>
+    { children }
+  </View>
 );
 
 export default ThemedCardComponent;

@@ -14,6 +14,7 @@ export const Colors = {
   darkBlue: '#001E30',
   gravel: '#0F0F0F',
   lightGravel: '#262626',
+  whiteTransparent: 'rgba(191, 191, 191, 0.5)',
 };
 
 export const ThemeColors = {

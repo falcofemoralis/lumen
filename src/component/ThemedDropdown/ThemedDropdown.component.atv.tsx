@@ -20,9 +20,11 @@ export const ThemedDropdownComponent = ({
   data,
   value,
   searchPlaceholder,
+  asOverlay,
+  overlayId,
   onChange,
 }: ThemedDropdownProps) => {
-  const id = useRef(generateId());
+  const id = useRef(overlayId ?? generateId());
 
   const renderHeader = () => {
     if (!searchPlaceholder) {
@@ -38,12 +40,12 @@ export const ThemedDropdownComponent = ({
     );
   };
 
-  const renderItem = useCallback((item: DropdownItem) => {
+  const renderItem = useCallback((item: DropdownItem, idx: number) => {
     const isSelected = value === item.value;
 
     return (
       <SpatialNavigationFocusableView
-        key={ item.value }
+        key={ `${item.value}-${idx}` }
         onSelect={ () => onChange(item) }
       >
         { ({ isFocused }) => (
@@ -102,13 +104,17 @@ export const ThemedDropdownComponent = ({
       { renderHeader() }
       <DefaultFocus>
         <SpatialNavigationScrollView offsetFromStart={ scale(64) }>
-          { data.map((item) => renderItem(item)) }
+          { data.map((item, index) => renderItem(item, index)) }
         </SpatialNavigationScrollView>
       </DefaultFocus>
     </ThemedModal>
   );
 
   const renderInput = () => {
+    if (asOverlay) {
+      return null;
+    }
+
     const selectedLabel = data.find((item) => item.value === value)?.label;
 
     return (

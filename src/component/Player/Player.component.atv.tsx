@@ -1,3 +1,5 @@
+import ThemedDropdown from 'Component/ThemedDropdown';
+import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedText from 'Component/ThemedText';
@@ -14,21 +16,27 @@ import {
   SpatialNavigationFocusableView,
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
+import OverlayStore from 'Store/Overlay.store';
 import { scale } from 'Util/CreateStyles';
 import RemoteControlManager from 'Util/RemoteControl/RemoteControlManager';
 import { SupportedKeys } from 'Util/RemoteControl/SupportedKeys';
 
-import { FocusedElement, LONG_PRESS_DURATION, RewindDirection } from './Player.config';
+import {
+  FocusedElement, LONG_PRESS_DURATION, QUALITY_OVERLAY_ID, RewindDirection,
+} from './Player.config';
 import { styles } from './Player.style.atv';
 import { LongEvent, PlayerComponentProps } from './Player.type';
 
 export function PlayerComponent({
   player,
   status,
+  video,
   film,
+  selectedQuality,
   togglePlayPause,
   rewindPosition,
   rewindPositionAuto,
+  handleQualityChange,
 }: PlayerComponentProps) {
   const [focusedElement, setFocusedElement] = useState<FocusedElement>(
     FocusedElement.ProgressThumb,
@@ -159,6 +167,16 @@ export function PlayerComponent({
     };
   });
 
+  const openQualitySelector = () => {
+    OverlayStore.openOverlay(QUALITY_OVERLAY_ID);
+  };
+
+  const onQualityChange = (item: DropdownItem) => {
+    handleQualityChange(item);
+
+    OverlayStore.goToPreviousOverlay();
+  };
+
   const renderTitle = () => {
     const { title } = film;
 
@@ -199,12 +217,16 @@ export function PlayerComponent({
     >
       { ({ isFocused }) => (
         <ThemedIcon
+          style={ [
+            styles.action,
+            isFocused && styles.focusedAction,
+          ] }
           icon={ {
             name: icon,
             pack: IconPackType.MaterialIcons,
           } }
-          size={ scale(32) }
-          color={ isFocused ? 'black' : 'white' }
+          size={ scale(30) }
+          color="white"
         />
       ) }
     </SpatialNavigationFocusableView>
@@ -288,7 +310,7 @@ export function PlayerComponent({
           ...(hideActions ? styles.controlsRowHidden : {}),
         } }
       >
-        { renderAction('high-quality', 'Quality') }
+        { renderAction('high-quality', 'Quality', openQualitySelector) }
         { renderAction('playlist-play', 'Series') }
         { renderAction('subtitles', 'Subtitles') }
         { renderAction('bookmarks', 'Bookmarks') }
@@ -306,7 +328,7 @@ export function PlayerComponent({
     return (
       <LinearGradient
         style={ styles.background }
-        colors={ ['rgba(0, 0, 0, 0.8)', 'transparent'] }
+        colors={ ['rgba(0, 0, 0, 0.6)', 'transparent'] }
         start={ { x: 0, y: 1 } }
         end={ { x: 0, y: 0 } }
       />
@@ -330,6 +352,26 @@ export function PlayerComponent({
     );
   };
 
+  const renderQualitySelector = () => {
+    const { streams } = video;
+
+    return (
+      <ThemedDropdown
+        asOverlay
+        overlayId={ QUALITY_OVERLAY_ID }
+        searchPlaceholder="Quality"
+        value={ selectedQuality }
+        data={ streams.map((stream) => ({
+          label: stream.quality,
+          value: stream.quality,
+        })) }
+        onChange={ onQualityChange }
+      />
+    );
+  };
+
+  const renderModals = () => renderQualitySelector();
+
   return (
     <View style={ styles.container }>
       <VideoView
@@ -341,6 +383,7 @@ export function PlayerComponent({
       />
       { renderBackground() }
       { renderControls() }
+      { renderModals() }
     </View>
   );
 }

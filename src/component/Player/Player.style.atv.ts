@@ -33,7 +33,7 @@ export const styles = CreateStyles({
   },
   controlsRow: {
     flexDirection: 'row',
-    gap: 32,
+    gap: 14,
     opacity: 1,
   },
   controlsRowHidden: {
@@ -45,8 +45,8 @@ export const styles = CreateStyles({
     marginRight: 'auto',
     width: '100%',
     height: 4,
-    marginTop: 26,
-    marginBottom: 20,
+    marginTop: 16,
+    marginBottom: 16,
   },
   playableBar: {
     backgroundColor: '#888888aa',
@@ -107,5 +107,12 @@ export const styles = CreateStyles({
   durationText: {
     fontSize: 16,
     textAlign: 'right',
+  },
+  action: {
+    padding: 8,
+    borderRadius: 50,
+  },
+  focusedAction: {
+    backgroundColor: Colors.whiteTransparent,
   },
 });

@@ -14,7 +14,6 @@ import { FilmPageContainerProps } from './FilmPage.type';
 
 export function FilmPageContainer({ link }: FilmPageContainerProps) {
   const [film, setFilm] = useState<FilmInterface | null>(null);
-  const [filmVideo, setFilmVideo] = useState<FilmVideoInterface | null>(null);
 
   useEffect(() => {
     const loadFilm = async () => {
@@ -45,7 +44,6 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
   }, []);
 
   const handleVideoSelect = (video: FilmVideoInterface) => {
-    // setFilmVideo(video);
     hideVideoSelector();
     openPlayer(video);
   };
@@ -77,7 +75,6 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
       return;
     }
 
-    // setFilmVideo(video);
     openPlayer(video);
   };
 
@@ -95,7 +92,6 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
 
   const containerProps = () => ({
     film,
-    filmVideo,
   });
 
   const containerFunctions = {

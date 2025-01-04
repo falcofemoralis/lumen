@@ -1,4 +1,5 @@
 /* eslint-disable react-compiler/react-compiler */
+import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import { useEventListener } from 'expo';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { useVideoPlayer } from 'expo-video';
@@ -22,7 +23,8 @@ export function PlayerContainer({
   film,
 }: PlayerContainerProps) {
   const rewindTimeout = useRef<NodeJS.Timeout | null>(null);
-  const [status, setStatus] = useState<Status>(DEFAULT_STATUS); // used for rendering component
+  const [status, setStatus] = useState<Status>(DEFAULT_STATUS);
+  const [selectedQuality, setSelectedQuality] = useState<string>(video.streams[0].quality);
 
   const player = useVideoPlayer(video.streams[0].url, (p) => {
     p.loop = false;
@@ -115,10 +117,26 @@ export function PlayerContainer({
     }, DEFAULT_AUTO_REWIND_MS);
   };
 
+  const handleQualityChange = (item: DropdownItem) => {
+    const { value: quality } = item;
+
+    const stream = video.streams.find((s) => s.quality === quality);
+
+    if (!stream) {
+      return;
+    }
+
+    setSelectedQuality(quality);
+
+    player.replace(stream.url);
+  };
+
   const containerProps = () => ({
     player,
     status,
+    video,
     film,
+    selectedQuality,
   });
 
   const containerFunctions = {
@@ -127,6 +145,7 @@ export function PlayerContainer({
     rewindPositionAuto,
     seekToPosition,
     calculateCurrentTime,
+    handleQualityChange,
   };
 
   return withTV(PlayerComponentTV, PlayerComponent, {
