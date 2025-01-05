@@ -4,6 +4,7 @@ export const DEFAULT_STATUS: Status = {
   progressPercentage: 0,
   playablePercentage: 0,
   isPlaying: false,
+  isLoading: true,
   currentTime: '-',
   durationTime: '-',
   remainingTime: '-',

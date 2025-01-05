@@ -1,11 +1,13 @@
+import Loader from 'Component/Loader';
 import ThemedDropdown from 'Component/ThemedDropdown';
-import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedText from 'Component/ThemedText';
 import { LinearGradient } from 'expo-linear-gradient';
 import { VideoView } from 'expo-video';
-import React, { useEffect, useRef, useState } from 'react';
+import React, {
+  useEffect, useRef, useState,
+} from 'react';
 import {
   BackHandler,
   DimensionValue,
@@ -16,13 +18,15 @@ import {
   SpatialNavigationFocusableView,
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
-import OverlayStore from 'Store/Overlay.store';
 import { scale } from 'Util/CreateStyles';
 import RemoteControlManager from 'Util/RemoteControl/RemoteControlManager';
 import { SupportedKeys } from 'Util/RemoteControl/SupportedKeys';
 
 import {
-  FocusedElement, LONG_PRESS_DURATION, QUALITY_OVERLAY_ID, RewindDirection,
+  FocusedElement,
+  LONG_PRESS_DURATION,
+  QUALITY_OVERLAY_ID,
+  RewindDirection,
 } from './Player.config';
 import { styles } from './Player.style.atv';
 import { LongEvent, PlayerComponentProps } from './Player.type';
@@ -36,6 +40,7 @@ export function PlayerComponent({
   togglePlayPause,
   rewindPosition,
   rewindPositionAuto,
+  openQualitySelector,
   handleQualityChange,
 }: PlayerComponentProps) {
   const [focusedElement, setFocusedElement] = useState<FocusedElement>(
@@ -166,16 +171,6 @@ export function PlayerComponent({
       RemoteControlManager.removeKeyupListener(remoteControlUpListener);
     };
   });
-
-  const openQualitySelector = () => {
-    OverlayStore.openOverlay(QUALITY_OVERLAY_ID);
-  };
-
-  const onQualityChange = (item: DropdownItem) => {
-    handleQualityChange(item);
-
-    OverlayStore.goToPreviousOverlay();
-  };
 
   const renderTitle = () => {
     const { title } = film;
@@ -365,10 +360,17 @@ export function PlayerComponent({
           label: stream.quality,
           value: stream.quality,
         })) }
-        onChange={ onQualityChange }
+        onChange={ handleQualityChange }
       />
     );
   };
+
+  const renderLoader = () => (
+    <Loader
+      isLoading={ status.isLoading }
+      fullScreen
+    />
+  );
 
   const renderModals = () => renderQualitySelector();
 
@@ -383,6 +385,7 @@ export function PlayerComponent({
       />
       { renderBackground() }
       { renderControls() }
+      { renderLoader() }
       { renderModals() }
     </View>
   );

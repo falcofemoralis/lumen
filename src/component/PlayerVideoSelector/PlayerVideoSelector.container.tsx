@@ -75,9 +75,10 @@ export function PlayerVideoSelectorContainer({
     }
   };
 
-  const handleOnPlay = async () => {
+  const handleSelectEpisode = async (episodeId: string) => {
     const { hasSeasons } = film;
 
+    setSelectedEpisodeId(episodeId);
     setIsLoading(true);
 
     try {
@@ -89,7 +90,7 @@ export function PlayerVideoSelectorContainer({
           film,
           selectedVoice,
           selectedSeasonId ?? '1',
-          selectedEpisodeId ?? '1',
+          episodeId,
         );
 
       onSelect(video);
@@ -114,8 +115,7 @@ export function PlayerVideoSelectorContainer({
   const containerFunctions = {
     handleSelectVoice,
     setSelectedSeasonId,
-    setSelectedEpisodeId,
-    handleOnPlay,
+    handleSelectEpisode,
   };
 
   return withTV(FilmVideoSelectorComponentTV, PlayerVideoSelectorComponent, {

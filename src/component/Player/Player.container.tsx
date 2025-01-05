@@ -5,6 +5,7 @@ import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { useVideoPlayer } from 'expo-video';
 import { withTV } from 'Hooks/withTV';
 import { useEffect, useRef, useState } from 'react';
+import OverlayStore from 'Store/Overlay.store';
 import { convertSecondsToTime } from 'Util/Date';
 
 import PlayerComponent from './Player.component';
@@ -14,6 +15,7 @@ import {
   DEFAULT_AUTO_REWIND_MS,
   DEFAULT_REWIND,
   DEFAULT_STATUS,
+  QUALITY_OVERLAY_ID,
   RewindDirection,
 } from './Player.config';
 import { PlayerContainerProps, Status } from './Player.type';
@@ -57,6 +59,13 @@ export function PlayerContainer({
     setStatus({
       ...status,
       isPlaying,
+    });
+  });
+
+  useEventListener(player, 'statusChange', ({ status: playerStatus }) => {
+    setStatus({
+      ...status,
+      isLoading: playerStatus === 'loading',
     });
   });
 
@@ -117,6 +126,10 @@ export function PlayerContainer({
     }, DEFAULT_AUTO_REWIND_MS);
   };
 
+  const openQualitySelector = () => {
+    OverlayStore.openOverlay(QUALITY_OVERLAY_ID);
+  };
+
   const handleQualityChange = (item: DropdownItem) => {
     const { value: quality } = item;
 
@@ -128,7 +141,11 @@ export function PlayerContainer({
 
     setSelectedQuality(quality);
 
+    const { currentTime } = player;
     player.replace(stream.url);
+    player.currentTime = currentTime;
+
+    OverlayStore.goToPreviousOverlay();
   };
 
   const containerProps = () => ({
@@ -145,6 +162,7 @@ export function PlayerContainer({
     rewindPositionAuto,
     seekToPosition,
     calculateCurrentTime,
+    openQualitySelector,
     handleQualityChange,
   };
 

@@ -9,6 +9,7 @@ export interface PageContainerProps {
 export interface PageComponentProps {
   children: React.ReactNode;
   style?: ViewStyle;
+  testID?: string;
 }
 
 export type HistoryItem = {

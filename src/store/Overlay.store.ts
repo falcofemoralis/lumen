@@ -33,7 +33,7 @@ class OverlayStore {
   }
 
   closeOverlay(id: string) {
-    this.currentOverlay.filter(
+    this.currentOverlay = this.currentOverlay.filter(
       (overlayId) => overlayId !== id,
     );
   }

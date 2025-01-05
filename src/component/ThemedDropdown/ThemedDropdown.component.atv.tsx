@@ -44,53 +44,57 @@ export const ThemedDropdownComponent = ({
     const isSelected = value === item.value;
 
     return (
-      <SpatialNavigationFocusableView
+      <DefaultFocus
         key={ `${item.value}-${idx}` }
-        onSelect={ () => onChange(item) }
+        enable={ isSelected }
       >
-        { ({ isFocused }) => (
-          <View style={ [
-            styles.item,
-            isSelected && styles.itemSelected,
-            isFocused && styles.itemFocused,
-          ] }
-          >
-            <View style={ styles.itemContainer }>
-              { item.startIcon && (
-                <ThemedImage
-                  style={ styles.icon }
-                  src={ item.startIcon }
-                />
-              ) }
-              <Text style={ [
-                styles.text,
-                isSelected && styles.textSelected,
-                isFocused && styles.textFocused,
-              ] }
-              >
-                { item.label }
-              </Text>
-              { item.endIcon && (
-                <ThemedImage
-                  style={ styles.icon }
-                  src={ item.endIcon }
+        <SpatialNavigationFocusableView
+          onSelect={ () => onChange(item) }
+        >
+          { ({ isFocused }) => (
+            <View style={ [
+              styles.item,
+              isSelected && styles.itemSelected,
+              isFocused && styles.itemFocused,
+            ] }
+            >
+              <View style={ styles.itemContainer }>
+                { item.startIcon && (
+                  <ThemedImage
+                    style={ styles.icon }
+                    src={ item.startIcon }
+                  />
+                ) }
+                <Text style={ [
+                  styles.text,
+                  isSelected && styles.textSelected,
+                  isFocused && styles.textFocused,
+                ] }
+                >
+                  { item.label }
+                </Text>
+                { item.endIcon && (
+                  <ThemedImage
+                    style={ styles.icon }
+                    src={ item.endIcon }
+                  />
+                ) }
+              </View>
+              { isSelected && !isFocused && (
+                <ThemedIcon
+                  style={ styles.iconSelected }
+                  icon={ {
+                    name: 'check',
+                    pack: IconPackType.MaterialIcons,
+                  } }
+                  size={ scale(16) }
+                  color="white"
                 />
               ) }
             </View>
-            { isSelected && !isFocused && (
-              <ThemedIcon
-                style={ styles.iconSelected }
-                icon={ {
-                  name: 'check',
-                  pack: IconPackType.MaterialIcons,
-                } }
-                size={ scale(16) }
-                color="white"
-              />
-            ) }
-          </View>
-        ) }
-      </SpatialNavigationFocusableView>
+          ) }
+        </SpatialNavigationFocusableView>
+      </DefaultFocus>
     );
   }, [value, onChange]);
 
@@ -102,11 +106,9 @@ export const ThemedDropdownComponent = ({
       contentContainerStyle={ styles.contentContainer }
     >
       { renderHeader() }
-      <DefaultFocus>
-        <SpatialNavigationScrollView offsetFromStart={ scale(64) }>
-          { data.map((item, index) => renderItem(item, index)) }
-        </SpatialNavigationScrollView>
-      </DefaultFocus>
+      <SpatialNavigationScrollView offsetFromStart={ scale(64) }>
+        { data.map((item, index) => renderItem(item, index)) }
+      </SpatialNavigationScrollView>
     </ThemedModal>
   );
 

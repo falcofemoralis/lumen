@@ -45,8 +45,11 @@ const onDirectionHandledWithoutMovement = (movement: string) => {
 export function PageComponent({
   children,
   style,
+  // testID,
 }: PageComponentProps) {
   const isFocused = useIsFocused();
+
+  // console.log('isFocused for ', testID, isFocused);
 
   const isActive = isFocused && !NavigationStore.isNavigationOpened;
 

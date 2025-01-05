@@ -1,3 +1,4 @@
+import NotificationStore from 'Store/Notification.store';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
@@ -73,11 +74,19 @@ const playerApi: PlayerApiInterface = {
       throw new Error(json.message);
     }
 
-    const streams = parseStreams(json.url);
+    try {
+      const streams = parseStreams(json.url);
 
-    return {
-      streams: configApi.modifyCDN(streams),
-    };
+      return {
+        streams: configApi.modifyCDN(streams),
+      };
+    } catch (e) {
+      NotificationStore.displayError(e as Error);
+
+      return {
+        streams: [],
+      };
+    }
   },
 
   /**

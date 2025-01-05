@@ -27,7 +27,7 @@ export function PlayerPageComponent({ video, film }: PlayerPageComponentProps) {
   // } as FilmVideoInterface;
 
   return (
-    <Page>
+    <Page testID="player-page">
       <Player
         video={ video }
         film={ film }

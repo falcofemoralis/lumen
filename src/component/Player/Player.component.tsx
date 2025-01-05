@@ -1,3 +1,4 @@
+import Loader from 'Component/Loader';
 import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedText from 'Component/ThemedText';
@@ -209,6 +210,13 @@ export function PlayerComponent({
     );
   };
 
+  const renderLoader = () => (
+    <Loader
+      isLoading={ status.isLoading }
+      fullScreen
+    />
+  );
+
   return (
     <SafeAreaView>
       <StatusBar
@@ -229,6 +237,7 @@ export function PlayerComponent({
         >
           { renderControls() }
         </Pressable>
+        { renderLoader() }
       </ThemedView>
     </SafeAreaView>
   );

@@ -17,8 +17,7 @@ export type PlayerVideoSelectorComponentProps = {
   selectedEpisodeId: string | null;
   handleSelectVoice: (voiceId: string) => void;
   setSelectedSeasonId: (id: string) => void;
-  setSelectedEpisodeId: (id: string) => void;
   seasons: SeasonInterface[];
   episodes: EpisodeInterface[];
-  handleOnPlay: () => void;
+  handleSelectEpisode: (episodeId: string) => void;
 };

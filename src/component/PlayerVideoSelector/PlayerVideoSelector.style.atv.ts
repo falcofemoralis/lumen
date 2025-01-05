@@ -19,10 +19,4 @@ export const styles = CreateStyles({
     marginEnd: 10,
     marginBottom: 10,
   },
-  play: {
-    flexDirection: 'row',
-    borderTopWidth: 2,
-    borderTopColor: Colors.lightGravel,
-    paddingTop: 8,
-  },
 });

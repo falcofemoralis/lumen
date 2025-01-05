@@ -1,3 +1,4 @@
+import Loader from 'Component/Loader';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedDropdown from 'Component/ThemedDropdown';
 import ThemedModal from 'Component/ThemedModal';
@@ -19,10 +20,9 @@ export function PlayerVideoSelectorComponent({
   selectedEpisodeId,
   handleSelectVoice,
   setSelectedSeasonId,
-  setSelectedEpisodeId,
   seasons,
   episodes,
-  handleOnPlay,
+  handleSelectEpisode,
 }: PlayerVideoSelectorComponentProps) {
   const renderVoices = () => {
     if (voices.length <= 1) {
@@ -67,42 +67,30 @@ export function PlayerVideoSelectorComponent({
 
   const renderEpisodes = () => (
     <ThemedView style={ styles.episodesContainer }>
-      { episodes.map((episode) => (
+      { episodes.map(({ episodeId, name }) => (
         <Button
-          key={ episode.episodeId }
+          key={ episodeId }
           style={ styles.episode }
-          onPress={ () => setSelectedEpisodeId(episode.episodeId) }
+          onPress={ () => handleSelectEpisode(episodeId) }
         >
           <ThemedText style={ [
             styles.episodeText,
-            selectedEpisodeId === episode.episodeId ? styles.episodeTextSelected : undefined,
+            selectedEpisodeId === episodeId ? styles.episodeTextSelected : undefined,
           ] }
           >
-            { episode.name }
+            { name }
           </ThemedText>
         </Button>
       )) }
     </ThemedView>
   );
 
-  const renderPlayButton = () => (
-    <ThemedView style={ styles.playContainer }>
-      <ThemedButton
-        style={ styles.playBtn }
-        onPress={ handleOnPlay }
-      >
-        Play
-      </ThemedButton>
-    </ThemedView>
+  const renderLoader = () => (
+    <Loader
+      isLoading={ isLoading }
+      fullScreen
+    />
   );
-
-  const renderLoader = () => {
-    if (!isLoading) {
-      return null;
-    }
-
-    return <ThemedText>Loading...</ThemedText>;
-  };
 
   return (
     <ThemedModal
@@ -116,7 +104,6 @@ export function PlayerVideoSelectorComponent({
         { renderVoices() }
         { renderSeasons() }
         { renderEpisodes() }
-        { renderPlayButton() }
       </ScrollView>
     </ThemedModal>
   );

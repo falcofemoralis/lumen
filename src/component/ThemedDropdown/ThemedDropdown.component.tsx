@@ -14,6 +14,8 @@ import { DropdownItem, ThemedDropdownProps } from './ThemedDropdown.type';
 export const ThemedDropdownComponent = ({
   style,
   selectedTextStyle,
+  asOverlay,
+  overlayId,
   ...props
 }: ThemedDropdownProps) => {
   const renderItem = useCallback((item: DropdownItem) => (

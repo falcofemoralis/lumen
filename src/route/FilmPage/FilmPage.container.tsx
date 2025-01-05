@@ -4,6 +4,7 @@ import { withTV } from 'Hooks/withTV';
 import { useCallback, useEffect, useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
 import OverlayStore from 'Store/Overlay.store';
+import RouterStore from 'Store/Router.store';
 import ServiceStore from 'Store/Service.store';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
@@ -79,14 +80,13 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
   };
 
   const openPlayer = (video: FilmVideoInterface) => {
+    RouterStore.pushData('player', {
+      video,
+      film,
+    });
+
     router.push({
-      pathname: '/player/[data]',
-      params: {
-        data: JSON.stringify({
-          video,
-          film,
-        }),
-      },
+      pathname: '/player',
     });
   };
 

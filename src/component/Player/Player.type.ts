@@ -21,6 +21,7 @@ export interface PlayerComponentProps {
   rewindPositionAuto: (type: RewindDirection, ms?: number) => void;
   seekToPosition: (percent: number) => void;
   calculateCurrentTime: (percent: number) => number;
+  openQualitySelector: () => void;
   handleQualityChange: (item: DropdownItem) => void;
 }
 
@@ -28,6 +29,7 @@ export type Status = {
   progressPercentage: number;
   playablePercentage: number;
   isPlaying: boolean;
+  isLoading: boolean;
   currentTime: string;
   durationTime: string;
   remainingTime: string;

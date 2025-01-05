@@ -1,14 +1,13 @@
 import FilmGrid from 'Component/FilmGrid';
+import Loader from 'Component/Loader';
 import ThemedButton from 'Component/ThemedButton';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedView from 'Component/ThemedView';
-import { ActivityIndicator } from 'react-native';
 import {
   DefaultFocus,
   SpatialNavigationScrollView,
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
-import Colors from 'Style/Colors';
 
 import { styles } from './FilmPager.style.atv';
 import { FilmPagerComponentProps, PagerItemInterface } from './FilmPager.type';
@@ -80,11 +79,9 @@ export function FilmPagerComponent({
   );
 
   const renderLoader = () => (
-    <ActivityIndicator
-      style={ styles.loader }
-      animating={ isLoading }
-      size="large"
-      color={ Colors.primary }
+    <Loader
+      isLoading={ isLoading }
+      fullScreen
     />
   );
 

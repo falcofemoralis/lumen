@@ -52,7 +52,7 @@ export function FilmGridComponent({
       onEndReachedThresholdRowsNumber={ 2 }
       style={ styles.container }
       additionalRenderedRows={ 1 }
-      scrollDuration={ 600 }
+      scrollDuration={ 400 }
     />
   );
 }

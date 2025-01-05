@@ -15,14 +15,4 @@ export const styles = CreateStyles({
   gridWrapper: {
     zIndex: 2,
   },
-  loader: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    zIndex: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
 });

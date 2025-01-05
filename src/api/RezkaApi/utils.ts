@@ -49,27 +49,21 @@ export const parseFilmCard = (el: HTMLElementInterface): FilmCardInterface | nul
 };
 
 export const decodeUrl = (str: string): string => {
-  try {
-    if (!str.startsWith('#h')) {
-      return str;
-    }
-    let replace = str.replace('#h', '');
-    let i = 0;
-    while (i < 20 && replace.includes('//_//')) {
-      const indexOf = replace.indexOf('//_//');
-      if (indexOf > -1) {
-        replace = replace.replace(replace.substring(indexOf, indexOf + 21), '');
-      }
-      // eslint-disable-next-line no-plusplus -- Requires for decoding
-      i++;
-    }
-
-    return atob(replace);
-  } catch (e) {
-    console.error(e);
-
+  if (!str.startsWith('#h')) {
     return str;
   }
+  let replace = str.replace('#h', '');
+  let i = 0;
+  while (i < 20 && replace.includes('//_//')) {
+    const indexOf = replace.indexOf('//_//');
+    if (indexOf > -1) {
+      replace = replace.replace(replace.substring(indexOf, indexOf + 21), '');
+    }
+    // eslint-disable-next-line no-plusplus -- Requires for decoding
+    i++;
+  }
+
+  return atob(replace);
 };
 
 export const parseStreams = (streams: string | null): FilmStreamInterface[] => {
@@ -80,20 +74,16 @@ export const parseStreams = (streams: string | null): FilmStreamInterface[] => {
     const split = decodedStreams.split(',');
 
     split.forEach((str) => {
-      try {
-        if (str.includes(' or ')) {
-          parsedStreams.push({
-            url: str.split(' or ')[1],
-            quality: str.substring(1, str.indexOf(']')),
-          });
-        } else {
-          parsedStreams.push({
-            url: str.substring(str.indexOf(']') + 1),
-            quality: str.substring(1, str.indexOf(']')),
-          });
-        }
-      } catch (e) {
-        console.error(e);
+      if (str.includes(' or ')) {
+        parsedStreams.push({
+          url: str.split(' or ')[1],
+          quality: str.substring(1, str.indexOf(']')),
+        });
+      } else {
+        parsedStreams.push({
+          url: str.substring(str.indexOf(']') + 1),
+          quality: str.substring(1, str.indexOf(']')),
+        });
       }
     });
   }

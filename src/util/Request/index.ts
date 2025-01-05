@@ -1,5 +1,6 @@
 import { queryCache } from 'Util/Cache';
 import { hash } from 'Util/Hash';
+import { removeParamFromUrl } from 'Util/Url';
 
 export type Variables = Record<string, string>;
 
@@ -107,7 +108,7 @@ export const executePost = async (
   signal?: AbortSignal,
 ): Promise<string> => {
   const uri = formatURI(query, {}, endpoint);
-  const uriHash = hash(uri).toString();
+  const uriHash = hash(removeParamFromUrl(uri, 't')).toString();
 
   try {
     if (!ignoreCache) {
