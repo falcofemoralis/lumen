@@ -7,7 +7,7 @@ import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { DEMO_VIDEO } from './PlayerPage.config';
 import { PlayerPageComponentProps } from './PlayerPage.type';
 
-export function PlayerPageComponent({ video, film }: PlayerPageComponentProps) {
+export function PlayerPageComponent({ video, film, voice }: PlayerPageComponentProps) {
   useEffect(() => {
     NavigationStore.lockNavigation();
 
@@ -31,6 +31,7 @@ export function PlayerPageComponent({ video, film }: PlayerPageComponentProps) {
       <Player
         video={ video }
         film={ film }
+        voice={ voice }
       />
     </Page>
   );

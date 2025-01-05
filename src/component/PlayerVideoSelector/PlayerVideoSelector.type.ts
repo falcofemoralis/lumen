@@ -5,7 +5,7 @@ import { EpisodeInterface, FilmVoiceInterface, SeasonInterface } from 'Type/Film
 export type PlayerVideoSelectorContainerProps = {
   film: FilmInterface;
   onHide: () => void;
-  onSelect: (video: FilmVideoInterface) => void;
+  onSelect: (video: FilmVideoInterface, voice: FilmVoiceInterface) => void;
 };
 
 export type PlayerVideoSelectorComponentProps = {
@@ -13,8 +13,8 @@ export type PlayerVideoSelectorComponentProps = {
   onHide: () => void;
   isLoading: boolean;
   selectedVoice: FilmVoiceInterface;
-  selectedSeasonId: string | null;
-  selectedEpisodeId: string | null;
+  selectedSeasonId: string | undefined;
+  selectedEpisodeId: string | undefined;
   handleSelectVoice: (voiceId: string) => void;
   setSelectedSeasonId: (id: string) => void;
   seasons: SeasonInterface[];

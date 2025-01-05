@@ -23,6 +23,7 @@ import { PlayerContainerProps, Status } from './Player.type';
 export function PlayerContainer({
   video,
   film,
+  voice,
 }: PlayerContainerProps) {
   const rewindTimeout = useRef<NodeJS.Timeout | null>(null);
   const [status, setStatus] = useState<Status>(DEFAULT_STATUS);
@@ -153,6 +154,7 @@ export function PlayerContainer({
     status,
     video,
     film,
+    voice,
     selectedQuality,
   });
 

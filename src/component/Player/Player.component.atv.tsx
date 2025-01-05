@@ -36,6 +36,7 @@ export function PlayerComponent({
   status,
   video,
   film,
+  voice,
   selectedQuality,
   togglePlayPause,
   rewindPosition,
@@ -173,18 +174,26 @@ export function PlayerComponent({
   });
 
   const renderTitle = () => {
-    const { title } = film;
+    const { title, hasSeasons } = film;
 
     return (
-      <ThemedText style={ styles.title }>{ title }</ThemedText>
+      <ThemedText style={ styles.title }>
+        {
+          `${title}${hasSeasons ? ` Сезон ${voice.lastSeasonId} - Эпизод ${voice.lastEpisodeId}` : ''}`
+        }
+      </ThemedText>
     );
   };
 
   const renderSubtitle = () => {
-    const { releaseDate, countries } = film;
+    const { releaseDate, countries, ratings } = film;
 
     return (
-      <ThemedText style={ styles.subtitle }>{ `${releaseDate} ${countries ? countries[0] : ''}` }</ThemedText>
+      <ThemedText style={ styles.subtitle }>
+        {
+          `${releaseDate} • ${ratings ? ratings[0].text : ''} • ${countries ? countries[0] : ''}`
+        }
+      </ThemedText>
     );
   };
 

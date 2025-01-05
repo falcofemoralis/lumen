@@ -18,11 +18,11 @@ export function PlayerVideoSelectorContainer({
   const [selectedVoice, setSelectedVoice] = useState<FilmVoiceInterface>(
     voices.find(({ isActive }) => isActive) ?? voices[0],
   );
-  const [selectedSeasonId, setSelectedSeasonId] = useState<string | null>(
-    selectedVoice.lastSeasonId ?? null,
+  const [selectedSeasonId, setSelectedSeasonId] = useState<string | undefined>(
+    selectedVoice.lastSeasonId,
   );
-  const [selectedEpisodeId, setSelectedEpisodeId] = useState<string | null>(
-    selectedVoice.lastEpisodeId ?? null,
+  const [selectedEpisodeId, setSelectedEpisodeId] = useState<string | undefined>(
+    selectedVoice.lastEpisodeId,
   );
 
   const getSeasons = (): SeasonInterface[] => {
@@ -49,6 +49,19 @@ export function PlayerVideoSelectorContainer({
 
     if (!hasSeasons) {
       setSelectedVoice(voice);
+
+      setIsLoading(true);
+
+      try {
+        const currentService = ServiceStore.getCurrentService();
+        const video = await currentService.getFilmStreamsByVoice(film, selectedVoice);
+
+        onSelect(video, voice);
+      } catch (error) {
+        NotificationStore.displayError(error as Error);
+      } finally {
+        setIsLoading(false);
+      }
 
       return;
     }
@@ -84,16 +97,23 @@ export function PlayerVideoSelectorContainer({
     try {
       const currentService = ServiceStore.getCurrentService();
 
-      const video = !hasSeasons
-        ? await currentService.getFilmStreamsByVoice(film, selectedVoice)
-        : await currentService.getFilmStreamsByEpisodeId(
-          film,
-          selectedVoice,
-          selectedSeasonId ?? '1',
-          episodeId,
-        );
+      const video = await currentService.getFilmStreamsByEpisodeId(
+        film,
+        selectedVoice,
+        selectedSeasonId ?? '1',
+        episodeId,
+      );
 
-      onSelect(video);
+      const voice = {
+        ...selectedVoice,
+      };
+
+      if (hasSeasons) {
+        voice.lastSeasonId = selectedSeasonId;
+        voice.lastEpisodeId = episodeId;
+      }
+
+      onSelect(video, voice);
     } catch (error) {
       NotificationStore.displayError(error as Error);
     } finally {

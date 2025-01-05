@@ -8,6 +8,7 @@ import RouterStore from 'Store/Router.store';
 import ServiceStore from 'Store/Service.store';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
+import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 
 import FilmPageComponent from './FilmPage.component';
 import FilmPageComponentTV from './FilmPage.component.atv';
@@ -44,9 +45,9 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
     OverlayStore.goToPreviousOverlay();
   }, []);
 
-  const handleVideoSelect = (video: FilmVideoInterface) => {
+  const handleVideoSelect = (video: FilmVideoInterface, voice: FilmVoiceInterface) => {
     hideVideoSelector();
-    openPlayer(video);
+    openPlayer(video, voice);
   };
 
   const playFilm = () => {
@@ -68,7 +69,8 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
       return;
     }
 
-    const { video } = voices[0];
+    const voice = voices[0];
+    const { video } = voice;
 
     if (!video) {
       NotificationStore.displayMessage('No video streams available');
@@ -76,13 +78,14 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
       return;
     }
 
-    openPlayer(video);
+    openPlayer(video, voice);
   };
 
-  const openPlayer = (video: FilmVideoInterface) => {
+  const openPlayer = (video: FilmVideoInterface, voice: FilmVoiceInterface) => {
     RouterStore.pushData('player', {
       video,
       film,
+      voice,
     });
 
     router.push({
