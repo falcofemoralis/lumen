@@ -1,6 +1,4 @@
 import ThemedView from 'Component/ThemedView';
-import { observer } from 'mobx-react-lite';
-import NavigationStore from 'Store/Navigation.store';
 
 import { styles } from './Page.style';
 import { PageComponentProps } from './Page.type';
@@ -12,7 +10,6 @@ export function PageComponent({
   return (
     <ThemedView style={ [
       styles.container,
-      NavigationStore.isNavigationLocked && styles.fullContainer,
       style,
     ] }
     >
@@ -21,4 +18,4 @@ export function PageComponent({
   );
 }
 
-export default observer(PageComponent);
+export default PageComponent;

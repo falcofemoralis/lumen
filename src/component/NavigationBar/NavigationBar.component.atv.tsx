@@ -12,7 +12,11 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Tabs } from 'expo-router';
 import { observer } from 'mobx-react-lite';
 import React, { useCallback, useState } from 'react';
-import { StyleProp, TextStyle, View } from 'react-native';
+import {
+  StyleProp,
+  TextStyle,
+  View,
+} from 'react-native';
 import {
   DefaultFocus,
   Directions,
@@ -162,6 +166,25 @@ export function NavigationBarComponent() {
         tabBarInactiveTintColor: Colors.white,
         tabBarHideOnKeyboard: true,
         tabBarPosition: 'left',
+        freezeOnBlur: true,
+        sceneStyle: {
+          margin: 16,
+        },
+        // transitionSpec: {
+        //   animation: 'timing',
+        //   config: {
+        //     duration: 2000,
+        //     easing: Easing.inOut(Easing.ease),
+        //   },
+        // },
+        // sceneStyleInterpolator: ({ current }) => ({
+        //   sceneStyle: {
+        //     opacity: current.progress.interpolate({
+        //       inputRange: [-1, 0, 1],
+        //       outputRange: [0, 1, 0],
+        //     }),
+        //   },
+        // }),
       } }
       // tabBar={ () => null }
       tabBar={ renderTabBar }

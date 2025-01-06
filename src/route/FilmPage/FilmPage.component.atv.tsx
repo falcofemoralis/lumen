@@ -1,4 +1,5 @@
 import { Rating } from '@kolking/react-native-rating';
+import Loader from 'Component/Loader';
 import Page from 'Component/Page';
 import PlayerVideoSelector from 'Component/PlayerVideoSelector';
 import ThemedButton from 'Component/ThemedButton';
@@ -46,6 +47,10 @@ export function FilmPageComponent({
           <Thumbnail style={ styles.poster } />
           <Thumbnail style={ styles.mainInfo } />
         </View>
+        <Loader
+          isLoading
+          fullScreen
+        />
       </Page>
     );
   }

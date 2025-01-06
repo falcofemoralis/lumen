@@ -6,7 +6,6 @@ import { Keyboard } from 'react-native';
 import { Portal } from 'react-native-paper';
 import { Directions, SpatialNavigationRoot, useLockSpatialNavigation } from 'react-tv-space-navigation';
 import NavigationStore from 'Store/Navigation.store';
-import { getWindowWidth } from 'Util/Window';
 
 import { styles } from './Page.style.atv';
 import { PageComponentProps } from './Page.type';
@@ -57,9 +56,6 @@ export function PageComponent({
     <ThemedView
       style={ [
         styles.container,
-        NavigationStore.isNavigationLocked
-          ? styles.fullContainer
-          : { width: getWindowWidth() },
         style,
       ] }
     >

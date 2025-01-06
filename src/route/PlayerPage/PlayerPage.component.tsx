@@ -1,6 +1,7 @@
 import Page from 'Component/Page';
 import Player from 'Component/Player';
 import { useEffect } from 'react';
+import ConfigStore from 'Store/Config.store';
 import NavigationStore from 'Store/Navigation.store';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 
@@ -9,10 +10,14 @@ import { PlayerPageComponentProps } from './PlayerPage.type';
 
 export function PlayerPageComponent({ video, film, voice }: PlayerPageComponentProps) {
   useEffect(() => {
-    NavigationStore.lockNavigation();
+    if (ConfigStore.isTV) {
+      NavigationStore.lockNavigation();
+    }
 
     return () => {
-      NavigationStore.unlockNavigation();
+      if (ConfigStore.isTV) {
+        NavigationStore.unlockNavigation();
+      }
     };
   }, []);
 
@@ -25,6 +30,8 @@ export function PlayerPageComponent({ video, film, voice }: PlayerPageComponentP
   //     },
   //   ],
   // } as FilmVideoInterface;
+
+  console.log('render PlayerComponent');
 
   return (
     <Page testID="player-page">

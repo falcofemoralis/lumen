@@ -78,8 +78,9 @@ export function RootLayout() {
         headerShown: false,
         contentStyle: {
           marginTop: Constants.statusBarHeight,
+          backgroundColor: Colors.background,
         },
-        animation: 'fade',
+        // animation: 'fade',
       } }
       initialRouteName="(tabs)"
     >

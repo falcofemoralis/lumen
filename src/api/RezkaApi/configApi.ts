@@ -5,7 +5,6 @@ import { executeGet, executePost } from 'Util/Request';
 import { updateUrlHost } from 'Util/Url';
 
 import { Variables } from '../../util/Request/index';
-import { JSONResult } from './utils';
 
 const configApi: ConfigApiInterface = {
   serviceType: ApiServiceType.rezka,

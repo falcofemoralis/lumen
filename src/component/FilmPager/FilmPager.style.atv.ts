@@ -13,6 +13,8 @@ export const styles = CreateStyles({
     gap: 8,
   },
   gridWrapper: {
+    paddingTop: 8,
+    paddingHorizontal: 8,
     zIndex: 2,
   },
 });

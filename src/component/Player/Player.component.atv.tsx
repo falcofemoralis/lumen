@@ -249,8 +249,14 @@ export function PlayerComponent({
         'Play',
         togglePlayPause,
       ) }
-      { renderAction('skip-previous', 'Previous') }
-      { renderAction('skip-next', 'Next') }
+      { renderAction('fast-rewind', 'Rewind') }
+      { renderAction('fast-forward', 'Forward') }
+      { film.hasSeasons && (
+        <>
+          { renderAction('skip-previous', 'Previous') }
+          { renderAction('skip-next', 'Next') }
+        </>
+      ) }
       { renderAction('speed', 'Speed') }
       { renderAction('comment', 'Comments') }
     </SpatialNavigationView>

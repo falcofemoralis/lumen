@@ -70,6 +70,10 @@ export function NavigationBarComponent() {
         tabBarActiveTintColor: Colors.primary,
         tabBarInactiveTintColor: Colors.white,
         tabBarHideOnKeyboard: true,
+        freezeOnBlur: true,
+        sceneStyle: {
+          marginHorizontal: 16,
+        },
         // tabBarButton,
       } }
       // tabBar={ () => null }

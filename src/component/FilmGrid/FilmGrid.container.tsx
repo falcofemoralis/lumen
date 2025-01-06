@@ -65,7 +65,7 @@ export function FilmGridContainer({
   };
 
   const handleOnPress = useCallback((film: FilmCardInterface) => {
-    router.push({
+    router.navigate({
       pathname: '/film/[link]',
       params: {
         link: film.link,

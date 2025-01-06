@@ -28,10 +28,8 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
       }
     };
 
-    setFilm(null);
-
     loadFilm();
-  }, [link]);
+  }, []);
 
   const openVideoSelector = useCallback(async () => {
     if (!film) {
@@ -87,6 +85,8 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
       film,
       voice,
     });
+
+    console.log('router.push player');
 
     router.push({
       pathname: '/player',
