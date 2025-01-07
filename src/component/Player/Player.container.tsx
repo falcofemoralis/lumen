@@ -13,12 +13,12 @@ import PlayerComponentTV from './Player.component.atv';
 import {
   AWAKE_TAG,
   DEFAULT_AUTO_REWIND_MS,
+  DEFAULT_PROGRESS_STATUS,
   DEFAULT_REWIND,
-  DEFAULT_STATUS,
   QUALITY_OVERLAY_ID,
   RewindDirection,
 } from './Player.config';
-import { PlayerContainerProps, Status } from './Player.type';
+import { PlayerContainerProps, ProgressStatus } from './Player.type';
 
 export function PlayerContainer({
   video,
@@ -26,7 +26,9 @@ export function PlayerContainer({
   voice,
 }: PlayerContainerProps) {
   const rewindTimeout = useRef<NodeJS.Timeout | null>(null);
-  const [status, setStatus] = useState<Status>(DEFAULT_STATUS);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [progressStatus, setProgressStatus] = useState<ProgressStatus>(DEFAULT_PROGRESS_STATUS);
   const [selectedQuality, setSelectedQuality] = useState<string>(video.streams[0].quality);
 
   const player = useVideoPlayer(video.streams[0].url, (p) => {
@@ -50,24 +52,21 @@ export function PlayerContainer({
       return;
     }
 
-    setStatus({
-      ...status,
-      ...calculateProgress(currentTime, bufferedPosition, duration),
-    });
+    setProgressStatus(calculateProgress(currentTime, bufferedPosition, duration));
   });
 
-  useEventListener(player, 'playingChange', ({ isPlaying }) => {
-    setStatus({
-      ...status,
-      isPlaying,
-    });
+  useEventListener(player, 'playingChange', ({ isPlaying: playing }) => {
+    if (isPlaying !== playing) {
+      setIsPlaying(playing);
+    }
   });
 
   useEventListener(player, 'statusChange', ({ status: playerStatus }) => {
-    setStatus({
-      ...status,
-      isLoading: playerStatus === 'loading',
-    });
+    const loading = playerStatus === 'loading';
+
+    if (isLoading !== loading) {
+      setIsLoading(loading);
+    }
   });
 
   const calculateProgress = (currentTime: number, bufferedPosition: number, duration: number) => ({
@@ -106,10 +105,7 @@ export function PlayerContainer({
     const seekTime = type === RewindDirection.Backward ? seconds * -1 : seconds;
     const newTime = currentTime + seekTime;
 
-    setStatus({
-      ...status,
-      ...calculateProgress(newTime, bufferedPosition, duration),
-    });
+    setProgressStatus(calculateProgress(newTime, bufferedPosition, duration));
 
     player.seekBy(seekTime);
   };
@@ -151,7 +147,9 @@ export function PlayerContainer({
 
   const containerProps = () => ({
     player,
-    status,
+    isLoading,
+    isPlaying,
+    progressStatus,
     video,
     film,
     voice,

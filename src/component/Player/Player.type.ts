@@ -14,7 +14,9 @@ export interface PlayerContainerProps {
 
 export interface PlayerComponentProps {
   player: VideoPlayer;
-  status: Status;
+  isLoading: boolean;
+  isPlaying: boolean;
+  progressStatus: ProgressStatus;
   video: FilmVideoInterface;
   film: FilmInterface;
   voice: FilmVoiceInterface;
@@ -28,11 +30,9 @@ export interface PlayerComponentProps {
   handleQualityChange: (item: DropdownItem) => void;
 }
 
-export type Status = {
+export type ProgressStatus = {
   progressPercentage: number;
   playablePercentage: number;
-  isPlaying: boolean;
-  isLoading: boolean;
   currentTime: string;
   durationTime: string;
   remainingTime: string;

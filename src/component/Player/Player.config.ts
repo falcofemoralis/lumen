@@ -1,10 +1,8 @@
-import { Status } from './Player.type';
+import { ProgressStatus } from './Player.type';
 
-export const DEFAULT_STATUS: Status = {
+export const DEFAULT_PROGRESS_STATUS: ProgressStatus = {
   progressPercentage: 0,
   playablePercentage: 0,
-  isPlaying: false,
-  isLoading: true,
   currentTime: '-',
   durationTime: '-',
   remainingTime: '-',

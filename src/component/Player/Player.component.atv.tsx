@@ -6,7 +6,9 @@ import ThemedText from 'Component/ThemedText';
 import { LinearGradient } from 'expo-linear-gradient';
 import { VideoView } from 'expo-video';
 import React, {
-  useEffect, useRef, useState,
+  useEffect,
+  useRef,
+  useState,
 } from 'react';
 import {
   BackHandler,
@@ -33,7 +35,9 @@ import { LongEvent, PlayerComponentProps } from './Player.type';
 
 export function PlayerComponent({
   player,
-  status,
+  isLoading,
+  isPlaying,
+  progressStatus,
   video,
   film,
   voice,
@@ -44,7 +48,7 @@ export function PlayerComponent({
   openQualitySelector,
   handleQualityChange,
 }: PlayerComponentProps) {
-  const [focusedElement, setFocusedElement] = useState<FocusedElement>(
+  const focusedElementRef = useRef<FocusedElement>(
     FocusedElement.ProgressThumb,
   );
   const [showControls, setShowControls] = useState(false);
@@ -111,7 +115,7 @@ export function PlayerComponent({
         return true;
       }
 
-      if (focusedElement === FocusedElement.ProgressThumb) {
+      if (focusedElementRef.current === FocusedElement.ProgressThumb) {
         if (type === SupportedKeys.Enter) {
           togglePlayPause();
         }
@@ -133,7 +137,7 @@ export function PlayerComponent({
     };
 
     const keyUpListener = (type: SupportedKeys) => {
-      if (focusedElement === FocusedElement.ProgressThumb) {
+      if (focusedElementRef.current === FocusedElement.ProgressThumb) {
         if (type === SupportedKeys.Left) {
           handleProgressThumbKeyUp(type, RewindDirection.Backward);
         }
@@ -150,7 +154,7 @@ export function PlayerComponent({
       if (showControls) {
         setShowControls(false);
         setHideActions(false);
-        setFocusedElement(FocusedElement.ProgressThumb);
+        focusedElementRef.current = FocusedElement.ProgressThumb;
 
         return true;
       }
@@ -217,7 +221,7 @@ export function PlayerComponent({
   ) => (
     <SpatialNavigationFocusableView
       onSelect={ action }
-      onFocus={ () => setFocusedElement(FocusedElement.Action) }
+      onFocus={ () => { focusedElementRef.current = FocusedElement.Action; } }
     >
       { ({ isFocused }) => (
         <ThemedIcon
@@ -245,7 +249,7 @@ export function PlayerComponent({
       } }
     >
       { renderAction(
-        status.isPlaying ? 'pause' : 'play-arrow',
+        isPlaying ? 'pause' : 'play-arrow',
         'Play',
         togglePlayPause,
       ) }
@@ -262,42 +266,46 @@ export function PlayerComponent({
     </SpatialNavigationView>
   );
 
-  const renderProgressBar = () => (
-    <View style={ styles.progressBarContainer }>
-      { /* Playable Duration */ }
-      <View
-        style={ [
-          styles.playableBar,
-          { width: (`${status.playablePercentage}%`) as DimensionValue },
-        ] }
-      />
-      { /* Progress Playback */ }
-      <View
-        style={ [
-          styles.progressBar,
-          { width: (`${status.progressPercentage}%`) as DimensionValue },
-        ] }
-      >
-        { /* Progress Thumb */ }
-        <SpatialNavigationFocusableView
-          style={ styles.thumbContainer }
-          onFocus={ () => setFocusedElement(FocusedElement.ProgressThumb) }
+  const renderProgressBar = () => {
+    const { playablePercentage, progressPercentage } = progressStatus;
+
+    return (
+      <View style={ styles.progressBarContainer }>
+        { /* Playable Duration */ }
+        <View
+          style={ [
+            styles.playableBar,
+            { width: (`${playablePercentage}%`) as DimensionValue },
+          ] }
+        />
+        { /* Progress Playback */ }
+        <View
+          style={ [
+            styles.progressBar,
+            { width: (`${progressPercentage}%`) as DimensionValue },
+          ] }
         >
-          { ({ isFocused }) => (
-            <View
-              style={ [
-                styles.thumb,
-                isFocused && styles.focusedThumb,
-              ] }
-            />
-          ) }
-        </SpatialNavigationFocusableView>
+          { /* Progress Thumb */ }
+          <SpatialNavigationFocusableView
+            style={ styles.thumbContainer }
+            onFocus={ () => { focusedElementRef.current = FocusedElement.ProgressThumb; } }
+          >
+            { ({ isFocused }) => (
+              <View
+                style={ [
+                  styles.thumb,
+                  isFocused && styles.focusedThumb,
+                ] }
+              />
+            ) }
+          </SpatialNavigationFocusableView>
+        </View>
       </View>
-    </View>
-  );
+    );
+  };
 
   const renderDuration = () => {
-    const { currentTime, durationTime, remainingTime } = status;
+    const { currentTime, durationTime, remainingTime } = progressStatus;
 
     return (
       <View style={ styles.duration }>
@@ -382,7 +390,7 @@ export function PlayerComponent({
 
   const renderLoader = () => (
     <Loader
-      isLoading={ status.isLoading }
+      isLoading={ isLoading }
       fullScreen
     />
   );

@@ -31,8 +31,6 @@ export function PlayerPageComponent({ video, film, voice }: PlayerPageComponentP
   //   ],
   // } as FilmVideoInterface;
 
-  console.log('render PlayerComponent');
-
   return (
     <Page testID="player-page">
       <Player

@@ -19,7 +19,11 @@ export function FilmCardComponent({
   isThumbnail,
 }: FilmCardComponentProps) {
   const {
-    type, poster, title, subtitle, info,
+    type,
+    poster,
+    title,
+    subtitle,
+    info,
   } = filmCard;
 
   const scaleAnimation = useFocusAnimation(isFocused);

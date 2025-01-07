@@ -3,9 +3,7 @@ import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedModal from 'Component/ThemedModal';
-import ThemedText from 'Component/ThemedText';
-import ThemedView from 'Component/ThemedView';
-import { useCallback, useRef } from 'react';
+import { memo, useCallback, useRef } from 'react';
 import { Text, View } from 'react-native';
 import { DefaultFocus, SpatialNavigationFocusableView, SpatialNavigationScrollView } from 'react-tv-space-navigation';
 import OverlayStore from 'Store/Overlay.store';
@@ -141,4 +139,4 @@ export const ThemedDropdownComponent = ({
   );
 };
 
-export default ThemedDropdownComponent;
+export default memo(ThemedDropdownComponent);

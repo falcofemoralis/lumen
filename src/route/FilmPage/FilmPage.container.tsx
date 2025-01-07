@@ -86,8 +86,6 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
       voice,
     });
 
-    console.log('router.push player');
-
     router.push({
       pathname: '/player',
     });

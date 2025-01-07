@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { ActivityIndicator } from 'react-native-paper';
 import Colors from 'Style/Colors';
 
@@ -19,4 +20,4 @@ export const LoaderComponent = ({
   />
 );
 
-export default LoaderComponent;
+export default memo(LoaderComponent);
