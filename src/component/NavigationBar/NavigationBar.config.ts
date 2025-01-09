@@ -1,19 +1,9 @@
-import { IconInterface, IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
-import { RelativePathString } from 'expo-router';
+import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 
-export interface Tab<T> {
-  route: T;
-  title: string;
-  icon?: IconInterface;
-  isDefault?: boolean;
-  options?: {
-    href?: RelativePathString | null;
-  };
-}
+import { Tab } from './NavigationBar.type';
 
 export const TABS_TV_CONFIG: Tab<string>[] = [
   {
-    isDefault: true,
     route: 'index',
     title: 'Home',
     icon: {
@@ -63,18 +53,16 @@ export const TABS_TV_CONFIG: Tab<string>[] = [
   },
 ];
 
-const TABS_MOBILE_IGNORED_TABS: string[] = [
-  'settings',
-  'notifications',
-  'film/[link]',
-];
-
 export const TABS_MOBILE_CONFIG: Tab<string>[] = [
   {
     route: 'index',
     title: 'Home',
     icon: {
-      name: 'home-variant-outline',
+      name: 'home-outline',
+      pack: IconPackType.MaterialCommunityIcons,
+    },
+    iconFocused: {
+      name: 'home',
       pack: IconPackType.MaterialCommunityIcons,
     },
   },
@@ -82,8 +70,12 @@ export const TABS_MOBILE_CONFIG: Tab<string>[] = [
     route: 'search',
     title: 'Search',
     icon: {
-      name: 'magnify',
-      pack: IconPackType.MaterialCommunityIcons,
+      name: 'search',
+      pack: IconPackType.MaterialIcons,
+    },
+    iconFocused: {
+      name: 'saved-search',
+      pack: IconPackType.MaterialIcons,
     },
   },
   {
@@ -93,13 +85,21 @@ export const TABS_MOBILE_CONFIG: Tab<string>[] = [
       name: 'movie-star-outline',
       pack: IconPackType.MaterialCommunityIcons,
     },
+    iconFocused: {
+      name: 'movie-star',
+      pack: IconPackType.MaterialCommunityIcons,
+    },
   },
   {
     route: 'recent',
     title: 'Recent',
     icon: {
       name: 'history',
-      pack: IconPackType.MaterialCommunityIcons,
+      pack: IconPackType.MaterialIcons,
+    },
+    iconFocused: {
+      name: 'history',
+      pack: IconPackType.MaterialIcons,
     },
   },
   {
@@ -109,12 +109,9 @@ export const TABS_MOBILE_CONFIG: Tab<string>[] = [
       name: 'bell-outline',
       pack: IconPackType.MaterialCommunityIcons,
     },
-  },
-  ...TABS_MOBILE_IGNORED_TABS.map((route) => ({
-    route,
-    title: route,
-    options: {
-      href: null,
+    iconFocused: {
+      name: 'bell',
+      pack: IconPackType.MaterialCommunityIcons,
     },
-  })),
+  },
 ];
