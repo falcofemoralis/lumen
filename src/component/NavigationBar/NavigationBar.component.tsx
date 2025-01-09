@@ -77,9 +77,7 @@ export function NavigationBarComponent() {
         // tabBarButton,
       } }
       // tabBar={ () => null }
-    >
-      { renderTabs() }
-    </Tabs>
+    />
   );
 }
 

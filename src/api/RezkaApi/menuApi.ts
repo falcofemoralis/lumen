@@ -5,20 +5,41 @@ import { MenuApiInterface } from '..';
 const menuApi: MenuApiInterface = {
   getHomeMenu: () => [
     {
+      id: 'slider',
       title: 'Горячие Новинки',
       path: '/engine/ajax/get_newest_slider_content.php',
       variables: { id: '0' },
       key: '.b-newest_slider__wrapper',
     },
-    { title: 'Новинки', path: '/new' },
-    { title: 'Сейчас смотрят', path: '/', variables: { filter: 'watching' } },
     {
+      id: 'new',
+      title: 'Новинки',
+      path: '/new',
+    },
+    {
+      id: 'watching',
+      title: 'Сейчас смотрят',
+      path: '/',
+      variables: { filter: 'watching' },
+    },
+    {
+      id: 'last',
       title: 'Последние Поступления',
       path: '/',
       variables: { filter: 'last' },
     },
-    { title: 'Популярные', path: '/', variables: { filter: 'popular' } },
-    { title: 'В ожидании ', path: '/', variables: { filter: 'soon' } },
+    {
+      id: 'popular',
+      title: 'Популярные',
+      path: '/',
+      variables: { filter: 'popular' },
+    },
+    {
+      id: 'soon',
+      title: 'В ожидании ',
+      path: '/',
+      variables: { filter: 'soon' },
+    },
   ] as MenuItemInterface[],
 };
 

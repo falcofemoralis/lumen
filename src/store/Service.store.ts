@@ -1,24 +1,19 @@
 import { ApiServiceType } from 'Api/index';
 import { services } from 'Api/services';
-import { makeAutoObservable } from 'mobx';
+import { action, makeAutoObservable } from 'mobx';
 
 class ServiceStore {
   private currentService = ApiServiceType.rezka;
 
+  public isSignedIn = false;
+
   constructor() {
     makeAutoObservable(this);
-    this.loadConfig();
-  }
-
-  async loadConfig() {
-    // const config = loadConfig([CONFIG_KEY_ENUM.currentService]);
-    // this.currentService = config.currentService;
+    this.isSignedIn = !!this.getCurrentService().getAuthorization();
   }
 
   setCurrentService(service: ApiServiceType) {
     this.currentService = service;
-    // this.currentService.setProvider(this.provider);
-    // this.currentService.setCDN(this.CDN);
   }
 
   getCurrentService() {
@@ -31,6 +26,17 @@ class ServiceStore {
 
   setCDN(cdn: string) {
     this.getCurrentService().setCDN(cdn);
+  }
+
+  @action
+  setSignedIn(value: boolean) {
+    this.isSignedIn = value;
+  }
+
+  async login(name: string, password: string) {
+    const auth = await this.getCurrentService().login(name, password);
+    this.getCurrentService().setAuthorization(auth);
+    this.setSignedIn(true);
   }
 }
 

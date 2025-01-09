@@ -2,6 +2,7 @@ import { ApiServiceType, ConfigApiInterface } from 'Api/index';
 import { FilmStreamInterface } from 'Type/FilmStream.interface';
 import { parseHtml } from 'Util/Parser';
 import { executeGet, executePost } from 'Util/Request';
+import { configStorage } from 'Util/Storage';
 import { updateUrlHost } from 'Util/Url';
 
 import { Variables } from '../../util/Request/index';
@@ -9,38 +10,95 @@ import { Variables } from '../../util/Request/index';
 const configApi: ConfigApiInterface = {
   serviceType: ApiServiceType.rezka,
   defaultProviders: ['https://rezka-ua.tv'],
-  defaultCDNs: ['https://prx-cogent.ukrtelcdn.net', 'https://stream.voidboost.cc'],
-  selectedProvider: null,
-  selectedCDN: null,
+  /**
+   *    <item>prx.ukrtelcdn.net</item>
+        <item>prx-ams.ukrtelcdn.net</item>
+        <item>prx2-ams.ukrtelcdn.net</item>
+        <item>ukrtelcdn.net</item>
+        <item>stream.voidboost.top</item>
+        <item>stream.voidboost.link</item>
+        <item>stream.voidboost.club</item>
+        <item>stream.voidboost.cc</item>
+
+        https://prx2-cogent.ukrtelcdn.ne
+   */
+  /**
+   *
+   *    <item>None</item>
+        <item>https://1.1.1.1/dns-query;1.1.1.1;1.0.0.1</item>
+        <item>https://dns.google/dns-query;8.8.8.8;8.8.4.4</item>
+        <item>https://dns.adguard-dns.com/dns-query;94.140.14.14;94.140.15.15</item>
+        <item>https://unfiltered.adguard-dns.com/dns-query;94.140.14.140;94.140.14.141</item>
+        <item>https://common.dot.dns.yandex.net/dns-query;77.88.8.1;77.88.8.8</item>
+   */
+  defaultCDNs: [
+    'https://prx-cogent.ukrtelcdn.net',
+    'https://stream.voidboost.cc',
+  ],
+  config: null,
+
+  formatConfigKey(key: string) {
+    return `${this.serviceType}_${key}`;
+  },
+
+  getConfig() {
+    if (!this.config) {
+      this.config = {
+        provider: configStorage.getString(this.formatConfigKey('provider')) ?? this.defaultProviders[0],
+        cdn: configStorage.getString(this.formatConfigKey('cdn')) ?? this.defaultCDNs[0],
+        auth: configStorage.getString(this.formatConfigKey('auth')) ?? '',
+      };
+    }
+
+    return this.config;
+  },
 
   setProvider(provider: string): void {
-    this.selectedProvider = provider;
+    configStorage.setStringAsync(this.formatConfigKey('provider'), provider);
+    this.getConfig().provider = provider;
   },
 
   getProvider(): string {
-    return this.selectedProvider ?? this.defaultProviders[0];
+    return this.getConfig().provider;
   },
 
   setCDN(cdn: string): void {
-    this.selectedCDN = cdn;
+    configStorage.setStringAsync(this.formatConfigKey('cdn'), cdn);
+    this.getConfig().cdn = cdn;
   },
 
   getCDN(): string {
-    return this.selectedCDN ?? this.defaultCDNs[0];
+    return this.getConfig().cdn;
   },
 
   setAuthorization(auth: string): void {
-    // TODO implement custom authorization logic
+    configStorage.setStringAsync(this.formatConfigKey('auth'), auth);
+    this.getConfig().auth = auth;
   },
 
-  getAuthorization(): HeadersInit {
-    // TODO need to add Cookie header
+  getAuthorization(): string {
+    const { auth } = this.getConfig();
 
-    const agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36';
+    return auth;
+  },
 
-    return {
+  getHeaders(): HeadersInit {
+    const agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0';
+
+    const headers = {
       'User-Agent': agent,
     };
+
+    //
+    // Rezka authorization works with cookies and we manage them automatically through fetch api
+    //
+    // if (this.getAuthorization()) {
+    //   Object.assign(headers, {
+    //     Cookie: this.getAuthorization(),
+    //   });
+    // }
+
+    return headers;
   },
 
   /**
@@ -50,14 +108,18 @@ const configApi: ConfigApiInterface = {
    * @param ignoreCache
    * @returns HTMLElement
    */
-  async fetchPage(query: string, variables: Variables = {}, ignoreCache = false) {
+  async fetchPage(
+    query: string,
+    variables: Variables = {},
+    ignoreCache = false,
+  ) {
     const res = await this.getRequest(query, variables, ignoreCache);
 
     return parseHtml(res);
   },
 
   async fetchJson<T>(query: string, variables: Variables = {}) {
-    const result = await this.postRequest(query, variables);
+    const result = await this.postRequest(query, variables, true);
 
     const json = JSON.parse(result) as T;
 
@@ -70,8 +132,18 @@ const configApi: ConfigApiInterface = {
    * @param variables
    * @returns text
    */
-  async getRequest(query: string, variables: Variables = {}, ignoreCache = false) {
-    return executeGet(query, this.getProvider(), this.getAuthorization(), variables, ignoreCache);
+  async getRequest(
+    query: string,
+    variables: Variables = {},
+    ignoreCache = false,
+  ) {
+    return executeGet(
+      query,
+      this.getProvider(),
+      this.getHeaders(),
+      variables,
+      ignoreCache,
+    );
   },
 
   /**
@@ -80,11 +152,15 @@ const configApi: ConfigApiInterface = {
    * @param variables
    * @returns JSON object
    */
-  async postRequest(query: string, variables: Record<string, string> = {}, ignoreCache = true) {
+  async postRequest(
+    query: string,
+    variables: Record<string, string> = {},
+    ignoreCache,
+  ) {
     return executePost(
       `${query}/?t=${Date.now()}`,
       this.getProvider(),
-      this.getAuthorization(),
+      this.getHeaders(),
       variables,
       ignoreCache,
     );

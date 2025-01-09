@@ -5,11 +5,14 @@ import { PaginationInterface } from 'Type/Pagination.interface';
 
 export interface FilmPagerContainerProps {
   menuItems: MenuItemInterface[];
+  filmPager: FilmPagerInterface;
+  loadOnInit?: boolean;
   onLoadFilms: (
     menuItem: MenuItemInterface,
     currentPage: number,
     isRefresh: boolean
   ) => Promise<FilmListInterface>;
+  onUpdateFilms: (key: string, filmList: FilmListInterface) => void;
 }
 
 export interface FilmPagerComponentProps {
@@ -28,6 +31,12 @@ export interface PagerItemInterface {
   key: string;
   title: string;
   menuItem: MenuItemInterface;
-  films: FilmCardInterface[] | null;
+  films: FilmCardInterface[];
   pagination: PaginationInterface;
+}
+
+export interface FilmPagerInterface {
+  [key: string]: {
+    filmList: FilmListInterface;
+  } | undefined;
 }

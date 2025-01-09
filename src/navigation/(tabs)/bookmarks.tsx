@@ -1,10 +1,5 @@
-import Page from 'Component/Page';
-import ThemedText from 'Component/ThemedText';
+import BookmarksPage from 'Route/BookmarksPage';
 
 export default function BookmarksScreen() {
-  return (
-    <Page>
-      <ThemedText>Bookmarks page</ThemedText>
-    </Page>
-  );
+  return <BookmarksPage />;
 }

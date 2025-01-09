@@ -1,4 +1,5 @@
 import { ApiParams, FilmApiInterface } from 'Api/index';
+import { BookmarkInterface } from 'Type/Bookmark.interface';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { FilmListInterface } from 'Type/FilmList.interface';
@@ -12,7 +13,7 @@ import { Variables } from 'Util/Request';
 
 import configApi from './configApi';
 import {
-  parseFilmCard, parseSeasons, parseStreams,
+  parseFilmCard, parseFilmsListRoot, parseSeasons, parseStreams,
 } from './utils';
 
 const filmApi: FilmApiInterface = {
@@ -29,7 +30,6 @@ const filmApi: FilmApiInterface = {
     params?: ApiParams,
   ): Promise<FilmListInterface> {
     const { key, isRefresh } = params || {};
-    const films: FilmCardInterface[] = [];
 
     const root = await configApi.fetchPage(
       `${path === '/' ? '' : path}/page/${page}/`,
@@ -41,34 +41,12 @@ const filmApi: FilmApiInterface = {
 
     if (!content) {
       return {
-        films,
+        films: [],
         totalPages: 1,
       };
     }
 
-    const filmElements = content.querySelectorAll('.b-content__inline_item');
-
-    filmElements.forEach((el) => {
-      const film = parseFilmCard(el);
-
-      if (film) {
-        films.push(film);
-      }
-    });
-
-    const navs = content.querySelectorAll('.b-navigation a');
-
-    let totalPages = 1;
-    navs.forEach((el, idx) => {
-      if (idx === navs.length - 2) {
-        totalPages = Number(el.rawText);
-      }
-    });
-
-    return {
-      films,
-      totalPages,
-    };
+    return parseFilmsListRoot(content);
   },
 
   /**
@@ -250,8 +228,10 @@ const filmApi: FilmApiInterface = {
     const { path, key, variables } = menuItem;
 
     if (key === '.b-newest_slider__wrapper') {
+      const { isRefresh } = params ?? {};
       const films: FilmCardInterface[] = [];
-      const res = await configApi.postRequest(path, variables, false);
+
+      const res = await configApi.postRequest(path, variables, isRefresh);
       const root = parseHtml(`<div>${res}</div>`);
       const filmElements = root.querySelectorAll('.b-content__inline_item');
 
@@ -272,6 +252,54 @@ const filmApi: FilmApiInterface = {
     const filmsList = await this.getFilms(page, path, variables, {
       ...params,
       key,
+    });
+
+    return filmsList;
+  },
+
+  /**
+   * Get bookmarks
+   * @returns Bookmark[]
+   */
+  async getBookmarks() {
+    const bookmarks: BookmarkInterface[] = [];
+
+    const root = await configApi.fetchPage(
+      '/favorites',
+      {},
+      true,
+    );
+
+    root.querySelectorAll('.b-favorites_content__cats_list_item').forEach((el) => {
+      const id = el.attributes['data-cat_id'];
+      const title = el.querySelector('.name')?.rawText;
+
+      if (id && title) {
+        bookmarks.push({
+          id,
+          title,
+        });
+      }
+    });
+
+    if (bookmarks.length > 0) {
+      bookmarks[0].filmList = parseFilmsListRoot(root);
+    }
+
+    return bookmarks;
+  },
+
+  /**
+   * Get films from bookmark
+   * @param bookmark
+   * @param page
+   * @returns
+   */
+  async getFilmsFromBookmark(bookmark: BookmarkInterface, page: number) {
+    const { id } = bookmark;
+
+    const filmsList = await this.getFilms(page, `/favorites/${id}`, {}, {
+      isRefresh: true,
     });
 
     return filmsList;

@@ -1,4 +1,5 @@
 import { queryCache } from 'Util/Cache';
+import { customFetch } from 'Util/Fetch';
 import { hash } from 'Util/Hash';
 import { removeParamFromUrl } from 'Util/Url';
 
@@ -27,7 +28,7 @@ export const getFetch = (
   uri: string,
   headers: HeadersInit,
   signal?: AbortSignal,
-): Promise<Response> => fetch(uri, {
+): Promise<Response> => customFetch(uri, {
   method: 'GET',
   signal,
   headers: {
@@ -42,7 +43,7 @@ export const postFetch = (
   headers: HeadersInit,
   variables: FormData,
   signal?: AbortSignal,
-): Promise<Response> => fetch(uri, {
+): Promise<Response> => customFetch(uri, {
   method: 'POST',
   body: variables,
   signal,

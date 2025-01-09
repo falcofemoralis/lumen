@@ -1,4 +1,5 @@
 import { FilmCardInterface } from 'Type/FilmCard.interface';
+import { FilmListInterface } from 'Type/FilmList.interface';
 import { FilmStreamInterface } from 'Type/FilmStream.interface';
 import { FilmType } from 'Type/FilmType.type';
 import { EpisodeInterface, SeasonInterface } from 'Type/FilmVoice.interface';
@@ -135,5 +136,32 @@ export const parseSeasons = (root: HTMLElementInterface): {
   return {
     seasons,
     ...lastWatch,
+  };
+};
+
+export const parseFilmsListRoot = (root: HTMLElementInterface): FilmListInterface => {
+  const films: FilmCardInterface[] = [];
+  const filmElements = root.querySelectorAll('.b-content__inline_item');
+
+  filmElements.forEach((el) => {
+    const film = parseFilmCard(el);
+
+    if (film) {
+      films.push(film);
+    }
+  });
+
+  const navs = root.querySelectorAll('.b-navigation a');
+
+  let totalPages = 1;
+  navs.forEach((el, idx) => {
+    if (idx === navs.length - 2) {
+      totalPages = Number(el.rawText);
+    }
+  });
+
+  return {
+    films,
+    totalPages,
   };
 };
