@@ -1,10 +1,9 @@
 import Loader from 'Component/Loader';
-import ThemedButton from 'Component/ThemedButton';
 import ThemedDropdown from 'Component/ThemedDropdown';
 import ThemedModal from 'Component/ThemedModal';
 import ThemedText from 'Component/ThemedText';
-import ThemedView from 'Component/ThemedView';
-import { ScrollView } from 'react-native';
+import React from 'react';
+import { ScrollView, View } from 'react-native';
 import { Button } from 'react-native-paper';
 
 import { PLAYER_VIDEO_SELECTOR_OVERLAY_ID } from './PlayerVideoSelector.config';
@@ -30,7 +29,7 @@ export function PlayerVideoSelectorComponent({
     }
 
     return (
-      <ThemedView style={ styles.voicesContainer }>
+      <View style={ styles.voicesContainer }>
         <ThemedDropdown
           data={ voices.map((voice) => ({
             label: voice.title,
@@ -40,50 +39,70 @@ export function PlayerVideoSelectorComponent({
           })) }
           value={ selectedVoice.id }
           onChange={ (item) => handleSelectVoice(item.value) }
+          asList={ !seasons.length }
         />
-      </ThemedView>
+      </View>
     );
   };
 
   const renderSeasons = () => (
-    <ThemedView style={ styles.seasonsContainer }>
+    <View style={ styles.seasonsContainer }>
       { seasons.map((season) => (
         <Button
           key={ season.seasonId }
-          style={ styles.season }
+          style={ [
+            styles.season,
+            selectedSeasonId === season.seasonId && styles.seasonSelected,
+          ] }
           onPress={ () => setSelectedSeasonId(season.seasonId) }
         >
           <ThemedText style={ [
             styles.seasonText,
-            selectedSeasonId === season.seasonId ? styles.seasonTextSelected : undefined,
+            selectedSeasonId === season.seasonId && styles.seasonTextSelected,
           ] }
           >
             { season.name }
           </ThemedText>
         </Button>
       )) }
-    </ThemedView>
+    </View>
   );
 
   const renderEpisodes = () => (
-    <ThemedView style={ styles.episodesContainer }>
+    <View style={ styles.episodesContainer }>
       { episodes.map(({ episodeId, name }) => (
         <Button
           key={ episodeId }
-          style={ styles.episode }
+          style={ [
+            styles.episode,
+            selectedEpisodeId === episodeId && styles.episodeSelected,
+          ] }
           onPress={ () => handleSelectEpisode(episodeId) }
         >
           <ThemedText style={ [
             styles.episodeText,
-            selectedEpisodeId === episodeId ? styles.episodeTextSelected : undefined,
+            selectedEpisodeId === episodeId && styles.episodeTextSelected,
           ] }
           >
             { name }
           </ThemedText>
         </Button>
       )) }
-    </ThemedView>
+    </View>
   );
+
+  const renderSeriesSelection = () => {
+    if (!seasons.length) {
+      return null;
+    }
+
+    return (
+      <>
+        { renderSeasons() }
+        { renderEpisodes() }
+      </>
+    );
+  };
 
   const renderLoader = () => (
     <Loader
@@ -102,8 +121,7 @@ export function PlayerVideoSelectorComponent({
       <ScrollView>
         { renderLoader() }
         { renderVoices() }
-        { renderSeasons() }
-        { renderEpisodes() }
+        { renderSeriesSelection() }
       </ScrollView>
     </ThemedModal>
   );

@@ -9,6 +9,7 @@ export default function ThemedButton({ onPress, children, style }: ThemedButtonP
       mode="contained"
       onPress={ onPress }
       style={ [styles.container, style] }
+      theme={ { roundness: 0 } }
     >
       { children }
     </Button>

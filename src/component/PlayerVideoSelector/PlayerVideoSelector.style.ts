@@ -3,11 +3,8 @@ import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
   background: {
-    padding: 8,
   },
   container: {
-    backgroundColor: Colors.background,
-    padding: 8,
   },
   voicesContainer: {
     width: '100%',
@@ -23,28 +20,39 @@ export const styles = CreateStyles({
   seasonsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 8,
   },
   season: {
     backgroundColor: Colors.gray,
-    margin: 8,
+  },
+  seasonSelected: {
+    backgroundColor: Colors.primary,
   },
   seasonText: {
     color: 'white',
   },
   seasonTextSelected: {
-    color: 'green',
+    color: Colors.lightBlue,
   },
   episodesContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 8,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: Colors.lightGravel,
   },
   episode: {
     backgroundColor: Colors.gray,
-    margin: 8,
+  },
+  episodeSelected: {
+    backgroundColor: Colors.primary,
   },
   episodeText: {},
   episodeTextSelected: {
-    color: 'green',
+    color: Colors.lightBlue,
   },
   playContainer: {
     flexDirection: 'row',

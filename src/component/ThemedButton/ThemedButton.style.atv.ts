@@ -13,25 +13,27 @@ export const styles = CreateStyles({
   // filled
   containerFilled: {},
   containerFilledSelected: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.primary,
   },
   containerFilledFocused: {
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.white,
   },
   textFilled: {
     color: Colors.white,
   },
   textFilledSelected: {
-    color: Colors.black,
+    color: Colors.lightBlue,
   },
   textFilledFocused: {
-    color: Colors.lightBlue,
+    color: Colors.black,
   },
   iconFilled: {
     color: Colors.white,
   },
   iconFilledSelected: {},
-  iconFilledFocused: {},
+  iconFilledFocused: {
+    color: Colors.black,
+  },
   // outlined
   containerOutlined: {
     backgroundColor: Colors.transparent,

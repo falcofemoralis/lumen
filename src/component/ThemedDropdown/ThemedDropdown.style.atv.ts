@@ -6,13 +6,10 @@ export const styles = CreateStyles({
     borderRadius: 12,
   },
   inputFocused: {
-
   },
   inputText: {
-
   },
   inputTextFocused: {
-
   },
   icon: {
     marginRight: 5,
@@ -20,7 +17,6 @@ export const styles = CreateStyles({
     width: 20,
   },
   iconFocused: {
-
   },
   container: {
     maxHeight: 300,

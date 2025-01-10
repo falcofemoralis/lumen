@@ -2,7 +2,7 @@ import Loader from 'Component/Loader';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedDropdown from 'Component/ThemedDropdown';
 import ThemedModal from 'Component/ThemedModal';
-import { SpatialNavigationScrollView, SpatialNavigationView } from 'react-tv-space-navigation';
+import { DefaultFocus, SpatialNavigationScrollView, SpatialNavigationView } from 'react-tv-space-navigation';
 import { EpisodeInterface, SeasonInterface } from 'Type/FilmVoice.interface';
 
 import { PLAYER_VIDEO_SELECTOR_OVERLAY_ID } from './PlayerVideoSelector.config';
@@ -128,14 +128,18 @@ export function PlayerVideoSelectorComponent({
               const { episodeId, name } = season;
 
               return (
-                <ThemedButton
+                <DefaultFocus
                   key={ episodeId }
-                  isSelected={ selectedEpisodeId === episodeId }
-                  onPress={ () => handleSelectEpisode(episodeId) }
-                  style={ styles.button }
+                  enable={ selectedEpisodeId === episodeId }
                 >
-                  { name }
-                </ThemedButton>
+                  <ThemedButton
+                    isSelected={ selectedEpisodeId === episodeId }
+                    onPress={ () => handleSelectEpisode(episodeId) }
+                    style={ styles.button }
+                  >
+                    { name }
+                  </ThemedButton>
+                </DefaultFocus>
               );
             }) }
           </SpatialNavigationView>

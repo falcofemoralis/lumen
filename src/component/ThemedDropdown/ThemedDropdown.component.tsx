@@ -1,7 +1,12 @@
+import ThemedIcon from 'Component/ThemedIcon';
+import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import { useCallback } from 'react';
-import { Text, View } from 'react-native';
+import { Text, TouchableHighlight, View } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
+import Colors from 'Style/Colors';
+import { scale } from 'Util/CreateStyles';
+import { noopFn } from 'Util/Function';
 
 import { styles } from './ThemedDropdown.style';
 import { DropdownItem, ThemedDropdownProps } from './ThemedDropdown.type';
@@ -13,9 +18,7 @@ import { DropdownItem, ThemedDropdownProps } from './ThemedDropdown.type';
  */
 export const ThemedDropdownComponent = ({
   style,
-  selectedTextStyle,
-  asOverlay,
-  overlayId,
+  asList,
   ...props
 }: ThemedDropdownProps) => {
   const renderItem = useCallback((item: DropdownItem) => (
@@ -26,7 +29,9 @@ export const ThemedDropdownComponent = ({
           src={ item.startIcon }
         />
       ) }
-      <Text style={ styles.textItem }>{ item.label }</Text>
+      <Text style={ styles.itemLabel }>
+        { item.label }
+      </Text>
       { item.endIcon && (
         <ThemedImage
           style={ styles.icon }
@@ -36,6 +41,34 @@ export const ThemedDropdownComponent = ({
     </View>
   ), []);
 
+  const renderList = () => {
+    const { data, onChange = noopFn, value } = props;
+
+    return (
+      <View style={ style }>
+        { data.map((item) => (
+          <TouchableHighlight
+            key={ item.value }
+            underlayColor={ Colors.primary }
+            onPress={ () => { onChange(item); } }
+          >
+            <View style={ [
+              styles.listItem,
+              item.value === value && styles.listItemSelected,
+            ] }
+            >
+              { renderItem(item) }
+            </View>
+          </TouchableHighlight>
+        )) }
+      </View>
+    );
+  };
+
+  if (asList) {
+    return renderList();
+  }
+
   return (
     <Dropdown
       maxHeight={ 300 }
@@ -44,8 +77,23 @@ export const ThemedDropdownComponent = ({
       renderItem={ renderItem }
       autoScroll={ false }
       { ...props }
-      style={ [styles.container, style] }
-      selectedTextStyle={ [styles.selectedTextStyle, selectedTextStyle] }
+      containerStyle={ styles.content }
+      activeColor={ Colors.primary }
+      searchPlaceholderTextColor={ Colors.white }
+      style={ [styles.input, style] }
+      selectedTextProps={ { style: styles.inputText } }
+      renderLeftIcon={ () => (
+        <ThemedIcon
+          style={ styles.inputIcon }
+          icon={ {
+            name: 'plus',
+            pack: IconPackType.Octicons,
+          } }
+          color="white"
+          size={ scale(16) }
+        />
+      ) }
+      renderRightIcon={ () => null }
     />
   );
 };
