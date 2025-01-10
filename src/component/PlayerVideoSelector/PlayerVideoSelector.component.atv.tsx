@@ -2,7 +2,8 @@ import Loader from 'Component/Loader';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedDropdown from 'Component/ThemedDropdown';
 import ThemedModal from 'Component/ThemedModal';
-import { DefaultFocus, SpatialNavigationView } from 'react-tv-space-navigation';
+import { SpatialNavigationScrollView, SpatialNavigationView } from 'react-tv-space-navigation';
+import { EpisodeInterface, SeasonInterface } from 'Type/FilmVoice.interface';
 
 import { PLAYER_VIDEO_SELECTOR_OVERLAY_ID } from './PlayerVideoSelector.config';
 import { styles } from './PlayerVideoSelector.style.atv';
@@ -38,50 +39,123 @@ export function PlayerVideoSelectorComponent({
         onChange={ (item) => handleSelectVoice(item.value) }
         searchPlaceholder="Search voice"
         style={ styles.voicesInput }
+        asList={ !seasons.length }
       />
     );
   };
 
-  const renderSeasons = () => (
-    <SpatialNavigationView direction="horizontal">
-      { seasons.map((season) => {
-        const { seasonId, name } = season;
+  const calculateRows = <T, >(list: T[]) => {
+    const numberOfColumns = 4;
 
-        return (
-          <ThemedButton
-            key={ seasonId }
-            isSelected={ selectedSeasonId === seasonId }
-            onPress={ () => setSelectedSeasonId(seasonId) }
-            style={ styles.button }
-          >
-            { name }
-          </ThemedButton>
-        );
-      }) }
-    </SpatialNavigationView>
-  );
+    const columns: T[][] = Array.from({ length: numberOfColumns }, () => []);
 
-  const renderEpisodes = () => (
-    <SpatialNavigationView
-      direction="horizontal"
-      style={ styles.episodesContainer }
-    >
-      { episodes.map(({ episodeId, name }) => (
-        <DefaultFocus
-          key={ episodeId }
-          enable={ selectedEpisodeId === episodeId }
-        >
-          <ThemedButton
-            isSelected={ selectedEpisodeId === episodeId }
-            onPress={ () => handleSelectEpisode(episodeId) }
-            style={ styles.button }
+    list.forEach((item, index) => {
+      columns[index % numberOfColumns].push(item);
+    });
+
+    const rows: T[][] = [];
+    // eslint-disable-next-line no-plusplus
+    for (let i = 0; i < columns[0].length; i++) {
+      const row: T[] = [];
+      // eslint-disable-next-line no-plusplus
+      for (let j = 0; j < numberOfColumns; j++) {
+        if (columns[j][i] !== undefined) {
+          row.push(columns[j][i]);
+        }
+      }
+      rows.push(row);
+    }
+
+    return rows;
+  };
+
+  const renderSeasons = () => {
+    if (!seasons.length) {
+      return null;
+    }
+
+    const rows = calculateRows<SeasonInterface>(seasons);
+
+    return (
+      <SpatialNavigationView
+        alignInGrid
+        direction="vertical"
+      >
+        { rows.map((listRow) => (
+          <SpatialNavigationView
+            direction="horizontal"
+            key={ `${listRow[0].seasonId}-row` }
           >
-            { name }
-          </ThemedButton>
-        </DefaultFocus>
-      )) }
-    </SpatialNavigationView>
-  );
+            { listRow.map((season) => {
+              const { seasonId, name } = season;
+
+              return (
+                <ThemedButton
+                  key={ seasonId }
+                  isSelected={ selectedSeasonId === seasonId }
+                  onPress={ () => setSelectedSeasonId(seasonId) }
+                  style={ styles.button }
+                >
+                  { name }
+                </ThemedButton>
+              );
+            }) }
+          </SpatialNavigationView>
+        )) }
+      </SpatialNavigationView>
+    );
+  };
+
+  const renderEpisodes = () => {
+    if (!episodes.length) {
+      return null;
+    }
+
+    const rows = calculateRows<EpisodeInterface>(episodes);
+
+    return (
+      <SpatialNavigationView
+        alignInGrid
+        direction="vertical"
+        style={ styles.episodesContainer }
+      >
+        { rows.map((listRow) => (
+          <SpatialNavigationView
+            direction="horizontal"
+            key={ `${listRow[0].episodeId}-row` }
+          >
+            { listRow.map((season) => {
+              const { episodeId, name } = season;
+
+              return (
+                <ThemedButton
+                  key={ episodeId }
+                  isSelected={ selectedEpisodeId === episodeId }
+                  onPress={ () => handleSelectEpisode(episodeId) }
+                  style={ styles.button }
+                >
+                  { name }
+                </ThemedButton>
+              );
+            }) }
+          </SpatialNavigationView>
+        )) }
+      </SpatialNavigationView>
+    );
+  };
+
+  const renderSeriesSelection = () => {
+    if (!seasons.length) {
+      return null;
+    }
+
+    return (
+      <SpatialNavigationScrollView>
+        { renderSeasons() }
+        { renderEpisodes() }
+      </SpatialNavigationScrollView>
+    );
+  };
 
   const renderLoader = () => (
     <Loader
@@ -94,12 +168,11 @@ export function PlayerVideoSelectorComponent({
     <ThemedModal
       id={ PLAYER_VIDEO_SELECTOR_OVERLAY_ID }
       onHide={ onHide }
-      contentContainerStyle={ styles.container }
+      contentContainerStyle={ seasons.length > 0 ? styles.container : undefined }
     >
       { renderLoader() }
       { renderVoices() }
-      { renderSeasons() }
-      { renderEpisodes() }
+      { renderSeriesSelection() }
     </ThemedModal>
   );
 }

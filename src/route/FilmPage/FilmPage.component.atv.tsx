@@ -116,7 +116,10 @@ export function FilmPageComponent({
       <ThemedText style={ styles.collectionTitle }>
         { title }
       </ThemedText>
-      <View style={ styles.collection }>
+      <SpatialNavigationView
+        style={ styles.collection }
+        direction="horizontal"
+      >
         { collection.map((item) => (
           <ThemedButton
             key={ item }
@@ -126,7 +129,7 @@ export function FilmPageComponent({
             { item }
           </ThemedButton>
         )) }
-      </View>
+      </SpatialNavigationView>
     </View>
   );
 

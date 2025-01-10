@@ -3,14 +3,12 @@ import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
   container: {
-    minWidth: '30%',
-    maxWidth: '40%',
+    maxHeight: 300,
   },
   voicesInput: {
     marginBottom: 10,
   },
   episodesContainer: {
-    flexWrap: 'wrap',
     borderTopWidth: 2,
     borderTopColor: Colors.lightGravel,
     paddingTop: 8,

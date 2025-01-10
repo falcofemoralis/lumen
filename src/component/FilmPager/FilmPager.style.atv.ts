@@ -5,15 +5,15 @@ export const styles = CreateStyles({
     flex: 1,
   },
   menuListWrapper: {
-    height: 50,
-    zIndex: 1,
+    height: 40,
+    zIndex: 10,
   },
   menuListScroll: {},
   menuList: {
     gap: 8,
   },
   gridWrapper: {
-    paddingTop: 8,
+    paddingTop: 16,
     paddingHorizontal: 8,
     zIndex: 2,
   },

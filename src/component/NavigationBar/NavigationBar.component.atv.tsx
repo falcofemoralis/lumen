@@ -132,21 +132,6 @@ export function NavigationBarComponent({
         sceneStyle: {
           margin: 16,
         },
-        // transitionSpec: {
-        //   animation: 'timing',
-        //   config: {
-        //     duration: 2000,
-        //     easing: Easing.inOut(Easing.ease),
-        //   },
-        // },
-        // sceneStyleInterpolator: ({ current }) => ({
-        //   sceneStyle: {
-        //     opacity: current.progress.interpolate({
-        //       inputRange: [-1, 0, 1],
-        //       outputRange: [0, 1, 0],
-        //     }),
-        //   },
-        // }),
       } }
       tabBar={ renderTabBar }
     />

@@ -3,6 +3,7 @@ import { DropdownProps } from 'react-native-element-dropdown/lib/typescript/comp
 export type ThemedDropdownProps = Omit<DropdownProps<DropdownItem>, 'labelField' | 'valueField' | 'renderItem'> & {
   asOverlay?: boolean;
   overlayId?: string;
+  asList?: boolean;
 }
 
 export interface DropdownItem {

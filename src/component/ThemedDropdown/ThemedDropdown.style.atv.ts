@@ -26,6 +26,11 @@ export const styles = CreateStyles({
     maxHeight: 300,
     padding: 8,
   },
+  listContainer: {
+    maxHeight: 300,
+    padding: 8,
+    alignSelf: 'flex-end',
+  },
   contentContainer: {
   },
   header: {

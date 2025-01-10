@@ -1,4 +1,3 @@
-import { NAVIGATION_BAR_TV_WIDTH } from 'Component/NavigationBar/NavigationBar.style.atv';
 import Colors from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 

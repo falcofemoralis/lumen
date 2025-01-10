@@ -3,7 +3,7 @@ import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedModal from 'Component/ThemedModal';
-import { memo, useCallback, useRef } from 'react';
+import React, { memo, useCallback, useRef } from 'react';
 import { Text, View } from 'react-native';
 import { DefaultFocus, SpatialNavigationFocusableView, SpatialNavigationScrollView } from 'react-tv-space-navigation';
 import OverlayStore from 'Store/Overlay.store';
@@ -20,6 +20,7 @@ export const ThemedDropdownComponent = ({
   searchPlaceholder,
   asOverlay,
   overlayId,
+  asList,
   onChange,
 }: ThemedDropdownProps) => {
   const id = useRef(overlayId ?? generateId());
@@ -96,22 +97,42 @@ export const ThemedDropdownComponent = ({
     );
   }, [value, onChange]);
 
-  const renderModal = () => (
-    <ThemedModal
-      id={ id.current }
-      onHide={ () => OverlayStore.goToPreviousOverlay() }
-      containerStyle={ styles.container }
-      contentContainerStyle={ styles.contentContainer }
-    >
+  const renderContent = () => (
+    <>
       { renderHeader() }
-      <SpatialNavigationScrollView offsetFromStart={ scale(64) }>
+      <SpatialNavigationScrollView
+        offsetFromStart={ scale(64) }
+      >
         { data.map((item, index) => renderItem(item, index)) }
       </SpatialNavigationScrollView>
-    </ThemedModal>
+    </>
   );
 
+  const renderModal = () => {
+    if (asList) {
+      return (
+        <View style={ styles.listContainer }>
+          <View style={ styles.contentContainer }>
+            { renderContent() }
+          </View>
+        </View>
+      );
+    }
+
+    return (
+      <ThemedModal
+        id={ id.current }
+        onHide={ () => OverlayStore.goToPreviousOverlay() }
+        containerStyle={ styles.container }
+        contentContainerStyle={ styles.contentContainer }
+      >
+        { renderContent() }
+      </ThemedModal>
+    );
+  };
+
   const renderInput = () => {
-    if (asOverlay) {
+    if (asOverlay || asList) {
       return null;
     }
 

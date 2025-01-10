@@ -19,22 +19,6 @@ export function FilmPagerComponent({
   onNextLoad,
   handleMenuItemChange,
 }: FilmPagerComponentProps) {
-  const renderPage = () => {
-    const { films, pagination } = selectedPagerItem;
-
-    return (
-      <ThemedView style={ styles.gridWrapper }>
-        <DefaultFocus>
-          <FilmGrid
-            films={ films }
-            pagination={ pagination }
-            onNextLoad={ onNextLoad }
-          />
-        </DefaultFocus>
-      </ThemedView>
-    );
-  };
-
   const renderMenuItem = (item: PagerItemInterface) => {
     const {
       menuItem: { title },
@@ -77,6 +61,22 @@ export function FilmPagerComponent({
       </SpatialNavigationScrollView>
     </ThemedView>
   );
+
+  const renderPage = () => {
+    const { films, pagination } = selectedPagerItem;
+
+    return (
+      <ThemedView style={ styles.gridWrapper }>
+        <DefaultFocus>
+          <FilmGrid
+            films={ films }
+            pagination={ pagination }
+            onNextLoad={ onNextLoad }
+          />
+        </DefaultFocus>
+      </ThemedView>
+    );
+  };
 
   const renderLoader = () => (
     <Loader
