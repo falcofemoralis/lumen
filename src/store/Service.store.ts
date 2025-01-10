@@ -38,6 +38,12 @@ class ServiceStore {
     this.getCurrentService().setAuthorization(auth);
     this.setSignedIn(true);
   }
+
+  logout() {
+    this.getCurrentService().logout();
+    this.getCurrentService().setAuthorization('');
+    this.setSignedIn(false);
+  }
 }
 
 export default new ServiceStore();

@@ -4,7 +4,7 @@ import { Tab } from './NavigationBar.type';
 
 export const TABS_TV_CONFIG: Tab<string>[] = [
   {
-    route: 'index',
+    route: '(home)',
     title: 'Home',
     icon: {
       name: 'home-variant-outline',
@@ -12,15 +12,7 @@ export const TABS_TV_CONFIG: Tab<string>[] = [
     },
   },
   {
-    route: 'search',
-    title: 'Search',
-    icon: {
-      name: 'magnify',
-      pack: IconPackType.MaterialCommunityIcons,
-    },
-  },
-  {
-    route: 'bookmarks',
+    route: '(bookmarks)',
     title: 'Bookmarks',
     icon: {
       name: 'movie-star-outline',
@@ -32,6 +24,14 @@ export const TABS_TV_CONFIG: Tab<string>[] = [
     title: 'Recent',
     icon: {
       name: 'history',
+      pack: IconPackType.MaterialCommunityIcons,
+    },
+  },
+  {
+    route: 'search',
+    title: 'Search',
+    icon: {
+      name: 'magnify',
       pack: IconPackType.MaterialCommunityIcons,
     },
   },
@@ -55,7 +55,7 @@ export const TABS_TV_CONFIG: Tab<string>[] = [
 
 export const TABS_MOBILE_CONFIG: Tab<string>[] = [
   {
-    route: 'index',
+    route: '(home)',
     title: 'Home',
     icon: {
       name: 'home-outline',
@@ -79,7 +79,7 @@ export const TABS_MOBILE_CONFIG: Tab<string>[] = [
     },
   },
   {
-    route: 'bookmarks',
+    route: '(bookmarks)',
     title: 'Bookmarks',
     icon: {
       name: 'movie-star-outline',

@@ -1,3 +1,4 @@
+import Colors from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
@@ -11,5 +12,6 @@ export const styles = CreateStyles({
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 9999,
+    backgroundColor: Colors.transparent,
   },
 });

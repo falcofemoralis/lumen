@@ -1,6 +1,7 @@
 import Page from 'Component/Page';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedText from 'Component/ThemedText';
+import { observer } from 'mobx-react-lite';
 import { useRef } from 'react';
 import { View } from 'react-native';
 import { TextInput } from 'react-native-paper';
@@ -8,7 +9,7 @@ import { SpatialNavigationFocusableView } from 'react-tv-space-navigation';
 import NotificationStore from 'Store/Notification.store';
 import ServiceStore from 'Store/Service.store';
 
-export default function SettingsScreen() {
+export function SettingsScreen() {
   const credsRef = useRef({ username: '', password: '' });
 
   const login = async () => {
@@ -56,3 +57,5 @@ export default function SettingsScreen() {
     </Page>
   );
 }
+
+export default observer(SettingsScreen);

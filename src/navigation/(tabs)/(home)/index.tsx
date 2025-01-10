@@ -1,7 +1,4 @@
 import HomePage from 'Route/HomePage';
-import PlayerPage from 'Route/PlayerPage';
-import { FilmInterface } from 'Type/Film.interface';
-import { FilmType } from 'Type/FilmType.type';
 
 export function HomeScreen() {
   // const film = {

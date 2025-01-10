@@ -1,17 +1,16 @@
 import {
   DarkTheme,
-  DefaultTheme,
   ThemeProvider,
 } from '@react-navigation/native';
-import { Stack } from 'Component/Layouts/stack';
 import Constants from 'expo-constants';
 import * as NavigationBar from 'expo-navigation-bar';
+import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useLocale } from 'Hooks/useLocale';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
-import { BackHandler, useColorScheme } from 'react-native';
+import { BackHandler } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { PaperProvider } from 'react-native-paper';
 import { SpatialNavigationDeviceTypeProvider } from 'react-tv-space-navigation';
@@ -19,13 +18,11 @@ import ConfigStore from 'Store/Config.store';
 import NotificationStore from 'Store/Notification.store';
 import Colors from 'Style/Colors';
 import { configureRemoteControl } from 'Util/RemoteControl';
-
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export function RootLayout() {
   const [backPressedOnce, setBackPressedOnce] = useState(false);
-  const colorScheme = useColorScheme();
   const [languageLoaded] = useLocale();
 
   useEffect(() => {
@@ -80,9 +77,8 @@ export function RootLayout() {
           marginTop: Constants.statusBarHeight,
           backgroundColor: Colors.background,
         },
-        // animation: 'fade',
+        animation: 'fade',
       } }
-      initialRouteName="(tabs)"
     >
       <Stack.Screen
         name="player" // player
@@ -106,7 +102,14 @@ export function RootLayout() {
   const renderLayout = () => (ConfigStore.isTV ? renderTVLayout() : renderMobileLayout());
 
   return (
-    <ThemeProvider value={ colorScheme === 'dark' ? DarkTheme : DefaultTheme }>
+    <ThemeProvider value={ {
+      ...DarkTheme,
+      colors: {
+        ...DarkTheme.colors,
+        background: Colors.background,
+      },
+    } }
+    >
       <PaperProvider>
         <StatusBar
           style="light"

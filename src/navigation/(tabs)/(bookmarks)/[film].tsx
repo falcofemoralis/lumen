@@ -3,7 +3,7 @@ import React from 'react';
 import FilmPage from 'Route/FilmPage';
 
 export default function FilmScreen() {
-  const { link } = useLocalSearchParams();
+  const { film } = useLocalSearchParams();
 
-  return <FilmPage link={ link as string } />;
+  return <FilmPage link={ film as string } />;
 }

@@ -20,8 +20,12 @@ export function BookmarksPageContainer() {
   const loadBookmarks = async () => {
     setIsLoading(true);
 
+    console.log('loadBookmarks');
+
     try {
       const items = await ServiceStore.getCurrentService().getBookmarks();
+
+      console.log('loadedBookmarks ', items.length);
 
       if (items.length > 0 && items[0].filmList) {
         const { id, filmList } = items[0];

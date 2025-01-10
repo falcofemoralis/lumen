@@ -1,8 +1,8 @@
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import { Tabs } from 'Component/Layouts/tabs';
 import ThemedIcon from 'Component/ThemedIcon';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
+import { Tabs } from 'expo-router';
 import React, { useCallback } from 'react';
 import {
   Pressable,
@@ -16,6 +16,8 @@ import { styles } from './NavigationBar.style';
 import {
   NavigationBarComponentProps, NavigationType, StateType, Tab,
 } from './NavigationBar.type';
+
+export { Tabs } from 'expo-router';
 
 export function NavigationBarComponent({
   navigateTo,
