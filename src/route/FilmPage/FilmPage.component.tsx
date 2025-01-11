@@ -201,7 +201,10 @@ export function FilmPageComponent({
     }
 
     return (
-      <View style={ styles.textContainer }>
+      <View
+        key={ text }
+        style={ styles.textContainer }
+      >
         { title && (
           <ThemedText style={ styles.textTitle }>
             { `${title}: ` }
@@ -249,15 +252,15 @@ export function FilmPageComponent({
       directors = [],
       countries = [],
       duration,
-      infoLists = [],
     } = film;
 
     return (
       <View style={ styles.mainInfo }>
         { ratings.map(({ name, rating, votes }) => renderInfoText(`${rating} (${votes})`, name)) }
-        { renderCollectionInfo(directors, 'Режиссер') }
         { renderInfoText(releaseDate, 'Дата выхода') }
         { renderInfoText(duration, 'Время') }
+        { renderRating() }
+        { renderCollectionInfo(directors, 'Режиссер') }
         { renderCollectionInfo(countries, 'Страна') }
       </View>
     );
@@ -343,13 +346,17 @@ export function FilmPageComponent({
   const renderRating = () => {
     const { ratings = [], ratingsScale } = film;
 
+    if (!ratings.length) {
+      return null;
+    }
+
     return (
       <View style={ styles.rating }>
         <Rating
-          // size={ scale(12) }
+          size={ scale(12) }
           rating={ ratings[0].rating || 0 }
-          // scale={ 1 }
-          // spacing={ scale(2) }
+          scale={ 1 }
+          spacing={ scale(2) }
           maxRating={ ratingsScale || 10 }
           fillColor={ Colors.secondary }
         />
@@ -396,8 +403,7 @@ export function FilmPageComponent({
         { renderDescription() }
         { renderActions() }
         { renderPlayFilmButton() }
-        { renderRating() }
-        { renderCollections() }
+        { /* { renderCollections() } */ }
         { renderModals() }
       </ScrollView>
     </Page>

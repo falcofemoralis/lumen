@@ -18,6 +18,7 @@ import ConfigStore from 'Store/Config.store';
 import NotificationStore from 'Store/Notification.store';
 import Colors from 'Style/Colors';
 import { configureRemoteControl } from 'Util/RemoteControl';
+
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 

@@ -28,8 +28,8 @@ export const styles = CreateStyles({
     borderRadius: 16,
   },
   mainInfo: {
-    flex: 1,
     padding: 16,
+    flexShrink: 1,
   },
   title: {
     fontSize: 24,
@@ -44,11 +44,24 @@ export const styles = CreateStyles({
     opacity: 0.6,
     marginTop: 4,
   },
+  additionalInfo: {
+    flexDirection: 'row',
+    gap: 16,
+  },
   rating: {
     marginTop: 8,
   },
+  ratingsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
   textContainer: {
     marginTop: 8,
+    flexDirection: 'row',
+  },
+  textTitle: {
+    fontWeight: '700',
   },
   text: {
     fontSize: 14,
@@ -60,7 +73,8 @@ export const styles = CreateStyles({
     gap: 6,
   },
   collectionTitle: {
-    fontSize: 12,
+    fontSize: 14,
+    fontWeight: '700',
     lineHeight: 20,
   },
   collection: {

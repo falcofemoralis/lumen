@@ -48,7 +48,7 @@ export const styles = CreateStyles({
     justifyContent: 'flex-start',
   },
   rating: {
-    marginTop: 16,
+    marginTop: 8,
   },
   textContainer: {
     marginTop: 8,
@@ -75,8 +75,8 @@ export const styles = CreateStyles({
   },
   collectionButton: {
     borderRadius: 8,
-    paddingHorizontal: 4,
-    paddingVertical: 0,
+    paddingHorizontal: 6,
+    paddingVertical: 1,
     backgroundColor: Colors.gray,
   },
   collectionButtonText: {
@@ -85,7 +85,7 @@ export const styles = CreateStyles({
   },
   quickInfo: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
     marginTop: 16,
     gap: 8,
   },

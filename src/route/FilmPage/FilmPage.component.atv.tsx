@@ -99,15 +99,41 @@ export function FilmPageComponent({
     );
   };
 
+  const renderGenres = (collection: string[]) => (
+    <View style={ styles.collectionContainer }>
+      <SpatialNavigationView
+        style={ styles.collection }
+        direction="horizontal"
+      >
+        { collection.map((item) => (
+          <ThemedButton
+            key={ item }
+            style={ styles.collectionButton }
+            textStyle={ styles.collectionButtonText }
+          >
+            { item }
+          </ThemedButton>
+        )) }
+      </SpatialNavigationView>
+    </View>
+  );
+
   const renderInfoText = (text: string | undefined, title?: string) => {
     if (!text) {
       return null;
     }
 
     return (
-      <ThemedText style={ styles.text }>
-        { title ? `${title}: ${text}` : text }
-      </ThemedText>
+      <View style={ styles.textContainer }>
+        { title && (
+          <ThemedText style={ styles.textTitle }>
+            { `${title}: ` }
+          </ThemedText>
+        ) }
+        <ThemedText style={ styles.text }>
+          { text }
+        </ThemedText>
+      </View>
     );
   };
 
@@ -133,6 +159,22 @@ export function FilmPageComponent({
     </View>
   );
 
+  const renderRating = () => {
+    const { ratings = [], ratingsScale } = film;
+
+    return (
+      <Rating
+        style={ styles.rating }
+        size={ scale(14) }
+        rating={ ratings[0]?.rating || 0 }
+        scale={ 1 }
+        spacing={ scale(2) }
+        maxRating={ ratingsScale || 10 }
+        fillColor={ Colors.secondary }
+      />
+    );
+  };
+
   const renderMainInfo = () => {
     const {
       title,
@@ -141,7 +183,6 @@ export function FilmPageComponent({
       genres = [],
       countries = [],
       ratings = [],
-      ratingsScale,
       directors = [],
       duration,
       description,
@@ -155,22 +196,17 @@ export function FilmPageComponent({
             { originalTitle }
           </ThemedText>
         ) }
-        <Rating
-          style={ styles.rating }
-          size={ scale(12) }
-          rating={ ratings[0]?.rating || 0 }
-          scale={ 1 }
-          spacing={ scale(2) }
-          maxRating={ ratingsScale || 10 }
-          fillColor={ Colors.secondary }
-        />
-        <View style={ styles.textContainer }>
-          { renderInfoText(`${releaseDate} • ${duration}`) }
-          { renderInfoText(ratings.reduce((acc, { text }) => `${acc}${acc !== '' ? ' • ' : ''}${text}`, ''), 'Рейтинги') }
-          { renderInfoText(directors.length > 0 ? directors[0] : undefined, 'Режиссер') }
+        { renderGenres(genres) }
+        <View style={ styles.additionalInfo }>
+          { renderInfoText(releaseDate) }
+          { renderInfoText(duration) }
+          { renderRating() }
         </View>
-        { renderCollection(genres, 'Жанры') }
-        { renderCollection(countries, 'Страны') }
+        <View style={ styles.ratingsRow }>
+          { ratings.map(({ name, rating, votes }) => renderInfoText(`${rating} (${votes})`, name)) }
+        </View>
+        { renderCollection(directors, 'Режиссер') }
+        { renderCollection(countries, 'Страна') }
         <ThemedText style={ styles.description }>
           { description }
         </ThemedText>
