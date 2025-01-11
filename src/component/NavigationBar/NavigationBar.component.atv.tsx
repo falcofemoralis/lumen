@@ -5,7 +5,7 @@ import ThemedView from 'Component/ThemedView';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Tabs } from 'expo-router';
 import { observer } from 'mobx-react-lite';
-import React, { useCallback } from 'react';
+import React, { useCallback, useRef } from 'react';
 import {
   StyleProp,
   TextStyle,
@@ -22,7 +22,7 @@ import NavigationStore from 'Store/Navigation.store';
 import Colors from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 
-import { TABS_TV_CONFIG } from './NavigationBar.config';
+import { LOADER_PAGE, TABS_TV_CONFIG } from './NavigationBar.config';
 import { OpeningAnimation, styles } from './NavigationBar.style.atv';
 import {
   NavigationBarComponentProps, NavigationType, StateType, Tab,
@@ -32,11 +32,30 @@ export function NavigationBarComponent({
   navigateTo,
   isFocused,
 }: NavigationBarComponentProps) {
+  const lastPage = useRef<string | null>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
   const onDirectionHandledWithoutMovement = useCallback((movement: string) => {
     if (movement === Directions.RIGHT) {
       NavigationStore.closeNavigation();
     }
   }, []);
+
+  const onTabSelect = (tab: Tab<string>, navigation: NavigationType, state: StateType) => {
+    if (lastPage.current !== LOADER_PAGE) {
+      navigateTo({ ...tab, route: LOADER_PAGE }, navigation, state);
+      lastPage.current = LOADER_PAGE;
+    }
+
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+
+    timerRef.current = setTimeout(() => {
+      navigateTo(tab, navigation, state);
+      lastPage.current = tab.route;
+    }, 500);
+  };
 
   const renderTab = useCallback((
     tab: Tab<string>,
@@ -44,27 +63,27 @@ export function NavigationBarComponent({
     state: StateType,
     animatedTextStyle: StyleProp<TextStyle>,
   ) => {
-    const { route, title, icon } = tab;
+    const { title, icon } = tab;
     const focused = isFocused(tab, state);
 
     return (
       <SpatialNavigationFocusableView
         key={ title }
-        onFocus={ () => navigateTo(tab, navigation, state) }
+        onFocus={ () => onTabSelect(tab, navigation, state) }
       >
-        { ({ isRootActive }) => (
+        { ({ isRootActive, isFocused: isf }) => (
           <View
             style={ [
               styles.tab,
               focused && !isRootActive && styles.tabSelected,
-              focused && isRootActive && styles.tabFocused,
+              isf && isRootActive && styles.tabFocused,
             ] }
           >
             { icon && (
               <ThemedIcon
                 style={ [
                   styles.tabIcon,
-                  focused && isRootActive && styles.tabContentFocused,
+                  isf && isRootActive && styles.tabContentFocused,
                 ] }
                 icon={ icon }
                 size={ scale(24) }
@@ -74,7 +93,7 @@ export function NavigationBarComponent({
             <ThemedText.Animated
               style={ [
                 styles.tabText,
-                focused && isRootActive && styles.tabContentFocused,
+                isf && isRootActive && styles.tabContentFocused,
                 animatedTextStyle,
               ] }
             >

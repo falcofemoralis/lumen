@@ -115,3 +115,5 @@ export const TABS_MOBILE_CONFIG: Tab<string>[] = [
     },
   },
 ];
+
+export const LOADER_PAGE = 'loader';
