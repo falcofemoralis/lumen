@@ -1,5 +1,6 @@
 import { FilmType } from './FilmType.type';
 import { FilmVoiceInterface } from './FilmVoice.interface';
+import { InfoListInterface } from './InfoList.interface';
 import { RatingInterface } from './Rating.interface';
 
 export interface FilmInterface {
@@ -25,6 +26,7 @@ export interface FilmInterface {
   additionalInfo?: string[];
   duration?: string;
   age?: string;
+  infoLists?: InfoListInterface[];
 
   // collections data
   schedule?: string[];

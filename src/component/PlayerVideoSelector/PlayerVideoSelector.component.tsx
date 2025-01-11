@@ -38,6 +38,7 @@ export function PlayerVideoSelectorComponent({
             endIcon: voice.img,
           })) }
           value={ selectedVoice.id }
+          placeholder={ selectedVoice.title }
           onChange={ (item) => handleSelectVoice(item.value) }
           asList={ !seasons.length }
         />

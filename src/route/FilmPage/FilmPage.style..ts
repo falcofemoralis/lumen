@@ -15,10 +15,28 @@ export const styles = CreateStyles({
     width: 32,
     margin: 8,
   },
+  title: {
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  originalTitle: {
+    fontSize: 16,
+    color: Colors.lightGray,
+  },
+  genres: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 8,
+  },
+  genre: {
+    backgroundColor: Colors.gray,
+    borderRadius: 8,
+    padding: 4,
+  },
   mainContent: {
     flexDirection: 'row',
-    gap: 16,
-    width: '100%',
+    gap: 12,
+    marginTop: 16,
   },
   poster: {
     width: '40%',
@@ -26,25 +44,44 @@ export const styles = CreateStyles({
     borderRadius: 16,
   },
   mainInfo: {
-    width: '55%',
+    marginTop: -8,
     justifyContent: 'flex-start',
   },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-  },
-  originalTitle: {
-    fontSize: 16,
-    color: Colors.gray,
-  },
   rating: {
-
+    marginTop: 16,
   },
   textContainer: {
     marginTop: 8,
+    flexDirection: 'row',
+  },
+  textTitle: {
+    fontSize: 14,
+    fontWeight: '700',
   },
   text: {
     fontSize: 14,
+  },
+  collectionContainer: {
+    flexDirection: 'row',
+    gap: 4,
+    marginTop: 8,
+    flexWrap: 'wrap',
+    maxWidth: '99%',
+  },
+  collectionTitle: {
+    fontSize: 14,
+    lineHeight: 20,
+    fontWeight: '700',
+  },
+  collectionButton: {
+    borderRadius: 8,
+    paddingHorizontal: 4,
+    paddingVertical: 0,
+    backgroundColor: Colors.gray,
+  },
+  collectionButtonText: {
+    fontSize: 14,
+    lineHeight: 20,
   },
   quickInfo: {
     flexDirection: 'row',
@@ -65,29 +102,6 @@ export const styles = CreateStyles({
   quickInfoLowerText: {
     fontSize: 16,
     color: Colors.white,
-  },
-  collectionContainer: {
-    marginTop: 8,
-    gap: 6,
-  },
-  collectionTitle: {
-    fontSize: 14,
-    lineHeight: 20,
-    fontWeight: '700',
-  },
-  collection: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  collectionButton: {
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    backgroundColor: Colors.gray,
-  },
-  collectionButtonText: {
-    fontSize: 12,
-    lineHeight: 20,
   },
   playBtn: {
     width: '100%',
@@ -124,6 +138,9 @@ export const styles = CreateStyles({
   description: {
     color: Colors.lightGray,
     fontSize: 16,
+    marginTop: 16,
+  },
+  collections: {
     marginTop: 16,
   },
 });

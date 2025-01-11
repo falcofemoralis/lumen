@@ -7,6 +7,7 @@ import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
 import Thumbnail from 'Component/Thumbnail';
+import { useRouter } from 'expo-router';
 import __ from 'i18n/__';
 import {
   ScrollView,
@@ -25,35 +26,55 @@ export function FilmPageComponent({
   hideVideoSelector,
   handleVideoSelect,
 }: FilmPageComponentProps) {
+  const router = useRouter();
+
   if (!film) {
     return (
       <Page>
         <View style={ styles.topActions }>
-          <Thumbnail
+          <TouchableOpacity
             style={ styles.topActionsButton }
-            height={ scale(32) }
-            width={ scale(32) }
-          />
+            onPress={ () => router.back() }
+          >
+            <ThemedIcon
+              icon={ {
+                name: 'arrow-back',
+                pack: IconPackType.MaterialIcons,
+              } }
+              size={ scale(32) }
+              color="white"
+            />
+          </TouchableOpacity>
           <Thumbnail
             style={ styles.topActionsButton }
             height={ scale(32) }
             width={ scale(32) }
           />
         </View>
+        <Thumbnail
+          height={ scale(24) }
+          width="100%"
+        />
+        <Thumbnail
+          style={ { marginTop: scale(8) } }
+          height={ scale(24) }
+          width="50%"
+        />
+        <View style={ styles.genres }>
+          { Array(5).fill(0).map((_, i) => (
+            <Thumbnail
+            // eslint-disable-next-line react/no-array-index-key
+              key={ `${i}-thumb` }
+              height={ scale(24) }
+              width={ scale(64) }
+            />
+          )) }
+        </View>
         <View style={ styles.mainContent }>
           <Thumbnail
             style={ styles.poster }
           />
-          <View style={ styles.mainInfo }>
-            <Thumbnail
-              height={ scale(24) }
-              width="100%"
-            />
-            <Thumbnail
-              style={ styles.textContainer }
-              height={ scale(20) }
-              width="70%"
-            />
+          <View style={ [styles.mainInfo, { width: '55%' }] }>
             { Array(5).fill(0).map((_, i) => (
               <Thumbnail
                 // eslint-disable-next-line react/no-array-index-key
@@ -76,8 +97,8 @@ export function FilmPageComponent({
           )) }
         </View>
         <Thumbnail
-          style={ styles.playBtn }
-          height={ scale(48) }
+          style={ styles.description }
+          height="20%"
           width="100%"
         />
         <View style={ styles.actions }>
@@ -85,14 +106,14 @@ export function FilmPageComponent({
             <Thumbnail
               // eslint-disable-next-line react/no-array-index-key
               key={ `${i}-action` }
-              height={ scale(32) }
+              height={ scale(48) }
               width="30%"
             />
           )) }
         </View>
         <Thumbnail
-          style={ styles.description }
-          height="30%"
+          style={ styles.playBtn }
+          height={ scale(48) }
           width="100%"
         />
       </Page>
@@ -101,7 +122,10 @@ export function FilmPageComponent({
 
   const renderTopActions = () => (
     <View style={ styles.topActions }>
-      <TouchableOpacity style={ styles.topActionsButton }>
+      <TouchableOpacity
+        style={ styles.topActionsButton }
+        onPress={ () => router.back() }
+      >
         <ThemedIcon
           icon={ {
             name: 'arrow-back',
@@ -124,6 +148,42 @@ export function FilmPageComponent({
     </View>
   );
 
+  const renderTitle = () => {
+    const { title, originalTitle } = film;
+
+    return (
+      <View>
+        <ThemedText style={ styles.title }>
+          { title }
+        </ThemedText>
+        { originalTitle && (
+          <ThemedText style={ styles.originalTitle }>
+            { originalTitle }
+          </ThemedText>
+        ) }
+      </View>
+    );
+  };
+
+  const renderGenres = () => {
+    const { genres = [] } = film;
+
+    return (
+      <ScrollView horizontal>
+        <View style={ styles.genres }>
+          { genres.map((genre) => (
+            <ThemedText
+              key={ genre }
+              style={ styles.genre }
+            >
+              { genre }
+            </ThemedText>
+          )) }
+        </View>
+      </ScrollView>
+    );
+  };
+
   const renderPoster = () => {
     const { poster } = film;
 
@@ -141,45 +201,64 @@ export function FilmPageComponent({
     }
 
     return (
-      <ThemedText style={ styles.text }>
-        { title ? `${title}: ${text}` : text }
-      </ThemedText>
+      <View style={ styles.textContainer }>
+        { title && (
+          <ThemedText style={ styles.textTitle }>
+            { `${title}: ` }
+          </ThemedText>
+        ) }
+        <ThemedText style={ styles.text }>
+          { text }
+        </ThemedText>
+      </View>
+    );
+  };
+
+  const renderCollectionInfo = (collection: string[], title?: string) => {
+    if (!collection.length) {
+      return null;
+    }
+
+    return (
+      <View style={ styles.collectionContainer }>
+        { title && (
+          <ThemedText style={ styles.collectionTitle }>
+            { `${title}: ` }
+          </ThemedText>
+        ) }
+        { collection.map((item) => (
+          <TouchableOpacity
+            key={ item }
+            style={ styles.collectionButton }
+          >
+            <ThemedText
+              style={ styles.collectionButtonText }
+            >
+              { item }
+            </ThemedText>
+          </TouchableOpacity>
+        )) }
+      </View>
     );
   };
 
   const renderMainInfo = () => {
     const {
-      title,
-      originalTitle,
       releaseDate,
       ratings = [],
-      ratingsScale,
       directors = [],
+      countries = [],
       duration,
+      infoLists = [],
     } = film;
 
     return (
       <View style={ styles.mainInfo }>
-        <ThemedText style={ styles.title }>{ title }</ThemedText>
-        { originalTitle && (
-          <ThemedText style={ styles.originalTitle }>
-            { originalTitle }
-          </ThemedText>
-        ) }
-        <Rating
-          style={ styles.rating }
-          size={ scale(12) }
-          rating={ ratings[0]?.rating || 0 }
-          scale={ 1 }
-          spacing={ scale(2) }
-          maxRating={ ratingsScale || 10 }
-          fillColor={ Colors.secondary }
-        />
-        <View style={ styles.textContainer }>
-          { renderInfoText(`${releaseDate} • ${duration}`) }
-          { renderInfoText(ratings.reduce((acc, { text }) => `${acc}${acc !== '' ? ' • ' : ''}${text}`, ''), 'Рейтинги') }
-          { renderInfoText(directors.length > 0 ? directors[0] : undefined, 'Режиссер') }
-        </View>
+        { ratings.map(({ name, rating, votes }) => renderInfoText(`${rating} (${votes})`, name)) }
+        { renderCollectionInfo(directors, 'Режиссер') }
+        { renderInfoText(releaseDate, 'Дата выхода') }
+        { renderInfoText(duration, 'Время') }
+        { renderCollectionInfo(countries, 'Страна') }
       </View>
     );
   };
@@ -216,6 +295,12 @@ export function FilmPageComponent({
     );
   };
 
+  const renderDescription = () => {
+    const { description } = film;
+
+    return <ThemedText style={ styles.description }>{ description }</ThemedText>;
+  };
+
   const renderPlayFilmButton = () => (
     <ThemedButton
       style={ styles.playBtn }
@@ -240,7 +325,7 @@ export function FilmPageComponent({
         color="white"
       />
       <ThemedText
-        style={ styles.text }
+        style={ styles.actionText }
       >
         { text }
       </ThemedText>
@@ -255,41 +340,29 @@ export function FilmPageComponent({
     </View>
   );
 
-  const renderDescription = () => {
-    const { description } = film;
-
-    return <ThemedText style={ styles.description }>{ description }</ThemedText>;
-  };
-
-  const renderCollection = (collection: string[], title: string) => (
-    <View style={ styles.collectionContainer }>
-      <ThemedText style={ styles.collectionTitle }>
-        { title }
-      </ThemedText>
-      <ScrollView horizontal>
-        <View style={ styles.collection }>
-          { collection.map((item) => (
-            <TouchableOpacity
-              key={ item }
-              style={ styles.collectionButton }
-            >
-              <ThemedText style={ styles.collectionButtonText }>
-                { item }
-              </ThemedText>
-            </TouchableOpacity>
-          )) }
-        </View>
-      </ScrollView>
-    </View>
-  );
-
-  const renderCollections = () => {
-    const { genres = [], countries = [] } = film;
+  const renderRating = () => {
+    const { ratings = [], ratingsScale } = film;
 
     return (
-      <View style={ styles.collectionContainer }>
-        { renderCollection(genres, __('Genres')) }
-        { renderCollection(countries, __('Countries')) }
+      <View style={ styles.rating }>
+        <Rating
+          // size={ scale(12) }
+          rating={ ratings[0].rating || 0 }
+          // scale={ 1 }
+          // spacing={ scale(2) }
+          maxRating={ ratingsScale || 10 }
+          fillColor={ Colors.secondary }
+        />
+      </View>
+    );
+  };
+
+  const renderCollections = () => {
+    const { infoLists = [] } = film;
+
+    return (
+      <View style={ styles.collections }>
+        { renderCollectionInfo(infoLists.map(({ name, position }) => `${name} ${position}`)) }
       </View>
     );
   };
@@ -316,11 +389,14 @@ export function FilmPageComponent({
     <Page>
       <ScrollView>
         { renderTopActions() }
+        { renderTitle() }
+        { renderGenres() }
         { renderMainContent() }
         { renderQuickInfo() }
-        { renderPlayFilmButton() }
-        { renderActions() }
         { renderDescription() }
+        { renderActions() }
+        { renderPlayFilmButton() }
+        { renderRating() }
         { renderCollections() }
         { renderModals() }
       </ScrollView>

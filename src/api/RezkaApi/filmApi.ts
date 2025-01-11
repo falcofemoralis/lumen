@@ -6,6 +6,7 @@ import { FilmListInterface } from 'Type/FilmList.interface';
 import { FilmType } from 'Type/FilmType.type';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
+import { InfoListInterface } from 'Type/InfoList.interface';
 import { MenuItemInterface } from 'Type/MenuItem.interface';
 import { RatingInterface } from 'Type/Rating.interface';
 import { HTMLElementInterface, parseHtml } from 'Util/Parser';
@@ -88,12 +89,24 @@ const filmApi: FilmApiInterface = {
             film.ratings = value.childNodes.filter((node) => node.rawTagName === 'span').map((node) => (
               {
                 text: node.rawText,
+                name: node.childNodes[0]?.rawText,
                 rating: Number(node.childNodes[2]?.rawText),
                 votes: Number(node.childNodes[4]?.rawText.replace('(', '').replace(')', '').replaceAll(' ', '')),
               } as RatingInterface
             ));
             break;
           case 'Входит в списки':
+            film.infoLists = value.childNodes.reduce((acc: InfoListInterface[], node, idx) => {
+              if (node.rawTagName === 'a') {
+                acc.push({
+                  name: node.rawText,
+                  position: String(value.childNodes[idx + 1]?.rawText),
+                  link: (node as HTMLElementInterface).attributes.href,
+                });
+              }
+
+              return acc;
+            }, []);
             break;
           case 'Дата выхода':
             film.releaseDate = value.rawText;
