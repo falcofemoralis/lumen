@@ -46,6 +46,7 @@ export function FilmPagerContainer({
     isRefresh = false,
   ) => {
     const {
+      key,
       menuItem,
       films,
       pagination: { totalPages: currentTotalPages },
@@ -63,6 +64,12 @@ export function FilmPagerContainer({
       const { films: newFilms, totalPages } = await onLoadFilms(menuItem, currentPage, isRefresh);
 
       const updatedFilms = isUpdate ? newFilms : Array.from(films).concat(newFilms);
+
+      const currentPagerItem = pagerItems.find(({ key: crKey }) => crKey === key);
+
+      if (currentPagerItem) {
+        currentPagerItem.pagination.currentPage = currentPage;
+      }
 
       onUpdateFilms(menuItemId, {
         films: updatedFilms,

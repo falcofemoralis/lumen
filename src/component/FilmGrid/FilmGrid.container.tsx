@@ -21,6 +21,7 @@ export function FilmGridContainer({
   films,
   pagination,
   onNextLoad,
+  onItemFocus,
 }: FilmGridContainerProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const updatingStateRef = useRef(false);
@@ -106,9 +107,18 @@ export function FilmGridContainer({
     loadNextPage((state) => setIsRefreshing(state), true);
   };
 
+  const handleItemFocus = (index: number) => {
+    if (onItemFocus) {
+      const numberOfColumns = ConfigStore.isTV ? NUMBER_OF_COLUMNS_TV : NUMBER_OF_COLUMNS;
+
+      onItemFocus(Math.floor(index / numberOfColumns));
+    }
+  };
+
   const containerFunctions = {
     handleOnPress,
     onScrollEnd,
+    handleItemFocus,
   };
 
   const containerProps = () => ({

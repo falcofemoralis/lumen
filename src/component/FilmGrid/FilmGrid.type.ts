@@ -9,6 +9,7 @@ export interface FilmGridContainerProps {
     isUpdate?: boolean, // flag to rewrite current data
     isRefresh?: boolean // flag to load new data from server
   ) => Promise<void>;
+  onItemFocus?: (row: number) => void;
 }
 
 export interface FilmGridComponentProps {
@@ -18,6 +19,7 @@ export interface FilmGridComponentProps {
   handleOnPress: (film: FilmCardInterface) => void;
   onScrollEnd: () => void;
   onRefresh?: () => void;
+  handleItemFocus: (index: number) => void;
 }
 
 export interface FilmGridRowProps {

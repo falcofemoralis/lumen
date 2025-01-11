@@ -102,8 +102,8 @@ export default function ThemedButton({
       onSelect={ onPress }
       onFocus={ onFocus }
     >
-      { ({ isFocused }) => (
-        renderButton(isFocused)
+      { ({ isFocused, isRootActive }) => (
+        renderButton(isFocused && isRootActive)
       ) }
     </SpatialNavigationFocusableView>
   );
