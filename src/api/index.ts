@@ -5,6 +5,8 @@ import { FilmStreamInterface } from 'Type/FilmStream.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { MenuItemInterface } from 'Type/MenuItem.interface';
+import { RecentItemInterface } from 'Type/RecentItem.interface';
+import { RecentListInterface } from 'Type/RecentList.interface';
 import { HTMLElementInterface } from 'Util/Parser';
 
 import { Variables } from '../util/Request/index';
@@ -63,11 +65,11 @@ export interface FilmApiInterface {
     page: number,
     params?: ApiParams
   ): Promise<FilmListInterface>;
-  getBookmarks(): Promise<BookmarkInterface[]>;
-  getFilmsFromBookmark(
+  getBookmarkedFilms(
     bookmark: BookmarkInterface,
     page: number,
   ): Promise<FilmListInterface>;
+
 }
 
 export interface PlayerApiInterface {
@@ -96,9 +98,18 @@ export interface AuthApiInterface {
   logout(): Promise<void>;
 }
 
+export interface AccountApiInterface {
+  getBookmarks(): Promise<BookmarkInterface[]>;
+  addBookmark(filmId: string): Promise<void>;
+  removeBookmark(filmId: string): Promise<void>;
+  getRecent(page: number, params?: ApiParams): Promise<RecentListInterface>;
+  removeRecent(filmId: string): Promise<void>;
+}
+
 export interface ApiInterface extends
   ConfigApiInterface,
   FilmApiInterface,
   MenuApiInterface,
   PlayerApiInterface,
-  AuthApiInterface {}
+  AuthApiInterface,
+  AccountApiInterface {}

@@ -89,7 +89,6 @@ export function FilmGridComponent({
     />
   ), [isRefreshing, onRefresh]);
 
-  // TODO replace with flashlist
   return (
     <FlatList
       data={ rows }

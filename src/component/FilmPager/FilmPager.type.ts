@@ -19,11 +19,7 @@ export interface FilmPagerComponentProps {
   pagerItems: PagerItemInterface[];
   selectedPagerItem: PagerItemInterface;
   isLoading: boolean;
-  onNextLoad: (
-    pagination: PaginationInterface,
-    isRefresh?: boolean,
-    isUpdate?: boolean
-  ) => Promise<void>;
+  onNextLoad: (isRefresh: boolean) => Promise<void>;
   handleMenuItemChange: (pagerItem: PagerItemInterface) => void;
 }
 
@@ -31,7 +27,7 @@ export interface PagerItemInterface {
   key: string;
   title: string;
   menuItem: MenuItemInterface;
-  films: FilmCardInterface[];
+  films: FilmCardInterface[] | null;
   pagination: PaginationInterface;
 }
 

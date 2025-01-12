@@ -19,7 +19,6 @@ import { FilmGridContainerProps, FilmGridItem } from './FilmGrid.type';
 
 export function FilmGridContainer({
   films,
-  pagination,
   onNextLoad,
   onItemFocus,
 }: FilmGridContainerProps) {
@@ -36,7 +35,7 @@ export function FilmGridContainer({
         title: '',
         subtitle: '',
         isThumbnail: true,
-      });
+      }) as FilmCardInterface[];
     }
 
     return films;
@@ -75,23 +74,15 @@ export function FilmGridContainer({
   }, []);
 
   const loadNextPage = async (onLoading: (state: boolean) => void, isRefresh = false) => {
-    const { currentPage, totalPages } = pagination;
-
-    const newPage = !isRefresh ? currentPage + 1 : 1;
-
     if (!updatingStateRef.current) {
+      console.log('loadNextPage');
+
       updatingStateRef.current = true;
+
       onLoading(true);
 
       try {
-        await onNextLoad(
-          {
-            totalPages,
-            currentPage: newPage,
-          },
-          isRefresh,
-          isRefresh,
-        );
+        await onNextLoad(isRefresh);
       } finally {
         updatingStateRef.current = false;
         onLoading(false);
@@ -100,6 +91,8 @@ export function FilmGridContainer({
   };
 
   const onScrollEnd = async () => {
+    console.log('onScrollEnd');
+
     loadNextPage(noopFn);
   };
 

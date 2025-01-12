@@ -14,7 +14,7 @@ export function SettingsScreen() {
 
   const login = async () => {
     try {
-      await ServiceStore.login(credsRef.current.username, credsRef.current.password);
+      await ServiceStore.login(credsRef.current.username.trim(), credsRef.current.password.trim());
 
       NotificationStore.displayMessage('Login successful!!!');
     } catch (e) {

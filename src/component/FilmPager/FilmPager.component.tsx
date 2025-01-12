@@ -24,7 +24,6 @@ export function FilmPagerComponent({
     return (
       <FilmGrid
         films={ films ?? [] }
-        pagination={ pagination }
         onNextLoad={ onNextLoad }
       />
     );

@@ -20,7 +20,7 @@ export const TABS_TV_CONFIG: Tab<string>[] = [
     },
   },
   {
-    route: 'recent',
+    route: '(recent)',
     title: 'Recent',
     icon: {
       name: 'history',
@@ -91,7 +91,7 @@ export const TABS_MOBILE_CONFIG: Tab<string>[] = [
     },
   },
   {
-    route: 'recent',
+    route: '(recent)',
     title: 'Recent',
     icon: {
       name: 'history',

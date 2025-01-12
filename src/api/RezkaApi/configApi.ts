@@ -113,6 +113,8 @@ const configApi: ConfigApiInterface = {
     variables: Variables = {},
     ignoreCache = false,
   ) {
+    console.log('fetchPage', query, variables, ignoreCache);
+
     const res = await this.getRequest(query, variables, ignoreCache);
 
     return parseHtml(res);

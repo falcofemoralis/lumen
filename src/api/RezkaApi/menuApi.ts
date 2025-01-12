@@ -19,26 +19,19 @@ const menuApi: MenuApiInterface = {
     {
       id: 'watching',
       title: 'Сейчас смотрят',
-      path: '/',
+      path: '/new',
       variables: { filter: 'watching' },
-    },
-    {
-      id: 'last',
-      title: 'Последние Поступления',
-      path: '/',
-      variables: { filter: 'last' },
     },
     {
       id: 'popular',
       title: 'Популярные',
-      path: '/',
+      path: '/new',
       variables: { filter: 'popular' },
     },
     {
       id: 'soon',
       title: 'В ожидании ',
-      path: '/',
-      variables: { filter: 'soon' },
+      path: '/announce',
     },
   ] as MenuItemInterface[],
 };

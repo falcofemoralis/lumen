@@ -128,8 +128,7 @@ export function FilmPagerComponent({
       <ThemedView style={ styles.gridWrapper }>
         <DefaultFocus>
           <FilmGrid
-            films={ films }
-            pagination={ pagination }
+            films={ films ?? [] }
             onNextLoad={ onNextLoad }
             onItemFocus={ (row: number) => {
               canNavigateMenuRef.current = false;

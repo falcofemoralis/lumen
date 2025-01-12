@@ -271,44 +271,12 @@ const filmApi: FilmApiInterface = {
   },
 
   /**
-   * Get bookmarks
-   * @returns Bookmark[]
-   */
-  async getBookmarks() {
-    const bookmarks: BookmarkInterface[] = [];
-
-    const root = await configApi.fetchPage(
-      '/favorites',
-      {},
-      true,
-    );
-
-    root.querySelectorAll('.b-favorites_content__cats_list_item').forEach((el) => {
-      const id = el.attributes['data-cat_id'];
-      const title = el.querySelector('.name')?.rawText;
-
-      if (id && title) {
-        bookmarks.push({
-          id,
-          title,
-        });
-      }
-    });
-
-    if (bookmarks.length > 0) {
-      bookmarks[0].filmList = parseFilmsListRoot(root);
-    }
-
-    return bookmarks;
-  },
-
-  /**
    * Get films from bookmark
    * @param bookmark
    * @param page
    * @returns
    */
-  async getFilmsFromBookmark(bookmark: BookmarkInterface, page: number) {
+  async getBookmarkedFilms(bookmark: BookmarkInterface, page: number) {
     const { id } = bookmark;
 
     const filmsList = await this.getFilms(page, `/favorites/${id}`, {}, {

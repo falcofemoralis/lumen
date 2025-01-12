@@ -8,8 +8,8 @@ import { BookmarkInterface } from 'Type/Bookmark.interface';
 import { FilmListInterface } from 'Type/FilmList.interface';
 import { MenuItemInterface } from 'Type/MenuItem.interface';
 
-import HomePageComponent from './BookmarksPage.component';
-import HomePageComponentTV from './BookmarksPage.component.atv';
+import BookmarksPageComponent from './BookmarksPage.component';
+import BookmarksPageComponentTV from './BookmarksPage.component.atv';
 
 export function BookmarksPageContainer() {
   const [isLoading, setIsLoading] = useState(true);
@@ -55,10 +55,14 @@ export function BookmarksPageContainer() {
     menuItem: MenuItemInterface,
     currentPage: number,
     _isRefresh: boolean,
-  ) => ServiceStore.getCurrentService().getFilmsFromBookmark({
-    id: menuItem.path,
-    title: menuItem.title,
-  }, currentPage);
+  ) => {
+    console.log(menuItem);
+
+    return ServiceStore.getCurrentService().getBookmarkedFilms({
+      id: menuItem.id,
+      title: menuItem.title,
+    }, currentPage);
+  };
 
   const onUpdateFilms = async (key: string, filmList: FilmListInterface) => {
     setFilmPager((prevFilmPager) => ({
@@ -88,7 +92,7 @@ export function BookmarksPageContainer() {
     menuItems: getMenuItems(),
   });
 
-  return withTV(HomePageComponentTV, HomePageComponent, {
+  return withTV(BookmarksPageComponentTV, BookmarksPageComponent, {
     ...containerFunctions,
     ...containerProps(),
   });

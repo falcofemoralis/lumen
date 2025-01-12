@@ -22,7 +22,7 @@ export function FilmPagerContainer({
       key: String(idx + 1),
       title: item.title,
       menuItem: item,
-      films: [],
+      films: null,
       pagination: {
         currentPage: 1,
         totalPages: 1,
@@ -42,8 +42,8 @@ export function FilmPagerContainer({
   const loadFilms = async (
     pagerItem: PagerItemInterface,
     pagination: PaginationInterface,
-    isUpdate = false,
-    isRefresh = false,
+    isUpdate = false, // replace current films with new ones
+    isRefresh = false, // fetch new films avoiding cache
   ) => {
     const {
       key,
@@ -63,10 +63,9 @@ export function FilmPagerContainer({
     try {
       const { films: newFilms, totalPages } = await onLoadFilms(menuItem, currentPage, isRefresh);
 
-      const updatedFilms = isUpdate ? newFilms : Array.from(films).concat(newFilms);
+      const updatedFilms = isUpdate ? newFilms : Array.from(films ?? []).concat(newFilms);
 
       const currentPagerItem = pagerItems.find(({ key: crKey }) => crKey === key);
-
       if (currentPagerItem) {
         currentPagerItem.pagination.currentPage = currentPage;
       }
@@ -82,19 +81,20 @@ export function FilmPagerContainer({
     }
   };
 
-  const getSelectedPagerItem = () => getPagerItems().find(
-    ({ key }) => key === selectedPageItemId,
-  ) ?? pagerItems[0];
+  const onNextLoad = async (isRefresh = false) => {
+    const { pagination } = getSelectedPagerItem();
 
-  const onNextLoad = async (
-    pagination: PaginationInterface,
-    isRefresh = false,
-    isUpdate = false,
-  ) => {
-    await loadFilms(getSelectedPagerItem(), pagination, isUpdate, isRefresh);
+    const newPage = {
+      ...pagination,
+      currentPage: !isRefresh ? pagination.currentPage + 1 : 1,
+    };
+
+    await loadFilms(getSelectedPagerItem(), newPage, isRefresh, isRefresh);
   };
 
   const handleMenuItemChange = (pagerItem: PagerItemInterface) => {
+    console.log('handleMenuItemChange', pagerItem.title);
+
     const { key } = pagerItem;
 
     if (key !== selectedPageItemId) {
@@ -105,7 +105,9 @@ export function FilmPagerContainer({
         if (ConfigStore.isTV) lock();
 
         setSelectedPageItemId(key);
-        await loadFilms(pagerItem, { currentPage: 1, totalPages: 1 }, true);
+        if (!pagerItem.films) {
+          await loadFilms(pagerItem, { currentPage: 1, totalPages: 1 }, true);
+        }
 
         if (ConfigStore.isTV) {
           setTimeout(() => {
@@ -140,6 +142,10 @@ export function FilmPagerContainer({
       },
     };
   });
+
+  const getSelectedPagerItem = () => getPagerItems().find(
+    ({ key }) => key === selectedPageItemId,
+  ) ?? pagerItems[0];
 
   const containerFunctions = {
     onNextLoad,
