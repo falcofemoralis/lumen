@@ -76,6 +76,8 @@ export function RecentPageContainer() {
   };
 
   const onScrollEnd = () => {
+    console.log('onScrollEnd ', updatingStateRef.current);
+
     loadRecent(noopFn, paginationRef.current.page + 1, false);
   };
 

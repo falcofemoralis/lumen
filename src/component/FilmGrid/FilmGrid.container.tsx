@@ -91,7 +91,7 @@ export function FilmGridContainer({
   };
 
   const onScrollEnd = async () => {
-    console.log('onScrollEnd');
+    console.log('onScrollEnd ', updatingStateRef.current);
 
     loadNextPage(noopFn);
   };

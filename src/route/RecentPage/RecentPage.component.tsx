@@ -1,14 +1,21 @@
 import { SCROLL_EVENT_END_PADDING, SCROLL_EVENT_UPDATES_MS } from 'Component/FilmGrid/FilmGrid.config';
-import Loader from 'Component/Loader';
 import Page from 'Component/Page';
-import ThemedButton from 'Component/ThemedButton/ThemedButton.component';
+import ThemedIcon from 'Component/ThemedIcon';
+import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
 import React, { memo, useCallback } from 'react';
 import {
-  FlatList, ListRenderItem, NativeScrollEvent, NativeSyntheticEvent, RefreshControl, View,
+  FlatList,
+  ListRenderItem,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  RefreshControl,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { RecentItemInterface } from 'Type/RecentItem.interface';
+import { scale } from 'Util/CreateStyles';
 import { noopFn } from 'Util/Function';
 import { isCloseToBottom } from 'Util/Scroll';
 
@@ -20,18 +27,51 @@ function FilmGridRow({
   handleOnPress,
   index,
 }: RecentGridRowProps) {
-  const { image, name } = item;
+  const {
+    image,
+    name,
+    date,
+    info,
+    additionalInfo,
+  } = item;
 
   return (
-    <View style={ styles.item }>
-      { /* <ThemedText>{ index }</ThemedText> */ }
-      <ThemedImage
-        style={ styles.poster }
-        src={ image }
-      />
-      <ThemedText>
-        { name }
-      </ThemedText>
+    <View style={ [styles.item, index !== 0 && styles.itemBorder] }>
+      <View style={ styles.itemContainer }>
+        <ThemedImage
+          style={ styles.poster }
+          src={ image }
+        />
+        <View style={ styles.itemContent }>
+          <ThemedText style={ styles.name }>
+            { name }
+          </ThemedText>
+          <ThemedText style={ styles.date }>
+            { date }
+          </ThemedText>
+          { info && (
+            <ThemedText style={ styles.info }>
+              { info }
+            </ThemedText>
+          ) }
+          { additionalInfo && (
+            <ThemedText style={ styles.additionalInfo }>
+              { additionalInfo }
+            </ThemedText>
+          ) }
+        </View>
+        <TouchableOpacity onPress={ () => handleOnPress(item) }>
+          <ThemedIcon
+            style={ styles.deleteButton }
+            icon={ {
+              name: 'delete',
+              pack: IconPackType.MaterialCommunityIcons,
+            } }
+            size={ scale(24) }
+            color="white"
+          />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }

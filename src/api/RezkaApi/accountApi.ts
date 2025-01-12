@@ -86,15 +86,17 @@ const accountApi: RezkaAccountApiInterface = {
     const recentItems = slicedItems.map((el) => {
       const date = el.querySelector('.date');
       const link = el.querySelector('.title a');
+      const info = el.querySelector('.info')?.childNodes[0]?.rawText;
+      const additionalInfo = el.querySelector('.new-episode')?.rawText;
 
       return {
         id: el.querySelector('.delete')?.attributes['data-id'] ?? '',
         link: link?.attributes.href ?? '',
         image: link?.attributes['data-cover_url'] ?? '',
-        date: date ? date.rawText.trim() : '',
-        name: el.querySelector('.title')?.rawText ?? '',
-        info: el.querySelector('.info')?.rawText,
-        additionalInfo: el.querySelector('.new-episode')?.rawText,
+        date: (date ? date.rawText : '').trim(),
+        name: (el.querySelector('.title')?.rawText ?? '').trim(),
+        info: info ? info.trim() : '',
+        additionalInfo: additionalInfo ? additionalInfo.trim() : '',
         isWatched: false,
       };
     });
