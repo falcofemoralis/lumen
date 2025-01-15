@@ -3,10 +3,10 @@ import { View } from 'react-native';
 import { Portal } from 'react-native-paper';
 
 import { SpatialNavigationOverlay } from './SpatialNavigationOverlay';
-import { styles } from './ThemedModal.style.atv';
-import { ThemedModalComponentProps } from './ThemedModal.type';
+import { styles } from './ThemedOverlay.style.atv';
+import { ThemedOverlayComponentProps } from './ThemedOverlay.type';
 
-export function ThemedModalComponent({
+export function ThemedOverlayComponent({
   onHide,
   style,
   containerStyle,
@@ -14,7 +14,7 @@ export function ThemedModalComponent({
   children,
   isOpened,
   isVisible,
-}: ThemedModalComponentProps) {
+}: ThemedOverlayComponentProps) {
   if (!isOpened) return null;
 
   return (
@@ -42,4 +42,4 @@ export function ThemedModalComponent({
   );
 }
 
-export default observer(ThemedModalComponent);
+export default observer(ThemedOverlayComponent);

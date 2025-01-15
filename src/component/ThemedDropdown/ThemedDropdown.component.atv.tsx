@@ -2,7 +2,7 @@ import ThemedButton from 'Component/ThemedButton';
 import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
-import ThemedModal from 'Component/ThemedModal';
+import ThemedOverlay from 'Component/ThemedOverlay';
 import React, { memo, useCallback, useRef } from 'react';
 import { Text, View } from 'react-native';
 import { DefaultFocus, SpatialNavigationFocusableView, SpatialNavigationScrollView } from 'react-tv-space-navigation';
@@ -120,14 +120,14 @@ export const ThemedDropdownComponent = ({
     }
 
     return (
-      <ThemedModal
+      <ThemedOverlay
         id={ id.current }
         onHide={ () => OverlayStore.goToPreviousOverlay() }
         containerStyle={ styles.container }
         contentContainerStyle={ styles.contentContainer }
       >
         { renderContent() }
-      </ThemedModal>
+      </ThemedOverlay>
     );
   };
 

@@ -1,6 +1,6 @@
 import Loader from 'Component/Loader';
 import ThemedDropdown from 'Component/ThemedDropdown';
-import ThemedModal from 'Component/ThemedModal';
+import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedText from 'Component/ThemedText';
 import React from 'react';
 import { ScrollView, View } from 'react-native';
@@ -113,7 +113,7 @@ export function PlayerVideoSelectorComponent({
   );
 
   return (
-    <ThemedModal
+    <ThemedOverlay
       id={ PLAYER_VIDEO_SELECTOR_OVERLAY_ID }
       onHide={ onHide }
       contentContainerStyle={ styles.container }
@@ -124,7 +124,7 @@ export function PlayerVideoSelectorComponent({
         { renderVoices() }
         { renderSeriesSelection() }
       </ScrollView>
-    </ThemedModal>
+    </ThemedOverlay>
   );
 }
 

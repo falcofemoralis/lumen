@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { withTV } from 'Hooks/withTV';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useRef, useState } from 'react';
@@ -86,7 +87,12 @@ export function RecentPageContainer() {
   };
 
   const handleOnPress = (item: RecentItemInterface) => {
-    console.log(item);
+    router.push({
+      pathname: '/[film]',
+      params: {
+        film: item.link,
+      },
+    });
   };
 
   const containerFunctions = {

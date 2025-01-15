@@ -43,7 +43,9 @@ export function NavigationBarComponent({
 
   const onTabSelect = (tab: Tab<string>, navigation: NavigationType, state: StateType) => {
     if (lastPage.current !== LOADER_PAGE) {
-      navigateTo({ ...tab, route: LOADER_PAGE }, navigation, state);
+      setTimeout(() => {
+        navigateTo({ ...tab, route: LOADER_PAGE }, navigation, state);
+      }, 0);
       lastPage.current = LOADER_PAGE;
     }
 

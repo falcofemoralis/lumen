@@ -1,6 +1,6 @@
 import { StyleProp, ViewStyle } from 'react-native';
 
-export interface ThemedModalContainerProps {
+export interface ThemedOverlayContainerProps {
   id: string;
   onHide: () => void;
   children: React.ReactNode;
@@ -9,7 +9,7 @@ export interface ThemedModalContainerProps {
   contentContainerStyle?: StyleProp<ViewStyle>;
 }
 
-export interface ThemedModalComponentProps {
+export interface ThemedOverlayComponentProps {
   isOpened: boolean;
   isVisible: boolean;
   onHide: () => void;

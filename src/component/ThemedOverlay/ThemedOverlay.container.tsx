@@ -3,14 +3,14 @@ import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 import OverlayStore from 'Store/Overlay.store';
 
-import ThemedModalComponent from './ThemedModal.component';
-import ThemedModalComponentTV from './ThemedModal.component.atv';
-import { ThemedModalContainerProps } from './ThemedModal.type';
+import ThemedOverlayComponent from './ThemedOverlay.component';
+import ThemedOverlayComponentTV from './ThemedOverlay.component.atv';
+import { ThemedOverlayContainerProps } from './ThemedOverlay.type';
 
-export function ThemedModalContainer({
+export function ThemedOverlayContainer({
   id,
   ...props
-}: ThemedModalContainerProps) {
+}: ThemedOverlayContainerProps) {
   const [isOpened, setIsOpened] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
@@ -25,9 +25,9 @@ export function ThemedModalContainer({
     isVisible,
   });
 
-  return withTV(ThemedModalComponentTV, ThemedModalComponent, {
+  return withTV(ThemedOverlayComponentTV, ThemedOverlayComponent, {
     ...containerProps(),
   });
 }
 
-export default observer(ThemedModalContainer);
+export default observer(ThemedOverlayContainer);

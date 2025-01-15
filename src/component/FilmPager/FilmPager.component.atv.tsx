@@ -3,7 +3,11 @@ import Loader from 'Component/Loader';
 import ThemedButton from 'Component/ThemedButton';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedView from 'Component/ThemedView';
-import { useEffect, useRef, useState } from 'react';
+import { useNavigation } from 'expo-router';
+import {
+  createContext,
+  useEffect, useRef, useState,
+} from 'react';
 import {
   DefaultFocus,
   SpatialNavigationRoot,
@@ -17,6 +21,8 @@ import { SupportedKeys } from 'Util/RemoteControl/SupportedKeys';
 import { styles } from './FilmPager.style.atv';
 import { FilmPagerComponentProps, PagerItemInterface } from './FilmPager.type';
 
+export const IsRootActiveContext = createContext<boolean>(true);
+
 export function FilmPagerComponent({
   pagerItems,
   selectedPagerItem,
@@ -24,6 +30,7 @@ export function FilmPagerComponent({
   onNextLoad,
   handleMenuItemChange,
 }: FilmPagerComponentProps) {
+  const { isFocused: isPageFocused } = useNavigation();
   const { lock, unlock } = useLockSpatialNavigation();
   const [isMenuActive, setIsMenuActive] = useState(false);
   const rowRef = useRef<number>(0);
@@ -32,7 +39,15 @@ export function FilmPagerComponent({
 
   useEffect(() => {
     const keyDownListener = (type: SupportedKeys) => {
-      if (type === SupportedKeys.Up && canNavigateMenuRef.current && rowRef.current === 0) {
+      if (!isPageFocused()) {
+        return false;
+      }
+
+      if (type === SupportedKeys.Up
+        && canNavigateMenuRef.current
+        && rowRef.current === 0
+        && !isMenuActive
+      ) {
         setIsMenuActive(true);
         lock();
 
@@ -131,8 +146,10 @@ export function FilmPagerComponent({
             films={ films ?? [] }
             onNextLoad={ onNextLoad }
             onItemFocus={ (row: number) => {
-              canNavigateMenuRef.current = false;
-              rowRef.current = row;
+              if (rowRef.current !== row) {
+                canNavigateMenuRef.current = false;
+                rowRef.current = row;
+              }
             } }
           />
         </DefaultFocus>

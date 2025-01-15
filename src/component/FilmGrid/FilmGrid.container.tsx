@@ -75,8 +75,6 @@ export function FilmGridContainer({
 
   const loadNextPage = async (onLoading: (state: boolean) => void, isRefresh = false) => {
     if (!updatingStateRef.current) {
-      console.log('loadNextPage');
-
       updatingStateRef.current = true;
 
       onLoading(true);
@@ -91,8 +89,6 @@ export function FilmGridContainer({
   };
 
   const onScrollEnd = async () => {
-    console.log('onScrollEnd ', updatingStateRef.current);
-
     loadNextPage(noopFn);
   };
 

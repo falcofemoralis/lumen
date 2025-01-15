@@ -93,8 +93,6 @@ export function FilmPagerContainer({
   };
 
   const handleMenuItemChange = (pagerItem: PagerItemInterface) => {
-    console.log('handleMenuItemChange', pagerItem.title);
-
     const { key } = pagerItem;
 
     if (key !== selectedPageItemId) {

@@ -20,12 +20,8 @@ export function BookmarksPageContainer() {
   const loadBookmarks = async () => {
     setIsLoading(true);
 
-    console.log('loadBookmarks');
-
     try {
       const items = await ServiceStore.getCurrentService().getBookmarks();
-
-      console.log('loadedBookmarks ', items.length);
 
       if (items.length > 0 && items[0].filmList) {
         const { id, filmList } = items[0];
@@ -55,14 +51,10 @@ export function BookmarksPageContainer() {
     menuItem: MenuItemInterface,
     currentPage: number,
     _isRefresh: boolean,
-  ) => {
-    console.log(menuItem);
-
-    return ServiceStore.getCurrentService().getBookmarkedFilms({
-      id: menuItem.id,
-      title: menuItem.title,
-    }, currentPage);
-  };
+  ) => ServiceStore.getCurrentService().getBookmarkedFilms({
+    id: menuItem.id,
+    title: menuItem.title,
+  }, currentPage);
 
   const onUpdateFilms = async (key: string, filmList: FilmListInterface) => {
     setFilmPager((prevFilmPager) => ({

@@ -1,7 +1,7 @@
 import Loader from 'Component/Loader';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedDropdown from 'Component/ThemedDropdown';
-import ThemedModal from 'Component/ThemedModal';
+import ThemedOverlay from 'Component/ThemedOverlay';
 import { DefaultFocus, SpatialNavigationScrollView, SpatialNavigationView } from 'react-tv-space-navigation';
 import { EpisodeInterface, SeasonInterface } from 'Type/FilmVoice.interface';
 
@@ -169,7 +169,7 @@ export function PlayerVideoSelectorComponent({
   );
 
   return (
-    <ThemedModal
+    <ThemedOverlay
       id={ PLAYER_VIDEO_SELECTOR_OVERLAY_ID }
       onHide={ onHide }
       contentContainerStyle={ seasons.length > 0 ? styles.container : undefined }
@@ -177,7 +177,7 @@ export function PlayerVideoSelectorComponent({
       { renderLoader() }
       { renderVoices() }
       { renderSeriesSelection() }
-    </ThemedModal>
+    </ThemedOverlay>
   );
 }
 
