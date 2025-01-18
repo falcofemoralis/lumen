@@ -124,7 +124,10 @@ export function FilmPageComponent({
     }
 
     return (
-      <View style={ styles.textContainer }>
+      <View
+        key={ text }
+        style={ styles.textContainer }
+      >
         { title && (
           <ThemedText style={ styles.textTitle }>
             { `${title}: ` }

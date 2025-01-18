@@ -41,10 +41,12 @@ export function PlayerVideoSelectorContainer({
   };
 
   const handleSelectVideo = (video: FilmVideoInterface, voice: FilmVoiceInterface) => {
-    ServiceStore.getCurrentService().saveWatch(film, voice)
-      .catch((error) => {
-        NotificationStore.displayError(error as Error);
-      });
+    if (ServiceStore.isSignedIn) {
+      ServiceStore.getCurrentService().saveWatch(film, voice)
+        .catch((error) => {
+          NotificationStore.displayError(error as Error);
+        });
+    }
 
     onSelect(video, voice);
   };

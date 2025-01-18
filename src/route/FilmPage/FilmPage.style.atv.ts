@@ -61,7 +61,9 @@ export const styles = CreateStyles({
     flexDirection: 'row',
   },
   textTitle: {
+    fontSize: 14,
     fontWeight: '700',
+    lineHeight: 20,
   },
   text: {
     fontSize: 14,

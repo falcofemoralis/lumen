@@ -20,7 +20,7 @@ const configApi: ConfigApiInterface = {
         <item>stream.voidboost.club</item>
         <item>stream.voidboost.cc</item>
 
-        https://prx2-cogent.ukrtelcdn.ne
+        https://prx2-cogent.ukrtelcdn.net
    */
   /**
    *

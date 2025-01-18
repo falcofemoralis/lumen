@@ -10,6 +10,7 @@ import OverlayStore from 'Store/Overlay.store';
 import ServiceStore from 'Store/Service.store';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { convertSecondsToTime } from 'Util/Date';
+import { playerStorage } from 'Util/Storage';
 
 import PlayerComponent from './Player.component';
 import PlayerComponentTV from './Player.component.atv';
@@ -21,46 +22,71 @@ import {
   DEFAULT_REWIND_SECONDS,
   QUALITY_OVERLAY_ID,
   RewindDirection,
+  SAVE_TIME_EVERY_MS,
+  SAVE_TIME_STORAGE_KEY,
 } from './Player.config';
 import { PlayerContainerProps, ProgressStatus } from './Player.type';
 
-export function PlayerContainer({
-  video,
-  film,
-  voice,
-}: PlayerContainerProps) {
-  const rewindTimeout = useRef<NodeJS.Timeout | null>(null);
+export function PlayerContainer({ video, film, voice }: PlayerContainerProps) {
   const [selectedVideo, setSelectedVideo] = useState<FilmVideoInterface>(video);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [progressStatus, setProgressStatus] = useState<ProgressStatus>(DEFAULT_PROGRESS_STATUS);
-  const [selectedQuality, setSelectedQuality] = useState<string>(selectedVideo.streams[0].quality);
+  const [progressStatus, setProgressStatus] = useState<ProgressStatus>(
+    DEFAULT_PROGRESS_STATUS,
+  );
+  const [selectedQuality, setSelectedQuality] = useState<string>(
+    selectedVideo.streams[0].quality,
+  );
+  const autoRewindTimeout = useRef<NodeJS.Timeout | null>(null);
   const autoRewindCount = useRef<number>(0);
   const autoRewindFactor = useRef<number>(1);
+  const updateTimeTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const player = useVideoPlayer(selectedVideo.streams[0].url, (p) => {
+    const loadTime = () => {
+      const { id: filmId } = film;
+      const { id: voiceId, lastEpisodeId, lastSeasonId } = voice;
+
+      const time = playerStorage.getInt(`${SAVE_TIME_STORAGE_KEY}-${filmId}-${voiceId}-${lastSeasonId}-${lastEpisodeId}`);
+
+      if (!time) {
+        return 0;
+      }
+
+      return time;
+    };
+
     p.loop = false;
     p.timeUpdateEventInterval = 1;
+    p.currentTime = loadTime();
     p.play();
   });
 
   useEffect(() => {
     activateKeepAwakeAsync(AWAKE_TAG);
+    createUpdateTimeTimeout();
 
     return () => {
       deactivateKeepAwake(AWAKE_TAG);
+      removeUpdateTimeTimeout();
     };
   }, []);
 
-  useEventListener(player, 'timeUpdate', ({ currentTime, bufferedPosition }) => {
-    const { duration, playing } = player;
+  useEventListener(
+    player,
+    'timeUpdate',
+    ({ currentTime, bufferedPosition }) => {
+      const { duration, playing } = player;
 
-    if (!playing) {
-      return;
-    }
+      if (!playing) {
+        return;
+      }
 
-    setProgressStatus(calculateProgress(currentTime, bufferedPosition, duration));
-  });
+      setProgressStatus(
+        calculateProgress(currentTime, bufferedPosition, duration),
+      );
+    },
+  );
 
   useEventListener(player, 'playingChange', ({ isPlaying: playing }) => {
     if (isPlaying !== playing) {
@@ -76,7 +102,25 @@ export function PlayerContainer({
     }
   });
 
-  const calculateProgress = (currentTime: number, bufferedPosition: number, duration: number) => ({
+  const changePlayerVideo = (newVideo: FilmVideoInterface) => {
+    if (ServiceStore.isSignedIn) {
+      ServiceStore.getCurrentService().saveWatch(film, voice)
+        .catch((error) => {
+          NotificationStore.displayError(error as Error);
+        });
+    }
+
+    setProgressStatus(DEFAULT_PROGRESS_STATUS);
+    setIsLoading(true);
+    setSelectedVideo(newVideo);
+    resetUpdateTimeTimeout();
+  };
+
+  const calculateProgress = (
+    currentTime: number,
+    bufferedPosition: number,
+    duration: number,
+  ) => ({
     progressPercentage: (currentTime / duration) * 100,
     playablePercentage: (bufferedPosition / duration) * 100,
     currentTime: convertSecondsToTime(currentTime),
@@ -89,6 +133,7 @@ export function PlayerContainer({
 
     if (playing) {
       player.pause();
+      updateTime();
     } else {
       player.play();
     }
@@ -106,7 +151,10 @@ export function PlayerContainer({
     player.currentTime = calculateCurrentTime(percent);
   };
 
-  const rewindPosition = async (type: RewindDirection, seconds = DEFAULT_REWIND_SECONDS) => {
+  const rewindPosition = async (
+    type: RewindDirection,
+    seconds = DEFAULT_REWIND_SECONDS,
+  ) => {
     const { currentTime, bufferedPosition, duration } = player;
 
     const seekTime = type === RewindDirection.Backward ? seconds * -1 : seconds;
@@ -117,17 +165,20 @@ export function PlayerContainer({
     player.seekBy(seekTime);
   };
 
-  const rewindPositionAuto = (direction: RewindDirection, seconds = DEFAULT_REWIND_SECONDS) => {
-    if (rewindTimeout.current) {
-      clearInterval(rewindTimeout.current);
-      rewindTimeout.current = null;
+  const rewindPositionAuto = (
+    direction: RewindDirection,
+    seconds = DEFAULT_REWIND_SECONDS,
+  ) => {
+    if (autoRewindTimeout.current) {
+      clearInterval(autoRewindTimeout.current);
+      autoRewindTimeout.current = null;
       autoRewindCount.current = 0;
       autoRewindFactor.current = 1;
 
       return;
     }
 
-    rewindTimeout.current = setInterval(() => {
+    autoRewindTimeout.current = setInterval(() => {
       autoRewindCount.current += 1;
 
       if (autoRewindCount.current >= DEFAULT_AUTO_REWIND_COUNT) {
@@ -178,7 +229,9 @@ export function PlayerContainer({
     const season = seasons[seasonIndex];
     const { episodes = [] } = season;
 
-    const episodeIndex = episodes.findIndex((e) => e.episodeId === lastEpisodeId);
+    const episodeIndex = episodes.findIndex(
+      (e) => e.episodeId === lastEpisodeId,
+    );
 
     if (episodeIndex === -1) {
       return;
@@ -206,10 +259,10 @@ export function PlayerContainer({
     } else {
       newEpisodeIndex += 1;
 
-      if (newEpisodeIndex > (episodes.length - 1)) {
+      if (newEpisodeIndex > episodes.length - 1) {
         newSeasonIndex += 1;
 
-        if (newSeasonIndex > (seasons.length - 1)) {
+        if (newSeasonIndex > seasons.length - 1) {
           return;
         }
 
@@ -220,25 +273,50 @@ export function PlayerContainer({
     const { seasonId } = seasons[newSeasonIndex];
     const { episodeId } = episodes[newEpisodeIndex];
 
-    const newVideo = await ServiceStore.getCurrentService()
-      .getFilmStreamsByEpisodeId(
-        film,
-        voice,
-        seasonId,
-        episodeId,
-      );
+    const newVideo = await ServiceStore.getCurrentService().getFilmStreamsByEpisodeId(
+      film,
+      voice,
+      seasonId,
+      episodeId,
+    );
 
     voice.lastSeasonId = seasonId;
     voice.lastEpisodeId = episodeId;
 
-    ServiceStore.getCurrentService().saveWatch(film, voice)
-      .catch((error) => {
-        NotificationStore.displayError(error as Error);
-      });
+    changePlayerVideo(newVideo);
+  };
 
-    setProgressStatus(DEFAULT_PROGRESS_STATUS);
-    setIsLoading(true);
-    setSelectedVideo(newVideo);
+  const createUpdateTimeTimeout = () => {
+    updateTimeTimeout.current = setInterval(() => {
+      const { playing } = player;
+
+      if (playing) {
+        updateTime();
+      }
+    }, SAVE_TIME_EVERY_MS);
+  };
+
+  const removeUpdateTimeTimeout = () => {
+    if (updateTimeTimeout.current) {
+      clearInterval(updateTimeTimeout.current);
+      updateTimeTimeout.current = null;
+    }
+  };
+
+  const resetUpdateTimeTimeout = () => {
+    removeUpdateTimeTimeout();
+    createUpdateTimeTimeout();
+  };
+
+  const updateTime = () => {
+    const { id: filmId } = film;
+    const { id: voiceId, lastEpisodeId, lastSeasonId } = voice;
+    const { currentTime } = player;
+
+    playerStorage.setIntAsync(
+      `${SAVE_TIME_STORAGE_KEY}-${filmId}-${voiceId}-${lastSeasonId}-${lastEpisodeId}`,
+      currentTime,
+    );
   };
 
   const containerProps = () => ({

@@ -47,8 +47,6 @@ export function RecentPageContainer() {
       onLoading(true);
 
       try {
-        console.log('Loading recent page: ', page);
-
         const {
           items: resItems,
           totalPages: resTotalPages,
@@ -56,8 +54,6 @@ export function RecentPageContainer() {
           page,
           { isRefresh },
         );
-
-        console.log('Recent page loaded: ', resItems.length);
 
         paginationRef.current = {
           page,
@@ -77,8 +73,6 @@ export function RecentPageContainer() {
   };
 
   const onScrollEnd = () => {
-    console.log('onScrollEnd ', updatingStateRef.current);
-
     loadRecent(noopFn, paginationRef.current.page + 1, false);
   };
 

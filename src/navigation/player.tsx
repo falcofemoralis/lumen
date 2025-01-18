@@ -5,7 +5,7 @@ import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 
-export default function FilmScreen() {
+export default function PlayerScreen() {
   const { video, film, voice } = RouterStore.popData('player') as {
     video: FilmVideoInterface;
     film: FilmInterface;
