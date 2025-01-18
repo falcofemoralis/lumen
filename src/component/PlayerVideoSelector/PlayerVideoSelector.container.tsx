@@ -2,6 +2,7 @@ import { withTV } from 'Hooks/withTV';
 import { useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
 import ServiceStore from 'Store/Service.store';
+import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { EpisodeInterface, FilmVoiceInterface, SeasonInterface } from 'Type/FilmVoice.interface';
 
 import PlayerVideoSelectorComponent from './PlayerVideoSelector.component';
@@ -39,6 +40,15 @@ export function PlayerVideoSelectorContainer({
     return episodes;
   };
 
+  const handleSelectVideo = (video: FilmVideoInterface, voice: FilmVoiceInterface) => {
+    ServiceStore.getCurrentService().saveWatch(film, voice)
+      .catch((error) => {
+        NotificationStore.displayError(error as Error);
+      });
+
+    onSelect(video, voice);
+  };
+
   const handleSelectVoice = async (voiceId: string) => {
     const { hasSeasons } = film;
     const voice = voices.find(({ id }) => id === voiceId);
@@ -53,10 +63,10 @@ export function PlayerVideoSelectorContainer({
       setIsLoading(true);
 
       try {
-        const currentService = ServiceStore.getCurrentService();
-        const video = await currentService.getFilmStreamsByVoice(film, selectedVoice);
+        const video = await ServiceStore.getCurrentService()
+          .getFilmStreamsByVoice(film, selectedVoice);
 
-        onSelect(video, voice);
+        handleSelectVideo(video, voice);
       } catch (error) {
         NotificationStore.displayError(error as Error);
       } finally {
@@ -95,14 +105,13 @@ export function PlayerVideoSelectorContainer({
     setIsLoading(true);
 
     try {
-      const currentService = ServiceStore.getCurrentService();
-
-      const video = await currentService.getFilmStreamsByEpisodeId(
-        film,
-        selectedVoice,
-        selectedSeasonId ?? '1',
-        episodeId,
-      );
+      const video = await ServiceStore.getCurrentService()
+        .getFilmStreamsByEpisodeId(
+          film,
+          selectedVoice,
+          selectedSeasonId ?? '1',
+          episodeId,
+        );
 
       const voice = {
         ...selectedVoice,
@@ -113,7 +122,7 @@ export function PlayerVideoSelectorContainer({
         voice.lastEpisodeId = episodeId;
       }
 
-      onSelect(video, voice);
+      handleSelectVideo(video, voice);
     } catch (error) {
       NotificationStore.displayError(error as Error);
     } finally {

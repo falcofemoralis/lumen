@@ -56,7 +56,10 @@ const filmApi: FilmApiInterface = {
    * @returns Film
    */
   async getFilm(link: string): Promise<FilmInterface | null> {
-    const root = await configApi.fetchPage(link);
+    /**
+     * We should ignore cache because player data can be changed
+     */
+    const root = await configApi.fetchPage(link, {}, true);
 
     // base data
     const id = root.querySelector('#user-favorites-holder')?.attributes['data-post_id'] ?? '';

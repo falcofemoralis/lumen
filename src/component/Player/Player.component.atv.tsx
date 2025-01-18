@@ -47,6 +47,7 @@ export function PlayerComponent({
   rewindPositionAuto,
   openQualitySelector,
   handleQualityChange,
+  handleNewEpisode,
 }: PlayerComponentProps) {
   const focusedElementRef = useRef<FocusedElement>(
     FocusedElement.ProgressThumb,
@@ -257,8 +258,8 @@ export function PlayerComponent({
       { renderAction('fast-forward', 'Forward') }
       { film.hasSeasons && (
         <>
-          { renderAction('skip-previous', 'Previous') }
-          { renderAction('skip-next', 'Next') }
+          { renderAction('skip-previous', 'Previous', () => handleNewEpisode(RewindDirection.Backward)) }
+          { renderAction('skip-next', 'Next', () => handleNewEpisode(RewindDirection.Forward)) }
         </>
       ) }
       { renderAction('speed', 'Speed') }

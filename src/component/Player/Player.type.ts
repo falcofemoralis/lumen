@@ -28,6 +28,7 @@ export interface PlayerComponentProps {
   calculateCurrentTime: (percent: number) => number;
   openQualitySelector: () => void;
   handleQualityChange: (item: DropdownItem) => void;
+  handleNewEpisode: (type: RewindDirection) => void;
 }
 
 export type ProgressStatus = {

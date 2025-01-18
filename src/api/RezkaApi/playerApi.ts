@@ -117,6 +117,28 @@ const playerApi: PlayerApiInterface = {
       ...parseSeasons(root),
     };
   },
+
+  async saveWatch(
+    film: FilmInterface,
+    voice: FilmVoiceInterface,
+  ): Promise<void> {
+    const { id: filmId } = film;
+    const { id: voiceId } = voice;
+
+    configApi.fetchJson<JSONResult>('/ajax/send_save', {
+      post_id: filmId,
+      translator_id: voiceId,
+      season: voice.lastSeasonId ?? '0',
+      episode: voice.lastEpisodeId ?? '0',
+      current_time: '1',
+    });
+
+    // res.success is always false for some reason ¯\_(ツ)_/¯
+
+    // if (!res.success) {
+    //   throw new Error(res.message);
+    // }
+  },
 };
 
 export default playerApi;

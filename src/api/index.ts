@@ -5,12 +5,10 @@ import { FilmStreamInterface } from 'Type/FilmStream.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { MenuItemInterface } from 'Type/MenuItem.interface';
-import { RecentItemInterface } from 'Type/RecentItem.interface';
 import { RecentListInterface } from 'Type/RecentList.interface';
 import { HTMLElementInterface } from 'Util/Parser';
 
 import { Variables } from '../util/Request/index';
-import { JSONResult } from './RezkaApi/utils';
 
 export enum ApiServiceType {
   rezka = 'rezka',
@@ -88,6 +86,10 @@ export interface PlayerApiInterface {
     film: FilmInterface,
     voice: FilmVoiceInterface
   ): Promise<FilmVoiceInterface>;
+  saveWatch(
+    film: FilmInterface,
+    voice: FilmVoiceInterface,
+  ): Promise<void>;
 }
 
 export interface MenuApiInterface {
