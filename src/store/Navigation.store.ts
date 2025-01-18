@@ -3,8 +3,6 @@ import { makeAutoObservable } from 'mobx';
 class NavigationStore {
   public isNavigationLocked = false;
 
-  public isNavigationOpened = false;
-
   constructor() {
     makeAutoObservable(this);
   }
@@ -15,14 +13,6 @@ class NavigationStore {
 
   unlockNavigation() {
     this.isNavigationLocked = false;
-  }
-
-  openNavigation() {
-    this.isNavigationOpened = true;
-  }
-
-  closeNavigation() {
-    this.isNavigationOpened = false;
   }
 }
 

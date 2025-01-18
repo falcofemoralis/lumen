@@ -1,5 +1,6 @@
 import FilmGrid from 'Component/FilmGrid';
 import Loader from 'Component/Loader';
+import { useMenuContext } from 'Component/NavigationBar/MenuContext';
 import ThemedButton from 'Component/ThemedButton';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedView from 'Component/ThemedView';
@@ -15,7 +16,6 @@ import {
   SpatialNavigationView,
   useLockSpatialNavigation,
 } from 'react-tv-space-navigation';
-import NavigationStore from 'Store/Navigation.store';
 import RemoteControlManager from 'Util/RemoteControl/RemoteControlManager';
 import { SupportedKeys } from 'Util/RemoteControl/SupportedKeys';
 
@@ -31,6 +31,7 @@ export function FilmPagerComponent({
   onNextLoad,
   handleMenuItemChange,
 }: FilmPagerComponentProps) {
+  const { isOpen: isMenuOpen } = useMenuContext();
   const { isFocused: isPageFocused } = useNavigation();
   const { lock, unlock } = useLockSpatialNavigation();
   const [isMenuActive, setIsMenuActive] = useState(false);
@@ -40,7 +41,7 @@ export function FilmPagerComponent({
 
   useEffect(() => {
     const keyDownListener = (type: SupportedKeys) => {
-      if (!isPageFocused() || NavigationStore.isNavigationOpened) {
+      if (!isPageFocused() || isMenuOpen) {
         return false;
       }
 

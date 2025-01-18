@@ -2,6 +2,7 @@ import {
   DarkTheme,
   ThemeProvider,
 } from '@react-navigation/native';
+import { MenuProvider } from 'Component/NavigationBar/MenuContext';
 import Constants from 'expo-constants';
 import * as NavigationBar from 'expo-navigation-bar';
 import { Stack } from 'expo-router';
@@ -82,7 +83,7 @@ export function RootLayout() {
       } }
     >
       <Stack.Screen
-        name="player" // player
+        name="player"
         options={ {
           contentStyle: {
             marginTop: 0,
@@ -93,7 +94,9 @@ export function RootLayout() {
   );
 
   const renderTVLayout = () => (
-    <SpatialNavigationDeviceTypeProvider>{ renderStack() }</SpatialNavigationDeviceTypeProvider>
+    <MenuProvider>
+      <SpatialNavigationDeviceTypeProvider>{ renderStack() }</SpatialNavigationDeviceTypeProvider>
+    </MenuProvider>
   );
 
   const renderMobileLayout = () => (

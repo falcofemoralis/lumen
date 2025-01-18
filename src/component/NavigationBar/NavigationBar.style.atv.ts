@@ -1,5 +1,3 @@
-import { useEffect } from 'react';
-import { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import Colors from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
@@ -92,35 +90,3 @@ export const styles = CreateStyles({
     color: Colors.black,
   },
 });
-
-export const OpeningAnimation = ({
-  isOpened,
-  children,
-}: {
-  isOpened: boolean;
-  children: (style: any) => React.ReactElement;
-}) => {
-  const duration = 350;
-  const opened = useSharedValue<boolean>(isOpened);
-
-  useEffect(() => {
-    opened.value = isOpened;
-  });
-
-  const animatedOpeningStyle = useAnimatedStyle(() => ({
-    width: withTiming(opened.value ? styles.tabsOpened.width : styles.tabs.width, {
-      duration,
-    }),
-  }));
-
-  const animatedTextStyle = useAnimatedStyle(() => ({
-    opacity: withTiming(opened.value ? styles.tabTextOpened.opacity : styles.tabText.opacity, {
-      duration,
-    }),
-  }));
-
-  return children({
-    animatedOpeningStyle,
-    animatedTextStyle,
-  });
-};

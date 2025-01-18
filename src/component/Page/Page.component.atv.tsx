@@ -1,7 +1,8 @@
 import { useIsFocused } from '@react-navigation/native';
+import { useMenuContext } from 'Component/NavigationBar/MenuContext';
 import ThemedView from 'Component/ThemedView';
 import { observer } from 'mobx-react-lite';
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { Keyboard } from 'react-native';
 import { Portal } from 'react-native-paper';
 import { Directions, SpatialNavigationRoot, useLockSpatialNavigation } from 'react-tv-space-navigation';
@@ -35,22 +36,23 @@ const SpatialNavigationKeyboardLocker = () => {
   return null;
 };
 
-const onDirectionHandledWithoutMovement = (movement: string) => {
-  if (movement === Directions.LEFT && !NavigationStore.isNavigationLocked) {
-    NavigationStore.openNavigation();
-  }
-};
-
 export function PageComponent({
   children,
   style,
-  // testID,
 }: PageComponentProps) {
   const isFocused = useIsFocused();
+  const { isOpen: isMenuOpen, toggleMenu } = useMenuContext();
 
-  // console.log('isFocused for ', testID, isFocused);
+  const isActive = isFocused && !isMenuOpen;
 
-  const isActive = isFocused && !NavigationStore.isNavigationOpened;
+  const onDirectionHandledWithoutMovement = useCallback(
+    (movement: string) => {
+      if (movement === Directions.LEFT && !NavigationStore.isNavigationLocked) {
+        toggleMenu(true);
+      }
+    },
+    [toggleMenu, NavigationStore.isNavigationLocked],
+  );
 
   return (
     <ThemedView

@@ -4,11 +4,9 @@ import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Tabs } from 'expo-router';
-import { observer } from 'mobx-react-lite';
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import {
-  StyleProp,
-  TextStyle,
+  Animated,
   View,
 } from 'react-native';
 import {
@@ -18,30 +16,53 @@ import {
   SpatialNavigationRoot,
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
-import NavigationStore from 'Store/Navigation.store';
 import Colors from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 
+import { useMenuContext } from './MenuContext';
 import { LOADER_PAGE, TABS_TV_CONFIG } from './NavigationBar.config';
-import { OpeningAnimation, styles } from './NavigationBar.style.atv';
+import { styles } from './NavigationBar.style.atv';
 import {
-  NavigationBarComponentProps, NavigationType, StateType, Tab,
+  NavigationBarComponentProps,
+  NavigationType,
+  StateType,
+  Tab,
 } from './NavigationBar.type';
 
 export function NavigationBarComponent({
   navigateTo,
   isFocused,
 }: NavigationBarComponentProps) {
+  const { isOpen: isMenuOpen, toggleMenu } = useMenuContext();
+
   const lastPage = useRef<string | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const animatedWidth = useRef(
+    new Animated.Value(isMenuOpen ? styles.tabsOpened.width : styles.tabs.width),
+  ).current;
 
-  const onDirectionHandledWithoutMovement = useCallback((movement: string) => {
-    if (movement === Directions.RIGHT) {
-      NavigationStore.closeNavigation();
-    }
-  }, []);
+  const onDirectionHandledWithoutMovement = useCallback(
+    (movement: string) => {
+      if (movement === Directions.RIGHT) {
+        toggleMenu(false);
+      }
+    },
+    [toggleMenu],
+  );
 
-  const onTabSelect = (tab: Tab<string>, navigation: NavigationType, state: StateType) => {
+  useEffect(() => {
+    Animated.timing(animatedWidth, {
+      toValue: isMenuOpen ? styles.tabsOpened.width : styles.tabs.width,
+      duration: 350,
+      useNativeDriver: false,
+    }).start();
+  }, [animatedWidth, isMenuOpen]);
+
+  const onTabSelect = useCallback((
+    tab: Tab<string>,
+    navigation: NavigationType,
+    state: StateType,
+  ) => {
     if (lastPage.current !== LOADER_PAGE) {
       setTimeout(() => {
         navigateTo({ ...tab, route: LOADER_PAGE }, navigation, state);
@@ -57,13 +78,12 @@ export function NavigationBarComponent({
       navigateTo(tab, navigation, state);
       lastPage.current = tab.route;
     }, 500);
-  };
+  }, [navigateTo]);
 
   const renderTab = useCallback((
     tab: Tab<string>,
     navigation: NavigationType,
     state: StateType,
-    animatedTextStyle: StyleProp<TextStyle>,
   ) => {
     const { title, icon } = tab;
     const focused = isFocused(tab, state);
@@ -96,7 +116,7 @@ export function NavigationBarComponent({
               style={ [
                 styles.tabText,
                 isf && isRootActive && styles.tabContentFocused,
-                animatedTextStyle,
+                isMenuOpen && styles.tabTextOpened,
               ] }
             >
               { title }
@@ -105,21 +125,17 @@ export function NavigationBarComponent({
         ) }
       </SpatialNavigationFocusableView>
     );
-  }, [navigateTo, isFocused]);
+  }, [onTabSelect, isFocused, isMenuOpen]);
 
   const renderTabs = useCallback((navigation: NavigationType, state: StateType) => (
-    <OpeningAnimation isOpened={ NavigationStore.isNavigationOpened }>
-      { ({ animatedOpeningStyle, animatedTextStyle }) => (
-        <ThemedView.Animated style={ [styles.tabs, animatedOpeningStyle] }>
-          { TABS_TV_CONFIG.map((tab) => renderTab(tab, navigation, state, animatedTextStyle)) }
-        </ThemedView.Animated>
-      ) }
-    </OpeningAnimation>
-  ), [renderTab]);
+    <Animated.View style={ [styles.tabs, { width: animatedWidth }] }>
+      { TABS_TV_CONFIG.map((tab) => renderTab(tab, navigation, state)) }
+    </Animated.View>
+  ), [renderTab, animatedWidth]);
 
   const renderTabBar = useCallback(({ navigation, state }: BottomTabBarProps) => (
     <SpatialNavigationRoot
-      isActive={ NavigationStore.isNavigationOpened }
+      isActive={ isMenuOpen }
       onDirectionHandledWithoutMovement={ onDirectionHandledWithoutMovement }
     >
       <ThemedView style={ styles.bar }>
@@ -131,7 +147,7 @@ export function NavigationBarComponent({
         <LinearGradient
           style={ [
             styles.barBackground,
-            NavigationStore.isNavigationOpened && styles.barBackgroundOpened,
+            isMenuOpen && styles.barBackgroundOpened,
           ] }
           colors={ ['rgba(0, 0, 0, 0.8)', 'transparent'] }
           start={ { x: 0.5, y: 0 } }
@@ -139,7 +155,7 @@ export function NavigationBarComponent({
         />
       </ThemedView>
     </SpatialNavigationRoot>
-  ), [renderTabs, onDirectionHandledWithoutMovement, NavigationStore.isNavigationOpened]);
+  ), [renderTabs, onDirectionHandledWithoutMovement, isMenuOpen]);
 
   return (
     <Tabs
@@ -159,4 +175,4 @@ export function NavigationBarComponent({
   );
 }
 
-export default observer(NavigationBarComponent);
+export default NavigationBarComponent;
