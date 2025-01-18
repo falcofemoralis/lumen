@@ -7,6 +7,7 @@ export interface RecentPageComponentProps {
   onScrollEnd: () => void;
   onRefresh?: () => void;
   isRefreshing?: boolean;
+  removeItem: (item: RecentItemInterface) => void;
 }
 
 export type RecentGridItem = RecentItemInterface & {
@@ -17,4 +18,5 @@ export interface RecentGridRowProps {
   item: RecentGridItem;
   handleOnPress: (item: RecentItemInterface) => void;
   index: number;
+  removeItem: (item: RecentItemInterface) => void;
 }

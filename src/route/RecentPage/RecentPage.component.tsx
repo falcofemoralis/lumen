@@ -10,6 +10,7 @@ import {
   ListRenderItem,
   NativeScrollEvent,
   NativeSyntheticEvent,
+  Pressable,
   RefreshControl,
   TouchableOpacity,
   View,
@@ -26,6 +27,7 @@ function FilmGridRow({
   item,
   handleOnPress,
   index,
+  removeItem,
 }: RecentGridRowProps) {
   const {
     image,
@@ -36,43 +38,45 @@ function FilmGridRow({
   } = item;
 
   return (
-    <View style={ [styles.item, index !== 0 && styles.itemBorder] }>
-      <View style={ styles.itemContainer }>
-        <ThemedImage
-          style={ styles.poster }
-          src={ image }
-        />
-        <View style={ styles.itemContent }>
-          <ThemedText style={ styles.name }>
-            { name }
-          </ThemedText>
-          <ThemedText style={ styles.date }>
-            { date }
-          </ThemedText>
-          { info && (
-            <ThemedText style={ styles.info }>
-              { info }
-            </ThemedText>
-          ) }
-          { additionalInfo && (
-            <ThemedText style={ styles.additionalInfo }>
-              { additionalInfo }
-            </ThemedText>
-          ) }
-        </View>
-        <TouchableOpacity onPress={ () => handleOnPress(item) }>
-          <ThemedIcon
-            style={ styles.deleteButton }
-            icon={ {
-              name: 'delete',
-              pack: IconPackType.MaterialCommunityIcons,
-            } }
-            size={ scale(24) }
-            color="white"
+    <Pressable onPress={ () => removeItem(item) }>
+      <View style={ [styles.item, index !== 0 && styles.itemBorder] }>
+        <View style={ styles.itemContainer }>
+          <ThemedImage
+            style={ styles.poster }
+            src={ image }
           />
-        </TouchableOpacity>
+          <View style={ styles.itemContent }>
+            <ThemedText style={ styles.name }>
+              { name }
+            </ThemedText>
+            <ThemedText style={ styles.date }>
+              { date }
+            </ThemedText>
+            { info && (
+              <ThemedText style={ styles.info }>
+                { info }
+              </ThemedText>
+            ) }
+            { additionalInfo && (
+              <ThemedText style={ styles.additionalInfo }>
+                { additionalInfo }
+              </ThemedText>
+            ) }
+          </View>
+          <TouchableOpacity onPress={ () => handleOnPress(item) }>
+            <ThemedIcon
+              style={ styles.deleteButton }
+              icon={ {
+                name: 'delete',
+                pack: IconPackType.MaterialCommunityIcons,
+              } }
+              size={ scale(24) }
+              color="white"
+            />
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </Pressable>
   );
 }
 
@@ -88,6 +92,7 @@ export function RecentPageComponent({
   handleOnPress,
   onScrollEnd,
   onRefresh = noopFn,
+  removeItem,
   isRefreshing = false,
 }: RecentPageComponentProps) {
   const onScroll = useCallback(
@@ -112,6 +117,7 @@ export function RecentPageComponent({
         item={ item }
         handleOnPress={ handleOnPress }
         index={ index }
+        removeItem={ removeItem }
       />
     ),
     [handleOnPress],

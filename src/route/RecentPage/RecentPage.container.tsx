@@ -95,10 +95,25 @@ export function RecentPageContainer() {
     });
   };
 
+  const removeItem = async (item: RecentItemInterface) => {
+    const { id } = item;
+
+    try {
+      const newItems = items.filter((i) => i.id !== id);
+
+      setItems(newItems);
+
+      await ServiceStore.getCurrentService().removeRecent(id);
+    } catch (error) {
+      NotificationStore.displayError(error as Error);
+    }
+  };
+
   const containerFunctions = {
     onScrollEnd,
     onRefresh,
     handleOnPress,
+    removeItem,
   };
 
   const containerProps = () => ({

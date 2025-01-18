@@ -3,7 +3,7 @@ import { HTMLElementInterface } from 'Util/Parser';
 
 import { AccountApiInterface, ApiParams } from '..';
 import configApi from './configApi';
-import { parseFilmsListRoot } from './utils';
+import { JSONResult, parseFilmsListRoot } from './utils';
 
 type RezkaAccountApiInterface = AccountApiInterface & {
   recentItems: HTMLElementInterface[] | null;
@@ -112,7 +112,13 @@ const accountApi: RezkaAccountApiInterface = {
   * @param filmId string
   */
   async removeRecent(filmId: string) {
-    // Implementation for removing a watch later item
+    const data = await configApi.fetchJson<JSONResult>('/engine/ajax/cdn_saves_remove.php', { id: filmId });
+
+    if (!data.success) {
+      throw new Error(data.message);
+    }
+
+    return true;
   },
 };
 

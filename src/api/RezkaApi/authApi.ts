@@ -18,6 +18,7 @@ const authApi: AuthApiInterface = {
 
     return 'authorized';
   },
+
   async logout() {
     cookiesManager.reset();
   },

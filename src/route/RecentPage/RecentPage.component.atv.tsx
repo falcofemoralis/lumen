@@ -18,6 +18,7 @@ export function RecentPageComponent({
   items,
   onScrollEnd,
   handleOnPress,
+  removeItem,
 }: RecentPageComponentProps) {
   const containerWidth = getWindowWidth() - scale(ROW_GAP * 2);
 
@@ -33,7 +34,7 @@ export function RecentPageComponent({
     return (
       <SpatialNavigationFocusableView
         onSelect={ () => handleOnPress(item) }
-        onLongSelect={ () => console.log('remove') }
+        onLongSelect={ () => removeItem(item) }
       >
         { ({ isFocused }) => {
           const scaleAnimation = useFocusAnimation(isFocused);

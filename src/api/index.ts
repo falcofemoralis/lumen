@@ -10,6 +10,7 @@ import { RecentListInterface } from 'Type/RecentList.interface';
 import { HTMLElementInterface } from 'Util/Parser';
 
 import { Variables } from '../util/Request/index';
+import { JSONResult } from './RezkaApi/utils';
 
 export enum ApiServiceType {
   rezka = 'rezka',
@@ -103,7 +104,7 @@ export interface AccountApiInterface {
   addBookmark(filmId: string): Promise<void>;
   removeBookmark(filmId: string): Promise<void>;
   getRecent(page: number, params?: ApiParams): Promise<RecentListInterface>;
-  removeRecent(filmId: string): Promise<void>;
+  removeRecent(filmId: string): Promise<boolean>;
 }
 
 export interface ApiInterface extends
