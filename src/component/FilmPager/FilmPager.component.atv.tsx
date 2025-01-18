@@ -15,6 +15,7 @@ import {
   SpatialNavigationView,
   useLockSpatialNavigation,
 } from 'react-tv-space-navigation';
+import NavigationStore from 'Store/Navigation.store';
 import RemoteControlManager from 'Util/RemoteControl/RemoteControlManager';
 import { SupportedKeys } from 'Util/RemoteControl/SupportedKeys';
 
@@ -39,7 +40,7 @@ export function FilmPagerComponent({
 
   useEffect(() => {
     const keyDownListener = (type: SupportedKeys) => {
-      if (!isPageFocused()) {
+      if (!isPageFocused() || NavigationStore.isNavigationOpened) {
         return false;
       }
 
