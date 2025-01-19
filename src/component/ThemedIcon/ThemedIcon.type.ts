@@ -16,4 +16,5 @@ export enum IconPackType {
   MaterialCommunityIcons = 'MaterialCommunityIcons',
   MaterialIcons = 'MaterialIcons',
   Octicons = 'Octicons',
+  Ionicons = 'Ionicons',
 }

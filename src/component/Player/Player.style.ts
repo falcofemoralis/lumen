@@ -18,11 +18,12 @@ export const styles = CreateStyles({
     width: '100%',
     left: 0,
     top: 0,
-    zIndex: 10,
+    zIndex: 55,
   },
   controls: {
     height: '100%',
     width: '100%',
+    backgroundColor: Colors.modal,
   },
   topActions: {
     position: 'absolute',
@@ -31,7 +32,6 @@ export const styles = CreateStyles({
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
     padding: 16,
   },
   middleActions: {
@@ -65,6 +65,15 @@ export const styles = CreateStyles({
   },
   actionsRow: {
     flexDirection: 'row',
-    gap: 20,
+    gap: 28,
   },
+  topInfo: {
+    flexDirection: 'column',
+    gap: 4,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  subtitle: {},
 });

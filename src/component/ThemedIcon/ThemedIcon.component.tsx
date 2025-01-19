@@ -1,4 +1,5 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Octicons from '@expo/vector-icons/Octicons';
 
@@ -39,6 +40,16 @@ export function ThemedIconComponent({
     case IconPackType.Octicons:
       return (
         <Octicons
+          style={ style }
+          // @ts-ignore
+          name={ name }
+          size={ size }
+          color={ color }
+        />
+      );
+    case IconPackType.Ionicons:
+      return (
+        <Ionicons
           style={ style }
           // @ts-ignore
           name={ name }

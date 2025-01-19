@@ -69,8 +69,6 @@ export const executeGet = async (
   signal?: AbortSignal,
 ): Promise<string> => {
   const uri = formatURI(query, variables, endpoint);
-  console.log(uri);
-
   const uriHash = hash(uri).toString();
 
   try {

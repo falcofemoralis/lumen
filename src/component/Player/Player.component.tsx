@@ -9,7 +9,7 @@ import { OrientationLock } from 'expo-screen-orientation';
 import { StatusBar } from 'expo-status-bar';
 import { VideoView } from 'expo-video';
 import React, { useEffect, useRef, useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { Pressable, TouchableOpacity, View } from 'react-native';
 import { Slider } from 'react-native-awesome-slider';
 import { useSharedValue } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -17,17 +17,24 @@ import Colors from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 import { convertSecondsToTime } from 'Util/Date';
 
+import { RewindDirection } from './Player.config';
 import { styles } from './Player.style';
 import { PlayerComponentProps } from './Player.type';
 
 export function PlayerComponent({
   player,
-  status,
+  isLoading,
+  isPlaying,
+  progressStatus,
+  video,
   film,
+  voice,
+  selectedQuality,
   togglePlayPause,
   rewindPosition,
   seekToPosition,
   calculateCurrentTime,
+  handleNewEpisode,
 }: PlayerComponentProps) {
   const [showControls, setShowControls] = useState(false);
   const progress = useSharedValue(0);
@@ -47,7 +54,7 @@ export function PlayerComponent({
   }, []);
 
   useEffect(() => {
-    const { progressPercentage, playablePercentage } = status;
+    const { progressPercentage, playablePercentage } = progressStatus;
 
     if (isSliding.current) {
       return;
@@ -55,96 +62,121 @@ export function PlayerComponent({
 
     progress.value = progressPercentage;
     cache.value = playablePercentage;
-  }, [status]);
+  }, [progressStatus]);
 
   const renderAction = (
     icon: string,
     _name: string,
     action?: () => void,
   ) => (
-    <Pressable onPress={ action }>
+    <TouchableOpacity onPress={ action }>
       <ThemedIcon
         icon={ {
           name: icon,
-          pack: IconPackType.MaterialIcons,
+          pack: IconPackType.MaterialCommunityIcons,
         } }
-        size={ scale(36) }
+        size={ scale(28) }
         color="white"
       />
-    </Pressable>
+    </TouchableOpacity>
   );
 
-  const renderTopInfo = () => {
-    const { title } = film;
+  const renderTitle = () => {
+    const { title, hasSeasons } = film;
 
     return (
-      <ThemedText>
-        { title }
+      <ThemedText style={ styles.title }>
+        {
+          `${title}${hasSeasons ? ` Сезон ${voice.lastSeasonId} - Эпизод ${voice.lastEpisodeId}` : ''}`
+        }
       </ThemedText>
     );
   };
+
+  const renderSubtitle = () => {
+    const { releaseDate, countries, ratings } = film;
+
+    return (
+      <ThemedText style={ styles.subtitle }>
+        {
+          `${releaseDate} • ${ratings ? ratings[0].text : ''} • ${countries ? countries[0] : ''}`
+        }
+      </ThemedText>
+    );
+  };
+
+  const renderTopInfo = () => (
+    <View style={ styles.topInfo }>
+      { renderTitle() }
+      { renderSubtitle() }
+    </View>
+  );
 
   const renderTopActions = () => (
     <View style={ styles.topActions }>
       { renderTopInfo() }
       <View style={ styles.actionsRow }>
-        { renderAction('speed', 'Speed') }
-        { renderAction('comment', 'Comments') }
+        { renderAction('play-speed', 'Speed') }
+        { renderAction('quality-high', 'Quality') }
+        { renderAction(true ? 'closed-caption-outline' : 'closed-caption', 'Subtitles') }
+        { renderAction('lock-open-outline', 'Lock') }
       </View>
     </View>
   );
 
-  const renderMiddleControls = () => {
-    const { isPlaying } = status;
-
-    return (
-      <View style={ styles.middleActions }>
-        <Pressable
+  const renderMiddleControls = () => (
+    <View style={ styles.middleActions }>
+      { film.hasSeasons && (
+        <TouchableOpacity
           style={ styles.control }
+          onPress={ () => handleNewEpisode(RewindDirection.Backward) }
         >
           <ThemedIcon
             style={ styles.controlIcon }
             icon={ {
-              name: 'skip-backward',
-              pack: IconPackType.MaterialCommunityIcons,
+              name: 'skip-previous',
+              pack: IconPackType.MaterialIcons,
             } }
             size={ scale(24) }
             color="white"
           />
-        </Pressable>
-        <Pressable
+        </TouchableOpacity>
+      ) }
+      <TouchableOpacity
+        style={ styles.control }
+        onPress={ togglePlayPause }
+      >
+        <ThemedIcon
+          style={ styles.controlIcon }
+          icon={ {
+            name: isPlaying ? 'pause' : 'play',
+            pack: IconPackType.MaterialCommunityIcons,
+          } }
+          size={ scale(36) }
+          color="white"
+        />
+      </TouchableOpacity>
+      { film.hasSeasons && (
+        <TouchableOpacity
           style={ styles.control }
-          onPress={ togglePlayPause }
+          onPress={ () => handleNewEpisode(RewindDirection.Forward) }
         >
           <ThemedIcon
             style={ styles.controlIcon }
             icon={ {
-              name: isPlaying ? 'pause' : 'play',
-              pack: IconPackType.MaterialCommunityIcons,
-            } }
-            size={ scale(36) }
-            color="white"
-          />
-        </Pressable>
-        <Pressable
-          style={ styles.control }
-        >
-          <ThemedIcon
-            style={ styles.controlIcon }
-            icon={ {
-              name: 'skip-forward',
-              pack: IconPackType.MaterialCommunityIcons,
+              name: 'skip-next',
+              pack: IconPackType.MaterialIcons,
             } }
             size={ scale(24) }
             color="white"
           />
-        </Pressable>
-      </View>
-    );
-  };
+        </TouchableOpacity>
+      ) }
+    </View>
+  );
 
   const renderDuration = () => {
-    const { currentTime, durationTime, remainingTime } = status;
+    const { currentTime, durationTime, remainingTime } = progressStatus;
 
     return (
       <ThemedText>
@@ -187,11 +219,12 @@ export function PlayerComponent({
         { renderProgressBar() }
       </View>
       <View style={ styles.actionsRow }>
-        { renderAction('high-quality', 'Quality') }
-        { renderAction('playlist-play', 'Series') }
-        { renderAction('subtitles', 'Subtitles') }
-        { renderAction('bookmarks', 'Bookmarks') }
-        { renderAction('share', 'Share') }
+        { film.hasSeasons && (
+          renderAction('playlist-play', 'Series')
+        ) }
+        { renderAction('comment-text-outline', 'Comments') }
+        { renderAction('bookmark-outline', 'Bookmarks') }
+        { renderAction('share-outline', 'Share') }
       </View>
     </View>
   );
@@ -212,7 +245,7 @@ export function PlayerComponent({
 
   const renderLoader = () => (
     <Loader
-      isLoading={ status.isLoading }
+      isLoading={ isLoading }
       fullScreen
     />
   );

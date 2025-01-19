@@ -11,7 +11,7 @@ export const styles = CreateStyles({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 9999,
+    zIndex: 50,
     backgroundColor: Colors.transparent,
   },
 });

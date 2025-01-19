@@ -3,9 +3,7 @@ import Player from 'Component/Player';
 import { useEffect } from 'react';
 import ConfigStore from 'Store/Config.store';
 import NavigationStore from 'Store/Navigation.store';
-import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 
-import { DEMO_VIDEO } from './PlayerPage.config';
 import { PlayerPageComponentProps } from './PlayerPage.type';
 
 export function PlayerPageComponent({ video, film, voice }: PlayerPageComponentProps) {
