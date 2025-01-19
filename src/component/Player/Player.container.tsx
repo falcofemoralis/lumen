@@ -97,6 +97,8 @@ export function PlayerContainer({ video, film, voice }: PlayerContainerProps) {
   useEventListener(player, 'statusChange', ({ status: playerStatus }) => {
     const loading = playerStatus === 'loading';
 
+    console.log(playerStatus);
+
     if (isLoading !== loading) {
       setIsLoading(loading);
     }

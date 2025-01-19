@@ -39,5 +39,10 @@ export const styles = CreateStyles({
   },
   listItemSelected: {
     backgroundColor: Colors.primary,
+    borderRadius: 16,
+  },
+  container: {
+    maxHeight: 300,
+    padding: 8,
   },
 });

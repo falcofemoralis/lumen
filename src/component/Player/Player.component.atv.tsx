@@ -371,6 +371,13 @@ export function PlayerComponent({
     );
   };
 
+  const renderLoader = () => (
+    <Loader
+      isLoading={ isLoading }
+      fullScreen
+    />
+  );
+
   const renderQualitySelector = () => {
     const { streams } = video;
 
@@ -388,13 +395,6 @@ export function PlayerComponent({
       />
     );
   };
-
-  const renderLoader = () => (
-    <Loader
-      isLoading={ isLoading }
-      fullScreen
-    />
-  );
 
   const renderModals = () => renderQualitySelector();
 

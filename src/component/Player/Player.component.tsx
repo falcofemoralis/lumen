@@ -1,4 +1,5 @@
 import Loader from 'Component/Loader';
+import ThemedDropdown from 'Component/ThemedDropdown';
 import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedText from 'Component/ThemedText';
@@ -17,7 +18,7 @@ import Colors from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 import { convertSecondsToTime } from 'Util/Date';
 
-import { RewindDirection } from './Player.config';
+import { QUALITY_OVERLAY_ID, RewindDirection } from './Player.config';
 import { styles } from './Player.style';
 import { PlayerComponentProps } from './Player.type';
 
@@ -31,10 +32,11 @@ export function PlayerComponent({
   voice,
   selectedQuality,
   togglePlayPause,
-  rewindPosition,
   seekToPosition,
   calculateCurrentTime,
   handleNewEpisode,
+  handleQualityChange,
+  openQualitySelector,
 }: PlayerComponentProps) {
   const [showControls, setShowControls] = useState(false);
   const progress = useSharedValue(0);
@@ -117,7 +119,7 @@ export function PlayerComponent({
       { renderTopInfo() }
       <View style={ styles.actionsRow }>
         { renderAction('play-speed', 'Speed') }
-        { renderAction('quality-high', 'Quality') }
+        { renderAction('quality-high', 'Quality', openQualitySelector) }
         { renderAction(true ? 'closed-caption-outline' : 'closed-caption', 'Subtitles') }
         { renderAction('lock-open-outline', 'Lock') }
       </View>
@@ -249,6 +251,27 @@ export function PlayerComponent({
       fullScreen
     />
   );
+  const renderQualitySelector = () => {
+    const { streams } = video;
+
+    return (
+      <ThemedDropdown
+        asOverlay
+        asList
+        overlayId={ QUALITY_OVERLAY_ID }
+        searchPlaceholder="Quality"
+        value={ selectedQuality }
+        data={ streams.map((stream) => ({
+          label: stream.quality,
+          value: stream.quality,
+        })) }
+        onChange={ handleQualityChange }
+        containerStyle={ styles.overlayContainer }
+      />
+    );
+  };
+
+  const renderModals = () => renderQualitySelector();
 
   return (
     <SafeAreaView>
@@ -271,6 +294,7 @@ export function PlayerComponent({
           { renderControls() }
         </Pressable>
         { renderLoader() }
+        { renderModals() }
       </ThemedView>
     </SafeAreaView>
   );

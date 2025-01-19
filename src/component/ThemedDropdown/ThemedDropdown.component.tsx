@@ -1,12 +1,15 @@
 import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
-import { useCallback } from 'react';
+import ThemedOverlay from 'Component/ThemedOverlay';
+import { useCallback, useRef } from 'react';
 import { Text, TouchableHighlight, View } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
+import OverlayStore from 'Store/Overlay.store';
 import Colors from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 import { noopFn } from 'Util/Function';
+import { generateId } from 'Util/Math';
 
 import { styles } from './ThemedDropdown.style';
 import { DropdownItem, ThemedDropdownProps } from './ThemedDropdown.type';
@@ -19,8 +22,13 @@ import { DropdownItem, ThemedDropdownProps } from './ThemedDropdown.type';
 export const ThemedDropdownComponent = ({
   style,
   asList,
+  asOverlay,
+  overlayId,
+  containerStyle,
   ...props
 }: ThemedDropdownProps) => {
+  const id = useRef(overlayId ?? generateId());
+
   const renderItem = useCallback((item: DropdownItem) => (
     <View style={ styles.item }>
       { item.startIcon && (
@@ -65,11 +73,7 @@ export const ThemedDropdownComponent = ({
     );
   };
 
-  if (asList) {
-    return renderList();
-  }
-
-  return (
+  const renderDropdown = () => (
     <Dropdown
       maxHeight={ 300 }
       labelField="label"
@@ -96,6 +100,28 @@ export const ThemedDropdownComponent = ({
       renderRightIcon={ () => null }
     />
   );
+
+  const renderContent = () => {
+    if (asList) {
+      return renderList();
+    }
+
+    return renderDropdown();
+  };
+
+  if (asOverlay) {
+    return (
+      <ThemedOverlay
+        id={ id.current }
+        onHide={ () => OverlayStore.goToPreviousOverlay() }
+        contentContainerStyle={ [styles.container, containerStyle] }
+      >
+        { renderContent() }
+      </ThemedOverlay>
+    );
+  }
+
+  return renderContent();
 };
 
 export default ThemedDropdownComponent;
