@@ -5,14 +5,12 @@ import { useEffect, useRef, useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
 import ServiceStore from 'Store/Service.store';
 import { RecentItemInterface } from 'Type/RecentItem.interface';
-import { noopFn } from 'Util/Function';
 
 import RecentPageComponent from './RecentPage.component';
 import RecentPageComponentTV from './RecentPage.component.atv';
 
 export function RecentPageContainer() {
   const [isSignedIn, setIsSignedIn] = useState(ServiceStore.isSignedIn);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [items, setItems] = useState<RecentItemInterface[]>([]);
   const paginationRef = useRef({
     page: 1,
@@ -26,12 +24,11 @@ export function RecentPageContainer() {
     }
 
     if (ServiceStore.isSignedIn) {
-      loadRecent(noopFn, 1, false);
+      loadRecent(1, false);
     }
   }, [ServiceStore.isSignedIn]);
 
   const loadRecent = async (
-    onLoading: (state: boolean) => void,
     page: number,
     isRefresh: boolean,
   ) => {
@@ -43,8 +40,6 @@ export function RecentPageContainer() {
 
     if (!updatingStateRef.current) {
       updatingStateRef.current = true;
-
-      onLoading(true);
 
       try {
         const {
@@ -67,17 +62,12 @@ export function RecentPageContainer() {
         NotificationStore.displayError(error as Error);
       } finally {
         updatingStateRef.current = false;
-        onLoading(false);
       }
     }
   };
 
-  const onScrollEnd = () => {
-    loadRecent(noopFn, paginationRef.current.page + 1, false);
-  };
-
-  const onRefresh = async () => {
-    loadRecent((state) => setIsRefreshing(state), 1, true);
+  const onNextLoad = async (isRefresh = false) => {
+    loadRecent(isRefresh ? 1 : paginationRef.current.page + 1, isRefresh);
   };
 
   const handleOnPress = (item: RecentItemInterface) => {
@@ -104,8 +94,7 @@ export function RecentPageContainer() {
   };
 
   const containerFunctions = {
-    onScrollEnd,
-    onRefresh,
+    onNextLoad,
     handleOnPress,
     removeItem,
   };
@@ -113,7 +102,6 @@ export function RecentPageContainer() {
   const containerProps = () => ({
     isSignedIn,
     items,
-    isRefreshing,
   });
 
   return withTV(RecentPageComponentTV, RecentPageComponent, {

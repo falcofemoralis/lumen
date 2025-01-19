@@ -8,12 +8,9 @@ export interface FilmGridContainerProps {
 
 export interface FilmGridComponentProps {
   films: FilmCardInterface[];
-  rows: FilmGridItem[][];
-  isRefreshing?: boolean;
   handleOnPress: (film: FilmCardInterface) => void;
-  onScrollEnd: () => void;
-  onRefresh?: () => void;
   handleItemFocus: (index: number) => void;
+  onNextLoad: (isRefresh: boolean) => Promise<void>;
 }
 
 export type FilmGridItem = FilmCardInterface & {

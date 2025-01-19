@@ -1,24 +1,15 @@
 import FilmCard from 'Component/FilmCard';
+import ThemedList from 'Component/ThemedList';
+import { ThemedListRowProps } from 'Component/ThemedList/ThemedList.type';
 import React, { memo, useCallback } from 'react';
 import {
   DimensionValue,
-  FlatList,
-  ListRenderItem,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
   Pressable,
-  RefreshControl,
   View,
 } from 'react-native';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
-import { noopFn } from 'Util/Function';
-import { isCloseToBottom } from 'Util/Scroll';
 
-import {
-  NUMBER_OF_COLUMNS,
-  SCROLL_EVENT_END_PADDING,
-  SCROLL_EVENT_UPDATES_MS,
-} from './FilmGrid.config';
+import { NUMBER_OF_COLUMNS } from './FilmGrid.config';
 import { FilmGridComponentProps, FilmGridRowProps } from './FilmGrid.type';
 
 function FilmGridRow({
@@ -57,23 +48,12 @@ function rowPropsAreEqual(prevProps: FilmGridRowProps, props: FilmGridRowProps) 
 const MemoizedGridRow = memo(FilmGridRow, rowPropsAreEqual);
 
 export function FilmGridComponent({
-  rows,
+  films,
   handleOnPress,
-  onScrollEnd,
-  onRefresh = noopFn,
-  isRefreshing = false,
+  onNextLoad,
 }: FilmGridComponentProps) {
-  const onScroll = useCallback(
-    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-      if (isCloseToBottom(event, SCROLL_EVENT_END_PADDING)) {
-        onScrollEnd();
-      }
-    },
-    [onScrollEnd],
-  );
-
-  const renderRow: ListRenderItem<FilmCardInterface[]> = useCallback(
-    ({ item }) => (
+  const renderRow = useCallback(
+    ({ item }: ThemedListRowProps<FilmCardInterface[]>) => (
       <MemoizedGridRow
         item={ item }
         handleOnPress={ handleOnPress }
@@ -82,24 +62,12 @@ export function FilmGridComponent({
     [handleOnPress],
   );
 
-  const renderRefreshControl = useCallback(() => (
-    <RefreshControl
-      refreshing={ isRefreshing }
-      onRefresh={ onRefresh }
-    />
-  ), [isRefreshing, onRefresh]);
-
   return (
-    <FlatList
-      data={ rows }
+    <ThemedList
+      data={ films }
       renderItem={ renderRow }
-      // eslint-disable-next-line react-perf/jsx-no-new-function-as-prop -- idx is unique
-      keyExtractor={ (item, idx) => `${item[0].id}-row-${idx}` }
-      onScroll={ onScroll }
-      scrollEventThrottle={ SCROLL_EVENT_UPDATES_MS }
-      refreshControl={ renderRefreshControl() }
-      removeClippedSubviews
-      initialNumToRender={ 5 }
+      onNextLoad={ onNextLoad }
+      numberOfColumns={ NUMBER_OF_COLUMNS }
     />
   );
 }

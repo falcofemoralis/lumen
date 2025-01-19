@@ -1,0 +1,3 @@
+export const SCROLL_EVENT_UPDATES_MS = 50;
+export const SCROLL_EVENT_UPDATES_MS_TV = 150;
+export const SCROLL_EVENT_END_PADDING = 300;

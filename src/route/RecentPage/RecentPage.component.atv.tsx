@@ -1,6 +1,7 @@
-import { SCROLL_EVENT_UPDATES_MS_TV } from 'Component/FilmGrid/FilmGrid.config';
 import Page from 'Component/Page';
 import ThemedImage from 'Component/ThemedImage';
+import ThemedList from 'Component/ThemedList';
+import { ThemedListRowProps } from 'Component/ThemedList/ThemedList.type';
 import ThemedText from 'Component/ThemedText';
 import React, { useCallback } from 'react';
 import { Animated, Dimensions, View } from 'react-native';
@@ -16,13 +17,14 @@ import { useFocusAnimation } from './useFocusAnimation';
 export function RecentPageComponent({
   isSignedIn,
   items,
-  onScrollEnd,
+  onNextLoad,
   handleOnPress,
   removeItem,
 }: RecentPageComponentProps) {
   const containerWidth = getWindowWidth() - scale(ROW_GAP * 2);
+  const { height } = Dimensions.get('window');
 
-  const renderItem = useCallback(({ item }: { item: RecentGridItem }) => {
+  const renderItem = useCallback(({ item }: ThemedListRowProps<RecentGridItem>) => {
     const {
       image,
       name,
@@ -79,8 +81,6 @@ export function RecentPageComponent({
     );
   }, [handleOnPress]);
 
-  const { height } = Dimensions.get('window');
-
   const renderContent = () => {
     if (!isSignedIn) {
       return (
@@ -91,19 +91,14 @@ export function RecentPageComponent({
     }
 
     return (
-      <SpatialNavigationVirtualizedGrid
+      <ThemedList
         data={ items }
         renderItem={ renderItem }
         itemHeight={ height / 3 }
-        numberOfColumns={ 2 }
-        scrollInterval={ SCROLL_EVENT_UPDATES_MS_TV }
-        onEndReached={ onScrollEnd }
-        onEndReachedThresholdRowsNumber={ 2 }
+        numberOfColumns={ NUMBER_OF_COLUMNS_TV }
         style={ styles.grid }
-        rowContainerStyle={ styles.rowStyle }
-        // style={ styles.container }
-        // additionalRenderedRows={ 1 }
-        // scrollDuration={ 500 }
+        rowStyle={ styles.rowStyle }
+        onNextLoad={ onNextLoad }
       />
     );
   };

@@ -1,32 +1,27 @@
-import { SCROLL_EVENT_END_PADDING, SCROLL_EVENT_UPDATES_MS } from 'Component/FilmGrid/FilmGrid.config';
 import Page from 'Component/Page';
 import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
+import ThemedList from 'Component/ThemedList';
+import { ThemedListRowProps } from 'Component/ThemedList/ThemedList.type';
 import ThemedText from 'Component/ThemedText';
 import React, { memo, useCallback } from 'react';
 import {
-  FlatList,
-  ListRenderItem,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
   Pressable,
-  RefreshControl,
   TouchableOpacity,
   View,
 } from 'react-native';
 import { RecentItemInterface } from 'Type/RecentItem.interface';
 import { scale } from 'Util/CreateStyles';
-import { noopFn } from 'Util/Function';
-import { isCloseToBottom } from 'Util/Scroll';
 
+import { NUMBER_OF_COLUMNS } from './RecentPage.config';
 import { styles } from './RecentPage.style';
 import { RecentGridRowProps, RecentPageComponentProps } from './RecentPage.type';
 
 function FilmGridRow({
   item,
-  handleOnPress,
   index,
+  handleOnPress,
   removeItem,
 }: RecentGridRowProps) {
   const {
@@ -38,7 +33,7 @@ function FilmGridRow({
   } = item;
 
   return (
-    <Pressable onPress={ () => removeItem(item) }>
+    <Pressable onPress={ () => handleOnPress(item) }>
       <View style={ [styles.item, index !== 0 && styles.itemBorder] }>
         <View style={ styles.itemContainer }>
           <ThemedImage
@@ -63,7 +58,7 @@ function FilmGridRow({
               </ThemedText>
             ) }
           </View>
-          <TouchableOpacity onPress={ () => handleOnPress(item) }>
+          <TouchableOpacity onPress={ () => removeItem(item) }>
             <ThemedIcon
               style={ styles.deleteButton }
               icon={ {
@@ -89,32 +84,14 @@ const MemoizedGridRow = memo(FilmGridRow, rowPropsAreEqual);
 export function RecentPageComponent({
   isSignedIn,
   items,
+  onNextLoad,
   handleOnPress,
-  onScrollEnd,
-  onRefresh = noopFn,
   removeItem,
-  isRefreshing = false,
 }: RecentPageComponentProps) {
-  const onScroll = useCallback(
-    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-      if (isCloseToBottom(event, SCROLL_EVENT_END_PADDING)) {
-        onScrollEnd();
-      }
-    },
-    [onScrollEnd],
-  );
-
-  const renderRefreshControl = useCallback(() => (
-    <RefreshControl
-      refreshing={ isRefreshing }
-      onRefresh={ onRefresh }
-    />
-  ), [isRefreshing, onRefresh]);
-
-  const renderRow: ListRenderItem<RecentItemInterface> = useCallback(
-    ({ item, index }) => (
+  const renderRow = useCallback(
+    ({ item, index }: ThemedListRowProps<RecentItemInterface[]>) => (
       <MemoizedGridRow
-        item={ item }
+        item={ item[0] }
         handleOnPress={ handleOnPress }
         index={ index }
         removeItem={ removeItem }
@@ -133,14 +110,11 @@ export function RecentPageComponent({
     }
 
     return (
-      <FlatList
+      <ThemedList
         data={ items }
         renderItem={ renderRow }
-        keyExtractor={ (item) => `${item.id}-recent-row` }
-        onScroll={ onScroll }
-        scrollEventThrottle={ SCROLL_EVENT_UPDATES_MS }
-        refreshControl={ renderRefreshControl() }
-        removeClippedSubviews
+        numberOfColumns={ NUMBER_OF_COLUMNS }
+        onNextLoad={ onNextLoad }
       />
     );
   };
