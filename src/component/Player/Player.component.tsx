@@ -266,7 +266,6 @@ export function PlayerComponent({
           value: stream.quality,
         })) }
         onChange={ handleQualityChange }
-        containerStyle={ styles.overlayContainer }
       />
     );
   };

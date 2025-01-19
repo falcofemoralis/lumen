@@ -19,8 +19,16 @@ export const styles = CreateStyles({
     backgroundColor: Colors.background,
     borderWidth: 0,
   },
+  container: {
+    maxHeight: 300,
+    padding: 8,
+    position: 'absolute',
+    right: '10%',
+    width: '100%',
+    maxWidth: 300,
+  },
   item: {
-    padding: 16,
+    padding: 14,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -35,14 +43,29 @@ export const styles = CreateStyles({
     height: 20,
     width: 20,
   },
+  listContainer: {
+  },
+  listHeader: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 8,
+    borderBottomColor: Colors.gray,
+    borderBottomWidth: 1,
+  },
+  listHeaderText: {
+    color: Colors.lightGray,
+    fontSize: 16,
+    lineHeight: 16,
+    fontWeight: '500',
+  },
+  listItems: {
+    marginTop: 8,
+    height: 250,
+  },
   listItem: {
+    borderRadius: 16,
   },
   listItemSelected: {
     backgroundColor: Colors.primary,
-    borderRadius: 16,
-  },
-  container: {
-    maxHeight: 300,
-    padding: 8,
   },
 });

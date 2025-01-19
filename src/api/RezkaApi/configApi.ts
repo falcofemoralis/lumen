@@ -32,7 +32,7 @@ const configApi: ConfigApiInterface = {
         <item>https://common.dot.dns.yandex.net/dns-query;77.88.8.1;77.88.8.8</item>
    */
   defaultCDNs: [
-    'https://prx-cogent.ukrtelcdn.net',
+    'https://prx2-cogent.ukrtelcdn.net',
     'https://stream.voidboost.cc',
   ],
   config: null,

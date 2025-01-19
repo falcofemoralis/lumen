@@ -3,7 +3,9 @@ import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import { useCallback, useRef } from 'react';
-import { Text, TouchableHighlight, View } from 'react-native';
+import {
+  ScrollView, Text, TouchableHighlight, View,
+} from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 import OverlayStore from 'Store/Overlay.store';
 import Colors from 'Style/Colors';
@@ -24,7 +26,6 @@ export const ThemedDropdownComponent = ({
   asList,
   asOverlay,
   overlayId,
-  containerStyle,
   ...props
 }: ThemedDropdownProps) => {
   const id = useRef(overlayId ?? generateId());
@@ -50,26 +51,42 @@ export const ThemedDropdownComponent = ({
   ), []);
 
   const renderList = () => {
-    const { data, onChange = noopFn, value } = props;
+    const {
+      data,
+      onChange = noopFn,
+      value,
+      searchPlaceholder,
+    } = props;
 
     return (
-      <View style={ style }>
-        { data.map((item) => (
-          <TouchableHighlight
-            key={ item.value }
-            underlayColor={ Colors.primary }
-            onPress={ () => { onChange(item); } }
-          >
-            <View style={ [
-              styles.listItem,
-              item.value === value && styles.listItemSelected,
-            ] }
+      <View style={ [styles.listContainer, style] }>
+        { searchPlaceholder && (
+          <View style={ styles.listHeader }>
+            <Text style={ styles.listHeaderText }>
+              { searchPlaceholder }
+            </Text>
+          </View>
+        ) }
+        <ScrollView style={ styles.listItems }>
+          { data.map((item) => (
+            <TouchableHighlight
+              key={ item.value }
+              underlayColor={ Colors.primary }
+              onPress={ () => { onChange(item); } }
+              style={ styles.listItem }
             >
-              { renderItem(item) }
-            </View>
-          </TouchableHighlight>
-        )) }
+              <View style={ [
+                styles.listItem,
+                item.value === value && styles.listItemSelected,
+              ] }
+              >
+                { renderItem(item) }
+              </View>
+            </TouchableHighlight>
+          )) }
+        </ScrollView>
       </View>
+
     );
   };
 
@@ -110,6 +127,8 @@ export const ThemedDropdownComponent = ({
   };
 
   if (asOverlay) {
+    const { containerStyle } = props;
+
     return (
       <ThemedOverlay
         id={ id.current }

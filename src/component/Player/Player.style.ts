@@ -76,10 +76,4 @@ export const styles = CreateStyles({
     fontWeight: '700',
   },
   subtitle: {},
-  overlayContainer: {
-    position: 'absolute',
-    right: '10%',
-    width: '100%',
-    maxWidth: 300,
-  },
 });

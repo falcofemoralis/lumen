@@ -21,6 +21,7 @@ import {
   DEFAULT_PROGRESS_STATUS,
   DEFAULT_REWIND_SECONDS,
   QUALITY_OVERLAY_ID,
+  QUALITY_STORAGE_KEY,
   RewindDirection,
   SAVE_TIME_EVERY_MS,
   SAVE_TIME_STORAGE_KEY,
@@ -199,6 +200,12 @@ export function PlayerContainer({ video, film, voice }: PlayerContainerProps) {
   const handleQualityChange = (item: DropdownItem) => {
     const { value: quality } = item;
 
+    if (selectedQuality === quality) {
+      OverlayStore.goToPreviousOverlay();
+
+      return;
+    }
+
     const stream = selectedVideo.streams.find((s) => s.quality === quality);
 
     if (!stream) {
@@ -206,6 +213,7 @@ export function PlayerContainer({ video, film, voice }: PlayerContainerProps) {
     }
 
     setSelectedQuality(quality);
+    playerStorage.setStringAsync(QUALITY_STORAGE_KEY, quality);
 
     const { currentTime } = player;
     player.replace(stream.url);
