@@ -1,4 +1,5 @@
 import Loader from 'Component/Loader';
+import PlayerVideoSelector from 'Component/PlayerVideoSelector';
 import ThemedDropdown from 'Component/ThemedDropdown';
 import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
@@ -37,6 +38,9 @@ export function PlayerComponent({
   handleNewEpisode,
   handleQualityChange,
   openQualitySelector,
+  openVideoSelector,
+  hideVideoSelector,
+  handleVideoSelect,
 }: PlayerComponentProps) {
   const [showControls, setShowControls] = useState(false);
   const progress = useSharedValue(0);
@@ -221,9 +225,7 @@ export function PlayerComponent({
         { renderProgressBar() }
       </View>
       <View style={ styles.actionsRow }>
-        { film.hasSeasons && (
-          renderAction('playlist-play', 'Series')
-        ) }
+        { renderAction('playlist-play', 'Series', openVideoSelector) }
         { renderAction('comment-text-outline', 'Comments') }
         { renderAction('bookmark-outline', 'Bookmarks') }
         { renderAction('share-outline', 'Share') }
@@ -270,7 +272,28 @@ export function PlayerComponent({
     );
   };
 
-  const renderModals = () => renderQualitySelector();
+  const renderPlayerVideoSelector = () => {
+    const { voices = [], hasVoices, hasSeasons } = film;
+
+    if (!voices.length || (!hasVoices && !hasSeasons)) {
+      return null;
+    }
+
+    return (
+      <PlayerVideoSelector
+        film={ film }
+        onHide={ hideVideoSelector }
+        onSelect={ handleVideoSelect }
+      />
+    );
+  };
+
+  const renderModals = () => (
+    <>
+      { renderQualitySelector() }
+      { renderPlayerVideoSelector() }
+    </>
+  );
 
   return (
     <SafeAreaView>

@@ -1,6 +1,6 @@
 import { Rating } from '@kolking/react-native-rating';
 import Page from 'Component/Page';
-import FilmVideoSelector from 'Component/PlayerVideoSelector';
+import PlayerVideoSelector from 'Component/PlayerVideoSelector';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
@@ -382,7 +382,7 @@ export function FilmPageComponent({
     }
 
     return (
-      <FilmVideoSelector
+      <PlayerVideoSelector
         film={ film }
         onHide={ hideVideoSelector }
         onSelect={ handleVideoSelect }

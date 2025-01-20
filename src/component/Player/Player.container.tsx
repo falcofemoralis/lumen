@@ -1,4 +1,5 @@
 /* eslint-disable react-compiler/react-compiler */
+import { PLAYER_VIDEO_SELECTOR_OVERLAY_ID } from 'Component/PlayerVideoSelector/PlayerVideoSelector.config';
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import { useEventListener } from 'expo';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
@@ -9,6 +10,7 @@ import NotificationStore from 'Store/Notification.store';
 import OverlayStore from 'Store/Overlay.store';
 import ServiceStore from 'Store/Service.store';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
+import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { convertSecondsToTime } from 'Util/Date';
 import { playerStorage } from 'Util/Storage';
 
@@ -30,6 +32,7 @@ import { PlayerContainerProps, ProgressStatus } from './Player.type';
 
 export function PlayerContainer({ video, film, voice }: PlayerContainerProps) {
   const [selectedVideo, setSelectedVideo] = useState<FilmVideoInterface>(video);
+  const [selectedVoice, setSelectedVoice] = useState<FilmVoiceInterface>(voice);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [progressStatus, setProgressStatus] = useState<ProgressStatus>(
@@ -46,7 +49,7 @@ export function PlayerContainer({ video, film, voice }: PlayerContainerProps) {
   const player = useVideoPlayer(selectedVideo.streams[0].url, (p) => {
     const loadTime = () => {
       const { id: filmId } = film;
-      const { id: voiceId, lastEpisodeId, lastSeasonId } = voice;
+      const { id: voiceId, lastEpisodeId, lastSeasonId } = selectedVoice;
 
       const time = playerStorage.getInt(`${SAVE_TIME_STORAGE_KEY}-${filmId}-${voiceId}-${lastSeasonId}-${lastEpisodeId}`);
 
@@ -107,7 +110,7 @@ export function PlayerContainer({ video, film, voice }: PlayerContainerProps) {
 
   const changePlayerVideo = (newVideo: FilmVideoInterface) => {
     if (ServiceStore.isSignedIn) {
-      ServiceStore.getCurrentService().saveWatch(film, voice)
+      ServiceStore.getCurrentService().saveWatch(film, selectedVoice)
         .catch((error) => {
           NotificationStore.displayError(error as Error);
         });
@@ -229,7 +232,7 @@ export function PlayerContainer({ video, film, voice }: PlayerContainerProps) {
       return;
     }
 
-    const { seasons = [], lastSeasonId, lastEpisodeId } = voice;
+    const { seasons = [], lastSeasonId, lastEpisodeId } = selectedVoice;
     const seasonIndex = seasons.findIndex((s) => s.seasonId === lastSeasonId);
 
     if (seasonIndex === -1) {
@@ -285,13 +288,13 @@ export function PlayerContainer({ video, film, voice }: PlayerContainerProps) {
 
     const newVideo = await ServiceStore.getCurrentService().getFilmStreamsByEpisodeId(
       film,
-      voice,
+      selectedVoice,
       seasonId,
       episodeId,
     );
 
-    voice.lastSeasonId = seasonId;
-    voice.lastEpisodeId = episodeId;
+    selectedVoice.lastSeasonId = seasonId;
+    selectedVoice.lastEpisodeId = episodeId;
 
     changePlayerVideo(newVideo);
   };
@@ -320,13 +323,27 @@ export function PlayerContainer({ video, film, voice }: PlayerContainerProps) {
 
   const updateTime = () => {
     const { id: filmId } = film;
-    const { id: voiceId, lastEpisodeId, lastSeasonId } = voice;
+    const { id: voiceId, lastEpisodeId, lastSeasonId } = selectedVoice;
     const { currentTime } = player;
 
     playerStorage.setIntAsync(
       `${SAVE_TIME_STORAGE_KEY}-${filmId}-${voiceId}-${lastSeasonId}-${lastEpisodeId}`,
       currentTime,
     );
+  };
+
+  const openVideoSelector = () => {
+    OverlayStore.openOverlay(PLAYER_VIDEO_SELECTOR_OVERLAY_ID);
+  };
+
+  const hideVideoSelector = () => {
+    OverlayStore.goToPreviousOverlay();
+  };
+
+  const handleVideoSelect = (newVideo: FilmVideoInterface, newVoice: FilmVoiceInterface) => {
+    hideVideoSelector();
+    setSelectedVoice(newVoice);
+    setSelectedVideo(newVideo);
   };
 
   const containerProps = () => ({
@@ -349,6 +366,9 @@ export function PlayerContainer({ video, film, voice }: PlayerContainerProps) {
     openQualitySelector,
     handleQualityChange,
     handleNewEpisode,
+    openVideoSelector,
+    hideVideoSelector,
+    handleVideoSelect,
   };
 
   return withTV(PlayerComponentTV, PlayerComponent, {

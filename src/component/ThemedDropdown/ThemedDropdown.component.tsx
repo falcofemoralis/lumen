@@ -133,7 +133,7 @@ export const ThemedDropdownComponent = ({
       <ThemedOverlay
         id={ id.current }
         onHide={ () => OverlayStore.goToPreviousOverlay() }
-        contentContainerStyle={ [styles.container, containerStyle] }
+        contentContainerStyle={ [styles.overlayContainer, containerStyle] }
       >
         { renderContent() }
       </ThemedOverlay>

@@ -3,7 +3,7 @@ import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
   modal: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 8,
     backgroundColor: Colors.modal,
   },
   contentContainerStyle: {
@@ -12,5 +12,13 @@ export const styles = CreateStyles({
     borderRadius: 16,
     borderColor: Colors.lightGravel,
     borderWidth: 1,
+    maxHeight: '50%',
+  },
+  contentContainerStyleLandscape: {
+    position: 'absolute',
+    right: '10%',
+    width: '100%',
+    maxHeight: 300,
+    maxWidth: 300,
   },
 });

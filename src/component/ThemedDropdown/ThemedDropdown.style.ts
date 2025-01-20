@@ -15,17 +15,11 @@ export const styles = CreateStyles({
   inputIcon: {
     marginRight: 8,
   },
+  overlayContainer: {
+  },
   content: {
     backgroundColor: Colors.background,
     borderWidth: 0,
-  },
-  container: {
-    maxHeight: 300,
-    padding: 8,
-    position: 'absolute',
-    right: '10%',
-    width: '100%',
-    maxWidth: 300,
   },
   item: {
     padding: 14,

@@ -1,4 +1,5 @@
 import Loader from 'Component/Loader';
+import PlayerVideoSelector from 'Component/PlayerVideoSelector';
 import ThemedDropdown from 'Component/ThemedDropdown';
 import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
@@ -48,6 +49,9 @@ export function PlayerComponent({
   openQualitySelector,
   handleQualityChange,
   handleNewEpisode,
+  openVideoSelector,
+  handleVideoSelect,
+  hideVideoSelector,
 }: PlayerComponentProps) {
   const focusedElementRef = useRef<FocusedElement>(
     FocusedElement.ProgressThumb,
@@ -330,7 +334,7 @@ export function PlayerComponent({
         } }
       >
         { renderAction('high-quality', 'Quality', openQualitySelector) }
-        { renderAction('playlist-play', 'Series') }
+        { renderAction('playlist-play', 'Series', openVideoSelector) }
         { renderAction('subtitles', 'Subtitles') }
         { renderAction('bookmarks', 'Bookmarks') }
         { renderAction('share', 'Share') }
@@ -396,7 +400,28 @@ export function PlayerComponent({
     );
   };
 
-  const renderModals = () => renderQualitySelector();
+  const renderPlayerVideoSelector = () => {
+    const { voices = [], hasVoices, hasSeasons } = film;
+
+    if (!voices.length || (!hasVoices && !hasSeasons)) {
+      return null;
+    }
+
+    return (
+      <PlayerVideoSelector
+        film={ film }
+        onHide={ hideVideoSelector }
+        onSelect={ handleVideoSelect }
+      />
+    );
+  };
+
+  const renderModals = () => (
+    <>
+      { renderQualitySelector() }
+      { renderPlayerVideoSelector() }
+    </>
+  );
 
   return (
     <View style={ styles.container }>

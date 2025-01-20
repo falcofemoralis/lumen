@@ -29,6 +29,9 @@ export interface PlayerComponentProps {
   openQualitySelector: () => void;
   handleQualityChange: (item: DropdownItem) => void;
   handleNewEpisode: (type: RewindDirection) => void;
+  openVideoSelector: () => void;
+  hideVideoSelector: () => void;
+  handleVideoSelect: (video: FilmVideoInterface, voice: FilmVoiceInterface) => void;
 }
 
 export type ProgressStatus = {
