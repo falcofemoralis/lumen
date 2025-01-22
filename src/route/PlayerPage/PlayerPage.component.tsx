@@ -3,6 +3,7 @@ import Player from 'Component/Player';
 import { useEffect } from 'react';
 import ConfigStore from 'Store/Config.store';
 import NavigationStore from 'Store/Navigation.store';
+import { getPlayerStream } from 'Util/Player';
 
 import { PlayerPageComponentProps } from './PlayerPage.type';
 
@@ -35,6 +36,7 @@ export function PlayerPageComponent({ video, film, voice }: PlayerPageComponentP
         video={ video }
         film={ film }
         voice={ voice }
+        stream={ getPlayerStream(video) }
       />
     </Page>
   );

@@ -22,8 +22,6 @@ export default function ThemedOverlayComponent({
   useEffect(() => {
     const subscription = ScreenOrientation.addOrientationChangeListener(({ orientationInfo }) => {
       const { orientation: o } = orientationInfo;
-      console.log('setIsLandscape', o === ScreenOrientation.Orientation.LANDSCAPE_LEFT
-        || o === ScreenOrientation.Orientation.LANDSCAPE_RIGHT);
 
       setIsLandscape(o === ScreenOrientation.Orientation.LANDSCAPE_LEFT
         || o === ScreenOrientation.Orientation.LANDSCAPE_RIGHT);

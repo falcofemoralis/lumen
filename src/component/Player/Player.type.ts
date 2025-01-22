@@ -1,6 +1,7 @@
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import { VideoPlayer } from 'expo-video';
 import { FilmInterface } from 'Type/Film.interface';
+import { FilmStreamInterface } from 'Type/FilmStream.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 
@@ -8,6 +9,7 @@ import { RewindDirection } from './Player.config';
 
 export interface PlayerContainerProps {
   video: FilmVideoInterface;
+  stream: FilmStreamInterface;
   film: FilmInterface
   voice: FilmVoiceInterface;
 }

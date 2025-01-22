@@ -1,4 +1,3 @@
-/* eslint-disable react-compiler/react-compiler */
 import { PLAYER_VIDEO_SELECTOR_OVERLAY_ID } from 'Component/PlayerVideoSelector/PlayerVideoSelector.config';
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import { useEventListener } from 'expo';
@@ -9,10 +8,16 @@ import { useEffect, useRef, useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
 import OverlayStore from 'Store/Overlay.store';
 import ServiceStore from 'Store/Service.store';
+import { FilmStreamInterface } from 'Type/FilmStream.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { convertSecondsToTime } from 'Util/Date';
-import { playerStorage } from 'Util/Storage';
+import {
+  getPlayerStream,
+  getPlayerTime,
+  updatePlayerQuality,
+  updatePlayerTime,
+} from 'Util/Player';
 
 import PlayerComponent from './Player.component';
 import PlayerComponentTV from './Player.component.atv';
@@ -23,46 +28,33 @@ import {
   DEFAULT_PROGRESS_STATUS,
   DEFAULT_REWIND_SECONDS,
   QUALITY_OVERLAY_ID,
-  QUALITY_STORAGE_KEY,
   RewindDirection,
   SAVE_TIME_EVERY_MS,
-  SAVE_TIME_STORAGE_KEY,
 } from './Player.config';
 import { PlayerContainerProps, ProgressStatus } from './Player.type';
 
-export function PlayerContainer({ video, film, voice }: PlayerContainerProps) {
+export function PlayerContainer({
+  video,
+  stream,
+  film,
+  voice,
+}: PlayerContainerProps) {
   const [selectedVideo, setSelectedVideo] = useState<FilmVideoInterface>(video);
+  const [selectedStream, setSelectedStream] = useState<FilmStreamInterface>(stream);
   const [selectedVoice, setSelectedVoice] = useState<FilmVoiceInterface>(voice);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [progressStatus, setProgressStatus] = useState<ProgressStatus>(
-    DEFAULT_PROGRESS_STATUS,
-  );
-  const [selectedQuality, setSelectedQuality] = useState<string>(
-    selectedVideo.streams[0].quality,
-  );
+  const [progressStatus, setProgressStatus] = useState<ProgressStatus>(DEFAULT_PROGRESS_STATUS);
+  const [selectedQuality, setSelectedQuality] = useState<string>(selectedStream.quality);
   const autoRewindTimeout = useRef<NodeJS.Timeout | null>(null);
   const autoRewindCount = useRef<number>(0);
   const autoRewindFactor = useRef<number>(1);
   const updateTimeTimeout = useRef<NodeJS.Timeout | null>(null);
 
-  const player = useVideoPlayer(selectedVideo.streams[0].url, (p) => {
-    const loadTime = () => {
-      const { id: filmId } = film;
-      const { id: voiceId, lastEpisodeId, lastSeasonId } = selectedVoice;
-
-      const time = playerStorage.getInt(`${SAVE_TIME_STORAGE_KEY}-${filmId}-${voiceId}-${lastSeasonId}-${lastEpisodeId}`);
-
-      if (!time) {
-        return 0;
-      }
-
-      return time;
-    };
-
+  const player = useVideoPlayer(selectedStream.url, (p) => {
     p.loop = false;
     p.timeUpdateEventInterval = 1;
-    p.currentTime = loadTime();
+    p.currentTime = getPlayerTime(film, selectedVoice);
     p.play();
   });
 
@@ -101,16 +93,18 @@ export function PlayerContainer({ video, film, voice }: PlayerContainerProps) {
   useEventListener(player, 'statusChange', ({ status: playerStatus }) => {
     const loading = playerStatus === 'loading';
 
-    console.log(playerStatus);
+    if (playerStatus === 'error') {
+      NotificationStore.displayError('An error occurred while loading the video');
+    }
 
     if (isLoading !== loading) {
       setIsLoading(loading);
     }
   });
 
-  const changePlayerVideo = (newVideo: FilmVideoInterface) => {
+  const changePlayerVideo = (newVideo: FilmVideoInterface, newVoice: FilmVoiceInterface) => {
     if (ServiceStore.isSignedIn) {
-      ServiceStore.getCurrentService().saveWatch(film, selectedVoice)
+      ServiceStore.getCurrentService().saveWatch(film, newVoice)
         .catch((error) => {
           NotificationStore.displayError(error as Error);
         });
@@ -119,6 +113,7 @@ export function PlayerContainer({ video, film, voice }: PlayerContainerProps) {
     setProgressStatus(DEFAULT_PROGRESS_STATUS);
     setIsLoading(true);
     setSelectedVideo(newVideo);
+    setSelectedStream(getPlayerStream(newVideo));
     resetUpdateTimeTimeout();
   };
 
@@ -209,17 +204,18 @@ export function PlayerContainer({ video, film, voice }: PlayerContainerProps) {
       return;
     }
 
-    const stream = selectedVideo.streams.find((s) => s.quality === quality);
+    const newStream = selectedVideo.streams.find((s) => s.quality === quality);
 
-    if (!stream) {
+    if (!newStream) {
       return;
     }
 
     setSelectedQuality(quality);
-    playerStorage.setStringAsync(QUALITY_STORAGE_KEY, quality);
+    updatePlayerQuality(quality);
+    setSelectedStream(newStream);
 
     const { currentTime } = player;
-    player.replace(stream.url);
+    player.replace(newStream.url);
     player.currentTime = currentTime;
 
     OverlayStore.goToPreviousOverlay();
@@ -296,7 +292,7 @@ export function PlayerContainer({ video, film, voice }: PlayerContainerProps) {
     selectedVoice.lastSeasonId = seasonId;
     selectedVoice.lastEpisodeId = episodeId;
 
-    changePlayerVideo(newVideo);
+    changePlayerVideo(newVideo, selectedVoice);
   };
 
   const createUpdateTimeTimeout = () => {
@@ -322,14 +318,9 @@ export function PlayerContainer({ video, film, voice }: PlayerContainerProps) {
   };
 
   const updateTime = () => {
-    const { id: filmId } = film;
-    const { id: voiceId, lastEpisodeId, lastSeasonId } = selectedVoice;
     const { currentTime } = player;
 
-    playerStorage.setIntAsync(
-      `${SAVE_TIME_STORAGE_KEY}-${filmId}-${voiceId}-${lastSeasonId}-${lastEpisodeId}`,
-      currentTime,
-    );
+    updatePlayerTime(film, selectedVoice, currentTime);
   };
 
   const openVideoSelector = () => {
@@ -343,7 +334,7 @@ export function PlayerContainer({ video, film, voice }: PlayerContainerProps) {
   const handleVideoSelect = (newVideo: FilmVideoInterface, newVoice: FilmVoiceInterface) => {
     hideVideoSelector();
     setSelectedVoice(newVoice);
-    setSelectedVideo(newVideo);
+    changePlayerVideo(newVideo, newVoice);
   };
 
   const containerProps = () => ({
