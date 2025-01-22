@@ -43,6 +43,7 @@
     "react-native-awesome-slider": "^2.9.0",
     "react-native-cache": "^2.0.3",
     "react-native-element-dropdown": "^2.12.4",
+    "react-native-error-boundary": "^1.2.7",
     "react-native-gesture-handler": "^2.22.0",
     "react-native-keyevent": "^0.3.2",
     "react-native-mmkv-storage": "^0.11.2",

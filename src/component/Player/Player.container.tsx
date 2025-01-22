@@ -213,10 +213,9 @@ export function PlayerContainer({
     setSelectedQuality(quality);
     updatePlayerQuality(quality);
     setSelectedStream(newStream);
+    updateTime();
 
-    const { currentTime } = player;
     player.replace(newStream.url);
-    player.currentTime = currentTime;
 
     OverlayStore.goToPreviousOverlay();
   };

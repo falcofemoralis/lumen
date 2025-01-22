@@ -1,3 +1,4 @@
+import { ReactNode } from 'react';
 import { ViewStyle } from 'react-native';
 
 export interface PageContainerProps {
@@ -7,7 +8,7 @@ export interface PageContainerProps {
 }
 
 export interface PageComponentProps {
-  children?: React.ReactNode;
+  children: Exclude<NonNullable<ReactNode>, string | number | boolean>
   style?: ViewStyle;
   testID?: string;
 }

@@ -31,12 +31,13 @@ export function RootLayout() {
     if (ConfigStore.isTV) {
       configureRemoteControl();
     }
+
+    NavigationBar.setBackgroundColorAsync(Colors.background);
   }, []);
 
   useEffect(() => {
     if (languageLoaded) {
       SplashScreen.hideAsync();
-      NavigationBar.setBackgroundColorAsync(Colors.background);
     }
   }, [languageLoaded]);
 
@@ -68,7 +69,12 @@ export function RootLayout() {
   });
 
   if (!languageLoaded) {
-    return null;
+    return (
+      <StatusBar
+        style="light"
+        backgroundColor={ Colors.background }
+      />
+    );
   }
 
   const renderStack = () => (

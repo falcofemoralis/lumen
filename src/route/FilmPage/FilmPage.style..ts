@@ -63,10 +63,11 @@ export const styles = CreateStyles({
   },
   collectionContainer: {
     flexDirection: 'row',
-    gap: 4,
+    gap: 2,
+    rowGap: 4,
     marginTop: 8,
     flexWrap: 'wrap',
-    maxWidth: '99%',
+    width: '75%',
   },
   collectionTitle: {
     fontSize: 14,
