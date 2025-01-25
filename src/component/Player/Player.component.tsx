@@ -10,7 +10,10 @@ import * as ScreenOrientation from 'expo-screen-orientation';
 import { OrientationLock } from 'expo-screen-orientation';
 import { StatusBar } from 'expo-status-bar';
 import { VideoView } from 'expo-video';
-import React, { useEffect, useRef, useState } from 'react';
+import { observer } from 'mobx-react-lite';
+import React, {
+  useCallback, useEffect, useRef, useState,
+} from 'react';
 import { Dimensions, View } from 'react-native';
 import { Slider } from 'react-native-awesome-slider';
 import {
@@ -30,6 +33,7 @@ import { scale } from 'Util/CreateStyles';
 import { convertSecondsToTime } from 'Util/Date';
 
 import { QUALITY_OVERLAY_ID, RewindDirection } from './Player.config';
+import PlayerStore from './Player.store';
 import { styles } from './Player.style';
 import { PlayerComponentProps } from './Player.type';
 
@@ -39,7 +43,6 @@ export function PlayerComponent({
   player,
   isLoading,
   isPlaying,
-  progressStatus,
   video,
   film,
   voice,
@@ -57,11 +60,6 @@ export function PlayerComponent({
   setPlayerRate,
 }: PlayerComponentProps) {
   const [showControls, setShowControls] = useState(false);
-  const progress = useSharedValue(0);
-  const cache = useSharedValue(0);
-  const minimumValue = useSharedValue(0);
-  const maximumValue = useSharedValue(100);
-  const isSliding = useRef(false);
 
   const controlsAnimation = useAnimatedStyle(() => ({
     opacity: withTiming(showControls ? 1 : 0, { duration: 150 }),
@@ -76,17 +74,6 @@ export function PlayerComponent({
       NavigationBar.setVisibilityAsync('visible');
     };
   }, []);
-
-  useEffect(() => {
-    const { progressPercentage, playablePercentage } = progressStatus;
-
-    if (isSliding.current) {
-      return;
-    }
-
-    progress.value = progressPercentage;
-    cache.value = playablePercentage;
-  }, [progressStatus]);
 
   const singleTap = Gesture.Tap()
     .maxDuration(150)
@@ -221,38 +208,14 @@ export function PlayerComponent({
     </View>
   );
 
-  const renderDuration = () => {
-    const { currentTime, durationTime, remainingTime } = progressStatus;
-
-    return (
-      <ThemedText>
-        { `${currentTime} / ${durationTime} (${remainingTime})` }
-      </ThemedText>
-    );
-  };
+  const renderDuration = () => (
+    <Duration />
+  );
 
   const renderProgressBar = () => (
-    <Slider
-      progress={ progress }
-      cache={ cache }
-      minimumValue={ minimumValue }
-      maximumValue={ maximumValue }
-      bubble={
-        (value) => convertSecondsToTime(calculateCurrentTime(value))
-      }
-      onSlidingStart={ () => {
-        isSliding.current = true;
-      } }
-      onSlidingComplete={ (value) => {
-        isSliding.current = false;
-        seekToPosition(value);
-      } }
-      theme={ {
-        minimumTrackTintColor: Colors.secondary,
-        cacheTrackTintColor: '#888888aa',
-        maximumTrackTintColor: '#555555aa',
-        bubbleBackgroundColor: Colors.secondary,
-      } }
+    <ProgressBar
+      seekToPosition={ seekToPosition }
+      calculateCurrentTime={ calculateCurrentTime }
     />
   );
 
@@ -302,6 +265,7 @@ export function PlayerComponent({
       fullScreen
     />
   );
+
   const renderQualitySelector = () => {
     const { streams } = video;
 
@@ -365,5 +329,68 @@ export function PlayerComponent({
     </SafeAreaView>
   );
 }
+
+export const Duration = observer(() => {
+  const { currentTime, durationTime, remainingTime } = PlayerStore.progressStatus;
+
+  return (
+    <ThemedText>
+      { `${currentTime} / ${durationTime} (${remainingTime})` }
+    </ThemedText>
+  );
+});
+
+export const ProgressBar = observer(({
+  seekToPosition,
+  calculateCurrentTime,
+}: Pick<PlayerComponentProps, 'seekToPosition' | 'calculateCurrentTime'>) => {
+  const progress = useSharedValue(0);
+  const cache = useSharedValue(0);
+  const minimumValue = useSharedValue(0);
+  const maximumValue = useSharedValue(100);
+  const isSliding = useRef(false);
+
+  useEffect(() => {
+    const { progressPercentage, playablePercentage } = PlayerStore.progressStatus;
+
+    if (isSliding.current) {
+      return;
+    }
+
+    progress.value = progressPercentage;
+    cache.value = playablePercentage;
+  }, [PlayerStore.progressStatus]);
+
+  const renderBubble = useCallback((value: number) => convertSecondsToTime(
+    calculateCurrentTime(value),
+  ), [calculateCurrentTime]);
+
+  const onSlidingStart = useCallback(() => {
+    isSliding.current = true;
+  }, []);
+
+  const onSlidingComplete = useCallback((value: number) => {
+    isSliding.current = false;
+    seekToPosition(value);
+  }, [seekToPosition]);
+
+  return (
+    <Slider
+      progress={ progress }
+      cache={ cache }
+      minimumValue={ minimumValue }
+      maximumValue={ maximumValue }
+      bubble={ renderBubble }
+      onSlidingStart={ onSlidingStart }
+      onSlidingComplete={ onSlidingComplete }
+      theme={ {
+        minimumTrackTintColor: Colors.secondary,
+        cacheTrackTintColor: '#888888aa',
+        maximumTrackTintColor: '#555555aa',
+        bubbleBackgroundColor: Colors.secondary,
+      } }
+    />
+  );
+});
 
 export default PlayerComponent;

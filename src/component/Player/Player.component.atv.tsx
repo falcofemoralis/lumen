@@ -6,6 +6,7 @@ import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedText from 'Component/ThemedText';
 import { LinearGradient } from 'expo-linear-gradient';
 import { VideoView } from 'expo-video';
+import { observer } from 'mobx-react-lite';
 import React, {
   useEffect,
   useRef,
@@ -31,6 +32,7 @@ import {
   QUALITY_OVERLAY_ID,
   RewindDirection,
 } from './Player.config';
+import PlayerStore from './Player.store';
 import { styles } from './Player.style.atv';
 import { LongEvent, PlayerComponentProps } from './Player.type';
 
@@ -38,7 +40,6 @@ export function PlayerComponent({
   player,
   isLoading,
   isPlaying,
-  progressStatus,
   video,
   film,
   voice,
@@ -114,7 +115,19 @@ export function PlayerComponent({
 
   useEffect(() => {
     const keyDownListener = (type: SupportedKeys) => {
-      if (type === SupportedKeys.Enter && !showControls) {
+      if (!showControls) {
+        if (type === SupportedKeys.Up) {
+          focusedElementRef.current = FocusedElement.TopAction;
+        }
+
+        if (type === SupportedKeys.Enter) {
+          focusedElementRef.current = FocusedElement.ProgressThumb;
+        }
+
+        if (type === SupportedKeys.Down) {
+          focusedElementRef.current = FocusedElement.BottomAction;
+        }
+
         setShowControls(true);
 
         return true;
@@ -159,7 +172,6 @@ export function PlayerComponent({
       if (showControls) {
         setShowControls(false);
         setHideActions(false);
-        focusedElementRef.current = FocusedElement.ProgressThumb;
 
         return true;
       }
@@ -222,11 +234,12 @@ export function PlayerComponent({
   const renderAction = (
     icon: string,
     _name: string,
+    el: FocusedElement,
     action?: () => void,
   ) => (
     <SpatialNavigationFocusableView
       onSelect={ action }
-      onFocus={ () => { focusedElementRef.current = FocusedElement.Action; } }
+      onFocus={ () => { focusedElementRef.current = el; } }
     >
       { ({ isFocused }) => (
         <ThemedIcon
@@ -245,6 +258,28 @@ export function PlayerComponent({
     </SpatialNavigationFocusableView>
   );
 
+  const renderTopAction = (
+    icon: string,
+    name: string,
+    action?: () => void,
+  ) => renderAction(
+    icon,
+    name,
+    FocusedElement.TopAction,
+    action,
+  );
+
+  const renderBottomAction = (
+    icon: string,
+    name: string,
+    action?: () => void,
+  ) => renderAction(
+    icon,
+    name,
+    FocusedElement.BottomAction,
+    action,
+  );
+
   const renderTopActions = () => (
     <SpatialNavigationView
       direction="horizontal"
@@ -253,76 +288,35 @@ export function PlayerComponent({
         ...(hideActions ? styles.controlsRowHidden : {}),
       } }
     >
-      { renderAction(
+      { renderTopAction(
         isPlaying ? 'pause' : 'play-arrow',
         'Play',
         togglePlayPause,
       ) }
-      { renderAction('fast-rewind', 'Rewind') }
-      { renderAction('fast-forward', 'Forward') }
+      { renderTopAction('fast-rewind', 'Rewind') }
+      { renderTopAction('fast-forward', 'Forward') }
       { film.hasSeasons && (
         <>
-          { renderAction('skip-previous', 'Previous', () => handleNewEpisode(RewindDirection.Backward)) }
-          { renderAction('skip-next', 'Next', () => handleNewEpisode(RewindDirection.Forward)) }
+          { renderTopAction('skip-previous', 'Previous', () => handleNewEpisode(RewindDirection.Backward)) }
+          { renderTopAction('skip-next', 'Next', () => handleNewEpisode(RewindDirection.Forward)) }
         </>
       ) }
-      { renderAction('speed', 'Speed') }
-      { renderAction('comment', 'Comments') }
+      { renderTopAction('speed', 'Speed') }
+      { renderTopAction('comment', 'Comments') }
     </SpatialNavigationView>
   );
 
-  const renderProgressBar = () => {
-    const { playablePercentage, progressPercentage } = progressStatus;
+  const renderProgressBar = () => (
+    <ProgressBar
+      onFocus={ () => {
+        focusedElementRef.current = FocusedElement.ProgressThumb;
+      } }
+    />
+  );
 
-    return (
-      <View style={ styles.progressBarContainer }>
-        { /* Playable Duration */ }
-        <View
-          style={ [
-            styles.playableBar,
-            { width: (`${playablePercentage}%`) as DimensionValue },
-          ] }
-        />
-        { /* Progress Playback */ }
-        <View
-          style={ [
-            styles.progressBar,
-            { width: (`${progressPercentage}%`) as DimensionValue },
-          ] }
-        >
-          { /* Progress Thumb */ }
-          <SpatialNavigationFocusableView
-            style={ styles.thumbContainer }
-            onFocus={ () => { focusedElementRef.current = FocusedElement.ProgressThumb; } }
-          >
-            { ({ isFocused }) => (
-              <View
-                style={ [
-                  styles.thumb,
-                  isFocused && styles.focusedThumb,
-                ] }
-              />
-            ) }
-          </SpatialNavigationFocusableView>
-        </View>
-      </View>
-    );
-  };
-
-  const renderDuration = () => {
-    const { currentTime, durationTime, remainingTime } = progressStatus;
-
-    return (
-      <View style={ styles.duration }>
-        <ThemedText style={ styles.durationText }>
-          { `Remaining: ${remainingTime}` }
-        </ThemedText>
-        <ThemedText style={ styles.durationText }>
-          { `${currentTime} / ${durationTime}` }
-        </ThemedText>
-      </View>
-    );
-  };
+  const renderDuration = () => (
+    <Duration />
+  );
 
   const renderBottomActions = () => (
     <View style={ styles.bottomActions }>
@@ -333,11 +327,11 @@ export function PlayerComponent({
           ...(hideActions ? styles.controlsRowHidden : {}),
         } }
       >
-        { renderAction('high-quality', 'Quality', openQualitySelector) }
-        { renderAction('playlist-play', 'Series', openVideoSelector) }
-        { renderAction('subtitles', 'Subtitles') }
-        { renderAction('bookmarks', 'Bookmarks') }
-        { renderAction('share', 'Share') }
+        { renderBottomAction('high-quality', 'Quality', openQualitySelector) }
+        { renderBottomAction('playlist-play', 'Series', openVideoSelector) }
+        { renderBottomAction('subtitles', 'Subtitles') }
+        { renderBottomAction('bookmarks', 'Bookmarks') }
+        { renderBottomAction('share', 'Share') }
       </SpatialNavigationView>
       { renderDuration() }
     </View>
@@ -366,11 +360,15 @@ export function PlayerComponent({
     return (
       <View style={ styles.controls }>
         { renderTopInfo() }
-        { renderTopActions() }
-        <DefaultFocus>
+        <DefaultFocus enable={ focusedElementRef.current === FocusedElement.TopAction }>
+          { renderTopActions() }
+        </DefaultFocus>
+        <DefaultFocus enable={ focusedElementRef.current === FocusedElement.ProgressThumb }>
           { renderProgressBar() }
         </DefaultFocus>
-        { renderBottomActions() }
+        <DefaultFocus enable={ focusedElementRef.current === FocusedElement.BottomAction }>
+          { renderBottomActions() }
+        </DefaultFocus>
       </View>
     );
   };
@@ -439,5 +437,67 @@ export function PlayerComponent({
     </View>
   );
 }
+
+export const Duration = observer(() => {
+  const {
+    currentTime,
+    durationTime,
+    remainingTime,
+  } = PlayerStore.progressStatus;
+
+  return (
+    <View style={ styles.duration }>
+      <ThemedText style={ styles.durationText }>
+        { `Remaining: ${remainingTime}` }
+      </ThemedText>
+      <ThemedText style={ styles.durationText }>
+        { `${currentTime} / ${durationTime}` }
+      </ThemedText>
+    </View>
+  );
+});
+
+export const ProgressBar = observer(({
+  onFocus,
+}: {onFocus: () => void}) => {
+  const {
+    playablePercentage,
+    progressPercentage,
+  } = PlayerStore.progressStatus;
+
+  return (
+    <View style={ styles.progressBarContainer }>
+      { /* Playable Duration */ }
+      <View
+        style={ [
+          styles.playableBar,
+          { width: (`${playablePercentage}%`) as DimensionValue },
+        ] }
+      />
+      { /* Progress Playback */ }
+      <View
+        style={ [
+          styles.progressBar,
+          { width: (`${progressPercentage}%`) as DimensionValue },
+        ] }
+      >
+        { /* Progress Thumb */ }
+        <SpatialNavigationFocusableView
+          style={ styles.thumbContainer }
+          onFocus={ onFocus }
+        >
+          { ({ isFocused }) => (
+            <View
+              style={ [
+                styles.thumb,
+                isFocused && styles.focusedThumb,
+              ] }
+            />
+          ) }
+        </SpatialNavigationFocusableView>
+      </View>
+    </View>
+  );
+});
 
 export default PlayerComponent;

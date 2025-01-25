@@ -18,7 +18,6 @@ export interface PlayerComponentProps {
   player: VideoPlayer;
   isLoading: boolean;
   isPlaying: boolean;
-  progressStatus: ProgressStatus;
   video: FilmVideoInterface;
   film: FilmInterface;
   voice: FilmVoiceInterface;

@@ -31,7 +31,8 @@ import {
   RewindDirection,
   SAVE_TIME_EVERY_MS,
 } from './Player.config';
-import { PlayerContainerProps, ProgressStatus } from './Player.type';
+import PlayerStore from './Player.store';
+import { PlayerContainerProps } from './Player.type';
 
 export function PlayerContainer({
   video,
@@ -44,7 +45,6 @@ export function PlayerContainer({
   const [selectedVoice, setSelectedVoice] = useState<FilmVoiceInterface>(voice);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [progressStatus, setProgressStatus] = useState<ProgressStatus>(DEFAULT_PROGRESS_STATUS);
   const [selectedQuality, setSelectedQuality] = useState<string>(selectedStream.quality);
   const autoRewindTimeout = useRef<NodeJS.Timeout | null>(null);
   const autoRewindCount = useRef<number>(0);
@@ -78,7 +78,7 @@ export function PlayerContainer({
         return;
       }
 
-      setProgressStatus(
+      PlayerStore.setProgressStatus(
         calculateProgress(currentTime, bufferedPosition, duration),
       );
     },
@@ -110,7 +110,7 @@ export function PlayerContainer({
         });
     }
 
-    setProgressStatus(DEFAULT_PROGRESS_STATUS);
+    PlayerStore.setProgressStatus(DEFAULT_PROGRESS_STATUS);
     setIsLoading(true);
     setSelectedVideo(newVideo);
     setSelectedStream(getPlayerStream(newVideo));
@@ -149,7 +149,13 @@ export function PlayerContainer({
   };
 
   const seekToPosition = async (percent: number) => {
-    player.currentTime = calculateCurrentTime(percent);
+    const { bufferedPosition, duration } = player;
+
+    const newTime = calculateCurrentTime(percent);
+
+    PlayerStore.setProgressStatus(calculateProgress(newTime, bufferedPosition, duration));
+
+    player.currentTime = newTime;
   };
 
   const rewindPosition = async (
@@ -161,7 +167,7 @@ export function PlayerContainer({
     const seekTime = type === RewindDirection.Backward ? seconds * -1 : seconds;
     const newTime = currentTime + seekTime;
 
-    setProgressStatus(calculateProgress(newTime, bufferedPosition, duration));
+    PlayerStore.setProgressStatus(calculateProgress(newTime, bufferedPosition, duration));
 
     player.seekBy(seekTime);
   };
@@ -344,12 +350,13 @@ export function PlayerContainer({
     player,
     isLoading,
     isPlaying,
-    progressStatus,
     video: selectedVideo,
     film,
     voice,
     selectedQuality,
   });
+
+  console.log('render PlayerContainer');
 
   const containerFunctions = {
     togglePlayPause,

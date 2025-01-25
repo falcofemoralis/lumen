@@ -15,7 +15,8 @@ export enum RewindDirection {
 
 export enum FocusedElement {
   ProgressThumb = 'progressThumb',
-  Action = 'action',
+  TopAction = 'topAction',
+  BottomAction = 'bottomAction',
 }
 
 export const AWAKE_TAG = 'player';
@@ -28,5 +29,5 @@ export const LONG_PRESS_DURATION = 500;
 
 export const QUALITY_OVERLAY_ID = 'qualityOverlayId';
 
-// 5 minutes * 60 seconds/minute * 1000 milliseconds/second
-export const SAVE_TIME_EVERY_MS = 5 * 60 * 1000;
+// 1 minutes * 60 seconds/minute * 1000 milliseconds/second
+export const SAVE_TIME_EVERY_MS = 1 * 60 * 1000;
