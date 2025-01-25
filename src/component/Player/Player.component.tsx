@@ -90,10 +90,7 @@ export function PlayerComponent({
 
   const singleTap = Gesture.Tap()
     .maxDuration(150)
-    .onStart((e) => {
-      console.log('single tap');
-      console.log(e);
-
+    .onStart(() => {
       runOnJS(setShowControls)(!showControls);
     });
 
@@ -278,9 +275,11 @@ export function PlayerComponent({
 
   const renderControls = () => (
     <GestureDetector
-      gesture={ Gesture.Exclusive(doubleTap,
+      gesture={ Gesture.Exclusive(
+        doubleTap,
         singleTap,
-        longPressGesture) }
+        longPressGesture,
+      ) }
     >
       <View style={ styles.controlsContainer }>
         <ThemedView.Animated style={ [
