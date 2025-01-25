@@ -76,8 +76,9 @@ export const parseStreams = (streams: string | null): FilmStreamInterface[] => {
 
     split.forEach((str) => {
       if (str.includes(' or ')) {
+        const m = str.substring(str.indexOf(']') + 1);
         parsedStreams.push({
-          url: str.split(' or ')[1],
+          url: m.split(' or ')[0],
           quality: str.substring(1, str.indexOf(']')),
         });
       } else {

@@ -44,7 +44,7 @@ const playerApi: PlayerApiInterface = {
     const streams = parseStreams(json.url);
 
     return {
-      streams: configApi.modifyCDN(streams),
+      streams, // configApi.modifyCDN(streams),
     };
   },
 
@@ -78,7 +78,7 @@ const playerApi: PlayerApiInterface = {
       const streams = parseStreams(json.url);
 
       return {
-        streams: configApi.modifyCDN(streams),
+        streams, // configApi.modifyCDN(streams),
       };
     } catch (e) {
       NotificationStore.displayError(e as Error);
