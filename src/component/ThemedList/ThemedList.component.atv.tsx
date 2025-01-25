@@ -26,8 +26,8 @@ export const ThemedListComponent = ({
       onEndReached={ handleScrollEnd }
       onEndReachedThresholdRowsNumber={ 2 }
       style={ style }
-      additionalRenderedRows={ 1 }
-      scrollDuration={ 500 }
+      additionalRenderedRows={ 0 }
+      scrollDuration={ 350 }
     />
   );
 };

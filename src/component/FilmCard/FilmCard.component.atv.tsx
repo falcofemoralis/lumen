@@ -2,6 +2,7 @@ import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
 import Thumbnail from 'Component/Thumbnail';
+import React from 'react';
 import { Animated, View } from 'react-native';
 import { scale } from 'Util/CreateStyles';
 
@@ -51,13 +52,14 @@ export function FilmCardComponent({
   }
 
   const renderType = () => (
-    <View style={ styles.additionItemContainer }>
-      <ThemedText
-        style={ [styles.typeText, { backgroundColor: FILM_TYPE_COLORS[type] }] }
-      >
-        { TYPE_LABELS[type] }
-      </ThemedText>
-    </View>
+    <ThemedText
+      style={ [
+        styles.typeText,
+        { backgroundColor: FILM_TYPE_COLORS[type] },
+      ] }
+    >
+      { TYPE_LABELS[type] }
+    </ThemedText>
   );
 
   const renderFilmAdditionalText = () => {
@@ -66,44 +68,36 @@ export function FilmCardComponent({
     }
 
     return (
-      <View style={ styles.additionItemContainer }>
-        <ThemedText
-          style={ [
-            styles.filmAdditionalText,
-            { backgroundColor: FILM_TYPE_COLORS[type] },
-            isFocused && styles.posterFocused,
-          ] }
-        >
-          { info }
-        </ThemedText>
-      </View>
+      <ThemedText
+        style={ [
+          styles.filmAdditionalText,
+          { backgroundColor: FILM_TYPE_COLORS[type] },
+        ] }
+      >
+        { info }
+      </ThemedText>
     );
   };
 
   const renderAdditionContainer = () => (
-    <View
-      style={ [
-        {
-          height: CARD_HEIGHT_TV - INFO_HEIGHT,
-          marginTop: (CARD_HEIGHT_TV - INFO_HEIGHT) * -1,
-        },
-        styles.additionContainer,
-      ] }
-    >
+    <>
       { renderType() }
       { renderFilmAdditionalText() }
-    </View>
+    </>
   );
 
   const renderPoster = () => (
-    <ThemedImage
-      style={ [
-        { height: CARD_HEIGHT_TV - INFO_HEIGHT },
-        styles.poster,
-        isFocused && styles.posterFocused,
-      ] }
-      src={ poster }
-    />
+    <View>
+      <ThemedImage
+        style={ [
+          { height: CARD_HEIGHT_TV - INFO_HEIGHT },
+          styles.poster,
+          isFocused && styles.posterFocused,
+        ] }
+        src={ poster }
+      />
+      { renderAdditionContainer() }
+    </View>
   );
 
   const renderTitle = () => (
@@ -132,7 +126,6 @@ export function FilmCardComponent({
       style={ [styles.card, { height: CARD_HEIGHT_TV }, scaleAnimation, style] }
     >
       { renderPoster() }
-      { renderAdditionContainer() }
       <ThemedView
         style={ [
           styles.info,

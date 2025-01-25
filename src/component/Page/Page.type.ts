@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 import { ViewStyle } from 'react-native';
 
 export interface PageContainerProps {
-  children?: React.ReactNode;
+  children: Exclude<NonNullable<ReactNode>, string | number | boolean>
   style?: ViewStyle;
   testID?: string;
 }
