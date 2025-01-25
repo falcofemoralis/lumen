@@ -69,13 +69,14 @@ export const styles = CreateStyles({
   progressBarRow: {
     marginBottom: 20,
   },
+  topInfo: {
+    flex: 1,
+    flexDirection: 'column',
+    gap: 4,
+  },
   actionsRow: {
     flexDirection: 'row',
     gap: 28,
-  },
-  topInfo: {
-    flexDirection: 'column',
-    gap: 4,
   },
   title: {
     fontSize: 20,

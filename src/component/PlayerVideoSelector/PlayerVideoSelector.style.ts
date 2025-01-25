@@ -41,8 +41,8 @@ export const styles = CreateStyles({
     gap: 8,
     marginTop: 8,
     paddingTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: Colors.lightGravel,
+    borderTopWidth: 2,
+    borderTopColor: Colors.darkGray,
   },
   episode: {
     backgroundColor: Colors.gray,

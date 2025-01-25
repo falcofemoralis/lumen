@@ -73,6 +73,7 @@ export const styles = CreateStyles({
   collectionContainer: {
     marginTop: 8,
     gap: 6,
+    flexDirection: 'row',
   },
   collectionTitle: {
     fontSize: 14,

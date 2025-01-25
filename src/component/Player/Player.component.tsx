@@ -76,13 +76,13 @@ export function PlayerComponent({
   }, []);
 
   const singleTap = Gesture.Tap()
-    .maxDuration(150)
+    .maxDuration(125)
     .onStart(() => {
       runOnJS(setShowControls)(!showControls);
     });
 
   const doubleTap = Gesture.Tap()
-    .maxDuration(250)
+    .maxDuration(125)
     .numberOfTaps(2)
     .onStart((e) => {
       if (showControls) {
