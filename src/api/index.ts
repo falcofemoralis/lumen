@@ -40,14 +40,10 @@ export interface ConfigApiInterface {
   setAuthorization(auth: string): void;
   getAuthorization(): string;
   getHeaders(): HeadersInit;
-  fetchPage(
-    query: string,
-    variables?: Variables,
-    ignoreCache?: boolean
-  ): Promise<HTMLElementInterface>;
+  fetchPage(query: string, variables?: Variables): Promise<HTMLElementInterface>;
   fetchJson<T>(query: string, variables: Variables): Promise<T>;
-  getRequest(query: string, variables?: Variables, ignoreCache?: boolean): Promise<any>;
-  postRequest(query: string, variables?: Variables, ignoreCache?: boolean): Promise<any>;
+  getRequest(query: string, variables?: Variables): Promise<any>;
+  postRequest(query: string, variables?: Variables): Promise<any>;
   modifyCDN(streams: FilmStreamInterface[]): FilmStreamInterface[];
 }
 

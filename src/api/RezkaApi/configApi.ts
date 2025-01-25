@@ -105,21 +105,19 @@ const configApi: ConfigApiInterface = {
    * Fetch page
    * @param query
    * @param variables
-   * @param ignoreCache
    * @returns HTMLElement
    */
   async fetchPage(
     query: string,
     variables: Variables = {},
-    ignoreCache = false,
   ) {
-    const res = await this.getRequest(query, variables, ignoreCache);
+    const res = await this.getRequest(query, variables);
 
     return parseHtml(res);
   },
 
   async fetchJson<T>(query: string, variables: Variables = {}) {
-    const result = await this.postRequest(query, variables, true);
+    const result = await this.postRequest(query, variables);
 
     const json = JSON.parse(result) as T;
 
@@ -135,14 +133,12 @@ const configApi: ConfigApiInterface = {
   async getRequest(
     query: string,
     variables: Variables = {},
-    ignoreCache = false,
   ) {
     return executeGet(
       query,
       this.getProvider(),
       this.getHeaders(),
       variables,
-      ignoreCache,
     );
   },
 
@@ -155,14 +151,12 @@ const configApi: ConfigApiInterface = {
   async postRequest(
     query: string,
     variables: Record<string, string> = {},
-    ignoreCache,
   ) {
     return executePost(
       `${query}/?t=${Date.now()}`,
       this.getProvider(),
       this.getHeaders(),
       variables,
-      ignoreCache,
     );
   },
 

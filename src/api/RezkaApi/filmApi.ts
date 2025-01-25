@@ -30,12 +30,11 @@ const filmApi: FilmApiInterface = {
     variables?: Variables,
     params?: ApiParams,
   ): Promise<FilmListInterface> {
-    const { key, isRefresh } = params || {};
+    const { key } = params || {};
 
     const root = await configApi.fetchPage(
       `${path === '/' ? '' : path}/page/${page}/`,
       variables,
-      isRefresh,
     );
 
     const content = key ? root.querySelector(key) : root;
@@ -56,10 +55,7 @@ const filmApi: FilmApiInterface = {
    * @returns Film
    */
   async getFilm(link: string): Promise<FilmInterface | null> {
-    /**
-     * We should ignore cache because player data can be changed
-     */
-    const root = await configApi.fetchPage(link, {}, true);
+    const root = await configApi.fetchPage(link);
 
     // base data
     const id = root.querySelector('#user-favorites-holder')?.attributes['data-post_id'] ?? '';
@@ -244,10 +240,9 @@ const filmApi: FilmApiInterface = {
     const { path, key, variables } = menuItem;
 
     if (key === '.b-newest_slider__wrapper') {
-      const { isRefresh } = params ?? {};
       const films: FilmCardInterface[] = [];
 
-      const res = await configApi.postRequest(path, variables, isRefresh);
+      const res = await configApi.postRequest(path, variables);
       const root = parseHtml(`<div>${res}</div>`);
       const filmElements = root.querySelectorAll('.b-content__inline_item');
 
@@ -282,9 +277,7 @@ const filmApi: FilmApiInterface = {
   async getBookmarkedFilms(bookmark: BookmarkInterface, page: number) {
     const { id } = bookmark;
 
-    const filmsList = await this.getFilms(page, `/favorites/${id}`, {}, {
-      isRefresh: true,
-    });
+    const filmsList = await this.getFilms(page, `/favorites/${id}`);
 
     return filmsList;
   },

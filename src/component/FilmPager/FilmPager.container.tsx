@@ -43,7 +43,7 @@ export function FilmPagerContainer({
     pagerItem: PagerItemInterface,
     pagination: PaginationInterface,
     isUpdate = false, // replace current films with new ones
-    isRefresh = false, // fetch new films avoiding cache
+    isRefresh = false, // fetch new films
   ) => {
     const {
       key,

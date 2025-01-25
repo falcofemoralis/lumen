@@ -22,7 +22,6 @@ const accountApi: RezkaAccountApiInterface = {
     const root = await configApi.fetchPage(
       '/favorites',
       {},
-      true,
     );
 
     root.querySelectorAll('.b-favorites_content__cats_list_item').forEach((el) => {
@@ -69,7 +68,7 @@ const accountApi: RezkaAccountApiInterface = {
     const itemsPerPage = 20;
 
     const loadItems = async (): Promise<HTMLElementInterface[]> => {
-      const res = await configApi.fetchPage('/continue', {}, isRefresh);
+      const res = await configApi.fetchPage('/continue', {});
       const parsedItems = res.querySelectorAll('.b-videosaves__list_item');
 
       const s = parsedItems.slice(1);

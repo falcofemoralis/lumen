@@ -1,7 +1,4 @@
-import { queryCache } from 'Util/Cache';
 import { customFetch } from 'Util/Fetch';
-import { hash } from 'Util/Hash';
-import { removeParamFromUrl } from 'Util/Url';
 
 export type Variables = Record<string, string>;
 
@@ -65,21 +62,11 @@ export const executeGet = async (
   endpoint: string,
   headers: HeadersInit,
   variables: Variables,
-  ignoreCache = false,
   signal?: AbortSignal,
 ): Promise<string> => {
   const uri = formatURI(query, variables, endpoint);
-  const uriHash = hash(uri).toString();
 
   try {
-    if (!ignoreCache) {
-      const cachedResult = await queryCache.get(uriHash);
-
-      if (cachedResult) {
-        return cachedResult;
-      }
-    }
-
     const response = await getFetch(uri, headers, signal);
 
     if (response.status === 503) {
@@ -92,8 +79,6 @@ export const executeGet = async (
 
     const parsedRes = await parseResponse(response);
 
-    queryCache.set(uriHash, parsedRes);
-
     return parsedRes;
   } catch (error) {
     throw new Error(error as string);
@@ -105,21 +90,11 @@ export const executePost = async (
   endpoint: string,
   headers: HeadersInit,
   variables: Variables,
-  ignoreCache?: boolean,
   signal?: AbortSignal,
 ): Promise<string> => {
   const uri = formatURI(query, {}, endpoint);
-  const uriHash = hash(removeParamFromUrl(uri, 't')).toString();
 
   try {
-    if (!ignoreCache) {
-      const cachedResult = await queryCache.get(uriHash);
-
-      if (cachedResult) {
-        return cachedResult;
-      }
-    }
-
     const formData = new FormData();
 
     Object.entries(variables).forEach(([key, value]) => {
@@ -129,8 +104,6 @@ export const executePost = async (
     const response = await postFetch(uri, headers, formData, signal);
 
     const parsedRes = await parseResponse(response);
-
-    queryCache.set(uriHash, parsedRes);
 
     return parsedRes;
   } catch (error) {
