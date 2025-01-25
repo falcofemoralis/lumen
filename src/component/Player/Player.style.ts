@@ -19,11 +19,16 @@ export const styles = CreateStyles({
     left: 0,
     top: 0,
     zIndex: 55,
+    flexDirection: 'row',
   },
   controls: {
+    position: 'absolute',
     height: '100%',
     width: '100%',
     backgroundColor: Colors.modal,
+  },
+  controlsDisabled: {
+    pointerEvents: 'none',
   },
   topActions: {
     position: 'absolute',
@@ -33,6 +38,7 @@ export const styles = CreateStyles({
     flexDirection: 'row',
     justifyContent: 'space-between',
     padding: 16,
+    zIndex: 100,
   },
   middleActions: {
     position: 'absolute',

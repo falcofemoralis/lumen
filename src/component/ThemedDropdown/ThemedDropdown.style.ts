@@ -54,7 +54,6 @@ export const styles = CreateStyles({
   },
   listItems: {
     marginTop: 8,
-    height: 250,
   },
   listItem: {
     borderRadius: 16,

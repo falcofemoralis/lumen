@@ -2,7 +2,7 @@ import Loader from 'Component/Loader';
 import PlayerVideoSelector from 'Component/PlayerVideoSelector';
 import ThemedDropdown from 'Component/ThemedDropdown';
 import ThemedIcon from 'Component/ThemedIcon';
-import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
+import { IconInterface, IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
 import * as NavigationBar from 'expo-navigation-bar';
@@ -11,9 +11,19 @@ import { OrientationLock } from 'expo-screen-orientation';
 import { StatusBar } from 'expo-status-bar';
 import { VideoView } from 'expo-video';
 import React, { useEffect, useRef, useState } from 'react';
-import { Pressable, TouchableOpacity, View } from 'react-native';
+import { Dimensions, View } from 'react-native';
 import { Slider } from 'react-native-awesome-slider';
-import { useSharedValue } from 'react-native-reanimated';
+import {
+  Gesture,
+  GestureDetector,
+  TouchableOpacity,
+} from 'react-native-gesture-handler';
+import {
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Colors from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
@@ -22,6 +32,8 @@ import { convertSecondsToTime } from 'Util/Date';
 import { QUALITY_OVERLAY_ID, RewindDirection } from './Player.config';
 import { styles } from './Player.style';
 import { PlayerComponentProps } from './Player.type';
+
+const { width: screenWidth } = Dimensions.get('window');
 
 export function PlayerComponent({
   player,
@@ -41,6 +53,8 @@ export function PlayerComponent({
   openVideoSelector,
   hideVideoSelector,
   handleVideoSelect,
+  rewindPosition,
+  setPlayerRate,
 }: PlayerComponentProps) {
   const [showControls, setShowControls] = useState(false);
   const progress = useSharedValue(0);
@@ -48,6 +62,10 @@ export function PlayerComponent({
   const minimumValue = useSharedValue(0);
   const maximumValue = useSharedValue(100);
   const isSliding = useRef(false);
+
+  const controlsAnimation = useAnimatedStyle(() => ({
+    opacity: withTiming(showControls ? 1 : 0, { duration: 150 }),
+  }));
 
   useEffect(() => {
     ScreenOrientation.lockAsync(OrientationLock.LANDSCAPE);
@@ -70,21 +88,57 @@ export function PlayerComponent({
     cache.value = playablePercentage;
   }, [progressStatus]);
 
+  const singleTap = Gesture.Tap()
+    .maxDuration(150)
+    .onStart((e) => {
+      console.log('single tap');
+      console.log(e);
+
+      runOnJS(setShowControls)(!showControls);
+    });
+
+  const doubleTap = Gesture.Tap()
+    .maxDuration(250)
+    .numberOfTaps(2)
+    .onStart((e) => {
+      if (showControls) {
+        return;
+      }
+
+      const { absoluteX } = e;
+
+      if (absoluteX < (screenWidth / 2)) {
+        runOnJS(rewindPosition)(RewindDirection.Backward);
+      } else {
+        runOnJS(rewindPosition)(RewindDirection.Forward);
+      }
+    });
+
+  const longPressGesture = Gesture.LongPress()
+    .onStart(() => {
+      runOnJS(setPlayerRate)(1.5);
+    })
+    .onEnd(() => {
+      runOnJS(setPlayerRate)(1);
+    });
+
   const renderAction = (
     icon: string,
     _name: string,
     action?: () => void,
   ) => (
-    <TouchableOpacity onPress={ action }>
-      <ThemedIcon
-        icon={ {
-          name: icon,
-          pack: IconPackType.MaterialCommunityIcons,
-        } }
-        size={ scale(28) }
-        color="white"
-      />
-    </TouchableOpacity>
+    <GestureDetector gesture={ Gesture.Tap() }>
+      <TouchableOpacity onPress={ action }>
+        <ThemedIcon
+          icon={ {
+            name: icon,
+            pack: IconPackType.MaterialCommunityIcons,
+          } }
+          size={ scale(28) }
+          color="white"
+        />
+      </TouchableOpacity>
+    </GestureDetector>
   );
 
   const renderTitle = () => {
@@ -130,53 +184,42 @@ export function PlayerComponent({
     </View>
   );
 
-  const renderMiddleControls = () => (
-    <View style={ styles.middleActions }>
-      { film.hasSeasons && (
-        <TouchableOpacity
-          style={ styles.control }
-          onPress={ () => handleNewEpisode(RewindDirection.Backward) }
-        >
-          <ThemedIcon
-            style={ styles.controlIcon }
-            icon={ {
-              name: 'skip-previous',
-              pack: IconPackType.MaterialIcons,
-            } }
-            size={ scale(24) }
-            color="white"
-          />
-        </TouchableOpacity>
-      ) }
+  const renderMiddleControl = (
+    icon: IconInterface,
+    action: () => void,
+    size: number,
+  ) => (
+    <GestureDetector gesture={ Gesture.Tap() }>
       <TouchableOpacity
         style={ styles.control }
-        onPress={ togglePlayPause }
+        onPress={ action }
       >
         <ThemedIcon
           style={ styles.controlIcon }
-          icon={ {
-            name: isPlaying ? 'pause' : 'play',
-            pack: IconPackType.MaterialCommunityIcons,
-          } }
-          size={ scale(36) }
+          icon={ icon }
+          size={ scale(size) }
           color="white"
         />
       </TouchableOpacity>
-      { film.hasSeasons && (
-        <TouchableOpacity
-          style={ styles.control }
-          onPress={ () => handleNewEpisode(RewindDirection.Forward) }
-        >
-          <ThemedIcon
-            style={ styles.controlIcon }
-            icon={ {
-              name: 'skip-next',
-              pack: IconPackType.MaterialIcons,
-            } }
-            size={ scale(24) }
-            color="white"
-          />
-        </TouchableOpacity>
+    </GestureDetector>
+  );
+
+  const renderMiddleControls = () => (
+    <View style={ styles.middleActions }>
+      { film.hasSeasons && renderMiddleControl(
+        { name: 'skip-previous', pack: IconPackType.MaterialIcons },
+        () => handleNewEpisode(RewindDirection.Backward),
+        24,
+      ) }
+      { renderMiddleControl(
+        { name: isPlaying ? 'pause' : 'play', pack: IconPackType.MaterialCommunityIcons },
+        togglePlayPause,
+        36,
+      ) }
+      { film.hasSeasons && renderMiddleControl(
+        { name: 'skip-next', pack: IconPackType.MaterialIcons },
+        () => handleNewEpisode(RewindDirection.Forward),
+        24,
       ) }
     </View>
   );
@@ -233,19 +276,26 @@ export function PlayerComponent({
     </View>
   );
 
-  const renderControls = () => {
-    if (!showControls) {
-      return null;
-    }
-
-    return (
-      <View style={ styles.controls }>
-        { renderTopActions() }
-        { renderMiddleControls() }
-        { renderBottomActions() }
+  const renderControls = () => (
+    <GestureDetector
+      gesture={ Gesture.Exclusive(doubleTap,
+        singleTap,
+        longPressGesture) }
+    >
+      <View style={ styles.controlsContainer }>
+        <ThemedView.Animated style={ [
+          styles.controls,
+          controlsAnimation,
+          !showControls && styles.controlsDisabled,
+        ] }
+        >
+          { renderTopActions() }
+          { renderMiddleControls() }
+          { renderBottomActions() }
+        </ThemedView.Animated>
       </View>
-    );
-  };
+    </GestureDetector>
+  );
 
   const renderLoader = () => (
     <Loader
@@ -309,12 +359,7 @@ export function PlayerComponent({
           nativeControls={ false }
           allowsPictureInPicture={ false }
         />
-        <Pressable
-          style={ styles.controlsContainer }
-          onPress={ () => setShowControls(!showControls) }
-        >
-          { renderControls() }
-        </Pressable>
+        { renderControls() }
         { renderLoader() }
         { renderModals() }
       </ThemedView>

@@ -24,8 +24,8 @@ export interface PlayerComponentProps {
   voice: FilmVoiceInterface;
   selectedQuality: string;
   togglePlayPause: () => void;
-  rewindPosition: (type: RewindDirection, ms?: number) => void;
-  rewindPositionAuto: (type: RewindDirection, ms?: number) => void;
+  rewindPosition: (type: RewindDirection, seconds?: number) => void;
+  rewindPositionAuto: (type: RewindDirection, seconds?: number) => void;
   seekToPosition: (percent: number) => void;
   calculateCurrentTime: (percent: number) => number;
   openQualitySelector: () => void;
@@ -34,6 +34,7 @@ export interface PlayerComponentProps {
   openVideoSelector: () => void;
   hideVideoSelector: () => void;
   handleVideoSelect: (video: FilmVideoInterface, voice: FilmVoiceInterface) => void;
+  setPlayerRate: (rate: number) => void;
 }
 
 export type ProgressStatus = {

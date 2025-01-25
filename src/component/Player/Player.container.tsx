@@ -336,6 +336,10 @@ export function PlayerContainer({
     changePlayerVideo(newVideo, newVoice);
   };
 
+  const setPlayerRate = (rate = 1) => {
+    player.playbackRate = rate;
+  };
+
   const containerProps = () => ({
     player,
     isLoading,
@@ -359,6 +363,7 @@ export function PlayerContainer({
     openVideoSelector,
     hideVideoSelector,
     handleVideoSelect,
+    setPlayerRate,
   };
 
   return withTV(PlayerComponentTV, PlayerComponent, {
