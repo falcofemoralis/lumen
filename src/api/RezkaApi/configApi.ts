@@ -1,6 +1,7 @@
 import { ApiServiceType, ConfigApiInterface } from 'Api/index';
+import NotificationStore from 'Store/Notification.store';
 import { FilmStreamInterface } from 'Type/FilmStream.interface';
-import { parseHtml } from 'Util/Parser';
+import { HTMLElementInterface, parseHtml } from 'Util/Parser';
 import { executeGet, executePost } from 'Util/Request';
 import { configStorage } from 'Util/Storage';
 import { updateUrlHost } from 'Util/Url';
@@ -101,6 +102,23 @@ const configApi: ConfigApiInterface = {
     return headers;
   },
 
+  parseContent(content: string): HTMLElementInterface {
+    const page = parseHtml(content);
+
+    const error = page.querySelector('.error-code');
+
+    if (error) {
+      NotificationStore.displayErrorScreen(
+        page.querySelector('.error-code div')?.textContent,
+        page.querySelector('.error-title')?.textContent,
+        'Повторите попытку чуть позже',
+      );
+      throw new Error('Service temporarily unavailable');
+    }
+
+    return page;
+  },
+
   /**
    * Fetch page
    * @param query
@@ -113,7 +131,7 @@ const configApi: ConfigApiInterface = {
   ) {
     const res = await this.getRequest(query, variables);
 
-    return parseHtml(res);
+    return this.parseContent(res);
   },
 
   async fetchJson<T>(query: string, variables: Variables = {}) {

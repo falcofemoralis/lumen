@@ -57,6 +57,20 @@ export const parseResponse = async (response: Response): Promise<string> => {
   return data;
 };
 
+export const handleRequestError = (response: Response): void => {
+  if (response.status === 503 || response.status === 500) {
+    throw new Error(response.statusText);
+  }
+
+  if (response.status === 403) {
+    throw new Error('You are blocked');
+  }
+
+  if (response.status === 404) {
+    throw new Error('Not found');
+  }
+};
+
 export const executeGet = async (
   query: string,
   endpoint: string,
@@ -69,13 +83,7 @@ export const executeGet = async (
   try {
     const response = await getFetch(uri, headers, signal);
 
-    if (response.status === 503) {
-      throw new Error(response.statusText);
-    }
-
-    if (response.status === 403) {
-      throw new Error('You are blocked');
-    }
+    handleRequestError(response);
 
     const parsedRes = await parseResponse(response);
 
@@ -102,6 +110,8 @@ export const executePost = async (
     });
 
     const response = await postFetch(uri, headers, formData, signal);
+
+    handleRequestError(response);
 
     const parsedRes = await parseResponse(response);
 

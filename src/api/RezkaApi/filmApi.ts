@@ -243,7 +243,7 @@ const filmApi: FilmApiInterface = {
       const films: FilmCardInterface[] = [];
 
       const res = await configApi.postRequest(path, variables);
-      const root = parseHtml(`<div>${res}</div>`);
+      const root = configApi.parseContent(`<div>${res}</div>`);
       const filmElements = root.querySelectorAll('.b-content__inline_item');
 
       filmElements.forEach((el) => {

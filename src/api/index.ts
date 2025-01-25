@@ -40,6 +40,7 @@ export interface ConfigApiInterface {
   setAuthorization(auth: string): void;
   getAuthorization(): string;
   getHeaders(): HeadersInit;
+  parseContent(content: string): HTMLElementInterface;
   fetchPage(query: string, variables?: Variables): Promise<HTMLElementInterface>;
   fetchJson<T>(query: string, variables: Variables): Promise<T>;
   getRequest(query: string, variables?: Variables): Promise<any>;
