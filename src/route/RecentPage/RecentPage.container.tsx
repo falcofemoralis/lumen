@@ -3,6 +3,7 @@ import { withTV } from 'Hooks/withTV';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useRef, useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
+import RecentStore from 'Store/Recent.store';
 import ServiceStore from 'Store/Service.store';
 import { RecentItemInterface } from 'Type/RecentItem.interface';
 
@@ -11,10 +12,9 @@ import RecentPageComponentTV from './RecentPage.component.atv';
 
 export function RecentPageContainer() {
   const [isSignedIn, setIsSignedIn] = useState(ServiceStore.isSignedIn);
-  const [items, setItems] = useState<RecentItemInterface[]>([]);
   const paginationRef = useRef({
-    page: 1,
-    totalPages: 1,
+    page: RecentStore.currentPage,
+    totalPages: RecentStore.totalPages,
   });
   const updatingStateRef = useRef(false);
 
@@ -23,7 +23,7 @@ export function RecentPageContainer() {
       setIsSignedIn(ServiceStore.isSignedIn);
     }
 
-    if (ServiceStore.isSignedIn) {
+    if (ServiceStore.isSignedIn && !RecentStore.isPreloaded) {
       loadRecent(1, false);
     }
   }, [ServiceStore.isSignedIn]);
@@ -55,9 +55,11 @@ export function RecentPageContainer() {
           totalPages: resTotalPages,
         };
 
-        const newItems = isRefresh ? resItems : [...items, ...resItems];
+        const newItems = isRefresh ? resItems : [...RecentStore.items, ...resItems];
 
-        setItems(newItems);
+        RecentStore.setItems(newItems);
+        RecentStore.setCurrentPage(page);
+        RecentStore.setTotalPages(resTotalPages);
       } catch (error) {
         NotificationStore.displayError(error as Error);
       } finally {
@@ -83,9 +85,9 @@ export function RecentPageContainer() {
     const { id } = item;
 
     try {
-      const newItems = items.filter((i) => i.id !== id);
+      const newItems = RecentStore.items.filter((i) => i.id !== id);
 
-      setItems(newItems);
+      RecentStore.setItems(newItems);
 
       await ServiceStore.getCurrentService().removeRecent(id);
     } catch (error) {
@@ -101,7 +103,7 @@ export function RecentPageContainer() {
 
   const containerProps = () => ({
     isSignedIn,
-    items,
+    items: RecentStore.items,
   });
 
   return withTV(RecentPageComponentTV, RecentPageComponent, {
