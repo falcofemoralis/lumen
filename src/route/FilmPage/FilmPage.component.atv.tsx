@@ -19,6 +19,7 @@ import {
 import Colors from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 
+import { PLAYER_VIDEO_SELECTOR_OVERLAY_ID } from './FilmPage.config';
 import { styles } from './FilmPage.style.atv';
 import { FilmPageComponentProps } from './FilmPage.type';
 
@@ -163,16 +164,20 @@ export function FilmPageComponent({
   );
 
   const renderRating = () => {
-    const { ratings = [], ratingsScale } = film;
+    const { mainRating, ratingScale } = film;
+
+    if (!mainRating) {
+      return null;
+    }
 
     return (
       <Rating
         style={ styles.rating }
         size={ scale(14) }
-        rating={ ratings[0]?.rating || 0 }
+        rating={ mainRating.rating || 0 }
         scale={ 1 }
         spacing={ scale(2) }
-        maxRating={ ratingsScale || 10 }
+        maxRating={ ratingScale || 10 }
         fillColor={ Colors.secondary }
       />
     );
@@ -233,6 +238,7 @@ export function FilmPageComponent({
 
     return (
       <PlayerVideoSelector
+        overlayId={ PLAYER_VIDEO_SELECTOR_OVERLAY_ID }
         film={ film }
         onHide={ hideVideoSelector }
         onSelect={ handleVideoSelect }

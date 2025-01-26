@@ -97,5 +97,6 @@ export const styles = CreateStyles({
     fontSize: 14,
     lineHeight: 24,
     marginTop: 8,
+    textAlign: 'justify',
   },
 });

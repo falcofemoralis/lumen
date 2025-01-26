@@ -1,4 +1,3 @@
-import { PLAYER_VIDEO_SELECTOR_OVERLAY_ID } from 'Component/PlayerVideoSelector/PlayerVideoSelector.config';
 import { router } from 'expo-router';
 import { withTV } from 'Hooks/withTV';
 import { useCallback, useEffect, useState } from 'react';
@@ -12,6 +11,7 @@ import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 
 import FilmPageComponent from './FilmPage.component';
 import FilmPageComponentTV from './FilmPage.component.atv';
+import { PLAYER_VIDEO_SELECTOR_OVERLAY_ID } from './FilmPage.config';
 import { FilmPageContainerProps } from './FilmPage.type';
 
 export function FilmPageContainer({ link }: FilmPageContainerProps) {

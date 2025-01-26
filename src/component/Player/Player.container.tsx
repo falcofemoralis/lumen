@@ -1,9 +1,9 @@
-import { PLAYER_VIDEO_SELECTOR_OVERLAY_ID } from 'Component/PlayerVideoSelector/PlayerVideoSelector.config';
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import { useEventListener } from 'expo';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { useVideoPlayer } from 'expo-video';
 import { withTV } from 'Hooks/withTV';
+import __ from 'i18n/__';
 import { useEffect, useRef, useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
 import OverlayStore from 'Store/Overlay.store';
@@ -27,6 +27,7 @@ import {
   DEFAULT_AUTO_REWIND_MS,
   DEFAULT_PROGRESS_STATUS,
   DEFAULT_REWIND_SECONDS,
+  IN_PLAYER_VIDEO_SELECTOR_OVERLAY_ID,
   QUALITY_OVERLAY_ID,
   RewindDirection,
   SAVE_TIME_EVERY_MS,
@@ -55,6 +56,7 @@ export function PlayerContainer({
     p.loop = false;
     p.timeUpdateEventInterval = 1;
     p.currentTime = getPlayerTime(film, selectedVoice);
+    p.preservesPitch = true;
     p.play();
   });
 
@@ -110,6 +112,7 @@ export function PlayerContainer({
         });
     }
 
+    updateTime();
     PlayerStore.setProgressStatus(DEFAULT_PROGRESS_STATUS);
     setIsLoading(true);
     setSelectedVideo(newVideo);
@@ -263,6 +266,8 @@ export function PlayerContainer({
         newSeasonIndex -= 1;
 
         if (newSeasonIndex < 0) {
+          NotificationStore.displayMessage(__('No more episodes available'));
+
           return;
         }
 
@@ -277,6 +282,8 @@ export function PlayerContainer({
         newSeasonIndex += 1;
 
         if (newSeasonIndex > seasons.length - 1) {
+          NotificationStore.displayMessage(__('No more episodes available'));
+
           return;
         }
 
@@ -329,7 +336,7 @@ export function PlayerContainer({
   };
 
   const openVideoSelector = () => {
-    OverlayStore.openOverlay(PLAYER_VIDEO_SELECTOR_OVERLAY_ID);
+    OverlayStore.openOverlay(IN_PLAYER_VIDEO_SELECTOR_OVERLAY_ID);
   };
 
   const hideVideoSelector = () => {
@@ -355,8 +362,6 @@ export function PlayerContainer({
     voice,
     selectedQuality,
   });
-
-  console.log('render PlayerContainer');
 
   const containerFunctions = {
     togglePlayPause,

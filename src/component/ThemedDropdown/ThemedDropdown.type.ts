@@ -1,10 +1,17 @@
-import { DropdownProps } from 'react-native-element-dropdown/lib/typescript/components/Dropdown/model';
+import { StyleProp, ViewStyle } from 'react-native';
 
-export type ThemedDropdownProps = Omit<DropdownProps<DropdownItem>, 'labelField' | 'valueField' | 'renderItem'> & {
+export type ThemedDropdownContainerProps<T> = {
+  data: T[],
+  value: T,
+  header?: string;
+  inputStyle?: StyleProp<ViewStyle>;
   asOverlay?: boolean;
   overlayId?: string;
   asList?: boolean;
+  onChange: (value: T) => void;
 }
+
+export type ThemedDropdownComponentProps<T> = ThemedDropdownContainerProps<T>;
 
 export interface DropdownItem {
   label: string;

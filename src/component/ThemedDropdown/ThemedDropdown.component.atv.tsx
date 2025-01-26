@@ -11,29 +11,29 @@ import { scale } from 'Util/CreateStyles';
 import { generateId } from 'Util/Math';
 
 import { styles } from './ThemedDropdown.style.atv';
-import { DropdownItem, ThemedDropdownProps } from './ThemedDropdown.type';
+import { DropdownItem, ThemedDropdownComponentProps } from './ThemedDropdown.type';
 
 export const ThemedDropdownComponent = ({
-  style,
+  inputStyle,
   data,
   value,
-  searchPlaceholder,
+  header,
   asOverlay,
   overlayId,
   asList,
   onChange,
-}: ThemedDropdownProps) => {
+}: ThemedDropdownComponentProps<any>) => {
   const id = useRef(overlayId ?? generateId());
 
   const renderHeader = () => {
-    if (!searchPlaceholder) {
+    if (!header) {
       return null;
     }
 
     return (
       <View style={ styles.header }>
         <Text style={ styles.headerText }>
-          { searchPlaceholder }
+          { header }
         </Text>
       </View>
     );
@@ -136,18 +136,20 @@ export const ThemedDropdownComponent = ({
       return null;
     }
 
-    const selectedLabel = data.find((item) => item.value === value)?.label;
+    const { label, endIcon } = data.find((item) => item.value === value);
 
     return (
       <ThemedButton
-        style={ [styles.input, style] }
+        style={ [styles.input, inputStyle] }
+        rightImageStyle={ styles.inputImage }
         icon={ {
           name: 'plus',
           pack: IconPackType.Octicons,
         } }
         onPress={ () => OverlayStore.openOverlay(id.current) }
+        rightImage={ endIcon }
       >
-        { selectedLabel }
+        { label }
       </ThemedButton>
     );
   };

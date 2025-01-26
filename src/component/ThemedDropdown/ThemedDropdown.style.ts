@@ -4,22 +4,23 @@ import CreateStyles from 'Util/CreateStyles';
 export const styles = CreateStyles({
   input: {
     backgroundColor: Colors.gray,
-    borderRadius: 8,
-    padding: 12,
-  },
-  inputText: {
-    fontSize: 16,
-    color: Colors.white,
-    flex: 1,
+    justifyContent: 'flex-start',
+    gap: 4,
   },
   inputIcon: {
-    marginRight: 8,
   },
-  overlayContainer: {
+  inputText: {
   },
-  content: {
-    backgroundColor: Colors.background,
-    borderWidth: 0,
+  inputImage: {
+    height: 20,
+    width: 20,
+    alignSelf: 'center',
+  },
+  container: {
+    maxHeight: 300,
+    padding: 8,
+  },
+  contentContainer: {
   },
   item: {
     padding: 14,

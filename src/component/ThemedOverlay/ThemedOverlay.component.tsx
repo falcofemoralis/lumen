@@ -8,13 +8,15 @@ import { ThemedOverlayComponentProps } from './ThemedOverlay.type';
 
 const window = Dimensions.get('window');
 
-export default function ThemedOverlayComponent({
-  isVisible,
-  onHide,
-  contentContainerStyle,
-  style,
-  children,
-}: ThemedOverlayComponentProps) {
+export function ThemedOverlayComponent(props: ThemedOverlayComponentProps) {
+  const {
+    id,
+    isOpened,
+    onHide,
+    contentContainerStyle,
+    style,
+    children,
+  } = props;
   const [isLandscape, setIsLandscape] = useState(
     window.height < window.width,
   );
@@ -32,10 +34,14 @@ export default function ThemedOverlayComponent({
     };
   }, []);
 
+  // console.log('ThemedOverlay', id);
+  // const { children: mm, ...rest } = props;
+  // console.log(rest);
+
   return (
     <Portal>
       <Modal
-        visible={ isVisible }
+        visible={ isOpened }
         onDismiss={ onHide }
         contentContainerStyle={ [
           styles.contentContainerStyle,
@@ -49,3 +55,5 @@ export default function ThemedOverlayComponent({
     </Portal>
   );
 }
+
+export default ThemedOverlayComponent;

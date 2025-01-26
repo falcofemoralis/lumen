@@ -1,5 +1,7 @@
 import { IconInterface } from 'Component/ThemedIcon/ThemedIcon.type';
-import { StyleProp, TextStyle, ViewStyle } from 'react-native';
+import {
+  ImageStyle, StyleProp, TextStyle, ViewStyle,
+} from 'react-native';
 
 export type Variant = 'filled' | 'outlined';
 
@@ -8,9 +10,11 @@ export interface ThemedButtonProps {
   style?: StyleProp<ViewStyle>;
   iconStyle?: StyleProp<TextStyle>;
   textStyle?: StyleProp<TextStyle>;
+  rightImageStyle?: StyleProp<ImageStyle>
   isSelected?: boolean;
   icon?: IconInterface;
   variant?: Variant;
+  rightImage?: string;
   onPress?: () => void;
   onFocus?: () => void;
 }

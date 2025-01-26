@@ -9,6 +9,7 @@ export const styles = CreateStyles({
     borderRadius: 44,
     flexDirection: 'row',
     gap: 6,
+    alignItems: 'center',
   },
   // filled
   containerFilled: {},
@@ -61,5 +62,7 @@ export const styles = CreateStyles({
   },
   iconOutlinedFocused: {
     color: Colors.black,
+  },
+  rightIcon: {
   },
 });

@@ -1,8 +1,11 @@
+import FilmGrid from 'Component/FilmGrid';
 import FilmPager from 'Component/FilmPager';
 import Page from 'Component/Page';
 import ThemedText from 'Component/ThemedText';
+import Thumbnail from 'Component/Thumbnail';
 import React from 'react';
 import { View } from 'react-native';
+import { scale } from 'Util/CreateStyles';
 
 import { BookmarksPageComponentProps } from './BookmarksPage.type';
 
@@ -26,7 +29,22 @@ export function BookmarksPageComponent({
     if (isLoading) {
       return (
         <View>
-          <ThemedText>Loading...</ThemedText>
+          <View style={ {
+            flexDirection: 'row',
+            height: scale(40),
+            gap: scale(8),
+            marginBlockEnd: scale(16),
+          } }
+          >
+            { Array(3).fill(0).map((_, i) => (
+              <Thumbnail
+                // eslint-disable-next-line react/no-array-index-key
+                key={ `${i}-thumb` }
+                width="20%"
+              />
+            )) }
+          </View>
+          <FilmGrid films={ [] } />
         </View>
       );
     }

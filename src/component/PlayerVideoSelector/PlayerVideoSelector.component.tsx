@@ -6,11 +6,11 @@ import React from 'react';
 import { ScrollView, View } from 'react-native';
 import { Button } from 'react-native-paper';
 
-import { PLAYER_VIDEO_SELECTOR_OVERLAY_ID } from './PlayerVideoSelector.config';
 import { styles } from './PlayerVideoSelector.style';
 import { PlayerVideoSelectorComponentProps } from './PlayerVideoSelector.type';
 
 export function PlayerVideoSelectorComponent({
+  overlayId,
   voices,
   onHide,
   isLoading,
@@ -38,7 +38,7 @@ export function PlayerVideoSelectorComponent({
             endIcon: voice.img,
           })) }
           value={ selectedVoice.id }
-          placeholder={ selectedVoice.title }
+          header="Search voice"
           onChange={ (item) => handleSelectVoice(item.value) }
           asList={ !seasons.length }
         />
@@ -114,7 +114,7 @@ export function PlayerVideoSelectorComponent({
 
   return (
     <ThemedOverlay
-      id={ PLAYER_VIDEO_SELECTOR_OVERLAY_ID }
+      id={ overlayId }
       onHide={ onHide }
       contentContainerStyle={ styles.container }
       style={ styles.background }

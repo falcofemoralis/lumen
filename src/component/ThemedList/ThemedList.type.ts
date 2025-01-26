@@ -12,7 +12,7 @@ export interface ThemedListContainerProps<T = any> {
   style?: ViewStyle;
   rowStyle?: ViewStyle;
   renderItem: (args: ThemedListRowProps<T>) => JSX.Element;
-  onNextLoad: (isRefresh: boolean) => Promise<void>;
+  onNextLoad?: (isRefresh: boolean) => Promise<void>;
 }
 
 export interface ThemedListComponentProps<T = any> {

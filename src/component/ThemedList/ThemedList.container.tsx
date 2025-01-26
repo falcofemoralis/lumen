@@ -48,7 +48,9 @@ export function ThemedListContainer({
       onLoading(true);
 
       try {
-        await onNextLoad(isRefresh);
+        if (onNextLoad) {
+          await onNextLoad(isRefresh);
+        }
       } finally {
         updatingStateRef.current = false;
         onLoading(false);

@@ -1,34 +1,43 @@
-import ThemedIcon from 'Component/ThemedIcon';
+import ThemedButton from 'Component/ThemedButton';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedOverlay from 'Component/ThemedOverlay';
-import { useCallback, useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 import {
   ScrollView, Text, TouchableHighlight, View,
 } from 'react-native';
-import { Dropdown } from 'react-native-element-dropdown';
 import OverlayStore from 'Store/Overlay.store';
 import Colors from 'Style/Colors';
-import { scale } from 'Util/CreateStyles';
-import { noopFn } from 'Util/Function';
 import { generateId } from 'Util/Math';
 
 import { styles } from './ThemedDropdown.style';
-import { DropdownItem, ThemedDropdownProps } from './ThemedDropdown.type';
+import { DropdownItem, ThemedDropdownComponentProps } from './ThemedDropdown.type';
 
-/**
- * https://github.com/hoaphantn7604/react-native-element-dropdown#readme
- * @param props
- * @returns
- */
 export const ThemedDropdownComponent = ({
-  style,
-  asList,
+  inputStyle,
+  data,
+  value,
+  header,
   asOverlay,
   overlayId,
-  ...props
-}: ThemedDropdownProps) => {
+  asList,
+  onChange,
+}: ThemedDropdownComponentProps<any>) => {
   const id = useRef(overlayId ?? generateId());
+
+  const renderHeader = () => {
+    if (!header) {
+      return null;
+    }
+
+    return (
+      <View style={ styles.listHeader }>
+        <Text style={ styles.listHeaderText }>
+          { header }
+        </Text>
+      </View>
+    );
+  };
 
   const renderItem = useCallback((item: DropdownItem) => (
     <View style={ styles.item }>
@@ -50,97 +59,84 @@ export const ThemedDropdownComponent = ({
     </View>
   ), []);
 
-  const renderList = () => {
-    const {
-      data,
-      onChange = noopFn,
-      value,
-      searchPlaceholder,
-    } = props;
-
-    return (
-      <View style={ [styles.listContainer, style] }>
-        { searchPlaceholder && (
-          <View style={ styles.listHeader }>
-            <Text style={ styles.listHeaderText }>
-              { searchPlaceholder }
-            </Text>
-          </View>
-        ) }
-        <ScrollView style={ styles.listItems }>
-          { data.map((item) => (
-            <TouchableHighlight
-              key={ item.value }
-              underlayColor={ Colors.primary }
-              onPress={ () => { onChange(item); } }
-              style={ styles.listItem }
+  const renderContent = () => (
+    <>
+      { renderHeader() }
+      <ScrollView style={ styles.listItems }>
+        { data.map((item) => (
+          <TouchableHighlight
+            key={ item.value }
+            underlayColor={ Colors.primary }
+            onPress={ () => { onChange(item); } }
+            style={ styles.listItem }
+          >
+            <View style={ [
+              styles.listItem,
+              item.value === value && styles.listItemSelected,
+            ] }
             >
-              <View style={ [
-                styles.listItem,
-                item.value === value && styles.listItemSelected,
-              ] }
-              >
-                { renderItem(item) }
-              </View>
-            </TouchableHighlight>
-          )) }
-        </ScrollView>
-      </View>
-
-    );
-  };
-
-  const renderDropdown = () => (
-    <Dropdown
-      maxHeight={ 300 }
-      labelField="label"
-      valueField="value"
-      renderItem={ renderItem }
-      autoScroll={ false }
-      { ...props }
-      containerStyle={ styles.content }
-      activeColor={ Colors.primary }
-      searchPlaceholderTextColor={ Colors.white }
-      style={ [styles.input, style] }
-      selectedTextProps={ { style: styles.inputText } }
-      renderLeftIcon={ () => (
-        <ThemedIcon
-          style={ styles.inputIcon }
-          icon={ {
-            name: 'plus',
-            pack: IconPackType.Octicons,
-          } }
-          color="white"
-          size={ scale(16) }
-        />
-      ) }
-      renderRightIcon={ () => null }
-    />
+              { renderItem(item) }
+            </View>
+          </TouchableHighlight>
+        )) }
+      </ScrollView>
+    </>
   );
 
-  const renderContent = () => {
+  const renderModal = () => {
     if (asList) {
-      return renderList();
+      return (
+        <View style={ styles.listContainer }>
+          <View style={ styles.contentContainer }>
+            { renderContent() }
+          </View>
+        </View>
+      );
     }
-
-    return renderDropdown();
-  };
-
-  if (asOverlay) {
-    const { containerStyle } = props;
 
     return (
       <ThemedOverlay
         id={ id.current }
         onHide={ () => OverlayStore.goToPreviousOverlay() }
-        contentContainerStyle={ [styles.overlayContainer, containerStyle] }
+        containerStyle={ styles.container }
+        contentContainerStyle={ styles.contentContainer }
       >
         { renderContent() }
       </ThemedOverlay>
     );
-  }
+  };
 
-  return renderContent();
+  const renderInput = () => {
+    if (asOverlay || asList) {
+      return null;
+    }
+
+    const { label, endIcon } = data.find((item) => item.value === value);
+
+    return (
+      <ThemedButton
+        style={ [styles.input, inputStyle] }
+        iconStyle={ styles.inputIcon }
+        textStyle={ styles.inputText }
+        rightImageStyle={ styles.inputImage }
+        icon={ {
+          name: 'plus',
+          pack: IconPackType.Octicons,
+        } }
+        onPress={ () => OverlayStore.openOverlay(id.current) }
+        rightImage={ endIcon }
+      >
+        { label }
+      </ThemedButton>
+    );
+  };
+
+  return (
+    <View>
+      { renderModal() }
+      { renderInput() }
+    </View>
+  );
 };
 
 export default ThemedDropdownComponent;

@@ -15,14 +15,23 @@ export function ThemedOverlayContainer({
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    setIsOpened(OverlayStore.isOverlayOpened(id));
-    setIsVisible(OverlayStore.isOverlayVisible(id));
+    const opened = OverlayStore.isOverlayOpened(id);
+    const visible = OverlayStore.isOverlayVisible(id);
+
+    if (opened !== isOpened) {
+      setIsOpened(opened);
+    }
+
+    if (visible !== isVisible) {
+      setIsVisible(visible);
+    }
   }, [OverlayStore.currentOverlay.length]);
 
   const containerProps = () => ({
     ...props,
     isOpened,
     isVisible,
+    id,
   });
 
   return withTV(ThemedOverlayComponentTV, ThemedOverlayComponent, {

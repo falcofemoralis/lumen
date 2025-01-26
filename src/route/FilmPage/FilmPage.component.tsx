@@ -11,12 +11,14 @@ import { useRouter } from 'expo-router';
 import __ from 'i18n/__';
 import {
   ScrollView,
+  Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 import Colors from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 
+import { PLAYER_VIDEO_SELECTOR_OVERLAY_ID } from './FilmPage.config';
 import { styles } from './FilmPage.style.';
 import { FilmPageComponentProps } from './FilmPage.type';
 
@@ -201,7 +203,7 @@ export function FilmPageComponent({
     }
 
     return (
-      <View
+      <Text
         key={ text }
         style={ styles.textContainer }
       >
@@ -213,7 +215,7 @@ export function FilmPageComponent({
         <ThemedText style={ styles.text }>
           { text }
         </ThemedText>
-      </View>
+      </Text>
     );
   };
 
@@ -344,9 +346,9 @@ export function FilmPageComponent({
   );
 
   const renderRating = () => {
-    const { ratings = [], ratingsScale } = film;
+    const { mainRating, ratingScale } = film;
 
-    if (!ratings.length) {
+    if (!mainRating) {
       return null;
     }
 
@@ -354,10 +356,10 @@ export function FilmPageComponent({
       <View style={ styles.rating }>
         <Rating
           size={ scale(12) }
-          rating={ ratings[0].rating || 0 }
+          rating={ mainRating.rating || 0 }
           scale={ 1 }
           spacing={ scale(2) }
-          maxRating={ ratingsScale || 10 }
+          maxRating={ ratingScale || 10 }
           fillColor={ Colors.secondary }
         />
       </View>
@@ -383,6 +385,7 @@ export function FilmPageComponent({
 
     return (
       <PlayerVideoSelector
+        overlayId={ PLAYER_VIDEO_SELECTOR_OVERLAY_ID }
         film={ film }
         onHide={ hideVideoSelector }
         onSelect={ handleVideoSelect }

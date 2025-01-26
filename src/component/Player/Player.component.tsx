@@ -32,7 +32,7 @@ import Colors from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 import { convertSecondsToTime } from 'Util/Date';
 
-import { QUALITY_OVERLAY_ID, RewindDirection } from './Player.config';
+import { IN_PLAYER_VIDEO_SELECTOR_OVERLAY_ID, QUALITY_OVERLAY_ID, RewindDirection } from './Player.config';
 import PlayerStore from './Player.store';
 import { styles } from './Player.style';
 import { PlayerComponentProps } from './Player.type';
@@ -272,9 +272,8 @@ export function PlayerComponent({
     return (
       <ThemedDropdown
         asOverlay
-        asList
         overlayId={ QUALITY_OVERLAY_ID }
-        searchPlaceholder="Quality"
+        header="Quality"
         value={ selectedQuality }
         data={ streams.map((stream) => ({
           label: stream.quality,
@@ -294,6 +293,7 @@ export function PlayerComponent({
 
     return (
       <PlayerVideoSelector
+        overlayId={ IN_PLAYER_VIDEO_SELECTOR_OVERLAY_ID }
         film={ film }
         onHide={ hideVideoSelector }
         onSelect={ handleVideoSelect }

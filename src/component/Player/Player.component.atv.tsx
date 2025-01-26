@@ -28,6 +28,7 @@ import { SupportedKeys } from 'Util/RemoteControl/SupportedKeys';
 
 import {
   FocusedElement,
+  IN_PLAYER_VIDEO_SELECTOR_OVERLAY_ID,
   LONG_PRESS_DURATION,
   QUALITY_OVERLAY_ID,
   RewindDirection,
@@ -116,6 +117,10 @@ export function PlayerComponent({
   useEffect(() => {
     const keyDownListener = (type: SupportedKeys) => {
       if (!showControls) {
+        if (type === SupportedKeys.Back) {
+          return false;
+        }
+
         if (type === SupportedKeys.Up) {
           focusedElementRef.current = FocusedElement.TopAction;
         }
@@ -387,7 +392,7 @@ export function PlayerComponent({
       <ThemedDropdown
         asOverlay
         overlayId={ QUALITY_OVERLAY_ID }
-        searchPlaceholder="Quality"
+        header="Quality"
         value={ selectedQuality }
         data={ streams.map((stream) => ({
           label: stream.quality,
@@ -407,6 +412,7 @@ export function PlayerComponent({
 
     return (
       <PlayerVideoSelector
+        overlayId={ IN_PLAYER_VIDEO_SELECTOR_OVERLAY_ID }
         film={ film }
         onHide={ hideVideoSelector }
         onSelect={ handleVideoSelect }

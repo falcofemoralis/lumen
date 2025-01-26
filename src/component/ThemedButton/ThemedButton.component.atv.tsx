@@ -1,4 +1,5 @@
 import ThemedIcon from 'Component/ThemedIcon';
+import ThemedImage from 'Component/ThemedImage';
 import { Text, View } from 'react-native';
 import { SpatialNavigationFocusableView } from 'react-tv-space-navigation';
 import { scale } from 'Util/CreateStyles';
@@ -16,6 +17,8 @@ export default function ThemedButton({
   isSelected,
   icon,
   variant = 'filled',
+  rightImage,
+  rightImageStyle,
 }: ThemedButtonProps) {
   const renderFilled = (isFocused: boolean) => (
     <View
@@ -50,6 +53,12 @@ export default function ThemedButton({
       >
         { children }
       </Text>
+      { rightImage && (
+        <ThemedImage
+          style={ [styles.rightIcon, rightImageStyle] }
+          src={ rightImage }
+        />
+      ) }
     </View>
   );
 

@@ -1,6 +1,7 @@
 import { withTV } from 'Hooks/withTV';
 import { useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
+import OverlayStore from 'Store/Overlay.store';
 import ServiceStore from 'Store/Service.store';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { EpisodeInterface, FilmVoiceInterface, SeasonInterface } from 'Type/FilmVoice.interface';
@@ -10,6 +11,7 @@ import FilmVideoSelectorComponentTV from './PlayerVideoSelector.component.atv';
 import { PlayerVideoSelectorContainerProps } from './PlayerVideoSelector.type';
 
 export function PlayerVideoSelectorContainer({
+  overlayId,
   onHide,
   film,
   onSelect,
@@ -58,6 +60,10 @@ export function PlayerVideoSelectorContainer({
     if (!voice) {
       return;
     }
+
+    console.log('handleSelectVoice', voiceId);
+
+    OverlayStore.goToPreviousOverlay();
 
     if (!hasSeasons) {
       setSelectedVoice(voice);
@@ -133,6 +139,7 @@ export function PlayerVideoSelectorContainer({
   };
 
   const containerProps = () => ({
+    overlayId,
     voices,
     onHide,
     isLoading,

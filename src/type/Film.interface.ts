@@ -19,7 +19,8 @@ export interface FilmInterface {
   seriesInfo?: string;
   largePoster?: string;
   ratings?: RatingInterface[]; // type = rating + votes
-  ratingsScale?: number;
+  mainRating?: RatingInterface;
+  ratingScale?: number;
   description?: string;
   actors?: string[];
   directors?: string[];

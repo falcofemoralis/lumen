@@ -47,6 +47,7 @@ export const styles = CreateStyles({
     transform: [{ translateX: '-50%' }, { translateY: '-50%' }],
     flexDirection: 'row',
     gap: 80,
+    alignItems: 'center',
   },
   bottomActions: {
     position: 'absolute',

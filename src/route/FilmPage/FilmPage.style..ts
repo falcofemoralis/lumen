@@ -46,6 +46,7 @@ export const styles = CreateStyles({
   mainInfo: {
     marginTop: -8,
     justifyContent: 'flex-start',
+    width: '55%',
   },
   rating: {
     marginTop: 8,
@@ -67,7 +68,6 @@ export const styles = CreateStyles({
     rowGap: 4,
     marginTop: 8,
     flexWrap: 'wrap',
-    width: '75%',
   },
   collectionTitle: {
     fontSize: 14,
@@ -107,9 +107,6 @@ export const styles = CreateStyles({
   playBtn: {
     width: '100%',
     backgroundColor: Colors.secondary,
-    borderRadius: 8,
-    color: Colors.white,
-    fontSize: 16,
     marginBlockStart: 16,
   },
   actions: {
@@ -140,6 +137,7 @@ export const styles = CreateStyles({
     color: Colors.lightGray,
     fontSize: 16,
     marginTop: 16,
+    textAlign: 'justify',
   },
   collections: {
     marginTop: 16,

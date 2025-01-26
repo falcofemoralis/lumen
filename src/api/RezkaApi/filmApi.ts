@@ -9,7 +9,7 @@ import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { InfoListInterface } from 'Type/InfoList.interface';
 import { MenuItemInterface } from 'Type/MenuItem.interface';
 import { RatingInterface } from 'Type/Rating.interface';
-import { HTMLElementInterface, parseHtml } from 'Util/Parser';
+import { HTMLElementInterface } from 'Util/Parser';
 import { Variables } from 'Util/Request';
 
 import configApi from './configApi';
@@ -84,7 +84,7 @@ const filmApi: FilmApiInterface = {
       if (key && value) {
         switch (key) {
           case 'Рейтинги':
-            film.ratingsScale = 10;
+            film.ratingScale = 10;
             film.ratings = value.childNodes.filter((node) => node.rawTagName === 'span').map((node) => (
               {
                 text: node.rawText,
@@ -144,6 +144,19 @@ const filmApi: FilmApiInterface = {
         }
       }
     });
+
+    const rating = root.querySelector('.b-post__rating');
+    if (rating) {
+      const num = rating.querySelector('.num')?.rawText;
+      const votes = rating.querySelector('.votes')?.rawText.replace('(', '').replace(')', '').replaceAll(' ', '');
+
+      film.mainRating = {
+        text: `${num} (${votes})`,
+        name: 'Rezka',
+        rating: Number(num),
+        votes: Number(votes),
+      };
+    }
 
     film.description = root.querySelector('.b-post__description_text')?.rawText.trim();
 

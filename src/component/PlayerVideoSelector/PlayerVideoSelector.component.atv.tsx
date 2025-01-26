@@ -5,11 +5,11 @@ import ThemedOverlay from 'Component/ThemedOverlay';
 import { DefaultFocus, SpatialNavigationScrollView, SpatialNavigationView } from 'react-tv-space-navigation';
 import { EpisodeInterface, SeasonInterface } from 'Type/FilmVoice.interface';
 
-import { PLAYER_VIDEO_SELECTOR_OVERLAY_ID } from './PlayerVideoSelector.config';
 import { styles } from './PlayerVideoSelector.style.atv';
 import { PlayerVideoSelectorComponentProps } from './PlayerVideoSelector.type';
 
 export function PlayerVideoSelectorComponent({
+  overlayId,
   voices,
   onHide,
   isLoading,
@@ -37,8 +37,8 @@ export function PlayerVideoSelectorComponent({
         })) }
         value={ selectedVoice.id }
         onChange={ (item) => handleSelectVoice(item.value) }
-        searchPlaceholder="Search voice"
-        style={ styles.voicesInput }
+        header="Search voice"
+        inputStyle={ styles.voicesInput }
         asList={ !seasons.length }
       />
     );
@@ -170,7 +170,7 @@ export function PlayerVideoSelectorComponent({
 
   return (
     <ThemedOverlay
-      id={ PLAYER_VIDEO_SELECTOR_OVERLAY_ID }
+      id={ overlayId }
       onHide={ onHide }
       contentContainerStyle={ seasons.length > 0 ? styles.container : undefined }
     >

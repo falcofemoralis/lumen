@@ -10,6 +10,7 @@ export interface ThemedOverlayContainerProps {
 }
 
 export interface ThemedOverlayComponentProps {
+  id: string;
   isOpened: boolean;
   isVisible: boolean;
   onHide: () => void;

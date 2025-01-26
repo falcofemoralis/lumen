@@ -3,12 +3,14 @@ import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { EpisodeInterface, FilmVoiceInterface, SeasonInterface } from 'Type/FilmVoice.interface';
 
 export type PlayerVideoSelectorContainerProps = {
+  overlayId: string;
   film: FilmInterface;
   onHide: () => void;
   onSelect: (video: FilmVideoInterface, voice: FilmVoiceInterface) => void;
 };
 
 export type PlayerVideoSelectorComponentProps = {
+  overlayId: string;
   voices: FilmVoiceInterface[];
   onHide: () => void;
   isLoading: boolean;

@@ -11,6 +11,11 @@ export const styles = CreateStyles({
   },
   inputTextFocused: {
   },
+  inputImage: {
+    height: 20,
+    width: 20,
+    alignSelf: 'center',
+  },
   icon: {
     marginRight: 5,
     height: 20,

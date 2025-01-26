@@ -1,17 +1,44 @@
-import { Button } from 'react-native-paper';
+import ThemedIcon from 'Component/ThemedIcon';
+import ThemedImage from 'Component/ThemedImage';
+import ThemedText from 'Component/ThemedText';
+import { TouchableOpacity, View } from 'react-native';
+import { scale } from 'Util/CreateStyles';
 
 import { styles } from './ThemedButton.style';
 import { ThemedButtonProps } from './ThemedButton.type';
 
-export default function ThemedButton({ onPress, children, style }: ThemedButtonProps) {
+export default function ThemedButton({
+  onPress,
+  children,
+  style,
+  icon,
+  rightImage,
+  iconStyle,
+  textStyle,
+  rightImageStyle,
+}: ThemedButtonProps) {
   return (
-    <Button
-      mode="contained"
-      onPress={ onPress }
+    <TouchableOpacity
       style={ [styles.container, style] }
-      theme={ { roundness: 0 } }
+      onPress={ onPress }
     >
-      { children }
-    </Button>
+      { icon && (
+        <ThemedIcon
+          style={ [styles.icon, iconStyle] }
+          icon={ icon }
+          size={ scale(16) }
+          color="white"
+        />
+      ) }
+      <ThemedText style={ [styles.text, textStyle] }>
+        { children }
+      </ThemedText>
+      { rightImage && (
+        <ThemedImage
+          style={ [styles.rightIcon, rightImageStyle] }
+          src={ rightImage }
+        />
+      ) }
+    </TouchableOpacity>
   );
 }
