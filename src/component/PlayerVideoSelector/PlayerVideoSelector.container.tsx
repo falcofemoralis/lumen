@@ -61,8 +61,6 @@ export function PlayerVideoSelectorContainer({
       return;
     }
 
-    console.log('handleSelectVoice', voiceId);
-
     OverlayStore.goToPreviousOverlay();
 
     if (!hasSeasons) {

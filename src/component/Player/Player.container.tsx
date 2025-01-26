@@ -92,11 +92,11 @@ export function PlayerContainer({
     }
   });
 
-  useEventListener(player, 'statusChange', ({ status: playerStatus }) => {
+  useEventListener(player, 'statusChange', ({ status: playerStatus, error }) => {
     const loading = playerStatus === 'loading';
 
     if (playerStatus === 'error') {
-      NotificationStore.displayError('An error occurred while loading the video');
+      NotificationStore.displayError(`An error occurred : ${error?.message}`);
     }
 
     if (isLoading !== loading) {
@@ -308,13 +308,25 @@ export function PlayerContainer({
   };
 
   const createUpdateTimeTimeout = () => {
-    updateTimeTimeout.current = setInterval(() => {
-      const { playing } = player;
+    try {
+      updateTimeTimeout.current = setInterval(() => {
+        try {
+          const { playing } = player;
 
-      if (playing) {
-        updateTime();
-      }
-    }, SAVE_TIME_EVERY_MS);
+          if (playing) {
+            updateTime();
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      }, SAVE_TIME_EVERY_MS);
+    } catch (error) {
+      // sometimes it can throw an error
+      // Error: The 1st argument cannot be cast to type expo.modules.video.player.VideoPlayer
+      // (received class java.lang.Integer)
+      // → Caused by: Cannot use shared object that was already released
+      console.error(error);
+    }
   };
 
   const removeUpdateTimeTimeout = () => {

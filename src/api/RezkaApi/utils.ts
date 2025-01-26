@@ -5,6 +5,8 @@ import { FilmType } from 'Type/FilmType.type';
 import { EpisodeInterface, SeasonInterface } from 'Type/FilmVoice.interface';
 import { HTMLElementInterface } from 'Util/Parser';
 
+import { decodeUrl } from './decode';
+
 export interface JSONResult {
   success: boolean;
   message: string;
@@ -49,29 +51,11 @@ export const parseFilmCard = (el: HTMLElementInterface): FilmCardInterface | nul
   };
 };
 
-export const decodeUrl = (str: string): string => {
-  if (!str.startsWith('#h')) {
-    return str;
-  }
-  let replace = str.replace('#h', '');
-  let i = 0;
-  while (i < 20 && replace.includes('//_//')) {
-    const indexOf = replace.indexOf('//_//');
-    if (indexOf > -1) {
-      replace = replace.replace(replace.substring(indexOf, indexOf + 21), '');
-    }
-    // eslint-disable-next-line no-plusplus -- Requires for decoding
-    i++;
-  }
-
-  return atob(replace);
-};
-
 export const parseStreams = (streams: string | null): FilmStreamInterface[] => {
   const parsedStreams: FilmStreamInterface[] = [];
 
   if (streams && streams.length > 0) {
-    const decodedStreams = decodeUrl(streams);
+    const decodedStreams = decodeUrl(streams) as string;
     const split = decodedStreams.split(',');
 
     split.forEach((str) => {

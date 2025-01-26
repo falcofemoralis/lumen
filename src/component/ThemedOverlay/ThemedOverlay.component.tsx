@@ -8,15 +8,13 @@ import { ThemedOverlayComponentProps } from './ThemedOverlay.type';
 
 const window = Dimensions.get('window');
 
-export function ThemedOverlayComponent(props: ThemedOverlayComponentProps) {
-  const {
-    id,
-    isOpened,
-    onHide,
-    contentContainerStyle,
-    style,
-    children,
-  } = props;
+export function ThemedOverlayComponent({
+  isOpened,
+  onHide,
+  contentContainerStyle,
+  style,
+  children,
+}: ThemedOverlayComponentProps) {
   const [isLandscape, setIsLandscape] = useState(
     window.height < window.width,
   );
@@ -33,10 +31,6 @@ export function ThemedOverlayComponent(props: ThemedOverlayComponentProps) {
       ScreenOrientation.removeOrientationChangeListener(subscription);
     };
   }, []);
-
-  // console.log('ThemedOverlay', id);
-  // const { children: mm, ...rest } = props;
-  // console.log(rest);
 
   return (
     <Portal>

@@ -16,7 +16,7 @@ const formatPlayerKeyTime = (film: FilmInterface, voice: FilmVoiceInterface) => 
 export const updatePlayerTime = (film: FilmInterface, voice: FilmVoiceInterface, time: number) => {
   playerStorage.setIntAsync(
     formatPlayerKeyTime(film, voice),
-    time,
+    Number(time),
   );
 };
 

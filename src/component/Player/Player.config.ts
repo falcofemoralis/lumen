@@ -31,4 +31,4 @@ export const QUALITY_OVERLAY_ID = 'qualityOverlayId';
 export const IN_PLAYER_VIDEO_SELECTOR_OVERLAY_ID = 'IN_PLAYER_VIDEO_SELECTOR_OVERLAY_ID';
 
 // 1 minutes * 60 seconds/minute * 1000 milliseconds/second
-export const SAVE_TIME_EVERY_MS = 1 * 60 * 1000;
+export const SAVE_TIME_EVERY_MS = 60000;
