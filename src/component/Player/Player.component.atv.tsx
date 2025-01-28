@@ -22,7 +22,9 @@ import {
   SpatialNavigationFocusableView,
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
+import OverlayStore from 'Store/Overlay.store';
 import { scale } from 'Util/CreateStyles';
+import { setTimeoutSafe } from 'Util/Misc';
 import RemoteControlManager from 'Util/RemoteControl/RemoteControlManager';
 import { SupportedKeys } from 'Util/RemoteControl/SupportedKeys';
 
@@ -30,6 +32,7 @@ import {
   FocusedElement,
   IN_PLAYER_VIDEO_SELECTOR_OVERLAY_ID,
   LONG_PRESS_DURATION,
+  PLAYER_CONTROLS_TIMEOUT,
   QUALITY_OVERLAY_ID,
   RewindDirection,
 } from './Player.config';
@@ -72,6 +75,46 @@ export function PlayerComponent({
       isLongFired: false,
     },
   });
+  const controlsTimeout = useRef<NodeJS.Timeout | null>(null);
+  const canHideControls = useRef(isPlaying && showControls);
+
+  useEffect(() => () => {
+    if (controlsTimeout.current) {
+      clearTimeout(controlsTimeout.current);
+    }
+  }, []);
+
+  useEffect(() => {
+    canHideControls.current = isPlaying && showControls;
+  }, [isPlaying, showControls]);
+
+  useEffect(() => {
+    canHideControls.current = isPlaying && showControls && !OverlayStore.currentOverlay.length;
+
+    if (canHideControls.current) {
+      handleUserInteraction();
+    }
+  }, [OverlayStore.currentOverlay.length]);
+
+  const setControlsTimeout = () => {
+    if (controlsTimeout.current) {
+      clearTimeout(controlsTimeout.current);
+    }
+
+    controlsTimeout.current = setTimeoutSafe(() => {
+      if (canHideControls.current) {
+        setShowControls(false);
+      }
+    }, PLAYER_CONTROLS_TIMEOUT);
+  };
+
+  const handleUserInteraction = (action?: () => void) => {
+    setControlsTimeout();
+
+    if (action) {
+      action();
+    }
+  };
 
   const toggleSeekMode = () => {
     setHideActions(true);
@@ -83,7 +126,7 @@ export function PlayerComponent({
 
     if (!e.isKeyDownPressed) {
       e.isKeyDownPressed = true;
-      e.longTimeout = setTimeout(() => {
+      e.longTimeout = setTimeoutSafe(() => {
         // Long button press
         rewindPositionAuto(direction);
         toggleSeekMode();
@@ -125,7 +168,10 @@ export function PlayerComponent({
           focusedElementRef.current = FocusedElement.TopAction;
         }
 
-        if (type === SupportedKeys.Enter) {
+        if (type === SupportedKeys.Enter
+          || type === SupportedKeys.Left
+          || type === SupportedKeys.Right
+        ) {
           focusedElementRef.current = FocusedElement.ProgressThumb;
         }
 
@@ -168,6 +214,8 @@ export function PlayerComponent({
         if (type === SupportedKeys.Right) {
           handleProgressThumbKeyUp(type, RewindDirection.Forward);
         }
+
+        handleUserInteraction();
       }
 
       return true;
@@ -244,7 +292,7 @@ export function PlayerComponent({
   ) => (
     <SpatialNavigationFocusableView
       onSelect={ action }
-      onFocus={ () => { focusedElementRef.current = el; } }
+      onFocus={ () => handleUserInteraction(() => { focusedElementRef.current = el; }) }
     >
       { ({ isFocused }) => (
         <ThemedIcon

@@ -12,6 +12,7 @@ import { FilmStreamInterface } from 'Type/FilmStream.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { convertSecondsToTime } from 'Util/Date';
+import { setIntervalSafe } from 'Util/Misc';
 import {
   getPlayerStream,
   getPlayerTime,
@@ -308,25 +309,13 @@ export function PlayerContainer({
   };
 
   const createUpdateTimeTimeout = () => {
-    try {
-      updateTimeTimeout.current = setInterval(() => {
-        try {
-          const { playing } = player;
+    updateTimeTimeout.current = setIntervalSafe(() => {
+      const { playing } = player;
 
-          if (playing) {
-            updateTime();
-          }
-        } catch (error) {
-          console.error(error);
-        }
-      }, SAVE_TIME_EVERY_MS);
-    } catch (error) {
-      // sometimes it can throw an error
-      // Error: The 1st argument cannot be cast to type expo.modules.video.player.VideoPlayer
-      // (received class java.lang.Integer)
-      // → Caused by: Cannot use shared object that was already released
-      console.error(error);
-    }
+      if (playing) {
+        updateTime();
+      }
+    }, SAVE_TIME_EVERY_MS);
   };
 
   const removeUpdateTimeTimeout = () => {

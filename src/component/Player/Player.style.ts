@@ -85,3 +85,5 @@ export const styles = CreateStyles({
   },
   subtitle: {},
 });
+
+export type MiddleActionVariant = 'big' | 'small';

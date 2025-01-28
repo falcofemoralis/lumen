@@ -52,29 +52,35 @@ export const parseFilmCard = (el: HTMLElementInterface): FilmCardInterface | nul
 };
 
 export const parseStreams = (streams: string | null): FilmStreamInterface[] => {
-  const parsedStreams: FilmStreamInterface[] = [];
+  const parsedStreams = new Map<string, FilmStreamInterface>();
 
   if (streams && streams.length > 0) {
     const decodedStreams = decodeUrl(streams) as string;
     const split = decodedStreams.split(',');
 
     split.forEach((str) => {
+      let s = null;
+
       if (str.includes(' or ')) {
         const m = str.substring(str.indexOf(']') + 1);
-        parsedStreams.push({
+        s = {
           url: m.split(' or ')[0],
           quality: str.substring(1, str.indexOf(']')),
-        });
+        };
       } else {
-        parsedStreams.push({
+        s = {
           url: str.substring(str.indexOf(']') + 1),
           quality: str.substring(1, str.indexOf(']')),
-        });
+        };
+      }
+
+      if (!parsedStreams.has(s.url)) {
+        parsedStreams.set(s.url, s);
       }
     });
   }
 
-  return parsedStreams;
+  return Array.from(parsedStreams.values());
 };
 
 export const parseSeasons = (root: HTMLElementInterface): {

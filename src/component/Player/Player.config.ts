@@ -32,3 +32,5 @@ export const IN_PLAYER_VIDEO_SELECTOR_OVERLAY_ID = 'IN_PLAYER_VIDEO_SELECTOR_OVE
 
 // 1 minutes * 60 seconds/minute * 1000 milliseconds/second
 export const SAVE_TIME_EVERY_MS = 60000;
+
+export const PLAYER_CONTROLS_TIMEOUT = 3000;

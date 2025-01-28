@@ -28,13 +28,17 @@ import {
   withTiming,
 } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import OverlayStore from 'Store/Overlay.store';
 import Colors from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 import { convertSecondsToTime } from 'Util/Date';
+import { setTimeoutSafe } from 'Util/Misc';
 
-import { IN_PLAYER_VIDEO_SELECTOR_OVERLAY_ID, QUALITY_OVERLAY_ID, RewindDirection } from './Player.config';
+import {
+  IN_PLAYER_VIDEO_SELECTOR_OVERLAY_ID, PLAYER_CONTROLS_TIMEOUT, QUALITY_OVERLAY_ID, RewindDirection,
+} from './Player.config';
 import PlayerStore from './Player.store';
-import { styles } from './Player.style';
+import { MiddleActionVariant, styles } from './Player.style';
 import { PlayerComponentProps } from './Player.type';
 
 const { width: screenWidth } = Dimensions.get('window');
@@ -60,6 +64,8 @@ export function PlayerComponent({
   setPlayerRate,
 }: PlayerComponentProps) {
   const [showControls, setShowControls] = useState(false);
+  const controlsTimeout = useRef<NodeJS.Timeout | null>(null);
+  const canHideControls = useRef(isPlaying && showControls);
 
   const controlsAnimation = useAnimatedStyle(() => ({
     opacity: withTiming(showControls ? 1 : 0, { duration: 150 }),
@@ -72,13 +78,50 @@ export function PlayerComponent({
     return () => {
       ScreenOrientation.unlockAsync();
       NavigationBar.setVisibilityAsync('visible');
+
+      if (controlsTimeout.current) {
+        clearTimeout(controlsTimeout.current);
+      }
     };
   }, []);
+
+  useEffect(() => {
+    canHideControls.current = isPlaying && showControls;
+  }, [isPlaying, showControls]);
+
+  useEffect(() => {
+    canHideControls.current = isPlaying && showControls && !OverlayStore.currentOverlay.length;
+
+    if (canHideControls.current) {
+      handleUserInteraction();
+    }
+  }, [OverlayStore.currentOverlay.length]);
+
+  const setControlsTimeout = () => {
+    if (controlsTimeout.current) {
+      clearTimeout(controlsTimeout.current);
+    }
+
+    controlsTimeout.current = setTimeoutSafe(() => {
+      if (canHideControls.current) {
+        setShowControls(false);
+      }
+    }, PLAYER_CONTROLS_TIMEOUT);
+  };
+
+  const handleUserInteraction = (action?: () => void) => {
+    setControlsTimeout();
+
+    if (action) {
+      action();
+    }
+  };
 
   const singleTap = Gesture.Tap()
     .maxDuration(125)
     .onStart(() => {
       runOnJS(setShowControls)(!showControls);
+      runOnJS(setControlsTimeout)();
     });
 
   const doubleTap = Gesture.Tap()
@@ -112,7 +155,7 @@ export function PlayerComponent({
     action?: () => void,
   ) => (
     <GestureDetector gesture={ Gesture.Tap() }>
-      <TouchableOpacity onPress={ action }>
+      <TouchableOpacity onPress={ () => handleUserInteraction(action) }>
         <ThemedIcon
           icon={ {
             name: icon,
@@ -171,17 +214,17 @@ export function PlayerComponent({
   const renderMiddleControl = (
     icon: IconInterface,
     action: () => void,
-    size: number,
+    size: MiddleActionVariant = 'small',
   ) => (
     <GestureDetector gesture={ Gesture.Tap() }>
       <TouchableOpacity
         style={ styles.control }
-        onPress={ action }
+        onPress={ () => handleUserInteraction(action) }
       >
         <ThemedIcon
           style={ styles.controlIcon }
           icon={ icon }
-          size={ scale(size) }
+          size={ scale(size === 'big' ? 36 : 24) }
           color="white"
         />
       </TouchableOpacity>
@@ -191,19 +234,26 @@ export function PlayerComponent({
   const renderMiddleControls = () => (
     <View style={ styles.middleActions }>
       { film.hasSeasons && renderMiddleControl(
-        { name: 'skip-previous', pack: IconPackType.MaterialIcons },
+        {
+          name: 'skip-previous',
+          pack: IconPackType.MaterialIcons,
+        },
         () => handleNewEpisode(RewindDirection.Backward),
-        24,
       ) }
       { renderMiddleControl(
-        { name: isPlaying ? 'pause' : 'play', pack: IconPackType.MaterialCommunityIcons },
+        {
+          name: isPlaying ? 'pause' : 'play',
+          pack: IconPackType.MaterialCommunityIcons,
+        },
         togglePlayPause,
-        36,
+        'big',
       ) }
       { film.hasSeasons && renderMiddleControl(
-        { name: 'skip-next', pack: IconPackType.MaterialIcons },
+        {
+          name: 'skip-next',
+          pack: IconPackType.MaterialIcons,
+        },
         () => handleNewEpisode(RewindDirection.Forward),
-        24,
       ) }
     </View>
   );
@@ -393,4 +443,4 @@ export const ProgressBar = observer(({
   );
 });
 
-export default PlayerComponent;
+export default observer(PlayerComponent);

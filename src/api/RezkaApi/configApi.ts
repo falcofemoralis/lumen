@@ -10,7 +10,7 @@ import { Variables } from '../../util/Request/index';
 
 const configApi: ConfigApiInterface = {
   serviceType: ApiServiceType.rezka,
-  defaultProviders: ['https://rezka-ua.tv'],
+  defaultProviders: ['https://rezka-ua.org'],
   /**
    *    <item>prx.ukrtelcdn.net</item>
         <item>prx-ams.ukrtelcdn.net</item>
