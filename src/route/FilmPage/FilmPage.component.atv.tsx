@@ -38,8 +38,8 @@ export function FilmPageComponent({
               <Thumbnail
                 // eslint-disable-next-line react/no-array-index-key
                 key={ `${i}-thumb` }
-                height={ 32 }
-                width={ 110 }
+                height={ scale(32) }
+                width={ scale(110) }
               />
             )) }
           </ThemedView>

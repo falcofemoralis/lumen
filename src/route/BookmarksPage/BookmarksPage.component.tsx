@@ -29,12 +29,14 @@ export function BookmarksPageComponent({
     if (isLoading) {
       return (
         <View>
-          <View style={ {
-            flexDirection: 'row',
-            height: scale(40),
-            gap: scale(8),
-            marginBlockEnd: scale(16),
-          } }
+          <View
+            style={ {
+              flexDirection: 'row',
+              height: scale(24),
+              gap: scale(8),
+              marginBlockEnd: scale(8),
+              marginBlockStart: scale(16),
+            } }
           >
             { Array(3).fill(0).map((_, i) => (
               <Thumbnail

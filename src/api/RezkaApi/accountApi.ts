@@ -6,11 +6,11 @@ import configApi from './configApi';
 import { JSONResult, parseFilmsListRoot } from './utils';
 
 type RezkaAccountApiInterface = AccountApiInterface & {
-  recentItems: HTMLElementInterface[] | null;
+  recentPage: HTMLElementInterface | null;
 };
 
 const accountApi: RezkaAccountApiInterface = {
-  recentItems: null,
+  recentPage: null,
 
   /**
    * Get bookmarks
@@ -65,24 +65,21 @@ const accountApi: RezkaAccountApiInterface = {
    */
   async getRecent(page: number, params?: ApiParams) {
     const { isRefresh } = params || {};
-    const itemsPerPage = 20;
+    const itemsPerPage = 15;
+    const start = (page - 1) * itemsPerPage + 1; // 1 means that we start from the second element
+    const end = page * itemsPerPage + 1;
 
-    const loadItems = async (): Promise<HTMLElementInterface[]> => {
-      const res = await configApi.fetchPage('/continue', {});
-      const parsedItems = res.querySelectorAll('.b-videosaves__list_item');
+    const loadPage = async (): Promise<HTMLElementInterface> => {
+      this.recentPage = await configApi.fetchPage('/continue', {});
 
-      const s = parsedItems.slice(1);
-
-      this.recentItems = s;
-
-      return s;
+      return this.recentPage;
     };
 
-    const items = (this.recentItems && !isRefresh) ? this.recentItems : await loadItems();
+    const root = (this.recentPage && !isRefresh) ? this.recentPage : await loadPage();
 
-    const slicedItems = items.slice((page - 1) * itemsPerPage, (page * itemsPerPage) - 1);
+    const items = root.querySelectorAll(`.b-videosaves__list_item:nth-child(n+${start + 1}):nth-child(-n+${end})`);
 
-    const recentItems = slicedItems.map((el) => {
+    const recentItems = items.map((el) => {
       const date = el.querySelector('.date');
       const link = el.querySelector('.title a');
       const info = el.querySelector('.info')?.childNodes[0]?.rawText;
@@ -102,7 +99,7 @@ const accountApi: RezkaAccountApiInterface = {
 
     return {
       items: recentItems,
-      totalPages: Math.ceil(items.length / itemsPerPage),
+      totalPages: 9999, // We don't know the total number of pages
     };
   },
 

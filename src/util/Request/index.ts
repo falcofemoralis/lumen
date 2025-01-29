@@ -81,7 +81,11 @@ export const executeGet = async (
   const uri = formatURI(query, variables, endpoint);
 
   try {
+    const t0 = performance.now();
     const response = await getFetch(uri, headers, signal);
+    const t1 = performance.now();
+
+    console.log(`executeGet to ${query} took ${t1 - t0} milliseconds`);
 
     handleRequestError(response);
 
@@ -109,7 +113,11 @@ export const executePost = async (
       formData.append(key, value);
     });
 
+    const t0 = performance.now();
     const response = await postFetch(uri, headers, formData, signal);
+    const t1 = performance.now();
+
+    console.log(`executePost to ${query} took ${t1 - t0} milliseconds`);
 
     handleRequestError(response);
 

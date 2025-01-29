@@ -20,6 +20,7 @@ export const styles = CreateStyles({
   },
   poster: {
     height: 100,
+    width: 'auto',
     aspectRatio: '166 / 250',
   },
   itemContent: {

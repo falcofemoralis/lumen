@@ -3,9 +3,10 @@ import ThemedImage from 'Component/ThemedImage';
 import ThemedList from 'Component/ThemedList';
 import { ThemedListRowProps } from 'Component/ThemedList/ThemedList.type';
 import ThemedText from 'Component/ThemedText';
+import Thumbnail from 'Component/Thumbnail';
 import React, { useCallback } from 'react';
 import { Animated, Dimensions, View } from 'react-native';
-import { SpatialNavigationFocusableView, SpatialNavigationVirtualizedGrid } from 'react-tv-space-navigation';
+import { DefaultFocus, SpatialNavigationFocusableView } from 'react-tv-space-navigation';
 import { scale } from 'Util/CreateStyles';
 import { getWindowWidth } from 'Util/Window';
 
@@ -31,7 +32,36 @@ export function RecentPageComponent({
       date,
       info,
       additionalInfo,
+      isThumbnail,
     } = item;
+
+    if (isThumbnail) {
+      return (
+        <View style={ [
+          styles.item,
+          { width: containerWidth / NUMBER_OF_COLUMNS_TV - scale(ROW_GAP) },
+        ] }
+        >
+          <Thumbnail
+            style={ styles.poster }
+          />
+          <View style={ styles.itemContent }>
+            <Thumbnail
+              height={ scale(30) }
+              width="80%"
+            />
+            <Thumbnail
+              height={ scale(20) }
+              width="30%"
+            />
+            <Thumbnail
+              height={ scale(20) }
+              width="50%"
+            />
+          </View>
+        </View>
+      );
+    }
 
     return (
       <SpatialNavigationFocusableView
@@ -91,15 +121,17 @@ export function RecentPageComponent({
     }
 
     return (
-      <ThemedList
-        data={ items }
-        renderItem={ renderItem }
-        itemHeight={ height / 3 }
-        numberOfColumns={ NUMBER_OF_COLUMNS_TV }
-        style={ styles.grid }
-        rowStyle={ styles.rowStyle }
-        onNextLoad={ onNextLoad }
-      />
+      <DefaultFocus>
+        <ThemedList
+          data={ items }
+          renderItem={ renderItem }
+          itemHeight={ height / 3 }
+          numberOfColumns={ NUMBER_OF_COLUMNS_TV }
+          style={ styles.grid }
+          rowStyle={ styles.rowStyle }
+          onNextLoad={ onNextLoad }
+        />
+      </DefaultFocus>
     );
   };
 

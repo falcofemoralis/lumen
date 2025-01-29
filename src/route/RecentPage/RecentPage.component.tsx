@@ -5,6 +5,7 @@ import ThemedImage from 'Component/ThemedImage';
 import ThemedList from 'Component/ThemedList';
 import { ThemedListRowProps } from 'Component/ThemedList/ThemedList.type';
 import ThemedText from 'Component/ThemedText';
+import Thumbnail from 'Component/Thumbnail';
 import React, { memo, useCallback } from 'react';
 import {
   Pressable,
@@ -30,7 +31,38 @@ function FilmGridRow({
     date,
     info,
     additionalInfo,
+    isThumbnail,
   } = item;
+
+  if (isThumbnail) {
+    return (
+      <View style={ [styles.item, index !== 0 && styles.itemBorder] }>
+        <View style={ styles.itemContainer }>
+          <Thumbnail
+            style={ styles.poster }
+          />
+          <View style={ styles.itemContent }>
+            <Thumbnail
+              width="80%"
+              height={ scale(20) }
+            />
+            <Thumbnail
+              width="30%"
+              height={ scale(20) }
+            />
+            <Thumbnail
+              width="50%"
+              height={ scale(20) }
+            />
+          </View>
+          <Thumbnail
+            width={ scale(30) }
+            height={ scale(30) }
+          />
+        </View>
+      </View>
+    );
+  }
 
   return (
     <Pressable onPress={ () => handleOnPress(item) }>

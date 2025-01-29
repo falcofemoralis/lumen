@@ -2,19 +2,21 @@ import { router } from 'expo-router';
 import { withTV } from 'Hooks/withTV';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useRef, useState } from 'react';
+import ConfigStore from 'Store/Config.store';
 import NotificationStore from 'Store/Notification.store';
-import RecentStore from 'Store/Recent.store';
 import ServiceStore from 'Store/Service.store';
 import { RecentItemInterface } from 'Type/RecentItem.interface';
 
 import RecentPageComponent from './RecentPage.component';
 import RecentPageComponentTV from './RecentPage.component.atv';
+import { THUMBNAILS_AMOUNT, THUMBNAILS_AMOUNT_TV } from './RecentPage.config';
 
 export function RecentPageContainer() {
   const [isSignedIn, setIsSignedIn] = useState(ServiceStore.isSignedIn);
+  const [items, setItems] = useState<RecentItemInterface[]>([]);
   const paginationRef = useRef({
-    page: RecentStore.currentPage,
-    totalPages: RecentStore.totalPages,
+    page: 1,
+    totalPages: 1,
   });
   const updatingStateRef = useRef(false);
 
@@ -23,7 +25,7 @@ export function RecentPageContainer() {
       setIsSignedIn(ServiceStore.isSignedIn);
     }
 
-    if (ServiceStore.isSignedIn && !RecentStore.isPreloaded) {
+    if (ServiceStore.isSignedIn) {
       loadRecent(1, false);
     }
   }, [ServiceStore.isSignedIn]);
@@ -55,11 +57,9 @@ export function RecentPageContainer() {
           totalPages: resTotalPages,
         };
 
-        const newItems = isRefresh ? resItems : [...RecentStore.items, ...resItems];
+        const newItems = isRefresh ? resItems : [...items, ...resItems];
 
-        RecentStore.setItems(newItems);
-        RecentStore.setCurrentPage(page);
-        RecentStore.setTotalPages(resTotalPages);
+        setItems(newItems);
       } catch (error) {
         NotificationStore.displayError(error as Error);
       } finally {
@@ -85,14 +85,29 @@ export function RecentPageContainer() {
     const { id } = item;
 
     try {
-      const newItems = RecentStore.items.filter((i) => i.id !== id);
+      const newItems = items.filter((i) => i.id !== id);
 
-      RecentStore.setItems(newItems);
+      setItems(newItems);
 
       await ServiceStore.getCurrentService().removeRecent(id);
     } catch (error) {
       NotificationStore.displayError(error as Error);
     }
+  };
+
+  const getItems = () => {
+    if (!items.length) {
+      return Array(ConfigStore.isTV ? THUMBNAILS_AMOUNT_TV : THUMBNAILS_AMOUNT).fill({
+        id: '',
+        link: '',
+        image: '',
+        date: '',
+        name: '',
+        isThumbnail: true,
+      }) as RecentItemInterface[];
+    }
+
+    return items;
   };
 
   const containerFunctions = {
@@ -103,7 +118,7 @@ export function RecentPageContainer() {
 
   const containerProps = () => ({
     isSignedIn,
-    items: RecentStore.items,
+    items: getItems(),
   });
 
   return withTV(RecentPageComponentTV, RecentPageComponent, {
