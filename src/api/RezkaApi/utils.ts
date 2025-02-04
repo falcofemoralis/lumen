@@ -2,10 +2,12 @@ import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { FilmListInterface } from 'Type/FilmList.interface';
 import { FilmStreamInterface } from 'Type/FilmStream.interface';
 import { FilmType } from 'Type/FilmType.type';
+import { SubtitleInterface } from 'Type/FilmVideo.interface';
 import { EpisodeInterface, SeasonInterface } from 'Type/FilmVoice.interface';
 import { HTMLElementInterface } from 'Util/Parser';
 
 import { decodeUrl } from './decode';
+import { SubtitleLns } from './playerApi';
 
 export interface JSONResult {
   success: boolean;
@@ -155,4 +157,43 @@ export const parseFilmsListRoot = (root: HTMLElementInterface): FilmListInterfac
     films,
     totalPages,
   };
+};
+
+export const parseSubtitles = (
+  subtitle: string | undefined,
+  subtitleDef: string,
+  subtitleLns: SubtitleLns,
+): SubtitleInterface[] => {
+  if (!subtitle) {
+    return [];
+  }
+
+  const rawSubtitles: SubtitleInterface[] = [];
+  const subtitles: SubtitleInterface[] = [];
+
+  const subtitleEntries = subtitle.split(',');
+  subtitleEntries.forEach((str) => {
+    const language = str.substring(1, str.indexOf(']'));
+    const url = str.substring(str.indexOf(']') + 1);
+
+    rawSubtitles.push({
+      name: language,
+      languageCode: '',
+      url,
+      isDefault: false,
+    });
+  });
+
+  Object.entries(subtitleLns).forEach(([name, languageCode]) => {
+    const rawSubtitle = rawSubtitles.find((s) => s.name === name);
+
+    subtitles.push({
+      name: rawSubtitle?.name ?? name,
+      languageCode,
+      url: rawSubtitle?.url ?? '',
+      isDefault: languageCode === subtitleDef,
+    });
+  });
+
+  return subtitles;
 };

@@ -3,17 +3,22 @@ import ThemedView from 'Component/ThemedView';
 import { useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import { StyleSheet } from 'react-native';
+import Colors from 'Style/Colors';
 
 export default function ErrorScreen() {
-  const { code = '500', error = 'ERROR!', info } = useLocalSearchParams();
+  const { code = '500', error = 'ERROR!', info } = useLocalSearchParams() as {
+    code: string;
+    error: string;
+    info?: string;
+  };
 
   return (
     <ThemedView style={ styles.container }>
-      <ThemedText type="title">{ code }</ThemedText>
-      <ThemedText type="title">{ error }</ThemedText>
+      <ThemedText style={ styles.code }>{ code.trim() }</ThemedText>
+      <ThemedText style={ styles.text }>{ error.trim() }</ThemedText>
       { info && (
-        <ThemedText type="subtitle">
-          { info }
+        <ThemedText style={ styles.text }>
+          { info.trim() }
         </ThemedText>
       ) }
     </ThemedView>
@@ -21,10 +26,19 @@ export default function ErrorScreen() {
 }
 
 const styles = StyleSheet.create({
+  code: {
+    color: Colors.secondary,
+    fontSize: 24,
+    fontWeight: '700',
+  },
   container: {
     alignItems: 'center',
     flex: 1,
+    gap: 20,
     justifyContent: 'center',
     padding: 20,
+  },
+  text: {
+    fontSize: 16,
   },
 });

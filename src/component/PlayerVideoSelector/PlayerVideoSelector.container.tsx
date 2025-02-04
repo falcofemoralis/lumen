@@ -55,7 +55,7 @@ export function PlayerVideoSelectorContainer({
 
   const handleSelectVoice = async (voiceId: string) => {
     const { hasSeasons } = film;
-    const voice = voices.find(({ id }) => id === voiceId);
+    const voice = voices.find(({ identifier }) => identifier === voiceId);
 
     if (!voice) {
       return;

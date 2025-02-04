@@ -56,7 +56,10 @@
     "react-native-tab-view": "^4.0.5",
     "react-native-web": "^0.19.13",
     "react-tv-space-navigation": "^5.1.0",
-    "set-cookie-parser": "^2.7.1"
+    "set-cookie-parser": "^2.7.1",
+    "srt-parser-2": "^1.2.3",
+    "vtt-to-json": "^0.1.1",
+    "webvtt-parser": "^2.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",
@@ -64,6 +67,7 @@
     "@stylistic/eslint-plugin-jsx": "^2.12.1",
     "@types/react": "^18.3.18",
     "@types/set-cookie-parser": "^2.4.10",
+    "@types/webvtt-parser": "^2.2.0",
     "@typescript-eslint/eslint-plugin": "5.59.7",
     "@typescript-eslint/parser": "5.59.7",
     "eslint": "^8.57.1",

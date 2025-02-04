@@ -1,9 +1,13 @@
 import Loader from 'Component/Loader';
+import PlayerDuration from 'Component/PlayerDuration';
+import PlayerProgressBar from 'Component/PlayerProgressBar';
+import PlayerSubtitles from 'Component/PlayerSubtitles';
 import PlayerVideoSelector from 'Component/PlayerVideoSelector';
 import ThemedDropdown from 'Component/ThemedDropdown';
 import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedText from 'Component/ThemedText';
+import ThemedView from 'Component/ThemedView';
 import { LinearGradient } from 'expo-linear-gradient';
 import { VideoView } from 'expo-video';
 import { observer } from 'mobx-react-lite';
@@ -14,12 +18,13 @@ import React, {
 } from 'react';
 import {
   BackHandler,
-  DimensionValue,
   View,
 } from 'react-native';
+import { runOnJS, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import {
   DefaultFocus,
   SpatialNavigationFocusableView,
+  SpatialNavigationNodeRef,
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
 import OverlayStore from 'Store/Overlay.store';
@@ -31,14 +36,15 @@ import { SupportedKeys } from 'Util/RemoteControl/SupportedKeys';
 import {
   FocusedElement,
   IN_PLAYER_VIDEO_SELECTOR_OVERLAY_ID,
-  LONG_PRESS_DURATION,
+  PLAYER_CONTROLS_ANIMATION,
   PLAYER_CONTROLS_TIMEOUT,
   QUALITY_OVERLAY_ID,
   RewindDirection,
+  SUBTITLE_OVERLAY_ID,
 } from './Player.config';
 import PlayerStore from './Player.store';
 import { styles } from './Player.style.atv';
-import { LongEvent, PlayerComponentProps } from './Player.type';
+import { PlayerComponentProps } from './Player.type';
 
 export function PlayerComponent({
   player,
@@ -48,35 +54,39 @@ export function PlayerComponent({
   film,
   voice,
   selectedQuality,
+  selectedSubtitle,
   togglePlayPause,
   rewindPosition,
-  rewindPositionAuto,
   openQualitySelector,
   handleQualityChange,
   handleNewEpisode,
   openVideoSelector,
   handleVideoSelect,
   hideVideoSelector,
+  openSubtitleSelector,
+  handleSubtitleChange,
+  calculateCurrentTime,
+  seekToPosition,
 }: PlayerComponentProps) {
-  const focusedElementRef = useRef<FocusedElement>(
-    FocusedElement.ProgressThumb,
-  );
   const [showControls, setShowControls] = useState(false);
   const [hideActions, setHideActions] = useState(false);
-  const longEvent = useRef<{[key: string]: LongEvent}>({
-    [SupportedKeys.Left]: {
-      isKeyDownPressed: false,
-      longTimeout: null,
-      isLongFired: false,
-    },
-    [SupportedKeys.Right]: {
-      isKeyDownPressed: false,
-      longTimeout: null,
-      isLongFired: false,
-    },
-  });
   const controlsTimeout = useRef<NodeJS.Timeout | null>(null);
   const canHideControls = useRef(isPlaying && showControls);
+  const topActionRef = useRef<SpatialNavigationNodeRef | null>(null);
+  const middleActionRef = useRef<SpatialNavigationNodeRef | null>(null);
+  const bottomActionRef = useRef<SpatialNavigationNodeRef | null>(null);
+
+  const controlsAnimation = useAnimatedStyle(() => ({
+    opacity: withTiming(
+      showControls ? 1 : 0,
+      { duration: PLAYER_CONTROLS_ANIMATION },
+      (finished) => {
+        if (!showControls && hideActions && finished) {
+          runOnJS(setHideActions)(false);
+        }
+      },
+    ),
+  }));
 
   useEffect(() => () => {
     if (controlsTimeout.current) {
@@ -85,16 +95,88 @@ export function PlayerComponent({
   }, []);
 
   useEffect(() => {
-    canHideControls.current = isPlaying && showControls;
+    canHideControls.current = isPlaying && showControls && !OverlayStore.currentOverlay.length;
   }, [isPlaying, showControls]);
 
   useEffect(() => {
     canHideControls.current = isPlaying && showControls && !OverlayStore.currentOverlay.length;
 
+    // popup was closed, trigger controls timeout
     if (canHideControls.current) {
       handleUserInteraction();
     }
   }, [OverlayStore.currentOverlay.length]);
+
+  useEffect(() => {
+    const keyDownListener = (type: SupportedKeys) => {
+      if (!showControls) {
+        if (type === SupportedKeys.Back) {
+          return false;
+        }
+
+        if (type === SupportedKeys.Up) {
+          PlayerStore.setFocusedElement(FocusedElement.TopAction);
+          topActionRef.current?.focus();
+        }
+
+        if (type === SupportedKeys.Enter
+          || type === SupportedKeys.Left
+          || type === SupportedKeys.Right
+        ) {
+          PlayerStore.setFocusedElement(FocusedElement.ProgressThumb);
+          middleActionRef.current?.focus();
+
+          if (type === SupportedKeys.Left || type === SupportedKeys.Right) {
+            return true;
+          }
+        }
+
+        if (type === SupportedKeys.Down) {
+          PlayerStore.setFocusedElement(FocusedElement.BottomAction);
+          bottomActionRef.current?.focus();
+        }
+
+        setShowControls(true);
+
+        return true;
+      }
+
+      if (PlayerStore.focusedElement === FocusedElement.ProgressThumb) {
+        if (type === SupportedKeys.Enter) {
+          togglePlayPause();
+        }
+
+        if ((type === SupportedKeys.Up || type === SupportedKeys.Down) && hideActions) {
+          setHideActions(false);
+        }
+      }
+
+      return false;
+    };
+
+    const backAction = () => {
+      if (showControls) {
+        setShowControls(false);
+        // setHideActions(false);
+
+        return true;
+      }
+
+      return false;
+    };
+
+    const remoteControlDownListener = RemoteControlManager.addKeydownListener(keyDownListener);
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+
+    return () => {
+      backHandler.remove();
+      RemoteControlManager.removeKeydownListener(remoteControlDownListener);
+    };
+  });
 
   const setControlsTimeout = () => {
     if (controlsTimeout.current) {
@@ -104,6 +186,7 @@ export function PlayerComponent({
     controlsTimeout.current = setTimeoutSafe(() => {
       if (canHideControls.current) {
         setShowControls(false);
+        // setHideActions(false);
       }
     }, PLAYER_CONTROLS_TIMEOUT);
   };
@@ -120,132 +203,6 @@ export function PlayerComponent({
     setHideActions(true);
     setShowControls(true);
   };
-
-  const handleProgressThumbKeyDown = (key: SupportedKeys, direction: RewindDirection) => {
-    const e = longEvent.current[key];
-
-    if (!e.isKeyDownPressed) {
-      e.isKeyDownPressed = true;
-      e.longTimeout = setTimeoutSafe(() => {
-        // Long button press
-        rewindPositionAuto(direction);
-        toggleSeekMode();
-        e.longTimeout = null;
-        e.isLongFired = true;
-      }, LONG_PRESS_DURATION);
-    }
-
-    return true;
-  };
-
-  const handleProgressThumbKeyUp = (key: SupportedKeys, direction: RewindDirection) => {
-    const e = longEvent.current[key];
-    e.isKeyDownPressed = false;
-
-    if (e.isLongFired) {
-      // Long button unpress
-      e.isLongFired = false;
-      rewindPositionAuto(direction);
-      toggleSeekMode();
-    }
-
-    if (e.longTimeout) {
-      // Button press
-      clearTimeout(e.longTimeout);
-      rewindPosition(direction);
-      toggleSeekMode();
-    }
-  };
-
-  useEffect(() => {
-    const keyDownListener = (type: SupportedKeys) => {
-      if (!showControls) {
-        if (type === SupportedKeys.Back) {
-          return false;
-        }
-
-        if (type === SupportedKeys.Up) {
-          focusedElementRef.current = FocusedElement.TopAction;
-        }
-
-        if (type === SupportedKeys.Enter
-          || type === SupportedKeys.Left
-          || type === SupportedKeys.Right
-        ) {
-          focusedElementRef.current = FocusedElement.ProgressThumb;
-        }
-
-        if (type === SupportedKeys.Down) {
-          focusedElementRef.current = FocusedElement.BottomAction;
-        }
-
-        setShowControls(true);
-
-        return true;
-      }
-
-      if (focusedElementRef.current === FocusedElement.ProgressThumb) {
-        if (type === SupportedKeys.Enter) {
-          togglePlayPause();
-        }
-
-        if (type === SupportedKeys.Left) {
-          handleProgressThumbKeyDown(type, RewindDirection.Backward);
-        }
-
-        if (type === SupportedKeys.Right) {
-          handleProgressThumbKeyDown(type, RewindDirection.Forward);
-        }
-
-        if ((type === SupportedKeys.Up || type === SupportedKeys.Down) && hideActions) {
-          setHideActions(false);
-        }
-      }
-
-      return false;
-    };
-
-    const keyUpListener = (type: SupportedKeys) => {
-      if (focusedElementRef.current === FocusedElement.ProgressThumb) {
-        if (type === SupportedKeys.Left) {
-          handleProgressThumbKeyUp(type, RewindDirection.Backward);
-        }
-
-        if (type === SupportedKeys.Right) {
-          handleProgressThumbKeyUp(type, RewindDirection.Forward);
-        }
-
-        handleUserInteraction();
-      }
-
-      return true;
-    };
-
-    const backAction = () => {
-      if (showControls) {
-        setShowControls(false);
-        setHideActions(false);
-
-        return true;
-      }
-
-      return false;
-    };
-
-    const remoteControlDownListener = RemoteControlManager.addKeydownListener(keyDownListener);
-    const remoteControlUpListener = RemoteControlManager.addKeyupListener(keyUpListener);
-
-    const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      backAction,
-    );
-
-    return () => {
-      backHandler.remove();
-      RemoteControlManager.removeKeydownListener(remoteControlDownListener);
-      RemoteControlManager.removeKeyupListener(remoteControlUpListener);
-    };
-  });
 
   const renderTitle = () => {
     const { title, hasSeasons } = film;
@@ -289,10 +246,12 @@ export function PlayerComponent({
     _name: string,
     el: FocusedElement,
     action?: () => void,
+    ref?: React.LegacyRef<SpatialNavigationNodeRef>,
   ) => (
     <SpatialNavigationFocusableView
-      onSelect={ action }
-      onFocus={ () => handleUserInteraction(() => { focusedElementRef.current = el; }) }
+      ref={ ref }
+      onSelect={ () => handleUserInteraction(action) }
+      onFocus={ () => handleUserInteraction(() => { PlayerStore.setFocusedElement(el); }) }
     >
       { ({ isFocused }) => (
         <ThemedIcon
@@ -315,22 +274,26 @@ export function PlayerComponent({
     icon: string,
     name: string,
     action?: () => void,
+    ref?: React.LegacyRef<SpatialNavigationNodeRef>,
   ) => renderAction(
     icon,
     name,
     FocusedElement.TopAction,
     action,
+    ref,
   );
 
   const renderBottomAction = (
     icon: string,
     name: string,
     action?: () => void,
+    ref?: React.LegacyRef<SpatialNavigationNodeRef>,
   ) => renderAction(
     icon,
     name,
     FocusedElement.BottomAction,
     action,
+    ref,
   );
 
   const renderTopActions = () => (
@@ -345,6 +308,7 @@ export function PlayerComponent({
         isPlaying ? 'pause' : 'play-arrow',
         'Play',
         togglePlayPause,
+        topActionRef,
       ) }
       { renderTopAction('fast-rewind', 'Rewind') }
       { renderTopAction('fast-forward', 'Forward') }
@@ -359,16 +323,49 @@ export function PlayerComponent({
     </SpatialNavigationView>
   );
 
-  const renderProgressBar = () => (
-    <ProgressBar
-      onFocus={ () => {
-        focusedElementRef.current = FocusedElement.ProgressThumb;
-      } }
-    />
-  );
+  const renderProgressBar = () => {
+    const { storyboardUrl } = video;
+
+    return (
+      <PlayerProgressBar
+        player={ player }
+        storyboardUrl={ storyboardUrl }
+        calculateCurrentTime={ calculateCurrentTime }
+        seekToPosition={ seekToPosition }
+        thumbRef={ middleActionRef }
+        onFocus={ () => {
+          PlayerStore.setFocusedElement(FocusedElement.ProgressThumb);
+        } }
+        toggleSeekMode={ toggleSeekMode }
+        rewindPosition={ rewindPosition }
+        handleUserInteraction={ handleUserInteraction }
+        togglePlayPause={ togglePlayPause }
+        hideActions={ hideActions }
+      />
+    );
+  };
+
+  const renderSubtitles = () => {
+    if (!selectedSubtitle) {
+      return null;
+    }
+
+    const { url } = selectedSubtitle;
+
+    if (!url) {
+      return null;
+    }
+
+    return (
+      <PlayerSubtitles
+        player={ player }
+        subtitleUrl={ url }
+      />
+    );
+  };
 
   const renderDuration = () => (
-    <Duration />
+    <PlayerDuration />
   );
 
   const renderBottomActions = () => (
@@ -380,9 +377,9 @@ export function PlayerComponent({
           ...(hideActions ? styles.controlsRowHidden : {}),
         } }
       >
-        { renderBottomAction('high-quality', 'Quality', openQualitySelector) }
+        { renderBottomAction('high-quality', 'Quality', openQualitySelector, bottomActionRef) }
         { renderBottomAction('playlist-play', 'Series', openVideoSelector) }
-        { renderBottomAction('subtitles', 'Subtitles') }
+        { renderBottomAction('subtitles', 'Subtitles', openSubtitleSelector) }
         { renderBottomAction('bookmarks', 'Bookmarks') }
         { renderBottomAction('share', 'Share') }
       </SpatialNavigationView>
@@ -405,26 +402,16 @@ export function PlayerComponent({
     );
   };
 
-  const renderControls = () => {
-    if (!showControls) {
-      return null;
-    }
-
-    return (
-      <View style={ styles.controls }>
-        { renderTopInfo() }
-        <DefaultFocus enable={ focusedElementRef.current === FocusedElement.TopAction }>
-          { renderTopActions() }
-        </DefaultFocus>
-        <DefaultFocus enable={ focusedElementRef.current === FocusedElement.ProgressThumb }>
-          { renderProgressBar() }
-        </DefaultFocus>
-        <DefaultFocus enable={ focusedElementRef.current === FocusedElement.BottomAction }>
-          { renderBottomActions() }
-        </DefaultFocus>
-      </View>
-    );
-  };
+  const renderControls = () => (
+    <ThemedView.Animated style={ [styles.controls, controlsAnimation] }>
+      { renderTopInfo() }
+      { renderTopActions() }
+      <DefaultFocus>
+        { renderProgressBar() }
+      </DefaultFocus>
+      { renderBottomActions() }
+    </ThemedView.Animated>
+  );
 
   const renderLoader = () => (
     <Loader
@@ -468,10 +455,29 @@ export function PlayerComponent({
     );
   };
 
+  const renderSubtitlesSelector = () => {
+    const { subtitles = [] } = video;
+
+    return (
+      <ThemedDropdown
+        asOverlay
+        overlayId={ SUBTITLE_OVERLAY_ID }
+        header="Subtitles"
+        value={ selectedSubtitle?.languageCode }
+        data={ subtitles.map((subtitle) => ({
+          label: subtitle.name,
+          value: subtitle.languageCode,
+        })) }
+        onChange={ handleSubtitleChange }
+      />
+    );
+  };
+
   const renderModals = () => (
     <>
       { renderQualitySelector() }
       { renderPlayerVideoSelector() }
+      { renderSubtitlesSelector() }
     </>
   );
 
@@ -484,6 +490,7 @@ export function PlayerComponent({
         nativeControls={ false }
         allowsPictureInPicture={ false }
       />
+      { renderSubtitles() }
       { renderBackground() }
       { renderControls() }
       { renderLoader() }
@@ -492,66 +499,4 @@ export function PlayerComponent({
   );
 }
 
-export const Duration = observer(() => {
-  const {
-    currentTime,
-    durationTime,
-    remainingTime,
-  } = PlayerStore.progressStatus;
-
-  return (
-    <View style={ styles.duration }>
-      <ThemedText style={ styles.durationText }>
-        { `Remaining: ${remainingTime}` }
-      </ThemedText>
-      <ThemedText style={ styles.durationText }>
-        { `${currentTime} / ${durationTime}` }
-      </ThemedText>
-    </View>
-  );
-});
-
-export const ProgressBar = observer(({
-  onFocus,
-}: {onFocus: () => void}) => {
-  const {
-    playablePercentage,
-    progressPercentage,
-  } = PlayerStore.progressStatus;
-
-  return (
-    <View style={ styles.progressBarContainer }>
-      { /* Playable Duration */ }
-      <View
-        style={ [
-          styles.playableBar,
-          { width: (`${playablePercentage}%`) as DimensionValue },
-        ] }
-      />
-      { /* Progress Playback */ }
-      <View
-        style={ [
-          styles.progressBar,
-          { width: (`${progressPercentage}%`) as DimensionValue },
-        ] }
-      >
-        { /* Progress Thumb */ }
-        <SpatialNavigationFocusableView
-          style={ styles.thumbContainer }
-          onFocus={ onFocus }
-        >
-          { ({ isFocused }) => (
-            <View
-              style={ [
-                styles.thumb,
-                isFocused && styles.focusedThumb,
-              ] }
-            />
-          ) }
-        </SpatialNavigationFocusableView>
-      </View>
-    </View>
-  );
-});
-
-export default PlayerComponent;
+export default observer(PlayerComponent);

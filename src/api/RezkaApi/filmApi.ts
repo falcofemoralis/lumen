@@ -164,6 +164,7 @@ const filmApi: FilmApiInterface = {
     root.querySelectorAll('.b-translator__item').forEach((el) => {
       const voice: FilmVoiceInterface = {
         id: el.attributes['data-translator_id'],
+        identifier: '',
         title: el.attributes.title,
         img: el.querySelector('img')?.attributes.src,
         isCamrip: el.attributes['data-camrip'],
@@ -174,7 +175,7 @@ const filmApi: FilmApiInterface = {
       };
 
       if (voice.isPremium) {
-        voice.premiumIcon = 'https://rezka-ua.tv/templates/hdrezka/images/prem-icon.svg';
+        voice.premiumIcon = `${configApi.getProvider()}/templates/hdrezka/images/prem-icon.svg`;
       }
 
       film.voices.push({
@@ -206,6 +207,7 @@ const filmApi: FilmApiInterface = {
 
         film.voices.push({
           id: '',
+          identifier: '',
           title: '',
           isCamrip: '0',
           isDirector: '0',
@@ -224,6 +226,7 @@ const filmApi: FilmApiInterface = {
 
         film.voices.push({
           id: subString.split(',')[1].replaceAll(' ', ''),
+          identifier: '',
           title: '',
           isCamrip: '0',
           isDirector: '0',
@@ -238,6 +241,20 @@ const filmApi: FilmApiInterface = {
     const { seasons = [] } = voices.find(({ isActive }) => isActive) ?? {};
     film.hasSeasons = seasons.length > 0;
     film.hasVoices = film.voices.length > 1;
+    film.voices = film.voices.map((voice) => {
+      const {
+        id: vID,
+        isDirector,
+        isCamrip,
+        isPremium,
+        isAds,
+      } = voice;
+
+      return {
+        ...voice,
+        identifier: `${vID}-${isDirector}-${isCamrip}-${isPremium}-${isAds}`,
+      };
+    });
 
     return film;
   },

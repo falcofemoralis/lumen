@@ -84,15 +84,13 @@ export function RecentPageContainer() {
   const removeItem = async (item: RecentItemInterface) => {
     const { id } = item;
 
-    try {
-      const newItems = items.filter((i) => i.id !== id);
+    const newItems = items.filter((i) => i.id !== id);
 
-      setItems(newItems);
+    setItems(newItems);
 
-      await ServiceStore.getCurrentService().removeRecent(id);
-    } catch (error) {
+    ServiceStore.getCurrentService().removeRecent(id).catch((error) => {
       NotificationStore.displayError(error as Error);
-    }
+    });
   };
 
   const getItems = () => {

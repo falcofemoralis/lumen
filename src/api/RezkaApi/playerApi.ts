@@ -6,10 +6,44 @@ import { parseHtml } from 'Util/Parser';
 
 import { PlayerApiInterface } from '..';
 import configApi from './configApi';
-import { JSONResult, parseSeasons, parseStreams } from './utils';
+import {
+  JSONResult,
+  parseSeasons,
+  parseStreams,
+  parseSubtitles,
+} from './utils';
 
-type StreamsResult = JSONResult & {url: string};
-type SeasonsResult = JSONResult & {seasons: string; episodes: string};
+export type SubtitleLns = {
+  [key: string]: string;
+};
+
+export type StreamsResult = JSONResult & {
+  url: string
+  thumbnails: string,
+  subtitle: string,
+  subtitle_def: string,
+  subtitle_lns: SubtitleLns
+};
+
+type SeasonsResult = JSONResult & {
+  seasons: string;
+  episodes: string
+};
+
+const formatFilmVideo = (json: StreamsResult): FilmVideoInterface => {
+  const streams = parseStreams(json.url);
+  const subtitles = parseSubtitles(
+    json.subtitle,
+    json.subtitle_def,
+    json.subtitle_lns,
+  );
+
+  return {
+    streams, // configApi.modifyCDN(streams),
+    subtitles,
+    storyboardUrl: configApi.getProvider() + json.thumbnails,
+  };
+};
 
 const playerApi: PlayerApiInterface = {
   /**
@@ -41,11 +75,15 @@ const playerApi: PlayerApiInterface = {
       throw new Error(json.message);
     }
 
-    const streams = parseStreams(json.url);
+    try {
+      return formatFilmVideo(json);
+    } catch (e) {
+      NotificationStore.displayError(e as Error);
 
-    return {
-      streams, // configApi.modifyCDN(streams),
-    };
+      return {
+        streams: [],
+      };
+    }
   },
 
   /**
@@ -75,11 +113,7 @@ const playerApi: PlayerApiInterface = {
     }
 
     try {
-      const streams = parseStreams(json.url);
-
-      return {
-        streams, // configApi.modifyCDN(streams),
-      };
+      return formatFilmVideo(json);
     } catch (e) {
       NotificationStore.displayError(e as Error);
 

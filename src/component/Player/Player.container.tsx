@@ -9,7 +9,7 @@ import NotificationStore from 'Store/Notification.store';
 import OverlayStore from 'Store/Overlay.store';
 import ServiceStore from 'Store/Service.store';
 import { FilmStreamInterface } from 'Type/FilmStream.interface';
-import { FilmVideoInterface } from 'Type/FilmVideo.interface';
+import { FilmVideoInterface, SubtitleInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { convertSecondsToTime } from 'Util/Date';
 import { setIntervalSafe } from 'Util/Misc';
@@ -32,6 +32,7 @@ import {
   QUALITY_OVERLAY_ID,
   RewindDirection,
   SAVE_TIME_EVERY_MS,
+  SUBTITLE_OVERLAY_ID,
 } from './Player.config';
 import PlayerStore from './Player.store';
 import { PlayerContainerProps } from './Player.type';
@@ -48,10 +49,12 @@ export function PlayerContainer({
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [selectedQuality, setSelectedQuality] = useState<string>(selectedStream.quality);
-  const autoRewindTimeout = useRef<NodeJS.Timeout | null>(null);
-  const autoRewindCount = useRef<number>(0);
-  const autoRewindFactor = useRef<number>(1);
+  const [selectedSubtitle, setSelectedSubtitle] = useState<SubtitleInterface|undefined>(
+    selectedVideo.subtitles?.find(({ isDefault }) => isDefault),
+  );
   const updateTimeTimeout = useRef<NodeJS.Timeout | null>(null);
+  const seekTimeTimeout = useRef<NodeJS.Timeout | null>(null);
+  const seekTimeAmount = useRef<number>(0);
 
   const player = useVideoPlayer(selectedStream.url, (p) => {
     p.loop = false;
@@ -117,8 +120,10 @@ export function PlayerContainer({
     PlayerStore.setProgressStatus(DEFAULT_PROGRESS_STATUS);
     setIsLoading(true);
     setSelectedVideo(newVideo);
+    setSelectedVoice(newVoice);
     setSelectedStream(getPlayerStream(newVideo));
     resetUpdateTimeTimeout();
+    setSelectedSubtitle(newVideo.subtitles?.find(({ isDefault }) => isDefault));
   };
 
   const calculateProgress = (
@@ -152,6 +157,15 @@ export function PlayerContainer({
     return (percent / 100) * duration;
   };
 
+  const calculateSeekTime = (type:RewindDirection, seconds: number) => {
+    const { duration = 0, currentTime } = player;
+
+    const seekTime = type === RewindDirection.Backward ? seconds * -1 : seconds;
+    const newTime = currentTime + seekTime;
+
+    return (newTime / duration) * 100;
+  };
+
   const seekToPosition = async (percent: number) => {
     const { bufferedPosition, duration } = player;
 
@@ -176,33 +190,12 @@ export function PlayerContainer({
     player.seekBy(seekTime);
   };
 
-  const rewindPositionAuto = (
-    direction: RewindDirection,
-    seconds = DEFAULT_REWIND_SECONDS,
-  ) => {
-    if (autoRewindTimeout.current) {
-      clearInterval(autoRewindTimeout.current);
-      autoRewindTimeout.current = null;
-      autoRewindCount.current = 0;
-      autoRewindFactor.current = 1;
-
-      return;
-    }
-
-    autoRewindTimeout.current = setInterval(() => {
-      autoRewindCount.current += 1;
-
-      if (autoRewindCount.current >= DEFAULT_AUTO_REWIND_COUNT) {
-        autoRewindCount.current = 0;
-        autoRewindFactor.current += 1;
-      }
-
-      rewindPosition(direction, seconds * autoRewindFactor.current);
-    }, DEFAULT_AUTO_REWIND_MS);
-  };
-
   const openQualitySelector = () => {
     OverlayStore.openOverlay(QUALITY_OVERLAY_ID);
+  };
+
+  const openSubtitleSelector = () => {
+    OverlayStore.openOverlay(SUBTITLE_OVERLAY_ID);
   };
 
   const handleQualityChange = (item: DropdownItem) => {
@@ -226,6 +219,27 @@ export function PlayerContainer({
     updateTime();
 
     player.replace(newStream.url);
+
+    OverlayStore.goToPreviousOverlay();
+  };
+
+  const handleSubtitleChange = (item: DropdownItem) => {
+    const { value: languageCode } = item;
+
+    if (selectedSubtitle?.languageCode === languageCode) {
+      OverlayStore.goToPreviousOverlay();
+
+      return;
+    }
+
+    const newSubtitle = selectedVideo.subtitles?.find((s) => s.languageCode === languageCode);
+
+    if (!newSubtitle) {
+      return;
+    }
+
+    setSelectedSubtitle(newSubtitle);
+    updateTime();
 
     OverlayStore.goToPreviousOverlay();
   };
@@ -302,10 +316,13 @@ export function PlayerContainer({
       episodeId,
     );
 
-    selectedVoice.lastSeasonId = seasonId;
-    selectedVoice.lastEpisodeId = episodeId;
+    const newVoice = {
+      ...selectedVoice,
+      lastSeasonId: seasonId,
+      lastEpisodeId: episodeId,
+    };
 
-    changePlayerVideo(newVideo, selectedVoice);
+    changePlayerVideo(newVideo, newVoice);
   };
 
   const createUpdateTimeTimeout = () => {
@@ -360,14 +377,14 @@ export function PlayerContainer({
     isPlaying,
     video: selectedVideo,
     film,
-    voice,
+    voice: selectedVoice,
     selectedQuality,
+    selectedSubtitle,
   });
 
   const containerFunctions = {
     togglePlayPause,
     rewindPosition,
-    rewindPositionAuto,
     seekToPosition,
     calculateCurrentTime,
     openQualitySelector,
@@ -377,6 +394,8 @@ export function PlayerContainer({
     hideVideoSelector,
     handleVideoSelect,
     setPlayerRate,
+    openSubtitleSelector,
+    handleSubtitleChange,
   };
 
   return withTV(PlayerComponentTV, PlayerComponent, {

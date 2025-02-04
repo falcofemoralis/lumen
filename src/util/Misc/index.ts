@@ -4,7 +4,7 @@ export const setTimeoutSafe = (callback: () => void, ms?: number): NodeJS.Timeou
       try {
         callback();
       } catch (e) {
-        console.log('error', e);
+        console.error('error', e);
       }
     }, ms);
   } catch (e) {
@@ -12,7 +12,7 @@ export const setTimeoutSafe = (callback: () => void, ms?: number): NodeJS.Timeou
     // Error: The 1st argument cannot be cast to type expo.modules.video.player.VideoPlayer
     // (received class java.lang.Integer)
     // → Caused by: Cannot use shared object that was already released
-    console.log('error', e);
+    console.error('error', e);
 
     return null;
   }
@@ -24,7 +24,7 @@ export const setIntervalSafe = (callback: () => void, ms?: number): NodeJS.Timeo
       try {
         callback();
       } catch (e) {
-        console.log('error', e);
+        console.error('error', e);
       }
     }, ms);
   } catch (e) {
@@ -32,7 +32,7 @@ export const setIntervalSafe = (callback: () => void, ms?: number): NodeJS.Timeo
     // Error: The 1st argument cannot be cast to type expo.modules.video.player.VideoPlayer
     // (received class java.lang.Integer)
     // → Caused by: Cannot use shared object that was already released
-    console.log('error', e);
+    console.error('error', e);
 
     return null;
   }

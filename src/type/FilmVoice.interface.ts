@@ -13,6 +13,7 @@ export interface SeasonInterface {
 
 export interface FilmVoiceInterface {
   id: string;
+  identifier: string; // can be voiceId + something else for correct identification
   title: string;
   img?: string;
   premiumIcon?: string;

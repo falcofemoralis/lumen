@@ -103,12 +103,7 @@ const configApi: ConfigApiInterface = {
   },
 
   parseContent(content: string): HTMLElementInterface {
-    const t0 = performance.now();
     const page = parseHtml(content);
-    const t1 = performance.now();
-
-    console.log(`parseContent took ${t1 - t0} milliseconds`);
-
     const error = page.querySelector('.error-code');
 
     if (error) {

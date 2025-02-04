@@ -1,8 +1,8 @@
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
-import { VideoPlayer } from 'expo-video';
+import { VideoPlayer, VideoView } from 'expo-video';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmStreamInterface } from 'Type/FilmStream.interface';
-import { FilmVideoInterface } from 'Type/FilmVideo.interface';
+import { FilmVideoInterface, SubtitleInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 
 import { RewindDirection } from './Player.config';
@@ -22,9 +22,9 @@ export interface PlayerComponentProps {
   film: FilmInterface;
   voice: FilmVoiceInterface;
   selectedQuality: string;
+  selectedSubtitle?: SubtitleInterface;
   togglePlayPause: () => void;
   rewindPosition: (type: RewindDirection, seconds?: number) => void;
-  rewindPositionAuto: (type: RewindDirection, seconds?: number) => void;
   seekToPosition: (percent: number) => void;
   calculateCurrentTime: (percent: number) => number;
   openQualitySelector: () => void;
@@ -34,6 +34,8 @@ export interface PlayerComponentProps {
   hideVideoSelector: () => void;
   handleVideoSelect: (video: FilmVideoInterface, voice: FilmVoiceInterface) => void;
   setPlayerRate: (rate: number) => void;
+  openSubtitleSelector: () => void;
+  handleSubtitleChange: (item: DropdownItem) => void;
 }
 
 export type ProgressStatus = {

@@ -31,11 +31,11 @@ export function PlayerVideoSelectorComponent({
       <ThemedDropdown
         data={ voices.map((voice) => ({
           label: voice.title,
-          value: voice.id,
+          value: voice.identifier,
           startIcon: voice.premiumIcon,
           endIcon: voice.img,
         })) }
-        value={ selectedVoice.id }
+        value={ selectedVoice.identifier }
         onChange={ (item) => handleSelectVoice(item.value) }
         header="Search voice"
         inputStyle={ styles.voicesInput }

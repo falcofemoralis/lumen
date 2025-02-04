@@ -1,4 +1,7 @@
 import Loader from 'Component/Loader';
+import PlayerDuration from 'Component/PlayerDuration';
+import PlayerProgressBar from 'Component/PlayerProgressBar';
+import PlayerSubtitles from 'Component/PlayerSubtitles';
 import PlayerVideoSelector from 'Component/PlayerVideoSelector';
 import ThemedDropdown from 'Component/ThemedDropdown';
 import ThemedIcon from 'Component/ThemedIcon';
@@ -12,10 +15,9 @@ import { StatusBar } from 'expo-status-bar';
 import { VideoView } from 'expo-video';
 import { observer } from 'mobx-react-lite';
 import React, {
-  useCallback, useEffect, useRef, useState,
+  useEffect, useRef, useState,
 } from 'react';
 import { Dimensions, View } from 'react-native';
-import { Slider } from 'react-native-awesome-slider';
 import {
   Gesture,
   GestureDetector,
@@ -24,20 +26,20 @@ import {
 import {
   runOnJS,
   useAnimatedStyle,
-  useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import OverlayStore from 'Store/Overlay.store';
-import Colors from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
-import { convertSecondsToTime } from 'Util/Date';
 import { setTimeoutSafe } from 'Util/Misc';
 
 import {
-  IN_PLAYER_VIDEO_SELECTOR_OVERLAY_ID, PLAYER_CONTROLS_TIMEOUT, QUALITY_OVERLAY_ID, RewindDirection,
+  IN_PLAYER_VIDEO_SELECTOR_OVERLAY_ID,
+  PLAYER_CONTROLS_ANIMATION,
+  PLAYER_CONTROLS_TIMEOUT,
+  QUALITY_OVERLAY_ID,
+  RewindDirection,
+  SUBTITLE_OVERLAY_ID,
 } from './Player.config';
-import PlayerStore from './Player.store';
 import { MiddleActionVariant, styles } from './Player.style';
 import { PlayerComponentProps } from './Player.type';
 
@@ -51,6 +53,7 @@ export function PlayerComponent({
   film,
   voice,
   selectedQuality,
+  selectedSubtitle,
   togglePlayPause,
   seekToPosition,
   calculateCurrentTime,
@@ -62,13 +65,16 @@ export function PlayerComponent({
   handleVideoSelect,
   rewindPosition,
   setPlayerRate,
+  openSubtitleSelector,
+  handleSubtitleChange,
 }: PlayerComponentProps) {
   const [showControls, setShowControls] = useState(false);
+  const [isScrolling, setIsScrolling] = useState(false);
   const controlsTimeout = useRef<NodeJS.Timeout | null>(null);
   const canHideControls = useRef(isPlaying && showControls);
 
   const controlsAnimation = useAnimatedStyle(() => ({
-    opacity: withTiming(showControls ? 1 : 0, { duration: 150 }),
+    opacity: withTiming(showControls ? 1 : 0, { duration: PLAYER_CONTROLS_ANIMATION }),
   }));
 
   useEffect(() => {
@@ -86,11 +92,17 @@ export function PlayerComponent({
   }, []);
 
   useEffect(() => {
-    canHideControls.current = isPlaying && showControls;
-  }, [isPlaying, showControls]);
+    canHideControls.current = isPlaying
+    && showControls
+    && !OverlayStore.currentOverlay.length
+    && !isScrolling;
+  }, [isPlaying, showControls, isScrolling]);
 
   useEffect(() => {
-    canHideControls.current = isPlaying && showControls && !OverlayStore.currentOverlay.length;
+    canHideControls.current = isPlaying
+    && showControls
+    && !OverlayStore.currentOverlay.length
+    && !isScrolling;
 
     if (canHideControls.current) {
       handleUserInteraction();
@@ -115,6 +127,10 @@ export function PlayerComponent({
     if (action) {
       action();
     }
+  };
+
+  const handleIsScrolling = (value: boolean) => {
+    setIsScrolling(value);
   };
 
   const singleTap = Gesture.Tap()
@@ -205,7 +221,7 @@ export function PlayerComponent({
       <View style={ styles.actionsRow }>
         { renderAction('play-speed', 'Speed') }
         { renderAction('quality-high', 'Quality', openQualitySelector) }
-        { renderAction(true ? 'closed-caption-outline' : 'closed-caption', 'Subtitles') }
+        { renderAction(selectedSubtitle?.languageCode === '' ? 'closed-caption-outline' : 'closed-caption', 'Subtitles', openSubtitleSelector) }
         { renderAction('lock-open-outline', 'Lock') }
       </View>
     </View>
@@ -259,15 +275,41 @@ export function PlayerComponent({
   );
 
   const renderDuration = () => (
-    <Duration />
+    <PlayerDuration />
   );
 
-  const renderProgressBar = () => (
-    <ProgressBar
-      seekToPosition={ seekToPosition }
-      calculateCurrentTime={ calculateCurrentTime }
-    />
-  );
+  const renderProgressBar = () => {
+    const { storyboardUrl } = video;
+
+    return (
+      <PlayerProgressBar
+        player={ player }
+        storyboardUrl={ storyboardUrl }
+        seekToPosition={ seekToPosition }
+        calculateCurrentTime={ calculateCurrentTime }
+        handleIsScrolling={ handleIsScrolling }
+      />
+    );
+  };
+
+  const renderSubtitles = () => {
+    if (!selectedSubtitle) {
+      return null;
+    }
+
+    const { url } = selectedSubtitle;
+
+    if (!url) {
+      return null;
+    }
+
+    return (
+      <PlayerSubtitles
+        player={ player }
+        subtitleUrl={ url }
+      />
+    );
+  };
 
   const renderBottomActions = () => (
     <View style={ styles.bottomActions }>
@@ -351,15 +393,34 @@ export function PlayerComponent({
     );
   };
 
+  const renderSubtitlesSelector = () => {
+    const { subtitles = [] } = video;
+
+    return (
+      <ThemedDropdown
+        asOverlay
+        overlayId={ SUBTITLE_OVERLAY_ID }
+        header="Subtitles"
+        value={ selectedSubtitle?.languageCode }
+        data={ subtitles.map((subtitle) => ({
+          label: subtitle.name,
+          value: subtitle.languageCode,
+        })) }
+        onChange={ handleSubtitleChange }
+      />
+    );
+  };
+
   const renderModals = () => (
     <>
       { renderQualitySelector() }
       { renderPlayerVideoSelector() }
+      { renderSubtitlesSelector() }
     </>
   );
 
   return (
-    <SafeAreaView>
+    <View>
       <StatusBar
         hidden
         animated
@@ -372,75 +433,13 @@ export function PlayerComponent({
           nativeControls={ false }
           allowsPictureInPicture={ false }
         />
+        { renderSubtitles() }
         { renderControls() }
         { renderLoader() }
         { renderModals() }
       </ThemedView>
-    </SafeAreaView>
+    </View>
   );
 }
-
-export const Duration = observer(() => {
-  const { currentTime, durationTime, remainingTime } = PlayerStore.progressStatus;
-
-  return (
-    <ThemedText>
-      { `${currentTime} / ${durationTime} (${remainingTime})` }
-    </ThemedText>
-  );
-});
-
-export const ProgressBar = observer(({
-  seekToPosition,
-  calculateCurrentTime,
-}: Pick<PlayerComponentProps, 'seekToPosition' | 'calculateCurrentTime'>) => {
-  const progress = useSharedValue(0);
-  const cache = useSharedValue(0);
-  const minimumValue = useSharedValue(0);
-  const maximumValue = useSharedValue(100);
-  const isSliding = useRef(false);
-
-  useEffect(() => {
-    const { progressPercentage, playablePercentage } = PlayerStore.progressStatus;
-
-    if (isSliding.current) {
-      return;
-    }
-
-    progress.value = progressPercentage;
-    cache.value = playablePercentage;
-  }, [PlayerStore.progressStatus]);
-
-  const renderBubble = useCallback((value: number) => convertSecondsToTime(
-    calculateCurrentTime(value),
-  ), [calculateCurrentTime]);
-
-  const onSlidingStart = useCallback(() => {
-    isSliding.current = true;
-  }, []);
-
-  const onSlidingComplete = useCallback((value: number) => {
-    isSliding.current = false;
-    seekToPosition(value);
-  }, [seekToPosition]);
-
-  return (
-    <Slider
-      progress={ progress }
-      cache={ cache }
-      minimumValue={ minimumValue }
-      maximumValue={ maximumValue }
-      bubble={ renderBubble }
-      onSlidingStart={ onSlidingStart }
-      onSlidingComplete={ onSlidingComplete }
-      theme={ {
-        minimumTrackTintColor: Colors.secondary,
-        cacheTrackTintColor: '#888888aa',
-        maximumTrackTintColor: '#555555aa',
-        bubbleBackgroundColor: Colors.secondary,
-      } }
-    />
-  );
-});
 
 export default observer(PlayerComponent);
