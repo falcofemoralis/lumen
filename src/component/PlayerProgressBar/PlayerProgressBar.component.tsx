@@ -14,6 +14,7 @@ export const PlayerProgressBarComponent = ({
   storyboardUrl,
   seekToPosition,
   calculateCurrentTime,
+  handleUserInteraction,
   handleIsScrolling = noopFn,
 }: PlayerProgressBarComponentProps) => {
   const bubbleRef = useRef<BubbleRef>(null);
@@ -56,6 +57,7 @@ export const PlayerProgressBarComponent = ({
     isSliding.current = false;
     seekToPosition(value);
     updateIsScrolling(false);
+    handleUserInteraction();
   }, []);
 
   const renderBubble = useCallback(() => (

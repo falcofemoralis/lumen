@@ -19,11 +19,29 @@ export enum FocusedElement {
   BottomAction = 'bottomAction',
 }
 
+export interface AutoRewindParams {
+  ms: number;
+  factor: number;
+  active?: boolean;
+  count: number;
+  statusBefore?: boolean;
+  progress: number;
+}
+
 export const AWAKE_TAG = 'player';
 
 export const DEFAULT_REWIND_SECONDS = 10;
-export const DEFAULT_AUTO_REWIND_MS = 250;
-export const DEFAULT_AUTO_REWIND_COUNT = 3;
+export const DEFAULT_AUTO_REWIND_SECONDS = 30;
+export const DEFAULT_AUTO_REWIND_MS = 50;
+export const DEFAULT_AUTO_REWIND_FACTOR = 20; // 20 * 50ms = 1second (user will wait 1 second)
+// 40 * 25ms = 1second (user will wait 1 second)
+// 80 * 12.5ms = 1second (user will wait 1 second)
+export const DEFAULT_AUTO_REWIND_PARAMS = {
+  ms: DEFAULT_AUTO_REWIND_MS,
+  factor: DEFAULT_AUTO_REWIND_FACTOR,
+  count: 0,
+  progress: 0,
+} as AutoRewindParams;
 
 export const LONG_PRESS_DURATION = 500;
 

@@ -37,3 +37,6 @@ export const setIntervalSafe = (callback: () => void, ms?: number): NodeJS.Timeo
     return null;
   }
 };
+
+// eslint-disable-next-line max-len
+export const wait = (ms: number): Promise<void> => new Promise((resolve) => { setTimeoutSafe(resolve, ms); });

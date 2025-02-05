@@ -1,7 +1,7 @@
 import {
-  DEFAULT_AUTO_REWIND_COUNT,
-  DEFAULT_AUTO_REWIND_MS,
-  DEFAULT_REWIND_SECONDS,
+  AutoRewindParams,
+  DEFAULT_AUTO_REWIND_PARAMS,
+  DEFAULT_AUTO_REWIND_SECONDS,
   FocusedElement,
   LONG_PRESS_DURATION,
   RewindDirection,
@@ -17,12 +17,17 @@ import React, {
 import { DimensionValue, View } from 'react-native';
 import { SpatialNavigationFocusableView } from 'react-tv-space-navigation';
 import { noopFn } from 'Util/Function';
-import { setTimeoutSafe } from 'Util/Misc';
+import {
+  setTimeoutSafe, wait,
+} from 'Util/Misc';
 import RemoteControlManager from 'Util/RemoteControl/RemoteControlManager';
 import { SupportedKeys } from 'Util/RemoteControl/SupportedKeys';
 
 import { styles } from './PlayerProgressBar.style.atv';
 import { PlayerProgressBarComponentProps } from './PlayerProgressBar.type';
+
+// eslint-disable-next-line functional/no-let
+const autoRewindParams = DEFAULT_AUTO_REWIND_PARAMS as AutoRewindParams;
 
 export const PlayerProgressBarComponent = ({
   player,
@@ -35,7 +40,7 @@ export const PlayerProgressBarComponent = ({
   seekToPosition,
   toggleSeekMode = noopFn,
   rewindPosition = noopFn,
-  handleUserInteraction = noopFn,
+  handleUserInteraction,
   togglePlayPause = noopFn,
 }: PlayerProgressBarComponentProps) => {
   const [progress, setProgress] = useState(progressStatus.progressPercentage || 0);
@@ -52,16 +57,11 @@ export const PlayerProgressBarComponent = ({
       isLongFired: false,
     },
   });
-  const autoRewindTimeout = useRef<NodeJS.Timeout | null>(null);
-  const autoRewindCount = useRef<number>(0);
-  const autoRewindFactor = useRef<number>(1);
-  const isSliding = useRef<boolean>(false);
-  const autoRewindIsPlayed = useRef<boolean>(false);
 
   useEffect(() => {
     const { progressPercentage, playablePercentage } = progressStatus;
 
-    if (isSliding.current) {
+    if (autoRewindParams.active) {
       return;
     }
 
@@ -69,46 +69,66 @@ export const PlayerProgressBarComponent = ({
     setPlayable(playablePercentage);
   }, [progressStatus]);
 
-  const calculateSeekProgress = (
+  const rewindPositionAuto = async (
     direction: RewindDirection,
-    seconds: number = DEFAULT_REWIND_SECONDS,
+    seconds = DEFAULT_AUTO_REWIND_SECONDS,
   ) => {
-    const { duration = 0 } = player;
+    const { duration = 0, playing } = player;
 
-    const newSeconds = seconds * autoRewindFactor.current;
-    const seekTime = direction === RewindDirection.Backward ? newSeconds * -1 : newSeconds;
-    const currentTime = calculateCurrentTime(progress);
-    const newTime = currentTime + seekTime;
+    if (autoRewindParams.active) {
+      autoRewindParams.active = false;
 
-    return (newTime / duration) * 100;
-  };
+      seekToPosition(autoRewindParams.progress);
 
-  const rewindPositionAuto = (
-    direction: RewindDirection,
-    seconds = DEFAULT_REWIND_SECONDS,
-  ) => {
-    if (autoRewindTimeout.current) {
-      clearInterval(autoRewindTimeout.current);
-      autoRewindTimeout.current = null;
-      autoRewindCount.current = 0;
-      autoRewindFactor.current = 1;
-      isSliding.current = false;
+      if (autoRewindParams.statusBefore !== undefined && autoRewindParams.statusBefore) {
+        togglePlayPause();
+        autoRewindParams.statusBefore = undefined;
+      }
 
       return;
     }
 
-    isSliding.current = true;
-    autoRewindTimeout.current = setInterval(() => {
-      autoRewindCount.current += 1;
+    (Object.keys(DEFAULT_AUTO_REWIND_PARAMS) as (keyof AutoRewindParams)[]).forEach((key) => {
+      autoRewindParams[key] = DEFAULT_AUTO_REWIND_PARAMS[key] as never;
+    });
 
-      if (autoRewindCount.current >= DEFAULT_AUTO_REWIND_COUNT) {
-        autoRewindCount.current = 0;
-        autoRewindFactor.current += 1;
+    if (playing) {
+      togglePlayPause();
+      autoRewindParams.statusBefore = true;
+    }
+
+    autoRewindParams.active = true;
+
+    while (autoRewindParams.active) {
+      autoRewindParams.count += 1;
+
+      if (autoRewindParams.count % autoRewindParams.factor === 0) {
+        autoRewindParams.factor *= 2;
+        autoRewindParams.ms /= 2;
       }
 
-      setProgress(calculateSeekProgress(direction, seconds * autoRewindFactor.current));
-      // vvv change ms to lowers
-    }, DEFAULT_AUTO_REWIND_MS);
+      // eslint-disable-next-line no-await-in-loop
+      await wait(autoRewindParams.ms);
+
+      if (!autoRewindParams.active) {
+        return;
+      }
+
+      setProgress((prevProgress) => {
+        const seekTime = direction === RewindDirection.Backward ? seconds * -1 : seconds;
+        const currentTime = calculateCurrentTime(prevProgress);
+        const newTime = currentTime + seekTime;
+        const newProgress = (newTime / duration) * 100;
+
+        if (!autoRewindParams.active) {
+          return autoRewindParams.progress;
+        }
+
+        autoRewindParams.progress = newProgress;
+
+        return newProgress;
+      });
+    }
   };
 
   const handleProgressThumbKeyDown = (key: SupportedKeys, direction: RewindDirection) => {
@@ -118,13 +138,8 @@ export const PlayerProgressBarComponent = ({
       e.isKeyDownPressed = true;
       e.longTimeout = setTimeoutSafe(() => {
         // Long button press
-        rewindPositionAuto(direction, 30);
+        rewindPositionAuto(direction);
         toggleSeekMode();
-
-        if (player.playing) {
-          togglePlayPause();
-          autoRewindIsPlayed.current = true;
-        }
 
         e.longTimeout = null;
         e.isLongFired = true;
@@ -143,12 +158,6 @@ export const PlayerProgressBarComponent = ({
       e.isLongFired = false;
       rewindPositionAuto(direction);
       toggleSeekMode();
-      seekToPosition(progress);
-
-      if (autoRewindIsPlayed.current) {
-        togglePlayPause();
-        autoRewindIsPlayed.current = false;
-      }
     }
 
     if (e.longTimeout) {
@@ -216,14 +225,12 @@ export const PlayerProgressBarComponent = ({
   };
 
   const renderThumb = (isFocused: boolean) => (
-    <View>
-      <View
-        style={ [
-          styles.thumb,
-          isFocused && styles.focusedThumb,
-        ] }
-      />
-    </View>
+    <View
+      style={ [
+        styles.thumb,
+        isFocused && styles.focusedThumb,
+      ] }
+    />
   );
 
   return (

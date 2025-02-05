@@ -186,7 +186,6 @@ export function PlayerComponent({
     controlsTimeout.current = setTimeoutSafe(() => {
       if (canHideControls.current) {
         setShowControls(false);
-        // setHideActions(false);
       }
     }, PLAYER_CONTROLS_TIMEOUT);
   };
@@ -368,24 +367,28 @@ export function PlayerComponent({
     <PlayerDuration />
   );
 
-  const renderBottomActions = () => (
-    <View style={ styles.bottomActions }>
-      <SpatialNavigationView
-        direction="horizontal"
-        style={ {
-          ...styles.controlsRow,
-          ...(hideActions ? styles.controlsRowHidden : {}),
-        } }
-      >
-        { renderBottomAction('high-quality', 'Quality', openQualitySelector, bottomActionRef) }
-        { renderBottomAction('playlist-play', 'Series', openVideoSelector) }
-        { renderBottomAction('subtitles', 'Subtitles', openSubtitleSelector) }
-        { renderBottomAction('bookmarks', 'Bookmarks') }
-        { renderBottomAction('share', 'Share') }
-      </SpatialNavigationView>
-      { renderDuration() }
-    </View>
-  );
+  const renderBottomActions = () => {
+    const { subtitles = [] } = video;
+
+    return (
+      <View style={ styles.bottomActions }>
+        <SpatialNavigationView
+          direction="horizontal"
+          style={ {
+            ...styles.controlsRow,
+            ...(hideActions ? styles.controlsRowHidden : {}),
+          } }
+        >
+          { renderBottomAction('high-quality', 'Quality', openQualitySelector, bottomActionRef) }
+          { renderBottomAction('playlist-play', 'Series', openVideoSelector) }
+          { subtitles.length > 0 && renderBottomAction('subtitles', 'Subtitles', openSubtitleSelector) }
+          { renderBottomAction('bookmarks', 'Bookmarks') }
+          { renderBottomAction('share', 'Share') }
+        </SpatialNavigationView>
+        { renderDuration() }
+      </View>
+    );
+  };
 
   const renderBackground = () => {
     if (!showControls) {

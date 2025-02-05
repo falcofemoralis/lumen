@@ -137,7 +137,7 @@ export function PlayerComponent({
     .maxDuration(125)
     .onStart(() => {
       runOnJS(setShowControls)(!showControls);
-      runOnJS(setControlsTimeout)();
+      runOnJS(handleUserInteraction)();
     });
 
   const doubleTap = Gesture.Tap()
@@ -215,17 +215,25 @@ export function PlayerComponent({
     </View>
   );
 
-  const renderTopActions = () => (
-    <View style={ styles.topActions }>
-      { renderTopInfo() }
-      <View style={ styles.actionsRow }>
-        { renderAction('play-speed', 'Speed') }
-        { renderAction('quality-high', 'Quality', openQualitySelector) }
-        { renderAction(selectedSubtitle?.languageCode === '' ? 'closed-caption-outline' : 'closed-caption', 'Subtitles', openSubtitleSelector) }
-        { renderAction('lock-open-outline', 'Lock') }
+  const renderTopActions = () => {
+    const { subtitles = [] } = video;
+
+    return (
+      <View style={ styles.topActions }>
+        { renderTopInfo() }
+        <View style={ styles.actionsRow }>
+          { renderAction('play-speed', 'Speed') }
+          { renderAction('quality-high', 'Quality', openQualitySelector) }
+          { subtitles.length > 0 && renderAction(
+            selectedSubtitle?.languageCode === '' ? 'closed-caption-outline' : 'closed-caption',
+            'Subtitles',
+            openSubtitleSelector,
+          ) }
+          { renderAction('lock-open-outline', 'Lock') }
+        </View>
       </View>
-    </View>
-  );
+    );
+  };
 
   const renderMiddleControl = (
     icon: IconInterface,
@@ -288,6 +296,7 @@ export function PlayerComponent({
         seekToPosition={ seekToPosition }
         calculateCurrentTime={ calculateCurrentTime }
         handleIsScrolling={ handleIsScrolling }
+        handleUserInteraction={ handleUserInteraction }
       />
     );
   };

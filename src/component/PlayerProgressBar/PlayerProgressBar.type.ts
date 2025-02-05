@@ -8,6 +8,7 @@ export interface PlayerProgressBarContainerProps {
   storyboardUrl?: string;
   seekToPosition: (percent: number) => void;
   calculateCurrentTime: (percent: number) => number;
+  handleUserInteraction: () => void;
 
   // TV Only
   handleIsScrolling?: (value: boolean) => void;
@@ -18,7 +19,6 @@ export interface PlayerProgressBarContainerProps {
   onFocus?: () => void
   toggleSeekMode?: () => void;
   rewindPosition?: (direction: RewindDirection, seconds?: number) => void;
-  handleUserInteraction?: () => void;
   togglePlayPause?: () => void;
 }
 
