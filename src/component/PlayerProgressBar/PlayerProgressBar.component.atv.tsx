@@ -12,7 +12,6 @@ import PlayerStoryboard from 'Component/PlayerStoryboard';
 import React, {
   useEffect,
   useRef,
-  useState,
 } from 'react';
 import { DimensionValue, View } from 'react-native';
 import { SpatialNavigationFocusableView } from 'react-tv-space-navigation';
@@ -27,7 +26,9 @@ import { styles } from './PlayerProgressBar.style.atv';
 import { PlayerProgressBarComponentProps } from './PlayerProgressBar.type';
 
 // eslint-disable-next-line functional/no-let
-const autoRewindParams = DEFAULT_AUTO_REWIND_PARAMS as AutoRewindParams;
+const autoRewindParams: AutoRewindParams = {
+  ...DEFAULT_AUTO_REWIND_PARAMS,
+};
 
 export const PlayerProgressBarComponent = ({
   player,
@@ -43,8 +44,6 @@ export const PlayerProgressBarComponent = ({
   handleUserInteraction,
   togglePlayPause = noopFn,
 }: PlayerProgressBarComponentProps) => {
-  const [progress, setProgress] = useState(progressStatus.progressPercentage || 0);
-  const [playable, setPlayable] = useState(progressStatus.playablePercentage || 0);
   const longEvent = useRef<{[key: string]: LongEvent}>({
     [SupportedKeys.Left]: {
       isKeyDownPressed: false,
@@ -58,17 +57,6 @@ export const PlayerProgressBarComponent = ({
     },
   });
 
-  useEffect(() => {
-    const { progressPercentage, playablePercentage } = progressStatus;
-
-    if (autoRewindParams.active) {
-      return;
-    }
-
-    setProgress(progressPercentage);
-    setPlayable(playablePercentage);
-  }, [progressStatus]);
-
   const rewindPositionAuto = async (
     direction: RewindDirection,
     seconds = DEFAULT_AUTO_REWIND_SECONDS,
@@ -78,7 +66,7 @@ export const PlayerProgressBarComponent = ({
     if (autoRewindParams.active) {
       autoRewindParams.active = false;
 
-      seekToPosition(autoRewindParams.progress);
+      seekToPosition(PlayerStore.progressStatus.progressPercentage);
 
       if (autoRewindParams.statusBefore !== undefined && autoRewindParams.statusBefore) {
         togglePlayPause();
@@ -114,20 +102,21 @@ export const PlayerProgressBarComponent = ({
         return;
       }
 
-      setProgress((prevProgress) => {
-        const seekTime = direction === RewindDirection.Backward ? seconds * -1 : seconds;
-        const currentTime = calculateCurrentTime(prevProgress);
-        const newTime = currentTime + seekTime;
-        const newProgress = (newTime / duration) * 100;
+      const seekTime = direction === RewindDirection.Backward ? seconds * -1 : seconds;
+      const currentTime = calculateCurrentTime(PlayerStore.progressStatus.progressPercentage);
+      const newTime = currentTime + seekTime;
 
-        if (!autoRewindParams.active) {
-          return autoRewindParams.progress;
-        }
+      if (newTime < 0 || newTime > duration) {
+        PlayerStore.setProgressStatus(newTime < 0 ? 0 : duration, 0, duration);
 
-        autoRewindParams.progress = newProgress;
+        return;
+      }
 
-        return newProgress;
-      });
+      PlayerStore.setProgressStatus(
+        newTime,
+        0,
+        duration,
+      );
     }
   };
 
@@ -213,7 +202,9 @@ export const PlayerProgressBarComponent = ({
       return null;
     }
 
-    const currentTime = hideActions ? calculateCurrentTime(progress) : 0;
+    const currentTime = hideActions ? calculateCurrentTime(
+      PlayerStore.progressStatus.progressPercentage,
+    ) : 0;
 
     return (
       <PlayerStoryboard
@@ -241,14 +232,14 @@ export const PlayerProgressBarComponent = ({
         <View
           style={ [
             styles.playableBar,
-            { width: (`${playable}%`) as DimensionValue },
+            { width: (`${progressStatus.playablePercentage}%`) as DimensionValue },
           ] }
         />
         { /* Progress Playback */ }
         <View
           style={ [
             styles.progressBar,
-            { width: (`${progress}%`) as DimensionValue },
+            { width: (`${progressStatus.progressPercentage}%`) as DimensionValue },
           ] }
         >
           { /* Progress Thumb */ }

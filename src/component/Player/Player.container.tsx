@@ -11,7 +11,6 @@ import ServiceStore from 'Store/Service.store';
 import { FilmStreamInterface } from 'Type/FilmStream.interface';
 import { FilmVideoInterface, SubtitleInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
-import { convertSecondsToTime } from 'Util/Date';
 import { setIntervalSafe } from 'Util/Misc';
 import {
   getPlayerStream,
@@ -24,9 +23,6 @@ import PlayerComponent from './Player.component';
 import PlayerComponentTV from './Player.component.atv';
 import {
   AWAKE_TAG,
-  DEFAULT_AUTO_REWIND_COUNT,
-  DEFAULT_AUTO_REWIND_MS,
-  DEFAULT_PROGRESS_STATUS,
   DEFAULT_REWIND_SECONDS,
   IN_PLAYER_VIDEO_SELECTOR_OVERLAY_ID,
   QUALITY_OVERLAY_ID,
@@ -53,8 +49,6 @@ export function PlayerContainer({
     selectedVideo.subtitles?.find(({ isDefault }) => isDefault),
   );
   const updateTimeTimeout = useRef<NodeJS.Timeout | null>(null);
-  const seekTimeTimeout = useRef<NodeJS.Timeout | null>(null);
-  const seekTimeAmount = useRef<number>(0);
 
   const player = useVideoPlayer(selectedStream.url, (p) => {
     p.loop = false;
@@ -84,9 +78,7 @@ export function PlayerContainer({
         return;
       }
 
-      PlayerStore.setProgressStatus(
-        calculateProgress(currentTime, bufferedPosition, duration),
-      );
+      PlayerStore.setProgressStatus(currentTime, bufferedPosition, duration);
     },
   );
 
@@ -117,7 +109,7 @@ export function PlayerContainer({
     }
 
     updateTime();
-    PlayerStore.setProgressStatus(DEFAULT_PROGRESS_STATUS);
+    PlayerStore.resetProgressStatus();
     setIsLoading(true);
     setSelectedVideo(newVideo);
     setSelectedVoice(newVoice);
@@ -125,18 +117,6 @@ export function PlayerContainer({
     resetUpdateTimeTimeout();
     setSelectedSubtitle(newVideo.subtitles?.find(({ isDefault }) => isDefault));
   };
-
-  const calculateProgress = (
-    currentTime: number,
-    bufferedPosition: number,
-    duration: number,
-  ) => ({
-    progressPercentage: (currentTime / duration) * 100,
-    playablePercentage: (bufferedPosition / duration) * 100,
-    currentTime: convertSecondsToTime(currentTime),
-    durationTime: convertSecondsToTime(duration),
-    remainingTime: convertSecondsToTime(duration - currentTime),
-  });
 
   const togglePlayPause = () => {
     const { playing } = player;
@@ -157,21 +137,12 @@ export function PlayerContainer({
     return (percent / 100) * duration;
   };
 
-  const calculateSeekTime = (type:RewindDirection, seconds: number) => {
-    const { duration = 0, currentTime } = player;
-
-    const seekTime = type === RewindDirection.Backward ? seconds * -1 : seconds;
-    const newTime = currentTime + seekTime;
-
-    return (newTime / duration) * 100;
-  };
-
   const seekToPosition = async (percent: number) => {
     const { bufferedPosition, duration } = player;
 
     const newTime = calculateCurrentTime(percent);
 
-    PlayerStore.setProgressStatus(calculateProgress(newTime, bufferedPosition, duration));
+    PlayerStore.setProgressStatus(newTime, bufferedPosition, duration);
 
     player.currentTime = newTime;
   };
@@ -185,7 +156,7 @@ export function PlayerContainer({
     const seekTime = type === RewindDirection.Backward ? seconds * -1 : seconds;
     const newTime = currentTime + seekTime;
 
-    PlayerStore.setProgressStatus(calculateProgress(newTime, bufferedPosition, duration));
+    PlayerStore.setProgressStatus(newTime, bufferedPosition, duration);
 
     player.seekBy(seekTime);
   };

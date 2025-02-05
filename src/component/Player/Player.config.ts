@@ -25,7 +25,6 @@ export interface AutoRewindParams {
   active?: boolean;
   count: number;
   statusBefore?: boolean;
-  progress: number;
 }
 
 export const AWAKE_TAG = 'player';
@@ -33,15 +32,15 @@ export const AWAKE_TAG = 'player';
 export const DEFAULT_REWIND_SECONDS = 10;
 export const DEFAULT_AUTO_REWIND_SECONDS = 30;
 export const DEFAULT_AUTO_REWIND_MS = 50;
-export const DEFAULT_AUTO_REWIND_FACTOR = 20; // 20 * 50ms = 1second (user will wait 1 second)
-// 40 * 25ms = 1second (user will wait 1 second)
-// 80 * 12.5ms = 1second (user will wait 1 second)
-export const DEFAULT_AUTO_REWIND_PARAMS = {
+export const DEFAULT_AUTO_REWIND_FACTOR = 20;
+// it will rewind every DEFAULT_AUTO_REWIND_MS on DEFAULT_AUTO_REWIND_SECONDS seconds
+// speed factors calculates like count * ms = rewind is applied
+// when limit is reach then ms / 2 and factor * 2
+export const DEFAULT_AUTO_REWIND_PARAMS: AutoRewindParams = {
   ms: DEFAULT_AUTO_REWIND_MS,
   factor: DEFAULT_AUTO_REWIND_FACTOR,
   count: 0,
-  progress: 0,
-} as AutoRewindParams;
+};
 
 export const LONG_PRESS_DURATION = 500;
 
