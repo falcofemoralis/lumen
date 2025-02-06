@@ -70,7 +70,7 @@ export function PlayerVideoSelectorContainer({
 
       try {
         const video = await ServiceStore.getCurrentService()
-          .getFilmStreamsByVoice(film, selectedVoice);
+          .getFilmStreamsByVoice(film, voice);
 
         handleSelectVideo(video, voice);
       } catch (error) {

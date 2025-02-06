@@ -12,7 +12,7 @@ import * as NavigationBar from 'expo-navigation-bar';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { OrientationLock } from 'expo-screen-orientation';
 import { StatusBar } from 'expo-status-bar';
-import { VideoView } from 'expo-video';
+import { isPictureInPictureSupported, VideoView } from 'expo-video';
 import { observer } from 'mobx-react-lite';
 import React, {
   useEffect, useRef, useState,
@@ -72,6 +72,7 @@ export function PlayerComponent({
   const [isScrolling, setIsScrolling] = useState(false);
   const controlsTimeout = useRef<NodeJS.Timeout | null>(null);
   const canHideControls = useRef(isPlaying && showControls);
+  const playerRef = useRef<VideoView>(null);
 
   const controlsAnimation = useAnimatedStyle(() => ({
     opacity: withTiming(showControls ? 1 : 0, { duration: PLAYER_CONTROLS_ANIMATION }),
@@ -215,6 +216,10 @@ export function PlayerComponent({
     </View>
   );
 
+  const enablePIP = () => {
+    playerRef.current?.startPictureInPicture();
+  };
+
   const renderTopActions = () => {
     const { subtitles = [] } = video;
 
@@ -222,6 +227,7 @@ export function PlayerComponent({
       <View style={ styles.topActions }>
         { renderTopInfo() }
         <View style={ styles.actionsRow }>
+          { isPictureInPictureSupported() && renderAction('picture-in-picture-bottom-right', 'PIP', enablePIP) }
           { renderAction('play-speed', 'Speed') }
           { renderAction('quality-high', 'Quality', openQualitySelector) }
           { subtitles.length > 0 && renderAction(
@@ -436,11 +442,12 @@ export function PlayerComponent({
       />
       <ThemedView style={ styles.container }>
         <VideoView
+          ref={ playerRef }
           style={ styles.video }
           player={ player }
           contentFit="contain"
           nativeControls={ false }
-          allowsPictureInPicture={ false }
+          allowsPictureInPicture={ isPictureInPictureSupported() }
         />
         { renderSubtitles() }
         { renderControls() }
