@@ -1,6 +1,7 @@
 /* eslint-disable functional/no-let */
+import { Image } from 'expo-image';
 import { memo, useEffect, useState } from 'react';
-import { Image, View } from 'react-native';
+import { View } from 'react-native';
 import Colors from 'Style/Colors';
 import { storyboardParser, VTTItem } from 'Util/VttParser';
 
@@ -10,9 +11,23 @@ import { PlayerStoryboardComponentProps } from './PlayerStoryboard.type';
 
 interface StoryImageProps {
   uri: string;
+  scale?: number;
 }
 
-const StoryImage = ({ uri }: StoryImageProps) => {
+export const CacheImage = ({ uri }: { uri: string }) => (
+  <Image
+    style={ styles.image }
+    source={ { uri } }
+  />
+);
+
+function imagePropsAreEqual(prevProps: StoryImageProps, props: StoryImageProps) {
+  return prevProps.uri === props.uri;
+}
+
+const MemoizedCacheImage = memo(CacheImage, imagePropsAreEqual);
+
+const StoryImage = ({ uri, scale = 1 }: StoryImageProps) => {
   if (!uri) {
     return null;
   }
@@ -29,10 +44,10 @@ const StoryImage = ({ uri }: StoryImageProps) => {
     const xywh = params.get('xywh');
     if (xywh) {
       const [x, y, w, h] = xywh.split(',').map(Number);
-      offsetX = x;
-      offsetY = y;
-      width = w;
-      height = h;
+      offsetX = x * scale;
+      offsetY = y * scale;
+      width = w * scale;
+      height = h * scale;
     }
   }
 
@@ -45,29 +60,25 @@ const StoryImage = ({ uri }: StoryImageProps) => {
         overflow: 'hidden',
       } }
     >
-      <Image
-        source={ { uri: baseUri } }
+      <View
         style={ {
           top: offsetY * -1,
           left: offsetX * -1,
           width: width * STORYBOARD_TILES_COUNT,
           height: height * STORYBOARD_TILES_COUNT,
         } }
-      />
+      >
+        <MemoizedCacheImage uri={ baseUri } />
+      </View>
     </View>
   );
 };
-
-function imagePropsAreEqual(prevProps: StoryImageProps, props: StoryImageProps) {
-  return prevProps.uri === props.uri;
-}
-
-const MemoizedStoryImage = memo(StoryImage, imagePropsAreEqual);
 
 const PlayerStoryboardComponent = ({
   storyboardUrl,
   currentTime,
   style,
+  scale,
 }: PlayerStoryboardComponentProps) => {
   const [storyboard, setStoryboard] = useState<VTTItem[] | null>([]);
   const [img, setImg] = useState<string>('');
@@ -100,7 +111,10 @@ const PlayerStoryboardComponent = ({
 
   return (
     <View style={ [styles.container, style] }>
-      <MemoizedStoryImage uri={ img } />
+      <StoryImage
+        uri={ img }
+        scale={ scale }
+      />
     </View>
   );
 };

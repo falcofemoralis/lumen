@@ -80,6 +80,8 @@ export const executeGet = async (
 ): Promise<string> => {
   const uri = formatURI(query, variables, endpoint);
 
+  console.log(uri);
+
   try {
     const response = await getFetch(uri, headers, signal);
 

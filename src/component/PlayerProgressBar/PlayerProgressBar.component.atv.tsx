@@ -57,10 +57,7 @@ export const PlayerProgressBarComponent = ({
     },
   });
 
-  const rewindPositionAuto = async (
-    direction: RewindDirection,
-    seconds = DEFAULT_AUTO_REWIND_SECONDS,
-  ) => {
+  const rewindPositionAuto = async (direction: RewindDirection) => {
     const { duration = 0, playing } = player;
 
     if (autoRewindParams.active) {
@@ -93,6 +90,13 @@ export const PlayerProgressBarComponent = ({
       if (autoRewindParams.count % autoRewindParams.factor === 0) {
         autoRewindParams.factor *= 2;
         autoRewindParams.ms /= 2;
+
+        // if ms is less than 20 ms then mobx update will throw an error
+        if (autoRewindParams.ms <= 20) {
+          autoRewindParams.ms = 20;
+        }
+
+        autoRewindParams.seconds += DEFAULT_AUTO_REWIND_SECONDS;
       }
 
       // eslint-disable-next-line no-await-in-loop
@@ -102,7 +106,9 @@ export const PlayerProgressBarComponent = ({
         return;
       }
 
-      const seekTime = direction === RewindDirection.Backward ? seconds * -1 : seconds;
+      const seekTime = direction === RewindDirection.Backward
+        ? autoRewindParams.seconds * -1
+        : autoRewindParams.seconds;
       const currentTime = calculateCurrentTime(PlayerStore.progressStatus.progressPercentage);
       const newTime = currentTime + seekTime;
 
@@ -211,6 +217,7 @@ export const PlayerProgressBarComponent = ({
         style={ [styles.storyBoard, hideActions && styles.storyBoardVisible] }
         storyboardUrl={ storyboardUrl }
         currentTime={ currentTime }
+        scale={ 1.5 }
       />
     );
   };

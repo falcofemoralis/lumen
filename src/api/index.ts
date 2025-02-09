@@ -106,10 +106,16 @@ export interface AccountApiInterface {
   removeRecent(filmId: string): Promise<boolean>;
 }
 
+export interface SearchApiInterface {
+  searchSuggestions(query: string): Promise<string[]>;
+  search: (query: string, page: number) => Promise<FilmListInterface>;
+}
+
 export interface ApiInterface extends
   ConfigApiInterface,
   FilmApiInterface,
   MenuApiInterface,
   PlayerApiInterface,
   AuthApiInterface,
-  AccountApiInterface {}
+  AccountApiInterface,
+  SearchApiInterface {}

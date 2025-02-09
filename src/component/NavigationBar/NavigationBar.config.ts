@@ -28,7 +28,7 @@ export const TABS_TV_CONFIG: Tab<string>[] = [
     },
   },
   {
-    route: 'search',
+    route: '(search)',
     title: 'Search',
     icon: {
       name: 'magnify',
@@ -67,7 +67,7 @@ export const TABS_MOBILE_CONFIG: Tab<string>[] = [
     },
   },
   {
-    route: 'search',
+    route: '(search)',
     title: 'Search',
     icon: {
       name: 'search',

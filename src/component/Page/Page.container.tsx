@@ -24,11 +24,12 @@ export function PageContainer(props: PageContainerProps) {
         return true;
       }
 
-      if (router.canGoBack()) {
-        router.back();
+      // This code prevents user from closing the app on lvl1 screen (recent, search, etc...)
+      // if (router.canGoBack()) {
+      //   router.back();
 
-        return true;
-      }
+      //   return true;
+      // }
 
       return false;
     };

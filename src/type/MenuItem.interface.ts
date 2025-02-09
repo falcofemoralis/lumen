@@ -7,4 +7,5 @@ export interface MenuItemInterface {
   key?: string;
   variables?: Variables;
   subMenuItems?: MenuItemInterface[];
+  isHidden?: boolean;
 }

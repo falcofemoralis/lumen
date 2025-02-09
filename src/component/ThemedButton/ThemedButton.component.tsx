@@ -1,7 +1,7 @@
 import ThemedIcon from 'Component/ThemedIcon';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
-import { TouchableOpacity, View } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 import { scale } from 'Util/CreateStyles';
 
 import { styles } from './ThemedButton.style';

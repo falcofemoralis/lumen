@@ -2,6 +2,7 @@
   "expo": {
     "scheme": "routertv",
     "plugins": [
+      "@terrier-tech/react-native-keyevent-expo-config-plugin",
       [
         "@react-native-tvos/config-tv",
         {
@@ -45,7 +46,8 @@
         {
           "initialOrientation": "DEFAULT"
         }
-      ]
+      ],
+      "expo-speech-recognition"
     ],
     "android": {
       "splash": {

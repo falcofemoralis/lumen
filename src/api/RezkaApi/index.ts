@@ -5,6 +5,7 @@ import configApi from './configApi';
 import filmApi from './filmApi';
 import menuApi from './menuApi';
 import playerApi from './playerApi';
+import searchApi from './searchApi';
 
 const RezkaApi: ApiInterface = Object.assign(
   configApi,
@@ -13,6 +14,7 @@ const RezkaApi: ApiInterface = Object.assign(
   playerApi,
   authApi,
   accountApi,
+  searchApi,
 );
 
 export default RezkaApi;

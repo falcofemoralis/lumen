@@ -29,7 +29,7 @@ export const styles = CreateStyles({
   },
   listContainer: {
     maxHeight: 300,
-    padding: 8,
+    padding: 4,
     alignSelf: 'flex-end',
   },
   contentContainer: {
@@ -43,7 +43,7 @@ export const styles = CreateStyles({
   },
   headerText: {
     color: Colors.lightGray,
-    fontSize: 12,
+    fontSize: 14,
     lineHeight: 16,
     fontWeight: '500',
   },

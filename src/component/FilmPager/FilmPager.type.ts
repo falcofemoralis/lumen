@@ -1,3 +1,4 @@
+import { StyleProp, ViewStyle } from 'react-native';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { FilmListInterface } from 'Type/FilmList.interface';
 import { MenuItemInterface } from 'Type/MenuItem.interface';
@@ -7,20 +8,24 @@ export interface FilmPagerContainerProps {
   menuItems: MenuItemInterface[];
   filmPager: FilmPagerInterface;
   loadOnInit?: boolean;
+  gridStyle?: StyleProp<ViewStyle>;
   onLoadFilms: (
     menuItem: MenuItemInterface,
     currentPage: number,
     isRefresh: boolean
   ) => Promise<FilmListInterface>;
   onUpdateFilms: (key: string, filmList: FilmListInterface) => void;
+  onRowFocus?: (row: number) => void;
 }
 
 export interface FilmPagerComponentProps {
   pagerItems: PagerItemInterface[];
   selectedPagerItem: PagerItemInterface;
   isLoading: boolean;
+  gridStyle?: StyleProp<ViewStyle>;
   onNextLoad: (isRefresh: boolean) => Promise<void>;
   handleMenuItemChange: (pagerItem: PagerItemInterface) => void;
+  onRowFocus?: (row: number) => void;
 }
 
 export interface PagerItemInterface {

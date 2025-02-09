@@ -13,8 +13,10 @@ export function FilmPagerContainer({
   menuItems,
   filmPager,
   loadOnInit = false,
+  gridStyle,
   onLoadFilms,
   onUpdateFilms,
+  onRowFocus,
 }: FilmPagerContainerProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [pagerItems] = useState<PagerItemInterface[]>(
@@ -151,9 +153,11 @@ export function FilmPagerContainer({
   };
 
   const containerProps = () => ({
-    pagerItems: getPagerItems(),
+    pagerItems: getPagerItems().filter(({ menuItem }) => !menuItem.isHidden),
     selectedPagerItem: getSelectedPagerItem(),
     isLoading,
+    gridStyle,
+    onRowFocus,
   });
 
   return withTV(FilmPagerComponentTV, FilmPagerComponent, {

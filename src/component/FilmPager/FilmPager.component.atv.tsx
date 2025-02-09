@@ -9,6 +9,7 @@ import {
   createContext,
   useEffect, useRef, useState,
 } from 'react';
+import { View } from 'react-native';
 import {
   DefaultFocus,
   SpatialNavigationRoot,
@@ -16,6 +17,8 @@ import {
   SpatialNavigationView,
   useLockSpatialNavigation,
 } from 'react-tv-space-navigation';
+import { scale } from 'Util/CreateStyles';
+import { noopFn } from 'Util/Function';
 import RemoteControlManager from 'Util/RemoteControl/RemoteControlManager';
 import { SupportedKeys } from 'Util/RemoteControl/SupportedKeys';
 
@@ -28,8 +31,10 @@ export function FilmPagerComponent({
   pagerItems,
   selectedPagerItem,
   isLoading,
+  gridStyle,
   onNextLoad,
   handleMenuItemChange,
+  onRowFocus = noopFn,
 }: FilmPagerComponentProps) {
   const { isOpen: isMenuOpen } = useMenuContext();
   const { isFocused: isPageFocused } = useNavigation();
@@ -41,7 +46,7 @@ export function FilmPagerComponent({
 
   useEffect(() => {
     const keyDownListener = (type: SupportedKeys) => {
-      if (!isPageFocused() || isMenuOpen) {
+      if (!isPageFocused() || isMenuOpen || !pagerItems.length) {
         return false;
       }
 
@@ -115,34 +120,38 @@ export function FilmPagerComponent({
     );
   };
 
-  const renderMenuItems = () => pagerItems.map((item) => renderMenuItem(item));
-
-  const renderTopMenu = () => (
-    <ThemedView style={ styles.menuListWrapper }>
-      <SpatialNavigationRoot isActive={ isMenuActive }>
-        <SpatialNavigationScrollView
-          horizontal
-          offsetFromStart={ 20 }
-          style={ styles.menuListScroll }
-        >
-          <SpatialNavigationView
-            direction="horizontal"
-            style={ styles.menuList }
-          >
-            <DefaultFocus>
-              { renderMenuItems() }
-            </DefaultFocus>
-          </SpatialNavigationView>
-        </SpatialNavigationScrollView>
-      </SpatialNavigationRoot>
-    </ThemedView>
-  );
-
-  const renderPage = () => {
-    const { films, pagination } = selectedPagerItem;
+  const renderTopMenu = () => {
+    if (!pagerItems.length) {
+      return null;
+    }
 
     return (
-      <ThemedView style={ styles.gridWrapper }>
+      <View style={ styles.menuListWrapper }>
+        <SpatialNavigationRoot isActive={ isMenuActive }>
+          <SpatialNavigationScrollView
+            horizontal
+            offsetFromStart={ scale(20) }
+            style={ styles.menuListScroll }
+          >
+            <SpatialNavigationView
+              direction="horizontal"
+              style={ styles.menuList }
+            >
+              <DefaultFocus>
+                { pagerItems.map((item) => renderMenuItem(item)) }
+              </DefaultFocus>
+            </SpatialNavigationView>
+          </SpatialNavigationScrollView>
+        </SpatialNavigationRoot>
+      </View>
+    );
+  };
+
+  const renderPage = () => {
+    const { films } = selectedPagerItem;
+
+    return (
+      <ThemedView style={ [styles.gridWrapper, gridStyle] }>
         <DefaultFocus>
           <FilmGrid
             films={ films ?? [] }
@@ -151,6 +160,7 @@ export function FilmPagerComponent({
               if (rowRef.current !== row) {
                 canNavigateMenuRef.current = false;
                 rowRef.current = row;
+                onRowFocus(row);
               }
             } }
           />

@@ -7,3 +7,5 @@ export const configStorage = new MMKVLoader().withInstanceID('config').initializ
 export const cookiesStorage = new MMKVLoader().withInstanceID('cookies').initialize();
 
 export const playerStorage = new MMKVLoader().withInstanceID('player').initialize();
+
+export const miscStorage = new MMKVLoader().withInstanceID('misc').initialize();

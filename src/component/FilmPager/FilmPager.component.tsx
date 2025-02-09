@@ -19,7 +19,7 @@ export function FilmPagerComponent({
   };
 
   const renderPage = ({ route }: { route: PagerItemInterface }) => {
-    const { films, pagination } = route;
+    const { films } = route;
 
     return (
       <FilmGrid
@@ -40,6 +40,10 @@ export function FilmPagerComponent({
       scrollEnabled
     />
   );
+
+  if (!pagerItems.length) {
+    return renderPage({ route: selectedPagerItem });
+  }
 
   return (
     <TabView

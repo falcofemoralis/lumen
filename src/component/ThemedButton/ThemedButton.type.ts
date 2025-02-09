@@ -8,7 +8,9 @@ export type Variant = 'filled' | 'outlined';
 export interface ThemedButtonProps {
   children?: React.ReactNode;
   style?: StyleProp<ViewStyle>;
+  styleFocused?: StyleProp<ViewStyle>;
   iconStyle?: StyleProp<TextStyle>;
+  iconStyleFocused?: StyleProp<TextStyle>;
   textStyle?: StyleProp<TextStyle>;
   rightImageStyle?: StyleProp<ImageStyle>
   isSelected?: boolean;
