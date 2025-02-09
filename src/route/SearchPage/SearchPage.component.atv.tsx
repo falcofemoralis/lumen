@@ -17,7 +17,8 @@ export function SearchPageComponent({
   filmPager,
   query,
   recognizing,
-  loadSuggestions,
+  enteredText,
+  onChangeText,
   onApplySuggestion,
   onLoadFilms,
   onUpdateFilms,
@@ -30,11 +31,11 @@ export function SearchPageComponent({
     <View style={ styles.searchBarContainer }>
       <DefaultFocus>
         <ThemedInput
-          placeholder="Search"
-          onChangeText={ (text) => loadSuggestions(text) }
           style={ styles.searchBar }
+          placeholder="Search"
+          onChangeText={ (text) => onChangeText(text) }
           onSubmitEditing={ ({ nativeEvent: { text } }) => onApplySuggestion(text) }
-          value={ query }
+          value={ enteredText }
         />
       </DefaultFocus>
     </View>

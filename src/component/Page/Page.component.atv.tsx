@@ -4,6 +4,7 @@ import ThemedView from 'Component/ThemedView';
 import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect } from 'react';
 import { Keyboard } from 'react-native';
+import ErrorBoundary from 'react-native-error-boundary';
 import { Portal } from 'react-native-paper';
 import { Directions, SpatialNavigationRoot, useLockSpatialNavigation } from 'react-tv-space-navigation';
 import NavigationStore from 'Store/Navigation.store';
@@ -61,15 +62,17 @@ export function PageComponent({
         style,
       ] }
     >
-      <SpatialNavigationRoot
-        isActive={ isActive }
-        onDirectionHandledWithoutMovement={ onDirectionHandledWithoutMovement }
-      >
-        <SpatialNavigationKeyboardLocker />
-        <Portal.Host>
-          { children }
-        </Portal.Host>
-      </SpatialNavigationRoot>
+      <ErrorBoundary>
+        <SpatialNavigationRoot
+          isActive={ isActive }
+          onDirectionHandledWithoutMovement={ onDirectionHandledWithoutMovement }
+        >
+          <SpatialNavigationKeyboardLocker />
+          <Portal.Host>
+            { children }
+          </Portal.Host>
+        </SpatialNavigationRoot>
+      </ErrorBoundary>
     </ThemedView>
   );
 }

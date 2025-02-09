@@ -1,3 +1,4 @@
+import Colors from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
@@ -7,6 +8,7 @@ export const styles = CreateStyles({
   menuListWrapper: {
     height: 40,
     zIndex: 10,
+    backgroundColor: Colors.background,
   },
   menuListScroll: {},
   menuList: {

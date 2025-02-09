@@ -5,6 +5,7 @@ import {
 } from 'expo-speech-recognition';
 import { withTV } from 'Hooks/withTV';
 import { useRef, useState } from 'react';
+import { Keyboard } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
 import ServiceStore from 'Store/Service.store';
 import { FilmListInterface } from 'Type/FilmList.interface';
@@ -13,7 +14,7 @@ import { miscStorage } from 'Util/Storage';
 
 import SearchPageComponent from './SearchPage.component';
 import SearchPageComponentTV from './SearchPage.component.atv';
-import { MAX_USER_SUGGESTIONS, USER_SUGGESTIONS } from './SearchPage.config';
+import { MAX_USER_SUGGESTIONS, SEARCH_DEBOUNCE_TIME, USER_SUGGESTIONS } from './SearchPage.config';
 
 export function SearchPageContainer() {
   const [query, setQuery] = useState('');
@@ -21,9 +22,9 @@ export function SearchPageContainer() {
     miscStorage.getArray(USER_SUGGESTIONS) || [],
   );
   const [filmPager, setFilmPager] = useState<FilmPagerInterface>({});
-  const enteredTextRef = useRef<string>('');
-
+  const [enteredText, setEnteredText] = useState('');
   const [recognizing, setRecognizing] = useState(false);
+  const debounce = useRef<NodeJS.Timeout | undefined>();
 
   useSpeechRecognitionEvent('start', () => setRecognizing(true));
   useSpeechRecognitionEvent('end', () => setRecognizing(false));
@@ -31,28 +32,35 @@ export function SearchPageContainer() {
     onApplySuggestion(event.results[0]?.transcript);
   });
 
-  const loadSuggestions = async (q: string) => {
-    enteredTextRef.current = q;
-
+  const onChangeText = async (q: string) => {
     resetSearch();
+    setEnteredText(q);
 
     if (!q) {
+      clearTimeout(debounce.current);
       setSuggestions(miscStorage.getArray(USER_SUGGESTIONS) || []);
 
       return;
     }
 
-    try {
-      const res = await ServiceStore.getCurrentService().searchSuggestions(q);
+    clearTimeout(debounce.current);
 
-      setSuggestions(res);
-    } catch (e) {
-      NotificationStore.displayError(e as Error);
-    }
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    debounce.current = setTimeout(async () => {
+      console.log('searching suggestions');
+
+      try {
+        const res = await ServiceStore.getCurrentService().searchSuggestions(q);
+
+        setSuggestions(res);
+      } catch (e) {
+        NotificationStore.displayError(e as Error);
+      }
+    }, SEARCH_DEBOUNCE_TIME);
   };
 
   const handleApplySearch = () => {
-    onApplySuggestion(enteredTextRef.current);
+    onApplySuggestion(enteredText);
   };
 
   const onApplySuggestion = async (q: string) => {
@@ -60,7 +68,10 @@ export function SearchPageContainer() {
       return;
     }
 
+    Keyboard.dismiss();
+
     setQuery(q);
+    setEnteredText(q);
     updateUserSuggestions(q);
 
     try {
@@ -93,6 +104,12 @@ export function SearchPageContainer() {
     if (query) {
       setQuery('');
     }
+  };
+
+  const clearSearch = () => {
+    setEnteredText('');
+    setSuggestions(miscStorage.getArray(USER_SUGGESTIONS) || []);
+    resetSearch();
   };
 
   const handleStartRecognition = async () => {
@@ -129,12 +146,14 @@ export function SearchPageContainer() {
   };
 
   const containerFunctions = {
-    loadSuggestions,
+    onChangeText,
     onApplySuggestion,
     onLoadFilms,
     onUpdateFilms,
     handleStartRecognition,
     handleApplySearch,
+    resetSearch,
+    clearSearch,
   };
 
   const containerProps = () => ({
@@ -142,6 +161,7 @@ export function SearchPageContainer() {
     filmPager,
     query,
     recognizing,
+    enteredText,
   });
 
   return withTV(SearchPageComponentTV, SearchPageComponent, {

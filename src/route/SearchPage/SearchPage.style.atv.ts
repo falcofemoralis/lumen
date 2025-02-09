@@ -22,9 +22,6 @@ export const styles = CreateStyles({
     width: '100%',
     height: 48,
   },
-  searchBarVoiceFocused: {
-    backgroundColor: Colors.gravel,
-  },
   suggestionsWrapper: {
     marginTop: 16,
     height: 36,

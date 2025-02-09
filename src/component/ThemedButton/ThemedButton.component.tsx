@@ -14,6 +14,7 @@ export default function ThemedButton({
   icon,
   rightImage,
   iconStyle,
+  iconSize,
   textStyle,
   rightImageStyle,
 }: ThemedButtonProps) {
@@ -26,13 +27,15 @@ export default function ThemedButton({
         <ThemedIcon
           style={ [styles.icon, iconStyle] }
           icon={ icon }
-          size={ scale(16) }
+          size={ iconSize ?? scale(16) }
           color="white"
         />
       ) }
-      <ThemedText style={ [styles.text, textStyle] }>
-        { children }
-      </ThemedText>
+      { children && (
+        <ThemedText style={ [styles.text, textStyle] }>
+          { children }
+        </ThemedText>
+      ) }
       { rightImage && (
         <ThemedImage
           style={ [styles.rightIcon, rightImageStyle] }

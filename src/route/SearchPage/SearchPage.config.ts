@@ -8,5 +8,6 @@ export const SEARCH_MENU_ITEM: MenuItemInterface = {
   isHidden: true,
 };
 
+export const SEARCH_DEBOUNCE_TIME = 500;
 export const USER_SUGGESTIONS = 'suggestions';
 export const MAX_USER_SUGGESTIONS = 10;

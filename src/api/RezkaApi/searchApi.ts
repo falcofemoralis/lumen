@@ -9,10 +9,13 @@ const searchApi: SearchApiInterface = {
     });
 
     const root = configApi.parseContent(res);
-
     const suggestionsItems = root.querySelectorAll('li');
 
-    return suggestionsItems.map((item) => item.querySelector('.enty')?.rawText || '');
+    const arr = suggestionsItems.map((item) => item.querySelector('.enty')?.rawText || '');
+    const mArray = new Set(arr);
+    const uniqueArray = [...mArray];
+
+    return uniqueArray;
   },
 
   search: async (query, page) => {

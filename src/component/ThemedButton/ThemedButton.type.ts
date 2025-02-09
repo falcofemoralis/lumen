@@ -15,6 +15,7 @@ export interface ThemedButtonProps {
   rightImageStyle?: StyleProp<ImageStyle>
   isSelected?: boolean;
   icon?: IconInterface;
+  iconSize?: number;
   variant?: Variant;
   rightImage?: string;
   onPress?: () => void;

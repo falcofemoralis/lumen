@@ -18,6 +18,7 @@ export default function ThemedButton({
   textStyle,
   isSelected,
   icon,
+  iconSize,
   variant = 'filled',
   rightImage,
   rightImageStyle,
@@ -43,20 +44,22 @@ export default function ThemedButton({
             isFocused && iconStyleFocused,
           ] }
           icon={ icon }
-          size={ scale(18) }
+          size={ iconSize ?? scale(18) }
           color={ isFocused ? 'black' : 'gray' }
         />
       ) }
-      <Text
-        style={ [
-          styles.textFilled,
-          textStyle,
-          isSelected && styles.textFilledSelected,
-          isFocused && styles.textFilledFocused,
-        ] }
-      >
-        { children }
-      </Text>
+      { children && (
+        <Text
+          style={ [
+            styles.textFilled,
+            textStyle,
+            isSelected && styles.textFilledSelected,
+            isFocused && styles.textFilledFocused,
+          ] }
+        >
+          { children }
+        </Text>
+      ) }
       { rightImage && (
         <ThemedImage
           style={ [styles.rightIcon, rightImageStyle] }
@@ -87,20 +90,22 @@ export default function ThemedButton({
             isFocused && iconStyleFocused,
           ] }
           icon={ icon }
-          size={ scale(18) }
+          size={ iconSize ?? scale(18) }
           color={ isFocused ? 'black' : 'gray' }
         />
       ) }
-      <Text
-        style={ [
-          styles.textOutlined,
-          textStyle,
-          isSelected && styles.textOutlinedSelected,
-          isFocused && styles.textOutlinedFocused,
-        ] }
-      >
-        { children }
-      </Text>
+      { children && (
+        <Text
+          style={ [
+            styles.textOutlined,
+            textStyle,
+            isSelected && styles.textOutlinedSelected,
+            isFocused && styles.textOutlinedFocused,
+          ] }
+        >
+          { children }
+        </Text>
+      ) }
     </View>
   );
 

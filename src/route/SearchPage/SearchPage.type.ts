@@ -7,7 +7,8 @@ export interface SearchPageComponentProps {
   filmPager: FilmPagerInterface;
   query: string;
   recognizing: boolean;
-  loadSuggestions: (q: string) => void;
+  enteredText: string;
+  onChangeText: (q: string) => void;
   onApplySuggestion: (q: string) => void;
   onLoadFilms: (
     menuItem: MenuItemInterface,
@@ -17,4 +18,6 @@ export interface SearchPageComponentProps {
   onUpdateFilms: (key: string, filmList: FilmListInterface) => void;
   handleStartRecognition: () => void;
   handleApplySearch: () => void;
+  resetSearch: () => void;
+  clearSearch: () => void;
 }
