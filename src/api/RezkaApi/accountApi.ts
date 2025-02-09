@@ -6,11 +6,11 @@ import configApi from './configApi';
 import { JSONResult, parseFilmsListRoot } from './utils';
 
 type RezkaAccountApiInterface = AccountApiInterface & {
-  recentPage: HTMLElementInterface | null;
+  recentItems: HTMLElementInterface[] | null;
 };
 
 const accountApi: RezkaAccountApiInterface = {
-  recentPage: null,
+  recentItems: null,
 
   /**
    * Get bookmarks
@@ -65,21 +65,26 @@ const accountApi: RezkaAccountApiInterface = {
    */
   async getRecent(page: number, params?: ApiParams) {
     const { isRefresh } = params || {};
-    const itemsPerPage = 15;
-    const start = (page - 1) * itemsPerPage + 1; // 1 means that we start from the second element
-    const end = page * itemsPerPage + 1;
+    const itemsPerPage = 20;
 
-    const loadPage = async (): Promise<HTMLElementInterface> => {
-      this.recentPage = await configApi.fetchPage('/continue', {});
+    const loadItems = async (): Promise<HTMLElementInterface[]> => {
+      const res = await configApi.fetchPage('/continue', {});
+      const parsedItems = res.querySelectorAll('.b-videosaves__list_item');
 
-      return this.recentPage;
+      const s = parsedItems.slice(1);
+
+      this.recentItems = s;
+
+      return s;
     };
 
-    const root = (this.recentPage && !isRefresh) ? this.recentPage : await loadPage();
+    const items = (this.recentItems && !isRefresh) ? this.recentItems : await loadItems();
 
-    const items = root.querySelectorAll(`.b-videosaves__list_item:nth-child(n+${start + 1}):nth-child(-n+${end})`);
+    // eslint-disable-next-line max-len
+    // const items = root.querySelectorAll(`.b-videosaves__list_item:nth-child(n+${start + 1}):nth-child(-n+${end})`);
+    const slicedItems = items.slice((page - 1) * itemsPerPage, (page * itemsPerPage) - 1);
 
-    const recentItems = items.map((el) => {
+    const recentItems = slicedItems.map((el) => {
       const date = el.querySelector('.date');
       const link = el.querySelector('.title a');
       const info = el.querySelector('.info')?.childNodes[0]?.rawText;
@@ -99,7 +104,7 @@ const accountApi: RezkaAccountApiInterface = {
 
     return {
       items: recentItems,
-      totalPages: 9999, // We don't know the total number of pages
+      totalPages: Math.ceil(items.length / itemsPerPage),
     };
   },
 
@@ -115,6 +120,10 @@ const accountApi: RezkaAccountApiInterface = {
     }
 
     return true;
+  },
+
+  unloadRecentPage() {
+    this.recentItems = null;
   },
 };
 

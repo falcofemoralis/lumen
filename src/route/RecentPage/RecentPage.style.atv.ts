@@ -1,4 +1,3 @@
-import Colors from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const ROW_GAP = 24;
@@ -6,6 +5,8 @@ export const ROW_GAP = 24;
 export const styles = CreateStyles({
   grid: {
     padding: ROW_GAP,
+    marginLeft: ROW_GAP,
+    marginRight: ROW_GAP,
   },
   rowStyle: {
     gap: ROW_GAP,
@@ -14,9 +15,10 @@ export const styles = CreateStyles({
     height: 'auto',
     flexDirection: 'row',
     gap: 8,
+    opacity: 0.7,
   },
   itemFocused: {
-    backgroundColor: Colors.white,
+    opacity: 1,
   },
   poster: {
     height: 150,
@@ -35,21 +37,17 @@ export const styles = CreateStyles({
     fontSize: 16,
   },
   nameFocused: {
-    color: Colors.black,
   },
   date: {
   },
   dateFocused: {
-    color: Colors.black,
   },
   info: {
   },
   infoFocused: {
-    color: Colors.black,
   },
   additionalInfo: {
   },
   additionalInfoFocused: {
-    color: Colors.black,
   },
 });

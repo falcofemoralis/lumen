@@ -1,4 +1,4 @@
 export const NUMBER_OF_COLUMNS = 1;
-export const NUMBER_OF_COLUMNS_TV = 2;
+export const NUMBER_OF_COLUMNS_TV = 1;
 export const THUMBNAILS_AMOUNT = NUMBER_OF_COLUMNS * 10;
 export const THUMBNAILS_AMOUNT_TV = NUMBER_OF_COLUMNS_TV * 3;

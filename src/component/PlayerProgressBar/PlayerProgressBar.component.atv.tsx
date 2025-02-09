@@ -3,7 +3,6 @@ import {
   DEFAULT_AUTO_REWIND_MIN_MS,
   DEFAULT_AUTO_REWIND_MULTIPLIER,
   DEFAULT_AUTO_REWIND_PARAMS,
-  DEFAULT_AUTO_REWIND_SECONDS,
   FocusedElement,
   LONG_PRESS_DURATION,
   RewindDirection,
@@ -84,19 +83,19 @@ export const PlayerProgressBarComponent = ({
     autoRewindParams.active = true;
 
     while (autoRewindParams.active) {
-      autoRewindParams.count += 1;
+      // autoRewindParams.count += 1;
 
-      if (autoRewindParams.count % autoRewindParams.factor === 0) {
-        autoRewindParams.factor *= DEFAULT_AUTO_REWIND_MULTIPLIER;
-        autoRewindParams.ms /= DEFAULT_AUTO_REWIND_MULTIPLIER;
+      // if (autoRewindParams.count % autoRewindParams.factor === 0) {
+      //   autoRewindParams.factor *= DEFAULT_AUTO_REWIND_MULTIPLIER;
+      //   autoRewindParams.ms /= DEFAULT_AUTO_REWIND_MULTIPLIER;
 
-        // if ms is less than DEFAULT_AUTO_REWIND_MIN_MS ms then mobx update will throw an error
-        if (autoRewindParams.ms <= DEFAULT_AUTO_REWIND_MIN_MS) {
-          autoRewindParams.ms = DEFAULT_AUTO_REWIND_MIN_MS;
-        }
+      //   // if ms is less than DEFAULT_AUTO_REWIND_MIN_MS ms then mobx update will throw an error
+      //   if (autoRewindParams.ms <= DEFAULT_AUTO_REWIND_MIN_MS) {
+      //     autoRewindParams.ms = DEFAULT_AUTO_REWIND_MIN_MS;
+      //   }
 
-        // autoRewindParams.seconds += DEFAULT_AUTO_REWIND_SECONDS;
-      }
+      //   // autoRewindParams.seconds += DEFAULT_AUTO_REWIND_SECONDS;
+      // }
 
       // eslint-disable-next-line no-await-in-loop
       await wait(autoRewindParams.ms);

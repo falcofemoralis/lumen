@@ -13,11 +13,19 @@ export interface FilmGridComponentProps {
   onNextLoad?: (isRefresh: boolean) => Promise<void>;
 }
 
-export type FilmGridItem = FilmCardInterface & {
+export type FilmGridItemType = FilmCardInterface & {
   isThumbnail?: boolean;
 };
 
 export interface FilmGridRowProps {
-  item: FilmGridItem[];
+  item: FilmGridItemType[];
   handleOnPress: (film: FilmCardInterface) => void;
+}
+
+export interface FilmGridItemProps {
+  item: FilmGridItemType,
+  index: number;
+  isThumbnail?: boolean;
+  handleOnPress: (film: FilmCardInterface) => void;
+  handleItemFocus: (index: number) => void;
 }

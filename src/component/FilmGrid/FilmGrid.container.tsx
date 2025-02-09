@@ -14,14 +14,14 @@ import {
   THUMBNAILS_AMOUNT,
   THUMBNAILS_AMOUNT_TV,
 } from './FilmGrid.config';
-import { FilmGridContainerProps, FilmGridItem } from './FilmGrid.type';
+import { FilmGridContainerProps, FilmGridItemType } from './FilmGrid.type';
 
 export function FilmGridContainer({
   films,
   onNextLoad,
   onItemFocus,
 }: FilmGridContainerProps) {
-  const getFilms = (): FilmGridItem[] => {
+  const getFilms = (): FilmGridItemType[] => {
     if (!films.length) {
       return Array(ConfigStore.isTV ? THUMBNAILS_AMOUNT_TV : THUMBNAILS_AMOUNT).fill({
         id: '',

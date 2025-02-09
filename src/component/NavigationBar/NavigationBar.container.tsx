@@ -1,6 +1,8 @@
 import { CommonActions } from '@react-navigation/native';
+import { useNavigation } from 'expo-router';
 import { withTV } from 'Hooks/withTV';
 import { useCallback } from 'react';
+import ConfigStore from 'Store/Config.store';
 
 import NavigationBarComponent from './NavigationBar.component';
 import NavigationBarComponentTV from './NavigationBar.component.atv';
@@ -13,10 +15,21 @@ export function NavigationBarContainer() {
     state: StateType,
   ) => {
     const { route } = tab;
+
     const routes = Array.from(state.routes);
     const rn = routes.find((r) => r.name === route);
 
     if (!rn) {
+      return;
+    }
+
+    // we should unload current row on TV
+    if (ConfigStore.isTV) {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: rn.name }], // your stack screen name
+      });
+
       return;
     }
 

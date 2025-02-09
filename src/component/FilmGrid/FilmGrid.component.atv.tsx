@@ -2,7 +2,7 @@ import FilmCard from 'Component/FilmCard';
 import { CARD_HEIGHT_TV } from 'Component/FilmCard/FilmCard.style.atv';
 import ThemedList from 'Component/ThemedList';
 import { ThemedListRowProps } from 'Component/ThemedList/ThemedList.type';
-import React, { useCallback, useMemo } from 'react';
+import React, { memo, useCallback, useMemo } from 'react';
 import {
   SpatialNavigationFocusableView,
 } from 'react-tv-space-navigation';
@@ -11,7 +11,9 @@ import { getWindowWidth } from 'Util/Window';
 
 import { NUMBER_OF_COLUMNS_TV } from './FilmGrid.config';
 import { ROW_GAP, styles } from './FilmGrid.style.atv';
-import { FilmGridComponentProps, FilmGridItem } from './FilmGrid.type';
+import { FilmGridComponentProps, FilmGridItemProps, FilmGridItemType } from './FilmGrid.type';
+
+const containerWidth = getWindowWidth() - scale(ROW_GAP * 2);
 
 export function FilmGridComponent({
   films,
@@ -19,9 +21,7 @@ export function FilmGridComponent({
   handleOnPress,
   handleItemFocus,
 }: FilmGridComponentProps) {
-  const containerWidth = getWindowWidth() - scale(ROW_GAP * 2);
-
-  const renderItem = useCallback(({ item, index }: ThemedListRowProps<FilmGridItem>) => {
+  const renderItem = useCallback(({ item, index }: ThemedListRowProps<FilmGridItemType>) => {
     const { isThumbnail } = item;
 
     return (

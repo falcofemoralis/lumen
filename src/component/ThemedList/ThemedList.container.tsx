@@ -1,6 +1,6 @@
 /* eslint-disable no-plusplus */
 import { withTV } from 'Hooks/withTV';
-import { useRef, useState } from 'react';
+import { memo, useRef, useState } from 'react';
 import ConfigStore from 'Store/Config.store';
 import { noopFn } from 'Util/Function';
 
@@ -88,4 +88,8 @@ export function ThemedListContainer({
   });
 }
 
-export default ThemedListContainer;
+function propsAreEqual(prevProps: ThemedListContainerProps, props: ThemedListContainerProps) {
+  return JSON.stringify(prevProps.data) === JSON.stringify(props.data);
+}
+
+export default memo(ThemedListContainer, propsAreEqual);

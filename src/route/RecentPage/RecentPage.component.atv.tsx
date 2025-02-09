@@ -48,15 +48,15 @@ export function RecentPageComponent({
           <View style={ styles.itemContent }>
             <Thumbnail
               height={ scale(30) }
-              width="80%"
+              width="60%"
+            />
+            <Thumbnail
+              height={ scale(20) }
+              width="10%"
             />
             <Thumbnail
               height={ scale(20) }
               width="30%"
-            />
-            <Thumbnail
-              height={ scale(20) }
-              width="50%"
             />
           </View>
         </View>
@@ -75,7 +75,7 @@ export function RecentPageComponent({
             <Animated.View
               style={ [
                 styles.item,
-                { width: containerWidth / NUMBER_OF_COLUMNS_TV - scale(ROW_GAP) },
+                { width: containerWidth / NUMBER_OF_COLUMNS_TV - scale(100) },
                 isFocused && styles.itemFocused,
                 scaleAnimation,
               ] }

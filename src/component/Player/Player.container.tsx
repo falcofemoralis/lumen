@@ -123,16 +123,10 @@ export function PlayerContainer({
 
     const newPlaying = pause !== undefined ? pause : playing;
 
-    console.log('newPlaying', newPlaying);
-
     if (newPlaying) {
-      console.log('pause');
-
       player.pause();
       updateTime();
     } else {
-      console.log('play');
-
       player.play();
     }
   };

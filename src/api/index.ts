@@ -104,6 +104,7 @@ export interface AccountApiInterface {
   removeBookmark(filmId: string): Promise<void>;
   getRecent(page: number, params?: ApiParams): Promise<RecentListInterface>;
   removeRecent(filmId: string): Promise<boolean>;
+  unloadRecentPage(): void;
 }
 
 export interface SearchApiInterface {

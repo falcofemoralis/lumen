@@ -28,6 +28,10 @@ export function RecentPageContainer() {
     if (ServiceStore.isSignedIn) {
       loadRecent(1, false);
     }
+
+    return () => {
+      ServiceStore.getCurrentService().unloadRecentPage();
+    };
   }, [ServiceStore.isSignedIn]);
 
   const loadRecent = async (
@@ -69,7 +73,11 @@ export function RecentPageContainer() {
   };
 
   const onNextLoad = async (isRefresh = false) => {
-    loadRecent(isRefresh ? 1 : paginationRef.current.page + 1, isRefresh);
+    const newPage = isRefresh ? 1 : paginationRef.current.page + 1;
+
+    if (newPage <= paginationRef.current.totalPages) {
+      loadRecent(isRefresh ? 1 : newPage, isRefresh);
+    }
   };
 
   const handleOnPress = (item: RecentItemInterface) => {

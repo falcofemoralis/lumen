@@ -26,7 +26,7 @@ export const ThemedListComponent = ({
       onEndReached={ handleScrollEnd }
       onEndReachedThresholdRowsNumber={ 2 }
       style={ style }
-      additionalRenderedRows={ 0 }
+      additionalRenderedRows={ 1 }
       scrollDuration={ 350 }
     />
   );

@@ -47,8 +47,6 @@ export function SearchPageContainer() {
 
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     debounce.current = setTimeout(async () => {
-      console.log('searching suggestions');
-
       try {
         const res = await ServiceStore.getCurrentService().searchSuggestions(q);
 
