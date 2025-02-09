@@ -19,7 +19,7 @@ export interface PlayerProgressBarContainerProps {
   onFocus?: () => void
   toggleSeekMode?: () => void;
   rewindPosition?: (direction: RewindDirection, seconds?: number) => void;
-  togglePlayPause?: () => void;
+  togglePlayPause?: (state?: boolean) => void;
 }
 
 export interface PlayerProgressBarComponentProps extends PlayerProgressBarContainerProps {

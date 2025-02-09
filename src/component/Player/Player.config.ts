@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { ProgressStatus } from './Player.type';
 
 export const DEFAULT_PROGRESS_STATUS: ProgressStatus = {
@@ -31,9 +32,12 @@ export interface AutoRewindParams {
 export const AWAKE_TAG = 'player';
 
 export const DEFAULT_REWIND_SECONDS = 10;
-export const DEFAULT_AUTO_REWIND_SECONDS = 10;
-export const DEFAULT_AUTO_REWIND_MS = 80;
-export const DEFAULT_AUTO_REWIND_FACTOR = 40;
+
+export const DEFAULT_AUTO_REWIND_SECONDS = 30; // rewind seconds
+export const DEFAULT_AUTO_REWIND_MS = 100; // how many ms to wait
+export const DEFAULT_AUTO_REWIND_FACTOR = 40; // how many times wait (DEFAULT_AUTO_REWIND_MS) and rewind
+export const DEFAULT_AUTO_REWIND_MIN_MS = 40; // divided ms can't be less than this value
+export const DEFAULT_AUTO_REWIND_MULTIPLIER = 1.5; // this value will multiple factor and divide ms
 
 export const DEFAULT_AUTO_REWIND_PARAMS: AutoRewindParams = {
   ms: DEFAULT_AUTO_REWIND_MS,

@@ -1,5 +1,7 @@
 import {
   AutoRewindParams,
+  DEFAULT_AUTO_REWIND_MIN_MS,
+  DEFAULT_AUTO_REWIND_MULTIPLIER,
   DEFAULT_AUTO_REWIND_PARAMS,
   DEFAULT_AUTO_REWIND_SECONDS,
   FocusedElement,
@@ -66,7 +68,7 @@ export const PlayerProgressBarComponent = ({
       seekToPosition(PlayerStore.progressStatus.progressPercentage);
 
       if (autoRewindParams.statusBefore !== undefined && autoRewindParams.statusBefore) {
-        togglePlayPause();
+        togglePlayPause(false);
         autoRewindParams.statusBefore = undefined;
       }
 
@@ -77,26 +79,23 @@ export const PlayerProgressBarComponent = ({
       autoRewindParams[key] = DEFAULT_AUTO_REWIND_PARAMS[key] as never;
     });
 
-    if (playing) {
-      togglePlayPause();
-      autoRewindParams.statusBefore = true;
-    }
-
+    togglePlayPause(true);
+    autoRewindParams.statusBefore = playing;
     autoRewindParams.active = true;
 
     while (autoRewindParams.active) {
       autoRewindParams.count += 1;
 
       if (autoRewindParams.count % autoRewindParams.factor === 0) {
-        autoRewindParams.factor *= 2;
-        autoRewindParams.ms /= 2;
+        autoRewindParams.factor *= DEFAULT_AUTO_REWIND_MULTIPLIER;
+        autoRewindParams.ms /= DEFAULT_AUTO_REWIND_MULTIPLIER;
 
-        // if ms is less than 20 ms then mobx update will throw an error
-        if (autoRewindParams.ms <= 20) {
-          autoRewindParams.ms = 20;
+        // if ms is less than DEFAULT_AUTO_REWIND_MIN_MS ms then mobx update will throw an error
+        if (autoRewindParams.ms <= DEFAULT_AUTO_REWIND_MIN_MS) {
+          autoRewindParams.ms = DEFAULT_AUTO_REWIND_MIN_MS;
         }
 
-        autoRewindParams.seconds += DEFAULT_AUTO_REWIND_SECONDS;
+        // autoRewindParams.seconds += DEFAULT_AUTO_REWIND_SECONDS;
       }
 
       // eslint-disable-next-line no-await-in-loop

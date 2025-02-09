@@ -84,7 +84,8 @@ export function RecentPageContainer() {
   const removeItem = async (item: RecentItemInterface) => {
     const { id } = item;
 
-    const newItems = items.filter((i) => i.id !== id);
+    const arr = [...items];
+    const newItems = arr.filter((i) => i.id !== id);
 
     setItems(newItems);
 

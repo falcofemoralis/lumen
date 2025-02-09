@@ -118,13 +118,21 @@ export function PlayerContainer({
     setSelectedSubtitle(newVideo.subtitles?.find(({ isDefault }) => isDefault));
   };
 
-  const togglePlayPause = () => {
+  const togglePlayPause = (pause?: boolean) => {
     const { playing } = player;
 
-    if (playing) {
+    const newPlaying = pause !== undefined ? pause : playing;
+
+    console.log('newPlaying', newPlaying);
+
+    if (newPlaying) {
+      console.log('pause');
+
       player.pause();
       updateTime();
     } else {
+      console.log('play');
+
       player.play();
     }
   };
