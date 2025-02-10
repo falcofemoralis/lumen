@@ -142,4 +142,19 @@ export const styles = CreateStyles({
   collections: {
     marginTop: 16,
   },
+  pendingRelease: {
+    height: 100,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 36,
+    gap: 8,
+    marginBlock: 16,
+  },
+  pendingReleaseIcon: {
+    height: 32,
+    width: 32,
+  },
+  pendingReleaseText: {
+    fontSize: 16,
+  },
 });

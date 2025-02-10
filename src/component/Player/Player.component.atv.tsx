@@ -390,20 +390,16 @@ export function PlayerComponent({
     );
   };
 
-  const renderBackground = () => {
-    if (!showControls) {
-      return null;
-    }
-
-    return (
+  const renderBackground = () => (
+    <ThemedView.Animated style={ [styles.background, controlsAnimation] }>
       <LinearGradient
-        style={ styles.background }
-        colors={ ['rgba(0, 0, 0, 0.6)', 'transparent'] }
+        style={ styles.backgroundGradient }
+        colors={ ['rgba(0, 0, 0, 0.8)', 'transparent'] }
         start={ { x: 0, y: 1 } }
         end={ { x: 0, y: 0 } }
       />
-    );
-  };
+    </ThemedView.Animated>
+  );
 
   const renderControls = () => (
     <ThemedView.Animated style={ [styles.controls, controlsAnimation] }>

@@ -159,102 +159,105 @@ const filmApi: FilmApiInterface = {
     }
 
     film.description = root.querySelector('.b-post__description_text')?.rawText.trim();
+    film.isPendingRelease = !root.querySelector('b-post__go_status');
 
-    // player data
-    root.querySelectorAll('.b-translator__item').forEach((el) => {
-      const voice: FilmVoiceInterface = {
-        id: el.attributes['data-translator_id'],
-        identifier: '',
-        title: el.attributes.title,
-        img: el.querySelector('img')?.attributes.src,
-        isCamrip: el.attributes['data-camrip'],
-        isDirector: el.attributes['data-director'],
-        isAds: el.attributes['data-ad'],
-        isActive: el.attributes.class.includes('active'),
-        isPremium: el.attributes.class.includes('b-prem_translator'),
-      };
-
-      if (voice.isPremium) {
-        voice.premiumIcon = `${configApi.getProvider()}/templates/hdrezka/images/prem-icon.svg`;
-      }
-
-      film.voices.push({
-        ...voice,
-        ...(voice.isActive ? parseSeasons(root) : {}),
-      });
-    });
-
-    const { voices } = film;
-
-    if (!voices.length) {
-      const isMovie = root.querySelector('meta[property=og:type]')?.attributes.content?.includes('video.movie');
-      const stringedDoc = root.innerHTML;
-
-      if (isMovie) {
-        const index = stringedDoc.indexOf('initCDNMoviesEvents');
-        const subString = stringedDoc.substring(
-          stringedDoc.indexOf('{"id"', index),
-          stringedDoc.indexOf('});', index) + 1,
-        );
-        const jsonObject = JSON.parse(subString);
-        const streams = parseStreams(jsonObject.streams);
-        // subtitles = parseSubtitles(jsonObject.subtitle);
-        // getThumbnails(jsonObject.thumbnails, trans);
-
-        const video: FilmVideoInterface = {
-          streams,
+    if (!film.isPendingRelease) {
+      // player data
+      root.querySelectorAll('.b-translator__item').forEach((el) => {
+        const voice: FilmVoiceInterface = {
+          id: el.attributes['data-translator_id'],
+          identifier: '',
+          title: el.attributes.title,
+          img: el.querySelector('img')?.attributes.src,
+          isCamrip: el.attributes['data-camrip'],
+          isDirector: el.attributes['data-director'],
+          isAds: el.attributes['data-ad'],
+          isActive: el.attributes.class.includes('active'),
+          isPremium: el.attributes.class.includes('b-prem_translator'),
         };
 
-        film.voices.push({
-          id: '',
-          identifier: '',
-          title: '',
-          isCamrip: '0',
-          isDirector: '0',
-          isAds: '0',
-          isActive: true,
-          isPremium: false,
-          video,
-        });
-      } else {
-        const startIndex = stringedDoc.indexOf('initCDNSeriesEvents');
-        let endIndex = stringedDoc.indexOf('{"id"', startIndex);
-        if (endIndex === -1) {
-          endIndex = stringedDoc.indexOf('{"url"', startIndex);
+        if (voice.isPremium) {
+          voice.premiumIcon = `${configApi.getProvider()}/templates/hdrezka/images/prem-icon.svg`;
         }
-        const subString = stringedDoc.substring(startIndex, endIndex);
 
         film.voices.push({
-          id: subString.split(',')[1].replaceAll(' ', ''),
-          identifier: '',
-          title: '',
-          isCamrip: '0',
-          isDirector: '0',
-          isAds: '0',
-          isActive: true,
-          isPremium: false,
-          ...parseSeasons(root),
+          ...voice,
+          ...(voice.isActive ? parseSeasons(root) : {}),
         });
+      });
+
+      const { voices } = film;
+
+      if (!voices.length) {
+        const isMovie = root.querySelector('meta[property=og:type]')?.attributes.content?.includes('video.movie');
+        const stringedDoc = root.innerHTML;
+
+        if (isMovie) {
+          const index = stringedDoc.indexOf('initCDNMoviesEvents');
+          const subString = stringedDoc.substring(
+            stringedDoc.indexOf('{"id"', index),
+            stringedDoc.indexOf('});', index) + 1,
+          );
+          const jsonObject = JSON.parse(subString);
+          const streams = parseStreams(jsonObject.streams);
+          // subtitles = parseSubtitles(jsonObject.subtitle);
+          // getThumbnails(jsonObject.thumbnails, trans);
+
+          const video: FilmVideoInterface = {
+            streams,
+          };
+
+          film.voices.push({
+            id: '',
+            identifier: '',
+            title: '',
+            isCamrip: '0',
+            isDirector: '0',
+            isAds: '0',
+            isActive: true,
+            isPremium: false,
+            video,
+          });
+        } else {
+          const startIndex = stringedDoc.indexOf('initCDNSeriesEvents');
+          let endIndex = stringedDoc.indexOf('{"id"', startIndex);
+          if (endIndex === -1) {
+            endIndex = stringedDoc.indexOf('{"url"', startIndex);
+          }
+          const subString = stringedDoc.substring(startIndex, endIndex);
+
+          film.voices.push({
+            id: subString.split(',')[1].replaceAll(' ', ''),
+            identifier: '',
+            title: '',
+            isCamrip: '0',
+            isDirector: '0',
+            isAds: '0',
+            isActive: true,
+            isPremium: false,
+            ...parseSeasons(root),
+          });
+        }
       }
+
+      const { seasons = [] } = voices.find(({ isActive }) => isActive) ?? {};
+      film.hasSeasons = seasons.length > 0;
+      film.hasVoices = film.voices.length > 1;
+      film.voices = film.voices.map((voice) => {
+        const {
+          id: vID,
+          isDirector,
+          isCamrip,
+          isPremium,
+          isAds,
+        } = voice;
+
+        return {
+          ...voice,
+          identifier: `${vID}-${isDirector}-${isCamrip}-${isPremium}-${isAds}`,
+        };
+      });
     }
-
-    const { seasons = [] } = voices.find(({ isActive }) => isActive) ?? {};
-    film.hasSeasons = seasons.length > 0;
-    film.hasVoices = film.voices.length > 1;
-    film.voices = film.voices.map((voice) => {
-      const {
-        id: vID,
-        isDirector,
-        isCamrip,
-        isPremium,
-        isAds,
-      } = voice;
-
-      return {
-        ...voice,
-        identifier: `${vID}-${isDirector}-${isCamrip}-${isPremium}-${isAds}`,
-      };
-    });
 
     return film;
   },

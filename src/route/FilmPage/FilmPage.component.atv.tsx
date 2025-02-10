@@ -16,6 +16,7 @@ import {
   SpatialNavigationFocusableView,
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
+import NotificationStore from 'Store/Notification.store';
 import Colors from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 
@@ -74,11 +75,27 @@ export function FilmPageComponent({
     </SpatialNavigationFocusableView>
   );
 
+  const renderPlayButton = () => {
+    const { isPendingRelease } = film;
+
+    if (isPendingRelease) {
+      return renderAction(
+        __('Coming Soon'),
+        'clock-outline',
+        () => {
+          NotificationStore.displayMessage(__('Ожидаем фильм в хорошем качестве...'));
+        },
+      );
+    }
+
+    return renderAction(__('Watch Now'), 'play-outline', playFilm);
+  };
+
   const renderActions = () => (
     <SpatialNavigationView direction="horizontal">
       <DefaultFocus>
         <ThemedView style={ styles.actions }>
-          { renderAction(__('Watch Now'), 'play-outline', playFilm) }
+          { renderPlayButton() }
           { renderAction('Comments', 'comment-text-multiple-outline') }
           { renderAction('Bookmark', 'movie-star-outline') }
           { renderAction('Trailer', 'movie-open-check-outline') }

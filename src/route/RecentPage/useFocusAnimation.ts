@@ -3,7 +3,7 @@ import { Animated } from 'react-native';
 
 export const useFocusAnimation = (isFocused: boolean) => {
   // eslint-disable-next-line react-compiler/react-compiler -- Required
-  const scaleAnimation = useRef(new Animated.Value(0)).current;
+  const scaleAnimation = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     Animated.spring(scaleAnimation, {

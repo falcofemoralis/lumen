@@ -35,11 +35,14 @@ export function RecentPageComponent({
       isThumbnail,
     } = item;
 
+    // containerWidth / NUMBER_OF_COLUMNS_TV - scale(ROW_GAP)
+    const width = containerWidth / 2;
+
     if (isThumbnail) {
       return (
         <View style={ [
           styles.item,
-          { width: containerWidth / NUMBER_OF_COLUMNS_TV - scale(ROW_GAP) },
+          { width },
         ] }
         >
           <Thumbnail
@@ -75,7 +78,7 @@ export function RecentPageComponent({
             <Animated.View
               style={ [
                 styles.item,
-                { width: containerWidth / NUMBER_OF_COLUMNS_TV - scale(100) },
+                { width },
                 isFocused && styles.itemFocused,
                 scaleAnimation,
               ] }

@@ -9,6 +9,7 @@ import ThemedText from 'Component/ThemedText';
 import Thumbnail from 'Component/Thumbnail';
 import { useRouter } from 'expo-router';
 import __ from 'i18n/__';
+import React from 'react';
 import {
   ScrollView,
   Text,
@@ -306,14 +307,37 @@ export function FilmPageComponent({
     return <ThemedText style={ styles.description }>{ description }</ThemedText>;
   };
 
-  const renderPlayFilmButton = () => (
-    <ThemedButton
-      style={ styles.playBtn }
-      onPress={ playFilm }
-    >
-      { __('Watch Now') }
-    </ThemedButton>
-  );
+  const renderPlayFilmButton = () => {
+    const { isPendingRelease } = film;
+
+    if (isPendingRelease) {
+      return (
+        <View style={ styles.pendingRelease }>
+          <ThemedIcon
+            style={ styles.pendingReleaseIcon }
+            icon={ {
+              pack: IconPackType.MaterialCommunityIcons,
+              name: 'clock-outline',
+            } }
+            size={ 32 }
+            color="white"
+          />
+          <ThemedText style={ styles.pendingReleaseText }>
+            { __('Ожидаем фильм в хорошем качестве...') }
+          </ThemedText>
+        </View>
+      );
+    }
+
+    return (
+      <ThemedButton
+        style={ styles.playBtn }
+        onPress={ playFilm }
+      >
+        { __('Watch Now') }
+      </ThemedButton>
+    );
+  };
 
   const renderAction = (text: string, icon: string, onPress?: () => void) => (
     <TouchableOpacity

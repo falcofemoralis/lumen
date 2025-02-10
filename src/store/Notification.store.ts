@@ -25,6 +25,7 @@ class NotificationStore {
 
     const msg = error instanceof Error ? error.message : String(error);
 
+    console.error(msg);
     ToastAndroid.show(msg, ToastAndroid.LONG);
   }
 

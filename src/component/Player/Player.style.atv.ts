@@ -16,9 +16,15 @@ export const styles = CreateStyles({
     position: 'absolute',
     left: 0,
     bottom: 0,
-    height: '50%',
+    height: '60%',
     width: '100%',
     zIndex: 1,
+    backgroundColor: Colors.transparent,
+    opacity: 1,
+  },
+  backgroundGradient: {
+    height: '100%',
+    width: '100%',
   },
   controls: {
     position: 'absolute',
