@@ -426,7 +426,7 @@ export function FilmPageComponent({
         { renderTitle() }
         { renderGenres() }
         { renderMainContent() }
-        { renderQuickInfo() }
+        { /* { renderQuickInfo() } */ }
         { renderDescription() }
         { renderActions() }
         { renderPlayFilmButton() }

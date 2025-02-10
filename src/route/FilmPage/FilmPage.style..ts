@@ -143,12 +143,12 @@ export const styles = CreateStyles({
     marginTop: 16,
   },
   pendingRelease: {
-    height: 100,
+    width: '90%',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 36,
+    alignSelf: 'center',
+    padding: 32,
     gap: 8,
-    marginBlock: 16,
   },
   pendingReleaseIcon: {
     height: 32,
@@ -156,5 +156,6 @@ export const styles = CreateStyles({
   },
   pendingReleaseText: {
     fontSize: 16,
+    textAlign: 'center',
   },
 });
