@@ -2,7 +2,7 @@
   "expo": {
     "scheme": "routertv",
     "plugins": [
-      "@terrier-tech/react-native-keyevent-expo-config-plugin",
+      "./plugins/withReactNativeKeyevent.js",
       [
         "@react-native-tvos/config-tv",
         {

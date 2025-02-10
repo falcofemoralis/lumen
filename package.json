@@ -72,7 +72,6 @@
     "@types/webvtt-parser": "^2.2.0",
     "@typescript-eslint/eslint-plugin": "5.59.7",
     "@typescript-eslint/parser": "5.59.7",
-    "@terrier-tech/react-native-keyevent-expo-config-plugin": "^1.0.52",
     "eslint": "^8.57.1",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-plugin-eslint-comments": "^3.2.0",
