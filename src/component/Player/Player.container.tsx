@@ -79,6 +79,8 @@ export function PlayerContainer({
       }
 
       PlayerStore.setProgressStatus(currentTime, bufferedPosition, duration);
+
+      onPlaybackEnd(currentTime, duration);
     },
   );
 
@@ -99,6 +101,16 @@ export function PlayerContainer({
       setIsLoading(loading);
     }
   });
+
+  const onPlaybackEnd = (currentTime: number, duration: number) => {
+    console.log('onPlaybackEnd', currentTime, duration);
+
+    if (currentTime >= duration - 1) {
+      console.log('next episode');
+
+      handleNewEpisode(RewindDirection.Forward);
+    }
+  };
 
   const changePlayerVideo = (newVideo: FilmVideoInterface, newVoice: FilmVoiceInterface) => {
     if (ServiceStore.isSignedIn) {
