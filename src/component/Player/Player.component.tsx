@@ -404,6 +404,7 @@ export function PlayerComponent({
         film={ film }
         onHide={ hideVideoSelector }
         onSelect={ handleVideoSelect }
+        voice={ voice }
       />
     );
   };

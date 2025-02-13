@@ -1,5 +1,7 @@
+import PlayerStore from 'Component/Player/Player.store';
 import { withTV } from 'Hooks/withTV';
-import { useState } from 'react';
+import { observer } from 'mobx-react-lite';
+import { memo, useEffect, useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
 import OverlayStore from 'Store/Overlay.store';
 import ServiceStore from 'Store/Service.store';
@@ -12,21 +14,48 @@ import { PlayerVideoSelectorContainerProps } from './PlayerVideoSelector.type';
 
 export function PlayerVideoSelectorContainer({
   overlayId,
-  onHide,
   film,
+  voice: voiceInput,
+  onHide,
   onSelect,
 }: PlayerVideoSelectorContainerProps) {
   const { voices = [] } = film;
   const [isLoading, setIsLoading] = useState(false);
   const [selectedVoice, setSelectedVoice] = useState<FilmVoiceInterface>(
-    voices.find(({ isActive }) => isActive) ?? voices[0],
+    voiceInput ?? voices.find(({ isActive }) => isActive) ?? voices[0],
   );
+
   const [selectedSeasonId, setSelectedSeasonId] = useState<string | undefined>(
     selectedVoice.lastSeasonId,
   );
   const [selectedEpisodeId, setSelectedEpisodeId] = useState<string | undefined>(
     selectedVoice.lastEpisodeId,
   );
+
+  const getStoreVoice = () => {
+    const { id } = film;
+
+    const { filmId, voice } = PlayerStore.selectedVoice || {};
+
+    if (filmId === id && voice) {
+      return voice;
+    }
+
+    return null;
+  };
+
+  /**
+   * In case if user selected another voice\season\episode directly in the player
+   */
+  useEffect(() => {
+    const voice = getStoreVoice();
+
+    if (voice) {
+      setSelectedVoice(voice);
+      setSelectedSeasonId(voice.lastSeasonId);
+      setSelectedEpisodeId(voice.lastEpisodeId);
+    }
+  }, [PlayerStore.selectedVoice]);
 
   const getSeasons = (): SeasonInterface[] => {
     const { seasons = [] } = selectedVoice;
@@ -51,6 +80,11 @@ export function PlayerVideoSelectorContainer({
     }
 
     onSelect(video, voice);
+
+    if (getStoreVoice()) {
+      // if store voice was updated, re update it
+      PlayerStore.setSelectedVoice(film.id, voice);
+    }
   };
 
   const handleSelectVoice = async (voiceId: string) => {
@@ -160,4 +194,4 @@ export function PlayerVideoSelectorContainer({
   });
 }
 
-export default PlayerVideoSelectorContainer;
+export default observer(PlayerVideoSelectorContainer);

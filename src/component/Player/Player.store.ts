@@ -1,4 +1,5 @@
 import { makeAutoObservable } from 'mobx';
+import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { convertSecondsToTime } from 'Util/Date';
 
 import { DEFAULT_PROGRESS_STATUS, FocusedElement } from './Player.config';
@@ -8,6 +9,11 @@ class PlayerStore {
   public progressStatus: ProgressStatus = DEFAULT_PROGRESS_STATUS;
 
   public focusedElement: FocusedElement = FocusedElement.ProgressThumb;
+
+  public selectedVoice: {
+    filmId: string;
+    voice: FilmVoiceInterface;
+  } | null = null;
 
   constructor() {
     makeAutoObservable(this);
@@ -33,6 +39,13 @@ class PlayerStore {
 
   setFocusedElement(focusedElement: FocusedElement) {
     this.focusedElement = focusedElement;
+  }
+
+  setSelectedVoice(filmId: string, voice: FilmVoiceInterface) {
+    this.selectedVoice = {
+      filmId,
+      voice,
+    };
   }
 }
 

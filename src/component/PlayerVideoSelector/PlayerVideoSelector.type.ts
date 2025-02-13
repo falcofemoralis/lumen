@@ -7,6 +7,7 @@ export type PlayerVideoSelectorContainerProps = {
   film: FilmInterface;
   onHide: () => void;
   onSelect: (video: FilmVideoInterface, voice: FilmVoiceInterface) => void;
+  voice?: FilmVoiceInterface;
 };
 
 export type PlayerVideoSelectorComponentProps = {

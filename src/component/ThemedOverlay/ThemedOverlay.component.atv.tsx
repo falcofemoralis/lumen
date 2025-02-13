@@ -1,4 +1,5 @@
 import { observer } from 'mobx-react-lite';
+import { memo } from 'react';
 import { View } from 'react-native';
 import { Portal } from 'react-native-paper';
 
@@ -42,4 +43,12 @@ export function ThemedOverlayComponent({
   );
 }
 
-export default observer(ThemedOverlayComponent);
+function propsAreEqual(
+  prevProps: ThemedOverlayComponentProps,
+  props: ThemedOverlayComponentProps,
+) {
+  return prevProps.isOpened === props.isOpened && prevProps.isVisible === props.isVisible
+    && prevProps.children === props.children;
+}
+
+export default memo(ThemedOverlayComponent, propsAreEqual);

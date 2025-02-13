@@ -116,6 +116,8 @@ export function PlayerContainer({
     setSelectedStream(getPlayerStream(newVideo));
     resetUpdateTimeTimeout();
     setSelectedSubtitle(newVideo.subtitles?.find(({ isDefault }) => isDefault));
+
+    PlayerStore.setSelectedVoice(film.id, newVoice);
   };
 
   const togglePlayPause = (pause?: boolean) => {

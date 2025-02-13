@@ -29,6 +29,7 @@ class OverlayStore {
 
   openOverlay(id: string) {
     this.closeOverlay(id);
+
     this.currentOverlay.push(id);
   }
 

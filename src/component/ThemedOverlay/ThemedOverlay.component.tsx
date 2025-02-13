@@ -1,5 +1,5 @@
 import * as ScreenOrientation from 'expo-screen-orientation';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { Dimensions } from 'react-native';
 import { Modal, Portal } from 'react-native-paper';
 
@@ -50,4 +50,12 @@ export function ThemedOverlayComponent({
   );
 }
 
-export default ThemedOverlayComponent;
+function propsAreEqual(
+  prevProps: ThemedOverlayComponentProps,
+  props: ThemedOverlayComponentProps,
+) {
+  return prevProps.isOpened === props.isOpened && prevProps.isVisible === props.isVisible
+    && prevProps.children === props.children;
+}
+
+export default memo(ThemedOverlayComponent, propsAreEqual);

@@ -1,4 +1,5 @@
 import { withTV } from 'Hooks/withTV';
+import { memo } from 'react';
 
 import ThemedDropdownComponent from './ThemedDropdown.component';
 import ThemedDropdownComponentTV from './ThemedDropdown.component.atv';
@@ -8,4 +9,12 @@ export function ThemedDropdownContainer(props: ThemedDropdownContainerProps<any>
   return withTV(ThemedDropdownComponentTV, ThemedDropdownComponent, props);
 }
 
-export default ThemedDropdownContainer;
+function propsAreEqual(
+  prevProps: ThemedDropdownContainerProps<any>,
+  props: ThemedDropdownContainerProps<any>,
+) {
+  return JSON.stringify(prevProps.data) === JSON.stringify(props.data)
+    && prevProps.value === props.value;
+}
+
+export default memo(ThemedDropdownContainer, propsAreEqual);
