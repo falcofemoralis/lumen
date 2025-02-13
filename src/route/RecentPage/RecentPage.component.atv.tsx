@@ -1,4 +1,6 @@
 import Page from 'Component/Page';
+import ThemedButton from 'Component/ThemedButton';
+import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedList from 'Component/ThemedList';
 import { ThemedListRowProps } from 'Component/ThemedList/ThemedList.type';
@@ -21,9 +23,23 @@ export function RecentPageComponent({
   onNextLoad,
   handleOnPress,
   removeItem,
-}: RecentPageComponentProps) {
+}: RecentPageComponentProps & { items: RecentGridItem[] }) {
   const containerWidth = getWindowWidth() - scale(ROW_GAP * 2);
   const { height } = Dimensions.get('window');
+
+  const prepareItems = () => {
+    const rowsItems = [] as RecentGridItem[];
+
+    items.forEach((item) => {
+      rowsItems.push(item);
+      rowsItems.push({
+        ...item,
+        isDeleteButton: true,
+      });
+    });
+
+    return rowsItems;
+  };
 
   const renderItem = useCallback(({ item }: ThemedListRowProps<RecentGridItem>) => {
     const {
@@ -33,10 +49,15 @@ export function RecentPageComponent({
       info,
       additionalInfo,
       isThumbnail,
+      isDeleteButton,
     } = item;
 
     // containerWidth / NUMBER_OF_COLUMNS_TV - scale(ROW_GAP)
     const width = containerWidth / 2;
+
+    if (isThumbnail && isDeleteButton) {
+      return <View />;
+    }
 
     if (isThumbnail) {
       return (
@@ -66,11 +87,21 @@ export function RecentPageComponent({
       );
     }
 
+    if (isDeleteButton) {
+      return (
+        <ThemedButton
+          style={ styles.deleteButton }
+          icon={ {
+            pack: IconPackType.MaterialCommunityIcons,
+            name: 'delete',
+          } }
+          onPress={ () => removeItem(item) }
+        />
+      );
+    }
+
     return (
-      <SpatialNavigationFocusableView
-        onSelect={ () => handleOnPress(item) }
-        onLongSelect={ () => removeItem(item) }
-      >
+      <SpatialNavigationFocusableView onSelect={ () => handleOnPress(item) }>
         { ({ isFocused }) => {
           const scaleAnimation = useFocusAnimation(isFocused);
 
@@ -126,10 +157,10 @@ export function RecentPageComponent({
     return (
       <DefaultFocus>
         <ThemedList
-          data={ items }
+          data={ prepareItems() }
           renderItem={ renderItem }
           itemHeight={ height / 3 }
-          numberOfColumns={ NUMBER_OF_COLUMNS_TV }
+          numberOfColumns={ NUMBER_OF_COLUMNS_TV + 1 }
           style={ styles.grid }
           rowStyle={ styles.rowStyle }
           onNextLoad={ onNextLoad }

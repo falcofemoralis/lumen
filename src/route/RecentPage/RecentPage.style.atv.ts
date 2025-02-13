@@ -1,3 +1,4 @@
+import Colors from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const ROW_GAP = 24;
@@ -49,5 +50,8 @@ export const styles = CreateStyles({
   additionalInfo: {
   },
   additionalInfoFocused: {
+  },
+  deleteButton: {
+    backgroundColor: Colors.transparent,
   },
 });
