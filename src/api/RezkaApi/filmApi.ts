@@ -61,6 +61,7 @@ const filmApi: FilmApiInterface = {
     const id = root.querySelector('#user-favorites-holder')?.attributes['data-post_id'] ?? '';
     const title = root.querySelector('.b-post__title h1')?.rawText ?? '';
     const poster = root.querySelector('.b-sidecover img')?.attributes.src ?? '';
+    const largePoster = root.querySelector('.b-sidecover a')?.attributes.href ?? '';
 
     const film: FilmInterface = {
       id,
@@ -71,6 +72,7 @@ const filmApi: FilmApiInterface = {
       voices: [],
       hasVoices: false,
       hasSeasons: false,
+      largePoster,
     };
 
     film.originalTitle = root.querySelector('.b-post__origtitle')?.rawText;

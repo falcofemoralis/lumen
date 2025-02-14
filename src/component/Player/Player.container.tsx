@@ -103,11 +103,7 @@ export function PlayerContainer({
   });
 
   const onPlaybackEnd = (currentTime: number, duration: number) => {
-    console.log('onPlaybackEnd', currentTime, duration);
-
     if (currentTime >= duration - 1) {
-      console.log('next episode');
-
       handleNewEpisode(RewindDirection.Forward);
     }
   };

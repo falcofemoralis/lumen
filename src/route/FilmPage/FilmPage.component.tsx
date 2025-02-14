@@ -4,7 +4,7 @@ import PlayerVideoSelector from 'Component/PlayerVideoSelector';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
-import ThemedImage from 'Component/ThemedImage';
+import ThemedImageModal from 'Component/ThemedImageModal';
 import ThemedText from 'Component/ThemedText';
 import Thumbnail from 'Component/Thumbnail';
 import { useRouter } from 'expo-router';
@@ -75,7 +75,7 @@ export function FilmPageComponent({
         </View>
         <View style={ styles.mainContent }>
           <Thumbnail
-            style={ styles.poster }
+            style={ styles.posterWrapper }
           />
           <View style={ [styles.mainInfo, { width: '55%' }] }>
             { Array(5).fill(0).map((_, i) => (
@@ -89,7 +89,7 @@ export function FilmPageComponent({
             )) }
           </View>
         </View>
-        <View style={ styles.quickInfo }>
+        { /* <View style={ styles.quickInfo }>
           { Array(4).fill(0).map((_, i) => (
             <Thumbnail
               // eslint-disable-next-line react/no-array-index-key
@@ -98,7 +98,7 @@ export function FilmPageComponent({
               width="20%"
             />
           )) }
-        </View>
+        </View> */ }
         <Thumbnail
           style={ styles.description }
           height="20%"
@@ -188,12 +188,14 @@ export function FilmPageComponent({
   };
 
   const renderPoster = () => {
-    const { poster } = film;
+    const { poster, largePoster } = film;
 
     return (
-      <ThemedImage
+      <ThemedImageModal
         src={ poster }
-        style={ styles.poster }
+        modalSrc={ largePoster }
+        style={ styles.posterWrapper }
+        imageStyle={ styles.poster }
       />
     );
   };
@@ -276,30 +278,31 @@ export function FilmPageComponent({
     </View>
   );
 
-  const renderQuickInfoText = (title: string, text: string) => (
-    <View style={ styles.quickInfoTextWrapper }>
-      <ThemedText style={ styles.quickInfoUpperText }>{ title }</ThemedText>
-      <ThemedText style={ styles.quickInfoLowerText }>{ text }</ThemedText>
-    </View>
-  );
+  // const renderQuickInfoText = (title: string, text: string) => (
+  //   <View style={ styles.quickInfoTextWrapper }>
+  //     <ThemedText style={ styles.quickInfoUpperText }>{ title }</ThemedText>
+  //     <ThemedText style={ styles.quickInfoLowerText }>{ text }</ThemedText>
+  //   </View>
+  // );
 
-  const renderQuickInfo = () => {
-    const {
-      genres = [],
-      countries = [],
-      duration,
-      ratings = [],
-    } = film;
+  // const renderQuickInfo = () => {
+  //   const {
+  //     genres = [],
+  //     countries = [],
+  //     duration,
+  //     ratings = [],
+  //   } = film;
 
-    return (
-      <View style={ styles.quickInfo }>
-        { genres.length > 0 && renderQuickInfoText('Жанр', genres[0]) }
-        { countries.length > 0 && renderQuickInfoText('Страна', countries[0]) }
-        { ratings.length > 0 && renderQuickInfoText('Рейтинг', `${ratings[0].rating} (${ratings[0].votes})`) }
-        { duration && renderQuickInfoText('Длина', duration) }
-      </View>
-    );
-  };
+  //   return (
+  //     <View style={ styles.quickInfo }>
+  //       { genres.length > 0 && renderQuickInfoText('Жанр', genres[0]) }
+  //       { countries.length > 0 && renderQuickInfoText('Страна', countries[0]) }
+  //       eslint-disable-next-line max-len
+  //       { ratings.length > 0 && renderQuickInfoText('Рейтинг', `${ratings[0].rating} (${ratings[0].votes})`) }
+  //       { duration && renderQuickInfoText('Длина', duration) }
+  //     </View>
+  //   );
+  // };
 
   const renderDescription = () => {
     const { description } = film;

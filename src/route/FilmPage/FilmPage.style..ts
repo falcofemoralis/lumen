@@ -38,9 +38,14 @@ export const styles = CreateStyles({
     gap: 12,
     marginTop: 16,
   },
-  poster: {
+  posterWrapper: {
     width: '40%',
     aspectRatio: '166 / 250',
+    borderRadius: 16,
+  },
+  poster: {
+    height: '100%',
+    width: '100%',
     borderRadius: 16,
   },
   mainInfo: {
