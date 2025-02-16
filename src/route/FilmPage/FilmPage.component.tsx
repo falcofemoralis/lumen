@@ -1,9 +1,12 @@
 import { Rating } from '@kolking/react-native-rating';
+import FilmCard from 'Component/FilmCard';
 import Page from 'Component/Page';
 import PlayerVideoSelector from 'Component/PlayerVideoSelector';
+import ThemedAccordion from 'Component/ThemedAccordion';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
+import ThemedImage from 'Component/ThemedImage';
 import ThemedImageModal from 'Component/ThemedImageModal';
 import ThemedText from 'Component/ThemedText';
 import Thumbnail from 'Component/Thumbnail';
@@ -11,16 +14,22 @@ import { useRouter } from 'expo-router';
 import __ from 'i18n/__';
 import React from 'react';
 import {
+  Pressable,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 import Colors from 'Style/Colors';
+import { ActorInterface } from 'Type/Actor.interface';
+import { FilmCardInterface } from 'Type/FilmCard.interface';
+import { FranchiseItem } from 'Type/FranchiseItem.interface';
+import { InfoListInterface } from 'Type/InfoList.interface';
+import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { scale } from 'Util/CreateStyles';
 
 import { PLAYER_VIDEO_SELECTOR_OVERLAY_ID } from './FilmPage.config';
-import { styles } from './FilmPage.style.';
+import { styles } from './FilmPage.style';
 import { FilmPageComponentProps } from './FilmPage.type';
 
 export function FilmPageComponent({
@@ -28,6 +37,7 @@ export function FilmPageComponent({
   playFilm,
   hideVideoSelector,
   handleVideoSelect,
+  handleSelectFilm,
 }: FilmPageComponentProps) {
   const router = useRouter();
 
@@ -265,7 +275,7 @@ export function FilmPageComponent({
         { renderInfoText(releaseDate, 'Дата выхода') }
         { renderInfoText(duration, 'Время') }
         { renderRating() }
-        { renderCollectionInfo(directors, 'Режиссер') }
+        { renderCollectionInfo(directors.map(({ name }) => name), 'Режиссер') }
         { renderCollectionInfo(countries, 'Страна') }
       </View>
     );
@@ -393,12 +403,323 @@ export function FilmPageComponent({
     );
   };
 
-  const renderCollections = () => {
-    const { infoLists = [] } = film;
+  const renderActor = (actor: ActorInterface) => {
+    const {
+      name,
+      photo,
+      job,
+      isDirector,
+    } = actor;
 
     return (
-      <View style={ styles.collections }>
-        { renderCollectionInfo(infoLists.map(({ name, position }) => `${name} ${position}`)) }
+      <View
+        key={ name }
+        style={ styles.actor }
+      >
+        <View>
+          <ThemedImage
+            style={ styles.actorPhoto }
+            src={ photo }
+          />
+          { isDirector && (
+            <View style={ styles.director }>
+              <ThemedIcon
+                icon={ {
+                  pack: IconPackType.MaterialIcons,
+                  name: 'stars',
+                } }
+                size={ scale(12) }
+                color="yellow"
+              />
+              <ThemedText style={ styles.directorText }>
+                { __('Director') }
+              </ThemedText>
+            </View>
+          ) }
+        </View>
+        <ThemedText
+          style={ styles.actorName }
+        >
+          { name }
+        </ThemedText>
+        { job && (
+          <ThemedText
+            style={ styles.actorJob }
+          >
+            { job }
+          </ThemedText>
+        ) }
+      </View>
+    );
+  };
+
+  const renderActors = () => {
+    const { directors = [], actors = [] } = film;
+
+    const persons = [...directors, ...actors];
+
+    if (!persons.length) {
+      return null;
+    }
+
+    return (
+      <View style={ styles.section }>
+        <ThemedText style={ styles.sectionHeading }>
+          { __('Actors') }
+        </ThemedText>
+        <ScrollView horizontal>
+          <View style={ styles.actorsList }>
+            { persons.map((actor) => renderActor(actor)) }
+          </View>
+        </ScrollView>
+      </View>
+    );
+  };
+
+  const renderScheduleItem = (item: ScheduleItemInterface, idx: number) => {
+    const {
+      name,
+      episodeName,
+      episodeNameOriginal,
+      date,
+      releaseDate,
+      isWatched,
+      isReleased,
+    } = item;
+
+    return (
+      <View
+        key={ name }
+        style={ [
+          styles.scheduleItem,
+          idx % 2 === 0 && styles.scheduleItemEven,
+        ] }
+      >
+        <View style={ styles.scheduleItemInfoWrapper }>
+          <View style={ styles.scheduleItemEpisodeWrapper }>
+            <ThemedText style={ [
+              styles.scheduleItemText,
+              styles.scheduleItemEpisodeName,
+            ] }
+            >
+              { episodeName }
+            </ThemedText>
+            <ThemedText style={ [
+              styles.scheduleItemText,
+              styles.scheduleItemEpisodeOgName,
+            ] }
+            >
+              { episodeNameOriginal }
+            </ThemedText>
+          </View>
+          <View style={ styles.scheduleItemNameWrapper }>
+            <ThemedText style={ styles.scheduleItemText }>
+              { name }
+            </ThemedText>
+            <ThemedText style={ styles.scheduleItemText }>
+              { date }
+            </ThemedText>
+          </View>
+        </View>
+        <View style={ styles.scheduleItemReleaseWrapper }>
+          { isReleased ? (
+            <TouchableOpacity
+              onPress={ () => console.log('watch') }
+            >
+              <ThemedIcon
+                style={ styles.scheduleItemMarkIcon }
+                icon={ {
+                  name: 'checkbox-marked-circle-outline',
+                  pack: IconPackType.MaterialCommunityIcons,
+                } }
+                size={ scale(32) }
+                color={ isWatched ? Colors.secondary : Colors.white }
+              />
+            </TouchableOpacity>
+          ) : (
+            <ThemedText style={ [
+              styles.scheduleItemText,
+              styles.scheduleItemReleaseDate,
+            ] }
+            >
+              { releaseDate }
+            </ThemedText>
+          ) }
+        </View>
+      </View>
+    );
+  };
+
+  const renderSchedule = () => {
+    const { schedule = [] } = film;
+
+    if (!schedule.length) {
+      return null;
+    }
+
+    const data = schedule.map((item) => ({
+      id: item.name,
+      title: item.name,
+      items: item.items,
+    }));
+
+    return (
+      <View style={ styles.section }>
+        <ThemedText style={ styles.sectionHeading }>
+          { __('Schedule') }
+        </ThemedText>
+        <ThemedAccordion
+          data={ data }
+          renderItem={ renderScheduleItem }
+        />
+      </View>
+    );
+  };
+
+  const renderFranchiseItem = (item: FranchiseItem, idx: number) => {
+    const { franchise = [] } = film;
+    const {
+      name,
+      year,
+      rating,
+      link,
+    } = item;
+    const position = Math.abs(idx - franchise.length);
+
+    return (
+      <TouchableOpacity
+        key={ item.name }
+        onPress={ () => handleSelectFilm(link) }
+      >
+        <View style={ styles.franchiseItem }>
+          <ThemedText style={ styles.franchiseText }>
+            { position }
+          </ThemedText>
+          <ThemedText
+            style={ [
+              styles.franchiseText,
+              styles.franchiseName,
+              !link && styles.franchiseSelected,
+            ] }
+          >
+            { name }
+          </ThemedText>
+          <ThemedText style={ styles.franchiseText }>
+            { year }
+          </ThemedText>
+          <ThemedText style={ styles.franchiseText }>
+            { rating }
+          </ThemedText>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
+  const renderFranchise = () => {
+    const { franchise = [] } = film;
+
+    if (!franchise.length) {
+      return null;
+    }
+
+    return (
+      <View style={ styles.section }>
+        <ThemedText style={ styles.sectionHeading }>
+          { __('Franchise') }
+        </ThemedText>
+        <View style={ styles.franchiseList }>
+          { franchise.map((item, idx) => renderFranchiseItem(item, idx)) }
+        </View>
+      </View>
+    );
+  };
+
+  const renderRelatedItem = (item: FilmCardInterface, idx: number) => (
+    <Pressable
+      // eslint-disable-next-line react/no-array-index-key -- idx is unique
+      key={ `${film.id}-${idx}` }
+      style={ { width: scale(100) } }
+      onPress={ () => handleSelectFilm(item.link) }
+    >
+      <FilmCard
+        filmCard={ item }
+        // isThumbnail={ film.isThumbnail }
+      />
+    </Pressable>
+  );
+
+  const renderRelated = () => {
+    const { related = [] } = film;
+
+    return (
+      <View style={ styles.section }>
+        <ThemedText style={ styles.sectionHeading }>
+          { __('Watch also') }
+        </ThemedText>
+        <ScrollView horizontal>
+          <View style={ styles.relatedList }>
+            { related.map((item, idx) => renderRelatedItem(item, idx)) }
+          </View>
+        </ScrollView>
+      </View>
+    );
+  };
+
+  const renderInfoList = (list: InfoListInterface, idx: number) => {
+    const { name, position, link } = list;
+
+    return (
+      <TouchableOpacity
+        key={ name }
+        onPress={ () => console.log('info-list', link) }
+      >
+        <View style={ [
+          styles.infoList,
+          idx % 2 === 0 && styles.infoListEven,
+        ] }
+        >
+          <ThemedText style={ styles.infoListName }>
+            { `${name} ${position || ''}` }
+          </ThemedText>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
+  const renderInfoLists = () => {
+    const { includedIn = [], fromCollections = [] } = film;
+
+    if (!includedIn.length && !fromCollections.length) {
+      return null;
+    }
+
+    const data = [];
+
+    if (includedIn.length) {
+      data.push({
+        id: 'included-in',
+        title: 'Included in the lists',
+        items: includedIn,
+      });
+    }
+
+    if (fromCollections.length) {
+      data.push({
+        id: 'from-collections',
+        title: 'From collections',
+        items: fromCollections,
+      });
+    }
+
+    return (
+      <View style={ styles.section }>
+        <ThemedText style={ styles.sectionHeading }>
+          { __('Included in') }
+        </ThemedText>
+        <ThemedAccordion
+          data={ data }
+          renderItem={ renderInfoList }
+        />
       </View>
     );
   };
@@ -420,21 +741,43 @@ export function FilmPageComponent({
     );
   };
 
-  const renderModals = () => renderPlayerVideoSelector();
+  const renderComments = () => (
+    <View style={ styles.section }>
+      <ThemedText style={ styles.sectionHeading }>
+        { __('Comments') }
+      </ThemedText>
+    </View>
+  );
+
+  const renderModals = () => (
+    <>
+      { renderPlayerVideoSelector() }
+    </>
+  );
 
   return (
     <Page>
       <ScrollView>
+        { renderModals() }
         { renderTopActions() }
         { renderTitle() }
         { renderGenres() }
         { renderMainContent() }
+        {
+        /**
+         * It is useless to display this data since it is already displayed in the main content
+         */
+        }
         { /* { renderQuickInfo() } */ }
         { renderDescription() }
         { renderActions() }
         { renderPlayFilmButton() }
-        { /* { renderCollections() } */ }
-        { renderModals() }
+        { renderActors() }
+        { renderSchedule() }
+        { renderFranchise() }
+        { renderInfoLists() }
+        { renderRelated() }
+        { renderComments() }
       </ScrollView>
     </Page>
   );

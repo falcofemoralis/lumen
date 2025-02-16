@@ -99,4 +99,58 @@ export const styles = CreateStyles({
     marginTop: 8,
     textAlign: 'justify',
   },
+  sectionHeading: {
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  section: {
+    marginTop: 16,
+  },
+  actorsListWrapper: {
+    marginTop: 8,
+    gap: 6,
+    flexDirection: 'row',
+  },
+  actorsList: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  actor: {
+    width: 90,
+    borderRadius: 12,
+    paddingBottom: 4,
+  },
+  actorFocused: {
+    backgroundColor: Colors.white,
+  },
+  actorPhoto: {
+    height: 130,
+    borderRadius: 12,
+  },
+  actorName: {
+    fontSize: 12,
+    textAlign: 'center',
+    marginTop: 8,
+  },
+  actorJob: {
+    fontSize: 12,
+    textAlign: 'center',
+  },
+  actorNameFocused: {
+    color: Colors.black,
+  },
+  director: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    flexDirection: 'row',
+    gap: 4,
+    backgroundColor: Colors.modal,
+    alignItems: 'center',
+    paddingInline: 4,
+    width: '100%',
+  },
+  directorText: {
+    fontSize: 12,
+  },
 });

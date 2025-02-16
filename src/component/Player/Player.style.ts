@@ -55,6 +55,7 @@ export const styles = CreateStyles({
     left: 0,
     width: '100%',
     padding: 16,
+    marginBottom: 16,
   },
   control: {
     alignSelf: 'center',
@@ -68,7 +69,7 @@ export const styles = CreateStyles({
     marginBottom: 16,
   },
   progressBarRow: {
-    marginBottom: 20,
+    marginBottom: 32,
   },
   topInfo: {
     flex: 1,
@@ -77,7 +78,7 @@ export const styles = CreateStyles({
   },
   actionsRow: {
     flexDirection: 'row',
-    gap: 28,
+    gap: 32,
   },
   title: {
     fontSize: 20,

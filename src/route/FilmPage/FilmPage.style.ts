@@ -163,4 +163,117 @@ export const styles = CreateStyles({
     fontSize: 16,
     textAlign: 'center',
   },
+  actorsList: {
+    marginTop: 8,
+    flexDirection: 'row',
+    gap: 16,
+  },
+  actor: {
+    width: 90,
+  },
+  actorPhoto: {
+    height: 130,
+    borderRadius: 12,
+  },
+  actorName: {
+    fontSize: 12,
+    textAlign: 'center',
+    marginTop: 8,
+  },
+  actorJob: {
+    fontSize: 12,
+    textAlign: 'center',
+  },
+  director: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    flexDirection: 'row',
+    gap: 4,
+    backgroundColor: Colors.modal,
+    alignItems: 'center',
+    paddingInline: 4,
+    width: '100%',
+  },
+  directorText: {
+    fontSize: 12,
+  },
+  franchiseList: {
+    marginTop: 8,
+  },
+  franchiseItem: {
+    flexDirection: 'row',
+    gap: 12,
+    paddingBlock: 12,
+  },
+  franchiseName: {
+    flex: 1,
+  },
+  franchiseText: {
+    fontSize: 14,
+  },
+  franchiseSelected: {
+    color: Colors.secondary,
+  },
+  scheduleItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    gap: 8,
+    padding: 8,
+  },
+  scheduleItemEven: {
+    backgroundColor: Colors.gray,
+  },
+  scheduleItemInfoWrapper: {
+    flexDirection: 'column',
+    flex: 1,
+  },
+  scheduleItemEpisodeWrapper: {
+    flexDirection: 'column',
+  },
+  scheduleItemNameWrapper: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  scheduleItemReleaseWrapper: {
+    width: 48,
+    justifyContent: 'center',
+  },
+  scheduleItemText: {
+    fontSize: 14,
+  },
+  scheduleItemEpisodeName: {
+
+  },
+  scheduleItemEpisodeOgName: {
+
+  },
+  scheduleItemReleaseDate: {
+    textAlign: 'center',
+  },
+  scheduleItemMarkIcon: {
+    width: 32,
+    alignSelf: 'center',
+  },
+  sectionHeading: {
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  section: {
+    marginTop: 16,
+  },
+  infoList: {
+    padding: 8,
+  },
+  infoListEven: {
+    backgroundColor: Colors.gray,
+  },
+  infoListName: {
+  },
+  relatedList: {
+    marginTop: 8,
+    flexDirection: 'row',
+    gap: 16,
+  },
 });

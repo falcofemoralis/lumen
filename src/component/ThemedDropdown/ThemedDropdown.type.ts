@@ -9,6 +9,7 @@ export type ThemedDropdownContainerProps<T> = {
   overlayId?: string;
   asList?: boolean;
   onChange: (value: T) => void;
+  inputLabel?: string;
 }
 
 export type ThemedDropdownComponentProps<T> = ThemedDropdownContainerProps<T>;

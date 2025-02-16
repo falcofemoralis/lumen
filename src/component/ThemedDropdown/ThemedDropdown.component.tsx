@@ -15,6 +15,7 @@ import { DropdownItem, ThemedDropdownComponentProps } from './ThemedDropdown.typ
 
 export const ThemedDropdownComponent = ({
   inputStyle,
+  inputLabel,
   data,
   value,
   header,
@@ -111,7 +112,7 @@ export const ThemedDropdownComponent = ({
       return null;
     }
 
-    const { label, endIcon } = data.find((item) => item.value === value);
+    const { label, endIcon } = data.find((item) => item.value === value) ?? {};
 
     return (
       <ThemedButton
@@ -126,7 +127,7 @@ export const ThemedDropdownComponent = ({
         onPress={ () => OverlayStore.openOverlay(id.current) }
         rightImage={ endIcon }
       >
-        { label }
+        { inputLabel ?? label }
       </ThemedButton>
     );
   };

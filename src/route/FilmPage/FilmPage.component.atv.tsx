@@ -4,20 +4,23 @@ import Page from 'Component/Page';
 import PlayerVideoSelector from 'Component/PlayerVideoSelector';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedCard from 'Component/ThemedCard';
+import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
 import Thumbnail from 'Component/Thumbnail';
 import __ from 'i18n/__';
-import { View } from 'react-native';
+import { Dimensions, View } from 'react-native';
 import {
   DefaultFocus,
   SpatialNavigationFocusableView,
+  SpatialNavigationScrollView,
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
 import NotificationStore from 'Store/Notification.store';
 import Colors from 'Style/Colors';
+import { ActorInterface } from 'Type/Actor.interface';
 import { scale } from 'Util/CreateStyles';
 
 import { PLAYER_VIDEO_SELECTOR_OVERLAY_ID } from './FilmPage.config';
@@ -30,6 +33,8 @@ export function FilmPageComponent({
   hideVideoSelector,
   handleVideoSelect,
 }: FilmPageComponentProps) {
+  const { height } = Dimensions.get('window');
+
   if (!film) {
     return (
       <Page>
@@ -119,20 +124,24 @@ export function FilmPageComponent({
 
   const renderGenres = (collection: string[]) => (
     <View style={ styles.collectionContainer }>
-      <SpatialNavigationView
-        style={ styles.collection }
-        direction="horizontal"
+      <SpatialNavigationScrollView
+        horizontal
       >
-        { collection.map((item) => (
-          <ThemedButton
-            key={ item }
-            style={ styles.collectionButton }
-            textStyle={ styles.collectionButtonText }
-          >
-            { item }
-          </ThemedButton>
-        )) }
-      </SpatialNavigationView>
+        <SpatialNavigationView
+          style={ styles.collection }
+          direction="horizontal"
+        >
+          { collection.map((item) => (
+            <ThemedButton
+              key={ item }
+              style={ styles.collectionButton }
+              textStyle={ styles.collectionButtonText }
+            >
+              { item }
+            </ThemedButton>
+          )) }
+        </SpatialNavigationView>
+      </SpatialNavigationScrollView>
     </View>
   );
 
@@ -163,20 +172,25 @@ export function FilmPageComponent({
       <ThemedText style={ styles.collectionTitle }>
         { title }
       </ThemedText>
-      <SpatialNavigationView
-        style={ styles.collection }
-        direction="horizontal"
+      <SpatialNavigationScrollView
+        horizontal
+        offsetFromStart={ scale(20) }
       >
-        { collection.map((item) => (
-          <ThemedButton
-            key={ item }
-            style={ styles.collectionButton }
-            textStyle={ styles.collectionButtonText }
-          >
-            { item }
-          </ThemedButton>
-        )) }
-      </SpatialNavigationView>
+        <SpatialNavigationView
+          style={ styles.collection }
+          direction="horizontal"
+        >
+          { collection.map((item) => (
+            <ThemedButton
+              key={ item }
+              style={ styles.collectionButton }
+              textStyle={ styles.collectionButtonText }
+            >
+              { item }
+            </ThemedButton>
+          )) }
+        </SpatialNavigationView>
+      </SpatialNavigationScrollView>
     </View>
   );
 
@@ -200,6 +214,21 @@ export function FilmPageComponent({
     );
   };
 
+  const renderDescription = () => {
+    const { description } = film;
+
+    return (
+      <View>
+        <ThemedText style={ styles.description }>
+          { description }
+        </ThemedText>
+        <ThemedButton>
+          { __('Read more') }
+        </ThemedButton>
+      </View>
+    );
+  };
+
   const renderMainInfo = () => {
     const {
       title,
@@ -210,7 +239,6 @@ export function FilmPageComponent({
       ratings = [],
       directors = [],
       duration,
-      description,
     } = film;
 
     return (
@@ -230,11 +258,9 @@ export function FilmPageComponent({
         <View style={ styles.ratingsRow }>
           { ratings.map(({ name, rating, votes }) => renderInfoText(`${rating} (${votes})`, name)) }
         </View>
-        { renderCollection(directors, 'Режиссер') }
+        { renderCollection(directors.map(({ name }) => name), 'Режиссер') }
         { renderCollection(countries, 'Страна') }
-        <ThemedText style={ styles.description }>
-          { description }
-        </ThemedText>
+        { renderDescription() }
       </ThemedCard>
     );
   };
@@ -263,19 +289,107 @@ export function FilmPageComponent({
     );
   };
 
-  const renderModals = () => renderPlayerVideoSelector();
+  const renderActor = (actor: ActorInterface) => {
+    const {
+      name,
+      photo,
+      job,
+      isDirector,
+    } = actor;
 
-  const renderContent = () => (
-    <View>
-      { renderActions() }
-      { renderMainContent() }
-      { renderModals() }
-    </View>
-  );
+    return (
+      <SpatialNavigationFocusableView
+        key={ name }
+      >
+        { ({ isFocused }) => (
+          <View style={ [styles.actor, isFocused && styles.actorFocused] }>
+            <View>
+              <ThemedImage
+                style={ styles.actorPhoto }
+                src={ photo }
+              />
+              { isDirector && (
+                <View style={ styles.director }>
+                  <ThemedIcon
+                    icon={ {
+                      pack: IconPackType.MaterialIcons,
+                      name: 'stars',
+                    } }
+                    size={ scale(12) }
+                    color="yellow"
+                  />
+                  <ThemedText style={ styles.directorText }>
+                    { __('Director') }
+                  </ThemedText>
+                </View>
+              ) }
+            </View>
+            <ThemedText
+              style={ [
+                styles.actorName,
+                isFocused && styles.actorNameFocused,
+              ] }
+            >
+              { name }
+            </ThemedText>
+            { job && (
+              <ThemedText
+                style={ [
+                  styles.actorJob,
+                  isFocused && styles.actorNameFocused,
+                ] }
+              >
+                { job }
+              </ThemedText>
+            ) }
+          </View>
+        ) }
+      </SpatialNavigationFocusableView>
+    );
+  };
+
+  const renderActors = () => {
+    const { directors = [], actors = [], genres = [] } = film;
+
+    const persons = [...directors, ...actors];
+
+    if (!persons.length) {
+      return null;
+    }
+
+    return (
+      <View style={ styles.section }>
+        <ThemedText style={ styles.sectionHeading }>
+          { __('Actors') }
+        </ThemedText>
+        <View style={ styles.actorsListWrapper }>
+          <SpatialNavigationScrollView
+            horizontal
+          >
+            <SpatialNavigationView
+              style={ styles.collection }
+              direction="horizontal"
+            >
+              { persons.map((item) => renderActor(item)) }
+            </SpatialNavigationView>
+          </SpatialNavigationScrollView>
+        </View>
+      </View>
+    );
+  };
+
+  const renderModals = () => renderPlayerVideoSelector();
 
   return (
     <Page testID="film-page">
-      { renderContent() }
+      <SpatialNavigationScrollView offsetFromStart={ height / 2 }>
+        <View>
+          { renderModals() }
+          { renderActions() }
+          { renderMainContent() }
+          { renderActors() }
+        </View>
+      </SpatialNavigationScrollView>
     </Page>
   );
 }

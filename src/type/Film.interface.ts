@@ -1,7 +1,11 @@
+import { ActorInterface } from './Actor.interface';
+import { FilmCardInterface } from './FilmCard.interface';
 import { FilmType } from './FilmType.type';
 import { FilmVoiceInterface } from './FilmVoice.interface';
+import { FranchiseItem } from './FranchiseItem.interface';
 import { InfoListInterface } from './InfoList.interface';
 import { RatingInterface } from './Rating.interface';
+import { ScheduleInterface } from './Schedule.interface';
 
 export interface FilmInterface {
   // base data
@@ -22,17 +26,19 @@ export interface FilmInterface {
   mainRating?: RatingInterface;
   ratingScale?: number;
   description?: string;
-  actors?: string[];
-  directors?: string[];
+  actors?: ActorInterface[];
+  directors?: ActorInterface[];
   additionalInfo?: string[];
   duration?: string;
   age?: string;
-  infoLists?: InfoListInterface[];
 
   // collections data
-  schedule?: string[];
-  related?: string[];
+  schedule?: ScheduleInterface[];
+  franchise?: FranchiseItem[];
+  related?: FilmCardInterface[];
   bookmarks?: string[];
+  includedIn?: InfoListInterface[];
+  fromCollections?: InfoListInterface[];
 
   // player data
   voices: FilmVoiceInterface[];

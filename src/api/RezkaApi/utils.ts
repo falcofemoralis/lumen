@@ -1,3 +1,4 @@
+import { ActorInterface } from 'Type/Actor.interface';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { FilmListInterface } from 'Type/FilmList.interface';
 import { FilmStreamInterface } from 'Type/FilmStream.interface';
@@ -30,7 +31,7 @@ export const parseFilmType = (type = '') => {
   return FilmType.Film;
 };
 
-export const parseFilmCard = (el: HTMLElementInterface): FilmCardInterface | null => {
+export const parseFilmCard = (el: HTMLElementInterface): FilmCardInterface => {
   const id = el.attributes['data-id'];
   const link = el.querySelector('.b-content__inline_item-link a')?.attributes.href ?? '';
   const type = parseFilmType(el.querySelector('.cat')?.attributes.class);
@@ -196,4 +197,22 @@ export const parseSubtitles = (
   });
 
   return subtitles;
+};
+
+export const parseActorCard = (
+  node: HTMLElementInterface,
+  isDirector?: boolean,
+): ActorInterface => {
+  const name = node.querySelector('span')?.rawText ?? '';
+  const photo = node.attributes['data-photo'];
+  const link = node.querySelector('a')?.attributes.href;
+  const job = node.attributes['data-job'];
+
+  return {
+    name,
+    photo,
+    link,
+    job,
+    isDirector,
+  };
 };

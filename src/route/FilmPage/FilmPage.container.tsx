@@ -91,6 +91,15 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
     });
   };
 
+  const handleSelectFilm = useCallback((filmLink: string) => {
+    router.push({
+      pathname: '/[film]',
+      params: {
+        film: filmLink,
+      },
+    });
+  }, []);
+
   const containerProps = () => ({
     film,
   });
@@ -99,6 +108,7 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
     playFilm,
     hideVideoSelector,
     handleVideoSelect,
+    handleSelectFilm,
   };
 
   return withTV(FilmPageComponentTV, FilmPageComponent, {

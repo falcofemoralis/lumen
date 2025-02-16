@@ -9,11 +9,14 @@ import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { InfoListInterface } from 'Type/InfoList.interface';
 import { MenuItemInterface } from 'Type/MenuItem.interface';
 import { RatingInterface } from 'Type/Rating.interface';
+import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
+import { decodeHtml } from 'Util/Htlm';
 import { HTMLElementInterface } from 'Util/Parser';
 import { Variables } from 'Util/Request';
 
 import configApi from './configApi';
 import {
+  parseActorCard,
   parseFilmCard, parseFilmsListRoot, parseSeasons, parseStreams,
 } from './utils';
 
@@ -97,7 +100,7 @@ const filmApi: FilmApiInterface = {
             ));
             break;
           case 'Входит в списки':
-            film.infoLists = value.childNodes.reduce((acc: InfoListInterface[], node, idx) => {
+            film.includedIn = value.childNodes.reduce((acc: InfoListInterface[], node, idx) => {
               if (node.rawTagName === 'a') {
                 acc.push({
                   name: node.rawText,
@@ -120,7 +123,7 @@ const filmApi: FilmApiInterface = {
           case 'Режиссер':
             film.directors = value
               .querySelectorAll('.person-name-item')
-              .map((node) => node.rawText);
+              .map((node) => parseActorCard(node, true));
             break;
           case 'Жанр':
             film.genres = value.childNodes
@@ -138,10 +141,21 @@ const filmApi: FilmApiInterface = {
             film.duration = value.rawText;
             break;
           case 'Из серии':
-            break;
-          case 'В ролях актеры':
+            film.fromCollections = value.childNodes
+              .filter((node) => node.rawTagName === 'a')
+              .map((node) => ({
+                name: node.rawText,
+                link: (node as HTMLElementInterface).attributes.href,
+              }));
             break;
           default:
+            if (key.includes('В ролях актеры')) {
+              film.actors = el.querySelectorAll('.person-name-item').map(
+                (node) => parseActorCard(node),
+              );
+              break;
+            }
+
             break;
         }
       }
@@ -260,6 +274,69 @@ const filmApi: FilmApiInterface = {
         };
       });
     }
+
+    // additional info
+
+    film.schedule = root.querySelectorAll('.b-post__schedule_block').map((table) => {
+      const scheduleName = table.querySelector('.b-post__schedule_block_title .title')?.rawText ?? '';
+      const scheduleItems: ScheduleItemInterface[] = table.querySelectorAll('tr')
+        .filter((row) => {
+          const tds = row.querySelectorAll('td');
+
+          return tds.length > 2;
+        })
+        .map((row) => {
+          const tds = row.querySelectorAll('td');
+          const tableName = tds[0]?.rawText;
+          const episodeName = decodeHtml(tds[1]?.querySelector('b')?.rawText ?? '');
+          const episodeNameOriginal = decodeHtml(tds[1]?.querySelector('span')?.rawText);
+          const isWatched = tds[2]?.querySelector('i')?.attributes.class.includes('watched');
+          const date = tds[3]?.rawText;
+          const exists = tds[4]?.rawText ?? '';
+          const isReleased = exists.includes('check');
+
+          return {
+            name: tableName,
+            episodeName,
+            episodeNameOriginal,
+            date,
+            releaseDate: exists,
+            isWatched,
+            isReleased,
+          };
+        });
+
+      const scheduleHardcodedHeader = `${film.title} - даты выхода серий `;
+
+      const correctedName = scheduleName.includes(scheduleHardcodedHeader)
+        ? scheduleName
+          .replace(scheduleHardcodedHeader, '')
+          .slice(0, -1)
+        : scheduleName;
+
+      return {
+        name: correctedName,
+        items: scheduleItems,
+      };
+    });
+
+    film.franchise = root.querySelectorAll('.b-post__partcontent_item').map((el) => {
+      const partItem = el.querySelector('.title')?.rawText ?? '';
+      const partYear = el.querySelector('.year')?.rawText ?? '';
+      const partRating = el.querySelector('.rating')?.rawText ?? '';
+      const partLink = el.attributes['data-url'];
+
+      return {
+        name: partItem,
+        year: partYear,
+        rating: partRating,
+        link: partLink,
+      };
+    });
+
+    film.related = root.querySelectorAll('.b-sidelist .b-content__inline_item').map(
+      (el) => parseFilmCard(el),
+    );
 
     return film;
   },

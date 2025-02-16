@@ -11,4 +11,5 @@ export interface FilmPageComponentProps {
   playFilm: () => void;
   hideVideoSelector: () => void;
   handleVideoSelect: (video: FilmVideoInterface, voice: FilmVoiceInterface) => void;
+  handleSelectFilm: (filmLink: string) => void;
 }

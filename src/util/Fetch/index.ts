@@ -15,8 +15,10 @@ export function customFetch(input: RequestInfo | URL, init?: RequestInit | undef
     headers: {
       ...(init?.headers || {}),
       Cookie: buildCookieString(cookiesManager.get(hostname) || {}),
+      'Accept-Encoding': 'gzip',
     },
     credentials: 'omit', // Omit cookies and handle ourselves
+    keepalive: true,
   }).then((res) => {
     const existingCookies = cookiesManager.get(hostname) || {};
     const newCookies = parseCookies(res.headers.get('Set-Cookie') || '');
