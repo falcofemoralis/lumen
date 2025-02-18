@@ -108,7 +108,6 @@ export const styles = CreateStyles({
   },
   actorsListWrapper: {
     marginTop: 8,
-    gap: 6,
     flexDirection: 'row',
   },
   actorsList: {
@@ -152,5 +151,96 @@ export const styles = CreateStyles({
   },
   directorText: {
     fontSize: 12,
+  },
+  scheduleItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    gap: 8,
+    padding: 8,
+  },
+  scheduleItemFocused: {
+    backgroundColor: Colors.white,
+  },
+  scheduleItemEven: {
+    backgroundColor: Colors.gray,
+  },
+  scheduleItemInfoWrapper: {
+    flexDirection: 'column',
+    flex: 1,
+  },
+  scheduleItemEpisodeWrapper: {
+    flexDirection: 'column',
+  },
+  scheduleItemNameWrapper: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  scheduleItemReleaseWrapper: {
+    width: 48,
+    justifyContent: 'center',
+  },
+  scheduleItemText: {
+    fontSize: 14,
+  },
+  scheduleItemEpisodeName: {
+
+  },
+  scheduleItemEpisodeOgName: {
+
+  },
+  scheduleItemReleaseDate: {
+    textAlign: 'center',
+  },
+  scheduleItemMarkIcon: {
+    width: 32,
+    alignSelf: 'center',
+  },
+  franchiseList: {
+    marginTop: 8,
+  },
+  franchiseItem: {
+    flexDirection: 'row',
+    gap: 12,
+    paddingBlock: 12,
+  },
+  franchiseItemFocused: {
+    backgroundColor: Colors.white,
+  },
+  franchiseName: {
+    flex: 1,
+  },
+  franchiseText: {
+    fontSize: 14,
+  },
+  franchiseSelected: {
+    color: Colors.secondary,
+  },
+  infoList: {
+    padding: 8,
+  },
+  infoListEven: {
+    backgroundColor: Colors.gray,
+  },
+  infoListFocused: {
+    backgroundColor: Colors.white,
+  },
+  infoListName: {
+  },
+  relatedListWrapper: {
+    marginTop: 8,
+    flexDirection: 'row',
+  },
+  relatedList: {
+    flexDirection: 'row',
+    gap: 16,
+    padding: 16,
+  },
+  relatedListItem: {
+    flex: 0,
+    width: 100,
+  },
+  relatedListItemPoster: {
+    height: 160,
   },
 });

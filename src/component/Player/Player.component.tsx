@@ -326,22 +326,28 @@ export function PlayerComponent({
     );
   };
 
-  const renderBottomActions = () => (
-    <View style={ styles.bottomActions }>
-      <View style={ styles.durationRow }>
-        { renderDuration() }
+  const renderBottomActions = () => {
+    const { hasSeasons, hasVoices } = film;
+
+    const isPlaylistSelector = hasSeasons || hasVoices;
+
+    return (
+      <View style={ styles.bottomActions }>
+        <View style={ styles.durationRow }>
+          { renderDuration() }
+        </View>
+        <View style={ styles.progressBarRow }>
+          { renderProgressBar() }
+        </View>
+        <View style={ styles.actionsRow }>
+          { isPlaylistSelector && renderAction('playlist-play', 'Series', openVideoSelector) }
+          { renderAction('comment-text-outline', 'Comments') }
+          { renderAction('bookmark-outline', 'Bookmarks') }
+          { renderAction('share-outline', 'Share') }
+        </View>
       </View>
-      <View style={ styles.progressBarRow }>
-        { renderProgressBar() }
-      </View>
-      <View style={ styles.actionsRow }>
-        { renderAction('playlist-play', 'Series', openVideoSelector) }
-        { renderAction('comment-text-outline', 'Comments') }
-        { renderAction('bookmark-outline', 'Bookmarks') }
-        { renderAction('share-outline', 'Share') }
-      </View>
-    </View>
-  );
+    );
+  };
 
   const renderControls = () => (
     <GestureDetector

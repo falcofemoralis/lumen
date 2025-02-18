@@ -1,6 +1,7 @@
 import { ApiServiceType, ConfigApiInterface } from 'Api/index';
 import NotificationStore from 'Store/Notification.store';
 import { FilmStreamInterface } from 'Type/FilmStream.interface';
+import { safeJsonParse } from 'Util/Json';
 import { HTMLElementInterface, parseHtml } from 'Util/Parser';
 import { executeGet, executePost } from 'Util/Request';
 import { configStorage } from 'Util/Storage';
@@ -136,7 +137,7 @@ const configApi: ConfigApiInterface = {
   async fetchJson<T>(query: string, variables: Variables = {}) {
     const result = await this.postRequest(query, variables);
 
-    const json = JSON.parse(result) as T;
+    const json = safeJsonParse<T>(result);
 
     return json;
   },

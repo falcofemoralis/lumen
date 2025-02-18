@@ -368,7 +368,10 @@ export function PlayerComponent({
   );
 
   const renderBottomActions = () => {
+    const { hasSeasons, hasVoices } = film;
     const { subtitles = [] } = video;
+
+    const isPlaylistSelector = hasSeasons || hasVoices;
 
     return (
       <View style={ styles.bottomActions }>
@@ -380,7 +383,7 @@ export function PlayerComponent({
           } }
         >
           { renderBottomAction('high-quality', 'Quality', openQualitySelector, bottomActionRef) }
-          { renderBottomAction('playlist-play', 'Series', openVideoSelector) }
+          { isPlaylistSelector && renderBottomAction('playlist-play', 'Series', openVideoSelector) }
           { subtitles.length > 0 && renderBottomAction('subtitles', 'Subtitles', openSubtitleSelector) }
           { renderBottomAction('bookmarks', 'Bookmarks') }
           { renderBottomAction('share', 'Share') }

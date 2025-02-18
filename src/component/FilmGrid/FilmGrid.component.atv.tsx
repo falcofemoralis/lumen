@@ -2,7 +2,7 @@ import FilmCard from 'Component/FilmCard';
 import { CARD_HEIGHT_TV } from 'Component/FilmCard/FilmCard.style.atv';
 import ThemedList from 'Component/ThemedList';
 import { ThemedListRowProps } from 'Component/ThemedList/ThemedList.type';
-import React, { memo, useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import {
   SpatialNavigationFocusableView,
 } from 'react-tv-space-navigation';
@@ -11,7 +11,7 @@ import { getWindowWidth } from 'Util/Window';
 
 import { NUMBER_OF_COLUMNS_TV } from './FilmGrid.config';
 import { ROW_GAP, styles } from './FilmGrid.style.atv';
-import { FilmGridComponentProps, FilmGridItemProps, FilmGridItemType } from './FilmGrid.type';
+import { FilmGridComponentProps, FilmGridItemType } from './FilmGrid.type';
 
 const containerWidth = getWindowWidth() - scale(ROW_GAP * 2);
 

@@ -42,7 +42,7 @@ export interface ConfigApiInterface {
   getHeaders(): HeadersInit;
   parseContent(content: string): HTMLElementInterface;
   fetchPage(query: string, variables?: Variables): Promise<HTMLElementInterface>;
-  fetchJson<T>(query: string, variables: Variables): Promise<T>;
+  fetchJson<T>(query: string, variables: Variables): Promise<T | null>;
   getRequest(query: string, variables?: Variables): Promise<any>;
   postRequest(query: string, variables?: Variables): Promise<any>;
   modifyCDN(streams: FilmStreamInterface[]): FilmStreamInterface[];

@@ -71,8 +71,8 @@ const playerApi: PlayerApiInterface = {
       action: 'get_movie',
     });
 
-    if (!json.success) {
-      throw new Error(json.message);
+    if (!json?.success) {
+      throw new Error(json?.message);
     }
 
     try {
@@ -108,8 +108,8 @@ const playerApi: PlayerApiInterface = {
       action: 'get_stream',
     });
 
-    if (!json.success) {
-      throw new Error(json.message);
+    if (!json?.success) {
+      throw new Error(json?.message);
     }
 
     try {
@@ -140,6 +140,10 @@ const playerApi: PlayerApiInterface = {
       translator_id: voiceId,
       action: 'get_episodes',
     });
+
+    if (!result) {
+      throw new Error('Failed to get seasons');
+    }
 
     const { seasons } = result;
     const { episodes } = result;

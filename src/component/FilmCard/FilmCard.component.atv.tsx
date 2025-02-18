@@ -16,6 +16,7 @@ import { useFocusAnimation } from './useFocusAnimation';
 export function FilmCardComponent({
   filmCard,
   style,
+  stylePoster,
   isFocused = false,
   isThumbnail,
 }: FilmCardComponentProps) {
@@ -92,6 +93,7 @@ export function FilmCardComponent({
         style={ [
           { height: CARD_HEIGHT_TV - INFO_HEIGHT },
           styles.poster,
+          stylePoster,
           isFocused && styles.posterFocused,
         ] }
         src={ poster }

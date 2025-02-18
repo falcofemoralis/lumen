@@ -19,11 +19,11 @@ export const ThemedDropdownComponent = ({
   value,
   header,
   asOverlay,
-  overlayId,
+  overlayId: overlayIdProp,
   asList,
   onChange,
 }: ThemedDropdownComponentProps<any>) => {
-  const id = useRef(overlayId ?? generateId());
+  const overlayId = useRef(overlayIdProp ?? generateId());
 
   const renderHeader = () => {
     if (!header) {
@@ -121,7 +121,7 @@ export const ThemedDropdownComponent = ({
 
     return (
       <ThemedOverlay
-        id={ id.current }
+        id={ overlayId.current }
         onHide={ () => OverlayStore.goToPreviousOverlay() }
         containerStyle={ styles.container }
         contentContainerStyle={ styles.contentContainer }
@@ -146,7 +146,7 @@ export const ThemedDropdownComponent = ({
           name: 'plus',
           pack: IconPackType.Octicons,
         } }
-        onPress={ () => OverlayStore.openOverlay(id.current) }
+        onPress={ () => OverlayStore.openOverlay(overlayId.current) }
         rightImage={ endIcon }
       >
         { label }

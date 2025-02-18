@@ -163,6 +163,13 @@ export const styles = CreateStyles({
     fontSize: 16,
     textAlign: 'center',
   },
+  sectionHeading: {
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  section: {
+    marginTop: 16,
+  },
   actorsList: {
     marginTop: 8,
     flexDirection: 'row',
@@ -197,23 +204,6 @@ export const styles = CreateStyles({
   },
   directorText: {
     fontSize: 12,
-  },
-  franchiseList: {
-    marginTop: 8,
-  },
-  franchiseItem: {
-    flexDirection: 'row',
-    gap: 12,
-    paddingBlock: 12,
-  },
-  franchiseName: {
-    flex: 1,
-  },
-  franchiseText: {
-    fontSize: 14,
-  },
-  franchiseSelected: {
-    color: Colors.secondary,
   },
   scheduleItem: {
     flexDirection: 'row',
@@ -256,12 +246,22 @@ export const styles = CreateStyles({
     width: 32,
     alignSelf: 'center',
   },
-  sectionHeading: {
-    fontSize: 20,
-    fontWeight: '700',
+  franchiseList: {
+    marginTop: 8,
   },
-  section: {
-    marginTop: 16,
+  franchiseItem: {
+    flexDirection: 'row',
+    gap: 12,
+    paddingBlock: 12,
+  },
+  franchiseName: {
+    flex: 1,
+  },
+  franchiseText: {
+    fontSize: 14,
+  },
+  franchiseSelected: {
+    color: Colors.secondary,
   },
   infoList: {
     padding: 8,

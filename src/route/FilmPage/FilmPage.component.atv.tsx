@@ -1,7 +1,9 @@
 import { Rating } from '@kolking/react-native-rating';
+import FilmCard from 'Component/FilmCard';
 import Loader from 'Component/Loader';
 import Page from 'Component/Page';
 import PlayerVideoSelector from 'Component/PlayerVideoSelector';
+import ThemedAccordion from 'Component/ThemedAccordion';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedCard from 'Component/ThemedCard';
 import ThemedIcon from 'Component/ThemedIcon';
@@ -11,7 +13,7 @@ import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
 import Thumbnail from 'Component/Thumbnail';
 import __ from 'i18n/__';
-import { Dimensions, View } from 'react-native';
+import { Dimensions, TouchableOpacity, View } from 'react-native';
 import {
   DefaultFocus,
   SpatialNavigationFocusableView,
@@ -21,6 +23,10 @@ import {
 import NotificationStore from 'Store/Notification.store';
 import Colors from 'Style/Colors';
 import { ActorInterface } from 'Type/Actor.interface';
+import { FilmCardInterface } from 'Type/FilmCard.interface';
+import { FranchiseItem } from 'Type/FranchiseItem.interface';
+import { InfoListInterface } from 'Type/InfoList.interface';
+import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { scale } from 'Util/CreateStyles';
 
 import { PLAYER_VIDEO_SELECTOR_OVERLAY_ID } from './FilmPage.config';
@@ -378,16 +384,289 @@ export function FilmPageComponent({
     );
   };
 
+  const renderScheduleItem = (item: ScheduleItemInterface, idx: number) => {
+    const {
+      name,
+      episodeName,
+      episodeNameOriginal,
+      date,
+      releaseDate,
+      isWatched,
+      isReleased,
+    } = item;
+
+    return (
+      <SpatialNavigationFocusableView
+        key={ name }
+      >
+        { ({ isFocused }) => (
+          <View
+            style={ [
+              styles.scheduleItem,
+              idx % 2 === 0 && styles.scheduleItemEven,
+              isFocused && styles.scheduleItemFocused,
+            ] }
+          >
+            <View style={ styles.scheduleItemInfoWrapper }>
+              <View style={ styles.scheduleItemEpisodeWrapper }>
+                <ThemedText style={ [
+                  styles.scheduleItemText,
+                  styles.scheduleItemEpisodeName,
+                ] }
+                >
+                  { episodeName }
+                </ThemedText>
+                <ThemedText style={ [
+                  styles.scheduleItemText,
+                  styles.scheduleItemEpisodeOgName,
+                ] }
+                >
+                  { episodeNameOriginal }
+                </ThemedText>
+              </View>
+              <View style={ styles.scheduleItemNameWrapper }>
+                <ThemedText style={ styles.scheduleItemText }>
+                  { name }
+                </ThemedText>
+                <ThemedText style={ styles.scheduleItemText }>
+                  { date }
+                </ThemedText>
+              </View>
+            </View>
+            <View style={ styles.scheduleItemReleaseWrapper }>
+              { isReleased ? (
+                <TouchableOpacity
+                  onPress={ () => console.log('watch') }
+                >
+                  <ThemedIcon
+                    style={ styles.scheduleItemMarkIcon }
+                    icon={ {
+                      name: 'checkbox-marked-circle-outline',
+                      pack: IconPackType.MaterialCommunityIcons,
+                    } }
+                    size={ scale(32) }
+                    color={ isWatched ? Colors.secondary : Colors.white }
+                  />
+                </TouchableOpacity>
+              ) : (
+                <ThemedText style={ [
+                  styles.scheduleItemText,
+                  styles.scheduleItemReleaseDate,
+                ] }
+                >
+                  { releaseDate }
+                </ThemedText>
+              ) }
+            </View>
+          </View>
+        ) }
+      </SpatialNavigationFocusableView>
+    );
+  };
+
+  const renderSchedule = () => {
+    const { schedule = [] } = film;
+
+    if (!schedule.length) {
+      return null;
+    }
+
+    const data = schedule.map((item) => ({
+      id: item.name,
+      title: item.name,
+      items: item.items,
+    }));
+
+    return (
+      <View style={ styles.section }>
+        <ThemedText style={ styles.sectionHeading }>
+          { __('Schedule') }
+        </ThemedText>
+        <ThemedAccordion
+          data={ data }
+          renderItem={ renderScheduleItem }
+        />
+      </View>
+    );
+  };
+
+  const renderFranchiseItem = (item: FranchiseItem, idx: number) => {
+    const { franchise = [] } = film;
+    const {
+      name,
+      year,
+      rating,
+      link,
+    } = item;
+    const position = Math.abs(idx - franchise.length);
+
+    return (
+      <SpatialNavigationFocusableView
+        key={ item.name }
+        // onPress={ () => handleSelectFilm(link) }
+      >
+        { ({ isFocused }) => (
+          <View style={ [styles.franchiseItem, isFocused && styles.franchiseItemFocused] }>
+            <ThemedText style={ styles.franchiseText }>
+              { position }
+            </ThemedText>
+            <ThemedText
+              style={ [
+                styles.franchiseText,
+                styles.franchiseName,
+                !link && styles.franchiseSelected,
+              ] }
+            >
+              { name }
+            </ThemedText>
+            <ThemedText style={ styles.franchiseText }>
+              { year }
+            </ThemedText>
+            <ThemedText style={ styles.franchiseText }>
+              { rating }
+            </ThemedText>
+          </View>
+        ) }
+
+      </SpatialNavigationFocusableView>
+    );
+  };
+
+  const renderFranchise = () => {
+    const { franchise = [] } = film;
+
+    if (!franchise.length) {
+      return null;
+    }
+
+    return (
+      <View style={ styles.section }>
+        <ThemedText style={ styles.sectionHeading }>
+          { __('Franchise') }
+        </ThemedText>
+        <View style={ styles.franchiseList }>
+          { franchise.map((item, idx) => renderFranchiseItem(item, idx)) }
+        </View>
+      </View>
+    );
+  };
+
+  const renderInfoList = (list: InfoListInterface, idx: number) => {
+    const { name, position, link } = list;
+
+    return (
+      <SpatialNavigationFocusableView
+        key={ name }
+        // onPress={ () => console.log('info-list', link) }
+      >
+        { ({ isFocused }) => (
+          <View style={ [
+            styles.infoList,
+            idx % 2 === 0 && styles.infoListEven,
+            isFocused && styles.infoListFocused,
+          ] }
+          >
+            <ThemedText style={ styles.infoListName }>
+              { `${name} ${position || ''}` }
+            </ThemedText>
+          </View>
+        ) }
+      </SpatialNavigationFocusableView>
+    );
+  };
+
+  const renderInfoLists = () => {
+    const { includedIn = [], fromCollections = [] } = film;
+
+    if (!includedIn.length && !fromCollections.length) {
+      return null;
+    }
+
+    const data = [];
+
+    if (includedIn.length) {
+      data.push({
+        id: 'included-in',
+        title: __('Included in the lists'),
+        items: includedIn,
+      });
+    }
+
+    if (fromCollections.length) {
+      data.push({
+        id: 'from-collections',
+        title: __('From collections'),
+        items: fromCollections,
+      });
+    }
+
+    return (
+      <View style={ styles.section }>
+        <ThemedText style={ styles.sectionHeading }>
+          { __('Included in') }
+        </ThemedText>
+        <ThemedAccordion
+          data={ data }
+          renderItem={ renderInfoList }
+        />
+      </View>
+    );
+  };
+
+  const renderRelatedItem = (item: FilmCardInterface, idx: number) => (
+    <SpatialNavigationFocusableView
+      key={ `${film.id}-${idx}` }
+    >
+      { ({ isFocused }) => (
+        <FilmCard
+          filmCard={ item }
+          isFocused={ isFocused }
+          style={ styles.relatedListItem }
+          stylePoster={ styles.relatedListItemPoster }
+        />
+      ) }
+    </SpatialNavigationFocusableView>
+  );
+
+  const renderRelated = () => {
+    const { related = [] } = film;
+
+    return (
+      <View style={ styles.section }>
+        <ThemedText style={ styles.sectionHeading }>
+          { __('Watch also') }
+        </ThemedText>
+        <View style={ styles.relatedListWrapper }>
+          <SpatialNavigationScrollView
+            horizontal
+            offsetFromStart={ scale(20) }
+          >
+            <SpatialNavigationView
+              style={ styles.relatedList }
+              direction="horizontal"
+            >
+              { related.map((item, idx) => renderRelatedItem(item, idx)) }
+            </SpatialNavigationView>
+          </SpatialNavigationScrollView>
+        </View>
+      </View>
+    );
+  };
+
   const renderModals = () => renderPlayerVideoSelector();
 
   return (
     <Page testID="film-page">
-      <SpatialNavigationScrollView offsetFromStart={ height / 2 }>
+      <SpatialNavigationScrollView offsetFromStart={ height / 2.1 }>
         <View>
           { renderModals() }
           { renderActions() }
           { renderMainContent() }
           { renderActors() }
+          { renderSchedule() }
+          { renderFranchise() }
+          { renderInfoLists() }
+          { renderRelated() }
         </View>
       </SpatialNavigationScrollView>
     </Page>

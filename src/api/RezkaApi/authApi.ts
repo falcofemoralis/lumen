@@ -12,8 +12,8 @@ const authApi: AuthApiInterface = {
       login_not_save: '0',
     });
 
-    if (!data.success) {
-      throw new Error(data.message);
+    if (!data?.success) {
+      throw new Error(data?.message);
     }
 
     return 'authorized';

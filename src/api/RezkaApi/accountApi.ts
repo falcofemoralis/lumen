@@ -115,8 +115,8 @@ const accountApi: RezkaAccountApiInterface = {
   async removeRecent(filmId: string) {
     const data = await configApi.fetchJson<JSONResult>('/engine/ajax/cdn_saves_remove.php', { id: filmId });
 
-    if (!data.success) {
-      throw new Error(data.message);
+    if (!data?.success) {
+      throw new Error(data?.message);
     }
 
     return true;

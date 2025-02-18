@@ -76,7 +76,7 @@ export function RecentPageContainer() {
     const newPage = isRefresh ? 1 : paginationRef.current.page + 1;
 
     if (newPage <= paginationRef.current.totalPages) {
-      loadRecent(isRefresh ? 1 : newPage, isRefresh);
+      await loadRecent(isRefresh ? 1 : newPage, isRefresh);
     }
   };
 
