@@ -3,7 +3,7 @@ import { services } from 'Api/services';
 import { action, makeAutoObservable } from 'mobx';
 
 class ServiceStore {
-  private currentService = ApiServiceType.rezka;
+  private currentService = ApiServiceType.REZKA;
 
   public isSignedIn = false;
 

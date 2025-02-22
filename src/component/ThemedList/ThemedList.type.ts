@@ -8,7 +8,7 @@ export interface ThemedListRowProps<T = any> {
 export interface ThemedListContainerProps<T = any> {
   data: T[];
   numberOfColumns: number;
-  itemHeight?: number;
+  itemSize: number;
   style?: ViewStyle;
   rowStyle?: ViewStyle;
   renderItem: (args: ThemedListRowProps<T>) => JSX.Element;
@@ -17,10 +17,9 @@ export interface ThemedListContainerProps<T = any> {
 
 export interface ThemedListComponentProps<T = any> {
   data: T[];
-  rows: T[][];
   numberOfColumns: number;
+  itemSize: number;
   isRefreshing?: boolean;
-  itemHeight?: number;
   style?: ViewStyle;
   rowStyle?: ViewStyle;
   renderItem: (props: { item: T, index: number }) => JSX.Element;

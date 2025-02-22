@@ -25,8 +25,8 @@ export function FilmCardComponent({
 
   if (isThumbnail) {
     return (
-      <View style={ [styles.card, { gap: 8 }, style] }>
-        <Thumbnail style={ [styles.posterWrapper, styles.poster, style] } />
+      <View style={ [styles.card, { gap: scale(8) }, style] }>
+        <Thumbnail style={ [styles.posterWrapper, styles.poster] } />
         <Thumbnail
           height={ scale(24) }
           width="100%"
@@ -94,7 +94,7 @@ export function FilmCardComponent({
   );
 
   return (
-    <ThemedView style={ styles.card }>
+    <ThemedView style={ [styles.card, style] }>
       { renderPoster() }
       <ThemedView style={ styles.info }>
         { renderTitle() }

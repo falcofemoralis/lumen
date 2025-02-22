@@ -9,13 +9,13 @@ export const configureRemoteControl = () => {
   SpatialNavigation.configureRemoteControl({
     remoteControlSubscriber: (callback) => {
       const mapping: { [key in SupportedKeys]: Directions | null } = {
-        [SupportedKeys.Right]: Directions.RIGHT,
-        [SupportedKeys.Left]: Directions.LEFT,
-        [SupportedKeys.Up]: Directions.UP,
-        [SupportedKeys.Down]: Directions.DOWN,
-        [SupportedKeys.Enter]: Directions.ENTER,
-        [SupportedKeys.LongEnter]: Directions.LONG_ENTER,
-        [SupportedKeys.Back]: null,
+        [SupportedKeys.RIGHT]: Directions.RIGHT,
+        [SupportedKeys.LEFT]: Directions.LEFT,
+        [SupportedKeys.UP]: Directions.UP,
+        [SupportedKeys.DOWN]: Directions.DOWN,
+        [SupportedKeys.ENTER]: Directions.ENTER,
+        [SupportedKeys.LONG_ENTER]: Directions.LONG_ENTER,
+        [SupportedKeys.BACK]: null,
       };
 
       const remoteControlListener = (keyEvent: SupportedKeys) => {

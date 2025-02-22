@@ -152,9 +152,9 @@ export function PlayerComponent({
       const { absoluteX } = e;
 
       if (absoluteX < (screenWidth / 2)) {
-        runOnJS(rewindPosition)(RewindDirection.Backward);
+        runOnJS(rewindPosition)(RewindDirection.BACKWARD);
       } else {
-        runOnJS(rewindPosition)(RewindDirection.Forward);
+        runOnJS(rewindPosition)(RewindDirection.FORWARD);
       }
     });
 
@@ -268,7 +268,7 @@ export function PlayerComponent({
           name: 'skip-previous',
           pack: IconPackType.MaterialIcons,
         },
-        () => handleNewEpisode(RewindDirection.Backward),
+        () => handleNewEpisode(RewindDirection.BACKWARD),
       ) }
       { renderMiddleControl(
         {
@@ -283,7 +283,7 @@ export function PlayerComponent({
           name: 'skip-next',
           pack: IconPackType.MaterialIcons,
         },
-        () => handleNewEpisode(RewindDirection.Forward),
+        () => handleNewEpisode(RewindDirection.FORWARD),
       ) }
     </View>
   );

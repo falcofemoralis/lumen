@@ -17,18 +17,18 @@ export interface JSONResult {
 
 export const parseFilmType = (type = '') => {
   if (type.includes('films')) {
-    return FilmType.Film;
+    return FilmType.FILM;
   } if (type.includes('series')) {
-    return FilmType.Series;
+    return FilmType.SERIES;
   } if (type.includes('cartoons')) {
-    return FilmType.Multfilm;
+    return FilmType.CARTOON;
   } if (type.includes('animation')) {
-    return FilmType.Anime;
+    return FilmType.ANIME;
   } if (type.includes('show')) {
-    return FilmType.TVShow;
+    return FilmType.TV_SHOW;
   }
 
-  return FilmType.Film;
+  return FilmType.FILM;
 };
 
 export const parseFilmCard = (el: HTMLElementInterface): FilmCardInterface => {
@@ -210,7 +210,7 @@ export const parseActorCard = (
 
   return {
     name,
-    photo,
+    photo: photo === 'null' ? 'https://statichdrezka.ac/i/nopersonphoto.png' : photo,
     link,
     job,
     isDirector,

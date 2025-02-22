@@ -69,7 +69,7 @@ const filmApi: FilmApiInterface = {
     const film: FilmInterface = {
       id,
       link,
-      type: FilmType.Film,
+      type: FilmType.FILM,
       title,
       poster,
       voices: [],

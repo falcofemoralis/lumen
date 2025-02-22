@@ -169,6 +169,7 @@ export const styles = CreateStyles({
   },
   section: {
     marginTop: 16,
+    width: '100%',
   },
   actorsList: {
     marginTop: 8,
@@ -275,5 +276,9 @@ export const styles = CreateStyles({
     marginTop: 8,
     flexDirection: 'row',
     gap: 16,
+  },
+  commentsWrapper: {
+    width: '100%',
+    height: '100%',
   },
 });

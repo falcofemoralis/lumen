@@ -110,29 +110,29 @@ export function PlayerComponent({
   useEffect(() => {
     const keyDownListener = (type: SupportedKeys) => {
       if (!showControls) {
-        if (type === SupportedKeys.Back) {
+        if (type === SupportedKeys.BACK) {
           return false;
         }
 
-        if (type === SupportedKeys.Up) {
-          PlayerStore.setFocusedElement(FocusedElement.TopAction);
+        if (type === SupportedKeys.UP) {
+          PlayerStore.setFocusedElement(FocusedElement.TOP_ACTION);
           topActionRef.current?.focus();
         }
 
-        if (type === SupportedKeys.Enter
-          || type === SupportedKeys.Left
-          || type === SupportedKeys.Right
+        if (type === SupportedKeys.ENTER
+          || type === SupportedKeys.LEFT
+          || type === SupportedKeys.RIGHT
         ) {
-          PlayerStore.setFocusedElement(FocusedElement.ProgressThumb);
+          PlayerStore.setFocusedElement(FocusedElement.PROGRESS_THUMB);
           middleActionRef.current?.focus();
 
-          if (type === SupportedKeys.Left || type === SupportedKeys.Right) {
+          if (type === SupportedKeys.LEFT || type === SupportedKeys.RIGHT) {
             return true;
           }
         }
 
-        if (type === SupportedKeys.Down) {
-          PlayerStore.setFocusedElement(FocusedElement.BottomAction);
+        if (type === SupportedKeys.DOWN) {
+          PlayerStore.setFocusedElement(FocusedElement.BOTTOM_ACTION);
           bottomActionRef.current?.focus();
         }
 
@@ -141,12 +141,12 @@ export function PlayerComponent({
         return true;
       }
 
-      if (PlayerStore.focusedElement === FocusedElement.ProgressThumb) {
-        if (type === SupportedKeys.Enter) {
+      if (PlayerStore.focusedElement === FocusedElement.PROGRESS_THUMB) {
+        if (type === SupportedKeys.ENTER) {
           togglePlayPause();
         }
 
-        if ((type === SupportedKeys.Up || type === SupportedKeys.Down) && hideActions) {
+        if ((type === SupportedKeys.UP || type === SupportedKeys.DOWN) && hideActions) {
           setHideActions(false);
         }
       }
@@ -277,7 +277,7 @@ export function PlayerComponent({
   ) => renderAction(
     icon,
     name,
-    FocusedElement.TopAction,
+    FocusedElement.TOP_ACTION,
     action,
     ref,
   );
@@ -290,7 +290,7 @@ export function PlayerComponent({
   ) => renderAction(
     icon,
     name,
-    FocusedElement.BottomAction,
+    FocusedElement.BOTTOM_ACTION,
     action,
     ref,
   );
@@ -313,8 +313,8 @@ export function PlayerComponent({
       { renderTopAction('fast-forward', 'Forward') }
       { film.hasSeasons && (
         <>
-          { renderTopAction('skip-previous', 'Previous', () => handleNewEpisode(RewindDirection.Backward)) }
-          { renderTopAction('skip-next', 'Next', () => handleNewEpisode(RewindDirection.Forward)) }
+          { renderTopAction('skip-previous', 'Previous', () => handleNewEpisode(RewindDirection.BACKWARD)) }
+          { renderTopAction('skip-next', 'Next', () => handleNewEpisode(RewindDirection.FORWARD)) }
         </>
       ) }
       { renderTopAction('speed', 'Speed') }
@@ -333,7 +333,7 @@ export function PlayerComponent({
         seekToPosition={ seekToPosition }
         thumbRef={ middleActionRef }
         onFocus={ () => {
-          PlayerStore.setFocusedElement(FocusedElement.ProgressThumb);
+          PlayerStore.setFocusedElement(FocusedElement.PROGRESS_THUMB);
         } }
         toggleSeekMode={ toggleSeekMode }
         rewindPosition={ rewindPosition }

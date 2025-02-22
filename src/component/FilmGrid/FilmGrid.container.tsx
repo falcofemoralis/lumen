@@ -26,7 +26,7 @@ export function FilmGridContainer({
       return Array(ConfigStore.isTV ? THUMBNAILS_AMOUNT_TV : THUMBNAILS_AMOUNT).fill({
         id: '',
         link: '',
-        type: FilmType.Film,
+        type: FilmType.FILM,
         poster: '',
         title: '',
         subtitle: '',

@@ -1,5 +1,7 @@
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
-  scrollView: {},
+  gridItem: {
+    padding: 4,
+  },
 });

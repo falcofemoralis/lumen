@@ -1,6 +1,6 @@
 import { makeAutoObservable } from 'mobx';
 import { loadConfig, updateConfig } from 'Util/Config';
-import { CONFIG_KEY_ENUM } from 'Util/Config/mapping';
+import { ConfigKeyType } from 'Util/Config/mapping';
 
 class ConfigStore {
   public isConfigured = false;
@@ -28,11 +28,11 @@ class ConfigStore {
   }
 
   async updateIsConfigured(isConfigured: boolean) {
-    await updateConfig(CONFIG_KEY_ENUM.isConfigured, isConfigured);
+    await updateConfig(ConfigKeyType.IS_CONFIGURED, isConfigured);
   }
 
   async updateIsTV(isTV: boolean) {
-    await updateConfig(CONFIG_KEY_ENUM.isTV, isTV);
+    await updateConfig(ConfigKeyType.IS_TV, isTV);
   }
 }
 

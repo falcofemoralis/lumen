@@ -9,6 +9,7 @@ import {
   View,
 } from 'react-native';
 import { Colors } from 'Style/Colors';
+import { CONTENT_WRAPPER_PADDING } from 'Style/Layout';
 import { scale } from 'Util/CreateStyles';
 
 import { TABS_MOBILE_CONFIG } from './NavigationBar.config';
@@ -84,7 +85,7 @@ export function NavigationBarComponent({
         tabBarHideOnKeyboard: true,
         freezeOnBlur: true,
         sceneStyle: {
-          marginHorizontal: 16,
+          marginHorizontal: CONTENT_WRAPPER_PADDING,
         },
       } }
       tabBar={ renderTabBar }

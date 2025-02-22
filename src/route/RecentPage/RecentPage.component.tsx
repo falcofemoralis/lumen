@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { calculateItemSize } from 'Style/Layout';
 import { RecentItemInterface } from 'Type/RecentItem.interface';
 import { scale } from 'Util/CreateStyles';
 
@@ -19,7 +20,7 @@ import { NUMBER_OF_COLUMNS } from './RecentPage.config';
 import { styles } from './RecentPage.style';
 import { RecentGridRowProps, RecentPageComponentProps } from './RecentPage.type';
 
-function FilmGridRow({
+function RecentItem({
   item,
   index,
   handleOnPress,
@@ -111,7 +112,7 @@ function rowPropsAreEqual(prevProps: RecentGridRowProps, props: RecentGridRowPro
   return prevProps.item.id === props.item.id;
 }
 
-const MemoizedGridRow = memo(FilmGridRow, rowPropsAreEqual);
+const MemoizedRecentItem = memo(RecentItem, rowPropsAreEqual);
 
 export function RecentPageComponent({
   isSignedIn,
@@ -120,10 +121,12 @@ export function RecentPageComponent({
   handleOnPress,
   removeItem,
 }: RecentPageComponentProps) {
-  const renderRow = useCallback(
-    ({ item, index }: ThemedListRowProps<RecentItemInterface[]>) => (
-      <MemoizedGridRow
-        item={ item[0] }
+  const itemWidth = calculateItemSize(NUMBER_OF_COLUMNS);
+
+  const renderItem = useCallback(
+    ({ item, index }: ThemedListRowProps<RecentItemInterface>) => (
+      <MemoizedRecentItem
+        item={ item }
         handleOnPress={ handleOnPress }
         index={ index }
         removeItem={ removeItem }
@@ -144,8 +147,9 @@ export function RecentPageComponent({
     return (
       <ThemedList
         data={ items }
-        renderItem={ renderRow }
         numberOfColumns={ NUMBER_OF_COLUMNS }
+        itemSize={ itemWidth }
+        renderItem={ renderItem }
         onNextLoad={ onNextLoad }
       />
     );

@@ -1,4 +1,6 @@
 import { Rating } from '@kolking/react-native-rating';
+import Comments from 'Component/Comments';
+import { CommentsRef } from 'Component/Comments/Comments.container';
 import FilmCard from 'Component/FilmCard';
 import Page from 'Component/Page';
 import PlayerVideoSelector from 'Component/PlayerVideoSelector';
@@ -12,8 +14,10 @@ import ThemedText from 'Component/ThemedText';
 import Thumbnail from 'Component/Thumbnail';
 import { useRouter } from 'expo-router';
 import __ from 'i18n/__';
-import React from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import {
+  NativeScrollEvent,
+  NativeSyntheticEvent,
   Pressable,
   ScrollView,
   Text,
@@ -27,8 +31,9 @@ import { FranchiseItem } from 'Type/FranchiseItem.interface';
 import { InfoListInterface } from 'Type/InfoList.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { scale } from 'Util/CreateStyles';
+import { isCloseToBottom } from 'Util/Scroll';
 
-import { PLAYER_VIDEO_SELECTOR_OVERLAY_ID } from './FilmPage.config';
+import { PLAYER_VIDEO_SELECTOR_OVERLAY_ID, SCROLL_EVENT_END_PADDING } from './FilmPage.config';
 import { styles } from './FilmPage.style';
 import { FilmPageComponentProps } from './FilmPage.type';
 
@@ -40,6 +45,24 @@ export function FilmPageComponent({
   handleSelectFilm,
 }: FilmPageComponentProps) {
   const router = useRouter();
+  const [commentsVisible, setCommentsVisible] = useState(false);
+  const commentsRef = useRef<CommentsRef>(null);
+
+  const onScroll = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const closePadding = commentsVisible
+        ? SCROLL_EVENT_END_PADDING * 4
+        : SCROLL_EVENT_END_PADDING;
+
+      if (isCloseToBottom(event, closePadding)) {
+        if (commentsVisible) {
+          commentsRef.current?.loadComments();
+        } else {
+          setCommentsVisible(true);
+        }
+      }
+    }, [commentsVisible],
+  );
 
   if (!film) {
     return (
@@ -537,10 +560,11 @@ export function FilmPageComponent({
               />
             </TouchableOpacity>
           ) : (
-            <ThemedText style={ [
-              styles.scheduleItemText,
-              styles.scheduleItemReleaseDate,
-            ] }
+            <ThemedText
+              style={ [
+                styles.scheduleItemText,
+                styles.scheduleItemReleaseDate,
+              ] }
             >
               { releaseDate }
             </ThemedText>
@@ -741,13 +765,28 @@ export function FilmPageComponent({
     );
   };
 
-  const renderComments = () => (
-    <View style={ styles.section }>
-      <ThemedText style={ styles.sectionHeading }>
-        { __('Comments') }
-      </ThemedText>
-    </View>
-  );
+  const renderComments = () => {
+    if (!commentsVisible) {
+      return null;
+    }
+
+    return (
+      <ScrollView
+        horizontal
+        contentContainerStyle={ { width: '100%', height: '100%' } }
+      >
+        <View style={ styles.section }>
+          <ThemedText style={ styles.sectionHeading }>
+            { __('Comments') }
+          </ThemedText>
+          <Comments
+            ref={ commentsRef }
+            film={ film }
+          />
+        </View>
+      </ScrollView>
+    );
+  };
 
   const renderModals = () => (
     <>
@@ -757,7 +796,7 @@ export function FilmPageComponent({
 
   return (
     <Page>
-      <ScrollView>
+      <ScrollView onScroll={ onScroll }>
         { renderModals() }
         { renderTopActions() }
         { renderTitle() }

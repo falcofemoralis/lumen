@@ -17,6 +17,7 @@ import {
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
 import Colors from 'Style/Colors';
+import { CONTENT_WRAPPER_PADDING_TV } from 'Style/Layout';
 import { scale } from 'Util/CreateStyles';
 
 import { useMenuContext } from './MenuContext';
@@ -167,7 +168,7 @@ export function NavigationBarComponent({
         tabBarPosition: 'left',
         freezeOnBlur: true,
         sceneStyle: {
-          margin: 16,
+          margin: CONTENT_WRAPPER_PADDING_TV,
         },
       } }
       tabBar={ renderTabBar }

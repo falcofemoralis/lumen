@@ -47,12 +47,12 @@ export function FilmGridComponent({
 
   return (
     <ThemedList
-      data={ filmsData }
-      renderItem={ renderItem }
-      itemHeight={ CARD_HEIGHT_TV + scale(ROW_GAP) }
-      numberOfColumns={ NUMBER_OF_COLUMNS_TV }
-      rowStyle={ styles.rowStyle }
       style={ styles.grid }
+      rowStyle={ styles.rowStyle }
+      data={ filmsData }
+      numberOfColumns={ NUMBER_OF_COLUMNS_TV }
+      itemSize={ CARD_HEIGHT_TV + scale(ROW_GAP) }
+      renderItem={ renderItem }
       onNextLoad={ onNextLoad }
     />
   );

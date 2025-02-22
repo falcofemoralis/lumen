@@ -19,7 +19,7 @@ export function FilmPagerComponent({
   };
 
   const renderPage = ({ route }: { route: PagerItemInterface }) => {
-    const { films } = route;
+    const { films = [] } = route ?? {};
 
     return (
       <FilmGrid

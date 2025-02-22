@@ -17,15 +17,11 @@ export type FilmGridItemType = FilmCardInterface & {
   isThumbnail?: boolean;
 };
 
-export interface FilmGridRowProps {
-  item: FilmGridItemType[];
-  handleOnPress: (film: FilmCardInterface) => void;
-}
-
 export interface FilmGridItemProps {
   item: FilmGridItemType,
   index: number;
+  itemSize: number;
   isThumbnail?: boolean;
   handleOnPress: (film: FilmCardInterface) => void;
-  handleItemFocus: (index: number) => void;
+  handleItemFocus?: (index: number) => void;
 }

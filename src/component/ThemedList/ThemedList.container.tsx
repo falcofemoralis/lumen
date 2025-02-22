@@ -1,7 +1,8 @@
 /* eslint-disable no-plusplus */
 import { withTV } from 'Hooks/withTV';
-import { memo, useRef, useState } from 'react';
-import ConfigStore from 'Store/Config.store';
+import {
+  memo, useEffect, useRef, useState,
+} from 'react';
 import { noopFn } from 'Util/Function';
 
 import ThemedListComponent from './ThemedList.component';
@@ -11,7 +12,7 @@ import { ThemedListContainerProps } from './ThemedList.type';
 export function ThemedListContainer({
   data,
   numberOfColumns,
-  itemHeight,
+  itemSize,
   style,
   rowStyle,
   renderItem,
@@ -20,26 +21,9 @@ export function ThemedListContainer({
   const [isRefreshing, setIsRefreshing] = useState(false);
   const updatingStateRef = useRef(false);
 
-  const calculateRows = () => {
-    const columns: any[][] = Array.from({ length: numberOfColumns }, () => []);
-
-    data.forEach((film, index) => {
-      columns[index % numberOfColumns].push(film);
-    });
-
-    const rows: any[][] = [];
-    for (let i = 0; i < columns[0].length; i++) {
-      const row: any[] = [];
-      for (let j = 0; j < numberOfColumns; j++) {
-        if (columns[j][i] !== undefined) {
-          row.push(columns[j][i]);
-        }
-      }
-      rows.push(row);
-    }
-
-    return rows;
-  };
+  useEffect(() => {
+    updatingStateRef.current = false;
+  }, [data]);
 
   const loadNextPage = async (onLoading: (state: boolean) => void, isRefresh = false) => {
     if (!updatingStateRef.current) {
@@ -51,8 +35,9 @@ export function ThemedListContainer({
         if (onNextLoad) {
           await onNextLoad(isRefresh);
         }
-      } finally {
+      } catch (e) {
         updatingStateRef.current = false;
+      } finally {
         onLoading(false);
       }
     }
@@ -73,10 +58,9 @@ export function ThemedListContainer({
 
   const containerProps = () => ({
     data,
-    rows: !ConfigStore.isTV ? calculateRows() : [], // TV version do not use rows
     numberOfColumns,
     isRefreshing,
-    itemHeight,
+    itemSize,
     style,
     rowStyle,
     renderItem,

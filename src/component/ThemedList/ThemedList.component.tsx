@@ -1,6 +1,6 @@
+import { FlashList } from '@shopify/flash-list';
 import { useCallback } from 'react';
 import {
-  FlatList,
   NativeScrollEvent,
   NativeSyntheticEvent,
   RefreshControl,
@@ -12,11 +12,13 @@ import { SCROLL_EVENT_END_PADDING, SCROLL_EVENT_UPDATES_MS } from './ThemedList.
 import { ThemedListComponentProps } from './ThemedList.type';
 
 export const ThemedListComponent = ({
-  rows,
+  data,
+  numberOfColumns,
+  itemSize,
+  isRefreshing = false,
   renderItem,
   handleScrollEnd,
   handleRefresh = noopFn,
-  isRefreshing = false,
 }: ThemedListComponentProps) => {
   const onScroll = useCallback(
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -35,14 +37,15 @@ export const ThemedListComponent = ({
   ), [isRefreshing, handleRefresh]);
 
   return (
-    <FlatList
-      data={ rows }
+    <FlashList
+      data={ data }
+      numColumns={ numberOfColumns }
+      estimatedItemSize={ itemSize }
       renderItem={ renderItem }
-      // eslint-disable-next-line react-perf/jsx-no-new-function-as-prop -- idx is unique
-      keyExtractor={ (item, idx) => `${item[0].id}-row-${idx}` }
       onScroll={ onScroll }
       scrollEventThrottle={ SCROLL_EVENT_UPDATES_MS }
       refreshControl={ renderRefreshControl() }
+      keyExtractor={ (item, idx) => `${item.id}-row-${idx}` }
     />
   );
 };

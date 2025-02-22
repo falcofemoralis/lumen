@@ -50,7 +50,7 @@ export function FilmPagerComponent({
         return false;
       }
 
-      if (type === SupportedKeys.Up
+      if (type === SupportedKeys.UP
         && canNavigateMenuRef.current
         && rowRef.current === 0
         && !isMenuActive
@@ -61,7 +61,7 @@ export function FilmPagerComponent({
         return false;
       }
 
-      if (type === SupportedKeys.Up) {
+      if (type === SupportedKeys.UP) {
         if (timerRef.current) {
           clearTimeout(timerRef.current);
         }
@@ -73,14 +73,14 @@ export function FilmPagerComponent({
         return false;
       }
 
-      if (type === SupportedKeys.Down && isMenuActive) {
+      if (type === SupportedKeys.DOWN && isMenuActive) {
         setIsMenuActive(false);
         unlock();
 
         return false;
       }
 
-      if (type === SupportedKeys.Down) {
+      if (type === SupportedKeys.DOWN) {
         canNavigateMenuRef.current = false;
 
         return false;

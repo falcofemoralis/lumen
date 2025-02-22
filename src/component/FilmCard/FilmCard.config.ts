@@ -1,17 +1,17 @@
 import { FilmType } from 'Type/FilmType.type';
 
 export const TYPE_LABELS = {
-  [FilmType.Film]: 'Movie',
-  [FilmType.Series]: 'Series',
-  [FilmType.Multfilm]: 'Cartoon',
-  [FilmType.Anime]: 'Anime',
-  [FilmType.TVShow]: 'TV Show',
+  [FilmType.FILM]: 'Movie',
+  [FilmType.SERIES]: 'Series',
+  [FilmType.CARTOON]: 'Cartoon',
+  [FilmType.ANIME]: 'Anime',
+  [FilmType.TV_SHOW]: 'TV Show',
 };
 
 export const FILM_TYPE_COLORS = {
-  [FilmType.Film]: '#00a0b0',
-  [FilmType.Multfilm]: '#216d2b',
-  [FilmType.Series]: '#df565a',
-  [FilmType.Anime]: '#696969',
-  [FilmType.TVShow]: '##909215',
+  [FilmType.FILM]: '#00a0b0',
+  [FilmType.CARTOON]: '#216d2b',
+  [FilmType.SERIES]: '#df565a',
+  [FilmType.ANIME]: '#696969',
+  [FilmType.TV_SHOW]: '##909215',
 };

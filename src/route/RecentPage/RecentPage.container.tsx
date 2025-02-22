@@ -34,6 +34,10 @@ export function RecentPageContainer() {
     };
   }, [ServiceStore.isSignedIn]);
 
+  useEffect(() => {
+    updatingStateRef.current = false;
+  }, [items]);
+
   const loadRecent = async (
     page: number,
     isRefresh: boolean,
@@ -66,7 +70,6 @@ export function RecentPageContainer() {
         setItems(newItems);
       } catch (error) {
         NotificationStore.displayError(error as Error);
-      } finally {
         updatingStateRef.current = false;
       }
     }

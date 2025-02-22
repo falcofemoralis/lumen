@@ -1,4 +1,6 @@
 import { BookmarkInterface } from 'Type/Bookmark.interface';
+import { CommentInterface } from 'Type/Comment.interface';
+import { CommentListInterface } from 'Type/CommentList.interface';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmListInterface } from 'Type/FilmList.interface';
 import { FilmStreamInterface } from 'Type/FilmStream.interface';
@@ -11,8 +13,8 @@ import { HTMLElementInterface } from 'Util/Parser';
 import { Variables } from '../util/Request/index';
 
 export enum ApiServiceType {
-  rezka = 'rezka',
-  // kinokong = 'kinokong',
+  REZKA = 'REZKA',
+  // KINOKONG = 'KINOKONG',
 }
 
 export interface ApiParams {
@@ -65,7 +67,6 @@ export interface FilmApiInterface {
     bookmark: BookmarkInterface,
     page: number,
   ): Promise<FilmListInterface>;
-
 }
 
 export interface PlayerApiInterface {
@@ -112,6 +113,10 @@ export interface SearchApiInterface {
   search: (query: string, page: number) => Promise<FilmListInterface>;
 }
 
+export interface CommentsApiInterface {
+  getComments(filmId: string, page: number): Promise<CommentListInterface>;
+}
+
 export interface ApiInterface extends
   ConfigApiInterface,
   FilmApiInterface,
@@ -119,4 +124,5 @@ export interface ApiInterface extends
   PlayerApiInterface,
   AuthApiInterface,
   AccountApiInterface,
-  SearchApiInterface {}
+  SearchApiInterface,
+  CommentsApiInterface {}

@@ -3,71 +3,65 @@ import ThemedList from 'Component/ThemedList';
 import { ThemedListRowProps } from 'Component/ThemedList/ThemedList.type';
 import React, { memo, useCallback } from 'react';
 import {
-  DimensionValue,
   Pressable,
-  View,
 } from 'react-native';
-import { FilmCardInterface } from 'Type/FilmCard.interface';
+import { calculateItemSize } from 'Style/Layout';
 
 import { NUMBER_OF_COLUMNS } from './FilmGrid.config';
-import { FilmGridComponentProps, FilmGridRowProps } from './FilmGrid.type';
+import { styles } from './FilmGrid.style';
+import { FilmGridComponentProps, FilmGridItemProps, FilmGridItemType } from './FilmGrid.type';
 
-function FilmGridRow({
+function FilmGridItem({
   item,
+  itemSize,
   handleOnPress,
-}: FilmGridRowProps) {
+}: FilmGridItemProps) {
   return (
-    <View
-      style={ {
-        flex: 1,
-        flexDirection: 'row',
-        width: '100%',
-      } }
+    <Pressable
+      style={ { width: itemSize } }
+      onPress={ () => handleOnPress(item) }
     >
-      { item.map((film, idx) => (
-        <Pressable
-          // eslint-disable-next-line react/no-array-index-key -- idx is unique
-          key={ `${film.id}-item-${idx}` }
-          style={ { width: (`${100 / NUMBER_OF_COLUMNS}%`) as DimensionValue } }
-          onPress={ () => handleOnPress(film) }
-        >
-          <FilmCard
-            filmCard={ film }
-            isThumbnail={ film.isThumbnail }
-          />
-        </Pressable>
-      )) }
-    </View>
+      <FilmCard
+        style={ styles.gridItem }
+        filmCard={ item }
+        isThumbnail={ item.isThumbnail }
+      />
+    </Pressable>
   );
 }
 
-function rowPropsAreEqual(prevProps: FilmGridRowProps, props: FilmGridRowProps) {
-  return prevProps.item[0].id === props.item[0].id;
+function rowPropsAreEqual(prevProps: FilmGridItemProps, props: FilmGridItemProps) {
+  return prevProps.item.id === props.item.id;
 }
 
-const MemoizedGridRow = memo(FilmGridRow, rowPropsAreEqual);
+const MemoizedGridItem = memo(FilmGridItem, rowPropsAreEqual);
 
 export function FilmGridComponent({
   films,
   handleOnPress,
   onNextLoad,
 }: FilmGridComponentProps) {
-  const renderRow = useCallback(
-    ({ item }: ThemedListRowProps<FilmCardInterface[]>) => (
-      <MemoizedGridRow
+  const itemWidth = calculateItemSize(NUMBER_OF_COLUMNS);
+
+  const renderItem = useCallback(
+    ({ item, index }: ThemedListRowProps<FilmGridItemType>) => (
+      <MemoizedGridItem
+        index={ index }
         item={ item }
         handleOnPress={ handleOnPress }
+        itemSize={ itemWidth }
       />
     ),
-    [handleOnPress],
+    [handleOnPress, itemWidth],
   );
 
   return (
     <ThemedList
       data={ films }
-      renderItem={ renderRow }
-      onNextLoad={ onNextLoad }
       numberOfColumns={ NUMBER_OF_COLUMNS }
+      itemSize={ itemWidth }
+      renderItem={ renderItem }
+      onNextLoad={ onNextLoad }
     />
   );
 }

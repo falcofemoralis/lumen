@@ -15,7 +15,7 @@ class RemoteControlManager implements RemoteControlManagerInterface {
 
   private handleLongEnter = () => {
     this.longEnterTimeout = setTimeout(() => {
-      this.eventEmitter.emit('keyDown', SupportedKeys.LongEnter);
+      this.eventEmitter.emit('keyDown', SupportedKeys.LONG_ENTER);
       this.longEnterTimeout = null;
     }, LONG_PRESS_DURATION);
   };
@@ -27,21 +27,21 @@ class RemoteControlManager implements RemoteControlManagerInterface {
 
   private handleKeyDown = (keyEvent: { keyCode: number }) => {
     const mappedKey = {
-      21: SupportedKeys.Left,
-      22: SupportedKeys.Right,
-      20: SupportedKeys.Down,
-      19: SupportedKeys.Up,
-      66: SupportedKeys.Enter,
-      23: SupportedKeys.Enter,
-      67: SupportedKeys.Back,
-      4: SupportedKeys.Back,
+      21: SupportedKeys.LEFT,
+      22: SupportedKeys.RIGHT,
+      20: SupportedKeys.DOWN,
+      19: SupportedKeys.UP,
+      66: SupportedKeys.ENTER,
+      23: SupportedKeys.ENTER,
+      67: SupportedKeys.BACK,
+      4: SupportedKeys.BACK,
     }[keyEvent.keyCode];
 
     if (!mappedKey) {
       return;
     }
 
-    if (mappedKey === SupportedKeys.Enter) {
+    if (mappedKey === SupportedKeys.ENTER) {
       if (!this.isEnterKeyDownPressed) {
         this.isEnterKeyDownPressed = true;
         this.handleLongEnter();
@@ -55,17 +55,17 @@ class RemoteControlManager implements RemoteControlManagerInterface {
 
   private handleKeyUp = (keyEvent: { keyCode: number }) => {
     const mappedKey = {
-      21: SupportedKeys.Left,
-      22: SupportedKeys.Right,
-      66: SupportedKeys.Enter,
-      23: SupportedKeys.Enter,
+      21: SupportedKeys.LEFT,
+      22: SupportedKeys.RIGHT,
+      66: SupportedKeys.ENTER,
+      23: SupportedKeys.ENTER,
     }[keyEvent.keyCode];
 
     if (!mappedKey) {
       return;
     }
 
-    if (mappedKey === SupportedKeys.Enter) {
+    if (mappedKey === SupportedKeys.ENTER) {
       this.isEnterKeyDownPressed = false;
 
       if (this.longEnterTimeout) {

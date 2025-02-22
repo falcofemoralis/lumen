@@ -10,14 +10,14 @@ export const DEFAULT_PROGRESS_STATUS: ProgressStatus = {
 };
 
 export enum RewindDirection {
-  Backward = 'backward',
-  Forward = 'forward',
+  BACKWARD = 'BACKWARD',
+  FORWARD = 'FORWARD',
 }
 
 export enum FocusedElement {
-  ProgressThumb = 'progressThumb',
-  TopAction = 'topAction',
-  BottomAction = 'bottomAction',
+  PROGRESS_THUMB = 'PROGRESS_THUMB',
+  TOP_ACTION = 'TOP_ACTION',
+  BOTTOM_ACTION = 'BOTTOM_ACTION',
 }
 
 export interface AutoRewindParams {

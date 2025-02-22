@@ -104,7 +104,7 @@ export function PlayerContainer({
 
   const onPlaybackEnd = (currentTime: number, duration: number) => {
     if (currentTime >= duration - 1) {
-      handleNewEpisode(RewindDirection.Forward);
+      handleNewEpisode(RewindDirection.FORWARD);
     }
   };
 
@@ -165,7 +165,7 @@ export function PlayerContainer({
   ) => {
     const { currentTime, bufferedPosition, duration } = player;
 
-    const seekTime = type === RewindDirection.Backward ? seconds * -1 : seconds;
+    const seekTime = type === RewindDirection.BACKWARD ? seconds * -1 : seconds;
     const newTime = currentTime + seekTime;
 
     PlayerStore.setProgressStatus(newTime, bufferedPosition, duration);
@@ -257,7 +257,7 @@ export function PlayerContainer({
     // eslint-disable-next-line functional/no-let
     let newSeasonIndex = seasonIndex;
 
-    if (direction === RewindDirection.Backward) {
+    if (direction === RewindDirection.BACKWARD) {
       newEpisodeIndex -= 1;
 
       if (newEpisodeIndex < 0) {

@@ -1,5 +1,6 @@
 import PlayerStoryboard from 'Component/PlayerStoryboard';
-import React, {
+import {
+  forwardRef,
   memo,
   useImperativeHandle,
   useState,
@@ -20,7 +21,7 @@ export type BubbleRef = {
   setText: (text: string) => void;
 };
 
-export const BubbleComponent = React.forwardRef<BubbleRef, BubbleProps>(
+export const BubbleComponent = forwardRef<BubbleRef, BubbleProps>(
   (
     {
       storyboardUrl,

@@ -1,7 +1,7 @@
 export enum FilmType {
-  Film = 'film',
-  Series = 'series',
-  Multfilm = 'multfilm',
-  Anime = 'anime',
-  TVShow = 'tvshow',
+  FILM = 'FILM',
+  SERIES = 'SERIES',
+  CARTOON = 'CARTOON',
+  ANIME = 'ANIME',
+  TV_SHOW = 'TV_SHOW',
 }

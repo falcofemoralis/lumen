@@ -6,7 +6,7 @@ import { ThemedListComponentProps } from './ThemedList.type';
 
 export const ThemedListComponent = ({
   data,
-  itemHeight,
+  itemSize,
   numberOfColumns,
   style,
   rowStyle,
@@ -19,7 +19,7 @@ export const ThemedListComponent = ({
     <SpatialNavigationVirtualizedGrid
       data={ memoData }
       renderItem={ renderItem }
-      itemHeight={ itemHeight ?? 0 }
+      itemHeight={ itemSize }
       numberOfColumns={ numberOfColumns }
       scrollInterval={ SCROLL_EVENT_UPDATES_MS_TV }
       rowContainerStyle={ rowStyle }

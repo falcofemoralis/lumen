@@ -8,7 +8,7 @@ import { ProgressStatus } from './Player.type';
 class PlayerStore {
   public progressStatus: ProgressStatus = DEFAULT_PROGRESS_STATUS;
 
-  public focusedElement: FocusedElement = FocusedElement.ProgressThumb;
+  public focusedElement: FocusedElement = FocusedElement.PROGRESS_THUMB;
 
   public selectedVoice: {
     filmId: string;

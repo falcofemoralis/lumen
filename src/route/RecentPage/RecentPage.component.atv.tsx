@@ -157,12 +157,12 @@ export function RecentPageComponent({
     return (
       <DefaultFocus>
         <ThemedList
-          data={ prepareItems() }
-          renderItem={ renderItem }
-          itemHeight={ height / 3 }
-          numberOfColumns={ NUMBER_OF_COLUMNS_TV + 1 }
           style={ styles.grid }
           rowStyle={ styles.rowStyle }
+          data={ prepareItems() }
+          numberOfColumns={ NUMBER_OF_COLUMNS_TV + 1 }
+          itemSize={ height / 3 }
+          renderItem={ renderItem }
           onNextLoad={ onNextLoad }
         />
       </DefaultFocus>

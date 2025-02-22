@@ -1,9 +1,9 @@
 export enum SupportedKeys {
-  Up = 'Up',
-  Down = 'Down',
-  Left = 'Left',
-  Right = 'Right',
-  Enter = 'Enter',
-  LongEnter = 'LongEnter',
-  Back = 'Back',
+  UP = 'Up',
+  DOWN = 'Down',
+  LEFT = 'Left',
+  RIGHT = 'Right',
+  ENTER = 'Enter',
+  LONG_ENTER = 'LongEnter',
+  BACK = 'Back',
 }

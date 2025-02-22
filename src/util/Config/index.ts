@@ -3,10 +3,10 @@ import { configStorage } from 'Util/Storage';
 
 import {
   Config,
-  CONFIG_KEY_ENUM,
   CONFIG_MAP,
+  ConfigKeyType,
   ConfigMapping,
-  DATA_TYPE_ENUM,
+  DataType,
 } from './mapping';
 
 export const getDefaultConfig = () => CONFIG_MAP.reduce((acc, { key, default: defaultValue }) => {
@@ -15,7 +15,7 @@ export const getDefaultConfig = () => CONFIG_MAP.reduce((acc, { key, default: de
   return acc;
 }, {} as Config);
 
-export const loadConfig = (keys?: CONFIG_KEY_ENUM[]): Config => {
+export const loadConfig = (keys?: ConfigKeyType[]): Config => {
   const mapByType: { [key: string]: ConfigMapping[] } = {};
 
   CONFIG_MAP.forEach((item) => {
@@ -35,7 +35,7 @@ export const loadConfig = (keys?: CONFIG_KEY_ENUM[]): Config => {
   Object.keys(mapByType).forEach((type) => {
     const items = mapByType[type];
     const itemsKeys = items.map((item) => item.key);
-    results.push(configStorage.getMultipleItems(itemsKeys, type as DATA_TYPE_ENUM));
+    results.push(configStorage.getMultipleItems(itemsKeys, type as DataType));
   });
 
   const configArr = results.flat();
@@ -47,7 +47,7 @@ export const loadConfig = (keys?: CONFIG_KEY_ENUM[]): Config => {
   }, {} as Config);
 };
 
-export const getConfig = async (key: CONFIG_KEY_ENUM): Promise<any> => {
+export const getConfig = async (key: ConfigKeyType): Promise<any> => {
   const mapping = CONFIG_MAP.find((k) => k.key === key);
 
   if (!mapping) {
@@ -57,15 +57,15 @@ export const getConfig = async (key: CONFIG_KEY_ENUM): Promise<any> => {
   const { key: name, type } = mapping;
 
   switch (type) {
-    case DATA_TYPE_ENUM.boolean:
+    case DataType.boolean:
       return configStorage.getBoolAsync(name);
-    case DATA_TYPE_ENUM.number:
+    case DataType.number:
       return configStorage.getIntAsync(name);
-    case DATA_TYPE_ENUM.string:
+    case DataType.string:
       return configStorage.getStringAsync(name);
-    case DATA_TYPE_ENUM.array:
+    case DataType.array:
       return configStorage.getArrayAsync(name);
-    case DATA_TYPE_ENUM.object:
+    case DataType.object:
       return configStorage.getMapAsync(name);
     default:
       throw new Error(`Unknown type: ${type}`);
@@ -73,7 +73,7 @@ export const getConfig = async (key: CONFIG_KEY_ENUM): Promise<any> => {
 };
 
 export const updateConfig = async (
-  key: CONFIG_KEY_ENUM,
+  key: ConfigKeyType,
   value: any,
 ): Promise<boolean | null | undefined> => {
   const mapping = CONFIG_MAP.find((k) => k.key === key);
@@ -85,15 +85,15 @@ export const updateConfig = async (
   const { key: name, type } = mapping;
 
   switch (type) {
-    case DATA_TYPE_ENUM.boolean:
+    case DataType.boolean:
       return configStorage.setBoolAsync(name, value);
-    case DATA_TYPE_ENUM.number:
+    case DataType.number:
       return configStorage.setIntAsync(name, value);
-    case DATA_TYPE_ENUM.string:
+    case DataType.string:
       return configStorage.setStringAsync(name, value);
-    case DATA_TYPE_ENUM.array:
+    case DataType.array:
       return configStorage.setArrayAsync(name, value);
-    case DATA_TYPE_ENUM.object:
+    case DataType.object:
       return configStorage.setMapAsync(name, value);
     default:
       throw new Error(`Unknown type: ${type}`);

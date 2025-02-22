@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any -- Config value can be any value */
-export enum DATA_TYPE_ENUM {
+export enum DataType {
   boolean = 'boolean',
   number = 'number',
   string = 'string',
@@ -8,15 +8,15 @@ export enum DATA_TYPE_ENUM {
 }
 
 export interface ConfigMapping {
-  key: CONFIG_KEY_ENUM;
+  key: ConfigKeyType;
   default: any;
-  type: DATA_TYPE_ENUM;
+  type: DataType;
 }
 
-export enum CONFIG_KEY_ENUM {
-  isConfigured = 'isConfigured',
-  isTV = 'isTV',
-  language = 'language',
+export enum ConfigKeyType {
+  IS_CONFIGURED = 'isConfigured',
+  IS_TV = 'isTV',
+  LANGUAGE = 'language',
 }
 
 export interface Config {
@@ -26,13 +26,13 @@ export interface Config {
 
 export const CONFIG_MAP: ConfigMapping[] = [
   {
-    key: CONFIG_KEY_ENUM.isConfigured,
+    key: ConfigKeyType.IS_CONFIGURED,
     default: false,
-    type: DATA_TYPE_ENUM.boolean,
+    type: DataType.boolean,
   },
   {
-    key: CONFIG_KEY_ENUM.isTV,
+    key: ConfigKeyType.IS_TV,
     default: false,
-    type: DATA_TYPE_ENUM.boolean,
+    type: DataType.boolean,
   },
 ];

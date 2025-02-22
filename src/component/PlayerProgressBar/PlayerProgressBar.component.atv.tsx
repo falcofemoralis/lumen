@@ -46,12 +46,12 @@ export const PlayerProgressBarComponent = ({
   togglePlayPause = noopFn,
 }: PlayerProgressBarComponentProps) => {
   const longEvent = useRef<{[key: string]: LongEvent}>({
-    [SupportedKeys.Left]: {
+    [SupportedKeys.LEFT]: {
       isKeyDownPressed: false,
       longTimeout: null,
       isLongFired: false,
     },
-    [SupportedKeys.Right]: {
+    [SupportedKeys.RIGHT]: {
       isKeyDownPressed: false,
       longTimeout: null,
       isLongFired: false,
@@ -104,7 +104,7 @@ export const PlayerProgressBarComponent = ({
         return;
       }
 
-      const seekTime = direction === RewindDirection.Backward
+      const seekTime = direction === RewindDirection.BACKWARD
         ? autoRewindParams.seconds * -1
         : autoRewindParams.seconds;
       const currentTime = calculateCurrentTime(PlayerStore.progressStatus.progressPercentage);
@@ -163,13 +163,13 @@ export const PlayerProgressBarComponent = ({
 
   useEffect(() => {
     const keyDownListener = (type: SupportedKeys) => {
-      if (PlayerStore.focusedElement === FocusedElement.ProgressThumb) {
-        if (type === SupportedKeys.Left) {
-          handleProgressThumbKeyDown(type, RewindDirection.Backward);
+      if (PlayerStore.focusedElement === FocusedElement.PROGRESS_THUMB) {
+        if (type === SupportedKeys.LEFT) {
+          handleProgressThumbKeyDown(type, RewindDirection.BACKWARD);
         }
 
-        if (type === SupportedKeys.Right) {
-          handleProgressThumbKeyDown(type, RewindDirection.Forward);
+        if (type === SupportedKeys.RIGHT) {
+          handleProgressThumbKeyDown(type, RewindDirection.FORWARD);
         }
       }
 
@@ -177,13 +177,13 @@ export const PlayerProgressBarComponent = ({
     };
 
     const keyUpListener = (type: SupportedKeys) => {
-      if (PlayerStore.focusedElement === FocusedElement.ProgressThumb) {
-        if (type === SupportedKeys.Left) {
-          handleProgressThumbKeyUp(type, RewindDirection.Backward);
+      if (PlayerStore.focusedElement === FocusedElement.PROGRESS_THUMB) {
+        if (type === SupportedKeys.LEFT) {
+          handleProgressThumbKeyUp(type, RewindDirection.BACKWARD);
         }
 
-        if (type === SupportedKeys.Right) {
-          handleProgressThumbKeyUp(type, RewindDirection.Forward);
+        if (type === SupportedKeys.RIGHT) {
+          handleProgressThumbKeyUp(type, RewindDirection.FORWARD);
         }
 
         handleUserInteraction();

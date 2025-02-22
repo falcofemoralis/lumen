@@ -10,7 +10,7 @@ import { updateUrlHost } from 'Util/Url';
 import { Variables } from '../../util/Request/index';
 
 const configApi: ConfigApiInterface = {
-  serviceType: ApiServiceType.rezka,
+  serviceType: ApiServiceType.REZKA,
   defaultProviders: ['https://rezka-ua.org'],
   /**
    *    <item>prx.ukrtelcdn.net</item>

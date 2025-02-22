@@ -9,10 +9,11 @@ export function PageComponent({
   style,
 }: PageComponentProps) {
   return (
-    <ThemedView style={ [
-      styles.container,
-      style,
-    ] }
+    <ThemedView
+      style={ [
+        styles.container,
+        style,
+      ] }
     >
       <ErrorBoundary>
         { children }
