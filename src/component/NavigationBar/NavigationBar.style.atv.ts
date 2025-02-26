@@ -20,9 +20,6 @@ export const styles = CreateStyles({
     width: '100%',
     height: '100%',
   },
-  slotBarVisible: {
-    marginLeft: NAVIGATION_BAR_TV_WIDTH,
-  },
   bar: {
     left: 0,
     top: 0,
@@ -32,15 +29,6 @@ export const styles = CreateStyles({
     justifyContent: 'center',
     alignItems: 'flex-start',
     zIndex: NAVIGATION_BAR_Z_INDEX,
-  },
-  barBackground: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    height: '100%',
-    width: NAVIGATION_BAR_TV_WIDTH,
-    zIndex: NAVIGATION_BAR_Z_INDEX + 1,
   },
   barBackgroundOpened: {
     width: NAVIGATION_BAR_TV_WIDTH_EXPANDED + 200,

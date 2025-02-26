@@ -2,11 +2,11 @@ import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import ThemedIcon from 'Component/ThemedIcon';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Tabs } from 'expo-router';
 import React, { useCallback, useEffect, useRef } from 'react';
 import {
   Animated,
+  Dimensions,
   View,
 } from 'react-native';
 import {
@@ -21,8 +21,8 @@ import { CONTENT_WRAPPER_PADDING_TV } from 'Style/Layout';
 import { scale } from 'Util/CreateStyles';
 
 import { useMenuContext } from './MenuContext';
-import { LOADER_PAGE, TABS_TV_CONFIG } from './NavigationBar.config';
-import { styles } from './NavigationBar.style.atv';
+import { LOADER_PAGE, TABS_OPENING_DURATION_TV, TABS_TV_CONFIG } from './NavigationBar.config';
+import { NAVIGATION_BAR_TV_WIDTH, styles } from './NavigationBar.style.atv';
 import {
   NavigationBarComponentProps,
   NavigationType,
@@ -36,6 +36,7 @@ export function NavigationBarComponent({
 }: NavigationBarComponentProps) {
   const { isOpen: isMenuOpen, toggleMenu } = useMenuContext();
 
+  const containerWidth = Dimensions.get('window').width;
   const lastPage = useRef<string | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const animatedWidth = useRef(
@@ -54,7 +55,7 @@ export function NavigationBarComponent({
   useEffect(() => {
     Animated.timing(animatedWidth, {
       toValue: isMenuOpen ? styles.tabsOpened.width : styles.tabs.width,
-      duration: 350,
+      duration: TABS_OPENING_DURATION_TV,
       useNativeDriver: false,
     }).start();
   }, [animatedWidth, isMenuOpen]);
@@ -145,7 +146,7 @@ export function NavigationBarComponent({
             { renderTabs(navigation, state) }
           </DefaultFocus>
         </SpatialNavigationView>
-        <LinearGradient
+        { /* <LinearGradient
           style={ [
             styles.barBackground,
             isMenuOpen && styles.barBackgroundOpened,
@@ -153,10 +154,12 @@ export function NavigationBarComponent({
           colors={ ['rgba(0, 0, 0, 0.8)', 'transparent'] }
           start={ { x: 0.5, y: 0 } }
           end={ { x: 1, y: 0 } }
-        />
+        /> */ }
       </ThemedView>
     </SpatialNavigationRoot>
   ), [renderTabs, onDirectionHandledWithoutMovement, isMenuOpen]);
+
+  // styles.tabs.width * -1
 
   return (
     <Tabs
@@ -168,7 +171,10 @@ export function NavigationBarComponent({
         tabBarPosition: 'left',
         freezeOnBlur: true,
         sceneStyle: {
-          margin: CONTENT_WRAPPER_PADDING_TV,
+          width: containerWidth - scale(NAVIGATION_BAR_TV_WIDTH) - CONTENT_WRAPPER_PADDING_TV * 2,
+          marginRight: CONTENT_WRAPPER_PADDING_TV,
+          left: styles.tabs.width * -1 + CONTENT_WRAPPER_PADDING_TV,
+          marginLeft: animatedWidth,
         },
       } }
       tabBar={ renderTabBar }

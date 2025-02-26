@@ -2,6 +2,8 @@ import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 
 import { Tab } from './NavigationBar.type';
 
+export const TABS_OPENING_DURATION_TV = 250;
+
 export const TABS_TV_CONFIG: Tab<string>[] = [
   {
     route: '(home)',
