@@ -1,14 +1,17 @@
+import ThemedIcon from 'Component/ThemedIcon';
+import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedList from 'Component/ThemedList';
 import { ThemedListRowProps } from 'Component/ThemedList/ThemedList.type';
 import ThemedText from 'Component/ThemedText';
 import { memo, useCallback } from 'react';
 import { View } from 'react-native';
+import Colors from 'Style/Colors';
 import { calculateItemSize } from 'Style/Layout';
 import { CommentInterface } from 'Type/Comment.interface';
 import { scale } from 'Util/CreateStyles';
 
-import { styles } from './Comments.style';
+import { INDENT_SIZE, styles } from './Comments.style';
 import { CommentItemProps, CommentsComponentProps } from './Comments.type';
 import { CommentText } from './CommentText';
 
@@ -21,7 +24,10 @@ export function CommentItem({
     avatar,
     username,
     date,
+    likes,
   } = comment;
+
+  const leftIndent = INDENT_SIZE * comment.indent;
 
   return (
     <View
@@ -29,7 +35,10 @@ export function CommentItem({
       style={ [
         styles.item,
         idx % 2 === 0 ? styles.itemEven : null,
-        { paddingLeft: scale(16) * comment.indent },
+        {
+          paddingLeft: leftIndent,
+
+        },
       ] }
     >
       <ThemedImage
@@ -37,12 +46,34 @@ export function CommentItem({
         style={ styles.avatar }
       />
       <View style={ styles.comment }>
-        <ThemedText>{ username }</ThemedText>
+        <ThemedText style={ styles.commentTextSmall }>
+          { username }
+        </ThemedText>
         <CommentText
-          style={ styles.commentText }
+          style={ styles.commentTextWrapper }
+          textStyle={ styles.commentText }
           comment={ comment }
         />
-        <ThemedText>{ date }</ThemedText>
+        <View style={ styles.commentDateRow }>
+          <ThemedText style={ styles.commentTextSmall }>
+            { date }
+          </ThemedText>
+          { likes > 0 && (
+            <View style={ styles.commentLikes }>
+              <ThemedText style={ styles.commentTextSmall }>
+                { likes }
+              </ThemedText>
+              <ThemedIcon
+                icon={ {
+                  pack: IconPackType.MaterialCommunityIcons,
+                  name: 'thumb-up-outline',
+                } }
+                size={ scale(16) }
+                color={ Colors.white }
+              />
+            </View>
+          ) }
+        </View>
       </View>
     </View>
   );
@@ -72,7 +103,7 @@ export const CommentsComponent = ({
 
   return (
     <ThemedList
-      style={ styles.list }
+      style={ styles.commentsList }
       data={ comments }
       numberOfColumns={ 1 }
       itemSize={ itemWidth }

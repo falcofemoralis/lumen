@@ -13,78 +13,74 @@ interface CommentTextProps {
   textStyle?: StyleProp<TextStyle>;
 }
 
-const SpoilerItem = (textItem: CommentTextInterface) => {
+interface SpoilerItemProps {
+  textItem: CommentTextInterface,
+  textStyle?: StyleProp<TextStyle>,
+}
+
+const SpoilerItem = ({
+  textItem,
+  textStyle,
+}: SpoilerItemProps) => {
   const [visible, setVisible] = useState(false);
 
   const { text } = textItem;
 
   return (
     <ThemedText
-      style={ !visible ? styles.spoiler : null }
+      style={ [
+        textStyle,
+        !visible ? styles.spoiler : null,
+      ] }
       onPress={ () => setVisible(!visible) }
     >
-      { visible ? text : 'Spoiler' }
+      { text }
     </ThemedText>
   );
 };
 
 export const CommentText = ({ comment, style, textStyle }: CommentTextProps) => {
-  const { text } = comment;
+  const { text: commentText } = comment;
+
+  const renderLines = (text: string, nStyle?: StyleProp<TextStyle>) => (
+    <ThemedText
+      style={ [textStyle, nStyle] }
+    >
+      { text }
+    </ThemedText>
+  );
+
+  const renderSpoiler = (textItem: CommentTextInterface) => (
+    <SpoilerItem
+      textItem={ textItem }
+      textStyle={ textStyle }
+    />
+  );
 
   const renderText = (textItem: CommentTextInterface) => {
-    switch (textItem.type) {
+    const { text, type } = textItem;
+
+    switch (type) {
       case CommentTextType.BOLD:
-        return (
-          <ThemedText
-            style={ [textStyle, { fontWeight: 'bold' }] }
-          >
-            { textItem.text }
-          </ThemedText>
-        );
+        return renderLines(text, { fontWeight: 'bold' });
       case CommentTextType.INCLINED:
-        return (
-          <ThemedText
-            style={ [textStyle, { fontStyle: 'italic' }] }
-          >
-            { textItem.text }
-          </ThemedText>
-        );
+        return renderLines(text, { fontStyle: 'italic' });
       case CommentTextType.UNDERLINE:
-        return (
-          <ThemedText
-            style={ [textStyle, { textDecorationLine: 'underline' }] }
-          >
-            { textItem.text }
-          </ThemedText>
-        );
+        return renderLines(text, { textDecorationLine: 'underline' });
       case CommentTextType.CROSSED:
-        return (
-          <ThemedText
-            style={ [textStyle, { textDecorationLine: 'line-through' }] }
-          >
-            { textItem.text }
-          </ThemedText>
-        );
+        return renderLines(text, { textDecorationLine: 'line-through' });
       case CommentTextType.BREAK:
         return null;
       case CommentTextType.SPOILER:
-        return (
-          <SpoilerItem
-            { ...textItem }
-          />
-        );
+        return renderSpoiler(textItem);
       default:
-        return (
-          <ThemedText style={ textStyle }>
-            { textItem.text }
-          </ThemedText>
-        );
+        return renderLines(text);
     }
   };
 
   return (
     <View style={ style }>
-      { text.map((textItem, index) => (
+      { commentText.map((textItem, index) => (
         // eslint-disable-next-line react/no-array-index-key
         <View key={ `comment-${comment.id}-${index}-${textItem.text}` }>
           { renderText(textItem) }

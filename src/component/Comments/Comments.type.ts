@@ -17,8 +17,8 @@ export interface CommentsComponentProps {
 export interface CommentItemProps {
   comment: CommentInterface;
   idx: number;
-  containerWidth: number;
-  lines: CalculatedLine[];
+  containerWidth?: number;
+  lines?: CalculatedLine[];
 }
 
 export type CalculatedLine = {

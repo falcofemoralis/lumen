@@ -1,32 +1,72 @@
 import Colors from 'Style/Colors';
-import CreateStyles from 'Util/CreateStyles';
+import CreateStyles, { scale } from 'Util/CreateStyles';
+
+export const INDENT_SIZE = scale(16);
 
 export const styles = CreateStyles({
-  list: {
+  commentsList: {
   },
   item: {
     flexDirection: 'row',
+    gap: 8,
+    paddingBottom: 8,
   },
   itemEven: {
-    backgroundColor: Colors.darkGray,
   },
   avatar: {
-    height: 40,
-    width: 40,
+    height: 32,
+    width: 32,
+    borderRadius: 64,
   },
   comment: {
     flexDirection: 'column',
-    paddingBlock: 8,
+    flex: 1,
+    backgroundColor: Colors.darkGray,
+    borderRadius: 12,
+    padding: 8,
+  },
+  commentTextWrapper: {
+    width: '100%',
+    flexDirection: 'column',
+    marginBlock: 4,
   },
   commentText: {
-    padding: 8,
-    flex: 1,
-    width: '90%',
+    fontSize: 16,
+    lineHeight: 16,
+  },
+  commentTextSmall: {
+    fontSize: 13,
+    color: Colors.lightGray,
+  },
+  commentTextFocused: {
+    color: Colors.black,
+  },
+  commentDateRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignSelf: 'baseline',
+    width: '100%',
+  },
+  commentLikes: {
+    flexDirection: 'row',
+    gap: 4,
+    alignItems: 'center',
   },
   spoiler: {
     backgroundColor: Colors.gray,
-    padding: 2,
-    borderRadius: 8,
-    color: Colors.white,
+    color: Colors.gray,
+  },
+  textFocused: {
+    color: Colors.black,
+  },
+  loader: {
+    alignSelf: 'center',
+    height: '100%',
+    width: '100%',
+  },
+  measureText: {
+    opacity: 0,
+    position: 'absolute',
+    alignSelf: 'baseline',
   },
 });

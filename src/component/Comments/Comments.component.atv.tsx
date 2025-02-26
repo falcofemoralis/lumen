@@ -19,6 +19,7 @@ import {
 } from 'react-tv-space-navigation';
 import Colors from 'Style/Colors';
 import { CommentInterface, CommentTextType } from 'Type/Comment.interface';
+import { scale } from 'Util/CreateStyles';
 
 import { MEASURE_TEXT_STRING } from './Comments.config';
 import {
@@ -34,8 +35,8 @@ import { CommentText, CommentTextRef } from './CommentText.atv';
 export function CommentItem({
   comment,
   idx,
-  containerWidth,
-  lines,
+  containerWidth = 0,
+  lines = [],
 }: CommentItemProps) {
   const {
     id,
@@ -113,7 +114,7 @@ export function CommentItem({
                       pack: IconPackType.MaterialCommunityIcons,
                       name: 'thumb-up-outline',
                     } }
-                    size={ 16 }
+                    size={ scale(16) }
                     color={ isFocused ? Colors.black : Colors.white }
                   />
                 </View>
