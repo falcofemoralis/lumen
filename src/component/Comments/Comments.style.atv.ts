@@ -1,16 +1,15 @@
 import Colors from 'Style/Colors';
 import CreateStyles, { scale } from 'Util/CreateStyles';
 
-export const ITEM_ELEMENTS_HEIGHT = scale(0) * 2;
-export const INDENT_SIZE = scale(0);
+export const ITEM_ELEMENTS_HEIGHT = scale(20) * 2;
+export const INDENT_SIZE = scale(16);
 
-export const ITEM_INTERNAL_GAP = scale(0);
-export const ITEM_PADDING = scale(0);
-export const BOTTOM_PADDING = scale(0);
+export const ITEM_PADDING = scale(8);
+export const BOTTOM_PADDING = scale(16);
 
 export const ITEM_ADDITIONAL_HEIGHT = ITEM_ELEMENTS_HEIGHT
-  + ITEM_PADDING * 2;
-  // + BOTTOM_PADDING;
+  + ITEM_PADDING * 2
+  + BOTTOM_PADDING;
 
 export const styles = CreateStyles({
   wrapper: {
@@ -21,13 +20,13 @@ export const styles = CreateStyles({
   },
   item: {
     flexDirection: 'row',
-    // paddingBottom: BOTTOM_PADDING,
+    gap: 8,
+    paddingBottom: BOTTOM_PADDING,
   },
   itemFocused: {
     backgroundColor: Colors.white,
   },
   itemEven: {
-    // backgroundColor: Colors.darkGray,
   },
   avatar: {
     height: 32,
@@ -36,23 +35,36 @@ export const styles = CreateStyles({
   },
   comment: {
     flexDirection: 'column',
-    // paddingBlock: 8,
-    borderWidth: 1,
-    borderColor: Colors.secondary,
-    // backgroundColor: Colors.darkGray,
-    // borderRadius: 12,
-    // padding: ITEM_PADDING,
+    backgroundColor: Colors.darkGray,
+    borderRadius: 12,
+    padding: ITEM_PADDING,
   },
   commentTextWrapper: {
     width: '100%',
     flexDirection: 'column',
+    marginBlock: 4,
   },
   commentText: {
     fontSize: 16,
     lineHeight: 16,
   },
+  commentTextSmall: {
+    fontSize: 13,
+    color: Colors.lightGray,
+  },
   commentTextFocused: {
     color: Colors.black,
+  },
+  commentDateRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignSelf: 'baseline',
+    width: '100%',
+  },
+  commentLikes: {
+    flexDirection: 'row',
+    gap: 4,
+    alignItems: 'center',
   },
   spoiler: {
     backgroundColor: Colors.gray,

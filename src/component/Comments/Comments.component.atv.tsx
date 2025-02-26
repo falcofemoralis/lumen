@@ -1,4 +1,6 @@
 import Loader from 'Component/Loader';
+import ThemedIcon from 'Component/ThemedIcon';
+import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import { ThemedListRowProps } from 'Component/ThemedList/ThemedList.type';
 import ThemedText from 'Component/ThemedText';
@@ -15,12 +17,13 @@ import {
   SpatialNavigationFocusableView,
   SpatialNavigationVirtualizedList,
 } from 'react-tv-space-navigation';
+import Colors from 'Style/Colors';
 import { CommentInterface, CommentTextType } from 'Type/Comment.interface';
 
 import { MEASURE_TEXT_STRING } from './Comments.config';
 import {
   INDENT_SIZE,
-  ITEM_INTERNAL_GAP,
+  ITEM_ADDITIONAL_HEIGHT,
   styles,
 } from './Comments.style.atv';
 import {
@@ -39,6 +42,7 @@ export function CommentItem({
     avatar,
     username,
     date,
+    likes,
   } = comment;
 
   const commentTextRef = useRef<CommentTextRef>(null);
@@ -57,9 +61,7 @@ export function CommentItem({
             idx % 2 === 0 && styles.itemEven,
             {
               paddingLeft: leftIndent,
-              gap: ITEM_INTERNAL_GAP,
             },
-            isFocused && styles.itemFocused,
           ] }
         >
           <ThemedImage
@@ -69,11 +71,16 @@ export function CommentItem({
           <View style={ [
             styles.comment,
             { width: containerWidth - leftIndent },
+            isFocused && styles.itemFocused,
           ] }
           >
-            { /* <ThemedText style={ isFocused && styles.textFocused }>
+            <ThemedText style={ [
+              styles.commentTextSmall,
+              isFocused && styles.textFocused,
+            ] }
+            >
               { username }
-            </ThemedText> */ }
+            </ThemedText>
             <CommentText
               ref={ commentTextRef }
               style={ styles.commentTextWrapper }
@@ -84,9 +91,34 @@ export function CommentItem({
               comment={ comment }
               lines={ lines }
             />
-            { /* <ThemedText style={ isFocused && styles.textFocused }>
-              { date }
-            </ThemedText> */ }
+            <View style={ styles.commentDateRow }>
+              <ThemedText style={ [
+                styles.commentTextSmall,
+                isFocused && styles.textFocused,
+              ] }
+              >
+                { date }
+              </ThemedText>
+              { likes > 0 && (
+                <View style={ styles.commentLikes }>
+                  <ThemedText style={ [
+                    styles.commentTextSmall,
+                    isFocused && styles.textFocused,
+                  ] }
+                  >
+                    { likes }
+                  </ThemedText>
+                  <ThemedIcon
+                    icon={ {
+                      pack: IconPackType.MaterialCommunityIcons,
+                      name: 'thumb-up-outline',
+                    } }
+                    size={ 16 }
+                    color={ isFocused ? Colors.black : Colors.white }
+                  />
+                </View>
+              ) }
+            </View>
           </View>
         </View>
       ) }
@@ -110,7 +142,7 @@ export const CommentsComponent = ({
   const [charLayout, setCharLayout] = useState<LayoutRectangle|null>(null);
 
   const splitText = useCallback((str: string, indent: number) => {
-    const width = containerWidth; // - (indent * INDENT_SIZE);
+    const width = containerWidth - (indent * INDENT_SIZE);
     const charWidth = Math.ceil((charLayout?.width || 1) / MEASURE_TEXT_STRING.length);
 
     const words = str.split(' ');
@@ -124,6 +156,21 @@ export const CommentsComponent = ({
 
       if (lineWidth <= width) {
         currentLine = newLine;
+      } else if ((word.length * charWidth) > width) {
+        // if the word is longer than the width, split the word
+        let splitWord = '';
+        // eslint-disable-next-line no-plusplus
+        for (let i = 0; i < word.length; i++) {
+          if ((splitWord.length + 1) * charWidth > width) {
+            lines.push(splitWord);
+            splitWord = '';
+          }
+          splitWord += word[i];
+        }
+
+        if (splitWord) {
+          currentLine = splitWord;
+        }
       } else {
         lines.push(currentLine);
         currentLine = word;
@@ -156,10 +203,10 @@ export const CommentsComponent = ({
     const numberOfLines = calculatedLines.reduce((acc, textObj) => acc + textObj.lines.length, 0);
 
     const charHeight = charLayout?.height || 0;
-    const textHeight = (numberOfLines === 1 ? 2 : numberOfLines) * charHeight;
+    const textHeight = numberOfLines * charHeight;
 
     return {
-      height: textHeight, //  + ITEM_ADDITIONAL_HEIGHT
+      height: textHeight + ITEM_ADDITIONAL_HEIGHT,
       lines: calculatedLines,
     };
   }, [charLayout, splitText]);
@@ -237,7 +284,7 @@ export const CommentsComponent = ({
       style={ [styles.wrapper, style] }
       onLayout={ (event) => {
         const { width } = event.nativeEvent.layout;
-        setContainerWidth(width - styles.avatar.width);
+        setContainerWidth(width - styles.avatar.width - styles.item.gap);
       } }
     >
       { renderMeasureText() }

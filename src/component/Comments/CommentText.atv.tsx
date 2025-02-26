@@ -3,8 +3,7 @@ import { forwardRef, useImperativeHandle, useState } from 'react';
 import {
   StyleProp, TextStyle, View, ViewStyle,
 } from 'react-native';
-import { CommentInterface, CommentTextInterface, CommentTextType } from 'Type/Comment.interface';
-import { scale } from 'Util/CreateStyles';
+import { CommentInterface, CommentTextType } from 'Type/Comment.interface';
 
 import { styles } from './Comments.style.atv';
 import { CalculatedLine } from './Comments.type';
@@ -30,7 +29,6 @@ export const CommentText = forwardRef<CommentTextRef, CommentTextProps>(
     },
     ref,
   ) => {
-    const { indent } = comment;
     const [isSpoilersVisible, setSpoilersVisible] = useState(false);
 
     useImperativeHandle(ref, () => ({
