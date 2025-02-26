@@ -6,8 +6,6 @@ import { Modal, Portal } from 'react-native-paper';
 import { styles } from './ThemedOverlay.style';
 import { ThemedOverlayComponentProps } from './ThemedOverlay.type';
 
-const window = Dimensions.get('window');
-
 export function ThemedOverlayComponent({
   isOpened,
   onHide,
@@ -15,8 +13,10 @@ export function ThemedOverlayComponent({
   style,
   children,
 }: ThemedOverlayComponentProps) {
+  const { height, width } = Dimensions.get('window');
+
   const [isLandscape, setIsLandscape] = useState(
-    window.height < window.width,
+    height < width,
   );
 
   useEffect(() => {

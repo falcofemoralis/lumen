@@ -100,7 +100,7 @@ export const executePost = async (
   variables: Variables,
   signal?: AbortSignal,
 ): Promise<string> => {
-  const uri = formatURI(query, {}, endpoint);
+  const uri = formatURI(query, {}, endpoint);  
 
   try {
     const formData = new FormData();

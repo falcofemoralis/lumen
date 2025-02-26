@@ -1,6 +1,6 @@
 import FilmGrid from 'Component/FilmGrid';
 import ThemedView from 'Component/ThemedView';
-import { Dimensions } from 'react-native';
+import { useCallback } from 'react';
 import { TabBar, TabView } from 'react-native-tab-view';
 
 import { styles } from './FilmPager.style';
@@ -14,12 +14,12 @@ export function FilmPagerComponent({
   onNextLoad,
   handleMenuItemChange,
 }: FilmPagerComponentProps) {
-  const handleIndexChange = (index: number) => {
+  const handleIndexChange = useCallback((index: number) => {
     handleMenuItemChange(pagerItems[index]);
-  };
+  }, [pagerItems]);
 
-  const renderPage = ({ route }: { route: PagerItemInterface }) => {
-    const { films = [] } = route ?? {};
+  const renderPage = useCallback(({ route }: { route: PagerItemInterface }) => {
+    const { films = [] } = route;
 
     return (
       <FilmGrid
@@ -27,11 +27,14 @@ export function FilmPagerComponent({
         onNextLoad={ onNextLoad }
       />
     );
-  };
+  }, []);
 
-  const renderLazyPlaceholder = ({ route }: any) => <LazyPlaceholder route={ route } />;
+  const renderLazyPlaceholder = useCallback(
+    ({ route }: any) => <LazyPlaceholder route={ route } />,
+    [],
+  );
 
-  const renderTabBar = (props: any) => (
+  const renderTabBar = useCallback((props: any) => (
     <TabBar
       { ...props }
       indicatorStyle={ styles.tabBarIndicator }
@@ -39,7 +42,7 @@ export function FilmPagerComponent({
       tabStyle={ styles.tabStyle }
       scrollEnabled
     />
-  );
+  ), []);
 
   if (!pagerItems.length) {
     return renderPage({ route: selectedPagerItem });
@@ -55,7 +58,6 @@ export function FilmPagerComponent({
       } }
       renderScene={ renderPage }
       onIndexChange={ handleIndexChange }
-      initialLayout={ { width: Dimensions.get('window').width } }
       style={ styles.container }
       renderTabBar={ renderTabBar }
     />

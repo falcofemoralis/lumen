@@ -19,6 +19,9 @@ export const styles = CreateStyles({
     paddingBlock: 8,
   },
   commentText: {
+    padding: 8,
+    flex: 1,
+    width: '90%',
   },
   spoiler: {
     backgroundColor: Colors.gray,

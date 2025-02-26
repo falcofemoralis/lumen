@@ -1,6 +1,6 @@
 import { CommentTextInterface, CommentTextType } from 'Type/Comment.interface';
 import { decodeHtml } from 'Util/Htlm';
-import { HTMLElementInterface } from 'Util/Parser';
+import { safeJsonParse } from 'Util/Json';
 
 import { CommentsApiInterface } from '..';
 import configApi from './configApi';
@@ -13,13 +13,16 @@ export type CommentsResult = {
 
 export const commentsApi: CommentsApiInterface = {
   getComments: async (filmId: string, page: number) => {
-    const result = await configApi.fetchJson<CommentsResult>('/ajax/get_comments', {
+    const json = await configApi.getRequest('/ajax/get_comments', {
+      t: String(Date.now()),
       news_id: filmId,
       cstart: String(page),
       type: '0',
       comment_id: '0',
       skin: 'hdrezka',
     });
+
+    const result = safeJsonParse<CommentsResult>(json);
 
     if (!result) {
       throw new Error('Failed to fetch comments');

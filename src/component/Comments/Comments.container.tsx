@@ -7,6 +7,7 @@ import ServiceStore from 'Store/Service.store';
 import { CommentInterface } from 'Type/Comment.interface';
 
 import CommentsComponent from './Comments.component';
+import CommentsComponentTV from './Comments.component.atv';
 import { CommentsContainerProps } from './Comments.type';
 
 export type CommentsRef = {
@@ -14,7 +15,7 @@ export type CommentsRef = {
 };
 
 export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>(
-  ({ film }, ref) => {
+  ({ film, style }, ref) => {
     const { id } = film;
     const [comments, setComments] = useState<CommentInterface[]>([]);
     const paginationRef = useRef({
@@ -22,6 +23,7 @@ export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>
       totalPages: 1,
     });
     const updatingStateRef = useRef(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
       loadComments(1);
@@ -46,6 +48,7 @@ export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>
 
       if (!updatingStateRef.current) {
         updatingStateRef.current = true;
+        setIsLoading(true);
 
         try {
           const {
@@ -65,6 +68,8 @@ export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>
         } catch (error) {
           NotificationStore.displayError(error as Error);
           updatingStateRef.current = false;
+        } finally {
+          setIsLoading(false);
         }
       }
     };
@@ -77,19 +82,17 @@ export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>
       }
     };
 
-    if (!comments.length) {
-      return null;
-    }
-
     const containerFunctions = {
       onNextLoad,
     };
 
     const containerProps = () => ({
       comments,
+      style,
+      isLoading,
     });
 
-    return withTV(CommentsComponent, CommentsComponent, {
+    return withTV(CommentsComponentTV, CommentsComponent, {
       ...containerFunctions,
       ...containerProps(),
     });

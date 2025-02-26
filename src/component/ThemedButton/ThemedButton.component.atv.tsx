@@ -22,6 +22,7 @@ export default function ThemedButton({
   variant = 'filled',
   rightImage,
   rightImageStyle,
+  disableRootActive,
 }: ThemedButtonProps) {
   const renderFilled = (isFocused: boolean) => (
     <View
@@ -117,13 +118,21 @@ export default function ThemedButton({
     return renderFilled(isFocused);
   };
 
+  const isActive = (isFocused: boolean, isRootActive: boolean) => {
+    if (disableRootActive) {
+      return isFocused;
+    }
+
+    return isFocused && isRootActive;
+  };
+
   return (
     <SpatialNavigationFocusableView
       onSelect={ onPress }
       onFocus={ onFocus }
     >
       { ({ isFocused, isRootActive }) => (
-        renderButton(isFocused && isRootActive)
+        renderButton(isActive(isFocused, isRootActive))
       ) }
     </SpatialNavigationFocusableView>
   );

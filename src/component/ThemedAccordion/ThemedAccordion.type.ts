@@ -1,11 +1,11 @@
-export interface AccordionGroup<T> {
+export interface AccordionGroupInterface<T> {
   id: string;
   title: string;
   items: T[];
 }
 
 export interface ThemedAccordionContainerProps<T> {
-  data: AccordionGroup<T>[];
+  data: AccordionGroupInterface<T>[];
   renderItem: (item: T, idx: number) => JSX.Element;
 }
 

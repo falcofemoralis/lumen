@@ -8,7 +8,7 @@ import { scale } from 'Util/CreateStyles';
 import { generateId } from 'Util/Math';
 
 import { styles } from './ThemedAccordion.style.atv';
-import { AccordionGroup, ThemedAccordionComponentProps } from './ThemedAccordion.type';
+import { AccordionGroupInterface, ThemedAccordionComponentProps } from './ThemedAccordion.type';
 
 export const ThemedAccordionComponent = ({
   data,
@@ -29,20 +29,20 @@ export const ThemedAccordionComponent = ({
     OverlayStore.closeOverlay(overlayId.current);
   };
 
-  const renderAccordionGroup = (group: AccordionGroup<any>) => {
+  const renderAccordionGroup = (group: AccordionGroupInterface<any>) => {
     const { id, title } = group;
 
     return (
-      <View key={ id }>
+      <View key={ `group-${id}` }>
         <SpatialNavigationFocusableView
-          style={ {
-            padding: 20,
-          } }
           onSelect={ () => openOverlay(id) }
         >
           { ({ isFocused }) => (
             <ThemedText
-              style={ isFocused && styles.groupFocused }
+              style={ [
+                styles.group,
+                isFocused && styles.groupFocused,
+              ] }
             >
               { title }
             </ThemedText>
@@ -59,13 +59,19 @@ export const ThemedAccordionComponent = ({
       <ThemedOverlay
         id={ overlayId.current }
         onHide={ closeOverlay }
+        containerStyle={ styles.overlay }
       >
         <SpatialNavigationScrollView
           offsetFromStart={ scale(32) }
         >
           <DefaultFocus>
             <View style={ styles.content }>
-              { items.map((subItem, idx) => renderItem(subItem, idx)) }
+              { items.map((subItem, idx) => (
+                // eslint-disable-next-line react/no-array-index-key
+                <View key={ `sub-item-${idx}` }>
+                  { renderItem(subItem, idx) }
+                </View>
+              )) }
             </View>
           </DefaultFocus>
         </SpatialNavigationScrollView>

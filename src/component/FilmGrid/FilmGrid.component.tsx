@@ -13,16 +13,26 @@ import { FilmGridComponentProps, FilmGridItemProps, FilmGridItemType } from './F
 
 function FilmGridItem({
   item,
+  index,
   itemSize,
   handleOnPress,
 }: FilmGridItemProps) {
+  const { gap } = styles.grid;
+
+  const halfGap = gap / 2;
+  const column = index % NUMBER_OF_COLUMNS;
+
   return (
     <Pressable
       style={ { width: itemSize } }
       onPress={ () => handleOnPress(item) }
     >
       <FilmCard
-        style={ styles.gridItem }
+        style={ {
+          paddingRight: column < NUMBER_OF_COLUMNS - 1 ? halfGap : 0,
+          paddingLeft: column > 0 ? halfGap : 0,
+          paddingBottom: gap,
+        } }
         filmCard={ item }
         isThumbnail={ item.isThumbnail }
       />

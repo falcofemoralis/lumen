@@ -3,7 +3,7 @@ import { TouchableOpacity, View } from 'react-native';
 import Expandable from 'react-native-reanimated-animated-accordion';
 
 import { styles } from './ThemedAccordion.style';
-import { AccordionGroup, ThemedAccordionComponentProps } from './ThemedAccordion.type';
+import { AccordionGroupInterface, ThemedAccordionComponentProps } from './ThemedAccordion.type';
 
 export const ThemedAccordionComponent = ({
   expanded,
@@ -11,7 +11,7 @@ export const ThemedAccordionComponent = ({
   openAccordionGroup,
   renderItem,
 }: ThemedAccordionComponentProps<any>) => {
-  const renderAccordionGroup = (group: AccordionGroup<any>) => {
+  const renderAccordionGroup = (group: AccordionGroupInterface<any>) => {
     const { id, title, items } = group;
 
     return (

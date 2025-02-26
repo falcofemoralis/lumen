@@ -1,16 +1,32 @@
-import { CommentInterface } from 'Type/Comment.interface';
+import { StyleProp, ViewStyle } from 'react-native';
+import { CommentInterface, CommentTextType } from 'Type/Comment.interface';
 import { FilmInterface } from 'Type/Film.interface';
 
 export interface CommentsContainerProps {
   film: FilmInterface;
+  style?: StyleProp<ViewStyle> | undefined;
 }
 
 export interface CommentsComponentProps {
   comments: CommentInterface[];
-  onNextLoad: (isRefresh: boolean) => Promise<void>;
+  onNextLoad: () => Promise<void>;
+  style?: StyleProp<ViewStyle> | undefined;
+  isLoading: boolean;
 }
 
 export interface CommentItemProps {
   comment: CommentInterface;
   idx: number;
+  containerWidth: number;
+  lines: CalculatedLine[];
+}
+
+export type CalculatedLine = {
+  lines: string[];
+  type: CommentTextType;
+}
+
+export type CalculatedText = {
+  height: number;
+  lines: CalculatedLine[] | null;
 }

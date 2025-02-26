@@ -1,5 +1,4 @@
 import { CommonActions } from '@react-navigation/native';
-import { useNavigation } from 'expo-router';
 import { withTV } from 'Hooks/withTV';
 import { useCallback } from 'react';
 import ConfigStore from 'Store/Config.store';

@@ -8,10 +8,11 @@ import ServiceStore from 'Store/Service.store';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
+import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 
 import FilmPageComponent from './FilmPage.component';
 import FilmPageComponentTV from './FilmPage.component.atv';
-import { PLAYER_VIDEO_SELECTOR_OVERLAY_ID } from './FilmPage.config';
+import { COMMENTS_OVERLAY_ID, MINIMUM_SCHEDULE_ITEMS, PLAYER_VIDEO_SELECTOR_OVERLAY_ID } from './FilmPage.config';
 import { FilmPageContainerProps } from './FilmPage.type';
 
 export function FilmPageContainer({ link }: FilmPageContainerProps) {
@@ -100,8 +101,47 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
     });
   }, []);
 
+  const getVisibleScheduleItems = useCallback(() => {
+    if (!film) {
+      return [];
+    }
+
+    const { schedule = [] } = film;
+
+    if (!schedule.length) {
+      return [];
+    }
+
+    const { items } = schedule[0];
+
+    const initialItems = items.reduce<ScheduleItemInterface[]>((acc, item) => {
+      if (!item.isReleased) {
+        acc.push(item);
+      } else if (acc.length < MINIMUM_SCHEDULE_ITEMS) {
+        acc.push(item);
+      }
+
+      return acc;
+    }, []);
+
+    return initialItems;
+  }, [film]);
+
+  const openCommentsOverlay = useCallback(async () => {
+    if (!film) {
+      return;
+    }
+
+    OverlayStore.openOverlay(COMMENTS_OVERLAY_ID);
+  }, [film]);
+
+  const closeCommentsOverlay = useCallback(() => {
+    OverlayStore.goToPreviousOverlay();
+  }, []);
+
   const containerProps = () => ({
     film,
+    visibleScheduleItems: getVisibleScheduleItems(),
   });
 
   const containerFunctions = {
@@ -109,6 +149,8 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
     hideVideoSelector,
     handleVideoSelect,
     handleSelectFilm,
+    openCommentsOverlay,
+    closeCommentsOverlay,
   };
 
   return withTV(FilmPageComponentTV, FilmPageComponent, {

@@ -1,19 +1,19 @@
 import { Rating } from '@kolking/react-native-rating';
-import FilmCard from 'Component/FilmCard';
+import Comments from 'Component/Comments';
 import Loader from 'Component/Loader';
 import Page from 'Component/Page';
 import PlayerVideoSelector from 'Component/PlayerVideoSelector';
 import ThemedAccordion from 'Component/ThemedAccordion';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedCard from 'Component/ThemedCard';
-import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
+import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
 import Thumbnail from 'Component/Thumbnail';
 import __ from 'i18n/__';
-import { Dimensions, TouchableOpacity, View } from 'react-native';
+import { Dimensions, View } from 'react-native';
 import {
   DefaultFocus,
   SpatialNavigationFocusableView,
@@ -21,23 +21,28 @@ import {
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
 import NotificationStore from 'Store/Notification.store';
+import OverlayStore from 'Store/Overlay.store';
 import Colors from 'Style/Colors';
-import { ActorInterface } from 'Type/Actor.interface';
-import { FilmCardInterface } from 'Type/FilmCard.interface';
-import { FranchiseItem } from 'Type/FranchiseItem.interface';
-import { InfoListInterface } from 'Type/InfoList.interface';
+import { ScheduleInterface } from 'Type/Schedule.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { scale } from 'Util/CreateStyles';
 
-import { PLAYER_VIDEO_SELECTOR_OVERLAY_ID } from './FilmPage.config';
+import { COMMENTS_OVERLAY_ID, PLAYER_VIDEO_SELECTOR_OVERLAY_ID, SCHEDULE_OVERLAY_ID } from './FilmPage.config';
 import { styles } from './FilmPage.style.atv';
 import { FilmPageComponentProps } from './FilmPage.type';
+import {
+  ActorView, FranchiseItemComponent, InfoList, RelatedItem, ScheduleItem, Section,
+} from './FilmPageElements.atv';
 
 export function FilmPageComponent({
   film,
+  visibleScheduleItems,
   playFilm,
   hideVideoSelector,
   handleVideoSelect,
+  handleSelectFilm,
+  openCommentsOverlay,
+  closeCommentsOverlay,
 }: FilmPageComponentProps) {
   const { height } = Dimensions.get('window');
 
@@ -80,6 +85,7 @@ export function FilmPageComponent({
         style={ styles.actionButton }
         textStyle={ styles.actionButtonText }
         iconStyle={ styles.actionButtonIcon }
+        disableRootActive
       >
         { text }
       </ThemedButton>
@@ -107,7 +113,7 @@ export function FilmPageComponent({
       <DefaultFocus>
         <ThemedView style={ styles.actions }>
           { renderPlayButton() }
-          { renderAction('Comments', 'comment-text-multiple-outline') }
+          { renderAction('Comments', 'comment-text-multiple-outline', openCommentsOverlay) }
           { renderAction('Bookmark', 'movie-star-outline') }
           { renderAction('Trailer', 'movie-open-check-outline') }
           { renderAction('Share', 'share-variant-outline') }
@@ -295,67 +301,8 @@ export function FilmPageComponent({
     );
   };
 
-  const renderActor = (actor: ActorInterface) => {
-    const {
-      name,
-      photo,
-      job,
-      isDirector,
-    } = actor;
-
-    return (
-      <SpatialNavigationFocusableView
-        key={ name }
-      >
-        { ({ isFocused }) => (
-          <View style={ [styles.actor, isFocused && styles.actorFocused] }>
-            <View>
-              <ThemedImage
-                style={ styles.actorPhoto }
-                src={ photo }
-              />
-              { isDirector && (
-                <View style={ styles.director }>
-                  <ThemedIcon
-                    icon={ {
-                      pack: IconPackType.MaterialIcons,
-                      name: 'stars',
-                    } }
-                    size={ scale(12) }
-                    color="yellow"
-                  />
-                  <ThemedText style={ styles.directorText }>
-                    { __('Director') }
-                  </ThemedText>
-                </View>
-              ) }
-            </View>
-            <ThemedText
-              style={ [
-                styles.actorName,
-                isFocused && styles.actorNameFocused,
-              ] }
-            >
-              { name }
-            </ThemedText>
-            { job && (
-              <ThemedText
-                style={ [
-                  styles.actorJob,
-                  isFocused && styles.actorNameFocused,
-                ] }
-              >
-                { job }
-              </ThemedText>
-            ) }
-          </View>
-        ) }
-      </SpatialNavigationFocusableView>
-    );
-  };
-
   const renderActors = () => {
-    const { directors = [], actors = [], genres = [] } = film;
+    const { directors = [], actors = [] } = film;
 
     const persons = [...directors, ...actors];
 
@@ -364,10 +311,7 @@ export function FilmPageComponent({
     }
 
     return (
-      <View style={ styles.section }>
-        <ThemedText style={ styles.sectionHeading }>
-          { __('Actors') }
-        </ThemedText>
+      <Section title={ __('Actors') }>
         <View style={ styles.actorsListWrapper }>
           <SpatialNavigationScrollView
             horizontal
@@ -376,93 +320,50 @@ export function FilmPageComponent({
               style={ styles.collection }
               direction="horizontal"
             >
-              { persons.map((item) => renderActor(item)) }
+              { persons.map((actor) => (
+                <ActorView
+                  key={ actor.name }
+                  actor={ actor }
+                />
+              )) }
             </SpatialNavigationView>
           </SpatialNavigationScrollView>
         </View>
-      </View>
+      </Section>
     );
   };
 
-  const renderScheduleItem = (item: ScheduleItemInterface, idx: number) => {
-    const {
-      name,
-      episodeName,
-      episodeNameOriginal,
-      date,
-      releaseDate,
-      isWatched,
-      isReleased,
-    } = item;
-
-    return (
-      <SpatialNavigationFocusableView
-        key={ name }
+  const renderSchedulePopup = (data: ScheduleInterface[]) => (
+    <ThemedOverlay
+      id={ SCHEDULE_OVERLAY_ID }
+      onHide={ () => OverlayStore.closeOverlay(SCHEDULE_OVERLAY_ID) }
+      containerStyle={ styles.scheduleOverlay }
+      contentContainerStyle={ styles.scheduleOverlayContent }
+    >
+      <SpatialNavigationScrollView
+        offsetFromStart={ scale(32) }
       >
-        { ({ isFocused }) => (
-          <View
-            style={ [
-              styles.scheduleItem,
-              idx % 2 === 0 && styles.scheduleItemEven,
-              isFocused && styles.scheduleItemFocused,
-            ] }
-          >
-            <View style={ styles.scheduleItemInfoWrapper }>
-              <View style={ styles.scheduleItemEpisodeWrapper }>
-                <ThemedText style={ [
-                  styles.scheduleItemText,
-                  styles.scheduleItemEpisodeName,
-                ] }
-                >
-                  { episodeName }
-                </ThemedText>
-                <ThemedText style={ [
-                  styles.scheduleItemText,
-                  styles.scheduleItemEpisodeOgName,
-                ] }
-                >
-                  { episodeNameOriginal }
-                </ThemedText>
-              </View>
-              <View style={ styles.scheduleItemNameWrapper }>
-                <ThemedText style={ styles.scheduleItemText }>
-                  { name }
-                </ThemedText>
-                <ThemedText style={ styles.scheduleItemText }>
-                  { date }
-                </ThemedText>
-              </View>
-            </View>
-            <View style={ styles.scheduleItemReleaseWrapper }>
-              { isReleased ? (
-                <TouchableOpacity
-                  onPress={ () => console.log('watch') }
-                >
-                  <ThemedIcon
-                    style={ styles.scheduleItemMarkIcon }
-                    icon={ {
-                      name: 'checkbox-marked-circle-outline',
-                      pack: IconPackType.MaterialCommunityIcons,
-                    } }
-                    size={ scale(32) }
-                    color={ isWatched ? Colors.secondary : Colors.white }
+        <DefaultFocus>
+          { data.map(({ name, items }) => (
+            <View key={ name }>
+              <ThemedText style={ styles.scheduleSeason }>
+                { name }
+              </ThemedText>
+              <View>
+                { items.map((subItem, idx) => (
+                  <ScheduleItem
+                    key={ `modal-${subItem.name}` }
+                    item={ subItem }
+                    idx={ idx }
                   />
-                </TouchableOpacity>
-              ) : (
-                <ThemedText style={ [
-                  styles.scheduleItemText,
-                  styles.scheduleItemReleaseDate,
-                ] }
-                >
-                  { releaseDate }
-                </ThemedText>
-              ) }
+                )) }
+              </View>
             </View>
-          </View>
-        ) }
-      </SpatialNavigationFocusableView>
-    );
-  };
+          )) }
+        </DefaultFocus>
+      </SpatialNavigationScrollView>
+    </ThemedOverlay>
+  );
 
   const renderSchedule = () => {
     const { schedule = [] } = film;
@@ -471,64 +372,33 @@ export function FilmPageComponent({
       return null;
     }
 
-    const data = schedule.map((item) => ({
-      id: item.name,
-      title: item.name,
-      items: item.items,
-    }));
-
     return (
-      <View style={ styles.section }>
-        <ThemedText style={ styles.sectionHeading }>
-          { __('Schedule') }
-        </ThemedText>
-        <ThemedAccordion
-          data={ data }
-          renderItem={ renderScheduleItem }
-        />
-      </View>
-    );
-  };
-
-  const renderFranchiseItem = (item: FranchiseItem, idx: number) => {
-    const { franchise = [] } = film;
-    const {
-      name,
-      year,
-      rating,
-      link,
-    } = item;
-    const position = Math.abs(idx - franchise.length);
-
-    return (
-      <SpatialNavigationFocusableView
-        key={ item.name }
-        // onPress={ () => handleSelectFilm(link) }
-      >
-        { ({ isFocused }) => (
-          <View style={ [styles.franchiseItem, isFocused && styles.franchiseItemFocused] }>
-            <ThemedText style={ styles.franchiseText }>
-              { position }
-            </ThemedText>
-            <ThemedText
-              style={ [
-                styles.franchiseText,
-                styles.franchiseName,
-                !link && styles.franchiseSelected,
-              ] }
-            >
-              { name }
-            </ThemedText>
-            <ThemedText style={ styles.franchiseText }>
-              { year }
-            </ThemedText>
-            <ThemedText style={ styles.franchiseText }>
-              { rating }
-            </ThemedText>
-          </View>
-        ) }
-
-      </SpatialNavigationFocusableView>
+      <Section title={ __('Schedule') }>
+        <View style={ styles.visibleScheduleItems }>
+          <SpatialNavigationScrollView
+            offsetFromStart={ scale(32) }
+          >
+            <DefaultFocus>
+              <View>
+                { visibleScheduleItems.map((item: ScheduleItemInterface, idx: number) => (
+                  <ScheduleItem
+                    key={ `visible-${item.name}` }
+                    item={ item }
+                    idx={ idx }
+                  />
+                )) }
+              </View>
+            </DefaultFocus>
+          </SpatialNavigationScrollView>
+        </View>
+        <ThemedButton
+          onPress={ () => OverlayStore.openOverlay(SCHEDULE_OVERLAY_ID) }
+          style={ styles.scheduleViewAll }
+        >
+          { __('View full schedule') }
+        </ThemedButton>
+        { renderSchedulePopup(schedule) }
+      </Section>
     );
   };
 
@@ -540,38 +410,19 @@ export function FilmPageComponent({
     }
 
     return (
-      <View style={ styles.section }>
-        <ThemedText style={ styles.sectionHeading }>
-          { __('Franchise') }
-        </ThemedText>
+      <Section title={ __('Franchise') }>
         <View style={ styles.franchiseList }>
-          { franchise.map((item, idx) => renderFranchiseItem(item, idx)) }
+          { franchise.map((item, idx) => (
+            <FranchiseItemComponent
+              key={ `franchise-${item.link}` }
+              film={ film }
+              item={ item }
+              idx={ idx }
+              handleSelectFilm={ handleSelectFilm }
+            />
+          )) }
         </View>
-      </View>
-    );
-  };
-
-  const renderInfoList = (list: InfoListInterface, idx: number) => {
-    const { name, position, link } = list;
-
-    return (
-      <SpatialNavigationFocusableView
-        key={ name }
-        // onPress={ () => console.log('info-list', link) }
-      >
-        { ({ isFocused }) => (
-          <View style={ [
-            styles.infoList,
-            idx % 2 === 0 && styles.infoListEven,
-            isFocused && styles.infoListFocused,
-          ] }
-          >
-            <ThemedText style={ styles.infoListName }>
-              { `${name} ${position || ''}` }
-            </ThemedText>
-          </View>
-        ) }
-      </SpatialNavigationFocusableView>
+      </Section>
     );
   };
 
@@ -601,41 +452,26 @@ export function FilmPageComponent({
     }
 
     return (
-      <View style={ styles.section }>
-        <ThemedText style={ styles.sectionHeading }>
-          { __('Included in') }
-        </ThemedText>
+      <Section title={ __('Info lists') }>
         <ThemedAccordion
           data={ data }
-          renderItem={ renderInfoList }
+          renderItem={ (subItem, idx) => (
+            <InfoList
+              key={ `info-list-${subItem.name}` }
+              list={ subItem }
+              idx={ idx }
+            />
+          ) }
         />
-      </View>
+      </Section>
     );
   };
-
-  const renderRelatedItem = (item: FilmCardInterface, idx: number) => (
-    <SpatialNavigationFocusableView
-      key={ `${film.id}-${idx}` }
-    >
-      { ({ isFocused }) => (
-        <FilmCard
-          filmCard={ item }
-          isFocused={ isFocused }
-          style={ styles.relatedListItem }
-          stylePoster={ styles.relatedListItemPoster }
-        />
-      ) }
-    </SpatialNavigationFocusableView>
-  );
 
   const renderRelated = () => {
     const { related = [] } = film;
 
     return (
-      <View style={ styles.section }>
-        <ThemedText style={ styles.sectionHeading }>
-          { __('Watch also') }
-        </ThemedText>
+      <Section title={ __('Watch also') }>
         <View style={ styles.relatedListWrapper }>
           <SpatialNavigationScrollView
             horizontal
@@ -645,15 +481,39 @@ export function FilmPageComponent({
               style={ styles.relatedList }
               direction="horizontal"
             >
-              { related.map((item, idx) => renderRelatedItem(item, idx)) }
+              { related.map((item) => (
+                <RelatedItem
+                  key={ item.link }
+                  item={ item }
+                  handleSelectFilm={ handleSelectFilm }
+                />
+              )) }
             </SpatialNavigationView>
           </SpatialNavigationScrollView>
         </View>
-      </View>
+      </Section>
     );
   };
 
-  const renderModals = () => renderPlayerVideoSelector();
+  const renderComments = () => (
+    <ThemedOverlay
+      id={ COMMENTS_OVERLAY_ID }
+      onHide={ closeCommentsOverlay }
+      containerStyle={ styles.commentsOverlay }
+    >
+      <Comments
+        style={ styles.commentsOverlayContent }
+        film={ film }
+      />
+    </ThemedOverlay>
+  );
+
+  const renderModals = () => (
+    <>
+      { renderPlayerVideoSelector() }
+      { renderComments() }
+    </>
+  );
 
   return (
     <Page testID="film-page">
@@ -663,8 +523,8 @@ export function FilmPageComponent({
           { renderActions() }
           { renderMainContent() }
           { renderActors() }
-          { renderSchedule() }
           { renderFranchise() }
+          { renderSchedule() }
           { renderInfoLists() }
           { renderRelated() }
         </View>

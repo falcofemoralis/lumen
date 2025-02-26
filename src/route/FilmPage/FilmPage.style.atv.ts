@@ -99,15 +99,18 @@ export const styles = CreateStyles({
     marginTop: 8,
     textAlign: 'justify',
   },
+  section: {
+    marginTop: 16,
+    padding: 16,
+  },
   sectionHeading: {
     fontSize: 20,
     fontWeight: '700',
   },
-  section: {
-    marginTop: 16,
+  sectionContent: {
+    marginTop: 8,
   },
   actorsListWrapper: {
-    marginTop: 8,
     flexDirection: 'row',
   },
   actorsList: {
@@ -152,18 +155,24 @@ export const styles = CreateStyles({
   directorText: {
     fontSize: 12,
   },
+  visibleScheduleItems: {
+    flexDirection: 'row',
+  },
+  scheduleItems: {
+  },
   scheduleItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
     gap: 8,
-    padding: 8,
+    padding: 16,
+    borderRadius: 16,
   },
   scheduleItemFocused: {
     backgroundColor: Colors.white,
   },
   scheduleItemEven: {
-    backgroundColor: Colors.gray,
+    backgroundColor: Colors.darkGray,
   },
   scheduleItemInfoWrapper: {
     flexDirection: 'column',
@@ -183,11 +192,12 @@ export const styles = CreateStyles({
   scheduleItemText: {
     fontSize: 14,
   },
+  scheduleItemTextFocused: {
+    color: Colors.black,
+  },
   scheduleItemEpisodeName: {
-
   },
   scheduleItemEpisodeOgName: {
-
   },
   scheduleItemReleaseDate: {
     textAlign: 'center',
@@ -196,16 +206,37 @@ export const styles = CreateStyles({
     width: 32,
     alignSelf: 'center',
   },
+  scheduleSeason: {
+    fontSize: 20,
+    padding: 8,
+    fontWeight: '700',
+    borderBottomColor: Colors.secondary,
+    borderBottomWidth: 1,
+    marginBottom: 4,
+  },
+  scheduleViewAll: {
+    marginTop: 16,
+    width: '25%',
+  },
+  scheduleOverlay: {
+    width: '50%',
+    height: '90%',
+  },
+  scheduleOverlayContent: {
+    flexDirection: 'row',
+    height: '100%',
+  },
   franchiseList: {
-    marginTop: 8,
   },
   franchiseItem: {
     flexDirection: 'row',
     gap: 12,
     paddingBlock: 12,
+    paddingInline: 8,
   },
   franchiseItemFocused: {
     backgroundColor: Colors.white,
+    borderRadius: 8,
   },
   franchiseName: {
     flex: 1,
@@ -213,28 +244,34 @@ export const styles = CreateStyles({
   franchiseText: {
     fontSize: 14,
   },
+  franchiseTextFocused: {
+    color: Colors.black,
+  },
   franchiseSelected: {
     color: Colors.secondary,
   },
   infoList: {
     padding: 8,
+    borderRadius: 8,
   },
   infoListEven: {
-    backgroundColor: Colors.gray,
+    backgroundColor: Colors.darkGray,
   },
   infoListFocused: {
     backgroundColor: Colors.white,
   },
   infoListName: {
   },
+  infoListNameFocused: {
+    color: Colors.black,
+  },
   relatedListWrapper: {
-    marginTop: 8,
     flexDirection: 'row',
   },
   relatedList: {
     flexDirection: 'row',
     gap: 16,
-    padding: 16,
+    paddingBlock: 16,
   },
   relatedListItem: {
     flex: 0,
@@ -242,5 +279,12 @@ export const styles = CreateStyles({
   },
   relatedListItemPoster: {
     height: 160,
+  },
+  commentsOverlay: {
+    width: '50%',
+    height: '100%',
+  },
+  commentsOverlayContent: {
+    height: '100%',
   },
 });

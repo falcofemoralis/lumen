@@ -1,4 +1,3 @@
-import { observer } from 'mobx-react-lite';
 import { memo } from 'react';
 import { View } from 'react-native';
 import { Portal } from 'react-native-paper';

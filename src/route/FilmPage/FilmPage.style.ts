@@ -163,16 +163,18 @@ export const styles = CreateStyles({
     fontSize: 16,
     textAlign: 'center',
   },
-  sectionHeading: {
-    fontSize: 20,
-    fontWeight: '700',
-  },
   section: {
     marginTop: 16,
     width: '100%',
   },
-  actorsList: {
+  sectionHeading: {
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  sectionContent: {
     marginTop: 8,
+  },
+  actorsList: {
     flexDirection: 'row',
     gap: 16,
   },
@@ -206,15 +208,18 @@ export const styles = CreateStyles({
   directorText: {
     fontSize: 12,
   },
+  visibleScheduleItems: {
+  },
   scheduleItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
     gap: 8,
     padding: 8,
+    borderRadius: 16,
   },
   scheduleItemEven: {
-    backgroundColor: Colors.gray,
+    backgroundColor: Colors.darkGray,
   },
   scheduleItemInfoWrapper: {
     flexDirection: 'column',
@@ -235,10 +240,8 @@ export const styles = CreateStyles({
     fontSize: 14,
   },
   scheduleItemEpisodeName: {
-
   },
   scheduleItemEpisodeOgName: {
-
   },
   scheduleItemReleaseDate: {
     textAlign: 'center',
@@ -247,8 +250,18 @@ export const styles = CreateStyles({
     width: 32,
     alignSelf: 'center',
   },
+  scheduleSeason: {
+    fontSize: 18,
+    padding: 8,
+    fontWeight: '700',
+    borderBottomColor: Colors.secondary,
+    borderBottomWidth: 1,
+  },
+  scheduleViewAll: {
+    marginTop: 16,
+    backgroundColor: Colors.gray,
+  },
   franchiseList: {
-    marginTop: 8,
   },
   franchiseItem: {
     flexDirection: 'row',
@@ -264,16 +277,20 @@ export const styles = CreateStyles({
   franchiseSelected: {
     color: Colors.secondary,
   },
+  infoListHeader: {
+    fontSize: 16,
+    paddingBottom: 8,
+  },
   infoList: {
     padding: 8,
+    borderRadius: 8,
   },
   infoListEven: {
-    backgroundColor: Colors.gray,
+    backgroundColor: Colors.darkGray,
   },
   infoListName: {
   },
   relatedList: {
-    marginTop: 8,
     flexDirection: 'row',
     gap: 16,
   },
