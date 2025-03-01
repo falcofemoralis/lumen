@@ -69,4 +69,11 @@ export const styles = CreateStyles({
   focusedAction: {
     backgroundColor: Colors.whiteTransparent,
   },
+  commentsOverlay: {
+    width: '50%',
+    height: '100%',
+  },
+  commentsOverlayContent: {
+    height: '100%',
+  },
 });

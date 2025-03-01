@@ -14,6 +14,4 @@ export interface FilmPageComponentProps {
   hideVideoSelector: () => void;
   handleVideoSelect: (video: FilmVideoInterface, voice: FilmVoiceInterface) => void;
   handleSelectFilm: (filmLink: string) => void;
-  openCommentsOverlay: () => void;
-  closeCommentsOverlay: () => void;
 }

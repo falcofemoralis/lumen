@@ -3,6 +3,17 @@ import { NavigationHelpers, ParamListBase, TabNavigationState } from '@react-nav
 import { IconInterface } from 'Component/ThemedIcon/ThemedIcon.type';
 import { RelativePathString } from 'expo-router';
 
+export enum TAB_POSITION {
+  TOP = 'TOP',
+  MIDDLE = 'MIDDLE',
+  BOTTOM = 'BOTTOM',
+}
+
+export enum TAB_COMPONENT {
+  DEFAULT = 'DEFAULT',
+  ACCOUNT = 'ACCOUNT',
+}
+
 export interface NavigationBarComponentProps {
   navigateTo: (tab: Tab<string>, navigation: NavigationType, state: StateType) => void;
   isFocused: (tab: Tab<string>, state: StateType) => boolean;
@@ -16,6 +27,8 @@ export interface Tab<T> {
   options?: {
     href?: RelativePathString | null;
   };
+  position?: TAB_POSITION;
+  tabComponent?: TAB_COMPONENT;
 }
 
 export type NavigationType = NavigationHelpers<ParamListBase, BottomTabNavigationEventMap>;

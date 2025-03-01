@@ -101,8 +101,8 @@ export interface AuthApiInterface {
 
 export interface AccountApiInterface {
   getBookmarks(): Promise<BookmarkInterface[]>;
-  addBookmark(filmId: string): Promise<void>;
-  removeBookmark(filmId: string): Promise<void>;
+  addBookmark(filmId: string, bookmarkId: string): Promise<void>;
+  removeBookmark(filmId: string, bookmarkId: string): Promise<void>;
   getRecent(page: number, params?: ApiParams): Promise<RecentListInterface>;
   removeRecent(filmId: string): Promise<boolean>;
   unloadRecentPage(): void;

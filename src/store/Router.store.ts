@@ -1,26 +1,26 @@
 import { makeAutoObservable } from 'mobx';
 
-class RouterStore {
-  private transitionData: any = {};
+const transitionData: any = {};
 
+class RouterStore {
   constructor() {
     makeAutoObservable(this);
   }
 
   popData(key: string) {
-    if (!this.transitionData[key]) {
+    if (!transitionData[key]) {
       return null;
     }
 
-    const data = this.transitionData[key];
+    const data = transitionData[key];
 
-    delete this.transitionData[key];
+    delete transitionData[key];
 
     return data;
   }
 
   pushData(key: string, data: any) {
-    this.transitionData[key] = data;
+    transitionData[key] = data;
   }
 }
 

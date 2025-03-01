@@ -1,3 +1,5 @@
+import BookmarksSelector from 'Component/BookmarksSelector';
+import Comments from 'Component/Comments';
 import Loader from 'Component/Loader';
 import PlayerDuration from 'Component/PlayerDuration';
 import PlayerProgressBar from 'Component/PlayerProgressBar';
@@ -6,6 +8,7 @@ import PlayerVideoSelector from 'Component/PlayerVideoSelector';
 import ThemedDropdown from 'Component/ThemedDropdown';
 import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
+import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -35,6 +38,8 @@ import { SupportedKeys } from 'Util/RemoteControl/SupportedKeys';
 
 import {
   FocusedElement,
+  IN_PLAYER_BOOKMARKS_OVERLAY_ID,
+  IN_PLAYER_COMMENTS_OVERLAY_ID,
   IN_PLAYER_VIDEO_SELECTOR_OVERLAY_ID,
   PLAYER_CONTROLS_ANIMATION,
   PLAYER_CONTROLS_TIMEOUT,
@@ -318,7 +323,7 @@ export function PlayerComponent({
         </>
       ) }
       { renderTopAction('speed', 'Speed') }
-      { renderTopAction('comment', 'Comments') }
+      { renderTopAction('comment', 'Comments', () => OverlayStore.openOverlay(IN_PLAYER_COMMENTS_OVERLAY_ID)) }
     </SpatialNavigationView>
   );
 
@@ -385,7 +390,7 @@ export function PlayerComponent({
           { renderBottomAction('high-quality', 'Quality', openQualitySelector, bottomActionRef) }
           { isPlaylistSelector && renderBottomAction('playlist-play', 'Series', openVideoSelector) }
           { subtitles.length > 0 && renderBottomAction('subtitles', 'Subtitles', openSubtitleSelector) }
-          { renderBottomAction('bookmarks', 'Bookmarks') }
+          { renderBottomAction('bookmarks', 'Bookmarks', () => OverlayStore.openOverlay(IN_PLAYER_BOOKMARKS_OVERLAY_ID)) }
           { renderBottomAction('share', 'Share') }
         </SpatialNavigationView>
         { renderDuration() }
@@ -476,11 +481,33 @@ export function PlayerComponent({
     );
   };
 
+  const renderCommentsOverlay = () => (
+    <ThemedOverlay
+      id={ IN_PLAYER_COMMENTS_OVERLAY_ID }
+      onHide={ () => OverlayStore.goToPreviousOverlay() }
+      containerStyle={ styles.commentsOverlay }
+    >
+      <Comments
+        style={ styles.commentsOverlayContent }
+        film={ film }
+      />
+    </ThemedOverlay>
+  );
+
+  const renderBookmarksOverlay = () => (
+    <BookmarksSelector
+      overlayId={ IN_PLAYER_BOOKMARKS_OVERLAY_ID }
+      film={ film }
+    />
+  );
+
   const renderModals = () => (
     <>
       { renderQualitySelector() }
       { renderPlayerVideoSelector() }
       { renderSubtitlesSelector() }
+      { renderCommentsOverlay() }
+      { renderBookmarksOverlay() }
     </>
   );
 

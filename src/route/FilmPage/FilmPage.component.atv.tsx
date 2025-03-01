@@ -1,4 +1,5 @@
 import { Rating } from '@kolking/react-native-rating';
+import BookmarksSelector from 'Component/BookmarksSelector';
 import Comments from 'Component/Comments';
 import Loader from 'Component/Loader';
 import Page from 'Component/Page';
@@ -23,11 +24,15 @@ import {
 import NotificationStore from 'Store/Notification.store';
 import OverlayStore from 'Store/Overlay.store';
 import Colors from 'Style/Colors';
-import { ScheduleInterface } from 'Type/Schedule.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { scale } from 'Util/CreateStyles';
 
-import { COMMENTS_OVERLAY_ID, PLAYER_VIDEO_SELECTOR_OVERLAY_ID, SCHEDULE_OVERLAY_ID } from './FilmPage.config';
+import {
+  BOOKMARKS_OVERLAY_ID,
+  COMMENTS_OVERLAY_ID,
+  PLAYER_VIDEO_SELECTOR_OVERLAY_ID,
+  SCHEDULE_OVERLAY_ID,
+} from './FilmPage.config';
 import { styles } from './FilmPage.style.atv';
 import { FilmPageComponentProps } from './FilmPage.type';
 import {
@@ -41,8 +46,6 @@ export function FilmPageComponent({
   hideVideoSelector,
   handleVideoSelect,
   handleSelectFilm,
-  openCommentsOverlay,
-  closeCommentsOverlay,
 }: FilmPageComponentProps) {
   const { height } = Dimensions.get('window');
 
@@ -113,8 +116,8 @@ export function FilmPageComponent({
       <DefaultFocus>
         <ThemedView style={ styles.actions }>
           { renderPlayButton() }
-          { renderAction('Comments', 'comment-text-multiple-outline', openCommentsOverlay) }
-          { renderAction('Bookmark', 'movie-star-outline') }
+          { renderAction('Comments', 'comment-text-multiple-outline', () => OverlayStore.openOverlay(COMMENTS_OVERLAY_ID)) }
+          { renderAction('Bookmark', 'movie-star-outline', () => OverlayStore.openOverlay(BOOKMARKS_OVERLAY_ID)) }
           { renderAction('Trailer', 'movie-open-check-outline') }
           { renderAction('Share', 'share-variant-outline') }
           { renderAction('Download', 'folder-download-outline') }
@@ -333,37 +336,41 @@ export function FilmPageComponent({
     );
   };
 
-  const renderSchedulePopup = (data: ScheduleInterface[]) => (
-    <ThemedOverlay
-      id={ SCHEDULE_OVERLAY_ID }
-      onHide={ () => OverlayStore.closeOverlay(SCHEDULE_OVERLAY_ID) }
-      containerStyle={ styles.scheduleOverlay }
-      contentContainerStyle={ styles.scheduleOverlayContent }
-    >
-      <SpatialNavigationScrollView
-        offsetFromStart={ scale(32) }
+  const renderScheduleOverlay = () => {
+    const { schedule = [] } = film;
+
+    return (
+      <ThemedOverlay
+        id={ SCHEDULE_OVERLAY_ID }
+        onHide={ () => OverlayStore.closeOverlay(SCHEDULE_OVERLAY_ID) }
+        containerStyle={ styles.scheduleOverlay }
+        contentContainerStyle={ styles.scheduleOverlayContent }
       >
-        <DefaultFocus>
-          { data.map(({ name, items }) => (
-            <View key={ name }>
-              <ThemedText style={ styles.scheduleSeason }>
-                { name }
-              </ThemedText>
-              <View>
-                { items.map((subItem, idx) => (
-                  <ScheduleItem
-                    key={ `modal-${subItem.name}` }
-                    item={ subItem }
-                    idx={ idx }
-                  />
-                )) }
+        <SpatialNavigationScrollView
+          offsetFromStart={ scale(32) }
+        >
+          <DefaultFocus>
+            { schedule.map(({ name, items }) => (
+              <View key={ name }>
+                <ThemedText style={ styles.scheduleSeason }>
+                  { name }
+                </ThemedText>
+                <View>
+                  { items.map((subItem, idx) => (
+                    <ScheduleItem
+                      key={ `modal-${subItem.name}` }
+                      item={ subItem }
+                      idx={ idx }
+                    />
+                  )) }
+                </View>
               </View>
-            </View>
-          )) }
-        </DefaultFocus>
-      </SpatialNavigationScrollView>
-    </ThemedOverlay>
-  );
+            )) }
+          </DefaultFocus>
+        </SpatialNavigationScrollView>
+      </ThemedOverlay>
+    );
+  };
 
   const renderSchedule = () => {
     const { schedule = [] } = film;
@@ -397,7 +404,6 @@ export function FilmPageComponent({
         >
           { __('View full schedule') }
         </ThemedButton>
-        { renderSchedulePopup(schedule) }
       </Section>
     );
   };
@@ -495,10 +501,10 @@ export function FilmPageComponent({
     );
   };
 
-  const renderComments = () => (
+  const renderCommentsOverlay = () => (
     <ThemedOverlay
       id={ COMMENTS_OVERLAY_ID }
-      onHide={ closeCommentsOverlay }
+      onHide={ () => OverlayStore.goToPreviousOverlay() }
       containerStyle={ styles.commentsOverlay }
     >
       <Comments
@@ -508,10 +514,19 @@ export function FilmPageComponent({
     </ThemedOverlay>
   );
 
+  const renderBookmarksOverlay = () => (
+    <BookmarksSelector
+      overlayId={ BOOKMARKS_OVERLAY_ID }
+      film={ film }
+    />
+  );
+
   const renderModals = () => (
     <>
       { renderPlayerVideoSelector() }
-      { renderComments() }
+      { renderScheduleOverlay() }
+      { renderBookmarksOverlay() }
+      { renderCommentsOverlay() }
     </>
   );
 

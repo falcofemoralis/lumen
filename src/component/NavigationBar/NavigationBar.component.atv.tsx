@@ -28,6 +28,7 @@ import {
   NavigationType,
   StateType,
   Tab,
+  TAB_POSITION,
 } from './NavigationBar.type';
 
 export function NavigationBarComponent({
@@ -129,11 +130,42 @@ export function NavigationBarComponent({
     );
   }, [onTabSelect, isFocused, isMenuOpen]);
 
-  const renderTabs = useCallback((navigation: NavigationType, state: StateType) => (
-    <Animated.View style={ [styles.tabs, { width: animatedWidth }] }>
-      { TABS_TV_CONFIG.map((tab) => renderTab(tab, navigation, state)) }
-    </Animated.View>
-  ), [renderTab, animatedWidth]);
+  const renderTabs = useCallback((navigation: NavigationType, state: StateType) => {
+    const topTabs = [] as Tab<string>[];
+    const middleTabs = [] as Tab<string>[];
+    const bottomTabs = [] as Tab<string>[];
+
+    TABS_TV_CONFIG.forEach((tab) => {
+      switch (tab.position) {
+        case TAB_POSITION.TOP:
+          topTabs.push(tab);
+          break;
+        case TAB_POSITION.MIDDLE:
+          middleTabs.push(tab);
+          break;
+        case TAB_POSITION.BOTTOM:
+          bottomTabs.push(tab);
+          break;
+        default:
+          middleTabs.push(tab);
+          break;
+      }
+    });
+
+    return (
+      <Animated.View style={ [styles.tabs, { width: animatedWidth }] }>
+        <View>
+          { topTabs.map((tab) => renderTab(tab, navigation, state)) }
+        </View>
+        <View>
+          { middleTabs.map((tab) => renderTab(tab, navigation, state)) }
+        </View>
+        <View>
+          { bottomTabs.map((tab) => renderTab(tab, navigation, state)) }
+        </View>
+      </Animated.View>
+    );
+  }, [renderTab, animatedWidth]);
 
   const renderTabBar = useCallback(({ navigation, state }: BottomTabBarProps) => (
     <SpatialNavigationRoot
@@ -158,8 +190,6 @@ export function NavigationBarComponent({
       </ThemedView>
     </SpatialNavigationRoot>
   ), [renderTabs, onDirectionHandledWithoutMovement, isMenuOpen]);
-
-  // styles.tabs.width * -1
 
   return (
     <Tabs

@@ -47,16 +47,24 @@ const accountApi: RezkaAccountApiInterface = {
    * Add a bookmark
    * @param filmId string
    */
-  async addBookmark(filmId: string) {
-    // Implementation for adding a bookmark
+  async addBookmark(filmId: string, bookmarkId: string) {
+    const res = await configApi.fetchJson<JSONResult>('/ajax/favorites', {
+      post_id: filmId,
+      cat_id: bookmarkId,
+      action: 'add_post',
+    });
+
+    if (!res?.success) {
+      throw new Error(res?.message);
+    }
   },
 
   /**
   * Remove a bookmark
   * @param filmId string
   */
-  async removeBookmark(filmId: string) {
-    // Implementation for removing a bookmark
+  async removeBookmark(filmId: string, bookmarkId: string) {
+    this.addBookmark(filmId, bookmarkId);
   },
 
   /**

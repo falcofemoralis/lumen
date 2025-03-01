@@ -1,23 +1,33 @@
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 
-import { Tab } from './NavigationBar.type';
+import { Tab, TAB_COMPONENT, TAB_POSITION } from './NavigationBar.type';
 
 export const TABS_OPENING_DURATION_TV = 250;
 
 export const TABS_TV_CONFIG: Tab<string>[] = [
   {
-    route: '(home)',
-    title: 'Home',
+    route: 'account',
+    title: 'Account',
     icon: {
       name: 'home-variant-outline',
       pack: IconPackType.MaterialCommunityIcons,
     },
+    position: TAB_POSITION.TOP,
+    tabComponent: TAB_COMPONENT.ACCOUNT,
   },
   {
-    route: '(bookmarks)',
-    title: 'Bookmarks',
+    route: 'notifications',
+    title: 'Notifications',
     icon: {
-      name: 'movie-star-outline',
+      name: 'bell-outline',
+      pack: IconPackType.MaterialCommunityIcons,
+    },
+  },
+  {
+    route: '(home)',
+    title: 'Home',
+    icon: {
+      name: 'home-variant-outline',
       pack: IconPackType.MaterialCommunityIcons,
     },
   },
@@ -38,10 +48,10 @@ export const TABS_TV_CONFIG: Tab<string>[] = [
     },
   },
   {
-    route: 'notifications',
-    title: 'Notifications',
+    route: '(bookmarks)',
+    title: 'Bookmarks',
     icon: {
-      name: 'bell-outline',
+      name: 'movie-star-outline',
       pack: IconPackType.MaterialCommunityIcons,
     },
   },
@@ -52,6 +62,7 @@ export const TABS_TV_CONFIG: Tab<string>[] = [
       name: 'settings',
       pack: IconPackType.MaterialIcons,
     },
+    position: TAB_POSITION.BOTTOM,
   },
 ];
 

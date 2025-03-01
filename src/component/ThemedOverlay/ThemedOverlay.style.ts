@@ -13,6 +13,7 @@ export const styles = CreateStyles({
     borderColor: Colors.lightGravel,
     borderWidth: 1,
     maxHeight: '50%',
+    overflow: 'hidden',
   },
   contentContainerStyleLandscape: {
     position: 'absolute',

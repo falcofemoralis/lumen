@@ -4,4 +4,5 @@ export interface BookmarkInterface {
   id: string;
   title: string;
   filmList?: FilmListInterface;
+  isBookmarked?: boolean;
 }

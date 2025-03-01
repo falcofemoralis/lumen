@@ -51,8 +51,10 @@ export const DEFAULT_AUTO_REWIND_PARAMS: AutoRewindParams = {
 export const LONG_PRESS_DURATION = 500;
 
 export const QUALITY_OVERLAY_ID = 'qualityOverlayId';
-export const IN_PLAYER_VIDEO_SELECTOR_OVERLAY_ID = 'IN_PLAYER_VIDEO_SELECTOR_OVERLAY_ID';
 export const SUBTITLE_OVERLAY_ID = 'subtitleOverlayId';
+export const IN_PLAYER_VIDEO_SELECTOR_OVERLAY_ID = 'IN_PLAYER_VIDEO_SELECTOR_OVERLAY_ID';
+export const IN_PLAYER_BOOKMARKS_OVERLAY_ID = 'IN_PLAYER_BOOKMARKS_OVERLAY_ID';
+export const IN_PLAYER_COMMENTS_OVERLAY_ID = 'IN_PLAYER_COMMENTS_OVERLAY_ID';
 
 // 1 minutes * 60 seconds/minute * 1000 milliseconds/second
 export const SAVE_TIME_EVERY_MS = 60000;

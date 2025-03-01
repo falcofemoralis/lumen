@@ -35,8 +35,9 @@ export const styles = CreateStyles({
   },
   tabs: {
     width: NAVIGATION_BAR_TV_TAB_WIDTH,
+    height: '100%',
+    justifyContent: 'space-between',
     overflow: 'hidden',
-    backgroundColor: 'transparent',
     zIndex: NAVIGATION_BAR_Z_INDEX + 2,
   },
   tabsOpened: {

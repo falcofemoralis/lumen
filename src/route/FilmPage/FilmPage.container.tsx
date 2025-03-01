@@ -12,7 +12,10 @@ import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 
 import FilmPageComponent from './FilmPage.component';
 import FilmPageComponentTV from './FilmPage.component.atv';
-import { COMMENTS_OVERLAY_ID, MINIMUM_SCHEDULE_ITEMS, PLAYER_VIDEO_SELECTOR_OVERLAY_ID } from './FilmPage.config';
+import {
+  MINIMUM_SCHEDULE_ITEMS,
+  PLAYER_VIDEO_SELECTOR_OVERLAY_ID,
+} from './FilmPage.config';
 import { FilmPageContainerProps } from './FilmPage.type';
 
 export function FilmPageContainer({ link }: FilmPageContainerProps) {
@@ -127,18 +130,6 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
     return initialItems;
   }, [film]);
 
-  const openCommentsOverlay = useCallback(async () => {
-    if (!film) {
-      return;
-    }
-
-    OverlayStore.openOverlay(COMMENTS_OVERLAY_ID);
-  }, [film]);
-
-  const closeCommentsOverlay = useCallback(() => {
-    OverlayStore.goToPreviousOverlay();
-  }, []);
-
   const containerProps = () => ({
     film,
     visibleScheduleItems: getVisibleScheduleItems(),
@@ -149,8 +140,6 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
     hideVideoSelector,
     handleVideoSelect,
     handleSelectFilm,
-    openCommentsOverlay,
-    closeCommentsOverlay,
   };
 
   return withTV(FilmPageComponentTV, FilmPageComponent, {

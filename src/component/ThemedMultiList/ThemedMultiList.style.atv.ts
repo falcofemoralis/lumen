@@ -57,7 +57,6 @@ export const styles = CreateStyles({
     padding: 10,
     marginBlock: 5,
     borderRadius: 12,
-    minWidth: 200,
   },
   itemFocused: {
     backgroundColor: Colors.white,

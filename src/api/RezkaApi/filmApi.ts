@@ -338,6 +338,14 @@ const filmApi: FilmApiInterface = {
       (el) => parseFilmCard(el),
     );
 
+    film.bookmarks = root.querySelectorAll('.hd-label-row').map(
+      (el) => ({
+        id: el.querySelector('input')?.attributes.value ?? '',
+        title: el.querySelector('label')?.rawText ?? '',
+        isBookmarked: el.querySelector('input')?.attributes.checked === 'checked',
+      }),
+    );
+
     return film;
   },
 

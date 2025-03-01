@@ -85,6 +85,13 @@ export const styles = CreateStyles({
     fontWeight: '700',
   },
   subtitle: {},
+  commentsOverlay: {
+    width: '50%',
+    height: '100%',
+  },
+  commentsOverlayContent: {
+    height: '100%',
+  },
 });
 
 export type MiddleActionVariant = 'big' | 'small';

@@ -1,4 +1,5 @@
 import { ActorInterface } from './Actor.interface';
+import { BookmarkInterface } from './Bookmark.interface';
 import { FilmCardInterface } from './FilmCard.interface';
 import { FilmType } from './FilmType.type';
 import { FilmVoiceInterface } from './FilmVoice.interface';
@@ -36,7 +37,7 @@ export interface FilmInterface {
   schedule?: ScheduleInterface[];
   franchise?: FranchiseItem[];
   related?: FilmCardInterface[];
-  bookmarks?: string[];
+  bookmarks?: BookmarkInterface[];
   includedIn?: InfoListInterface[];
   fromCollections?: InfoListInterface[];
 

@@ -1,7 +1,7 @@
 import PlayerStore from 'Component/Player/Player.store';
 import { withTV } from 'Hooks/withTV';
 import { observer } from 'mobx-react-lite';
-import { memo, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
 import OverlayStore from 'Store/Overlay.store';
 import ServiceStore from 'Store/Service.store';
