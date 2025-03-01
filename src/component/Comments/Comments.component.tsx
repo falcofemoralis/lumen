@@ -1,8 +1,8 @@
+import ThemedGrid from 'Component/ThemedGrid';
+import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
 import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
-import ThemedList from 'Component/ThemedList';
-import { ThemedListRowProps } from 'Component/ThemedList/ThemedList.type';
 import ThemedText from 'Component/ThemedText';
 import { memo, useCallback } from 'react';
 import { View } from 'react-native';
@@ -92,7 +92,7 @@ export const CommentsComponent = ({
   const itemWidth = calculateItemSize(1);
 
   const renderItem = useCallback(
-    ({ item, index }: ThemedListRowProps<CommentInterface>) => (
+    ({ item, index }: ThemedGridRowProps<CommentInterface>) => (
       <MemoCommentItem
         comment={ item }
         idx={ index }
@@ -102,7 +102,7 @@ export const CommentsComponent = ({
   );
 
   return (
-    <ThemedList
+    <ThemedGrid
       style={ styles.commentsList }
       data={ comments }
       numberOfColumns={ 1 }

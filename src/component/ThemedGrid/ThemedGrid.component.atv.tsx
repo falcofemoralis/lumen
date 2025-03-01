@@ -1,10 +1,10 @@
 import { useMemo } from 'react';
 import { SpatialNavigationVirtualizedGrid } from 'react-tv-space-navigation';
 
-import { SCROLL_EVENT_UPDATES_MS_TV } from './ThemedList.config';
-import { ThemedListComponentProps } from './ThemedList.type';
+import { SCROLL_EVENT_UPDATES_MS_TV } from './ThemedGrid.config';
+import { ThemedGridComponentProps } from './ThemedGrid.type';
 
-export const ThemedListComponent = ({
+export const ThemedGridComponent = ({
   data,
   itemSize,
   numberOfColumns,
@@ -12,7 +12,7 @@ export const ThemedListComponent = ({
   rowStyle,
   renderItem,
   handleScrollEnd,
-}: ThemedListComponentProps) => {
+}: ThemedGridComponentProps) => {
   const memoData = useMemo(() => data.map((element, index) => ({ ...element, index })), [data]);
 
   return (
@@ -32,4 +32,4 @@ export const ThemedListComponent = ({
   );
 };
 
-export default ThemedListComponent;
+export default ThemedGridComponent;

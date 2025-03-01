@@ -1,9 +1,9 @@
 import Page from 'Component/Page';
+import ThemedGrid from 'Component/ThemedGrid';
+import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
 import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
-import ThemedList from 'Component/ThemedList';
-import { ThemedListRowProps } from 'Component/ThemedList/ThemedList.type';
 import ThemedText from 'Component/ThemedText';
 import Thumbnail from 'Component/Thumbnail';
 import React, { memo, useCallback } from 'react';
@@ -124,7 +124,7 @@ export function RecentPageComponent({
   const itemWidth = calculateItemSize(NUMBER_OF_COLUMNS);
 
   const renderItem = useCallback(
-    ({ item, index }: ThemedListRowProps<RecentItemInterface>) => (
+    ({ item, index }: ThemedGridRowProps<RecentItemInterface>) => (
       <MemoizedRecentItem
         item={ item }
         handleOnPress={ handleOnPress }
@@ -145,7 +145,7 @@ export function RecentPageComponent({
     }
 
     return (
-      <ThemedList
+      <ThemedGrid
         data={ items }
         numberOfColumns={ NUMBER_OF_COLUMNS }
         itemSize={ itemWidth }

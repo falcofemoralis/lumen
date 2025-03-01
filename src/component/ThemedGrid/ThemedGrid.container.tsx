@@ -5,11 +5,11 @@ import {
 } from 'react';
 import { noopFn } from 'Util/Function';
 
-import ThemedListComponent from './ThemedList.component';
-import ThemedListComponentTV from './ThemedList.component.atv';
-import { ThemedListContainerProps } from './ThemedList.type';
+import ThemedGridComponent from './ThemedGrid.component';
+import ThemedGridComponentTV from './ThemedGrid.component.atv';
+import { ThemedGridContainerProps } from './ThemedGrid.type';
 
-export function ThemedListContainer({
+export function ThemedGridContainer({
   data,
   numberOfColumns,
   itemSize,
@@ -17,7 +17,7 @@ export function ThemedListContainer({
   rowStyle,
   renderItem,
   onNextLoad,
-}: ThemedListContainerProps) {
+}: ThemedGridContainerProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const updatingStateRef = useRef(false);
 
@@ -66,14 +66,14 @@ export function ThemedListContainer({
     renderItem,
   });
 
-  return withTV(ThemedListComponentTV, ThemedListComponent, {
+  return withTV(ThemedGridComponentTV, ThemedGridComponent, {
     ...containerFunctions,
     ...containerProps(),
   });
 }
 
-function propsAreEqual(prevProps: ThemedListContainerProps, props: ThemedListContainerProps) {
+function propsAreEqual(prevProps: ThemedGridContainerProps, props: ThemedGridContainerProps) {
   return JSON.stringify(prevProps.data) === JSON.stringify(props.data);
 }
 
-export default memo(ThemedListContainer, propsAreEqual);
+export default memo(ThemedGridContainer, propsAreEqual);

@@ -8,10 +8,10 @@ import {
 import { noopFn } from 'Util/Function';
 import { isCloseToBottom } from 'Util/Scroll';
 
-import { SCROLL_EVENT_END_PADDING, SCROLL_EVENT_UPDATES_MS } from './ThemedList.config';
-import { ThemedListComponentProps } from './ThemedList.type';
+import { SCROLL_EVENT_END_PADDING, SCROLL_EVENT_UPDATES_MS } from './ThemedGrid.config';
+import { ThemedGridComponentProps } from './ThemedGrid.type';
 
-export const ThemedListComponent = ({
+export const ThemedGridComponent = ({
   data,
   numberOfColumns,
   itemSize,
@@ -19,7 +19,7 @@ export const ThemedListComponent = ({
   renderItem,
   handleScrollEnd,
   handleRefresh = noopFn,
-}: ThemedListComponentProps) => {
+}: ThemedGridComponentProps) => {
   const onScroll = useCallback(
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
       if (isCloseToBottom(event, SCROLL_EVENT_END_PADDING)) {
@@ -50,4 +50,4 @@ export const ThemedListComponent = ({
   );
 };
 
-export default ThemedListComponent;
+export default ThemedGridComponent;

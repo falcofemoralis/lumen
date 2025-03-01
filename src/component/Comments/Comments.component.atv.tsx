@@ -1,8 +1,8 @@
 import Loader from 'Component/Loader';
+import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
 import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
-import { ThemedListRowProps } from 'Component/ThemedList/ThemedList.type';
 import ThemedText from 'Component/ThemedText';
 import {
   memo,
@@ -226,7 +226,7 @@ export const CommentsComponent = ({
     item: CommentInterface,
   ) => commentCalculatedHeights[item.id].lines ?? [], [commentCalculatedHeights]);
 
-  const renderItem = useCallback(({ item, index }: ThemedListRowProps<CommentInterface>) => (
+  const renderItem = useCallback(({ item, index }: ThemedGridRowProps<CommentInterface>) => (
     <MemoCommentItem
       comment={ item }
       idx={ index }

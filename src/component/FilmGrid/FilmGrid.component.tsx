@@ -1,6 +1,6 @@
 import FilmCard from 'Component/FilmCard';
-import ThemedList from 'Component/ThemedList';
-import { ThemedListRowProps } from 'Component/ThemedList/ThemedList.type';
+import ThemedGrid from 'Component/ThemedGrid';
+import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
 import React, { memo, useCallback } from 'react';
 import {
   Pressable,
@@ -54,7 +54,7 @@ export function FilmGridComponent({
   const itemWidth = calculateItemSize(NUMBER_OF_COLUMNS);
 
   const renderItem = useCallback(
-    ({ item, index }: ThemedListRowProps<FilmGridItemType>) => (
+    ({ item, index }: ThemedGridRowProps<FilmGridItemType>) => (
       <MemoizedGridItem
         index={ index }
         item={ item }
@@ -66,7 +66,7 @@ export function FilmGridComponent({
   );
 
   return (
-    <ThemedList
+    <ThemedGrid
       data={ films }
       numberOfColumns={ NUMBER_OF_COLUMNS }
       itemSize={ itemWidth }

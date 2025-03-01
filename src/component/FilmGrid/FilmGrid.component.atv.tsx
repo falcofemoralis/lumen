@@ -1,7 +1,7 @@
 import FilmCard from 'Component/FilmCard';
 import { CARD_HEIGHT_TV } from 'Component/FilmCard/FilmCard.style.atv';
-import ThemedList from 'Component/ThemedList';
-import { ThemedListRowProps } from 'Component/ThemedList/ThemedList.type';
+import ThemedGrid from 'Component/ThemedGrid';
+import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
 import React, { useCallback, useMemo } from 'react';
 import {
   SpatialNavigationFocusableView,
@@ -21,7 +21,7 @@ export function FilmGridComponent({
   handleOnPress,
   handleItemFocus,
 }: FilmGridComponentProps) {
-  const renderItem = useCallback(({ item, index }: ThemedListRowProps<FilmGridItemType>) => {
+  const renderItem = useCallback(({ item, index }: ThemedGridRowProps<FilmGridItemType>) => {
     const { isThumbnail } = item;
 
     return (
@@ -46,7 +46,7 @@ export function FilmGridComponent({
   const filmsData = useMemo(() => films.map((element, index) => ({ ...element, index })), [films]);
 
   return (
-    <ThemedList
+    <ThemedGrid
       style={ styles.grid }
       rowStyle={ styles.rowStyle }
       data={ filmsData }

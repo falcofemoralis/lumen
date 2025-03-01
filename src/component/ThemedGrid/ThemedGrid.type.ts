@@ -1,21 +1,21 @@
 import { ViewStyle } from 'react-native';
 
-export interface ThemedListRowProps<T = any> {
+export interface ThemedGridRowProps<T = any> {
   item: T,
   index: number;
 }
 
-export interface ThemedListContainerProps<T = any> {
+export interface ThemedGridContainerProps<T = any> {
   data: T[];
   numberOfColumns: number;
   itemSize: number;
   style?: ViewStyle;
   rowStyle?: ViewStyle;
-  renderItem: (args: ThemedListRowProps<T>) => JSX.Element;
+  renderItem: (args: ThemedGridRowProps<T>) => JSX.Element;
   onNextLoad?: (isRefresh: boolean) => Promise<void>;
 }
 
-export interface ThemedListComponentProps<T = any> {
+export interface ThemedGridComponentProps<T = any> {
   data: T[];
   numberOfColumns: number;
   itemSize: number;

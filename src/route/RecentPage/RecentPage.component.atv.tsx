@@ -1,9 +1,9 @@
 import Page from 'Component/Page';
 import ThemedButton from 'Component/ThemedButton';
+import ThemedGrid from 'Component/ThemedGrid';
+import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
-import ThemedList from 'Component/ThemedList';
-import { ThemedListRowProps } from 'Component/ThemedList/ThemedList.type';
 import ThemedText from 'Component/ThemedText';
 import Thumbnail from 'Component/Thumbnail';
 import React, { useCallback } from 'react';
@@ -41,7 +41,7 @@ export function RecentPageComponent({
     return rowsItems;
   };
 
-  const renderItem = useCallback(({ item }: ThemedListRowProps<RecentGridItem>) => {
+  const renderItem = useCallback(({ item }: ThemedGridRowProps<RecentGridItem>) => {
     const {
       image,
       name,
@@ -156,7 +156,7 @@ export function RecentPageComponent({
 
     return (
       <DefaultFocus>
-        <ThemedList
+        <ThemedGrid
           style={ styles.grid }
           rowStyle={ styles.rowStyle }
           data={ prepareItems() }
