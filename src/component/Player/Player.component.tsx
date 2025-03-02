@@ -20,7 +20,7 @@ import { observer } from 'mobx-react-lite';
 import React, {
   useEffect, useRef, useState,
 } from 'react';
-import { Dimensions, View } from 'react-native';
+import { Dimensions, ScrollView, View } from 'react-native';
 import {
   Gesture,
   GestureDetector,
@@ -444,10 +444,15 @@ export function PlayerComponent({
       onHide={ () => OverlayStore.goToPreviousOverlay() }
       containerStyle={ styles.commentsOverlay }
     >
-      <Comments
-        style={ styles.commentsOverlayContent }
-        film={ film }
-      />
+      <ScrollView
+        horizontal
+        contentContainerStyle={ { width: '100%', height: '100%' } }
+      >
+        <Comments
+          style={ styles.commentsOverlayContent }
+          film={ film }
+        />
+      </ScrollView>
     </ThemedOverlay>
   );
 
