@@ -3,10 +3,12 @@ import Page from 'Component/Page';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedText from 'Component/ThemedText';
 import { Redirect } from 'expo-router';
+import __ from 'i18n/__';
+import i18n, { changeLanguage } from 'i18n/i18n';
 import { observer } from 'mobx-react-lite';
 import { useRef } from 'react';
 import { TouchableOpacity, View } from 'react-native';
-import { Button, TextInput } from 'react-native-paper';
+import { TextInput } from 'react-native-paper';
 import ConfigStore from 'Store/Config.store';
 import NotificationStore from 'Store/Notification.store';
 import ServiceStore from 'Store/Service.store';
@@ -63,10 +65,23 @@ export function AccountScreen() {
     );
   }
 
+  const renderLanguageSelector = () => (
+    <View>
+      <ThemedText>{ i18n.t('Language') }</ThemedText>
+      <ThemedButton onPress={ () => changeLanguage('en') }>
+        English
+      </ThemedButton>
+      <ThemedButton onPress={ () => changeLanguage('uk') }>
+        Russuan
+      </ThemedButton>
+    </View>
+  );
+
   return (
     <Page>
       <ThemedText>Account page</ThemedText>
       { renderContent() }
+      { renderLanguageSelector() }
     </Page>
   );
 }

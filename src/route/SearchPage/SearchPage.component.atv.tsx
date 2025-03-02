@@ -4,6 +4,7 @@ import ThemedButton from 'Component/ThemedButton';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedInput from 'Component/ThemedInput';
 import ThemedView from 'Component/ThemedView';
+import __ from 'i18n/__';
 import React, { useState } from 'react';
 import { View } from 'react-native';
 import { DefaultFocus, SpatialNavigationScrollView, SpatialNavigationView } from 'react-tv-space-navigation';
@@ -32,7 +33,7 @@ export function SearchPageComponent({
       <DefaultFocus>
         <ThemedInput
           style={ styles.searchBar }
-          placeholder="Search"
+          placeholder={ __('Search') }
           onChangeText={ (text) => onChangeText(text) }
           onSubmitEditing={ ({ nativeEvent: { text } }) => onApplySuggestion(text) }
           value={ enteredText }

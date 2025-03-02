@@ -2,6 +2,7 @@ import Loader from 'Component/Loader';
 import ThemedDropdown from 'Component/ThemedDropdown';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedText from 'Component/ThemedText';
+import __ from 'i18n/__';
 import React from 'react';
 import { ScrollView, View } from 'react-native';
 import { Button } from 'react-native-paper';
@@ -38,7 +39,7 @@ export function PlayerVideoSelectorComponent({
             endIcon: voice.img,
           })) }
           value={ selectedVoice.identifier }
-          header="Search voice"
+          header={ __('Search voice') }
           onChange={ (item) => handleSelectVoice(item.value) }
           asList={ !seasons.length }
         />

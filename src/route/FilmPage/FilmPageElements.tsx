@@ -200,6 +200,7 @@ export const FranchiseItemComponent = memo(({
 
   return (
     <TouchableOpacity
+      disabled={ !link }
       onPress={ () => handleSelectFilm(link) }
     >
       <View style={ styles.franchiseItem }>

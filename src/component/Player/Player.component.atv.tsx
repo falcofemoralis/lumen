@@ -13,6 +13,7 @@ import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
 import { LinearGradient } from 'expo-linear-gradient';
 import { VideoView } from 'expo-video';
+import __ from 'i18n/__';
 import { observer } from 'mobx-react-lite';
 import React, {
   useEffect,
@@ -219,7 +220,7 @@ export function PlayerComponent({
     return (
       <ThemedText style={ styles.title }>
         {
-          `${title}${hasSeasons ? ` Сезон ${voice.lastSeasonId} - Эпизод ${voice.lastEpisodeId}` : ''}`
+          `${title}${hasSeasons ? ` ${__('Season %s - Episode %s', voice.lastSeasonId, voice.lastEpisodeId)}` : ''}`
         }
       </ThemedText>
     );
@@ -439,7 +440,7 @@ export function PlayerComponent({
       <ThemedDropdown
         asOverlay
         overlayId={ QUALITY_OVERLAY_ID }
-        header="Quality"
+        header={ __('Quality') }
         value={ selectedQuality }
         data={ streams.map((stream) => ({
           label: stream.quality,
@@ -475,7 +476,7 @@ export function PlayerComponent({
       <ThemedDropdown
         asOverlay
         overlayId={ SUBTITLE_OVERLAY_ID }
-        header="Subtitles"
+        header={ __('Subtitles') }
         value={ selectedSubtitle?.languageCode }
         data={ subtitles.map((subtitle) => ({
           label: subtitle.name,

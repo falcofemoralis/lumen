@@ -103,7 +103,7 @@ export function FilmPageComponent({
         __('Coming Soon'),
         'clock-outline',
         () => {
-          NotificationStore.displayMessage(__('Ожидаем фильм в хорошем качестве...'));
+          NotificationStore.displayMessage(__('We are waiting for the film in good quality...'));
         },
       );
     }
@@ -116,11 +116,11 @@ export function FilmPageComponent({
       <DefaultFocus>
         <ThemedView style={ styles.actions }>
           { renderPlayButton() }
-          { renderAction('Comments', 'comment-text-multiple-outline', () => OverlayStore.openOverlay(COMMENTS_OVERLAY_ID)) }
-          { renderAction('Bookmark', 'movie-star-outline', () => OverlayStore.openOverlay(BOOKMARKS_OVERLAY_ID)) }
-          { renderAction('Trailer', 'movie-open-check-outline') }
-          { renderAction('Share', 'share-variant-outline') }
-          { renderAction('Download', 'folder-download-outline') }
+          { renderAction(__('Comments'), 'comment-text-multiple-outline', () => OverlayStore.openOverlay(COMMENTS_OVERLAY_ID)) }
+          { renderAction(__('Bookmark'), 'movie-star-outline', () => OverlayStore.openOverlay(BOOKMARKS_OVERLAY_ID)) }
+          { renderAction(__('Trailer'), 'movie-open-check-outline') }
+          { renderAction(__('Share'), 'share-variant-outline') }
+          { renderAction(__('Download'), 'folder-download-outline') }
         </ThemedView>
       </DefaultFocus>
     </SpatialNavigationView>
@@ -273,8 +273,8 @@ export function FilmPageComponent({
         <View style={ styles.ratingsRow }>
           { ratings.map(({ name, rating, votes }) => renderInfoText(`${rating} (${votes})`, name)) }
         </View>
-        { renderCollection(directors.map(({ name }) => name), 'Режиссер') }
-        { renderCollection(countries, 'Страна') }
+        { renderCollection(directors.map(({ name }) => name), __('Director')) }
+        { renderCollection(countries, __('Country')) }
         { renderDescription() }
       </ThemedCard>
     );
@@ -458,7 +458,7 @@ export function FilmPageComponent({
     }
 
     return (
-      <Section title={ __('Info lists') }>
+      <Section title={ __('Included in') }>
         <ThemedAccordion
           data={ data }
           renderItem={ (subItem, idx) => (
@@ -477,7 +477,7 @@ export function FilmPageComponent({
     const { related = [] } = film;
 
     return (
-      <Section title={ __('Watch also') }>
+      <Section title={ __('Related') }>
         <View style={ styles.relatedListWrapper }>
           <SpatialNavigationScrollView
             horizontal

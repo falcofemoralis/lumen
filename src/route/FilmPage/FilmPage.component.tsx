@@ -139,22 +139,7 @@ export function FilmPageComponent({
         </View> */ }
         <Thumbnail
           style={ styles.description }
-          height="20%"
-          width="100%"
-        />
-        <View style={ styles.actions }>
-          { Array(3).fill(0).map((_, i) => (
-            <Thumbnail
-              // eslint-disable-next-line react/no-array-index-key
-              key={ `${i}-action` }
-              height={ scale(48) }
-              width="30%"
-            />
-          )) }
-        </View>
-        <Thumbnail
-          style={ styles.playBtn }
-          height={ scale(48) }
+          height="30%"
           width="100%"
         />
       </Page>
@@ -300,11 +285,11 @@ export function FilmPageComponent({
     return (
       <View style={ styles.mainInfo }>
         { ratings.map(({ name, rating, votes }) => renderInfoText(`${rating} (${votes})`, name)) }
-        { renderInfoText(releaseDate, 'Дата выхода') }
-        { renderInfoText(duration, 'Время') }
+        { renderInfoText(releaseDate, __('Release date')) }
+        { renderInfoText(duration, __('Time')) }
         { renderRating() }
-        { renderCollectionInfo(directors.map(({ name }) => name), 'Режиссер') }
-        { renderCollectionInfo(countries, 'Страна') }
+        { renderCollectionInfo(directors.map(({ name }) => name), __('Director')) }
+        { renderCollectionInfo(countries, __('Country')) }
       </View>
     );
   };
@@ -360,11 +345,11 @@ export function FilmPageComponent({
               pack: IconPackType.MaterialCommunityIcons,
               name: 'clock-outline',
             } }
-            size={ 32 }
+            size={ scale(32) }
             color="white"
           />
           <ThemedText style={ styles.pendingReleaseText }>
-            { __('Ожидаем фильм в хорошем качестве...') }
+            { __('We are waiting for the film in good quality...') }
           </ThemedText>
         </View>
       );
@@ -571,7 +556,7 @@ export function FilmPageComponent({
     if (includedIn.length) {
       data.push({
         id: 'included-in',
-        title: 'Included in the lists',
+        title: __('Included in the lists'),
         items: includedIn,
       });
     }
@@ -579,7 +564,7 @@ export function FilmPageComponent({
     if (fromCollections.length) {
       data.push({
         id: 'from-collections',
-        title: 'From collections',
+        title: __('From collections'),
         items: fromCollections,
       });
     }
@@ -587,9 +572,13 @@ export function FilmPageComponent({
     return (
       <Section title={ __('Included in') }>
         <View>
-          { data.map(({ id, title, items }) => (
+          { data.map(({ id, title, items }, index) => (
             <View key={ id }>
-              <ThemedText style={ styles.infoListHeader }>
+              <ThemedText style={ [
+                styles.infoListHeader,
+                index > 0 && { marginTop: scale(16) },
+              ] }
+              >
                 { title }
               </ThemedText>
               <View>
@@ -668,11 +657,6 @@ export function FilmPageComponent({
         { renderTitle() }
         { renderGenres() }
         { renderMainContent() }
-        {
-        /**
-         * It is useless to display this data since it is already displayed in the main content
-         */
-        }
         { /* { renderQuickInfo() } */ }
         { renderDescription() }
         { renderActions() }
