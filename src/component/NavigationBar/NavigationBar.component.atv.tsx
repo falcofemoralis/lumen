@@ -1,12 +1,15 @@
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import ThemedIcon from 'Component/ThemedIcon';
+import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
 import { Tabs } from 'expo-router';
+import __ from 'i18n/__';
 import React, { useCallback, useEffect, useRef } from 'react';
 import {
   Animated,
   Dimensions,
+  Image,
   View,
 } from 'react-native';
 import {
@@ -33,10 +36,12 @@ import {
   NavigationType,
   StateType,
   Tab,
+  TAB_COMPONENT,
   TAB_POSITION,
 } from './NavigationBar.type';
 
 export function NavigationBarComponent({
+  profile,
   navigateTo,
   isFocused,
 }: NavigationBarComponentProps) {
@@ -88,13 +93,123 @@ export function NavigationBarComponent({
     }, 500);
   }, [navigateTo]);
 
+  const renderDefaultTab = useCallback((
+    tab: Tab<string>,
+    focused: boolean,
+    isRootActive: boolean,
+    isf: boolean,
+  ) => {
+    const { title, icon } = tab;
+
+    return (
+      <View
+        style={ [
+          styles.tab,
+          focused && !isRootActive && styles.tabSelected,
+          isf && isRootActive && styles.tabFocused,
+        ] }
+      >
+        { icon && (
+          <ThemedIcon
+            style={ [
+              styles.tabIcon,
+              isf && isRootActive && styles.tabContentFocused,
+            ] }
+            icon={ icon }
+            size={ scale(24) }
+            color="white"
+          />
+        ) }
+        <ThemedText.Animated
+          style={ [
+            styles.tabText,
+            isf && isRootActive && styles.tabContentFocused,
+            isMenuOpen && styles.tabTextOpened,
+          ] }
+        >
+          { title }
+        </ThemedText.Animated>
+      </View>
+    );
+  }, [isMenuOpen]);
+
+  const renderAccountTab = useCallback((
+    tab: Tab<string>,
+    focused: boolean,
+    isRootActive: boolean,
+    isf: boolean,
+  ) => {
+    const { title } = tab;
+    const { avatar } = profile ?? {};
+
+    return (
+      <View
+        style={ [
+          styles.tab,
+          focused && !isRootActive && styles.tabSelected,
+          isf && isRootActive && styles.tabFocused,
+        ] }
+      >
+        <View
+          style={ [
+            styles.profileAvatarContainer,
+            focused ? styles.profileAvatarFocused : styles.profileAvatarUnfocused,
+          ] }
+        >
+          { avatar ? (
+            <ThemedImage
+              src={ avatar }
+              style={ styles.profileAvatar }
+            />
+          ) : (
+            <Image
+              source={ require('../../../assets/images/no_avatar.png') }
+              style={ styles.profileAvatar }
+            />
+          ) }
+        </View>
+        <View style={ styles.profile }>
+          <ThemedText.Animated
+            style={ [
+              styles.tabText,
+              styles.profileNameText,
+              isf && isRootActive && styles.tabContentFocused,
+              isMenuOpen && styles.tabTextOpened,
+            ] }
+          >
+            { title }
+          </ThemedText.Animated>
+          <ThemedText.Animated
+            style={ [
+              styles.tabText,
+              styles.profileSwitchText,
+              isf && isRootActive && styles.tabContentFocused,
+              isMenuOpen && styles.tabTextOpened,
+            ] }
+          >
+            { __('Switch account') }
+          </ThemedText.Animated>
+        </View>
+      </View>
+    );
+  }, [isMenuOpen, profile]);
+
   const renderTab = useCallback((
     tab: Tab<string>,
     navigation: NavigationType,
     state: StateType,
   ) => {
-    const { title, icon } = tab;
+    const { title, tabComponent } = tab;
     const focused = isFocused(tab, state);
+
+    const renderComponent = (isRootActive: boolean, isf: boolean) => {
+      switch (tabComponent) {
+        case TAB_COMPONENT.ACCOUNT:
+          return renderAccountTab(tab, focused, isRootActive, isf);
+        default:
+          return renderDefaultTab(tab, focused, isRootActive, isf);
+      }
+    };
 
     return (
       <DefaultFocus
@@ -105,39 +220,12 @@ export function NavigationBarComponent({
           onFocus={ () => isMenuOpen && onTabSelect(tab, navigation, state) }
         >
           { ({ isRootActive, isFocused: isf }) => (
-            <View
-              style={ [
-                styles.tab,
-                focused && !isRootActive && styles.tabSelected,
-                isf && isRootActive && styles.tabFocused,
-              ] }
-            >
-              { icon && (
-                <ThemedIcon
-                  style={ [
-                    styles.tabIcon,
-                    isf && isRootActive && styles.tabContentFocused,
-                  ] }
-                  icon={ icon }
-                  size={ scale(24) }
-                  color="white"
-                />
-              ) }
-              <ThemedText.Animated
-                style={ [
-                  styles.tabText,
-                  isf && isRootActive && styles.tabContentFocused,
-                  isMenuOpen && styles.tabTextOpened,
-                ] }
-              >
-                { title }
-              </ThemedText.Animated>
-            </View>
+            renderComponent(isRootActive, isf)
           ) }
         </SpatialNavigationFocusableView>
       </DefaultFocus>
     );
-  }, [onTabSelect, isFocused, isMenuOpen]);
+  }, [onTabSelect, isFocused, isMenuOpen, renderAccountTab, renderDefaultTab]);
 
   const renderTabs = useCallback((navigation: NavigationType, state: StateType) => {
     const topTabs = [] as Tab<string>[];

@@ -93,6 +93,12 @@ export function PlayerComponent({
     ),
   }));
 
+  const handleHideControls = () => {
+    canHideControls.current = isPlaying
+    && showControls
+    && !OverlayStore.currentOverlay.length;
+  };
+
   useEffect(() => () => {
     if (controlsTimeout.current) {
       clearTimeout(controlsTimeout.current);
@@ -100,13 +106,12 @@ export function PlayerComponent({
   }, []);
 
   useEffect(() => {
-    canHideControls.current = isPlaying && showControls && !OverlayStore.currentOverlay.length;
+    handleHideControls();
   }, [isPlaying, showControls]);
 
   useEffect(() => {
-    canHideControls.current = isPlaying && showControls && !OverlayStore.currentOverlay.length;
+    handleHideControls();
 
-    // popup was closed, trigger controls timeout
     if (canHideControls.current) {
       handleUserInteraction();
     }

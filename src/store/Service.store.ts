@@ -1,6 +1,11 @@
 import { ApiServiceType } from 'Api/index';
 import { services } from 'Api/services';
 import { action, makeAutoObservable } from 'mobx';
+import { ProfileInterface } from 'Type/Profile.interface';
+import { safeJsonParse } from 'Util/Json';
+import { miscStorage } from 'Util/Storage';
+
+export const PROFILE_STORAGE = 'PROFILE_STORAGE';
 
 class ServiceStore {
   private currentService = ApiServiceType.REZKA;
@@ -37,12 +42,21 @@ class ServiceStore {
     const auth = await this.getCurrentService().login(name, password);
     this.getCurrentService().setAuthorization(auth);
     this.setSignedIn(true);
+    this.setProfile(await this.getCurrentService().getProfile());
   }
 
   logout() {
     this.getCurrentService().logout();
     this.getCurrentService().setAuthorization('');
     this.setSignedIn(false);
+  }
+
+  setProfile(profile: ProfileInterface) {
+    miscStorage.setString(PROFILE_STORAGE, JSON.stringify(profile));
+  }
+
+  getProfile(): ProfileInterface|null {
+    return safeJsonParse<ProfileInterface>(miscStorage.getString(PROFILE_STORAGE));
   }
 }
 

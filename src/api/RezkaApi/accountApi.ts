@@ -1,4 +1,5 @@
 import { BookmarkInterface } from 'Type/Bookmark.interface';
+import { cookiesManager } from 'Util/Cookies';
 import { HTMLElementInterface } from 'Util/Parser';
 
 import { AccountApiInterface, ApiParams } from '..';
@@ -11,6 +12,24 @@ type RezkaAccountApiInterface = AccountApiInterface & {
 
 const accountApi: RezkaAccountApiInterface = {
   recentItems: null,
+
+  async getProfile(id?: string) {
+    const url = new URL(configApi.getProvider());
+    const cookies = cookiesManager.get(url.hostname);
+    const userId = cookies ? cookies.dle_user_id.value : id;
+
+    if (!userId) {
+      throw new Error('Something went wrong');
+    }
+
+    const root = await configApi.fetchPage(`/user/${userId}`);
+
+    return {
+      name: root.querySelector('head title')?.rawText ?? '',
+      email: root.querySelector('#email')?.attributes.value ?? '',
+      avatar: root.querySelector('.b-userprofile__avatar_holder img')?.attributes.src ?? '',
+    };
+  },
 
   /**
    * Get bookmarks

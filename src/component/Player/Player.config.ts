@@ -59,5 +59,5 @@ export const IN_PLAYER_COMMENTS_OVERLAY_ID = 'IN_PLAYER_COMMENTS_OVERLAY_ID';
 // 1 minutes * 60 seconds/minute * 1000 milliseconds/second
 export const SAVE_TIME_EVERY_MS = 60000;
 
-export const PLAYER_CONTROLS_TIMEOUT = 4000;
+export const PLAYER_CONTROLS_TIMEOUT = 3000;
 export const PLAYER_CONTROLS_ANIMATION = 150;

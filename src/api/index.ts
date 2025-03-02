@@ -6,6 +6,7 @@ import { FilmStreamInterface } from 'Type/FilmStream.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { MenuItemInterface } from 'Type/MenuItem.interface';
+import { ProfileInterface } from 'Type/Profile.interface';
 import { RecentListInterface } from 'Type/RecentList.interface';
 import { HTMLElementInterface } from 'Util/Parser';
 
@@ -99,6 +100,7 @@ export interface AuthApiInterface {
 }
 
 export interface AccountApiInterface {
+  getProfile: (id?: string) => Promise<ProfileInterface>;
   getBookmarks(): Promise<BookmarkInterface[]>;
   addBookmark(filmId: string, bookmarkId: string): Promise<void>;
   removeBookmark(filmId: string, bookmarkId: string): Promise<void>;

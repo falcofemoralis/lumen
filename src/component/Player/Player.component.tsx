@@ -83,6 +83,13 @@ export function PlayerComponent({
     opacity: withTiming(showControls ? 1 : 0, { duration: PLAYER_CONTROLS_ANIMATION }),
   }));
 
+  const handleHideControls = () => {
+    canHideControls.current = isPlaying
+      && showControls
+      && !OverlayStore.currentOverlay.length
+      && !isScrolling;
+  };
+
   useEffect(() => {
     ScreenOrientation.lockAsync(OrientationLock.LANDSCAPE);
     NavigationBar.setVisibilityAsync('hidden');
@@ -98,17 +105,11 @@ export function PlayerComponent({
   }, []);
 
   useEffect(() => {
-    canHideControls.current = isPlaying
-    && showControls
-    && !OverlayStore.currentOverlay.length
-    && !isScrolling;
+    handleHideControls();
   }, [isPlaying, showControls, isScrolling]);
 
   useEffect(() => {
-    canHideControls.current = isPlaying
-    && showControls
-    && !OverlayStore.currentOverlay.length
-    && !isScrolling;
+    handleHideControls();
 
     if (canHideControls.current) {
       handleUserInteraction();

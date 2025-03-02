@@ -1,4 +1,5 @@
 import { CommonActions } from '@react-navigation/native';
+import { useProfile } from 'Hooks/useProfile';
 import { withTV } from 'Hooks/withTV';
 import { useCallback } from 'react';
 import ConfigStore from 'Store/Config.store';
@@ -8,6 +9,8 @@ import NavigationBarComponentTV from './NavigationBar.component.atv';
 import { NavigationType, StateType, Tab } from './NavigationBar.type';
 
 export function NavigationBarContainer() {
+  const [profile] = useProfile();
+
   const navigateTo = useCallback((
     tab: Tab<string>,
     navigation: NavigationType,
@@ -52,6 +55,10 @@ export function NavigationBarContainer() {
     return state.index === routeIndex;
   }, []);
 
+  const containerProps = {
+    profile,
+  };
+
   const containerFunctions = {
     navigateTo,
     isFocused,
@@ -59,6 +66,7 @@ export function NavigationBarContainer() {
 
   return withTV(NavigationBarComponentTV, NavigationBarComponent, {
     ...containerFunctions,
+    ...containerProps,
   });
 }
 

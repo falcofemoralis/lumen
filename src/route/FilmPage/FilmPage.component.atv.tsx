@@ -237,9 +237,9 @@ export function FilmPageComponent({
         <ThemedText style={ styles.description }>
           { description }
         </ThemedText>
-        <ThemedButton>
+        { /* <ThemedButton>
           { __('Read more') }
-        </ThemedButton>
+        </ThemedButton> */ }
       </View>
     );
   };

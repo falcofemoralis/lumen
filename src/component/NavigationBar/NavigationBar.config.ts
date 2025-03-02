@@ -9,7 +9,7 @@ export const DEFAULT_ROUTE = '(home)';
 export const TABS_TV_CONFIG: Tab<string>[] = [
   {
     route: 'account',
-    title: 'Account',
+    title: 'You',
     icon: {
       name: 'home-variant-outline',
       pack: IconPackType.MaterialCommunityIcons,
@@ -61,8 +61,8 @@ export const TABS_TV_CONFIG: Tab<string>[] = [
     route: 'settings',
     title: 'Settings',
     icon: {
-      name: 'settings',
-      pack: IconPackType.MaterialIcons,
+      name: 'settings-outline',
+      pack: IconPackType.Ionicons,
     },
     position: TAB_POSITION.BOTTOM,
   },
@@ -119,7 +119,7 @@ export const TABS_MOBILE_CONFIG: Tab<string>[] = [
   },
   {
     route: 'account',
-    title: 'Account',
+    title: 'You',
     icon: {
       name: 'bell-outline',
       pack: IconPackType.MaterialCommunityIcons,
@@ -128,6 +128,7 @@ export const TABS_MOBILE_CONFIG: Tab<string>[] = [
       name: 'bell',
       pack: IconPackType.MaterialCommunityIcons,
     },
+    tabComponent: TAB_COMPONENT.ACCOUNT,
   },
 ];
 

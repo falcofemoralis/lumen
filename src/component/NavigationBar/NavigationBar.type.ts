@@ -2,6 +2,7 @@ import { BottomTabNavigationEventMap } from '@react-navigation/bottom-tabs';
 import { NavigationHelpers, ParamListBase, TabNavigationState } from '@react-navigation/native';
 import { IconInterface } from 'Component/ThemedIcon/ThemedIcon.type';
 import { RelativePathString } from 'expo-router';
+import { ProfileInterface } from 'Type/Profile.interface';
 
 export enum TAB_POSITION {
   TOP = 'TOP',
@@ -15,6 +16,7 @@ export enum TAB_COMPONENT {
 }
 
 export interface NavigationBarComponentProps {
+  profile: ProfileInterface | null;
   navigateTo: (tab: Tab<string>, navigation: NavigationType, state: StateType) => void;
   isFocused: (tab: Tab<string>, state: StateType) => boolean;
 }

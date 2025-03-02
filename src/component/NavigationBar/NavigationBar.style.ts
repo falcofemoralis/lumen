@@ -37,4 +37,20 @@ export const styles = CreateStyles({
   tabTextFocused: {
     fontWeight: 700,
   },
+  profileAvatar: {
+    width: 22,
+    height: 22,
+    backgroundColor: Colors.black,
+    borderRadius: 99,
+  },
+  profileAvatarContainer: {
+  },
+  profileAvatarUnfocused: {
+    padding: 2,
+  },
+  profileAvatarFocused: {
+    borderRadius: 99,
+    borderWidth: 2,
+    borderColor: Colors.white,
+  },
 });

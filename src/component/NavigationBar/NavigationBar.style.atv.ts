@@ -78,4 +78,35 @@ export const styles = CreateStyles({
   tabContentFocused: {
     color: Colors.black,
   },
+  profile: {
+    height: 32,
+  },
+  profileNameText: {
+    left: 8,
+    top: 0,
+    fontWeight: '700',
+  },
+  profileSwitchText: {
+    left: 8,
+    bottom: 0,
+    color: Colors.lightGray,
+  },
+  profileAvatar: {
+    width: 32,
+    height: 32,
+    backgroundColor: Colors.black,
+    borderRadius: 99,
+    borderColor: Colors.gray,
+    borderWidth: 1,
+  },
+  profileAvatarContainer: {
+  },
+  profileAvatarUnfocused: {
+    padding: 2,
+  },
+  profileAvatarFocused: {
+    borderRadius: 99,
+    borderWidth: 2,
+    borderColor: Colors.white,
+  },
 });
