@@ -1,5 +1,4 @@
 import { BookmarkInterface } from 'Type/Bookmark.interface';
-import { CommentInterface } from 'Type/Comment.interface';
 import { CommentListInterface } from 'Type/CommentList.interface';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmListInterface } from 'Type/FilmList.interface';

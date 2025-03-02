@@ -4,6 +4,8 @@ import { Tab, TAB_COMPONENT, TAB_POSITION } from './NavigationBar.type';
 
 export const TABS_OPENING_DURATION_TV = 250;
 
+export const DEFAULT_ROUTE = '(home)';
+
 export const TABS_TV_CONFIG: Tab<string>[] = [
   {
     route: 'account',

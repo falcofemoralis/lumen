@@ -21,7 +21,12 @@ import { CONTENT_WRAPPER_PADDING_TV } from 'Style/Layout';
 import { scale } from 'Util/CreateStyles';
 
 import { useMenuContext } from './MenuContext';
-import { LOADER_PAGE, TABS_OPENING_DURATION_TV, TABS_TV_CONFIG } from './NavigationBar.config';
+import {
+  DEFAULT_ROUTE,
+  LOADER_PAGE,
+  TABS_OPENING_DURATION_TV,
+  TABS_TV_CONFIG,
+} from './NavigationBar.config';
 import { NAVIGATION_BAR_TV_WIDTH, styles } from './NavigationBar.style.atv';
 import {
   NavigationBarComponentProps,
@@ -92,41 +97,45 @@ export function NavigationBarComponent({
     const focused = isFocused(tab, state);
 
     return (
-      <SpatialNavigationFocusableView
+      <DefaultFocus
         key={ title }
-        onFocus={ () => onTabSelect(tab, navigation, state) }
+        enable={ tab.route === DEFAULT_ROUTE }
       >
-        { ({ isRootActive, isFocused: isf }) => (
-          <View
-            style={ [
-              styles.tab,
-              focused && !isRootActive && styles.tabSelected,
-              isf && isRootActive && styles.tabFocused,
-            ] }
-          >
-            { icon && (
-              <ThemedIcon
-                style={ [
-                  styles.tabIcon,
-                  isf && isRootActive && styles.tabContentFocused,
-                ] }
-                icon={ icon }
-                size={ scale(24) }
-                color="white"
-              />
-            ) }
-            <ThemedText.Animated
+        <SpatialNavigationFocusableView
+          onFocus={ () => isMenuOpen && onTabSelect(tab, navigation, state) }
+        >
+          { ({ isRootActive, isFocused: isf }) => (
+            <View
               style={ [
-                styles.tabText,
-                isf && isRootActive && styles.tabContentFocused,
-                isMenuOpen && styles.tabTextOpened,
+                styles.tab,
+                focused && !isRootActive && styles.tabSelected,
+                isf && isRootActive && styles.tabFocused,
               ] }
             >
-              { title }
-            </ThemedText.Animated>
-          </View>
-        ) }
-      </SpatialNavigationFocusableView>
+              { icon && (
+                <ThemedIcon
+                  style={ [
+                    styles.tabIcon,
+                    isf && isRootActive && styles.tabContentFocused,
+                  ] }
+                  icon={ icon }
+                  size={ scale(24) }
+                  color="white"
+                />
+              ) }
+              <ThemedText.Animated
+                style={ [
+                  styles.tabText,
+                  isf && isRootActive && styles.tabContentFocused,
+                  isMenuOpen && styles.tabTextOpened,
+                ] }
+              >
+                { title }
+              </ThemedText.Animated>
+            </View>
+          ) }
+        </SpatialNavigationFocusableView>
+      </DefaultFocus>
     );
   }, [onTabSelect, isFocused, isMenuOpen]);
 
@@ -174,9 +183,7 @@ export function NavigationBarComponent({
     >
       <ThemedView style={ styles.bar }>
         <SpatialNavigationView direction="vertical">
-          <DefaultFocus>
-            { renderTabs(navigation, state) }
-          </DefaultFocus>
+          { renderTabs(navigation, state) }
         </SpatialNavigationView>
         { /* <LinearGradient
           style={ [
