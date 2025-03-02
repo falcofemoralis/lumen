@@ -16,7 +16,6 @@ export const styles = CreateStyles({
     flex: 1,
     flexDirection: 'column',
     borderRadius: 99,
-    overflow: 'hidden',
   },
   tab: {
     flexDirection: 'column',

@@ -115,7 +115,7 @@ export function CommentItem({
                       name: 'thumb-up-outline',
                     } }
                     size={ scale(16) }
-                    color={ isFocused ? Colors.black : Colors.white }
+                    color={ Colors.white }
                   />
                 </View>
               ) }

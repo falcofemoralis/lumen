@@ -209,7 +209,13 @@ export const FranchiseItemComponent = memo(({
   const position = Math.abs(idx - franchise.length);
 
   return (
-    <SpatialNavigationFocusableView>
+    <SpatialNavigationFocusableView
+      onSelect={ () => {
+        if (link) {
+          handleSelectFilm(link);
+        }
+      } }
+    >
       { ({ isFocused }) => (
         <View style={ [styles.franchiseItem, isFocused && styles.franchiseItemFocused] }>
           <ThemedText
@@ -264,7 +270,7 @@ export const InfoList = memo(({
   list,
   idx,
 }: InfoListProps) => {
-  const { name, position, link } = list;
+  const { name, position } = list;
 
   return (
     <SpatialNavigationFocusableView>
@@ -299,7 +305,9 @@ export const RelatedItem = memo(({
   item,
   handleSelectFilm,
 }: RelatedItemProps) => (
-  <SpatialNavigationFocusableView>
+  <SpatialNavigationFocusableView
+    onSelect={ () => handleSelectFilm(item.link) }
+  >
     { ({ isFocused }) => (
       <FilmCard
         filmCard={ item }

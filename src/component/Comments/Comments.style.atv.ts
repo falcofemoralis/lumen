@@ -24,7 +24,7 @@ export const styles = CreateStyles({
     paddingBottom: BOTTOM_PADDING,
   },
   itemFocused: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.gray,
   },
   itemEven: {
   },
@@ -53,7 +53,6 @@ export const styles = CreateStyles({
     color: Colors.lightGray,
   },
   commentTextFocused: {
-    color: Colors.black,
   },
   commentDateRow: {
     flexDirection: 'row',
@@ -71,7 +70,6 @@ export const styles = CreateStyles({
     color: Colors.gray,
   },
   textFocused: {
-    color: Colors.black,
   },
   loader: {
     alignSelf: 'center',

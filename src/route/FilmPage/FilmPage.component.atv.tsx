@@ -323,9 +323,10 @@ export function FilmPageComponent({
               style={ styles.collection }
               direction="horizontal"
             >
-              { persons.map((actor) => (
+              { persons.map((actor, index) => (
                 <ActorView
-                  key={ actor.name }
+                  // eslint-disable-next-line react/no-array-index-key
+                  key={ `actor-${actor.name}-${index}` }
                   actor={ actor }
                 />
               )) }

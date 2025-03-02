@@ -139,7 +139,22 @@ export function FilmPageComponent({
         </View> */ }
         <Thumbnail
           style={ styles.description }
-          height="30%"
+          height="20%"
+          width="100%"
+        />
+        <View style={ styles.actions }>
+          { Array(3).fill(0).map((_, i) => (
+            <Thumbnail
+              // eslint-disable-next-line react/no-array-index-key
+              key={ `${i}-action` }
+              height={ scale(48) }
+              width="30%"
+            />
+          )) }
+        </View>
+        <Thumbnail
+          style={ styles.playBtn }
+          height={ scale(48) }
           width="100%"
         />
       </Page>
@@ -429,9 +444,10 @@ export function FilmPageComponent({
       <Section title={ __('Actors') }>
         <ScrollView horizontal>
           <View style={ styles.actorsList }>
-            { persons.map((actor) => (
+            { persons.map((actor, index) => (
               <ActorView
-                key={ `actor-${actor.name}` }
+                // eslint-disable-next-line react/no-array-index-key
+                key={ `actor-${actor.name}-${index}` }
                 actor={ actor }
               />
             )) }
