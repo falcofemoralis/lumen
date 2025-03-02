@@ -23,6 +23,10 @@ import { configureRemoteControl } from 'Util/RemoteControl';
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
+SplashScreen.setOptions({
+  fade: true,
+});
+
 export function RootLayout() {
   const [backPressedOnce, setBackPressedOnce] = useState(false);
   const [languageLoaded] = useLocale();

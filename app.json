@@ -6,16 +6,7 @@
       [
         "@react-native-tvos/config-tv",
         {
-          "androidTVBanner": "./assets/tv_icons/icon-400x240.png",
-          "appleTVImages": {
-            "icon": "./assets/tv_icons/icon-1280x768.png",
-            "iconSmall": "./assets/tv_icons/icon-400x240.png",
-            "iconSmall2x": "./assets/tv_icons/icon-800x480.png",
-            "topShelf": "./assets/tv_icons/icon-1920x720.png",
-            "topShelf2x": "./assets/tv_icons/icon-3840x1440.png",
-            "topShelfWide": "./assets/tv_icons/icon-2320x720.png",
-            "topShelfWide2x": "./assets/tv_icons/icon-4640x1440.png"
-          }
+          "androidTVBanner": "./assets/tv_icons/ic_banner.png"
         }
       ],
       [
@@ -47,20 +38,30 @@
           "initialOrientation": "DEFAULT"
         }
       ],
-      "expo-speech-recognition"
+      "expo-speech-recognition",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#000000",
+          "image": "./assets/images/icon.png",
+          "dark": {
+            "image": "./assets/images/icon.png",
+            "backgroundColor": "#000000"
+          },
+          "imageWidth": 100
+        }
+      ]
     ],
-    "android": {
-      "splash": {
-        "image": "./assets/images/splash.png"
-      },
-      "package": "com.falcofemoralis.lumen",
-      "versionCode": 1
-    },
     "experiments": {
       "typedRoutes": true
     },
+    "android": {
+      "icon": "./assets/images/icon.png",
+      "package": "com.falcofemoralis.lumen",
+      "versionCode": 1
+    },
     "newArchEnabled": true,
-    "name": "lumen",
+    "name": "Lumen App",
     "slug": "lumen",
     "version": "1.0.0",
     "extra": {
