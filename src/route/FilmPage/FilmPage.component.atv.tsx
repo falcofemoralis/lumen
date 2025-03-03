@@ -103,7 +103,7 @@ export function FilmPageComponent({
         __('Coming Soon'),
         'clock-outline',
         () => {
-          NotificationStore.displayMessage(__('We are waiting for the film in good quality...'));
+          NotificationStore.displayMessage(__('We are waiting for the film in the good quality'));
         },
       );
     }

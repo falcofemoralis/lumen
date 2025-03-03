@@ -364,7 +364,7 @@ export function FilmPageComponent({
             color="white"
           />
           <ThemedText style={ styles.pendingReleaseText }>
-            { __('We are waiting for the film in good quality...') }
+            { __('We are waiting for the film in the good quality') }
           </ThemedText>
         </View>
       );
