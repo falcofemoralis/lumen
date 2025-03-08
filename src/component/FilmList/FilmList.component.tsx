@@ -7,7 +7,7 @@ import React, { memo, useCallback, useMemo } from 'react';
 import { Pressable } from 'react-native';
 import { calculateItemSize } from 'Style/Layout';
 
-import { HEADER_HEIGHT, styles } from './FilmList.style';
+import { styles } from './FilmList.style';
 import {
   FilmListComponentProps,
   FilmListItem,
@@ -114,7 +114,7 @@ export function FilmListComponent({
     <FlashList
       data={ data }
       numColumns={ 1 }
-      estimatedItemSize={ (CARD_HEIGHT + HEADER_HEIGHT) / 2 }
+      estimatedItemSize={ CARD_HEIGHT }
       renderItem={ renderItem }
     />
   );

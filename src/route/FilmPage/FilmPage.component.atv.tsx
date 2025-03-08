@@ -24,6 +24,7 @@ import {
 import NotificationStore from 'Store/Notification.store';
 import OverlayStore from 'Store/Overlay.store';
 import Colors from 'Style/Colors';
+import { CollectionItemInterface } from 'Type/CollectionItem';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { scale } from 'Util/CreateStyles';
 
@@ -47,6 +48,7 @@ export function FilmPageComponent({
   handleVideoSelect,
   handleSelectFilm,
   handleSelectActor,
+  handleSelectCategory,
 }: FilmPageComponentProps) {
   const { height } = Dimensions.get('window');
 
@@ -138,28 +140,33 @@ export function FilmPageComponent({
     );
   };
 
-  const renderGenres = (collection: string[]) => (
-    <View style={ styles.collectionContainer }>
-      <SpatialNavigationScrollView
-        horizontal
-      >
-        <SpatialNavigationView
-          style={ styles.collection }
-          direction="horizontal"
+  const renderGenres = () => {
+    const { genres = [] } = film;
+
+    return (
+      <View style={ styles.collectionContainer }>
+        <SpatialNavigationScrollView
+          horizontal
         >
-          { collection.map((item) => (
-            <ThemedButton
-              key={ item }
-              style={ styles.collectionButton }
-              textStyle={ styles.collectionButtonText }
-            >
-              { item }
-            </ThemedButton>
-          )) }
-        </SpatialNavigationView>
-      </SpatialNavigationScrollView>
-    </View>
-  );
+          <SpatialNavigationView
+            style={ styles.collection }
+            direction="horizontal"
+          >
+            { genres.map(({ name, link }) => (
+              <ThemedButton
+                key={ name }
+                style={ styles.collectionButton }
+                textStyle={ styles.collectionButtonText }
+                onPress={ () => handleSelectCategory(link) }
+              >
+                { name }
+              </ThemedButton>
+            )) }
+          </SpatialNavigationView>
+        </SpatialNavigationScrollView>
+      </View>
+    );
+  };
 
   const renderInfoText = (text: string | undefined, title?: string) => {
     if (!text) {
@@ -183,8 +190,18 @@ export function FilmPageComponent({
     );
   };
 
+  const renderRatings = () => {
+    const { ratings = [] } = film;
+
+    return (
+      <View style={ styles.ratingsRow }>
+        { ratings.map(({ name, rating, votes }) => renderInfoText(`${rating} (${votes})`, name)) }
+      </View>
+    );
+  };
+
   const renderCollection = (
-    collection: string[],
+    collection: CollectionItemInterface[],
     title: string,
     handler?: (link: string) => void,
   ) => (
@@ -200,19 +217,28 @@ export function FilmPageComponent({
           style={ styles.collection }
           direction="horizontal"
         >
-          { collection.map((item) => (
+          { collection.map(({ name, link }) => (
             <ThemedButton
-              key={ item }
+              key={ name }
               style={ styles.collectionButton }
               textStyle={ styles.collectionButtonText }
+              onPress={ () => handler && handler(link) }
             >
-              { item }
+              { name }
             </ThemedButton>
           )) }
         </SpatialNavigationView>
       </SpatialNavigationScrollView>
     </View>
   );
+
+  const renderDirectors = () => {
+    const { directors = [] } = film;
+
+    const items = directors.map(({ name, link }) => ({ name, link: link || '' }));
+
+    return renderCollection(items, __('Director'), handleSelectActor);
+  };
 
   const renderRating = () => {
     const { mainRating, ratingScale } = film;
@@ -254,10 +280,7 @@ export function FilmPageComponent({
       title,
       originalTitle,
       releaseDate,
-      genres = [],
       countries = [],
-      ratings = [],
-      directors = [],
       duration,
     } = film;
 
@@ -269,17 +292,15 @@ export function FilmPageComponent({
             { originalTitle }
           </ThemedText>
         ) }
-        { renderGenres(genres) }
+        { renderGenres() }
         <View style={ styles.additionalInfo }>
           { renderInfoText(releaseDate) }
           { renderInfoText(duration) }
           { renderRating() }
         </View>
-        <View style={ styles.ratingsRow }>
-          { ratings.map(({ name, rating, votes }) => renderInfoText(`${rating} (${votes})`, name)) }
-        </View>
-        { renderCollection(directors.map(({ name }) => name), __('Director')) }
-        { renderCollection(countries, __('Country')) }
+        { renderRatings() }
+        { renderDirectors() }
+        { renderCollection(countries, __('Country'), handleSelectCategory) }
         { renderDescription() }
       </ThemedCard>
     );
@@ -474,6 +495,7 @@ export function FilmPageComponent({
               key={ `info-list-${subItem.name}` }
               list={ subItem }
               idx={ idx }
+              handleSelectCategory={ handleSelectCategory }
             />
           ) }
         />

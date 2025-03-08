@@ -2,8 +2,6 @@ import { useRouter } from 'expo-router';
 import { withTV } from 'Hooks/withTV';
 import { useEffect } from 'react';
 import { BackHandler } from 'react-native';
-import ConfigStore from 'Store/Config.store';
-import OverlayStore from 'Store/Overlay.store';
 
 import PageComponent from './Page.component';
 import PageComponentTV from './Page.component.atv';
@@ -14,10 +12,6 @@ export function PageContainer(props: PageContainerProps) {
 
   useEffect(() => {
     const backAction = () => {
-      if (ConfigStore.isTV && OverlayStore.hasOpenedOverlay()) {
-        return false;
-      }
-
       if (router.canDismiss()) {
         router.dismiss();
 

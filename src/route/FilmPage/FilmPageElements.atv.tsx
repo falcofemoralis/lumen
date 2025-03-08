@@ -266,17 +266,21 @@ export const FranchiseItemComponent = memo(({
 
 interface InfoListProps {
   list: InfoListInterface,
-  idx: number
+  idx: number,
+  handleSelectCategory: (link: string) => void
 }
 
 export const InfoList = memo(({
   list,
   idx,
+  handleSelectCategory,
 }: InfoListProps) => {
-  const { name, position } = list;
+  const { name, position, link } = list;
 
   return (
-    <SpatialNavigationFocusableView>
+    <SpatialNavigationFocusableView
+      onSelect={ () => handleSelectCategory(link) }
+    >
       { ({ isFocused }) => (
         <View style={ [
           styles.infoList,

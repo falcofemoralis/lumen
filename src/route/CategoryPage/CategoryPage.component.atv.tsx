@@ -17,6 +17,7 @@ export function CategoryPageComponent({
         filmPager={ filmPager }
         onLoadFilms={ onLoadFilms }
         onUpdateFilms={ onUpdateFilms }
+        loadOnInit
       />
     </Page>
   );

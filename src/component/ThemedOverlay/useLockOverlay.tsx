@@ -1,3 +1,4 @@
+import { useIsFocused } from '@react-navigation/native';
 import { useEffect } from 'react';
 import { BackHandler } from 'react-native';
 import { useLockSpatialNavigation } from 'react-tv-space-navigation';
@@ -31,7 +32,13 @@ const useLockParentSpatialNavigator = (isModalVisible: boolean) => {
 };
 
 const usePreventNavigationGoBack = (isModalVisible: boolean, hideModal: () => void) => {
+  const isFocused = useIsFocused();
+
   useEffect(() => {
+    if (!isFocused) {
+      return () => {};
+    }
+
     const backAction = () => {
       if (isModalVisible) {
         hideModal();
@@ -45,5 +52,5 @@ const usePreventNavigationGoBack = (isModalVisible: boolean, hideModal: () => vo
     const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
 
     return () => backHandler.remove();
-  });
+  }, [isFocused]);
 };

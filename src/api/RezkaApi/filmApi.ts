@@ -120,7 +120,10 @@ const filmApi: FilmApiInterface = {
           case 'Страна':
             film.countries = value.childNodes
               .filter((node) => node.rawTagName === 'a')
-              .map((node) => node.rawText);
+              .map((node) => ({
+                name: node.rawText,
+                link: (node as HTMLElementInterface).attributes.href,
+              }));
             break;
           case 'Режиссер':
             film.directors = value
@@ -130,7 +133,10 @@ const filmApi: FilmApiInterface = {
           case 'Жанр':
             film.genres = value.childNodes
               .filter((node) => node.rawTagName === 'a')
-              .map((node) => node.rawText);
+              .map((node) => ({
+                name: node.rawText,
+                link: (node as HTMLElementInterface).attributes.href,
+              }));
             break;
           case 'В качестве':
             break;
@@ -329,7 +335,7 @@ const filmApi: FilmApiInterface = {
       return {
         name: partItem,
         year: partYear,
-        rating: partRating,
+        rating: partRating.includes('dash') ? '0.00' : partRating,
         link: partLink,
       };
     });

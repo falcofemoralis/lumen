@@ -32,13 +32,21 @@ export function RootLayout() {
   const [backPressedOnce, setBackPressedOnce] = useState(false);
   const [languageLoaded] = useLocale();
 
+  const loadNotifications = async () => {
+    try {
+      await ServiceStore.getNotifications();
+    } catch (error) {
+      NotificationStore.displayError(error as Error);
+    }
+  };
+
   useEffect(() => {
     if (ConfigStore.isTV) {
       configureRemoteControl();
     }
 
     if (ServiceStore.isSignedIn) {
-      ServiceStore.getNotifications();
+      loadNotifications();
     }
 
     NavigationBar.setBackgroundColorAsync(Colors.background);

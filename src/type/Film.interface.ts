@@ -1,5 +1,6 @@
 import { ActorCardInterface } from './ActorCard.interface';
 import { BookmarkInterface } from './Bookmark.interface';
+import { CollectionItemInterface } from './CollectionItem';
 import { FilmCardInterface } from './FilmCard.interface';
 import { FilmType } from './FilmType.type';
 import { FilmVoiceInterface } from './FilmVoice.interface';
@@ -19,8 +20,8 @@ export interface FilmInterface {
   // additional data
   originalTitle?: string;
   releaseDate?: string;
-  countries?: string[];
-  genres?: string[];
+  countries?: CollectionItemInterface[];
+  genres?: CollectionItemInterface[];
   seriesInfo?: string;
   largePoster?: string;
   ratings?: RatingInterface[]; // type = rating + votes

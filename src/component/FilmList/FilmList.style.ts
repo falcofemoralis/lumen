@@ -1,6 +1,4 @@
-import CreateStyles, { scale } from 'Util/CreateStyles';
-
-export const HEADER_HEIGHT = scale(32);
+import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
   container: {

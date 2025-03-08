@@ -1,7 +1,8 @@
+import { FilmListData } from 'Component/FilmList/FilmList.type';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
-import { NotificationInterface } from 'Type/Notification.interface';
 
 export interface NotificationsPageComponentProps {
-  notifications: NotificationInterface[];
+  isLoading: boolean;
+  data: FilmListData[];
   handleSelectFilm: (film: FilmCardInterface) => void;
 }
