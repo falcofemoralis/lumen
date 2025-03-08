@@ -1,11 +1,14 @@
+import { ActorInterface } from 'Type/Actor.interface';
 import { BookmarkInterface } from 'Type/Bookmark.interface';
 import { CommentListInterface } from 'Type/CommentList.interface';
 import { FilmInterface } from 'Type/Film.interface';
+import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { FilmListInterface } from 'Type/FilmList.interface';
 import { FilmStreamInterface } from 'Type/FilmStream.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { MenuItemInterface } from 'Type/MenuItem.interface';
+import { NotificationInterface } from 'Type/Notification.interface';
 import { ProfileInterface } from 'Type/Profile.interface';
 import { RecentListInterface } from 'Type/RecentList.interface';
 import { HTMLElementInterface } from 'Util/Parser';
@@ -67,6 +70,10 @@ export interface FilmApiInterface {
     bookmark: BookmarkInterface,
     page: number,
   ): Promise<FilmListInterface>;
+  getActorDetails: (link: string) => Promise<ActorInterface>;
+  getFilmsFromNotifications(
+    notifications: NotificationInterface[]
+  ): Promise<NotificationInterface[]>;
 }
 
 export interface PlayerApiInterface {
@@ -107,6 +114,7 @@ export interface AccountApiInterface {
   getRecent(page: number, params?: ApiParams): Promise<RecentListInterface>;
   removeRecent(filmId: string): Promise<boolean>;
   unloadRecentPage(): void;
+  getNotifications(): Promise<NotificationInterface[]>;
 }
 
 export interface SearchApiInterface {

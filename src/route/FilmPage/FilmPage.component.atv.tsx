@@ -46,6 +46,7 @@ export function FilmPageComponent({
   hideVideoSelector,
   handleVideoSelect,
   handleSelectFilm,
+  handleSelectActor,
 }: FilmPageComponentProps) {
   const { height } = Dimensions.get('window');
 
@@ -182,7 +183,11 @@ export function FilmPageComponent({
     );
   };
 
-  const renderCollection = (collection: string[], title: string) => (
+  const renderCollection = (
+    collection: string[],
+    title: string,
+    handler?: (link: string) => void,
+  ) => (
     <View style={ styles.collectionContainer }>
       <ThemedText style={ styles.collectionTitle }>
         { title }
@@ -318,6 +323,7 @@ export function FilmPageComponent({
         <View style={ styles.actorsListWrapper }>
           <SpatialNavigationScrollView
             horizontal
+            offsetFromStart={ Dimensions.get('window').width / 2 }
           >
             <SpatialNavigationView
               style={ styles.collection }
@@ -328,6 +334,7 @@ export function FilmPageComponent({
                   // eslint-disable-next-line react/no-array-index-key
                   key={ `actor-${actor.name}-${index}` }
                   actor={ actor }
+                  handleSelectActor={ handleSelectActor }
                 />
               )) }
             </SpatialNavigationView>
@@ -482,7 +489,7 @@ export function FilmPageComponent({
         <View style={ styles.relatedListWrapper }>
           <SpatialNavigationScrollView
             horizontal
-            offsetFromStart={ scale(20) }
+            offsetFromStart={ Dimensions.get('window').width / 2 }
           >
             <SpatialNavigationView
               style={ styles.relatedList }

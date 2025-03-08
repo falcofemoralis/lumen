@@ -8,7 +8,7 @@ import __ from 'i18n/__';
 import { memo } from 'react';
 import { View } from 'react-native';
 import { SpatialNavigationFocusableView } from 'react-tv-space-navigation';
-import { ActorInterface } from 'Type/Actor.interface';
+import { ActorCardInterface } from 'Type/ActorCard.interface';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { FranchiseItem } from 'Type/FranchiseItem.interface';
@@ -38,21 +38,26 @@ export const Section = ({
 );
 
 interface ActorProps {
-  actor: ActorInterface
+  actor: ActorCardInterface
+  handleSelectActor: (link: string) => void
 }
 
 export const ActorView = memo(({
   actor,
+  handleSelectActor,
 }: ActorProps) => {
   const {
     name,
     photo,
     job,
     isDirector,
+    link,
   } = actor;
 
   return (
-    <SpatialNavigationFocusableView>
+    <SpatialNavigationFocusableView
+      onSelect={ () => handleSelectActor(link ?? '') }
+    >
       { ({ isFocused }) => (
         <View style={ [styles.actor, isFocused && styles.actorFocused] }>
           <View>
@@ -166,18 +171,16 @@ export const ScheduleItem = memo(({
               </ThemedText>
             </View>
           </View>
-          { !isReleased && (
-            <View style={ styles.scheduleItemReleaseWrapper }>
-              <ThemedText style={ [
-                styles.scheduleItemText,
-                styles.scheduleItemReleaseDate,
-                isFocused && styles.scheduleItemTextFocused,
-              ] }
-              >
-                { releaseDate }
-              </ThemedText>
-            </View>
-          ) }
+          <View style={ styles.scheduleItemReleaseWrapper }>
+            <ThemedText style={ [
+              styles.scheduleItemText,
+              styles.scheduleItemReleaseDate,
+              isFocused && styles.scheduleItemTextFocused,
+            ] }
+            >
+              { !isReleased ? releaseDate : '' }
+            </ThemedText>
+          </View>
         </View>
       ) }
     </SpatialNavigationFocusableView>

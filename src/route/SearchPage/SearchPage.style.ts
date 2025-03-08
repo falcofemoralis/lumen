@@ -65,6 +65,8 @@ export const styles = CreateStyles({
   },
   grid: {
     marginTop: 12,
+    width: '100%',
+    height: '100%',
   },
   speakActive: {
     backgroundColor: Colors.secondary,

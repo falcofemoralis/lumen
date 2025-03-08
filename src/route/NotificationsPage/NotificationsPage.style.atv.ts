@@ -1,0 +1,7 @@
+import CreateStyles from 'Util/CreateStyles';
+
+export const styles = CreateStyles({
+  container: {
+    marginTop: 40,
+  },
+});

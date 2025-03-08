@@ -1,13 +1,18 @@
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import __ from 'i18n/__';
 
-import { Tab, TAB_COMPONENT, TAB_POSITION } from './NavigationBar.type';
+import {
+  NavigationRoute,
+  Tab,
+  TAB_COMPONENT,
+  TAB_POSITION,
+} from './NavigationBar.type';
 
 export const TABS_OPENING_DURATION_TV = 250;
 
-export const DEFAULT_ROUTE = '(home)';
+export const DEFAULT_ROUTE: NavigationRoute = '(home)';
 
-export const TABS_TV_CONFIG: Tab<string>[] = [
+export const TABS_TV_CONFIG: Tab[] = [
   {
     route: 'account',
     title: __('You'),
@@ -19,7 +24,7 @@ export const TABS_TV_CONFIG: Tab<string>[] = [
     tabComponent: TAB_COMPONENT.ACCOUNT,
   },
   {
-    route: 'notifications',
+    route: '(notifications)',
     title: __('Notifications'),
     icon: {
       name: 'bell-outline',
@@ -69,7 +74,7 @@ export const TABS_TV_CONFIG: Tab<string>[] = [
   },
 ];
 
-export const TABS_MOBILE_CONFIG: Tab<string>[] = [
+export const TABS_MOBILE_CONFIG: Tab[] = [
   {
     route: '(home)',
     title: __('Home'),

@@ -9,6 +9,7 @@ import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
+import { openActor, openCategory, openFilm } from 'Util/Router';
 
 import FilmPageComponent from './FilmPage.component';
 import FilmPageComponentTV from './FilmPage.component.atv';
@@ -80,6 +81,13 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
       return;
     }
 
+    if (ServiceStore.isSignedIn) {
+      ServiceStore.getCurrentService().saveWatch(film, voice)
+        .catch((error) => {
+          NotificationStore.displayError(error as Error);
+        });
+    }
+
     openPlayer(video, voice);
   };
 
@@ -96,12 +104,15 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
   };
 
   const handleSelectFilm = useCallback((filmLink: string) => {
-    router.push({
-      pathname: '/[film]',
-      params: {
-        film: filmLink,
-      },
-    });
+    openFilm(filmLink);
+  }, []);
+
+  const handleSelectActor = useCallback((actorLink: string) => {
+    openActor(actorLink);
+  }, []);
+
+  const handleSelectCategory = useCallback((categoryLink: string) => {
+    openCategory(categoryLink);
   }, []);
 
   const getVisibleScheduleItems = useCallback(() => {
@@ -140,6 +151,8 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
     hideVideoSelector,
     handleVideoSelect,
     handleSelectFilm,
+    handleSelectActor,
+    handleSelectCategory,
   };
 
   return withTV(FilmPageComponentTV, FilmPageComponent, {

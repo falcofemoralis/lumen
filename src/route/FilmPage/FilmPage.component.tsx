@@ -37,7 +37,10 @@ import {
 import { styles } from './FilmPage.style';
 import { FilmPageComponentProps } from './FilmPage.type';
 import {
-  ActorView, FranchiseItemComponent, InfoList, RelatedItem, ScheduleItem,
+  ActorView, FranchiseItemComponent,
+  InfoList,
+  RelatedItem,
+  ScheduleItem,
   Section,
 } from './FilmPageElements';
 
@@ -48,6 +51,8 @@ export function FilmPageComponent({
   hideVideoSelector,
   handleVideoSelect,
   handleSelectFilm,
+  handleSelectActor,
+  handleSelectCategory,
 }: FilmPageComponentProps) {
   const router = useRouter();
   const [commentsVisible, setCommentsVisible] = useState(false);
@@ -449,6 +454,7 @@ export function FilmPageComponent({
                 // eslint-disable-next-line react/no-array-index-key
                 key={ `actor-${actor.name}-${index}` }
                 actor={ actor }
+                handleSelectActor={ handleSelectActor }
               />
             )) }
           </View>
@@ -603,6 +609,7 @@ export function FilmPageComponent({
                     key={ `info-list-${subItem.name}` }
                     list={ subItem }
                     idx={ idx }
+                    handleSelectCategory={ handleSelectCategory }
                   />
                 )) }
               </View>

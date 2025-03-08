@@ -1,7 +1,10 @@
+import { BadgeData, NavigationRoute } from 'Component/NavigationBar/NavigationBar.type';
 import { makeAutoObservable } from 'mobx';
 
 class NavigationStore {
   public isNavigationLocked = false;
+
+  public badgeData: BadgeData = {};
 
   constructor() {
     makeAutoObservable(this);
@@ -13,6 +16,15 @@ class NavigationStore {
 
   unlockNavigation() {
     this.isNavigationLocked = false;
+  }
+
+  setBadgeData(key: NavigationRoute, count: number) {
+    const data = {
+      ...this.badgeData,
+      [key]: count,
+    };
+
+    this.badgeData = data;
   }
 }
 

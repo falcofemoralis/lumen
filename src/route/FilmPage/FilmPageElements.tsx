@@ -1,14 +1,15 @@
 import FilmCard from 'Component/FilmCard';
-import ThemedCard from 'Component/ThemedCard';
 import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
 import __ from 'i18n/__';
 import { memo } from 'react';
-import { Pressable, TouchableOpacity, View } from 'react-native';
+import {
+  Pressable, TouchableHighlight, TouchableOpacity, View,
+} from 'react-native';
 import Colors from 'Style/Colors';
-import { ActorInterface } from 'Type/Actor.interface';
+import { ActorCardInterface } from 'Type/ActorCard.interface';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { FranchiseItem } from 'Type/FranchiseItem.interface';
@@ -38,55 +39,63 @@ export const Section = ({
 );
 
 interface ActorProps {
-  actor: ActorInterface
+  actor: ActorCardInterface,
+  handleSelectActor: (link: string) => void
 }
 
 export const ActorView = memo(({
   actor,
+  handleSelectActor,
 }: ActorProps) => {
   const {
     name,
     photo,
     job,
     isDirector,
+    link,
   } = actor;
 
   return (
-    <View style={ styles.actor }>
+    <TouchableHighlight
+      style={ styles.actor }
+      onPress={ () => handleSelectActor(link ?? '') }
+    >
       <View>
-        <ThemedImage
-          style={ styles.actorPhoto }
-          src={ photo }
-        />
-        { isDirector && (
-          <View style={ styles.director }>
-            <ThemedIcon
-              icon={ {
-                pack: IconPackType.MaterialIcons,
-                name: 'stars',
-              } }
-              size={ scale(12) }
-              color="yellow"
-            />
-            <ThemedText style={ styles.directorText }>
-              { __('Director') }
-            </ThemedText>
-          </View>
+        <View>
+          <ThemedImage
+            style={ styles.actorPhoto }
+            src={ photo }
+          />
+          { isDirector && (
+            <View style={ styles.director }>
+              <ThemedIcon
+                icon={ {
+                  pack: IconPackType.MaterialIcons,
+                  name: 'stars',
+                } }
+                size={ scale(12) }
+                color="yellow"
+              />
+              <ThemedText style={ styles.directorText }>
+                { __('Director') }
+              </ThemedText>
+            </View>
+          ) }
+        </View>
+        <ThemedText
+          style={ styles.actorName }
+        >
+          { name }
+        </ThemedText>
+        { job && (
+          <ThemedText
+            style={ styles.actorJob }
+          >
+            { job }
+          </ThemedText>
         ) }
       </View>
-      <ThemedText
-        style={ styles.actorName }
-      >
-        { name }
-      </ThemedText>
-      { job && (
-        <ThemedText
-          style={ styles.actorJob }
-        >
-          { job }
-        </ThemedText>
-      ) }
-    </View>
+    </TouchableHighlight>
   );
 }, (
   prevProps: ActorProps, nextProps: ActorProps,
@@ -232,17 +241,19 @@ export const FranchiseItemComponent = memo(({
 interface InfoListProps {
   list: InfoListInterface,
   idx: number
+  handleSelectCategory: (link: string) => void
 }
 
 export const InfoList = memo(({
   list,
   idx,
+  handleSelectCategory,
 }: InfoListProps) => {
   const { name, position, link } = list;
 
   return (
     <TouchableOpacity
-      onPress={ () => console.log('info-list', link) }
+      onPress={ () => handleSelectCategory(link) }
     >
       <View style={ [
         styles.infoList,

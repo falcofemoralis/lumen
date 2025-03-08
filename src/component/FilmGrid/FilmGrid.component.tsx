@@ -1,4 +1,5 @@
 import FilmCard from 'Component/FilmCard';
+import { CARD_HEIGHT } from 'Component/FilmCard/FilmCard.style';
 import ThemedGrid from 'Component/ThemedGrid';
 import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
 import React, { memo, useCallback } from 'react';
@@ -69,7 +70,7 @@ export function FilmGridComponent({
     <ThemedGrid
       data={ films }
       numberOfColumns={ NUMBER_OF_COLUMNS }
-      itemSize={ itemWidth }
+      itemSize={ CARD_HEIGHT }
       renderItem={ renderItem }
       onNextLoad={ onNextLoad }
     />

@@ -1,16 +1,22 @@
 import { ApiServiceType } from 'Api/index';
 import { services } from 'Api/services';
 import { action, makeAutoObservable } from 'mobx';
+import { NotificationInterface, NotificationItemInterface } from 'Type/Notification.interface';
 import { ProfileInterface } from 'Type/Profile.interface';
 import { safeJsonParse } from 'Util/Json';
 import { miscStorage } from 'Util/Storage';
 
+import NavigationStore from './Navigation.store';
+
 export const PROFILE_STORAGE = 'PROFILE_STORAGE';
+export const NOTIFICATIONS_STORAGE = 'NOTIFICATIONS_STORAGE2';
 
 class ServiceStore {
   private currentService = ApiServiceType.REZKA;
 
   public isSignedIn = false;
+
+  public notifications: NotificationInterface[] | null = null;
 
   constructor() {
     makeAutoObservable(this);
@@ -57,6 +63,47 @@ class ServiceStore {
 
   getProfile(): ProfileInterface|null {
     return safeJsonParse<ProfileInterface>(miscStorage.getString(PROFILE_STORAGE));
+  }
+
+  async getNotifications() {
+    this.notifications = await this.getCurrentService().getNotifications();
+
+    const newItems = this.notifications.reduce((acc: NotificationItemInterface[], item) => {
+      acc.push(...item.items);
+
+      return acc;
+    },
+    []);
+
+    const previousItems = safeJsonParse<NotificationItemInterface[]>(
+      miscStorage.getString(NOTIFICATIONS_STORAGE),
+    ) ?? [];
+
+    const badgeCount = newItems.reduce((acc, item) => {
+      if (!previousItems.find((prevItem) => prevItem.link === item.link)) {
+        acc += 1;
+      }
+
+      return acc;
+    },
+    0);
+
+    NavigationStore.setBadgeData('(notifications)', badgeCount);
+  }
+
+  async resetNotifications() {
+    if (this.notifications) {
+      const newItems = this.notifications.reduce((acc: NotificationItemInterface[], item) => {
+        acc.push(...item.items);
+
+        return acc;
+      },
+      []);
+
+      miscStorage.setString(NOTIFICATIONS_STORAGE, JSON.stringify(newItems));
+    }
+
+    NavigationStore.setBadgeData('(notifications)', 0);
   }
 }
 

@@ -1,7 +1,8 @@
 import { CommonActions } from '@react-navigation/native';
 import { useProfile } from 'Hooks/useProfile';
 import { withTV } from 'Hooks/withTV';
-import { useCallback } from 'react';
+import { observer } from 'mobx-react-lite';
+import { useCallback, useEffect } from 'react';
 import ConfigStore from 'Store/Config.store';
 
 import NavigationBarComponent from './NavigationBar.component';
@@ -10,9 +11,13 @@ import { NavigationType, StateType, Tab } from './NavigationBar.type';
 
 export function NavigationBarContainer() {
   const [profile] = useProfile();
+  // const badgeData = {};
+
+  // useEffect(() => {
+  // }, [NavigationStore.badgeData]);
 
   const navigateTo = useCallback((
-    tab: Tab<string>,
+    tab: Tab,
     navigation: NavigationType,
     state: StateType,
   ) => {
@@ -49,7 +54,7 @@ export function NavigationBarContainer() {
     }
   }, []);
 
-  const isFocused = useCallback((tab: Tab<string>, state: StateType) => {
+  const isFocused = useCallback((tab: Tab, state: StateType) => {
     const routeIndex = state.routes.findIndex((r) => r.name === tab.route);
 
     return state.index === routeIndex;

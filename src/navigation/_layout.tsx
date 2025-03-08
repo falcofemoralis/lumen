@@ -17,6 +17,7 @@ import { PaperProvider } from 'react-native-paper';
 import { SpatialNavigationDeviceTypeProvider } from 'react-tv-space-navigation';
 import ConfigStore from 'Store/Config.store';
 import NotificationStore from 'Store/Notification.store';
+import ServiceStore from 'Store/Service.store';
 import Colors from 'Style/Colors';
 import { configureRemoteControl } from 'Util/RemoteControl';
 
@@ -34,6 +35,10 @@ export function RootLayout() {
   useEffect(() => {
     if (ConfigStore.isTV) {
       configureRemoteControl();
+    }
+
+    if (ServiceStore.isSignedIn) {
+      ServiceStore.getNotifications();
     }
 
     NavigationBar.setBackgroundColorAsync(Colors.background);

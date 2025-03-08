@@ -1,4 +1,4 @@
-import { ActorInterface } from './Actor.interface';
+import { ActorCardInterface } from './ActorCard.interface';
 import { BookmarkInterface } from './Bookmark.interface';
 import { FilmCardInterface } from './FilmCard.interface';
 import { FilmType } from './FilmType.type';
@@ -27,8 +27,8 @@ export interface FilmInterface {
   mainRating?: RatingInterface;
   ratingScale?: number;
   description?: string;
-  actors?: ActorInterface[];
-  directors?: ActorInterface[];
+  actors?: ActorCardInterface[];
+  directors?: ActorCardInterface[];
   additionalInfo?: string[];
   duration?: string;
   age?: string;

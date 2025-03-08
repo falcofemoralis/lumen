@@ -1,4 +1,4 @@
-import { ActorInterface } from 'Type/Actor.interface';
+import { ActorCardInterface } from 'Type/ActorCard.interface';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { FilmListInterface } from 'Type/FilmList.interface';
 import { FilmStreamInterface } from 'Type/FilmStream.interface';
@@ -202,7 +202,7 @@ export const parseSubtitles = (
 export const parseActorCard = (
   node: HTMLElementInterface,
   isDirector?: boolean,
-): ActorInterface => {
+): ActorCardInterface => {
   const name = node.querySelector('span')?.rawText ?? '';
   const photo = node.attributes['data-photo'];
   const link = node.querySelector('a')?.attributes.href;

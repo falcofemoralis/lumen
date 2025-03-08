@@ -15,14 +15,20 @@ export enum TAB_COMPONENT {
   ACCOUNT = 'ACCOUNT',
 }
 
-export interface NavigationBarComponentProps {
-  profile: ProfileInterface | null;
-  navigateTo: (tab: Tab<string>, navigation: NavigationType, state: StateType) => void;
-  isFocused: (tab: Tab<string>, state: StateType) => boolean;
+export type NavigationRoute = 'account' | '(notifications)' | '(home)' | '(recent)' | '(search)' | '(bookmarks)' | 'settings' | 'loader';
+
+export type BadgeData = {
+  [key in NavigationRoute]?: number;
 }
 
-export interface Tab<T> {
-  route: T;
+export interface NavigationBarComponentProps {
+  profile: ProfileInterface | null;
+  navigateTo: (tab: Tab, navigation: NavigationType, state: StateType) => void;
+  isFocused: (tab: Tab, state: StateType) => boolean;
+}
+
+export interface Tab {
+  route: NavigationRoute;
   title: string;
   icon?: IconInterface;
   iconFocused?: IconInterface;

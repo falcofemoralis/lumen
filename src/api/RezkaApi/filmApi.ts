@@ -1,4 +1,5 @@
 import { ApiParams, FilmApiInterface } from 'Api/index';
+import { ActorInterface, ActorRole } from 'Type/Actor.interface';
 import { BookmarkInterface } from 'Type/Bookmark.interface';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
@@ -14,10 +15,11 @@ import { decodeHtml } from 'Util/Htlm';
 import { HTMLElementInterface } from 'Util/Parser';
 import { Variables } from 'Util/Request';
 
+import { NotificationInterface } from '../../type/Notification.interface';
 import configApi from './configApi';
 import {
   parseActorCard,
-  parseFilmCard, parseFilmsListRoot, parseSeasons, parseStreams,
+  parseFilmCard, parseFilmsListRoot, parseFilmType, parseSeasons, parseStreams,
 } from './utils';
 
 const filmApi: FilmApiInterface = {
@@ -216,8 +218,6 @@ const filmApi: FilmApiInterface = {
           );
           const jsonObject = JSON.parse(subString);
           const streams = parseStreams(jsonObject.streams);
-          // subtitles = parseSubtitles(jsonObject.subtitle);
-          // getThumbnails(jsonObject.thumbnails, trans);
 
           const video: FilmVideoInterface = {
             streams,
@@ -400,6 +400,166 @@ const filmApi: FilmApiInterface = {
     const filmsList = await this.getFilms(page, `/favorites/${id}`);
 
     return filmsList;
+  },
+
+  /**
+   * Get actor details
+   * @param link
+   * @returns
+   */
+  async getActorDetails(link: string) {
+    const root = await configApi.fetchPage(link);
+
+    const roles = root.querySelectorAll('.b-person__career').map((el) => {
+      const role = el.querySelector('h2')?.rawText ?? '';
+      const info = el.querySelector('.b-person__career_stats')?.rawText ?? '';
+      const films = parseFilmsListRoot(el);
+
+      return {
+        role,
+        info,
+        films: films.films,
+      };
+    }) as ActorRole[];
+
+    const actor: ActorInterface = {
+      name: root.querySelector('.b-post__title .t1')?.rawText ?? '',
+      originalName: root.querySelector('.b-post__title .t2')?.rawText ?? '',
+      photo: root.querySelector('.b-sidecover img')?.attributes.src ?? '',
+      roles,
+    };
+
+    const infoTable = root.querySelectorAll('.b-post__info tr');
+    infoTable.forEach((el) => {
+      el.childNodes = el.childNodes.filter((node) => node.rawTagName === 'td');
+      const key = el.firstChild?.rawText.replace(':', '');
+      const value = el.lastChild as HTMLElementInterface|undefined;
+
+      if (key && value) {
+        switch (key) {
+          case 'Дата рождения':
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            actor.dob = value?.rawText.trim();
+            break;
+          case 'Место рождения':
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            actor.birthPlace = value?.rawText.trim();
+            break;
+          case 'Рост':
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            actor.height = value?.rawText.trim();
+            break;
+          case 'Карьера':
+            actor.careers = value.childNodes
+              .filter((node) => node.rawTagName === 'a')
+              .map((node) => node.rawText);
+            break;
+          default:
+            break;
+        }
+      }
+    });
+
+    return actor;
+  },
+
+  async getFilmsFromNotifications(notifications: NotificationInterface[]) {
+    const links = notifications.reduce((acc, notification) => {
+      acc.push(...notification.items.map((item) => item.link));
+
+      return acc;
+    },
+    [] as string[]);
+
+    const films = {} as {
+      [key: string]: FilmCardInterface;
+    };
+
+    const getFilm = async (link: string): Promise<FilmCardInterface> => {
+      const root = await configApi.fetchPage(link);
+
+      const id = root.querySelector('#user-favorites-holder')?.attributes['data-post_id'] ?? '';
+      const title = root.querySelector('.b-post__title h1')?.rawText ?? '';
+      const poster = root.querySelector('.b-sidecover img')?.attributes.src ?? '';
+      const type = parseFilmType(link);
+
+      const infoTable = root.querySelectorAll('.b-post__info tr');
+      const subtitle = infoTable.reduce<string[]>((acc, el) => {
+        el.childNodes = el.childNodes.filter((node) => node.rawTagName === 'td');
+        const key = el.firstChild?.rawText.replace(':', '');
+        const value = el.lastChild as HTMLElementInterface|undefined;
+
+        if (key && value) {
+          switch (key) {
+            case 'Дата выхода': {
+              const rel = value.querySelector('a')?.rawText;
+
+              if (rel) {
+                acc.push(rel);
+              }
+
+              return acc;
+            }
+            case 'Страна': {
+              const countries = value.childNodes
+                .filter((node) => node.rawTagName === 'a')
+                .map((node) => node.rawText);
+
+              if (countries.length > 0) {
+                acc.push(countries[0]);
+              }
+
+              return acc;
+            }
+            case 'Жанр': {
+              const genres = value.childNodes
+                .filter((node) => node.rawTagName === 'a')
+                .map((node) => node.rawText);
+
+              if (genres.length > 0) {
+                acc.push(genres[0]);
+              }
+
+              return acc;
+            }
+            default:
+              return acc;
+          }
+        }
+
+        return acc;
+      }, []);
+
+      return {
+        id,
+        link,
+        type,
+        poster,
+        title,
+        subtitle: subtitle.join(', '),
+      };
+    };
+
+    await Promise.all(links.map(async (link) => {
+      films[link] = await getFilm(link);
+    }));
+
+    return notifications.map((notification) => {
+      const items = notification.items.map((item) => {
+        const film = films[item.link];
+        film.info = item.info;
+
+        return {
+          ...item,
+          film,
+        };
+      });
+
+      return {
+        ...notification,
+        items,
+      };
+    });
   },
 };
 

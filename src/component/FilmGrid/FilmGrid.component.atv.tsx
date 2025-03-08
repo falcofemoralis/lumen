@@ -33,7 +33,7 @@ export function FilmGridComponent({
           <FilmCard
             filmCard={ item }
             style={ {
-              width: containerWidth / NUMBER_OF_COLUMNS_TV - scale(styles.rowStyle.gap),
+              width: containerWidth / NUMBER_OF_COLUMNS_TV - styles.rowStyle.gap,
             } }
             isFocused={ isFocused && isRootActive }
             isThumbnail={ isThumbnail }

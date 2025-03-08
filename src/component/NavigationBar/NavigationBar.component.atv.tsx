@@ -5,6 +5,7 @@ import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
 import { Tabs } from 'expo-router';
 import __ from 'i18n/__';
+import { observer } from 'mobx-react-lite';
 import React, { useCallback, useEffect, useRef } from 'react';
 import {
   Animated,
@@ -19,6 +20,7 @@ import {
   SpatialNavigationRoot,
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
+import NavigationStore from 'Store/Navigation.store';
 import Colors from 'Style/Colors';
 import { CONTENT_WRAPPER_PADDING_TV } from 'Style/Layout';
 import { scale } from 'Util/CreateStyles';
@@ -72,7 +74,7 @@ export function NavigationBarComponent({
   }, [animatedWidth, isMenuOpen]);
 
   const onTabSelect = useCallback((
-    tab: Tab<string>,
+    tab: Tab,
     navigation: NavigationType,
     state: StateType,
   ) => {
@@ -94,12 +96,14 @@ export function NavigationBarComponent({
   }, [navigateTo]);
 
   const renderDefaultTab = useCallback((
-    tab: Tab<string>,
+    tab: Tab,
     focused: boolean,
     isRootActive: boolean,
     isf: boolean,
   ) => {
     const { title, icon } = tab;
+
+    const badge = NavigationStore.badgeData[tab.route] ?? 0;
 
     return (
       <View
@@ -110,15 +114,20 @@ export function NavigationBarComponent({
         ] }
       >
         { icon && (
-          <ThemedIcon
-            style={ [
-              styles.tabIcon,
-              isf && isRootActive && styles.tabContentFocused,
-            ] }
-            icon={ icon }
-            size={ scale(24) }
-            color="white"
-          />
+          <View>
+            <ThemedIcon
+              style={ [
+                styles.tabIcon,
+                isf && isRootActive && styles.tabContentFocused,
+              ] }
+              icon={ icon }
+              size={ scale(24) }
+              color="white"
+            />
+            { !isMenuOpen && badge > 0 && (
+              <View style={ styles.badge } />
+            ) }
+          </View>
         ) }
         <ThemedText.Animated
           style={ [
@@ -129,12 +138,22 @@ export function NavigationBarComponent({
         >
           { title }
         </ThemedText.Animated>
+        { badge > 0 && (
+          <ThemedText
+            style={ [
+              styles.badgeText,
+              isMenuOpen && styles.tabTextOpened,
+            ] }
+          >
+            { __('New') }
+          </ThemedText>
+        ) }
       </View>
     );
-  }, [isMenuOpen]);
+  }, [isMenuOpen, NavigationStore.badgeData]);
 
   const renderAccountTab = useCallback((
-    tab: Tab<string>,
+    tab: Tab,
     focused: boolean,
     isRootActive: boolean,
     isf: boolean,
@@ -195,7 +214,7 @@ export function NavigationBarComponent({
   }, [isMenuOpen, profile]);
 
   const renderTab = useCallback((
-    tab: Tab<string>,
+    tab: Tab,
     navigation: NavigationType,
     state: StateType,
   ) => {
@@ -228,9 +247,9 @@ export function NavigationBarComponent({
   }, [onTabSelect, isFocused, isMenuOpen, renderAccountTab, renderDefaultTab]);
 
   const renderTabs = useCallback((navigation: NavigationType, state: StateType) => {
-    const topTabs = [] as Tab<string>[];
-    const middleTabs = [] as Tab<string>[];
-    const bottomTabs = [] as Tab<string>[];
+    const topTabs = [] as Tab[];
+    const middleTabs = [] as Tab[];
+    const bottomTabs = [] as Tab[];
 
     TABS_TV_CONFIG.forEach((tab) => {
       switch (tab.position) {
@@ -307,4 +326,4 @@ export function NavigationBarComponent({
   );
 }
 
-export default NavigationBarComponent;
+export default observer(NavigationBarComponent);

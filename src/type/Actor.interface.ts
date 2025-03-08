@@ -1,7 +1,18 @@
+import { FilmCardInterface } from './FilmCard.interface';
+
 export interface ActorInterface {
   name: string;
+  originalName: string;
   photo: string;
-  link?: string;
-  job?: string;
-  isDirector?: boolean;
+  careers?: string[];
+  dob?: string;
+  birthPlace?: string;
+  height?: string;
+  roles: ActorRole[];
+}
+
+export interface ActorRole {
+  role: string;
+  info?: string;
+  films: FilmCardInterface[];
 }

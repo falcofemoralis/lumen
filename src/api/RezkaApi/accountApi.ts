@@ -1,4 +1,5 @@
 import { BookmarkInterface } from 'Type/Bookmark.interface';
+import { NotificationInterface } from 'Type/Notification.interface';
 import { cookiesManager } from 'Util/Cookies';
 import { HTMLElementInterface } from 'Util/Parser';
 
@@ -151,6 +152,30 @@ const accountApi: RezkaAccountApiInterface = {
 
   unloadRecentPage() {
     this.recentItems = null;
+  },
+
+  async getNotifications() {
+    const root = await configApi.fetchPage('/');
+
+    return root.querySelectorAll('.b-seriesupdate__block').map((el) => {
+      const date = el.querySelector('.b-seriesupdate__block_date')?.rawText ?? '';
+
+      const items = el.querySelectorAll('.tracked').map((item) => {
+        const season = el.querySelector('.season')?.rawText ?? '';
+        const episode = el.querySelector('.cell-2')?.rawText ?? '';
+        const info = `${season} - ${episode}`;
+
+        return {
+          link: item.querySelector('.b-seriesupdate__block_list_link')?.attributes.href ?? '',
+          info,
+        };
+      });
+
+      return {
+        date: date.replace(' развернуть', '').trim(),
+        items,
+      };
+    }) as NotificationInterface[];
   },
 };
 

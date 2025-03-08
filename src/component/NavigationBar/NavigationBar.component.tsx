@@ -28,7 +28,7 @@ export function NavigationBarComponent({
   navigateTo,
   isFocused,
 }: NavigationBarComponentProps) {
-  const renderDefaultTab = useCallback((tab: Tab<string>, focused: boolean) => {
+  const renderDefaultTab = useCallback((tab: Tab, focused: boolean) => {
     const { title, icon, iconFocused } = tab;
 
     return (
@@ -56,7 +56,7 @@ export function NavigationBarComponent({
     );
   }, []);
 
-  const renderAccountTab = useCallback((tab: Tab<string>, focused: boolean) => {
+  const renderAccountTab = useCallback((tab: Tab, focused: boolean) => {
     const { title } = tab;
     const { avatar } = profile ?? {};
 
@@ -93,7 +93,7 @@ export function NavigationBarComponent({
   }, [profile]);
 
   const renderTab = useCallback((
-    tab: Tab<string>,
+    tab: Tab,
     navigation: NavigationType,
     state: StateType,
   ) => {
