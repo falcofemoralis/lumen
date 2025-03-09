@@ -34,5 +34,6 @@
   "Remaining: %s": "Осталось: %s",
   "Switch account": "Сменить аккаунт",
   "New": "Новое",
-  "No notifications": "Нет обновлений"
+  "No notifications": "Нет обновлений",
+  "Successfully logged in!": "Успешная авторизация!"
 }

@@ -32,6 +32,7 @@ export interface AutoRewindParams {
 export const AWAKE_TAG = 'player';
 
 export const DEFAULT_REWIND_SECONDS = 10;
+export const REWIND_SECONDS_TV = 30;
 
 export const DEFAULT_AUTO_REWIND_SECONDS = 30; // rewind seconds
 export const DEFAULT_AUTO_REWIND_MS = 50; // how many ms to wait

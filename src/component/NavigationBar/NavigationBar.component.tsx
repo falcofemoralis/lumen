@@ -4,12 +4,14 @@ import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
 import { Tabs } from 'expo-router';
+import { observer } from 'mobx-react-lite';
 import React, { useCallback } from 'react';
 import {
   Image,
   Pressable,
   View,
 } from 'react-native';
+import NavigationStore from 'Store/Navigation.store';
 import { Colors } from 'Style/Colors';
 import { CONTENT_WRAPPER_PADDING } from 'Style/Layout';
 import { scale } from 'Util/CreateStyles';
@@ -60,6 +62,8 @@ export function NavigationBarComponent({
     const { title } = tab;
     const { avatar } = profile ?? {};
 
+    const badge = NavigationStore.badgeData[tab.route] ?? 0;
+
     return (
       <View style={ styles.tab }>
         <View
@@ -79,6 +83,9 @@ export function NavigationBarComponent({
               style={ styles.profileAvatar }
             />
           ) }
+          { badge > 0 && (
+            <View style={ styles.badge } />
+          ) }
         </View>
         <ThemedText
           style={ [
@@ -90,7 +97,7 @@ export function NavigationBarComponent({
         </ThemedText>
       </View>
     );
-  }, [profile]);
+  }, [profile, NavigationStore.badgeData]);
 
   const renderTab = useCallback((
     tab: Tab,
@@ -150,4 +157,4 @@ export function NavigationBarComponent({
   );
 }
 
-export default NavigationBarComponent;
+export default observer(NavigationBarComponent);

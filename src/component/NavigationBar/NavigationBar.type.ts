@@ -15,7 +15,14 @@ export enum TAB_COMPONENT {
   ACCOUNT = 'ACCOUNT',
 }
 
-export type NavigationRoute = 'account' | '(notifications)' | '(home)' | '(recent)' | '(search)' | '(bookmarks)' | 'settings' | 'loader';
+export type NavigationRoute = '(account)'
+| '(notifications)'
+| '(home)'
+| '(recent)'
+| '(search)'
+| '(bookmarks)'
+| 'settings'
+| 'loader';
 
 export type BadgeData = {
   [key in NavigationRoute]?: number;

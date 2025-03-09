@@ -52,4 +52,13 @@ export const styles = CreateStyles({
     borderWidth: 2,
     borderColor: Colors.white,
   },
+  badge: {
+    backgroundColor: Colors.secondary,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    position: 'absolute',
+    right: -4,
+    top: -4,
+  },
 });

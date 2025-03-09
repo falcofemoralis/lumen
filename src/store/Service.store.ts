@@ -6,6 +6,7 @@ import { ProfileInterface } from 'Type/Profile.interface';
 import { safeJsonParse } from 'Util/Json';
 import { miscStorage } from 'Util/Storage';
 
+import ConfigStore from './Config.store';
 import NavigationStore from './Navigation.store';
 
 export const PROFILE_STORAGE = 'PROFILE_STORAGE';
@@ -88,7 +89,7 @@ class ServiceStore {
     },
     0);
 
-    NavigationStore.setBadgeData('(notifications)', badgeCount);
+    NavigationStore.setBadgeData(ConfigStore.isTV ? '(notifications)' : '(account)', badgeCount);
   }
 
   async resetNotifications() {
@@ -103,7 +104,7 @@ class ServiceStore {
       miscStorage.setString(NOTIFICATIONS_STORAGE, JSON.stringify(newItems));
     }
 
-    NavigationStore.setBadgeData('(notifications)', 0);
+    NavigationStore.setBadgeData(ConfigStore.isTV ? '(notifications)' : '(account)', 0);
   }
 }
 

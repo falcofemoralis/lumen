@@ -1,10 +1,9 @@
 import {
   AutoRewindParams,
-  DEFAULT_AUTO_REWIND_MIN_MS,
-  DEFAULT_AUTO_REWIND_MULTIPLIER,
   DEFAULT_AUTO_REWIND_PARAMS,
   FocusedElement,
   LONG_PRESS_DURATION,
+  REWIND_SECONDS_TV,
   RewindDirection,
 } from 'Component/Player/Player.config';
 import PlayerStore from 'Component/Player/Player.store';
@@ -156,7 +155,7 @@ export const PlayerProgressBarComponent = ({
     if (e.longTimeout) {
       // Button press
       clearTimeout(e.longTimeout);
-      rewindPosition(direction);
+      rewindPosition(direction, REWIND_SECONDS_TV);
       toggleSeekMode();
     }
   };

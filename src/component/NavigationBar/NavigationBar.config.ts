@@ -14,7 +14,7 @@ export const DEFAULT_ROUTE: NavigationRoute = '(home)';
 
 export const TABS_TV_CONFIG: Tab[] = [
   {
-    route: 'account',
+    route: '(account)',
     title: __('You'),
     icon: {
       name: 'home-variant-outline',
@@ -124,7 +124,7 @@ export const TABS_MOBILE_CONFIG: Tab[] = [
     },
   },
   {
-    route: 'account',
+    route: '(account)',
     title: __('You'),
     icon: {
       name: 'bell-outline',

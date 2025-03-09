@@ -3,6 +3,8 @@ import { makeAutoObservable } from 'mobx';
 const transitionData: any = {};
 
 class RouterStore {
+  public isAppLoaded = false;
+
   constructor() {
     makeAutoObservable(this);
   }
@@ -21,6 +23,10 @@ class RouterStore {
 
   pushData(key: string, data: any) {
     transitionData[key] = data;
+  }
+
+  setAppLoaded() {
+    this.isAppLoaded = true;
   }
 }
 
