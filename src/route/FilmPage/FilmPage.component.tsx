@@ -28,12 +28,7 @@ import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { scale } from 'Util/CreateStyles';
 import { isCloseToBottom } from 'Util/Scroll';
 
-import {
-  BOOKMARKS_OVERLAY_ID,
-  PLAYER_VIDEO_SELECTOR_OVERLAY_ID,
-  SCHEDULE_OVERLAY_ID,
-  SCROLL_EVENT_END_PADDING,
-} from './FilmPage.config';
+import { SCROLL_EVENT_END_PADDING } from './FilmPage.config';
 import { styles } from './FilmPage.style';
 import { FilmPageComponentProps } from './FilmPage.type';
 import {
@@ -47,6 +42,9 @@ import {
 export function FilmPageComponent({
   film,
   visibleScheduleItems,
+  playerVideoSelectorOverlayId,
+  scheduleOverlayId,
+  bookmarksOverlayId,
   playFilm,
   hideVideoSelector,
   handleVideoSelect,
@@ -410,7 +408,7 @@ export function FilmPageComponent({
   const renderActions = () => (
     <View style={ styles.actions }>
       { renderAction(__('Trailer'), 'movie-open-check-outline') }
-      { renderAction(__('Bookmark'), 'movie-star-outline', () => OverlayStore.openOverlay(BOOKMARKS_OVERLAY_ID)) }
+      { renderAction(__('Bookmark'), 'movie-star-outline', () => OverlayStore.openOverlay(bookmarksOverlayId)) }
       { renderAction(__('Download'), 'folder-download-outline') }
     </View>
   );
@@ -468,8 +466,8 @@ export function FilmPageComponent({
 
     return (
       <ThemedOverlay
-        id={ SCHEDULE_OVERLAY_ID }
-        onHide={ () => OverlayStore.closeOverlay(SCHEDULE_OVERLAY_ID) }
+        id={ scheduleOverlayId }
+        onHide={ () => OverlayStore.goToPreviousOverlay() }
       >
         <ScrollView>
           { schedule.map(({ name, items }) => (
@@ -512,7 +510,7 @@ export function FilmPageComponent({
           )) }
         </View>
         <ThemedButton
-          onPress={ () => OverlayStore.openOverlay(SCHEDULE_OVERLAY_ID) }
+          onPress={ () => OverlayStore.openOverlay(scheduleOverlayId) }
           style={ styles.scheduleViewAll }
         >
           { __('View full schedule') }
@@ -629,7 +627,7 @@ export function FilmPageComponent({
 
     return (
       <PlayerVideoSelector
-        overlayId={ PLAYER_VIDEO_SELECTOR_OVERLAY_ID }
+        overlayId={ playerVideoSelectorOverlayId }
         film={ film }
         onHide={ hideVideoSelector }
         onSelect={ handleVideoSelect }
@@ -659,7 +657,7 @@ export function FilmPageComponent({
 
   const renderBookmarksOverlay = () => (
     <BookmarksSelector
-      overlayId={ BOOKMARKS_OVERLAY_ID }
+      overlayId={ bookmarksOverlayId }
       film={ film }
     />
   );

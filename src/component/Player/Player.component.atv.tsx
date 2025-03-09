@@ -39,14 +39,9 @@ import { SupportedKeys } from 'Util/RemoteControl/SupportedKeys';
 
 import {
   FocusedElement,
-  IN_PLAYER_BOOKMARKS_OVERLAY_ID,
-  IN_PLAYER_COMMENTS_OVERLAY_ID,
-  IN_PLAYER_VIDEO_SELECTOR_OVERLAY_ID,
   PLAYER_CONTROLS_ANIMATION,
   PLAYER_CONTROLS_TIMEOUT,
-  QUALITY_OVERLAY_ID,
   RewindDirection,
-  SUBTITLE_OVERLAY_ID,
 } from './Player.config';
 import PlayerStore from './Player.store';
 import { styles } from './Player.style.atv';
@@ -61,6 +56,11 @@ export function PlayerComponent({
   voice,
   selectedQuality,
   selectedSubtitle,
+  qualityOverlayId,
+  subtitleOverlayId,
+  playerVideoSelectorOverlayId,
+  commentsOverlayId,
+  bookmarksOverlayId,
   togglePlayPause,
   rewindPosition,
   openQualitySelector,
@@ -227,12 +227,12 @@ export function PlayerComponent({
   };
 
   const renderSubtitle = () => {
-    const { releaseDate, countries, ratings } = film;
+    const { releaseDate, countries = [], ratings = [] } = film;
 
     return (
       <ThemedText style={ styles.subtitle }>
         {
-          `${releaseDate} • ${ratings ? ratings[0].text : ''} • ${countries ? countries[0] : ''}`
+          `${releaseDate} • ${ratings.length ? ratings[0].text : ''} • ${countries.length ? countries[0].name : ''}`
         }
       </ThemedText>
     );
@@ -329,7 +329,7 @@ export function PlayerComponent({
         </>
       ) }
       { renderTopAction('speed', 'Speed') }
-      { renderTopAction('comment', 'Comments', () => OverlayStore.openOverlay(IN_PLAYER_COMMENTS_OVERLAY_ID)) }
+      { renderTopAction('comment', 'Comments', () => OverlayStore.openOverlay(commentsOverlayId)) }
     </SpatialNavigationView>
   );
 
@@ -396,7 +396,7 @@ export function PlayerComponent({
           { renderBottomAction('high-quality', 'Quality', openQualitySelector, bottomActionRef) }
           { isPlaylistSelector && renderBottomAction('playlist-play', 'Series', openVideoSelector) }
           { subtitles.length > 0 && renderBottomAction('subtitles', 'Subtitles', openSubtitleSelector) }
-          { renderBottomAction('bookmarks', 'Bookmarks', () => OverlayStore.openOverlay(IN_PLAYER_BOOKMARKS_OVERLAY_ID)) }
+          { renderBottomAction('bookmarks', 'Bookmarks', () => OverlayStore.openOverlay(bookmarksOverlayId)) }
           { renderBottomAction('share', 'Share') }
         </SpatialNavigationView>
         { renderDuration() }
@@ -439,7 +439,7 @@ export function PlayerComponent({
     return (
       <ThemedDropdown
         asOverlay
-        overlayId={ QUALITY_OVERLAY_ID }
+        overlayId={ qualityOverlayId }
         header={ __('Quality') }
         value={ selectedQuality }
         data={ streams.map((stream) => ({
@@ -460,7 +460,7 @@ export function PlayerComponent({
 
     return (
       <PlayerVideoSelector
-        overlayId={ IN_PLAYER_VIDEO_SELECTOR_OVERLAY_ID }
+        overlayId={ playerVideoSelectorOverlayId }
         film={ film }
         onHide={ hideVideoSelector }
         onSelect={ handleVideoSelect }
@@ -475,7 +475,7 @@ export function PlayerComponent({
     return (
       <ThemedDropdown
         asOverlay
-        overlayId={ SUBTITLE_OVERLAY_ID }
+        overlayId={ subtitleOverlayId }
         header={ __('Subtitles') }
         value={ selectedSubtitle?.languageCode }
         data={ subtitles.map((subtitle) => ({
@@ -489,7 +489,7 @@ export function PlayerComponent({
 
   const renderCommentsOverlay = () => (
     <ThemedOverlay
-      id={ IN_PLAYER_COMMENTS_OVERLAY_ID }
+      id={ commentsOverlayId }
       onHide={ () => OverlayStore.goToPreviousOverlay() }
       containerStyle={ styles.commentsOverlay }
     >
@@ -502,7 +502,7 @@ export function PlayerComponent({
 
   const renderBookmarksOverlay = () => (
     <BookmarksSelector
-      overlayId={ IN_PLAYER_BOOKMARKS_OVERLAY_ID }
+      overlayId={ bookmarksOverlayId }
       film={ film }
     />
   );

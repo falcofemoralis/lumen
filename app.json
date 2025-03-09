@@ -63,7 +63,7 @@
     "newArchEnabled": true,
     "name": "Lumen App",
     "slug": "lumen",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "extra": {
       "eas": {
         "projectId": "ad7c3459-7949-4f54-9d83-5e8a400a0af4"

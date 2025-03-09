@@ -1,12 +1,14 @@
 import Colors from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
+export const MAIN_CONTENT_HEIGHT_TV = 300;
+
 export const styles = CreateStyles({
   mainContent: {
     flexDirection: 'row',
     gap: 24,
     width: '100%',
-    paddingBottom: 40,
+    paddingBottom: 8,
   },
   photo: {
     width: '15%',

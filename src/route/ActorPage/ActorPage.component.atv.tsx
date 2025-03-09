@@ -15,7 +15,7 @@ import { scale } from 'Util/CreateStyles';
 import { getWindowWidth } from 'Util/Window';
 
 import { NUMBER_OF_COLUMNS_TV } from './ActorPage.config';
-import { styles } from './ActorPage.style.atv';
+import { MAIN_CONTENT_HEIGHT_TV, styles } from './ActorPage.style.atv';
 import { ActorPageComponentProps } from './ActorPage.type';
 
 // TODO: Rework
@@ -168,9 +168,11 @@ export function ActorPageComponent({
         <FilmList
           data={ data }
           handleOnPress={ handleSelectFilm }
-          offsetFromStart={ CARD_HEIGHT_TV }
           numberOfColumns={ NUMBER_OF_COLUMNS_TV }
-        />
+          contentHeight={ MAIN_CONTENT_HEIGHT_TV }
+        >
+          { renderMainData() }
+        </FilmList>
       </DefaultFocus>
     );
   };
@@ -178,7 +180,6 @@ export function ActorPageComponent({
   return (
     <Page>
       <View>
-        { renderMainData() }
         { renderRoles() }
       </View>
     </Page>

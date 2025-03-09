@@ -23,6 +23,11 @@ export interface PlayerComponentProps {
   voice: FilmVoiceInterface;
   selectedQuality: string;
   selectedSubtitle?: SubtitleInterface;
+  qualityOverlayId: string;
+  subtitleOverlayId: string;
+  playerVideoSelectorOverlayId: string;
+  commentsOverlayId: string;
+  bookmarksOverlayId: string;
   togglePlayPause: (state?: boolean) => void;
   rewindPosition: (type: RewindDirection, seconds?: number) => void;
   seekToPosition: (percent: number) => void;

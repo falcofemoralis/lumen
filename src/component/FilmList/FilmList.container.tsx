@@ -10,9 +10,9 @@ import { FilmListContainerProps } from './FilmList.type';
 
 export function FilmListContainer({
   data,
-  offsetFromStart,
   numberOfColumns = 1,
   children,
+  contentHeight,
 }: FilmListContainerProps) {
   const handleOnPress = useCallback((film: FilmCardInterface) => {
     openFilm(film.link);
@@ -48,9 +48,9 @@ export function FilmListContainer({
 
   const containerProps = () => ({
     data,
-    offsetFromStart,
     numberOfColumns,
     children,
+    contentHeight,
   });
 
   return withTV(FilmListComponentTV, FilmListComponent, {

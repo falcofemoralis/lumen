@@ -28,12 +28,6 @@ import { CollectionItemInterface } from 'Type/CollectionItem';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { scale } from 'Util/CreateStyles';
 
-import {
-  BOOKMARKS_OVERLAY_ID,
-  COMMENTS_OVERLAY_ID,
-  PLAYER_VIDEO_SELECTOR_OVERLAY_ID,
-  SCHEDULE_OVERLAY_ID,
-} from './FilmPage.config';
 import { styles } from './FilmPage.style.atv';
 import { FilmPageComponentProps } from './FilmPage.type';
 import {
@@ -43,6 +37,10 @@ import {
 export function FilmPageComponent({
   film,
   visibleScheduleItems,
+  playerVideoSelectorOverlayId,
+  scheduleOverlayId,
+  commentsOverlayId,
+  bookmarksOverlayId,
   playFilm,
   hideVideoSelector,
   handleVideoSelect,
@@ -119,8 +117,8 @@ export function FilmPageComponent({
       <DefaultFocus>
         <ThemedView style={ styles.actions }>
           { renderPlayButton() }
-          { renderAction(__('Comments'), 'comment-text-multiple-outline', () => OverlayStore.openOverlay(COMMENTS_OVERLAY_ID)) }
-          { renderAction(__('Bookmark'), 'movie-star-outline', () => OverlayStore.openOverlay(BOOKMARKS_OVERLAY_ID)) }
+          { renderAction(__('Comments'), 'comment-text-multiple-outline', () => OverlayStore.openOverlay(commentsOverlayId)) }
+          { renderAction(__('Bookmark'), 'movie-star-outline', () => OverlayStore.openOverlay(bookmarksOverlayId)) }
           { renderAction(__('Trailer'), 'movie-open-check-outline') }
           { renderAction(__('Share'), 'share-variant-outline') }
           { renderAction(__('Download'), 'folder-download-outline') }
@@ -322,7 +320,7 @@ export function FilmPageComponent({
 
     return (
       <PlayerVideoSelector
-        overlayId={ PLAYER_VIDEO_SELECTOR_OVERLAY_ID }
+        overlayId={ playerVideoSelectorOverlayId }
         film={ film }
         onHide={ hideVideoSelector }
         onSelect={ handleVideoSelect }
@@ -370,8 +368,8 @@ export function FilmPageComponent({
 
     return (
       <ThemedOverlay
-        id={ SCHEDULE_OVERLAY_ID }
-        onHide={ () => OverlayStore.closeOverlay(SCHEDULE_OVERLAY_ID) }
+        id={ scheduleOverlayId }
+        onHide={ () => OverlayStore.goToPreviousOverlay() }
         containerStyle={ styles.scheduleOverlay }
         contentContainerStyle={ styles.scheduleOverlayContent }
       >
@@ -428,7 +426,7 @@ export function FilmPageComponent({
           </SpatialNavigationScrollView>
         </View>
         <ThemedButton
-          onPress={ () => OverlayStore.openOverlay(SCHEDULE_OVERLAY_ID) }
+          onPress={ () => OverlayStore.openOverlay(scheduleOverlayId) }
           style={ styles.scheduleViewAll }
         >
           { __('View full schedule') }
@@ -533,7 +531,7 @@ export function FilmPageComponent({
 
   const renderCommentsOverlay = () => (
     <ThemedOverlay
-      id={ COMMENTS_OVERLAY_ID }
+      id={ commentsOverlayId }
       onHide={ () => OverlayStore.goToPreviousOverlay() }
       containerStyle={ styles.commentsOverlay }
     >
@@ -546,7 +544,7 @@ export function FilmPageComponent({
 
   const renderBookmarksOverlay = () => (
     <BookmarksSelector
-      overlayId={ BOOKMARKS_OVERLAY_ID }
+      overlayId={ bookmarksOverlayId }
       film={ film }
     />
   );

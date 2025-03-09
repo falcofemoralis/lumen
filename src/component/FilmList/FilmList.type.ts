@@ -7,37 +7,31 @@ export type FilmListData = {
 
 export interface FilmListContainerProps {
   data: FilmListData[];
-  offsetFromStart?: number;
   numberOfColumns?: number;
-  handleOnPress: (film: FilmCardInterface) => void;
   children?: JSX.Element;
+  contentHeight?: number;
+  handleOnPress: (film: FilmCardInterface) => void;
 }
 
 export interface FilmListComponentProps {
   data: FilmListData[];
-  offsetFromStart?: number;
   numberOfColumns: number;
+  children?: JSX.Element;
+  contentHeight?: number;
   handleOnPress: (film: FilmCardInterface) => void;
   calculateRows: <T>(list: T[]) => T[][];
-  children?: JSX.Element;
-}
-
-export enum FilmListItemType {
-  FILM = 'FILM',
-  HEADER = 'HEADER',
-  CONTENT = 'CONTENT',
 }
 
 export type FilmListItem = {
   index: number;
   films?: FilmCardInterface[];
   header?: string;
-  type: FilmListItemType;
+  content?: JSX.Element;
 }
 
 export interface FilmListRowProps {
   row: FilmListItem;
-  itemSize: number;
-  children?: JSX.Element;
+  itemSize?: number;
+  numberOfColumns: number;
   handleOnPress: (film: FilmCardInterface) => void;
 }

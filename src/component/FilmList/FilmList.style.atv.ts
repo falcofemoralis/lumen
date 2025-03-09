@@ -1,8 +1,8 @@
-import CreateStyles, { scale } from 'Util/CreateStyles';
+import CreateStyles from 'Util/CreateStyles';
 
 export const ROW_GAP = 16;
 
-export const HEADER_HEIGHT = scale(40);
+export const HEADER_HEIGHT = 32;
 
 export const styles = CreateStyles({
   container: {
@@ -17,9 +17,8 @@ export const styles = CreateStyles({
   rowStyle: {
   },
   headerText: {
-    fontSize: 32,
+    fontSize: HEADER_HEIGHT,
+    lineHeight: HEADER_HEIGHT,
     fontWeight: '700',
-    paddingBottom: 8,
-    marginBottom: 8,
   },
 });

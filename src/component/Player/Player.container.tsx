@@ -4,7 +4,9 @@ import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { useVideoPlayer } from 'expo-video';
 import { withTV } from 'Hooks/withTV';
 import __ from 'i18n/__';
-import { useEffect, useRef, useState } from 'react';
+import {
+  useEffect, useId, useRef, useState,
+} from 'react';
 import NotificationStore from 'Store/Notification.store';
 import OverlayStore from 'Store/Overlay.store';
 import ServiceStore from 'Store/Service.store';
@@ -24,11 +26,8 @@ import PlayerComponentTV from './Player.component.atv';
 import {
   AWAKE_TAG,
   DEFAULT_REWIND_SECONDS,
-  IN_PLAYER_VIDEO_SELECTOR_OVERLAY_ID,
-  QUALITY_OVERLAY_ID,
   RewindDirection,
   SAVE_TIME_EVERY_MS,
-  SUBTITLE_OVERLAY_ID,
 } from './Player.config';
 import PlayerStore from './Player.store';
 import { PlayerContainerProps } from './Player.type';
@@ -49,6 +48,11 @@ export function PlayerContainer({
     selectedVideo.subtitles?.find(({ isDefault }) => isDefault),
   );
   const updateTimeTimeout = useRef<NodeJS.Timeout | null>(null);
+  const qualityOverlayId = useId();
+  const subtitleOverlayId = useId();
+  const playerVideoSelectorOverlayId = useId();
+  const commentsOverlayId = useId();
+  const bookmarksOverlayId = useId();
 
   const player = useVideoPlayer(selectedStream.url, (p) => {
     p.loop = false;
@@ -174,11 +178,11 @@ export function PlayerContainer({
   };
 
   const openQualitySelector = () => {
-    OverlayStore.openOverlay(QUALITY_OVERLAY_ID);
+    OverlayStore.openOverlay(qualityOverlayId);
   };
 
   const openSubtitleSelector = () => {
-    OverlayStore.openOverlay(SUBTITLE_OVERLAY_ID);
+    OverlayStore.openOverlay(subtitleOverlayId);
   };
 
   const handleQualityChange = (item: DropdownItem) => {
@@ -337,7 +341,7 @@ export function PlayerContainer({
   };
 
   const openVideoSelector = () => {
-    OverlayStore.openOverlay(IN_PLAYER_VIDEO_SELECTOR_OVERLAY_ID);
+    OverlayStore.openOverlay(playerVideoSelectorOverlayId);
   };
 
   const hideVideoSelector = () => {
@@ -363,6 +367,11 @@ export function PlayerContainer({
     voice: selectedVoice,
     selectedQuality,
     selectedSubtitle,
+    qualityOverlayId,
+    subtitleOverlayId,
+    playerVideoSelectorOverlayId,
+    commentsOverlayId,
+    bookmarksOverlayId,
   });
 
   const containerFunctions = {

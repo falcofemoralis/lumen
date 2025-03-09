@@ -10,6 +10,10 @@ export interface FilmPageContainerProps {
 export interface FilmPageComponentProps {
   film: FilmInterface | null;
   visibleScheduleItems: ScheduleItemInterface[];
+  playerVideoSelectorOverlayId: string;
+  scheduleOverlayId: string;
+  commentsOverlayId: string;
+  bookmarksOverlayId: string;
   playFilm: () => void;
   hideVideoSelector: () => void;
   handleVideoSelect: (video: FilmVideoInterface, voice: FilmVoiceInterface) => void;

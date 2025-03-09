@@ -1,6 +1,8 @@
 import { router } from 'expo-router';
 import { withTV } from 'Hooks/withTV';
-import { useCallback, useEffect, useState } from 'react';
+import {
+  useCallback, useEffect, useId, useState,
+} from 'react';
 import NotificationStore from 'Store/Notification.store';
 import OverlayStore from 'Store/Overlay.store';
 import RouterStore from 'Store/Router.store';
@@ -13,14 +15,15 @@ import { openActor, openCategory, openFilm } from 'Util/Router';
 
 import FilmPageComponent from './FilmPage.component';
 import FilmPageComponentTV from './FilmPage.component.atv';
-import {
-  MINIMUM_SCHEDULE_ITEMS,
-  PLAYER_VIDEO_SELECTOR_OVERLAY_ID,
-} from './FilmPage.config';
+import { MINIMUM_SCHEDULE_ITEMS } from './FilmPage.config';
 import { FilmPageContainerProps } from './FilmPage.type';
 
 export function FilmPageContainer({ link }: FilmPageContainerProps) {
   const [film, setFilm] = useState<FilmInterface | null>(null);
+  const playerVideoSelectorOverlayId = useId();
+  const scheduleOverlayId = useId();
+  const commentsOverlayId = useId();
+  const bookmarksOverlayId = useId();
 
   useEffect(() => {
     const loadFilm = async () => {
@@ -41,8 +44,8 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
       return;
     }
 
-    OverlayStore.openOverlay(PLAYER_VIDEO_SELECTOR_OVERLAY_ID);
-  }, [film]);
+    OverlayStore.openOverlay(playerVideoSelectorOverlayId);
+  }, [film, playerVideoSelectorOverlayId]);
 
   const hideVideoSelector = useCallback(() => {
     OverlayStore.goToPreviousOverlay();
@@ -144,6 +147,10 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
   const containerProps = () => ({
     film,
     visibleScheduleItems: getVisibleScheduleItems(),
+    playerVideoSelectorOverlayId,
+    scheduleOverlayId,
+    commentsOverlayId,
+    bookmarksOverlayId,
   });
 
   const containerFunctions = {

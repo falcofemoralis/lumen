@@ -37,14 +37,9 @@ import { scale } from 'Util/CreateStyles';
 import { setTimeoutSafe } from 'Util/Misc';
 
 import {
-  IN_PLAYER_BOOKMARKS_OVERLAY_ID,
-  IN_PLAYER_COMMENTS_OVERLAY_ID,
-  IN_PLAYER_VIDEO_SELECTOR_OVERLAY_ID,
   PLAYER_CONTROLS_ANIMATION,
   PLAYER_CONTROLS_TIMEOUT,
-  QUALITY_OVERLAY_ID,
   RewindDirection,
-  SUBTITLE_OVERLAY_ID,
 } from './Player.config';
 import { MiddleActionVariant, styles } from './Player.style';
 import { PlayerComponentProps } from './Player.type';
@@ -60,6 +55,11 @@ export function PlayerComponent({
   voice,
   selectedQuality,
   selectedSubtitle,
+  qualityOverlayId,
+  subtitleOverlayId,
+  playerVideoSelectorOverlayId,
+  commentsOverlayId,
+  bookmarksOverlayId,
   togglePlayPause,
   seekToPosition,
   calculateCurrentTime,
@@ -348,8 +348,8 @@ export function PlayerComponent({
         </View>
         <View style={ styles.actionsRow }>
           { isPlaylistSelector && renderAction('playlist-play', 'Series', openVideoSelector) }
-          { renderAction('comment-text-outline', 'Comments', () => OverlayStore.openOverlay(IN_PLAYER_COMMENTS_OVERLAY_ID)) }
-          { renderAction('bookmark-outline', 'Bookmarks', () => OverlayStore.openOverlay(IN_PLAYER_BOOKMARKS_OVERLAY_ID)) }
+          { renderAction('comment-text-outline', 'Comments', () => OverlayStore.openOverlay(commentsOverlayId)) }
+          { renderAction('bookmark-outline', 'Bookmarks', () => OverlayStore.openOverlay(bookmarksOverlayId)) }
           { renderAction('share-outline', 'Share') }
         </View>
       </View>
@@ -392,7 +392,7 @@ export function PlayerComponent({
     return (
       <ThemedDropdown
         asOverlay
-        overlayId={ QUALITY_OVERLAY_ID }
+        overlayId={ qualityOverlayId }
         header={ __('Quality') }
         value={ selectedQuality }
         data={ streams.map((stream) => ({
@@ -413,7 +413,7 @@ export function PlayerComponent({
 
     return (
       <PlayerVideoSelector
-        overlayId={ IN_PLAYER_VIDEO_SELECTOR_OVERLAY_ID }
+        overlayId={ playerVideoSelectorOverlayId }
         film={ film }
         onHide={ hideVideoSelector }
         onSelect={ handleVideoSelect }
@@ -428,7 +428,7 @@ export function PlayerComponent({
     return (
       <ThemedDropdown
         asOverlay
-        overlayId={ SUBTITLE_OVERLAY_ID }
+        overlayId={ subtitleOverlayId }
         header={ __('Subtitles') }
         value={ selectedSubtitle?.languageCode }
         data={ subtitles.map((subtitle) => ({
@@ -442,7 +442,7 @@ export function PlayerComponent({
 
   const renderCommentsOverlay = () => (
     <ThemedOverlay
-      id={ IN_PLAYER_COMMENTS_OVERLAY_ID }
+      id={ commentsOverlayId }
       onHide={ () => OverlayStore.goToPreviousOverlay() }
       containerStyle={ styles.commentsOverlay }
     >
@@ -460,7 +460,7 @@ export function PlayerComponent({
 
   const renderBookmarksOverlay = () => (
     <BookmarksSelector
-      overlayId={ IN_PLAYER_BOOKMARKS_OVERLAY_ID }
+      overlayId={ bookmarksOverlayId }
       film={ film }
     />
   );

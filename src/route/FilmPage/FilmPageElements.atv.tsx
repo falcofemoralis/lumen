@@ -8,6 +8,7 @@ import __ from 'i18n/__';
 import { memo } from 'react';
 import { View } from 'react-native';
 import { SpatialNavigationFocusableView } from 'react-tv-space-navigation';
+import OverlayStore from 'Store/Overlay.store';
 import { ActorCardInterface } from 'Type/ActorCard.interface';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
@@ -279,7 +280,10 @@ export const InfoList = memo(({
 
   return (
     <SpatialNavigationFocusableView
-      onSelect={ () => handleSelectCategory(link) }
+      onSelect={ () => {
+        handleSelectCategory(link);
+        OverlayStore.goToPreviousOverlay();
+      } }
     >
       { ({ isFocused }) => (
         <View style={ [
