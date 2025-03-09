@@ -12,9 +12,14 @@ export const styles = CreateStyles({
     width: '100%',
     paddingBottom: 16,
   },
-  photo: {
+  photoWrapper: {
     width: '30%',
     aspectRatio: '12 / 19',
+    borderRadius: 16,
+  },
+  photo: {
+    height: '100%',
+    width: '100%',
     borderRadius: 16,
   },
   name: {

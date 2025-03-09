@@ -19,11 +19,13 @@ import {
   NativeSyntheticEvent,
   ScrollView,
   Text,
+  TouchableHighlight,
   TouchableOpacity,
   View,
 } from 'react-native';
 import OverlayStore from 'Store/Overlay.store';
 import Colors from 'Style/Colors';
+import { CollectionItemInterface } from 'Type/CollectionItem';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { scale } from 'Util/CreateStyles';
 import { isCloseToBottom } from 'Util/Scroll';
@@ -215,13 +217,15 @@ export function FilmPageComponent({
     return (
       <ScrollView horizontal>
         <View style={ styles.genres }>
-          { genres.map((genre) => (
-            <ThemedText
-              key={ genre }
-              style={ styles.genre }
+          { genres.map(({ name, link }) => (
+            <TouchableHighlight
+              key={ name }
+              onPress={ () => handleSelectCategory(link) }
             >
-              { genre }
-            </ThemedText>
+              <ThemedText style={ styles.genre }>
+                { name }
+              </ThemedText>
+            </TouchableHighlight>
           )) }
         </View>
       </ScrollView>
@@ -263,27 +267,30 @@ export function FilmPageComponent({
     );
   };
 
-  const renderCollectionInfo = (collection: string[], title?: string) => {
+  const renderCollection = (
+    collection: CollectionItemInterface[],
+    title: string,
+    handler?: (link: string) => void,
+  ) => {
     if (!collection.length) {
       return null;
     }
 
     return (
       <View style={ styles.collectionContainer }>
-        { title && (
-          <ThemedText style={ styles.collectionTitle }>
-            { `${title}: ` }
-          </ThemedText>
-        ) }
-        { collection.map((item) => (
+        <ThemedText style={ styles.collectionTitle }>
+          { `${title}: ` }
+        </ThemedText>
+        { collection.map(({ name, link }) => (
           <TouchableOpacity
-            key={ item }
+            key={ name }
             style={ styles.collectionButton }
+            onPress={ () => handler && handler(link) }
           >
             <ThemedText
               style={ styles.collectionButtonText }
             >
-              { item }
+              { name }
             </ThemedText>
           </TouchableOpacity>
         )) }
@@ -291,11 +298,18 @@ export function FilmPageComponent({
     );
   };
 
+  const renderDirectors = () => {
+    const { directors = [] } = film;
+
+    const items = directors.map(({ name, link }) => ({ name, link: link || '' }));
+
+    return renderCollection(items, __('Director'), handleSelectActor);
+  };
+
   const renderMainInfo = () => {
     const {
       releaseDate,
       ratings = [],
-      directors = [],
       countries = [],
       duration,
     } = film;
@@ -306,8 +320,8 @@ export function FilmPageComponent({
         { renderInfoText(releaseDate, __('Release date')) }
         { renderInfoText(duration, __('Time')) }
         { renderRating() }
-        { renderCollectionInfo(directors.map(({ name }) => name), __('Director')) }
-        { renderCollectionInfo(countries, __('Country')) }
+        { renderDirectors() }
+        { renderCollection(countries, __('Country'), handleSelectCategory) }
       </View>
     );
   };

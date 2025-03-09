@@ -49,8 +49,8 @@ export function NotificationsPageComponent({
           <View style={ {
             flexDirection: 'row',
             height: CARD_HEIGHT_TV,
-            gap: 16,
-            marginTop: 16,
+            gap: scale(16),
+            marginTop: scale(16),
           } }
           >
             { filmThumbs.map((item, i) => (

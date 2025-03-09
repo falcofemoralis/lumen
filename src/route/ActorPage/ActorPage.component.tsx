@@ -1,11 +1,16 @@
+import FilmCard from 'Component/FilmCard';
+import { CARD_HEIGHT } from 'Component/FilmCard/FilmCard.style';
 import FilmList from 'Component/FilmList';
+import { ROW_GAP } from 'Component/FilmList/FilmList.style.atv';
 import Page from 'Component/Page';
-import ThemedImage from 'Component/ThemedImage';
+import ThemedImageModal from 'Component/ThemedImageModal';
 import ThemedText from 'Component/ThemedText';
-import ThemedView from 'Component/ThemedView';
 import Thumbnail from 'Component/Thumbnail';
 import React from 'react';
 import { View } from 'react-native';
+import { calculateItemSize } from 'Style/Layout';
+import { FilmCardInterface } from 'Type/FilmCard.interface';
+import { FilmType } from 'Type/FilmType.type';
 import { scale } from 'Util/CreateStyles';
 
 import { NUMBER_OF_COLUMNS } from './ActorPage.config';
@@ -17,27 +22,62 @@ export function ActorPageComponent({
   actor,
   handleSelectFilm,
 }: ActorPageComponentProps) {
+  const itemWidth = calculateItemSize(NUMBER_OF_COLUMNS);
+
   if (!actor || isLoading) {
+    const filmThumbs = Array(NUMBER_OF_COLUMNS).fill({
+      id: '',
+      link: '',
+      type: FilmType.FILM,
+      poster: '',
+      title: '',
+      subtitle: '',
+      isThumbnail: true,
+    }) as FilmCardInterface[];
+
     return (
       <Page>
-        <ThemedView>
-          { Array(5).fill(0).map((_, i) => (
+        <View>
+          <View style={ styles.mainContent }>
             <Thumbnail
-              // eslint-disable-next-line react/no-array-index-key
-              key={ `${i}-thumb` }
-              height={ scale(32) }
-              width={ scale(110) }
+              style={ styles.photoWrapper }
             />
-          )) }
-        </ThemedView>
-        { /* <View style={ styles.mainContent }>
-          <Thumbnail style={ styles.poster } />
-          <Thumbnail style={ styles.mainInfo } />
+            <View style={ [styles.additionalInfo, { marginTop: 0 }] }>
+              { Array(5).fill(0).map((_, i) => (
+                <Thumbnail
+                  // eslint-disable-next-line react/no-array-index-key
+                  key={ `${i}-actor-thumb` }
+                  height={ scale(16) }
+                  width={ scale(200) }
+                />
+              )) }
+            </View>
+          </View>
+          <View style={ [styles.additionalInfo, { marginTop: 0 }] }>
+            <Thumbnail
+              height={ scale(24) }
+              width={ scale(200) }
+            />
+            <View style={ {
+              flexDirection: 'row',
+              gap: scale(16),
+            } }
+            >
+              { filmThumbs.map((item, i) => (
+                <FilmCard
+                // eslint-disable-next-line react/no-array-index-key
+                  key={ `${i}-actor-film-thumb` }
+                  filmCard={ item }
+                  style={ {
+                    // TODO: Rework
+                    width: itemWidth - scale(ROW_GAP),
+                  } }
+                  isThumbnail
+                />
+              )) }
+            </View>
+          </View>
         </View>
-        <Loader
-          isLoading
-          fullScreen
-        /> */ }
       </Page>
     );
   }
@@ -46,9 +86,11 @@ export function ActorPageComponent({
     const { photo } = actor;
 
     return (
-      <ThemedImage
-        style={ styles.photo }
+      <ThemedImageModal
         src={ photo }
+        modalSrc={ photo }
+        style={ styles.photoWrapper }
+        imageStyle={ styles.photo }
       />
     );
   };

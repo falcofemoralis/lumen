@@ -4,55 +4,55 @@ import { CARD_HEIGHT } from 'Component/FilmCard/FilmCard.style';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
 import React, { memo, useCallback, useMemo } from 'react';
-import { Pressable } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { calculateItemSize } from 'Style/Layout';
 
 import { styles } from './FilmList.style';
 import {
   FilmListComponentProps,
   FilmListItem,
-  FilmListItemType,
   FilmListRowProps,
 } from './FilmList.type';
 
 const FilmListRow = ({
   row,
   itemSize,
-  children,
   handleOnPress,
 }: FilmListRowProps) => {
-  const { type } = row;
+  const { content, header } = row;
 
-  if (type === FilmListItemType.CONTENT) {
-    return children;
-  }
+  const renderContent = () => (
+    <View>
+      { content }
+    </View>
+  );
 
-  if (type === FilmListItemType.HEADER) {
-    const { header: text } = row;
-
-    return (
-      <ThemedView>
-        <ThemedText style={ styles.headerText }>
-          { text }
-        </ThemedText>
-      </ThemedView>
-    );
-  }
+  const renderHeader = () => (
+    <ThemedView>
+      <ThemedText style={ styles.headerText }>
+        { header }
+      </ThemedText>
+    </ThemedView>
+  );
 
   return (
-    <ThemedView style={ styles.gridItem }>
-      { row.films?.map((item) => (
-        <Pressable
-          key={ item.id }
-          style={ { width: itemSize } }
-          onPress={ () => handleOnPress(item) }
-        >
-          <FilmCard
-            filmCard={ item }
-          />
-        </Pressable>
-      )) }
-    </ThemedView>
+    <View>
+      { content && renderContent() }
+      { header && renderHeader() }
+      <View style={ styles.gridItem }>
+        { row.films?.map((item) => (
+          <Pressable
+            key={ item.id }
+            style={ { width: itemSize } }
+            onPress={ () => handleOnPress(item) }
+          >
+            <FilmCard
+              filmCard={ item }
+            />
+          </Pressable>
+        )) }
+      </View>
+    </View>
   );
 };
 
@@ -75,40 +75,36 @@ export function FilmListComponent({
     <MemoizedFilmListRow
       row={ row }
       itemSize={ itemWidth }
+      numberOfColumns={ numberOfColumns }
       handleOnPress={ handleOnPress }
-    >
-      { children }
-    </MemoizedFilmListRow>
+    />
   ), [numberOfColumns, children]);
 
   const data = useMemo(() => {
-    const memoData: FilmListItem[] = [];
-
-    if (children) {
-      memoData.push({
+    const items = initialData.reduce((acc, item) => {
+      const rows = calculateRows(item.films).map<FilmListItem>((row) => ({
         index: -1,
-        type: FilmListItemType.CONTENT,
-      });
-    }
-
-    return initialData.reduce((acc, item, index) => {
-      acc.push({
-        index,
-        header: item.header,
-        type: FilmListItemType.HEADER,
-      });
-
-      const rows = calculateRows(item.films).map((row, innerIndex) => ({
-        index: (acc.length - 1) + innerIndex,
         films: row,
-        type: FilmListItemType.FILM,
       }));
+
+      if (rows.length > 0) {
+        rows[0].header = item.header;
+      }
 
       acc.push(...rows);
 
       return acc;
-    }, memoData);
-  }, [initialData, children, calculateRows]);
+    }, [] as FilmListItem[]);
+
+    if (items.length > 0) {
+      items[0].content = children;
+    }
+
+    return items.map((item, index) => ({
+      ...item,
+      index,
+    }));
+  }, [initialData, calculateRows]);
 
   return (
     <FlashList
