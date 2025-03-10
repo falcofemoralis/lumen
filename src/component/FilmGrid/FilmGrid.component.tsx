@@ -1,48 +1,49 @@
 import FilmCard from 'Component/FilmCard';
-import { CARD_HEIGHT } from 'Component/FilmCard/FilmCard.style';
+import { calculateCardDimensions } from 'Component/FilmCard/FilmCard.style';
 import ThemedGrid from 'Component/ThemedGrid';
 import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
-import React, { memo, useCallback } from 'react';
+import React, { memo, useCallback, useMemo } from 'react';
 import {
   Pressable,
+  View,
 } from 'react-native';
-import { calculateItemSize } from 'Style/Layout';
+import { scale } from 'Util/CreateStyles';
+import { calculateRows } from 'Util/List';
 
 import { NUMBER_OF_COLUMNS } from './FilmGrid.config';
-import { styles } from './FilmGrid.style';
-import { FilmGridComponentProps, FilmGridItemProps, FilmGridItemType } from './FilmGrid.type';
+import { ROW_GAP, styles } from './FilmGrid.style';
+import {
+  FilmGridComponentProps, FilmGridItemProps, FilmGridRowType,
+} from './FilmGrid.type';
 
 function FilmGridItem({
-  item,
+  row,
   index,
-  itemSize,
+  width,
   handleOnPress,
 }: FilmGridItemProps) {
-  const { gap } = styles.grid;
-
-  const halfGap = gap / 2;
-  const column = index % NUMBER_OF_COLUMNS;
+  const { items } = row;
 
   return (
-    <Pressable
-      style={ { width: itemSize } }
-      onPress={ () => handleOnPress(item) }
-    >
-      <FilmCard
-        style={ {
-          paddingRight: column < NUMBER_OF_COLUMNS - 1 ? halfGap : 0,
-          paddingLeft: column > 0 ? halfGap : 0,
-          paddingBottom: gap,
-        } }
-        filmCard={ item }
-        isThumbnail={ item.isThumbnail }
-      />
-    </Pressable>
+    <View style={ styles.gridRow }>
+      { items.map((item, innerIndex) => (
+        <Pressable
+          key={ item.id !== '' ? item.id : `film-grid-thumb-${index}-${innerIndex}` }
+          style={ { width } }
+          onPress={ () => handleOnPress(item) }
+        >
+          <FilmCard
+            filmCard={ item }
+            isThumbnail={ item.isThumbnail }
+          />
+        </Pressable>
+      )) }
+    </View>
   );
 }
 
 function rowPropsAreEqual(prevProps: FilmGridItemProps, props: FilmGridItemProps) {
-  return prevProps.item.id === props.item.id;
+  return prevProps.row.id === props.row.id;
 }
 
 const MemoizedGridItem = memo(FilmGridItem, rowPropsAreEqual);
@@ -52,27 +53,35 @@ export function FilmGridComponent({
   handleOnPress,
   onNextLoad,
 }: FilmGridComponentProps) {
-  const itemWidth = calculateItemSize(NUMBER_OF_COLUMNS);
+  const { width, height } = calculateCardDimensions(NUMBER_OF_COLUMNS, scale(ROW_GAP));
 
   const renderItem = useCallback(
-    ({ item, index }: ThemedGridRowProps<FilmGridItemType>) => (
+    ({ item: row, index }: ThemedGridRowProps<FilmGridRowType>) => (
       <MemoizedGridItem
         index={ index }
-        item={ item }
+        row={ row }
+        width={ width }
         handleOnPress={ handleOnPress }
-        itemSize={ itemWidth }
       />
     ),
-    [handleOnPress, itemWidth],
+    [],
   );
+
+  const data = useMemo(() => calculateRows(
+    films, NUMBER_OF_COLUMNS,
+  ).map((items) => ({
+    id: items[0].id,
+    items,
+  })), [films]);
 
   return (
     <ThemedGrid
-      data={ films }
-      numberOfColumns={ NUMBER_OF_COLUMNS }
-      itemSize={ CARD_HEIGHT }
+      data={ data }
+      numberOfColumns={ 1 }
+      itemSize={ height }
       renderItem={ renderItem }
       onNextLoad={ onNextLoad }
+      style={ styles.grid }
     />
   );
 }

@@ -6,7 +6,7 @@ import Thumbnail from 'Component/Thumbnail';
 import __ from 'i18n/__';
 import React from 'react';
 import { View } from 'react-native';
-import { calculateItemSize } from 'Style/Layout';
+import { calculateItemWidth } from 'Style/Layout';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { FilmType } from 'Type/FilmType.type';
 import { scale } from 'Util/CreateStyles';
@@ -20,7 +20,7 @@ export function NotificationsPageComponent({
   data,
   handleSelectFilm,
 }: NotificationsPageComponentProps) {
-  const itemWidth = calculateItemSize(NUMBER_OF_COLUMNS);
+  const itemWidth = calculateItemWidth(NUMBER_OF_COLUMNS);
 
   if (isLoading) {
     const filmThumbs = Array(NUMBER_OF_COLUMNS).fill({

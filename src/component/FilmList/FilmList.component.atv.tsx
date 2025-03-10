@@ -1,5 +1,5 @@
 import FilmCard from 'Component/FilmCard';
-import { CARD_HEIGHT_TV } from 'Component/FilmCard/FilmCard.style.atv';
+import { calculateCardDimensionsTV } from 'Component/FilmCard/FilmCard.style.atv';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
 import React, {
@@ -15,7 +15,6 @@ import {
   SpatialNavigationVirtualizedList,
 } from 'react-tv-space-navigation';
 import { scale } from 'Util/CreateStyles';
-import { getWindowWidth } from 'Util/Window';
 
 import { HEADER_HEIGHT, ROW_GAP, styles } from './FilmList.style.atv';
 import {
@@ -24,14 +23,14 @@ import {
   FilmListRowProps,
 } from './FilmList.type';
 
-const containerWidth = getWindowWidth() - scale(ROW_GAP * 2);
-
 const FilmListRow = ({
   row,
-  numberOfColumns,
+  itemSize,
   handleOnPress,
 }: FilmListRowProps) => {
-  const { header, content } = row;
+  const { header, content, films = [] } = row;
+
+  console.log('FilmListRow', films[0].title);
 
   const renderContent = () => (
     <View>
@@ -40,7 +39,7 @@ const FilmListRow = ({
   );
 
   const renderHeader = () => (
-    <View style={ { width: containerWidth } }>
+    <View style={ styles.container }>
       <ThemedText style={ styles.headerText }>
         { header }
       </ThemedText>
@@ -48,16 +47,16 @@ const FilmListRow = ({
   );
 
   return (
-    <ThemedView style={ { width: containerWidth } }>
+    <ThemedView style={ styles.container }>
       { content && renderContent() }
       { header && renderHeader() }
       <SpatialNavigationScrollView horizontal>
         <SpatialNavigationView
           direction="horizontal"
           alignInGrid
-          style={ styles.gridItem }
+          style={ styles.rowStyle }
         >
-          { row.films?.map((item) => (
+          { films.map((item) => (
             <SpatialNavigationFocusableView
               key={ item.id }
               onSelect={ () => handleOnPress(item) }
@@ -66,9 +65,7 @@ const FilmListRow = ({
                 <FilmCard
                   filmCard={ item }
                   isFocused={ isFocused }
-                  style={ {
-                    width: containerWidth / numberOfColumns - scale(ROW_GAP),
-                  } }
+                  style={ { width: itemSize } }
                 />
               ) }
             </SpatialNavigationFocusableView>
@@ -79,62 +76,36 @@ const FilmListRow = ({
   );
 };
 
-function rowPropsAreEqual(prevProps: FilmListRowProps, props: FilmListRowProps) {
-  return prevProps.row.index === props.row.index;
-}
-
-const MemoizedFilmListRow = memo(FilmListRow, rowPropsAreEqual);
+const MemoizedFilmListRow = memo(FilmListRow);
 
 export function FilmListComponent({
-  data: initialData,
-  children,
+  data,
   numberOfColumns,
   contentHeight = 0,
   handleOnPress,
-  calculateRows,
 }: FilmListComponentProps) {
+  const { width, height } = calculateCardDimensionsTV(
+    numberOfColumns,
+    scale(ROW_GAP),
+    scale(ROW_GAP) * 2,
+  );
+
   const renderItem = useCallback(({ item: row }: {item: FilmListItem}) => (
     <MemoizedFilmListRow
       row={ row }
+      itemSize={ width }
       numberOfColumns={ numberOfColumns }
       handleOnPress={ handleOnPress }
     />
-  ), [numberOfColumns]);
-
-  const data = useMemo(() => {
-    const items = initialData.reduce((acc, item) => {
-      const rows = calculateRows(item.films).map<FilmListItem>((row) => ({
-        index: -1,
-        films: row,
-      }));
-
-      if (rows.length > 0) {
-        rows[0].header = item.header;
-      }
-
-      acc.push(...rows);
-
-      return acc;
-    }, [] as FilmListItem[]);
-
-    if (items.length > 0) {
-      items[0].content = children;
-    }
-
-    return items.map((item, index) => ({
-      ...item,
-      index,
-    }));
-  }, [initialData, calculateRows]);
+  ), []);
 
   const calculatedHeights = useMemo(() => data.reduce((acc, item) => {
-    acc[item.index] = CARD_HEIGHT_TV
-      + ROW_GAP * 2
+    acc[item.index] = height
       + (item.header ? scale(HEADER_HEIGHT) : 0)
       + (item.content ? contentHeight : 0);
 
     return acc;
-  }, {} as Record<string, number>), [data, contentHeight]);
+  }, {} as Record<string, number>), [data]);
 
   const getCalculatedItemSize = useCallback((
     item: FilmListItem,

@@ -10,6 +10,8 @@ export const ThemedGridComponent = ({
   numberOfColumns,
   style,
   rowStyle,
+  header,
+  headerSize,
   renderItem,
   handleScrollEnd,
 }: ThemedGridComponentProps) => {
@@ -27,7 +29,8 @@ export const ThemedGridComponent = ({
       onEndReachedThresholdRowsNumber={ 2 }
       style={ style }
       additionalRenderedRows={ 1 }
-      // scrollDuration={ 350 }
+      header={ header }
+      headerSize={ headerSize }
     />
   );
 };

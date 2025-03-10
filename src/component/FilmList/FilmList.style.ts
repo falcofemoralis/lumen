@@ -1,14 +1,13 @@
 import CreateStyles from 'Util/CreateStyles';
 
+export const ROW_GAP = 8;
+
 export const styles = CreateStyles({
-  container: {
-  },
-  grid: {
-  },
-  gridItem: {
+  gridRow: {
     flexDirection: 'row',
-  },
-  rowStyle: {
+    width: '100%',
+    gap: ROW_GAP,
+    paddingBottom: ROW_GAP,
   },
   headerText: {
     fontSize: 24,

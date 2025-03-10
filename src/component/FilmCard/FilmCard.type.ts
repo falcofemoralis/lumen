@@ -16,3 +16,8 @@ export interface FilmCardComponentProps {
   stylePoster?: StyleProp<ViewStyle>;
   isThumbnail?: boolean;
 }
+
+export interface FilmCardDimensions {
+  height: number;
+  width: number;
+}

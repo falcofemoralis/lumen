@@ -1,6 +1,6 @@
-import FilmCard from 'Component/FilmCard';
-import { CARD_HEIGHT_TV } from 'Component/FilmCard/FilmCard.style.atv';
+import { calculateCardDimensionsTV } from 'Component/FilmCard/FilmCard.style.atv';
 import FilmList from 'Component/FilmList';
+import { ROW_GAP } from 'Component/FilmList/FilmList.style.atv';
 import Loader from 'Component/Loader';
 import Page from 'Component/Page';
 import ThemedText from 'Component/ThemedText';
@@ -14,14 +14,10 @@ import {
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { FilmType } from 'Type/FilmType.type';
 import { scale } from 'Util/CreateStyles';
-import { getWindowWidth } from 'Util/Window';
 
 import { NUMBER_OF_COLUMNS_TV } from './NotificationsPage.config';
 import { styles } from './NotificationsPage.style.atv';
 import { NotificationsPageComponentProps } from './NotificationsPage.type';
-
-// TODO: Rework
-const containerWidth = getWindowWidth() - scale(16);
 
 export function NotificationsPageComponent({
   isLoading,
@@ -29,6 +25,8 @@ export function NotificationsPageComponent({
   handleSelectFilm,
 }: NotificationsPageComponentProps) {
   if (isLoading) {
+    const { width } = calculateCardDimensionsTV(NUMBER_OF_COLUMNS_TV, scale(ROW_GAP));
+
     const filmThumbs = Array(NUMBER_OF_COLUMNS_TV).fill({
       id: '',
       link: '',
@@ -48,21 +46,15 @@ export function NotificationsPageComponent({
           />
           <View style={ {
             flexDirection: 'row',
-            height: CARD_HEIGHT_TV,
             gap: scale(16),
             marginTop: scale(16),
           } }
           >
             { filmThumbs.map((item, i) => (
-              <FilmCard
+              <Thumbnail
                 // eslint-disable-next-line react/no-array-index-key
-                key={ `${i}-notification-film-thumb` }
-                filmCard={ item }
-                style={ {
-                  // TODO: Rework
-                  width: containerWidth / NUMBER_OF_COLUMNS_TV - scale(16),
-                } }
-                isThumbnail
+                key={ `${i}-actor-film-thumb` }
+                style={ { width, height: scale(150) } }
               />
             )) }
           </View>

@@ -7,7 +7,7 @@ import ThemedText from 'Component/ThemedText';
 import { memo, useCallback } from 'react';
 import { View } from 'react-native';
 import Colors from 'Style/Colors';
-import { calculateItemSize } from 'Style/Layout';
+import { calculateItemWidth } from 'Style/Layout';
 import { CommentInterface } from 'Type/Comment.interface';
 import { scale } from 'Util/CreateStyles';
 
@@ -89,7 +89,7 @@ export const CommentsComponent = ({
   comments,
   onNextLoad,
 }: CommentsComponentProps) => {
-  const itemWidth = calculateItemSize(1);
+  const itemWidth = calculateItemWidth(1);
 
   const renderItem = useCallback(
     ({ item, index }: ThemedGridRowProps<CommentInterface>) => (

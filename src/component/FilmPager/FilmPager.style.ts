@@ -2,7 +2,8 @@ import Colors from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
-  container: {},
+  container: {
+  },
   lazyContainer: {
     flex: 1,
     alignItems: 'center',

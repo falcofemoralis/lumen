@@ -1,19 +1,32 @@
-import { NUMBER_OF_COLUMNS_TV } from 'Component/FilmGrid/FilmGrid.config';
-import { ROW_GAP } from 'Component/FilmGrid/FilmGrid.style.atv';
 import Colors from 'Style/Colors';
+import { calculateItemWidth } from 'Style/Layout';
 import CreateStyles, { scale } from 'Util/CreateStyles';
-import { getWindowWidth } from 'Util/Window';
 
-const windowWidth = getWindowWidth() - scale(ROW_GAP);
-const cardWidth = windowWidth / NUMBER_OF_COLUMNS_TV - scale(ROW_GAP);
+import { FilmCardDimensions } from './FilmCard.type';
 
-export const POSTER_HEIGHT = cardWidth * (250 / 166);
-export const INFO_PADDING = 8;
-export const INFO_PADDING_TOP = 4;
-export const INFO_HEIGHT = scale(60) + scale(INFO_PADDING) + scale(INFO_PADDING_TOP);
-export const CARD_HEIGHT_TV = POSTER_HEIGHT + INFO_HEIGHT;
+export const INFO_PADDING_HORIZONTAL = 8;
+export const INFO_PADDING_VERTICAL = 4;
+
 export const DEFAULT_SCALE = 1;
 export const FOCUSED_SCALE = 1.1;
+
+export const calculateCardDimensionsTV = (
+  numberOfColumns: number,
+  gap?: number,
+  additionalWidth?: number,
+): FilmCardDimensions => {
+  const width = calculateItemWidth(numberOfColumns, gap, additionalWidth);
+
+  const posterHeight = width * (250 / 166);
+  const infoHeight = scale(80) + scale(INFO_PADDING_VERTICAL);
+
+  const height = posterHeight + infoHeight;
+
+  return {
+    width,
+    height,
+  };
+};
 
 export const styles = CreateStyles({
   card: {
@@ -21,13 +34,20 @@ export const styles = CreateStyles({
     flexDirection: 'column',
     width: '100%',
   },
-  poster: {},
+  posterWrapper: {
+    width: '100%',
+    height: 'auto',
+    flexDirection: 'column',
+  },
+  poster: {
+    aspectRatio: '166 / 250',
+  },
   posterFocused: {},
   info: {
     width: '100%',
     backgroundColor: Colors.transparent,
-    padding: INFO_PADDING,
-    paddingTop: INFO_PADDING_TOP,
+    paddingHorizontal: INFO_PADDING_HORIZONTAL,
+    paddingVertical: INFO_PADDING_VERTICAL,
   },
   infoFocused: {
     backgroundColor: Colors.white,
@@ -36,7 +56,7 @@ export const styles = CreateStyles({
     fontSize: 12,
     fontWeight: '700',
     color: Colors.white,
-    paddingRight: INFO_PADDING * 2,
+    // paddingRight: INFO_PADDING * 2,
   },
   titleFocused: {
     color: Colors.darkGray,

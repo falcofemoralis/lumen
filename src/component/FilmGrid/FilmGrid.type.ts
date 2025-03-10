@@ -2,12 +2,16 @@ import { FilmCardInterface } from 'Type/FilmCard.interface';
 
 export interface FilmGridContainerProps {
   films: FilmCardInterface[];
+  header?: JSX.Element;
+  headerSize?: number;
   onNextLoad?: (isRefresh: boolean) => Promise<void>;
   onItemFocus?: (row: number) => void;
 }
 
 export interface FilmGridComponentProps {
   films: FilmCardInterface[];
+  header?: JSX.Element;
+  headerSize?: number;
   handleOnPress: (film: FilmCardInterface) => void;
   handleItemFocus: (index: number) => void;
   onNextLoad?: (isRefresh: boolean) => Promise<void>;
@@ -17,11 +21,15 @@ export type FilmGridItemType = FilmCardInterface & {
   isThumbnail?: boolean;
 };
 
+export type FilmGridRowType = {
+  id: string;
+  items: FilmGridItemType[];
+}
+
 export interface FilmGridItemProps {
-  item: FilmGridItemType,
   index: number;
-  itemSize: number;
-  isThumbnail?: boolean;
+  row: FilmGridRowType,
+  width: number;
   handleOnPress: (film: FilmCardInterface) => void;
   handleItemFocus?: (index: number) => void;
 }

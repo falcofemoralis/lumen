@@ -9,11 +9,11 @@ import Thumbnail from 'Component/Thumbnail';
 import React, { useCallback } from 'react';
 import { Animated, Dimensions, View } from 'react-native';
 import { DefaultFocus, SpatialNavigationFocusableView } from 'react-tv-space-navigation';
+import { calculateLayoutWidth } from 'Style/Layout';
 import { scale } from 'Util/CreateStyles';
-import { getWindowWidth } from 'Util/Window';
 
 import { NUMBER_OF_COLUMNS_TV } from './RecentPage.config';
-import { ROW_GAP, styles } from './RecentPage.style.atv';
+import { styles } from './RecentPage.style.atv';
 import { RecentGridItem, RecentPageComponentProps } from './RecentPage.type';
 import { useFocusAnimation } from './useFocusAnimation';
 
@@ -24,7 +24,7 @@ export function RecentPageComponent({
   handleOnPress,
   removeItem,
 }: RecentPageComponentProps & { items: RecentGridItem[] }) {
-  const containerWidth = getWindowWidth() - scale(ROW_GAP * 2);
+  const containerWidth = calculateLayoutWidth();
   const { height } = Dimensions.get('window');
 
   const prepareItems = () => {
@@ -52,7 +52,6 @@ export function RecentPageComponent({
       isDeleteButton,
     } = item;
 
-    // containerWidth / NUMBER_OF_COLUMNS_TV - scale(ROW_GAP)
     const width = containerWidth / 2;
 
     if (isThumbnail && isDeleteButton) {

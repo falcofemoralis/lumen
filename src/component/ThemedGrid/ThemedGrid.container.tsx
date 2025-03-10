@@ -1,7 +1,9 @@
-/* eslint-disable no-plusplus */
 import { withTV } from 'Hooks/withTV';
 import {
-  memo, useEffect, useRef, useState,
+  memo,
+  useEffect,
+  useRef,
+  useState,
 } from 'react';
 import { noopFn } from 'Util/Function';
 
@@ -15,6 +17,8 @@ export function ThemedGridContainer({
   itemSize,
   style,
   rowStyle,
+  header,
+  headerSize,
   renderItem,
   onNextLoad,
 }: ThemedGridContainerProps) {
@@ -63,6 +67,8 @@ export function ThemedGridContainer({
     itemSize,
     style,
     rowStyle,
+    header,
+    headerSize,
     renderItem,
   });
 

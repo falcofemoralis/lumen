@@ -1,14 +1,15 @@
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
-import ThemedView from 'Component/ThemedView';
 import Thumbnail from 'Component/Thumbnail';
 import React from 'react';
 import { Animated, View } from 'react-native';
-import { scale } from 'Util/CreateStyles';
 
-import { FILM_TYPE_COLORS, TYPE_LABELS } from './FilmCard.config';
 import {
-  CARD_HEIGHT_TV, INFO_HEIGHT, INFO_PADDING_TOP, POSTER_HEIGHT, styles,
+  FILM_TYPE_COLORS,
+  TYPE_LABELS,
+} from './FilmCard.config';
+import {
+  styles,
 } from './FilmCard.style.atv';
 import { FilmCardComponentProps } from './FilmCard.type';
 import { useFocusAnimation } from './useFocusAnimation';
@@ -32,22 +33,27 @@ export function FilmCardComponent({
 
   if (isThumbnail) {
     return (
-      <View style={ { gap: scale(INFO_PADDING_TOP * 2) } }>
-        <Thumbnail
-          style={ [
-            styles.card,
-            { height: POSTER_HEIGHT },
-            style,
-          ] }
-        />
-        <Thumbnail
-          height={ INFO_HEIGHT / 4 }
-          width="100%"
-        />
-        <Thumbnail
-          height={ INFO_HEIGHT / 6 }
-          width="50%"
-        />
+      <View
+        style={ [
+          styles.card,
+          style,
+        ] }
+      >
+        <View style={ styles.posterWrapper }>
+          <Thumbnail
+            style={ [styles.poster, stylePoster] }
+          />
+        </View>
+        { /* <View style={ styles.info }>
+          <Thumbnail
+            height={ INFO_HEIGHT / 4 }
+            width="100%"
+          />
+          <Thumbnail
+            height={ INFO_HEIGHT / 6 }
+            width="50%"
+          />
+        </View> */ }
       </View>
     );
   }
@@ -88,10 +94,9 @@ export function FilmCardComponent({
   );
 
   const renderPoster = () => (
-    <View>
+    <View style={ styles.posterWrapper }>
       <ThemedImage
         style={ [
-          { height: CARD_HEIGHT_TV - INFO_HEIGHT },
           styles.poster,
           stylePoster,
           isFocused && styles.posterFocused,
@@ -125,19 +130,22 @@ export function FilmCardComponent({
 
   return (
     <Animated.View
-      style={ [styles.card, { height: CARD_HEIGHT_TV }, scaleAnimation, style] }
+      style={ [
+        styles.card,
+        scaleAnimation,
+        style,
+      ] }
     >
       { renderPoster() }
-      <ThemedView
+      <View
         style={ [
           styles.info,
-          { height: INFO_HEIGHT },
-          isFocused ? styles.infoFocused : styles.info,
+          isFocused && styles.infoFocused,
         ] }
       >
         { renderTitle() }
         { renderSubtitle() }
-      </ThemedView>
+      </View>
     </Animated.View>
   );
 }

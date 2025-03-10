@@ -12,7 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { calculateItemSize } from 'Style/Layout';
+import { calculateItemWidth } from 'Style/Layout';
 import { RecentItemInterface } from 'Type/RecentItem.interface';
 import { scale } from 'Util/CreateStyles';
 
@@ -121,7 +121,7 @@ export function RecentPageComponent({
   handleOnPress,
   removeItem,
 }: RecentPageComponentProps) {
-  const itemWidth = calculateItemSize(NUMBER_OF_COLUMNS);
+  const itemWidth = calculateItemWidth(NUMBER_OF_COLUMNS);
 
   const renderItem = useCallback(
     ({ item, index }: ThemedGridRowProps<RecentItemInterface>) => (

@@ -1,5 +1,4 @@
 import FilmCard from 'Component/FilmCard';
-import { CARD_HEIGHT } from 'Component/FilmCard/FilmCard.style';
 import FilmList from 'Component/FilmList';
 import { ROW_GAP } from 'Component/FilmList/FilmList.style.atv';
 import Page from 'Component/Page';
@@ -8,7 +7,7 @@ import ThemedText from 'Component/ThemedText';
 import Thumbnail from 'Component/Thumbnail';
 import React from 'react';
 import { View } from 'react-native';
-import { calculateItemSize } from 'Style/Layout';
+import { calculateItemWidth } from 'Style/Layout';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { FilmType } from 'Type/FilmType.type';
 import { scale } from 'Util/CreateStyles';
@@ -22,7 +21,7 @@ export function ActorPageComponent({
   actor,
   handleSelectFilm,
 }: ActorPageComponentProps) {
-  const itemWidth = calculateItemSize(NUMBER_OF_COLUMNS);
+  const itemWidth = calculateItemWidth(NUMBER_OF_COLUMNS);
 
   if (!actor || isLoading) {
     const filmThumbs = Array(NUMBER_OF_COLUMNS).fill({

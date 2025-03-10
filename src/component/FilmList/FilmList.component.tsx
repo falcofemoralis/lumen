@@ -1,13 +1,13 @@
 import { FlashList } from '@shopify/flash-list';
 import FilmCard from 'Component/FilmCard';
-import { CARD_HEIGHT } from 'Component/FilmCard/FilmCard.style';
+import { calculateCardDimensions } from 'Component/FilmCard/FilmCard.style';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
-import React, { memo, useCallback, useMemo } from 'react';
+import React, { memo, useCallback } from 'react';
 import { Pressable, View } from 'react-native';
-import { calculateItemSize } from 'Style/Layout';
+import { scale } from 'Util/CreateStyles';
 
-import { styles } from './FilmList.style';
+import { ROW_GAP, styles } from './FilmList.style';
 import {
   FilmListComponentProps,
   FilmListItem,
@@ -19,7 +19,7 @@ const FilmListRow = ({
   itemSize,
   handleOnPress,
 }: FilmListRowProps) => {
-  const { content, header } = row;
+  const { content, header, films = [] } = row;
 
   const renderContent = () => (
     <View>
@@ -39,8 +39,8 @@ const FilmListRow = ({
     <View>
       { content && renderContent() }
       { header && renderHeader() }
-      <View style={ styles.gridItem }>
-        { row.films?.map((item) => (
+      <View style={ styles.gridRow }>
+        { films.map((item) => (
           <Pressable
             key={ item.id }
             style={ { width: itemSize } }
@@ -63,55 +63,28 @@ function rowPropsAreEqual(prevProps: FilmListRowProps, props: FilmListRowProps) 
 const MemoizedFilmListRow = memo(FilmListRow, rowPropsAreEqual);
 
 export function FilmListComponent({
-  data: initialData,
+  data,
   numberOfColumns,
-  children,
   handleOnPress,
-  calculateRows,
 }: FilmListComponentProps) {
-  const itemWidth = calculateItemSize(numberOfColumns);
+  const { width, height } = calculateCardDimensions(numberOfColumns, scale(ROW_GAP));
 
   const renderItem = useCallback(({ item: row }: {item: FilmListItem}) => (
     <MemoizedFilmListRow
       row={ row }
-      itemSize={ itemWidth }
+      itemSize={ width }
       numberOfColumns={ numberOfColumns }
       handleOnPress={ handleOnPress }
     />
-  ), [numberOfColumns, children]);
-
-  const data = useMemo(() => {
-    const items = initialData.reduce((acc, item) => {
-      const rows = calculateRows(item.films).map<FilmListItem>((row) => ({
-        index: -1,
-        films: row,
-      }));
-
-      if (rows.length > 0) {
-        rows[0].header = item.header;
-      }
-
-      acc.push(...rows);
-
-      return acc;
-    }, [] as FilmListItem[]);
-
-    if (items.length > 0) {
-      items[0].content = children;
-    }
-
-    return items.map((item, index) => ({
-      ...item,
-      index,
-    }));
-  }, [initialData, calculateRows]);
+  ), []);
 
   return (
     <FlashList
       data={ data }
       numColumns={ 1 }
-      estimatedItemSize={ CARD_HEIGHT }
+      estimatedItemSize={ height }
       renderItem={ renderItem }
+      keyExtractor={ (item) => `${item.index}-film-list-row` }
     />
   );
 }

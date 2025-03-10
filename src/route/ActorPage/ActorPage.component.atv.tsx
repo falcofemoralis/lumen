@@ -1,6 +1,6 @@
-import FilmCard from 'Component/FilmCard';
-import { CARD_HEIGHT_TV } from 'Component/FilmCard/FilmCard.style.atv';
+import { calculateCardDimensionsTV } from 'Component/FilmCard/FilmCard.style.atv';
 import FilmList from 'Component/FilmList';
+import { ROW_GAP } from 'Component/FilmList/FilmList.style.atv';
 import Loader from 'Component/Loader';
 import Page from 'Component/Page';
 import ThemedImage from 'Component/ThemedImage';
@@ -12,14 +12,10 @@ import { DefaultFocus } from 'react-tv-space-navigation';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { FilmType } from 'Type/FilmType.type';
 import { scale } from 'Util/CreateStyles';
-import { getWindowWidth } from 'Util/Window';
 
 import { NUMBER_OF_COLUMNS_TV } from './ActorPage.config';
 import { MAIN_CONTENT_HEIGHT_TV, styles } from './ActorPage.style.atv';
 import { ActorPageComponentProps } from './ActorPage.type';
-
-// TODO: Rework
-const containerWidth = getWindowWidth() - scale(16);
 
 export function ActorPageComponent({
   isLoading,
@@ -27,6 +23,8 @@ export function ActorPageComponent({
   handleSelectFilm,
 }: ActorPageComponentProps) {
   if (!actor || isLoading) {
+    const { width } = calculateCardDimensionsTV(NUMBER_OF_COLUMNS_TV, scale(ROW_GAP));
+
     const filmThumbs = Array(NUMBER_OF_COLUMNS_TV).fill({
       id: '',
       link: '',
@@ -62,20 +60,14 @@ export function ActorPageComponent({
             />
             <View style={ {
               flexDirection: 'row',
-              height: CARD_HEIGHT_TV,
-              gap: scale(16),
+              gap: scale(8),
             } }
             >
               { filmThumbs.map((item, i) => (
-                <FilmCard
-                // eslint-disable-next-line react/no-array-index-key
+                <Thumbnail
+                  // eslint-disable-next-line react/no-array-index-key
                   key={ `${i}-actor-film-thumb` }
-                  filmCard={ item }
-                  style={ {
-                    // TODO: Rework
-                    width: containerWidth / NUMBER_OF_COLUMNS_TV - scale(16),
-                  } }
-                  isThumbnail
+                  style={ { width, height: scale(150) } }
                 />
               )) }
             </View>

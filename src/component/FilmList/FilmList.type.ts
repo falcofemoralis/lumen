@@ -14,12 +14,10 @@ export interface FilmListContainerProps {
 }
 
 export interface FilmListComponentProps {
-  data: FilmListData[];
+  data: FilmListItem[];
   numberOfColumns: number;
-  children?: JSX.Element;
   contentHeight?: number;
   handleOnPress: (film: FilmCardInterface) => void;
-  calculateRows: <T>(list: T[]) => T[][];
 }
 
 export type FilmListItem = {

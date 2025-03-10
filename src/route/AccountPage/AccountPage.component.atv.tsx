@@ -1,5 +1,4 @@
 import FilmCard from 'Component/FilmCard';
-import { CARD_HEIGHT_TV } from 'Component/FilmCard/FilmCard.style.atv';
 import FilmList from 'Component/FilmList';
 import Loader from 'Component/Loader';
 import Page from 'Component/Page';
@@ -12,14 +11,10 @@ import { DefaultFocus } from 'react-tv-space-navigation';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { FilmType } from 'Type/FilmType.type';
 import { scale } from 'Util/CreateStyles';
-import { getWindowWidth } from 'Util/Window';
 
 import { MAIN_CONTENT_HEIGHT_TV, styles } from './AccountPage.style.atv';
 import { AccountPageComponentProps } from './AccountPage.type';
 import { NUMBER_OF_COLUMNS_TV } from './ActorPage.config';
-
-// TODO: Rework
-const containerWidth = getWindowWidth() - scale(16);
 
 export function ActorPageComponent({
   isLoading,

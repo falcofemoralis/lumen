@@ -18,6 +18,8 @@ import { FilmGridContainerProps, FilmGridItemType } from './FilmGrid.type';
 
 export function FilmGridContainer({
   films,
+  header,
+  headerSize,
   onNextLoad,
   onItemFocus,
 }: FilmGridContainerProps) {
@@ -56,6 +58,8 @@ export function FilmGridContainer({
 
   const containerProps = () => ({
     films: getFilms(),
+    header,
+    headerSize,
     onNextLoad,
   });
 

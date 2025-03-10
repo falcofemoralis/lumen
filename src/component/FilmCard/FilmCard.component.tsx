@@ -65,14 +65,14 @@ export function FilmCardComponent({
   };
 
   const renderPoster = () => (
-    <ThemedView style={ styles.posterWrapper }>
+    <View style={ styles.posterWrapper }>
       { renderType() }
       <ThemedImage
         style={ styles.poster }
         src={ poster }
       />
       { renderFilmAdditionalText() }
-    </ThemedView>
+    </View>
   );
 
   const renderTitle = () => (

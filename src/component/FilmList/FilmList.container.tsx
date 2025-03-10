@@ -1,15 +1,15 @@
-/* eslint-disable no-plusplus */
 import { withTV } from 'Hooks/withTV';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
+import { calculateRows } from 'Util/List';
 import { openFilm } from 'Util/Router';
 
 import FilmListComponent from './FilmList.component';
 import FilmListComponentTV from './FilmList.component.atv';
-import { FilmListContainerProps } from './FilmList.type';
+import { FilmListContainerProps, FilmListItem } from './FilmList.type';
 
 export function FilmListContainer({
-  data,
+  data: initialData,
   numberOfColumns = 1,
   children,
   contentHeight,
@@ -18,32 +18,34 @@ export function FilmListContainer({
     openFilm(film.link);
   }, []);
 
-  const calculateRows = useCallback(<T, >(list: T[]) => {
-    const columns: T[][] = Array.from({ length: numberOfColumns }, () => []);
+  const data = useMemo(() => {
+    const items = initialData.reduce((acc, item) => {
+      const rows = calculateRows(item.films, numberOfColumns).map<FilmListItem>((row) => ({
+        index: -1,
+        films: row,
+      }));
 
-    list.forEach((item, index) => {
-      columns[index % numberOfColumns].push(item);
-    });
-
-    const rows: T[][] = [];
-    // eslint-disable-next-line no-plusplus
-    for (let i = 0; i < columns[0].length; i++) {
-      const row: T[] = [];
-      // eslint-disable-next-line no-plusplus
-      for (let j = 0; j < numberOfColumns; j++) {
-        if (columns[j][i] !== undefined) {
-          row.push(columns[j][i]);
-        }
+      if (rows.length > 0) {
+        rows[0].header = item.header;
       }
-      rows.push(row);
+
+      acc.push(...rows);
+
+      return acc;
+    }, [] as FilmListItem[]);
+
+    if (items.length > 0) {
+      items[0].content = children;
     }
 
-    return rows;
-  }, [numberOfColumns]);
+    return items.map((item, index) => ({
+      ...item,
+      index,
+    }));
+  }, [initialData]);
 
   const containerFunctions = {
     handleOnPress,
-    calculateRows,
   };
 
   const containerProps = () => ({

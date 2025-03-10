@@ -1,16 +1,28 @@
-import { NUMBER_OF_COLUMNS } from 'Component/FilmGrid/FilmGrid.config';
-import { ROW_GAP } from 'Component/FilmGrid/FilmGrid.style';
 import Colors from 'Style/Colors';
-import { calculateItemSize } from 'Style/Layout';
+import { calculateItemWidth } from 'Style/Layout';
 import CreateStyles, { scale } from 'Util/CreateStyles';
 
-const windowWidth = calculateItemSize(NUMBER_OF_COLUMNS);
-const cardWidth = windowWidth / NUMBER_OF_COLUMNS - scale(ROW_GAP);
+import { FilmCardDimensions } from './FilmCard.type';
 
-export const POSTER_HEIGHT = cardWidth * (250 / 166);
-export const INFO_PADDING_TOP = 4;
-export const INFO_HEIGHT = scale(40) + scale(INFO_PADDING_TOP);
-export const CARD_HEIGHT = POSTER_HEIGHT + INFO_HEIGHT;
+export const INFO_PADDING_TOP = 8;
+
+export const calculateCardDimensions = (
+  numberOfColumns: number,
+  gap?: number,
+  additionalWidth?: number,
+): FilmCardDimensions => {
+  const width = calculateItemWidth(numberOfColumns, gap, additionalWidth);
+
+  const posterHeight = width * (250 / 166);
+  const infoHeight = scale(40) + scale(INFO_PADDING_TOP);
+
+  const height = posterHeight + infoHeight;
+
+  return {
+    width,
+    height,
+  };
+};
 
 export const styles = CreateStyles({
   card: {
@@ -26,7 +38,7 @@ export const styles = CreateStyles({
   info: {
     width: '100%',
     backgroundColor: Colors.transparent,
-    paddingTop: 8,
+    paddingTop: INFO_PADDING_TOP,
   },
   title: {
     fontSize: 12,
