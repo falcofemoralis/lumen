@@ -6,8 +6,5 @@ export const isCloseToBottom = (
 ) => {
   const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
 
-  return (
-    layoutMeasurement.height + contentOffset.y
-    >= contentSize.height - paddingToBottom
-  );
+  return layoutMeasurement.height + contentOffset.y >= contentSize.height - paddingToBottom;
 };

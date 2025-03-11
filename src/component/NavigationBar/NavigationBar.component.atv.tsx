@@ -124,7 +124,7 @@ export function NavigationBarComponent({
               size={ scale(24) }
               color="white"
             />
-            { !isMenuOpen && badge > 0 && (
+            { badge > 0 && (
               <View style={ styles.badge } />
             ) }
           </View>
@@ -138,16 +138,6 @@ export function NavigationBarComponent({
         >
           { title }
         </ThemedText.Animated>
-        { badge > 0 && (
-          <ThemedText
-            style={ [
-              styles.badgeText,
-              isMenuOpen && styles.tabTextOpened,
-            ] }
-          >
-            { __('New') }
-          </ThemedText>
-        ) }
       </View>
     );
   }, [isMenuOpen, NavigationStore.badgeData]);

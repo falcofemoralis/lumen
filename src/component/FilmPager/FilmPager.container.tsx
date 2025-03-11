@@ -19,7 +19,7 @@ export function FilmPagerContainer({
   onRowFocus,
 }: FilmPagerContainerProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [pagerItems] = useState<PagerItemInterface[]>(
+  const [pagerItems, setPagerItems] = useState<PagerItemInterface[]>(
     menuItems.map((item, idx) => ({
       key: String(idx + 1),
       title: item.title,
@@ -40,6 +40,35 @@ export function FilmPagerContainer({
       loadFilms(pagerItems[0], { currentPage: 1, totalPages: 1 });
     }
   }, []);
+
+  useEffect(() => {
+    const newItems = pagerItems.map((item) => {
+      const { menuItem: { id } } = item;
+      const pagerItem = filmPager[id];
+
+      if (!pagerItem) {
+        return item;
+      }
+
+      const {
+        filmList: {
+          films = [],
+          totalPages = 1,
+        } = {},
+      } = pagerItem;
+
+      return {
+        ...item,
+        films,
+        pagination: {
+          ...item.pagination,
+          totalPages,
+        },
+      };
+    });
+
+    setPagerItems(newItems);
+  }, [filmPager]);
 
   const loadFilms = async (
     pagerItem: PagerItemInterface,
@@ -118,32 +147,7 @@ export function FilmPagerContainer({
     }
   };
 
-  const getPagerItems = () => pagerItems.map((item) => {
-    const { menuItem: { id } } = item;
-    const pagerItem = filmPager[id];
-
-    if (!pagerItem) {
-      return item;
-    }
-
-    const {
-      filmList: {
-        films = [],
-        totalPages = 1,
-      } = {},
-    } = pagerItem;
-
-    return {
-      ...item,
-      films,
-      pagination: {
-        ...item.pagination,
-        totalPages,
-      },
-    };
-  });
-
-  const getSelectedPagerItem = () => getPagerItems().find(
+  const getSelectedPagerItem = () => pagerItems.find(
     ({ key }) => key === selectedPageItemId,
   ) ?? pagerItems[0];
 
@@ -153,7 +157,7 @@ export function FilmPagerContainer({
   };
 
   const containerProps = () => ({
-    pagerItems: getPagerItems().filter(({ menuItem }) => !menuItem.isHidden),
+    pagerItems: pagerItems.filter(({ menuItem }) => !menuItem.isHidden),
     selectedPagerItem: getSelectedPagerItem(),
     isLoading,
     gridStyle,

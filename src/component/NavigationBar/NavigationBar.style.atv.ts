@@ -7,7 +7,7 @@ export const NAVIGATION_BAR_TV_WIDTH_EXPANDED = 256;
 export const NAVIGATION_BAR_TV_WIDTH_PADDING = 12;
 // eslint-disable-next-line max-len -- This is a constant
 export const NAVIGATION_BAR_TV_TAB_WIDTH = NAVIGATION_BAR_TV_WIDTH - NAVIGATION_BAR_TV_WIDTH_PADDING * 2;
-export const NAVIGATION_BAR_TV_TAB_WIDTH_EXPANDED = NAVIGATION_BAR_TV_TAB_WIDTH + 150;
+export const NAVIGATION_BAR_TV_TAB_WIDTH_EXPANDED = NAVIGATION_BAR_TV_TAB_WIDTH + 100;
 
 export const styles = CreateStyles({
   layout: {
@@ -117,17 +117,5 @@ export const styles = CreateStyles({
     position: 'absolute',
     right: -4,
     top: -4,
-  },
-  badgeText: {
-    display: 'flex',
-    position: 'absolute',
-    right: 16,
-    color: Colors.white,
-    opacity: 0,
-    backgroundColor: Colors.secondary,
-    paddingBlock: 4,
-    paddingHorizontal: 8,
-    fontSize: 10,
-    borderRadius: 64,
   },
 });

@@ -27,7 +27,7 @@ export function FilmPagerComponent({
         onNextLoad={ onNextLoad }
       />
     );
-  }, []);
+  }, [onNextLoad]);
 
   const renderLazyPlaceholder = useCallback(
     ({ route }: any) => <LazyPlaceholder route={ route } />,
