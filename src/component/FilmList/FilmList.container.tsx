@@ -1,16 +1,17 @@
 import { withTV } from 'Hooks/withTV';
 import { useCallback, useMemo } from 'react';
+import ConfigStore from 'Store/Config.store';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { calculateRows } from 'Util/List';
 import { openFilm } from 'Util/Router';
 
 import FilmListComponent from './FilmList.component';
 import FilmListComponentTV from './FilmList.component.atv';
+import { NUMBER_OF_COLUMNS, NUMBER_OF_COLUMNS_TV } from './FilmList.config';
 import { FilmListContainerProps, FilmListItem } from './FilmList.type';
 
 export function FilmListContainer({
   data: initialData,
-  numberOfColumns = 1,
   children,
   contentHeight,
 }: FilmListContainerProps) {
@@ -19,8 +20,9 @@ export function FilmListContainer({
   }, []);
 
   const data = useMemo(() => {
+    const columns = ConfigStore.isTV ? NUMBER_OF_COLUMNS_TV : NUMBER_OF_COLUMNS;
     const items = initialData.reduce((acc, item) => {
-      const rows = calculateRows(item.films, numberOfColumns).map<FilmListItem>((row) => ({
+      const rows = calculateRows(item.films, columns).map<FilmListItem>((row) => ({
         index: -1,
         films: row,
       }));
@@ -50,7 +52,6 @@ export function FilmListContainer({
 
   const containerProps = () => ({
     data,
-    numberOfColumns,
     children,
     contentHeight,
   });

@@ -7,7 +7,6 @@ export type FilmListData = {
 
 export interface FilmListContainerProps {
   data: FilmListData[];
-  numberOfColumns?: number;
   children?: JSX.Element;
   contentHeight?: number;
   handleOnPress: (film: FilmCardInterface) => void;
@@ -15,7 +14,6 @@ export interface FilmListContainerProps {
 
 export interface FilmListComponentProps {
   data: FilmListItem[];
-  numberOfColumns: number;
   contentHeight?: number;
   handleOnPress: (film: FilmCardInterface) => void;
 }

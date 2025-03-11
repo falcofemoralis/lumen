@@ -9,6 +9,7 @@ import {
   TYPE_LABELS,
 } from './FilmCard.config';
 import {
+  INFO_HEIGHT,
   styles,
 } from './FilmCard.style.atv';
 import { FilmCardComponentProps } from './FilmCard.type';
@@ -33,18 +34,19 @@ export function FilmCardComponent({
 
   if (isThumbnail) {
     return (
-      <View
+      <Animated.View
         style={ [
           styles.card,
           style,
         ] }
       >
-        <View style={ styles.posterWrapper }>
+        <View style={ [styles.posterWrapper, style] }>
           <Thumbnail
             style={ [styles.poster, stylePoster] }
+            height="auto"
           />
         </View>
-        { /* <View style={ styles.info }>
+        <View style={ [styles.info, { gap: 8 }] }>
           <Thumbnail
             height={ INFO_HEIGHT / 4 }
             width="100%"
@@ -53,8 +55,8 @@ export function FilmCardComponent({
             height={ INFO_HEIGHT / 6 }
             width="50%"
           />
-        </View> */ }
-      </View>
+        </View>
+      </Animated.View>
     );
   }
 

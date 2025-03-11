@@ -16,6 +16,7 @@ import {
 } from 'react-tv-space-navigation';
 import { scale } from 'Util/CreateStyles';
 
+import { NUMBER_OF_COLUMNS_TV } from './FilmList.config';
 import { HEADER_HEIGHT, ROW_GAP, styles } from './FilmList.style.atv';
 import {
   FilmListComponentProps,
@@ -29,8 +30,6 @@ const FilmListRow = ({
   handleOnPress,
 }: FilmListRowProps) => {
   const { header, content, films = [] } = row;
-
-  console.log('FilmListRow', films[0].title);
 
   const renderContent = () => (
     <View>
@@ -80,12 +79,11 @@ const MemoizedFilmListRow = memo(FilmListRow);
 
 export function FilmListComponent({
   data,
-  numberOfColumns,
   contentHeight = 0,
   handleOnPress,
 }: FilmListComponentProps) {
   const { width, height } = calculateCardDimensionsTV(
-    numberOfColumns,
+    NUMBER_OF_COLUMNS_TV,
     scale(ROW_GAP),
     scale(ROW_GAP) * 2,
   );
@@ -94,7 +92,7 @@ export function FilmListComponent({
     <MemoizedFilmListRow
       row={ row }
       itemSize={ width }
-      numberOfColumns={ numberOfColumns }
+      numberOfColumns={ NUMBER_OF_COLUMNS_TV }
       handleOnPress={ handleOnPress }
     />
   ), []);

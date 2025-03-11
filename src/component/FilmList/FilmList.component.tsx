@@ -7,6 +7,7 @@ import React, { memo, useCallback } from 'react';
 import { Pressable, View } from 'react-native';
 import { scale } from 'Util/CreateStyles';
 
+import { NUMBER_OF_COLUMNS } from './FilmList.config';
 import { ROW_GAP, styles } from './FilmList.style';
 import {
   FilmListComponentProps,
@@ -64,16 +65,15 @@ const MemoizedFilmListRow = memo(FilmListRow, rowPropsAreEqual);
 
 export function FilmListComponent({
   data,
-  numberOfColumns,
   handleOnPress,
 }: FilmListComponentProps) {
-  const { width, height } = calculateCardDimensions(numberOfColumns, scale(ROW_GAP));
+  const { width, height } = calculateCardDimensions(NUMBER_OF_COLUMNS, scale(ROW_GAP));
 
   const renderItem = useCallback(({ item: row }: {item: FilmListItem}) => (
     <MemoizedFilmListRow
       row={ row }
       itemSize={ width }
-      numberOfColumns={ numberOfColumns }
+      numberOfColumns={ NUMBER_OF_COLUMNS }
       handleOnPress={ handleOnPress }
     />
   ), []);

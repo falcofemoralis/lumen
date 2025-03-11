@@ -13,5 +13,11 @@ export const styles = CreateStyles({
   },
   grid: {
     zIndex: 2,
+    paddingTop: 8,
+    height: '80%',
+  },
+  hidden: {
+    opacity: 0,
+    height: 0,
   },
 });

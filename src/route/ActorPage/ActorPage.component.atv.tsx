@@ -13,7 +13,6 @@ import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { FilmType } from 'Type/FilmType.type';
 import { scale } from 'Util/CreateStyles';
 
-import { NUMBER_OF_COLUMNS_TV } from './ActorPage.config';
 import { MAIN_CONTENT_HEIGHT_TV, styles } from './ActorPage.style.atv';
 import { ActorPageComponentProps } from './ActorPage.type';
 
@@ -23,9 +22,9 @@ export function ActorPageComponent({
   handleSelectFilm,
 }: ActorPageComponentProps) {
   if (!actor || isLoading) {
-    const { width } = calculateCardDimensionsTV(NUMBER_OF_COLUMNS_TV, scale(ROW_GAP));
+    const { width } = calculateCardDimensionsTV(6, scale(ROW_GAP));
 
-    const filmThumbs = Array(NUMBER_OF_COLUMNS_TV).fill({
+    const filmThumbs = Array(6).fill({
       id: '',
       link: '',
       type: FilmType.FILM,
@@ -160,7 +159,6 @@ export function ActorPageComponent({
         <FilmList
           data={ data }
           handleOnPress={ handleSelectFilm }
-          numberOfColumns={ NUMBER_OF_COLUMNS_TV }
           contentHeight={ MAIN_CONTENT_HEIGHT_TV }
         >
           { renderMainData() }

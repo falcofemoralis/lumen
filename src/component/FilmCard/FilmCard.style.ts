@@ -4,6 +4,7 @@ import CreateStyles, { scale } from 'Util/CreateStyles';
 
 import { FilmCardDimensions } from './FilmCard.type';
 
+export const INFO_HEIGHT = 40;
 export const INFO_PADDING_TOP = 8;
 
 export const calculateCardDimensions = (
@@ -14,7 +15,7 @@ export const calculateCardDimensions = (
   const width = calculateItemWidth(numberOfColumns, gap, additionalWidth);
 
   const posterHeight = width * (250 / 166);
-  const infoHeight = scale(40) + scale(INFO_PADDING_TOP);
+  const infoHeight = scale(INFO_HEIGHT) + scale(INFO_PADDING_TOP);
 
   const height = posterHeight + infoHeight;
 

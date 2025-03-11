@@ -12,7 +12,6 @@ import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { FilmType } from 'Type/FilmType.type';
 import { scale } from 'Util/CreateStyles';
 
-import { NUMBER_OF_COLUMNS } from './ActorPage.config';
 import { styles } from './ActorPage.style';
 import { ActorPageComponentProps } from './ActorPage.type';
 
@@ -21,10 +20,10 @@ export function ActorPageComponent({
   actor,
   handleSelectFilm,
 }: ActorPageComponentProps) {
-  const itemWidth = calculateItemWidth(NUMBER_OF_COLUMNS);
+  const itemWidth = calculateItemWidth(3);
 
   if (!actor || isLoading) {
-    const filmThumbs = Array(NUMBER_OF_COLUMNS).fill({
+    const filmThumbs = Array(3).fill({
       id: '',
       link: '',
       type: FilmType.FILM,
@@ -162,7 +161,6 @@ export function ActorPageComponent({
         <FilmList
           data={ data }
           handleOnPress={ handleSelectFilm }
-          numberOfColumns={ NUMBER_OF_COLUMNS }
         >
           { renderMainData() }
         </FilmList>

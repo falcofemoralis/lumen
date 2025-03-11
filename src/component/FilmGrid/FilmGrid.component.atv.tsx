@@ -2,15 +2,50 @@ import FilmCard from 'Component/FilmCard';
 import { calculateCardDimensionsTV } from 'Component/FilmCard/FilmCard.style.atv';
 import ThemedGrid from 'Component/ThemedGrid';
 import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
-import React, { useCallback, useMemo } from 'react';
+import React, { memo, useCallback, useMemo } from 'react';
 import {
   SpatialNavigationFocusableView,
 } from 'react-tv-space-navigation';
 import { scale } from 'Util/CreateStyles';
+import { noopFn } from 'Util/Function';
 
 import { NUMBER_OF_COLUMNS_TV } from './FilmGrid.config';
 import { ROW_GAP, styles } from './FilmGrid.style.atv';
-import { FilmGridComponentProps, FilmGridItemType } from './FilmGrid.type';
+import { FilmGridComponentProps, FilmGridItemProps, FilmGridItemType } from './FilmGrid.type';
+
+function FilmGridItem({
+  row,
+  index,
+  width,
+  handleOnPress,
+  handleItemFocus = noopFn,
+}: FilmGridItemProps) {
+  const { items } = row;
+  const item = items[0];
+  const { isThumbnail } = item;
+
+  return (
+    <SpatialNavigationFocusableView
+      onSelect={ () => handleOnPress(item) }
+      onFocus={ () => handleItemFocus(index) }
+    >
+      { ({ isFocused, isRootActive }) => (
+        <FilmCard
+          filmCard={ item }
+          style={ { width } }
+          isFocused={ isFocused && isRootActive }
+          isThumbnail={ isThumbnail }
+        />
+      ) }
+    </SpatialNavigationFocusableView>
+  );
+}
+
+function rowPropsAreEqual(prevProps: FilmGridItemProps, props: FilmGridItemProps) {
+  return prevProps.row.items[0].id === props.row.items[0].id;
+}
+
+const MemoizedGridItem = memo(FilmGridItem, rowPropsAreEqual);
 
 export function FilmGridComponent({
   films,
@@ -26,27 +61,15 @@ export function FilmGridComponent({
     scale(ROW_GAP) * 2,
   );
 
-  const renderItem = useCallback(({ item, index }: ThemedGridRowProps<FilmGridItemType>) => {
-    const { isThumbnail } = item;
-
-    console.log('renderItem', item.title);
-
-    return (
-      <SpatialNavigationFocusableView
-        onSelect={ () => handleOnPress(item) }
-        onFocus={ () => handleItemFocus(index) }
-      >
-        { ({ isFocused, isRootActive }) => (
-          <FilmCard
-            filmCard={ item }
-            style={ { width } }
-            isFocused={ isFocused && isRootActive }
-            isThumbnail={ isThumbnail }
-          />
-        ) }
-      </SpatialNavigationFocusableView>
-    );
-  }, [handleItemFocus, handleOnPress]);
+  const renderItem = useCallback(({ item, index }: ThemedGridRowProps<FilmGridItemType>) => (
+    <MemoizedGridItem
+      index={ index }
+      row={ { id: String(index), items: [item] } }
+      width={ width }
+      handleOnPress={ handleOnPress }
+      handleItemFocus={ handleItemFocus }
+    />
+  ), []);
 
   const filmsData = useMemo(() => films.map((element, index) => ({ ...element, index })), [films]);
 
@@ -56,7 +79,7 @@ export function FilmGridComponent({
       rowStyle={ styles.rowStyle }
       data={ filmsData }
       numberOfColumns={ NUMBER_OF_COLUMNS_TV }
-      itemSize={ height }
+      itemSize={ height + scale(ROW_GAP) * 2 }
       renderItem={ renderItem }
       onNextLoad={ onNextLoad }
       header={ header }

@@ -4,6 +4,7 @@ import CreateStyles, { scale } from 'Util/CreateStyles';
 
 import { FilmCardDimensions } from './FilmCard.type';
 
+export const INFO_HEIGHT = 65;
 export const INFO_PADDING_HORIZONTAL = 8;
 export const INFO_PADDING_VERTICAL = 4;
 
@@ -18,7 +19,7 @@ export const calculateCardDimensionsTV = (
   const width = calculateItemWidth(numberOfColumns, gap, additionalWidth);
 
   const posterHeight = width * (250 / 166);
-  const infoHeight = scale(80) + scale(INFO_PADDING_VERTICAL);
+  const infoHeight = scale(INFO_HEIGHT) + scale(INFO_PADDING_VERTICAL);
 
   const height = posterHeight + infoHeight;
 
@@ -45,6 +46,7 @@ export const styles = CreateStyles({
   posterFocused: {},
   info: {
     width: '100%',
+    height: INFO_HEIGHT,
     backgroundColor: Colors.transparent,
     paddingHorizontal: INFO_PADDING_HORIZONTAL,
     paddingVertical: INFO_PADDING_VERTICAL,
@@ -56,7 +58,6 @@ export const styles = CreateStyles({
     fontSize: 12,
     fontWeight: '700',
     color: Colors.white,
-    // paddingRight: INFO_PADDING * 2,
   },
   titleFocused: {
     color: Colors.darkGray,

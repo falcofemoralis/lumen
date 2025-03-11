@@ -11,7 +11,6 @@ import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { FilmType } from 'Type/FilmType.type';
 import { scale } from 'Util/CreateStyles';
 
-import { NUMBER_OF_COLUMNS } from './NotificationsPage.config';
 import { styles } from './NotificationsPage.style';
 import { NotificationsPageComponentProps } from './NotificationsPage.type';
 
@@ -20,10 +19,10 @@ export function NotificationsPageComponent({
   data,
   handleSelectFilm,
 }: NotificationsPageComponentProps) {
-  const itemWidth = calculateItemWidth(NUMBER_OF_COLUMNS);
+  const itemWidth = calculateItemWidth(3);
 
   if (isLoading) {
-    const filmThumbs = Array(NUMBER_OF_COLUMNS).fill({
+    const filmThumbs = Array(3).fill({
       id: '',
       link: '',
       type: FilmType.FILM,
@@ -82,7 +81,6 @@ export function NotificationsPageComponent({
         <FilmList
           data={ data }
           handleOnPress={ handleSelectFilm }
-          numberOfColumns={ NUMBER_OF_COLUMNS }
         />
       </View>
     </Page>
