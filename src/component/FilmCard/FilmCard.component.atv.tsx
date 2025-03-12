@@ -96,7 +96,10 @@ export function FilmCardComponent({
   );
 
   const renderPoster = () => (
-    <View style={ styles.posterWrapper }>
+    <View
+      style={ styles.posterWrapper }
+      renderToHardwareTextureAndroid
+    >
       <ThemedImage
         style={ [
           styles.poster,
