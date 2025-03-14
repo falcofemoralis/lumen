@@ -1,5 +1,5 @@
 import FilmCard from 'Component/FilmCard';
-import { calculateCardDimensionsTV } from 'Component/FilmCard/FilmCard.style.atv';
+import { calculateCardDimensions } from 'Component/FilmCard/FilmCard.style.atv';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
 import React, {
@@ -10,7 +10,6 @@ import React, {
 import { View } from 'react-native';
 import {
   SpatialNavigationFocusableView,
-  SpatialNavigationScrollView,
   SpatialNavigationView,
   SpatialNavigationVirtualizedList,
 } from 'react-tv-space-navigation';
@@ -49,28 +48,27 @@ const FilmListRow = ({
     <ThemedView style={ styles.container }>
       { content && renderContent() }
       { header && renderHeader() }
-      <SpatialNavigationScrollView horizontal>
-        <SpatialNavigationView
-          direction="horizontal"
-          alignInGrid
-          style={ styles.rowStyle }
-        >
-          { films.map((item) => (
-            <SpatialNavigationFocusableView
-              key={ item.id }
-              onSelect={ () => handleOnPress(item) }
-            >
-              { ({ isFocused }) => (
-                <FilmCard
-                  filmCard={ item }
-                  isFocused={ isFocused }
-                  style={ { width: itemSize } }
-                />
-              ) }
-            </SpatialNavigationFocusableView>
-          )) }
-        </SpatialNavigationView>
-      </SpatialNavigationScrollView>
+      <SpatialNavigationView
+        direction="horizontal"
+        alignInGrid
+        style={ styles.rowStyle }
+      >
+        { films.map((item, index) => (
+          <SpatialNavigationFocusableView
+            // eslint-disable-next-line react/no-array-index-key
+            key={ index }
+            onSelect={ () => handleOnPress(item) }
+          >
+            { ({ isFocused }) => (
+              <FilmCard
+                filmCard={ item }
+                isFocused={ isFocused }
+                style={ { width: itemSize } }
+              />
+            ) }
+          </SpatialNavigationFocusableView>
+        )) }
+      </SpatialNavigationView>
     </ThemedView>
   );
 };
@@ -82,7 +80,7 @@ export function FilmListComponent({
   contentHeight = 0,
   handleOnPress,
 }: FilmListComponentProps) {
-  const { width, height } = calculateCardDimensionsTV(
+  const { width, height } = calculateCardDimensions(
     NUMBER_OF_COLUMNS_TV,
     scale(ROW_GAP),
     scale(ROW_GAP) * 2,
@@ -98,7 +96,7 @@ export function FilmListComponent({
   ), []);
 
   const calculatedHeights = useMemo(() => data.reduce((acc, item) => {
-    acc[item.index] = height
+    acc[item.index] = (height + scale(ROW_GAP) * 2)
       + (item.header ? scale(HEADER_HEIGHT) : 0)
       + (item.content ? contentHeight : 0);
 
@@ -115,6 +113,7 @@ export function FilmListComponent({
       renderItem={ renderItem }
       itemSize={ getCalculatedItemSize }
       additionalItemsRendered={ 1 }
+      scrollDuration={ 0 }
       style={ styles.grid }
       orientation="vertical"
       isGrid

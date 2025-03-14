@@ -10,8 +10,7 @@ export function FilmCardContainer(props: FilmCardContainerProps) {
 }
 
 function propsAreEqual(prevProps: FilmCardContainerProps, props: FilmCardContainerProps) {
-  return JSON.stringify(prevProps.filmCard) === JSON.stringify(props.filmCard)
-    && prevProps.isFocused === props.isFocused && prevProps.isThumbnail === props.isThumbnail;
+  return prevProps.filmCard.id === props.filmCard.id && prevProps.isFocused === props.isFocused;
 }
 
 export default memo(FilmCardContainer, propsAreEqual);

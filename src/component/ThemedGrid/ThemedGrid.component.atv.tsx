@@ -12,10 +12,15 @@ export const ThemedGridComponent = ({
   rowStyle,
   header,
   headerSize,
+  ListEmptyComponent,
   renderItem,
   handleScrollEnd,
 }: ThemedGridComponentProps) => {
   const memoData = useMemo(() => data.map((element, index) => ({ ...element, index })), [data]);
+
+  if (!memoData.length) {
+    return ListEmptyComponent;
+  }
 
   return (
     <SpatialNavigationVirtualizedGrid
@@ -29,6 +34,7 @@ export const ThemedGridComponent = ({
       onEndReachedThresholdRowsNumber={ 2 }
       style={ style }
       additionalRenderedRows={ 1 }
+      scrollDuration={ 0 }
       header={ header }
       headerSize={ headerSize }
     />

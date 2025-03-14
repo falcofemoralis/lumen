@@ -1,5 +1,5 @@
-import { FlashList } from '@shopify/flash-list';
-import { useCallback } from 'react';
+import { LegendList } from '@legendapp/list';
+import React, { useCallback, useEffect } from 'react';
 import {
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -16,18 +16,22 @@ export const ThemedGridComponent = ({
   numberOfColumns,
   itemSize,
   isRefreshing = false,
+  ListEmptyComponent,
   renderItem,
   handleScrollEnd,
   handleRefresh = noopFn,
 }: ThemedGridComponentProps) => {
-  const onScroll = useCallback(
-    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-      if (isCloseToBottom(event, SCROLL_EVENT_END_PADDING)) {
-        handleScrollEnd();
-      }
-    },
-    [handleScrollEnd],
-  );
+  const scrollFuncRef = React.useRef<() => void>(handleScrollEnd);
+
+  useEffect(() => {
+    scrollFuncRef.current = handleScrollEnd;
+  }, [handleScrollEnd]);
+
+  const onScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    if (isCloseToBottom(event, SCROLL_EVENT_END_PADDING)) {
+      scrollFuncRef.current();
+    }
+  }, []);
 
   const renderRefreshControl = useCallback(() => (
     <RefreshControl
@@ -37,7 +41,7 @@ export const ThemedGridComponent = ({
   ), [isRefreshing, handleRefresh]);
 
   return (
-    <FlashList
+    <LegendList
       data={ data }
       numColumns={ numberOfColumns }
       estimatedItemSize={ itemSize }
@@ -46,6 +50,8 @@ export const ThemedGridComponent = ({
       scrollEventThrottle={ SCROLL_EVENT_UPDATES_MS }
       refreshControl={ renderRefreshControl() }
       keyExtractor={ (item, idx) => `${item.id}-row-${idx}` }
+      ListEmptyComponent={ ListEmptyComponent }
+      recycleItems
     />
   );
 };

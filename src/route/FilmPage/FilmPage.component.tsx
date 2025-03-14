@@ -10,7 +10,6 @@ import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImageModal from 'Component/ThemedImageModal';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedText from 'Component/ThemedText';
-import Thumbnail from 'Component/Thumbnail';
 import { useRouter } from 'expo-router';
 import __ from 'i18n/__';
 import React, { useCallback, useRef, useState } from 'react';
@@ -32,6 +31,7 @@ import { isCloseToBottom } from 'Util/Scroll';
 
 import { SCROLL_EVENT_END_PADDING } from './FilmPage.config';
 import { styles } from './FilmPage.style';
+import { FilmPageThumbnail } from './FilmPage.thumbnail';
 import { FilmPageComponentProps } from './FilmPage.type';
 import {
   ActorView, FranchiseItemComponent,
@@ -75,95 +75,7 @@ export function FilmPageComponent({
   );
 
   if (!film) {
-    return (
-      <Page>
-        <View style={ styles.topActions }>
-          <TouchableOpacity
-            style={ styles.topActionsButton }
-            onPress={ () => router.back() }
-          >
-            <ThemedIcon
-              icon={ {
-                name: 'arrow-back',
-                pack: IconPackType.MaterialIcons,
-              } }
-              size={ scale(32) }
-              color="white"
-            />
-          </TouchableOpacity>
-          <Thumbnail
-            style={ styles.topActionsButton }
-            height={ scale(32) }
-            width={ scale(32) }
-          />
-        </View>
-        <Thumbnail
-          height={ scale(24) }
-          width="100%"
-        />
-        <Thumbnail
-          style={ { marginTop: scale(8) } }
-          height={ scale(24) }
-          width="50%"
-        />
-        <View style={ styles.genres }>
-          { Array(5).fill(0).map((_, i) => (
-            <Thumbnail
-            // eslint-disable-next-line react/no-array-index-key
-              key={ `${i}-thumb` }
-              height={ scale(24) }
-              width={ scale(64) }
-            />
-          )) }
-        </View>
-        <View style={ styles.mainContent }>
-          <Thumbnail
-            style={ styles.posterWrapper }
-          />
-          <View style={ [styles.mainInfo, { width: '55%' }] }>
-            { Array(5).fill(0).map((_, i) => (
-              <Thumbnail
-                // eslint-disable-next-line react/no-array-index-key
-                key={ `${i}-thumb` }
-                style={ styles.textContainer }
-                height={ scale(16) }
-                width="100%"
-              />
-            )) }
-          </View>
-        </View>
-        { /* <View style={ styles.quickInfo }>
-          { Array(4).fill(0).map((_, i) => (
-            <Thumbnail
-              // eslint-disable-next-line react/no-array-index-key
-              key={ `${i}-quick` }
-              height={ scale(48) }
-              width="20%"
-            />
-          )) }
-        </View> */ }
-        <Thumbnail
-          style={ styles.description }
-          height="20%"
-          width="100%"
-        />
-        <View style={ styles.actions }>
-          { Array(3).fill(0).map((_, i) => (
-            <Thumbnail
-              // eslint-disable-next-line react/no-array-index-key
-              key={ `${i}-action` }
-              height={ scale(48) }
-              width="30%"
-            />
-          )) }
-        </View>
-        <Thumbnail
-          style={ styles.playBtn }
-          height={ scale(48) }
-          width="100%"
-        />
-      </Page>
-    );
+    return <FilmPageThumbnail />;
   }
 
   const renderTopActions = () => (
@@ -332,32 +244,6 @@ export function FilmPageComponent({
       { renderMainInfo() }
     </View>
   );
-
-  // const renderQuickInfoText = (title: string, text: string) => (
-  //   <View style={ styles.quickInfoTextWrapper }>
-  //     <ThemedText style={ styles.quickInfoUpperText }>{ title }</ThemedText>
-  //     <ThemedText style={ styles.quickInfoLowerText }>{ text }</ThemedText>
-  //   </View>
-  // );
-
-  // const renderQuickInfo = () => {
-  //   const {
-  //     genres = [],
-  //     countries = [],
-  //     duration,
-  //     ratings = [],
-  //   } = film;
-
-  //   return (
-  //     <View style={ styles.quickInfo }>
-  //       { genres.length > 0 && renderQuickInfoText('Жанр', genres[0]) }
-  //       { countries.length > 0 && renderQuickInfoText('Страна', countries[0]) }
-  //       eslint-disable-next-line max-len
-  //       { ratings.length > 0 && renderQuickInfoText('Рейтинг', `${ratings[0].rating} (${ratings[0].votes})`) }
-  //       { duration && renderQuickInfoText('Длина', duration) }
-  //     </View>
-  //   );
-  // };
 
   const renderDescription = () => {
     const { description } = film;
@@ -692,7 +578,6 @@ export function FilmPageComponent({
         { renderTitle() }
         { renderGenres() }
         { renderMainContent() }
-        { /* { renderQuickInfo() } */ }
         { renderDescription() }
         { renderActions() }
         { renderPlayFilmButton() }

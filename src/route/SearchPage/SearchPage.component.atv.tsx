@@ -3,6 +3,7 @@ import Page from 'Component/Page';
 import ThemedButton from 'Component/ThemedButton';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedInput from 'Component/ThemedInput';
+import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
 import __ from 'i18n/__';
 import React, { useState } from 'react';
@@ -19,6 +20,7 @@ export function SearchPageComponent({
   query,
   recognizing,
   enteredText,
+  isLoading,
   onChangeText,
   onApplySuggestion,
   onLoadFilms,
@@ -104,6 +106,16 @@ export function SearchPageComponent({
   const renderFilms = () => {
     if (!query) {
       return null;
+    }
+
+    if (!isLoading && !filmPager.search?.filmList.films.length) {
+      return (
+        <View style={ styles.noResults }>
+          <ThemedText style={ styles.noResultsText }>
+            { __('No results found') }
+          </ThemedText>
+        </View>
+      );
     }
 
     return (

@@ -81,4 +81,16 @@ export const styles = CreateStyles({
     position: 'absolute',
     alignSelf: 'baseline',
   },
+  noComments: {
+    height: '100%',
+    width: '100%',
+    justifyContent: 'center',
+    alignContent: 'center',
+    alignItems: 'center',
+  },
+  noCommentsText: {
+    color: Colors.white,
+    fontSize: 16,
+    textAlign: 'center',
+  },
 });

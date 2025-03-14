@@ -17,13 +17,9 @@ export interface FilmGridComponentProps {
   onNextLoad?: (isRefresh: boolean) => Promise<void>;
 }
 
-export type FilmGridItemType = FilmCardInterface & {
-  isThumbnail?: boolean;
-};
-
 export type FilmGridRowType = {
   id: string;
-  items: FilmGridItemType[];
+  items: FilmCardInterface[];
 }
 
 export interface FilmGridItemProps {

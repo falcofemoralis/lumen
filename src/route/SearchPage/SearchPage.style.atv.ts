@@ -42,4 +42,15 @@ export const styles = CreateStyles({
     opacity: 0,
     height: 0,
   },
+  noResults: {
+    marginTop: '20%',
+    justifyContent: 'center',
+    alignContent: 'center',
+    alignItems: 'center',
+  },
+  noResultsText: {
+    color: Colors.white,
+    fontSize: 16,
+    textAlign: 'center',
+  },
 });

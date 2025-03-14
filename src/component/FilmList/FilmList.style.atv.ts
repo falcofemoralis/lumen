@@ -1,6 +1,6 @@
 import CreateStyles from 'Util/CreateStyles';
 
-export const ROW_GAP = 8;
+export const ROW_GAP = 16;
 
 export const HEADER_HEIGHT = 32;
 

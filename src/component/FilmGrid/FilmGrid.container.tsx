@@ -1,9 +1,7 @@
-/* eslint-disable no-plusplus */
 import { withTV } from 'Hooks/withTV';
 import { useCallback } from 'react';
 import ConfigStore from 'Store/Config.store';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
-import { FilmType } from 'Type/FilmType.type';
 import { openFilm } from 'Util/Router';
 
 import FilmGridComponent from './FilmGrid.component';
@@ -11,10 +9,8 @@ import GridComponentTV from './FilmGrid.component.atv';
 import {
   NUMBER_OF_COLUMNS,
   NUMBER_OF_COLUMNS_TV,
-  THUMBNAILS_AMOUNT,
-  THUMBNAILS_AMOUNT_TV,
 } from './FilmGrid.config';
-import { FilmGridContainerProps, FilmGridItemType } from './FilmGrid.type';
+import { FilmGridContainerProps } from './FilmGrid.type';
 
 export function FilmGridContainer({
   films,
@@ -35,29 +31,13 @@ export function FilmGridContainer({
     }
   };
 
-  const getFilms = (): FilmGridItemType[] => {
-    if (!films.length) {
-      return Array(ConfigStore.isTV ? THUMBNAILS_AMOUNT_TV : THUMBNAILS_AMOUNT).fill({
-        id: '',
-        link: '',
-        type: FilmType.FILM,
-        poster: '',
-        title: '',
-        subtitle: '',
-        isThumbnail: true,
-      }) as FilmCardInterface[];
-    }
-
-    return films;
-  };
-
   const containerFunctions = {
     handleOnPress,
     handleItemFocus,
   };
 
   const containerProps = () => ({
-    films: getFilms(),
+    films,
     header,
     headerSize,
     onNextLoad,

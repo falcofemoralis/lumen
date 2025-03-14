@@ -5,19 +5,18 @@ import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
-import Thumbnail from 'Component/Thumbnail';
 import React, { memo, useCallback } from 'react';
 import {
   Pressable,
   TouchableOpacity,
   View,
 } from 'react-native';
-import { calculateItemWidth } from 'Style/Layout';
 import { RecentItemInterface } from 'Type/RecentItem.interface';
 import { scale } from 'Util/CreateStyles';
 
 import { NUMBER_OF_COLUMNS } from './RecentPage.config';
 import { styles } from './RecentPage.style';
+import { RecentPageThumbnail } from './RecentPage.thumbnail';
 import { RecentGridRowProps, RecentPageComponentProps } from './RecentPage.type';
 
 function RecentItem({
@@ -32,38 +31,7 @@ function RecentItem({
     date,
     info,
     additionalInfo,
-    isThumbnail,
   } = item;
-
-  if (isThumbnail) {
-    return (
-      <View style={ [styles.item, index !== 0 && styles.itemBorder] }>
-        <View style={ styles.itemContainer }>
-          <Thumbnail
-            style={ styles.poster }
-          />
-          <View style={ styles.itemContent }>
-            <Thumbnail
-              width="80%"
-              height={ scale(20) }
-            />
-            <Thumbnail
-              width="30%"
-              height={ scale(20) }
-            />
-            <Thumbnail
-              width="50%"
-              height={ scale(20) }
-            />
-          </View>
-          <Thumbnail
-            width={ scale(30) }
-            height={ scale(30) }
-          />
-        </View>
-      </View>
-    );
-  }
 
   return (
     <Pressable onPress={ () => handleOnPress(item) }>
@@ -121,8 +89,6 @@ export function RecentPageComponent({
   handleOnPress,
   removeItem,
 }: RecentPageComponentProps) {
-  const itemWidth = calculateItemWidth(NUMBER_OF_COLUMNS);
-
   const renderItem = useCallback(
     ({ item, index }: ThemedGridRowProps<RecentItemInterface>) => (
       <MemoizedRecentItem
@@ -148,9 +114,10 @@ export function RecentPageComponent({
       <ThemedGrid
         data={ items }
         numberOfColumns={ NUMBER_OF_COLUMNS }
-        itemSize={ itemWidth }
+        itemSize={ scale(130) }
         renderItem={ renderItem }
         onNextLoad={ onNextLoad }
+        ListEmptyComponent={ <RecentPageThumbnail /> }
       />
     );
   };

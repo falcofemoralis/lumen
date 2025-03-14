@@ -4,6 +4,7 @@ import { useLockSpatialNavigation } from 'react-tv-space-navigation';
 import ConfigStore from 'Store/Config.store';
 import NotificationStore from 'Store/Notification.store';
 import { PaginationInterface } from 'Type/Pagination.interface';
+import { setTimeoutSafe } from 'Util/Misc';
 
 import FilmPagerComponent from './FilmPager.component';
 import FilmPagerComponentTV from './FilmPager.component.atv';
@@ -32,7 +33,7 @@ export function FilmPagerContainer({
     })),
   );
   const [selectedPageItemId, setSelectedPageItemId] = useState<string>(pagerItems[0]?.key);
-  const debounce = useRef<NodeJS.Timeout | undefined>();
+  const debounce = useRef<NodeJS.Timeout | null>();
   const { lock, unlock } = useLockSpatialNavigation();
 
   useEffect(() => {
@@ -113,24 +114,27 @@ export function FilmPagerContainer({
   };
 
   const onNextLoad = async (isRefresh = false) => {
-    const { pagination } = getSelectedPagerItem();
+    const pagerItem = getSelectedPagerItem();
+    const { pagination } = pagerItem;
 
     const newPage = {
       ...pagination,
       currentPage: !isRefresh ? pagination.currentPage + 1 : 1,
     };
 
-    await loadFilms(getSelectedPagerItem(), newPage, isRefresh, isRefresh);
+    await loadFilms(pagerItem, newPage, isRefresh, isRefresh);
   };
 
   const handleMenuItemChange = (pagerItem: PagerItemInterface) => {
     const { key } = pagerItem;
 
     if (key !== selectedPageItemId) {
-      clearTimeout(debounce.current);
+      if (debounce.current) {
+        clearTimeout(debounce.current);
+      }
 
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      debounce.current = setTimeout(async () => {
+      debounce.current = setTimeoutSafe(async () => {
         if (ConfigStore.isTV) lock();
 
         setSelectedPageItemId(key);
@@ -139,7 +143,7 @@ export function FilmPagerContainer({
         }
 
         if (ConfigStore.isTV) {
-          setTimeout(() => {
+          setTimeoutSafe(() => {
             unlock();
           }, 0);
         }

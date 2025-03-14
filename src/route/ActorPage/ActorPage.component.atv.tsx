@@ -1,19 +1,13 @@
-import { calculateCardDimensionsTV } from 'Component/FilmCard/FilmCard.style.atv';
 import FilmList from 'Component/FilmList';
-import { ROW_GAP } from 'Component/FilmList/FilmList.style.atv';
-import Loader from 'Component/Loader';
 import Page from 'Component/Page';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
-import Thumbnail from 'Component/Thumbnail';
 import React from 'react';
 import { View } from 'react-native';
 import { DefaultFocus } from 'react-tv-space-navigation';
-import { FilmCardInterface } from 'Type/FilmCard.interface';
-import { FilmType } from 'Type/FilmType.type';
-import { scale } from 'Util/CreateStyles';
 
 import { MAIN_CONTENT_HEIGHT_TV, styles } from './ActorPage.style.atv';
+import { ActorPageThumbnail } from './ActorPage.thumbnail.atv';
 import { ActorPageComponentProps } from './ActorPage.type';
 
 export function ActorPageComponent({
@@ -22,62 +16,7 @@ export function ActorPageComponent({
   handleSelectFilm,
 }: ActorPageComponentProps) {
   if (!actor || isLoading) {
-    const { width } = calculateCardDimensionsTV(6, scale(ROW_GAP));
-
-    const filmThumbs = Array(6).fill({
-      id: '',
-      link: '',
-      type: FilmType.FILM,
-      poster: '',
-      title: '',
-      subtitle: '',
-      isThumbnail: true,
-    }) as FilmCardInterface[];
-
-    return (
-      <Page>
-        <View>
-          <View style={ styles.mainContent }>
-            <Thumbnail
-              style={ styles.photo }
-            />
-            <View style={ [styles.additionalInfo, { marginTop: 0 }] }>
-              { Array(5).fill(0).map((_, i) => (
-                <Thumbnail
-                  // eslint-disable-next-line react/no-array-index-key
-                  key={ `${i}-actor-thumb` }
-                  height={ scale(32) }
-                  width={ scale(200) }
-                />
-              )) }
-            </View>
-          </View>
-          <View style={ [styles.additionalInfo, { marginTop: 0 }] }>
-            <Thumbnail
-              height={ scale(42) }
-              width={ scale(200) }
-            />
-            <View style={ {
-              flexDirection: 'row',
-              gap: scale(8),
-            } }
-            >
-              { filmThumbs.map((item, i) => (
-                <Thumbnail
-                  // eslint-disable-next-line react/no-array-index-key
-                  key={ `${i}-actor-film-thumb` }
-                  style={ { width, height: scale(150) } }
-                />
-              )) }
-            </View>
-          </View>
-        </View>
-        <Loader
-          isLoading
-          fullScreen
-        />
-      </Page>
-    );
+    return <ActorPageThumbnail />;
   }
 
   const renderPhoto = () => {

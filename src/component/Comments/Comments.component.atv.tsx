@@ -4,6 +4,7 @@ import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
+import __ from 'i18n/__';
 import {
   memo,
   useCallback,
@@ -212,7 +213,7 @@ export const CommentsComponent = ({
     };
   }, [charLayout, splitText]);
 
-  const commentCalculatedHeights = useMemo(() => comments.reduce((acc, comment) => {
+  const commentCalculatedHeights = useMemo(() => (comments ?? []).reduce((acc, comment) => {
     acc[comment.id] = calculateItemSize(comment);
 
     return acc;
@@ -236,13 +237,23 @@ export const CommentsComponent = ({
   ), [getCalculatedItemLines, containerWidth]);
 
   const renderComments = () => {
-    if (isLoading && !comments.length) {
+    if (isLoading || !comments) {
       return (
         <View style={ styles.loader }>
           <Loader
-            isLoading={ isLoading }
+            isLoading
             fullScreen
           />
+        </View>
+      );
+    }
+
+    if (!comments.length) {
+      return (
+        <View style={ styles.noComments }>
+          <ThemedText style={ styles.noCommentsText }>
+            { __('No comments yet') }
+          </ThemedText>
         </View>
       );
     }

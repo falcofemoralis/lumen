@@ -100,21 +100,6 @@ export function RecentPageContainer() {
     });
   };
 
-  const getItems = () => {
-    if (!items.length) {
-      return Array(ConfigStore.isTV ? THUMBNAILS_AMOUNT_TV : THUMBNAILS_AMOUNT).fill({
-        id: '',
-        link: '',
-        image: '',
-        date: '',
-        name: '',
-        isThumbnail: true,
-      }) as RecentItemInterface[];
-    }
-
-    return items;
-  };
-
   const containerFunctions = {
     onNextLoad,
     handleOnPress,
@@ -123,7 +108,7 @@ export function RecentPageContainer() {
 
   const containerProps = () => ({
     isSignedIn,
-    items: getItems(),
+    items,
   });
 
   return withTV(RecentPageComponentTV, RecentPageComponent, {

@@ -1,4 +1,5 @@
 import KeyEvent from 'react-native-keyevent';
+import { setTimeoutSafe } from 'Util/Misc';
 
 import CustomEventEmitter from './CustomEventEmitter';
 import { RemoteControlManagerInterface } from './RemoteControlManager.interface';
@@ -14,7 +15,7 @@ class RemoteControlManager implements RemoteControlManagerInterface {
   private longEnterTimeout: NodeJS.Timeout | null = null;
 
   private handleLongEnter = () => {
-    this.longEnterTimeout = setTimeout(() => {
+    this.longEnterTimeout = setTimeoutSafe(() => {
       this.eventEmitter.emit('keyDown', SupportedKeys.LONG_ENTER);
       this.longEnterTimeout = null;
     }, LONG_PRESS_DURATION);

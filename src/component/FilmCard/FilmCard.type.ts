@@ -6,7 +6,6 @@ export interface FilmCardContainerProps {
   isFocused?: boolean;
   style?: StyleProp<ViewStyle>;
   stylePoster?: StyleProp<ViewStyle>;
-  isThumbnail?: boolean;
 }
 
 export interface FilmCardComponentProps {
@@ -14,7 +13,6 @@ export interface FilmCardComponentProps {
   isFocused?: boolean;
   style?: StyleProp<ViewStyle>;
   stylePoster?: StyleProp<ViewStyle>;
-  isThumbnail?: boolean;
 }
 
 export interface FilmCardDimensions {

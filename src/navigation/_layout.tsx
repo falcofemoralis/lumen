@@ -19,6 +19,7 @@ import ConfigStore from 'Store/Config.store';
 import NotificationStore from 'Store/Notification.store';
 import ServiceStore from 'Store/Service.store';
 import Colors from 'Style/Colors';
+import { setTimeoutSafe } from 'Util/Misc';
 import { configureRemoteControl } from 'Util/RemoteControl';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -70,7 +71,7 @@ export function RootLayout() {
         setBackPressedOnce(true);
         NotificationStore.displayMessage('Press back again to exit');
 
-        setTimeout(() => {
+        setTimeoutSafe(() => {
           setBackPressedOnce(false);
         }, 2000);
 

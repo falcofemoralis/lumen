@@ -5,15 +5,14 @@ import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
-import Thumbnail from 'Component/Thumbnail';
 import React, { useCallback } from 'react';
 import { Animated, Dimensions, View } from 'react-native';
 import { DefaultFocus, SpatialNavigationFocusableView } from 'react-tv-space-navigation';
 import { calculateLayoutWidth } from 'Style/Layout';
-import { scale } from 'Util/CreateStyles';
 
 import { NUMBER_OF_COLUMNS_TV } from './RecentPage.config';
 import { styles } from './RecentPage.style.atv';
+import { RecentPageThumbnail } from './RecentPage.thumbnail.atv';
 import { RecentGridItem, RecentPageComponentProps } from './RecentPage.type';
 import { useFocusAnimation } from './useFocusAnimation';
 
@@ -48,43 +47,10 @@ export function RecentPageComponent({
       date,
       info,
       additionalInfo,
-      isThumbnail,
       isDeleteButton,
     } = item;
 
     const width = containerWidth / 2;
-
-    if (isThumbnail && isDeleteButton) {
-      return <View />;
-    }
-
-    if (isThumbnail) {
-      return (
-        <View style={ [
-          styles.item,
-          { width },
-        ] }
-        >
-          <Thumbnail
-            style={ styles.poster }
-          />
-          <View style={ styles.itemContent }>
-            <Thumbnail
-              height={ scale(30) }
-              width="60%"
-            />
-            <Thumbnail
-              height={ scale(20) }
-              width="10%"
-            />
-            <Thumbnail
-              height={ scale(20) }
-              width="30%"
-            />
-          </View>
-        </View>
-      );
-    }
 
     if (isDeleteButton) {
       return (
@@ -163,6 +129,7 @@ export function RecentPageComponent({
           itemSize={ height / 3 }
           renderItem={ renderItem }
           onNextLoad={ onNextLoad }
+          ListEmptyComponent={ <RecentPageThumbnail /> }
         />
       </DefaultFocus>
     );

@@ -1,17 +1,12 @@
-import FilmCard from 'Component/FilmCard';
 import FilmList from 'Component/FilmList';
 import Page from 'Component/Page';
 import ThemedText from 'Component/ThemedText';
-import Thumbnail from 'Component/Thumbnail';
 import __ from 'i18n/__';
 import React from 'react';
 import { View } from 'react-native';
-import { calculateItemWidth } from 'Style/Layout';
-import { FilmCardInterface } from 'Type/FilmCard.interface';
-import { FilmType } from 'Type/FilmType.type';
-import { scale } from 'Util/CreateStyles';
 
 import { styles } from './NotificationsPage.style';
+import { NotificationsPageThumbnail } from './NotificationsPage.thumbnail';
 import { NotificationsPageComponentProps } from './NotificationsPage.type';
 
 export function NotificationsPageComponent({
@@ -19,48 +14,8 @@ export function NotificationsPageComponent({
   data,
   handleSelectFilm,
 }: NotificationsPageComponentProps) {
-  const itemWidth = calculateItemWidth(3);
-
   if (isLoading) {
-    const filmThumbs = Array(3).fill({
-      id: '',
-      link: '',
-      type: FilmType.FILM,
-      poster: '',
-      title: '',
-      subtitle: '',
-      isThumbnail: true,
-    }) as FilmCardInterface[];
-
-    return (
-      <Page>
-        <View>
-          <Thumbnail
-            height={ 24 }
-            width={ 200 }
-          />
-          <View style={ {
-            flexDirection: 'row',
-            gap: scale(16),
-            marginTop: scale(16),
-          } }
-          >
-            { filmThumbs.map((item, i) => (
-              <FilmCard
-                // eslint-disable-next-line react/no-array-index-key
-                key={ `${i}-notification-film-thumb` }
-                filmCard={ item }
-                style={ {
-                  // TODO: Rework
-                  width: itemWidth - scale(16),
-                } }
-                isThumbnail
-              />
-            )) }
-          </View>
-        </View>
-      </Page>
-    );
+    return <NotificationsPageThumbnail />;
   }
 
   if (!data.length) {

@@ -11,7 +11,7 @@ export const INFO_PADDING_VERTICAL = 4;
 export const DEFAULT_SCALE = 1;
 export const FOCUSED_SCALE = 1.1;
 
-export const calculateCardDimensionsTV = (
+export const calculateCardDimensions = (
   numberOfColumns: number,
   gap?: number,
   additionalWidth?: number,

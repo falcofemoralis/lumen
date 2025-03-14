@@ -74,4 +74,15 @@ export const styles = CreateStyles({
   speakActiveIcon: {
     color: Colors.white,
   },
+  noResults: {
+    marginTop: '20%',
+    justifyContent: 'center',
+    alignContent: 'center',
+    alignItems: 'center',
+  },
+  noResultsText: {
+    color: Colors.white,
+    fontSize: 16,
+    textAlign: 'center',
+  },
 });

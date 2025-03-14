@@ -12,13 +12,13 @@ import { calculateRows } from 'Util/List';
 
 import { NUMBER_OF_COLUMNS } from './FilmGrid.config';
 import { ROW_GAP, styles } from './FilmGrid.style';
+import { FilmGridThumbnail } from './FilmGrid.thumbnail';
 import {
   FilmGridComponentProps, FilmGridItemProps, FilmGridRowType,
 } from './FilmGrid.type';
 
 function FilmGridItem({
   row,
-  index,
   width,
   handleOnPress,
 }: FilmGridItemProps) {
@@ -26,16 +26,14 @@ function FilmGridItem({
 
   return (
     <View style={ styles.gridRow }>
-      { items.map((item, innerIndex) => (
+      { items.map((item, index) => (
         <Pressable
-          key={ item.id !== '' ? item.id : `film-grid-thumb-${index}-${innerIndex}` }
+          // eslint-disable-next-line react/no-array-index-key
+          key={ index }
           style={ { width } }
           onPress={ () => handleOnPress(item) }
         >
-          <FilmCard
-            filmCard={ item }
-            isThumbnail={ item.isThumbnail }
-          />
+          <FilmCard filmCard={ item } />
         </Pressable>
       )) }
     </View>
@@ -82,6 +80,7 @@ export function FilmGridComponent({
       renderItem={ renderItem }
       onNextLoad={ onNextLoad }
       style={ styles.grid }
+      ListEmptyComponent={ <FilmGridThumbnail /> }
     />
   );
 }

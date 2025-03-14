@@ -8,6 +8,7 @@ export interface SearchPageComponentProps {
   query: string;
   recognizing: boolean;
   enteredText: string;
+  isLoading: boolean;
   onChangeText: (q: string) => void;
   onApplySuggestion: (q: string) => void;
   onLoadFilms: (

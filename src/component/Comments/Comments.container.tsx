@@ -17,7 +17,7 @@ export type CommentsRef = {
 export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>(
   ({ film, style }, ref) => {
     const { id } = film;
-    const [comments, setComments] = useState<CommentInterface[]>([]);
+    const [comments, setComments] = useState<CommentInterface[] | null>(null);
     const paginationRef = useRef({
       page: 1,
       totalPages: 1,
@@ -64,7 +64,7 @@ export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>
             totalPages: newTotalsPages,
           };
 
-          setComments([...comments, ...newItems]);
+          setComments([...(comments ?? []), ...newItems]);
         } catch (error) {
           NotificationStore.displayError(error as Error);
           updatingStateRef.current = false;

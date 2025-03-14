@@ -19,6 +19,7 @@ import {
 } from 'react-tv-space-navigation';
 import { scale } from 'Util/CreateStyles';
 import { noopFn } from 'Util/Function';
+import { setTimeoutSafe } from 'Util/Misc';
 import RemoteControlManager from 'Util/RemoteControl/RemoteControlManager';
 import { SupportedKeys } from 'Util/RemoteControl/SupportedKeys';
 
@@ -42,7 +43,7 @@ export function FilmPagerComponent({
   const [isMenuActive, setIsMenuActive] = useState(false);
   const rowRef = useRef<number>(0);
   const canNavigateMenuRef = useRef<boolean>(true);
-  const timerRef = useRef<NodeJS.Timeout | undefined>();
+  const timerRef = useRef<NodeJS.Timeout | null>();
   const [currentRow, setCurrentRow] = useState(0);
 
   useEffect(() => {
@@ -67,7 +68,7 @@ export function FilmPagerComponent({
           clearTimeout(timerRef.current);
         }
 
-        timerRef.current = setTimeout(() => {
+        timerRef.current = setTimeoutSafe(() => {
           canNavigateMenuRef.current = true;
         }, 500);
 
@@ -184,11 +185,11 @@ export function FilmPagerComponent({
   );
 
   return (
-    <ThemedView>
+    <View>
       { renderLoader() }
       { renderTopMenu() }
       { renderPage() }
-    </ThemedView>
+    </View>
   );
 }
 

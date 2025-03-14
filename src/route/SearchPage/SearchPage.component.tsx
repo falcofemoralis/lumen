@@ -23,6 +23,7 @@ export function SearchPageComponent({
   query,
   recognizing,
   enteredText,
+  isLoading,
   onChangeText,
   onApplySuggestion,
   onLoadFilms,
@@ -136,6 +137,16 @@ export function SearchPageComponent({
   const renderFilms = () => {
     if (!query) {
       return null;
+    }
+
+    if (!isLoading && !filmPager.search?.filmList.films.length) {
+      return (
+        <View style={ styles.noResults }>
+          <ThemedText style={ styles.noResultsText }>
+            { __('No results found') }
+          </ThemedText>
+        </View>
+      );
     }
 
     return (

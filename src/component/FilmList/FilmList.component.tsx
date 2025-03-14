@@ -1,4 +1,4 @@
-import { FlashList } from '@shopify/flash-list';
+import { LegendList } from '@legendapp/list';
 import FilmCard from 'Component/FilmCard';
 import { calculateCardDimensions } from 'Component/FilmCard/FilmCard.style';
 import ThemedText from 'Component/ThemedText';
@@ -41,9 +41,10 @@ const FilmListRow = ({
       { content && renderContent() }
       { header && renderHeader() }
       <View style={ styles.gridRow }>
-        { films.map((item) => (
+        { films.map((item, index) => (
           <Pressable
-            key={ item.id }
+            // eslint-disable-next-line react/no-array-index-key
+            key={ index }
             style={ { width: itemSize } }
             onPress={ () => handleOnPress(item) }
           >
@@ -79,12 +80,13 @@ export function FilmListComponent({
   ), []);
 
   return (
-    <FlashList
+    <LegendList
       data={ data }
       numColumns={ 1 }
       estimatedItemSize={ height }
       renderItem={ renderItem }
       keyExtractor={ (item) => `${item.index}-film-list-row` }
+      recycleItems
     />
   );
 }

@@ -1,6 +1,5 @@
 import { withTV } from 'Hooks/withTV';
 import {
-  memo,
   useEffect,
   useRef,
   useState,
@@ -19,6 +18,7 @@ export function ThemedGridContainer({
   rowStyle,
   header,
   headerSize,
+  ListEmptyComponent,
   renderItem,
   onNextLoad,
 }: ThemedGridContainerProps) {
@@ -69,6 +69,7 @@ export function ThemedGridContainer({
     rowStyle,
     header,
     headerSize,
+    ListEmptyComponent,
     renderItem,
   });
 
@@ -78,8 +79,4 @@ export function ThemedGridContainer({
   });
 }
 
-function propsAreEqual(prevProps: ThemedGridContainerProps, props: ThemedGridContainerProps) {
-  return JSON.stringify(prevProps.data) === JSON.stringify(props.data);
-}
-
-export default memo(ThemedGridContainer, propsAreEqual);
+export default ThemedGridContainer;

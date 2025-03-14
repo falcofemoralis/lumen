@@ -24,6 +24,7 @@ import NavigationStore from 'Store/Navigation.store';
 import Colors from 'Style/Colors';
 import { CONTENT_WRAPPER_PADDING_TV } from 'Style/Layout';
 import { scale } from 'Util/CreateStyles';
+import { setTimeoutSafe } from 'Util/Misc';
 
 import { useMenuContext } from './MenuContext';
 import {
@@ -79,7 +80,7 @@ export function NavigationBarComponent({
     state: StateType,
   ) => {
     if (lastPage.current !== LOADER_PAGE) {
-      setTimeout(() => {
+      setTimeoutSafe(() => {
         navigateTo({ ...tab, route: LOADER_PAGE }, navigation, state);
       }, 0);
       lastPage.current = LOADER_PAGE;
@@ -89,7 +90,7 @@ export function NavigationBarComponent({
       clearTimeout(timerRef.current);
     }
 
-    timerRef.current = setTimeout(() => {
+    timerRef.current = setTimeoutSafe(() => {
       navigateTo(tab, navigation, state);
       lastPage.current = tab.route;
     }, 500);

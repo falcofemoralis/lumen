@@ -89,26 +89,6 @@ export const styles = CreateStyles({
     fontSize: 14,
     lineHeight: 20,
   },
-  quickInfo: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: 16,
-    gap: 8,
-  },
-  quickInfoTextWrapper: {
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  quickInfoUpperText: {
-    fontSize: 16,
-    color: Colors.white,
-    fontWeight: '700',
-  },
-  quickInfoLowerText: {
-    fontSize: 16,
-    color: Colors.white,
-  },
   playBtn: {
     width: '100%',
     backgroundColor: Colors.secondary,

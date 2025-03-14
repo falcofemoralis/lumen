@@ -10,6 +10,7 @@ import NotificationStore from 'Store/Notification.store';
 import ServiceStore from 'Store/Service.store';
 import { FilmListInterface } from 'Type/FilmList.interface';
 import { MenuItemInterface } from 'Type/MenuItem.interface';
+import { setTimeoutSafe } from 'Util/Misc';
 import { miscStorage } from 'Util/Storage';
 
 import SearchPageComponent from './SearchPage.component';
@@ -24,41 +25,68 @@ export function SearchPageContainer() {
   const [filmPager, setFilmPager] = useState<FilmPagerInterface>({});
   const [enteredText, setEnteredText] = useState('');
   const [recognizing, setRecognizing] = useState(false);
-  const debounce = useRef<NodeJS.Timeout | undefined>();
+  const [isLoading, setIsLoading] = useState(false);
+  const debounce = useRef<NodeJS.Timeout | null>();
 
   useSpeechRecognitionEvent('start', () => setRecognizing(true));
   useSpeechRecognitionEvent('end', () => setRecognizing(false));
   useSpeechRecognitionEvent('result', (event) => {
-    onApplySuggestion(event.results[0]?.transcript);
+    search(event.results[0]?.transcript);
   });
+
+  const searchSuggestions = async (q: string) => {
+    try {
+      const res = await ServiceStore.getCurrentService().searchSuggestions(q);
+
+      setSuggestions(res);
+    } catch (e) {
+      NotificationStore.displayError(e as Error);
+    }
+  };
+
+  const search = async (q: string) => {
+    if (!q) {
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const films = await ServiceStore.getCurrentService().search(q, 1);
+
+      onUpdateFilms('search', films);
+    } catch (e) {
+      NotificationStore.displayError(e as Error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const onChangeText = async (q: string) => {
     resetSearch();
     setEnteredText(q);
 
     if (!q) {
-      clearTimeout(debounce.current);
+      if (debounce.current) {
+        clearTimeout(debounce.current);
+      }
       setSuggestions(miscStorage.getArray(USER_SUGGESTIONS) || []);
 
       return;
     }
 
-    clearTimeout(debounce.current);
+    if (debounce.current) {
+      clearTimeout(debounce.current);
+    }
 
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    debounce.current = setTimeout(async () => {
-      try {
-        const res = await ServiceStore.getCurrentService().searchSuggestions(q);
-
-        setSuggestions(res);
-      } catch (e) {
-        NotificationStore.displayError(e as Error);
-      }
+    debounce.current = setTimeoutSafe(async () => {
+      await searchSuggestions(q);
     }, SEARCH_DEBOUNCE_TIME);
   };
 
   const handleApplySearch = () => {
-    onApplySuggestion(enteredText);
+    search(enteredText);
   };
 
   const onApplySuggestion = async (q: string) => {
@@ -72,13 +100,7 @@ export function SearchPageContainer() {
     setEnteredText(q);
     updateUserSuggestions(q);
 
-    try {
-      const films = await ServiceStore.getCurrentService().search(q, 1);
-
-      onUpdateFilms('search', films);
-    } catch (e) {
-      NotificationStore.displayError(e as Error);
-    }
+    search(q);
   };
 
   const updateUserSuggestions = (q: string) => {
@@ -143,6 +165,15 @@ export function SearchPageContainer() {
     }));
   };
 
+  const containerProps = () => ({
+    suggestions,
+    filmPager,
+    query,
+    recognizing,
+    enteredText,
+    isLoading,
+  });
+
   const containerFunctions = {
     onChangeText,
     onApplySuggestion,
@@ -153,14 +184,6 @@ export function SearchPageContainer() {
     resetSearch,
     clearSearch,
   };
-
-  const containerProps = () => ({
-    suggestions,
-    filmPager,
-    query,
-    recognizing,
-    enteredText,
-  });
 
   return withTV(SearchPageComponentTV, SearchPageComponent, {
     ...containerFunctions,

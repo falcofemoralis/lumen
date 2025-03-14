@@ -1,6 +1,5 @@
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
-import Thumbnail from 'Component/Thumbnail';
 import React from 'react';
 import { Animated, View } from 'react-native';
 
@@ -8,10 +7,7 @@ import {
   FILM_TYPE_COLORS,
   TYPE_LABELS,
 } from './FilmCard.config';
-import {
-  INFO_HEIGHT,
-  styles,
-} from './FilmCard.style.atv';
+import { styles } from './FilmCard.style.atv';
 import { FilmCardComponentProps } from './FilmCard.type';
 import { useFocusAnimation } from './useFocusAnimation';
 
@@ -20,7 +16,6 @@ export function FilmCardComponent({
   style,
   stylePoster,
   isFocused = false,
-  isThumbnail,
 }: FilmCardComponentProps) {
   const {
     type,
@@ -31,34 +26,6 @@ export function FilmCardComponent({
   } = filmCard;
 
   const scaleAnimation = useFocusAnimation(isFocused);
-
-  if (isThumbnail) {
-    return (
-      <Animated.View
-        style={ [
-          styles.card,
-          style,
-        ] }
-      >
-        <View style={ [styles.posterWrapper, style] }>
-          <Thumbnail
-            style={ [styles.poster, stylePoster] }
-            height="auto"
-          />
-        </View>
-        <View style={ [styles.info, { gap: 8 }] }>
-          <Thumbnail
-            height={ INFO_HEIGHT / 4 }
-            width="100%"
-          />
-          <Thumbnail
-            height={ INFO_HEIGHT / 6 }
-            width="50%"
-          />
-        </View>
-      </Animated.View>
-    );
-  }
 
   const renderType = () => (
     <ThemedText

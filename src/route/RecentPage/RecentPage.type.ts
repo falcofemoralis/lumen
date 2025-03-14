@@ -9,7 +9,6 @@ export interface RecentPageComponentProps {
 }
 
 export type RecentGridItem = RecentItemInterface & {
-  isThumbnail?: boolean;
   isDeleteButton?: boolean;
 };
 

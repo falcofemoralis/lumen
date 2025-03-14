@@ -1,12 +1,11 @@
-import FilmGrid from 'Component/FilmGrid';
 import FilmPager from 'Component/FilmPager';
 import Page from 'Component/Page';
 import ThemedText from 'Component/ThemedText';
-import Thumbnail from 'Component/Thumbnail';
+import __ from 'i18n/__';
 import React from 'react';
 import { View } from 'react-native';
-import { scale } from 'Util/CreateStyles';
 
+import { BookmarksPageThumbnail } from './BookmarksPage.thumbnail.atv';
 import { BookmarksPageComponentProps } from './BookmarksPage.type';
 
 export function BookmarksPageComponent({
@@ -27,32 +26,15 @@ export function BookmarksPageComponent({
     }
 
     if (isLoading) {
-      return (
-        <View>
-          <View style={ {
-            flexDirection: 'row',
-            height: scale(40),
-            gap: scale(8),
-            marginBlockEnd: scale(16),
-          } }
-          >
-            { Array(3).fill(0).map((_, i) => (
-              <Thumbnail
-                // eslint-disable-next-line react/no-array-index-key
-                key={ `${i}-thumb` }
-                width="20%"
-              />
-            )) }
-          </View>
-          <FilmGrid films={ [] } />
-        </View>
-      );
+      return <BookmarksPageThumbnail />;
     }
 
     if (!menuItems.length) {
       return (
         <View>
-          <ThemedText>No bookmarks</ThemedText>
+          <ThemedText>
+            { __('No bookmarks') }
+          </ThemedText>
         </View>
       );
     }

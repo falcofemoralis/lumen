@@ -29,6 +29,7 @@ import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { scale } from 'Util/CreateStyles';
 
 import { styles } from './FilmPage.style.atv';
+import { FilmPageThumbnail } from './FilmPage.thumbnail.atv';
 import { FilmPageComponentProps } from './FilmPage.type';
 import {
   ActorView, FranchiseItemComponent, InfoList, RelatedItem, ScheduleItem, Section,
@@ -51,30 +52,7 @@ export function FilmPageComponent({
   const { height } = Dimensions.get('window');
 
   if (!film) {
-    return (
-      <Page>
-        <SpatialNavigationView direction="horizontal">
-          <ThemedView style={ styles.actions }>
-            { Array(5).fill(0).map((_, i) => (
-              <Thumbnail
-                // eslint-disable-next-line react/no-array-index-key
-                key={ `${i}-thumb` }
-                height={ scale(32) }
-                width={ scale(110) }
-              />
-            )) }
-          </ThemedView>
-        </SpatialNavigationView>
-        <View style={ styles.mainContent }>
-          <Thumbnail style={ styles.poster } />
-          <Thumbnail style={ styles.mainInfo } />
-        </View>
-        <Loader
-          isLoading
-          fullScreen
-        />
-      </Page>
-    );
+    return <FilmPageThumbnail />;
   }
 
   const renderAction = (text: string, icon: string, onPress?: () => void) => (
@@ -121,7 +99,6 @@ export function FilmPageComponent({
           { renderAction(__('Bookmark'), 'movie-star-outline', () => OverlayStore.openOverlay(bookmarksOverlayId)) }
           { renderAction(__('Trailer'), 'movie-open-check-outline') }
           { renderAction(__('Share'), 'share-variant-outline') }
-          { renderAction(__('Download'), 'folder-download-outline') }
         </ThemedView>
       </DefaultFocus>
     </SpatialNavigationView>

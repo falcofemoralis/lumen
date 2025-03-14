@@ -13,6 +13,9 @@ export interface ThemedGridContainerProps<T = any> {
   rowStyle?: ViewStyle;
   header?: JSX.Element;
   headerSize?: number;
+  ListEmptyComponent?: React.ComponentType<any>
+  | React.ReactElement<any, string
+  | React.JSXElementConstructor<any>>;
   renderItem: (args: ThemedGridRowProps<T>) => JSX.Element;
   onNextLoad?: (isRefresh: boolean) => Promise<void>;
 }
@@ -26,6 +29,7 @@ export interface ThemedGridComponentProps<T = any> {
   rowStyle?: ViewStyle;
   header?: JSX.Element;
   headerSize?: number;
+  ListEmptyComponent?: any;
   renderItem: (props: { item: T, index: number }) => JSX.Element;
   handleScrollEnd: () => void;
   handleRefresh?: () => void;

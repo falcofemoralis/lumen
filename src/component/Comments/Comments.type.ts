@@ -8,7 +8,7 @@ export interface CommentsContainerProps {
 }
 
 export interface CommentsComponentProps {
-  comments: CommentInterface[];
+  comments: CommentInterface[] | null;
   onNextLoad: () => Promise<void>;
   style?: StyleProp<ViewStyle> | undefined;
   isLoading: boolean;

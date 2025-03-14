@@ -1,17 +1,19 @@
 import FilmCard from 'Component/FilmCard';
-import { calculateCardDimensionsTV } from 'Component/FilmCard/FilmCard.style.atv';
+import { calculateCardDimensions } from 'Component/FilmCard/FilmCard.style.atv';
 import ThemedGrid from 'Component/ThemedGrid';
 import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
 import React, { memo, useCallback, useMemo } from 'react';
 import {
   SpatialNavigationFocusableView,
 } from 'react-tv-space-navigation';
+import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { scale } from 'Util/CreateStyles';
 import { noopFn } from 'Util/Function';
 
 import { NUMBER_OF_COLUMNS_TV } from './FilmGrid.config';
 import { ROW_GAP, styles } from './FilmGrid.style.atv';
-import { FilmGridComponentProps, FilmGridItemProps, FilmGridItemType } from './FilmGrid.type';
+import { FilmGridThumbnail } from './FilmGrid.thumbnail.atv';
+import { FilmGridComponentProps, FilmGridItemProps } from './FilmGrid.type';
 
 function FilmGridItem({
   row,
@@ -22,7 +24,6 @@ function FilmGridItem({
 }: FilmGridItemProps) {
   const { items } = row;
   const item = items[0];
-  const { isThumbnail } = item;
 
   return (
     <SpatialNavigationFocusableView
@@ -34,7 +35,6 @@ function FilmGridItem({
           filmCard={ item }
           style={ { width } }
           isFocused={ isFocused && isRootActive }
-          isThumbnail={ isThumbnail }
         />
       ) }
     </SpatialNavigationFocusableView>
@@ -55,13 +55,13 @@ export function FilmGridComponent({
   handleOnPress,
   handleItemFocus,
 }: FilmGridComponentProps) {
-  const { width, height } = calculateCardDimensionsTV(
+  const { width, height } = calculateCardDimensions(
     NUMBER_OF_COLUMNS_TV,
     scale(ROW_GAP),
     scale(ROW_GAP) * 2,
   );
 
-  const renderItem = useCallback(({ item, index }: ThemedGridRowProps<FilmGridItemType>) => (
+  const renderItem = useCallback(({ item, index }: ThemedGridRowProps<FilmCardInterface>) => (
     <MemoizedGridItem
       index={ index }
       row={ { id: String(index), items: [item] } }
@@ -84,6 +84,7 @@ export function FilmGridComponent({
       onNextLoad={ onNextLoad }
       header={ header }
       headerSize={ headerSize }
+      ListEmptyComponent={ <FilmGridThumbnail /> }
     />
   );
 }
