@@ -1,9 +1,9 @@
 import { LegendList } from '@legendapp/list';
 import FilmCard from 'Component/FilmCard';
-import { calculateCardDimensions } from 'Component/FilmCard/FilmCard.style';
+import { useFilmCardDimensions } from 'Component/FilmCard/FilmCard.style';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
-import React, { memo, useCallback } from 'react';
+import React, { memo, useCallback, useMemo } from 'react';
 import { Pressable, View } from 'react-native';
 import { scale } from 'Util/CreateStyles';
 
@@ -59,16 +59,16 @@ const FilmListRow = ({
 };
 
 function rowPropsAreEqual(prevProps: FilmListRowProps, props: FilmListRowProps) {
-  return prevProps.row.index === props.row.index;
+  return prevProps.row.index === props.row.index && prevProps.itemSize === props.itemSize;
 }
 
 const MemoizedFilmListRow = memo(FilmListRow, rowPropsAreEqual);
 
 export function FilmListComponent({
-  data,
+  data: films,
   handleOnPress,
 }: FilmListComponentProps) {
-  const { width, height } = calculateCardDimensions(NUMBER_OF_COLUMNS, scale(ROW_GAP));
+  const { width, height } = useFilmCardDimensions(NUMBER_OF_COLUMNS, scale(ROW_GAP));
 
   const renderItem = useCallback(({ item: row }: {item: FilmListItem}) => (
     <MemoizedFilmListRow
@@ -77,7 +77,13 @@ export function FilmListComponent({
       numberOfColumns={ NUMBER_OF_COLUMNS }
       handleOnPress={ handleOnPress }
     />
-  ), []);
+  ), [width]);
+
+  const data = useMemo(() => films.map(
+    (row) => ({
+      ...row,
+    }),
+  ), [films, width]);
 
   return (
     <LegendList

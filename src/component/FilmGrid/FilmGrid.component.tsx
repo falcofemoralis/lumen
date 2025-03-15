@@ -1,5 +1,5 @@
 import FilmCard from 'Component/FilmCard';
-import { calculateCardDimensions } from 'Component/FilmCard/FilmCard.style';
+import { useFilmCardDimensions } from 'Component/FilmCard/FilmCard.style';
 import ThemedGrid from 'Component/ThemedGrid';
 import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
 import React, { memo, useCallback, useMemo } from 'react';
@@ -41,7 +41,7 @@ function FilmGridItem({
 }
 
 function rowPropsAreEqual(prevProps: FilmGridItemProps, props: FilmGridItemProps) {
-  return prevProps.row.id === props.row.id;
+  return prevProps.row.id === props.row.id && prevProps.width === props.width;
 }
 
 const MemoizedGridItem = memo(FilmGridItem, rowPropsAreEqual);
@@ -51,7 +51,7 @@ export function FilmGridComponent({
   handleOnPress,
   onNextLoad,
 }: FilmGridComponentProps) {
-  const { width, height } = calculateCardDimensions(NUMBER_OF_COLUMNS, scale(ROW_GAP));
+  const { width, height } = useFilmCardDimensions(NUMBER_OF_COLUMNS, scale(ROW_GAP));
 
   const renderItem = useCallback(
     ({ item: row, index }: ThemedGridRowProps<FilmGridRowType>) => (
@@ -62,7 +62,7 @@ export function FilmGridComponent({
         handleOnPress={ handleOnPress }
       />
     ),
-    [],
+    [width],
   );
 
   const data = useMemo(() => calculateRows(
@@ -70,7 +70,7 @@ export function FilmGridComponent({
   ).map((items) => ({
     id: items[0].id,
     items,
-  })), [films]);
+  })), [films, width]);
 
   return (
     <ThemedGrid

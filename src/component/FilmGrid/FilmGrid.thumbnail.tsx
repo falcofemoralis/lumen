@@ -1,4 +1,4 @@
-import { calculateCardDimensions } from 'Component/FilmCard/FilmCard.style';
+import { useFilmCardDimensions } from 'Component/FilmCard/FilmCard.style';
 import { FilmCardThumbnail } from 'Component/FilmCard/FilmCard.thumbnail';
 import { View } from 'react-native';
 import { scale } from 'Util/CreateStyles';
@@ -7,7 +7,7 @@ import { NUMBER_OF_COLUMNS, THUMBNAILS_AMOUNT } from './FilmGrid.config';
 import { ROW_GAP, styles } from './FilmGrid.style';
 
 export const FilmGridThumbnail = () => {
-  const { width } = calculateCardDimensions(NUMBER_OF_COLUMNS, scale(ROW_GAP));
+  const { width } = useFilmCardDimensions(NUMBER_OF_COLUMNS, scale(ROW_GAP));
 
   return (
     <View style={ styles.grid }>

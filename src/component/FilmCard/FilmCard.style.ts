@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+import { Dimensions } from 'react-native';
 import Colors from 'Style/Colors';
 import { calculateItemWidth } from 'Style/Layout';
 import CreateStyles, { scale } from 'Util/CreateStyles';
@@ -23,6 +25,32 @@ export const calculateCardDimensions = (
     width,
     height,
   };
+};
+
+export const useFilmCardDimensions = (
+  numberOfColumns: number,
+  gap?: number,
+  additionalWidth?: number,
+): FilmCardDimensions => {
+  const [dimensions, setDimensions] = useState(
+    calculateCardDimensions(numberOfColumns, gap, additionalWidth),
+  );
+
+  const updateDimensions = () => {
+    setDimensions(
+      calculateCardDimensions(numberOfColumns, gap, additionalWidth),
+    );
+  };
+
+  useEffect(() => {
+    const dimensionChangeHandler = Dimensions.addEventListener('change', updateDimensions);
+
+    return () => {
+      dimensionChangeHandler.remove();
+    };
+  }, []);
+
+  return dimensions;
 };
 
 export const styles = CreateStyles({
