@@ -9,7 +9,7 @@ export interface DropdownItem {
 
 export type ThemedDropdownContainerProps = {
   data: DropdownItem[],
-  value: string,
+  value?: string,
   header?: string;
   inputStyle?: StyleProp<ViewStyle>;
   asOverlay?: boolean;

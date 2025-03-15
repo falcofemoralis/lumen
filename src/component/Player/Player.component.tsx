@@ -285,7 +285,7 @@ export function PlayerComponent({
       ) }
       { renderMiddleControl(
         {
-          name: isPlaying ? 'pause' : 'play',
+          name: isPlaying || isLoading ? 'pause' : 'play',
           pack: IconPackType.MaterialCommunityIcons,
         },
         togglePlayPause,

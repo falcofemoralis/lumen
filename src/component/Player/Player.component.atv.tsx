@@ -315,7 +315,7 @@ export function PlayerComponent({
       } }
     >
       { renderTopAction(
-        isPlaying ? 'pause' : 'play-arrow',
+        isPlaying || isLoading ? 'pause' : 'play-arrow',
         'Play',
         togglePlayPause,
         topActionRef,
