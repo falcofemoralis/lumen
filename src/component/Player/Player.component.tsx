@@ -173,6 +173,10 @@ export function PlayerComponent({
       runOnJS(setPlayerRate)(1);
     });
 
+  const enablePIP = () => {
+    playerRef.current?.startPictureInPicture();
+  };
+
   const renderAction = (
     icon: string,
     _name: string,
@@ -210,7 +214,7 @@ export function PlayerComponent({
     return (
       <ThemedText style={ styles.subtitle }>
         {
-          `${releaseDate} • ${ratings ? ratings[0].text : ''} • ${countries ? countries[0] : ''}`
+          `${releaseDate} • ${ratings ? ratings[0].text : ''} • ${countries ? countries[0].name : ''}`
         }
       </ThemedText>
     );
@@ -223,30 +227,32 @@ export function PlayerComponent({
     </View>
   );
 
-  const enablePIP = () => {
-    playerRef.current?.startPictureInPicture();
-  };
-
-  const renderTopActions = () => {
+  const renderSubtitlesActions = () => {
     const { subtitles = [] } = video;
 
-    return (
-      <View style={ styles.topActions }>
-        { renderTopInfo() }
-        <View style={ styles.actionsRow }>
-          { isPictureInPictureSupported() && renderAction('picture-in-picture-bottom-right', 'PIP', enablePIP) }
-          { renderAction('play-speed', 'Speed') }
-          { renderAction('quality-high', 'Quality', openQualitySelector) }
-          { subtitles.length > 0 && renderAction(
-            selectedSubtitle?.languageCode === '' ? 'closed-caption-outline' : 'closed-caption',
-            'Subtitles',
-            openSubtitleSelector,
-          ) }
-          { renderAction('lock-open-outline', 'Lock') }
-        </View>
-      </View>
+    if (!subtitles.length) {
+      return null;
+    }
+
+    return renderAction(
+      selectedSubtitle?.languageCode === '' ? 'closed-caption-outline' : 'closed-caption',
+      'Subtitles',
+      openSubtitleSelector,
     );
   };
+
+  const renderTopActions = () => (
+    <View style={ styles.topActions }>
+      { renderTopInfo() }
+      <View style={ styles.actionsRow }>
+        { isPictureInPictureSupported() && renderAction('picture-in-picture-bottom-right', 'PIP', enablePIP) }
+        { renderAction('play-speed', 'Speed') }
+        { renderAction('quality-high', 'Quality', openQualitySelector) }
+        { renderSubtitlesActions() }
+        { renderAction('lock-open-outline', 'Lock') }
+      </View>
+    </View>
+  );
 
   const renderMiddleControl = (
     icon: IconInterface,
@@ -346,7 +352,7 @@ export function PlayerComponent({
         <View style={ styles.progressBarRow }>
           { renderProgressBar() }
         </View>
-        <View style={ styles.actionsRow }>
+        <View style={ [styles.actionsRow, styles.bottomActionsRow] }>
           { isPlaylistSelector && renderAction('playlist-play', 'Series', openVideoSelector) }
           { renderAction('comment-text-outline', 'Comments', () => OverlayStore.openOverlay(commentsOverlayId)) }
           { renderAction('bookmark-outline', 'Bookmarks', () => OverlayStore.openOverlay(bookmarksOverlayId)) }

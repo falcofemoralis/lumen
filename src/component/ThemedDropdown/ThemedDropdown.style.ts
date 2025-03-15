@@ -23,7 +23,8 @@ export const styles = CreateStyles({
   contentContainer: {
   },
   item: {
-    padding: 14,
+    paddingHorizontal: 12,
+    height: 48,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -39,6 +40,7 @@ export const styles = CreateStyles({
     width: 20,
   },
   listContainer: {
+    height: '100%',
   },
   listHeader: {
     justifyContent: 'center',
@@ -55,6 +57,8 @@ export const styles = CreateStyles({
   },
   listItems: {
     marginTop: 8,
+    flex: 1,
+    flexDirection: 'column',
   },
   listItem: {
     borderRadius: 16,

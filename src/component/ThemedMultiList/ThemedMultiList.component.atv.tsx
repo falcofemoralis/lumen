@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import { Checkbox } from 'react-native-paper';
 import { DefaultFocus, SpatialNavigationFocusableView, SpatialNavigationScrollView } from 'react-tv-space-navigation';
+import Colors from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 
 import { styles } from './ThemedMultiList.style.atv';
@@ -51,6 +52,7 @@ export const ThemedMultiListComponent = ({
           </View>
           <Checkbox
             status={ item.isChecked ? 'checked' : 'unchecked' }
+            color={ Colors.primary }
           />
         </View>
       ) }

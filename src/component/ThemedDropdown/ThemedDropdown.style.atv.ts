@@ -31,8 +31,17 @@ export const styles = CreateStyles({
     maxHeight: 300,
     padding: 4,
     alignSelf: 'flex-end',
+    height: '100%',
   },
   contentContainer: {
+  },
+  scrollViewContainer: {
+    overflow: 'hidden',
+    flex: 1,
+    flexDirection: 'column',
+  },
+  scrollView: {
+    minWidth: 250,
   },
   header: {
     justifyContent: 'center',
@@ -54,10 +63,10 @@ export const styles = CreateStyles({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 10,
-    marginBlock: 5,
+    paddingHorizontal: 10,
+    height: 48,
     borderRadius: 12,
-    minWidth: 200,
+    minWidth: 250,
   },
   itemFocused: {
     backgroundColor: Colors.white,

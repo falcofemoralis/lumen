@@ -5,13 +5,13 @@ import ThemedDropdownComponent from './ThemedDropdown.component';
 import ThemedDropdownComponentTV from './ThemedDropdown.component.atv';
 import { ThemedDropdownContainerProps } from './ThemedDropdown.type';
 
-export function ThemedDropdownContainer(props: ThemedDropdownContainerProps<any>) {
+export function ThemedDropdownContainer(props: ThemedDropdownContainerProps) {
   return withTV(ThemedDropdownComponentTV, ThemedDropdownComponent, props);
 }
 
 function propsAreEqual(
-  prevProps: ThemedDropdownContainerProps<any>,
-  props: ThemedDropdownContainerProps<any>,
+  prevProps: ThemedDropdownContainerProps,
+  props: ThemedDropdownContainerProps,
 ) {
   return JSON.stringify(prevProps.data) === JSON.stringify(props.data)
     && prevProps.value === props.value;

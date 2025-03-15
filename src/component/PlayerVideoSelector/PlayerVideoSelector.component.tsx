@@ -113,6 +113,19 @@ export function PlayerVideoSelectorComponent({
     />
   );
 
+  const renderContent = () => {
+    if (!seasons.length) {
+      return renderVoices();
+    }
+
+    return (
+      <ScrollView>
+        { renderVoices() }
+        { renderSeriesSelection() }
+      </ScrollView>
+    );
+  };
+
   return (
     <ThemedOverlay
       id={ overlayId }
@@ -120,11 +133,8 @@ export function PlayerVideoSelectorComponent({
       contentContainerStyle={ styles.container }
       style={ styles.background }
     >
-      <ScrollView>
-        { renderLoader() }
-        { renderVoices() }
-        { renderSeriesSelection() }
-      </ScrollView>
+      { renderLoader() }
+      { renderContent() }
     </ThemedOverlay>
   );
 }

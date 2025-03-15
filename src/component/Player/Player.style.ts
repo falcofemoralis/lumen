@@ -80,6 +80,9 @@ export const styles = CreateStyles({
     flexDirection: 'row',
     gap: 32,
   },
+  bottomActionsRow: {
+    justifyContent: 'flex-end',
+  },
   title: {
     fontSize: 20,
     fontWeight: '700',

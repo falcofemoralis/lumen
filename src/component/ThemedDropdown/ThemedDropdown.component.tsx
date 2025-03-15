@@ -2,7 +2,7 @@ import ThemedButton from 'Component/ThemedButton';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedOverlay from 'Component/ThemedOverlay';
-import React, { useCallback, useId, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import {
   ScrollView, Text, TouchableHighlight, View,
 } from 'react-native';
@@ -23,8 +23,17 @@ export const ThemedDropdownComponent = ({
   overlayId,
   asList,
   onChange,
-}: ThemedDropdownComponentProps<any>) => {
+}: ThemedDropdownComponentProps) => {
   const id = useRef(overlayId ?? generateId());
+  const scrollViewRef = useRef<ScrollView>(null);
+
+  const handleLayout = () => {
+    const itemIdx = data.findIndex((item) => item.value === value);
+
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollTo({ y: itemIdx * styles.item.height, animated: false });
+    }
+  };
 
   const renderHeader = () => {
     if (!header) {
@@ -60,27 +69,35 @@ export const ThemedDropdownComponent = ({
     </View>
   ), []);
 
+  const renderList = () => (
+    <ScrollView
+      ref={ scrollViewRef }
+      style={ styles.listItems }
+      onLayout={ handleLayout }
+    >
+      { data.map((item) => (
+        <TouchableHighlight
+          key={ item.value }
+          underlayColor={ Colors.primary }
+          onPress={ () => { onChange(item); } }
+          style={ styles.listItem }
+        >
+          <View style={ [
+            styles.listItem,
+            item.value === value && styles.listItemSelected,
+          ] }
+          >
+            { renderItem(item) }
+          </View>
+        </TouchableHighlight>
+      )) }
+    </ScrollView>
+  );
+
   const renderContent = () => (
     <>
       { renderHeader() }
-      <ScrollView style={ styles.listItems }>
-        { data.map((item) => (
-          <TouchableHighlight
-            key={ item.value }
-            underlayColor={ Colors.primary }
-            onPress={ () => { onChange(item); } }
-            style={ styles.listItem }
-          >
-            <View style={ [
-              styles.listItem,
-              item.value === value && styles.listItemSelected,
-            ] }
-            >
-              { renderItem(item) }
-            </View>
-          </TouchableHighlight>
-        )) }
-      </ScrollView>
+      { renderList() }
     </>
   );
 
@@ -88,9 +105,7 @@ export const ThemedDropdownComponent = ({
     if (asList) {
       return (
         <View style={ styles.listContainer }>
-          <View style={ styles.contentContainer }>
-            { renderContent() }
-          </View>
+          { renderContent() }
         </View>
       );
     }

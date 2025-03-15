@@ -1,6 +1,9 @@
-import * as ScreenOrientation from 'expo-screen-orientation';
-import { memo, useEffect, useState } from 'react';
-import { Dimensions } from 'react-native';
+import {
+  memo,
+  useEffect,
+  useState,
+} from 'react';
+import { Dimensions, ScaledSize } from 'react-native';
 import { Modal, Portal } from 'react-native-paper';
 
 import { styles } from './ThemedOverlay.style';
@@ -13,24 +16,30 @@ export function ThemedOverlayComponent({
   style,
   children,
 }: ThemedOverlayComponentProps) {
-  const { height, width } = Dimensions.get('window');
+  const [isLandscape, setIsLandscape] = useState(false);
 
-  const [isLandscape, setIsLandscape] = useState(
-    height < width,
-  );
+  const updateOrientation = (args?: { window: ScaledSize }) => {
+    const { window } = args ?? {};
+    const { width, height } = window ?? Dimensions.get('window');
+    const newLandscape = width > height;
+
+    setIsLandscape(newLandscape);
+  };
 
   useEffect(() => {
-    const subscription = ScreenOrientation.addOrientationChangeListener(({ orientationInfo }) => {
-      const { orientation: o } = orientationInfo;
-
-      setIsLandscape(o === ScreenOrientation.Orientation.LANDSCAPE_LEFT
-        || o === ScreenOrientation.Orientation.LANDSCAPE_RIGHT);
-    });
+    const dimensionChangeHandler = Dimensions.addEventListener('change', updateOrientation);
 
     return () => {
-      ScreenOrientation.removeOrientationChangeListener(subscription);
+      dimensionChangeHandler.remove();
     };
   }, []);
+
+  useEffect(() => {
+    if (isOpened) {
+      updateOrientation();
+    }
+  },
+  [isOpened]);
 
   return (
     <Portal>
@@ -54,7 +63,8 @@ function propsAreEqual(
   prevProps: ThemedOverlayComponentProps,
   props: ThemedOverlayComponentProps,
 ) {
-  return prevProps.isOpened === props.isOpened && prevProps.isVisible === props.isVisible
+  return prevProps.isOpened === props.isOpened
+    && prevProps.isVisible === props.isVisible
     && prevProps.children === props.children;
 }
 

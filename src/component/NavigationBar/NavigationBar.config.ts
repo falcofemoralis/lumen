@@ -32,7 +32,7 @@ export const TABS_TV_CONFIG: Tab[] = [
     },
   },
   {
-    route: '(home)',
+    route: '(+home)',
     title: __('Home'),
     icon: {
       name: 'home-variant-outline',
@@ -76,7 +76,7 @@ export const TABS_TV_CONFIG: Tab[] = [
 
 export const TABS_MOBILE_CONFIG: Tab[] = [
   {
-    route: '(home)',
+    route: '(+home)',
     title: __('Home'),
     icon: {
       name: 'home-outline',

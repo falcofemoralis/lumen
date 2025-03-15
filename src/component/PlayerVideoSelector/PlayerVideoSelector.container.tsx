@@ -95,8 +95,6 @@ export function PlayerVideoSelectorContainer({
       return;
     }
 
-    OverlayStore.goToPreviousOverlay();
-
     if (!hasSeasons) {
       setSelectedVoice(voice);
 
@@ -136,6 +134,8 @@ export function PlayerVideoSelectorContainer({
     } finally {
       setIsLoading(false);
     }
+
+    OverlayStore.goToPreviousOverlay();
   };
 
   const handleSelectEpisode = async (episodeId: string) => {

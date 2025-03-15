@@ -34,12 +34,15 @@ export const ThemedMultiListComponent = ({
       </Text>
       <Checkbox
         status={ item.isChecked ? 'checked' : 'unchecked' }
+        color={ Colors.primary }
       />
     </View>
   ), []);
 
   const renderContent = () => (
-    <ScrollView style={ styles.listItems }>
+    <ScrollView
+      style={ styles.listItems }
+    >
       { values.map((item) => (
         <TouchableHighlight
           key={ item.value }
@@ -57,10 +60,8 @@ export const ThemedMultiListComponent = ({
 
   return (
     <View style={ styles.listContainer }>
-      <View style={ styles.contentContainer }>
-        { renderHeader() }
-        { renderContent() }
-      </View>
+      { renderHeader() }
+      { renderContent() }
     </View>
   );
 };

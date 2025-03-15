@@ -6,10 +6,9 @@ export const styles = CreateStyles({
     maxHeight: 300,
     padding: 8,
   },
-  contentContainer: {
-  },
   item: {
-    padding: 14,
+    paddingHorizontal: 12,
+    height: 48,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -25,24 +24,25 @@ export const styles = CreateStyles({
     width: 20,
   },
   listContainer: {
+    height: '100%',
   },
   listHeader: {
-    flexDirection: 'column',
     justifyContent: 'center',
+    alignItems: 'center',
+    padding: 8,
     borderBottomColor: Colors.gray,
     borderBottomWidth: 1,
-    paddingTop: 12,
   },
   listHeaderText: {
-    alignSelf: 'center',
     color: Colors.lightGray,
     fontSize: 16,
     lineHeight: 16,
     fontWeight: '500',
-    marginBlock: 12,
   },
   listItems: {
     marginTop: 8,
+    flex: 1,
+    flexDirection: 'column',
   },
   listItem: {
     borderRadius: 16,
