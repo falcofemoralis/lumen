@@ -71,6 +71,9 @@ export const styles = CreateStyles({
   progressBarRow: {
     marginBottom: 32,
   },
+  progressBarRowLocked: {
+    pointerEvents: 'none',
+  },
   topInfo: {
     flex: 1,
     flexDirection: 'column',
@@ -82,6 +85,10 @@ export const styles = CreateStyles({
   },
   bottomActionsRow: {
     justifyContent: 'flex-end',
+  },
+  bottomActionsRowLocked: {
+    opacity: 0,
+    pointerEvents: 'none',
   },
   title: {
     fontSize: 20,

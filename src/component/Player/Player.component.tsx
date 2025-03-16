@@ -64,6 +64,7 @@ export function PlayerComponent({
   bookmarksOverlayId,
   speedOverlayId,
   selectedSpeed,
+  isLocked,
   togglePlayPause,
   seekToPosition,
   calculateCurrentTime,
@@ -81,6 +82,7 @@ export function PlayerComponent({
   openSpeedSelector,
   openBookmarksOverlay,
   openCommentsOverlay,
+  handleLockControls,
 }: PlayerComponentProps) {
   const [showControls, setShowControls] = useState(false);
   const [isScrolling, setIsScrolling] = useState(false);
@@ -160,7 +162,7 @@ export function PlayerComponent({
     .maxDuration(125)
     .numberOfTaps(2)
     .onStart((e) => {
-      if (showControls) {
+      if (showControls || isLocked) {
         return;
       }
 
@@ -253,11 +255,15 @@ export function PlayerComponent({
     <View style={ styles.topActions }>
       { renderTopInfo() }
       <View style={ styles.actionsRow }>
-        { isPictureInPictureSupported() && renderAction('picture-in-picture-bottom-right', 'PIP', enablePIP) }
-        { renderAction('play-speed', 'Speed', openSpeedSelector) }
-        { renderAction('quality-high', 'Quality', openQualitySelector) }
-        { renderSubtitlesActions() }
-        { renderAction('lock-open-outline', 'Lock') }
+        { !isLocked && (
+          <>
+            { isPictureInPictureSupported() && renderAction('picture-in-picture-bottom-right', 'PIP', enablePIP) }
+            { renderAction('play-speed', 'Speed', openSpeedSelector) }
+            { renderAction('quality-high', 'Quality', openQualitySelector) }
+            { renderSubtitlesActions() }
+          </>
+        ) }
+        { renderAction(!isLocked ? 'lock-open-outline' : 'lock-outline', 'Lock', handleLockControls) }
       </View>
     </View>
   );
@@ -282,32 +288,38 @@ export function PlayerComponent({
     </GestureDetector>
   );
 
-  const renderMiddleControls = () => (
-    <View style={ styles.middleActions }>
-      { film.hasSeasons && renderMiddleControl(
-        {
-          name: 'skip-previous',
-          pack: IconPackType.MaterialIcons,
-        },
-        () => handleNewEpisode(RewindDirection.BACKWARD),
-      ) }
-      { renderMiddleControl(
-        {
-          name: isPlaying || isLoading ? 'pause' : 'play',
-          pack: IconPackType.MaterialCommunityIcons,
-        },
-        togglePlayPause,
-        'big',
-      ) }
-      { film.hasSeasons && renderMiddleControl(
-        {
-          name: 'skip-next',
-          pack: IconPackType.MaterialIcons,
-        },
-        () => handleNewEpisode(RewindDirection.FORWARD),
-      ) }
-    </View>
-  );
+  const renderMiddleControls = () => {
+    if (isLocked) {
+      return null;
+    }
+
+    return (
+      <View style={ styles.middleActions }>
+        { film.hasSeasons && renderMiddleControl(
+          {
+            name: 'skip-previous',
+            pack: IconPackType.MaterialIcons,
+          },
+          () => handleNewEpisode(RewindDirection.BACKWARD),
+        ) }
+        { renderMiddleControl(
+          {
+            name: isPlaying || isLoading ? 'pause' : 'play',
+            pack: IconPackType.MaterialCommunityIcons,
+          },
+          togglePlayPause,
+          'big',
+        ) }
+        { film.hasSeasons && renderMiddleControl(
+          {
+            name: 'skip-next',
+            pack: IconPackType.MaterialIcons,
+          },
+          () => handleNewEpisode(RewindDirection.FORWARD),
+        ) }
+      </View>
+    );
+  };
 
   const renderDuration = () => (
     <PlayerDuration />
@@ -357,10 +369,16 @@ export function PlayerComponent({
         <View style={ styles.durationRow }>
           { renderDuration() }
         </View>
-        <View style={ styles.progressBarRow }>
+        <View style={ [styles.progressBarRow, isLocked && styles.progressBarRowLocked] }>
           { renderProgressBar() }
         </View>
-        <View style={ [styles.actionsRow, styles.bottomActionsRow] }>
+        <View
+          style={ [
+            styles.actionsRow,
+            styles.bottomActionsRow,
+            isLocked && styles.bottomActionsRowLocked,
+          ] }
+        >
           { isPlaylistSelector && renderAction('playlist-play', 'Series', openVideoSelector) }
           { renderAction('comment-text-outline', 'Comments', openCommentsOverlay) }
           { renderAction('bookmark-outline', 'Bookmarks', openBookmarksOverlay) }

@@ -328,8 +328,8 @@ export function PlayerComponent({
         togglePlayPause,
         topActionRef,
       ) }
-      { renderTopAction('fast-rewind', 'Rewind') }
-      { renderTopAction('fast-forward', 'Forward') }
+      { renderTopAction('fast-rewind', 'Rewind', () => rewindPosition(RewindDirection.BACKWARD)) }
+      { renderTopAction('fast-forward', 'Forward', () => rewindPosition(RewindDirection.FORWARD)) }
       { film.hasSeasons && (
         <>
           { renderTopAction('skip-previous', 'Previous', () => handleNewEpisode(RewindDirection.BACKWARD)) }
@@ -405,7 +405,6 @@ export function PlayerComponent({
           { isPlaylistSelector && renderBottomAction('playlist-play', 'Series', openVideoSelector) }
           { subtitles.length > 0 && renderBottomAction('subtitles', 'Subtitles', openSubtitleSelector) }
           { renderBottomAction('bookmarks', 'Bookmarks', openBookmarksOverlay) }
-          { renderBottomAction('share', 'Share') }
         </SpatialNavigationView>
         { renderDuration() }
       </View>

@@ -49,6 +49,7 @@ export function PlayerContainer({
     selectedVideo.subtitles?.find(({ isDefault }) => isDefault),
   );
   const [selectedSpeed, setSelectedSpeed] = useState<number>(DEFAULT_SPEED);
+  const [isLocked, setIsLocked] = useState<boolean>(false);
   const updateTimeTimeout = useRef<NodeJS.Timeout | null>(null);
   const qualityOverlayId = useId();
   const subtitleOverlayId = useId();
@@ -388,6 +389,10 @@ export function PlayerContainer({
     OverlayStore.goToPreviousOverlay();
   };
 
+  const handleLockControls = () => {
+    setIsLocked(!isLocked);
+  };
+
   const containerProps = () => ({
     player,
     isLoading,
@@ -404,6 +409,7 @@ export function PlayerContainer({
     bookmarksOverlayId,
     speedOverlayId,
     selectedSpeed,
+    isLocked,
   });
 
   const containerFunctions = {
@@ -424,6 +430,7 @@ export function PlayerContainer({
     openSpeedSelector,
     openCommentsOverlay,
     openBookmarksOverlay,
+    handleLockControls,
   };
 
   return withTV(PlayerComponentTV, PlayerComponent, {

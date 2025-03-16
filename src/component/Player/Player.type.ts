@@ -30,6 +30,7 @@ export interface PlayerComponentProps {
   bookmarksOverlayId: string;
   speedOverlayId: string;
   selectedSpeed: number;
+  isLocked: boolean;
   togglePlayPause: (state?: boolean) => void;
   rewindPosition: (type: RewindDirection, seconds?: number) => void;
   seekToPosition: (percent: number) => void;
@@ -47,6 +48,7 @@ export interface PlayerComponentProps {
   openSpeedSelector: () => void;
   openCommentsOverlay: () => void;
   openBookmarksOverlay: () => void;
+  handleLockControls: () => void;
 }
 
 export type ProgressStatus = {
