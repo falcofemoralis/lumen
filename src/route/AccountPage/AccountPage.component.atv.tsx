@@ -1,5 +1,5 @@
 import FilmCard from 'Component/FilmCard';
-import FilmList from 'Component/FilmList';
+import FilmSections from 'Component/FilmSections';
 import Loader from 'Component/Loader';
 import Page from 'Component/Page';
 import ThemedImage from 'Component/ThemedImage';
@@ -160,14 +160,14 @@ export function ActorPageComponent({
 
     return (
       <DefaultFocus>
-        <FilmList
+        <FilmSections
           data={ data }
           handleOnPress={ handleSelectFilm }
           numberOfColumns={ NUMBER_OF_COLUMNS_TV }
           contentHeight={ MAIN_CONTENT_HEIGHT_TV }
         >
           { renderMainData() }
-        </FilmList>
+        </FilmSections>
       </DefaultFocus>
     );
   };

@@ -1,32 +1,32 @@
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 
-export type FilmListData = {
+export type FilmSectionsData = {
   header: string;
   films: FilmCardInterface[];
 }
 
-export interface FilmListContainerProps {
-  data: FilmListData[];
+export interface FilmSectionsContainerProps {
+  data: FilmSectionsData[];
   children?: JSX.Element;
   contentHeight?: number;
   handleOnPress: (film: FilmCardInterface) => void;
 }
 
-export interface FilmListComponentProps {
-  data: FilmListItem[];
+export interface FilmSectionsComponentProps {
+  data: FilmSectionsItem[];
   contentHeight?: number;
   handleOnPress: (film: FilmCardInterface) => void;
 }
 
-export type FilmListItem = {
+export type FilmSectionsItem = {
   index: number;
   films?: FilmCardInterface[];
   header?: string;
   content?: JSX.Element;
 }
 
-export interface FilmListRowProps {
-  row: FilmListItem;
+export interface FilmSectionsRowProps {
+  row: FilmSectionsItem;
   itemSize?: number;
   numberOfColumns: number;
   handleOnPress: (film: FilmCardInterface) => void;

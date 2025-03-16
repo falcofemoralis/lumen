@@ -144,6 +144,46 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
     return initialItems;
   }, [film]);
 
+  const handleUpdateScheduleWatch = useCallback((scheduleItem: ScheduleItemInterface) => {
+    const { id } = scheduleItem;
+
+    setFilm((prevFilm) => {
+      if (!prevFilm) {
+        return prevFilm;
+      }
+
+      const schedule = prevFilm.schedule?.[0];
+      if (!schedule) {
+        return prevFilm;
+      }
+
+      const items = schedule.items.map((i) => {
+        if (i.id === id) {
+          return {
+            ...i,
+            isWatched: !i.isWatched,
+          };
+        }
+
+        return i;
+      });
+
+      return {
+        ...prevFilm,
+        schedule: [{
+          ...schedule,
+          items,
+        }],
+      };
+    });
+
+    try {
+      ServiceStore.getCurrentService().saveScheduleWatch(id);
+    } catch (error) {
+      NotificationStore.displayError(error as Error);
+    }
+  }, []);
+
   const containerProps = () => ({
     film,
     visibleScheduleItems: getVisibleScheduleItems(),
@@ -160,6 +200,7 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
     handleSelectFilm,
     handleSelectActor,
     handleSelectCategory,
+    handleUpdateScheduleWatch,
   };
 
   return withTV(FilmPageComponentTV, FilmPageComponent, {

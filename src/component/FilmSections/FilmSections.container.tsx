@@ -5,16 +5,16 @@ import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { calculateRows } from 'Util/List';
 import { openFilm } from 'Util/Router';
 
-import FilmListComponent from './FilmList.component';
-import FilmListComponentTV from './FilmList.component.atv';
-import { NUMBER_OF_COLUMNS, NUMBER_OF_COLUMNS_TV } from './FilmList.config';
-import { FilmListContainerProps, FilmListItem } from './FilmList.type';
+import FilmSectionsComponent from './FilmSections.component';
+import FilmSectionsComponentTV from './FilmSections.component.atv';
+import { NUMBER_OF_COLUMNS, NUMBER_OF_COLUMNS_TV } from './FilmSections.config';
+import { FilmSectionsContainerProps, FilmSectionsItem } from './FilmSections.type';
 
-export function FilmListContainer({
+export function FilmSectionsContainer({
   data: initialData,
   children,
   contentHeight,
-}: FilmListContainerProps) {
+}: FilmSectionsContainerProps) {
   const handleOnPress = useCallback((film: FilmCardInterface) => {
     openFilm(film.link);
   }, []);
@@ -22,7 +22,7 @@ export function FilmListContainer({
   const data = useMemo(() => {
     const columns = ConfigStore.isTV ? NUMBER_OF_COLUMNS_TV : NUMBER_OF_COLUMNS;
     const items = initialData.reduce((acc, item) => {
-      const rows = calculateRows(item.films, columns).map<FilmListItem>((row) => ({
+      const rows = calculateRows(item.films, columns).map<FilmSectionsItem>((row) => ({
         index: -1,
         films: row,
       }));
@@ -34,7 +34,7 @@ export function FilmListContainer({
       acc.push(...rows);
 
       return acc;
-    }, [] as FilmListItem[]);
+    }, [] as FilmSectionsItem[]);
 
     if (items.length > 0) {
       items[0].content = children;
@@ -56,10 +56,10 @@ export function FilmListContainer({
     contentHeight,
   });
 
-  return withTV(FilmListComponentTV, FilmListComponent, {
+  return withTV(FilmSectionsComponentTV, FilmSectionsComponent, {
     ...containerFunctions,
     ...containerProps(),
   });
 }
 
-export default FilmListContainer;
+export default FilmSectionsContainer;

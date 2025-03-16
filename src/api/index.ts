@@ -115,6 +115,7 @@ export interface AccountApiInterface {
   removeRecent(filmId: string): Promise<boolean>;
   unloadRecentPage(): void;
   getNotifications(): Promise<NotificationInterface[]>;
+  saveScheduleWatch(watchId: string): Promise<void>;
 }
 
 export interface SearchApiInterface {

@@ -177,6 +177,14 @@ const accountApi: RezkaAccountApiInterface = {
       };
     }) as NotificationInterface[];
   },
+
+  async saveScheduleWatch(id: string) {
+    const data = await configApi.fetchJson<JSONResult>('/engine/ajax/schedule_watched.php', { id });
+
+    if (!data?.success) {
+      throw new Error(data?.message ?? 'Something went wrong');
+    }
+  },
 };
 
 export default accountApi;

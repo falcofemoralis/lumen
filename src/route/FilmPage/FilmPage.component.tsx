@@ -53,6 +53,7 @@ export function FilmPageComponent({
   handleSelectFilm,
   handleSelectActor,
   handleSelectCategory,
+  handleUpdateScheduleWatch,
 }: FilmPageComponentProps) {
   const router = useRouter();
   const [commentsVisible, setCommentsVisible] = useState(false);
@@ -381,6 +382,7 @@ export function FilmPageComponent({
                     key={ `modal-${subItem.name}` }
                     item={ subItem }
                     idx={ idx }
+                    handleUpdateScheduleWatch={ handleUpdateScheduleWatch }
                   />
                 )) }
               </View>
@@ -403,9 +405,10 @@ export function FilmPageComponent({
         <View style={ styles.visibleScheduleItems }>
           { visibleScheduleItems.map((item: ScheduleItemInterface, idx: number) => (
             <ScheduleItem
-              key={ `visible-${item.name}` }
+              key={ `schedule-visible-${item.name}` }
               item={ item }
               idx={ idx }
+              handleUpdateScheduleWatch={ handleUpdateScheduleWatch }
             />
           )) }
         </View>

@@ -1,7 +1,6 @@
 import { Rating } from '@kolking/react-native-rating';
 import BookmarksSelector from 'Component/BookmarksSelector';
 import Comments from 'Component/Comments';
-import Loader from 'Component/Loader';
 import Page from 'Component/Page';
 import PlayerVideoSelector from 'Component/PlayerVideoSelector';
 import ThemedAccordion from 'Component/ThemedAccordion';
@@ -12,7 +11,6 @@ import ThemedImage from 'Component/ThemedImage';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
-import Thumbnail from 'Component/Thumbnail';
 import __ from 'i18n/__';
 import { Dimensions, View } from 'react-native';
 import {

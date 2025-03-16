@@ -1,4 +1,4 @@
-import FilmList from 'Component/FilmList';
+import FilmSections from 'Component/FilmSections';
 import Page from 'Component/Page';
 import ThemedImageModal from 'Component/ThemedImageModal';
 import ThemedText from 'Component/ThemedText';
@@ -96,12 +96,12 @@ export function ActorPageComponent({
 
     return (
       <View style={ styles.grid }>
-        <FilmList
+        <FilmSections
           data={ data }
           handleOnPress={ handleSelectFilm }
         >
           { renderMainData() }
-        </FilmList>
+        </FilmSections>
       </View>
     );
   };

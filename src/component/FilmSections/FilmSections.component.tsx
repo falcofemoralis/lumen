@@ -7,19 +7,19 @@ import React, { memo, useCallback, useMemo } from 'react';
 import { Pressable, View } from 'react-native';
 import { scale } from 'Util/CreateStyles';
 
-import { NUMBER_OF_COLUMNS } from './FilmList.config';
-import { ROW_GAP, styles } from './FilmList.style';
+import { NUMBER_OF_COLUMNS } from './FilmSections.config';
+import { ROW_GAP, styles } from './FilmSections.style';
 import {
-  FilmListComponentProps,
-  FilmListItem,
-  FilmListRowProps,
-} from './FilmList.type';
+  FilmSectionsComponentProps,
+  FilmSectionsItem,
+  FilmSectionsRowProps,
+} from './FilmSections.type';
 
-const FilmListRow = ({
+const FilmSectionsRow = ({
   row,
   itemSize,
   handleOnPress,
-}: FilmListRowProps) => {
+}: FilmSectionsRowProps) => {
   const { content, header, films = [] } = row;
 
   const renderContent = () => (
@@ -58,20 +58,20 @@ const FilmListRow = ({
   );
 };
 
-function rowPropsAreEqual(prevProps: FilmListRowProps, props: FilmListRowProps) {
+function rowPropsAreEqual(prevProps: FilmSectionsRowProps, props: FilmSectionsRowProps) {
   return prevProps.row.index === props.row.index && prevProps.itemSize === props.itemSize;
 }
 
-const MemoizedFilmListRow = memo(FilmListRow, rowPropsAreEqual);
+const MemoizedFilmSectionsRow = memo(FilmSectionsRow, rowPropsAreEqual);
 
-export function FilmListComponent({
+export function FilmSectionsComponent({
   data: films,
   handleOnPress,
-}: FilmListComponentProps) {
+}: FilmSectionsComponentProps) {
   const { width, height } = useFilmCardDimensions(NUMBER_OF_COLUMNS, scale(ROW_GAP));
 
-  const renderItem = useCallback(({ item: row }: {item: FilmListItem}) => (
-    <MemoizedFilmListRow
+  const renderItem = useCallback(({ item: row }: {item: FilmSectionsItem}) => (
+    <MemoizedFilmSectionsRow
       row={ row }
       itemSize={ width }
       numberOfColumns={ NUMBER_OF_COLUMNS }
@@ -97,4 +97,4 @@ export function FilmListComponent({
   );
 }
 
-export default FilmListComponent;
+export default FilmSectionsComponent;

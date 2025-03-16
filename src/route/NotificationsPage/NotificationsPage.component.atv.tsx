@@ -1,4 +1,4 @@
-import FilmList from 'Component/FilmList';
+import FilmSections from 'Component/FilmSections';
 import Page from 'Component/Page';
 import ThemedText from 'Component/ThemedText';
 import __ from 'i18n/__';
@@ -37,7 +37,7 @@ export function NotificationsPageComponent({
     <Page>
       <View style={ styles.container }>
         <DefaultFocus>
-          <FilmList
+          <FilmSections
             data={ data }
             handleOnPress={ handleSelectFilm }
           />

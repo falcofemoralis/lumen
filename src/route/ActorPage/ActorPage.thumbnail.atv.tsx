@@ -1,4 +1,4 @@
-import { FilmListThumbnail } from 'Component/FilmList/FilmList.thumbnail.atv';
+import { FilmSectionsThumbnail } from 'Component/FilmSections/FilmSections.thumbnail.atv';
 import Loader from 'Component/Loader';
 import Page from 'Component/Page';
 import Thumbnail from 'Component/Thumbnail';
@@ -30,7 +30,7 @@ export const ActorPageThumbnail = () => (
           height={ scale(42) }
           width={ scale(200) }
         />
-        <FilmListThumbnail />
+        <FilmSectionsThumbnail />
       </View>
     </View>
     <Loader

@@ -1,4 +1,5 @@
 export interface ScheduleItemInterface {
+  id: string;
   name: string;
   episodeName: string;
   episodeNameOriginal?: string;

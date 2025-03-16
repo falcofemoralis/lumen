@@ -15,19 +15,19 @@ import {
 } from 'react-tv-space-navigation';
 import { scale } from 'Util/CreateStyles';
 
-import { NUMBER_OF_COLUMNS_TV } from './FilmList.config';
-import { HEADER_HEIGHT, ROW_GAP, styles } from './FilmList.style.atv';
+import { NUMBER_OF_COLUMNS_TV } from './FilmSections.config';
+import { HEADER_HEIGHT, ROW_GAP, styles } from './FilmSections.style.atv';
 import {
-  FilmListComponentProps,
-  FilmListItem,
-  FilmListRowProps,
-} from './FilmList.type';
+  FilmSectionsComponentProps,
+  FilmSectionsItem,
+  FilmSectionsRowProps,
+} from './FilmSections.type';
 
-const FilmListRow = ({
+const FilmSectionsRow = ({
   row,
   itemSize,
   handleOnPress,
-}: FilmListRowProps) => {
+}: FilmSectionsRowProps) => {
   const { header, content, films = [] } = row;
 
   const renderContent = () => (
@@ -73,21 +73,21 @@ const FilmListRow = ({
   );
 };
 
-const MemoizedFilmListRow = memo(FilmListRow);
+const MemoizedFilmSectionsRow = memo(FilmSectionsRow);
 
-export function FilmListComponent({
+export function FilmSectionsComponent({
   data,
   contentHeight = 0,
   handleOnPress,
-}: FilmListComponentProps) {
+}: FilmSectionsComponentProps) {
   const { width, height } = calculateCardDimensions(
     NUMBER_OF_COLUMNS_TV,
     scale(ROW_GAP),
     scale(ROW_GAP) * 2,
   );
 
-  const renderItem = useCallback(({ item: row }: {item: FilmListItem}) => (
-    <MemoizedFilmListRow
+  const renderItem = useCallback(({ item: row }: {item: FilmSectionsItem}) => (
+    <MemoizedFilmSectionsRow
       row={ row }
       itemSize={ width }
       numberOfColumns={ NUMBER_OF_COLUMNS_TV }
@@ -104,7 +104,7 @@ export function FilmListComponent({
   }, {} as Record<string, number>), [data]);
 
   const getCalculatedItemSize = useCallback((
-    item: FilmListItem,
+    item: FilmSectionsItem,
   ) => calculatedHeights[item.index], [calculatedHeights]);
 
   return (
@@ -121,4 +121,4 @@ export function FilmListComponent({
   );
 }
 
-export default FilmListComponent;
+export default FilmSectionsComponent;

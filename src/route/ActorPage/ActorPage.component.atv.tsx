@@ -1,4 +1,4 @@
-import FilmList from 'Component/FilmList';
+import FilmSections from 'Component/FilmSections';
 import Page from 'Component/Page';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
@@ -95,13 +95,13 @@ export function ActorPageComponent({
 
     return (
       <DefaultFocus>
-        <FilmList
+        <FilmSections
           data={ data }
           handleOnPress={ handleSelectFilm }
           contentHeight={ MAIN_CONTENT_HEIGHT_TV }
         >
           { renderMainData() }
-        </FilmList>
+        </FilmSections>
       </DefaultFocus>
     );
   };

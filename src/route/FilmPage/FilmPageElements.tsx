@@ -4,7 +4,7 @@ import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
 import __ from 'i18n/__';
-import { memo } from 'react';
+import { memo, useCallback, useState } from 'react';
 import {
   Pressable, TouchableHighlight, TouchableOpacity, View,
 } from 'react-native';
@@ -104,11 +104,13 @@ export const ActorView = memo(({
 interface ScheduleItemProps {
   item: ScheduleItemInterface,
   idx: number
+  handleUpdateScheduleWatch: (scheduleItem: ScheduleItemInterface) => void
 }
 
 export const ScheduleItem = memo(({
   item,
   idx,
+  handleUpdateScheduleWatch,
 }: ScheduleItemProps) => {
   const {
     name,
@@ -119,6 +121,10 @@ export const ScheduleItem = memo(({
     isWatched,
     isReleased,
   } = item;
+
+  const handlePress = useCallback(() => {
+    handleUpdateScheduleWatch(item);
+  }, [handleUpdateScheduleWatch, item]);
 
   return (
     <View
@@ -156,7 +162,7 @@ export const ScheduleItem = memo(({
       <View style={ styles.scheduleItemReleaseWrapper }>
         { isReleased ? (
           <TouchableOpacity
-            onPress={ () => console.log('watch') }
+            onPress={ handlePress }
           >
             <ThemedIcon
               style={ styles.scheduleItemMarkIcon }
@@ -183,7 +189,8 @@ export const ScheduleItem = memo(({
   );
 }, (
   prevProps: ScheduleItemProps, nextProps: ScheduleItemProps,
-) => prevProps.item.name === nextProps.item.name);
+) => prevProps.item.name === nextProps.item.name
+  && prevProps.item.isWatched === nextProps.item.isWatched);
 
 interface FranchiseItemProps {
   film: FilmInterface,

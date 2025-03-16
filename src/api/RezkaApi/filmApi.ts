@@ -296,12 +296,15 @@ const filmApi: FilmApiInterface = {
           const tableName = tds[0]?.rawText;
           const episodeName = decodeHtml(tds[1]?.querySelector('b')?.rawText ?? '');
           const episodeNameOriginal = decodeHtml(tds[1]?.querySelector('span')?.rawText);
-          const isWatched = tds[2]?.querySelector('i')?.attributes.class.includes('watched');
+          const td3 = tds[2]?.querySelector('i');
+          const isWatched = td3?.attributes.class.includes('watched');
+          const watchId = td3?.attributes['data-id'] ?? '';
           const date = tds[3]?.rawText;
           const exists = tds[4]?.rawText ?? '';
           const isReleased = exists.includes('check');
 
           return {
+            id: watchId,
             name: tableName,
             episodeName,
             episodeNameOriginal,

@@ -1,4 +1,4 @@
-import { FilmListThumbnail } from 'Component/FilmList/FilmList.thumbnail';
+import { FilmSectionsThumbnail } from 'Component/FilmSections/FilmSections.thumbnail';
 import Page from 'Component/Page';
 import Thumbnail from 'Component/Thumbnail';
 import { View } from 'react-native';
@@ -29,8 +29,8 @@ export const ActorPageThumbnail = () => (
           height={ scale(24) }
           width={ scale(200) }
         />
-        <FilmListThumbnail />
-        <FilmListThumbnail />
+        <FilmSectionsThumbnail />
+        <FilmSectionsThumbnail />
       </View>
     </View>
   </Page>

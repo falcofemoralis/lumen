@@ -20,4 +20,5 @@ export interface FilmPageComponentProps {
   handleSelectFilm: (filmLink: string) => void;
   handleSelectActor: (actorLink: string) => void;
   handleSelectCategory: (categoryLink: string) => void;
+  handleUpdateScheduleWatch: (scheduleItem: ScheduleItemInterface) => void;
 }
