@@ -7,6 +7,7 @@ import __ from 'i18n/__';
 import {
   useEffect, useId, useRef, useState,
 } from 'react';
+import { Share } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
 import OverlayStore from 'Store/Overlay.store';
 import ServiceStore from 'Store/Service.store';
@@ -17,6 +18,7 @@ import { setIntervalSafe } from 'Util/Misc';
 import {
   getPlayerStream,
   getPlayerTime,
+  prepareShareBody,
   updatePlayerQuality,
   updatePlayerTime,
 } from 'Util/Player';
@@ -393,6 +395,16 @@ export function PlayerContainer({
     setIsLocked(!isLocked);
   };
 
+  const handleShare = async () => {
+    try {
+      await Share.share({
+        message: prepareShareBody(film),
+      });
+    } catch (error) {
+      NotificationStore.displayError(error as Error);
+    }
+  };
+
   const containerProps = () => ({
     player,
     isLoading,
@@ -431,6 +443,7 @@ export function PlayerContainer({
     openCommentsOverlay,
     openBookmarksOverlay,
     handleLockControls,
+    handleShare,
   };
 
   return withTV(PlayerComponentTV, PlayerComponent, {

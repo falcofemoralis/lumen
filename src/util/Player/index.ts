@@ -1,3 +1,4 @@
+import __ from 'i18n/__';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
@@ -66,4 +67,10 @@ export const getPlayerStream = (video: FilmVideoInterface) => {
   }
 
   return stream;
+};
+
+export const prepareShareBody = (film: FilmInterface) => {
+  const { title, link } = film;
+
+  return __('Watch %s:\n %s', title, link);
 };

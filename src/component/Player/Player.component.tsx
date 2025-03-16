@@ -83,6 +83,7 @@ export function PlayerComponent({
   openBookmarksOverlay,
   openCommentsOverlay,
   handleLockControls,
+  handleShare,
 }: PlayerComponentProps) {
   const [showControls, setShowControls] = useState(false);
   const [isScrolling, setIsScrolling] = useState(false);
@@ -152,16 +153,14 @@ export function PlayerComponent({
   };
 
   const singleTap = Gesture.Tap()
-    .maxDuration(125)
-    .onStart(() => {
+    .onEnd(() => {
       runOnJS(setShowControls)(!showControls);
       runOnJS(handleUserInteraction)();
     });
 
   const doubleTap = Gesture.Tap()
-    .maxDuration(125)
     .numberOfTaps(2)
-    .onStart((e) => {
+    .onEnd((e) => {
       if (showControls || isLocked) {
         return;
       }
@@ -382,7 +381,7 @@ export function PlayerComponent({
           { isPlaylistSelector && renderAction('playlist-play', 'Series', openVideoSelector) }
           { renderAction('comment-text-outline', 'Comments', openCommentsOverlay) }
           { renderAction('bookmark-outline', 'Bookmarks', openBookmarksOverlay) }
-          { renderAction('share-outline', 'Share') }
+          { renderAction('share-outline', 'Share', handleShare) }
         </View>
       </View>
     );

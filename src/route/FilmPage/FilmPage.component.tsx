@@ -54,6 +54,7 @@ export function FilmPageComponent({
   handleSelectActor,
   handleSelectCategory,
   handleUpdateScheduleWatch,
+  handleShare,
 }: FilmPageComponentProps) {
   const router = useRouter();
   const [commentsVisible, setCommentsVisible] = useState(false);
@@ -94,7 +95,10 @@ export function FilmPageComponent({
           color="white"
         />
       </TouchableOpacity>
-      <TouchableOpacity style={ styles.topActionsButton }>
+      <TouchableOpacity
+        style={ styles.topActionsButton }
+        onPress={ handleShare }
+      >
         <ThemedIcon
           icon={ {
             name: 'share',

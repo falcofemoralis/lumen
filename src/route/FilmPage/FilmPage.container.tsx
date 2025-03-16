@@ -3,6 +3,7 @@ import { withTV } from 'Hooks/withTV';
 import {
   useCallback, useEffect, useId, useState,
 } from 'react';
+import { Share } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
 import OverlayStore from 'Store/Overlay.store';
 import RouterStore from 'Store/Router.store';
@@ -11,6 +12,7 @@ import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
+import { prepareShareBody } from 'Util/Player';
 import { openActor, openCategory, openFilm } from 'Util/Router';
 
 import FilmPageComponent from './FilmPage.component';
@@ -184,6 +186,20 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
     }
   }, []);
 
+  const handleShare = async () => {
+    if (!film) {
+      return;
+    }
+
+    try {
+      await Share.share({
+        message: prepareShareBody(film),
+      });
+    } catch (error) {
+      NotificationStore.displayError(error as Error);
+    }
+  };
+
   const containerProps = () => ({
     film,
     visibleScheduleItems: getVisibleScheduleItems(),
@@ -201,6 +217,7 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
     handleSelectActor,
     handleSelectCategory,
     handleUpdateScheduleWatch,
+    handleShare,
   };
 
   return withTV(FilmPageComponentTV, FilmPageComponent, {

@@ -49,6 +49,7 @@ export interface PlayerComponentProps {
   openCommentsOverlay: () => void;
   openBookmarksOverlay: () => void;
   handleLockControls: () => void;
+  handleShare: () => void;
 }
 
 export type ProgressStatus = {
