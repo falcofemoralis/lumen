@@ -26,6 +26,7 @@ import PlayerComponentTV from './Player.component.atv';
 import {
   AWAKE_TAG,
   DEFAULT_REWIND_SECONDS,
+  DEFAULT_SPEED,
   RewindDirection,
   SAVE_TIME_EVERY_MS,
 } from './Player.config';
@@ -47,12 +48,14 @@ export function PlayerContainer({
   const [selectedSubtitle, setSelectedSubtitle] = useState<SubtitleInterface|undefined>(
     selectedVideo.subtitles?.find(({ isDefault }) => isDefault),
   );
+  const [selectedSpeed, setSelectedSpeed] = useState<number>(DEFAULT_SPEED);
   const updateTimeTimeout = useRef<NodeJS.Timeout | null>(null);
   const qualityOverlayId = useId();
   const subtitleOverlayId = useId();
   const playerVideoSelectorOverlayId = useId();
   const commentsOverlayId = useId();
   const bookmarksOverlayId = useId();
+  const speedOverlayId = useId();
 
   const player = useVideoPlayer(selectedStream.url, (p) => {
     p.loop = false;
@@ -183,6 +186,18 @@ export function PlayerContainer({
 
   const openSubtitleSelector = () => {
     OverlayStore.openOverlay(subtitleOverlayId);
+  };
+
+  const openCommentsOverlay = () => {
+    OverlayStore.openOverlay(commentsOverlayId);
+  };
+
+  const openBookmarksOverlay = () => {
+    OverlayStore.openOverlay(bookmarksOverlayId);
+  };
+
+  const openSpeedSelector = () => {
+    OverlayStore.openOverlay(speedOverlayId);
   };
 
   const handleQualityChange = (item: DropdownItem) => {
@@ -358,6 +373,21 @@ export function PlayerContainer({
     player.playbackRate = rate;
   };
 
+  const handleSpeedChange = (item: DropdownItem) => {
+    const { value: speed } = item;
+
+    if (String(selectedSpeed) === speed) {
+      OverlayStore.goToPreviousOverlay();
+
+      return;
+    }
+
+    setSelectedSpeed(Number(speed));
+    setPlayerRate(Number(speed));
+
+    OverlayStore.goToPreviousOverlay();
+  };
+
   const containerProps = () => ({
     player,
     isLoading,
@@ -372,6 +402,8 @@ export function PlayerContainer({
     playerVideoSelectorOverlayId,
     commentsOverlayId,
     bookmarksOverlayId,
+    speedOverlayId,
+    selectedSpeed,
   });
 
   const containerFunctions = {
@@ -388,6 +420,10 @@ export function PlayerContainer({
     setPlayerRate,
     openSubtitleSelector,
     handleSubtitleChange,
+    handleSpeedChange,
+    openSpeedSelector,
+    openCommentsOverlay,
+    openBookmarksOverlay,
   };
 
   return withTV(PlayerComponentTV, PlayerComponent, {

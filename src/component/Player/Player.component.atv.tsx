@@ -38,6 +38,8 @@ import RemoteControlManager from 'Util/RemoteControl/RemoteControlManager';
 import { SupportedKeys } from 'Util/RemoteControl/SupportedKeys';
 
 import {
+  DEFAULT_SPEED,
+  DEFAULT_SPEEDS,
   FocusedElement,
   PLAYER_CONTROLS_ANIMATION,
   PLAYER_CONTROLS_TIMEOUT,
@@ -61,6 +63,8 @@ export function PlayerComponent({
   playerVideoSelectorOverlayId,
   commentsOverlayId,
   bookmarksOverlayId,
+  speedOverlayId,
+  selectedSpeed,
   togglePlayPause,
   rewindPosition,
   openQualitySelector,
@@ -73,6 +77,10 @@ export function PlayerComponent({
   handleSubtitleChange,
   calculateCurrentTime,
   seekToPosition,
+  handleSpeedChange,
+  openSpeedSelector,
+  openBookmarksOverlay,
+  openCommentsOverlay,
 }: PlayerComponentProps) {
   const [showControls, setShowControls] = useState(false);
   const [hideActions, setHideActions] = useState(false);
@@ -328,8 +336,8 @@ export function PlayerComponent({
           { renderTopAction('skip-next', 'Next', () => handleNewEpisode(RewindDirection.FORWARD)) }
         </>
       ) }
-      { renderTopAction('speed', 'Speed') }
-      { renderTopAction('comment', 'Comments', () => OverlayStore.openOverlay(commentsOverlayId)) }
+      { renderTopAction('speed', 'Speed', openSpeedSelector) }
+      { renderTopAction('comment', 'Comments', openCommentsOverlay) }
     </SpatialNavigationView>
   );
 
@@ -396,7 +404,7 @@ export function PlayerComponent({
           { renderBottomAction('high-quality', 'Quality', openQualitySelector, bottomActionRef) }
           { isPlaylistSelector && renderBottomAction('playlist-play', 'Series', openVideoSelector) }
           { subtitles.length > 0 && renderBottomAction('subtitles', 'Subtitles', openSubtitleSelector) }
-          { renderBottomAction('bookmarks', 'Bookmarks', () => OverlayStore.openOverlay(bookmarksOverlayId)) }
+          { renderBottomAction('bookmarks', 'Bookmarks', openBookmarksOverlay) }
           { renderBottomAction('share', 'Share') }
         </SpatialNavigationView>
         { renderDuration() }
@@ -445,7 +453,7 @@ export function PlayerComponent({
         data={ streams.map((stream) => ({
           label: stream.quality,
           value: stream.quality,
-        })) }
+        })).reverse() }
         onChange={ handleQualityChange }
       />
     );
@@ -507,6 +515,20 @@ export function PlayerComponent({
     />
   );
 
+  const renderSpeedSelector = () => (
+    <ThemedDropdown
+      asOverlay
+      overlayId={ speedOverlayId }
+      header={ __('Speed') }
+      value={ String(selectedSpeed) }
+      data={ DEFAULT_SPEEDS.map((speed) => ({
+        label: speed === DEFAULT_SPEED ? __('Normal') : `${speed}x`,
+        value: String(speed),
+      })) }
+      onChange={ handleSpeedChange }
+    />
+  );
+
   const renderModals = () => (
     <>
       { renderQualitySelector() }
@@ -514,6 +536,7 @@ export function PlayerComponent({
       { renderSubtitlesSelector() }
       { renderCommentsOverlay() }
       { renderBookmarksOverlay() }
+      { renderSpeedSelector() }
     </>
   );
 

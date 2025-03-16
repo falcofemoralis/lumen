@@ -37,6 +37,8 @@ import { scale } from 'Util/CreateStyles';
 import { setTimeoutSafe } from 'Util/Misc';
 
 import {
+  DEFAULT_SPEED,
+  DEFAULT_SPEEDS,
   PLAYER_CONTROLS_ANIMATION,
   PLAYER_CONTROLS_TIMEOUT,
   RewindDirection,
@@ -60,6 +62,8 @@ export function PlayerComponent({
   playerVideoSelectorOverlayId,
   commentsOverlayId,
   bookmarksOverlayId,
+  speedOverlayId,
+  selectedSpeed,
   togglePlayPause,
   seekToPosition,
   calculateCurrentTime,
@@ -73,6 +77,10 @@ export function PlayerComponent({
   setPlayerRate,
   openSubtitleSelector,
   handleSubtitleChange,
+  handleSpeedChange,
+  openSpeedSelector,
+  openBookmarksOverlay,
+  openCommentsOverlay,
 }: PlayerComponentProps) {
   const [showControls, setShowControls] = useState(false);
   const [isScrolling, setIsScrolling] = useState(false);
@@ -246,7 +254,7 @@ export function PlayerComponent({
       { renderTopInfo() }
       <View style={ styles.actionsRow }>
         { isPictureInPictureSupported() && renderAction('picture-in-picture-bottom-right', 'PIP', enablePIP) }
-        { renderAction('play-speed', 'Speed') }
+        { renderAction('play-speed', 'Speed', openSpeedSelector) }
         { renderAction('quality-high', 'Quality', openQualitySelector) }
         { renderSubtitlesActions() }
         { renderAction('lock-open-outline', 'Lock') }
@@ -354,8 +362,8 @@ export function PlayerComponent({
         </View>
         <View style={ [styles.actionsRow, styles.bottomActionsRow] }>
           { isPlaylistSelector && renderAction('playlist-play', 'Series', openVideoSelector) }
-          { renderAction('comment-text-outline', 'Comments', () => OverlayStore.openOverlay(commentsOverlayId)) }
-          { renderAction('bookmark-outline', 'Bookmarks', () => OverlayStore.openOverlay(bookmarksOverlayId)) }
+          { renderAction('comment-text-outline', 'Comments', openCommentsOverlay) }
+          { renderAction('bookmark-outline', 'Bookmarks', openBookmarksOverlay) }
           { renderAction('share-outline', 'Share') }
         </View>
       </View>
@@ -404,7 +412,7 @@ export function PlayerComponent({
         data={ streams.map((stream) => ({
           label: stream.quality,
           value: stream.quality,
-        })) }
+        })).reverse() }
         onChange={ handleQualityChange }
       />
     );
@@ -471,6 +479,20 @@ export function PlayerComponent({
     />
   );
 
+  const renderSpeedSelector = () => (
+    <ThemedDropdown
+      asOverlay
+      overlayId={ speedOverlayId }
+      header={ __('Speed') }
+      value={ String(selectedSpeed) }
+      data={ DEFAULT_SPEEDS.map((speed) => ({
+        label: speed === DEFAULT_SPEED ? __('Normal') : `${speed}x`,
+        value: String(speed),
+      })) }
+      onChange={ handleSpeedChange }
+    />
+  );
+
   const renderModals = () => (
     <>
       { renderQualitySelector() }
@@ -478,6 +500,7 @@ export function PlayerComponent({
       { renderSubtitlesSelector() }
       { renderCommentsOverlay() }
       { renderBookmarksOverlay() }
+      { renderSpeedSelector() }
     </>
   );
 
