@@ -1,5 +1,5 @@
 import { withTV } from 'Hooks/withTV';
-import __ from 'i18n/__';
+import t from 'i18n/t';
 import { useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
 import ServiceStore from 'Store/Service.store';
@@ -15,7 +15,7 @@ export function AccountPageContainer() {
     try {
       await ServiceStore.login(username.trim(), password.trim());
 
-      NotificationStore.displayMessage(__('Successfully logged in!'));
+      NotificationStore.displayMessage(t('Successfully logged in!'));
     } catch (e) {
       NotificationStore.displayError(e as Error);
     } finally {

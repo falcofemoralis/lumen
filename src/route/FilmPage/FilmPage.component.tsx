@@ -11,7 +11,7 @@ import ThemedImageModal from 'Component/ThemedImageModal';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedText from 'Component/ThemedText';
 import { useRouter } from 'expo-router';
-import __ from 'i18n/__';
+import t from 'i18n/t';
 import React, { useCallback, useRef, useState } from 'react';
 import {
   NativeScrollEvent,
@@ -220,7 +220,7 @@ export function FilmPageComponent({
 
     const items = directors.map(({ name, link }) => ({ name, link: link || '' }));
 
-    return renderCollection(items, __('Director'), handleSelectActor);
+    return renderCollection(items, t('Director'), handleSelectActor);
   };
 
   const renderMainInfo = () => {
@@ -234,11 +234,11 @@ export function FilmPageComponent({
     return (
       <View style={ styles.mainInfo }>
         { ratings.map(({ name, rating, votes }) => renderInfoText(`${rating} (${votes})`, name)) }
-        { renderInfoText(releaseDate, __('Release date')) }
-        { renderInfoText(duration, __('Time')) }
+        { renderInfoText(releaseDate, t('Release date')) }
+        { renderInfoText(duration, t('Time')) }
         { renderRating() }
         { renderDirectors() }
-        { renderCollection(countries, __('Country'), handleSelectCategory) }
+        { renderCollection(countries, t('Country'), handleSelectCategory) }
       </View>
     );
   };
@@ -272,7 +272,7 @@ export function FilmPageComponent({
             color="white"
           />
           <ThemedText style={ styles.pendingReleaseText }>
-            { __('We are waiting for the film in the good quality') }
+            { t('We are waiting for the film in the good quality') }
           </ThemedText>
         </View>
       );
@@ -283,7 +283,7 @@ export function FilmPageComponent({
         style={ styles.playBtn }
         onPress={ playFilm }
       >
-        { __('Watch Now') }
+        { t('Watch Now') }
       </ThemedButton>
     );
   };
@@ -312,9 +312,9 @@ export function FilmPageComponent({
 
   const renderActions = () => (
     <View style={ styles.actions }>
-      { renderAction(__('Trailer'), 'movie-open-check-outline') }
-      { renderAction(__('Bookmark'), 'movie-star-outline', () => OverlayStore.openOverlay(bookmarksOverlayId)) }
-      { renderAction(__('Download'), 'folder-download-outline') }
+      { renderAction(t('Trailer'), 'movie-open-check-outline') }
+      { renderAction(t('Bookmark'), 'movie-star-outline', () => OverlayStore.openOverlay(bookmarksOverlayId)) }
+      { renderAction(t('Download'), 'folder-download-outline') }
     </View>
   );
 
@@ -349,7 +349,7 @@ export function FilmPageComponent({
     }
 
     return (
-      <Section title={ __('Actors') }>
+      <Section title={ t('Actors') }>
         <ScrollView horizontal>
           <View style={ styles.actorsList }>
             { persons.map((actor, index) => (
@@ -405,7 +405,7 @@ export function FilmPageComponent({
     }
 
     return (
-      <Section title={ __('Schedule') }>
+      <Section title={ t('Schedule') }>
         <View style={ styles.visibleScheduleItems }>
           { visibleScheduleItems.map((item: ScheduleItemInterface, idx: number) => (
             <ScheduleItem
@@ -420,7 +420,7 @@ export function FilmPageComponent({
           onPress={ () => OverlayStore.openOverlay(scheduleOverlayId) }
           style={ styles.scheduleViewAll }
         >
-          { __('View full schedule') }
+          { t('View full schedule') }
         </ThemedButton>
       </Section>
     );
@@ -434,7 +434,7 @@ export function FilmPageComponent({
     }
 
     return (
-      <Section title={ __('Franchise') }>
+      <Section title={ t('Franchise') }>
         <View style={ styles.franchiseList }>
           { franchise.map((item, idx) => (
             <FranchiseItemComponent
@@ -454,7 +454,7 @@ export function FilmPageComponent({
     const { related = [] } = film;
 
     return (
-      <Section title={ __('Related') }>
+      <Section title={ t('Related') }>
         <ScrollView horizontal>
           <View style={ styles.relatedList }>
             { related.map((item, idx) => (
@@ -483,7 +483,7 @@ export function FilmPageComponent({
     if (includedIn.length) {
       data.push({
         id: 'included-in',
-        title: __('Included in the lists'),
+        title: t('Included in the lists'),
         items: includedIn,
       });
     }
@@ -491,13 +491,13 @@ export function FilmPageComponent({
     if (fromCollections.length) {
       data.push({
         id: 'from-collections',
-        title: __('From collections'),
+        title: t('From collections'),
         items: fromCollections,
       });
     }
 
     return (
-      <Section title={ __('Included in') }>
+      <Section title={ t('Included in') }>
         <View>
           { data.map(({ id, title, items }, index) => (
             <View key={ id }>
@@ -552,7 +552,7 @@ export function FilmPageComponent({
         horizontal
         contentContainerStyle={ { width: '100%', height: '100%' } }
       >
-        <Section title={ __('Comments') }>
+        <Section title={ t('Comments') }>
           <Comments
             ref={ commentsRef }
             film={ film }

@@ -1,6 +1,6 @@
 import * as Application from 'expo-application';
 import { withTV } from 'Hooks/withTV';
-import __ from 'i18n/__';
+import t from 'i18n/t';
 import { useState } from 'react';
 import { Linking } from 'react-native';
 import ConfigStore from 'Store/Config.store';
@@ -18,21 +18,21 @@ export function SettingsPageContainer() {
   const [settings, setSettings] = useState<SettingItem[]>([
     {
       id: 'provider',
-      title: __('Provider'),
-      subtitle: __('Change provider'),
+      title: t('Provider'),
+      subtitle: t('Change provider'),
       type: SETTING_TYPE.INPUT,
       value: currentService.getProvider(),
     },
     {
       id: 'cdn',
-      title: __('CDN'),
-      subtitle: __('Change CDN'),
+      title: t('CDN'),
+      subtitle: t('Change CDN'),
       type: SETTING_TYPE.SELECT,
       value: currentService.getCDN(),
       options: [
         {
           value: 'auto',
-          label: __('Automatic'),
+          label: t('Automatic'),
         },
       ].concat(currentService.defaultCDNs.map((cdn) => ({
         value: cdn,
@@ -41,21 +41,21 @@ export function SettingsPageContainer() {
     },
     {
       id: 'userAgent',
-      title: __('Useragent'),
-      subtitle: __('Change useragent'),
+      title: t('Useragent'),
+      subtitle: t('Change useragent'),
       type: SETTING_TYPE.INPUT,
       value: currentService.getUserAgent(),
     },
     {
       id: 'github',
       title: 'Github',
-      subtitle: __('Go to GitHub'),
+      subtitle: t('Go to GitHub'),
       type: SETTING_TYPE.LINK,
       value: 'link',
     },
     {
       id: 'version',
-      title: __('App version'),
+      title: t('App version'),
       subtitle: Application.nativeApplicationVersion ?? '0.0.0',
       type: SETTING_TYPE.TEXT,
     },

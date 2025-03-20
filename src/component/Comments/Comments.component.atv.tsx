@@ -4,7 +4,7 @@ import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
-import __ from 'i18n/__';
+import t from 'i18n/t';
 import {
   memo,
   useCallback,
@@ -252,7 +252,7 @@ export const CommentsComponent = ({
       return (
         <View style={ styles.noComments }>
           <ThemedText style={ styles.noCommentsText }>
-            { __('No comments yet') }
+            { t('No comments yet') }
           </ThemedText>
         </View>
       );

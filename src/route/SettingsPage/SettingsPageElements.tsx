@@ -5,7 +5,7 @@ import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import ThemedInput from 'Component/ThemedInput';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedText from 'Component/ThemedText';
-import __ from 'i18n/__';
+import t from 'i18n/t';
 import {
   memo, useCallback,
   useId,
@@ -185,7 +185,7 @@ export const SettingInput = memo(({
           onPress={ onSave }
           disabled={ !inputValue || isLoading || hasError }
         >
-          { __('Save') }
+          { t('Save') }
         </ThemedButton>
         <Loader
           isLoading={ isLoading }

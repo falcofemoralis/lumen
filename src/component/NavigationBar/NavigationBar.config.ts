@@ -1,5 +1,5 @@
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
-import __ from 'i18n/__';
+import t from 'i18n/t';
 
 import {
   NavigationRoute,
@@ -15,7 +15,7 @@ export const DEFAULT_ROUTE: NavigationRoute = '(+home)';
 export const TABS_TV_CONFIG: Tab[] = [
   {
     route: '(account)',
-    title: __('You'),
+    title: t('You'),
     icon: {
       name: 'home-variant-outline',
       pack: IconPackType.MaterialCommunityIcons,
@@ -25,7 +25,7 @@ export const TABS_TV_CONFIG: Tab[] = [
   },
   {
     route: '(notifications)',
-    title: __('Notifications'),
+    title: t('Notifications'),
     icon: {
       name: 'bell-outline',
       pack: IconPackType.MaterialCommunityIcons,
@@ -33,7 +33,7 @@ export const TABS_TV_CONFIG: Tab[] = [
   },
   {
     route: '(+home)',
-    title: __('Home'),
+    title: t('Home'),
     icon: {
       name: 'home-variant-outline',
       pack: IconPackType.MaterialCommunityIcons,
@@ -41,7 +41,7 @@ export const TABS_TV_CONFIG: Tab[] = [
   },
   {
     route: '(recent)',
-    title: __('Recent'),
+    title: t('Recent'),
     icon: {
       name: 'history',
       pack: IconPackType.MaterialCommunityIcons,
@@ -49,7 +49,7 @@ export const TABS_TV_CONFIG: Tab[] = [
   },
   {
     route: '(search)',
-    title: __('Search'),
+    title: t('Search'),
     icon: {
       name: 'magnify',
       pack: IconPackType.MaterialCommunityIcons,
@@ -57,7 +57,7 @@ export const TABS_TV_CONFIG: Tab[] = [
   },
   {
     route: '(bookmarks)',
-    title: __('Bookmarks'),
+    title: t('Bookmarks'),
     icon: {
       name: 'movie-star-outline',
       pack: IconPackType.MaterialCommunityIcons,
@@ -65,7 +65,7 @@ export const TABS_TV_CONFIG: Tab[] = [
   },
   {
     route: 'settings',
-    title: __('Settings'),
+    title: t('Settings'),
     icon: {
       name: 'settings-outline',
       pack: IconPackType.Ionicons,
@@ -77,7 +77,7 @@ export const TABS_TV_CONFIG: Tab[] = [
 export const TABS_MOBILE_CONFIG: Tab[] = [
   {
     route: '(+home)',
-    title: __('Home'),
+    title: t('Home'),
     icon: {
       name: 'home-outline',
       pack: IconPackType.MaterialCommunityIcons,
@@ -89,7 +89,7 @@ export const TABS_MOBILE_CONFIG: Tab[] = [
   },
   {
     route: '(search)',
-    title: __('Search'),
+    title: t('Search'),
     icon: {
       name: 'search',
       pack: IconPackType.MaterialIcons,
@@ -101,7 +101,7 @@ export const TABS_MOBILE_CONFIG: Tab[] = [
   },
   {
     route: '(bookmarks)',
-    title: __('Bookmarks'),
+    title: t('Bookmarks'),
     icon: {
       name: 'movie-star-outline',
       pack: IconPackType.MaterialCommunityIcons,
@@ -113,7 +113,7 @@ export const TABS_MOBILE_CONFIG: Tab[] = [
   },
   {
     route: '(recent)',
-    title: __('Recent'),
+    title: t('Recent'),
     icon: {
       name: 'history',
       pack: IconPackType.MaterialIcons,
@@ -125,7 +125,7 @@ export const TABS_MOBILE_CONFIG: Tab[] = [
   },
   {
     route: '(account)',
-    title: __('You'),
+    title: t('You'),
     icon: {
       name: 'bell-outline',
       pack: IconPackType.MaterialCommunityIcons,

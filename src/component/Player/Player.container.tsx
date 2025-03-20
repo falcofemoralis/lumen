@@ -3,7 +3,7 @@ import { useEventListener } from 'expo';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { useVideoPlayer } from 'expo-video';
 import { withTV } from 'Hooks/withTV';
-import __ from 'i18n/__';
+import t from 'i18n/t';
 import {
   useEffect, useId, useRef, useState,
 } from 'react';
@@ -296,7 +296,7 @@ export function PlayerContainer({
         newSeasonIndex -= 1;
 
         if (newSeasonIndex < 0) {
-          NotificationStore.displayMessage(__('No more episodes available'));
+          NotificationStore.displayMessage(t('No more episodes available'));
 
           return;
         }
@@ -312,7 +312,7 @@ export function PlayerContainer({
         newSeasonIndex += 1;
 
         if (newSeasonIndex > seasons.length - 1) {
-          NotificationStore.displayMessage(__('No more episodes available'));
+          NotificationStore.displayMessage(t('No more episodes available'));
 
           return;
         }

@@ -6,7 +6,7 @@ import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedInput from 'Component/ThemedInput';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
-import __ from 'i18n/__';
+import t from 'i18n/t';
 import React from 'react';
 import { View } from 'react-native';
 import { TouchableRipple } from 'react-native-paper';
@@ -38,7 +38,7 @@ export function SearchPageComponent({
     <View style={ styles.searchBarContainer }>
       <ThemedInput
         style={ styles.searchBar }
-        placeholder={ __('Search') }
+        placeholder={ t('Search') }
         onChangeText={ (text) => onChangeText(text) }
         onSubmitEditing={ ({ nativeEvent: { text } }) => onApplySearch(text) }
         value={ enteredText }
@@ -144,7 +144,7 @@ export function SearchPageComponent({
       return (
         <View style={ styles.noResults }>
           <ThemedText style={ styles.noResultsText }>
-            { __('No results found') }
+            { t('No results found') }
           </ThemedText>
         </View>
       );

@@ -4,7 +4,7 @@ import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
 import { Tabs } from 'expo-router';
-import __ from 'i18n/__';
+import t from 'i18n/t';
 import { observer } from 'mobx-react-lite';
 import React, { useCallback, useEffect, useRef } from 'react';
 import {
@@ -197,7 +197,7 @@ export function NavigationBarComponent({
               isMenuOpen && styles.tabTextOpened,
             ] }
           >
-            { __('Switch account') }
+            { t('Switch account') }
           </ThemedText.Animated>
         </View>
       </View>

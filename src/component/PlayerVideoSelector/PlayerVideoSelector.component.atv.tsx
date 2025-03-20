@@ -2,7 +2,7 @@ import Loader from 'Component/Loader';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedDropdown from 'Component/ThemedDropdown';
 import ThemedOverlay from 'Component/ThemedOverlay';
-import __ from 'i18n/__';
+import t from 'i18n/t';
 import { DefaultFocus, SpatialNavigationScrollView, SpatialNavigationView } from 'react-tv-space-navigation';
 import { EpisodeInterface, SeasonInterface } from 'Type/FilmVoice.interface';
 
@@ -38,7 +38,7 @@ export function PlayerVideoSelectorComponent({
         })) }
         value={ selectedVoice.identifier }
         onChange={ (item) => handleSelectVoice(item.value) }
-        header={ __('Search voice') }
+        header={ t('Search voice') }
         inputStyle={ styles.voicesInput }
         asList={ !seasons.length }
       />

@@ -20,6 +20,6 @@ export function getTranslatedStringWithInjectedValues(string: string, values: Tr
   return injectValues(translateString(string), values);
 }
 
-export default function __(string: string, ...values: TranslationValue[]) {
+export default function t(string: string, ...values: TranslationValue[]) {
   return getTranslatedStringWithInjectedValues(string, values);
 }

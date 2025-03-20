@@ -13,7 +13,7 @@ import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
 import { LinearGradient } from 'expo-linear-gradient';
 import { VideoView } from 'expo-video';
-import __ from 'i18n/__';
+import t from 'i18n/t';
 import { observer } from 'mobx-react-lite';
 import React, {
   useEffect,
@@ -228,7 +228,7 @@ export function PlayerComponent({
     return (
       <ThemedText style={ styles.title }>
         {
-          `${title}${hasSeasons ? ` ${__('Season %s - Episode %s', voice.lastSeasonId, voice.lastEpisodeId)}` : ''}`
+          `${title}${hasSeasons ? ` ${t('Season %s - Episode %s', voice.lastSeasonId, voice.lastEpisodeId)}` : ''}`
         }
       </ThemedText>
     );
@@ -447,7 +447,7 @@ export function PlayerComponent({
       <ThemedDropdown
         asOverlay
         overlayId={ qualityOverlayId }
-        header={ __('Quality') }
+        header={ t('Quality') }
         value={ selectedQuality }
         data={ streams.map((stream) => ({
           label: stream.quality,
@@ -483,7 +483,7 @@ export function PlayerComponent({
       <ThemedDropdown
         asOverlay
         overlayId={ subtitleOverlayId }
-        header={ __('Subtitles') }
+        header={ t('Subtitles') }
         value={ selectedSubtitle?.languageCode }
         data={ subtitles.map((subtitle) => ({
           label: subtitle.name,
@@ -518,10 +518,10 @@ export function PlayerComponent({
     <ThemedDropdown
       asOverlay
       overlayId={ speedOverlayId }
-      header={ __('Speed') }
+      header={ t('Speed') }
       value={ String(selectedSpeed) }
       data={ DEFAULT_SPEEDS.map((speed) => ({
-        label: speed === DEFAULT_SPEED ? __('Normal') : `${speed}x`,
+        label: speed === DEFAULT_SPEED ? t('Normal') : `${speed}x`,
         value: String(speed),
       })) }
       onChange={ handleSpeedChange }

@@ -1,5 +1,5 @@
 import { ApiServiceType, ConfigApiInterface, ServiceConfigInterface } from 'Api/index';
-import __ from 'i18n/__';
+import t from 'i18n/t';
 import NotificationStore from 'Store/Notification.store';
 import { FilmStreamInterface } from 'Type/FilmStream.interface';
 import { getConfigJson, updateConfig } from 'Util/Config';
@@ -110,7 +110,7 @@ const configApi: ConfigApiInterface = {
       NotificationStore.displayErrorScreen(
         page.querySelector('.error-code div')?.textContent,
         page.querySelector('.error-title')?.textContent,
-        __('Try again later'),
+        t('Try again later'),
       );
       throw new Error('Service temporarily unavailable');
     }

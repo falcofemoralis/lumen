@@ -1,7 +1,7 @@
 import FilmSections from 'Component/FilmSections';
 import Page from 'Component/Page';
 import ThemedText from 'Component/ThemedText';
-import __ from 'i18n/__';
+import t from 'i18n/t';
 import React from 'react';
 import { View } from 'react-native';
 import {
@@ -26,7 +26,7 @@ export function NotificationsPageComponent({
       <Page>
         <View style={ styles.empty }>
           <ThemedText style={ styles.emptyText }>
-            { __('No notifications') }
+            { t('No notifications') }
           </ThemedText>
         </View>
       </Page>

@@ -1,7 +1,7 @@
 import Loader from 'Component/Loader';
 import ThemedMultiList from 'Component/ThemedMultiList';
 import ThemedOverlay from 'Component/ThemedOverlay';
-import __ from 'i18n/__';
+import t from 'i18n/t';
 import OverlayStore from 'Store/Overlay.store';
 
 import { BookmarksSelectorComponentProps } from './BookmarksSelector.type';
@@ -21,7 +21,7 @@ export const BookmarksSelectorComponent = ({
       fullScreen
     />
     <ThemedMultiList
-      header={ __('Bookmarks') }
+      header={ t('Bookmarks') }
       data={ data }
       onChange={ postBookmark }
     />

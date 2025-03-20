@@ -1,7 +1,7 @@
 import FilmPager from 'Component/FilmPager';
 import Page from 'Component/Page';
 import ThemedText from 'Component/ThemedText';
-import __ from 'i18n/__';
+import t from 'i18n/t';
 import React from 'react';
 import { View } from 'react-native';
 
@@ -33,7 +33,7 @@ export function BookmarksPageComponent({
       return (
         <View>
           <ThemedText>
-            { __('No bookmarks') }
+            { t('No bookmarks') }
           </ThemedText>
         </View>
       );

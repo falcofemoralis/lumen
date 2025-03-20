@@ -3,7 +3,7 @@ import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedText from 'Component/ThemedText';
 import { router } from 'expo-router';
-import __ from 'i18n/__';
+import t from 'i18n/t';
 import React from 'react';
 import { ScrollView, TouchableOpacity, View } from 'react-native';
 import { scale } from 'Util/CreateStyles';
@@ -40,7 +40,7 @@ export function SettingsPageComponent({
         />
       </TouchableOpacity>
       <ThemedText style={ styles.title }>
-        { __('Settings') }
+        { t('Settings') }
       </ThemedText>
     </View>
   );
