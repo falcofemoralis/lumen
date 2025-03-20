@@ -33,46 +33,46 @@ export function SearchPageComponent({
 
   const renderSearchBar = () => (
     <View style={ styles.searchBarContainer }>
-      <DefaultFocus>
-        <ThemedInput
-          style={ styles.searchBar }
-          placeholder={ t('Search') }
-          onChangeText={ (text) => onChangeText(text) }
-          onSubmitEditing={ ({ nativeEvent: { text } }) => onApplySearch(text) }
-          value={ enteredText }
-        />
-      </DefaultFocus>
+      <ThemedInput
+        style={ styles.searchBar }
+        placeholder={ t('Search') }
+        onChangeText={ (text) => onChangeText(text) }
+        onSubmitEditing={ ({ nativeEvent: { text } }) => onApplySearch(text) }
+        value={ enteredText }
+      />
     </View>
   );
 
   const renderSearchContainer = () => (
-    <SpatialNavigationView
-      style={ {
-        ...styles.searchContainer,
-        ...(currentRow > 0 && styles.hidden),
-      } }
-      direction="horizontal"
-    >
-      <ThemedButton
-        style={ styles.actionBtn }
-        styleFocused={ recognizing && styles.speakActive }
-        iconStyleFocused={ recognizing && styles.speakActiveIcon }
-        icon={ {
-          pack: IconPackType.MaterialCommunityIcons,
-          name: 'microphone-outline',
+    <DefaultFocus>
+      <SpatialNavigationView
+        style={ {
+          ...styles.searchContainer,
+          ...(currentRow > 0 && styles.hidden),
         } }
-        onPress={ handleStartRecognition }
-      />
-      { renderSearchBar() }
-      <ThemedButton
-        style={ styles.actionBtn }
-        icon={ {
-          name: 'magnify',
-          pack: IconPackType.MaterialCommunityIcons,
-        } }
-        onPress={ handleApplySearch }
-      />
-    </SpatialNavigationView>
+        direction="horizontal"
+      >
+        <ThemedButton
+          style={ styles.actionBtn }
+          styleFocused={ recognizing && styles.speakActive }
+          iconStyleFocused={ recognizing && styles.speakActiveIcon }
+          icon={ {
+            pack: IconPackType.MaterialCommunityIcons,
+            name: 'microphone-outline',
+          } }
+          onPress={ handleStartRecognition }
+        />
+        { renderSearchBar() }
+        <ThemedButton
+          style={ styles.actionBtn }
+          icon={ {
+            name: 'magnify',
+            pack: IconPackType.MaterialCommunityIcons,
+          } }
+          onPress={ handleApplySearch }
+        />
+      </SpatialNavigationView>
+    </DefaultFocus>
   );
 
   const renderSuggestions = () => {

@@ -1,3 +1,4 @@
+import t from 'i18n/t';
 import { customFetch } from 'Util/Fetch';
 
 export type Variables = Record<string, string>;
@@ -137,7 +138,7 @@ export const requestValidator = async (
       controller.signal,
     );
   } catch (error) {
-    throw new Error('Invalid URL');
+    throw new Error(t('Invalid URL'));
   } finally {
     clearTimeout(timeoutId);
   }

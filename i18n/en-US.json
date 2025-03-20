@@ -43,6 +43,15 @@
   "Normal": "Normal",
   "Watch %s:\n %s": "Watch %s:\n\n %s",
   "Try again later": "Try again later",
+  "Provider": "Provider",
+  "Change provider": "Change provider",
+  "CDN": "CDN",
+  "Change CDN": "Change CDN",
+  "Automatic": "Automatic",
+  "Useragent": "Useragent",
+  "Change useragent": "Change useragent",
+  "Invalid URL": "Invalid URL",
   "Go to GitHub": "Go to GitHub",
-  "Invalid URL": "Invalid URL"
+  "App version": "App version",
+  "Save": "Save"
 }

@@ -12,12 +12,11 @@ import {
   useState,
 } from 'react';
 import { View } from 'react-native';
-import { TouchableRipple } from 'react-native-paper';
+import { DefaultFocus, SpatialNavigationFocusableView } from 'react-tv-space-navigation';
 import OverlayStore from 'Store/Overlay.store';
-import Colors from 'Style/Colors';
 import { noopFn } from 'Util/Function';
 
-import { styles } from './SettingsPage.style';
+import { styles } from './SettingsPage.style.atv';
 import { SettingItem } from './SettingsPage.type';
 
 type BaseComponentProps = {
@@ -37,20 +36,32 @@ const BaseComponent = ({
   const { title, subtitle } = setting;
 
   return (
-    <TouchableRipple
-      style={ styles.setting }
-      onPress={ onPress ?? noopFn }
-      rippleColor={ Colors.white }
+    <SpatialNavigationFocusableView
+      onSelect={ onPress ?? noopFn }
     >
-      <View style={ styles.settingContainer }>
-        <ThemedText style={ styles.settingTitle }>
-          { title }
-        </ThemedText>
-        <ThemedText style={ styles.settingSubtitle }>
-          { subtitle }
-        </ThemedText>
-      </View>
-    </TouchableRipple>
+      { ({ isFocused }) => (
+        <View style={ [
+          styles.setting,
+          isFocused && styles.settingFocused,
+        ] }
+        >
+          <ThemedText style={ [
+            styles.settingTitle,
+            isFocused && styles.settingTitleFocused,
+          ] }
+          >
+            { title }
+          </ThemedText>
+          <ThemedText style={ [
+            styles.settingSubtitle,
+            isFocused && styles.settingSubtitleFocused,
+          ] }
+          >
+            { subtitle }
+          </ThemedText>
+        </View>
+      ) }
+    </SpatialNavigationFocusableView>
   );
 };
 
@@ -166,28 +177,30 @@ export const SettingInput = memo(({
         onHide={ () => OverlayStore.closeOverlay(overlayId) }
         contentContainerStyle={ styles.overlay }
       >
-        <ThemedText style={ styles.overlayTitle }>
-          { title }
-        </ThemedText>
-        <ThemedInput
-          style={ styles.overlayInput }
-          placeholder={ title }
-          onChangeText={ onChangeText }
-          value={ inputValue || '' }
-          multiline
-          disabled={ isLoading }
-        />
-        <ThemedButton
-          style={ styles.overlayButton }
-          onPress={ onSave }
-          disabled={ !inputValue || isLoading || hasError }
-        >
-          { t('Save') }
-        </ThemedButton>
-        <Loader
-          isLoading={ isLoading }
-          fullScreen
-        />
+        <DefaultFocus>
+          <ThemedText style={ styles.overlayTitle }>
+            { title }
+          </ThemedText>
+          <ThemedInput
+            style={ styles.overlayInput }
+            placeholder={ title }
+            onChangeText={ onChangeText }
+            value={ inputValue || '' }
+            multiline
+            disabled={ isLoading }
+          />
+          <ThemedButton
+            style={ styles.overlayButton }
+            onPress={ onSave }
+            disabled={ !inputValue || isLoading || hasError }
+          >
+            { t('Save') }
+          </ThemedButton>
+          <Loader
+            isLoading={ isLoading }
+            fullScreen
+          />
+        </DefaultFocus>
       </ThemedOverlay>
     </View>
   );

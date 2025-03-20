@@ -6,6 +6,6 @@ export const styles = CreateStyles({
     backgroundColor: Colors.gray,
   },
   inputFocus: {
-    backgroundColor: Colors.lightGray,
+    backgroundColor: Colors.white,
   },
 });

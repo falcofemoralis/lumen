@@ -43,6 +43,15 @@
   "Normal": "Обычная",
   "Watch %s:\n %s": "Смотреть %s:\n\n %s",
   "Try again later": "Повторите попытку чуть позже",
+  "Provider": "Зеркало",
+  "Change provider": "Изменить зеркало",
+  "CDN": "CDN",
+  "Change CDN": "Выбрать CDN (Адрес сервера с которого загружаются видео)",
+  "Automatic": "Автоматически",
+  "Useragent": "Useragent",
+  "Change useragent": "Изменить Useragent (Идентификатор устройства)",
+  "Invalid URL": "Эта ссылка не рабочая",
   "Go to GitHub": "Перейти на GitHub",
-  "Invalid URL": "Ваше зеркало не работает"
+  "App version": "Версия приложения",
+  "Save": "Сохранить"
 }

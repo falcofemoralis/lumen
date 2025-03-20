@@ -8,6 +8,7 @@ import NotificationStore from 'Store/Notification.store';
 import ServiceStore from 'Store/Service.store';
 
 import SettingsPageComponent from './SettingsPage.component';
+import SettingsPageComponentTV from './SettingsPage.component.atv';
 import { SETTING_TYPE, SettingItem } from './SettingsPage.type';
 
 const GITHUB_LINK = 'https://github.com/falcofemoralis/lumen';
@@ -104,7 +105,7 @@ export function SettingsPageContainer() {
     onSettingUpdate,
   };
 
-  return withTV(SettingsPageComponent, SettingsPageComponent, {
+  return withTV(SettingsPageComponentTV, SettingsPageComponent, {
     ...containerFunctions,
     ...containerProps(),
   });

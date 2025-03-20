@@ -1,39 +1,40 @@
 import Colors from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
-export const MAIN_CONTENT_HEIGHT_TV = 300;
-
 export const styles = CreateStyles({
-  mainContent: {
-    flexDirection: 'row',
-    gap: 24,
-    width: '100%',
-    paddingBottom: 8,
+  setting: {
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    backgroundColor: Colors.transparent,
   },
-  photo: {
-    width: '15%',
-    aspectRatio: '12 / 19',
-    borderRadius: 16,
+  settingFocused: {
+    backgroundColor: Colors.white,
   },
-  name: {
-    fontSize: 24,
-    lineHeight: 32,
-    fontWeight: '700',
-    color: Colors.white,
+  settingTitle: {
   },
-  originalName: {
-    fontSize: 16,
-    lineHeight: 16,
+  settingTitleFocused: {
+    color: Colors.black,
+  },
+  settingSubtitle: {
     color: Colors.lightGray,
-    opacity: 0.6,
-    marginTop: 4,
+    opacity: 0.8,
   },
-  text: {
-    fontSize: 14,
+  settingSubtitleFocused: {
+    color: Colors.black,
   },
-  additionalInfo: {
-    flexDirection: 'column',
-    gap: 8,
-    marginTop: 8,
+  overlay: {
+    gap: 16,
+    maxHeight: 288,
+    width: 250,
+  },
+  overlayTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+  },
+  overlayInput: {
+
+  },
+  overlayButton: {
+
   },
 });
