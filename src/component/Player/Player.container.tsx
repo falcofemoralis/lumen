@@ -7,7 +7,7 @@ import __ from 'i18n/__';
 import {
   useEffect, useId, useRef, useState,
 } from 'react';
-import { Share } from 'react-native';
+import { BackHandler, Share } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
 import OverlayStore from 'Store/Overlay.store';
 import ServiceStore from 'Store/Service.store';
@@ -72,9 +72,19 @@ export function PlayerContainer({
     activateKeepAwakeAsync(AWAKE_TAG);
     createUpdateTimeTimeout();
 
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      () => {
+        updateTime();
+
+        return false;
+      },
+    );
+
     return () => {
       deactivateKeepAwake(AWAKE_TAG);
       removeUpdateTimeTimeout();
+      backHandler.remove();
     };
   }, []);
 

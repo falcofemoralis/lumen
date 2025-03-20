@@ -5,7 +5,7 @@ export const styles = CreateStyles({
   container: {
     flexDirection: 'row',
     justifyContent: 'center',
-    backgroundColor: Colors.secondary,
+    backgroundColor: Colors.gray,
     borderRadius: 8,
     color: Colors.white,
     fontSize: 16,
@@ -20,5 +20,8 @@ export const styles = CreateStyles({
     textAlign: 'center',
   },
   rightIcon: {
+  },
+  disabled: {
+    opacity: 0.5,
   },
 });

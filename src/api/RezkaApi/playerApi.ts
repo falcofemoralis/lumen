@@ -39,7 +39,7 @@ const formatFilmVideo = (json: StreamsResult): FilmVideoInterface => {
   );
 
   return {
-    streams, // configApi.modifyCDN(streams),
+    streams: configApi.modifyCDN(streams),
     subtitles,
     storyboardUrl: configApi.getProvider() + json.thumbnails,
   };

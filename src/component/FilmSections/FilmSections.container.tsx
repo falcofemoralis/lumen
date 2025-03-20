@@ -20,7 +20,7 @@ export function FilmSectionsContainer({
   }, []);
 
   const data = useMemo(() => {
-    const columns = ConfigStore.isTV ? NUMBER_OF_COLUMNS_TV : NUMBER_OF_COLUMNS;
+    const columns = ConfigStore.isTV() ? NUMBER_OF_COLUMNS_TV : NUMBER_OF_COLUMNS;
     const items = initialData.reduce((acc, item) => {
       const rows = calculateRows(item.films, columns).map<FilmSectionsItem>((row) => ({
         index: -1,

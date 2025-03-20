@@ -25,6 +25,7 @@ export function SearchPageComponent({
   enteredText,
   isLoading,
   onChangeText,
+  onApplySearch,
   onApplySuggestion,
   onLoadFilms,
   onUpdateFilms,
@@ -39,7 +40,7 @@ export function SearchPageComponent({
         style={ styles.searchBar }
         placeholder={ __('Search') }
         onChangeText={ (text) => onChangeText(text) }
-        onSubmitEditing={ ({ nativeEvent: { text } }) => onApplySuggestion(text) }
+        onSubmitEditing={ ({ nativeEvent: { text } }) => onApplySearch(text) }
         value={ enteredText }
         mode="outlined"
         placeholderTextColor={ Colors.white }

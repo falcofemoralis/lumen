@@ -30,8 +30,14 @@ export const ThemedDropdownComponent = ({
   const handleLayout = () => {
     const itemIdx = data.findIndex((item) => item.value === value);
 
+    if (itemIdx <= 5) {
+      return;
+    }
+
+    const scrollIndex = itemIdx + 2;
+
     if (scrollViewRef.current) {
-      scrollViewRef.current.scrollTo({ y: itemIdx * styles.item.height, animated: false });
+      scrollViewRef.current.scrollTo({ y: scrollIndex * styles.item.height, animated: false });
     }
   };
 
@@ -117,7 +123,9 @@ export const ThemedDropdownComponent = ({
         containerStyle={ styles.container }
         contentContainerStyle={ styles.contentContainer }
       >
-        { renderContent() }
+        <View style={ styles.listContainer }>
+          { renderContent() }
+        </View>
       </ThemedOverlay>
     );
   };

@@ -24,11 +24,11 @@ export const styles = CreateStyles({
   iconFocused: {
   },
   container: {
-    maxHeight: 300,
+    maxHeight: 288,
     padding: 8,
   },
   listContainer: {
-    maxHeight: 300,
+    maxHeight: 288,
     padding: 4,
     alignSelf: 'flex-end',
     height: '100%',

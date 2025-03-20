@@ -1,38 +1,68 @@
 import { makeAutoObservable } from 'mobx';
-import { loadConfig, updateConfig } from 'Util/Config';
-import { ConfigKeyType } from 'Util/Config/mapping';
+import { getConfigJson, updateConfig } from 'Util/Config';
+import { configureRemoteControl } from 'Util/RemoteControl';
+
+const DEVICE_CONFIG = 'deviceConfig';
+
+type DeviceConfigType = {
+  isConfigured: boolean;
+  isTV: boolean;
+}
 
 class ConfigStore {
-  public isConfigured = false;
-
-  public isTV = true;
+  private config: DeviceConfigType = {
+    isConfigured: false,
+    isTV: false,
+  };
 
   constructor() {
     makeAutoObservable(this);
+
     this.loadConfig();
+
+    if (this.isTV()) {
+      this.setUpTV();
+    }
   }
 
-  /**
-   * How to add new type? Check util/config/mapping
-   *
-   * 1. Add new key to CONFIG_KEY_ENUM
-   * 2. Adjust TS interface
-   * 3. Add new mapping to CONFIG_MAP
-   * 4. Update ConfigStore
-   */
   async loadConfig() {
-    const config = loadConfig();
+    const config = getConfigJson<DeviceConfigType>(DEVICE_CONFIG);
 
-    this.isConfigured = config.isConfigured;
-    this.isTV = config.isTV;
+    if (!config) {
+      return;
+    }
+
+    this.config = {
+      ...this.config,
+      ...config,
+    };
   }
 
-  async updateIsConfigured(isConfigured: boolean) {
-    await updateConfig(ConfigKeyType.IS_CONFIGURED, isConfigured);
+  async updateConfig(key: keyof DeviceConfigType, value: unknown) {
+    await updateConfig(DEVICE_CONFIG, JSON.stringify({
+      ...this.config,
+      [key]: value,
+    }));
   }
 
-  async updateIsTV(isTV: boolean) {
-    await updateConfig(ConfigKeyType.IS_TV, isTV);
+  async configureDevice(isTV: boolean) {
+    await updateConfig(DEVICE_CONFIG, JSON.stringify({
+      ...this.config,
+      isConfigured: true,
+      isTV,
+    }));
+  }
+
+  isConfigured() {
+    return this.config.isConfigured;
+  }
+
+  isTV() {
+    return this.config.isTV;
+  }
+
+  setUpTV() {
+    configureRemoteControl();
   }
 }
 

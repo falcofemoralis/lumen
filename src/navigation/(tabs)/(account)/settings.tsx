@@ -1,13 +1,8 @@
-import Page from 'Component/Page';
-import ThemedText from 'Component/ThemedText';
 import React from 'react';
+import SettingsPage from 'Route/SettingsPage';
 
 export function SettingsScreen() {
-  return (
-    <Page>
-      <ThemedText>Mobile Settings page</ThemedText>
-    </Page>
-  );
+  return <SettingsPage />;
 }
 
 export default SettingsScreen;

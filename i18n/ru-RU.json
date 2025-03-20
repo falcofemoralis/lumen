@@ -41,5 +41,8 @@
   "No comments yet": "Комментарии отсутствуют",
   "Speed": "Скорость",
   "Normal": "Обычная",
-  "Watch %s:\n %s": "Смотреть %s:\n\n %s"
+  "Watch %s:\n %s": "Смотреть %s:\n\n %s",
+  "Try again later": "Повторите попытку чуть позже",
+  "Go to GitHub": "Перейти на GitHub",
+  "Invalid URL": "Ваше зеркало не работает"
 }

@@ -100,7 +100,7 @@ export const executePost = async (
   variables: Variables,
   signal?: AbortSignal,
 ): Promise<string> => {
-  const uri = formatURI(query, {}, endpoint);  
+  const uri = formatURI(query, {}, endpoint);
 
   try {
     const formData = new FormData();
@@ -118,5 +118,27 @@ export const executePost = async (
     return parsedRes;
   } catch (error) {
     throw new Error(error as string);
+  }
+};
+
+export const requestValidator = async (
+  host: string,
+  headers: HeadersInit,
+) => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+  try {
+    await executeGet(
+      '/',
+      host,
+      headers,
+      {},
+      controller.signal,
+    );
+  } catch (error) {
+    throw new Error('Invalid URL');
+  } finally {
+    clearTimeout(timeoutId);
   }
 };

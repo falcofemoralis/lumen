@@ -9,12 +9,12 @@ import { PlayerPageComponentProps } from './PlayerPage.type';
 
 export function PlayerPageComponent({ video, film, voice }: PlayerPageComponentProps) {
   useEffect(() => {
-    if (ConfigStore.isTV) {
+    if (ConfigStore.isTV()) {
       NavigationStore.lockNavigation();
     }
 
     return () => {
-      if (ConfigStore.isTV) {
+      if (ConfigStore.isTV()) {
         NavigationStore.unlockNavigation();
       }
     };

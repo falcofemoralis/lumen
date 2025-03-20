@@ -25,7 +25,7 @@ export function FilmGridContainer({
 
   const handleItemFocus = (index: number) => {
     if (onItemFocus) {
-      const numberOfColumns = ConfigStore.isTV ? NUMBER_OF_COLUMNS_TV : NUMBER_OF_COLUMNS;
+      const numberOfColumns = ConfigStore.isTV() ? NUMBER_OF_COLUMNS_TV : NUMBER_OF_COLUMNS;
 
       onItemFocus(Math.floor(index / numberOfColumns));
     }

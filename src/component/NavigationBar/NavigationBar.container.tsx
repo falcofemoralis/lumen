@@ -1,8 +1,7 @@
 import { CommonActions } from '@react-navigation/native';
 import { useProfile } from 'Hooks/useProfile';
 import { withTV } from 'Hooks/withTV';
-import { observer } from 'mobx-react-lite';
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import ConfigStore from 'Store/Config.store';
 
 import NavigationBarComponent from './NavigationBar.component';
@@ -31,7 +30,7 @@ export function NavigationBarContainer() {
     }
 
     // we should unload current row on TV
-    if (ConfigStore.isTV) {
+    if (ConfigStore.isTV()) {
       navigation.reset({
         index: 0,
         routes: [{ name: rn.name }], // your stack screen name

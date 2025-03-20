@@ -20,7 +20,6 @@ import NotificationStore from 'Store/Notification.store';
 import ServiceStore from 'Store/Service.store';
 import Colors from 'Style/Colors';
 import { setTimeoutSafe } from 'Util/Misc';
-import { configureRemoteControl } from 'Util/RemoteControl';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -42,10 +41,6 @@ export function RootLayout() {
   };
 
   useEffect(() => {
-    if (ConfigStore.isTV) {
-      configureRemoteControl();
-    }
-
     if (ServiceStore.isSignedIn) {
       loadNotifications();
     }
@@ -61,7 +56,7 @@ export function RootLayout() {
 
   useEffect(() => {
     const backAction = () => {
-      if (ConfigStore.isTV) {
+      if (ConfigStore.isTV()) {
         if (backPressedOnce) {
           BackHandler.exitApp();
 
@@ -127,7 +122,7 @@ export function RootLayout() {
     <GestureHandlerRootView>{ renderStack() }</GestureHandlerRootView>
   );
 
-  const renderLayout = () => (ConfigStore.isTV ? renderTVLayout() : renderMobileLayout());
+  const renderLayout = () => (ConfigStore.isTV() ? renderTVLayout() : renderMobileLayout());
 
   return (
     <ThemeProvider value={ {

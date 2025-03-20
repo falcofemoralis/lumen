@@ -9,8 +9,7 @@ export function WelcomePageContainer() {
   };
 
   const updateConfig = async (isTV: boolean) => {
-    await ConfigStore.updateIsTV(isTV);
-    await ConfigStore.updateIsConfigured(true);
+    await ConfigStore.configureDevice(isTV);
     reloadApp();
   };
 

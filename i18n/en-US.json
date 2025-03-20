@@ -41,5 +41,8 @@
   "No comments yet": "No comments yet",
   "Speed": "Speed",
   "Normal": "Normal",
-  "Watch %s:\n %s": "Watch %s:\n\n %s"
+  "Watch %s:\n %s": "Watch %s:\n\n %s",
+  "Try again later": "Try again later",
+  "Go to GitHub": "Go to GitHub",
+  "Invalid URL": "Invalid URL"
 }

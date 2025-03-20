@@ -135,14 +135,14 @@ export function FilmPagerContainer({
 
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       debounce.current = setTimeoutSafe(async () => {
-        if (ConfigStore.isTV) lock();
+        if (ConfigStore.isTV()) lock();
 
         setSelectedPageItemId(key);
         if (!pagerItem.films) {
           await loadFilms(pagerItem, { currentPage: 1, totalPages: 1 }, true);
         }
 
-        if (ConfigStore.isTV) {
+        if (ConfigStore.isTV()) {
           setTimeoutSafe(() => {
             unlock();
           }, 0);

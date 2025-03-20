@@ -2,7 +2,6 @@ import { ActorInterface } from 'Type/Actor.interface';
 import { BookmarkInterface } from 'Type/Bookmark.interface';
 import { CommentListInterface } from 'Type/CommentList.interface';
 import { FilmInterface } from 'Type/Film.interface';
-import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { FilmListInterface } from 'Type/FilmList.interface';
 import { FilmStreamInterface } from 'Type/FilmStream.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
@@ -29,6 +28,7 @@ export interface ServiceConfigInterface {
   provider: string;
   cdn: string;
   auth: string;
+  userAgent: string;
 }
 
 export interface ConfigApiInterface {
@@ -36,12 +36,14 @@ export interface ConfigApiInterface {
   defaultProviders: string[];
   defaultCDNs: string[];
   config: ServiceConfigInterface | null;
-  formatConfigKey(key: string): string;
-  getConfig(): ServiceConfigInterface;
+  loadConfig(): ServiceConfigInterface;
+  updateConfig(key: keyof ServiceConfigInterface, value: string): Promise<void>;
   setProvider(provider: string): void;
   getProvider(): string;
   setCDN(cdn: string): void;
   getCDN(): string;
+  setUserAgent(userAgent: string): void;
+  getUserAgent(): string;
   setAuthorization(auth: string): void;
   getAuthorization(): string;
   getHeaders(): HeadersInit;

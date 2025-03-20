@@ -17,11 +17,13 @@ export default function ThemedButton({
   iconSize,
   textStyle,
   rightImageStyle,
+  disabled,
 }: ThemedButtonProps) {
   return (
     <TouchableOpacity
-      style={ [styles.container, style] }
+      style={ [styles.container, style, disabled && styles.disabled] }
       onPress={ onPress }
+      disabled={ disabled }
     >
       { icon && (
         <ThemedIcon

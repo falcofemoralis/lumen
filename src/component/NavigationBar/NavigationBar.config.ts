@@ -10,7 +10,7 @@ import {
 
 export const TABS_OPENING_DURATION_TV = 250;
 
-export const DEFAULT_ROUTE: NavigationRoute = '(home)';
+export const DEFAULT_ROUTE: NavigationRoute = '(+home)';
 
 export const TABS_TV_CONFIG: Tab[] = [
   {

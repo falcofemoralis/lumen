@@ -31,7 +31,7 @@ export function SearchPageContainer() {
   useSpeechRecognitionEvent('start', () => setRecognizing(true));
   useSpeechRecognitionEvent('end', () => setRecognizing(false));
   useSpeechRecognitionEvent('result', (event) => {
-    search(event.results[0]?.transcript);
+    onApplySuggestion(event.results[0]?.transcript);
   });
 
   const searchSuggestions = async (q: string) => {
@@ -89,12 +89,24 @@ export function SearchPageContainer() {
     search(enteredText);
   };
 
-  const onApplySuggestion = async (q: string) => {
+  const onApplySearch = async (q: string) => {
     if (!q) {
       return;
     }
 
     Keyboard.dismiss();
+
+    setQuery(q);
+    setEnteredText(q);
+    updateUserSuggestions(q);
+
+    search(q);
+  };
+
+  const onApplySuggestion = async (q: string) => {
+    if (!q) {
+      return;
+    }
 
     setQuery(q);
     setEnteredText(q);
@@ -176,6 +188,7 @@ export function SearchPageContainer() {
 
   const containerFunctions = {
     onChangeText,
+    onApplySearch,
     onApplySuggestion,
     onLoadFilms,
     onUpdateFilms,

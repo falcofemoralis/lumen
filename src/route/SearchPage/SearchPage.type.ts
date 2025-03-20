@@ -10,6 +10,7 @@ export interface SearchPageComponentProps {
   enteredText: string;
   isLoading: boolean;
   onChangeText: (q: string) => void;
+  onApplySearch: (q: string) => void;
   onApplySuggestion: (q: string) => void;
   onLoadFilms: (
     menuItem: MenuItemInterface,

@@ -31,7 +31,7 @@ const objectMap2 = (object: any, overload: any) => Object.keys(object)
 /**
  * ATV always has size 960, so need to convert TVbox to 960
  */
-export const ratio = () => (ConfigStore.isTV ? W / 960 : 1);
+export const ratio = () => (ConfigStore.isTV() ? W / 960 : 1);
 
 export const scale = (number: any) => {
   const value = number * Number(ratio().toFixed(1));

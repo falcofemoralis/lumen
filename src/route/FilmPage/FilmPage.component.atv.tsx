@@ -96,7 +96,6 @@ export function FilmPageComponent({
           { renderAction(__('Comments'), 'comment-text-multiple-outline', () => OverlayStore.openOverlay(commentsOverlayId)) }
           { renderAction(__('Bookmark'), 'movie-star-outline', () => OverlayStore.openOverlay(bookmarksOverlayId)) }
           { renderAction(__('Trailer'), 'movie-open-check-outline') }
-          { renderAction(__('Share'), 'share-variant-outline') }
         </ThemedView>
       </DefaultFocus>
     </SpatialNavigationView>

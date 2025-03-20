@@ -1,16 +1,19 @@
 import { ApiServiceType } from 'Api/index';
 import { services } from 'Api/services';
-import { action, makeAutoObservable } from 'mobx';
+import { makeAutoObservable } from 'mobx';
 import { NotificationInterface, NotificationItemInterface } from 'Type/Notification.interface';
 import { ProfileInterface } from 'Type/Profile.interface';
+import { CookiesManager } from 'Util/Cookies';
 import { safeJsonParse } from 'Util/Json';
+import { executeGet, requestValidator } from 'Util/Request';
 import { miscStorage } from 'Util/Storage';
 
 import ConfigStore from './Config.store';
 import NavigationStore from './Navigation.store';
 
+export const CREDENTIALS_STORAGE = 'CREDENTIALS_STORAGE';
 export const PROFILE_STORAGE = 'PROFILE_STORAGE';
-export const NOTIFICATIONS_STORAGE = 'NOTIFICATIONS_STORAGE2';
+export const NOTIFICATIONS_STORAGE = 'NOTIFICATIONS_STORAGE';
 
 class ServiceStore {
   private currentService = ApiServiceType.REZKA;
@@ -32,15 +35,6 @@ class ServiceStore {
     return services[this.currentService];
   }
 
-  setProvider(provider: string) {
-    this.getCurrentService().setProvider(provider);
-  }
-
-  setCDN(cdn: string) {
-    this.getCurrentService().setCDN(cdn);
-  }
-
-  @action
   setSignedIn(value: boolean) {
     this.isSignedIn = value;
   }
@@ -50,12 +44,15 @@ class ServiceStore {
     this.getCurrentService().setAuthorization(auth);
     this.setSignedIn(true);
     this.setProfile(await this.getCurrentService().getProfile());
+    miscStorage.setString(CREDENTIALS_STORAGE, JSON.stringify({ name, password }));
   }
 
   logout() {
     this.getCurrentService().logout();
     this.getCurrentService().setAuthorization('');
     this.setSignedIn(false);
+    this.removeProfile();
+    miscStorage.setString(CREDENTIALS_STORAGE, '');
   }
 
   setProfile(profile: ProfileInterface) {
@@ -64,6 +61,10 @@ class ServiceStore {
 
   getProfile(): ProfileInterface|null {
     return safeJsonParse<ProfileInterface>(miscStorage.getString(PROFILE_STORAGE));
+  }
+
+  removeProfile() {
+    miscStorage.removeItem(PROFILE_STORAGE);
   }
 
   async getNotifications() {
@@ -89,7 +90,7 @@ class ServiceStore {
     },
     0);
 
-    NavigationStore.setBadgeData(ConfigStore.isTV ? '(notifications)' : '(account)', badgeCount);
+    NavigationStore.setBadgeData(ConfigStore.isTV() ? '(notifications)' : '(account)', badgeCount);
   }
 
   async resetNotifications() {
@@ -104,7 +105,41 @@ class ServiceStore {
       miscStorage.setString(NOTIFICATIONS_STORAGE, JSON.stringify(newItems));
     }
 
-    NavigationStore.setBadgeData(ConfigStore.isTV ? '(notifications)' : '(account)', 0);
+    NavigationStore.setBadgeData(ConfigStore.isTV() ? '(notifications)' : '(account)', 0);
+  }
+
+  async updateProvider(value: string) {
+    const service = this.getCurrentService();
+
+    await requestValidator(value, service.getHeaders());
+    service.setProvider(value);
+    (new CookiesManager()).reset();
+
+    if (this.isSignedIn) {
+      const { name, password } = safeJsonParse<{ name: string; password: string }>(
+        miscStorage.getString(CREDENTIALS_STORAGE),
+      ) ?? {};
+
+      this.logout();
+
+      if (name && password) {
+        await this.login(name, password);
+      }
+    }
+  }
+
+  async updateCDN(value: string) {
+    const service = this.getCurrentService();
+
+    if (value !== 'auto') {
+      await requestValidator(value, service.getHeaders());
+    }
+
+    this.getCurrentService().setCDN(value);
+  }
+
+  updateUserAgent(value: string) {
+    this.getCurrentService().setUserAgent(value);
   }
 }
 

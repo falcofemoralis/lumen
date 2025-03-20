@@ -7,5 +7,5 @@ export function withTV<T>(
   Component: React.ComponentType<T>,
   props: WithTVProps<T> = {} as WithTVProps<T>,
 ) {
-  return ConfigStore.isTV ? <TvComponent { ...props } /> : <Component { ...props } />;
+  return ConfigStore.isTV() ? <TvComponent { ...props } /> : <Component { ...props } />;
 }
