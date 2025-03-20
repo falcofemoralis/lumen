@@ -17,10 +17,10 @@ export const styles = CreateStyles({
     alignSelf: 'center',
   },
   container: {
-    maxHeight: 300,
     padding: 8,
   },
   contentContainer: {
+    maxHeight: 300,
   },
   item: {
     paddingHorizontal: 12,

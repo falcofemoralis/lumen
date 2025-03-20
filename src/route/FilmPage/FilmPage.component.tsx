@@ -22,6 +22,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import NotificationStore from 'Store/Notification.store';
 import OverlayStore from 'Store/Overlay.store';
 import Colors from 'Style/Colors';
 import { CollectionItemInterface } from 'Type/CollectionItem';
@@ -312,9 +313,9 @@ export function FilmPageComponent({
 
   const renderActions = () => (
     <View style={ styles.actions }>
-      { renderAction(t('Trailer'), 'movie-open-check-outline') }
+      { renderAction(t('Trailer'), 'movie-open-check-outline', () => NotificationStore.displayMessage(t('Not implemented'))) }
       { renderAction(t('Bookmark'), 'movie-star-outline', () => OverlayStore.openOverlay(bookmarksOverlayId)) }
-      { renderAction(t('Download'), 'folder-download-outline') }
+      { renderAction(t('Download'), 'folder-download-outline', () => NotificationStore.displayMessage(t('Not implemented'))) }
     </View>
   );
 
@@ -548,17 +549,19 @@ export function FilmPageComponent({
     }
 
     return (
-      <ScrollView
-        horizontal
-        contentContainerStyle={ { width: '100%', height: '100%' } }
-      >
-        <Section title={ t('Comments') }>
-          <Comments
-            ref={ commentsRef }
-            film={ film }
-          />
-        </Section>
-      </ScrollView>
+      <View>
+        <ScrollView
+          horizontal
+          contentContainerStyle={ { width: '100%', height: '100%' } }
+        >
+          <Section title={ t('Comments') }>
+            <Comments
+              ref={ commentsRef }
+              film={ film }
+            />
+          </Section>
+        </ScrollView>
+      </View>
     );
   };
 

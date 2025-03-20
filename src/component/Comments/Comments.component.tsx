@@ -102,7 +102,7 @@ export const CommentsComponent = ({
     [],
   );
 
-  if (isLoading || !comments) {
+  if (!comments || (isLoading && !comments.length)) {
     return (
       <View style={ styles.loader }>
         <Loader

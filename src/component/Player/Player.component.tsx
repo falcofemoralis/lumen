@@ -476,13 +476,14 @@ export function PlayerComponent({
       id={ commentsOverlayId }
       onHide={ () => OverlayStore.goToPreviousOverlay() }
       containerStyle={ styles.commentsOverlay }
+      contentContainerStyle={ styles.commentsOverlayContent }
     >
       <ScrollView
         horizontal
         contentContainerStyle={ { width: '100%', height: '100%' } }
       >
         <Comments
-          style={ styles.commentsOverlayContent }
+          style={ styles.commentsOverlayList }
           film={ film }
         />
       </ScrollView>

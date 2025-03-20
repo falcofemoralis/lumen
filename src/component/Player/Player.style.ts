@@ -101,6 +101,12 @@ export const styles = CreateStyles({
   },
   commentsOverlayContent: {
     height: '100%',
+    maxHeight: '90%',
+    maxWidth: '50%',
+    right: '5%',
+  },
+  commentsOverlayList: {
+    height: '100%',
   },
 });
 

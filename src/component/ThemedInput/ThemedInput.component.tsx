@@ -21,13 +21,13 @@ export const ThemedInputComponent = ({
     ] }
     placeholderTextColor={ Colors.white }
     textColor={ Colors.white }
-    selectionColor="white"
-    underlineColor="red"
-    outlineColor="blue"
-    activeOutlineColor="green"
-    cursorColor="yellow"
+    selectionColor={ Colors.primary }
+    underlineColor={ Colors.primary }
+    outlineColor={ Colors.primary }
+    activeOutlineColor={ Colors.secondary }
+    cursorColor={ Colors.primary }
     underlineColorAndroid={ Colors.white }
-    activeUnderlineColor="green"
+    activeUnderlineColor={ Colors.secondary }
     selectionHandleColor={ Colors.primary }
     { ...props }
   />

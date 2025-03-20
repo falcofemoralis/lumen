@@ -32,6 +32,14 @@ export const ThemedInputComponent = ({
           ] }
           placeholderTextColor={ isFocused ? Colors.black : Colors.white }
           textColor={ isFocused ? Colors.black : Colors.white }
+          selectionColor={ Colors.primary }
+          underlineColor={ Colors.primary }
+          outlineColor={ Colors.primary }
+          activeOutlineColor={ Colors.secondary }
+          cursorColor={ Colors.primary }
+          underlineColorAndroid={ Colors.white }
+          activeUnderlineColor={ Colors.secondary }
+          selectionHandleColor={ Colors.primary }
           { ...props }
         />
       ) }

@@ -10,7 +10,7 @@ class NotificationStore {
     makeAutoObservable(this);
   }
 
-  async displayMessage(msg: string) {
+  displayMessage(msg: string) {
     if (this.isErrorOccurred) {
       return;
     }
@@ -18,7 +18,7 @@ class NotificationStore {
     ToastAndroid.show(msg, ToastAndroid.SHORT);
   }
 
-  async displayError(error: string | Error) {
+  displayError(error: string | Error) {
     if (this.isErrorOccurred) {
       return;
     }
@@ -29,7 +29,7 @@ class NotificationStore {
     ToastAndroid.show(msg, ToastAndroid.LONG);
   }
 
-  async displayErrorScreen(code?: string, error?: string, info?: string) {
+  displayErrorScreen(code?: string, error?: string, info?: string) {
     if (this.isErrorOccurred) {
       return;
     }

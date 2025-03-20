@@ -1,6 +1,7 @@
 import Page from 'Component/Page';
 import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
+import ThemedInput from 'Component/ThemedInput';
 import ThemedText from 'Component/ThemedText';
 import { router } from 'expo-router';
 import t from 'i18n/t';
