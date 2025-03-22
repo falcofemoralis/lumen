@@ -6,10 +6,8 @@ export const styles = CreateStyles({
     flex: 1,
     justifyContent: 'center',
   },
-  title: {
-    fontSize: 20,
-    fontWeight: '700',
-    textAlign: 'center',
+  form: {
+    marginTop: 16,
   },
   input: {
     margin: 8,

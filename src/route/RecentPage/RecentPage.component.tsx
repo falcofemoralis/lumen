@@ -104,7 +104,7 @@ export function RecentPageComponent({
 
   const renderContent = () => {
     if (!isSignedIn) {
-      return <LoginForm />;
+      return <LoginForm withRedirect />;
     }
 
     return (

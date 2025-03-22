@@ -57,5 +57,11 @@
   "Not implemented": "Функционал в разработке",
   "You have no notifications yet": "У вас пока нет обновлений",
   "You have not bookmarked any films yet": "У вас пока нет закладок",
-  "Try searching for something else": "Попробуйте поискать что-то другое"
+  "Try searching for something else": "Попробуйте поискать что-то другое",
+  "Login or email": "Логин или email",
+  "Password": "Пароль",
+  "You are not logged in": "Вы не вошли в аккаунт",
+  "Sign in to sync content": "Авторизуйтесь для синхронизации контента",
+  "Sign in": "Войти",
+  "Go to login page": "Перейти на страницу авторизации"
 }

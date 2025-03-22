@@ -6,8 +6,11 @@ import ServiceStore from 'Store/Service.store';
 
 import LoginFormComponent from './LoginForm.component';
 import LoginFormComponentTV from './LoginForm.component.atv';
+import { LoginFormContainerProps } from './LoginForm.type';
 
-export function LoginFormContainer() {
+export function LoginFormContainer({
+  withRedirect,
+}: LoginFormContainerProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   const login = async (username: string, password: string) => {
@@ -34,6 +37,7 @@ export function LoginFormContainer() {
 
   const containerProps = () => ({
     isLoading,
+    withRedirect,
   });
 
   return withTV(LoginFormComponentTV, LoginFormComponent, {

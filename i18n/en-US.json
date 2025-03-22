@@ -57,5 +57,11 @@
   "Not implemented": "Not implemented",
   "You have no notifications yet": "You have no notifications yet",
   "You have not bookmarked any films yet": "You have not bookmarked any films yet",
-  "Try searching for something else": "Try searching for something else"
+  "Try searching for something else": "Try searching for something else",
+  "Login or email": "Login or email",
+  "Password": "Password",
+  "You are not logged in": "You are not logged in",
+  "Sign in to sync content": "Sign in to sync content",
+  "Sign in": "Sign in",
+  "Go to login page": "Go to login page"
 }

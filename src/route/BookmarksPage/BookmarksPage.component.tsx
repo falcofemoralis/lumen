@@ -2,7 +2,6 @@ import FilmPager from 'Component/FilmPager';
 import LoginForm from 'Component/LoginForm';
 import Page from 'Component/Page';
 import ThemedInfo from 'Component/ThemedInfo';
-import ThemedText from 'Component/ThemedText';
 import t from 'i18n/t';
 import React from 'react';
 import { View } from 'react-native';
@@ -21,7 +20,7 @@ export function BookmarksPageComponent({
 }: BookmarksPageComponentProps) {
   const renderContent = () => {
     if (!isSignedIn) {
-      return <LoginForm />;
+      return <LoginForm withRedirect />;
     }
 
     if (isLoading) {
