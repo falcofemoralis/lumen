@@ -8,6 +8,7 @@ export const styles = CreateStyles({
   },
   voicesContainer: {
     width: '100%',
+    maxHeight: 288,
   },
   voice: {
     backgroundColor: Colors.gray,

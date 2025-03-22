@@ -37,7 +37,7 @@ export const PlayerProgressBarComponent = ({
 
   const updateIsScrolling = useCallback((value: boolean) => {
     handleIsScrolling(value);
-  }, []);
+  }, [handleIsScrolling]);
 
   const bubble = useCallback((seconds: number) => String(seconds), []);
 
@@ -51,14 +51,15 @@ export const PlayerProgressBarComponent = ({
   const onSlidingStart = useCallback(() => {
     isSliding.current = true;
     updateIsScrolling(true);
-  }, []);
+  }, [updateIsScrolling]);
 
   const onSlidingComplete = useCallback((value: number) => {
     isSliding.current = false;
+
     seekToPosition(value);
     updateIsScrolling(false);
     handleUserInteraction();
-  }, []);
+  }, [seekToPosition, handleUserInteraction, updateIsScrolling]);
 
   const renderBubble = useCallback(() => (
     <Bubble
