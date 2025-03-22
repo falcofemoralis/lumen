@@ -1,6 +1,6 @@
 import Page from 'Component/Page';
 import React from 'react';
-import { ScrollView, View } from 'react-native';
+import { View } from 'react-native';
 import { DefaultFocus, SpatialNavigationScrollView } from 'react-tv-space-navigation';
 
 import {

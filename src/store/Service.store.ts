@@ -108,11 +108,13 @@ class ServiceStore {
     NavigationStore.setBadgeData(ConfigStore.isTV() ? '(notifications)' : '(account)', 0);
   }
 
-  async updateProvider(value: string) {
-    const service = this.getCurrentService();
+  async validateUrl(value: string) {
+    await requestValidator(value, this.getCurrentService().getHeaders());
+  }
 
-    await requestValidator(value, service.getHeaders());
-    service.setProvider(value);
+  async updateProvider(value: string) {
+    await this.validateUrl(value);
+    this.getCurrentService().setProvider(value);
     (new CookiesManager()).reset();
 
     if (this.isSignedIn) {
@@ -129,10 +131,8 @@ class ServiceStore {
   }
 
   async updateCDN(value: string) {
-    const service = this.getCurrentService();
-
     if (value !== 'auto') {
-      await requestValidator(value, service.getHeaders());
+      await this.validateUrl(value);
     }
 
     this.getCurrentService().setCDN(value);

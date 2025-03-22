@@ -8,6 +8,7 @@ const i18n = new I18n({
   ru,
 }, {
   missingBehavior: 'guess',
+  defaultSeparator: '][',
 });
 
 i18n.locale = 'ru'; // getLocales()[0].languageCode ??

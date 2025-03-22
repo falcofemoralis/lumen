@@ -2,7 +2,6 @@ import Loader from 'Component/Loader';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedInfo from 'Component/ThemedInfo';
 import ThemedInput from 'Component/ThemedInput';
-import ThemedText from 'Component/ThemedText';
 import { router } from 'expo-router';
 import t from 'i18n/t';
 import { useRef } from 'react';
