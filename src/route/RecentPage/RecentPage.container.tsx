@@ -1,7 +1,6 @@
 import { withTV } from 'Hooks/withTV';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useRef, useState } from 'react';
-import ConfigStore from 'Store/Config.store';
 import NotificationStore from 'Store/Notification.store';
 import ServiceStore from 'Store/Service.store';
 import { RecentItemInterface } from 'Type/RecentItem.interface';
@@ -9,7 +8,6 @@ import { openFilm } from 'Util/Router';
 
 import RecentPageComponent from './RecentPage.component';
 import RecentPageComponentTV from './RecentPage.component.atv';
-import { THUMBNAILS_AMOUNT, THUMBNAILS_AMOUNT_TV } from './RecentPage.config';
 
 export function RecentPageContainer() {
   const [isSignedIn, setIsSignedIn] = useState(ServiceStore.isSignedIn);

@@ -1,26 +1,25 @@
 import Loader from 'Component/Loader';
+import LoginForm from 'Component/LoginForm';
 import Page from 'Component/Page';
 import ThemedButton from 'Component/ThemedButton';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
+import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
 import { router } from 'expo-router';
-import { observer } from 'mobx-react-lite';
-import React, { useRef } from 'react';
-import { View } from 'react-native';
-import { TextInput } from 'react-native-paper';
+import t from 'i18n/t';
+import React from 'react';
+import { Image, View } from 'react-native';
 import NavigationStore from 'Store/Navigation.store';
-import ServiceStore from 'Store/Service.store';
+import NotificationStore from 'Store/Notification.store';
 import { scale } from 'Util/CreateStyles';
 
 import { styles } from './AccountPage.style';
 import { AccountPageComponentProps } from './AccountPage.type';
 
 export function AccountPageComponent({
-  isLoading,
-  login,
+  isSignedIn,
+  profile,
 }: AccountPageComponentProps) {
-  const loginRef = useRef({ username: '', password: '' });
-
   const renderTopBar = () => {
     const badge = NavigationStore.badgeData['(account)'] ?? 0;
 
@@ -59,55 +58,85 @@ export function AccountPageComponent({
     );
   };
 
-  const renderContent = () => {
-    if (!ServiceStore.isSignedIn) {
+  const renderProfile = () => {
+    if (!profile) {
       return (
-        <View>
-          <ThemedText>
-            Please sign in
-          </ThemedText>
-          <TextInput
-            placeholder="Username"
-            onChangeText={ (t) => { loginRef.current.username = t; } }
-          />
-          <TextInput
-            placeholder="Password"
-            onChangeText={ (t) => { loginRef.current.password = t; } }
-          />
-          <ThemedButton onPress={ () => login(
-            loginRef.current.username,
-            loginRef.current.password,
-          ) }
-          >
-            Login
-          </ThemedButton>
-        </View>
+        <Loader
+          isLoading
+          fullScreen
+        />
       );
     }
 
+    const {
+      avatar,
+      name,
+      email,
+    } = profile;
+
     return (
-      <View>
-        <ThemedText>Logged in</ThemedText>
+      <View style={ styles.profile }>
+        <View style={ styles.profileInfo }>
+          { avatar ? (
+            <ThemedImage
+              src={ avatar }
+              style={ styles.profileAvatar }
+            />
+          ) : (
+            <Image
+              source={ require('../../../assets/images/no_avatar.png') }
+              style={ styles.profileAvatar }
+            />
+          ) }
+          <View>
+            <ThemedText style={ styles.profileName }>
+              { name }
+            </ThemedText>
+            <View>
+              <ThemedText>
+                { email }
+              </ThemedText>
+            </View>
+          </View>
+        </View>
+        <View style={ styles.profileActions }>
+          <ThemedButton
+            style={ styles.profileAction }
+            onPress={ () => NotificationStore.displayMessage(t('Not implemented')) }
+          >
+            { t('Log out') }
+          </ThemedButton>
+          <ThemedButton
+            style={ styles.profileAction }
+            onPress={ () => NotificationStore.displayMessage(t('Not implemented')) }
+          >
+            { t('Switch provider') }
+          </ThemedButton>
+          <ThemedButton
+            style={ styles.profileAction }
+            onPress={ () => NotificationStore.displayMessage(t('Not implemented')) }
+          >
+            { t('View Profile') }
+          </ThemedButton>
+        </View>
       </View>
     );
   };
 
-  const renderLoader = () => (
-    <Loader
-      isLoading={ isLoading }
-      fullScreen
-    />
-  );
+  const renderContent = () => {
+    if (!isSignedIn) {
+      return <LoginForm />;
+    }
+
+    return renderProfile();
+  };
 
   return (
     <Page>
-      <View>
-        { renderTopBar() }
-        { renderContent() }
-        { renderLoader() }
-      </View>
+      { renderTopBar() }
+      { renderContent() }
     </Page>
   );
 }
 
-export default observer(AccountPageComponent);
+export default AccountPageComponent;

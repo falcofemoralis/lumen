@@ -1,34 +1,31 @@
 import { withTV } from 'Hooks/withTV';
-import t from 'i18n/t';
-import { useState } from 'react';
-import NotificationStore from 'Store/Notification.store';
+import { observer } from 'mobx-react-lite';
+import { useEffect, useState } from 'react';
 import ServiceStore from 'Store/Service.store';
+import { ProfileInterface } from 'Type/Profile.interface';
 
 import AccountPageComponent from './AccountPage.component';
 
 export function AccountPageContainer() {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSignedIn, setIsSignedIn] = useState(ServiceStore.isSignedIn);
+  const [profile, setProfile] = useState<ProfileInterface | null>(ServiceStore.getProfile());
 
-  const login = async (username: string, password: string) => {
-    setIsLoading(true);
-
-    try {
-      await ServiceStore.login(username.trim(), password.trim());
-
-      NotificationStore.displayMessage(t('Successfully logged in!'));
-    } catch (e) {
-      NotificationStore.displayError(e as Error);
-    } finally {
-      setIsLoading(false);
+  useEffect(() => {
+    if (!profile) {
+      setProfile(ServiceStore.getProfile());
     }
-  };
+
+    if (ServiceStore.isSignedIn !== isSignedIn) {
+      setIsSignedIn(ServiceStore.isSignedIn);
+    }
+  }, [ServiceStore.isSignedIn]);
 
   const containerFunctions = {
-    login,
   };
 
   const containerProps = () => ({
-    isLoading,
+    isSignedIn,
+    profile,
   });
 
   return withTV(AccountPageComponent, AccountPageComponent, {
@@ -37,4 +34,4 @@ export function AccountPageContainer() {
   });
 }
 
-export default AccountPageContainer;
+export default observer(AccountPageContainer);

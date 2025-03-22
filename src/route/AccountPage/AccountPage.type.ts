@@ -1,8 +1,6 @@
-export interface AccountPageContainerProps {
-  link: string;
-}
+import { ProfileInterface } from 'Type/Profile.interface';
 
 export interface AccountPageComponentProps {
-  isLoading: boolean;
-  login: (username: string, password: string) => void;
+  isSignedIn: boolean;
+  profile: ProfileInterface | null;
 }

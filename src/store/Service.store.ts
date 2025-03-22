@@ -5,7 +5,7 @@ import { NotificationInterface, NotificationItemInterface } from 'Type/Notificat
 import { ProfileInterface } from 'Type/Profile.interface';
 import { CookiesManager } from 'Util/Cookies';
 import { safeJsonParse } from 'Util/Json';
-import { executeGet, requestValidator } from 'Util/Request';
+import { requestValidator } from 'Util/Request';
 import { miscStorage } from 'Util/Storage';
 
 import ConfigStore from './Config.store';

@@ -21,14 +21,14 @@ export const ThemedInputComponent = ({
     ] }
     placeholderTextColor={ Colors.white }
     textColor={ Colors.white }
-    selectionColor={ Colors.primary }
-    underlineColor={ Colors.primary }
-    outlineColor={ Colors.primary }
+    selectionColor={ Colors.secondary }
+    underlineColor={ Colors.secondary }
+    outlineColor={ Colors.secondary }
     activeOutlineColor={ Colors.secondary }
-    cursorColor={ Colors.primary }
+    cursorColor={ Colors.secondary }
     underlineColorAndroid={ Colors.white }
     activeUnderlineColor={ Colors.secondary }
-    selectionHandleColor={ Colors.primary }
+    selectionHandleColor={ Colors.secondary }
     { ...props }
   />
 );

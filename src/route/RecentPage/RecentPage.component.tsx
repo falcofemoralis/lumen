@@ -1,3 +1,4 @@
+import LoginForm from 'Component/LoginForm';
 import Page from 'Component/Page';
 import ThemedGrid from 'Component/ThemedGrid';
 import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
@@ -103,11 +104,7 @@ export function RecentPageComponent({
 
   const renderContent = () => {
     if (!isSignedIn) {
-      return (
-        <View>
-          <ThemedText>Sign in</ThemedText>
-        </View>
-      );
+      return <LoginForm />;
     }
 
     return (
