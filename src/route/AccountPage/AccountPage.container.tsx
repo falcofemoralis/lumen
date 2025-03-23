@@ -13,14 +13,10 @@ export function AccountPageContainer() {
 
   useEffect(() => {
     if (!profile) {
-      console.log('set profile', ServiceStore.getProfile());
-
       setProfile(ServiceStore.getProfile());
     }
 
     if (ServiceStore.isSignedIn !== isSignedIn) {
-      console.log('set is signed in', ServiceStore.isSignedIn);
-
       setIsSignedIn(ServiceStore.isSignedIn);
     }
   }, [ServiceStore.isSignedIn]);
