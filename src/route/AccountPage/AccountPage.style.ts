@@ -6,11 +6,9 @@ export const styles = CreateStyles({
     flexDirection: 'row',
     width: '100%',
     justifyContent: 'flex-end',
-    gap: 24,
+    gap: 16,
   },
   tobBarBtn: {
-    width: 32,
-    height: 32,
     backgroundColor: Colors.transparent,
   },
   tobBarBtnIcon: {

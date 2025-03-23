@@ -240,9 +240,11 @@ export function FilmPageComponent({
         <ThemedText style={ styles.description }>
           { description }
         </ThemedText>
-        <ThemedButton>
-          { t('Read more') }
-        </ThemedButton>
+        <View style={ styles.readMoreButton }>
+          <ThemedButton>
+            { t('Read more') }
+          </ThemedButton>
+        </View>
       </View>
     );
   };

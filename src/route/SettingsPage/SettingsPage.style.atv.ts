@@ -6,6 +6,7 @@ export const styles = CreateStyles({
     paddingVertical: 12,
     paddingHorizontal: 12,
     backgroundColor: Colors.transparent,
+    borderRadius: 16,
   },
   settingFocused: {
     backgroundColor: Colors.white,
@@ -32,9 +33,7 @@ export const styles = CreateStyles({
     fontWeight: '600',
   },
   overlayInput: {
-
   },
   overlayButton: {
-
   },
 });

@@ -48,9 +48,4 @@ export const styles = CreateStyles({
     alignContent: 'center',
     alignItems: 'center',
   },
-  noResultsText: {
-    color: Colors.white,
-    fontSize: 16,
-    textAlign: 'center',
-  },
 });

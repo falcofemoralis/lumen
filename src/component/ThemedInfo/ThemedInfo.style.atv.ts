@@ -2,22 +2,26 @@ import Colors from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
-  menuListWrapper: {
-    height: 48,
-    backgroundColor: Colors.background,
-    zIndex: 10,
-  },
-  menuListScroll: {},
-  menuList: {
+  container: {
     gap: 8,
   },
-  grid: {
-    zIndex: 2,
-    paddingTop: 8,
-    height: '80%',
+  iconContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  hidden: {
-    opacity: 0,
-    height: 0,
+  icon: {
+    backgroundColor: Colors.darkGray,
+    borderRadius: 99,
+    padding: 8,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 16,
+    color: Colors.lightGray,
+    textAlign: 'center',
   },
 });

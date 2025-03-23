@@ -32,7 +32,6 @@
   "Quality": "Качество",
   "Subtitles": "Субтитры",
   "Remaining: %s": "Осталось: %s",
-  "Switch account": "Сменить аккаунт",
   "New": "Новое",
   "No notifications": "Нет обновлений",
   "Successfully logged in!": "Успешная авторизация!",
@@ -41,7 +40,7 @@
   "No comments yet": "Комментарии отсутствуют",
   "Speed": "Скорость",
   "Normal": "Обычная",
-  "Watch %s:\n %s": "Смотреть %s:\n\n %s",
+  "Watch %s:\n %s": "Смотреть %s:\n\n%s",
   "Try again later": "Повторите попытку чуть позже",
   "Provider": "Зеркало",
   "Change provider": "Изменить зеркало",
@@ -85,5 +84,8 @@
   "Suits for mobile": "• для смартфонов\n• для планшетов",
   "Validate": "Проверить",
   "Complete": "Завершить",
-  "Please select a device type": "Выберите тип устройства"
+  "Please select a device type": "Выберите тип устройства",
+  "Log out": "Выйти",
+  "Switch service": "Сменить сайт",
+  "View Profile": "Открыть профиль"
 }

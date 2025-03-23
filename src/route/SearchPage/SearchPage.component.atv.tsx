@@ -2,6 +2,7 @@ import FilmPager from 'Component/FilmPager';
 import Page from 'Component/Page';
 import ThemedButton from 'Component/ThemedButton';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
+import ThemedInfo from 'Component/ThemedInfo';
 import ThemedInput from 'Component/ThemedInput';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
@@ -112,9 +113,10 @@ export function SearchPageComponent({
     if (!isLoading && !filmPager.search?.filmList.films.length) {
       return (
         <View style={ styles.noResults }>
-          <ThemedText style={ styles.noResultsText }>
-            { t('No results found') }
-          </ThemedText>
+          <ThemedInfo
+            title={ t('No results found') }
+            subtitle={ t('Try searching for something else') }
+          />
         </View>
       );
     }

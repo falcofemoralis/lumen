@@ -1,23 +1,26 @@
-import Colors from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
-  menuListWrapper: {
-    height: 48,
-    backgroundColor: Colors.background,
-    zIndex: 10,
+  container: {
+    height: '100%',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignSelf: 'center',
+    maxWidth: '50%',
   },
-  menuListScroll: {},
-  menuList: {
-    gap: 8,
+  form: {
+    marginTop: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  grid: {
-    zIndex: 2,
-    paddingTop: 8,
-    height: '80%',
+  inputContainer: {
+    flexDirection: 'row',
+    margin: 8,
   },
-  hidden: {
-    opacity: 0,
-    height: 0,
+  input: {
+    width: 250,
+  },
+  button: {
+    margin: 8,
   },
 });

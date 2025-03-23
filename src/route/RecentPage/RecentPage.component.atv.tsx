@@ -1,3 +1,4 @@
+import LoginForm from 'Component/LoginForm';
 import Page from 'Component/Page';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedGrid from 'Component/ThemedGrid';
@@ -112,11 +113,7 @@ export function RecentPageComponent({
 
   const renderContent = () => {
     if (!isSignedIn) {
-      return (
-        <View>
-          <ThemedText>Sign in</ThemedText>
-        </View>
-      );
+      return <LoginForm withRedirect />;
     }
 
     return (

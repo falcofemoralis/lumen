@@ -1,39 +1,37 @@
 import Colors from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
-export const MAIN_CONTENT_HEIGHT_TV = 300;
-
 export const styles = CreateStyles({
-  mainContent: {
-    flexDirection: 'row',
-    gap: 24,
+  profile: {
     width: '100%',
-    paddingBottom: 8,
   },
-  photo: {
-    width: '15%',
-    aspectRatio: '12 / 19',
-    borderRadius: 16,
+  profileInfo: {
+    flexDirection: 'row',
+    gap: 16,
+    alignItems: 'center',
   },
-  name: {
-    fontSize: 24,
-    lineHeight: 32,
+  profileAvatar: {
+    width: 64,
+    height: 64,
+    backgroundColor: Colors.gray,
+    borderRadius: 99,
+  },
+  profileName: {
+    fontSize: 20,
     fontWeight: '700',
-    color: Colors.white,
   },
-  originalName: {
-    fontSize: 16,
-    lineHeight: 16,
-    color: Colors.lightGray,
-    opacity: 0.6,
-    marginTop: 4,
+  profileActionsWrapper: {
+    marginTop: 16,
+    height: 48,
+    backgroundColor: Colors.background,
+    zIndex: 10,
   },
-  text: {
-    fontSize: 14,
-  },
-  additionalInfo: {
-    flexDirection: 'column',
+  profileActions: {
     gap: 8,
-    marginTop: 8,
+  },
+  profileAction: {
+    padding: 6,
+    paddingInline: 8,
+    borderRadius: 24,
   },
 });

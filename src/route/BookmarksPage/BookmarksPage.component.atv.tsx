@@ -1,10 +1,12 @@
 import FilmPager from 'Component/FilmPager';
+import LoginForm from 'Component/LoginForm';
 import Page from 'Component/Page';
-import ThemedText from 'Component/ThemedText';
+import ThemedInfo from 'Component/ThemedInfo';
 import t from 'i18n/t';
 import React from 'react';
 import { View } from 'react-native';
 
+import { styles } from './BookmarksPage.style.atv';
 import { BookmarksPageThumbnail } from './BookmarksPage.thumbnail.atv';
 import { BookmarksPageComponentProps } from './BookmarksPage.type';
 
@@ -18,11 +20,7 @@ export function BookmarksPageComponent({
 }: BookmarksPageComponentProps) {
   const renderContent = () => {
     if (!isSignedIn) {
-      return (
-        <View>
-          <ThemedText>Sign in</ThemedText>
-        </View>
-      );
+      return <LoginForm withRedirect />;
     }
 
     if (isLoading) {
@@ -31,10 +29,11 @@ export function BookmarksPageComponent({
 
     if (!menuItems.length) {
       return (
-        <View>
-          <ThemedText>
-            { t('No bookmarks') }
-          </ThemedText>
+        <View style={ styles.empty }>
+          <ThemedInfo
+            title={ t('No bookmarks') }
+            subtitle={ t('You have not bookmarked any films yet') }
+          />
         </View>
       );
     }

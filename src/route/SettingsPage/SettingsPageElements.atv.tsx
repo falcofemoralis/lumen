@@ -39,22 +39,22 @@ const BaseComponent = ({
     <SpatialNavigationFocusableView
       onSelect={ onPress ?? noopFn }
     >
-      { ({ isFocused }) => (
+      { ({ isFocused, isRootActive }) => (
         <View style={ [
           styles.setting,
-          isFocused && styles.settingFocused,
+          isFocused && isRootActive && styles.settingFocused,
         ] }
         >
           <ThemedText style={ [
             styles.settingTitle,
-            isFocused && styles.settingTitleFocused,
+            isFocused && isRootActive && styles.settingTitleFocused,
           ] }
           >
             { title }
           </ThemedText>
           <ThemedText style={ [
             styles.settingSubtitle,
-            isFocused && styles.settingSubtitleFocused,
+            isFocused && isRootActive && styles.settingSubtitleFocused,
           ] }
           >
             { subtitle }

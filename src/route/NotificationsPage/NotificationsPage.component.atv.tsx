@@ -1,5 +1,6 @@
 import FilmSections from 'Component/FilmSections';
 import Page from 'Component/Page';
+import ThemedInfo from 'Component/ThemedInfo';
 import ThemedText from 'Component/ThemedText';
 import t from 'i18n/t';
 import React from 'react';
@@ -25,9 +26,10 @@ export function NotificationsPageComponent({
     return (
       <Page>
         <View style={ styles.empty }>
-          <ThemedText style={ styles.emptyText }>
-            { t('No notifications') }
-          </ThemedText>
+          <ThemedInfo
+            title={ t('No notifications') }
+            subtitle={ t('You have no notifications yet') }
+          />
         </View>
       </Page>
     );

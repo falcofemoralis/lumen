@@ -23,6 +23,7 @@ export const styles = CreateStyles({
   setting: {
     paddingVertical: 12,
     paddingHorizontal: 12,
+    borderRadius: 16,
   },
   settingContainer: {
   },

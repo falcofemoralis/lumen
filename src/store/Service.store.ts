@@ -42,8 +42,8 @@ class ServiceStore {
   async login(name: string, password: string) {
     const auth = await this.getCurrentService().login(name, password);
     this.getCurrentService().setAuthorization(auth);
-    this.setSignedIn(true);
     this.setProfile(await this.getCurrentService().getProfile());
+    this.setSignedIn(true);
     miscStorage.setString(CREDENTIALS_STORAGE, JSON.stringify({ name, password }));
   }
 

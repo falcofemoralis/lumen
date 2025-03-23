@@ -99,6 +99,10 @@ export const styles = CreateStyles({
     marginTop: 8,
     textAlign: 'justify',
   },
+  readMoreButton: {
+    flexDirection: 'row',
+    marginTop: 8,
+  },
   section: {
     marginTop: 16,
     padding: 16,

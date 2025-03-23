@@ -3,7 +3,7 @@ import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedText from 'Component/ThemedText';
 import t from 'i18n/t';
 import React, {
-  createRef, forwardRef, useEffect, useImperativeHandle, useRef,
+  createRef, forwardRef, useCallback, useEffect, useImperativeHandle, useRef,
   useState,
 } from 'react';
 import {
@@ -15,6 +15,7 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
+import NotificationStore from 'Store/Notification.store';
 import { scale } from 'Util/CreateStyles';
 
 import SliderIntro, { SliderRef } from '../../libs/react-native-slider-intro/src';
@@ -248,62 +249,74 @@ export function WelcomePageComponent({
     />
   );
 
-  const renderConfigureSlide = (slide: SlideInterface) => (
-    <WelcomeSlide
-      ref={ slidesRefs.current[slide.id] }
-      slide={ slide }
-      goBack={ goBack }
-      goNext={ goNext }
-      style={ styles.configureSlide }
-    >
-      <View style={ styles.configureWrapper }>
-        <Pressable
-          style={ ({ focused }) => ([
-            styles.configureButton,
-            selectedDeviceType === 'TV' && styles.configureSelected,
-            focused && styles.TVfocused,
-          ]) }
-          onPress={ handleSelectTV }
-        >
-          <View style={ styles.configureContainer }>
-            <View style={ styles.configureIcon }>
-              <WelcomePageTV />
+  const renderConfigureSlide = (slide: SlideInterface) => {
+    const handleNext = (s: SlideInterface) => {
+      if (!selectedDeviceType) {
+        NotificationStore.displayError(t('Please select a device type'));
+
+        return;
+      }
+
+      goNext(s);
+    };
+
+    return (
+      <WelcomeSlide
+        ref={ slidesRefs.current[slide.id] }
+        slide={ slide }
+        goBack={ goBack }
+        goNext={ handleNext }
+        style={ styles.configureSlide }
+      >
+        <View style={ styles.configureWrapper }>
+          <Pressable
+            style={ ({ focused }) => ([
+              styles.configureButton,
+              selectedDeviceType === 'TV' && styles.configureSelected,
+              focused && styles.TVfocused,
+            ]) }
+            onPress={ handleSelectTV }
+          >
+            <View style={ styles.configureContainer }>
+              <View style={ styles.configureIcon }>
+                <WelcomePageTV />
+              </View>
+              <View style={ styles.configureInfo }>
+                <ThemedText style={ styles.configureTitle }>
+                  { t('TV Version') }
+                </ThemedText>
+                <ThemedText style={ styles.configureSubtitle }>
+                  { t('Suits for TV') }
+                </ThemedText>
+              </View>
             </View>
-            <View style={ styles.configureInfo }>
-              <ThemedText style={ styles.configureTitle }>
-                { t('TV Version') }
-              </ThemedText>
-              <ThemedText style={ styles.configureSubtitle }>
-                { t('Suits for TV') }
-              </ThemedText>
+          </Pressable>
+          <Pressable
+            style={ ({ focused }) => ([
+              styles.configureButton,
+              selectedDeviceType === 'MOBILE' && styles.configureSelected,
+              focused && styles.TVfocused,
+            ]) }
+            onPress={ handleSelectMobile }
+          >
+            <View style={ styles.configureContainer }>
+              <View style={ styles.configureIcon }>
+                <WelcomePageMobile />
+              </View>
+              <View style={ styles.configureInfo }>
+                <ThemedText style={ styles.configureTitle }>
+                  { t('Mobile Version') }
+                </ThemedText>
+                <ThemedText style={ styles.configureSubtitle }>
+                  { t('Suits for mobile') }
+                </ThemedText>
+              </View>
             </View>
-          </View>
-        </Pressable>
-        <Pressable
-          style={ ({ focused }) => ([
-            styles.configureButton,
-            selectedDeviceType === 'MOBILE' && styles.configureSelected,
-            focused && styles.TVfocused,
-          ]) }
-          onPress={ handleSelectMobile }
-        >
-          <View style={ styles.configureContainer }>
-            <View style={ styles.configureIcon }>
-              <WelcomePageMobile />
-            </View>
-            <View style={ styles.configureInfo }>
-              <ThemedText style={ styles.configureTitle }>
-                { t('Mobile Version') }
-              </ThemedText>
-              <ThemedText style={ styles.configureSubtitle }>
-                { t('Suits for mobile') }
-              </ThemedText>
-            </View>
-          </View>
-        </Pressable>
-      </View>
-    </WelcomeSlide>
-  );
+          </Pressable>
+        </View>
+      </WelcomeSlide>
+    );
+  };
 
   const renderProviderSlide = (slide: SlideInterface) => (
     <WelcomeSlide

@@ -21,6 +21,7 @@ import {
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
 import NavigationStore from 'Store/Navigation.store';
+import ServiceStore from 'Store/Service.store';
 import Colors from 'Style/Colors';
 import { CONTENT_WRAPPER_PADDING_TV } from 'Style/Layout';
 import { scale } from 'Util/CreateStyles';
@@ -150,7 +151,7 @@ export function NavigationBarComponent({
     isf: boolean,
   ) => {
     const { title } = tab;
-    const { avatar } = profile ?? {};
+    const { avatar, name } = profile ?? {};
 
     return (
       <View
@@ -197,7 +198,7 @@ export function NavigationBarComponent({
               isMenuOpen && styles.tabTextOpened,
             ] }
           >
-            { t('Switch account') }
+            { ServiceStore.isSignedIn ? name : t('Sign in') }
           </ThemedText.Animated>
         </View>
       </View>

@@ -5,6 +5,7 @@ import ServiceStore from 'Store/Service.store';
 import { ProfileInterface } from 'Type/Profile.interface';
 
 import AccountPageComponent from './AccountPage.component';
+import AccountPageComponentTV from './AccountPage.component.atv';
 
 export function AccountPageContainer() {
   const [isSignedIn, setIsSignedIn] = useState(ServiceStore.isSignedIn);
@@ -12,10 +13,14 @@ export function AccountPageContainer() {
 
   useEffect(() => {
     if (!profile) {
+      console.log('set profile', ServiceStore.getProfile());
+
       setProfile(ServiceStore.getProfile());
     }
 
     if (ServiceStore.isSignedIn !== isSignedIn) {
+      console.log('set is signed in', ServiceStore.isSignedIn);
+
       setIsSignedIn(ServiceStore.isSignedIn);
     }
   }, [ServiceStore.isSignedIn]);
@@ -28,7 +33,7 @@ export function AccountPageContainer() {
     profile,
   });
 
-  return withTV(AccountPageComponent, AccountPageComponent, {
+  return withTV(AccountPageComponentTV, AccountPageComponent, {
     ...containerFunctions,
     ...containerProps(),
   });
