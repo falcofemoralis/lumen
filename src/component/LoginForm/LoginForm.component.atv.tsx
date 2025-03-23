@@ -55,6 +55,10 @@ export function LoginFormComponent({
         >
           { t('Sign in') }
         </ThemedButton>
+        <Loader
+          isLoading={ isLoading }
+          fullScreen
+        />
       </View>
     );
   };
@@ -69,10 +73,6 @@ export function LoginFormComponent({
           subtitle={ t('Sign in to sync content') }
         />
         { renderForm() }
-        <Loader
-          isLoading={ isLoading }
-          fullScreen
-        />
       </View>
     </DefaultFocus>
   );

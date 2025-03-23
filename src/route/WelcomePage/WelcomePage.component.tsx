@@ -338,7 +338,6 @@ export function WelcomePageComponent({
               isLoading && styles.providerValidateButtonDisabled,
             ]) }
             onPress={ validateProvider }
-            disabled={ isLoading }
           >
             { isProviderValid !== null && (
               <ThemedIcon
@@ -379,7 +378,6 @@ export function WelcomePageComponent({
               isLoading && styles.providerValidateButtonDisabled,
             ]) }
             onPress={ validateCDN }
-            disabled={ isLoading }
           >
             { isCDNValid !== null && (
               <ThemedIcon
