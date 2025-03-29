@@ -37,14 +37,16 @@ import { scale } from 'Util/CreateStyles';
 import { setTimeoutSafe } from 'Util/Misc';
 
 import {
+  DEFAULT_REWIND_SECONDS,
   DEFAULT_SPEED,
   DEFAULT_SPEEDS,
+  DOUBLE_TAP_ANIMATION,
   PLAYER_CONTROLS_ANIMATION,
   PLAYER_CONTROLS_TIMEOUT,
   RewindDirection,
 } from './Player.config';
 import { MiddleActionVariant, styles } from './Player.style';
-import { PlayerComponentProps } from './Player.type';
+import { DoubleTapAction, PlayerComponentProps } from './Player.type';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -87,9 +89,12 @@ export function PlayerComponent({
 }: PlayerComponentProps) {
   const [showControls, setShowControls] = useState(false);
   const [isScrolling, setIsScrolling] = useState(false);
+  const [doubleTapAction, setDoubleTapAction] = useState<DoubleTapAction | null>(null);
+  const [longTapAction, setLongTapAction] = useState(false);
   const controlsTimeout = useRef<NodeJS.Timeout | null>(null);
   const canHideControls = useRef(isPlaying && showControls);
   const playerRef = useRef<VideoView>(null);
+  const doubleTapTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const controlsAnimation = useAnimatedStyle(() => ({
     opacity: withTiming(showControls ? 1 : 0, { duration: PLAYER_CONTROLS_ANIMATION }),
@@ -152,6 +157,24 @@ export function PlayerComponent({
     setIsScrolling(value);
   };
 
+  const handleDoubleTap = (direction: RewindDirection) => {
+    const seconds = DEFAULT_REWIND_SECONDS;
+
+    rewindPosition(direction, seconds);
+    setDoubleTapAction({
+      seconds: seconds + (doubleTapAction?.seconds ?? 0),
+      direction,
+    });
+
+    if (doubleTapTimeout.current) {
+      clearTimeout(doubleTapTimeout.current);
+    }
+
+    setTimeoutSafe(() => {
+      setDoubleTapAction(null);
+    }, DOUBLE_TAP_ANIMATION);
+  };
+
   const singleTap = Gesture.Tap()
     .onEnd(() => {
       runOnJS(setShowControls)(!showControls);
@@ -168,18 +191,24 @@ export function PlayerComponent({
       const { absoluteX } = e;
 
       if (absoluteX < (screenWidth / 2)) {
-        runOnJS(rewindPosition)(RewindDirection.BACKWARD);
+        runOnJS(handleDoubleTap)(RewindDirection.BACKWARD);
       } else {
-        runOnJS(rewindPosition)(RewindDirection.FORWARD);
+        runOnJS(handleDoubleTap)(RewindDirection.FORWARD);
       }
     });
 
   const longPressGesture = Gesture.LongPress()
     .onStart(() => {
+      if (showControls || isLocked || !isPlaying) {
+        return;
+      }
+
       runOnJS(setPlayerRate)(1.5);
+      runOnJS(setLongTapAction)(true);
     })
     .onEnd(() => {
       runOnJS(setPlayerRate)(1);
+      runOnJS(setLongTapAction)(false);
     });
 
   const enablePIP = () => {
@@ -387,6 +416,70 @@ export function PlayerComponent({
     );
   };
 
+  const renderDoubleTapAction = () => {
+    if (!doubleTapAction) {
+      return null;
+    }
+
+    const { seconds, direction } = doubleTapAction;
+
+    return (
+      <View style={ [
+        styles.doubleTapAction,
+        {
+          left: direction === RewindDirection.BACKWARD ? '20%' : '80%',
+        },
+      ] }
+      >
+        <View style={ [
+          styles.doubleTapContainer,
+          {
+            flexDirection: direction === RewindDirection.BACKWARD ? 'row-reverse' : 'row',
+          },
+        ] }
+        >
+          <ThemedIcon
+            style={ styles.doubleTapIcon }
+            icon={ {
+              name: direction === RewindDirection.BACKWARD ? 'rewind-outline' : 'fast-forward-outline',
+              pack: IconPackType.MaterialCommunityIcons,
+            } }
+            size={ scale(24) }
+            color="white"
+          />
+          <ThemedText style={ styles.longTapText }>
+            { `${direction === RewindDirection.BACKWARD ? '-' : '+'}${seconds}` }
+          </ThemedText>
+        </View>
+      </View>
+    );
+  };
+
+  const renderLongTapAction = () => {
+    if (!longTapAction) {
+      return null;
+    }
+
+    return (
+      <View style={ styles.longTapAction }>
+        <View style={ styles.longTapContainer }>
+          <ThemedText style={ styles.longTapText }>
+            2x
+          </ThemedText>
+          <ThemedIcon
+            style={ styles.longTapIcon }
+            icon={ {
+              name: 'fast-forward-outline',
+              pack: IconPackType.MaterialCommunityIcons,
+            } }
+            size={ scale(24) }
+            color="white"
+          />
+        </View>
+      </View>
+    );
+  };
+
   const renderControls = () => (
     <GestureDetector
       gesture={ Gesture.Exclusive(
@@ -406,6 +499,8 @@ export function PlayerComponent({
           { renderMiddleControls() }
           { renderBottomActions() }
         </ThemedView.Animated>
+        { renderDoubleTapAction() }
+        { renderLongTapAction() }
       </View>
     </GestureDetector>
   );

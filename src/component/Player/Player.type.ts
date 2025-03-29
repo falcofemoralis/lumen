@@ -65,3 +65,8 @@ export interface LongEvent {
   longTimeout: NodeJS.Timeout | null;
   isLongFired: boolean;
 }
+
+export interface DoubleTapAction {
+  seconds: number;
+  direction: RewindDirection;
+}

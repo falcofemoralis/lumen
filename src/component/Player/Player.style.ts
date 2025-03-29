@@ -108,6 +108,49 @@ export const styles = CreateStyles({
   commentsOverlayList: {
     height: '100%',
   },
+  doubleTapAction: {
+    position: 'absolute',
+    top: '50%',
+    transform: [{ translateX: '-50%' }, { translateY: '-50%' }],
+    alignItems: 'center',
+  },
+  doubleTapContainer: {
+    backgroundColor: Colors.modal,
+    paddingBlock: 4,
+    paddingInline: 12,
+    borderRadius: 50,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  doubleTapText: {
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  doubleTapIcon: {
+  },
+  longTapAction: {
+    position: 'absolute',
+    top: '80%',
+    left: '50%',
+    transform: [{ translateX: '-50%' }, { translateY: '-50%' }],
+    alignItems: 'center',
+  },
+  longTapContainer: {
+    backgroundColor: Colors.modal,
+    paddingBlock: 4,
+    paddingInline: 12,
+    borderRadius: 50,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  longTapText: {
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  longTapIcon: {
+  },
 });
 
 export type MiddleActionVariant = 'big' | 'small';

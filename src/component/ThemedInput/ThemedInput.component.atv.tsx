@@ -1,5 +1,4 @@
 import { useRef } from 'react';
-import { TextInput as NativeTextInput } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import { SpatialNavigationFocusableView } from 'react-tv-space-navigation';
 import Colors from 'Style/Colors';
