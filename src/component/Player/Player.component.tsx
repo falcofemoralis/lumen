@@ -22,7 +22,6 @@ import { observer } from 'mobx-react-lite';
 import React, {
   useEffect, useRef, useState,
 } from 'react';
-import Clock from 'react-live-clock';
 import { Dimensions, ScrollView, View } from 'react-native';
 import {
   Gesture,

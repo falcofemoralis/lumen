@@ -1,8 +1,9 @@
 import ThemedText from 'Component/ThemedText';
-import Clock from 'react-live-clock';
 import { View } from 'react-native';
 import Colors from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
+
+import Clock from './Component';
 
 export const PlayerClockComponent = () => (
   <View
