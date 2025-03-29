@@ -87,5 +87,6 @@
   "Please select a device type": "Выберите тип устройства",
   "Log out": "Выйти",
   "Switch service": "Сменить сайт",
-  "View Profile": "Открыть профиль"
+  "View Profile": "Открыть профиль",
+  "Welcome back, %s!": "Добро пожаловать, %s!"
 }

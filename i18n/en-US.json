@@ -87,5 +87,6 @@
   "Please select a device type": "Please select a device type",
   "Log out": "Log out",
   "Switch service": "Switch service",
-  "View Profile": "View Profile"
+  "View Profile": "View Profile",
+  "Welcome back, %s!": "Welcome back, %s!"
 }

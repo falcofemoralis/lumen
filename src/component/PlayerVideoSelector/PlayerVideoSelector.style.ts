@@ -10,18 +10,10 @@ export const styles = CreateStyles({
     width: '100%',
     maxHeight: 288,
   },
-  voice: {
-    backgroundColor: Colors.gray,
-    margin: 8,
-  },
-  voiceText: {},
-  voiceTextSelected: {
-    color: 'green',
-  },
   seasonsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    gap: 4,
     marginTop: 8,
   },
   season: {
@@ -31,7 +23,7 @@ export const styles = CreateStyles({
     backgroundColor: Colors.primary,
   },
   seasonText: {
-    color: 'white',
+    color: Colors.white,
   },
   seasonTextSelected: {
     color: Colors.lightBlue,
@@ -39,7 +31,7 @@ export const styles = CreateStyles({
   episodesContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    gap: 4,
     marginTop: 8,
     paddingTop: 8,
     borderTopWidth: 2,

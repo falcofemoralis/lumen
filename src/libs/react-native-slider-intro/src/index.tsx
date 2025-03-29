@@ -172,7 +172,7 @@ const Slider = forwardRef<SliderRef, SliderProps>(
             transform: [{ translateX: _moveSlideTranslateX }],
           },
         ] }
-        { ...panResponder.panHandlers }
+        // { ...panResponder.panHandlers }
       >
         { children ? (
           <>{ children }</>

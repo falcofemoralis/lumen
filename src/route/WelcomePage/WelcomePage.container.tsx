@@ -1,12 +1,14 @@
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import * as Application from 'expo-application';
 import t from 'i18n/t';
-import { useState } from 'react';
+import { observer } from 'mobx-react-lite';
+import { useEffect, useState } from 'react';
 import RNRestart from 'react-native-restart';
 import ConfigStore from 'Store/Config.store';
 import NotificationStore from 'Store/Notification.store';
 import ServiceStore from 'Store/Service.store';
 import { FilmInterface } from 'Type/Film.interface';
+import { ProfileInterface } from 'Type/Profile.interface';
 
 import WelcomePageComponent from './WelcomePage.component';
 import { TEST_URL } from './WelcomePage.config';
@@ -23,6 +25,7 @@ export function WelcomePageContainer() {
   );
   const [isProviderValid, setIsProviderValid] = useState<boolean | null>(null);
   const [isCDNValid, setIsCDNValid] = useState<boolean | null>(null);
+  const [profile, setProfile] = useState<ProfileInterface | null>(null);
 
   const slides: SlideInterface[] = [
     {
@@ -61,15 +64,15 @@ export function WelcomePageContainer() {
         pack: IconPackType.MaterialCommunityIcons,
       },
     },
-    // {
-    //   id: SLIDE_TYPE.LOGIN,
-    //   title: t('Sign In to an Account'),
-    //   subtitle: t('Log in to sync your content and enjoy a seamless experience.'),
-    //   icon: {
-    //     name: 'account',
-    //     pack: IconPackType.MaterialCommunityIcons,
-    //   },
-    // },
+    {
+      id: SLIDE_TYPE.LOGIN,
+      title: t('Sign In to an Account'),
+      subtitle: t('Log in to sync your content and enjoy a seamless experience.'),
+      icon: {
+        name: 'account',
+        pack: IconPackType.MaterialCommunityIcons,
+      },
+    },
     {
       id: SLIDE_TYPE.COMPLETE,
       title: t('Setup Complete!'),
@@ -80,6 +83,12 @@ export function WelcomePageContainer() {
       },
     },
   ];
+
+  useEffect(() => {
+    if (!profile && ServiceStore.isSignedIn) {
+      setProfile(ServiceStore.getProfile());
+    }
+  }, [ServiceStore.isSignedIn]);
 
   const reloadApp = () => {
     RNRestart.restart();
@@ -102,6 +111,7 @@ export function WelcomePageContainer() {
       setIsProviderValid(true);
     } catch (error) {
       NotificationStore.displayError(t('Invalid provider'));
+      setIsProviderValid(false);
     } finally {
       setIsLoading(false);
     }
@@ -148,6 +158,7 @@ export function WelcomePageContainer() {
       setIsCDNValid(true);
     } catch (error) {
       NotificationStore.displayError(error as Error);
+      setIsCDNValid(false);
     } finally {
       setIsLoading(false);
     }
@@ -155,6 +166,18 @@ export function WelcomePageContainer() {
 
   const updateCDN = async (value: string) => {
     await ServiceStore.updateCDN(value);
+  };
+
+  const login = async (username: string, password: string) => {
+    setIsLoading(true);
+
+    try {
+      await ServiceStore.login(username, password);
+    } catch (error) {
+      NotificationStore.displayError(t('Invalid credentials'));
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const complete = async () => {
@@ -176,6 +199,9 @@ export function WelcomePageContainer() {
     validateCDN,
     updateCDN,
     complete,
+    setSelectedProvider,
+    setSelectedCDN,
+    login,
   };
 
   const containerProps = () => ({
@@ -186,6 +212,7 @@ export function WelcomePageContainer() {
     isCDNValid,
     selectedProvider,
     selectedCDN,
+    profile,
   });
 
   return (
@@ -196,4 +223,4 @@ export function WelcomePageContainer() {
   );
 }
 
-export default WelcomePageContainer;
+export default observer(WelcomePageContainer);

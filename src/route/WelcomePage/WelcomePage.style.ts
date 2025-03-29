@@ -31,6 +31,11 @@ export const styles = CreateStyles({
     borderRadius: 99,
     padding: 12,
   },
+  customImage: {
+    height: 44,
+    width: 44,
+    padding: 0,
+  },
   title: {
     fontSize: 24,
     fontWeight: '700',
@@ -58,10 +63,19 @@ export const styles = CreateStyles({
   nextButton: {
     flexDirection: 'row',
     backgroundColor: Colors.gray,
-    padding: 8,
+    paddingBlock: 8,
+    paddingInline: 12,
     borderRadius: 16,
   },
+  finishButton: {
+    gap: 8,
+  },
   prevButton: {
+    marginTop: 8,
+    flexDirection: 'row',
+    paddingBlock: 6,
+    paddingInline: 12,
+    borderRadius: 16,
   },
   welcomeSlide: {
   },
@@ -111,14 +125,25 @@ export const styles = CreateStyles({
     padding: 12,
     borderRadius: 16,
   },
+  providerSelectorMobile: {
+    height: 44,
+  },
+  providerSelectorInput: {
+    color: Colors.white,
+  },
   providerValidateButton: {
     flexDirection: 'row',
-    backgroundColor: Colors.gray,
-    padding: 8,
+    gap: 4,
+    paddingBlock: 6,
+    paddingInline: 12,
     borderRadius: 16,
   },
   providerValidateButtonDisabled: {
-    backgroundColor: Colors.darkGray,
+    opacity: 0.5,
+  },
+  cdnWrapper: {
+    marginTop: 16,
+    gap: 12,
   },
   cdnSlide: {
   },
@@ -128,9 +153,32 @@ export const styles = CreateStyles({
     borderRadius: 16,
     textTransform: 'capitalize',
   },
+  cdnSelectorListScroll: {
+    maxHeight: 160,
+    overflow: 'hidden',
+  },
+  cdnSelectorList: {
+    flexDirection: 'column',
+    gap: 8,
+  },
+  cdnSelectorListItem: {
+    backgroundColor: Colors.lightBackground,
+    padding: 12,
+    borderRadius: 16,
+  },
+  cdnSelectorListItemText: {
+    fontSize: 14,
+  },
   completeSlide: {
   },
   TVfocused: {
     backgroundColor: Colors.primary,
+  },
+  loginSlide: {
+  },
+  loginForm: {
+    marginBlock: 16,
+    flexDirection: 'column',
+    gap: 12,
   },
 });

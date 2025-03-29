@@ -1,9 +1,14 @@
 import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
+import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
 import t from 'i18n/t';
 import React, {
-  createRef, forwardRef, useCallback, useEffect, useImperativeHandle, useRef,
+  createRef,
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
   useState,
 } from 'react';
 import {
@@ -11,11 +16,15 @@ import {
   Pressable,
   ScaledSize,
   StyleProp,
+  TextInput,
   TVFocusGuideView,
   View,
   ViewStyle,
 } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import NotificationStore from 'Store/Notification.store';
+import ServiceStore from 'Store/Service.store';
+import Colors from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 
 import SliderIntro, { SliderRef } from '../../libs/react-native-slider-intro/src';
@@ -41,6 +50,9 @@ interface WelcomeSlideProps {
   canNext?: boolean;
   canBack?: boolean;
   canComplete?: boolean;
+  customImage?: string;
+  customTitle?: string;
+  customSubtitle?: string;
   complete?: () => void;
   goBack?: (slide: SlideInterface) => void;
   goNext?: (slide: SlideInterface) => void;
@@ -54,6 +66,9 @@ export const WelcomeSlide = forwardRef<WelcomeSlideRef, WelcomeSlideProps>(
       canNext = true,
       canBack = true,
       canComplete = false,
+      customImage,
+      customTitle,
+      customSubtitle,
       complete,
       goBack,
       goNext,
@@ -109,18 +124,28 @@ export const WelcomeSlide = forwardRef<WelcomeSlideRef, WelcomeSlideProps>(
           ] }
         >
           <View style={ styles.iconContainer }>
-            <ThemedIcon
-              style={ styles.icon }
-              icon={ icon }
-              size={ scale(32) }
-              color="white"
-            />
+            { customImage ? (
+              <ThemedImage
+                src={ customImage }
+                style={ [
+                  styles.icon,
+                  styles.customImage,
+                ] }
+              />
+            ) : (
+              <ThemedIcon
+                style={ styles.icon }
+                icon={ icon }
+                size={ scale(32) }
+                color="white"
+              />
+            ) }
           </View>
           <ThemedText style={ styles.title }>
-            { title }
+            { customTitle ?? title }
           </ThemedText>
           <ThemedText style={ styles.subtitle }>
-            { subtitle }
+            { customSubtitle ?? subtitle }
           </ThemedText>
         </View>
       );
@@ -141,6 +166,14 @@ export const WelcomeSlide = forwardRef<WelcomeSlideRef, WelcomeSlideProps>(
               <ThemedText style={ styles.buttonText }>
                 { t('Next') }
               </ThemedText>
+              <ThemedIcon
+                icon={ {
+                  name: 'navigate-next',
+                  pack: IconPackType.MaterialIcons,
+                } }
+                size={ scale(24) }
+                color="white"
+              />
             </Pressable>
           </View>
         ) }
@@ -150,6 +183,7 @@ export const WelcomeSlide = forwardRef<WelcomeSlideRef, WelcomeSlideProps>(
               ref={ completeButtonRef }
               style={ ({ focused }) => ([
                 styles.nextButton,
+                styles.finishButton,
                 focused && styles.TVfocused,
               ]) }
               onPress={ complete }
@@ -157,6 +191,14 @@ export const WelcomeSlide = forwardRef<WelcomeSlideRef, WelcomeSlideProps>(
               <ThemedText style={ styles.buttonText }>
                 { t('Complete') }
               </ThemedText>
+              <ThemedIcon
+                icon={ {
+                  name: 'done',
+                  pack: IconPackType.MaterialIcons,
+                } }
+                size={ scale(20) }
+                color="white"
+              />
             </Pressable>
           </View>
         ) }
@@ -169,6 +211,14 @@ export const WelcomeSlide = forwardRef<WelcomeSlideRef, WelcomeSlideProps>(
               ]) }
               onPress={ () => goBack?.(slide) }
             >
+              <ThemedIcon
+                icon={ {
+                  name: 'navigate-before',
+                  pack: IconPackType.MaterialIcons,
+                } }
+                size={ scale(24) }
+                color="white"
+              />
               <ThemedText style={ styles.buttonText }>
                 { t('Back') }
               </ThemedText>
@@ -204,14 +254,19 @@ export function WelcomePageComponent({
   isCDNValid,
   selectedProvider,
   selectedCDN,
+  profile,
   handleSelectTV,
   handleSelectMobile,
   validateProvider,
   validateCDN,
   complete,
+  setSelectedProvider,
+  setSelectedCDN,
+  login,
 }: WelcomePageComponentProps) {
   const introSliderRef = useRef<SliderRef>(null);
   const slidesRefs = useRef<{[key: string]: React.RefObject<WelcomeSlideRef>}>({});
+  const isTV = selectedDeviceType === 'TV';
 
   slides.forEach((slide) => {
     slidesRefs.current[slide.id] = createRef();
@@ -252,7 +307,7 @@ export function WelcomePageComponent({
   const renderConfigureSlide = (slide: SlideInterface) => {
     const handleNext = (s: SlideInterface) => {
       if (!selectedDeviceType) {
-        NotificationStore.displayError(t('Please select a device type'));
+        NotificationStore.displayMessage(t('Please select a device type'));
 
         return;
       }
@@ -318,58 +373,269 @@ export function WelcomePageComponent({
     );
   };
 
-  const renderProviderSlide = (slide: SlideInterface) => (
-    <WelcomeSlide
-      ref={ slidesRefs.current[slide.id] }
-      slide={ slide }
-      goBack={ goBack }
-      goNext={ goNext }
-      style={ styles.providerSlide }
-    >
-      <View style={ styles.providerWrapper }>
-        <ThemedText style={ styles.providerSelector }>
-          { selectedProvider ?? '' }
-        </ThemedText>
-        <View style={ styles.providerButtonContainer }>
-          <Pressable
-            style={ ({ focused }) => ([
-              styles.providerValidateButton,
-              focused && styles.TVfocused,
-              isLoading && styles.providerValidateButtonDisabled,
-            ]) }
-            onPress={ validateProvider }
-          >
-            { isProviderValid !== null && (
-              <ThemedIcon
-                icon={ {
-                  name: isProviderValid === true ? 'check-circle' : 'close-circle',
-                  pack: IconPackType.MaterialCommunityIcons,
-                } }
-                size={ scale(24) }
-                color={ isProviderValid === true ? 'green' : 'red' }
-              />
-            ) }
-            <ThemedText style={ styles.providerButtonText }>
-              { t('Validate') }
-            </ThemedText>
-          </Pressable>
-        </View>
-      </View>
-    </WelcomeSlide>
-  );
+  const renderProviderSlide = (slide: SlideInterface) => {
+    const inputRef = useRef<TextInput>(null);
 
-  const renderCDNSlide = (slide: SlideInterface) => (
-    <WelcomeSlide
-      ref={ slidesRefs.current[slide.id] }
-      slide={ slide }
-      goBack={ goBack }
-      goNext={ goNext }
-      style={ styles.cdnSlide }
-    >
-      <View style={ styles.providerWrapper }>
-        <ThemedText style={ styles.cdnSelector }>
-          { selectedCDN ?? '' }
-        </ThemedText>
+    const handleInputPress = () => {
+      inputRef.current?.focus();
+    };
+
+    return (
+      <WelcomeSlide
+        ref={ slidesRefs.current[slide.id] }
+        slide={ slide }
+        goBack={ goBack }
+        goNext={ goNext }
+        style={ styles.providerSlide }
+      >
+        <View style={ styles.providerWrapper }>
+          { isTV ? (
+            <Pressable
+              style={ ({ focused }) => ([
+                styles.providerSelector,
+                focused && styles.TVfocused,
+                isLoading && styles.providerValidateButtonDisabled,
+              ]) }
+              onPress={ handleInputPress }
+            >
+              <TextInput
+                ref={ inputRef }
+                style={ styles.providerSelectorInput }
+                value={ selectedProvider ?? '' }
+                onChangeText={ setSelectedProvider }
+                cursorColor={ Colors.secondary }
+                selectionColor={ Colors.secondary }
+                placeholderTextColor={ Colors.white }
+              />
+            </Pressable>
+          ) : (
+            <TextInput
+              ref={ inputRef }
+              style={ [
+                styles.providerSelector,
+                styles.providerSelectorInput,
+                isLoading && styles.providerValidateButtonDisabled,
+              ] }
+              value={ selectedProvider ?? '' }
+              onChangeText={ setSelectedProvider }
+              cursorColor={ Colors.secondary }
+              selectionColor={ Colors.secondary }
+              placeholderTextColor={ Colors.white }
+            />
+          ) }
+          <View style={ styles.providerButtonContainer }>
+            <Pressable
+              style={ ({ focused }) => ([
+                styles.providerValidateButton,
+                focused && styles.TVfocused,
+                isLoading && styles.providerValidateButtonDisabled,
+              ]) }
+              onPress={ validateProvider }
+            >
+              { isProviderValid !== null && (
+                <ThemedIcon
+                  icon={ {
+                    name: isProviderValid === true ? 'check-circle' : 'close-circle',
+                    pack: IconPackType.MaterialCommunityIcons,
+                  } }
+                  size={ scale(24) }
+                  color={ isProviderValid === true ? 'green' : 'red' }
+                />
+              ) }
+              <ThemedText style={ styles.providerButtonText }>
+                { t('Validate') }
+              </ThemedText>
+            </Pressable>
+          </View>
+        </View>
+      </WelcomeSlide>
+    );
+  };
+
+  const renderCDNSlide = (slide: SlideInterface) => {
+    const inputRef = useRef<View>(null);
+    const [isOpened, setIsOpened] = useState(false);
+    const options = [
+      {
+        value: 'auto',
+        label: t('Automatic'),
+      },
+    ].concat(ServiceStore.getCurrentService().defaultCDNs.map((cdn) => ({
+      value: cdn,
+      label: cdn,
+    })));
+
+    const handleSelectorPress = () => {
+      setIsOpened(!isOpened);
+    };
+
+    const handleItemPress = (value: string) => {
+      setSelectedCDN(value);
+      setIsOpened(false);
+      inputRef.current?.requestTVFocus();
+    };
+
+    return (
+      <WelcomeSlide
+        ref={ slidesRefs.current[slide.id] }
+        slide={ slide }
+        goBack={ goBack }
+        goNext={ goNext }
+        style={ styles.cdnSlide }
+      >
+        <View style={ styles.cdnWrapper }>
+          <Pressable
+            ref={ inputRef }
+            style={ ({ focused }) => ([
+              styles.cdnSelector,
+              focused && styles.TVfocused,
+              isLoading && styles.providerValidateButtonDisabled,
+            ]) }
+            onPress={ handleSelectorPress }
+          >
+            <ThemedText>
+              { options.find((option) => option.value === selectedCDN)?.label ?? '' }
+            </ThemedText>
+          </Pressable>
+          { isOpened && (
+            <ScrollView style={ styles.cdnSelectorListScroll }>
+              <View style={ styles.cdnSelectorList }>
+                { options.map((option) => (
+                  <Pressable
+                    key={ option.value }
+                    style={ ({ focused }) => ([
+                      styles.cdnSelectorListItem,
+                      focused && styles.TVfocused,
+                    ]) }
+                    onPress={ () => handleItemPress(option.value) }
+                  >
+                    <ThemedText style={ styles.cdnSelectorListItemText }>
+                      { option.label }
+                    </ThemedText>
+                  </Pressable>
+                )) }
+              </View>
+            </ScrollView>
+          ) }
+          <View style={ styles.providerButtonContainer }>
+            <Pressable
+              style={ ({ focused }) => ([
+                styles.providerValidateButton,
+                focused && styles.TVfocused,
+                isLoading && styles.providerValidateButtonDisabled,
+              ]) }
+              onPress={ validateCDN }
+            >
+              { isCDNValid !== null && (
+                <ThemedIcon
+                  icon={ {
+                    name: isCDNValid === true ? 'check-circle' : 'close-circle',
+                    pack: IconPackType.MaterialCommunityIcons,
+                  } }
+                  size={ scale(24) }
+                  color={ isCDNValid === true ? 'green' : 'red' }
+                />
+              ) }
+              <ThemedText style={ styles.providerButtonText }>
+                { t('Validate') }
+              </ThemedText>
+            </Pressable>
+          </View>
+        </View>
+      </WelcomeSlide>
+    );
+  };
+
+  const renderLoginSlide = (slide: SlideInterface) => {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const usernameRef = useRef<TextInput>(null);
+    const passwordRef = useRef<TextInput>(null);
+
+    const handleUsernamePress = () => {
+      usernameRef.current?.focus();
+    };
+
+    const handlePasswordPress = () => {
+      passwordRef.current?.focus();
+    };
+
+    const renderLoginForm = () => (
+      <View>
+        <View style={ styles.loginForm }>
+          { isTV ? (
+            <Pressable
+              style={ ({ focused }) => ([
+                styles.providerSelector,
+                focused && styles.TVfocused,
+                isLoading && styles.providerValidateButtonDisabled,
+              ]) }
+              onPress={ handleUsernamePress }
+            >
+              <TextInput
+                ref={ usernameRef }
+                style={ styles.providerSelectorInput }
+                value={ username ?? '' }
+                placeholder={ t('Login or email') }
+                onChangeText={ setUsername }
+                cursorColor={ Colors.secondary }
+                selectionColor={ Colors.secondary }
+                placeholderTextColor={ Colors.white }
+              />
+            </Pressable>
+          ) : (
+            <TextInput
+              ref={ usernameRef }
+              style={ [
+                styles.providerSelector,
+                styles.providerSelectorInput,
+                isLoading && styles.providerValidateButtonDisabled,
+              ] }
+              value={ username ?? '' }
+              placeholder={ t('Login or email') }
+              onChangeText={ setUsername }
+              cursorColor={ Colors.secondary }
+              selectionColor={ Colors.secondary }
+              placeholderTextColor={ Colors.white }
+            />
+          ) }
+          { isTV ? (
+            <Pressable
+              style={ ({ focused }) => ([
+                styles.providerSelector,
+                focused && styles.TVfocused,
+                isLoading && styles.providerValidateButtonDisabled,
+              ]) }
+              onPress={ handlePasswordPress }
+            >
+              <TextInput
+                ref={ passwordRef }
+                style={ styles.providerSelectorInput }
+                value={ password ?? '' }
+                placeholder={ t('Password') }
+                onChangeText={ setPassword }
+                cursorColor={ Colors.secondary }
+                selectionColor={ Colors.secondary }
+                placeholderTextColor={ Colors.white }
+              />
+            </Pressable>
+          ) : (
+            <TextInput
+              ref={ passwordRef }
+              style={ [
+                styles.providerSelector,
+                styles.providerSelectorInput,
+                isLoading && styles.providerValidateButtonDisabled,
+              ] }
+              value={ password ?? '' }
+              placeholder={ t('Password') }
+              onChangeText={ setPassword }
+              cursorColor={ Colors.secondary }
+              selectionColor={ Colors.secondary }
+              placeholderTextColor={ Colors.white }
+            />
+          ) }
+        </View>
         <View style={ styles.providerButtonContainer }>
           <Pressable
             style={ ({ focused }) => ([
@@ -377,26 +643,39 @@ export function WelcomePageComponent({
               focused && styles.TVfocused,
               isLoading && styles.providerValidateButtonDisabled,
             ]) }
-            onPress={ validateCDN }
+            onPress={ () => login(username, password) }
           >
-            { isCDNValid !== null && (
-              <ThemedIcon
-                icon={ {
-                  name: isCDNValid === true ? 'check-circle' : 'close-circle',
-                  pack: IconPackType.MaterialCommunityIcons,
-                } }
-                size={ scale(24) }
-                color={ isCDNValid === true ? 'green' : 'red' }
-              />
-            ) }
             <ThemedText style={ styles.providerButtonText }>
-              { t('Validate') }
+              { t('Sign in') }
             </ThemedText>
           </Pressable>
         </View>
       </View>
-    </WelcomeSlide>
-  );
+    );
+
+    const renderContent = () => {
+      if (profile) {
+        return null;
+      }
+
+      return renderLoginForm();
+    };
+
+    return (
+      <WelcomeSlide
+        ref={ slidesRefs.current[slide.id] }
+        slide={ slide }
+        goBack={ goBack }
+        goNext={ goNext }
+        style={ styles.loginSlide }
+        customImage={ profile?.avatar }
+        customTitle={ profile ? t('Welcome back, %s!', profile.name) : undefined }
+        customSubtitle={ profile?.email }
+      >
+        { renderContent() }
+      </WelcomeSlide>
+    );
+  };
 
   const renderCompleteSlide = (slide: SlideInterface) => (
     <WelcomeSlide
@@ -416,6 +695,7 @@ export function WelcomePageComponent({
     CONFIGURE: renderConfigureSlide(slide),
     PROVIDER: renderProviderSlide(slide),
     CDN: renderCDNSlide(slide),
+    LOGIN: renderLoginSlide(slide),
     COMPLETE: renderCompleteSlide(slide),
   });
 

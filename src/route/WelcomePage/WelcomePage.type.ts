@@ -1,4 +1,5 @@
 import { IconInterface } from 'Component/ThemedIcon/ThemedIcon.type';
+import { ProfileInterface } from 'Type/Profile.interface';
 
 export interface WelcomePageComponentProps {
   slides: SlideInterface[];
@@ -8,6 +9,7 @@ export interface WelcomePageComponentProps {
   isCDNValid: boolean | null;
   selectedProvider: string | null;
   selectedCDN: string | null;
+  profile: ProfileInterface | null;
   handleSelectTV: () => void;
   handleSelectMobile: () => void;
   validateProvider: () => void;
@@ -15,6 +17,9 @@ export interface WelcomePageComponentProps {
   validateCDN: () => void;
   updateCDN: (value: string) => void;
   complete: () => void;
+  setSelectedProvider: (value: string) => void;
+  setSelectedCDN: (value: string) => void;
+  login: (username: string, password: string) => void;
 }
 
 export enum SLIDE_TYPE {
@@ -22,7 +27,7 @@ export enum SLIDE_TYPE {
   CONFIGURE = 'CONFIGURE',
   PROVIDER = 'PROVIDER',
   CDN = 'CDN',
-  // LOGIN = 'LOGIN',
+  LOGIN = 'LOGIN',
   COMPLETE = 'COMPLETE',
 }
 
