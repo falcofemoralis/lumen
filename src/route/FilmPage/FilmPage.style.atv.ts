@@ -103,6 +103,9 @@ export const styles = CreateStyles({
     flexDirection: 'row',
     marginTop: 8,
   },
+  readMoreButtonHidden: {
+    opacity: 0,
+  },
   section: {
     marginTop: 16,
     padding: 16,

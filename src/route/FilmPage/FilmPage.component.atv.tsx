@@ -12,6 +12,7 @@ import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
 import t from 'i18n/t';
+import { useState } from 'react';
 import { Dimensions, View } from 'react-native';
 import {
   DefaultFocus,
@@ -48,10 +49,17 @@ export function FilmPageComponent({
   handleSelectCategory,
 }: FilmPageComponentProps) {
   const { height } = Dimensions.get('window');
+  const [showReadMore, setShowReadMore] = useState<boolean | null>(null);
 
   if (!film) {
     return <FilmPageThumbnail />;
   }
+
+  const shouldShowReadMore = (content: number) => {
+    const percent = ((content - scale(40)) / height) * 100;
+
+    setShowReadMore(percent > 45);
+  };
 
   const renderAction = (text: string, icon: string, onPress?: () => void) => (
     <SpatialNavigationFocusableView>
@@ -236,15 +244,22 @@ export function FilmPageComponent({
     const { description } = film;
 
     return (
-      <View>
+      <View onLayout={ (event) => shouldShowReadMore(event.nativeEvent.layout.height) }>
         <ThemedText style={ styles.description }>
           { description }
         </ThemedText>
-        <View style={ styles.readMoreButton }>
-          <ThemedButton>
-            { t('Read more') }
-          </ThemedButton>
-        </View>
+        { showReadMore !== false && (
+          <View
+            style={ [
+              styles.readMoreButton,
+              !showReadMore && styles.readMoreButtonHidden,
+            ] }
+          >
+            <ThemedButton>
+              { t('Read more') }
+            </ThemedButton>
+          </View>
+        ) }
       </View>
     );
   };
