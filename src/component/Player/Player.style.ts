@@ -69,7 +69,7 @@ export const styles = CreateStyles({
     marginBottom: 16,
   },
   progressBarRow: {
-    marginBottom: 32,
+    marginBottom: 16,
   },
   progressBarRowLocked: {
     pointerEvents: 'none',
@@ -82,6 +82,10 @@ export const styles = CreateStyles({
   actionsRow: {
     flexDirection: 'row',
     gap: 32,
+  },
+  bottomActionsRowLine: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   bottomActionsRow: {
     justifyContent: 'flex-end',

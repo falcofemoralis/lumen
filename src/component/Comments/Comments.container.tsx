@@ -15,7 +15,7 @@ export type CommentsRef = {
 };
 
 export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>(
-  ({ film, style }, ref) => {
+  ({ film, loaderFullScreen, style }, ref) => {
     const { id } = film;
     const [comments, setComments] = useState<CommentInterface[] | null>(null);
     const paginationRef = useRef({
@@ -90,6 +90,7 @@ export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>
       comments,
       style,
       isLoading,
+      loaderFullScreen,
     });
 
     return withTV(CommentsComponentTV, CommentsComponent, {

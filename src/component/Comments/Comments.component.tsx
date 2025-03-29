@@ -9,7 +9,6 @@ import t from 'i18n/t';
 import { memo, useCallback } from 'react';
 import { View } from 'react-native';
 import Colors from 'Style/Colors';
-import { calculateItemWidth } from 'Style/Layout';
 import { CommentInterface } from 'Type/Comment.interface';
 import { scale } from 'Util/CreateStyles';
 
@@ -90,6 +89,7 @@ const MemoCommentItem = memo(CommentItem, rowPropsAreEqual);
 export const CommentsComponent = ({
   comments,
   isLoading,
+  loaderFullScreen,
   onNextLoad,
 }: CommentsComponentProps) => {
   const renderItem = useCallback(
@@ -107,6 +107,7 @@ export const CommentsComponent = ({
       <View style={ styles.loader }>
         <Loader
           isLoading
+          fullScreen={ loaderFullScreen }
         />
       </View>
     );

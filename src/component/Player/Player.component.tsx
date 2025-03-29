@@ -1,6 +1,7 @@
 import BookmarksSelector from 'Component/BookmarksSelector';
 import Comments from 'Component/Comments';
 import Loader from 'Component/Loader';
+import PlayerClock from 'Component/PlayerClock';
 import PlayerDuration from 'Component/PlayerDuration';
 import PlayerProgressBar from 'Component/PlayerProgressBar';
 import PlayerSubtitles from 'Component/PlayerSubtitles';
@@ -21,6 +22,7 @@ import { observer } from 'mobx-react-lite';
 import React, {
   useEffect, useRef, useState,
 } from 'react';
+import Clock from 'react-live-clock';
 import { Dimensions, ScrollView, View } from 'react-native';
 import {
   Gesture,
@@ -170,7 +172,7 @@ export function PlayerComponent({
       clearTimeout(doubleTapTimeout.current);
     }
 
-    setTimeoutSafe(() => {
+    doubleTapTimeout.current = setTimeoutSafe(() => {
       setDoubleTapAction(null);
     }, DOUBLE_TAP_ANIMATION);
   };
@@ -400,17 +402,20 @@ export function PlayerComponent({
         <View style={ [styles.progressBarRow, isLocked && styles.progressBarRowLocked] }>
           { renderProgressBar() }
         </View>
-        <View
-          style={ [
-            styles.actionsRow,
-            styles.bottomActionsRow,
-            isLocked && styles.bottomActionsRowLocked,
-          ] }
-        >
-          { isPlaylistSelector && renderAction('playlist-play', 'Series', openVideoSelector) }
-          { renderAction('comment-text-outline', 'Comments', openCommentsOverlay) }
-          { renderAction('bookmark-outline', 'Bookmarks', openBookmarksOverlay) }
-          { renderAction('share-outline', 'Share', handleShare) }
+        <View style={ styles.bottomActionsRowLine }>
+          <PlayerClock />
+          <View
+            style={ [
+              styles.actionsRow,
+              styles.bottomActionsRow,
+              isLocked && styles.bottomActionsRowLocked,
+            ] }
+          >
+            { isPlaylistSelector && renderAction('playlist-play', 'Series', openVideoSelector) }
+            { renderAction('comment-text-outline', 'Comments', openCommentsOverlay) }
+            { renderAction('bookmark-outline', 'Bookmarks', openBookmarksOverlay) }
+            { renderAction('share-outline', 'Share', handleShare) }
+          </View>
         </View>
       </View>
     );
@@ -580,6 +585,7 @@ export function PlayerComponent({
         <Comments
           style={ styles.commentsOverlayList }
           film={ film }
+          loaderFullScreen
         />
       </ScrollView>
     </ThemedOverlay>

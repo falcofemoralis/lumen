@@ -1,6 +1,7 @@
 import BookmarksSelector from 'Component/BookmarksSelector';
 import Comments from 'Component/Comments';
 import Loader from 'Component/Loader';
+import PlayerClock from 'Component/PlayerClock';
 import PlayerDuration from 'Component/PlayerDuration';
 import PlayerProgressBar from 'Component/PlayerProgressBar';
 import PlayerSubtitles from 'Component/PlayerSubtitles';
@@ -318,26 +319,29 @@ export function PlayerComponent({
     <SpatialNavigationView
       direction="horizontal"
       style={ {
-        ...styles.controlsRow,
+        ...styles.controlsRowLine,
         ...(hideActions ? styles.controlsRowHidden : {}),
       } }
     >
-      { renderTopAction(
-        isPlaying || isLoading ? 'pause' : 'play-arrow',
-        'Play',
-        togglePlayPause,
-        topActionRef,
-      ) }
-      { renderTopAction('fast-rewind', 'Rewind', () => rewindPosition(RewindDirection.BACKWARD)) }
-      { renderTopAction('fast-forward', 'Forward', () => rewindPosition(RewindDirection.FORWARD)) }
-      { film.hasSeasons && (
-        <>
-          { renderTopAction('skip-previous', 'Previous', () => handleNewEpisode(RewindDirection.BACKWARD)) }
-          { renderTopAction('skip-next', 'Next', () => handleNewEpisode(RewindDirection.FORWARD)) }
-        </>
-      ) }
-      { renderTopAction('speed', 'Speed', openSpeedSelector) }
-      { renderTopAction('comment', 'Comments', openCommentsOverlay) }
+      <View style={ styles.controlsRow }>
+        { renderTopAction(
+          isPlaying || isLoading ? 'pause' : 'play-arrow',
+          'Play',
+          togglePlayPause,
+          topActionRef,
+        ) }
+        { renderTopAction('fast-rewind', 'Rewind', () => rewindPosition(RewindDirection.BACKWARD)) }
+        { renderTopAction('fast-forward', 'Forward', () => rewindPosition(RewindDirection.FORWARD)) }
+        { film.hasSeasons && (
+          <>
+            { renderTopAction('skip-previous', 'Previous', () => handleNewEpisode(RewindDirection.BACKWARD)) }
+            { renderTopAction('skip-next', 'Next', () => handleNewEpisode(RewindDirection.FORWARD)) }
+          </>
+        ) }
+        { renderTopAction('speed', 'Speed', openSpeedSelector) }
+        { renderTopAction('comment', 'Comments', openCommentsOverlay) }
+      </View>
+      <PlayerClock />
     </SpatialNavigationView>
   );
 

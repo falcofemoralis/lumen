@@ -4,6 +4,7 @@ import { FilmInterface } from 'Type/Film.interface';
 
 export interface CommentsContainerProps {
   film: FilmInterface;
+  loaderFullScreen?: boolean;
   style?: StyleProp<ViewStyle> | undefined;
 }
 
@@ -12,6 +13,7 @@ export interface CommentsComponentProps {
   onNextLoad: () => Promise<void>;
   style?: StyleProp<ViewStyle> | undefined;
   isLoading: boolean;
+  loaderFullScreen?: boolean;
 }
 
 export interface CommentItemProps {

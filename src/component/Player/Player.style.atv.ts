@@ -43,6 +43,10 @@ export const styles = CreateStyles({
     gap: 14,
     opacity: 1,
   },
+  controlsRowLine: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
   controlsRowHidden: {
     opacity: 0,
   },
