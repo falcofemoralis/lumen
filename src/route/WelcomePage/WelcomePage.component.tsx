@@ -55,6 +55,7 @@ interface WelcomeSlideProps {
   complete?: () => void;
   goBack?: (slide: SlideInterface) => void;
   goNext?: (slide: SlideInterface) => void;
+  onNext?: () => void;
 }
 export const WelcomeSlide = forwardRef<WelcomeSlideRef, WelcomeSlideProps>(
   (
@@ -71,6 +72,7 @@ export const WelcomeSlide = forwardRef<WelcomeSlideRef, WelcomeSlideProps>(
       complete,
       goBack,
       goNext,
+      onNext,
     },
     ref,
   ) => {
@@ -173,7 +175,10 @@ export const WelcomeSlide = forwardRef<WelcomeSlideRef, WelcomeSlideProps>(
               isLandscape && styles.nextButtonLandscape,
               focused && styles.TVfocused,
             ]) }
-            onPress={ canComplete ? complete : () => goNext?.(slide) }
+            onPress={ canComplete ? complete : () => {
+              goNext?.(slide);
+              onNext?.();
+            } }
           >
             <ThemedText style={ styles.buttonText }>
               { canComplete ? t('Complete') : t('Next') }
@@ -218,6 +223,8 @@ export function WelcomePageComponent({
   setSelectedProvider,
   setSelectedCDN,
   login,
+  updateProvider,
+  updateCDN,
 }: WelcomePageComponentProps) {
   const introSliderRef = useRef<SliderRef>(null);
   const slidesRefs = useRef<{[key: string]: React.RefObject<WelcomeSlideRef>}>({});
@@ -420,11 +427,16 @@ export function WelcomePageComponent({
       label: cdn,
     })));
 
+    const handleUpdateProvider = () => {
+      updateProvider(selectedProvider ?? '');
+    };
+
     const handleSelectorPress = () => {
       setIsOpened(!isOpened);
     };
 
     const handleItemPress = (value: string) => {
+      updateCDN(value);
       setSelectedCDN(value);
       setIsOpened(false);
       inputRef.current?.requestTVFocus();
@@ -437,6 +449,7 @@ export function WelcomePageComponent({
         goBack={ goBack }
         goNext={ goNext }
         style={ styles.cdnSlide }
+        onNext={ () => handleUpdateProvider() }
       >
         <View style={ styles.cdnWrapper }>
           <Pressable
@@ -446,7 +459,7 @@ export function WelcomePageComponent({
               focused && styles.TVfocused,
               isLoading && styles.providerValidateButtonDisabled,
             ]) }
-            onPress={ handleSelectorPress }
+            onPress={ () => handleSelectorPress() }
           >
             <ThemedText>
               { options.find((option) => option.value === selectedCDN)?.label ?? '' }
@@ -506,6 +519,7 @@ export function WelcomePageComponent({
     const [password, setPassword] = useState('');
     const usernameRef = useRef<TextInput>(null);
     const passwordRef = useRef<TextInput>(null);
+    const loginRef = useRef<View>(null);
 
     const handleUsernamePress = () => {
       usernameRef.current?.focus();
@@ -536,6 +550,7 @@ export function WelcomePageComponent({
                 cursorColor={ Colors.secondary }
                 selectionColor={ Colors.secondary }
                 placeholderTextColor={ Colors.white }
+                onEndEditing={ () => handlePasswordPress() }
               />
             </Pressable>
           ) : (
@@ -572,6 +587,7 @@ export function WelcomePageComponent({
                 cursorColor={ Colors.secondary }
                 selectionColor={ Colors.secondary }
                 placeholderTextColor={ Colors.white }
+                onEndEditing={ () => loginRef.current?.requestTVFocus() }
               />
             </Pressable>
           ) : (
@@ -593,6 +609,7 @@ export function WelcomePageComponent({
         </View>
         <View style={ styles.providerButtonContainer }>
           <Pressable
+            ref={ loginRef }
             style={ ({ focused }) => ([
               styles.providerValidateButton,
               focused && styles.TVfocused,

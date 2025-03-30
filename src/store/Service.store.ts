@@ -112,9 +112,14 @@ class ServiceStore {
     await requestValidator(value, this.getCurrentService().getHeaders());
   }
 
-  async updateProvider(value: string) {
-    await this.validateUrl(value);
+  async updateProvider(value: string, skipValidation = false) {
+    if (!skipValidation) {
+      await this.validateUrl(value);
+    }
+
     this.getCurrentService().setProvider(value);
+
+    // Reset cookies
     (new CookiesManager()).reset();
 
     if (this.isSignedIn) {
@@ -130,8 +135,8 @@ class ServiceStore {
     }
   }
 
-  async updateCDN(value: string) {
-    if (value !== 'auto') {
+  async updateCDN(value: string, skipValidation = false) {
+    if (value !== 'auto' && !skipValidation) {
       await this.validateUrl(value);
     }
 

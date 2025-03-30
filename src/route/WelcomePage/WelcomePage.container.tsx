@@ -118,7 +118,7 @@ export function WelcomePageContainer() {
   };
 
   const updateProvider = async (value: string) => {
-    await ServiceStore.updateProvider(value);
+    await ServiceStore.updateProvider(value, true);
   };
 
   const validateCDN = async () => {
@@ -150,7 +150,7 @@ export function WelcomePageContainer() {
       return;
     }
 
-    const { url } = voices[0].video.streams[0];
+    const { url } = ServiceStore.getCurrentService().modifyCDN(voices[0].video.streams)[0];
 
     try {
       await ServiceStore.validateUrl((new URL(url)).origin);
@@ -165,7 +165,7 @@ export function WelcomePageContainer() {
   };
 
   const updateCDN = async (value: string) => {
-    await ServiceStore.updateCDN(value);
+    await ServiceStore.updateCDN(value, true);
   };
 
   const login = async (username: string, password: string) => {
