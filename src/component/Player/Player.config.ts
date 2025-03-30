@@ -27,6 +27,7 @@ export interface AutoRewindParams {
   count: number;
   statusBefore?: boolean;
   seconds: number;
+  wasStarted?: boolean; // to prevent first delay
 }
 
 export const AWAKE_TAG = 'player';
@@ -35,7 +36,7 @@ export const DEFAULT_REWIND_SECONDS = 10;
 export const REWIND_SECONDS_TV = 30;
 
 export const DEFAULT_AUTO_REWIND_SECONDS = 30; // rewind seconds
-export const DEFAULT_AUTO_REWIND_MS = 50; // how many ms to wait
+export const DEFAULT_AUTO_REWIND_MS = 35; // how many ms to wait
 
 // vvv After test on real device, such approach not working, settings are not used
 export const DEFAULT_AUTO_REWIND_FACTOR = 40; // how many times wait (DEFAULT_AUTO_REWIND_MS) and rewind

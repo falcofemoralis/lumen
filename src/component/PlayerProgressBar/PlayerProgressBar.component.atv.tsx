@@ -96,8 +96,12 @@ export const PlayerProgressBarComponent = ({
       //   // autoRewindParams.seconds += DEFAULT_AUTO_REWIND_SECONDS;
       // }
 
-      // eslint-disable-next-line no-await-in-loop
-      await wait(autoRewindParams.ms);
+      if (autoRewindParams.wasStarted) {
+        // eslint-disable-next-line no-await-in-loop
+        await wait(autoRewindParams.ms);
+      } else {
+        autoRewindParams.wasStarted = true;
+      }
 
       if (!autoRewindParams.active) {
         return;
