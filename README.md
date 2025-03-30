@@ -1,6 +1,27 @@
 # Lumen app
 
-Modern application to view films on TV and Mobile
+Modern application to view films on TV and Mobile. This is a continuation of [HDrezka App](https://github.com/falcofemoralis/HDrezka-app), but with reworked functionality on modern tech stack!
+
+## Features
+
+- ⭐️ Full support for TV!
+- ⭐️ Custom developed player!
+- Comments
+- Account authorization
+- Comfortable films list
+- Voice search
+And more!
+
+## Roadmap
+
+- Implement download manager
+- Include played time in series selector
+- Support back button for TV
+- Skip intro\opening feature
+- Add ability to remove search history items
+- Add ability to create a comment
+- Support for film trailer in the app
+- Rework design\animations
 
 ## Screenshots
 
