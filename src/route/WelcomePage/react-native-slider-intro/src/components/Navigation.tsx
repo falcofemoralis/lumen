@@ -37,7 +37,7 @@ const Navigation = () => {
       style={ [
         styles.wrapper,
         {
-          bottom: navigationBarBottom,
+          top: navigationBarBottom,
           height: navigationBarHeight,
           maxHeight: navigationBarHeight,
         },

@@ -6,7 +6,7 @@ const { height } = Dimensions.get('window');
 
 export const styles = CreateStyles({
   container: {
-    paddingTop: 10,
+    paddingTop: 8,
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'space-around',
@@ -47,34 +47,42 @@ export const styles = CreateStyles({
     textAlign: 'center',
   },
   navigation: {
-    flexDirection: 'column',
+    position: 'absolute',
+    bottom: 8,
+    width: '80%',
     justifyContent: 'center',
-    alignContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+    flexDirection: 'row',
     marginTop: 16,
     gap: 8,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    zIndex: 10,
   },
   buttonText: {
     fontSize: 16,
+    textAlign: 'center',
   },
   nextButton: {
     flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: Colors.gray,
-    paddingBlock: 8,
-    paddingInline: 12,
+    paddingBlock: 10,
+    paddingInline: 10,
     borderRadius: 16,
+    flex: 1,
   },
-  finishButton: {
-    gap: 8,
+  nextButtonLandscape: {
+    maxWidth: '50%',
+  },
+  prevButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   prevButton: {
-    marginTop: 8,
     flexDirection: 'row',
-    paddingBlock: 6,
-    paddingInline: 12,
+    paddingBlock: 10,
+    paddingInline: 10,
     borderRadius: 16,
   },
   welcomeSlide: {

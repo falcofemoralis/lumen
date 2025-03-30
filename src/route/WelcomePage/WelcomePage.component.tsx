@@ -16,18 +16,17 @@ import {
   Pressable,
   ScaledSize,
   StyleProp,
-  TextInput,
   TVFocusGuideView,
   View,
   ViewStyle,
 } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
+import { ScrollView, TextInput } from 'react-native-gesture-handler';
 import NotificationStore from 'Store/Notification.store';
 import ServiceStore from 'Store/Service.store';
 import Colors from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 
-import SliderIntro, { SliderRef } from '../../libs/react-native-slider-intro/src';
+import SliderIntro, { SliderRef } from './react-native-slider-intro/src';
 import { styles } from './WelcomePage.style';
 import {
   SlideInterface,
@@ -76,7 +75,6 @@ export const WelcomeSlide = forwardRef<WelcomeSlideRef, WelcomeSlideProps>(
     ref,
   ) => {
     const [isLandscape, setIsLandscape] = useState(false);
-    const completeButtonRef = useRef<View>(null);
     const nextButtonRef = useRef<View>(null);
 
     const updateOrientation = (args?: { window: ScaledSize }) => {
@@ -99,12 +97,6 @@ export const WelcomeSlide = forwardRef<WelcomeSlideRef, WelcomeSlideProps>(
 
     useImperativeHandle(ref, () => ({
       focus: () => {
-        if (canComplete) {
-          completeButtonRef.current?.requestTVFocus();
-
-          return;
-        }
-
         nextButtonRef.current?.requestTVFocus();
       },
     }));
@@ -153,57 +145,8 @@ export const WelcomeSlide = forwardRef<WelcomeSlideRef, WelcomeSlideProps>(
 
     const renderBaseNavigation = () => (
       <View style={ styles.navigation }>
-        { canNext && (
-          <View style={ styles.buttonContainer }>
-            <Pressable
-              ref={ nextButtonRef }
-              style={ ({ focused }) => ([
-                styles.nextButton,
-                focused && styles.TVfocused,
-              ]) }
-              onPress={ () => goNext?.(slide) }
-            >
-              <ThemedText style={ styles.buttonText }>
-                { t('Next') }
-              </ThemedText>
-              <ThemedIcon
-                icon={ {
-                  name: 'navigate-next',
-                  pack: IconPackType.MaterialIcons,
-                } }
-                size={ scale(24) }
-                color="white"
-              />
-            </Pressable>
-          </View>
-        ) }
-        { canComplete && (
-          <View style={ styles.buttonContainer }>
-            <Pressable
-              ref={ completeButtonRef }
-              style={ ({ focused }) => ([
-                styles.nextButton,
-                styles.finishButton,
-                focused && styles.TVfocused,
-              ]) }
-              onPress={ complete }
-            >
-              <ThemedText style={ styles.buttonText }>
-                { t('Complete') }
-              </ThemedText>
-              <ThemedIcon
-                icon={ {
-                  name: 'done',
-                  pack: IconPackType.MaterialIcons,
-                } }
-                size={ scale(20) }
-                color="white"
-              />
-            </Pressable>
-          </View>
-        ) }
         { canBack && (
-          <View style={ styles.buttonContainer }>
+          <View style={ styles.prevButtonContainer }>
             <Pressable
               style={ ({ focused }) => ([
                 styles.prevButton,
@@ -219,11 +162,23 @@ export const WelcomeSlide = forwardRef<WelcomeSlideRef, WelcomeSlideProps>(
                 size={ scale(24) }
                 color="white"
               />
-              <ThemedText style={ styles.buttonText }>
-                { t('Back') }
-              </ThemedText>
             </Pressable>
           </View>
+        ) }
+        { (canNext || canComplete) && (
+          <Pressable
+            ref={ nextButtonRef }
+            style={ ({ focused }) => ([
+              styles.nextButton,
+              isLandscape && styles.nextButtonLandscape,
+              focused && styles.TVfocused,
+            ]) }
+            onPress={ canComplete ? complete : () => goNext?.(slide) }
+          >
+            <ThemedText style={ styles.buttonText }>
+              { canComplete ? t('Complete') : t('Next') }
+            </ThemedText>
+          </Pressable>
         ) }
       </View>
     );
@@ -238,9 +193,9 @@ export const WelcomeSlide = forwardRef<WelcomeSlideRef, WelcomeSlideProps>(
           <View style={ style }>
             { renderBaseSlide() }
             { children }
-            { renderBaseNavigation() }
           </View>
         </View>
+        { renderBaseNavigation() }
       </TVFocusGuideView>
     );
   },
@@ -721,9 +676,8 @@ export function WelcomePageComponent({
   return (
     <SliderIntro
       ref={ introSliderRef }
-      navContainerMaxSizePercent={ 0.25 }
       numberOfSlides={ slides.length }
-      dotWidth={ 15 }
+      dotWidth={ scale(12) }
       showLeftButton={ false }
     >
       { renderSlides() }
