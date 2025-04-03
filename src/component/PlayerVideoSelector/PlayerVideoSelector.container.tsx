@@ -180,6 +180,7 @@ export function PlayerVideoSelectorContainer({
     selectedEpisodeId,
     seasons: getSeasons(),
     episodes: getEpisodes(),
+    film,
   });
 
   const containerFunctions = {

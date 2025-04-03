@@ -8,6 +8,7 @@ import { FranchiseItem } from './FranchiseItem.interface';
 import { InfoListInterface } from './InfoList.interface';
 import { RatingInterface } from './Rating.interface';
 import { ScheduleInterface } from './Schedule.interface';
+import { VoiceRatingInterface } from './VoiceRating.interface';
 
 export interface FilmInterface {
   // base data
@@ -41,6 +42,7 @@ export interface FilmInterface {
   bookmarks?: BookmarkInterface[];
   includedIn?: InfoListInterface[];
   fromCollections?: InfoListInterface[];
+  voiceRating?: VoiceRatingInterface[];
 
   // player data
   voices: FilmVoiceInterface[];

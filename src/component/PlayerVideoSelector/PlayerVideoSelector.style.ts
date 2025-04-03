@@ -9,6 +9,8 @@ export const styles = CreateStyles({
   voicesContainer: {
     width: '100%',
     maxHeight: 288,
+    flexDirection: 'row',
+    gap: 4,
   },
   seasonsContainer: {
     flexDirection: 'row',
@@ -53,5 +55,65 @@ export const styles = CreateStyles({
   },
   playBtn: {
     margin: 8,
+  },
+  voiceDropdownInput: {
+    flex: 1,
+  },
+  voiceRatingInputContainer: {
+    borderRadius: 50,
+  },
+  voiceDropdownInputIcon: {
+    flex: 1,
+  },
+  voiceDropdownInputIconSeason: {
+    padding: 8,
+  },
+  voiceRatingSheetContainer: {
+    backgroundColor: Colors.lightBackground,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+  },
+  voiceRatingSheetIcon: {
+    width: 80,
+  },
+  voiceRatingContainer: {},
+  voiceRatingItemContainer: {
+    flexDirection: 'row',
+    padding: 16,
+  },
+  voiceRatingInfo: {
+    flexDirection: 'column',
+  },
+  voiceRatingTextContainer: {
+    flexDirection: 'column',
+  },
+  voiceRatingText: {
+    fontSize: 16,
+  },
+  voiceRatingBarContainer: {
+  },
+  voiceRatingBar: {
+    height: 10,
+    width: '100%',
+    backgroundColor: Colors.darkGray,
+    borderRadius: 16,
+    marginTop: 8,
+  },
+  voiceRatingBarActive: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    backgroundColor: Colors.secondary,
+    borderTopRightRadius: 0,
+    borderBottomRightRadius: 0,
+  },
+  voiceRatingPercentContainer: {
+    width: 60,
+    justifyContent: 'flex-end',
+    textAlign: 'center',
+  },
+  voiceRatingPercent: {
+    fontSize: 16,
+    textAlign: 'right',
   },
 });

@@ -43,6 +43,7 @@ export const styles = CreateStyles({
     height: '100%',
   },
   listHeader: {
+    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 8,
