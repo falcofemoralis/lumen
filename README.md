@@ -1,60 +1,45 @@
-# Expo Router TV demo 👋
+# Lumen app
 
-![Apple TV screen shot](https://github.com/douglowder/examples/assets/6577821/a881466f-a7a0-4c66-b1fc-33235c466997)
-![Android TV screen shot](https://github.com/douglowder/examples/assets/6577821/815c8e01-8275-4cc1-bd57-b9c8bce1fb02)
+Modern application to view films on TV and Mobile. This is a continuation of [HDrezka App](https://github.com/falcofemoralis/HDrezka-app), but with reworked functionality on modern tech stack!
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+## Features
 
-This project uses
+- ⭐️ Full support for TV!
+- ⭐️ Custom developed player!
+- Comments
+- Account authorization
+- Comfortable films list
+- Voice search
+And more!
 
-- the [React Native TV fork](https://github.com/react-native-tvos/react-native-tvos), which supports both phone (Android and iOS) and TV (Android TV and Apple TV) targets
-- the [React Native TV config plugin](https://github.com/react-native-tvos/config-tv/tree/main/packages/config-tv) to allow Expo prebuild to modify the project's native files for TV builds
+## Roadmap
 
-## 🚀 How to use
+- Implement download manager
+- Include played time in series selector
+- Support back button for TV
+- Skip intro\opening feature
+- Add ability to remove search history items
+- Add ability to create a comment
+- Support for film trailer in the app
+- Rework design\animations
 
-- `cd` into the project
+## Screenshots
 
-```sh
-yarn
-yarn prebuild # Executes Expo prebuild with TV modifications
-yarn ios # Build and run for Apple TV
-yarn android # Build for Android TV
-```
+|Mobile|TV|
+|:-------------------------:|:-------------------------:|
+|<img src="https://github.com/user-attachments/assets/2db81415-7acf-43c0-bc99-39654a0c0f8b" width="50%" />|<img src="https://github.com/user-attachments/assets/ec7b5226-3ffb-4005-887c-0dbb5ca2e7be" width="100%" />
+|<img src="https://github.com/user-attachments/assets/3b0e4216-43d9-4a8d-9cbb-06642193e16c" width="50%" />|<img src="https://github.com/user-attachments/assets/7b42c53b-b6c1-42e5-a87d-2a2693e0db38" width="100%" />
+|<img src="https://github.com/user-attachments/assets/1597f54e-cf64-4af9-a00b-e21af89d14ac" width="50%" />|<img src="https://github.com/user-attachments/assets/cc9f0ac5-81b1-41bc-b0de-e44cc8ba1513" width="100%" />
+|<img src="https://github.com/user-attachments/assets/22134b32-064f-4fac-8717-e8d0eec122fc" width="50%" />|<img src="https://github.com/user-attachments/assets/a396afa5-efb0-4e36-bfc2-30dedc7ede7d" width="100%" />
+|<img src="https://github.com/user-attachments/assets/ae1b1f04-43d9-4eab-8ecc-5682f336d64a" width="50%" />|<img src="https://github.com/user-attachments/assets/7723c794-a368-4f8c-82ed-eebce9bc1bc6" width="100%" />
+|<img src="https://github.com/user-attachments/assets/52668bea-e383-43b1-82ae-a7daa5a07244" width="50%" />|<img src="https://github.com/user-attachments/assets/c8af9d08-fa12-4cdd-aead-0fed26fbd250" width="100%" />
+|<img src="https://github.com/user-attachments/assets/32ad1a16-c067-44a4-9649-79c9c007cc40" width="100%" />|<img src="https://github.com/user-attachments/assets/c8d4d596-b2f0-4918-becd-448e272c08b5" width="100%" />
+|<img src="https://github.com/user-attachments/assets/277de774-36ab-424f-9f9d-8aa9db3a6f7e" width="50%" />|<img src="https://github.com/user-attachments/assets/5eff73d8-fabc-4f15-bb37-dedfa30eae81" width="100%" />
 
-> **_NOTE:_**
-> Setting the environment variable `EXPO_TV=1` enables the `@react-native-tvos/config-tv` plugin to modify the project for TV.
-> This can also be done by setting the parameter `isTV` to true in the `app.json`.
+## Sponsor & Support
 
-## Development
+To keep this app maintained and up-to-date please consider sponsoring it on GitHub. Or if you are looking for a private support or help in customizing the experience, then reach out to me on Telegram [@falcofemoralis](https://t.me/falcofemoralis).
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## License
 
-This project includes a [demo](./components/EventHandlingDemo.tsx)showing how to use React Native TV APIs to highlight controls as the user navigates the screen with the remote control.
-
-## TV specific file extensions
-
-This project includes an [example Metro configuration](./metro.config.js) that allows Metro to resolve application source files with TV-specific code, indicated by specific file extensions (`*.ios.tv.tsx`, `*.android.tv.tsx`, `*.tv.tsx`). The [ExternalLink](./components/ExternalLink.tsx) component makes use of this by having a [separate TV source file](./components/ExternalLink.tv.tsx) that avoids importing packages that don't exist on Apple TV.
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/learn): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+[MIT](./LICENSE)
