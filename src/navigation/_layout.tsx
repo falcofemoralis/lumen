@@ -1,3 +1,5 @@
+import 'Util/Firestore/deprecated-warning';
+
 import {
   DarkTheme,
   ThemeProvider,

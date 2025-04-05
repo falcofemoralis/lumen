@@ -9,12 +9,17 @@
     "lint:fix": "yarn lint --fix",
     "build": "cd android && gradlew assembleRelease",
     "ios": "expo run:ios",
-    "measure": "flashlight measure"
+    "measure": "flashlight measure",
+    "sign": "zipalign -f -v 4 android\\app\\build\\outputs\\apk\\release\\app-release.apk release-signed.apk && apksigner sign --ks lumen.keystore --ks-key-alias lumen release-signed.apk"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.4",
     "@kolking/react-native-rating": "^1.4.0",
     "@legendapp/list": "^1.0.0-beta.19",
+    "@react-native-firebase/analytics": "^21.13.0",
+    "@react-native-firebase/app": "^21.13.0",
+    "@react-native-firebase/crashlytics": "^21.13.0",
+    "@react-native-firebase/firestore": "^21.13.0",
     "@react-navigation/bottom-tabs": "^7.2.0",
     "@react-navigation/material-top-tabs": "^7.1.0",
     "@react-navigation/native": "^7.0.14",

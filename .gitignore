@@ -11,6 +11,10 @@ npm-debug.*
 *.mobileprovision
 *.orig.*
 web-build/
+*.keystore
+*.apk
+*.apk.idsig
+google-services.json
 
 # macOS
 .DS_Store

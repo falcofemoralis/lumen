@@ -50,7 +50,9 @@
           },
           "imageWidth": 100
         }
-      ]
+      ],
+      "@react-native-firebase/app",
+      "@react-native-firebase/crashlytics"
     ],
     "experiments": {
       "typedRoutes": true
@@ -58,7 +60,8 @@
     "android": {
       "icon": "./assets/images/icon.png",
       "package": "com.falcofemoralis.lumen",
-      "versionCode": 1
+      "versionCode": 1,
+      "googleServicesFile": "./google-services.json"
     },
     "newArchEnabled": true,
     "name": "Lumen App",
