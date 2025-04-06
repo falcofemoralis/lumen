@@ -70,3 +70,9 @@ export interface DoubleTapAction {
   seconds: number;
   direction: RewindDirection;
 }
+
+export interface FirestoreDocument {
+  deviceType: string;
+  timestamp: number;
+  updatedAt: number;
+}

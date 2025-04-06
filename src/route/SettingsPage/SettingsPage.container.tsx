@@ -9,9 +9,8 @@ import ServiceStore from 'Store/Service.store';
 
 import SettingsPageComponent from './SettingsPage.component';
 import SettingsPageComponentTV from './SettingsPage.component.atv';
+import { GITHUB_LINK } from './SettingsPage.config';
 import { SETTING_TYPE, SettingItem } from './SettingsPage.type';
-
-const GITHUB_LINK = 'https://github.com/falcofemoralis/lumen';
 
 export function SettingsPageContainer() {
   const currentService = ServiceStore.getCurrentService();
@@ -46,6 +45,23 @@ export function SettingsPageContainer() {
       subtitle: t('Change useragent'),
       type: SETTING_TYPE.INPUT,
       value: currentService.getUserAgent(),
+    },
+    {
+      id: 'isFirestore',
+      title: t('Time share'),
+      subtitle: t('Toggle time share. It will consume more data.'),
+      type: SETTING_TYPE.SELECT,
+      value: ConfigStore.isFirestore() ? 'true' : 'false',
+      options: [
+        {
+          value: 'true',
+          label: t('Yes'),
+        },
+        {
+          value: 'false',
+          label: t('No'),
+        },
+      ],
     },
     {
       id: 'github',

@@ -7,12 +7,14 @@ const DEVICE_CONFIG = 'deviceConfig';
 type DeviceConfigType = {
   isConfigured: boolean;
   isTV: boolean;
+  isFirestore: boolean;
 }
 
 class ConfigStore {
   private config: DeviceConfigType = {
     isConfigured: false,
     isTV: false,
+    isFirestore: false,
   };
 
   constructor() {
@@ -39,10 +41,14 @@ class ConfigStore {
   }
 
   async updateConfig(key: keyof DeviceConfigType, value: unknown) {
-    await updateConfig(DEVICE_CONFIG, JSON.stringify({
+    const newConfig = {
       ...this.config,
       [key]: value,
-    }));
+    };
+
+    await updateConfig(DEVICE_CONFIG, JSON.stringify(newConfig));
+
+    this.config = newConfig;
   }
 
   async configureDevice(isTV: boolean) {
@@ -59,6 +65,10 @@ class ConfigStore {
 
   isTV() {
     return this.config.isTV;
+  }
+
+  isFirestore() {
+    return this.config.isFirestore;
   }
 
   setUpTV() {

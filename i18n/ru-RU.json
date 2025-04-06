@@ -88,5 +88,8 @@
   "Log out": "Выйти",
   "Switch service": "Сменить сайт",
   "View Profile": "Открыть профиль",
-  "Welcome back, %s!": "Добро пожаловать, %s!"
+  "Welcome back, %s!": "Добро пожаловать, %s!",
+  "Toggle time share. It will consume more data.": "Включить time share. Это увеличит расход трафика.",
+  "Yes": "Да",
+  "No": "Нет"
 }
