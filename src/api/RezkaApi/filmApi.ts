@@ -11,6 +11,7 @@ import { InfoListInterface } from 'Type/InfoList.interface';
 import { MenuItemInterface } from 'Type/MenuItem.interface';
 import { RatingInterface } from 'Type/Rating.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
+import { VoiceRatingInterface } from 'Type/VoiceRating.interface';
 import { decodeHtml } from 'Util/Htlm';
 import { HTMLElementInterface } from 'Util/Parser';
 import { Variables } from 'Util/Request';
@@ -354,6 +355,23 @@ const filmApi: FilmApiInterface = {
         isBookmarked: el.querySelector('input')?.attributes.checked === 'checked',
       }),
     );
+
+    const voicesRatingHtml = root.querySelector('.b-rgstats__help')?.attributes.title;
+    if (voicesRatingHtml) {
+      const voicesRatingRoot = configApi.parseContent(voicesRatingHtml);
+
+      film.voiceRating = voicesRatingRoot.querySelectorAll('.b-rgstats__list_item').map((el) => {
+        const vRatingTitle = el.querySelector('.title')?.rawText ?? '';
+        const vRatingCount = (el.querySelector('.count')?.rawText ?? '')
+          .replace('%', '')
+          .replace(',', '.');
+
+        return {
+          title: vRatingTitle,
+          rating: Number(vRatingCount),
+        } as VoiceRatingInterface;
+      });
+    }
 
     return film;
   },

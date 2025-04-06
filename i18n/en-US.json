@@ -88,5 +88,8 @@
   "Log out": "Log out",
   "Switch service": "Switch service",
   "View Profile": "View Profile",
-  "Welcome back, %s!": "Welcome back, %s!"
+  "Welcome back, %s!": "Welcome back, %s!",
+  "Toggle time share. It will consume more data.": "Toggle time share. It will consume more data.",
+  "Yes": "Yes",
+  "No": "No"
 }

@@ -25,7 +25,16 @@ export default function ErrorScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
+  // eslint-disable-next-line react-native/no-unused-styles
+  boundaryError: {
+    height: '100%',
+    padding: 20,
+  },
+  // eslint-disable-next-line react-native/no-unused-styles
+  boundaryErrorText: {
+    fontSize: 16,
+  },
   code: {
     color: Colors.secondary,
     fontSize: 24,

@@ -26,6 +26,7 @@ const accountApi: RezkaAccountApiInterface = {
     const root = await configApi.fetchPage(`/user/${userId}`);
 
     return {
+      id: userId,
       name: root.querySelector('head title')?.rawText ?? '',
       email: root.querySelector('#email')?.attributes.value ?? '',
       avatar: root.querySelector('.b-userprofile__avatar_holder img')?.attributes.src ?? '',

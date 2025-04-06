@@ -1,3 +1,4 @@
+import { getFirestore } from '@react-native-firebase/firestore';
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import { useEventListener } from 'expo';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
@@ -8,6 +9,7 @@ import {
   useEffect, useId, useRef, useState,
 } from 'react';
 import { BackHandler, Share } from 'react-native';
+import ConfigStore from 'Store/Config.store';
 import NotificationStore from 'Store/Notification.store';
 import OverlayStore from 'Store/Overlay.store';
 import ServiceStore from 'Store/Service.store';
@@ -16,6 +18,7 @@ import { FilmVideoInterface, SubtitleInterface } from 'Type/FilmVideo.interface'
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { setIntervalSafe } from 'Util/Misc';
 import {
+  formatFirestoreKey,
   getPlayerStream,
   getPlayerTime,
   prepareShareBody,
@@ -29,11 +32,13 @@ import {
   AWAKE_TAG,
   DEFAULT_REWIND_SECONDS,
   DEFAULT_SPEED,
+  FIRESTORE_DB,
+  FIRESTORE_DEVICE_TYPE,
   RewindDirection,
   SAVE_TIME_EVERY_MS,
 } from './Player.config';
 import PlayerStore from './Player.store';
-import { PlayerContainerProps } from './Player.type';
+import { FirestoreDocument, PlayerContainerProps } from './Player.type';
 
 export function PlayerContainer({
   video,
@@ -60,6 +65,10 @@ export function PlayerContainer({
   const bookmarksOverlayId = useId();
   const speedOverlayId = useId();
 
+  const firestoreDb = ConfigStore.isFirestore() && ServiceStore.isSignedIn
+    ? getFirestore().collection<FirestoreDocument>(FIRESTORE_DB)
+    : null;
+
   const player = useVideoPlayer(selectedStream.url, (p) => {
     p.loop = false;
     p.timeUpdateEventInterval = 1;
@@ -80,6 +89,8 @@ export function PlayerContainer({
         return false;
       },
     );
+
+    initFirestoreTime();
 
     return () => {
       deactivateKeepAwake(AWAKE_TAG);
@@ -362,10 +373,54 @@ export function PlayerContainer({
     createUpdateTimeTimeout();
   };
 
+  const getFirestoreId = () => {
+    if (!ServiceStore.isSignedIn || !ConfigStore.isFirestore()) {
+      return null;
+    }
+
+    const profile = ServiceStore.getProfile();
+
+    if (!profile) {
+      return null;
+    }
+
+    return formatFirestoreKey(film, selectedVoice, profile);
+  };
+
   const updateTime = () => {
     const { currentTime } = player;
 
+    const firestoreId = getFirestoreId();
+
+    if (firestoreId && firestoreDb) {
+      firestoreDb
+        .doc(firestoreId)
+        .set({
+          deviceType: FIRESTORE_DEVICE_TYPE,
+          timestamp: currentTime,
+          updatedAt: Date.now(),
+        });
+    }
+
     updatePlayerTime(film, selectedVoice, currentTime);
+  };
+
+  const initFirestoreTime = async () => {
+    const firestoreId = getFirestoreId();
+
+    if (firestoreId && firestoreDb) {
+      const doc = await firestoreDb
+        .doc(firestoreId)
+        .get();
+
+      const data = doc.data();
+
+      if (data && data.deviceType !== FIRESTORE_DEVICE_TYPE) {
+        const newTime = data.timestamp;
+        updatePlayerTime(film, selectedVoice, data.timestamp);
+        player.currentTime = newTime;
+      }
+    }
   };
 
   const openVideoSelector = () => {

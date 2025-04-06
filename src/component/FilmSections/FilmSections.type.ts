@@ -30,4 +30,5 @@ export interface FilmSectionsRowProps {
   itemSize?: number;
   numberOfColumns: number;
   handleOnPress: (film: FilmCardInterface) => void;
+  containerWidth?: number;
 }

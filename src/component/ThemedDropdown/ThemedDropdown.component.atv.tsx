@@ -25,6 +25,7 @@ export const ThemedDropdownComponent = ({
   asOverlay,
   overlayId: overlayIdProp,
   asList,
+  style,
   onChange,
 }: ThemedDropdownComponentProps) => {
   const overlayId = useRef(overlayIdProp ?? generateId());
@@ -56,10 +57,6 @@ export const ThemedDropdownComponent = ({
     const isSelected = value === item.value;
 
     return (
-      // <DefaultFocus
-      //   key={ `${item.value}-${idx}` }
-      //   enable={ isSelected }
-      // >
       <SpatialNavigationFocusableView
         onSelect={ () => onChange(item) }
       >
@@ -106,7 +103,6 @@ export const ThemedDropdownComponent = ({
           </View>
         ) }
       </SpatialNavigationFocusableView>
-      // </DefaultFocus>
     );
   }, [value, onChange]);
 
@@ -179,7 +175,7 @@ export const ThemedDropdownComponent = ({
   };
 
   return (
-    <View>
+    <View style={ style }>
       { renderModal() }
       { renderInput() }
     </View>

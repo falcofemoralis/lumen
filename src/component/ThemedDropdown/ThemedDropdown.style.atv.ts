@@ -25,11 +25,9 @@ export const styles = CreateStyles({
   },
   container: {
     maxHeight: 288,
-    padding: 8,
   },
   listContainer: {
     maxHeight: 288,
-    padding: 4,
     alignSelf: 'flex-end',
     height: '100%',
   },

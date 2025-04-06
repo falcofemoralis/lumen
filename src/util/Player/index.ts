@@ -2,6 +2,7 @@ import t from 'i18n/t';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
+import { ProfileInterface } from 'Type/Profile.interface';
 import { playerStorage } from 'Util/Storage';
 
 export const PLAYER_SAVE_TIME_STORAGE_KEY = 'playerTime';
@@ -73,4 +74,16 @@ export const prepareShareBody = (film: FilmInterface) => {
   const { title, link } = film;
 
   return t('Watch %s:\n %s', title, link);
+};
+
+export const formatFirestoreKey = (
+  film: FilmInterface,
+  voice: FilmVoiceInterface,
+  profile: ProfileInterface,
+) => {
+  const { id: filmId } = film;
+  const { id: voiceId, lastEpisodeId, lastSeasonId } = voice;
+  const { id: userId } = profile;
+
+  return `${userId}-${filmId}-${voiceId}-${lastSeasonId}-${lastEpisodeId}`;
 };

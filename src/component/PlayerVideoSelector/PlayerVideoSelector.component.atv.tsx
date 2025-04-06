@@ -1,10 +1,18 @@
 import Loader from 'Component/Loader';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedDropdown from 'Component/ThemedDropdown';
+import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedOverlay from 'Component/ThemedOverlay';
+import ThemedText from 'Component/ThemedText';
 import t from 'i18n/t';
-import { DefaultFocus, SpatialNavigationScrollView, SpatialNavigationView } from 'react-tv-space-navigation';
+import React, { useId } from 'react';
+import { View } from 'react-native';
+import {
+  DefaultFocus, SpatialNavigationFocusableView, SpatialNavigationScrollView, SpatialNavigationView,
+} from 'react-tv-space-navigation';
+import OverlayStore from 'Store/Overlay.store';
 import { EpisodeInterface, SeasonInterface } from 'Type/FilmVoice.interface';
+import { scale } from 'Util/CreateStyles';
 
 import { styles } from './PlayerVideoSelector.style.atv';
 import { PlayerVideoSelectorComponentProps } from './PlayerVideoSelector.type';
@@ -22,10 +30,129 @@ export function PlayerVideoSelectorComponent({
   seasons,
   episodes,
   handleSelectEpisode,
+  film,
 }: PlayerVideoSelectorComponentProps) {
+  const ratingOverlayId = useId();
+
+  const renderVoiceRating = () => {
+    const { voiceRating = [] } = film;
+
+    if (!voiceRating.length) {
+      return null;
+    }
+
+    const barWidth = styles.voiceRatingOverlay.width
+      - styles.voiceRatingPercentContainer.width
+      - styles.voiceRatingItemContainer.padding * 2;
+
+    return (
+      <>
+        <ThemedButton
+          icon={ {
+            pack: IconPackType.Octicons,
+            name: 'question',
+          } }
+          onPress={ () => OverlayStore.openOverlay(ratingOverlayId) }
+          style={ styles.voiceRatingInput }
+          iconStyle={ styles.voiceRatingInputIcon }
+          iconSize={ scale(20) }
+        />
+        <ThemedOverlay
+          id={ ratingOverlayId }
+          onHide={ () => OverlayStore.closeOverlay(ratingOverlayId) }
+          contentContainerStyle={ styles.voiceRatingOverlay }
+        >
+          <View style={ styles.voiceRatingContainer }>
+            <SpatialNavigationScrollView
+              offsetFromStart={ styles.voiceRatingOverlay.height / 2 }
+            >
+              <SpatialNavigationView
+                direction="vertical"
+              >
+                <DefaultFocus>
+                  { voiceRating.map((item) => (
+                    <SpatialNavigationFocusableView key={ item.title }>
+                      { ({ isFocused }) => (
+                        <View
+                          style={ [
+                            styles.voiceRatingItemContainer,
+                            isFocused && styles.voiceRatingItemContainerFocused,
+                          ] }
+                        >
+                          <View style={ styles.voiceRatingInfo }>
+                            <View style={ styles.voiceRatingTextContainer }>
+                              <ThemedText
+                                style={ [
+                                  styles.voiceRatingText,
+                                  isFocused && styles.voiceRatingTextFocused,
+                                ] }
+                              >
+                                { item.title }
+                              </ThemedText>
+                            </View>
+                            <View style={ styles.voiceRatingBarContainer }>
+                              <View style={ [
+                                styles.voiceRatingBar,
+                                { width: barWidth },
+                              ] }
+                              />
+                              <View style={ [
+                                styles.voiceRatingBar,
+                                styles.voiceRatingBarActive,
+                                { width: barWidth * (item.rating / 100) },
+                              ] }
+                              />
+                            </View>
+                          </View>
+                          <View style={ styles.voiceRatingPercentContainer }>
+                            <ThemedText style={ [
+                              styles.voiceRatingPercent,
+                              isFocused && styles.voiceRatingPercentFocused,
+                            ] }
+                            >
+                              { `${item.rating}%` }
+                            </ThemedText>
+                          </View>
+                        </View>
+                      ) }
+                    </SpatialNavigationFocusableView>
+                  )) }
+                </DefaultFocus>
+              </SpatialNavigationView>
+            </SpatialNavigationScrollView>
+          </View>
+        </ThemedOverlay>
+      </>
+    );
+  };
+
   const renderVoices = () => {
     if (voices.length <= 1) {
       return null;
+    }
+
+    if (seasons.length) {
+      return (
+        <SpatialNavigationView
+          direction="horizontal"
+          style={ styles.voicesWrapper }
+        >
+          <ThemedDropdown
+            data={ voices.map((voice) => ({
+              label: voice.title,
+              value: voice.identifier,
+              startIcon: voice.premiumIcon,
+              endIcon: voice.img,
+            })) }
+            value={ selectedVoice.identifier }
+            onChange={ (item) => handleSelectVoice(item.value) }
+            header={ t('Search voice') }
+            inputStyle={ styles.voicesInput }
+            style={ styles.voicesContainer }
+          />
+          { seasons.length ? renderVoiceRating() : null }
+        </SpatialNavigationView>
+      );
     }
 
     return (
@@ -39,8 +166,8 @@ export function PlayerVideoSelectorComponent({
         value={ selectedVoice.identifier }
         onChange={ (item) => handleSelectVoice(item.value) }
         header={ t('Search voice') }
-        inputStyle={ styles.voicesInput }
-        asList={ !seasons.length }
+        style={ styles.voicesListContainer }
+        asList
       />
     );
   };

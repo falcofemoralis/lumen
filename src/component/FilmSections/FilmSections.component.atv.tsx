@@ -13,6 +13,7 @@ import {
   SpatialNavigationView,
   SpatialNavigationVirtualizedList,
 } from 'react-tv-space-navigation';
+import { calculateItemWidth } from 'Style/Layout';
 import { scale } from 'Util/CreateStyles';
 
 import { NUMBER_OF_COLUMNS_TV } from './FilmSections.config';
@@ -26,6 +27,7 @@ import {
 const FilmSectionsRow = ({
   row,
   itemSize,
+  containerWidth,
   handleOnPress,
 }: FilmSectionsRowProps) => {
   const { header, content, films = [] } = row;
@@ -45,7 +47,11 @@ const FilmSectionsRow = ({
   );
 
   return (
-    <ThemedView style={ styles.container }>
+    <ThemedView style={ [
+      styles.container,
+      { width: containerWidth },
+    ] }
+    >
       { content && renderContent() }
       { header && renderHeader() }
       <SpatialNavigationView
@@ -86,12 +92,15 @@ export function FilmSectionsComponent({
     scale(ROW_GAP) * 2,
   );
 
+  const containerWidth = calculateItemWidth(1);
+
   const renderItem = useCallback(({ item: row }: {item: FilmSectionsItem}) => (
     <MemoizedFilmSectionsRow
       row={ row }
       itemSize={ width }
       numberOfColumns={ NUMBER_OF_COLUMNS_TV }
       handleOnPress={ handleOnPress }
+      containerWidth={ containerWidth }
     />
   ), []);
 

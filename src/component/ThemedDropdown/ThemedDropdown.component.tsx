@@ -23,6 +23,7 @@ export const ThemedDropdownComponent = ({
   overlayId,
   asList,
   onChange,
+  style,
 }: ThemedDropdownComponentProps) => {
   const id = useRef(overlayId ?? generateId());
   const scrollViewRef = useRef<ScrollView>(null);
@@ -156,7 +157,7 @@ export const ThemedDropdownComponent = ({
   };
 
   return (
-    <View>
+    <View style={ style }>
       { renderModal() }
       { renderInput() }
     </View>

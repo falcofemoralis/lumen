@@ -9,6 +9,7 @@ export const styles = CreateStyles({
     width: '100%',
   },
   grid: {
+    width: '100%',
   },
   rowStyle: {
     flexDirection: 'row',
