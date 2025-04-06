@@ -131,27 +131,44 @@ export function PlayerVideoSelectorComponent({
       return null;
     }
 
+    if (seasons.length) {
+      return (
+        <SpatialNavigationView
+          direction="horizontal"
+          style={ styles.voicesWrapper }
+        >
+          <ThemedDropdown
+            data={ voices.map((voice) => ({
+              label: voice.title,
+              value: voice.identifier,
+              startIcon: voice.premiumIcon,
+              endIcon: voice.img,
+            })) }
+            value={ selectedVoice.identifier }
+            onChange={ (item) => handleSelectVoice(item.value) }
+            header={ t('Search voice') }
+            inputStyle={ styles.voicesInput }
+            style={ styles.voicesContainer }
+          />
+          { seasons.length ? renderVoiceRating() : null }
+        </SpatialNavigationView>
+      );
+    }
+
     return (
-      <SpatialNavigationView
-        direction="horizontal"
-        style={ styles.voicesContainer }
-      >
-        <ThemedDropdown
-          data={ voices.map((voice) => ({
-            label: voice.title,
-            value: voice.identifier,
-            startIcon: voice.premiumIcon,
-            endIcon: voice.img,
-          })) }
-          value={ selectedVoice.identifier }
-          onChange={ (item) => handleSelectVoice(item.value) }
-          header={ t('Search voice') }
-          inputStyle={ styles.voicesInput }
-          asList={ !seasons.length }
-          style={ styles.voiceDropdownInput }
-        />
-        { seasons.length ? renderVoiceRating() : null }
-      </SpatialNavigationView>
+      <ThemedDropdown
+        data={ voices.map((voice) => ({
+          label: voice.title,
+          value: voice.identifier,
+          startIcon: voice.premiumIcon,
+          endIcon: voice.img,
+        })) }
+        value={ selectedVoice.identifier }
+        onChange={ (item) => handleSelectVoice(item.value) }
+        header={ t('Search voice') }
+        style={ styles.voicesListContainer }
+        asList
+      />
     );
   };
 

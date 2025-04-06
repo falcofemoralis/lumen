@@ -108,9 +108,7 @@ export function ActorPageComponent({
 
   return (
     <Page>
-      <View>
-        { renderRoles() }
-      </View>
+      { renderRoles() }
     </Page>
   );
 }

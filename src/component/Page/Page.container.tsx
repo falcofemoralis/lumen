@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router';
 import { withTV } from 'Hooks/withTV';
 import { useEffect } from 'react';
 import { BackHandler } from 'react-native';
+import NotificationStore from 'Store/Notification.store';
 
 import PageComponent from './Page.component';
 import PageComponentTV from './Page.component.atv';
@@ -12,8 +13,14 @@ export function PageContainer(props: PageContainerProps) {
 
   useEffect(() => {
     const backAction = () => {
-      if (router.canDismiss()) {
-        router.dismiss();
+      try {
+        if (router.canDismiss()) {
+          router.dismiss();
+
+          return true;
+        }
+      } catch (e) {
+        NotificationStore.displayError(e as Error);
 
         return true;
       }

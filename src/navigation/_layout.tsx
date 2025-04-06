@@ -5,9 +5,11 @@ import {
   ThemeProvider,
 } from '@react-navigation/native';
 import { MenuProvider } from 'Component/NavigationBar/MenuContext';
+import ThemedText from 'Component/ThemedText';
+import ThemedView from 'Component/ThemedView';
 import Constants from 'expo-constants';
 import * as NavigationBar from 'expo-navigation-bar';
-import { Stack } from 'expo-router';
+import { ErrorBoundaryProps, Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useLocale } from 'Hooks/useLocale';
@@ -23,12 +25,22 @@ import ServiceStore from 'Store/Service.store';
 import Colors from 'Style/Colors';
 import { setTimeoutSafe } from 'Util/Misc';
 
+import { styles } from './error';
+
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 SplashScreen.setOptions({
   fade: true,
 });
+
+export function ErrorBoundary({ error }: ErrorBoundaryProps) {
+  return (
+    <ThemedView style={ styles.boundaryError }>
+      <ThemedText style={ styles.boundaryErrorText }>{ error.message }</ThemedText>
+    </ThemedView>
+  );
+}
 
 export function RootLayout() {
   const [backPressedOnce, setBackPressedOnce] = useState(false);

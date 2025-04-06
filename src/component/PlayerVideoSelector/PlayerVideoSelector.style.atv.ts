@@ -17,14 +17,21 @@ export const styles = CreateStyles({
     marginEnd: 10,
     marginBottom: 10,
   },
-  voicesContainer: {
+  voicesWrapper: {
     width: '100%',
+    minWidth: 288,
     maxHeight: 288,
     flexDirection: 'column',
     gap: 4,
   },
-  voiceDropdownInput: {
+  voicesContainer: {
     flex: 1,
+  },
+  voicesListContainer: {
+    width: '100%',
+    maxHeight: 288,
+    flexDirection: 'column',
+    gap: 4,
   },
   voiceRatingInput: {
     backgroundColor: Colors.transparent,
