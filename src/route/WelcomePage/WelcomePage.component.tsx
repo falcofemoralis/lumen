@@ -36,7 +36,7 @@ import {
 import { WelcomePageMobile, WelcomePageTV } from './WelcomePageIcons';
 
 const { width } = Dimensions.get('window');
-const deviceMaxHeight = Dimensions.get('screen').height;
+const { height: deviceMaxHeight } = Dimensions.get('screen');
 
 type WelcomeSlideRef = {
   focus: () => void;

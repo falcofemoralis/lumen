@@ -303,9 +303,7 @@ export function NavigationBarComponent({
         headerShown: false,
         tabBarActiveTintColor: Colors.primary,
         tabBarInactiveTintColor: Colors.white,
-        tabBarHideOnKeyboard: true,
         tabBarPosition: 'left',
-        freezeOnBlur: true,
         sceneStyle: {
           width: containerWidth - scale(NAVIGATION_BAR_TV_WIDTH) - CONTENT_WRAPPER_PADDING_TV * 2,
           marginRight: CONTENT_WRAPPER_PADDING_TV,

@@ -2,7 +2,7 @@ const getDocumentId = (data) => {
     if (!data.userId || data.userId == '0') {
         throw Error("unauthorized")
     }
-    return `${data.userId}-${data.titleId}-${data.voiceId}-${data.season}-${data.episode}`
+    return `${data.userId}-${data.titleId}-${data.voiceId}-${data.season ? data.season : undefined}-${data.episode ? data.episode : undefined}`
 };
 
 const getDeviceId = () => {
@@ -23,10 +23,12 @@ const handleFromWeb = async (event) => {
     if (event.data.action) {
         if (event.data.action == 'get') {
             try {
-                const data = (await db.collection(DB_COLLECTION).doc(getDocumentId(event.data.data)).get()).data();
-                if (data && getDeviceId() != data.deviceType) {
-                    window.postMessage({ action: 'seek', data: { time: data.timestamp } })
-                }
+				if (event.data.data.titleId) {
+					const data = (await db.collection(DB_COLLECTION).doc(getDocumentId(event.data.data)).get()).data();
+					if (data && getDeviceId() != data.deviceType) {
+						window.postMessage({ action: 'seek', data: { time: data.timestamp } })
+					}
+				}
             } catch (error) {
                 console.log(error);
             }

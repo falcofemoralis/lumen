@@ -52,7 +52,15 @@
         }
       ],
       "@react-native-firebase/app",
-      "@react-native-firebase/crashlytics"
+      "@react-native-firebase/crashlytics",
+      [
+        "@sentry/react-native/expo",
+        {
+          "url": "https://sentry.io/",
+          "project": "react-native",
+          "organization": "lumen-m9"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
@@ -60,13 +68,13 @@
     "android": {
       "icon": "./assets/images/icon.png",
       "package": "com.falcofemoralis.lumen",
-      "versionCode": 2,
+      "versionCode": 3,
       "googleServicesFile": "./google-services.json"
     },
     "newArchEnabled": true,
     "name": "Lumen App",
     "slug": "lumen",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "extra": {
       "eas": {
         "projectId": "ad7c3459-7949-4f54-9d83-5e8a400a0af4"

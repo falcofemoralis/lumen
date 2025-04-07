@@ -153,6 +153,12 @@ export function SearchPageContainer() {
       return;
     }
 
+    if (recognizing) {
+      ExpoSpeechRecognitionModule.stop();
+
+      return;
+    }
+
     ExpoSpeechRecognitionModule.start({
       lang: 'ru-RU', // 'en-US',
       interimResults: true,
