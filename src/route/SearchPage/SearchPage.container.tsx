@@ -28,9 +28,7 @@ export function SearchPageContainer() {
   const [isLoading, setIsLoading] = useState(false);
   const debounce = useRef<NodeJS.Timeout | null>();
 
-  useSpeechRecognitionEvent('start', () => {
-    setRecognizing(true);
-  });
+  useSpeechRecognitionEvent('start', () => setRecognizing(true));
   useSpeechRecognitionEvent('end', () => setRecognizing(false));
   useSpeechRecognitionEvent('result', (event) => {
     onApplySuggestion(event.results[0]?.transcript);
