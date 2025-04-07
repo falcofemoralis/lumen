@@ -5,24 +5,27 @@ Modern application to view films on TV and Mobile. This is a continuation of [HD
 ## Features
 
 - ⭐️ Full support for TV!
-- ⭐️ Custom developed player!
-- Comments
+- ⭐️ Custom player!
 - Account authorization
+- Bookmarks
+- Comments
 - Comfortable films list
-- Voice search
+
+
 And more!
 
 ## Roadmap
 
+- Rework design\animations
 - Implement download manager
-- Include played time in series selector
+- Support for film trailer in the app
 - Support back button for TV
 - Skip intro\opening feature
+- Include played time in series selector
 - Add ability to remove search history items
 - Add ability to create a comment
-- Support for film trailer in the app
-- Rework design\animations
 
+  
 ## Screenshots
 
 |Mobile|TV|
