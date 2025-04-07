@@ -52,13 +52,43 @@ export const PlayerSubtitlesComponent = ({
     },
   );
 
+  const renderText = () => {
+    if (text.includes('<i>')) {
+      return (
+        <Text
+          style={ [
+            styles.text,
+            { fontStyle: 'italic' },
+          ] }
+        >
+          { text.replace(/<\/?i>/g, '') }
+        </Text>
+      );
+    }
+
+    if (text.includes('<b>')) {
+      return (
+        <Text
+          style={ [
+            styles.text,
+            { fontWeight: 'bold' },
+          ] }
+        >
+          { text.replace(/<\/?b>/g, '') }
+        </Text>
+      );
+    }
+
+    return (
+      <Text style={ styles.text }>
+        { text }
+      </Text>
+    );
+  };
+
   return (
     <View style={ [styles.container, style] }>
-      { text ? (
-        <Text style={ styles.text }>
-          { text }
-        </Text>
-      ) : null }
+      { text ? renderText() : null }
     </View>
   );
 };

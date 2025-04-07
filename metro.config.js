@@ -1,8 +1,9 @@
-// Learn more https://docs.expo.io/guides/customizing-metro
-const { getDefaultConfig } = require('expo/metro-config');
+const {
+  getSentryExpoConfig
+} = require("@sentry/react-native/metro");
 
 /** @type {import('expo/metro-config').MetroConfig} */
-const config = getDefaultConfig(__dirname); // eslint-disable-line no-undef
+const config = getSentryExpoConfig(__dirname); // eslint-disable-line no-undef
 
 // When enabled, the optional code below will allow Metro to resolve
 // and bundle source files with TV-specific extensions

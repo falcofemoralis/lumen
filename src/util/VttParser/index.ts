@@ -1,9 +1,5 @@
-/* eslint-disable max-len */
-/* eslint-disable new-cap */
+import webvtt from 'node-webvtt';
 import { customFetch } from 'Util/Fetch';
-import vttToJson from 'vtt-to-json';
-
-const { default: srtParser2 } = require('srt-parser-2');
 
 export interface VTTItem {
   start: number
@@ -11,10 +7,16 @@ export interface VTTItem {
   part: string
 }
 
-export interface SRTTem {
-  startTime: string
-  endTime: string
-  text: string
+export interface ParsedVTTItem {
+  identifier: string;
+  start: number;
+  end: number;
+  text: string;
+}
+
+export interface ParsedVTTResult {
+  cues: ParsedVTTItem[]
+  valid: boolean
 }
 
 export const subtitleParser = async (subitleUrl: string): Promise<VTTItem[]> => {
@@ -25,32 +27,18 @@ export const subtitleParser = async (subitleUrl: string): Promise<VTTItem[]> => 
 
   const result: VTTItem[] = [];
 
-  if (subtitleType === 'srt') {
-    const parser: {
-      fromSrt: (data: any) => SRTTem[]
-    } = new srtParser2();
-
-    const parsedSubtitle: SRTTem[] = parser.fromSrt(subtitleData);
-
-    parsedSubtitle.forEach(({ startTime, endTime, text }) => {
-      result.push({
-        start: timeToSeconds(startTime.split(',')[0]),
-        end: timeToSeconds(endTime.split(',')[0]),
-        part: text,
-      });
-    });
-  }
-
   if (subtitleType === 'vtt') {
-    const parsedSubtitle: VTTItem[] = await vttToJson(subtitleData);
+    const parsedSubtitle = webvtt.parse(subtitleData) as ParsedVTTResult;
 
-    parsedSubtitle.forEach(({ start, end, part }) => {
-      result.push({
-        start: start / 1000,
-        end: end / 1000,
-        part,
+    if (parsedSubtitle.valid) {
+      parsedSubtitle.cues.forEach(({ start, end, text }) => {
+        result.push({
+          start,
+          end,
+          part: text,
+        });
       });
-    });
+    }
   }
 
   return result;
@@ -61,15 +49,17 @@ export const storyboardParser = async (storyboardUrl: string): Promise<VTTItem[]
   const storyboardData = await res.text();
 
   const result: VTTItem[] = [];
-  const parsedStoryboard: VTTItem[] = await vttToJson(storyboardData);
+  const parsedStoryboard = webvtt.parse(storyboardData) as ParsedVTTResult;
 
-  parsedStoryboard.forEach(({ start, end, part }) => {
-    result.push({
-      start: start / 1000,
-      end: end / 1000,
-      part,
+  if (parsedStoryboard.valid) {
+    parsedStoryboard.cues.forEach(({ start, end, text }) => {
+      result.push({
+        start,
+        end,
+        part: text,
+      });
     });
-  });
+  }
 
   return result;
 };

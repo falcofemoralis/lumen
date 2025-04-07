@@ -28,7 +28,9 @@ export function SearchPageContainer() {
   const [isLoading, setIsLoading] = useState(false);
   const debounce = useRef<NodeJS.Timeout | null>();
 
-  useSpeechRecognitionEvent('start', () => setRecognizing(true));
+  useSpeechRecognitionEvent('start', () => {
+    setRecognizing(true);
+  });
   useSpeechRecognitionEvent('end', () => setRecognizing(false));
   useSpeechRecognitionEvent('result', (event) => {
     onApplySuggestion(event.results[0]?.transcript);
@@ -149,6 +151,12 @@ export function SearchPageContainer() {
 
     if (!result.granted) {
       NotificationStore.displayError('Permissions not granted');
+
+      return;
+    }
+
+    if (recognizing) {
+      ExpoSpeechRecognitionModule.stop();
 
       return;
     }
