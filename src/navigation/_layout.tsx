@@ -1,10 +1,7 @@
-import 'Util/Firestore/deprecated-warning';
-
 import {
   DarkTheme,
   ThemeProvider,
 } from '@react-navigation/native';
-import * as Sentry from '@sentry/react-native';
 import { MenuProvider } from 'Component/NavigationBar/MenuContext';
 import Constants from 'expo-constants';
 import * as NavigationBar from 'expo-navigation-bar';
@@ -23,10 +20,6 @@ import NotificationStore from 'Store/Notification.store';
 import ServiceStore from 'Store/Service.store';
 import Colors from 'Style/Colors';
 import { setTimeoutSafe } from 'Util/Misc';
-
-Sentry.init({
-  dsn: 'https://68f03037de05c4eab2b51ba6a4fdf01c@o4509107041533952.ingest.de.sentry.io/4509107041927248',
-});
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -151,4 +144,4 @@ export function RootLayout() {
   );
 }
 
-export default Sentry.wrap(observer(RootLayout));
+export default observer(RootLayout);
