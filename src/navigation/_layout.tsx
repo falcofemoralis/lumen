@@ -6,11 +6,9 @@ import {
 } from '@react-navigation/native';
 import * as Sentry from '@sentry/react-native';
 import { MenuProvider } from 'Component/NavigationBar/MenuContext';
-import ThemedText from 'Component/ThemedText';
-import ThemedView from 'Component/ThemedView';
 import Constants from 'expo-constants';
 import * as NavigationBar from 'expo-navigation-bar';
-import { ErrorBoundaryProps, Stack } from 'expo-router';
+import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useLocale } from 'Hooks/useLocale';
@@ -26,13 +24,8 @@ import ServiceStore from 'Store/Service.store';
 import Colors from 'Style/Colors';
 import { setTimeoutSafe } from 'Util/Misc';
 
-import { styles } from './error';
-
 Sentry.init({
   dsn: 'https://68f03037de05c4eab2b51ba6a4fdf01c@o4509107041533952.ingest.de.sentry.io/4509107041927248',
-
-  // uncomment the line below to enable Spotlight (https://spotlightjs.com)
-  // spotlight: __DEV__,
 });
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -41,14 +34,6 @@ SplashScreen.preventAutoHideAsync();
 SplashScreen.setOptions({
   fade: true,
 });
-
-export function ErrorBoundary({ error }: ErrorBoundaryProps) {
-  return (
-    <ThemedView style={ styles.boundaryError }>
-      <ThemedText style={ styles.boundaryErrorText }>{ error.message }</ThemedText>
-    </ThemedView>
-  );
-}
 
 export function RootLayout() {
   const [backPressedOnce, setBackPressedOnce] = useState(false);
@@ -166,4 +151,4 @@ export function RootLayout() {
   );
 }
 
-export default observer(RootLayout);
+export default Sentry.wrap(observer(RootLayout));
