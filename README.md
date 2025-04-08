@@ -25,6 +25,15 @@ And more!
 - Add ability to remove search history items
 - Add ability to create a comment
 
+## Known bugs
+
+1. Settings input flickers
+2. When you go back from player then sometimes status bar can become white
+3. Player controls sometimes do not hide after seek left\right on TV
+4. Player series selector scroll sometimes is not correct on TV
+5. Comments section can be buggy
+6. Modal window can have wrong width
+
   
 ## Screenshots
 
