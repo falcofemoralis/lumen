@@ -8,6 +8,7 @@ type DeviceConfigType = {
   isConfigured: boolean;
   isTV: boolean;
   isFirestore: boolean;
+  deviceId: string | null;
 }
 
 class ConfigStore {
@@ -15,6 +16,7 @@ class ConfigStore {
     isConfigured: false,
     isTV: false,
     isFirestore: false,
+    deviceId: null,
   };
 
   constructor() {
@@ -73,6 +75,16 @@ class ConfigStore {
 
   setUpTV() {
     configureRemoteControl();
+  }
+
+  getDeviceId() {
+    if (!this.config.deviceId) {
+      this.config.deviceId = String(Date.now());
+
+      this.updateConfig('deviceId', this.config.deviceId);
+    }
+
+    return this.config.deviceId;
   }
 }
 
