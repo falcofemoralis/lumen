@@ -16,6 +16,7 @@ import ServiceStore from 'Store/Service.store';
 import { FilmStreamInterface } from 'Type/FilmStream.interface';
 import { FilmVideoInterface, SubtitleInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
+import { getFormattedDate } from 'Util/Date';
 import { setIntervalSafe } from 'Util/Misc';
 import {
   formatFirestoreKey,
@@ -33,7 +34,6 @@ import {
   DEFAULT_REWIND_SECONDS,
   DEFAULT_SPEED,
   FIRESTORE_DB,
-  FIRESTORE_DEVICE_TYPE,
   RewindDirection,
   SAVE_TIME_EVERY_MS,
 } from './Player.config';
@@ -396,9 +396,9 @@ export function PlayerContainer({
       firestoreDb
         .doc(firestoreId)
         .set({
-          deviceType: FIRESTORE_DEVICE_TYPE,
+          deviceId: ConfigStore.getDeviceId(),
           timestamp: currentTime,
-          updatedAt: Date.now(),
+          updatedAt: getFormattedDate(),
         });
     }
 
@@ -415,7 +415,7 @@ export function PlayerContainer({
 
       const data = doc.data();
 
-      if (data && data.deviceType !== FIRESTORE_DEVICE_TYPE) {
+      if (data && data.deviceId !== ConfigStore.getDeviceId()) {
         const newTime = data.timestamp;
         updatePlayerTime(film, selectedVoice, data.timestamp);
         player.currentTime = newTime;
