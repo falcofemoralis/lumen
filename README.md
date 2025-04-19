@@ -17,7 +17,7 @@ And more!
 ## Roadmap
 
 - ⭐️ Rework design\animations (expo 53 + react native 79 + react 19 + reanimated 4)
-- ⭐️Fixing a bunch of bugs (Thanks for testing!!!)
+- ⭐️ Fixing a bunch of bugs (Thanks for testing!!!)
 - Implement download manager
 - Support for film trailer in the app
 - Support back button for TV
