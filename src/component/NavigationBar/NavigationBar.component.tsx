@@ -151,6 +151,7 @@ export function NavigationBarComponent({
         sceneStyle: {
           marginHorizontal: CONTENT_WRAPPER_PADDING,
         },
+        lazy: false,
       } }
       tabBar={ renderTabBar }
     />

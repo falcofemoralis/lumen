@@ -9,6 +9,7 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useLocale } from 'Hooks/useLocale';
+import t from 'i18n/t';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 import { BackHandler } from 'react-native';
@@ -64,7 +65,7 @@ export function RootLayout() {
         }
 
         setBackPressedOnce(true);
-        NotificationStore.displayMessage('Press back again to exit');
+        NotificationStore.displayMessage(t('Press back again to exit'));
 
         setTimeoutSafe(() => {
           setBackPressedOnce(false);

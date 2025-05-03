@@ -91,5 +91,6 @@
   "Welcome back, %s!": "Welcome back, %s!",
   "Toggle time share. It will consume more data.": "Toggle time share. It will consume more data.",
   "Yes": "Yes",
-  "No": "No"
+  "No": "No",
+  "Press back again to exit": "Press back again to exit"
 }
