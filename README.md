@@ -16,7 +16,8 @@ And more!
 
 ## Roadmap
 
-- Rework design\animations
+- ⭐️ Rework design\animations (expo 53 + react native 79 + react 19 + reanimated 4)
+- ⭐️ Fixing a bunch of bugs (Thanks for testing!!!)
 - Implement download manager
 - Support for film trailer in the app
 - Support back button for TV
@@ -33,6 +34,7 @@ And more!
 4. Player series selector scroll sometimes is not correct on TV
 5. Comments section can be buggy
 6. Modal window can have wrong width
+7. Many others small bugs
 
   
 ## Screenshots

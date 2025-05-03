@@ -64,4 +64,3 @@ export const DEFAULT_SPEEDS = [0.25, 0.5, 1, 1.5, 2];
 export const DOUBLE_TAP_ANIMATION = 2000;
 
 export const FIRESTORE_DB = 'timestamps';
-export const FIRESTORE_DEVICE_TYPE = 'ANDROID';

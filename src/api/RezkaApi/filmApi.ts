@@ -14,6 +14,7 @@ import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { VoiceRatingInterface } from 'Type/VoiceRating.interface';
 import { decodeHtml } from 'Util/Htlm';
 import { HTMLElementInterface } from 'Util/Parser';
+import { processPromisesBatch } from 'Util/Promise';
 import { Variables } from 'Util/Request';
 
 import { NotificationInterface } from '../../type/Notification.interface';
@@ -567,9 +568,11 @@ const filmApi: FilmApiInterface = {
       };
     };
 
-    await Promise.all(links.map(async (link) => {
-      films[link] = await getFilm(link);
-    }));
+    const results = await processPromisesBatch(links, 3, getFilm) as FilmCardInterface[];
+
+    results.forEach((result) => {
+      films[result.link] = result;
+    });
 
     return notifications.map((notification) => {
       const items = notification.items.map((item) => {

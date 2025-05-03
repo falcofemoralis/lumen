@@ -72,7 +72,7 @@ export interface DoubleTapAction {
 }
 
 export interface FirestoreDocument {
-  deviceType: string;
+  deviceId: string;
   timestamp: number;
-  updatedAt: number;
+  updatedAt: string;
 }
