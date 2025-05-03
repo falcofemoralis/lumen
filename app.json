@@ -23,7 +23,6 @@
           "root": "./src/navigation"
         }
       ],
-      "expo-localization",
       "expo-font",
       [
         "expo-video",
