@@ -15,6 +15,7 @@ web-build/
 *.apk
 *.apk.idsig
 google-services.json
+.kotlin/
 
 # macOS
 .DS_Store
