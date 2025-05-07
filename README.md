@@ -26,6 +26,13 @@ And more!
 - Add ability to remove search history items
 - Add ability to create a comment
 
+## Bugs
+
+Found a bug? Post it here! [Known bugs](https://github.com/falcofemoralis/lumen/issues/8)
+
+## Sponsor & Support
+
+To keep this app maintained and up-to-date please consider sponsoring it on GitHub. Or if you are looking for a private support or help in customizing the experience, then reach out to me on Telegram [@falcofemoralis](https://t.me/falcofemoralis).
 
 ## Screenshots
 
@@ -39,10 +46,6 @@ And more!
 |<img src="https://github.com/user-attachments/assets/52668bea-e383-43b1-82ae-a7daa5a07244" width="50%" />|<img src="https://github.com/user-attachments/assets/c8af9d08-fa12-4cdd-aead-0fed26fbd250" width="100%" />
 |<img src="https://github.com/user-attachments/assets/32ad1a16-c067-44a4-9649-79c9c007cc40" width="100%" />|<img src="https://github.com/user-attachments/assets/c8d4d596-b2f0-4918-becd-448e272c08b5" width="100%" />
 |<img src="https://github.com/user-attachments/assets/277de774-36ab-424f-9f9d-8aa9db3a6f7e" width="50%" />|<img src="https://github.com/user-attachments/assets/5eff73d8-fabc-4f15-bb37-dedfa30eae81" width="100%" />
-
-## Sponsor & Support
-
-To keep this app maintained and up-to-date please consider sponsoring it on GitHub. Or if you are looking for a private support or help in customizing the experience, then reach out to me on Telegram [@falcofemoralis](https://t.me/falcofemoralis).
 
 ## License
 
