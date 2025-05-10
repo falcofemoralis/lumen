@@ -1,11 +1,9 @@
-import { MMKVLoader } from 'react-native-mmkv-storage';
+import { MMKV } from 'react-native-mmkv';
 
-// export const cacheStorage = new MMKVLoader().withInstanceID('cache').initialize();
+export const configStorage = new MMKV({ id: 'config' })
 
-export const configStorage = new MMKVLoader().withInstanceID('config').initialize();
+export const cookiesStorage = new MMKV({ id: 'cookies' })
 
-export const cookiesStorage = new MMKVLoader().withInstanceID('cookies').initialize();
+export const playerStorage = new MMKV({ id: 'player' })
 
-export const playerStorage = new MMKVLoader().withInstanceID('player').initialize();
-
-export const miscStorage = new MMKVLoader().withInstanceID('misc').initialize();
+export const miscStorage = new MMKV({ id: 'misc' })
