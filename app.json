@@ -13,7 +13,10 @@
         "expo-build-properties",
         {
           "android": {
-            "usesCleartextTraffic": true
+            "usesCleartextTraffic": true,
+            "enableProguardInReleaseBuilds": true,
+            "enableShrinkResourceslnReleaseBuilds": true,
+            "useLegacyPackaging": true
           }
         }
       ],
@@ -64,7 +67,7 @@
       "typedRoutes": true
     },
     "android": {
-	    "edgeToEdgeEnabled": true,
+	    "edgeToEdgeEnabled": false,
       "icon": "./assets/images/icon.png",
       "package": "com.falcofemoralis.lumen",
       "versionCode": 5,
