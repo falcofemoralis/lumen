@@ -26,7 +26,7 @@ export function SearchPageContainer() {
   const [enteredText, setEnteredText] = useState('');
   const [recognizing, setRecognizing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const debounce = useRef<NodeJS.Timeout | null>();
+  const debounce = useRef<NodeJS.Timeout | null>(null);
 
   useSpeechRecognitionEvent('start', () => setRecognizing(true));
   useSpeechRecognitionEvent('end', () => setRecognizing(false));

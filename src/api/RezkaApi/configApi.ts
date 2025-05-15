@@ -52,7 +52,7 @@ const configApi: ConfigApiInterface = {
   },
 
   async updateConfig(key: keyof ServiceConfigInterface, value: unknown) {
-    await updateConfig(REZKA_CONFIG, JSON.stringify({
+    updateConfig(REZKA_CONFIG, JSON.stringify({
       ...this.config,
       [key]: value,
     }));

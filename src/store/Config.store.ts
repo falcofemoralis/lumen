@@ -48,13 +48,13 @@ class ConfigStore {
       [key]: value,
     };
 
-    await updateConfig(DEVICE_CONFIG, JSON.stringify(newConfig));
+    updateConfig(DEVICE_CONFIG, JSON.stringify(newConfig));
 
     this.config = newConfig;
   }
 
   async configureDevice(isTV: boolean) {
-    await updateConfig(DEVICE_CONFIG, JSON.stringify({
+    updateConfig(DEVICE_CONFIG, JSON.stringify({
       ...this.config,
       isConfigured: true,
       isTV,

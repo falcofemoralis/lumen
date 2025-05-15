@@ -13,10 +13,10 @@ export const getConfig = (
   return config;
 };
 
-export const updateConfig = async (
+export const updateConfig = (
   key: string,
   value: string,
-): Promise<boolean | null | undefined> => configStorage.setStringAsync(key, value);
+): void => configStorage.set(key, value);
 
 export const getConfigJson = <T>(key: string): T | null => {
   const configJson = getConfig(key);

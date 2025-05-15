@@ -70,7 +70,7 @@
     "react-native-tab-view": "^4.0.11",
     "react-native-web": "~0.20.0",
     "react-native-webview": "^13.13.5",
-    "react-tv-space-navigation": "^5.1.1",
+    "react-tv-space-navigation": "file:libs/react-tv-space-navigation",
     "set-cookie-parser": "^2.7.1"
   },
   "devDependencies": {
