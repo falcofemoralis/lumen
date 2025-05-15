@@ -198,19 +198,19 @@ export function PlayerComponent({
       }
     });
 
-  const longPressGesture = Gesture.LongPress()
-    .onStart(() => {
-      if (showControls || isLocked || !isPlaying) {
-        return;
-      }
+  // const longPressGesture = Gesture.LongPress()
+  //   .onStart(() => {
+  //     if (showControls || isLocked || !isPlaying) {
+  //       return;
+  //     }
 
-      runOnJS(setPlayerRate)(1.5);
-      runOnJS(setLongTapAction)(true);
-    })
-    .onEnd(() => {
-      runOnJS(setPlayerRate)(1);
-      runOnJS(setLongTapAction)(false);
-    });
+  //     runOnJS(setPlayerRate)(1.5);
+  //     runOnJS(setLongTapAction)(true);
+  //   })
+  //   .onEnd(() => {
+  //     runOnJS(setPlayerRate)(1);
+  //     runOnJS(setLongTapAction)(false);
+  //   });
 
   const enablePIP = () => {
     playerRef.current?.startPictureInPicture();
@@ -489,7 +489,7 @@ export function PlayerComponent({
       gesture={ Gesture.Exclusive(
         doubleTap,
         singleTap,
-        longPressGesture,
+        // longPressGesture,
       ) }
     >
       <View style={ styles.controlsContainer }>

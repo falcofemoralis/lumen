@@ -10,6 +10,7 @@ import NotificationStore from 'Store/Notification.store';
 import ServiceStore from 'Store/Service.store';
 import { FilmListInterface } from 'Type/FilmList.interface';
 import { MenuItemInterface } from 'Type/MenuItem.interface';
+import { safeJsonParse } from 'Util/Json';
 import { setTimeoutSafe } from 'Util/Misc';
 import { miscStorage } from 'Util/Storage';
 
@@ -20,7 +21,7 @@ import { MAX_USER_SUGGESTIONS, SEARCH_DEBOUNCE_TIME, USER_SUGGESTIONS } from './
 export function SearchPageContainer() {
   const [query, setQuery] = useState('');
   const [suggestions, setSuggestions] = useState<string[]>(
-    miscStorage.getArray(USER_SUGGESTIONS) || [],
+    safeJsonParse(miscStorage.getString(USER_SUGGESTIONS), []) || [],
   );
   const [filmPager, setFilmPager] = useState<FilmPagerInterface>({});
   const [enteredText, setEnteredText] = useState('');
@@ -70,7 +71,7 @@ export function SearchPageContainer() {
       if (debounce.current) {
         clearTimeout(debounce.current);
       }
-      setSuggestions(miscStorage.getArray(USER_SUGGESTIONS) || []);
+      setSuggestions(safeJsonParse(miscStorage.getString(USER_SUGGESTIONS), []) || []);
 
       return;
     }
@@ -79,7 +80,6 @@ export function SearchPageContainer() {
       clearTimeout(debounce.current);
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     debounce.current = setTimeoutSafe(async () => {
       await searchSuggestions(q);
     }, SEARCH_DEBOUNCE_TIME);
@@ -116,15 +116,15 @@ export function SearchPageContainer() {
   };
 
   const updateUserSuggestions = (q: string) => {
-    const userSuggestions = miscStorage.getArray(USER_SUGGESTIONS) || [];
+    const userSuggestions = safeJsonParse(miscStorage.getString(USER_SUGGESTIONS), []) || [];
 
     const newArray = [q, ...userSuggestions];
     const mArray = new Set(newArray);
     const uniqueArray = [...mArray];
 
-    miscStorage.setArrayAsync(
+    miscStorage.set(
       USER_SUGGESTIONS,
-      uniqueArray.slice(0, MAX_USER_SUGGESTIONS),
+      JSON.stringify(uniqueArray.slice(0, MAX_USER_SUGGESTIONS)),
     );
   };
 
@@ -140,7 +140,7 @@ export function SearchPageContainer() {
 
   const clearSearch = () => {
     setEnteredText('');
-    setSuggestions(miscStorage.getArray(USER_SUGGESTIONS) || []);
+    setSuggestions(safeJsonParse(miscStorage.getString(USER_SUGGESTIONS), []) || []);
     resetSearch();
   };
 

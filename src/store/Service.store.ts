@@ -44,7 +44,7 @@ class ServiceStore {
     this.getCurrentService().setAuthorization(auth);
     this.setProfile(await this.getCurrentService().getProfile());
     this.setSignedIn(true);
-    miscStorage.setString(CREDENTIALS_STORAGE, JSON.stringify({ name, password }));
+    miscStorage.set(CREDENTIALS_STORAGE, JSON.stringify({ name, password }));
   }
 
   logout() {
@@ -52,11 +52,11 @@ class ServiceStore {
     this.getCurrentService().setAuthorization('');
     this.setSignedIn(false);
     this.removeProfile();
-    miscStorage.setString(CREDENTIALS_STORAGE, '');
+    miscStorage.set(CREDENTIALS_STORAGE, '');
   }
 
   setProfile(profile: ProfileInterface) {
-    miscStorage.setString(PROFILE_STORAGE, JSON.stringify(profile));
+    miscStorage.set(PROFILE_STORAGE, JSON.stringify(profile));
   }
 
   getProfile(): ProfileInterface|null {
@@ -64,7 +64,7 @@ class ServiceStore {
   }
 
   removeProfile() {
-    miscStorage.removeItem(PROFILE_STORAGE);
+    miscStorage.delete(PROFILE_STORAGE);
   }
 
   async getNotifications() {
@@ -102,7 +102,7 @@ class ServiceStore {
       },
       []);
 
-      miscStorage.setString(NOTIFICATIONS_STORAGE, JSON.stringify(newItems));
+      miscStorage.set(NOTIFICATIONS_STORAGE, JSON.stringify(newItems));
     }
 
     NavigationStore.setBadgeData(ConfigStore.isTV() ? '(notifications)' : '(account)', 0);
