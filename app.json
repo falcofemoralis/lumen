@@ -67,7 +67,7 @@
       "typedRoutes": true
     },
     "android": {
-	    "edgeToEdgeEnabled": false,
+	    "edgeToEdgeEnabled": true,
       "icon": "./assets/images/icon.png",
       "package": "com.falcofemoralis.lumen",
       "versionCode": 5,

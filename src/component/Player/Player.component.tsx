@@ -15,7 +15,7 @@ import ThemedView from 'Component/ThemedView';
 import * as NavigationBar from 'expo-navigation-bar';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { OrientationLock } from 'expo-screen-orientation';
-import { StatusBar } from 'expo-status-bar';
+import * as StatusBar from 'expo-status-bar';
 import { isPictureInPictureSupported, VideoView } from 'expo-video';
 import t from 'i18n/t';
 import { observer } from 'mobx-react-lite';
@@ -111,10 +111,12 @@ export function PlayerComponent({
   useEffect(() => {
     ScreenOrientation.lockAsync(OrientationLock.LANDSCAPE);
     NavigationBar.setVisibilityAsync('hidden');
+    StatusBar.setStatusBarHidden(true, 'slide')
 
     return () => {
       ScreenOrientation.unlockAsync();
       NavigationBar.setVisibilityAsync('visible');
+      StatusBar.setStatusBarHidden(false, 'slide')
 
       if (controlsTimeout.current) {
         clearTimeout(controlsTimeout.current);
@@ -623,26 +625,20 @@ export function PlayerComponent({
   );
 
   return (
-    <View>
-      <StatusBar
-        hidden
-        animated
+    <ThemedView style={ styles.container }>
+      <VideoView
+        ref={ playerRef }
+        style={ styles.video }
+        player={ player }
+        contentFit="contain"
+        nativeControls={ false }
+        allowsPictureInPicture={ isPictureInPictureSupported() }
       />
-      <ThemedView style={ styles.container }>
-        <VideoView
-          ref={ playerRef }
-          style={ styles.video }
-          player={ player }
-          contentFit="contain"
-          nativeControls={ false }
-          allowsPictureInPicture={ isPictureInPictureSupported() }
-        />
-        { renderSubtitles() }
-        { renderControls() }
-        { renderLoader() }
-        { renderModals() }
-      </ThemedView>
-    </View>
+      { renderSubtitles() }
+      { renderControls() }
+      { renderLoader() }
+      { renderModals() }
+    </ThemedView>
   );
 }
 
