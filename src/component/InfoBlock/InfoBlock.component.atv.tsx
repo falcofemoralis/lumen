@@ -4,13 +4,13 @@ import ThemedText from 'Component/ThemedText';
 import { View } from 'react-native';
 import { scale } from 'Util/CreateStyles';
 
-import { styles } from './ThemedInfo.style';
-import { ThemedInfoComponentProps } from './ThemedInfo.type';
+import { styles } from './InfoBlock.style.atv';
+import { InfoBlockComponentProps } from './InfoBlock.type';
 
-export function ThemedInfoComponent({
+export function InfoBlockComponent({
   title,
   subtitle,
-}: ThemedInfoComponentProps) {
+}: InfoBlockComponentProps) {
   return (
     <View style={ styles.container }>
       <View style={ styles.iconContainer }>
@@ -34,4 +34,4 @@ export function ThemedInfoComponent({
   );
 }
 
-export default ThemedInfoComponent;
+export default InfoBlockComponent;

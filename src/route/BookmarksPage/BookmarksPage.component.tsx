@@ -1,7 +1,7 @@
 import FilmPager from 'Component/FilmPager';
+import InfoBlock from 'Component/InfoBlock';
 import LoginForm from 'Component/LoginForm';
 import Page from 'Component/Page';
-import ThemedInfo from 'Component/ThemedInfo';
 import t from 'i18n/t';
 import React from 'react';
 import { View } from 'react-native';
@@ -30,7 +30,7 @@ export function BookmarksPageComponent({
     if (!menuItems.length) {
       return (
         <View style={ styles.empty }>
-          <ThemedInfo
+          <InfoBlock
             title={ t('No bookmarks') }
             subtitle={ t('You have not bookmarked any films yet') }
           />

@@ -1,6 +1,6 @@
+import InfoBlock from 'Component/InfoBlock';
 import Loader from 'Component/Loader';
 import ThemedButton from 'Component/ThemedButton';
-import ThemedInfo from 'Component/ThemedInfo';
 import ThemedInput from 'Component/ThemedInput';
 import { router } from 'expo-router';
 import t from 'i18n/t';
@@ -68,7 +68,7 @@ export function LoginFormComponent({
       <View
         style={ styles.container }
       >
-        <ThemedInfo
+        <InfoBlock
           title={ t('You are not logged in') }
           subtitle={ t('Sign in to sync content') }
         />
