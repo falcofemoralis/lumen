@@ -1,10 +1,9 @@
-import PlayerStore from 'Component/Player/Player.store';
+import { useOverlayContext } from 'Context/OverlayContext';
+import { usePlayerContext } from 'Context/PlayerContext';
+import { useServiceContext } from 'Context/ServiceContext';
 import { withTV } from 'Hooks/withTV';
-import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
-import OverlayStore from 'Store/Overlay.store';
-import ServiceStore from 'Store/Service.store';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { EpisodeInterface, FilmVoiceInterface, SeasonInterface } from 'Type/FilmVoice.interface';
 
@@ -20,10 +19,13 @@ export function PlayerVideoSelectorContainer({
   onSelect,
 }: PlayerVideoSelectorContainerProps) {
   const { voices = [] } = film;
+  const { selectedVoice: contextVoice, updateSelectedVoice } = usePlayerContext();
+  const { goToPreviousOverlay } = useOverlayContext();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedVoice, setSelectedVoice] = useState<FilmVoiceInterface>(
     voiceInput ?? voices.find(({ isActive }) => isActive) ?? voices[0],
   );
+  const { isSignedIn, getCurrentService } = useServiceContext();
 
   const [selectedSeasonId, setSelectedSeasonId] = useState<string | undefined>(
     selectedVoice.lastSeasonId,
@@ -35,7 +37,7 @@ export function PlayerVideoSelectorContainer({
   const getStoreVoice = () => {
     const { id } = film;
 
-    const { filmId, voice } = PlayerStore.selectedVoice || {};
+    const { filmId, voice } = contextVoice || {};
 
     if (filmId === id && voice) {
       return voice;
@@ -55,7 +57,7 @@ export function PlayerVideoSelectorContainer({
       setSelectedSeasonId(voice.lastSeasonId);
       setSelectedEpisodeId(voice.lastEpisodeId);
     }
-  }, [PlayerStore.selectedVoice]);
+  }, [contextVoice]);
 
   const getSeasons = (): SeasonInterface[] => {
     const { seasons = [] } = selectedVoice;
@@ -72,8 +74,8 @@ export function PlayerVideoSelectorContainer({
   };
 
   const handleSelectVideo = (video: FilmVideoInterface, voice: FilmVoiceInterface) => {
-    if (ServiceStore.isSignedIn) {
-      ServiceStore.getCurrentService().saveWatch(film, voice)
+    if (isSignedIn) {
+      getCurrentService().saveWatch(film, voice)
         .catch((error) => {
           NotificationStore.displayError(error as Error);
         });
@@ -83,7 +85,7 @@ export function PlayerVideoSelectorContainer({
 
     if (getStoreVoice()) {
       // if store voice was updated, re update it
-      PlayerStore.setSelectedVoice(film.id, voice);
+      updateSelectedVoice(film.id, voice);
     }
   };
 
@@ -101,7 +103,7 @@ export function PlayerVideoSelectorContainer({
       setIsLoading(true);
 
       try {
-        const video = await ServiceStore.getCurrentService()
+        const video = await getCurrentService()
           .getFilmStreamsByVoice(film, voice);
 
         handleSelectVideo(video, voice);
@@ -117,7 +119,7 @@ export function PlayerVideoSelectorContainer({
     setIsLoading(true);
 
     try {
-      const updatedVoice = await ServiceStore.getCurrentService().getFilmSeasons(film, voice);
+      const updatedVoice = await getCurrentService().getFilmSeasons(film, voice);
 
       setSelectedVoice(updatedVoice);
 
@@ -135,7 +137,7 @@ export function PlayerVideoSelectorContainer({
       setIsLoading(false);
     }
 
-    OverlayStore.goToPreviousOverlay();
+    goToPreviousOverlay();
   };
 
   const handleSelectEpisode = async (episodeId: string) => {
@@ -145,7 +147,7 @@ export function PlayerVideoSelectorContainer({
     setIsLoading(true);
 
     try {
-      const video = await ServiceStore.getCurrentService()
+      const video = await getCurrentService()
         .getFilmStreamsByEpisodeId(
           film,
           selectedVoice,
@@ -195,4 +197,4 @@ export function PlayerVideoSelectorContainer({
   });
 }
 
-export default observer(PlayerVideoSelectorContainer);
+export default PlayerVideoSelectorContainer;

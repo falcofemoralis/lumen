@@ -5,5 +5,5 @@ export interface LoginFormContainerProps {
 export interface LoginFormComponentProps {
   isLoading: boolean;
   withRedirect?: boolean;
-  login: (username: string, password: string) => void;
+  handleLogin: (username: string, password: string) => void;
 }

@@ -1,8 +1,7 @@
 import { FilmPagerInterface } from 'Component/FilmPager/FilmPager.type';
+import { useServiceContext } from 'Context/ServiceContext';
 import { withTV } from 'Hooks/withTV';
-import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
-import ServiceStore from 'Store/Service.store';
 import { FilmListInterface } from 'Type/FilmList.interface';
 import { MenuItemInterface } from 'Type/MenuItem.interface';
 
@@ -12,11 +11,12 @@ import { CategoryPageContainerProps } from './CategoryPage.type';
 
 export function CategoryPageContainer({ link }: CategoryPageContainerProps) {
   const [filmPager, setFilmPager] = useState<FilmPagerInterface>({});
+  const { getCurrentService } = useServiceContext();
 
   const onLoadFilms = async (
     _menuItem: MenuItemInterface,
     currentPage: number,
-  ) => ServiceStore.getCurrentService().getFilms(currentPage, link);
+  ) => getCurrentService().getFilms(currentPage, link);
 
   const onUpdateFilms = async (key: string, filmList: FilmListInterface) => {
     setFilmPager((prevFilmPager) => ({
@@ -42,4 +42,4 @@ export function CategoryPageContainer({ link }: CategoryPageContainerProps) {
   });
 }
 
-export default observer(CategoryPageContainer);
+export default CategoryPageContainer;

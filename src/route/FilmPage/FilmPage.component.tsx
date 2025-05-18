@@ -10,6 +10,7 @@ import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImageModal from 'Component/ThemedImageModal';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedText from 'Component/ThemedText';
+import { useOverlayContext } from 'Context/OverlayContext';
 import { useRouter } from 'expo-router';
 import t from 'i18n/t';
 import React, { useCallback, useRef, useState } from 'react';
@@ -23,7 +24,6 @@ import {
   View,
 } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
-import OverlayStore from 'Store/Overlay.store';
 import Colors from 'Style/Colors';
 import { CollectionItemInterface } from 'Type/CollectionItem';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
@@ -58,6 +58,7 @@ export function FilmPageComponent({
   handleShare,
 }: FilmPageComponentProps) {
   const router = useRouter();
+  const { openOverlay, goToPreviousOverlay } = useOverlayContext();
   const [commentsVisible, setCommentsVisible] = useState(false);
   const commentsRef = useRef<CommentsRef>(null);
 
@@ -314,7 +315,7 @@ export function FilmPageComponent({
   const renderActions = () => (
     <View style={ styles.actions }>
       { renderAction(t('Trailer'), 'movie-open-check-outline', () => NotificationStore.displayMessage(t('Not implemented'))) }
-      { renderAction(t('Bookmark'), 'movie-star-outline', () => OverlayStore.openOverlay(bookmarksOverlayId)) }
+      { renderAction(t('Bookmark'), 'movie-star-outline', () => openOverlay(bookmarksOverlayId)) }
       { renderAction(t('Download'), 'folder-download-outline', () => NotificationStore.displayMessage(t('Not implemented'))) }
     </View>
   );
@@ -373,7 +374,7 @@ export function FilmPageComponent({
     return (
       <ThemedOverlay
         id={ scheduleOverlayId }
-        onHide={ () => OverlayStore.goToPreviousOverlay() }
+        onHide={ () => goToPreviousOverlay() }
       >
         <ScrollView>
           { schedule.map(({ name, items }) => (
@@ -418,7 +419,7 @@ export function FilmPageComponent({
           )) }
         </View>
         <ThemedButton
-          onPress={ () => OverlayStore.openOverlay(scheduleOverlayId) }
+          onPress={ () => openOverlay(scheduleOverlayId) }
           style={ styles.scheduleViewAll }
         >
           { t('View full schedule') }

@@ -1,9 +1,9 @@
+import { useServiceContext } from 'Context/ServiceContext';
 import { withTV } from 'Hooks/withTV';
 import {
   forwardRef, useEffect, useImperativeHandle, useRef, useState,
 } from 'react';
 import NotificationStore from 'Store/Notification.store';
-import ServiceStore from 'Store/Service.store';
 import { CommentInterface } from 'Type/Comment.interface';
 
 import CommentsComponent from './Comments.component';
@@ -24,6 +24,7 @@ export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>
     });
     const updatingStateRef = useRef(false);
     const [isLoading, setIsLoading] = useState(false);
+    const { getCurrentService } = useServiceContext();
 
     useEffect(() => {
       loadComments(1);
@@ -54,7 +55,7 @@ export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>
           const {
             items: newItems,
             totalPages: newTotalsPages,
-          } = await ServiceStore.getCurrentService().getComments(
+          } = await getCurrentService().getComments(
             id,
             page,
           );

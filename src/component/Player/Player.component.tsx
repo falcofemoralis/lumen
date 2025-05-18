@@ -12,13 +12,13 @@ import { IconInterface, IconPackType } from 'Component/ThemedIcon/ThemedIcon.typ
 import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
+import { useOverlayContext } from 'Context/OverlayContext';
 import * as NavigationBar from 'expo-navigation-bar';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { OrientationLock } from 'expo-screen-orientation';
 import * as StatusBar from 'expo-status-bar';
 import { isPictureInPictureSupported, VideoView } from 'expo-video';
 import t from 'i18n/t';
-import { observer } from 'mobx-react-lite';
 import React, {
   useEffect, useRef, useState,
 } from 'react';
@@ -33,7 +33,6 @@ import {
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
-import OverlayStore from 'Store/Overlay.store';
 import { scale } from 'Util/CreateStyles';
 import { setTimeoutSafe } from 'Util/Misc';
 
@@ -88,6 +87,7 @@ export function PlayerComponent({
   handleLockControls,
   handleShare,
 }: PlayerComponentProps) {
+  const { currentOverlay, goToPreviousOverlay } = useOverlayContext();
   const [showControls, setShowControls] = useState(false);
   const [isScrolling, setIsScrolling] = useState(false);
   const [doubleTapAction, setDoubleTapAction] = useState<DoubleTapAction | null>(null);
@@ -104,7 +104,7 @@ export function PlayerComponent({
   const handleHideControls = () => {
     canHideControls.current = isPlaying
       && showControls
-      && !OverlayStore.currentOverlay.length
+      && !currentOverlay.length
       && !isScrolling;
   };
 
@@ -134,7 +134,7 @@ export function PlayerComponent({
     if (canHideControls.current) {
       handleUserInteraction();
     }
-  }, [OverlayStore.currentOverlay.length]);
+  }, [currentOverlay.length]);
 
   const setControlsTimeout = () => {
     if (controlsTimeout.current) {
@@ -575,7 +575,7 @@ export function PlayerComponent({
   const renderCommentsOverlay = () => (
     <ThemedOverlay
       id={ commentsOverlayId }
-      onHide={ () => OverlayStore.goToPreviousOverlay() }
+      onHide={ () => goToPreviousOverlay() }
       containerStyle={ styles.commentsOverlay }
       contentContainerStyle={ styles.commentsOverlayContent }
     >
@@ -642,4 +642,4 @@ export function PlayerComponent({
   );
 }
 
-export default observer(PlayerComponent);
+export default PlayerComponent;

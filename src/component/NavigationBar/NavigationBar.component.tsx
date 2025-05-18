@@ -3,15 +3,14 @@ import ThemedIcon from 'Component/ThemedIcon';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
+import { useServiceContext } from 'Context/ServiceContext';
 import { Tabs } from 'expo-router';
-import { observer } from 'mobx-react-lite';
 import React, { useCallback } from 'react';
 import {
   Image,
   Pressable,
   View,
 } from 'react-native';
-import NavigationStore from 'Store/Navigation.store';
 import { Colors } from 'Style/Colors';
 import { CONTENT_WRAPPER_PADDING } from 'Style/Layout';
 import { scale } from 'Util/CreateStyles';
@@ -30,6 +29,8 @@ export function NavigationBarComponent({
   navigateTo,
   isFocused,
 }: NavigationBarComponentProps) {
+  const { badgeData } = useServiceContext();
+
   const renderDefaultTab = useCallback((tab: Tab, focused: boolean) => {
     const { title, icon, iconFocused } = tab;
 
@@ -62,7 +63,7 @@ export function NavigationBarComponent({
     const { title } = tab;
     const { avatar } = profile ?? {};
 
-    const badge = NavigationStore.badgeData[tab.route] ?? 0;
+    const badge = badgeData[tab.route] ?? 0;
 
     return (
       <View style={ styles.tab }>
@@ -97,7 +98,7 @@ export function NavigationBarComponent({
         </ThemedText>
       </View>
     );
-  }, [profile, NavigationStore.badgeData]);
+  }, [profile, badgeData]);
 
   const renderTab = useCallback((
     tab: Tab,
@@ -151,11 +152,11 @@ export function NavigationBarComponent({
         sceneStyle: {
           marginHorizontal: CONTENT_WRAPPER_PADDING,
         },
-        lazy: false,
+        // lazy: false,
       } }
       tabBar={ renderTabBar }
     />
   );
 }
 
-export default observer(NavigationBarComponent);
+export default NavigationBarComponent;

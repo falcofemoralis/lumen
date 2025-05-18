@@ -1,13 +1,11 @@
 import { useIsFocused } from '@react-navigation/native';
-import { useMenuContext } from 'Component/NavigationBar/MenuContext';
 import ThemedView from 'Component/ThemedView';
-import { observer } from 'mobx-react-lite';
+import { useNavigationContext } from 'Context/NavigationContext';
 import { useCallback, useEffect } from 'react';
 import { Keyboard } from 'react-native';
 import ErrorBoundary from 'react-native-error-boundary';
 import { Portal } from 'react-native-paper';
 import { Directions, SpatialNavigationRoot, useLockSpatialNavigation } from 'react-tv-space-navigation';
-import NavigationStore from 'Store/Navigation.store';
 
 import { styles } from './Page.style.atv';
 import { PageComponentProps } from './Page.type';
@@ -42,17 +40,17 @@ export function PageComponent({
   style,
 }: PageComponentProps) {
   const isFocused = useIsFocused();
-  const { isOpen: isMenuOpen, toggleMenu } = useMenuContext();
+  const { isMenuOpen, toggleMenu, isNavigationLocked } = useNavigationContext();
 
   const isActive = isFocused && !isMenuOpen;
 
   const onDirectionHandledWithoutMovement = useCallback(
     (movement: string) => {
-      if (movement === Directions.LEFT && !NavigationStore.isNavigationLocked) {
+      if (movement === Directions.LEFT && !isNavigationLocked) {
         toggleMenu(true);
       }
     },
-    [toggleMenu, NavigationStore.isNavigationLocked],
+    [toggleMenu, isNavigationLocked],
   );
 
   return (
@@ -77,4 +75,4 @@ export function PageComponent({
   );
 }
 
-export default observer(PageComponent);
+export default PageComponent;

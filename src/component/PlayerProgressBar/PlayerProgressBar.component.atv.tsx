@@ -6,9 +6,9 @@ import {
   REWIND_SECONDS_TV,
   RewindDirection,
 } from 'Component/Player/Player.config';
-import PlayerStore from 'Component/Player/Player.store';
 import { LongEvent } from 'Component/Player/Player.type';
 import PlayerStoryboard from 'Component/PlayerStoryboard';
+import { usePlayerContext } from 'Context/PlayerContext';
 import React, {
   useEffect,
   useRef,
@@ -25,14 +25,12 @@ import { SupportedKeys } from 'Util/RemoteControl/SupportedKeys';
 import { styles } from './PlayerProgressBar.style.atv';
 import { PlayerProgressBarComponentProps } from './PlayerProgressBar.type';
 
-// eslint-disable-next-line functional/no-let
 const autoRewindParams: AutoRewindParams = {
   ...DEFAULT_AUTO_REWIND_PARAMS,
 };
 
 export const PlayerProgressBarComponent = ({
   player,
-  progressStatus,
   storyboardUrl,
   thumbRef,
   hideActions,
@@ -44,6 +42,8 @@ export const PlayerProgressBarComponent = ({
   handleUserInteraction,
   togglePlayPause = noopFn,
 }: PlayerProgressBarComponentProps) => {
+  const { progressStatus, focusedElement, updateProgressStatus } = usePlayerContext();
+
   const longEvent = useRef<{[key: string]: LongEvent}>({
     [SupportedKeys.LEFT]: {
       isKeyDownPressed: false,
@@ -63,7 +63,7 @@ export const PlayerProgressBarComponent = ({
     if (autoRewindParams.active) {
       autoRewindParams.active = false;
 
-      seekToPosition(PlayerStore.progressStatus.progressPercentage);
+      seekToPosition(progressStatus.progressPercentage);
 
       if (autoRewindParams.statusBefore !== undefined && autoRewindParams.statusBefore) {
         togglePlayPause(false);
@@ -97,7 +97,7 @@ export const PlayerProgressBarComponent = ({
       // }
 
       if (autoRewindParams.wasStarted) {
-        // eslint-disable-next-line no-await-in-loop
+
         await wait(autoRewindParams.ms);
       } else {
         autoRewindParams.wasStarted = true;
@@ -110,16 +110,16 @@ export const PlayerProgressBarComponent = ({
       const seekTime = direction === RewindDirection.BACKWARD
         ? autoRewindParams.seconds * -1
         : autoRewindParams.seconds;
-      const currentTime = calculateCurrentTime(PlayerStore.progressStatus.progressPercentage);
+      const currentTime = calculateCurrentTime(progressStatus.progressPercentage);
       const newTime = currentTime + seekTime;
 
       if (newTime < 0 || newTime > duration) {
-        PlayerStore.setProgressStatus(newTime < 0 ? 0 : duration, 0, duration);
+        updateProgressStatus(newTime < 0 ? 0 : duration, 0, duration);
 
         return;
       }
 
-      PlayerStore.setProgressStatus(
+      updateProgressStatus(
         newTime,
         0,
         duration,
@@ -166,7 +166,7 @@ export const PlayerProgressBarComponent = ({
 
   useEffect(() => {
     const keyDownListener = (type: SupportedKeys) => {
-      if (PlayerStore.focusedElement === FocusedElement.PROGRESS_THUMB) {
+      if (focusedElement === FocusedElement.PROGRESS_THUMB) {
         if (type === SupportedKeys.LEFT) {
           handleProgressThumbKeyDown(type, RewindDirection.BACKWARD);
         }
@@ -180,7 +180,7 @@ export const PlayerProgressBarComponent = ({
     };
 
     const keyUpListener = (type: SupportedKeys) => {
-      if (PlayerStore.focusedElement === FocusedElement.PROGRESS_THUMB) {
+      if (focusedElement === FocusedElement.PROGRESS_THUMB) {
         if (type === SupportedKeys.LEFT) {
           handleProgressThumbKeyUp(type, RewindDirection.BACKWARD);
         }
@@ -210,7 +210,7 @@ export const PlayerProgressBarComponent = ({
     }
 
     const currentTime = hideActions ? calculateCurrentTime(
-      PlayerStore.progressStatus.progressPercentage,
+      progressStatus.progressPercentage,
     ) : 0;
 
     return (

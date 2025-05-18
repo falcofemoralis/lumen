@@ -11,6 +11,7 @@ import ThemedImage from 'Component/ThemedImage';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
+import { useOverlayContext } from 'Context/OverlayContext';
 import t from 'i18n/t';
 import { useState } from 'react';
 import { Dimensions, View } from 'react-native';
@@ -21,7 +22,6 @@ import {
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
 import NotificationStore from 'Store/Notification.store';
-import OverlayStore from 'Store/Overlay.store';
 import Colors from 'Style/Colors';
 import { CollectionItemInterface } from 'Type/CollectionItem';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
@@ -49,6 +49,7 @@ export function FilmPageComponent({
   handleSelectCategory,
 }: FilmPageComponentProps) {
   const { height } = Dimensions.get('window');
+  const { openOverlay, goToPreviousOverlay } = useOverlayContext();
   const [showReadMore, setShowReadMore] = useState<boolean | null>(null);
 
   if (!film) {
@@ -101,8 +102,8 @@ export function FilmPageComponent({
       <DefaultFocus>
         <ThemedView style={ styles.actions }>
           { renderPlayButton() }
-          { renderAction(t('Comments'), 'comment-text-multiple-outline', () => OverlayStore.openOverlay(commentsOverlayId)) }
-          { renderAction(t('Bookmark'), 'movie-star-outline', () => OverlayStore.openOverlay(bookmarksOverlayId)) }
+          { renderAction(t('Comments'), 'comment-text-multiple-outline', () => openOverlay(commentsOverlayId)) }
+          { renderAction(t('Bookmark'), 'movie-star-outline', () => openOverlay(bookmarksOverlayId)) }
           { renderAction(t('Trailer'), 'movie-open-check-outline') }
         </ThemedView>
       </DefaultFocus>
@@ -360,7 +361,7 @@ export function FilmPageComponent({
     return (
       <ThemedOverlay
         id={ scheduleOverlayId }
-        onHide={ () => OverlayStore.goToPreviousOverlay() }
+        onHide={ () => goToPreviousOverlay() }
         containerStyle={ styles.scheduleOverlay }
         contentContainerStyle={ styles.scheduleOverlayContent }
       >
@@ -417,7 +418,7 @@ export function FilmPageComponent({
           </SpatialNavigationScrollView>
         </View>
         <ThemedButton
-          onPress={ () => OverlayStore.openOverlay(scheduleOverlayId) }
+          onPress={ () => openOverlay(scheduleOverlayId) }
           style={ styles.scheduleViewAll }
         >
           { t('View full schedule') }
@@ -523,7 +524,7 @@ export function FilmPageComponent({
   const renderCommentsOverlay = () => (
     <ThemedOverlay
       id={ commentsOverlayId }
-      onHide={ () => OverlayStore.goToPreviousOverlay() }
+      onHide={ () => goToPreviousOverlay() }
       containerStyle={ styles.commentsOverlay }
     >
       <Comments

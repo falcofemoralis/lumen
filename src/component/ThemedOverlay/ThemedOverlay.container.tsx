@@ -1,7 +1,6 @@
+import { useOverlayContext } from 'Context/OverlayContext';
 import { withTV } from 'Hooks/withTV';
-import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
-import OverlayStore from 'Store/Overlay.store';
 
 import ThemedOverlayComponent from './ThemedOverlay.component';
 import ThemedOverlayComponentTV from './ThemedOverlay.component.atv';
@@ -11,12 +10,13 @@ export function ThemedOverlayContainer({
   id,
   ...props
 }: ThemedOverlayContainerProps) {
+  const { currentOverlay, isOverlayOpened, isOverlayVisible } = useOverlayContext();
   const [isOpened, setIsOpened] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    const opened = OverlayStore.isOverlayOpened(id);
-    const visible = OverlayStore.isOverlayVisible(id);
+    const opened = isOverlayOpened(id);
+    const visible = isOverlayVisible(id);
 
     if (opened !== isOpened) {
       setIsOpened(opened);
@@ -25,7 +25,7 @@ export function ThemedOverlayContainer({
     if (visible !== isVisible) {
       setIsVisible(visible);
     }
-  }, [OverlayStore.currentOverlay.length]);
+  }, [currentOverlay.length]);
 
   const containerProps = () => ({
     ...props,
@@ -39,4 +39,4 @@ export function ThemedOverlayContainer({
   });
 }
 
-export default observer(ThemedOverlayContainer);
+export default ThemedOverlayContainer;

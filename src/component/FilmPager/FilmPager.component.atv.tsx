@@ -1,9 +1,9 @@
 import FilmGrid from 'Component/FilmGrid';
 import Loader from 'Component/Loader';
-import { useMenuContext } from 'Component/NavigationBar/MenuContext';
 import ThemedButton from 'Component/ThemedButton';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedView from 'Component/ThemedView';
+import { useNavigationContext } from 'Context/NavigationContext';
 import { useNavigation } from 'expo-router';
 import {
   createContext,
@@ -37,13 +37,13 @@ export function FilmPagerComponent({
   handleMenuItemChange,
   onRowFocus = noopFn,
 }: FilmPagerComponentProps) {
-  const { isOpen: isMenuOpen } = useMenuContext();
+  const { isMenuOpen } = useNavigationContext();
   const { isFocused: isPageFocused } = useNavigation();
   const { lock, unlock } = useLockSpatialNavigation();
   const [isMenuActive, setIsMenuActive] = useState(false);
   const rowRef = useRef<number>(0);
   const canNavigateMenuRef = useRef<boolean>(true);
-  const timerRef = useRef<NodeJS.Timeout | null>();
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
   const [currentRow, setCurrentRow] = useState(0);
 
   useEffect(() => {

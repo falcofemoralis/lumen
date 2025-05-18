@@ -1,43 +1,38 @@
 import Page from 'Component/Page';
 import Player from 'Component/Player';
+import { useNavigationContext } from 'Context/NavigationContext';
+import { PlayerProvider } from 'Context/PlayerContext';
 import { useEffect } from 'react';
 import ConfigStore from 'Store/Config.store';
-import NavigationStore from 'Store/Navigation.store';
 import { getPlayerStream } from 'Util/Player';
 
 import { PlayerPageComponentProps } from './PlayerPage.type';
 
 export function PlayerPageComponent({ video, film, voice }: PlayerPageComponentProps) {
+  const { lockNavigation, unlockNavigation } = useNavigationContext();
+
   useEffect(() => {
     if (ConfigStore.isTV()) {
-      NavigationStore.lockNavigation();
+      lockNavigation();
     }
 
     return () => {
       if (ConfigStore.isTV()) {
-        NavigationStore.unlockNavigation();
+        unlockNavigation();
       }
     };
   }, []);
 
-  // const testVideo = {
-  //   ...video,
-  //   streams: [
-  //     {
-  //       url: DEMO_VIDEO,
-  //       quality: '360p',
-  //     },
-  //   ],
-  // } as FilmVideoInterface;
-
   return (
     <Page testID="player-page">
-      <Player
-        video={ video }
-        film={ film }
-        voice={ voice }
-        stream={ getPlayerStream(video) }
-      />
+      <PlayerProvider>
+        <Player
+          video={ video }
+          film={ film }
+          voice={ voice }
+          stream={ getPlayerStream(video) }
+        />
+      </PlayerProvider>
     </Page>
   );
 }

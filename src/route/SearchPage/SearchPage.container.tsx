@@ -1,4 +1,5 @@
 import { FilmPagerInterface } from 'Component/FilmPager/FilmPager.type';
+import { useServiceContext } from 'Context/ServiceContext';
 import {
   ExpoSpeechRecognitionModule,
   useSpeechRecognitionEvent,
@@ -7,7 +8,6 @@ import { withTV } from 'Hooks/withTV';
 import { useRef, useState } from 'react';
 import { Keyboard } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
-import ServiceStore from 'Store/Service.store';
 import { FilmListInterface } from 'Type/FilmList.interface';
 import { MenuItemInterface } from 'Type/MenuItem.interface';
 import { safeJsonParse } from 'Util/Json';
@@ -28,6 +28,7 @@ export function SearchPageContainer() {
   const [recognizing, setRecognizing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const debounce = useRef<NodeJS.Timeout | null>(null);
+  const { getCurrentService } = useServiceContext();
 
   useSpeechRecognitionEvent('start', () => setRecognizing(true));
   useSpeechRecognitionEvent('end', () => setRecognizing(false));
@@ -37,7 +38,7 @@ export function SearchPageContainer() {
 
   const searchSuggestions = async (q: string) => {
     try {
-      const res = await ServiceStore.getCurrentService().searchSuggestions(q);
+      const res = await getCurrentService().searchSuggestions(q);
 
       setSuggestions(res);
     } catch (e) {
@@ -53,7 +54,7 @@ export function SearchPageContainer() {
     setIsLoading(true);
 
     try {
-      const films = await ServiceStore.getCurrentService().search(q, 1);
+      const films = await getCurrentService().search(q, 1);
 
       onUpdateFilms('search', films);
     } catch (e) {
@@ -172,7 +173,7 @@ export function SearchPageContainer() {
   const onLoadFilms = async (
     _menuItem: MenuItemInterface,
     currentPage: number,
-  ) => ServiceStore.getCurrentService().search(query, currentPage);
+  ) => getCurrentService().search(query, currentPage);
 
   const onUpdateFilms = async (key: string, filmList: FilmListInterface) => {
     setFilmPager((prevFilmPager) => ({

@@ -12,10 +12,11 @@ import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
+import { useOverlayContext } from 'Context/OverlayContext';
+import { usePlayerContext } from 'Context/PlayerContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { VideoView } from 'expo-video';
 import t from 'i18n/t';
-import { observer } from 'mobx-react-lite';
 import React, {
   useEffect,
   useRef,
@@ -32,7 +33,6 @@ import {
   SpatialNavigationNodeRef,
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
-import OverlayStore from 'Store/Overlay.store';
 import { scale } from 'Util/CreateStyles';
 import { setTimeoutSafe } from 'Util/Misc';
 import RemoteControlManager from 'Util/RemoteControl/RemoteControlManager';
@@ -46,7 +46,6 @@ import {
   PLAYER_CONTROLS_TIMEOUT,
   RewindDirection,
 } from './Player.config';
-import PlayerStore from './Player.store';
 import { styles } from './Player.style.atv';
 import { PlayerComponentProps } from './Player.type';
 
@@ -83,6 +82,8 @@ export function PlayerComponent({
   openBookmarksOverlay,
   openCommentsOverlay,
 }: PlayerComponentProps) {
+  const { focusedElement, updateFocusedElement } = usePlayerContext();
+  const { currentOverlay, goToPreviousOverlay } = useOverlayContext();
   const [showControls, setShowControls] = useState(false);
   const [hideActions, setHideActions] = useState(false);
   const controlsTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -106,7 +107,7 @@ export function PlayerComponent({
   const handleHideControls = () => {
     canHideControls.current = isPlaying
     && showControls
-    && !OverlayStore.currentOverlay.length;
+    && !currentOverlay.length;
   };
 
   useEffect(() => () => {
@@ -125,7 +126,7 @@ export function PlayerComponent({
     if (canHideControls.current) {
       handleUserInteraction();
     }
-  }, [OverlayStore.currentOverlay.length]);
+  }, [currentOverlay.length]);
 
   useEffect(() => {
     const keyDownListener = (type: SupportedKeys) => {
@@ -135,7 +136,7 @@ export function PlayerComponent({
         }
 
         if (type === SupportedKeys.UP) {
-          PlayerStore.setFocusedElement(FocusedElement.TOP_ACTION);
+          updateFocusedElement(FocusedElement.TOP_ACTION);
           topActionRef.current?.focus();
         }
 
@@ -143,7 +144,7 @@ export function PlayerComponent({
           || type === SupportedKeys.LEFT
           || type === SupportedKeys.RIGHT
         ) {
-          PlayerStore.setFocusedElement(FocusedElement.PROGRESS_THUMB);
+          updateFocusedElement(FocusedElement.PROGRESS_THUMB);
           middleActionRef.current?.focus();
 
           if (type === SupportedKeys.LEFT || type === SupportedKeys.RIGHT) {
@@ -152,7 +153,7 @@ export function PlayerComponent({
         }
 
         if (type === SupportedKeys.DOWN) {
-          PlayerStore.setFocusedElement(FocusedElement.BOTTOM_ACTION);
+          updateFocusedElement(FocusedElement.BOTTOM_ACTION);
           bottomActionRef.current?.focus();
         }
 
@@ -161,7 +162,7 @@ export function PlayerComponent({
         return true;
       }
 
-      if (PlayerStore.focusedElement === FocusedElement.PROGRESS_THUMB) {
+      if (focusedElement === FocusedElement.PROGRESS_THUMB) {
         if (type === SupportedKeys.ENTER) {
           togglePlayPause();
         }
@@ -270,7 +271,7 @@ export function PlayerComponent({
     <SpatialNavigationFocusableView
       ref={ ref }
       onSelect={ () => handleUserInteraction(action) }
-      onFocus={ () => handleUserInteraction(() => { PlayerStore.setFocusedElement(el); }) }
+      onFocus={ () => handleUserInteraction(() => { updateFocusedElement(el); }) }
     >
       { ({ isFocused }) => (
         <ThemedIcon
@@ -356,7 +357,7 @@ export function PlayerComponent({
         seekToPosition={ seekToPosition }
         thumbRef={ middleActionRef }
         onFocus={ () => {
-          PlayerStore.setFocusedElement(FocusedElement.PROGRESS_THUMB);
+          updateFocusedElement(FocusedElement.PROGRESS_THUMB);
         } }
         toggleSeekMode={ toggleSeekMode }
         rewindPosition={ rewindPosition }
@@ -501,7 +502,7 @@ export function PlayerComponent({
   const renderCommentsOverlay = () => (
     <ThemedOverlay
       id={ commentsOverlayId }
-      onHide={ () => OverlayStore.goToPreviousOverlay() }
+      onHide={ () => goToPreviousOverlay() }
       containerStyle={ styles.commentsOverlay }
     >
       <Comments
@@ -561,4 +562,4 @@ export function PlayerComponent({
   );
 }
 
-export default observer(PlayerComponent);
+export default PlayerComponent;

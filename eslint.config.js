@@ -1,21 +1,27 @@
 const { defineConfig } = require('eslint/config');
 const expoConfig = require('eslint-config-expo/flat');
-const stylisticJsx = require('@stylistic/eslint-plugin-jsx');
+const stylisticTs = require('@stylistic/eslint-plugin-ts');
 const eslintComments = require('eslint-plugin-eslint-comments');
 const etc = require('eslint-plugin-etc');
 const reactPerf = require('eslint-plugin-react-perf');
 const simpleImportSort = require('eslint-plugin-simple-import-sort');
+const typescriptEslint = require('@typescript-eslint/eslint-plugin');
+const tsParser = require('@typescript-eslint/parser');
 
 module.exports = defineConfig([
   expoConfig,
   {
     ignores: ['dist/*'],
     plugins: {
-      '@stylistic/jsx': stylisticJsx,
+      '@stylistic-plugin-ts': stylisticTs,
       'eslint-comments': eslintComments,
       etc,
       'react-perf': reactPerf,
-      'simple-import-sort': simpleImportSort
+      'simple-import-sort': simpleImportSort,
+      '@typescript-eslint': typescriptEslint,
+    },
+    languageOptions: {
+      parser: tsParser,
     },
     rules: {
       // eslint
@@ -28,7 +34,30 @@ module.exports = defineConfig([
       'no-else-return': ['warn', {
         allowElseIf: false,
       }],
-      indent: 'off',
+      indent: ['error', 2, {
+        SwitchCase: 1,
+        VariableDeclarator: 1,
+        outerIIFEBody: 1,
+        // MemberExpression: null,
+        FunctionDeclaration: {
+          parameters: 1,
+          body: 1
+        },
+        FunctionExpression: {
+          parameters: 1,
+          body: 1
+        },
+        CallExpression: {
+          arguments: 1
+        },
+        ArrayExpression: 1,
+        ObjectExpression: 1,
+        ImportDeclaration: 1,
+        flatTernaryExpressions: false,
+        // list derived from https://github.com/benjamn/ast-types/blob/HEAD/def/jsx.js
+        ignoredNodes: ['JSXElement', 'JSXElement > *', 'JSXAttribute', 'JSXIdentifier', 'JSXNamespacedName', 'JSXMemberExpression', 'JSXSpreadAttribute', 'JSXExpressionContainer', 'JSXOpeningElement', 'JSXClosingElement', 'JSXFragment', 'JSXOpeningFragment', 'JSXClosingFragment', 'JSXText', 'JSXEmptyExpression', 'JSXSpreadChild'],
+        ignoreComments: false
+      }],
       'default-param-last': 'off',
       'no-param-reassign': 0,
       'no-use-before-define': 'off',
@@ -41,15 +70,18 @@ module.exports = defineConfig([
       'function-paren-newline': ['error', 'consistent'],
       'prefer-regex-literals': 'off',
       'object-curly-spacing': ['error', 'always'],
-      // @stylistic/eslint-plugin-jsx
-      '@stylistic/jsx/jsx-max-props-per-line': 'warn',
-      '@stylistic/jsx/jsx-closing-bracket-location': 'warn',
-      '@stylistic/jsx/jsx-child-element-spacing': 'warn',
-      '@stylistic/jsx/jsx-closing-tag-location': 'warn',
-      '@stylistic/jsx/jsx-equals-spacing': 'warn',
-      '@stylistic/jsx/jsx-newline': ['warn', {
-        prevent: true,
+      'no-multiple-empty-lines': ['error', { max: 1, maxBOF: 0, maxEOF: 0 }],
+      'key-spacing': ['error', { beforeColon: false, afterColon: true }],
+      'func-call-spacing': ['error', 'never'],
+      'no-trailing-spaces': ['error', {
+        skipBlankLines: false,
+        ignoreComments: false,
       }],
+      // @typescript-eslint
+      '@stylistic-plugin-ts/indent': [2, 2],
+      '@typescript-eslint/no-unnecessary-condition': 'off',
+      '@typescript-eslint/no-shadow': 'error',
+      '@typescript-eslint/no-use-before-define': 'off',
       // eslint-plugin-eslint-comments
       'eslint-comments/require-description': ['off', {
         ignore: [],
@@ -78,7 +110,6 @@ module.exports = defineConfig([
       'react/static-property-placement': ['off'],
       'react/jsx-curly-spacing': ['error', {
         when: 'always',
-
         children: {
           when: 'always',
         },
@@ -156,11 +187,11 @@ module.exports = defineConfig([
             'getSnapshotBeforeUpdate',
             'componentDidUpdate',
             'componentDidCatch',
-            'componentWillUnmount'
+            'componentWillUnmount',
           ],
           rendering: [
             '/^render.+$/',
-            'render'
+            'render',
           ],
         },
       }],
@@ -196,6 +227,7 @@ module.exports = defineConfig([
         multiline: 'consistent',
         singleline: 'consistent',
       }],
+      'react/display-name': 'off',
     },
   },
 ]);

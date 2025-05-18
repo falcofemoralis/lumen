@@ -1,8 +1,7 @@
+import { useServiceContext } from 'Context/ServiceContext';
 import { withTV } from 'Hooks/withTV';
-import { observer } from 'mobx-react-lite';
 import { useEffect, useRef, useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
-import ServiceStore from 'Store/Service.store';
 import { RecentItemInterface } from 'Type/RecentItem.interface';
 import { openFilm } from 'Util/Router';
 
@@ -10,7 +9,7 @@ import RecentPageComponent from './RecentPage.component';
 import RecentPageComponentTV from './RecentPage.component.atv';
 
 export function RecentPageContainer() {
-  const [isSignedIn, setIsSignedIn] = useState(ServiceStore.isSignedIn);
+  const { isSignedIn, getCurrentService } = useServiceContext();
   const [items, setItems] = useState<RecentItemInterface[]>([]);
   const paginationRef = useRef({
     page: 1,
@@ -19,18 +18,14 @@ export function RecentPageContainer() {
   const updatingStateRef = useRef(false);
 
   useEffect(() => {
-    if (isSignedIn !== ServiceStore.isSignedIn) {
-      setIsSignedIn(ServiceStore.isSignedIn);
-    }
-
-    if (ServiceStore.isSignedIn) {
+    if (isSignedIn) {
       loadRecent(1, false);
     }
 
     return () => {
-      ServiceStore.getCurrentService().unloadRecentPage();
+      getCurrentService().unloadRecentPage();
     };
-  }, [ServiceStore.isSignedIn]);
+  }, [isSignedIn, getCurrentService]);
 
   useEffect(() => {
     updatingStateRef.current = false;
@@ -53,7 +48,7 @@ export function RecentPageContainer() {
         const {
           items: resItems,
           totalPages: resTotalPages,
-        } = await ServiceStore.getCurrentService().getRecent(
+        } = await getCurrentService().getRecent(
           page,
           { isRefresh },
         );
@@ -93,7 +88,7 @@ export function RecentPageContainer() {
 
     setItems(newItems);
 
-    ServiceStore.getCurrentService().removeRecent(id).catch((error) => {
+    getCurrentService().removeRecent(id).catch((error) => {
       NotificationStore.displayError(error as Error);
     });
   };
@@ -115,4 +110,4 @@ export function RecentPageContainer() {
   });
 }
 
-export default observer(RecentPageContainer);
+export default RecentPageContainer;

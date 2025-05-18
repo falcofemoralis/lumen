@@ -2,12 +2,11 @@ import {
   DarkTheme,
   ThemeProvider,
 } from '@react-navigation/native';
-import { MenuProvider } from 'Component/NavigationBar/MenuContext';
+import { AppProvider } from 'Context/AppContext';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useLocale } from 'Hooks/useLocale';
 import t from 'i18n/t';
-import { observer } from 'mobx-react-lite';
 import React, { useEffect, useState } from 'react';
 import { BackHandler } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -16,7 +15,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { SpatialNavigationDeviceTypeProvider } from 'react-tv-space-navigation';
 import ConfigStore from 'Store/Config.store';
 import NotificationStore from 'Store/Notification.store';
-import ServiceStore from 'Store/Service.store';
 import Colors from 'Style/Colors';
 import { setTimeoutSafe } from 'Util/Misc';
 
@@ -25,20 +23,6 @@ SplashScreen.preventAutoHideAsync();
 export function RootLayout() {
   const [backPressedOnce, setBackPressedOnce] = useState(false);
   const [languageLoaded] = useLocale();
-
-  const loadNotifications = async () => {
-    try {
-      await ServiceStore.getNotifications();
-    } catch (error) {
-      NotificationStore.displayError(error as Error);
-    }
-  };
-
-  useEffect(() => {
-    if (ServiceStore.isSignedIn) {
-      loadNotifications();
-    }
-  }, []);
 
   useEffect(() => {
     if (languageLoaded) {
@@ -86,11 +70,9 @@ export function RootLayout() {
   );
 
   const renderTVLayout = () => (
-    <MenuProvider>
-      <SpatialNavigationDeviceTypeProvider>
-        { renderStack() }
-      </SpatialNavigationDeviceTypeProvider>
-    </MenuProvider>
+    <SpatialNavigationDeviceTypeProvider>
+      { renderStack() }
+    </SpatialNavigationDeviceTypeProvider>
   );
 
   const renderMobileLayout = () => (
@@ -98,8 +80,6 @@ export function RootLayout() {
       { renderStack() }
     </GestureHandlerRootView>
   );
-
-  const renderLayout = () => (ConfigStore.isTV() ? renderTVLayout() : renderMobileLayout());
 
   const renderApp = () => {
     if (!languageLoaded) {
@@ -116,9 +96,11 @@ export function RootLayout() {
           },
         } }
       >
-        <PaperProvider>
-          { renderLayout() }
-        </PaperProvider>
+        <AppProvider>
+          <PaperProvider>
+            { ConfigStore.isTV() ? renderTVLayout() : renderMobileLayout() }
+          </PaperProvider>
+        </AppProvider>
       </ThemeProvider>
     )
   }
@@ -130,4 +112,4 @@ export function RootLayout() {
   );
 }
 
-export default observer(RootLayout);
+export default RootLayout;

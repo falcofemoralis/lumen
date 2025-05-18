@@ -2,6 +2,7 @@ import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
+import { useServiceContext } from 'Context/ServiceContext';
 import t from 'i18n/t';
 import React, {
   createRef,
@@ -22,7 +23,6 @@ import {
 } from 'react-native';
 import { ScrollView, TextInput } from 'react-native-gesture-handler';
 import NotificationStore from 'Store/Notification.store';
-import ServiceStore from 'Store/Service.store';
 import Colors from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 
@@ -226,6 +226,7 @@ export function WelcomePageComponent({
   updateProvider,
   updateCDN,
 }: WelcomePageComponentProps) {
+  const { getCurrentService } = useServiceContext();
   const introSliderRef = useRef<SliderRef>(null);
   const slidesRefs = useRef<{[key: string]: React.RefObject<WelcomeSlideRef>}>({});
   const isTV = selectedDeviceType === 'TV';
@@ -422,7 +423,7 @@ export function WelcomePageComponent({
         value: 'auto',
         label: t('Automatic'),
       },
-    ].concat(ServiceStore.getCurrentService().defaultCDNs.map((cdn) => ({
+    ].concat(getCurrentService().defaultCDNs.map((cdn) => ({
       value: cdn,
       label: cdn,
     })));

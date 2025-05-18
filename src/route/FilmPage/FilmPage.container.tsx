@@ -1,3 +1,5 @@
+import { useOverlayContext } from 'Context/OverlayContext';
+import { useServiceContext } from 'Context/ServiceContext';
 import { router } from 'expo-router';
 import { withTV } from 'Hooks/withTV';
 import {
@@ -5,9 +7,7 @@ import {
 } from 'react';
 import { Share } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
-import OverlayStore from 'Store/Overlay.store';
 import RouterStore from 'Store/Router.store';
-import ServiceStore from 'Store/Service.store';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
@@ -21,16 +21,18 @@ import { MINIMUM_SCHEDULE_ITEMS } from './FilmPage.config';
 import { FilmPageContainerProps } from './FilmPage.type';
 
 export function FilmPageContainer({ link }: FilmPageContainerProps) {
+  const { openOverlay, goToPreviousOverlay } = useOverlayContext();
   const [film, setFilm] = useState<FilmInterface | null>(null);
   const playerVideoSelectorOverlayId = useId();
   const scheduleOverlayId = useId();
   const commentsOverlayId = useId();
   const bookmarksOverlayId = useId();
+  const { isSignedIn, getCurrentService } = useServiceContext();
 
   useEffect(() => {
     const loadFilm = async () => {
       try {
-        const loadedFilm = await ServiceStore.getCurrentService().getFilm(link);
+        const loadedFilm = await getCurrentService().getFilm(link);
 
         setFilm(loadedFilm);
       } catch (error) {
@@ -46,11 +48,11 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
       return;
     }
 
-    OverlayStore.openOverlay(playerVideoSelectorOverlayId);
+    openOverlay(playerVideoSelectorOverlayId);
   }, [film, playerVideoSelectorOverlayId]);
 
   const hideVideoSelector = useCallback(() => {
-    OverlayStore.goToPreviousOverlay();
+    goToPreviousOverlay();
   }, []);
 
   const handleVideoSelect = (video: FilmVideoInterface, voice: FilmVoiceInterface) => {
@@ -86,8 +88,8 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
       return;
     }
 
-    if (ServiceStore.isSignedIn) {
-      ServiceStore.getCurrentService().saveWatch(film, voice)
+    if (isSignedIn) {
+      getCurrentService().saveWatch(film, voice)
         .catch((error) => {
           NotificationStore.displayError(error as Error);
         });
@@ -180,7 +182,7 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
     });
 
     try {
-      ServiceStore.getCurrentService().saveScheduleWatch(id);
+      getCurrentService().saveScheduleWatch(id);
     } catch (error) {
       NotificationStore.displayError(error as Error);
     }

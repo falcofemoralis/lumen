@@ -1,7 +1,7 @@
+import { useServiceContext } from 'Context/ServiceContext';
 import { withTV } from 'Hooks/withTV';
 import { useCallback, useEffect, useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
-import ServiceStore from 'Store/Service.store';
 import { ActorInterface } from 'Type/Actor.interface';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { openFilm } from 'Util/Router';
@@ -13,12 +13,13 @@ import { ActorPageContainerProps } from './ActorPage.type';
 export function ActorPageContainer({ link }: ActorPageContainerProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [actor, setActor] = useState<ActorInterface | null>(null);
+  const { getCurrentService } = useServiceContext();
 
   const fetchActor = async () => {
     try {
       setIsLoading(true);
 
-      const data = await ServiceStore.getCurrentService().getActorDetails(link);
+      const data = await getCurrentService().getActorDetails(link);
 
       setActor(data);
     } catch (error) {

@@ -4,11 +4,11 @@ import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
+import { useOverlayContext } from 'Context/OverlayContext';
 import t from 'i18n/t';
 import { memo } from 'react';
 import { View } from 'react-native';
 import { SpatialNavigationFocusableView } from 'react-tv-space-navigation';
-import OverlayStore from 'Store/Overlay.store';
 import { ActorCardInterface } from 'Type/ActorCard.interface';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
@@ -276,13 +276,14 @@ export const InfoList = memo(({
   idx,
   handleSelectCategory,
 }: InfoListProps) => {
+  const { goToPreviousOverlay } = useOverlayContext();
   const { name, position, link } = list;
 
   return (
     <SpatialNavigationFocusableView
       onSelect={ () => {
         handleSelectCategory(link);
-        OverlayStore.goToPreviousOverlay();
+        goToPreviousOverlay();
       } }
     >
       { ({ isFocused }) => (

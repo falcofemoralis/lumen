@@ -1,5 +1,8 @@
 import { getFirestore } from '@react-native-firebase/firestore';
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
+import { useOverlayContext } from 'Context/OverlayContext';
+import { usePlayerContext } from 'Context/PlayerContext';
+import { useServiceContext } from 'Context/ServiceContext';
 import { useEventListener } from 'expo';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { useVideoPlayer } from 'expo-video';
@@ -11,8 +14,6 @@ import {
 import { BackHandler, Share } from 'react-native';
 import ConfigStore from 'Store/Config.store';
 import NotificationStore from 'Store/Notification.store';
-import OverlayStore from 'Store/Overlay.store';
-import ServiceStore from 'Store/Service.store';
 import { FilmStreamInterface } from 'Type/FilmStream.interface';
 import { FilmVideoInterface, SubtitleInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
@@ -37,7 +38,6 @@ import {
   RewindDirection,
   SAVE_TIME_EVERY_MS,
 } from './Player.config';
-import PlayerStore from './Player.store';
 import { FirestoreDocument, PlayerContainerProps } from './Player.type';
 
 export function PlayerContainer({
@@ -46,6 +46,9 @@ export function PlayerContainer({
   film,
   voice,
 }: PlayerContainerProps) {
+  const { updateProgressStatus, resetProgressStatus, updateSelectedVoice } = usePlayerContext();
+  const { isSignedIn, profile, getCurrentService } = useServiceContext();
+  const { openOverlay, goToPreviousOverlay } = useOverlayContext();
   const [selectedVideo, setSelectedVideo] = useState<FilmVideoInterface>(video);
   const [selectedStream, setSelectedStream] = useState<FilmStreamInterface>(stream);
   const [selectedVoice, setSelectedVoice] = useState<FilmVoiceInterface>(voice);
@@ -57,6 +60,7 @@ export function PlayerContainer({
   );
   const [selectedSpeed, setSelectedSpeed] = useState<number>(DEFAULT_SPEED);
   const [isLocked, setIsLocked] = useState<boolean>(false);
+
   const updateTimeTimeout = useRef<NodeJS.Timeout | null>(null);
   const qualityOverlayId = useId();
   const subtitleOverlayId = useId();
@@ -65,7 +69,7 @@ export function PlayerContainer({
   const bookmarksOverlayId = useId();
   const speedOverlayId = useId();
 
-  const firestoreDb = ConfigStore.isFirestore() && ServiceStore.isSignedIn
+  const firestoreDb = ConfigStore.isFirestore() && isSignedIn
     ? getFirestore().collection<FirestoreDocument>(FIRESTORE_DB)
     : null;
 
@@ -109,7 +113,7 @@ export function PlayerContainer({
         return;
       }
 
-      PlayerStore.setProgressStatus(currentTime, bufferedPosition, duration);
+      updateProgressStatus(currentTime, bufferedPosition, duration);
 
       onPlaybackEnd(currentTime, duration);
     },
@@ -140,15 +144,15 @@ export function PlayerContainer({
   };
 
   const changePlayerVideo = (newVideo: FilmVideoInterface, newVoice: FilmVoiceInterface) => {
-    if (ServiceStore.isSignedIn) {
-      ServiceStore.getCurrentService().saveWatch(film, newVoice)
+    if (isSignedIn) {
+      getCurrentService().saveWatch(film, newVoice)
         .catch((error) => {
           NotificationStore.displayError(error as Error);
         });
     }
 
     updateTime();
-    PlayerStore.resetProgressStatus();
+    resetProgressStatus();
     setIsLoading(true);
     setSelectedVideo(newVideo);
     setSelectedVoice(newVoice);
@@ -156,7 +160,7 @@ export function PlayerContainer({
     resetUpdateTimeTimeout();
     setSelectedSubtitle(newVideo.subtitles?.find(({ isDefault }) => isDefault));
 
-    PlayerStore.setSelectedVoice(film.id, newVoice);
+    updateSelectedVoice(film.id, newVoice);
   };
 
   const togglePlayPause = (pause?: boolean) => {
@@ -185,7 +189,7 @@ export function PlayerContainer({
 
     const newTime = calculateCurrentTime(percent);
 
-    PlayerStore.setProgressStatus(newTime, bufferedPosition, duration);
+    updateProgressStatus(newTime, bufferedPosition, duration);
 
     player.currentTime = newTime;
   };
@@ -199,36 +203,36 @@ export function PlayerContainer({
     const seekTime = type === RewindDirection.BACKWARD ? seconds * -1 : seconds;
     const newTime = currentTime + seekTime;
 
-    PlayerStore.setProgressStatus(newTime, bufferedPosition, duration);
+    updateProgressStatus(newTime, bufferedPosition, duration);
 
     player.seekBy(seekTime);
   };
 
   const openQualitySelector = () => {
-    OverlayStore.openOverlay(qualityOverlayId);
+    openOverlay(qualityOverlayId);
   };
 
   const openSubtitleSelector = () => {
-    OverlayStore.openOverlay(subtitleOverlayId);
+    openOverlay(subtitleOverlayId);
   };
 
   const openCommentsOverlay = () => {
-    OverlayStore.openOverlay(commentsOverlayId);
+    openOverlay(commentsOverlayId);
   };
 
   const openBookmarksOverlay = () => {
-    OverlayStore.openOverlay(bookmarksOverlayId);
+    openOverlay(bookmarksOverlayId);
   };
 
   const openSpeedSelector = () => {
-    OverlayStore.openOverlay(speedOverlayId);
+    openOverlay(speedOverlayId);
   };
 
   const handleQualityChange = (item: DropdownItem) => {
     const { value: quality } = item;
 
     if (selectedQuality === quality) {
-      OverlayStore.goToPreviousOverlay();
+      goToPreviousOverlay();
 
       return;
     }
@@ -246,14 +250,14 @@ export function PlayerContainer({
 
     player.replace(newStream.url);
 
-    OverlayStore.goToPreviousOverlay();
+    goToPreviousOverlay();
   };
 
   const handleSubtitleChange = (item: DropdownItem) => {
     const { value: languageCode } = item;
 
     if (selectedSubtitle?.languageCode === languageCode) {
-      OverlayStore.goToPreviousOverlay();
+      goToPreviousOverlay();
 
       return;
     }
@@ -267,7 +271,7 @@ export function PlayerContainer({
     setSelectedSubtitle(newSubtitle);
     updateTime();
 
-    OverlayStore.goToPreviousOverlay();
+    goToPreviousOverlay();
   };
 
   const handleNewEpisode = async (direction: RewindDirection) => {
@@ -295,9 +299,7 @@ export function PlayerContainer({
       return;
     }
 
-    // eslint-disable-next-line functional/no-let
     let newEpisodeIndex = episodeIndex;
-    // eslint-disable-next-line functional/no-let
     let newSeasonIndex = seasonIndex;
 
     if (direction === RewindDirection.BACKWARD) {
@@ -335,7 +337,7 @@ export function PlayerContainer({
     const { seasonId } = seasons[newSeasonIndex];
     const { episodeId } = episodes[newEpisodeIndex];
 
-    const newVideo = await ServiceStore.getCurrentService().getFilmStreamsByEpisodeId(
+    const newVideo = await getCurrentService().getFilmStreamsByEpisodeId(
       film,
       selectedVoice,
       seasonId,
@@ -374,11 +376,9 @@ export function PlayerContainer({
   };
 
   const getFirestoreId = () => {
-    if (!ServiceStore.isSignedIn || !ConfigStore.isFirestore()) {
+    if (!isSignedIn || !ConfigStore.isFirestore()) {
       return null;
     }
-
-    const profile = ServiceStore.getProfile();
 
     if (!profile) {
       return null;
@@ -424,11 +424,11 @@ export function PlayerContainer({
   };
 
   const openVideoSelector = () => {
-    OverlayStore.openOverlay(playerVideoSelectorOverlayId);
+    openOverlay(playerVideoSelectorOverlayId);
   };
 
   const hideVideoSelector = () => {
-    OverlayStore.goToPreviousOverlay();
+    goToPreviousOverlay();
   };
 
   const handleVideoSelect = (newVideo: FilmVideoInterface, newVoice: FilmVoiceInterface) => {
@@ -445,7 +445,7 @@ export function PlayerContainer({
     const { value: speed } = item;
 
     if (String(selectedSpeed) === speed) {
-      OverlayStore.goToPreviousOverlay();
+      goToPreviousOverlay();
 
       return;
     }
@@ -453,7 +453,7 @@ export function PlayerContainer({
     setSelectedSpeed(Number(speed));
     setPlayerRate(Number(speed));
 
-    OverlayStore.goToPreviousOverlay();
+    goToPreviousOverlay();
   };
 
   const handleLockControls = () => {

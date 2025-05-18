@@ -3,6 +3,7 @@ import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedOverlay from 'Component/ThemedOverlay';
+import { useOverlayContext } from 'Context/OverlayContext';
 import React, { memo, useCallback, useRef } from 'react';
 import { Text, View } from 'react-native';
 import {
@@ -10,7 +11,6 @@ import {
   SpatialNavigationVirtualizedList,
   SpatialNavigationVirtualizedListRef,
 } from 'react-tv-space-navigation';
-import OverlayStore from 'Store/Overlay.store';
 import { scale } from 'Util/CreateStyles';
 import { generateId } from 'Util/Math';
 
@@ -28,6 +28,7 @@ export const ThemedDropdownComponent = ({
   style,
   onChange,
 }: ThemedDropdownComponentProps) => {
+  const { openOverlay, goToPreviousOverlay } = useOverlayContext();
   const overlayId = useRef(overlayIdProp ?? generateId());
   const scrollViewRef = useRef<SpatialNavigationVirtualizedListRef>(null);
 
@@ -142,7 +143,7 @@ export const ThemedDropdownComponent = ({
     return (
       <ThemedOverlay
         id={ overlayId.current }
-        onHide={ () => OverlayStore.goToPreviousOverlay() }
+        onHide={ () => goToPreviousOverlay() }
         containerStyle={ styles.container }
         contentContainerStyle={ styles.contentContainer }
       >
@@ -166,7 +167,7 @@ export const ThemedDropdownComponent = ({
           name: 'plus',
           pack: IconPackType.Octicons,
         } }
-        onPress={ () => OverlayStore.openOverlay(overlayId.current) }
+        onPress={ () => openOverlay(overlayId.current) }
         rightImage={ endIcon }
       >
         { label }

@@ -13,7 +13,7 @@ import { LoginFormComponentProps } from './LoginForm.type';
 export function LoginFormComponent({
   isLoading,
   withRedirect,
-  login,
+  handleLogin,
 }: LoginFormComponentProps) {
   const loginRef = useRef({ username: '', password: '' });
 
@@ -43,7 +43,7 @@ export function LoginFormComponent({
         />
         <ThemedButton
           style={ styles.button }
-          onPress={ () => login(
+          onPress={ () => handleLogin(
             loginRef.current.username,
             loginRef.current.password,
           ) }

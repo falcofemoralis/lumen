@@ -1,4 +1,3 @@
-import { makeAutoObservable } from 'mobx';
 import { getConfigJson, updateConfig } from 'Util/Config';
 import { configureRemoteControl } from 'Util/RemoteControl';
 
@@ -20,8 +19,6 @@ class ConfigStore {
   };
 
   constructor() {
-    makeAutoObservable(this);
-
     this.loadConfig();
 
     if (this.isTV()) {

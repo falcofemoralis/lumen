@@ -6,6 +6,7 @@
       "i18n/*": ["./src/util/Translation/*"],
       "Api/*": ["./src/api/*"],
       "Component/*": ["./src/component/*"],
+      "Context/*": ["./src/context/*"],
       "Constants/*": ["./src/constants/*"],
       "Hooks/*": ["./src/hooks/*"],
       "Route/*": ["./src/route/*"],

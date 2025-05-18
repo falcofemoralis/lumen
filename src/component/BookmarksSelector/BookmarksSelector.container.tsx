@@ -1,9 +1,8 @@
+import { useOverlayContext } from 'Context/OverlayContext';
+import { useServiceContext } from 'Context/ServiceContext';
 import { withTV } from 'Hooks/withTV';
-import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
-import OverlayStore from 'Store/Overlay.store';
-import ServiceStore from 'Store/Service.store';
 
 import BookmarksSelectorComponent from './BookmarksSelector.component';
 import BookmarksSelectorComponentTV from './BookmarksSelector.component.atv';
@@ -13,11 +12,13 @@ export const BookmarksSelectorContainer = ({
   overlayId,
   film,
 }: BookmarksSelectorContainerProps) => {
+  const { currentOverlay, isOverlayOpened } = useOverlayContext();
   const [isLoading, setIsLoading] = useState(false);
+  const { getCurrentService } = useServiceContext();
 
   const postBookmark = async (bookmarkId: string, isChecked: boolean) => {
     const { id } = film;
-    const service = ServiceStore.getCurrentService();
+    const service = getCurrentService();
 
     try {
       setIsLoading(true);
@@ -52,12 +53,12 @@ export const BookmarksSelectorContainer = ({
   const [data, setData] = useState(prepareData());
 
   useEffect(() => {
-    const opened = OverlayStore.isOverlayOpened(overlayId);
+    const opened = isOverlayOpened(overlayId);
 
     if (opened) {
       setData(prepareData());
     }
-  }, [OverlayStore.currentOverlay.length]);
+  }, [currentOverlay.length]);
 
   const containerProps = {
     overlayId,
@@ -76,4 +77,4 @@ export const BookmarksSelectorContainer = ({
   });
 };
 
-export default observer(BookmarksSelectorContainer);
+export default BookmarksSelectorContainer;

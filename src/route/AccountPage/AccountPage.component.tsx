@@ -1,15 +1,16 @@
 import Loader from 'Component/Loader';
 import LoginForm from 'Component/LoginForm';
+import { ACCOUNT_ROUTE } from 'Component/NavigationBar/NavigationBar.config';
 import Page from 'Component/Page';
 import ThemedButton from 'Component/ThemedButton';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
+import { useServiceContext } from 'Context/ServiceContext';
 import { router } from 'expo-router';
 import t from 'i18n/t';
 import React from 'react';
 import { Image, View } from 'react-native';
-import NavigationStore from 'Store/Navigation.store';
 import NotificationStore from 'Store/Notification.store';
 import { scale } from 'Util/CreateStyles';
 
@@ -20,8 +21,10 @@ export function AccountPageComponent({
   isSignedIn,
   profile,
 }: AccountPageComponentProps) {
+  const { badgeData } = useServiceContext();
+
   const renderTopBar = () => {
-    const badge = NavigationStore.badgeData['(account)'] ?? 0;
+    const badge = badgeData[ACCOUNT_ROUTE] ?? 0;
 
     return (
       <View style={ styles.topBar }>

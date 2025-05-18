@@ -3,9 +3,10 @@ import ThemedIcon from 'Component/ThemedIcon';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
+import { useNavigationContext } from 'Context/NavigationContext';
+import { useServiceContext } from 'Context/ServiceContext';
 import { Tabs } from 'expo-router';
 import t from 'i18n/t';
-import { observer } from 'mobx-react-lite';
 import React, { useCallback, useEffect, useRef } from 'react';
 import {
   Animated,
@@ -20,17 +21,14 @@ import {
   SpatialNavigationRoot,
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
-import NavigationStore from 'Store/Navigation.store';
-import ServiceStore from 'Store/Service.store';
 import Colors from 'Style/Colors';
 import { CONTENT_WRAPPER_PADDING_TV } from 'Style/Layout';
 import { scale } from 'Util/CreateStyles';
 import { setTimeoutSafe } from 'Util/Misc';
 
-import { useMenuContext } from './MenuContext';
 import {
   DEFAULT_ROUTE,
-  LOADER_PAGE,
+  LOADER_ROUTE,
   TABS_OPENING_DURATION_TV,
   TABS_TV_CONFIG,
 } from './NavigationBar.config';
@@ -49,7 +47,9 @@ export function NavigationBarComponent({
   navigateTo,
   isFocused,
 }: NavigationBarComponentProps) {
-  const { isOpen: isMenuOpen, toggleMenu } = useMenuContext();
+  const { isMenuOpen, toggleMenu } = useNavigationContext();
+  const { badgeData } = useServiceContext();
+  const { isSignedIn } = useServiceContext();
 
   const containerWidth = Dimensions.get('window').width;
   const lastPage = useRef<string | null>(null);
@@ -80,11 +80,11 @@ export function NavigationBarComponent({
     navigation: NavigationType,
     state: StateType,
   ) => {
-    if (lastPage.current !== LOADER_PAGE) {
+    if (lastPage.current !== LOADER_ROUTE) {
       setTimeoutSafe(() => {
-        navigateTo({ ...tab, route: LOADER_PAGE }, navigation, state);
+        navigateTo({ ...tab, route: LOADER_ROUTE }, navigation, state);
       }, 0);
-      lastPage.current = LOADER_PAGE;
+      lastPage.current = LOADER_ROUTE;
     }
 
     if (timerRef.current) {
@@ -105,7 +105,7 @@ export function NavigationBarComponent({
   ) => {
     const { title, icon } = tab;
 
-    const badge = NavigationStore.badgeData[tab.route] ?? 0;
+    const badge = badgeData[tab.route] ?? 0;
 
     return (
       <View
@@ -142,7 +142,7 @@ export function NavigationBarComponent({
         </ThemedText.Animated>
       </View>
     );
-  }, [isMenuOpen, NavigationStore.badgeData]);
+  }, [isMenuOpen, badgeData]);
 
   const renderAccountTab = useCallback((
     tab: Tab,
@@ -198,12 +198,12 @@ export function NavigationBarComponent({
               isMenuOpen && styles.tabTextOpened,
             ] }
           >
-            { ServiceStore.isSignedIn ? name : t('Sign in') }
+            { isSignedIn ? name : t('Sign in') }
           </ThemedText.Animated>
         </View>
       </View>
     );
-  }, [isMenuOpen, profile]);
+  }, [isMenuOpen, profile, isSignedIn]);
 
   const renderTab = useCallback((
     tab: Tab,
@@ -316,4 +316,4 @@ export function NavigationBarComponent({
   );
 }
 
-export default observer(NavigationBarComponent);
+export default NavigationBarComponent;

@@ -2,11 +2,11 @@ import ThemedButton from 'Component/ThemedButton';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedOverlay from 'Component/ThemedOverlay';
+import { useOverlayContext } from 'Context/OverlayContext';
 import React, { useCallback, useRef } from 'react';
 import {
   ScrollView, Text, TouchableHighlight, View,
 } from 'react-native';
-import OverlayStore from 'Store/Overlay.store';
 import Colors from 'Style/Colors';
 import { generateId } from 'Util/Math';
 
@@ -25,6 +25,7 @@ export const ThemedDropdownComponent = ({
   onChange,
   style,
 }: ThemedDropdownComponentProps) => {
+  const { openOverlay, goToPreviousOverlay } = useOverlayContext();
   const id = useRef(overlayId ?? generateId());
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -120,7 +121,7 @@ export const ThemedDropdownComponent = ({
     return (
       <ThemedOverlay
         id={ id.current }
-        onHide={ () => OverlayStore.goToPreviousOverlay() }
+        onHide={ () => goToPreviousOverlay() }
         containerStyle={ styles.container }
         contentContainerStyle={ styles.contentContainer }
       >
@@ -148,7 +149,7 @@ export const ThemedDropdownComponent = ({
           name: 'plus',
           pack: IconPackType.Octicons,
         } }
-        onPress={ () => OverlayStore.openOverlay(id.current) }
+        onPress={ () => openOverlay(id.current) }
         rightImage={ endIcon }
       >
         { inputLabel ?? label }

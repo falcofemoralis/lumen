@@ -1,8 +1,7 @@
+import { useServiceContext } from 'Context/ServiceContext';
 import { withTV } from 'Hooks/withTV';
-import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
-import ServiceStore from 'Store/Service.store';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { NotificationInterface } from 'Type/Notification.interface';
 import { openFilm } from 'Util/Router';
@@ -13,13 +12,14 @@ import NotificationsPageComponentTV from './NotificationsPage.component.atv';
 export function NotificationsPageContainer() {
   const [isLoading, setIsLoading] = useState(false);
   const [notifications, setNotifications] = useState<NotificationInterface[]>([]);
+  const { isSignedIn, getCurrentService, resetNotifications } = useServiceContext();
 
   const loadFilms = async (items: NotificationInterface[]) => {
     try {
       setIsLoading(true);
 
       setNotifications(
-        await ServiceStore.getCurrentService().getFilmsFromNotifications(items),
+        await getCurrentService().getFilmsFromNotifications(items),
       );
     } catch (error) {
       NotificationStore.displayError(error as Error);
@@ -29,16 +29,16 @@ export function NotificationsPageContainer() {
   };
 
   useEffect(() => {
-    if (ServiceStore.isSignedIn) {
-      ServiceStore.resetNotifications();
+    if (isSignedIn) {
+      resetNotifications();
     }
-  }, []);
+  }, [isSignedIn, resetNotifications]);
 
   useEffect(() => {
-    if (ServiceStore.isSignedIn && ServiceStore.notifications) {
-      loadFilms(ServiceStore.notifications);
+    if (isSignedIn && notifications) {
+      loadFilms(notifications);
     }
-  }, [ServiceStore.isSignedIn, ServiceStore.notifications]);
+  }, [isSignedIn, notifications]);
 
   const handleSelectFilm = useCallback((film: FilmCardInterface) => {
     openFilm(film.link);
@@ -70,4 +70,4 @@ export function NotificationsPageContainer() {
   });
 }
 
-export default observer(NotificationsPageContainer);
+export default NotificationsPageContainer;

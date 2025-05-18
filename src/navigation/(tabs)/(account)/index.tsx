@@ -1,8 +1,4 @@
-import { DEFAULT_ROUTE } from 'Component/NavigationBar/NavigationBar.config';
-import { router, useFocusEffect } from 'expo-router';
-import { observer } from 'mobx-react-lite';
 import AccountPage from 'Route/AccountPage';
-import RouterStore from 'Store/Router.store';
 
 export function AccountScreen() {
   // useFocusEffect(() => {
@@ -23,4 +19,4 @@ export function AccountScreen() {
   return <AccountPage />;
 }
 
-export default observer(AccountScreen);
+export default AccountScreen;

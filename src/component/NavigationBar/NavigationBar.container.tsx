@@ -10,10 +10,6 @@ import { NavigationType, StateType, Tab } from './NavigationBar.type';
 
 export function NavigationBarContainer() {
   const [profile] = useProfile();
-  // const badgeData = {};
-
-  // useEffect(() => {
-  // }, [NavigationStore.badgeData]);
 
   const navigateTo = useCallback((
     tab: Tab,

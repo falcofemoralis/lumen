@@ -1,14 +1,8 @@
 import { router } from 'expo-router';
-import { makeAutoObservable } from 'mobx';
-// eslint-disable-next-line react-native/split-platform-components -- App is android only
 import { ToastAndroid } from 'react-native';
 
 class NotificationStore {
   private isErrorOccurred = false;
-
-  constructor() {
-    makeAutoObservable(this);
-  }
 
   displayMessage(msg: string) {
     if (this.isErrorOccurred) {

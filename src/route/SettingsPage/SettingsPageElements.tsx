@@ -5,6 +5,7 @@ import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import ThemedInput from 'Component/ThemedInput';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedText from 'Component/ThemedText';
+import { useOverlayContext } from 'Context/OverlayContext';
 import t from 'i18n/t';
 import {
   memo, useCallback,
@@ -13,7 +14,6 @@ import {
 } from 'react';
 import { View } from 'react-native';
 import { TouchableRipple } from 'react-native-paper';
-import OverlayStore from 'Store/Overlay.store';
 import Colors from 'Style/Colors';
 import { noopFn } from 'Util/Function';
 
@@ -71,6 +71,7 @@ export const SettingSelect = memo(({
     value,
   } = setting;
   const overlayId = useId();
+  const { openOverlay, closeOverlay } = useOverlayContext();
   const [isLoading, setIsLoading] = useState(false);
 
   const onChange = useCallback(async (option: DropdownItem) => {
@@ -79,7 +80,7 @@ export const SettingSelect = memo(({
     const success = await onUpdate(id, option.value);
 
     if (success) {
-      OverlayStore.closeOverlay(overlayId);
+      closeOverlay(overlayId);
     }
 
     setIsLoading(false);
@@ -89,7 +90,7 @@ export const SettingSelect = memo(({
     <View>
       <BaseComponent
         setting={ setting }
-        onPress={ () => OverlayStore.openOverlay(overlayId) }
+        onPress={ () => openOverlay(overlayId) }
       />
       <ThemedDropdown
         asOverlay
@@ -119,6 +120,7 @@ export const SettingInput = memo(({
     value,
   } = setting;
   const overlayId = useId();
+  const { openOverlay, closeOverlay } = useOverlayContext();
   const [inputValue, setInputValue] = useState(value);
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -137,7 +139,7 @@ export const SettingInput = memo(({
     }
 
     if (inputValue === value) {
-      OverlayStore.closeOverlay(overlayId);
+      closeOverlay(overlayId);
 
       return;
     }
@@ -147,7 +149,7 @@ export const SettingInput = memo(({
     const success = await onUpdate(setting.id, inputValue);
 
     if (success) {
-      OverlayStore.closeOverlay(overlayId);
+      closeOverlay(overlayId);
     } else {
       setHasError(true);
     }
@@ -159,11 +161,11 @@ export const SettingInput = memo(({
     <View>
       <BaseComponent
         setting={ setting }
-        onPress={ () => OverlayStore.openOverlay(overlayId) }
+        onPress={ () => openOverlay(overlayId) }
       />
       <ThemedOverlay
         id={ overlayId }
-        onHide={ () => OverlayStore.closeOverlay(overlayId) }
+        onHide={ () => closeOverlay(overlayId) }
         contentContainerStyle={ styles.overlay }
       >
         <ThemedText style={ styles.overlayTitle }>

@@ -1,0 +1,83 @@
+// expo related
+"expo": "^53.0.9",
+"expo-application": "^6.1.4",
+"expo-build-properties": "^0.14.6",
+"expo-dev-client": "^5.1.8",
+"expo-image": "^2.1.7",
+"expo-keep-awake": "^14.1.4",
+"expo-linear-gradient": "^14.1.4",
+"expo-linking": "^7.1.4",
+"expo-navigation-bar": "^4.2.4",
+"expo-router": "^5.0.5",
+"expo-screen-orientation": "^8.1.5",
+"expo-speech-recognition": "^1.1.1",
+"expo-splash-screen": "^0.30.8",
+"expo-status-bar": "^2.2.3",
+"expo-video": "^2.1.8",
+"@expo/metro-runtime": "5.0.4",
+"@expo/vector-icons": "^14.1.0",
+
+// react related
+"react": "19.0.0",
+"react-dom": "19.0.0",
+"react-native": "npm:react-native-tvos@~0.79.2-0",
+"react-native-gesture-handler": "^2.24.0",
+"react-native-reanimated": "4.0.0-nightly-20250516-889b26b44",
+"react-native-safe-area-context": "^5.4.0",
+"react-native-screens": "~4.10.0",
+"react-native-svg": "^15.11.2",
+"react-native-tab-view": "^4.0.11",
+"react-native-web": "~0.20.0",
+"react-native-worklets": "^0.3.0-nightly-20250516-889b26b44",
+"@react-navigation/bottom-tabs": "^7.2.1",
+"@react-navigation/native": "^7.1.6",
+
+// UI
+"react-native-raw-bottom-sheet": "^3.0.0",
+"react-native-reanimated-animated-accordion": "^0.3.0",
+"react-native-pager-view": "^6.7.1",
+"react-native-error-boundary": "^2.0.0",
+"react-native-awesome-slider": "^2.9.0",
+"@kolking/react-native-rating": "^1.4.1",
+"@legendapp/list": "^1.0.12",
+"react-tv-space-navigation": "file:libs/react-tv-space-navigation",
+
+// utils
+"react-native-mmkv": "^3.2.0",
+"html-entities": "^2.6.0",
+"i18n-js": "^4.5.1",
+"node-html-parser": "^7.0.1",
+"node-webvtt": "^1.9.4",
+"moment": "^2.30.1",
+"react-moment": "^1.1.3",
+"set-cookie-parser": "^2.7.1"
+
+// misc
+"react-native-restart": "^0.0.27",
+"react-native-keyevent": "^0.3.2",
+"@react-native-firebase/analytics": "^22.1.0",
+"@react-native-firebase/app": "^22.1.0",
+"@react-native-firebase/firestore": "^22.1.0",
+"@sentry/react-native": "^6.13.0",
+
+// DEPRECATED
+"react-native-paper": "^5.14.0",
+"@react-navigation/elements": "^2.4.0",
+"@react-navigation/material-top-tabs": "^7.2.11",
+"mobx": "^6.13.7",
+"mobx-react-lite": "^4.1.0",
+
+// NEW
+bottom sheet - https://github.com/lodev09/react-native-true-sheet
+
+
+
+
+
+
+
+
+
+
+
+

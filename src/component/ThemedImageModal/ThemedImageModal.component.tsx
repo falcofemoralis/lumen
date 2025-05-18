@@ -1,9 +1,9 @@
 import ThemedImage from 'Component/ThemedImage';
 import ThemedOverlay from 'Component/ThemedOverlay';
+import { useOverlayContext } from 'Context/OverlayContext';
 import { useRef } from 'react';
 import { Dimensions, TouchableHighlight, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import OverlayStore from 'Store/Overlay.store';
 import { generateId } from 'Util/Math';
 
 import ImageViewer from './ImageViewer';
@@ -16,6 +16,7 @@ export const ThemedImageModalComponent = ({
   style,
   imageStyle,
 }: ThemedImageModalComponentProps) => {
+  const { openOverlay, closeOverlay } = useOverlayContext();
   const id = useRef(generateId());
   const { width } = Dimensions.get('window');
   const height = width / (166 / 250);
@@ -30,14 +31,14 @@ export const ThemedImageModalComponent = ({
         style={ styles.modal }
         contentContainerStyle={ styles.modalContentContainer }
         id={ id.current }
-        onHide={ () => OverlayStore.closeOverlay(id.current) }
+        onHide={ () => closeOverlay(id.current) }
       >
         <GestureHandlerRootView style={ { flex: 1 } }>
           <ImageViewer
             imageUrl={ modalSrc }
             width={ width }
             height={ height }
-            onRequestClose={ () => OverlayStore.closeOverlay(id.current) }
+            onRequestClose={ () => closeOverlay(id.current) }
           />
         </GestureHandlerRootView>
       </ThemedOverlay>
@@ -47,7 +48,7 @@ export const ThemedImageModalComponent = ({
   return (
     <View style={ style }>
       <TouchableHighlight
-        onPress={ () => OverlayStore.openOverlay(id.current) }
+        onPress={ () => openOverlay(id.current) }
       >
         <ThemedImage
           src={ src }

@@ -1,8 +1,7 @@
 import { FilmPagerInterface } from 'Component/FilmPager/FilmPager.type';
+import { useServiceContext } from 'Context/ServiceContext';
 import { withTV } from 'Hooks/withTV';
-import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
-import ServiceStore from 'Store/Service.store';
 import { FilmListInterface } from 'Type/FilmList.interface';
 import { MenuItemInterface } from 'Type/MenuItem.interface';
 
@@ -11,12 +10,13 @@ import HomePageComponentTV from './HomePage.component.atv';
 
 export function HomePageContainer() {
   const [filmPager, setFilmPager] = useState<FilmPagerInterface>({});
+  const { getCurrentService } = useServiceContext();
 
   const onLoadFilms = async (
     menuItem: MenuItemInterface,
     currentPage: number,
     isRefresh: boolean,
-  ) => ServiceStore.getCurrentService().getHomeMenuFilms(menuItem, currentPage, {
+  ) => getCurrentService().getHomeMenuFilms(menuItem, currentPage, {
     isRefresh,
   });
 
@@ -29,7 +29,7 @@ export function HomePageContainer() {
     }));
   };
 
-  const getMenuItems = () => ServiceStore.getCurrentService().getHomeMenu();
+  const getMenuItems = () => getCurrentService().getHomeMenu();
 
   const containerProps = () => ({
     menuItems: getMenuItems(),
@@ -47,4 +47,4 @@ export function HomePageContainer() {
   });
 }
 
-export default observer(HomePageContainer);
+export default HomePageContainer;

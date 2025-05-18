@@ -1,31 +1,32 @@
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
+import { useServiceContext } from 'Context/ServiceContext';
 import * as Application from 'expo-application';
 import t from 'i18n/t';
-import { observer } from 'mobx-react-lite';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import RNRestart from 'react-native-restart';
 import ConfigStore from 'Store/Config.store';
 import NotificationStore from 'Store/Notification.store';
-import ServiceStore from 'Store/Service.store';
 import { FilmInterface } from 'Type/Film.interface';
-import { ProfileInterface } from 'Type/Profile.interface';
 
 import WelcomePageComponent from './WelcomePage.component';
 import { TEST_URL } from './WelcomePage.config';
 import { DeviceType, SLIDE_TYPE, SlideInterface } from './WelcomePage.type';
 
 export function WelcomePageContainer() {
+  const {
+    profile,
+    getCurrentService,
+    updateProvider,
+    updateCDN,
+    login,
+    validateUrl,
+  } = useServiceContext();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [selectedDeviceType, setSelectedDeviceType] = useState<DeviceType | null>(null);
-  const [selectedProvider, setSelectedProvider] = useState<string | null>(
-    ServiceStore.getCurrentService().getProvider(),
-  );
-  const [selectedCDN, setSelectedCDN] = useState<string | null>(
-    ServiceStore.getCurrentService().getCDN(),
-  );
+  const [selectedProvider, setSelectedProvider] = useState<string | null>(getCurrentService().getProvider());
+  const [selectedCDN, setSelectedCDN] = useState<string | null>(getCurrentService().getCDN());
   const [isProviderValid, setIsProviderValid] = useState<boolean | null>(null);
   const [isCDNValid, setIsCDNValid] = useState<boolean | null>(null);
-  const [profile, setProfile] = useState<ProfileInterface | null>(null);
 
   const slides: SlideInterface[] = [
     {
@@ -84,12 +85,6 @@ export function WelcomePageContainer() {
     },
   ];
 
-  useEffect(() => {
-    if (!profile && ServiceStore.isSignedIn) {
-      setProfile(ServiceStore.getProfile());
-    }
-  }, [ServiceStore.isSignedIn]);
-
   const reloadApp = () => {
     RNRestart.restart();
   };
@@ -106,7 +101,7 @@ export function WelcomePageContainer() {
     setIsLoading(true);
 
     try {
-      await ServiceStore.getCurrentService().getFilm(TEST_URL);
+      await getCurrentService().getFilm(TEST_URL);
 
       setIsProviderValid(true);
     } catch (error) {
@@ -117,17 +112,17 @@ export function WelcomePageContainer() {
     }
   };
 
-  const updateProvider = async (value: string) => {
-    await ServiceStore.updateProvider(value, true);
+  const handleUpdateProvider = async (value: string) => {
+    await updateProvider(value, true);
   };
 
-  const validateCDN = async () => {
+  const handleValidateCDN = async () => {
     let film: FilmInterface | null = null;
 
     setIsLoading(true);
 
     try {
-      film = await ServiceStore.getCurrentService().getFilm(TEST_URL);
+      film = await getCurrentService().getFilm(TEST_URL);
     } catch (error) {
       NotificationStore.displayError(t('Invalid Provider'));
 
@@ -150,10 +145,10 @@ export function WelcomePageContainer() {
       return;
     }
 
-    const { url } = ServiceStore.getCurrentService().modifyCDN(voices[0].video.streams)[0];
+    const { url } = getCurrentService().modifyCDN(voices[0].video.streams)[0];
 
     try {
-      await ServiceStore.validateUrl((new URL(url)).origin);
+      await validateUrl((new URL(url)).origin);
 
       setIsCDNValid(true);
     } catch (error) {
@@ -164,15 +159,15 @@ export function WelcomePageContainer() {
     }
   };
 
-  const updateCDN = async (value: string) => {
-    await ServiceStore.updateCDN(value, true);
+  const handleUpdateCDN = async (value: string) => {
+    await updateCDN(value, true);
   };
 
-  const login = async (username: string, password: string) => {
+  const handleLogin = async (username: string, password: string) => {
     setIsLoading(true);
 
     try {
-      await ServiceStore.login(username, password);
+      await login(username, password);
     } catch (error) {
       NotificationStore.displayError(t('Invalid credentials'));
     } finally {
@@ -195,13 +190,13 @@ export function WelcomePageContainer() {
     handleSelectTV,
     handleSelectMobile,
     validateProvider,
-    updateProvider,
-    validateCDN,
-    updateCDN,
+    updateProvider: handleUpdateProvider,
+    validateCDN: handleValidateCDN,
+    updateCDN: handleUpdateCDN,
     complete,
     setSelectedProvider,
     setSelectedCDN,
-    login,
+    login: handleLogin,
   };
 
   const containerProps = () => ({
@@ -223,4 +218,4 @@ export function WelcomePageContainer() {
   );
 }
 
-export default observer(WelcomePageContainer);
+export default WelcomePageContainer;

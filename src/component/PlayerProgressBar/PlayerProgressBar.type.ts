@@ -23,5 +23,4 @@ export interface PlayerProgressBarContainerProps {
 }
 
 export interface PlayerProgressBarComponentProps extends PlayerProgressBarContainerProps {
-  progressStatus: ProgressStatus;
 }
