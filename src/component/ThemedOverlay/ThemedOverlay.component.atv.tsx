@@ -1,6 +1,6 @@
+import { Portal } from 'Component/ThemedPortal';
 import { memo } from 'react';
 import { View } from 'react-native';
-import { Portal } from 'react-native-paper';
 
 import { SpatialNavigationOverlay } from './SpatialNavigationOverlay';
 import { styles } from './ThemedOverlay.style.atv';

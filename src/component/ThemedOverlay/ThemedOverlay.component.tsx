@@ -1,10 +1,12 @@
+import { Portal } from 'Component/ThemedPortal';
 import {
   memo,
   useEffect,
   useState,
 } from 'react';
-import { Dimensions, ScaledSize } from 'react-native';
-import { Modal, Portal } from 'react-native-paper';
+import { Dimensions, Modal, Pressable, ScaledSize, View } from 'react-native';
+import Colors from 'Style/Colors';
+import { noopFn } from 'Util/Function';
 
 import { styles } from './ThemedOverlay.style';
 import { ThemedOverlayComponentProps } from './ThemedOverlay.type';
@@ -44,16 +46,26 @@ export function ThemedOverlayComponent({
   return (
     <Portal>
       <Modal
+        animationType='fade'
         visible={ isOpened }
-        onDismiss={ onHide }
-        contentContainerStyle={ [
-          styles.contentContainerStyle,
-          isLandscape && styles.contentContainerStyleLandscape,
-          contentContainerStyle,
-        ] }
-        style={ [styles.modal, style] }
+        onRequestClose={ onHide }
+        backdropColor={ Colors.modal }
       >
-        { children }
+        <Pressable
+          onPress={ onHide }
+          style={ [styles.modal, style] }
+        >
+          <Pressable
+            onPress={ noopFn }
+            style={ [
+              styles.contentContainerStyle,
+              isLandscape && styles.contentContainerStyleLandscape,
+              contentContainerStyle,
+            ] }
+          >
+            { children }
+          </Pressable>
+        </Pressable>
       </Modal>
     </Portal>
   );

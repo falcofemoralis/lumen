@@ -2,6 +2,7 @@ import {
   DarkTheme,
   ThemeProvider,
 } from '@react-navigation/native';
+import { Portal } from 'Component/ThemedPortal';
 import { AppProvider } from 'Context/AppContext';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -98,7 +99,9 @@ export function RootLayout() {
       >
         <AppProvider>
           <PaperProvider>
-            { ConfigStore.isTV() ? renderTVLayout() : renderMobileLayout() }
+            <Portal.Host>
+              { ConfigStore.isTV() ? renderTVLayout() : renderMobileLayout() }
+            </Portal.Host>
           </PaperProvider>
         </AppProvider>
       </ThemeProvider>
