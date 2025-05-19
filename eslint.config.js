@@ -7,6 +7,7 @@ const reactPerf = require('eslint-plugin-react-perf');
 const simpleImportSort = require('eslint-plugin-simple-import-sort');
 const typescriptEslint = require('@typescript-eslint/eslint-plugin');
 const tsParser = require('@typescript-eslint/parser');
+const reactCompiler = require('eslint-plugin-react-compiler');
 
 module.exports = defineConfig([
   expoConfig,
@@ -19,6 +20,7 @@ module.exports = defineConfig([
       'react-perf': reactPerf,
       'simple-import-sort': simpleImportSort,
       '@typescript-eslint': typescriptEslint,
+      'react-compiler': reactCompiler,
     },
     languageOptions: {
       parser: tsParser,
@@ -228,6 +230,8 @@ module.exports = defineConfig([
         singleline: 'consistent',
       }],
       'react/display-name': 'off',
+      // eslint-plugin-react-compiler
+      'react-compiler/react-compiler': 'error',
     },
   },
 ]);

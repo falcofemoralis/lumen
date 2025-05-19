@@ -7,12 +7,10 @@ import { useNavigationContext } from 'Context/NavigationContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { Tabs } from 'expo-router';
 import t from 'i18n/t';
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 import {
-  Animated,
-  Dimensions,
   Image,
-  View,
+  View
 } from 'react-native';
 import {
   DefaultFocus,
@@ -30,7 +28,7 @@ import {
   DEFAULT_ROUTE,
   LOADER_ROUTE,
   TABS_OPENING_DURATION_TV,
-  TABS_TV_CONFIG,
+  TABS_TV_CONFIG
 } from './NavigationBar.config';
 import { NAVIGATION_BAR_TV_WIDTH, styles } from './NavigationBar.style.atv';
 import {
@@ -50,13 +48,8 @@ export function NavigationBarComponent({
   const { isMenuOpen, toggleMenu } = useNavigationContext();
   const { badgeData } = useServiceContext();
   const { isSignedIn } = useServiceContext();
-
-  const containerWidth = Dimensions.get('window').width;
   const lastPage = useRef<string | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const animatedWidth = useRef(
-    new Animated.Value(isMenuOpen ? styles.tabsOpened.width : styles.tabs.width),
-  ).current;
 
   const onDirectionHandledWithoutMovement = useCallback(
     (movement: string) => {
@@ -66,14 +59,6 @@ export function NavigationBarComponent({
     },
     [toggleMenu],
   );
-
-  useEffect(() => {
-    Animated.timing(animatedWidth, {
-      toValue: isMenuOpen ? styles.tabsOpened.width : styles.tabs.width,
-      duration: TABS_OPENING_DURATION_TV,
-      useNativeDriver: false,
-    }).start();
-  }, [animatedWidth, isMenuOpen]);
 
   const onTabSelect = useCallback((
     tab: Tab,
@@ -261,7 +246,16 @@ export function NavigationBarComponent({
     });
 
     return (
-      <Animated.View style={ [styles.tabs, { width: animatedWidth }] }>
+      <ThemedView.Animated
+        style={ [
+          styles.tabs,
+          {
+            width: isMenuOpen ? styles.tabsOpened.width : styles.tabs.width,
+            transitionProperty: 'width',
+            transitionDuration: `${TABS_OPENING_DURATION_TV}ms`
+          }
+        ] }
+      >
         <View>
           { topTabs.map((tab) => renderTab(tab, navigation, state)) }
         </View>
@@ -271,9 +265,9 @@ export function NavigationBarComponent({
         <View>
           { bottomTabs.map((tab) => renderTab(tab, navigation, state)) }
         </View>
-      </Animated.View>
+      </ThemedView.Animated>
     );
-  }, [renderTab, animatedWidth]);
+  }, [renderTab, isMenuOpen]);
 
   const renderTabBar = useCallback(({ navigation, state }: BottomTabBarProps) => (
     <SpatialNavigationRoot
@@ -304,12 +298,6 @@ export function NavigationBarComponent({
         tabBarActiveTintColor: Colors.primary,
         tabBarInactiveTintColor: Colors.white,
         tabBarPosition: 'left',
-        sceneStyle: {
-          width: containerWidth - scale(NAVIGATION_BAR_TV_WIDTH) - CONTENT_WRAPPER_PADDING_TV * 2,
-          marginRight: CONTENT_WRAPPER_PADDING_TV,
-          left: styles.tabs.width * -1 + CONTENT_WRAPPER_PADDING_TV,
-          marginLeft: animatedWidth,
-        },
       } }
       tabBar={ renderTabBar }
     />

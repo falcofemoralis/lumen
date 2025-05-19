@@ -2,7 +2,7 @@ import { useThemeColor } from 'Hooks/useThemeColor';
 import { View } from 'react-native';
 import Animated from 'react-native-reanimated';
 
-import { ThemedViewProps } from './ThemedView.type';
+import { AnimatedThemedViewProps, ThemedViewProps } from './ThemedView.type';
 
 function ThemedView({
   style,
@@ -22,15 +22,11 @@ function ThemedView({
 
 function ThemedViewAnimated({
   style,
-  lightColor,
-  darkColor,
   ...rest
-}: ThemedViewProps) {
-  const backgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, 'background');
-
+}: AnimatedThemedViewProps) {
   return (
     <Animated.View
-      style={ [{ backgroundColor }, style] }
+      style={ style }
       { ...rest }
     />
   );

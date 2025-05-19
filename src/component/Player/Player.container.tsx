@@ -418,6 +418,7 @@ export function PlayerContainer({
       if (data && data.deviceId !== ConfigStore.getDeviceId()) {
         const newTime = data.timestamp;
         updatePlayerTime(film, selectedVoice, data.timestamp);
+        // eslint-disable-next-line react-compiler/react-compiler
         player.currentTime = newTime;
       }
     }

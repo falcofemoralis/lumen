@@ -1,0 +1,4 @@
+1. Change package and name in app.json
+2. Add .env
+3. Revert package name in google-services.json
+4. Revet icon

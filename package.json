@@ -27,6 +27,8 @@
     "@react-navigation/material-top-tabs": "^7.2.11",
     "@react-navigation/native": "^7.1.6",
     "@sentry/react-native": "^6.13.0",
+    "babel-plugin-react-compiler": "^19.0.0-beta-af1b7da-20250417",
+    "eslint-plugin-react-compiler": "^19.1.0-rc.2",
     "expo": "^53.0.9",
     "expo-application": "^6.1.4",
     "expo-build-properties": "^0.14.6",

@@ -20,9 +20,9 @@ export const useCachedValues = <T>(nthElementConstructor: (n: number) => T): ((n
 
     const newElement = nthElementConstructor(n);
     memoizedElements.current[n] = newElement;
+
     return newElement;
     /** We purposefully dont put `nthElementConstructor` as a dependency because, if it changed,
      *  we would have to re-construct the whole cache. This use-case is not supported yet. */
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 };

@@ -41,7 +41,6 @@ const useRegisterInitialAndUnregisterFinalVirtualNodes = <T,>({
     currentAllItems.current.forEach((_, n) => registerNthVirtualNode(n));
 
     return () => currentAllItems.current.forEach((_, n) => unregisterNthVirtualNode(n));
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- unfortunately, we can't have clean effects with lrud for now
   }, [parentId]);
 };
 

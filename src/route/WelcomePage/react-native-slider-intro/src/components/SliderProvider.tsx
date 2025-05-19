@@ -176,7 +176,6 @@ const SliderProvider = (props: SliderProviderProps) => {
     animationGroup.start();
 
     return () => animationGroup.stop();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slide]);
 
   const goToNewSlide = (newSlide: number) => {

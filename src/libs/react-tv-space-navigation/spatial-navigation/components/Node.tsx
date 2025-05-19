@@ -201,7 +201,6 @@ export const SpatialNavigationNode = forwardRef<SpatialNavigationNodeRef, Props>
       });
 
       return () => spatialNavigator.unregisterNode(id);
-      // eslint-disable-next-line react-hooks/exhaustive-deps -- unfortunately, we can't have clean effects with lrud for now
     }, [parentId]);
 
     useEffect(() => {

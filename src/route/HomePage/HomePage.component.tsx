@@ -1,11 +1,6 @@
 import FilmPager from 'Component/FilmPager';
 import Page from 'Component/Page';
-import ThemedText from 'Component/ThemedText';
-import ThemedView from 'Component/ThemedView';
-import React, { useState } from 'react';
-import { Button, Modal, View } from 'react-native';
-import { ModalView } from 'react-native-multiple-modals';
-import Animated from 'react-native-reanimated';
+import React from 'react';
 
 import { HomePageComponentProps } from './HomePage.type';
 

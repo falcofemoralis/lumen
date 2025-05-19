@@ -1,7 +1,8 @@
-import SpatialNavigator from '../SpatialNavigator';
 import { useEffect } from 'react';
-import { remoteControlSubscriber, remoteControlUnsubscriber } from '../configureRemoteControl';
+
+import { RemoteController } from '../configureRemoteControl';
 import { useSpatialNavigationDeviceType } from '../context/DeviceContext';
+import SpatialNavigator from '../SpatialNavigator';
 
 export const useRemoteControl = ({
   spatialNavigator,
@@ -10,10 +11,10 @@ export const useRemoteControl = ({
   spatialNavigator: SpatialNavigator;
   isActive: boolean;
 }) => {
-  const { setDeviceType, setScrollingIntervalId: setScrollingId } =
-    useSpatialNavigationDeviceType();
+  const { setDeviceType, setScrollingIntervalId: setScrollingId } = useSpatialNavigationDeviceType();
+
   useEffect(() => {
-    if (!remoteControlSubscriber) {
+    if (!RemoteController.remoteControlSubscriber) {
       console.warn(
         '[React Spatial Navigation] You probably forgot to configure the remote control. Please call the configuration function.',
       );
@@ -25,20 +26,21 @@ export const useRemoteControl = ({
       return () => undefined;
     }
 
-    const listener = remoteControlSubscriber((direction) => {
+    const listener = RemoteController.remoteControlSubscriber((direction) => {
       setDeviceType('remoteKeys');
       spatialNavigator.handleKeyDown(direction);
       setScrollingId(null);
     });
+
     return () => {
-      if (!remoteControlUnsubscriber) {
+      if (!RemoteController.remoteControlUnsubscriber) {
         console.warn(
           '[React Spatial Navigation] You did not provide a remote control unsubscriber. Are you sure you called configuration correctly?',
         );
 
         return;
       }
-      remoteControlUnsubscriber(listener);
+      RemoteController.remoteControlUnsubscriber(listener);
     };
   }, [spatialNavigator, isActive, setDeviceType, setScrollingId]);
 };

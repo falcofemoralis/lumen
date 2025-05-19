@@ -1,15 +1,15 @@
-import React, { ReactNode, useCallback, useEffect, useMemo } from 'react';
-import { View, ViewStyle, StyleSheet } from 'react-native';
 import range from 'lodash/range';
+import React, { ReactNode, useCallback, useEffect, useMemo } from 'react';
+import { StyleSheet,View, ViewStyle } from 'react-native';
 
+import { ParentIdContext, useParentId } from '../../context/ParentIdContext';
+import { useSpatialNavigator } from '../../context/SpatialNavigatorContext';
+import { typedMemo } from '../../helpers/TypedMemo';
 import { SpatialNavigationVirtualizedList } from '../virtualizedList/SpatialNavigationVirtualizedList';
 import {
   PointerScrollProps,
   SpatialNavigationVirtualizedListWithScrollProps,
 } from '../virtualizedList/SpatialNavigationVirtualizedListWithScroll';
-import { useSpatialNavigator } from '../../context/SpatialNavigatorContext';
-import { ParentIdContext, useParentId } from '../../context/ParentIdContext';
-import { typedMemo } from '../../helpers/TypedMemo';
 import { convertToGrid } from './helpers/convertToGrid';
 
 type SpatialNavigationVirtualizedGridProps<T> = Pick<
@@ -72,8 +72,8 @@ const useRegisterGridRowVirtualNodes = ({ numberOfColumns }: { numberOfColumns: 
 
   useEffect(() => {
     range(numberOfColumns).forEach((i) => registerNthVirtualNode(i));
+
     return () => range(numberOfColumns).forEach((i) => unregisterNthVirtualNode(i));
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- unfortunately, we can't have clean effects with lrud for now
   }, [parentId]);
 
   return { getNthVirtualNodeID };
@@ -91,8 +91,8 @@ const ItemWrapperWithVirtualParentContext = typedMemo(
     index: number;
     renderItem: (args: { item: T; index: number }) => JSX.Element;
   }) => (
-    <ParentIdContext.Provider value={virtualParentID}>
-      {renderItem({ item, index })}
+    <ParentIdContext.Provider value={ virtualParentID }>
+      { renderItem({ item, index }) }
     </ParentIdContext.Provider>
   ),
 );
@@ -114,21 +114,22 @@ const GridRow = <T,>({
   const { getNthVirtualNodeID } = useRegisterGridRowVirtualNodes({ numberOfColumns });
 
   return (
-    <HorizontalContainer style={rowContainerStyle}>
-      {row.items.map((item, columnIndex) => {
+    <HorizontalContainer style={ rowContainerStyle }>
+      { row.items.map((item, columnIndex) => {
         const itemIndex = rowIndex * numberOfColumns + columnIndex;
+
         return (
-          /* This view is important to reset flex direction to vertical */
-          <View key={columnIndex}>
+        /* This view is important to reset flex direction to vertical */
+          <View key={ columnIndex }>
             <ItemWrapperWithVirtualParentContext
-              virtualParentID={getNthVirtualNodeID(columnIndex)}
-              renderItem={renderItem}
-              item={item}
-              index={itemIndex}
+              virtualParentID={ getNthVirtualNodeID(columnIndex) }
+              renderItem={ renderItem }
+              item={ item }
+              index={ itemIndex }
             />
           </View>
         );
-      })}
+      }) }
     </HorizontalContainer>
   );
 };
@@ -214,6 +215,7 @@ export const SpatialNavigationVirtualizedGrid = typedMemo(
         if (hasHeader && React.isValidElement(item)) {
           return headerSize;
         }
+
         return itemHeight;
       },
       [hasHeader, headerSize, itemHeight],
@@ -224,11 +226,11 @@ export const SpatialNavigationVirtualizedGrid = typedMemo(
     const renderRow = useCallback(
       ({ item: row, index }: { item: GridRowType<T>; index: number }) => (
         <GridRow
-          renderItem={renderItem}
-          numberOfColumns={numberOfColumns}
-          row={row}
-          rowIndex={index}
-          rowContainerStyle={rowContainerStyle}
+          renderItem={ renderItem }
+          numberOfColumns={ numberOfColumns }
+          row={ row }
+          rowIndex={ index }
+          rowContainerStyle={ rowContainerStyle }
         />
       ),
       [renderItem, numberOfColumns, rowContainerStyle],
@@ -240,6 +242,7 @@ export const SpatialNavigationVirtualizedGrid = typedMemo(
         }
         //We do this to have index taking into account the header
         const computedIndex = hasHeader ? index - 1 : index;
+
         return renderRow({ item: item as GridRowType<T>, index: computedIndex });
       },
       [hasHeader, renderRow],
@@ -247,15 +250,15 @@ export const SpatialNavigationVirtualizedGrid = typedMemo(
 
     return (
       <SpatialNavigationVirtualizedList
-        data={gridRowsWithHeaderIfProvided}
-        itemSize={itemSize}
-        additionalItemsRendered={additionalRenderedRows}
-        onEndReachedThresholdItemsNumber={onEndReachedThresholdRowsNumber}
+        data={ gridRowsWithHeaderIfProvided }
+        itemSize={ itemSize }
+        additionalItemsRendered={ additionalRenderedRows }
+        onEndReachedThresholdItemsNumber={ onEndReachedThresholdRowsNumber }
         orientation="vertical"
-        nbMaxOfItems={nbMaxOfItems ? Math.ceil(nbMaxOfItems / numberOfColumns) : undefined}
-        renderItem={renderHeaderThenRows}
+        nbMaxOfItems={ nbMaxOfItems ? Math.ceil(nbMaxOfItems / numberOfColumns) : undefined }
+        renderItem={ renderHeaderThenRows }
         isGrid
-        {...props}
+        { ...props }
       />
     );
   },
@@ -268,7 +271,7 @@ type HorizontalContainerProps = {
 };
 
 const HorizontalContainer = ({ style, children }: HorizontalContainerProps) => {
-  return <View style={[style, styles.rowContainer]}>{children}</View>;
+  return <View style={ [style, styles.rowContainer] }>{ children }</View>;
 };
 
 const styles = StyleSheet.create({
