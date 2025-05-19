@@ -1,4 +1,3 @@
-import uniqueId from 'lodash.uniqueid';
 import { useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 import { VirtualizedListProps } from './VirtualizedList';
 import { useSpatialNavigator } from '../../context/SpatialNavigatorContext';
@@ -9,6 +8,7 @@ import { useCachedValues } from './hooks/useCachedValues';
 import { NodeOrientation } from '../../types/orientation';
 import { invertOrientation } from '../virtualizedGrid/helpers/convertToGrid';
 import { VirtualizedListWithSize } from './VirtualizedListWithSize';
+import { uniqueId } from 'Util/Math';
 
 const useCreateVirtualParentsIds = (parentId: string) =>
   useCachedValues(() => uniqueId(`${parentId}_virtual_`));

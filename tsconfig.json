@@ -13,7 +13,8 @@
       "Style/*": ["./src/style/*"],
       "Store/*": ["./src/store/*"],
       "Type/*": ["./src/type/*"],
-      "Util/*": ["./src/util/*"]
+      "Util/*": ["./src/util/*"],
+      "react-tv-space-navigation": ["./src/libs/react-tv-space-navigation"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"]
