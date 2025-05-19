@@ -31,15 +31,17 @@
 "react-native-worklets": "^0.3.0-nightly-20250516-889b26b44",
 "@react-navigation/bottom-tabs": "^7.2.1",
 "@react-navigation/native": "^7.1.6",
+"@react-navigation/elements": "^2.4.0",
+"@react-navigation/material-top-tabs": "^7.2.11",
 
 // UI
-"react-native-raw-bottom-sheet": "^3.0.0",
 "react-native-reanimated-animated-accordion": "^0.3.0",
 "react-native-pager-view": "^6.7.1",
 "react-native-error-boundary": "^2.0.0",
 "react-native-awesome-slider": "^2.9.0",
 "@kolking/react-native-rating": "^1.4.1",
 "@legendapp/list": "^1.0.12",
+"@lodev09/react-native-true-sheet": "^2.0.5",
 "react-tv-space-navigation": "file:libs/react-tv-space-navigation",
 
 // utils
@@ -62,22 +64,3 @@
 
 // DEPRECATED
 "react-native-paper": "^5.14.0",
-"@react-navigation/elements": "^2.4.0",
-"@react-navigation/material-top-tabs": "^7.2.11",
-"mobx": "^6.13.7",
-"mobx-react-lite": "^4.1.0",
-
-// NEW
-bottom sheet - https://github.com/lodev09/react-native-true-sheet
-
-
-
-
-
-
-
-
-
-
-
-

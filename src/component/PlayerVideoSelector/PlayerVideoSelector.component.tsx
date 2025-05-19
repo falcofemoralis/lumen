@@ -1,4 +1,6 @@
 import Loader from 'Component/Loader';
+import ThemedBottomSheet from 'Component/ThemedBottomSheet';
+import { ThemedBottomSheetRef } from 'Component/ThemedBottomSheet/ThemedBottomSheet.type';
 import ThemedDropdown from 'Component/ThemedDropdown';
 import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
@@ -11,12 +13,11 @@ import {
   TouchableOpacity, View,
 } from 'react-native';
 import { Button } from 'react-native-paper';
-import RBSheet from 'react-native-raw-bottom-sheet';
 import Colors from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 
 import { styles } from './PlayerVideoSelector.style';
-import { PlayerVideoSelectorComponentProps, RBSheetRef } from './PlayerVideoSelector.type';
+import { PlayerVideoSelectorComponentProps } from './PlayerVideoSelector.type';
 
 export function PlayerVideoSelectorComponent({
   overlayId,
@@ -33,7 +34,7 @@ export function PlayerVideoSelectorComponent({
   handleSelectEpisode,
   film,
 }: PlayerVideoSelectorComponentProps) {
-  const refRBSheet = useRef<RBSheetRef>(null);
+  const bottomSheetRef = useRef<ThemedBottomSheetRef>(null);
 
   const renderVoiceRating = () => {
     const { voiceRating = [] } = film;
@@ -49,7 +50,7 @@ export function PlayerVideoSelectorComponent({
     return (
       <>
         <TouchableOpacity
-          onPress={ () => refRBSheet.current?.open() }
+          onPress={ () => bottomSheetRef.current?.present() }
           style={ styles.voiceRatingInputContainer }
         >
           <ThemedIcon
@@ -65,21 +66,7 @@ export function PlayerVideoSelectorComponent({
             color={ Colors.white }
           />
         </TouchableOpacity>
-        <RBSheet
-          ref={ refRBSheet }
-          draggable
-          height={ Dimensions.get('window').height / 2 }
-          closeOnPressBack
-          closeOnPressMask
-          customModalProps={ {
-            animationType: 'slide',
-            statusBarTranslucent: true,
-          } }
-          customStyles={ {
-            container: styles.voiceRatingSheetContainer,
-            draggableIcon: styles.voiceRatingSheetIcon,
-          } }
-        >
+        <ThemedBottomSheet ref={ bottomSheetRef }>
           <ScrollView style={ styles.voiceRatingContainer }>
             { voiceRating.map((item) => (
               <View
@@ -114,7 +101,7 @@ export function PlayerVideoSelectorComponent({
               </View>
             )) }
           </ScrollView>
-        </RBSheet>
+        </ThemedBottomSheet>
       </>
     );
   };

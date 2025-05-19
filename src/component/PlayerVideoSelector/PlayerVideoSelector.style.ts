@@ -68,14 +68,6 @@ export const styles = CreateStyles({
   voiceDropdownInputIconSeason: {
     padding: 8,
   },
-  voiceRatingSheetContainer: {
-    backgroundColor: Colors.lightBackground,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-  },
-  voiceRatingSheetIcon: {
-    width: 80,
-  },
   voiceRatingContainer: {},
   voiceRatingItemContainer: {
     flexDirection: 'row',
