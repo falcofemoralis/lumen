@@ -2,7 +2,6 @@ import React, { useCallback } from 'react';
 import {
   ScrollView, Text, TouchableHighlight, View,
 } from 'react-native';
-import { Checkbox } from 'react-native-paper';
 import Colors from 'Style/Colors';
 
 import { styles } from './ThemedMultiList.style';
@@ -32,10 +31,10 @@ export const ThemedMultiListComponent = ({
       <Text style={ styles.itemLabel }>
         { item.label }
       </Text>
-      <Checkbox
+      { /* <Checkbox
         status={ item.isChecked ? 'checked' : 'unchecked' }
         color={ Colors.primary }
-      />
+      /> */ }
     </View>
   ), []);
 

@@ -1,10 +1,10 @@
 import { useIsFocused } from '@react-navigation/native';
+import { Portal } from 'Component/ThemedPortal';
 import ThemedView from 'Component/ThemedView';
 import { useNavigationContext } from 'Context/NavigationContext';
 import { useCallback, useEffect } from 'react';
 import { Keyboard } from 'react-native';
 import ErrorBoundary from 'react-native-error-boundary';
-import { Portal } from 'react-native-paper';
 import { Directions, SpatialNavigationRoot, useLockSpatialNavigation } from 'react-tv-space-navigation';
 
 import { styles } from './Page.style.atv';

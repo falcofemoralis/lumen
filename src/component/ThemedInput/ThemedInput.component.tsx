@@ -1,4 +1,4 @@
-import { TextInput } from 'react-native-paper';
+import { TextInput } from 'react-native';
 import Colors from 'Style/Colors';
 
 import { styles } from './ThemedInput.style';
@@ -12,7 +12,6 @@ export const ThemedInputComponent = ({
 }: ThemedInputComponentProps) => (
   <TextInput
     autoComplete="off"
-    mode="flat"
     placeholder={ placeholder }
     onChangeText={ onChangeText }
     style={ [
@@ -20,14 +19,9 @@ export const ThemedInputComponent = ({
       style,
     ] }
     placeholderTextColor={ Colors.white }
-    textColor={ Colors.white }
     selectionColor={ Colors.secondary }
-    underlineColor={ Colors.secondary }
-    outlineColor={ Colors.secondary }
-    activeOutlineColor={ Colors.secondary }
     cursorColor={ Colors.secondary }
     underlineColorAndroid={ Colors.white }
-    activeUnderlineColor={ Colors.secondary }
     selectionHandleColor={ Colors.secondary }
     { ...props }
   />

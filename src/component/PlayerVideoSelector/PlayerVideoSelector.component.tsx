@@ -9,10 +9,10 @@ import ThemedText from 'Component/ThemedText';
 import t from 'i18n/t';
 import React, { useRef } from 'react';
 import {
-  Dimensions, ScrollView,
+  Button,
+  Dimensions, Pressable, ScrollView,
   TouchableOpacity, View,
 } from 'react-native';
-import { Button } from 'react-native-paper';
 import Colors from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 
@@ -134,7 +134,7 @@ export function PlayerVideoSelectorComponent({
   const renderSeasons = () => (
     <View style={ styles.seasonsContainer }>
       { seasons.map((season) => (
-        <Button
+        <Pressable
           key={ season.seasonId }
           style={ [
             styles.season,
@@ -142,14 +142,15 @@ export function PlayerVideoSelectorComponent({
           ] }
           onPress={ () => setSelectedSeasonId(season.seasonId) }
         >
-          <ThemedText style={ [
-            styles.seasonText,
-            selectedSeasonId === season.seasonId && styles.seasonTextSelected,
-          ] }
+          <ThemedText
+            style={ [
+              styles.seasonText,
+              selectedSeasonId === season.seasonId && styles.seasonTextSelected,
+            ] }
           >
             { season.name }
           </ThemedText>
-        </Button>
+        </Pressable>
       )) }
     </View>
   );
@@ -157,7 +158,7 @@ export function PlayerVideoSelectorComponent({
   const renderEpisodes = () => (
     <View style={ styles.episodesContainer }>
       { episodes.map(({ episodeId, name }) => (
-        <Button
+        <Pressable
           key={ episodeId }
           style={ [
             styles.episode,
@@ -172,7 +173,7 @@ export function PlayerVideoSelectorComponent({
           >
             { name }
           </ThemedText>
-        </Button>
+        </Pressable>
       )) }
     </View>
   );

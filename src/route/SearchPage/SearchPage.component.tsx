@@ -9,8 +9,7 @@ import ThemedText from 'Component/ThemedText';
 import ThemedView from 'Component/ThemedView';
 import t from 'i18n/t';
 import React from 'react';
-import { View } from 'react-native';
-import { TouchableRipple } from 'react-native-paper';
+import { TouchableNativeFeedback, View } from 'react-native';
 import Colors from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 
@@ -43,12 +42,7 @@ export function SearchPageComponent({
         onChangeText={ (text) => onChangeText(text) }
         onSubmitEditing={ ({ nativeEvent: { text } }) => onApplySearch(text) }
         value={ enteredText }
-        mode="outlined"
         placeholderTextColor={ Colors.white }
-        outlineColor={ Colors.transparent }
-        activeOutlineColor={ Colors.transparent }
-        textColor={ Colors.white }
-        outlineStyle={ styles.searchBarOutline }
         selectionColor={ Colors.primary }
         cursorColor={ Colors.white }
         onPress={ resetSearch }
@@ -102,10 +96,13 @@ export function SearchPageComponent({
     return (
       <View style={ styles.suggestionsContainer }>
         { suggestions.map((suggestion) => (
-          <TouchableRipple
+          <TouchableNativeFeedback
             key={ suggestion }
             onPress={ () => onApplySuggestion(suggestion) }
-            rippleColor={ Colors.white }
+            background={ TouchableNativeFeedback.Ripple(
+              Colors.white,
+              true,
+            ) }
           >
             <View style={ styles.suggestion }>
               <ThemedIcon
@@ -130,7 +127,7 @@ export function SearchPageComponent({
                 color="white"
               />
             </View>
-          </TouchableRipple>
+          </TouchableNativeFeedback>
         )) }
       </View>
     );

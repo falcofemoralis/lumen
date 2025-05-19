@@ -11,7 +11,6 @@ import t from 'i18n/t';
 import React, { useEffect, useState } from 'react';
 import { BackHandler } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { PaperProvider } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { SpatialNavigationDeviceTypeProvider } from 'react-tv-space-navigation';
 import ConfigStore from 'Store/Config.store';
@@ -98,11 +97,9 @@ export function RootLayout() {
         } }
       >
         <AppProvider>
-          <PaperProvider>
-            <Portal.Host>
-              { ConfigStore.isTV() ? renderTVLayout() : renderMobileLayout() }
-            </Portal.Host>
-          </PaperProvider>
+          <Portal.Host>
+            { ConfigStore.isTV() ? renderTVLayout() : renderMobileLayout() }
+          </Portal.Host>
         </AppProvider>
       </ThemeProvider>
     )

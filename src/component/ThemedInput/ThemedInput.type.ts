@@ -1,5 +1,4 @@
-import { StyleProp, TextStyle } from 'react-native';
-import { TextInputProps } from 'react-native-paper';
+import { StyleProp, TextInputProps, TextStyle } from 'react-native';
 
 export interface ThemedInputContainerProps extends TextInputProps {
   placeholder: string;
@@ -7,6 +6,5 @@ export interface ThemedInputContainerProps extends TextInputProps {
   style?: StyleProp<TextStyle> | undefined;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface ThemedInputComponentProps extends ThemedInputContainerProps {
 }

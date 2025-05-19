@@ -12,8 +12,7 @@ import {
   useId,
   useState,
 } from 'react';
-import { View } from 'react-native';
-import { TouchableRipple } from 'react-native-paper';
+import { TouchableNativeFeedback, View } from 'react-native';
 import Colors from 'Style/Colors';
 import { noopFn } from 'Util/Function';
 
@@ -37,10 +36,13 @@ const BaseComponent = ({
   const { title, subtitle } = setting;
 
   return (
-    <TouchableRipple
+    <TouchableNativeFeedback
       style={ styles.setting }
       onPress={ onPress ?? noopFn }
-      rippleColor={ Colors.white }
+      background={ TouchableNativeFeedback.Ripple(
+        Colors.white,
+        true,
+      ) }
     >
       <View style={ styles.settingContainer }>
         <ThemedText style={ styles.settingTitle }>
@@ -50,7 +52,7 @@ const BaseComponent = ({
           { subtitle }
         </ThemedText>
       </View>
-    </TouchableRipple>
+    </TouchableNativeFeedback>
   );
 };
 

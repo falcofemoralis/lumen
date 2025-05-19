@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { TextInput } from 'react-native-paper';
+import { TextInput } from 'react-native';
 import { SpatialNavigationFocusableView } from 'react-tv-space-navigation';
 import Colors from 'Style/Colors';
 
@@ -12,7 +12,7 @@ export const ThemedInputComponent = ({
   style,
   ...props
 }: ThemedInputComponentProps) => {
-  const textInputRef = useRef<any>();
+  const textInputRef = useRef<any>(null);
 
   const focusInput = () => {
     textInputRef.current?.focus();
@@ -32,7 +32,6 @@ export const ThemedInputComponent = ({
           autoComplete="off"
           ref={ textInputRef }
           tvFocusable
-          mode="flat"
           placeholder={ placeholder }
           onChangeText={ onChangeText }
           style={ [
@@ -41,14 +40,9 @@ export const ThemedInputComponent = ({
             isFocused && styles.inputFocus,
           ] }
           placeholderTextColor={ isFocused ? Colors.black : Colors.white }
-          textColor={ isFocused ? Colors.black : Colors.white }
           selectionColor={ Colors.primary }
-          underlineColor={ Colors.primary }
-          outlineColor={ Colors.primary }
-          activeOutlineColor={ Colors.secondary }
           cursorColor={ Colors.primary }
           underlineColorAndroid={ Colors.white }
-          activeUnderlineColor={ Colors.secondary }
           selectionHandleColor={ Colors.primary }
           { ...props }
         />

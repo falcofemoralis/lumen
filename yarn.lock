@@ -778,14 +778,6 @@
   dependencies:
     mitt "3.0.1"
 
-"@callstack/react-theme-provider@^3.0.9":
-  version "3.0.9"
-  resolved "https://registry.yarnpkg.com/@callstack/react-theme-provider/-/react-theme-provider-3.0.9.tgz#01035fa1231f1fffc1a806be1b55eb82716e80c1"
-  integrity sha512-tTQ0uDSCL0ypeMa8T/E9wAZRGKWj8kXP7+6RYgPTfOPs9N07C9xM8P02GJ3feETap4Ux5S69D9nteq9mEj86NA==
-  dependencies:
-    deepmerge "^3.2.0"
-    hoist-non-react-statics "^3.3.0"
-
 "@egjs/hammerjs@^2.0.17":
   version "2.0.17"
   resolved "https://registry.yarnpkg.com/@egjs/hammerjs/-/hammerjs-2.0.17.tgz#5dc02af75a6a06e4c2db0202cae38c9263895124"
@@ -1773,9 +1765,9 @@
   integrity sha512-EdatROdtYPPo8zTDYXlmVWcWzguJD0RwwhrnmnJZyP99atrRShgB28nhmMk/An/YllrpkSBv1aFGVf140VOFuQ==
 
 "@legendapp/list@^1.0.12":
-  version "1.0.12"
-  resolved "https://registry.yarnpkg.com/@legendapp/list/-/list-1.0.12.tgz#875eae3433361859b819356b79235088828770c2"
-  integrity sha512-uvqMSnAB4v4KT2qOCuZ4kz1FIv+PFM4hrEqvpTKFzjxhX5+XgsSqbPAofBXf21YO+yZuG6SDOkUPNxShauSIbw==
+  version "1.0.13"
+  resolved "https://registry.yarnpkg.com/@legendapp/list/-/list-1.0.13.tgz#bfca62d4243b448b43120c1d25807534dae846a7"
+  integrity sha512-qTFbWEvdNM0wA7voVL+l+NLC8NfFmyqh/QvFratMiA5XImW2BPqN79Qq1x56SIVWnxxakHPjaW8J2wE0p+qMDQ==
   dependencies:
     use-sync-external-store "^1.5.0"
 
@@ -2391,9 +2383,9 @@
   integrity sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==
 
 "@types/node@*", "@types/node@>=12.12.47", "@types/node@>=13.7.0":
-  version "22.15.18"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-22.15.18.tgz#2f8240f7e932f571c2d45f555ba0b6c3f7a75963"
-  integrity sha512-v1DKRfUdyW+jJhZNEI1PYy29S2YRxMV5AOO/x/SjKmW0acCIOqmbj6Haf9eHAhsPmrhlHSxEhv/1WszcLWV4cg==
+  version "22.15.19"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-22.15.19.tgz#ba9f321675243af0456d607fa82a4865931e0cef"
+  integrity sha512-3vMNr4TzNQyjHcRZadojpRaD9Ofr6LsonZAoQ+HMUa/9ORTPoxVIw0e0mpqWpdjj8xybyCM+oKOUH2vwFu/oEw==
   dependencies:
     undici-types "~6.21.0"
 
@@ -3338,7 +3330,7 @@ clone@^1.0.2:
   resolved "https://registry.yarnpkg.com/clone/-/clone-1.0.4.tgz#da309cc263df15994c688ca902179ca3c7cd7c7e"
   integrity sha512-JQHZ2QMW6l3aH/j6xCqQThY/9OH4D/9ls34cgkUBiEeocRTU04tHfKPBsUK1PqZCUQM7GiA0IIXJSuXHI64Kbg==
 
-color-convert@^1.9.0, color-convert@^1.9.3:
+color-convert@^1.9.0:
   version "1.9.3"
   resolved "https://registry.yarnpkg.com/color-convert/-/color-convert-1.9.3.tgz#bb71850690e1f136567de629d2d5471deda4c1e8"
   integrity sha512-QfAUtd+vFdAtFQcC8CCyYt1fYWxSqAiK2cSD6zDB8N3cpsEBAvRxp9zOGg6G/SHHJYAT88/az/IuDGALsNVbGg==
@@ -3362,21 +3354,13 @@ color-name@^1.0.0, color-name@~1.1.4:
   resolved "https://registry.yarnpkg.com/color-name/-/color-name-1.1.4.tgz#c2a09a87acbde69543de6f63fa3995c826c536a2"
   integrity sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==
 
-color-string@^1.6.0, color-string@^1.9.0:
+color-string@^1.9.0:
   version "1.9.1"
   resolved "https://registry.yarnpkg.com/color-string/-/color-string-1.9.1.tgz#4467f9146f036f855b764dfb5bf8582bf342c7a4"
   integrity sha512-shrVawQFojnZv6xM40anx4CkoDP+fZsw/ZerEMsW/pyzsRbElpsL/DBVW7q3ExxwusdNXI3lXpuhEZkzs8p5Eg==
   dependencies:
     color-name "^1.0.0"
     simple-swizzle "^0.2.2"
-
-color@^3.1.2:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/color/-/color-3.2.1.tgz#3544dc198caf4490c3ecc9a790b54fe9ff45e164"
-  integrity sha512-aBl7dZI9ENN6fUGC7mWpMTPNHmWUSNan9tuWN6ahh5ZLNk9baLJOnSMlrQkHcrfFgz2/RigjUVAjdx36VcemKA==
-  dependencies:
-    color-convert "^1.9.3"
-    color-string "^1.6.0"
 
 color@^4.2.3:
   version "4.2.3"
@@ -3582,11 +3566,6 @@ deep-is@^0.1.3:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/deep-is/-/deep-is-0.1.4.tgz#a6f2dce612fadd2ef1f519b73551f17e85199831"
   integrity sha512-oIPzksmTg4/MriiaYGO+okXDT7ztn/w3Eptv/+gSIdMdKsJo0u4CfYNFJPy+4SKMuCqGw2wxnA+URMg3t8a/bQ==
-
-deepmerge@^3.2.0:
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/deepmerge/-/deepmerge-3.3.0.tgz#d3c47fd6f3a93d517b14426b0628a17b0125f5f7"
-  integrity sha512-GRQOafGHwMHpjPx9iCvTgpu9NojZ49q794EEL94JVEw6VaeA8XTUyBKvAkOOjBX9oJNiV6G3P+T+tihFjo2TqA==
 
 deepmerge@^4.3.1:
   version "4.3.1"
@@ -6582,24 +6561,15 @@ react-native-pager-view@^6.7.1:
   resolved "https://registry.yarnpkg.com/react-native-pager-view/-/react-native-pager-view-6.7.1.tgz#60d52dedbcc92ee7037a13287ebeed5f74e49df7"
   integrity sha512-cBSr6xw4g5N7Kd3VGWcf+kmaH7iBWb0DXAf2bVo3bXkzBcBbTOmYSvc0LVLHhUPW8nEq5WjT9LCIYAzgF++EXw==
 
-react-native-paper@^5.14.0:
-  version "5.14.4"
-  resolved "https://registry.yarnpkg.com/react-native-paper/-/react-native-paper-5.14.4.tgz#8ff978d1aebd6388c752287d557a5f8cb3716fe5"
-  integrity sha512-XtL9ilZGNZfGopt469vNCYqePNvHrZ1v6if0EXIQfXUx0vZ+lY0Cq7wi0Ap4CBxJTPbj71A1BcRyZDu6ogJKpg==
-  dependencies:
-    "@callstack/react-theme-provider" "^3.0.9"
-    color "^3.1.2"
-    use-latest-callback "^0.2.3"
-
 react-native-reanimated-animated-accordion@^0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/react-native-reanimated-animated-accordion/-/react-native-reanimated-animated-accordion-0.3.0.tgz#3212725194afd93a25994eeb85c0cac3b0c99e59"
   integrity sha512-HFp4a0trM2MBUlYi98BYaTvjuvOehFxHbKTzXn5PrD6JWjqa6+IAUZ8SxXouzbW7TQ6j+fsl0rH8uOdrQk9QXw==
 
-react-native-reanimated@3.17.5:
-  version "3.17.5"
-  resolved "https://registry.yarnpkg.com/react-native-reanimated/-/react-native-reanimated-3.17.5.tgz#09ebe3c9e3379c5c0c588b7ab30c131ea29b60f0"
-  integrity sha512-SxBK7wQfJ4UoWoJqQnmIC7ZjuNgVb9rcY5Xc67upXAFKftWg0rnkknTw6vgwnjRcvYThrjzUVti66XoZdDJGtw==
+react-native-reanimated@4.0.0-nightly-20250518-660c45f98:
+  version "4.0.0-nightly-20250518-660c45f98"
+  resolved "https://registry.yarnpkg.com/react-native-reanimated/-/react-native-reanimated-4.0.0-nightly-20250518-660c45f98.tgz#bfb5e204fda40c4663124abe18b92702b0f5777e"
+  integrity sha512-uH8zpMks54TxzDfRY9poyB+MEJ4phgLLBk4ET/cbI3zwB0JBOuXKPeJyWg17UY8SKjmlwe3DbtUR3aEnG7IPxg==
   dependencies:
     "@babel/plugin-transform-arrow-functions" "^7.0.0-0"
     "@babel/plugin-transform-class-properties" "^7.0.0-0"
@@ -6611,8 +6581,8 @@ react-native-reanimated@3.17.5:
     "@babel/plugin-transform-unicode-regex" "^7.0.0-0"
     "@babel/preset-typescript" "^7.16.7"
     convert-source-map "^2.0.0"
-    invariant "^2.2.4"
     react-native-is-edge-to-edge "1.1.7"
+    semver "^7.7.1"
 
 react-native-restart@^0.0.27:
   version "0.0.27"
@@ -6661,6 +6631,11 @@ react-native-web@~0.20.0:
     nullthrows "^1.1.1"
     postcss-value-parser "^4.2.0"
     styleq "^0.1.3"
+
+react-native-worklets@^0.3.0-nightly-20250518-660c45f98:
+  version "0.3.0-nightly-20250518-660c45f98"
+  resolved "https://registry.yarnpkg.com/react-native-worklets/-/react-native-worklets-0.3.0-nightly-20250518-660c45f98.tgz#4659ef31ffd3cde542f6dcec198f7d42d0fbf065"
+  integrity sha512-8vFMHzsy6vIhcVg0UM37mekfxahbq5Ox3w6mUED9THqVHEupYrlg7BIWR7ngtgp/gAj3AweCggOPRJYELMBBIg==
 
 "react-native@npm:react-native-tvos@~0.79.2-0":
   version "0.79.2-0"
