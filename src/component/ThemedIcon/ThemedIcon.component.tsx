@@ -7,6 +7,8 @@ import { IconPackType, ThemedIconComponentProps } from './ThemedIcon.type';
 
 /**
  * https://icons.expo.fyi/Index
+ * https://lucide.dev/guide/packages/lucide-react-native
+ * https://lucide.dev/icons/
  */
 export function ThemedIconComponent({
   icon,
