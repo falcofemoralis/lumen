@@ -3,7 +3,7 @@ import ThemedView from 'Component/ThemedView';
 import { useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import { StyleSheet } from 'react-native';
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 
 export default function ErrorScreen() {
   const { code = '500', error = 'ERROR!', info } = useLocalSearchParams() as {

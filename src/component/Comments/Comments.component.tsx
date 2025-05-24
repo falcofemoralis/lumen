@@ -8,7 +8,7 @@ import ThemedText from 'Component/ThemedText';
 import t from 'i18n/t';
 import { memo, useCallback } from 'react';
 import { View } from 'react-native';
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import { CommentInterface } from 'Type/Comment.interface';
 import { scale } from 'Util/CreateStyles';
 

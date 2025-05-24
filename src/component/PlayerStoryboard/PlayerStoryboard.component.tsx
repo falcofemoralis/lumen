@@ -2,7 +2,7 @@
 import { Image } from 'expo-image';
 import { memo, useEffect, useState } from 'react';
 import { View } from 'react-native';
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import { storyboardParser, VTTItem } from 'Util/VttParser';
 
 import { STORYBOARD_TILE_HEIGHT, STORYBOARD_TILE_WIDTH, STORYBOARD_TILES_COUNT } from './PlayerStoryboard.config';

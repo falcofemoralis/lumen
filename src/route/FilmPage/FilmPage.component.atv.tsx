@@ -22,7 +22,7 @@ import {
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
 import NotificationStore from 'Store/Notification.store';
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import { CollectionItemInterface } from 'Type/CollectionItem';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { scale } from 'Util/CreateStyles';

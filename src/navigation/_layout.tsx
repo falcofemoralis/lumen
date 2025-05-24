@@ -15,7 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { SpatialNavigationDeviceTypeProvider } from 'react-tv-space-navigation';
 import ConfigStore from 'Store/Config.store';
 import NotificationStore from 'Store/Notification.store';
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import { setTimeoutSafe } from 'Util/Misc';
 
 SplashScreen.preventAutoHideAsync();
@@ -66,7 +66,15 @@ export function RootLayout() {
         },
         animation: 'fade',
       } }
-    />
+    >
+      <Stack.Screen
+        name="modal"
+        options={ {
+          presentation: 'modal',
+          headerShown: true,
+        } }
+      />
+    </Stack>
   );
 
   const renderTVLayout = () => (

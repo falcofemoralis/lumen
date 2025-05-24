@@ -37,5 +37,3 @@ export const ThemeColors = {
     link: Colors.primary,
   },
 };
-
-export default Colors;

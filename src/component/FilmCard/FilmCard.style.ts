@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Dimensions } from 'react-native';
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import { calculateItemWidth } from 'Style/Layout';
 import CreateStyles, { scale } from 'Util/CreateStyles';
 

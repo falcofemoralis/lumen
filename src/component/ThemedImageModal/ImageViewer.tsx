@@ -9,7 +9,7 @@ import Animated, {
   withDecay,
   withTiming,
 } from 'react-native-reanimated';
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 
 export type ImageViewerProps = {
   imageUrl: string;

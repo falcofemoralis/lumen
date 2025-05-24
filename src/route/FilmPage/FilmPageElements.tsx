@@ -4,11 +4,11 @@ import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
 import t from 'i18n/t';
-import { memo, useCallback, useState } from 'react';
+import { memo, useCallback } from 'react';
 import {
   Pressable, TouchableHighlight, TouchableOpacity, View,
 } from 'react-native';
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import { ActorCardInterface } from 'Type/ActorCard.interface';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmCardInterface } from 'Type/FilmCard.interface';

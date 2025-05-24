@@ -1,5 +1,5 @@
 import { TextInput } from 'react-native';
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 
 import { styles } from './ThemedInput.style';
 import { ThemedInputComponentProps } from './ThemedInput.type';

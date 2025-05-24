@@ -18,7 +18,7 @@ import {
   SpatialNavigationFocusableView,
   SpatialNavigationVirtualizedList,
 } from 'react-tv-space-navigation';
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import { CommentInterface, CommentTextType } from 'Type/Comment.interface';
 import { scale } from 'Util/CreateStyles';
 

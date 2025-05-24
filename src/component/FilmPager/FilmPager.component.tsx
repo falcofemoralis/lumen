@@ -60,6 +60,7 @@ export function FilmPagerComponent({
       onIndexChange={ handleIndexChange }
       style={ styles.container }
       renderTabBar={ renderTabBar }
+      tabBarPosition='bottom'
     />
   );
 }

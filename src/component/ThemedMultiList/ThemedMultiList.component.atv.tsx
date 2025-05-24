@@ -4,7 +4,7 @@ import {
   View,
 } from 'react-native';
 import { DefaultFocus, SpatialNavigationFocusableView, SpatialNavigationScrollView } from 'react-tv-space-navigation';
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 
 import { styles } from './ThemedMultiList.style.atv';

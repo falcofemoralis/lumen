@@ -1,5 +1,5 @@
 import Svg, { Path } from 'react-native-svg';
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 
 export const WelcomePageTV = () => (
   <Svg

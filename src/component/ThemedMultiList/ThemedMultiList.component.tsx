@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import {
   ScrollView, Text, TouchableHighlight, View,
 } from 'react-native';
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 
 import { styles } from './ThemedMultiList.style';
 import { ListItem, ThemedMultiListComponentProps } from './ThemedMultiList.type';

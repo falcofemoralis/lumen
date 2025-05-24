@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { TextInput } from 'react-native';
 import { SpatialNavigationFocusableView } from 'react-tv-space-navigation';
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 
 import { styles } from './ThemedInput.style.atv';
 import { ThemedInputComponentProps } from './ThemedInput.type';

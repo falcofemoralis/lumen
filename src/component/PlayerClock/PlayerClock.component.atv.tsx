@@ -1,6 +1,6 @@
 import ThemedText from 'Component/ThemedText';
 import { View } from 'react-native';
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 
 import Clock from './Component';

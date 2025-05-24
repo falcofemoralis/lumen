@@ -10,7 +10,7 @@ import ThemedView from 'Component/ThemedView';
 import t from 'i18n/t';
 import React from 'react';
 import { TouchableNativeFeedback, View } from 'react-native';
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 
 import { SEARCH_MENU_ITEM } from './SearchPage.config';

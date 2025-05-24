@@ -7,7 +7,7 @@ import React, { useCallback, useRef } from 'react';
 import {
   ScrollView, Text, TouchableHighlight, View,
 } from 'react-native';
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import { generateId } from 'Util/Math';
 
 import { styles } from './ThemedDropdown.style';

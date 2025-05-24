@@ -2,7 +2,7 @@ import { TrueSheet } from '@lodev09/react-native-true-sheet'
 import { Portal } from 'Component/ThemedPortal';
 import React from 'react';
 import { View } from 'react-native';
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 
 import { ThemedBottomSheetComponentProps } from './ThemedBottomSheet.type';
 

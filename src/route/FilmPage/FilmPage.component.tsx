@@ -11,7 +11,7 @@ import ThemedImageModal from 'Component/ThemedImageModal';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedText from 'Component/ThemedText';
 import { useOverlayContext } from 'Context/OverlayContext';
-import { useRouter } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import t from 'i18n/t';
 import React, { useCallback, useRef, useState } from 'react';
 import {
@@ -24,7 +24,7 @@ import {
   View,
 } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import { CollectionItemInterface } from 'Type/CollectionItem';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { scale } from 'Util/CreateStyles';
@@ -589,7 +589,10 @@ export function FilmPageComponent({
         { renderTitle() }
         { renderGenres() }
         { renderMainContent() }
-        { renderDescription() }
+        { /* { renderDescription() } */ }
+        <Link href='/modal' style={ { color: '#fff' } }>
+          Open modal
+        </Link>
         { renderActions() }
         { renderPlayFilmButton() }
         { renderActors() }

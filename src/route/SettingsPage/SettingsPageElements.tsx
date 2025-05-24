@@ -13,7 +13,7 @@ import {
   useState,
 } from 'react';
 import { TouchableNativeFeedback, View } from 'react-native';
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import { noopFn } from 'Util/Function';
 
 import { styles } from './SettingsPage.style';

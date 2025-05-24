@@ -23,7 +23,7 @@ import {
 } from 'react-native';
 import { ScrollView, TextInput } from 'react-native-gesture-handler';
 import NotificationStore from 'Store/Notification.store';
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 
 import SliderIntro, { SliderRef } from './react-native-slider-intro/src';

@@ -5,7 +5,7 @@ import {
   useState,
 } from 'react';
 import { Dimensions, Modal, Pressable, ScaledSize, View } from 'react-native';
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import { noopFn } from 'Util/Function';
 
 import { styles } from './ThemedOverlay.style';

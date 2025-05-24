@@ -1,4 +1,4 @@
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import CreateStyles, { scale } from 'Util/CreateStyles';
 
 export const ITEM_ELEMENTS_HEIGHT = scale(20) * 2;

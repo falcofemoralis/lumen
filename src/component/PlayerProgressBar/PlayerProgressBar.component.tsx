@@ -4,7 +4,7 @@ import {
 } from 'react';
 import { Slider } from 'react-native-awesome-slider';
 import { useSharedValue } from 'react-native-reanimated';
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import { noopFn } from 'Util/Function';
 
 import { Bubble, BubbleRef } from './Bubble';

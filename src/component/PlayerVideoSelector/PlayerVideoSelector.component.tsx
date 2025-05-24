@@ -13,7 +13,7 @@ import {
   Dimensions, Pressable, ScrollView,
   TouchableOpacity, View,
 } from 'react-native';
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 
 import { styles } from './PlayerVideoSelector.style';

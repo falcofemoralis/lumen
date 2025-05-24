@@ -1,4 +1,4 @@
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import { calculateItemWidth } from 'Style/Layout';
 import CreateStyles, { scale } from 'Util/CreateStyles';
 
