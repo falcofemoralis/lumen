@@ -84,6 +84,7 @@ module.exports = defineConfig([
         exports: 'always-multiline',
         functions: 'never',
       }],
+       "semi": ["error", "always"],
       // @typescript-eslint
       '@stylistic-plugin-ts/indent': [2, 2],
       '@typescript-eslint/no-unnecessary-condition': 'off',

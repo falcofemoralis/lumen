@@ -12,8 +12,10 @@ export const styles = CreateStyles({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    width: 32,
-    margin: 8,
+    width: 40,
+    height: 40,
+    padding: 12,
+    borderRadius: 100,
   },
   title: {
     fontSize: 20,
@@ -88,7 +90,7 @@ export const styles = CreateStyles({
   collectionButtonText: {
     fontSize: 14,
     lineHeight: 20,
-    color: Colors.chipText
+    color: Colors.chipText,
   },
   playBtn: {
     width: '100%',

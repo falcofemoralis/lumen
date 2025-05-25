@@ -1,5 +1,6 @@
 import ThemedIcon from 'Component/ThemedIcon';
 import ThemedImage from 'Component/ThemedImage';
+import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import { TouchableOpacity } from 'react-native';
 import { scale } from 'Util/CreateStyles';
@@ -20,7 +21,7 @@ export default function ThemedButton({
   disabled,
 }: ThemedButtonProps) {
   return (
-    <TouchableOpacity
+    <ThemedPressable
       style={ [styles.container, style, disabled && styles.disabled] }
       onPress={ onPress }
       disabled={ disabled }
@@ -44,6 +45,6 @@ export default function ThemedButton({
           src={ rightImage }
         />
       ) }
-    </TouchableOpacity>
+    </ThemedPressable>
   );
 }

@@ -9,10 +9,12 @@ import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImageModal from 'Component/ThemedImageModal';
 import ThemedOverlay from 'Component/ThemedOverlay';
+import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import { useOverlayContext } from 'Context/OverlayContext';
 import { useRouter } from 'expo-router';
 import t from 'i18n/t';
+import { ArrowLeft, Share2 } from 'lucide-react-native';
 import React, { useCallback, useRef, useState } from 'react';
 import {
   NativeScrollEvent,
@@ -84,32 +86,26 @@ export function FilmPageComponent({
 
   const renderTopActions = () => (
     <View style={ styles.topActions }>
-      <TouchableOpacity
+      <ThemedPressable
         style={ styles.topActionsButton }
         onPress={ () => router.back() }
+        mode='dark'
       >
-        <ThemedIcon
-          icon={ {
-            name: 'arrow-back',
-            pack: IconPackType.MaterialIcons,
-          } }
-          size={ scale(32) }
-          color="white"
+        <ArrowLeft
+          size={ scale(24) }
+          color={ Colors.white }
         />
-      </TouchableOpacity>
-      <TouchableOpacity
+      </ThemedPressable>
+      <ThemedPressable
         style={ styles.topActionsButton }
         onPress={ handleShare }
+        mode='dark'
       >
-        <ThemedIcon
-          icon={ {
-            name: 'share',
-            pack: IconPackType.MaterialIcons,
-          } }
-          size={ scale(32) }
-          color="white"
+        <Share2
+          size={ scale(24) }
+          color={ Colors.white }
         />
-      </TouchableOpacity>
+      </ThemedPressable>
     </View>
   );
 

@@ -1,9 +1,10 @@
 import Page from 'Component/Page';
-import ThemedIcon from 'Component/ThemedIcon';
-import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
+import ThemedPressable from 'Component/ThemedPressable';
 import Thumbnail from 'Component/Thumbnail';
 import { router } from 'expo-router';
-import { TouchableOpacity, View } from 'react-native';
+import { ArrowLeft } from 'lucide-react-native';
+import { View } from 'react-native';
+import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 
 import { styles } from './FilmPage.style';
@@ -11,19 +12,16 @@ import { styles } from './FilmPage.style';
 export const FilmPageThumbnail = () => (
   <Page>
     <View style={ styles.topActions }>
-      <TouchableOpacity
+      <ThemedPressable
         style={ styles.topActionsButton }
         onPress={ () => router.back() }
+        mode='dark'
       >
-        <ThemedIcon
-          icon={ {
-            name: 'arrow-back',
-            pack: IconPackType.MaterialIcons,
-          } }
-          size={ scale(32) }
-          color="white"
+        <ArrowLeft
+          size={ scale(24) }
+          color={ Colors.white }
         />
-      </TouchableOpacity>
+      </ThemedPressable>
       <Thumbnail
         style={ styles.topActionsButton }
         height={ scale(32) }
