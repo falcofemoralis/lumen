@@ -5,10 +5,11 @@ import ThemedButton from 'Component/ThemedButton';
 import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedInput from 'Component/ThemedInput';
+import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import t from 'i18n/t';
 import React from 'react';
-import { TouchableNativeFeedback, View } from 'react-native';
+import { View } from 'react-native';
 import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 
@@ -95,38 +96,33 @@ export function SearchPageComponent({
     return (
       <View style={ styles.suggestionsContainer }>
         { suggestions.map((suggestion) => (
-          <TouchableNativeFeedback
+          <ThemedPressable
             key={ suggestion }
             onPress={ () => onApplySuggestion(suggestion) }
-            background={ TouchableNativeFeedback.Ripple(
-              Colors.white,
-              true,
-            ) }
+            style={ styles.suggestion }
           >
-            <View style={ styles.suggestion }>
-              <ThemedIcon
-                style={ styles.suggestionIcon }
-                icon={ {
-                  pack: IconPackType.MaterialCommunityIcons,
-                  name: 'history',
-                } }
-                size={ scale(20) }
-                color="white"
-              />
-              <ThemedText style={ styles.suggestionText }>
-                { suggestion }
-              </ThemedText>
-              <ThemedIcon
-                style={ styles.suggestionIcon }
-                icon={ {
-                  pack: IconPackType.MaterialCommunityIcons,
-                  name: 'arrow-top-left',
-                } }
-                size={ scale(20) }
-                color="white"
-              />
-            </View>
-          </TouchableNativeFeedback>
+            <ThemedIcon
+              style={ styles.suggestionIcon }
+              icon={ {
+                pack: IconPackType.MaterialCommunityIcons,
+                name: 'history',
+              } }
+              size={ scale(20) }
+              color="white"
+            />
+            <ThemedText style={ styles.suggestionText }>
+              { suggestion }
+            </ThemedText>
+            <ThemedIcon
+              style={ styles.suggestionIcon }
+              icon={ {
+                pack: IconPackType.MaterialCommunityIcons,
+                name: 'arrow-top-left',
+              } }
+              size={ scale(20) }
+              color="white"
+            />
+          </ThemedPressable>
         )) }
       </View>
     );

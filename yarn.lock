@@ -6539,6 +6539,13 @@ react-moment@^1.1.3:
   resolved "https://registry.yarnpkg.com/react-moment/-/react-moment-1.1.3.tgz#829b21dfb279aa6db47ce4f1ac2555af17a1bcdc"
   integrity sha512-8EPvlUL8u6EknPp1ISF5MQ3wx2OHJVXIP/iZc4wRh3iV3XozftZERDv9ANZeAtMlhNNQHdFoqcZHFUkBSTONfA==
 
+react-native-avoid-softinput@^7.0.1:
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/react-native-avoid-softinput/-/react-native-avoid-softinput-7.0.1.tgz#ad7f3b3db4858e026df56957839c5081bf8fc2f8"
+  integrity sha512-MWCh4LGz1cWOvxQXhUit9NcjRGC9CXRQcdWzQ0WR7SU1lzTmUqGwsibyde9M5+7f7RgDjLb5fwGTqjO+HJNrFw==
+  dependencies:
+    react-native-is-edge-to-edge "^1.1.6"
+
 react-native-awesome-slider@^2.9.0:
   version "2.9.0"
   resolved "https://registry.yarnpkg.com/react-native-awesome-slider/-/react-native-awesome-slider-2.9.0.tgz#7d5013a0e0e15ed84d59b4fa4c26a8b7ab9b2454"

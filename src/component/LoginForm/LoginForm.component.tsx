@@ -5,7 +5,7 @@ import ThemedInput from 'Component/ThemedInput';
 import { router } from 'expo-router';
 import t from 'i18n/t';
 import { useRef } from 'react';
-import { View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 
 import { styles } from './LoginForm.style';
 import { LoginFormComponentProps } from './LoginForm.type';
@@ -45,7 +45,7 @@ export function LoginFormComponent({
           style={ styles.button }
           onPress={ () => handleLogin(
             loginRef.current.username,
-            loginRef.current.password,
+            loginRef.current.password
           ) }
         >
           { t('Sign in') }

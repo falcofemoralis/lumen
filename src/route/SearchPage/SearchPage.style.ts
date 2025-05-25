@@ -52,6 +52,7 @@ export const styles = CreateStyles({
     flexDirection: 'row',
     padding: 12,
     gap: 20,
+    borderRadius: 12,
   },
   suggestionIcon: {
     height: 20,

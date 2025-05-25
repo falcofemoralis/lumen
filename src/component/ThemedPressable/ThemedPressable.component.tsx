@@ -10,7 +10,6 @@ export const ThemedPressable = ({
   disabled = false,
   mode = 'light',
 }: ThemedPressableProps) => {
-  console.log(style);
   let padding: DimensionValue | undefined = 0;
 
   if (Array.isArray(style) && style.length > 0) {
