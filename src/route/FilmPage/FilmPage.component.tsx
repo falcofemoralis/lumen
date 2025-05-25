@@ -75,7 +75,7 @@ export function FilmPageComponent({
           setCommentsVisible(true);
         }
       }
-    }, [commentsVisible],
+    }, [commentsVisible]
   );
 
   if (!film) {
@@ -189,7 +189,7 @@ export function FilmPageComponent({
   const renderCollection = (
     collection: CollectionItemInterface[],
     title: string,
-    handler?: (link: string) => void,
+    handler?: (link: string) => void
   ) => {
     if (!collection.length) {
       return null;

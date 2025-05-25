@@ -40,25 +40,23 @@ module.exports = defineConfig([
         SwitchCase: 1,
         VariableDeclarator: 1,
         outerIIFEBody: 1,
-        // MemberExpression: null,
         FunctionDeclaration: {
           parameters: 1,
-          body: 1
+          body: 1,
         },
         FunctionExpression: {
           parameters: 1,
-          body: 1
+          body: 1,
         },
         CallExpression: {
-          arguments: 1
+          arguments: 1,
         },
         ArrayExpression: 1,
         ObjectExpression: 1,
         ImportDeclaration: 1,
         flatTernaryExpressions: false,
-        // list derived from https://github.com/benjamn/ast-types/blob/HEAD/def/jsx.js
         ignoredNodes: ['JSXElement', 'JSXElement > *', 'JSXAttribute', 'JSXIdentifier', 'JSXNamespacedName', 'JSXMemberExpression', 'JSXSpreadAttribute', 'JSXExpressionContainer', 'JSXOpeningElement', 'JSXClosingElement', 'JSXFragment', 'JSXOpeningFragment', 'JSXClosingFragment', 'JSXText', 'JSXEmptyExpression', 'JSXSpreadChild'],
-        ignoreComments: false
+        ignoreComments: false,
       }],
       'default-param-last': 'off',
       'no-param-reassign': 0,
@@ -78,6 +76,13 @@ module.exports = defineConfig([
       'no-trailing-spaces': ['error', {
         skipBlankLines: false,
         ignoreComments: false,
+      }],
+      'comma-dangle': ['error', {
+        arrays: 'always-multiline',
+        objects: 'always-multiline',
+        imports: 'always-multiline',
+        exports: 'always-multiline',
+        functions: 'never',
       }],
       // @typescript-eslint
       '@stylistic-plugin-ts/indent': [2, 2],

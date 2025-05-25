@@ -1,7 +1,4 @@
-import {
-  DarkTheme,
-  ThemeProvider,
-} from '@react-navigation/native';
+import { DarkTheme,ThemeProvider } from '@react-navigation/native';
 import { Portal } from 'Component/ThemedPortal';
 import { AppProvider } from 'Context/AppContext';
 import { Stack } from 'expo-router';
@@ -15,6 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { SpatialNavigationDeviceTypeProvider } from 'react-tv-space-navigation';
 import ConfigStore from 'Store/Config.store';
 import NotificationStore from 'Store/Notification.store';
+import { DEFAULT_ROUTE_ANIMATION } from 'Style/Animations';
 import { Colors } from 'Style/Colors';
 import { setTimeoutSafe } from 'Util/Misc';
 
@@ -64,7 +62,7 @@ export function RootLayout() {
         contentStyle: {
           backgroundColor: Colors.background,
         },
-        animation: 'fade',
+        animation: DEFAULT_ROUTE_ANIMATION,
       } }
     >
       <Stack.Screen
