@@ -45,11 +45,11 @@ export const styles = CreateStyles({
     justifyContent: 'center',
     alignItems: 'center',
     paddingBottom: 10,
-    borderBottomColor: Colors.gray,
+    borderBottomColor: Colors.divider,
     borderBottomWidth: 1,
   },
   headerText: {
-    color: Colors.lightGray,
+    color: Colors.textSecondary,
     fontSize: 14,
     lineHeight: 16,
     fontWeight: '500',
@@ -67,22 +67,22 @@ export const styles = CreateStyles({
     minWidth: 250,
   },
   itemFocused: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.backgroundFocused,
   },
   itemSelected: {
     backgroundColor: Colors.primary,
   },
   text: {
-    color: Colors.white,
+    color: Colors.text,
     fontSize: 14,
     lineHeight: 20,
     fontWeight: '500',
   },
   textFocused: {
-    color: Colors.black,
+    color: Colors.textFocused,
   },
   textSelected: {
-    color: Colors.lightBlue,
+    color: Colors.textOnPrimary,
   },
   iconSelected: {
   },

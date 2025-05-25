@@ -5,9 +5,9 @@ export const styles = CreateStyles({
   container: {
     flexDirection: 'row',
     justifyContent: 'center',
-    backgroundColor: Colors.gray,
+    backgroundColor: Colors.button,
     borderRadius: 8,
-    color: Colors.white,
+    color: Colors.text,
     fontSize: 16,
     padding: 12,
   },

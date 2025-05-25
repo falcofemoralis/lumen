@@ -11,7 +11,6 @@ import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedText from 'Component/ThemedText';
-import ThemedView from 'Component/ThemedView';
 import { useOverlayContext } from 'Context/OverlayContext';
 import { usePlayerContext } from 'Context/PlayerContext';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -26,7 +25,7 @@ import {
   BackHandler,
   View,
 } from 'react-native';
-import { runOnJS, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import Animated, { runOnJS, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import {
   DefaultFocus,
   SpatialNavigationFocusableView,
@@ -417,25 +416,25 @@ export function PlayerComponent({
   };
 
   const renderBackground = () => (
-    <ThemedView.Animated style={ [styles.background, controlsAnimation] }>
+    <Animated.View style={ [styles.background, controlsAnimation] }>
       <LinearGradient
         style={ styles.backgroundGradient }
         colors={ ['rgba(0, 0, 0, 0.8)', 'transparent'] }
         start={ { x: 0, y: 1 } }
         end={ { x: 0, y: 0 } }
       />
-    </ThemedView.Animated>
+    </Animated.View>
   );
 
   const renderControls = () => (
-    <ThemedView.Animated style={ [styles.controls, controlsAnimation] }>
+    <Animated.View style={ [styles.controls, controlsAnimation] }>
       { renderTopInfo() }
       { renderTopActions() }
       <DefaultFocus>
         { renderProgressBar() }
       </DefaultFocus>
       { renderBottomActions() }
-    </ThemedView.Animated>
+    </Animated.View>
   );
 
   const renderLoader = () => (

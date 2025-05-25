@@ -5,7 +5,7 @@ export const NAVIGATION_BAR_Z_INDEX = 100;
 export const NAVIGATION_BAR_TV_WIDTH = 80;
 export const NAVIGATION_BAR_TV_WIDTH_EXPANDED = 256;
 export const NAVIGATION_BAR_TV_WIDTH_PADDING = 12;
-// eslint-disable-next-line max-len -- This is a constant
+
 export const NAVIGATION_BAR_TV_TAB_WIDTH = NAVIGATION_BAR_TV_WIDTH - NAVIGATION_BAR_TV_WIDTH_PADDING * 2;
 export const NAVIGATION_BAR_TV_TAB_WIDTH_EXPANDED = NAVIGATION_BAR_TV_TAB_WIDTH + 100;
 
@@ -54,11 +54,11 @@ export const styles = CreateStyles({
     marginBottom: 12,
   },
   tabSelected: {
-    backgroundColor: Colors.darkBlue,
+    backgroundColor: Colors.tertiary,
     borderRadius: 24,
   },
   tabFocused: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.backgroundFocused,
     borderRadius: 24,
   },
   tabIcon: {
@@ -69,14 +69,14 @@ export const styles = CreateStyles({
     display: 'flex',
     position: 'absolute',
     left: 48,
-    color: Colors.white,
+    color: Colors.text,
     opacity: 0,
   },
   tabTextOpened: {
     opacity: 1,
   },
   tabContentFocused: {
-    color: Colors.black,
+    color: Colors.textFocused,
   },
   profile: {
     height: 32,
@@ -89,14 +89,14 @@ export const styles = CreateStyles({
   profileSwitchText: {
     left: 8,
     bottom: 0,
-    color: Colors.lightGray,
+    color: Colors.textFocused,
   },
   profileAvatar: {
     width: 32,
     height: 32,
-    backgroundColor: Colors.black,
+    backgroundColor: Colors.backgroundLight,
     borderRadius: 99,
-    borderColor: Colors.gray,
+    borderColor: Colors.border,
     borderWidth: 1,
   },
   profileAvatarContainer: {

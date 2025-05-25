@@ -10,8 +10,8 @@ export const styles = CreateStyles({
     fontSize: 14,
   },
   groupFocused: {
-    backgroundColor: Colors.white,
-    color: Colors.black,
+    backgroundColor: Colors.backgroundFocused,
+    color: Colors.textFocused,
   },
   content: {
     flexDirection: 'column',

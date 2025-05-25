@@ -2,7 +2,6 @@ import FilmGrid from 'Component/FilmGrid';
 import Loader from 'Component/Loader';
 import ThemedButton from 'Component/ThemedButton';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
-import ThemedView from 'Component/ThemedView';
 import { useNavigationContext } from 'Context/NavigationContext';
 import { useNavigation } from 'expo-router';
 import {
@@ -158,7 +157,7 @@ export function FilmPagerComponent({
     const { films } = selectedPagerItem;
 
     return (
-      <ThemedView style={ [styles.grid, gridStyle] }>
+      <View style={ [styles.grid, gridStyle] }>
         <DefaultFocus>
           <FilmGrid
             films={ films ?? [] }
@@ -173,7 +172,7 @@ export function FilmPagerComponent({
             } }
           />
         </DefaultFocus>
-      </ThemedView>
+      </View>
     );
   };
 

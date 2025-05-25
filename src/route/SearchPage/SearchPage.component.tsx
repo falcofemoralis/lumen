@@ -6,7 +6,6 @@ import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedInput from 'Component/ThemedInput';
 import ThemedText from 'Component/ThemedText';
-import ThemedView from 'Component/ThemedView';
 import t from 'i18n/t';
 import React from 'react';
 import { TouchableNativeFeedback, View } from 'react-native';
@@ -163,10 +162,10 @@ export function SearchPageComponent({
 
   return (
     <Page>
-      <ThemedView style={ styles.container }>
+      <View style={ styles.container }>
         { renderSearchContainer() }
         { renderSuggestions() }
-      </ThemedView>
+      </View>
       { renderFilms() }
     </Page>
   );

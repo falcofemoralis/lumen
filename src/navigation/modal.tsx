@@ -1,5 +1,5 @@
 import ThemedText from 'Component/ThemedText';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 export default function Modal() {
   return (

@@ -52,22 +52,22 @@ export const styles = CreateStyles({
     paddingVertical: INFO_PADDING_VERTICAL,
   },
   infoFocused: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.buttonFocused,
   },
   title: {
     fontSize: 12,
     fontWeight: '700',
-    color: Colors.white,
+    color: Colors.text,
   },
   titleFocused: {
-    color: Colors.darkGray,
+    color: Colors.textFocused,
   },
   subtitle: {
     fontSize: 10,
-    color: Colors.lightGray,
+    color: Colors.textSecondary,
   },
   subtitleFocused: {
-    color: Colors.darkGray,
+    color: Colors.textFocused,
   },
   typeText: {
     position: 'absolute',

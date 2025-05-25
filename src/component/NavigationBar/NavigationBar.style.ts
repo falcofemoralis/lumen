@@ -5,7 +5,6 @@ export const styles = CreateStyles({
   tabBar: {
     width: '100%',
     borderTopWidth: 1,
-    borderTopColor: Colors.lightGravel,
   },
   tabs: {
     width: '100%',
@@ -39,7 +38,7 @@ export const styles = CreateStyles({
   profileAvatar: {
     width: 22,
     height: 22,
-    backgroundColor: Colors.black,
+    backgroundColor: Colors.background,
     borderRadius: 99,
   },
   profileAvatarContainer: {

@@ -2,7 +2,6 @@ import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import ThemedIcon from 'Component/ThemedIcon';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
-import ThemedView from 'Component/ThemedView';
 import { useNavigationContext } from 'Context/NavigationContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { Tabs } from 'expo-router';
@@ -12,6 +11,7 @@ import {
   Image,
   View
 } from 'react-native';
+import Animated from 'react-native-reanimated';
 import {
   DefaultFocus,
   Directions,
@@ -20,7 +20,6 @@ import {
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
 import { Colors } from 'Style/Colors';
-import { CONTENT_WRAPPER_PADDING_TV } from 'Style/Layout';
 import { scale } from 'Util/CreateStyles';
 import { setTimeoutSafe } from 'Util/Misc';
 
@@ -30,7 +29,7 @@ import {
   TABS_OPENING_DURATION_TV,
   TABS_TV_CONFIG
 } from './NavigationBar.config';
-import { NAVIGATION_BAR_TV_WIDTH, styles } from './NavigationBar.style.atv';
+import { styles } from './NavigationBar.style.atv';
 import {
   NavigationBarComponentProps,
   NavigationType,
@@ -246,7 +245,7 @@ export function NavigationBarComponent({
     });
 
     return (
-      <ThemedView.Animated
+      <Animated.View
         style={ [
           styles.tabs,
           {
@@ -265,7 +264,7 @@ export function NavigationBarComponent({
         <View>
           { bottomTabs.map((tab) => renderTab(tab, navigation, state)) }
         </View>
-      </ThemedView.Animated>
+      </Animated.View>
     );
   }, [renderTab, isMenuOpen]);
 
@@ -274,7 +273,7 @@ export function NavigationBarComponent({
       isActive={ isMenuOpen }
       onDirectionHandledWithoutMovement={ onDirectionHandledWithoutMovement }
     >
-      <ThemedView style={ styles.bar }>
+      <View style={ styles.bar }>
         <SpatialNavigationView direction="vertical">
           { renderTabs(navigation, state) }
         </SpatialNavigationView>
@@ -287,7 +286,7 @@ export function NavigationBarComponent({
           start={ { x: 0.5, y: 0 } }
           end={ { x: 1, y: 0 } }
         /> */ }
-      </ThemedView>
+      </View>
     </SpatialNavigationRoot>
   ), [renderTabs, onDirectionHandledWithoutMovement, isMenuOpen]);
 

@@ -1,4 +1,3 @@
-/* eslint-disable functional/no-let */
 import { Image } from 'expo-image';
 import { memo, useEffect, useState } from 'react';
 import { View } from 'react-native';
@@ -56,7 +55,7 @@ const StoryImage = ({ uri, scale = 1 }: StoryImageProps) => {
       style={ {
         width,
         height,
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.background,
         overflow: 'hidden',
       } }
     >

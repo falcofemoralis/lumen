@@ -8,7 +8,7 @@ export const styles = CreateStyles({
     gap: 10,
   },
   itemBorder: {
-    borderTopColor: Colors.lightGravel,
+    borderTopColor: Colors.border,
     borderTopWidth: 1,
   },
   itemContainer: {

@@ -1,12 +1,12 @@
 import FilmGrid from 'Component/FilmGrid';
-import ThemedView from 'Component/ThemedView';
 import { useCallback } from 'react';
+import { View } from 'react-native';
 import { TabBar, TabView } from 'react-native-tab-view';
 
 import { styles } from './FilmPager.style';
 import { FilmPagerComponentProps, PagerItemInterface } from './FilmPager.type';
 
-const LazyPlaceholder = ({ route }: any) => <ThemedView style={ styles.lazyContainer } />;
+const LazyPlaceholder = ({ route }: any) => <View style={ styles.lazyContainer } />;
 
 export function FilmPagerComponent({
   pagerItems,

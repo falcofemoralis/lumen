@@ -72,13 +72,13 @@ export const styles = CreateStyles({
   title: {
     fontSize: 12,
     fontWeight: '700',
-    color: Colors.white,
+    color: Colors.text,
     paddingRight: 4,
   },
   subtitle: {
     fontSize: 10,
     paddingTop: 4,
-    color: Colors.lightGray,
+    color: Colors.textSecondary,
   },
   typeText: {
     position: 'absolute',

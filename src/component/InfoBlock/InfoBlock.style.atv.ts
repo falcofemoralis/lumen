@@ -10,7 +10,7 @@ export const styles = CreateStyles({
     alignItems: 'center',
   },
   icon: {
-    backgroundColor: Colors.darkGray,
+    backgroundColor: Colors.backgroundLighter,
     borderRadius: 99,
     padding: 8,
   },
@@ -21,7 +21,7 @@ export const styles = CreateStyles({
   },
   subtitle: {
     fontSize: 16,
-    color: Colors.lightGray,
+    color: Colors.textSecondary,
     textAlign: 'center',
   },
 });

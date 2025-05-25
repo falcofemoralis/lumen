@@ -1,12 +1,11 @@
 import { useIsFocused } from '@react-navigation/native';
-import { TABS_OPENING_DURATION_TV } from 'Component/NavigationBar/NavigationBar.config';
-import { NAVIGATION_BAR_TV_WIDTH,styles as navBarStyles } from 'Component/NavigationBar/NavigationBar.style.atv';
+import { NAVIGATION_BAR_TV_WIDTH, styles as navBarStyles } from 'Component/NavigationBar/NavigationBar.style.atv';
 import { Portal } from 'Component/ThemedPortal';
-import ThemedView from 'Component/ThemedView';
 import { useNavigationContext } from 'Context/NavigationContext';
 import { useCallback, useEffect } from 'react';
 import { Dimensions, Keyboard, View } from 'react-native';
 import ErrorBoundary from 'react-native-error-boundary';
+import Animated from 'react-native-reanimated';
 import { Directions, SpatialNavigationRoot, useLockSpatialNavigation } from 'react-tv-space-navigation';
 import { CONTENT_WRAPPER_PADDING_TV } from 'Style/Layout';
 import { scale } from 'Util/CreateStyles';
@@ -60,14 +59,14 @@ export function PageComponent({
   );
 
   return (
-    <ThemedView.Animated
+    <Animated.View
       style={ {
         width: containerWidth - scale(NAVIGATION_BAR_TV_WIDTH) - CONTENT_WRAPPER_PADDING_TV * 2,
         marginRight: CONTENT_WRAPPER_PADDING_TV,
         left: navBarStyles.tabs.width * -1 + CONTENT_WRAPPER_PADDING_TV,
         marginLeft: isMenuOpen ? navBarStyles.tabsOpened.width : navBarStyles.tabs.width,
         transitionProperty: 'marginLeft',
-        transitionDuration: 250
+        transitionDuration: '250ms',
       } }
     >
       <View
@@ -88,7 +87,7 @@ export function PageComponent({
           </SpatialNavigationRoot>
         </ErrorBoundary>
       </View>
-    </ThemedView.Animated>
+    </Animated.View>
   );
 }
 

@@ -10,7 +10,7 @@ export const styles = CreateStyles({
   },
   episodesContainer: {
     borderTopWidth: 2,
-    borderTopColor: Colors.lightGravel,
+    borderTopColor: Colors.border,
     paddingTop: 8,
   },
   button: {
@@ -59,7 +59,7 @@ export const styles = CreateStyles({
     borderRadius: 16,
   },
   voiceRatingItemContainerFocused: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.backgroundFocused,
   },
   voiceRatingInfo: {
     flexDirection: 'column',
@@ -68,7 +68,7 @@ export const styles = CreateStyles({
     flexDirection: 'column',
   },
   voiceRatingTextFocused: {
-    color: Colors.black,
+    color: Colors.textFocused,
   },
   voiceRatingText: {
     fontSize: 16,
@@ -78,7 +78,7 @@ export const styles = CreateStyles({
   voiceRatingBar: {
     height: 10,
     width: '100%',
-    backgroundColor: Colors.darkGray,
+    backgroundColor: Colors.backgroundLighter,
     borderRadius: 16,
     marginTop: 8,
   },
@@ -100,6 +100,6 @@ export const styles = CreateStyles({
     textAlign: 'right',
   },
   voiceRatingPercentFocused: {
-    color: Colors.black,
+    color: Colors.textFocused,
   },
 });

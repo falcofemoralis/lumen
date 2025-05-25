@@ -21,7 +21,7 @@ export const styles = CreateStyles({
   },
   originalTitle: {
     fontSize: 16,
-    color: Colors.lightGray,
+    color: Colors.textSecondary,
   },
   genres: {
     flexDirection: 'row',
@@ -29,7 +29,7 @@ export const styles = CreateStyles({
     marginTop: 8,
   },
   genre: {
-    backgroundColor: Colors.gray,
+    backgroundColor: Colors.chip,
     borderRadius: 8,
     padding: 4,
   },
@@ -83,11 +83,12 @@ export const styles = CreateStyles({
     borderRadius: 8,
     paddingHorizontal: 6,
     paddingVertical: 1,
-    backgroundColor: Colors.gray,
+    backgroundColor: Colors.chip,
   },
   collectionButtonText: {
     fontSize: 14,
     lineHeight: 20,
+    color: Colors.chipText
   },
   playBtn: {
     width: '100%',
@@ -106,10 +107,10 @@ export const styles = CreateStyles({
     justifyContent: 'center',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: Colors.gravel,
+    backgroundColor: Colors.backgroundLight,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: Colors.lightGravel,
+    borderColor: Colors.border,
     padding: 8,
   },
   actionIcon: {
@@ -119,7 +120,7 @@ export const styles = CreateStyles({
 
   },
   description: {
-    color: Colors.lightGray,
+    color: Colors.textSecondary,
     fontSize: 16,
     marginTop: 16,
     textAlign: 'justify',
@@ -199,7 +200,7 @@ export const styles = CreateStyles({
     borderRadius: 16,
   },
   scheduleItemEven: {
-    backgroundColor: Colors.darkGray,
+    backgroundColor: Colors.background,
   },
   scheduleItemInfoWrapper: {
     flexDirection: 'column',
@@ -239,7 +240,7 @@ export const styles = CreateStyles({
   },
   scheduleViewAll: {
     marginTop: 16,
-    backgroundColor: Colors.gray,
+    backgroundColor: Colors.button,
   },
   franchiseList: {
   },
@@ -266,7 +267,7 @@ export const styles = CreateStyles({
     borderRadius: 8,
   },
   infoListEven: {
-    backgroundColor: Colors.darkGray,
+    backgroundColor: Colors.background,
   },
   infoListName: {
   },

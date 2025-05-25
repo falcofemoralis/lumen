@@ -30,11 +30,11 @@ export const styles = CreateStyles({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 8,
-    borderBottomColor: Colors.gray,
+    borderBottomColor: Colors.divider,
     borderBottomWidth: 1,
   },
   listHeaderText: {
-    color: Colors.lightGray,
+    color: Colors.text,
     fontSize: 16,
     lineHeight: 16,
     fontWeight: '500',

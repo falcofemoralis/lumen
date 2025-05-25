@@ -52,7 +52,7 @@ export const styles = CreateStyles({
     position: 'absolute',
     bottom: 40,
     alignSelf: 'center',
-    backgroundColor: Colors.black,
+    backgroundColor: Colors.background,
     opacity: 0,
   },
   storyBoardVisible: {

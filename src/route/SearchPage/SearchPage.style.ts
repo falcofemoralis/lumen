@@ -14,7 +14,7 @@ export const styles = CreateStyles({
   actionBtn: {
     width: 32,
     height: 32,
-    backgroundColor: Colors.gray,
+    backgroundColor: Colors.button,
     borderRadius: 99,
     padding: 0,
   },
@@ -31,7 +31,7 @@ export const styles = CreateStyles({
     width: 20,
     height: '100%',
     zIndex: 15,
-    backgroundColor: Colors.gray,
+    backgroundColor: Colors.button,
   },
   closeIcon: {
     width: 20,
@@ -40,8 +40,6 @@ export const styles = CreateStyles({
   searchBar: {
     width: '100%',
     height: 32,
-    backgroundColor: Colors.gray,
-    color: Colors.white,
   },
   searchBarOutline: {
     borderRadius: 24,

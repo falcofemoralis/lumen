@@ -3,9 +3,9 @@ import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
   card: {
-    backgroundColor: Colors.lightBackground,
+    backgroundColor: Colors.backgroundLight,
     borderRadius: 16,
-    borderColor: Colors.lightGravel,
+    borderColor: Colors.darkBorder,
     borderWidth: 1,
   },
 });

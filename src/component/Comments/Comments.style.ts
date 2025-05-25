@@ -21,7 +21,7 @@ export const styles = CreateStyles({
   comment: {
     flexDirection: 'column',
     flex: 1,
-    backgroundColor: Colors.darkGray,
+    backgroundColor: Colors.backgroundLighter,
     borderRadius: 12,
     padding: 8,
   },
@@ -36,10 +36,10 @@ export const styles = CreateStyles({
   },
   commentTextSmall: {
     fontSize: 13,
-    color: Colors.lightGray,
+    color: Colors.textSecondary,
   },
   commentTextFocused: {
-    color: Colors.black,
+    color: Colors.textFocused,
   },
   commentDateRow: {
     flexDirection: 'row',
@@ -53,11 +53,8 @@ export const styles = CreateStyles({
     alignItems: 'center',
   },
   spoiler: {
-    backgroundColor: Colors.gray,
-    color: Colors.gray,
-  },
-  textFocused: {
-    color: Colors.black,
+    backgroundColor: Colors.button,
+    color: Colors.button,
   },
   loader: {
     alignSelf: 'center',
@@ -78,7 +75,7 @@ export const styles = CreateStyles({
     paddingBottom: 24,
   },
   noCommentsText: {
-    color: Colors.white,
+    color: Colors.text,
     fontSize: 16,
     textAlign: 'center',
   },

@@ -15,7 +15,7 @@ export const PlayerClockComponent = () => (
   >
     <Clock
       style={ {
-        color: Colors.white,
+        color: Colors.text,
         fontSize: scale(16),
         alignSelf: 'flex-end',
       } }

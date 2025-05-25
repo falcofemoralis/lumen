@@ -27,7 +27,7 @@ export const styles = CreateStyles({
     alignItems: 'center',
   },
   icon: {
-    backgroundColor: Colors.darkGray,
+    backgroundColor: Colors.backgroundLighter,
     borderRadius: 99,
     padding: 12,
   },
@@ -43,7 +43,7 @@ export const styles = CreateStyles({
   },
   subtitle: {
     fontSize: 16,
-    color: Colors.lightGray,
+    color: Colors.textSecondary,
     textAlign: 'center',
   },
   navigation: {
@@ -66,7 +66,7 @@ export const styles = CreateStyles({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: Colors.gray,
+    backgroundColor: Colors.button,
     paddingBlock: 10,
     paddingInline: 10,
     borderRadius: 16,
@@ -94,7 +94,7 @@ export const styles = CreateStyles({
     gap: 12,
   },
   configureButton: {
-    backgroundColor: Colors.lightBackground,
+    backgroundColor: Colors.button,
     padding: 12,
     borderRadius: 16,
   },
@@ -129,7 +129,7 @@ export const styles = CreateStyles({
     fontSize: 16,
   },
   providerSelector: {
-    backgroundColor: Colors.lightBackground,
+    backgroundColor: Colors.input,
     padding: 12,
     borderRadius: 16,
   },
@@ -156,7 +156,7 @@ export const styles = CreateStyles({
   cdnSlide: {
   },
   cdnSelector: {
-    backgroundColor: Colors.lightBackground,
+    backgroundColor: Colors.input,
     padding: 12,
     borderRadius: 16,
     textTransform: 'capitalize',
@@ -170,7 +170,7 @@ export const styles = CreateStyles({
     gap: 8,
   },
   cdnSelectorListItem: {
-    backgroundColor: Colors.lightBackground,
+    backgroundColor: Colors.input,
     padding: 12,
     borderRadius: 16,
   },

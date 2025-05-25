@@ -11,7 +11,7 @@ import ThemedImageModal from 'Component/ThemedImageModal';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedText from 'Component/ThemedText';
 import { useOverlayContext } from 'Context/OverlayContext';
-import { Link, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import t from 'i18n/t';
 import React, { useCallback, useRef, useState } from 'react';
 import {
@@ -589,10 +589,7 @@ export function FilmPageComponent({
         { renderTitle() }
         { renderGenres() }
         { renderMainContent() }
-        { /* { renderDescription() } */ }
-        <Link href='/modal' style={ { color: '#fff' } }>
-          Open modal
-        </Link>
+        { renderDescription() }
         { renderActions() }
         { renderPlayFilmButton() }
         { renderActors() }

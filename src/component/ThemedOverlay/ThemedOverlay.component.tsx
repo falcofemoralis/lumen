@@ -4,7 +4,7 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { Dimensions, Modal, Pressable, ScaledSize, View } from 'react-native';
+import { Dimensions, Modal, Pressable, ScaledSize } from 'react-native';
 import { Colors } from 'Style/Colors';
 import { noopFn } from 'Util/Function';
 

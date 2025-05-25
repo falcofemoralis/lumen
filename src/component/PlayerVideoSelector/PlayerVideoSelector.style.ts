@@ -19,16 +19,16 @@ export const styles = CreateStyles({
     marginTop: 8,
   },
   season: {
-    backgroundColor: Colors.gray,
+    backgroundColor: Colors.chip,
   },
   seasonSelected: {
     backgroundColor: Colors.primary,
   },
   seasonText: {
-    color: Colors.white,
+    color: Colors.chipText,
   },
   seasonTextSelected: {
-    color: Colors.lightBlue,
+    color: Colors.textOnPrimary,
   },
   episodesContainer: {
     flexDirection: 'row',
@@ -37,17 +37,17 @@ export const styles = CreateStyles({
     marginTop: 8,
     paddingTop: 8,
     borderTopWidth: 2,
-    borderTopColor: Colors.darkGray,
+    borderTopColor: Colors.divider,
   },
   episode: {
-    backgroundColor: Colors.gray,
+    backgroundColor: Colors.chip,
   },
   episodeSelected: {
     backgroundColor: Colors.primary,
   },
   episodeText: {},
   episodeTextSelected: {
-    color: Colors.lightBlue,
+    color: Colors.textOnPrimary,
   },
   playContainer: {
     flexDirection: 'row',
@@ -87,7 +87,7 @@ export const styles = CreateStyles({
   voiceRatingBar: {
     height: 10,
     width: '100%',
-    backgroundColor: Colors.darkGray,
+    backgroundColor: Colors.backgroundLighter,
     borderRadius: 16,
     marginTop: 8,
   },

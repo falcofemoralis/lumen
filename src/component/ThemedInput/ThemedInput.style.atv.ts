@@ -3,9 +3,9 @@ import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
   input: {
-    backgroundColor: Colors.gray,
+    backgroundColor: Colors.input,
   },
   inputFocus: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.inputFocused,
   },
 });

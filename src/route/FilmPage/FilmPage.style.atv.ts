@@ -35,12 +35,12 @@ export const styles = CreateStyles({
     fontSize: 24,
     lineHeight: 32,
     fontWeight: '700',
-    color: Colors.white,
+    color: Colors.text,
   },
   originalTitle: {
     fontSize: 16,
     lineHeight: 16,
-    color: Colors.lightGray,
+    color: Colors.textSecondary,
     opacity: 0.6,
     marginTop: 4,
   },
@@ -88,6 +88,7 @@ export const styles = CreateStyles({
     borderRadius: 8,
     paddingHorizontal: 8,
     paddingVertical: 2,
+    backgroundColor: Colors.chip,
   },
   collectionButtonText: {
     fontSize: 12,
@@ -130,7 +131,7 @@ export const styles = CreateStyles({
     paddingBottom: 4,
   },
   actorFocused: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.backgroundFocused,
   },
   actorPhoto: {
     height: 130,
@@ -146,7 +147,7 @@ export const styles = CreateStyles({
     textAlign: 'center',
   },
   actorNameFocused: {
-    color: Colors.black,
+    color: Colors.textFocused,
   },
   director: {
     position: 'absolute',
@@ -176,10 +177,10 @@ export const styles = CreateStyles({
     borderRadius: 16,
   },
   scheduleItemFocused: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.backgroundFocused,
   },
   scheduleItemEven: {
-    backgroundColor: Colors.darkGray,
+    backgroundColor: Colors.background,
   },
   scheduleItemInfoWrapper: {
     flexDirection: 'column',
@@ -200,7 +201,7 @@ export const styles = CreateStyles({
     fontSize: 14,
   },
   scheduleItemTextFocused: {
-    color: Colors.black,
+    color: Colors.textFocused,
   },
   scheduleItemEpisodeName: {
   },
@@ -242,7 +243,7 @@ export const styles = CreateStyles({
     paddingInline: 8,
   },
   franchiseItemFocused: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.backgroundFocused,
     borderRadius: 8,
   },
   franchiseName: {
@@ -252,7 +253,7 @@ export const styles = CreateStyles({
     fontSize: 14,
   },
   franchiseTextFocused: {
-    color: Colors.black,
+    color: Colors.textFocused,
   },
   franchiseSelected: {
     color: Colors.secondary,
@@ -262,15 +263,15 @@ export const styles = CreateStyles({
     borderRadius: 8,
   },
   infoListEven: {
-    backgroundColor: Colors.darkGray,
+    backgroundColor: Colors.background,
   },
   infoListFocused: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.backgroundFocused,
   },
   infoListName: {
   },
   infoListNameFocused: {
-    color: Colors.black,
+    color: Colors.textFocused,
   },
   relatedListWrapper: {
     flexDirection: 'row',

@@ -35,7 +35,7 @@ export const styles = CreateStyles({
   profileAvatar: {
     width: 64,
     height: 64,
-    backgroundColor: Colors.gray,
+    backgroundColor: Colors.backgroundLight,
     borderRadius: 99,
   },
   profileName: {

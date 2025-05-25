@@ -12,7 +12,7 @@ export const styles = CreateStyles({
     backgroundColor: Colors.secondary,
   },
   textStyle: {
-    color: Colors.white,
+    color: Colors.text,
     fontSize: 12,
     paddingVertical: 0,
   },

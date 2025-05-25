@@ -18,7 +18,7 @@ export const ThemedInputComponent = ({
       styles.input,
       style,
     ] }
-    placeholderTextColor={ Colors.white }
+    placeholderTextColor={ Colors.text }
     selectionColor={ Colors.secondary }
     cursorColor={ Colors.secondary }
     underlineColorAndroid={ Colors.white }

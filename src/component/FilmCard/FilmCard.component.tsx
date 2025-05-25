@@ -1,6 +1,5 @@
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
-import ThemedView from 'Component/ThemedView';
 import React from 'react';
 import { View } from 'react-native';
 
@@ -75,13 +74,13 @@ export function FilmCardComponent({
   );
 
   return (
-    <ThemedView style={ [styles.card, style] }>
+    <View style={ [styles.card, style] }>
       { renderPoster() }
-      <ThemedView style={ styles.info }>
+      <View style={ styles.info }>
         { renderTitle() }
         { renderSubtitle() }
-      </ThemedView>
-    </ThemedView>
+      </View>
+    </View>
   );
 }
 

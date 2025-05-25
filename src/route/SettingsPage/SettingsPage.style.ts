@@ -30,7 +30,7 @@ export const styles = CreateStyles({
   settingTitle: {
   },
   settingSubtitle: {
-    color: Colors.lightGray,
+    color: Colors.textSecondary,
     opacity: 0.8,
   },
   overlay: {

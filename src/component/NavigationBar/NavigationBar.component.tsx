@@ -2,7 +2,6 @@ import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import ThemedIcon from 'Component/ThemedIcon';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
-import ThemedView from 'Component/ThemedView';
 import { useServiceContext } from 'Context/ServiceContext';
 import { Tabs } from 'expo-router';
 import React, { useCallback } from 'react';
@@ -135,9 +134,9 @@ export function NavigationBarComponent({
   ), [renderTab]);
 
   const renderTabBar = useCallback(({ navigation, state }: BottomTabBarProps) => (
-    <ThemedView style={ styles.tabBar }>
+    <View style={ styles.tabBar }>
       { renderTabs(navigation, state) }
-    </ThemedView>
+    </View>
   ), [renderTabs]);
 
   return (

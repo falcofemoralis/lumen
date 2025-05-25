@@ -36,7 +36,7 @@ export const styles = CreateStyles({
     backgroundColor: Colors.secondary,
   },
   speakActiveIcon: {
-    color: Colors.white,
+    color: Colors.text,
   },
   hidden: {
     opacity: 0,

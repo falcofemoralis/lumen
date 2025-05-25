@@ -1,6 +1,6 @@
-import { useThemeColor } from 'Hooks/useThemeColor';
 import { Text } from 'react-native';
 import Animated from 'react-native-reanimated';
+import { Colors } from 'Style/Colors';
 
 import { ThemedTextProps } from './ThemedText.type';
 
@@ -11,11 +11,9 @@ function ThemedText({
   type = 'default',
   ...rest
 }: ThemedTextProps) {
-  const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
-
   return (
     <Text
-      style={ [{ color }, style] }
+      style={ [{ color: Colors.text }, style] }
       { ...rest }
     />
   );
@@ -28,11 +26,9 @@ function ThemedTextAnimated({
   type = 'default',
   ...rest
 }: ThemedTextProps) {
-  const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
-
   return (
     <Animated.Text
-      style={ [{ color }, style] }
+      style={ [{ color: Colors.text }, style] }
       { ...rest }
     />
   );

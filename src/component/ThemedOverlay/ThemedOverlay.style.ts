@@ -9,10 +9,10 @@ export const styles = CreateStyles({
     width: '100%',
   },
   contentContainerStyle: {
-    backgroundColor: '#1E1F20',
+    backgroundColor: Colors.backgroundLight,
     padding: 8,
     borderRadius: 16,
-    borderColor: Colors.lightGravel,
+    borderColor: Colors.darkBorder,
     borderWidth: 1,
     maxHeight: '50%',
     overflow: 'hidden',

@@ -10,7 +10,6 @@ import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedText from 'Component/ThemedText';
-import ThemedView from 'Component/ThemedView';
 import { useOverlayContext } from 'Context/OverlayContext';
 import t from 'i18n/t';
 import { useState } from 'react';
@@ -100,12 +99,12 @@ export function FilmPageComponent({
   const renderActions = () => (
     <SpatialNavigationView direction="horizontal">
       <DefaultFocus>
-        <ThemedView style={ styles.actions }>
+        <View style={ styles.actions }>
           { renderPlayButton() }
           { renderAction(t('Comments'), 'comment-text-multiple-outline', () => openOverlay(commentsOverlayId)) }
           { renderAction(t('Bookmark'), 'movie-star-outline', () => openOverlay(bookmarksOverlayId)) }
           { renderAction(t('Trailer'), 'movie-open-check-outline') }
-        </ThemedView>
+        </View>
       </DefaultFocus>
     </SpatialNavigationView>
   );

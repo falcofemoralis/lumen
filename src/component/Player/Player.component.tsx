@@ -11,7 +11,6 @@ import ThemedIcon from 'Component/ThemedIcon';
 import { IconInterface, IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedText from 'Component/ThemedText';
-import ThemedView from 'Component/ThemedView';
 import { useOverlayContext } from 'Context/OverlayContext';
 import * as NavigationBar from 'expo-navigation-bar';
 import * as ScreenOrientation from 'expo-screen-orientation';
@@ -28,7 +27,7 @@ import {
   GestureDetector,
   TouchableOpacity,
 } from 'react-native-gesture-handler';
-import {
+import Animated, {
   runOnJS,
   useAnimatedStyle,
   withTiming,
@@ -495,7 +494,7 @@ export function PlayerComponent({
       ) }
     >
       <View style={ styles.controlsContainer }>
-        <ThemedView.Animated style={ [
+        <Animated.View style={ [
           styles.controls,
           controlsAnimation,
           !showControls && styles.controlsDisabled,
@@ -504,7 +503,7 @@ export function PlayerComponent({
           { renderTopActions() }
           { renderMiddleControls() }
           { renderBottomActions() }
-        </ThemedView.Animated>
+        </Animated.View>
         { renderDoubleTapAction() }
         { renderLongTapAction() }
       </View>
@@ -625,7 +624,7 @@ export function PlayerComponent({
   );
 
   return (
-    <ThemedView style={ styles.container }>
+    <View style={ styles.container }>
       <VideoView
         ref={ playerRef }
         style={ styles.video }
@@ -638,7 +637,7 @@ export function PlayerComponent({
       { renderControls() }
       { renderLoader() }
       { renderModals() }
-    </ThemedView>
+    </View>
   );
 }
 

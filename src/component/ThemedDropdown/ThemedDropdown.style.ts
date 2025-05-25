@@ -3,7 +3,7 @@ import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
   input: {
-    backgroundColor: Colors.gray,
+    backgroundColor: Colors.input,
     justifyContent: 'flex-start',
     gap: 4,
   },
@@ -32,7 +32,7 @@ export const styles = CreateStyles({
   itemLabel: {
     flex: 1,
     fontSize: 16,
-    color: Colors.white,
+    color: Colors.text,
   },
   icon: {
     marginRight: 5,
@@ -47,11 +47,11 @@ export const styles = CreateStyles({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 8,
-    borderBottomColor: Colors.gray,
+    borderBottomColor: Colors.divider,
     borderBottomWidth: 1,
   },
   listHeaderText: {
-    color: Colors.lightGray,
+    color: Colors.text,
     fontSize: 16,
     lineHeight: 16,
     fontWeight: '500',
