@@ -6,6 +6,8 @@
       [
         "@react-native-tvos/config-tv",
         {
+          "isTV": true,
+          "removeFlipperOnAndroid": true,
           "androidTVBanner": "./assets/tv_icons/ic_banner.png"
         }
       ],

@@ -60,29 +60,19 @@ export const FilmPageThumbnail = () => (
             key={ `${i}-thumb` }
             style={ styles.textContainer }
             height={ scale(16) }
-            width="100%"
+            width={ scale(32) * (i+1) }
           />
         )) }
       </View>
     </View>
     <Thumbnail
       style={ styles.description }
-      height="20%"
+      height="40%"
       width="100%"
     />
-    <View style={ styles.actions }>
-      { Array(3).fill(0).map((_, i) => (
-        <Thumbnail
-          // eslint-disable-next-line react/no-array-index-key
-          key={ `${i}-action` }
-          height={ scale(48) }
-          width="30%"
-        />
-      )) }
-    </View>
     <Thumbnail
       style={ styles.playBtn }
-      height={ scale(48) }
+      height={ scale(42) }
       width="100%"
     />
   </Page>
