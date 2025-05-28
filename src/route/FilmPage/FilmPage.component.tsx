@@ -255,6 +255,48 @@ export function FilmPageComponent({
   };
 
   const renderPlayFilmButton = () => {
+    return (
+      <ThemedButton
+        style={ styles.playBtn }
+        onPress={ playFilm }
+      >
+        { t('Watch Now') }
+      </ThemedButton>
+    );
+  };
+
+  const renderAction = (text: string, icon: string, onPress?: () => void) => (
+    <ThemedPressable
+      style={ styles.action }
+      onPress={ onPress }
+    >
+      <ThemedIcon
+        style={ styles.actionIcon }
+        icon={ {
+          name: icon,
+          pack: IconPackType.MaterialCommunityIcons,
+        } }
+        size={ scale(24) }
+        color="white"
+      />
+      { text && (
+        <ThemedText style={ styles.actionText }>
+          { text }
+        </ThemedText>
+      ) }
+    </ThemedPressable>
+  );
+
+  const renderMiddleActions = () => (
+    <View style={ styles.actions }>
+      { renderAction(t('3.4K'), 'movie-open-check-outline', () => NotificationStore.displayMessage(t('Not implemented'))) }
+      { renderAction('', 'movie-open-check-outline', () => NotificationStore.displayMessage(t('Not implemented'))) }
+      { renderAction('Comments', 'folder-download-outline', () => NotificationStore.displayMessage(t('Not implemented'))) }
+      { renderAction('', 'movie-star-outline', () => openOverlay(bookmarksOverlayId)) }
+    </View>
+  );
+
+  const renderBottomActions = () => {
     const { isPendingRelease } = film;
 
     if (isPendingRelease) {
@@ -277,44 +319,12 @@ export function FilmPageComponent({
     }
 
     return (
-      <ThemedButton
-        style={ styles.playBtn }
-        onPress={ playFilm }
-      >
-        { t('Watch Now') }
-      </ThemedButton>
+      <View style={ styles.actions }>
+        { renderPlayFilmButton() }
+        { renderAction(t('Download'), 'folder-download-outline', () => NotificationStore.displayMessage(t('Not implemented'))) }
+      </View>
     );
   };
-
-  const renderAction = (text: string, icon: string, onPress?: () => void) => (
-    <TouchableOpacity
-      style={ styles.action }
-      onPress={ onPress }
-    >
-      <ThemedIcon
-        style={ styles.actionIcon }
-        icon={ {
-          name: icon,
-          pack: IconPackType.MaterialCommunityIcons,
-        } }
-        size={ scale(24) }
-        color="white"
-      />
-      <ThemedText
-        style={ styles.actionText }
-      >
-        { text }
-      </ThemedText>
-    </TouchableOpacity>
-  );
-
-  const renderActions = () => (
-    <View style={ styles.actions }>
-      { renderAction(t('Trailer'), 'movie-open-check-outline', () => NotificationStore.displayMessage(t('Not implemented'))) }
-      { renderAction(t('Bookmark'), 'movie-star-outline', () => openOverlay(bookmarksOverlayId)) }
-      { renderAction(t('Download'), 'folder-download-outline', () => NotificationStore.displayMessage(t('Not implemented'))) }
-    </View>
-  );
 
   const renderRating = () => {
     const { mainRating, ratingScale } = film;
@@ -577,23 +587,25 @@ export function FilmPageComponent({
     </>
   );
 
+  //onScroll={ onScroll }
+
   return (
     <Page>
-      <ScrollView onScroll={ onScroll }>
+      <ScrollView>
         { renderModals() }
         { renderTopActions() }
         { renderTitle() }
         { renderGenres() }
         { renderMainContent() }
+        { renderMiddleActions() }
         { renderDescription() }
-        { renderActions() }
-        { renderPlayFilmButton() }
+        { renderBottomActions() }
         { renderActors() }
         { renderFranchise() }
         { renderSchedule() }
         { renderInfoLists() }
         { renderRelated() }
-        { renderComments() }
+        { /* { renderComments() } */ }
       </ScrollView>
     </Page>
   );

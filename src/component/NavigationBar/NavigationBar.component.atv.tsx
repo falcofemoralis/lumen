@@ -9,7 +9,7 @@ import t from 'i18n/t';
 import React, { useCallback, useRef } from 'react';
 import {
   Image,
-  View
+  View,
 } from 'react-native';
 import Animated from 'react-native-reanimated';
 import {
@@ -26,8 +26,7 @@ import { setTimeoutSafe } from 'Util/Misc';
 import {
   DEFAULT_ROUTE,
   LOADER_ROUTE,
-  TABS_OPENING_DURATION_TV,
-  TABS_TV_CONFIG
+  TABS_TV_CONFIG,
 } from './NavigationBar.config';
 import { styles } from './NavigationBar.style.atv';
 import {
@@ -56,13 +55,13 @@ export function NavigationBarComponent({
         toggleMenu(false);
       }
     },
-    [toggleMenu],
+    [toggleMenu]
   );
 
   const onTabSelect = useCallback((
     tab: Tab,
     navigation: NavigationType,
-    state: StateType,
+    state: StateType
   ) => {
     if (lastPage.current !== LOADER_ROUTE) {
       setTimeoutSafe(() => {
@@ -85,7 +84,7 @@ export function NavigationBarComponent({
     tab: Tab,
     focused: boolean,
     isRootActive: boolean,
-    isf: boolean,
+    isf: boolean
   ) => {
     const { title, icon } = tab;
 
@@ -132,7 +131,7 @@ export function NavigationBarComponent({
     tab: Tab,
     focused: boolean,
     isRootActive: boolean,
-    isf: boolean,
+    isf: boolean
   ) => {
     const { title } = tab;
     const { avatar, name } = profile ?? {};
@@ -192,7 +191,7 @@ export function NavigationBarComponent({
   const renderTab = useCallback((
     tab: Tab,
     navigation: NavigationType,
-    state: StateType,
+    state: StateType
   ) => {
     const { title, tabComponent } = tab;
     const focused = isFocused(tab, state);
@@ -248,11 +247,7 @@ export function NavigationBarComponent({
       <Animated.View
         style={ [
           styles.tabs,
-          {
-            width: isMenuOpen ? styles.tabsOpened.width : styles.tabs.width,
-            transitionProperty: 'width',
-            transitionDuration: `${TABS_OPENING_DURATION_TV}ms`
-          }
+          isMenuOpen && styles.tabsOpened,
         ] }
       >
         <View>
@@ -277,15 +272,6 @@ export function NavigationBarComponent({
         <SpatialNavigationView direction="vertical">
           { renderTabs(navigation, state) }
         </SpatialNavigationView>
-        { /* <LinearGradient
-          style={ [
-            styles.barBackground,
-            isMenuOpen && styles.barBackgroundOpened,
-          ] }
-          colors={ ['rgba(0, 0, 0, 0.8)', 'transparent'] }
-          start={ { x: 0.5, y: 0 } }
-          end={ { x: 1, y: 0 } }
-        /> */ }
       </View>
     </SpatialNavigationRoot>
   ), [renderTabs, onDirectionHandledWithoutMovement, isMenuOpen]);

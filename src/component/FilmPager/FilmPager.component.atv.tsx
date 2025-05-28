@@ -1,5 +1,4 @@
 import FilmGrid from 'Component/FilmGrid';
-import Loader from 'Component/Loader';
 import ThemedButton from 'Component/ThemedButton';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import { useNavigationContext } from 'Context/NavigationContext';
@@ -29,21 +28,21 @@ export const IsRootActiveContext = createContext<boolean>(true);
 
 export function FilmPagerComponent({
   pagerItems,
-  selectedPagerItem,
-  isLoading,
   gridStyle,
+  onPreLoad,
   onNextLoad,
-  handleMenuItemChange,
   onRowFocus = noopFn,
 }: FilmPagerComponentProps) {
   const { isMenuOpen } = useNavigationContext();
   const { isFocused: isPageFocused } = useNavigation();
   const { lock, unlock } = useLockSpatialNavigation();
+  const [currentRow, setCurrentRow] = useState(0);
+  const [selectedPageItemId, setSelectedPageItemId] = useState<string>(pagerItems[0]?.key);
   const [isMenuActive, setIsMenuActive] = useState(false);
   const rowRef = useRef<number>(0);
   const canNavigateMenuRef = useRef<boolean>(true);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const [currentRow, setCurrentRow] = useState(0);
+  const debounce = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const keyDownListener = (type: SupportedKeys) => {
@@ -97,13 +96,40 @@ export function FilmPagerComponent({
     };
   });
 
+  const getSelectedPagerItem = () => pagerItems.find(
+    ({ key }) => key === selectedPageItemId
+  ) ?? pagerItems[0];
+
+  const handleMenuItemChange = (pagerItem: PagerItemInterface) => {
+    const { key } = pagerItem;
+
+    if (key !== selectedPageItemId) {
+      if (debounce.current) {
+        clearTimeout(debounce.current);
+      }
+
+      debounce.current = setTimeoutSafe(async () => {
+        lock();
+
+        setSelectedPageItemId(key);
+        if (!pagerItem.films) {
+          await onPreLoad(pagerItem);
+        }
+
+        setTimeoutSafe(() => {
+          unlock();
+        }, 0);
+      }, 750);
+    }
+  };
+
   const renderMenuItem = (item: PagerItemInterface) => {
     const {
       menuItem: { title },
     } = item;
     const {
       menuItem: { title: selectedTitle },
-    } = selectedPagerItem;
+    } = getSelectedPagerItem();
 
     return (
       <ThemedButton
@@ -154,14 +180,15 @@ export function FilmPagerComponent({
   };
 
   const renderPage = () => {
-    const { films } = selectedPagerItem;
+    const pagerItem = getSelectedPagerItem();
+    const { films } = pagerItem;
 
     return (
       <View style={ [styles.grid, gridStyle] }>
         <DefaultFocus>
           <FilmGrid
             films={ films ?? [] }
-            onNextLoad={ onNextLoad }
+            onNextLoad={ (isRefresh) => onNextLoad(isRefresh, pagerItem) }
             onItemFocus={ (row: number) => {
               if (rowRef.current !== row) {
                 canNavigateMenuRef.current = false;
@@ -176,16 +203,8 @@ export function FilmPagerComponent({
     );
   };
 
-  const renderLoader = () => (
-    <Loader
-      isLoading={ isLoading }
-      fullScreen
-    />
-  );
-
   return (
     <View>
-      { renderLoader() }
       { renderTopMenu() }
       { renderPage() }
     </View>

@@ -108,8 +108,8 @@ export function RootLayout() {
           </Portal.Host>
         </AppProvider>
       </ThemeProvider>
-    )
-  }
+    );
+  };
 
   return (
     <SafeAreaView style={ { flex: 1, backgroundColor: Colors.background } }>

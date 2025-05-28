@@ -8,8 +8,6 @@ import {
   TAB_POSITION,
 } from './NavigationBar.type';
 
-export const TABS_OPENING_DURATION_TV = 250;
-
 export const ACCOUNT_ROUTE: NavigationRoute = '(account)';
 export const BOOKMARKS_ROUTE: NavigationRoute = '(bookmarks)';
 export const RECENT_ROUTE: NavigationRoute = '(recent)';

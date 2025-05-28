@@ -3,7 +3,7 @@ import {
   use,
   useCallback,
   useMemo,
-  useState
+  useState,
 } from 'react';
 
 interface NavigationContextInterface {

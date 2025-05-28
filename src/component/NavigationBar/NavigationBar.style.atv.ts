@@ -39,6 +39,8 @@ export const styles = CreateStyles({
     justifyContent: 'space-between',
     overflow: 'hidden',
     zIndex: NAVIGATION_BAR_Z_INDEX + 2,
+    transitionProperty: 'width',
+    transitionDuration: '250ms',
   },
   tabsOpened: {
     width: NAVIGATION_BAR_TV_TAB_WIDTH_EXPANDED,

@@ -14,7 +14,7 @@ export function NavigationBarContainer() {
   const navigateTo = useCallback((
     tab: Tab,
     navigation: NavigationType,
-    state: StateType,
+    state: StateType
   ) => {
     const { route } = tab;
 

@@ -3,7 +3,7 @@ import {
   use,
   useCallback,
   useMemo,
-  useState
+  useState,
 } from 'react';
 
 interface OverlayContextInterface {
@@ -72,7 +72,7 @@ export const OverlayProvider = ({ children }: { children: React.ReactNode }) => 
     isOverlayVisible,
     openOverlay,
     closeOverlay,
-    goToPreviousOverlay
+    goToPreviousOverlay,
   }), [
     currentOverlay,
     hasOpenedOverlay,
@@ -80,7 +80,7 @@ export const OverlayProvider = ({ children }: { children: React.ReactNode }) => 
     isOverlayVisible,
     openOverlay,
     closeOverlay,
-    goToPreviousOverlay
+    goToPreviousOverlay,
   ]);
 
   return (

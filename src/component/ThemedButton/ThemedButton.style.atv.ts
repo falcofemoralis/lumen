@@ -6,13 +6,15 @@ export const styles = CreateStyles({
     backgroundColor: Colors.button,
     paddingHorizontal: 16,
     paddingVertical: 10,
-    borderRadius: 44,
+    borderWidth: 0,
     flexDirection: 'row',
     gap: 6,
     alignItems: 'center',
   },
   // filled
-  containerFilled: {},
+  containerFilled: {
+    borderRadius: 44,
+  },
   containerFilledSelected: {
     backgroundColor: Colors.primary,
   },
@@ -37,6 +39,7 @@ export const styles = CreateStyles({
   },
   // outlined
   containerOutlined: {
+    borderRadius: 44,
     backgroundColor: Colors.transparent,
   },
   containerOutlinedSelected: {

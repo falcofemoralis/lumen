@@ -17,7 +17,10 @@ import { scale } from 'Util/CreateStyles';
 import { TABS_MOBILE_CONFIG } from './NavigationBar.config';
 import { styles } from './NavigationBar.style';
 import {
-  NavigationBarComponentProps, NavigationType, StateType, Tab,
+  NavigationBarComponentProps,
+  NavigationType,
+  StateType,
+  Tab,
   TAB_COMPONENT,
 } from './NavigationBar.type';
 
@@ -102,7 +105,7 @@ export function NavigationBarComponent({
   const renderTab = useCallback((
     tab: Tab,
     navigation: NavigationType,
-    state: StateType,
+    state: StateType
   ) => {
     const { title, tabComponent } = tab;
     const focused = isFocused(tab, state);
@@ -154,7 +157,14 @@ export function NavigationBarComponent({
         // lazy: false,
       } }
       tabBar={ renderTabBar }
-    />
+    >
+      <Tabs.Screen
+        name="settings"
+        options={ {
+          headerShown: true,
+        } }
+      />
+    </Tabs>
   );
 }
 

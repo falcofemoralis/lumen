@@ -93,7 +93,8 @@ export const styles = CreateStyles({
     color: Colors.chipText,
   },
   playBtn: {
-    width: '100%',
+    flex: 1,
+    // width: '100%',
     backgroundColor: Colors.secondary,
     marginBlockStart: 16,
   },
@@ -101,7 +102,7 @@ export const styles = CreateStyles({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 16,
-    gap: 16,
+    gap: 8,
   },
   action: {
     flex: 1,
@@ -114,6 +115,8 @@ export const styles = CreateStyles({
     borderWidth: 1,
     borderColor: Colors.border,
     padding: 8,
+    // height: 48,
+    // width: 48,
   },
   actionIcon: {
 

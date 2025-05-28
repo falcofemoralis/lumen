@@ -15,7 +15,7 @@ export function HomePageContainer() {
   const onLoadFilms = async (
     menuItem: MenuItemInterface,
     currentPage: number,
-    isRefresh: boolean,
+    isRefresh: boolean
   ) => getCurrentService().getHomeMenuFilms(menuItem, currentPage, {
     isRefresh,
   });

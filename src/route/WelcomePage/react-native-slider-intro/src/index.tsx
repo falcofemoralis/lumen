@@ -39,7 +39,7 @@ const Slider = forwardRef<SliderRef, SliderProps>(
     {
       children,
     },
-    ref,
+    ref
   ) => {
     const {
       data,
@@ -97,14 +97,14 @@ const Slider = forwardRef<SliderRef, SliderProps>(
 
         if (translationX < 0) {
           _slideDotTranslateX.setValue(
-            dotWidthToValue + newDotWidthValue - dotWidth,
+            dotWidthToValue + newDotWidthValue - dotWidth
           );
           _slideDotScaleX.setValue(newDotWidth);
 
           return;
         }
         _slideDotTranslateX.setValue(
-          dotWidthToValue - newDotWidthValue + dotWidth,
+          dotWidthToValue - newDotWidthValue + dotWidth
         );
         _slideDotScaleX.setValue(newDotWidth);
       };
@@ -192,13 +192,13 @@ const Slider = forwardRef<SliderRef, SliderProps>(
         ) }
       </Animated.View>
     );
-  },
+  }
 );
 
 const SliderIntro = forwardRef<SliderRef, Partial<SliderIntroProps>>(
   (
     props,
-    ref,
+    ref
   ) => (
     <SliderProvider
       { ...props }
@@ -210,7 +210,7 @@ const SliderIntro = forwardRef<SliderRef, Partial<SliderIntroProps>>(
       />
       <Navigation />
     </SliderProvider>
-  ),
+  )
 );
 
 export default SliderIntro;

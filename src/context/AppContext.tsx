@@ -1,7 +1,7 @@
 import {
   createContext,
   use,
-  useMemo
+  useMemo,
 } from 'react';
 
 import { NavigationProvider } from './NavigationContext';

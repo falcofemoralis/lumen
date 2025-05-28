@@ -5,7 +5,7 @@ import {
   use,
   useCallback,
   useMemo,
-  useState
+  useState,
 } from 'react';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { convertSecondsToTime } from 'Util/Date';
@@ -51,7 +51,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
         remainingTime: convertSecondsToTime(duration - currentTime),
       });
     },
-    [],
+    []
   );
 
   const resetProgressStatus = useCallback(() => {

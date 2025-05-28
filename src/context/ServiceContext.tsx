@@ -7,7 +7,7 @@ import {
   use,
   useCallback,
   useMemo,
-  useState
+  useState,
 } from 'react';
 import ConfigStore from 'Store/Config.store';
 import NotificationStore from 'Store/Notification.store';
@@ -60,7 +60,7 @@ const ServiceContext = createContext<ServiceContextInterface>({
 
 export const ServiceProvider = ({ children }: { children: React.ReactNode }) => {
   const [currentService, setCurrentService] = useState<ApiServiceType>(ApiServiceType.REZKA);
-  const [isSignedIn, setIsSignedIn] = useState<boolean>(false);
+  const [isSignedIn, setIsSignedIn] = useState<boolean>(!!miscStorage.getString(CREDENTIALS_STORAGE));
   const [notifications, setNotifications] = useState<NotificationInterface[] | null>(null);
   const [badgeData, setBadgeData] = useState<BadgeData>({});
   const [profile, setProfile] = useState<ProfileInterface | null>(safeJsonParse<ProfileInterface>(miscStorage.getString(PROFILE_STORAGE)));
@@ -120,7 +120,7 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
     const auth = await getCurrentService().login(name, password);
     setAuthorization(auth, name, password);
 
-    await loadProfile()
+    await loadProfile();
 
     setIsSignedIn(true);
   }, [getCurrentService, setAuthorization, loadProfile]);
@@ -154,7 +154,7 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
       []);
 
       const previousItems = safeJsonParse<NotificationItemInterface[]>(
-        miscStorage.getString(NOTIFICATIONS_STORAGE),
+        miscStorage.getString(NOTIFICATIONS_STORAGE)
       ) ?? [];
 
       const badgeCount = newItems.reduce((acc, item) => {
@@ -167,7 +167,7 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
       0);
 
       setBadgeData({
-        [ConfigStore.isTV() ? NOTIFICATIONS_ROUTE : ACCOUNT_ROUTE]: badgeCount
+        [ConfigStore.isTV() ? NOTIFICATIONS_ROUTE : ACCOUNT_ROUTE]: badgeCount,
       });
     } catch (error) {
       NotificationStore.displayError(error as Error);
@@ -190,7 +190,7 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
     }
 
     setBadgeData({
-      [ConfigStore.isTV() ? NOTIFICATIONS_ROUTE : ACCOUNT_ROUTE]: 0
+      [ConfigStore.isTV() ? NOTIFICATIONS_ROUTE : ACCOUNT_ROUTE]: 0,
     });
   }, [notifications]);
 
@@ -219,7 +219,7 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
 
     if (isSignedIn) {
       const { name, password } = safeJsonParse<{ name: string; password: string }>(
-        miscStorage.getString(CREDENTIALS_STORAGE),
+        miscStorage.getString(CREDENTIALS_STORAGE)
       ) ?? {};
 
       logout();

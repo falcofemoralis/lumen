@@ -3,7 +3,7 @@ const MainColors = {
   secondary: '#E50000',
   tertiary: '#001E30',
   error: '#8C1D18',
-}
+};
 
 const TextColors = {
   text: '#E3E3E3',
@@ -13,33 +13,33 @@ const TextColors = {
   textOnSecondary: '#E50000',
   textOnTertiary: '#C2E7FF',
   textOnError: '#F9DEDC',
-}
+};
 
 const BackgroundColors = {
-  background: '#000000',
-  backgroundLight: '#1A1A1A',
-  backgroundLighter: '#303030',
+  background: '#0D0D0D',
+  backgroundLight: '#252525',
+  backgroundLighter: '#5B5B5B',
   backgroundFocused: '#E3E3E3',
-  border: '#444746',
+  border: '#4E4E4E',
   darkBorder: '#262626',
-  divider: '#444746',
+  divider: '#4E4E4E',
   darkDivider: '#262626',
-}
+};
 
 const ButtonColors = {
-  button: '#444746',
+  button: '#383838',
   buttonText: '#E3E3E3',
   buttonFocused: BackgroundColors.backgroundFocused,
-  chip: '#444746',
+  chip: '#383838',
   chipText: '#E3E3E3',
-  chipFocused: BackgroundColors.backgroundFocused
-}
+  chipFocused: BackgroundColors.backgroundFocused,
+};
 
 const InputColors = {
-  input: '#444746',
+  input: '#383838',
   inputText: '#E3E3E3',
-  inputFocused: BackgroundColors.backgroundFocused
-}
+  inputFocused: BackgroundColors.backgroundFocused,
+};
 
 const UtilsColors = {
   white: '#E3E3E3',
@@ -47,7 +47,7 @@ const UtilsColors = {
   transparent: 'transparent',
   modal: 'rgba(0, 0, 0, 0.6)',
   whiteTransparent: 'rgba(191, 191, 191, 0.5)',
-}
+};
 
 export const Colors = {
   ...MainColors,
