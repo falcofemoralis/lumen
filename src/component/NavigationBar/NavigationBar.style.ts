@@ -54,8 +54,6 @@ export const styles = CreateStyles({
     borderRadius: 99,
   },
   profileAvatarContainer: {
-    transitionProperty: 'all',
-    transitionDuration: '150ms',
   },
   profileAvatarUnfocused: {
     padding: 2,

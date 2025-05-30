@@ -1,23 +1,21 @@
 import Thumbnail from 'Component/Thumbnail';
-import { StyleProp, View, ViewStyle } from 'react-native';
+import { View } from 'react-native';
 import { scale } from 'Util/CreateStyles';
 
-import { styles } from './FilmCard.style';
-
 export const FilmCardThumbnail = ({
-  style,
+  width,
 }: {
-  style?: StyleProp<ViewStyle>
+  width: number;
 }) => (
-  <View style={ [styles.card, { gap: scale(8) }, style] }>
-    <Thumbnail style={ [styles.posterWrapper, styles.poster] } />
+  <View style={ [{ gap: scale(8) }, { width }] }>
+    <Thumbnail height={ width * (250 / 166) } width={ width } />
     <Thumbnail
       height={ scale(24) }
-      width="100%"
+      width={ width }
     />
     <Thumbnail
       height={ scale(16) }
-      width="50%"
+      width={ width * 0.5 }
     />
   </View>
 );

@@ -62,11 +62,11 @@ export function FilmGridComponent({
         handleOnPress={ handleOnPress }
       />
     ),
-    [width],
+    [width]
   );
 
   const data = useMemo(() => calculateRows(
-    films, NUMBER_OF_COLUMNS,
+    films, NUMBER_OF_COLUMNS
   ).map((items) => ({
     id: items[0].id,
     items,

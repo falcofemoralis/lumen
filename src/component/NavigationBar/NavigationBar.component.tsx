@@ -60,7 +60,7 @@ export function NavigationBarComponent({
 
     return (
       <View style={ [styles.tab, styles.tabAccount] }>
-        <Animated.View
+        <View
           style={ [
             styles.profileAvatarContainer,
             focused ? styles.profileAvatarFocused : styles.profileAvatarUnfocused,
@@ -80,7 +80,7 @@ export function NavigationBarComponent({
           { badge > 0 && (
             <View style={ styles.badge } />
           ) }
-        </Animated.View>
+        </View>
       </View>
     );
   }, [profile, badgeData]);

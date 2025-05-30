@@ -16,7 +16,7 @@ const getLayoutWidth = () => {
   }
 
   return lw;
-}
+};
 
 const convertPercentageToNumber = (value: DimensionValue) => {
   if (typeof value === 'string' && value.endsWith('%')) {
@@ -28,7 +28,7 @@ const convertPercentageToNumber = (value: DimensionValue) => {
   }
 
   return typeof value === 'number' ? value : parseFloat(value as string);
-}
+};
 
 const transformValue = (type: 'width' | 'height', value: DimensionValue | undefined, style: any) => {
   if (style && style[type] !== undefined) {
@@ -40,7 +40,7 @@ const transformValue = (type: 'width' | 'height', value: DimensionValue | undefi
   }
 
   return 10;
-}
+};
 
 export const ThumbnailComponent = ({ style, height, width }: ThumbnailComponentProps) => {
   return (
@@ -52,7 +52,7 @@ export const ThumbnailComponent = ({ style, height, width }: ThumbnailComponentP
       width={ transformValue('width', width, style) }
       style={ [styles.thumbnail, style] }
     />
-  )
+  );
 };
 
 export default ThumbnailComponent;

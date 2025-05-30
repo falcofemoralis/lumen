@@ -21,7 +21,7 @@ export const FilmGridThumbnail = () => {
             <FilmCardThumbnail
               // eslint-disable-next-line react/no-array-index-key
               key={ `film-grid-thumb-row-${index}-col-${innerIndex}` }
-              style={ { width } }
+              width={ width }
             />
           )) }
         </View>
