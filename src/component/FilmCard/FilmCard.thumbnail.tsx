@@ -8,7 +8,10 @@ export const FilmCardThumbnail = ({
   width: number;
 }) => (
   <View style={ [{ gap: scale(8) }, { width }] }>
-    <Thumbnail height={ width * (250 / 166) } width={ width } />
+    <Thumbnail
+      height={ width * (250 / 166) }
+      width={ width }
+    />
     <Thumbnail
       height={ scale(24) }
       width={ width }

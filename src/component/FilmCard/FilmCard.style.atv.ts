@@ -14,7 +14,7 @@ export const FOCUSED_SCALE = 1.1;
 export const calculateCardDimensions = (
   numberOfColumns: number,
   gap?: number,
-  additionalWidth?: number,
+  additionalWidth?: number
 ): FilmCardDimensions => {
   const width = calculateItemWidth(numberOfColumns, gap, additionalWidth);
 
@@ -34,6 +34,12 @@ export const styles = CreateStyles({
     flex: 1,
     flexDirection: 'column',
     width: '100%',
+    transform: [{ scale: 1 }],
+    transitionProperty: 'transform',
+    transitionDuration: '250ms',
+  },
+  cardFocused: {
+    transform: [{ scale: 1.1 }],
   },
   posterWrapper: {
     width: '100%',

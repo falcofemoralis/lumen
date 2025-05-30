@@ -1,7 +1,8 @@
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
 import React from 'react';
-import { Animated, View } from 'react-native';
+import { View } from 'react-native';
+import Animated from 'react-native-reanimated';
 
 import {
   FILM_TYPE_COLORS,
@@ -9,7 +10,6 @@ import {
 } from './FilmCard.config';
 import { styles } from './FilmCard.style.atv';
 import { FilmCardComponentProps } from './FilmCard.type';
-import { useFocusAnimation } from './useFocusAnimation';
 
 export function FilmCardComponent({
   filmCard,
@@ -24,8 +24,6 @@ export function FilmCardComponent({
     subtitle,
     info,
   } = filmCard;
-
-  const scaleAnimation = useFocusAnimation(isFocused);
 
   const renderType = () => (
     <ThemedText
@@ -104,7 +102,7 @@ export function FilmCardComponent({
     <Animated.View
       style={ [
         styles.card,
-        scaleAnimation,
+        isFocused && styles.cardFocused,
         style,
       ] }
     >

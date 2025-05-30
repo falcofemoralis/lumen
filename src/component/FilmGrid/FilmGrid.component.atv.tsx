@@ -58,7 +58,7 @@ export function FilmGridComponent({
   const { width, height } = calculateCardDimensions(
     NUMBER_OF_COLUMNS_TV,
     scale(ROW_GAP),
-    scale(ROW_GAP) * 2,
+    scale(ROW_GAP) * 2
   );
 
   const renderItem = useCallback(({ item, index }: ThemedGridRowProps<FilmCardInterface>) => (
