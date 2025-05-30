@@ -34,6 +34,7 @@ export const ThemedGridComponent = ({
       onEndReachedThresholdRowsNumber={ 2 }
       style={ style }
       additionalRenderedRows={ 1 }
+      scrollBehavior='stick-to-center'
       scrollDuration={ 0 }
       header={ header }
       headerSize={ headerSize }

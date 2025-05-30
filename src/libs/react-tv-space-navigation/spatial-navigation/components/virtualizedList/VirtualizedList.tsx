@@ -1,18 +1,15 @@
 import { useCallback, useEffect, useMemo } from 'react';
-import { Animated, StyleSheet, View, ViewStyle, Platform } from 'react-native';
+import { StyleSheet, View, ViewStyle, Platform } from 'react-native';
 import { getRange } from './helpers/getRange';
-import {
-  useVirtualizedListAnimation,
-  useWebVirtualizedListAnimation,
-} from './hooks/useVirtualizedListAnimation';
 import { NodeOrientation } from '../../types/orientation';
 import { typedMemo } from '../../helpers/TypedMemo';
 import { getSizeInPxFromOneItemToAnother } from './helpers/getSizeInPxFromOneItemToAnother';
 import { computeAllScrollOffsets } from './helpers/createScrollOffsetArray';
 import { getNumberOfItemsVisibleOnScreen } from './helpers/getNumberOfItemsVisibleOnScreen';
 import { getAdditionalNumberOfItemsRendered } from './helpers/getAdditionalNumberOfItemsRendered';
+import Animated from 'react-native-reanimated';
 
-export type ScrollBehavior = 'stick-to-start' | 'stick-to-end' | 'jump-on-scroll';
+export type ScrollBehavior = 'stick-to-start' | 'stick-to-end' | 'jump-on-scroll' | 'stick-to-center';
 export interface VirtualizedListProps<T> {
   data: T[];
   renderItem: (args: { item: T; index: number }) => JSX.Element;
@@ -199,20 +196,20 @@ export const VirtualizedList = typedMemo(
       onEndReached,
     });
 
-    const animatedStyle =
-      Platform.OS === 'web'
-        ? useWebVirtualizedListAnimation({
-            currentlyFocusedItemIndex,
-            vertical,
-            scrollDuration,
-            scrollOffsetsArray: allScrollOffsets,
-          })
-        : useVirtualizedListAnimation({
-            currentlyFocusedItemIndex,
-            vertical,
-            scrollDuration,
-            scrollOffsetsArray: allScrollOffsets,
-          });
+    // const animatedStyle =
+    //   Platform.OS === 'web'
+    //     ? useWebVirtualizedListAnimation({
+    //         currentlyFocusedItemIndex,
+    //         vertical,
+    //         scrollDuration,
+    //         scrollOffsetsArray: allScrollOffsets,
+    //       })
+    //     : useVirtualizedListAnimation({
+    //         currentlyFocusedItemIndex,
+    //         vertical,
+    //         scrollDuration,
+    //         scrollOffsetsArray: allScrollOffsets,
+    //       });
 
     /*
      * This is a performance trick.
@@ -258,10 +255,16 @@ export const VirtualizedList = typedMemo(
           : ({ width: totalVirtualizedListSize } as const),
       [totalVirtualizedListSize, vertical],
     );
+    const newTranslationValue = allScrollOffsets[currentlyFocusedItemIndex];
 
     return (
       <Animated.View
-        style={[styles.container, animatedStyle, style, directionStyle, dimensionStyle]}
+        style={[styles.container, {
+          transform: [vertical ? { translateY: newTranslationValue } : { translateX: newTranslationValue }],
+          transitionProperty: 'transform',
+          transitionDuration: `${scrollDuration}ms`,
+          transitionTimingFunction: 'ease-out',
+        }, style, directionStyle, dimensionStyle]}
         testID={testID}
       >
         <View>
