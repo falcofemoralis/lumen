@@ -1,20 +1,26 @@
 import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
+export const TAB_ADDITIONAL_SIZE = 20;
+
 export const styles = CreateStyles({
   tabBar: {
     width: '100%',
     borderTopWidth: 1,
+    borderColor: Colors.border,
   },
   tabs: {
     width: '100%',
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    height: 50,
+    overflow: 'hidden',
   },
   tabContainer: {
-    flex: 1,
     flexDirection: 'column',
+    height: 50 + TAB_ADDITIONAL_SIZE,
+    top: -TAB_ADDITIONAL_SIZE / 2,
     borderRadius: 99,
+    position: 'absolute',
   },
   tab: {
     flexDirection: 'column',
@@ -23,17 +29,23 @@ export const styles = CreateStyles({
     alignItems: 'center',
     paddingVertical: 8,
     borderRadius: 99,
+    opacity: 0.7,
+    transitionProperty: 'opacity',
+    transitionDuration: '150ms',
+  },
+  tabFocused: {
+    opacity: 1,
   },
   tabIcon: {
-  },
-  tabIconFocused: {
-    color: Colors.primary,
   },
   tabText: {
     fontSize: 12,
   },
   tabTextFocused: {
     fontWeight: 700,
+  },
+  tabAccount: {
+    opacity: 1,
   },
   profileAvatar: {
     width: 22,
@@ -42,6 +54,8 @@ export const styles = CreateStyles({
     borderRadius: 99,
   },
   profileAvatarContainer: {
+    transitionProperty: 'all',
+    transitionDuration: '150ms',
   },
   profileAvatarUnfocused: {
     padding: 2,

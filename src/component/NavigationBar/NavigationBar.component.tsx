@@ -1,21 +1,22 @@
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import ThemedIcon from 'Component/ThemedIcon';
 import ThemedImage from 'Component/ThemedImage';
-import ThemedText from 'Component/ThemedText';
+import ThemedPressable from 'Component/ThemedPressable';
 import { useServiceContext } from 'Context/ServiceContext';
 import { Tabs } from 'expo-router';
 import React, { useCallback } from 'react';
 import {
+  Dimensions,
   Image,
-  Pressable,
   View,
 } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { Colors } from 'Style/Colors';
 import { CONTENT_WRAPPER_PADDING } from 'Style/Layout';
 import { scale } from 'Util/CreateStyles';
 
 import { TABS_MOBILE_CONFIG } from './NavigationBar.config';
-import { styles } from './NavigationBar.style';
+import { styles, TAB_ADDITIONAL_SIZE } from './NavigationBar.style';
 import {
   NavigationBarComponentProps,
   NavigationType,
@@ -26,6 +27,8 @@ import {
 
 export { Tabs } from 'expo-router';
 
+const width = Dimensions.get('window').width;
+
 export function NavigationBarComponent({
   profile,
   navigateTo,
@@ -34,42 +37,30 @@ export function NavigationBarComponent({
   const { badgeData } = useServiceContext();
 
   const renderDefaultTab = useCallback((tab: Tab, focused: boolean) => {
-    const { title, icon, iconFocused } = tab;
+    const { icon } = tab;
 
     return (
-      <View style={ styles.tab }>
+      <Animated.View style={ [styles.tab, focused && styles.tabFocused] }>
         { icon && (
           <ThemedIcon
-            style={ [
-              styles.tabIcon,
-              focused && !iconFocused && styles.tabIconFocused,
-            ] }
-            icon={ !focused ? icon : (iconFocused ?? icon) }
+            style={ styles.tabIcon }
+            icon={ icon }
             size={ scale(24) }
             color="white"
           />
         ) }
-        <ThemedText
-          style={ [
-            styles.tabText,
-            focused && styles.tabTextFocused,
-          ] }
-        >
-          { title }
-        </ThemedText>
-      </View>
+      </Animated.View>
     );
   }, []);
 
   const renderAccountTab = useCallback((tab: Tab, focused: boolean) => {
-    const { title } = tab;
     const { avatar } = profile ?? {};
 
     const badge = badgeData[tab.route] ?? 0;
 
     return (
-      <View style={ styles.tab }>
-        <View
+      <View style={ [styles.tab, styles.tabAccount] }>
+        <Animated.View
           style={ [
             styles.profileAvatarContainer,
             focused ? styles.profileAvatarFocused : styles.profileAvatarUnfocused,
@@ -89,15 +80,7 @@ export function NavigationBarComponent({
           { badge > 0 && (
             <View style={ styles.badge } />
           ) }
-        </View>
-        <ThemedText
-          style={ [
-            styles.tabText,
-            focused && styles.tabTextFocused,
-          ] }
-        >
-          { title }
-        </ThemedText>
+        </Animated.View>
       </View>
     );
   }, [profile, badgeData]);
@@ -105,7 +88,8 @@ export function NavigationBarComponent({
   const renderTab = useCallback((
     tab: Tab,
     navigation: NavigationType,
-    state: StateType
+    state: StateType,
+    idx: number
   ) => {
     const { title, tabComponent } = tab;
     const focused = isFocused(tab, state);
@@ -120,19 +104,22 @@ export function NavigationBarComponent({
     };
 
     return (
-      <Pressable
+      <ThemedPressable
         key={ title }
-        style={ styles.tabContainer }
+        style={ [styles.tabContainer, {
+          width: (width / TABS_MOBILE_CONFIG.length) + scale(TAB_ADDITIONAL_SIZE),
+          left: idx * (width / TABS_MOBILE_CONFIG.length) - scale(TAB_ADDITIONAL_SIZE / 2),
+        }] }
         onPress={ () => navigateTo(tab, navigation, state) }
       >
         { renderComponent() }
-      </Pressable>
+      </ThemedPressable>
     );
   }, [navigateTo, isFocused, renderAccountTab, renderDefaultTab]);
 
   const renderTabs = useCallback((navigation: NavigationType, state: StateType) => (
     <View style={ styles.tabs }>
-      { TABS_MOBILE_CONFIG.map((tab) => renderTab(tab, navigation, state)) }
+      { TABS_MOBILE_CONFIG.map((tab, i) => renderTab(tab, navigation, state, i)) }
     </View>
   ), [renderTab]);
 
