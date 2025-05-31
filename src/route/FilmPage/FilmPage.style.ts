@@ -94,35 +94,38 @@ export const styles = CreateStyles({
   },
   playBtn: {
     flex: 1,
-    // width: '100%',
     backgroundColor: Colors.secondary,
     marginBlockStart: 16,
   },
+  downloadBtn: {
+    backgroundColor: Colors.backgroundLight,
+    borderRadius: 50,
+    width: 40,
+    height: 40,
+  },
+  downloadBtnIcon: {
+  },
   actions: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
     marginTop: 16,
-    gap: 8,
+    gap: 6,
   },
   action: {
     flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 8,
     backgroundColor: Colors.backgroundLight,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    padding: 8,
-    // height: 48,
-    // width: 48,
+    borderRadius: 50,
+    padding: 4,
+  },
+  actionSquare: {
+    flex: 0,
   },
   actionIcon: {
-
+    margin: 8,
   },
   actionText: {
-
+    fontSize: 12,
   },
   description: {
     color: Colors.textSecondary,

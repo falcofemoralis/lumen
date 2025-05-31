@@ -12,7 +12,7 @@ export const INFO_PADDING_TOP = 8;
 export const calculateCardDimensions = (
   numberOfColumns: number,
   gap?: number,
-  additionalWidth?: number,
+  additionalWidth?: number
 ): FilmCardDimensions => {
   const width = calculateItemWidth(numberOfColumns, gap, additionalWidth);
 
@@ -30,15 +30,15 @@ export const calculateCardDimensions = (
 export const useFilmCardDimensions = (
   numberOfColumns: number,
   gap?: number,
-  additionalWidth?: number,
+  additionalWidth?: number
 ): FilmCardDimensions => {
   const [dimensions, setDimensions] = useState(
-    calculateCardDimensions(numberOfColumns, gap, additionalWidth),
+    calculateCardDimensions(numberOfColumns, gap, additionalWidth)
   );
 
   const updateDimensions = () => {
     setDimensions(
-      calculateCardDimensions(numberOfColumns, gap, additionalWidth),
+      calculateCardDimensions(numberOfColumns, gap, additionalWidth)
     );
   };
 
@@ -60,6 +60,8 @@ export const styles = CreateStyles({
   posterWrapper: {
     width: '100%',
     height: 'auto',
+    overflow: 'hidden',
+    borderRadius: 8,
   },
   poster: {
     aspectRatio: '166 / 250',
@@ -97,5 +99,6 @@ export const styles = CreateStyles({
     paddingHorizontal: 4,
     paddingVertical: 1,
     fontSize: 10,
+    borderBottomLeftRadius: 8,
   },
 });

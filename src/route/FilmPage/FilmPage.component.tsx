@@ -1,24 +1,19 @@
 import { Rating } from '@kolking/react-native-rating';
 import BookmarksSelector from 'Component/BookmarksSelector';
-import Comments from 'Component/Comments';
-import { CommentsRef } from 'Component/Comments/Comments.container';
 import Page from 'Component/Page';
 import PlayerVideoSelector from 'Component/PlayerVideoSelector';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImageModal from 'Component/ThemedImageModal';
-import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import { useOverlayContext } from 'Context/OverlayContext';
 import { useRouter } from 'expo-router';
 import t from 'i18n/t';
-import { ArrowLeft, Share2 } from 'lucide-react-native';
-import React, { useCallback, useRef, useState } from 'react';
+import { ArrowLeft, Bookmark, Clapperboard, Clock, Download, MessageCircle, Play, Share2, Star } from 'lucide-react-native';
+import React from 'react';
 import {
-  NativeScrollEvent,
-  NativeSyntheticEvent,
   ScrollView,
   Text,
   TouchableHighlight,
@@ -26,13 +21,12 @@ import {
   View,
 } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
+import RouterStore from 'Store/Router.store';
 import { Colors } from 'Style/Colors';
 import { CollectionItemInterface } from 'Type/CollectionItem';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { scale } from 'Util/CreateStyles';
-import { isCloseToBottom } from 'Util/Scroll';
 
-import { SCROLL_EVENT_END_PADDING } from './FilmPage.config';
 import { styles } from './FilmPage.style';
 import { FilmPageThumbnail } from './FilmPage.thumbnail';
 import { FilmPageComponentProps } from './FilmPage.type';
@@ -60,29 +54,27 @@ export function FilmPageComponent({
   handleShare,
 }: FilmPageComponentProps) {
   const router = useRouter();
-  const { openOverlay, goToPreviousOverlay } = useOverlayContext();
-  const [commentsVisible, setCommentsVisible] = useState(false);
-  const commentsRef = useRef<CommentsRef>(null);
-
-  const onScroll = useCallback(
-    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-      const closePadding = commentsVisible
-        ? SCROLL_EVENT_END_PADDING * 4
-        : SCROLL_EVENT_END_PADDING;
-
-      if (isCloseToBottom(event, closePadding)) {
-        if (commentsVisible) {
-          commentsRef.current?.loadComments();
-        } else {
-          setCommentsVisible(true);
-        }
-      }
-    }, [commentsVisible]
-  );
+  const { openOverlay } = useOverlayContext();
 
   if (!film) {
     return <FilmPageThumbnail />;
   }
+
+  const openComments = () => {
+    router.push({ pathname: '/modal' });
+    RouterStore.pushData('modal', {
+      type: 'comments',
+      film,
+    });
+  };
+
+  const openSchedule = () => {
+    router.push({ pathname: '/modal' });
+    RouterStore.pushData('modal', {
+      type: 'schedule',
+      film,
+    });
+  };
 
   const renderTopActions = () => (
     <View style={ styles.topActions }>
@@ -254,45 +246,54 @@ export function FilmPageComponent({
     return <ThemedText style={ styles.description }>{ description }</ThemedText>;
   };
 
-  const renderPlayFilmButton = () => {
-    return (
-      <ThemedButton
-        style={ styles.playBtn }
-        onPress={ playFilm }
-      >
-        { t('Watch Now') }
-      </ThemedButton>
-    );
-  };
-
-  const renderAction = (text: string, icon: string, onPress?: () => void) => (
-    <ThemedPressable
-      style={ styles.action }
-      onPress={ onPress }
-    >
-      <ThemedIcon
-        style={ styles.actionIcon }
-        icon={ {
-          name: icon,
-          pack: IconPackType.MaterialCommunityIcons,
-        } }
-        size={ scale(24) }
-        color="white"
-      />
-      { text && (
-        <ThemedText style={ styles.actionText }>
-          { text }
-        </ThemedText>
-      ) }
-    </ThemedPressable>
-  );
-
   const renderMiddleActions = () => (
     <View style={ styles.actions }>
-      { renderAction(t('3.4K'), 'movie-open-check-outline', () => NotificationStore.displayMessage(t('Not implemented'))) }
-      { renderAction('', 'movie-open-check-outline', () => NotificationStore.displayMessage(t('Not implemented'))) }
-      { renderAction('Comments', 'folder-download-outline', () => NotificationStore.displayMessage(t('Not implemented'))) }
-      { renderAction('', 'movie-star-outline', () => openOverlay(bookmarksOverlayId)) }
+      <ThemedPressable
+        style={ [styles.action, styles.actionSquare] }
+        onPress={ () => NotificationStore.displayMessage(t('Not implemented')) }
+      >
+        <Star
+          style={ styles.actionIcon }
+          size={ scale(18) }
+          color={ Colors.white }
+        />
+        <ThemedText style={ styles.actionText }>
+          3.4k
+        </ThemedText>
+      </ThemedPressable>
+      <ThemedPressable
+        style={ [styles.action, styles.actionSquare] }
+        onPress={ () => NotificationStore.displayMessage(t('Not implemented')) }
+      >
+        <Clapperboard
+          style={ styles.actionIcon }
+          size={ scale(18) }
+          color={ Colors.white }
+        />
+      </ThemedPressable>
+      <ThemedPressable
+        style={ styles.action }
+        onPress={ openComments }
+      >
+        <MessageCircle
+          style={ styles.actionIcon }
+          size={ scale(18) }
+          color={ Colors.white }
+        />
+        <ThemedText style={ styles.actionText }>
+          { t('Comments') }
+        </ThemedText>
+      </ThemedPressable>
+      <ThemedPressable
+        style={ [styles.action, styles.actionSquare] }
+        onPress={ () => openOverlay(bookmarksOverlayId) }
+      >
+        <Bookmark
+          style={ styles.actionIcon }
+          size={ scale(18) }
+          color={ Colors.white }
+        />
+      </ThemedPressable>
     </View>
   );
 
@@ -302,14 +303,10 @@ export function FilmPageComponent({
     if (isPendingRelease) {
       return (
         <View style={ styles.pendingRelease }>
-          <ThemedIcon
+          <Clock
             style={ styles.pendingReleaseIcon }
-            icon={ {
-              pack: IconPackType.MaterialCommunityIcons,
-              name: 'clock-outline',
-            } }
-            size={ scale(32) }
-            color="white"
+            size={ scale(24) }
+            color={ Colors.white }
           />
           <ThemedText style={ styles.pendingReleaseText }>
             { t('We are waiting for the film in the good quality') }
@@ -320,8 +317,28 @@ export function FilmPageComponent({
 
     return (
       <View style={ styles.actions }>
-        { renderPlayFilmButton() }
-        { renderAction(t('Download'), 'folder-download-outline', () => NotificationStore.displayMessage(t('Not implemented'))) }
+        <ThemedButton
+          style={ styles.playBtn }
+          onPress={ playFilm }
+          icon={ (
+            <Play
+              size={ scale(18) }
+              color={ Colors.white }
+            />
+          ) }
+        >
+          { t('Watch Now') }
+        </ThemedButton>
+        <ThemedPressable
+          style={ styles.downloadBtn }
+          onPress={ () => NotificationStore.displayMessage(t('Not implemented')) }
+        >
+          <Download
+            style={ styles.downloadBtnIcon }
+            size={ scale(18) }
+            color={ Colors.white }
+          />
+        </ThemedPressable>
       </View>
     );
   };
@@ -374,36 +391,6 @@ export function FilmPageComponent({
     );
   };
 
-  const renderScheduleOverlay = () => {
-    const { schedule = [] } = film;
-
-    return (
-      <ThemedOverlay
-        id={ scheduleOverlayId }
-        onHide={ () => goToPreviousOverlay() }
-      >
-        <ScrollView>
-          { schedule.map(({ name, items }) => (
-            <View key={ name }>
-              <ThemedText style={ styles.scheduleSeason }>
-                { name }
-              </ThemedText>
-              <View>
-                { items.map((subItem, idx) => (
-                  <ScheduleItem
-                    key={ `modal-${subItem.name}` }
-                    item={ subItem }
-                    handleUpdateScheduleWatch={ handleUpdateScheduleWatch }
-                  />
-                )) }
-              </View>
-            </View>
-          )) }
-        </ScrollView>
-      </ThemedOverlay>
-    );
-  };
-
   const renderSchedule = () => {
     const { schedule = [] } = film;
 
@@ -423,7 +410,7 @@ export function FilmPageComponent({
           )) }
         </View>
         <ThemedButton
-          onPress={ () => openOverlay(scheduleOverlayId) }
+          onPress={ openSchedule }
           style={ styles.scheduleViewAll }
         >
           { t('View full schedule') }
@@ -548,28 +535,6 @@ export function FilmPageComponent({
     );
   };
 
-  const renderComments = () => {
-    if (!commentsVisible) {
-      return null;
-    }
-
-    return (
-      <View>
-        <ScrollView
-          horizontal
-          contentContainerStyle={ { width: '100%', height: '100%' } }
-        >
-          <Section title={ t('Comments') }>
-            <Comments
-              ref={ commentsRef }
-              film={ film }
-            />
-          </Section>
-        </ScrollView>
-      </View>
-    );
-  };
-
   const renderBookmarksOverlay = () => (
     <BookmarksSelector
       overlayId={ bookmarksOverlayId }
@@ -580,12 +545,10 @@ export function FilmPageComponent({
   const renderModals = () => (
     <>
       { renderPlayerVideoSelector() }
-      { renderScheduleOverlay() }
+      { /* { renderScheduleOverlay() } */ }
       { renderBookmarksOverlay() }
     </>
   );
-
-  //onScroll={ onScroll }
 
   return (
     <Page>
@@ -603,7 +566,6 @@ export function FilmPageComponent({
         { renderSchedule() }
         { renderInfoLists() }
         { renderRelated() }
-        { /* { renderComments() } */ }
       </ScrollView>
     </Page>
   );

@@ -41,6 +41,6 @@ export default function CreateStyles<
   T extends StyleSheet.NamedStyles<T> | StyleSheet.NamedStyles<any>,
 >(styleSheet: T & StyleSheet.NamedStyles<any>, overload = {}): T {
   return StyleSheet.create(
-    objectMap(styleSheet, (value: any) => objectMap2(value, overload) as T),
+    objectMap(styleSheet, (value: any) => objectMap2(value, overload) as T)
   ) as T;
 }

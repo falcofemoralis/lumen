@@ -18,7 +18,7 @@ export const calculateLayoutWidth = (additionalWidth?: number) => {
 export const calculateItemWidth = (
   numberOfColumns: number,
   gap?: number,
-  additionalWidth?: number,
+  additionalWidth?: number
 ) => {
   const containerWidth = calculateLayoutWidth(additionalWidth);
   const pureGridWidth = containerWidth - ((gap || 0) * (numberOfColumns - 1));

@@ -73,7 +73,7 @@ export function ThemedOverlayComponent({
 
 function propsAreEqual(
   prevProps: ThemedOverlayComponentProps,
-  props: ThemedOverlayComponentProps,
+  props: ThemedOverlayComponentProps
 ) {
   return prevProps.isOpened === props.isOpened
     && prevProps.isVisible === props.isVisible

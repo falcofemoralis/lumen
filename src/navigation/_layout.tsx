@@ -69,6 +69,7 @@ export function RootLayout() {
         name="modal"
         options={ {
           presentation: 'modal',
+          animation: 'ios_from_right',
           headerShown: true,
         } }
       />
@@ -111,11 +112,7 @@ export function RootLayout() {
     );
   };
 
-  return (
-    <SafeAreaView style={ { flex: 1, backgroundColor: Colors.background } }>
-      { renderApp() }
-    </SafeAreaView>
-  );
+  return renderApp();
 }
 
 export default RootLayout;

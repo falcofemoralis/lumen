@@ -1,18 +1,24 @@
-import ThemedText from 'Component/ThemedText';
-import { StyleSheet, View } from 'react-native';
+import CommentsModal from 'Route/CommentsModal';
+import ScheduleModal from 'Route/ScheduleModal';
+import RouterStore from 'Store/Router.store';
+import { FilmInterface } from 'Type/Film.interface';
 
 export default function Modal() {
-  return (
-    <View style={ styles.container }>
-      <ThemedText>Modal screen</ThemedText>
-    </View>
-  );
-}
+  const { type, film } = RouterStore.popData('modal') as {
+    type: string;
+    film: FilmInterface;
+  };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+  console.log('type', type);
+
+  switch (type) {
+    case 'comments':
+      return <CommentsModal film={ film } />;
+    case 'schedule':
+      return <ScheduleModal film={ film } />;
+    default:
+      console.error('Unknown modal type:', type);
+
+      return null;
+  }
+}

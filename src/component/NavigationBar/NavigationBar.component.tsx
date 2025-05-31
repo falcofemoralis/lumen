@@ -3,14 +3,15 @@ import ThemedImage from 'Component/ThemedImage';
 import ThemedPressable from 'Component/ThemedPressable';
 import { useServiceContext } from 'Context/ServiceContext';
 import { Tabs } from 'expo-router';
+import { useDimensions } from 'Hooks/useDimensions';
 import { FolderHeart, History, House, Search } from 'lucide-react-native';
 import React, { useCallback } from 'react';
 import {
-  Dimensions,
   Image,
   View,
 } from 'react-native';
 import Animated from 'react-native-reanimated';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from 'Style/Colors';
 import { CONTENT_WRAPPER_PADDING } from 'Style/Layout';
 import { scale } from 'Util/CreateStyles';
@@ -28,14 +29,13 @@ import {
 
 export { Tabs } from 'expo-router';
 
-const width = Dimensions.get('window').width;
-
 export function NavigationBarComponent({
   profile,
   navigateTo,
   isFocused,
 }: NavigationBarComponentProps) {
   const { badgeData } = useServiceContext();
+  const { width } = useDimensions();
 
   const renderIcon = (route: NavigationRoute) => {
     const params = {
@@ -128,7 +128,7 @@ export function NavigationBarComponent({
         { renderComponent() }
       </ThemedPressable>
     );
-  }, [navigateTo, isFocused, renderAccountTab, renderDefaultTab]);
+  }, [navigateTo, isFocused, renderAccountTab, renderDefaultTab, width]);
 
   const renderTabs = useCallback((navigation: NavigationType, state: StateType) => (
     <View style={ styles.tabs }>
@@ -143,28 +143,30 @@ export function NavigationBarComponent({
   ), [renderTabs]);
 
   return (
-    <Tabs
-      screenOptions={ {
-        tabBarStyle: styles.tabBar,
-        headerShown: false,
-        tabBarActiveTintColor: Colors.primary,
-        tabBarInactiveTintColor: Colors.white,
-        tabBarHideOnKeyboard: true,
-        freezeOnBlur: true,
-        sceneStyle: {
-          marginHorizontal: CONTENT_WRAPPER_PADDING,
-        },
-        // lazy: false,
-      } }
-      tabBar={ renderTabBar }
-    >
-      <Tabs.Screen
-        name="settings"
-        options={ {
-          headerShown: true,
+    <SafeAreaView style={ { flex: 1, backgroundColor: Colors.background } }>
+      <Tabs
+        screenOptions={ {
+          tabBarStyle: styles.tabBar,
+          headerShown: false,
+          tabBarActiveTintColor: Colors.primary,
+          tabBarInactiveTintColor: Colors.white,
+          tabBarHideOnKeyboard: true,
+          freezeOnBlur: true,
+          sceneStyle: {
+            marginHorizontal: CONTENT_WRAPPER_PADDING,
+          },
+          // lazy: false,
         } }
-      />
-    </Tabs>
+        tabBar={ renderTabBar }
+      >
+        <Tabs.Screen
+          name="settings"
+          options={ {
+            headerShown: true,
+          } }
+        />
+      </Tabs>
+    </SafeAreaView>
   );
 }
 
