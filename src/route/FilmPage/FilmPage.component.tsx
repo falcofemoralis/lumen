@@ -418,7 +418,6 @@ export function FilmPageComponent({
             <ScheduleItem
               key={ `schedule-visible-${item.name}` }
               item={ item }
-              idx={ idx }
               handleUpdateScheduleWatch={ handleUpdateScheduleWatch }
             />
           )) }

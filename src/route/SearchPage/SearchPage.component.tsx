@@ -1,13 +1,13 @@
 import FilmPager from 'Component/FilmPager';
 import InfoBlock from 'Component/InfoBlock';
 import Page from 'Component/Page';
-import ThemedButton from 'Component/ThemedButton';
 import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedInput from 'Component/ThemedInput';
 import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import t from 'i18n/t';
+import { ArrowUpLeft, History,Mic, Search, X } from 'lucide-react-native';
 import React from 'react';
 import { View } from 'react-native';
 import { Colors } from 'Style/Colors';
@@ -48,43 +48,43 @@ export function SearchPageComponent({
         onPress={ resetSearch }
       />
       { enteredText && (
-        <ThemedButton
+        <ThemedPressable
           style={ styles.closeBtn }
-          iconStyle={ [styles.closeIcon] }
-          icon={ {
-            pack: IconPackType.MaterialCommunityIcons,
-            name: 'close',
-          } }
-          iconSize={ scale(20) }
           onPress={ clearSearch }
-        />
+        >
+          <X
+            style={ styles.closeIcon }
+            size={ scale(16) }
+            color={ Colors.white }
+          />
+        </ThemedPressable>
       ) }
     </View>
   );
 
   const renderSearchContainer = () => (
     <View style={ styles.searchContainer }>
-      <ThemedButton
+      <ThemedPressable
         style={ styles.actionBtn }
-        iconStyle={ styles.actionBtnIcon }
-        icon={ {
-          name: 'magnify',
-          pack: IconPackType.MaterialCommunityIcons,
-        } }
-        iconSize={ scale(18) }
         onPress={ handleApplySearch }
-      />
+      >
+        <Search
+          style={ styles.actionBtnIcon }
+          size={ scale(16) }
+          color={ Colors.white }
+        />
+      </ThemedPressable>
       { renderSearchBar() }
-      <ThemedButton
+      <ThemedPressable
         style={ [styles.actionBtn, recognizing && styles.speakActive] }
-        iconStyle={ [styles.actionBtnIcon, recognizing && styles.speakActiveIcon] }
-        icon={ {
-          pack: IconPackType.MaterialCommunityIcons,
-          name: 'microphone-outline',
-        } }
-        iconSize={ scale(18) }
         onPress={ handleStartRecognition }
-      />
+      >
+        <Mic
+          style={ styles.actionBtnIcon }
+          size={ scale(16) }
+          color={ Colors.white }
+        />
+      </ThemedPressable>
     </View>
   );
 
@@ -101,26 +101,18 @@ export function SearchPageComponent({
             onPress={ () => onApplySuggestion(suggestion) }
             style={ styles.suggestion }
           >
-            <ThemedIcon
+            <History
               style={ styles.suggestionIcon }
-              icon={ {
-                pack: IconPackType.MaterialCommunityIcons,
-                name: 'history',
-              } }
               size={ scale(20) }
-              color="white"
+              color={ Colors.white }
             />
             <ThemedText style={ styles.suggestionText }>
               { suggestion }
             </ThemedText>
-            <ThemedIcon
+            <ArrowUpLeft
               style={ styles.suggestionIcon }
-              icon={ {
-                pack: IconPackType.MaterialCommunityIcons,
-                name: 'arrow-top-left',
-              } }
               size={ scale(20) }
-              color="white"
+              color={ Colors.white }
             />
           </ThemedPressable>
         )) }

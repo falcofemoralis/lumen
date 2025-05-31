@@ -5,13 +5,16 @@ import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
 import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
+import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
+import { Trash2 } from 'lucide-react-native';
 import React, { memo, useCallback } from 'react';
 import {
   Pressable,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { Colors } from 'Style/Colors';
 import { RecentItemInterface } from 'Type/RecentItem.interface';
 import { scale } from 'Util/CreateStyles';
 
@@ -60,17 +63,15 @@ function RecentItem({
               </ThemedText>
             ) }
           </View>
-          <TouchableOpacity onPress={ () => removeItem(item) }>
-            <ThemedIcon
+          <ThemedPressable
+            onPress={ () => removeItem(item) }
+          >
+            <Trash2
               style={ styles.deleteButton }
-              icon={ {
-                name: 'delete',
-                pack: IconPackType.MaterialCommunityIcons,
-              } }
               size={ scale(24) }
-              color="white"
+              color={ Colors.white }
             />
-          </TouchableOpacity>
+          </ThemedPressable>
         </View>
       </View>
     </Pressable>
@@ -99,7 +100,7 @@ export function RecentPageComponent({
         removeItem={ removeItem }
       />
     ),
-    [handleOnPress],
+    [handleOnPress]
   );
 
   const renderContent = () => {

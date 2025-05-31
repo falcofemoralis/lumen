@@ -21,7 +21,7 @@ import { MAX_USER_SUGGESTIONS, SEARCH_DEBOUNCE_TIME, USER_SUGGESTIONS } from './
 export function SearchPageContainer() {
   const [query, setQuery] = useState('');
   const [suggestions, setSuggestions] = useState<string[]>(
-    safeJsonParse(miscStorage.getString(USER_SUGGESTIONS), []) || [],
+    safeJsonParse(miscStorage.getString(USER_SUGGESTIONS), []) || []
   );
   const [filmPager, setFilmPager] = useState<FilmPagerInterface>({});
   const [enteredText, setEnteredText] = useState('');
@@ -125,7 +125,7 @@ export function SearchPageContainer() {
 
     miscStorage.set(
       USER_SUGGESTIONS,
-      JSON.stringify(uniqueArray.slice(0, MAX_USER_SUGGESTIONS)),
+      JSON.stringify(uniqueArray.slice(0, MAX_USER_SUGGESTIONS))
     );
   };
 
@@ -172,7 +172,7 @@ export function SearchPageContainer() {
 
   const onLoadFilms = async (
     _menuItem: MenuItemInterface,
-    currentPage: number,
+    currentPage: number
   ) => getCurrentService().search(query, currentPage);
 
   const onUpdateFilms = async (key: string, filmList: FilmListInterface) => {

@@ -5,13 +5,16 @@ import Page from 'Component/Page';
 import ThemedButton from 'Component/ThemedButton';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
+import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import { useServiceContext } from 'Context/ServiceContext';
 import { router } from 'expo-router';
 import t from 'i18n/t';
+import { Bell, Settings } from 'lucide-react-native';
 import React from 'react';
 import { Image, View } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
+import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 
 import { styles } from './AccountPage.style';
@@ -29,34 +32,34 @@ export function AccountPageComponent({
     return (
       <View style={ styles.topBar }>
         <View>
-          <ThemedButton
+          <ThemedPressable
             style={ styles.tobBarBtn }
-            iconStyle={ styles.tobBarBtnIcon }
-            icon={ {
-              name: 'bell-outline',
-              pack: IconPackType.MaterialCommunityIcons,
-            } }
-            iconSize={ scale(24) }
             onPress={ () => router.push({
               pathname: '/(tabs)/(account)/(notifications)/notifications',
             }) }
-          />
+          >
+            <Bell
+              style={ styles.tobBarBtnIcon }
+              size={ scale(20) }
+              color={ Colors.white }
+            />
+          </ThemedPressable>
           { badge > 0 && (
             <View style={ styles.badge } />
           ) }
         </View>
-        <ThemedButton
+        <ThemedPressable
           style={ styles.tobBarBtn }
-          iconStyle={ styles.tobBarBtnIcon }
-          icon={ {
-            name: 'settings-outline',
-            pack: IconPackType.Ionicons,
-          } }
-          iconSize={ scale(24) }
           onPress={ () => router.push({
             pathname: '/(tabs)/(account)/settings',
           }) }
-        />
+        >
+          <Settings
+            style={ styles.tobBarBtnIcon }
+            size={ scale(20) }
+            color={ Colors.white }
+          />
+        </ThemedPressable>
       </View>
     );
   };

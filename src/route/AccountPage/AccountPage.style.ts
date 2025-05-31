@@ -10,10 +10,13 @@ export const styles = CreateStyles({
   },
   tobBarBtn: {
     backgroundColor: Colors.transparent,
+    width: 32,
+    height: 32,
+    borderRadius: 50,
   },
   tobBarBtnIcon: {
-    width: 24,
-    height: 24,
+    width: 20,
+    height: 20,
   },
   badge: {
     backgroundColor: Colors.secondary,
