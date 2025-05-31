@@ -136,10 +136,6 @@ export function FilmPagerComponent({
         key={ title }
         variant="outlined"
         isSelected={ selectedTitle === title }
-        icon={ {
-          name: 'dot-fill',
-          pack: IconPackType.Octicons,
-        } }
         onFocus={ () => handleMenuItemChange(item) }
       >
         { title }

@@ -1,6 +1,5 @@
 import { BottomTabNavigationEventMap } from '@react-navigation/bottom-tabs';
 import { NavigationHelpers, ParamListBase, TabNavigationState } from '@react-navigation/native';
-import { IconInterface } from 'Component/ThemedIcon/ThemedIcon.type';
 import { RelativePathString } from 'expo-router';
 import { ProfileInterface } from 'Type/Profile.interface';
 
@@ -37,8 +36,6 @@ export interface NavigationBarComponentProps {
 export interface Tab {
   route: NavigationRoute;
   title: string;
-  icon?: IconInterface;
-  iconFocused?: IconInterface;
   options?: {
     href?: RelativePathString | null;
   };
