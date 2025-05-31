@@ -6,6 +6,7 @@ import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
 import t from 'i18n/t';
+import { ThumbsUp } from 'lucide-react-native';
 import { memo, useCallback } from 'react';
 import { View } from 'react-native';
 import { Colors } from 'Style/Colors';
@@ -64,11 +65,7 @@ export function CommentItem({
               <ThemedText style={ styles.commentTextSmall }>
                 { likes }
               </ThemedText>
-              <ThemedIcon
-                icon={ {
-                  pack: IconPackType.MaterialCommunityIcons,
-                  name: 'thumb-up-outline',
-                } }
+              <ThumbsUp
                 size={ scale(16) }
                 color={ Colors.white }
               />
@@ -99,7 +96,7 @@ export const CommentsComponent = ({
         idx={ index }
       />
     ),
-    [],
+    []
   );
 
   if (!comments || (isLoading && !comments.length)) {

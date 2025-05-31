@@ -1,9 +1,9 @@
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import ThemedIcon from 'Component/ThemedIcon';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedPressable from 'Component/ThemedPressable';
 import { useServiceContext } from 'Context/ServiceContext';
 import { Tabs } from 'expo-router';
+import { FolderHeart, History, House, Search } from 'lucide-react-native';
 import React, { useCallback } from 'react';
 import {
   Dimensions,
@@ -15,10 +15,11 @@ import { Colors } from 'Style/Colors';
 import { CONTENT_WRAPPER_PADDING } from 'Style/Layout';
 import { scale } from 'Util/CreateStyles';
 
-import { TABS_MOBILE_CONFIG } from './NavigationBar.config';
+import { BOOKMARKS_ROUTE, HOME_ROUTE, RECENT_ROUTE, SEARCH_ROUTE, TABS_MOBILE_CONFIG } from './NavigationBar.config';
 import { styles, TAB_ADDITIONAL_SIZE } from './NavigationBar.style';
 import {
   NavigationBarComponentProps,
+  NavigationRoute,
   NavigationType,
   StateType,
   Tab,
@@ -36,19 +37,31 @@ export function NavigationBarComponent({
 }: NavigationBarComponentProps) {
   const { badgeData } = useServiceContext();
 
-  const renderDefaultTab = useCallback((tab: Tab, focused: boolean) => {
-    const { icon } = tab;
+  const renderIcon = (route: NavigationRoute) => {
+    const params = {
+      style: styles.tabIcon,
+      size: scale(24),
+      color: Colors.white,
+    };
 
+    switch(route) {
+      case HOME_ROUTE:
+        return <House { ...params } />;
+      case SEARCH_ROUTE:
+        return <Search { ...params } />;
+      case BOOKMARKS_ROUTE:
+        return <FolderHeart { ...params } />;
+      case RECENT_ROUTE:
+        return <History { ...params } />;
+      default:
+        return null;
+    }
+  };
+
+  const renderDefaultTab = useCallback((tab: Tab, focused: boolean) => {
     return (
       <Animated.View style={ [styles.tab, focused && styles.tabFocused] }>
-        { icon && (
-          <ThemedIcon
-            style={ styles.tabIcon }
-            icon={ icon }
-            size={ scale(24) }
-            color="white"
-          />
-        ) }
+        { renderIcon(tab.route) }
       </Animated.View>
     );
   }, []);

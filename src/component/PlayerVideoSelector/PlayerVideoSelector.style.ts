@@ -61,6 +61,8 @@ export const styles = CreateStyles({
   },
   voiceRatingInputContainer: {
     borderRadius: 50,
+    width: 36,
+    height: 36,
   },
   voiceDropdownInputIcon: {
     flex: 1,

@@ -5,8 +5,10 @@ import ThemedDropdown from 'Component/ThemedDropdown';
 import ThemedIcon from 'Component/ThemedIcon';
 import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedOverlay from 'Component/ThemedOverlay';
+import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import t from 'i18n/t';
+import { CircleHelp } from 'lucide-react-native';
 import React, { useRef } from 'react';
 import {
   Button,
@@ -49,23 +51,19 @@ export function PlayerVideoSelectorComponent({
 
     return (
       <>
-        <TouchableOpacity
+        <ThemedPressable
           onPress={ () => bottomSheetRef.current?.present() }
           style={ styles.voiceRatingInputContainer }
         >
-          <ThemedIcon
+          <CircleHelp
             style={ [
               styles.voiceDropdownInputIcon,
               seasons.length ? styles.voiceDropdownInputIconSeason : undefined,
             ] }
-            icon={ {
-              pack: IconPackType.Octicons,
-              name: 'question',
-            } }
             size={ scale(24) }
             color={ Colors.white }
           />
-        </TouchableOpacity>
+        </ThemedPressable>
         <ThemedBottomSheet ref={ bottomSheetRef }>
           <ScrollView style={ styles.voiceRatingContainer }>
             { voiceRating.map((item) => (

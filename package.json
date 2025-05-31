@@ -15,7 +15,6 @@
   "dependencies": {
     "@bam.tech/lrud": "^8.0.2",
     "@expo/metro-runtime": "5.0.4",
-    "@expo/vector-icons": "^14.1.0",
     "@kolking/react-native-rating": "^1.4.1",
     "@legendapp/list": "^1.0.14",
     "@lodev09/react-native-true-sheet": "^2.0.5",

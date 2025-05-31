@@ -8,19 +8,19 @@ export const styles = CreateStyles({
   iconContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  icon: {
-    backgroundColor: Colors.backgroundLighter,
+    alignSelf: 'center',
+    backgroundColor: Colors.backgroundLight,
     borderRadius: 99,
-    padding: 8,
+    width: 36,
+    height: 36,
   },
   title: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: '700',
     textAlign: 'center',
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 14,
     color: Colors.textSecondary,
     textAlign: 'center',
   },

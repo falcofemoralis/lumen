@@ -393,7 +393,6 @@ export function FilmPageComponent({
                   <ScheduleItem
                     key={ `modal-${subItem.name}` }
                     item={ subItem }
-                    idx={ idx }
                     handleUpdateScheduleWatch={ handleUpdateScheduleWatch }
                   />
                 )) }

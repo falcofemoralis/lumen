@@ -110,12 +110,12 @@ export function PlayerComponent({
   useEffect(() => {
     ScreenOrientation.lockAsync(OrientationLock.LANDSCAPE);
     NavigationBar.setVisibilityAsync('hidden');
-    StatusBar.setStatusBarHidden(true, 'slide')
+    StatusBar.setStatusBarHidden(true, 'slide');
 
     return () => {
       ScreenOrientation.unlockAsync();
       NavigationBar.setVisibilityAsync('visible');
-      StatusBar.setStatusBarHidden(false, 'slide')
+      StatusBar.setStatusBarHidden(false, 'slide');
 
       if (controlsTimeout.current) {
         clearTimeout(controlsTimeout.current);
@@ -220,7 +220,7 @@ export function PlayerComponent({
   const renderAction = (
     icon: string,
     _name: string,
-    action?: () => void,
+    action?: () => void
   ) => (
     <GestureDetector gesture={ Gesture.Tap() }>
       <TouchableOpacity onPress={ () => handleUserInteraction(action) }>
@@ -277,7 +277,7 @@ export function PlayerComponent({
     return renderAction(
       selectedSubtitle?.languageCode === '' ? 'closed-caption-outline' : 'closed-caption',
       'Subtitles',
-      openSubtitleSelector,
+      openSubtitleSelector
     );
   };
 
@@ -301,7 +301,7 @@ export function PlayerComponent({
   const renderMiddleControl = (
     icon: IconInterface,
     action: () => void,
-    size: MiddleActionVariant = 'small',
+    size: MiddleActionVariant = 'small'
   ) => (
     <GestureDetector gesture={ Gesture.Tap() }>
       <TouchableOpacity
@@ -330,7 +330,7 @@ export function PlayerComponent({
             name: 'skip-previous',
             pack: IconPackType.MaterialIcons,
           },
-          () => handleNewEpisode(RewindDirection.BACKWARD),
+          () => handleNewEpisode(RewindDirection.BACKWARD)
         ) }
         { renderMiddleControl(
           {
@@ -338,14 +338,14 @@ export function PlayerComponent({
             pack: IconPackType.MaterialCommunityIcons,
           },
           togglePlayPause,
-          'big',
+          'big'
         ) }
         { film.hasSeasons && renderMiddleControl(
           {
             name: 'skip-next',
             pack: IconPackType.MaterialIcons,
           },
-          () => handleNewEpisode(RewindDirection.FORWARD),
+          () => handleNewEpisode(RewindDirection.FORWARD)
         ) }
       </View>
     );
@@ -489,7 +489,7 @@ export function PlayerComponent({
     <GestureDetector
       gesture={ Gesture.Exclusive(
         doubleTap,
-        singleTap,
+        singleTap
         // longPressGesture,
       ) }
     >

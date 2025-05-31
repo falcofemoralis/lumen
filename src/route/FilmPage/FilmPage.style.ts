@@ -201,11 +201,10 @@ export const styles = CreateStyles({
     justifyContent: 'space-between',
     width: '100%',
     gap: 8,
-    padding: 8,
+    padding: 12,
+    marginVertical: 4,
     borderRadius: 16,
-  },
-  scheduleItemEven: {
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.backgroundLight,
   },
   scheduleItemInfoWrapper: {
     flexDirection: 'column',
@@ -233,8 +232,10 @@ export const styles = CreateStyles({
     textAlign: 'center',
   },
   scheduleItemMarkIcon: {
-    width: 32,
+    width: 40,
+    height: 40,
     alignSelf: 'center',
+    borderRadius: 100,
   },
   scheduleSeason: {
     fontSize: 18,

@@ -1,9 +1,9 @@
 import FilmCard from 'Component/FilmCard';
-import ThemedIcon from 'Component/ThemedIcon';
-import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
+import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import t from 'i18n/t';
+import { CircleCheck, Star } from 'lucide-react-native';
 import { memo, useCallback } from 'react';
 import {
   Pressable, TouchableHighlight, TouchableOpacity, View,
@@ -68,11 +68,7 @@ export const ActorView = memo(({
           />
           { isDirector && (
             <View style={ styles.director }>
-              <ThemedIcon
-                icon={ {
-                  pack: IconPackType.MaterialIcons,
-                  name: 'stars',
-                } }
+              <Star
                 size={ scale(12) }
                 color="yellow"
               />
@@ -98,18 +94,16 @@ export const ActorView = memo(({
     </TouchableHighlight>
   );
 }, (
-  prevProps: ActorProps, nextProps: ActorProps,
+  prevProps: ActorProps, nextProps: ActorProps
 ) => prevProps.actor.name === nextProps.actor.name);
 
 interface ScheduleItemProps {
   item: ScheduleItemInterface,
-  idx: number
   handleUpdateScheduleWatch: (scheduleItem: ScheduleItemInterface) => void
 }
 
 export const ScheduleItem = memo(({
   item,
-  idx,
   handleUpdateScheduleWatch,
 }: ScheduleItemProps) => {
   const {
@@ -127,12 +121,7 @@ export const ScheduleItem = memo(({
   }, [handleUpdateScheduleWatch, item]);
 
   return (
-    <View
-      style={ [
-        styles.scheduleItem,
-        idx % 2 === 0 && styles.scheduleItemEven,
-      ] }
-    >
+    <View style={ styles.scheduleItem }>
       <View style={ styles.scheduleItemInfoWrapper }>
         <View style={ styles.scheduleItemEpisodeWrapper }>
           <ThemedText style={ [
@@ -161,19 +150,15 @@ export const ScheduleItem = memo(({
       </View>
       <View style={ styles.scheduleItemReleaseWrapper }>
         { isReleased ? (
-          <TouchableOpacity
+          <ThemedPressable
+            style={ styles.scheduleItemMarkIcon }
             onPress={ handlePress }
           >
-            <ThemedIcon
-              style={ styles.scheduleItemMarkIcon }
-              icon={ {
-                name: 'checkbox-marked-circle-outline',
-                pack: IconPackType.MaterialCommunityIcons,
-              } }
-              size={ scale(32) }
+            <CircleCheck
+              size={ scale(24) }
               color={ isWatched ? Colors.secondary : Colors.white }
             />
-          </TouchableOpacity>
+          </ThemedPressable>
         ) : (
           <ThemedText
             style={ [
@@ -188,7 +173,7 @@ export const ScheduleItem = memo(({
     </View>
   );
 }, (
-  prevProps: ScheduleItemProps, nextProps: ScheduleItemProps,
+  prevProps: ScheduleItemProps, nextProps: ScheduleItemProps
 ) => prevProps.item.name === nextProps.item.name
   && prevProps.item.isWatched === nextProps.item.isWatched);
 
@@ -242,7 +227,7 @@ export const FranchiseItemComponent = memo(({
     </TouchableOpacity>
   );
 }, (
-  prevProps: FranchiseItemProps, nextProps: FranchiseItemProps,
+  prevProps: FranchiseItemProps, nextProps: FranchiseItemProps
 ) => prevProps.item.link === nextProps.item.link);
 
 interface InfoListProps {
@@ -274,7 +259,7 @@ export const InfoList = memo(({
     </TouchableOpacity>
   );
 }, (
-  prevProps: InfoListProps, nextProps: InfoListProps,
+  prevProps: InfoListProps, nextProps: InfoListProps
 ) => prevProps.list.link === nextProps.list.link);
 
 interface RelatedItemProps {
@@ -295,5 +280,5 @@ export const RelatedItem = memo(({
     />
   </Pressable>
 ), (
-  prevProps: RelatedItemProps, nextProps: RelatedItemProps,
+  prevProps: RelatedItemProps, nextProps: RelatedItemProps
 ) => prevProps.item.id === nextProps.item.id);

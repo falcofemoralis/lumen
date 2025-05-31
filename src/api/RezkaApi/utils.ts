@@ -40,7 +40,7 @@ export const parseFilmCard = (el: HTMLElementInterface): FilmCardInterface => {
   const subtitle = el.querySelector('.b-content__inline_item-link div')?.rawText ?? '';
   const info = (el.querySelector('.b-content__inline_item-cover .info')?.rawText ?? '').replaceAll(
     '<br/>',
-    ', ',
+    ', '
   );
 
   return {
@@ -100,7 +100,7 @@ export const parseSeasons = (root: HTMLElementInterface): {
     lastEpisodeId: undefined,
   };
 
-  root.querySelectorAll('li.b-simple_season__item').forEach((el) => {
+  root.querySelectorAll('.b-simple_season__item').forEach((el) => {
     const seasonId = el.attributes['data-tab_id'];
     const episodes: EpisodeInterface[] = [];
 
@@ -163,7 +163,7 @@ export const parseFilmsListRoot = (root: HTMLElementInterface): FilmListInterfac
 export const parseSubtitles = (
   subtitle: string | undefined,
   subtitleDef: string,
-  subtitleLns: SubtitleLns,
+  subtitleLns: SubtitleLns
 ): SubtitleInterface[] => {
   if (!subtitle) {
     return [];
@@ -201,7 +201,7 @@ export const parseSubtitles = (
 
 export const parseActorCard = (
   node: HTMLElementInterface,
-  isDirector?: boolean,
+  isDirector?: boolean
 ): ActorCardInterface => {
   const name = node.querySelector('span')?.rawText ?? '';
   const photo = node.attributes['data-photo'];

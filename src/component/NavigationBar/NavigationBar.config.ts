@@ -23,10 +23,6 @@ export const TABS_TV_CONFIG: Tab[] = [
   {
     route: ACCOUNT_ROUTE,
     title: t('You'),
-    icon: {
-      name: 'home-variant-outline',
-      pack: IconPackType.MaterialCommunityIcons,
-    },
     position: TAB_POSITION.TOP,
     tabComponent: TAB_COMPONENT.ACCOUNT,
   },

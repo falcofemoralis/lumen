@@ -23,15 +23,15 @@ export function PlayerVideoSelectorContainer({
   const { goToPreviousOverlay } = useOverlayContext();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedVoice, setSelectedVoice] = useState<FilmVoiceInterface>(
-    voiceInput ?? voices.find(({ isActive }) => isActive) ?? voices[0],
+    voiceInput ?? voices.find(({ isActive }) => isActive) ?? voices[0]
   );
   const { isSignedIn, getCurrentService } = useServiceContext();
 
   const [selectedSeasonId, setSelectedSeasonId] = useState<string | undefined>(
-    selectedVoice.lastSeasonId,
+    selectedVoice.lastSeasonId
   );
   const [selectedEpisodeId, setSelectedEpisodeId] = useState<string | undefined>(
-    selectedVoice.lastEpisodeId,
+    selectedVoice.lastEpisodeId
   );
 
   const getStoreVoice = () => {
@@ -152,7 +152,7 @@ export function PlayerVideoSelectorContainer({
           film,
           selectedVoice,
           selectedSeasonId ?? '1',
-          episodeId,
+          episodeId
         );
 
       const voice = {

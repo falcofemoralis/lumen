@@ -1,7 +1,7 @@
-import ThemedIcon from 'Component/ThemedIcon';
-import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedText from 'Component/ThemedText';
+import { Info } from 'lucide-react-native';
 import { View } from 'react-native';
+import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 
 import { styles } from './InfoBlock.style.atv';
@@ -14,14 +14,9 @@ export function InfoBlockComponent({
   return (
     <View style={ styles.container }>
       <View style={ styles.iconContainer }>
-        <ThemedIcon
-          style={ styles.icon }
-          icon={ {
-            pack: IconPackType.MaterialCommunityIcons,
-            name: 'information-outline',
-          } }
+        <Info
           size={ scale(24) }
-          color="white"
+          color={ Colors.white }
         />
       </View>
       <ThemedText style={ styles.title }>
