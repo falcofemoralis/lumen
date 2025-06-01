@@ -1,10 +1,9 @@
 import Loader from 'Component/Loader';
 import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
-import ThemedIcon from 'Component/ThemedIcon';
-import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
 import t from 'i18n/t';
+import { ThumbsUp } from 'lucide-react-native';
 import {
   memo,
   useCallback,
@@ -110,11 +109,7 @@ export function CommentItem({
                   >
                     { likes }
                   </ThemedText>
-                  <ThemedIcon
-                    icon={ {
-                      pack: IconPackType.MaterialCommunityIcons,
-                      name: 'thumb-up-outline',
-                    } }
+                  <ThumbsUp
                     size={ scale(16) }
                     color={ Colors.white }
                   />
@@ -161,7 +156,7 @@ export const CommentsComponent = ({
       } else if ((word.length * charWidth) > width) {
         // if the word is longer than the width, split the word
         let splitWord = '';
-        // eslint-disable-next-line no-plusplus
+
         for (let i = 0; i < word.length; i++) {
           if ((splitWord.length + 1) * charWidth > width) {
             lines.push(splitWord);
@@ -220,11 +215,11 @@ export const CommentsComponent = ({
   }, {} as Record<string, CalculatedText>), [comments, calculateItemSize]);
 
   const getCalculatedItemSize = useCallback((
-    item: CommentInterface,
+    item: CommentInterface
   ) => commentCalculatedHeights[item.id].height, [commentCalculatedHeights]);
 
   const getCalculatedItemLines = useCallback((
-    item: CommentInterface,
+    item: CommentInterface
   ) => commentCalculatedHeights[item.id].lines ?? [], [commentCalculatedHeights]);
 
   const renderItem = useCallback(({ item, index }: ThemedGridRowProps<CommentInterface>) => (

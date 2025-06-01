@@ -50,7 +50,7 @@ export function LoginFormComponent({
           style={ styles.button }
           onPress={ () => handleLogin(
             loginRef.current.username,
-            loginRef.current.password,
+            loginRef.current.password
           ) }
         >
           { t('Sign in') }

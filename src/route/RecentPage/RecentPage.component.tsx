@@ -2,8 +2,6 @@ import LoginForm from 'Component/LoginForm';
 import Page from 'Component/Page';
 import ThemedGrid from 'Component/ThemedGrid';
 import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
-import ThemedIcon from 'Component/ThemedIcon';
-import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
@@ -11,7 +9,6 @@ import { Trash2 } from 'lucide-react-native';
 import React, { memo, useCallback } from 'react';
 import {
   Pressable,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import { Colors } from 'Style/Colors';

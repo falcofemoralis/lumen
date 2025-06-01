@@ -1,11 +1,10 @@
 import FilmCard from 'Component/FilmCard';
 import ThemedCard from 'Component/ThemedCard';
-import ThemedIcon from 'Component/ThemedIcon';
-import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
 import { useOverlayContext } from 'Context/OverlayContext';
 import t from 'i18n/t';
+import { Star } from 'lucide-react-native';
 import { memo } from 'react';
 import { View } from 'react-native';
 import { SpatialNavigationFocusableView } from 'react-tv-space-navigation';
@@ -68,11 +67,7 @@ export const ActorView = memo(({
             />
             { isDirector && (
               <View style={ styles.director }>
-                <ThemedIcon
-                  icon={ {
-                    pack: IconPackType.MaterialIcons,
-                    name: 'stars',
-                  } }
+                <Star
                   size={ scale(12) }
                   color="yellow"
                 />
@@ -105,7 +100,7 @@ export const ActorView = memo(({
     </SpatialNavigationFocusableView>
   );
 }, (
-  prevProps: ActorProps, nextProps: ActorProps,
+  prevProps: ActorProps, nextProps: ActorProps
 ) => prevProps.actor.name === nextProps.actor.name);
 
 interface ScheduleItemProps {
@@ -187,7 +182,7 @@ export const ScheduleItem = memo(({
     </SpatialNavigationFocusableView>
   );
 }, (
-  prevProps: ScheduleItemProps, nextProps: ScheduleItemProps,
+  prevProps: ScheduleItemProps, nextProps: ScheduleItemProps
 ) => prevProps.item.name === nextProps.item.name);
 
 interface FranchiseItemProps {
@@ -262,7 +257,7 @@ export const FranchiseItemComponent = memo(({
     </SpatialNavigationFocusableView>
   );
 }, (
-  prevProps: FranchiseItemProps, nextProps: FranchiseItemProps,
+  prevProps: FranchiseItemProps, nextProps: FranchiseItemProps
 ) => prevProps.item.link === nextProps.item.link);
 
 interface InfoListProps {
@@ -305,7 +300,7 @@ export const InfoList = memo(({
     </SpatialNavigationFocusableView>
   );
 }, (
-  prevProps: InfoListProps, nextProps: InfoListProps,
+  prevProps: InfoListProps, nextProps: InfoListProps
 ) => prevProps.list.link === nextProps.list.link);
 
 interface RelatedItemProps {
@@ -330,5 +325,5 @@ export const RelatedItem = memo(({
     ) }
   </SpatialNavigationFocusableView>
 ), (
-  prevProps: RelatedItemProps, nextProps: RelatedItemProps,
+  prevProps: RelatedItemProps, nextProps: RelatedItemProps
 ) => prevProps.item.id === nextProps.item.id);

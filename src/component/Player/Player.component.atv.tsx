@@ -7,8 +7,6 @@ import PlayerProgressBar from 'Component/PlayerProgressBar';
 import PlayerSubtitles from 'Component/PlayerSubtitles';
 import PlayerVideoSelector from 'Component/PlayerVideoSelector';
 import ThemedDropdown from 'Component/ThemedDropdown';
-import ThemedIcon from 'Component/ThemedIcon';
-import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedText from 'Component/ThemedText';
 import { useOverlayContext } from 'Context/OverlayContext';
@@ -16,7 +14,9 @@ import { usePlayerContext } from 'Context/PlayerContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { VideoView } from 'expo-video';
 import t from 'i18n/t';
+import { Bookmark, Captions, CaptionsOff, FastForward, Gauge, ListVideo, MessageSquareText, Pause, Play, Rewind, SkipBack, SkipForward, Sparkles } from 'lucide-react-native';
 import React, {
+  Ref,
   useEffect,
   useRef,
   useState,
@@ -32,6 +32,7 @@ import {
   SpatialNavigationNodeRef,
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
+import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 import { setTimeoutSafe } from 'Util/Misc';
 import RemoteControlManager from 'Util/RemoteControl/RemoteControlManager';
@@ -99,7 +100,7 @@ export function PlayerComponent({
         if (!showControls && hideActions && finished) {
           runOnJS(setHideActions)(false);
         }
-      },
+      }
     ),
   }));
 
@@ -189,7 +190,7 @@ export function PlayerComponent({
 
     const backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
-      backAction,
+      backAction
     );
 
     return () => {
@@ -261,11 +262,10 @@ export function PlayerComponent({
   };
 
   const renderAction = (
-    icon: string,
-    _name: string,
+    IconComponent: React.ComponentType<any>,
     el: FocusedElement,
     action?: () => void,
-    ref?: React.LegacyRef<SpatialNavigationNodeRef>,
+    ref?: Ref<SpatialNavigationNodeRef>
   ) => (
     <SpatialNavigationFocusableView
       ref={ ref }
@@ -273,46 +273,38 @@ export function PlayerComponent({
       onFocus={ () => handleUserInteraction(() => { updateFocusedElement(el); }) }
     >
       { ({ isFocused }) => (
-        <ThemedIcon
+        <IconComponent
           style={ [
             styles.action,
             isFocused && styles.focusedAction,
           ] }
-          icon={ {
-            name: icon,
-            pack: IconPackType.MaterialIcons,
-          } }
           size={ scale(30) }
-          color="white"
+          color={ Colors.white }
         />
       ) }
     </SpatialNavigationFocusableView>
   );
 
   const renderTopAction = (
-    icon: string,
-    name: string,
+    icon: React.ComponentType<any>,
     action?: () => void,
-    ref?: React.LegacyRef<SpatialNavigationNodeRef>,
+    ref?: Ref<SpatialNavigationNodeRef>
   ) => renderAction(
     icon,
-    name,
     FocusedElement.TOP_ACTION,
     action,
-    ref,
+    ref
   );
 
   const renderBottomAction = (
-    icon: string,
-    name: string,
+    icon: React.ComponentType<any>,
     action?: () => void,
-    ref?: React.LegacyRef<SpatialNavigationNodeRef>,
+    ref?: Ref<SpatialNavigationNodeRef>
   ) => renderAction(
     icon,
-    name,
     FocusedElement.BOTTOM_ACTION,
     action,
-    ref,
+    ref
   );
 
   const renderTopActions = () => (
@@ -324,22 +316,17 @@ export function PlayerComponent({
       } }
     >
       <View style={ styles.controlsRow }>
-        { renderTopAction(
-          isPlaying || isLoading ? 'pause' : 'play-arrow',
-          'Play',
-          togglePlayPause,
-          topActionRef,
-        ) }
-        { renderTopAction('fast-rewind', 'Rewind', () => rewindPosition(RewindDirection.BACKWARD)) }
-        { renderTopAction('fast-forward', 'Forward', () => rewindPosition(RewindDirection.FORWARD)) }
+        { renderTopAction(isPlaying || isLoading ? Pause : Play, togglePlayPause, topActionRef) }
+        { renderTopAction(Rewind, () => rewindPosition(RewindDirection.BACKWARD)) }
+        { renderTopAction(FastForward, () => rewindPosition(RewindDirection.FORWARD)) }
         { film.hasSeasons && (
           <>
-            { renderTopAction('skip-previous', 'Previous', () => handleNewEpisode(RewindDirection.BACKWARD)) }
-            { renderTopAction('skip-next', 'Next', () => handleNewEpisode(RewindDirection.FORWARD)) }
+            { renderTopAction(SkipBack, () => handleNewEpisode(RewindDirection.BACKWARD)) }
+            { renderTopAction(SkipForward, () => handleNewEpisode(RewindDirection.FORWARD)) }
           </>
         ) }
-        { renderTopAction('speed', 'Speed', openSpeedSelector) }
-        { renderTopAction('comment', 'Comments', openCommentsOverlay) }
+        { renderTopAction(Gauge, openSpeedSelector) }
+        { renderTopAction(MessageSquareText, openCommentsOverlay) }
       </View>
       <PlayerClock />
     </SpatialNavigationView>
@@ -405,10 +392,10 @@ export function PlayerComponent({
             ...(hideActions ? styles.controlsRowHidden : {}),
           } }
         >
-          { renderBottomAction('high-quality', 'Quality', openQualitySelector, bottomActionRef) }
-          { isPlaylistSelector && renderBottomAction('playlist-play', 'Series', openVideoSelector) }
-          { subtitles.length > 0 && renderBottomAction('subtitles', 'Subtitles', openSubtitleSelector) }
-          { renderBottomAction('bookmarks', 'Bookmarks', openBookmarksOverlay) }
+          { renderBottomAction(Sparkles, openQualitySelector, bottomActionRef) }
+          { isPlaylistSelector && renderBottomAction(ListVideo, openVideoSelector) }
+          { subtitles.length > 0 && renderBottomAction(selectedSubtitle?.languageCode === '' ? Captions : CaptionsOff, openSubtitleSelector) }
+          { renderBottomAction(Bookmark, openBookmarksOverlay) }
         </SpatialNavigationView>
         { renderDuration() }
       </View>

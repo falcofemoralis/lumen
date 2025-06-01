@@ -7,9 +7,8 @@ import PlayerProgressBar from 'Component/PlayerProgressBar';
 import PlayerSubtitles from 'Component/PlayerSubtitles';
 import PlayerVideoSelector from 'Component/PlayerVideoSelector';
 import ThemedDropdown from 'Component/ThemedDropdown';
-import ThemedIcon from 'Component/ThemedIcon';
-import { IconInterface, IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedOverlay from 'Component/ThemedOverlay';
+import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import { useOverlayContext } from 'Context/OverlayContext';
 import * as NavigationBar from 'expo-navigation-bar';
@@ -18,6 +17,7 @@ import { OrientationLock } from 'expo-screen-orientation';
 import * as StatusBar from 'expo-status-bar';
 import { isPictureInPictureSupported, VideoView } from 'expo-video';
 import t from 'i18n/t';
+import { Bookmark, Captions, CaptionsOff, Gauge, ListVideo, LockKeyhole, LockKeyholeOpen, MessageSquareText, Pause, PictureInPicture2, Play, Share2, SkipBack, SkipForward, Sparkles } from 'lucide-react-native';
 import React, {
   useEffect, useRef, useState,
 } from 'react';
@@ -32,6 +32,7 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
+import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 import { setTimeoutSafe } from 'Util/Misc';
 
@@ -218,21 +219,18 @@ export function PlayerComponent({
   };
 
   const renderAction = (
-    icon: string,
-    _name: string,
+    IconComponent: React.ComponentType<any>,
     action?: () => void
   ) => (
     <GestureDetector gesture={ Gesture.Tap() }>
-      <TouchableOpacity onPress={ () => handleUserInteraction(action) }>
-        <ThemedIcon
-          icon={ {
-            name: icon,
-            pack: IconPackType.MaterialCommunityIcons,
-          } }
+      <ThemedPressable
+        onPress={ () => handleUserInteraction(action) }
+      >
+        <IconComponent
           size={ scale(28) }
-          color="white"
+          color={ Colors.white }
         />
-      </TouchableOpacity>
+      </ThemedPressable>
     </GestureDetector>
   );
 
@@ -274,11 +272,7 @@ export function PlayerComponent({
       return null;
     }
 
-    return renderAction(
-      selectedSubtitle?.languageCode === '' ? 'closed-caption-outline' : 'closed-caption',
-      'Subtitles',
-      openSubtitleSelector
-    );
+    return renderAction(selectedSubtitle?.languageCode === '' ? Captions : CaptionsOff, openSubtitleSelector);
   };
 
   const renderTopActions = () => (
@@ -287,34 +281,33 @@ export function PlayerComponent({
       <View style={ styles.actionsRow }>
         { !isLocked && (
           <>
-            { isPictureInPictureSupported() && renderAction('picture-in-picture-bottom-right', 'PIP', enablePIP) }
-            { renderAction('play-speed', 'Speed', openSpeedSelector) }
-            { renderAction('quality-high', 'Quality', openQualitySelector) }
+            { isPictureInPictureSupported() && renderAction(PictureInPicture2, enablePIP) }
+            { renderAction(Gauge, openSpeedSelector) }
+            { renderAction(Sparkles, openQualitySelector) }
             { renderSubtitlesActions() }
           </>
         ) }
-        { renderAction(!isLocked ? 'lock-open-outline' : 'lock-outline', 'Lock', handleLockControls) }
+        { renderAction(!isLocked ? LockKeyholeOpen : LockKeyhole, handleLockControls) }
       </View>
     </View>
   );
 
   const renderMiddleControl = (
-    icon: IconInterface,
+    IconComponent: React.ComponentType<any>,
     action: () => void,
     size: MiddleActionVariant = 'small'
   ) => (
     <GestureDetector gesture={ Gesture.Tap() }>
-      <TouchableOpacity
+      <ThemedPressable
         style={ styles.control }
         onPress={ () => handleUserInteraction(action) }
       >
-        <ThemedIcon
+        <IconComponent
           style={ styles.controlIcon }
-          icon={ icon }
           size={ scale(size === 'big' ? 36 : 24) }
-          color="white"
+          color={ Colors.white }
         />
-      </TouchableOpacity>
+      </ThemedPressable>
     </GestureDetector>
   );
 
@@ -326,25 +319,16 @@ export function PlayerComponent({
     return (
       <View style={ styles.middleActions }>
         { film.hasSeasons && renderMiddleControl(
-          {
-            name: 'skip-previous',
-            pack: IconPackType.MaterialIcons,
-          },
+          SkipBack,
           () => handleNewEpisode(RewindDirection.BACKWARD)
         ) }
         { renderMiddleControl(
-          {
-            name: isPlaying || isLoading ? 'pause' : 'play',
-            pack: IconPackType.MaterialCommunityIcons,
-          },
+          isPlaying || isLoading ? Pause : Play,
           togglePlayPause,
           'big'
         ) }
         { film.hasSeasons && renderMiddleControl(
-          {
-            name: 'skip-next',
-            pack: IconPackType.MaterialIcons,
-          },
+          SkipForward,
           () => handleNewEpisode(RewindDirection.FORWARD)
         ) }
       </View>
@@ -411,10 +395,10 @@ export function PlayerComponent({
               isLocked && styles.bottomActionsRowLocked,
             ] }
           >
-            { isPlaylistSelector && renderAction('playlist-play', 'Series', openVideoSelector) }
-            { renderAction('comment-text-outline', 'Comments', openCommentsOverlay) }
-            { renderAction('bookmark-outline', 'Bookmarks', openBookmarksOverlay) }
-            { renderAction('share-outline', 'Share', handleShare) }
+            { isPlaylistSelector && renderAction(ListVideo, openVideoSelector) }
+            { renderAction(MessageSquareText, openCommentsOverlay) }
+            { renderAction(Bookmark, openBookmarksOverlay) }
+            { renderAction(Share2, handleShare) }
           </View>
         </View>
       </View>
@@ -443,7 +427,7 @@ export function PlayerComponent({
           },
         ] }
         >
-          <ThemedIcon
+          { /* <ThemedIcon
             style={ styles.doubleTapIcon }
             icon={ {
               name: direction === RewindDirection.BACKWARD ? 'rewind-outline' : 'fast-forward-outline',
@@ -451,7 +435,7 @@ export function PlayerComponent({
             } }
             size={ scale(24) }
             color="white"
-          />
+          /> */ }
           <ThemedText style={ styles.longTapText }>
             { `${direction === RewindDirection.BACKWARD ? '-' : '+'}${seconds}` }
           </ThemedText>
@@ -471,7 +455,7 @@ export function PlayerComponent({
           <ThemedText style={ styles.longTapText }>
             2x
           </ThemedText>
-          <ThemedIcon
+          { /* <ThemedIcon
             style={ styles.longTapIcon }
             icon={ {
               name: 'fast-forward-outline',
@@ -479,7 +463,7 @@ export function PlayerComponent({
             } }
             size={ scale(24) }
             color="white"
-          />
+          /> */ }
         </View>
       </View>
     );

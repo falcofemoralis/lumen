@@ -21,7 +21,7 @@ export const styles = CreateStyles({
   comment: {
     flexDirection: 'column',
     flex: 1,
-    backgroundColor: Colors.backgroundLighter,
+    backgroundColor: Colors.backgroundLight,
     borderRadius: 12,
     padding: 8,
   },

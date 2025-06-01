@@ -9,7 +9,8 @@ export default function ThemedButton({
   onPress,
   children,
   style,
-  icon,
+  IconComponent,
+  iconProps,
   rightImage,
   textStyle,
   rightImageStyle,
@@ -21,7 +22,12 @@ export default function ThemedButton({
       onPress={ onPress }
       disabled={ disabled }
     >
-      { icon }
+      { IconComponent && (
+        <IconComponent
+          style={ styles.icon }
+          { ...iconProps }
+        />
+      ) }
       { children && (
         <ThemedText style={ [styles.text, textStyle] }>
           { children }

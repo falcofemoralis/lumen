@@ -4,6 +4,7 @@ import ThemedPressable from 'Component/ThemedPressable';
 import { useServiceContext } from 'Context/ServiceContext';
 import { Tabs } from 'expo-router';
 import { useDimensions } from 'Hooks/useDimensions';
+import t from 'i18n/t';
 import { FolderHeart, History, House, Search } from 'lucide-react-native';
 import React, { useCallback } from 'react';
 import {
@@ -158,14 +159,7 @@ export function NavigationBarComponent({
           // lazy: false,
         } }
         tabBar={ renderTabBar }
-      >
-        <Tabs.Screen
-          name="settings"
-          options={ {
-            headerShown: true,
-          } }
-        />
-      </Tabs>
+      />
     </SafeAreaView>
   );
 }

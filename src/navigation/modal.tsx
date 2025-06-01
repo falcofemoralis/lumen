@@ -9,8 +9,6 @@ export default function Modal() {
     film: FilmInterface;
   };
 
-  console.log('type', type);
-
   switch (type) {
     case 'comments':
       return <CommentsModal film={ film } />;

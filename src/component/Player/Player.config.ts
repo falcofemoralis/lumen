@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { ProgressStatus } from './Player.type';
 
 export const DEFAULT_PROGRESS_STATUS: ProgressStatus = {

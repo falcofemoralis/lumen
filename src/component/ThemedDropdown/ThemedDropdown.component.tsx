@@ -1,5 +1,4 @@
 import ThemedButton from 'Component/ThemedButton';
-import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import { useOverlayContext } from 'Context/OverlayContext';
@@ -142,13 +141,8 @@ export const ThemedDropdownComponent = ({
     return (
       <ThemedButton
         style={ [styles.input, inputStyle] }
-        iconStyle={ styles.inputIcon }
         textStyle={ styles.inputText }
         rightImageStyle={ styles.inputImage }
-        icon={ {
-          name: 'plus',
-          pack: IconPackType.Octicons,
-        } }
         onPress={ () => openOverlay(id.current) }
         rightImage={ endIcon }
       >

@@ -1,16 +1,17 @@
 import Loader from 'Component/Loader';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedDropdown from 'Component/ThemedDropdown';
-import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedText from 'Component/ThemedText';
 import { useOverlayContext } from 'Context/OverlayContext';
 import t from 'i18n/t';
+import { CircleHelp } from 'lucide-react-native';
 import React, { useId } from 'react';
 import { View } from 'react-native';
 import {
   DefaultFocus, SpatialNavigationFocusableView, SpatialNavigationScrollView, SpatialNavigationView,
 } from 'react-tv-space-navigation';
+import { Colors } from 'Style/Colors';
 import { EpisodeInterface, SeasonInterface } from 'Type/FilmVoice.interface';
 import { scale } from 'Util/CreateStyles';
 
@@ -49,14 +50,12 @@ export function PlayerVideoSelectorComponent({
     return (
       <>
         <ThemedButton
-          icon={ {
-            pack: IconPackType.Octicons,
-            name: 'question',
+          IconComponent={ CircleHelp }
+          iconProps={ {
+            size: scale(20),
           } }
           onPress={ () => openOverlay(ratingOverlayId) }
           style={ styles.voiceRatingInput }
-          iconStyle={ styles.voiceRatingInputIcon }
-          iconSize={ scale(20) }
         />
         <ThemedOverlay
           id={ ratingOverlayId }

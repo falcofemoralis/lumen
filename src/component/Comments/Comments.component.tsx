@@ -1,8 +1,6 @@
 import Loader from 'Component/Loader';
 import ThemedGrid from 'Component/ThemedGrid';
 import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
-import ThemedIcon from 'Component/ThemedIcon';
-import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
 import t from 'i18n/t';

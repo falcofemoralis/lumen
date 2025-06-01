@@ -24,6 +24,8 @@ const BackgroundColors = {
   darkBorder: '#262626',
   divider: '#4E4E4E',
   darkDivider: '#262626',
+  thumbnail: '#252525',
+  thumbnailHighlight: '#383838',
 };
 
 const ButtonColors = {

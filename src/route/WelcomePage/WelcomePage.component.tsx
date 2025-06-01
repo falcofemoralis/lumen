@@ -1,6 +1,3 @@
-import ThemedIcon from 'Component/ThemedIcon';
-import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
-import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
 import { useServiceContext } from 'Context/ServiceContext';
 import t from 'i18n/t';
@@ -74,7 +71,7 @@ export const WelcomeSlide = forwardRef<WelcomeSlideRef, WelcomeSlideProps>(
       goNext,
       onNext,
     },
-    ref,
+    ref
   ) => {
     const [isLandscape, setIsLandscape] = useState(false);
     const nextButtonRef = useRef<View>(null);
@@ -118,7 +115,7 @@ export const WelcomeSlide = forwardRef<WelcomeSlideRef, WelcomeSlideProps>(
           ] }
         >
           <View style={ styles.iconContainer }>
-            { customImage ? (
+            { /* { customImage ? (
               <ThemedImage
                 src={ customImage }
                 style={ [
@@ -133,7 +130,7 @@ export const WelcomeSlide = forwardRef<WelcomeSlideRef, WelcomeSlideProps>(
                 size={ scale(32) }
                 color="white"
               />
-            ) }
+            ) } */ }
           </View>
           <ThemedText style={ styles.title }>
             { customTitle ?? title }
@@ -156,14 +153,14 @@ export const WelcomeSlide = forwardRef<WelcomeSlideRef, WelcomeSlideProps>(
               ]) }
               onPress={ () => goBack?.(slide) }
             >
-              <ThemedIcon
+              { /* <ThemedIcon
                 icon={ {
                   name: 'navigate-before',
                   pack: IconPackType.MaterialIcons,
                 } }
                 size={ scale(24) }
                 color="white"
-              />
+              /> */ }
             </Pressable>
           </View>
         ) }
@@ -203,7 +200,7 @@ export const WelcomeSlide = forwardRef<WelcomeSlideRef, WelcomeSlideProps>(
         { renderBaseNavigation() }
       </TVFocusGuideView>
     );
-  },
+  }
 );
 
 export function WelcomePageComponent({
@@ -395,7 +392,7 @@ export function WelcomePageComponent({
               ]) }
               onPress={ validateProvider }
             >
-              { isProviderValid !== null && (
+              { /* { isProviderValid !== null && (
                 <ThemedIcon
                   icon={ {
                     name: isProviderValid === true ? 'check-circle' : 'close-circle',
@@ -404,7 +401,7 @@ export function WelcomePageComponent({
                   size={ scale(24) }
                   color={ isProviderValid === true ? 'green' : 'red' }
                 />
-              ) }
+              ) } */ }
               <ThemedText style={ styles.providerButtonText }>
                 { t('Validate') }
               </ThemedText>
@@ -495,7 +492,7 @@ export function WelcomePageComponent({
               ]) }
               onPress={ validateCDN }
             >
-              { isCDNValid !== null && (
+              { /* { isCDNValid !== null && (
                 <ThemedIcon
                   icon={ {
                     name: isCDNValid === true ? 'check-circle' : 'close-circle',
@@ -504,7 +501,7 @@ export function WelcomePageComponent({
                   size={ scale(24) }
                   color={ isCDNValid === true ? 'green' : 'red' }
                 />
-              ) }
+              ) } */ }
               <ThemedText style={ styles.providerButtonText }>
                 { t('Validate') }
               </ThemedText>

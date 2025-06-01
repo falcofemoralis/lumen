@@ -3,9 +3,9 @@ import Page from 'Component/Page';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedGrid from 'Component/ThemedGrid';
 import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
-import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
+import { Trash2 } from 'lucide-react-native';
 import React, { useCallback } from 'react';
 import { Animated, Dimensions, View } from 'react-native';
 import { DefaultFocus, SpatialNavigationFocusableView } from 'react-tv-space-navigation';
@@ -57,10 +57,7 @@ export function RecentPageComponent({
       return (
         <ThemedButton
           style={ styles.deleteButton }
-          icon={ {
-            pack: IconPackType.MaterialCommunityIcons,
-            name: 'delete',
-          } }
+          IconComponent={ Trash2 }
           onPress={ () => removeItem(item) }
         />
       );

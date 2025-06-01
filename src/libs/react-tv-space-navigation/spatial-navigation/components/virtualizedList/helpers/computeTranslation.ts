@@ -157,41 +157,10 @@ const computeStickToCenterTranslation = <T>({
     0,
     currentlyFocusedItemIndex,
   );
-  // const sizeOfListFromEndToCurrentlyFocusedItem = getSizeInPxFromOneItemToAnother(
-  //   data,
-  //   itemSizeInPx,
-  //   data.length - 1,
-  //   currentlyFocusedItemIndex,
-  // );
 
   if (sizeOfListFromStartToCurrentlyFocusedItem < listSizeInPx / 2) {
     return 0;
   }
-
-  // if (currentlyFocusedItemIndex > maxPossibleLeftAlignedIndex) {
-  //   console.log('currentlyFocusedItemIndex', currentlyFocusedItemIndex);
-  // }
-
-  // if (sizeOfListFromEndToCurrentlyFocusedItem < listSizeInPx / 2) {
-  //   console.log('-----------');
-  //   console.log('currentlyFocusedItemIndex', currentlyFocusedItemIndex);
-  //   const result =
-  //     sizeOfListFromStartToCurrentlyFocusedItem -
-  //     listSizeInPx +
-  //     sizeOfListFromEndToCurrentlyFocusedItem +
-  //     currentlyFocusedItemSize;
-  //   console.log('list END inferior to half list size in px', result);
-  //   console.log(
-  //     'sizeOfListFromStartToCurrentlyFocusedItem',
-  //     sizeOfListFromStartToCurrentlyFocusedItem,
-  //   );
-  //   console.log('listSizeInPx', listSizeInPx);
-  //   console.log('sizeOfListFromEndToCurrentlyFocusedItem', sizeOfListFromEndToCurrentlyFocusedItem);
-  //   console.log('currentlyFocusedItemSize', currentlyFocusedItemSize);
-  //   console.log('-----------');
-
-  //   return -result;
-  // }
 
   const scrollOffset =
     sizeOfListFromStartToCurrentlyFocusedItem - listSizeInPx / 2 + currentlyFocusedItemSize / 2;

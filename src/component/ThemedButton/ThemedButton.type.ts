@@ -1,4 +1,3 @@
-import { JSX } from 'react';
 import {
   ImageStyle, StyleProp, TextStyle, ViewStyle,
 } from 'react-native';
@@ -12,7 +11,8 @@ export interface ThemedButtonProps {
   textStyle?: StyleProp<TextStyle>;
   rightImageStyle?: StyleProp<ImageStyle>
   isSelected?: boolean;
-  icon?: JSX.Element;
+  IconComponent?: React.ComponentType<any>;
+  iconProps?: Record<string, any>;
   variant?: Variant;
   rightImage?: string;
   onPress?: () => void;

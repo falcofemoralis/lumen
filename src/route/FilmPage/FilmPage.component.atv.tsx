@@ -6,12 +6,12 @@ import PlayerVideoSelector from 'Component/PlayerVideoSelector';
 import ThemedAccordion from 'Component/ThemedAccordion';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedCard from 'Component/ThemedCard';
-import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedText from 'Component/ThemedText';
 import { useOverlayContext } from 'Context/OverlayContext';
 import t from 'i18n/t';
+import { Bookmark, Clapperboard, Clock, MessageSquareText, Play } from 'lucide-react-native';
 import { useState } from 'react';
 import { Dimensions, View } from 'react-native';
 import {
@@ -61,18 +61,19 @@ export function FilmPageComponent({
     setShowReadMore(percent > 45);
   };
 
-  const renderAction = (text: string, icon: string, onPress?: () => void) => (
+  const renderAction = (
+    text: string,
+    IconComponent: React.ComponentType<any>,
+    onPress?: () => void
+  ) => (
     <SpatialNavigationFocusableView>
       <ThemedButton
         variant="outlined"
         onPress={ onPress }
-        icon={ {
-          name: icon,
-          pack: IconPackType.MaterialCommunityIcons,
-        } }
+        IconComponent={ IconComponent }
+        iconProps={ { size: scale(18) } }
         style={ styles.actionButton }
         textStyle={ styles.actionButtonText }
-        iconStyle={ styles.actionButtonIcon }
         disableRootActive
       >
         { text }
@@ -86,14 +87,14 @@ export function FilmPageComponent({
     if (isPendingRelease) {
       return renderAction(
         t('Coming Soon'),
-        'clock-outline',
+        Clock,
         () => {
           NotificationStore.displayMessage(t('We are waiting for the film in the good quality'));
-        },
+        }
       );
     }
 
-    return renderAction(t('Watch Now'), 'play-outline', playFilm);
+    return renderAction(t('Watch Now'), Play, playFilm);
   };
 
   const renderActions = () => (
@@ -101,9 +102,9 @@ export function FilmPageComponent({
       <DefaultFocus>
         <View style={ styles.actions }>
           { renderPlayButton() }
-          { renderAction(t('Comments'), 'comment-text-multiple-outline', () => openOverlay(commentsOverlayId)) }
-          { renderAction(t('Bookmark'), 'movie-star-outline', () => openOverlay(bookmarksOverlayId)) }
-          { renderAction(t('Trailer'), 'movie-open-check-outline') }
+          { renderAction(t('Comments'), MessageSquareText, () => openOverlay(commentsOverlayId)) }
+          { renderAction(t('Bookmark'), Bookmark, () => openOverlay(bookmarksOverlayId)) }
+          { renderAction(t('Trailer'), Clapperboard, () => NotificationStore.displayMessage(t('Not implemented'))) }
         </View>
       </DefaultFocus>
     </SpatialNavigationView>
@@ -183,7 +184,7 @@ export function FilmPageComponent({
   const renderCollection = (
     collection: CollectionItemInterface[],
     title: string,
-    handler?: (link: string) => void,
+    handler?: (link: string) => void
   ) => (
     <View style={ styles.collectionContainer }>
       <ThemedText style={ styles.collectionTitle }>

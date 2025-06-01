@@ -56,7 +56,7 @@ export function PlayerContainer({
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [selectedQuality, setSelectedQuality] = useState<string>(selectedStream.quality);
   const [selectedSubtitle, setSelectedSubtitle] = useState<SubtitleInterface|undefined>(
-    selectedVideo.subtitles?.find(({ isDefault }) => isDefault),
+    selectedVideo.subtitles?.find(({ isDefault }) => isDefault)
   );
   const [selectedSpeed, setSelectedSpeed] = useState<number>(DEFAULT_SPEED);
   const [isLocked, setIsLocked] = useState<boolean>(false);
@@ -91,7 +91,7 @@ export function PlayerContainer({
         updateTime();
 
         return false;
-      },
+      }
     );
 
     initFirestoreTime();
@@ -100,6 +100,7 @@ export function PlayerContainer({
       deactivateKeepAwake(AWAKE_TAG);
       removeUpdateTimeTimeout();
       backHandler.remove();
+      resetProgressStatus();
     };
   }, []);
 
@@ -116,7 +117,7 @@ export function PlayerContainer({
       updateProgressStatus(currentTime, bufferedPosition, duration);
 
       onPlaybackEnd(currentTime, duration);
-    },
+    }
   );
 
   useEventListener(player, 'playingChange', ({ isPlaying: playing }) => {
@@ -196,7 +197,7 @@ export function PlayerContainer({
 
   const rewindPosition = async (
     type: RewindDirection,
-    seconds = DEFAULT_REWIND_SECONDS,
+    seconds = DEFAULT_REWIND_SECONDS
   ) => {
     const { currentTime, bufferedPosition, duration } = player;
 
@@ -292,7 +293,7 @@ export function PlayerContainer({
     const { episodes = [] } = season;
 
     const episodeIndex = episodes.findIndex(
-      (e) => e.episodeId === lastEpisodeId,
+      (e) => e.episodeId === lastEpisodeId
     );
 
     if (episodeIndex === -1) {
@@ -341,7 +342,7 @@ export function PlayerContainer({
       film,
       selectedVoice,
       seasonId,
-      episodeId,
+      episodeId
     );
 
     const newVoice = {

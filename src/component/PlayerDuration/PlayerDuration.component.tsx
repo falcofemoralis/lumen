@@ -1,11 +1,14 @@
 import ThemedText from 'Component/ThemedText';
+import { usePlayerContext } from 'Context/PlayerContext';
 
-import { PlayerDurationComponentProps } from './PlayerDuration.type';
-
-export const PlayerDurationComponent = ({
-  progressStatus,
-}: PlayerDurationComponentProps) => {
-  const { currentTime, durationTime, remainingTime } = progressStatus;
+export const PlayerDurationComponent = () => {
+  const {
+    progressStatus: {
+      currentTime,
+      durationTime,
+      remainingTime,
+    } = {},
+  } = usePlayerContext();
 
   return (
     <ThemedText>

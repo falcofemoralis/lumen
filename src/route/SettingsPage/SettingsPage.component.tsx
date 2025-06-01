@@ -1,14 +1,7 @@
 import Page from 'Component/Page';
-import ThemedIcon from 'Component/ThemedIcon';
-import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
-import ThemedText from 'Component/ThemedText';
-import { router } from 'expo-router';
-import t from 'i18n/t';
 import React from 'react';
-import { ScrollView, TouchableOpacity, View } from 'react-native';
-import { scale } from 'Util/CreateStyles';
+import { ScrollView, View } from 'react-native';
 
-import { styles } from './SettingsPage.style';
 import {
   SettingItem, SettingsPageComponentProps,
   SettingType,
@@ -24,27 +17,6 @@ export function SettingsPageComponent({
   settings,
   onSettingUpdate,
 }: SettingsPageComponentProps) {
-  const renderTopActions = () => (
-    <View style={ styles.topActions }>
-      <TouchableOpacity
-        style={ styles.topActionsButton }
-        onPress={ () => router.back() }
-      >
-        <ThemedIcon
-          icon={ {
-            name: 'arrow-back',
-            pack: IconPackType.MaterialIcons,
-          } }
-          size={ scale(28) }
-          color="white"
-        />
-      </TouchableOpacity>
-      <ThemedText style={ styles.title }>
-        { t('Settings') }
-      </ThemedText>
-    </View>
-  );
-
   const renderSetting = (setting: SettingItem): Record<SettingType, React.ReactNode> => ({
     TEXT: (
       <SettingText
@@ -84,7 +56,6 @@ export function SettingsPageComponent({
 
   return (
     <Page>
-      { renderTopActions() }
       { renderSettings() }
     </Page>
   );

@@ -1,7 +1,7 @@
-import ThemedIcon from 'Component/ThemedIcon';
 import ThemedImage from 'Component/ThemedImage';
 import { Text, View } from 'react-native';
 import { SpatialNavigationFocusableView } from 'react-tv-space-navigation';
+import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 
 import { styles } from './ThemedButton.style.atv';
@@ -13,12 +13,10 @@ export default function ThemedButton({
   children,
   style,
   styleFocused,
-  iconStyle,
-  iconStyleFocused,
+  IconComponent,
+  iconProps,
   textStyle,
   isSelected,
-  icon,
-  iconSize,
   variant = 'filled',
   rightImage,
   rightImageStyle,
@@ -35,18 +33,16 @@ export default function ThemedButton({
         isFocused && styleFocused,
       ] }
     >
-      { icon && (
-        <ThemedIcon
+      { IconComponent && (
+        <IconComponent
           style={ [
             styles.iconFilled,
-            iconStyle,
             isSelected && styles.iconFilledSelected,
             isFocused && styles.iconFilledFocused,
-            isFocused && iconStyleFocused,
           ] }
-          icon={ icon }
-          size={ iconSize ?? scale(18) }
-          color={ isFocused ? 'black' : 'gray' }
+          size={ scale(18) }
+          color={ isFocused ? Colors.black : Colors.white }
+          { ...iconProps }
         />
       ) }
       { children && (
@@ -81,18 +77,16 @@ export default function ThemedButton({
         isFocused && styleFocused,
       ] }
     >
-      { icon && (
-        <ThemedIcon
+      { IconComponent && (
+        <IconComponent
           style={ [
-            styles.iconOutlined,
-            iconStyle,
-            isSelected && styles.iconOutlinedSelected,
-            isFocused && styles.iconOutlinedFocused,
-            isFocused && iconStyleFocused,
+            styles.iconFilled,
+            isSelected && styles.iconFilledSelected,
+            isFocused && styles.iconFilledFocused,
           ] }
-          icon={ icon }
-          size={ iconSize ?? scale(18) }
-          color={ isFocused ? 'black' : 'gray' }
+          size={ scale(18) }
+          color={ isFocused ? Colors.black : Colors.white }
+          { ...iconProps }
         />
       ) }
       { children && (

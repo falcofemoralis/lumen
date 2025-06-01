@@ -3,7 +3,6 @@ import LoginForm from 'Component/LoginForm';
 import { ACCOUNT_ROUTE } from 'Component/NavigationBar/NavigationBar.config';
 import Page from 'Component/Page';
 import ThemedButton from 'Component/ThemedButton';
-import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';

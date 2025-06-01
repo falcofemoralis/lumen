@@ -32,6 +32,10 @@ const objectMap2 = (object: any, overload: any) => Object.keys(object)
 export const tvScale = () => (W / 960);
 
 export const scale = (number: any) => {
+  if (!ConfigStore.isConfigured()) {
+    return Number(number.toFixed(0));
+  }
+
   const value = ConfigStore.isTV() ? number * Number(tvScale().toFixed(1)) : mobileScale(number);
 
   return Number(value.toFixed(0));

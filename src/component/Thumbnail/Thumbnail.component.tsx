@@ -46,8 +46,8 @@ export const ThumbnailComponent = ({ style, height, width }: ThumbnailComponentP
   return (
     <GradientShimmer
       LinearGradientComponent={ LinearGradient }
-      backgroundColor={ Colors.backgroundLight }
-      highlightColor={ Colors.backgroundLighter }
+      backgroundColor={ Colors.thumbnail }
+      highlightColor={ Colors.thumbnailHighlight }
       height={ transformValue('height', height, style) }
       width={ transformValue('width', width, style) }
       style={ [styles.thumbnail, style] }

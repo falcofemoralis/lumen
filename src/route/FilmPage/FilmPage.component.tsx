@@ -3,22 +3,22 @@ import BookmarksSelector from 'Component/BookmarksSelector';
 import Page from 'Component/Page';
 import PlayerVideoSelector from 'Component/PlayerVideoSelector';
 import ThemedButton from 'Component/ThemedButton';
-import ThemedIcon from 'Component/ThemedIcon';
-import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImageModal from 'Component/ThemedImageModal';
 import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import { useOverlayContext } from 'Context/OverlayContext';
 import { useRouter } from 'expo-router';
 import t from 'i18n/t';
-import { ArrowLeft, Bookmark, Clapperboard, Clock, Download, MessageCircle, Play, Share2, Star } from 'lucide-react-native';
+import { ArrowLeft, Bookmark, Clapperboard, Clock, Download, MessageSquareText, Play, Share2, Star } from 'lucide-react-native';
 import React from 'react';
 import {
   ScrollView,
+  StyleProp,
   Text,
   TouchableHighlight,
   TouchableOpacity,
   View,
+  ViewStyle,
 } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
 import RouterStore from 'Store/Router.store';
@@ -42,7 +42,6 @@ export function FilmPageComponent({
   film,
   visibleScheduleItems,
   playerVideoSelectorOverlayId,
-  scheduleOverlayId,
   bookmarksOverlayId,
   playFilm,
   hideVideoSelector,
@@ -246,54 +245,35 @@ export function FilmPageComponent({
     return <ThemedText style={ styles.description }>{ description }</ThemedText>;
   };
 
+  const renderMiddleAction = (
+    IconComponent: React.ComponentType<any>,
+    text?: string,
+    action?: () => void,
+    style?: StyleProp<ViewStyle>
+  ) => (
+    <ThemedPressable
+      style={ [styles.action, style] }
+      onPress={ action }
+    >
+      <IconComponent
+        style={ styles.actionIcon }
+        size={ scale(18) }
+        color={ Colors.white }
+      />
+      { text && (
+        <ThemedText style={ styles.actionText }>
+          { text }
+        </ThemedText>
+      ) }
+    </ThemedPressable>
+  );
+
   const renderMiddleActions = () => (
     <View style={ styles.actions }>
-      <ThemedPressable
-        style={ [styles.action, styles.actionSquare] }
-        onPress={ () => NotificationStore.displayMessage(t('Not implemented')) }
-      >
-        <Star
-          style={ styles.actionIcon }
-          size={ scale(18) }
-          color={ Colors.white }
-        />
-        <ThemedText style={ styles.actionText }>
-          3.4k
-        </ThemedText>
-      </ThemedPressable>
-      <ThemedPressable
-        style={ [styles.action, styles.actionSquare] }
-        onPress={ () => NotificationStore.displayMessage(t('Not implemented')) }
-      >
-        <Clapperboard
-          style={ styles.actionIcon }
-          size={ scale(18) }
-          color={ Colors.white }
-        />
-      </ThemedPressable>
-      <ThemedPressable
-        style={ styles.action }
-        onPress={ openComments }
-      >
-        <MessageCircle
-          style={ styles.actionIcon }
-          size={ scale(18) }
-          color={ Colors.white }
-        />
-        <ThemedText style={ styles.actionText }>
-          { t('Comments') }
-        </ThemedText>
-      </ThemedPressable>
-      <ThemedPressable
-        style={ [styles.action, styles.actionSquare] }
-        onPress={ () => openOverlay(bookmarksOverlayId) }
-      >
-        <Bookmark
-          style={ styles.actionIcon }
-          size={ scale(18) }
-          color={ Colors.white }
-        />
-      </ThemedPressable>
+      { renderMiddleAction(Star, '3.4k', () => NotificationStore.displayMessage(t('Not implemented')), styles.actionSquare) }
+      { renderMiddleAction(Clapperboard, '', () => NotificationStore.displayMessage(t('Not implemented')), styles.actionSquare) }
+      { renderMiddleAction(MessageSquareText, t('Comments'), openComments) }
+      { renderMiddleAction(Bookmark, '', () => openOverlay(bookmarksOverlayId), styles.actionSquare) }
     </View>
   );
 
@@ -320,12 +300,11 @@ export function FilmPageComponent({
         <ThemedButton
           style={ styles.playBtn }
           onPress={ playFilm }
-          icon={ (
-            <Play
-              size={ scale(18) }
-              color={ Colors.white }
-            />
-          ) }
+          IconComponent={ Play }
+          iconProps={ {
+            size: scale(18),
+            color: Colors.white,
+          } }
         >
           { t('Watch Now') }
         </ThemedButton>

@@ -5,7 +5,7 @@ import ThemedInput from 'Component/ThemedInput';
 import { router } from 'expo-router';
 import t from 'i18n/t';
 import { useRef } from 'react';
-import { ScrollView, View } from 'react-native';
+import { View } from 'react-native';
 
 import { styles } from './LoginForm.style';
 import { LoginFormComponentProps } from './LoginForm.type';

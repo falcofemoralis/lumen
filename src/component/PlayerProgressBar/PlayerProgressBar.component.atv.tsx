@@ -43,6 +43,8 @@ export const PlayerProgressBarComponent = ({
   togglePlayPause = noopFn,
 }: PlayerProgressBarComponentProps) => {
   const { progressStatus, focusedElement, updateProgressStatus } = usePlayerContext();
+  const rewindTimer = useRef<number | null>(null);
+  const progressStatusRef = useRef(progressStatus);
 
   const longEvent = useRef<{[key: string]: LongEvent}>({
     [SupportedKeys.LEFT]: {
@@ -57,11 +59,20 @@ export const PlayerProgressBarComponent = ({
     },
   });
 
+  useEffect(() => {
+    progressStatusRef.current = progressStatus;
+  }, [progressStatus]);
+
   const rewindPositionAuto = async (direction: RewindDirection) => {
     const { duration = 0, playing } = player;
 
     if (autoRewindParams.active) {
       autoRewindParams.active = false;
+
+      if(rewindTimer.current) {
+        clearInterval(rewindTimer.current);
+        rewindTimer.current = null;
+      }
 
       seekToPosition(progressStatus.progressPercentage);
 
@@ -110,7 +121,7 @@ export const PlayerProgressBarComponent = ({
       const seekTime = direction === RewindDirection.BACKWARD
         ? autoRewindParams.seconds * -1
         : autoRewindParams.seconds;
-      const currentTime = calculateCurrentTime(progressStatus.progressPercentage);
+      const currentTime = calculateCurrentTime(progressStatusRef.current.progressPercentage);
       const newTime = currentTime + seekTime;
 
       if (newTime < 0 || newTime > duration) {
@@ -122,7 +133,7 @@ export const PlayerProgressBarComponent = ({
       updateProgressStatus(
         newTime,
         0,
-        duration,
+        duration
       );
     }
   };
@@ -210,7 +221,7 @@ export const PlayerProgressBarComponent = ({
     }
 
     const currentTime = hideActions ? calculateCurrentTime(
-      progressStatus.progressPercentage,
+      progressStatus.progressPercentage
     ) : 0;
 
     return (

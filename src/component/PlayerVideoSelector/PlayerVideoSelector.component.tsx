@@ -2,8 +2,6 @@ import Loader from 'Component/Loader';
 import ThemedBottomSheet from 'Component/ThemedBottomSheet';
 import { ThemedBottomSheetRef } from 'Component/ThemedBottomSheet/ThemedBottomSheet.type';
 import ThemedDropdown from 'Component/ThemedDropdown';
-import ThemedIcon from 'Component/ThemedIcon';
-import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
@@ -11,9 +9,8 @@ import t from 'i18n/t';
 import { CircleHelp } from 'lucide-react-native';
 import React, { useRef } from 'react';
 import {
-  Button,
   Dimensions, Pressable, ScrollView,
-  TouchableOpacity, View,
+  View,
 } from 'react-native';
 import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';

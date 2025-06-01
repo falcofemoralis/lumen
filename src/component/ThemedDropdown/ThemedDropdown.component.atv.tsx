@@ -1,9 +1,8 @@
 import ThemedButton from 'Component/ThemedButton';
-import ThemedIcon from 'Component/ThemedIcon';
-import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import { useOverlayContext } from 'Context/OverlayContext';
+import { Plus } from 'lucide-react-native';
 import React, { memo, useCallback, useRef } from 'react';
 import { Text, View } from 'react-native';
 import {
@@ -11,7 +10,6 @@ import {
   SpatialNavigationVirtualizedList,
   SpatialNavigationVirtualizedListRef,
 } from 'react-tv-space-navigation';
-import { scale } from 'Util/CreateStyles';
 import { generateId } from 'Util/Math';
 
 import { styles } from './ThemedDropdown.style.atv';
@@ -90,7 +88,7 @@ export const ThemedDropdownComponent = ({
                 />
               ) }
             </View>
-            { isSelected && !isFocused && (
+            { /* { isSelected && !isFocused && (
               <ThemedIcon
                 style={ styles.iconSelected }
                 icon={ {
@@ -100,7 +98,7 @@ export const ThemedDropdownComponent = ({
                 size={ scale(16) }
                 color="white"
               />
-            ) }
+            ) } */ }
           </View>
         ) }
       </SpatialNavigationFocusableView>
@@ -163,10 +161,7 @@ export const ThemedDropdownComponent = ({
       <ThemedButton
         style={ [styles.input, inputStyle] }
         rightImageStyle={ styles.inputImage }
-        icon={ {
-          name: 'plus',
-          pack: IconPackType.Octicons,
-        } }
+        IconComponent={ Plus }
         onPress={ () => openOverlay(overlayId.current) }
         rightImage={ endIcon }
       >

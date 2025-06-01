@@ -1,6 +1,5 @@
 import FilmGrid from 'Component/FilmGrid';
 import ThemedButton from 'Component/ThemedButton';
-import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import { useNavigationContext } from 'Context/NavigationContext';
 import { useNavigation } from 'expo-router';
 import {
