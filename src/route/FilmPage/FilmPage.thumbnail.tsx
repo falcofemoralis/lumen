@@ -1,5 +1,4 @@
 import Page from 'Component/Page';
-import ThemedImage from 'Component/ThemedImage';
 import ThemedPressable from 'Component/ThemedPressable';
 import Thumbnail from 'Component/Thumbnail';
 import Wrapper from 'Component/Wrapper';
@@ -13,17 +12,8 @@ import { noopFn } from 'Util/Function';
 
 import { styles } from './FilmPage.style';
 
-export const FilmPageThumbnail = ({
-  poster,
-  renderPoster,
-  renderGradient,
-}: {
-  poster: string,
-  renderPoster: React.ReactNode,
-  renderGradient: () => React.ReactNode,
-}) => (
-  <Page>
-    { renderPoster }
+export const FilmPageThumbnail = () => (
+  <View>
     <View style={ styles.upperContent }>
       <Wrapper>
         <View style={ styles.topActions }>
@@ -84,7 +74,12 @@ export const FilmPageThumbnail = ({
       </Wrapper>
     </View>
     <View style={ styles.middleContent }>
-      { renderGradient() }
+      <LinearGradient
+        style={ styles.backgroundGradient }
+        colors={ [Colors.background, Colors.transparent] }
+        start={ { x: 0, y: 1 } }
+        end={ { x: 0, y: 0 } }
+      />
       <Wrapper>
         <View style={ styles.middleActions }>
           { Array(5).fill(0).map((_, i) => (
@@ -110,5 +105,5 @@ export const FilmPageThumbnail = ({
         </Wrapper>
       </View>
     </View>
-  </Page>
+  </View>
 );

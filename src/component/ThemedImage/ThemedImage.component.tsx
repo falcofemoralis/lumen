@@ -20,7 +20,7 @@ export const ThemedImage = forwardRef<ImageRef, ThemedImageProps>(({
       style={ style }
       source={ src }
       // cachePolicy="memory-disk"
-       placeholder={ { blurhash: 'L03IYJj[fQj[j[fQfQfQfQfQfQfQ' } }
+      placeholder={ { blurhash: 'L03IYJj[fQj[j[fQfQfQfQfQfQfQ' } }
       contentFit="cover"
       placeholderContentFit="cover"
       transition={ transition }
@@ -32,7 +32,7 @@ export const ThemedImage = forwardRef<ImageRef, ThemedImageProps>(({
 });
 
 function rowPropsAreEqual(prevProps: ThemedImageProps, props: ThemedImageProps) {
-  return prevProps.src === props.src || prevProps.style === props.style;
+  return prevProps.src === props.src;
 }
 
 export default memo(ThemedImage, rowPropsAreEqual);

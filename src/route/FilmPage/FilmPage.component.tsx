@@ -22,11 +22,10 @@ import {
   Share2,
   Star,
 } from 'lucide-react-native';
-import React, { useMemo } from 'react';
+import React from 'react';
 import {
   ScrollView,
   Text,
-  TouchableHighlight,
   TouchableOpacity,
   useWindowDimensions,
   View,
@@ -42,6 +41,7 @@ import NotificationStore from 'Store/Notification.store';
 import RouterStore from 'Store/Router.store';
 import { Colors } from 'Style/Colors';
 import { CollectionItemInterface } from 'Type/CollectionItem';
+import { FilmInterface } from 'Type/Film.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { scale } from 'Util/CreateStyles';
 
@@ -55,8 +55,6 @@ import {
   ScheduleItem,
   Section,
 } from './FilmPageElements';
-
-const AnimatedImage = Animated.createAnimatedComponent(ThemedImage);
 
 export function FilmPageComponent({
   film,
@@ -100,36 +98,8 @@ export function FilmPageComponent({
     };
   });
 
-  const renderPosterBackground = () => {
-    return (
-      <AnimatedImage
-        src={ thumbnailPoster }
-        style={ [styles.posterBackground, imageAnimatedStyle] }
-        blurRadius={ 5 }
-        transition={ 0 }
-      />
-    );
-  };
-
-  const renderGradient = () => {
-    return (
-      <LinearGradient
-        style={ styles.backgroundGradient }
-        colors={ [Colors.background, Colors.transparent] }
-        start={ { x: 0, y: 1 } }
-        end={ { x: 0, y: 0 } }
-      />
-    );
-  };
-
   if (!film) {
-    return (
-      <FilmPageThumbnail
-        poster={ thumbnailPoster }
-        renderPoster={ renderPosterBackground }
-        renderGradient={ renderGradient }
-      />
-    );
+    film = null as unknown as FilmInterface; // dirty hack to avoid null checks
   }
 
   const openComments = () => {
@@ -501,12 +471,18 @@ export function FilmPageComponent({
     />
   );
 
-  const renderModals = () => (
-    <>
-      { renderPlayerVideoSelector() }
-      { renderBookmarksOverlay() }
-    </>
-  );
+  const renderModals = () => {
+    if (!film) {
+      return null;
+    }
+
+    return (
+      <>
+        { renderPlayerVideoSelector() }
+        { renderBookmarksOverlay() }
+      </>
+    );
+  };
 
   // NEW
 
@@ -532,6 +508,27 @@ export function FilmPageComponent({
       </ThemedPressable>
     </View>
   );
+
+  const renderPosterBackground = () => {
+    return (
+      <Animated.Image
+        src={ thumbnailPoster }
+        style={ [styles.posterBackground, imageAnimatedStyle] }
+        blurRadius={ 5 }
+      />
+    );
+  };
+
+  const renderGradient = () => {
+    return (
+      <LinearGradient
+        style={ styles.backgroundGradient }
+        colors={ [Colors.background, Colors.transparent] }
+        start={ { x: 0, y: 1 } }
+        end={ { x: 0, y: 0 } }
+      />
+    );
+  };
 
   const renderPoster = () => {
     const { poster, largePoster } = film;
@@ -574,11 +571,15 @@ export function FilmPageComponent({
     return ratings.map(({ name, rating, votes }) => renderInfoText(`${rating} (${votes})`, name));
   };
 
-  return (
-    <Page>
-      { renderModals() }
-      <Animated.ScrollView ref={ scrollRef } onScroll={ scrollHandler } scrollEventThrottle={ 16 }>
-        { renderPosterBackground() }
+  const renderContent = () => {
+    if (!film) {
+      return (
+        <FilmPageThumbnail />
+      );
+    }
+
+    return (
+      <View>
         <View style={ styles.upperContent }>
           <Wrapper>
             { renderTopActions() }
@@ -610,6 +611,23 @@ export function FilmPageComponent({
               { renderRelated() }
             </Wrapper>
           </View>
+        </View>
+      </View>
+    );
+  };
+
+  return (
+    <Page>
+      { renderModals() }
+      <Animated.ScrollView
+        ref={ scrollRef }
+        scrollEnabled={ !!film }
+        onScroll={ scrollHandler }
+        scrollEventThrottle={ 16 }
+      >
+        <View>
+          { renderPosterBackground() }
+          { renderContent() }
         </View>
       </Animated.ScrollView>
     </Page>
