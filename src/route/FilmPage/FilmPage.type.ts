@@ -5,10 +5,12 @@ import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 
 export interface FilmPageContainerProps {
   link: string;
+  thumbnailPoster: string;
 }
 
 export interface FilmPageComponentProps {
   film: FilmInterface | null;
+  thumbnailPoster: string;
   visibleScheduleItems: ScheduleItemInterface[];
   playerVideoSelectorOverlayId: string;
   scheduleOverlayId: string;

@@ -48,6 +48,7 @@ const UtilsColors = {
   black: '#000000',
   transparent: 'transparent',
   modal: 'rgba(0, 0, 0, 0.6)',
+  fade: 'rgba(0, 0, 0, 0.8)',
   whiteTransparent: 'rgba(191, 191, 191, 0.5)',
 };
 

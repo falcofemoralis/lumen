@@ -7,6 +7,8 @@ export const styles = CreateStyles({
     justifyContent: 'space-between',
     alignContent: 'center',
     width: '100%',
+    marginVertical: 16,
+    zIndex: 10,
   },
   topActionsButton: {
     flexDirection: 'row',
@@ -16,6 +18,38 @@ export const styles = CreateStyles({
     height: 40,
     padding: 12,
     borderRadius: 100,
+    backgroundColor: Colors.whiteTransparent,
+  },
+  upperContent: {
+    width: '100%',
+    backgroundColor: Colors.fade,
+  },
+  middleContent: {
+    width: '100%',
+    backgroundColor: Colors.fade,
+  },
+  bottomContent: {
+    width: '100%',
+  },
+  upperContentWrapper: {
+    flexDirection: 'row',
+    gap: 16,
+    marginTop: 16,
+  },
+  upperContentInfo: {
+    flex: 1,
+  },
+  mainContent: {
+    backgroundColor: Colors.background,
+  },
+  posterBackground: {
+    aspectRatio: '166 / 250',
+    width: '100%',
+    position: 'absolute',
+  },
+  posterWrapper: {
+    width: '40%',
+    aspectRatio: '166 / 250',
   },
   title: {
     fontSize: 20,
@@ -35,15 +69,11 @@ export const styles = CreateStyles({
     borderRadius: 8,
     padding: 4,
   },
-  mainContent: {
-    flexDirection: 'row',
-    gap: 12,
-    marginTop: 16,
-  },
-  posterWrapper: {
-    width: '40%',
-    aspectRatio: '166 / 250',
-    borderRadius: 16,
+  backgroundGradient: {
+    height: '100%',
+    width: '100%',
+    position: 'absolute',
+    zIndex: 1,
   },
   poster: {
     height: '100%',
@@ -51,9 +81,6 @@ export const styles = CreateStyles({
     borderRadius: 16,
   },
   mainInfo: {
-    marginTop: -8,
-    justifyContent: 'flex-start',
-    width: '55%',
   },
   rating: {
     marginTop: 8,
@@ -105,27 +132,35 @@ export const styles = CreateStyles({
   },
   downloadBtnIcon: {
   },
-  actions: {
+  middleActions: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
-    marginTop: 16,
+    paddingTop: 16,
     gap: 6,
+    zIndex: 10,
   },
-  action: {
+  middleAction: {
     flex: 1,
-    backgroundColor: Colors.backgroundLight,
     borderRadius: 50,
     padding: 4,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 4,
   },
-  actionSquare: {
-    flex: 0,
+  middleActionButton: {
+    backgroundColor: Colors.whiteTransparent,
+    width: 44,
+    height: 44,
+    borderRadius: 100,
   },
-  actionIcon: {
+  middleActionIcon: {
     margin: 8,
   },
-  actionText: {
+  middleActionText: {
     fontSize: 12,
+    textAlign: 'center',
   },
   description: {
     color: Colors.textSecondary,
@@ -287,5 +322,27 @@ export const styles = CreateStyles({
   commentsWrapper: {
     width: '100%',
     height: '100%',
+  },
+  ratings: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 16,
+    marginBottom: 8,
+  },
+  featuredRating: {
+    flexDirection: 'row',
+    gap: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 8,
+  },
+  featuredRatingText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: Colors.black,
+    backgroundColor: 'yellow',
+    padding: 4,
+    borderRadius: 16,
   },
 });

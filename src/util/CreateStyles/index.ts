@@ -1,5 +1,5 @@
 import { Dimensions, StyleSheet } from 'react-native';
-import { scale as mobileScale } from 'react-native-size-matters';
+import { moderateScale } from 'react-native-size-matters';
 import ConfigStore from 'Store/Config.store';
 
 const { width: W } = Dimensions.get('screen');
@@ -36,7 +36,7 @@ export const scale = (number: any) => {
     return Number(number.toFixed(0));
   }
 
-  const value = ConfigStore.isTV() ? number * Number(tvScale().toFixed(1)) : mobileScale(number);
+  const value = ConfigStore.isTV() ? number * Number(tvScale().toFixed(1)) : moderateScale(number);
 
   return Number(value.toFixed(0));
 };

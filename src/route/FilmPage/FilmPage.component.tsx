@@ -1,25 +1,43 @@
-import { Rating } from '@kolking/react-native-rating';
 import BookmarksSelector from 'Component/BookmarksSelector';
 import Page from 'Component/Page';
 import PlayerVideoSelector from 'Component/PlayerVideoSelector';
 import ThemedButton from 'Component/ThemedButton';
+import { ThemedImage } from 'Component/ThemedImage/ThemedImage.component';
 import ThemedImageModal from 'Component/ThemedImageModal';
 import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
+import Wrapper from 'Component/Wrapper';
 import { useOverlayContext } from 'Context/OverlayContext';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import t from 'i18n/t';
-import { ArrowLeft, Bookmark, Clapperboard, Clock, Download, MessageSquareText, Play, Share2, Star } from 'lucide-react-native';
-import React from 'react';
+import {
+  ArrowLeft,
+  Bookmark,
+  Clapperboard,
+  Clock,
+  Download,
+  MessageSquareText,
+  Play,
+  Share2,
+  Star,
+} from 'lucide-react-native';
+import React, { useMemo } from 'react';
 import {
   ScrollView,
-  StyleProp,
   Text,
   TouchableHighlight,
   TouchableOpacity,
+  useWindowDimensions,
   View,
-  ViewStyle,
 } from 'react-native';
+import Animated, {
+  interpolate,
+  useAnimatedRef,
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
+} from 'react-native-reanimated';
 import NotificationStore from 'Store/Notification.store';
 import RouterStore from 'Store/Router.store';
 import { Colors } from 'Style/Colors';
@@ -38,8 +56,11 @@ import {
   Section,
 } from './FilmPageElements';
 
+const AnimatedImage = Animated.createAnimatedComponent(ThemedImage);
+
 export function FilmPageComponent({
   film,
+  thumbnailPoster,
   visibleScheduleItems,
   playerVideoSelectorOverlayId,
   bookmarksOverlayId,
@@ -54,9 +75,61 @@ export function FilmPageComponent({
 }: FilmPageComponentProps) {
   const router = useRouter();
   const { openOverlay } = useOverlayContext();
+  const { width } = useWindowDimensions();
+  const scrollRef = useAnimatedRef<Animated.ScrollView>();
+  const scrollOffset = useSharedValue(0);
+  const scrollHandler = useAnimatedScrollHandler(event => {
+    scrollOffset.value = event.contentOffset.y;
+  });
+  const imageHeight = width * (166 / 250);
+
+  const imageAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          translateY: interpolate(
+            scrollOffset.value,
+            [-imageHeight, 0, imageHeight],
+            [-imageHeight / 2, 0, imageHeight * 0.75]
+          ),
+        },
+        {
+          scale: interpolate(scrollOffset.value, [-imageHeight, 0, imageHeight], [2, 1, 1]),
+        },
+      ],
+    };
+  });
+
+  const renderPosterBackground = () => {
+    return (
+      <AnimatedImage
+        src={ thumbnailPoster }
+        style={ [styles.posterBackground, imageAnimatedStyle] }
+        blurRadius={ 5 }
+        transition={ 0 }
+      />
+    );
+  };
+
+  const renderGradient = () => {
+    return (
+      <LinearGradient
+        style={ styles.backgroundGradient }
+        colors={ [Colors.background, Colors.transparent] }
+        start={ { x: 0, y: 1 } }
+        end={ { x: 0, y: 0 } }
+      />
+    );
+  };
 
   if (!film) {
-    return <FilmPageThumbnail />;
+    return (
+      <FilmPageThumbnail
+        poster={ thumbnailPoster }
+        renderPoster={ renderPosterBackground }
+        renderGradient={ renderGradient }
+      />
+    );
   }
 
   const openComments = () => {
@@ -75,30 +148,9 @@ export function FilmPageComponent({
     });
   };
 
-  const renderTopActions = () => (
-    <View style={ styles.topActions }>
-      <ThemedPressable
-        style={ styles.topActionsButton }
-        onPress={ () => router.back() }
-        mode='dark'
-      >
-        <ArrowLeft
-          size={ scale(24) }
-          color={ Colors.white }
-        />
-      </ThemedPressable>
-      <ThemedPressable
-        style={ styles.topActionsButton }
-        onPress={ handleShare }
-        mode='dark'
-      >
-        <Share2
-          size={ scale(24) }
-          color={ Colors.white }
-        />
-      </ThemedPressable>
-    </View>
-  );
+  const openNotImplemented = () => {
+    NotificationStore.displayMessage(t('Not implemented'));
+  };
 
   const renderTitle = () => {
     const { title, originalTitle } = film;
@@ -124,30 +176,18 @@ export function FilmPageComponent({
       <ScrollView horizontal>
         <View style={ styles.genres }>
           { genres.map(({ name, link }) => (
-            <TouchableHighlight
+            <ThemedPressable
               key={ name }
+              style={ styles.genre }
               onPress={ () => handleSelectCategory(link) }
             >
-              <ThemedText style={ styles.genre }>
+              <ThemedText>
                 { name }
               </ThemedText>
-            </TouchableHighlight>
+            </ThemedPressable>
           )) }
         </View>
       </ScrollView>
-    );
-  };
-
-  const renderPoster = () => {
-    const { poster, largePoster } = film;
-
-    return (
-      <ThemedImageModal
-        src={ poster }
-        modalSrc={ largePoster }
-        style={ styles.posterWrapper }
-        imageStyle={ styles.poster }
-      />
     );
   };
 
@@ -212,33 +252,6 @@ export function FilmPageComponent({
     return renderCollection(items, t('Director'), handleSelectActor);
   };
 
-  const renderMainInfo = () => {
-    const {
-      releaseDate,
-      ratings = [],
-      countries = [],
-      duration,
-    } = film;
-
-    return (
-      <View style={ styles.mainInfo }>
-        { ratings.map(({ name, rating, votes }) => renderInfoText(`${rating} (${votes})`, name)) }
-        { renderInfoText(releaseDate, t('Release date')) }
-        { renderInfoText(duration, t('Time')) }
-        { renderRating() }
-        { renderDirectors() }
-        { renderCollection(countries, t('Country'), handleSelectCategory) }
-      </View>
-    );
-  };
-
-  const renderMainContent = () => (
-    <View style={ styles.mainContent }>
-      { renderPoster() }
-      { renderMainInfo() }
-    </View>
-  );
-
   const renderDescription = () => {
     const { description } = film;
 
@@ -247,37 +260,37 @@ export function FilmPageComponent({
 
   const renderMiddleAction = (
     IconComponent: React.ComponentType<any>,
-    text?: string,
-    action?: () => void,
-    style?: StyleProp<ViewStyle>
+    text: string,
+    action?: () => void
   ) => (
-    <ThemedPressable
-      style={ [styles.action, style] }
-      onPress={ action }
-    >
-      <IconComponent
-        style={ styles.actionIcon }
-        size={ scale(18) }
-        color={ Colors.white }
-      />
-      { text && (
-        <ThemedText style={ styles.actionText }>
-          { text }
-        </ThemedText>
-      ) }
-    </ThemedPressable>
-  );
-
-  const renderMiddleActions = () => (
-    <View style={ styles.actions }>
-      { renderMiddleAction(Star, '3.4k', () => NotificationStore.displayMessage(t('Not implemented')), styles.actionSquare) }
-      { renderMiddleAction(Clapperboard, '', () => NotificationStore.displayMessage(t('Not implemented')), styles.actionSquare) }
-      { renderMiddleAction(MessageSquareText, t('Comments'), openComments) }
-      { renderMiddleAction(Bookmark, '', () => openOverlay(bookmarksOverlayId), styles.actionSquare) }
+    <View style={ styles.middleAction }>
+      <ThemedPressable
+        style={ styles.middleActionButton }
+        onPress={ action }
+      >
+        <IconComponent
+          style={ styles.middleActionIcon }
+          size={ scale(20) }
+          color={ Colors.white }
+        />
+      </ThemedPressable>
+      <ThemedText style={ styles.middleActionText }>
+        { text }
+      </ThemedText>
     </View>
   );
 
-  const renderBottomActions = () => {
+  const renderMiddleActions = () => (
+    <View style={ styles.middleActions }>
+      { renderMiddleAction(Star, 'Rate',openNotImplemented) }
+      { renderMiddleAction(Clapperboard, 'Trailer', openNotImplemented) }
+      { renderMiddleAction(MessageSquareText, t('Comm'), openComments) }
+      { renderMiddleAction(Bookmark, 'Bookmark', () => openOverlay(bookmarksOverlayId)) }
+      { renderMiddleAction(Download, 'Download', () => openOverlay(bookmarksOverlayId)) }
+    </View>
+  );
+
+  const renderPlay = () => {
     const { isPendingRelease } = film;
 
     if (isPendingRelease) {
@@ -296,50 +309,17 @@ export function FilmPageComponent({
     }
 
     return (
-      <View style={ styles.actions }>
-        <ThemedButton
-          style={ styles.playBtn }
-          onPress={ playFilm }
-          IconComponent={ Play }
-          iconProps={ {
-            size: scale(18),
-            color: Colors.white,
-          } }
-        >
-          { t('Watch Now') }
-        </ThemedButton>
-        <ThemedPressable
-          style={ styles.downloadBtn }
-          onPress={ () => NotificationStore.displayMessage(t('Not implemented')) }
-        >
-          <Download
-            style={ styles.downloadBtnIcon }
-            size={ scale(18) }
-            color={ Colors.white }
-          />
-        </ThemedPressable>
-      </View>
-    );
-  };
-
-  const renderRating = () => {
-    const { mainRating, ratingScale } = film;
-
-    if (!mainRating) {
-      return null;
-    }
-
-    return (
-      <View style={ styles.rating }>
-        <Rating
-          size={ scale(12) }
-          rating={ mainRating.rating || 0 }
-          scale={ 1 }
-          spacing={ scale(2) }
-          maxRating={ ratingScale || 10 }
-          fillColor={ Colors.secondary }
-        />
-      </View>
+      <ThemedButton
+        style={ styles.playBtn }
+        onPress={ playFilm }
+        IconComponent={ Play }
+        iconProps={ {
+          size: scale(18),
+          color: Colors.white,
+        } }
+      >
+        { t('Watch Now') }
+      </ThemedButton>
     );
   };
 
@@ -524,28 +504,114 @@ export function FilmPageComponent({
   const renderModals = () => (
     <>
       { renderPlayerVideoSelector() }
-      { /* { renderScheduleOverlay() } */ }
       { renderBookmarksOverlay() }
     </>
   );
 
+  // NEW
+
+  const renderTopActions = () => (
+    <View style={ styles.topActions }>
+      <ThemedPressable
+        style={ styles.topActionsButton }
+        onPress={ () => router.back() }
+      >
+        <ArrowLeft
+          size={ scale(24) }
+          color={ Colors.white }
+        />
+      </ThemedPressable>
+      <ThemedPressable
+        style={ styles.topActionsButton }
+        onPress={ handleShare }
+      >
+        <Share2
+          size={ scale(24) }
+          color={ Colors.white }
+        />
+      </ThemedPressable>
+    </View>
+  );
+
+  const renderPoster = () => {
+    const { poster, largePoster } = film;
+
+    return (
+      <ThemedImageModal
+        src={ poster }
+        modalSrc={ largePoster }
+        style={ styles.posterWrapper }
+        imageStyle={ styles.poster }
+      />
+    );
+  };
+
+  const renderMainInfo = () => {
+    const {
+      releaseDate,
+      countries = [],
+      duration,
+    } = film;
+
+    return (
+      <View style={ styles.mainInfo }>
+        { renderRatings() }
+        { renderInfoText(releaseDate, t('Release date')) }
+        { renderInfoText(duration, t('Time')) }
+        { renderDirectors() }
+        { renderCollection(countries, t('Country'), handleSelectCategory) }
+      </View>
+    );
+  };
+
+  const renderRatings = () => {
+    const { ratings = [] } = film;
+
+    if (!ratings.length) {
+      return null;
+    }
+
+    return ratings.map(({ name, rating, votes }) => renderInfoText(`${rating} (${votes})`, name));
+  };
+
   return (
     <Page>
-      <ScrollView>
-        { renderModals() }
-        { renderTopActions() }
-        { renderTitle() }
-        { renderGenres() }
-        { renderMainContent() }
-        { renderMiddleActions() }
-        { renderDescription() }
-        { renderBottomActions() }
-        { renderActors() }
-        { renderFranchise() }
-        { renderSchedule() }
-        { renderInfoLists() }
-        { renderRelated() }
-      </ScrollView>
+      { renderModals() }
+      <Animated.ScrollView ref={ scrollRef } onScroll={ scrollHandler } scrollEventThrottle={ 16 }>
+        { renderPosterBackground() }
+        <View style={ styles.upperContent }>
+          <Wrapper>
+            { renderTopActions() }
+            { renderTitle() }
+            { renderGenres() }
+            <View style={ styles.upperContentWrapper }>
+              { renderPoster() }
+              <View style={ styles.upperContentInfo }>
+                { renderMainInfo() }
+              </View>
+            </View>
+          </Wrapper>
+        </View>
+        <View style={ styles.middleContent }>
+          { renderGradient() }
+          <Wrapper>
+            { renderMiddleActions() }
+          </Wrapper>
+        </View>
+        <View style={ styles.bottomContent }>
+          <View style={ styles.mainContent }>
+            <Wrapper>
+              { renderDescription() }
+              { renderPlay() }
+              { renderActors() }
+              { renderFranchise() }
+              { renderSchedule() }
+              { renderInfoLists() }
+              { renderRelated() }
+            </Wrapper>
+          </View>
+        </View>
+      </Animated.ScrollView>
     </Page>
   );
 }

@@ -1,13 +1,11 @@
 import FilmPager from 'Component/FilmPager';
 import InfoBlock from 'Component/InfoBlock';
 import Page from 'Component/Page';
-import ThemedIcon from 'Component/ThemedIcon';
-import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedInput from 'Component/ThemedInput';
 import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import t from 'i18n/t';
-import { ArrowUpLeft, History,Mic, Search, X } from 'lucide-react-native';
+import { ArrowUpLeft, History, Mic, Search, X } from 'lucide-react-native';
 import React from 'react';
 import { View } from 'react-native';
 import { Colors } from 'Style/Colors';

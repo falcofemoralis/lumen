@@ -2,7 +2,6 @@ import FilmPager from 'Component/FilmPager';
 import InfoBlock from 'Component/InfoBlock';
 import Page from 'Component/Page';
 import ThemedButton from 'Component/ThemedButton';
-import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedInput from 'Component/ThemedInput';
 import t from 'i18n/t';
 import React, { useState } from 'react';
@@ -54,20 +53,20 @@ export function SearchPageComponent({
         <ThemedButton
           style={ styles.actionBtn }
           styleFocused={ recognizing && styles.speakActive }
-          iconStyleFocused={ recognizing && styles.speakActiveIcon }
-          icon={ {
-            pack: IconPackType.MaterialCommunityIcons,
-            name: 'microphone-outline',
-          } }
+          // iconStyleFocused={ recognizing && styles.speakActiveIcon }
+          // icon={ {
+          //   pack: IconPackType.MaterialCommunityIcons,
+          //   name: 'microphone-outline',
+          // } }
           onPress={ handleStartRecognition }
         />
         { renderSearchBar() }
         <ThemedButton
           style={ styles.actionBtn }
-          icon={ {
-            name: 'magnify',
-            pack: IconPackType.MaterialCommunityIcons,
-          } }
+          // icon={ {
+          //   name: 'magnify',
+          //   pack: IconPackType.MaterialCommunityIcons,
+          // } }
           onPress={ handleApplySearch }
         />
       </SpatialNavigationView>

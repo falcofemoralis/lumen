@@ -27,6 +27,10 @@ module.exports = defineConfig([
     },
     rules: {
       // eslint
+      'max-len': ['error', {
+        code: 120,
+        ignoreComments: true,
+      }],
       'no-multi-spaces': 'warn',
       'consistent-return': 'warn',
       'no-restricted-exports': 'off',
@@ -84,7 +88,7 @@ module.exports = defineConfig([
         exports: 'always-multiline',
         functions: 'never',
       }],
-       "semi": ["error", "always"],
+      'semi': ['error', 'always'],
       // @typescript-eslint
       '@stylistic-plugin-ts/indent': [2, 2],
       '@typescript-eslint/no-unnecessary-condition': 'off',

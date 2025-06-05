@@ -3,18 +3,16 @@ import ThemedImage from 'Component/ThemedImage';
 import ThemedPressable from 'Component/ThemedPressable';
 import { useServiceContext } from 'Context/ServiceContext';
 import { Tabs } from 'expo-router';
-import { useDimensions } from 'Hooks/useDimensions';
-import t from 'i18n/t';
 import { FolderHeart, History, House, Search } from 'lucide-react-native';
 import React, { useCallback } from 'react';
 import {
   Image,
+  useWindowDimensions,
   View,
 } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from 'Style/Colors';
-import { CONTENT_WRAPPER_PADDING } from 'Style/Layout';
 import { scale } from 'Util/CreateStyles';
 
 import { BOOKMARKS_ROUTE, HOME_ROUTE, RECENT_ROUTE, SEARCH_ROUTE, TABS_MOBILE_CONFIG } from './NavigationBar.config';
@@ -36,7 +34,7 @@ export function NavigationBarComponent({
   isFocused,
 }: NavigationBarComponentProps) {
   const { badgeData } = useServiceContext();
-  const { width } = useDimensions();
+  const { width } = useWindowDimensions();
 
   const renderIcon = (route: NavigationRoute) => {
     const params = {
@@ -154,7 +152,7 @@ export function NavigationBarComponent({
           tabBarHideOnKeyboard: true,
           freezeOnBlur: true,
           sceneStyle: {
-            marginHorizontal: CONTENT_WRAPPER_PADDING,
+            // marginHorizontal: CONTENT_WRAPPER_PADDING,
           },
           // lazy: false,
         } }

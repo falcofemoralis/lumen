@@ -1,4 +1,3 @@
-import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import { useServiceContext } from 'Context/ServiceContext';
 import * as Application from 'expo-application';
 import t from 'i18n/t';
@@ -33,55 +32,55 @@ export function WelcomePageContainer() {
       id: SLIDE_TYPE.WELCOME,
       title: t('Welcome to %s', Application.applicationName ?? ''),
       subtitle: t('Your gateway to unlimited movies. Let’s set things up!'),
-      icon: {
-        name: 'movie-open-play',
-        pack: IconPackType.MaterialCommunityIcons,
-      },
+      // icon: {
+      //   name: 'server-network',
+      //   pack: 'pack',
+      // },
     },
     {
       id: SLIDE_TYPE.CONFIGURE,
       title: t('Personalize Your Experience'),
       subtitle: t('Choose your device type for a tailored movie-watching journey.'),
-      icon: {
-        name: 'cog',
-        pack: IconPackType.MaterialCommunityIcons,
-      },
+      // icon: {
+      //   name: 'server-network',
+      //   pack: 'pack',
+      // },
     },
     {
       id: SLIDE_TYPE.PROVIDER,
       title: t('Select Your Content Provider'),
       subtitle: t('Connect with streaming services for the best selection.'),
-      icon: {
-        name: 'server-network',
-        pack: IconPackType.MaterialCommunityIcons,
-      },
+      // icon: {
+      //   name: 'server-network',
+      //   pack: 'pack',
+      // },
     },
     {
       id: SLIDE_TYPE.CDN,
       title: t('Optimize Streaming Performance'),
       subtitle: t('Choose a content delivery network (CDN) for faster streaming.'),
-      icon: {
-        name: 'speedometer',
-        pack: IconPackType.MaterialCommunityIcons,
-      },
+      // icon: {
+      //   name: 'server-network',
+      //   pack: 'pack',
+      // },
     },
     {
       id: SLIDE_TYPE.LOGIN,
       title: t('Sign In to an Account'),
       subtitle: t('Log in to sync your content and enjoy a seamless experience.'),
-      icon: {
-        name: 'account',
-        pack: IconPackType.MaterialCommunityIcons,
-      },
+      // icon: {
+      //   name: 'server-network',
+      //   pack: 'pack',
+      // },
     },
     {
       id: SLIDE_TYPE.COMPLETE,
       title: t('Setup Complete!'),
       subtitle: t('You’re all set. Grab some popcorn and start watching!'),
-      icon: {
-        name: 'check-circle',
-        pack: IconPackType.MaterialCommunityIcons,
-      },
+      // icon: {
+      //   name: 'server-network',
+      //   pack: 'pack',
+      // },
     },
   ];
 

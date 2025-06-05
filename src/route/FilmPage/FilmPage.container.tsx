@@ -20,7 +20,7 @@ import FilmPageComponentTV from './FilmPage.component.atv';
 import { MINIMUM_SCHEDULE_ITEMS } from './FilmPage.config';
 import { FilmPageContainerProps } from './FilmPage.type';
 
-export function FilmPageContainer({ link }: FilmPageContainerProps) {
+export function FilmPageContainer({ link, thumbnailPoster }: FilmPageContainerProps) {
   const { openOverlay, goToPreviousOverlay } = useOverlayContext();
   const [film, setFilm] = useState<FilmInterface | null>(null);
   const playerVideoSelectorOverlayId = useId();
@@ -204,6 +204,7 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
 
   const containerProps = () => ({
     film,
+    thumbnailPoster,
     visibleScheduleItems: getVisibleScheduleItems(),
     playerVideoSelectorOverlayId,
     scheduleOverlayId,

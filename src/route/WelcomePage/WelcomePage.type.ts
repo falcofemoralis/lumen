@@ -1,4 +1,3 @@
-import { IconInterface } from 'Component/ThemedIcon/ThemedIcon.type';
 import { ProfileInterface } from 'Type/Profile.interface';
 
 export interface WelcomePageComponentProps {
@@ -37,7 +36,7 @@ export interface SlideInterface {
   id: SLIDE_TYPE;
   title: string;
   subtitle: string;
-  icon: IconInterface
+  icon?: string
 }
 
 export type DeviceType = 'TV' | 'MOBILE';
