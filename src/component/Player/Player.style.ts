@@ -59,11 +59,14 @@ export const styles = CreateStyles({
   },
   control: {
     alignSelf: 'center',
-  },
-  controlIcon: {
+    width: 40,
+    height: 40,
     backgroundColor: Colors.modal,
-    padding: 10,
     borderRadius: 50,
+  },
+  controlBig: {
+    width: 48,
+    height: 48,
   },
   durationRow: {
     marginBottom: 16,
@@ -79,9 +82,14 @@ export const styles = CreateStyles({
     flexDirection: 'column',
     gap: 4,
   },
+  action: {
+    borderRadius: 50,
+    width: 42,
+    height: 42,
+  },
   actionsRow: {
     flexDirection: 'row',
-    gap: 32,
+    gap: 24,
   },
   bottomActionsRowLine: {
     flexDirection: 'row',

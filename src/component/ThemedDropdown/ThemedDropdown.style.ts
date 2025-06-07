@@ -3,9 +3,12 @@ import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
   input: {
-    backgroundColor: Colors.input,
+    backgroundColor: Colors.backgroundLighter,
+  },
+  inputContent: {
     justifyContent: 'flex-start',
-    gap: 4,
+    gap: 8,
+    padding: 8,
   },
   inputIcon: {
   },

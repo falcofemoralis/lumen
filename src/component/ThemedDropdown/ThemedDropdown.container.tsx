@@ -11,7 +11,7 @@ export function ThemedDropdownContainer(props: ThemedDropdownContainerProps) {
 
 function propsAreEqual(
   prevProps: ThemedDropdownContainerProps,
-  props: ThemedDropdownContainerProps,
+  props: ThemedDropdownContainerProps
 ) {
   return JSON.stringify(prevProps.data) === JSON.stringify(props.data)
     && prevProps.value === props.value;

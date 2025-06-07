@@ -1,6 +1,6 @@
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback } from 'react';
-import { TextInput } from 'react-native';
+import { TextInput, View } from 'react-native';
 import { AvoidSoftInput } from 'react-native-avoid-softinput';
 import { Colors } from 'Style/Colors';
 
@@ -12,6 +12,7 @@ export const ThemedInputComponent = ({
   onChangeText,
   useSoftInput = false,
   style,
+  containerStyle,
   ...props
 }: ThemedInputComponentProps) => {
   const onFocusEffect = useCallback(() => {
@@ -31,20 +32,19 @@ export const ThemedInputComponent = ({
   useFocusEffect(onFocusEffect); // register callback to focus events
 
   return (
-    <TextInput
-      placeholder={ placeholder }
-      onChangeText={ onChangeText }
-      style={ [
-        styles.input,
-        style,
-      ] }
-      placeholderTextColor={ Colors.text }
-      selectionColor={ Colors.secondary }
-      cursorColor={ Colors.secondary }
-      underlineColorAndroid={ Colors.white }
-      selectionHandleColor={ Colors.secondary }
-      { ...props }
-    />
+    <View style={ [styles.container, containerStyle] }>
+      <TextInput
+        placeholder={ placeholder }
+        onChangeText={ onChangeText }
+        style={ [ styles.input, style ] }
+        placeholderTextColor={ Colors.text }
+        selectionColor={ Colors.secondary }
+        cursorColor={ Colors.secondary }
+        underlineColorAndroid={ Colors.transparent }
+        selectionHandleColor={ Colors.secondary }
+        { ...props }
+      />
+    </View>
   );
 };
 

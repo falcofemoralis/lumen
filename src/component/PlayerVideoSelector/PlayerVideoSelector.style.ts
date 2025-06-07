@@ -20,6 +20,8 @@ export const styles = CreateStyles({
   },
   season: {
     backgroundColor: Colors.chip,
+    padding: 8,
+    borderRadius: 16,
   },
   seasonSelected: {
     backgroundColor: Colors.primary,
@@ -41,6 +43,8 @@ export const styles = CreateStyles({
   },
   episode: {
     backgroundColor: Colors.chip,
+    padding: 8,
+    borderRadius: 16,
   },
   episodeSelected: {
     backgroundColor: Colors.primary,

@@ -4,6 +4,7 @@ import Page from 'Component/Page';
 import ThemedInput from 'Component/ThemedInput';
 import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
+import Wrapper from 'Component/Wrapper';
 import t from 'i18n/t';
 import { ArrowUpLeft, History, Mic, Search, X } from 'lucide-react-native';
 import React from 'react';
@@ -35,7 +36,7 @@ export function SearchPageComponent({
   const renderSearchBar = () => (
     <View style={ styles.searchBarContainer }>
       <ThemedInput
-        style={ styles.searchBar }
+        containerStyle={ styles.searchBar }
         placeholder={ t('Search') }
         onChangeText={ (text) => onChangeText(text) }
         onSubmitEditing={ ({ nativeEvent: { text } }) => onApplySearch(text) }
@@ -148,11 +149,13 @@ export function SearchPageComponent({
 
   return (
     <Page>
-      <View style={ styles.container }>
-        { renderSearchContainer() }
-        { renderSuggestions() }
-      </View>
-      { renderFilms() }
+      <Wrapper>
+        <View style={ styles.container }>
+          { renderSearchContainer() }
+          { renderSuggestions() }
+        </View>
+        { renderFilms() }
+      </Wrapper>
     </Page>
   );
 }

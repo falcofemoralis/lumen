@@ -7,6 +7,7 @@ export const ThemedPressable = ({
   onPress,
   children,
   style,
+  contentStyle,
   disabled = false,
   mode = 'light',
 }: ThemedPressableProps) => {
@@ -36,7 +37,7 @@ export const ThemedPressable = ({
           flexDirection: 'row',
           justifyContent: 'center',
           alignItems: 'center',
-        }] }
+        }, contentStyle] }
       >
         { children }
       </Pressable>

@@ -40,8 +40,7 @@ export function ThemedOverlayComponent({
     if (isOpened) {
       updateOrientation();
     }
-  },
-  [isOpened]);
+  }, [isOpened]);
 
   return (
     <Portal>

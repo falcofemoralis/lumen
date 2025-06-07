@@ -14,7 +14,21 @@ import { usePlayerContext } from 'Context/PlayerContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { VideoView } from 'expo-video';
 import t from 'i18n/t';
-import { Bookmark, Captions, CaptionsOff, FastForward, Gauge, ListVideo, MessageSquareText, Pause, Play, Rewind, SkipBack, SkipForward, Sparkles } from 'lucide-react-native';
+import {
+  Bookmark,
+  Captions,
+  CaptionsOff,
+  FastForward,
+  Gauge,
+  ListVideo,
+  MessageSquareText,
+  Pause,
+  Play,
+  Rewind,
+  SkipBack,
+  SkipForward,
+  Sparkles,
+} from 'lucide-react-native';
 import React, {
   Ref,
   useEffect,

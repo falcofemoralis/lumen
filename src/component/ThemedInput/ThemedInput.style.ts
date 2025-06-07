@@ -2,10 +2,12 @@ import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
-  input: {
+  container: {
     backgroundColor: Colors.input,
+    borderRadius: 16,
+    paddingHorizontal: 8,
   },
-  inputFocus: {
-    backgroundColor: Colors.inputFocused,
+  input: {
+    color: Colors.text,
   },
 });

@@ -8,6 +8,7 @@ export interface ThemedButtonProps {
   children?: React.ReactNode;
   style?: StyleProp<ViewStyle>;
   styleFocused?: StyleProp<ViewStyle>;
+  contentStyle?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
   rightImageStyle?: StyleProp<ImageStyle>
   isSelected?: boolean;

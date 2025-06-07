@@ -17,7 +17,23 @@ import { OrientationLock } from 'expo-screen-orientation';
 import * as StatusBar from 'expo-status-bar';
 import { isPictureInPictureSupported, VideoView } from 'expo-video';
 import t from 'i18n/t';
-import { Bookmark, Captions, CaptionsOff, Gauge, ListVideo, LockKeyhole, LockKeyholeOpen, MessageSquareText, Pause, PictureInPicture2, Play, Share2, SkipBack, SkipForward, Sparkles } from 'lucide-react-native';
+import {
+  Bookmark,
+  Captions,
+  CaptionsOff,
+  Forward,
+  Gauge,
+  ListVideo,
+  LockKeyhole,
+  LockKeyholeOpen,
+  MessageSquareText,
+  Pause,
+  PictureInPicture2,
+  Play,
+  SkipBack,
+  SkipForward,
+  Sparkles,
+} from 'lucide-react-native';
 import React, {
   useEffect, useRef, useState,
 } from 'react';
@@ -25,7 +41,6 @@ import { Dimensions, ScrollView, View } from 'react-native';
 import {
   Gesture,
   GestureDetector,
-  TouchableOpacity,
 } from 'react-native-gesture-handler';
 import Animated, {
   runOnJS,
@@ -224,6 +239,7 @@ export function PlayerComponent({
   ) => (
     <GestureDetector gesture={ Gesture.Tap() }>
       <ThemedPressable
+        style={ styles.action }
         onPress={ () => handleUserInteraction(action) }
       >
         <IconComponent
@@ -299,12 +315,11 @@ export function PlayerComponent({
   ) => (
     <GestureDetector gesture={ Gesture.Tap() }>
       <ThemedPressable
-        style={ styles.control }
+        style={ [styles.control, size === 'big' && styles.controlBig] }
         onPress={ () => handleUserInteraction(action) }
       >
         <IconComponent
-          style={ styles.controlIcon }
-          size={ scale(size === 'big' ? 36 : 24) }
+          size={ scale(size === 'big' ? 28 : 20) }
           color={ Colors.white }
         />
       </ThemedPressable>
@@ -398,7 +413,7 @@ export function PlayerComponent({
             { isPlaylistSelector && renderAction(ListVideo, openVideoSelector) }
             { renderAction(MessageSquareText, openCommentsOverlay) }
             { renderAction(Bookmark, openBookmarksOverlay) }
-            { renderAction(Share2, handleShare) }
+            { renderAction(Forward, handleShare) }
           </View>
         </View>
       </View>

@@ -32,7 +32,7 @@ const ButtonColors = {
   button: '#383838',
   buttonText: '#E3E3E3',
   buttonFocused: BackgroundColors.backgroundFocused,
-  chip: '#383838',
+  chip: BackgroundColors.backgroundLighter,
   chipText: '#E3E3E3',
   chipFocused: BackgroundColors.backgroundFocused,
 };

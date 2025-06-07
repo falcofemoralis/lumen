@@ -9,7 +9,8 @@ import t from 'i18n/t';
 import { CircleHelp } from 'lucide-react-native';
 import React, { useRef } from 'react';
 import {
-  Dimensions, Pressable, ScrollView,
+  Dimensions,
+  ScrollView,
   View,
 } from 'react-native';
 import { Colors } from 'Style/Colors';
@@ -129,7 +130,7 @@ export function PlayerVideoSelectorComponent({
   const renderSeasons = () => (
     <View style={ styles.seasonsContainer }>
       { seasons.map((season) => (
-        <Pressable
+        <ThemedPressable
           key={ season.seasonId }
           style={ [
             styles.season,
@@ -145,7 +146,7 @@ export function PlayerVideoSelectorComponent({
           >
             { season.name }
           </ThemedText>
-        </Pressable>
+        </ThemedPressable>
       )) }
     </View>
   );
@@ -153,7 +154,7 @@ export function PlayerVideoSelectorComponent({
   const renderEpisodes = () => (
     <View style={ styles.episodesContainer }>
       { episodes.map(({ episodeId, name }) => (
-        <Pressable
+        <ThemedPressable
           key={ episodeId }
           style={ [
             styles.episode,
@@ -168,7 +169,7 @@ export function PlayerVideoSelectorComponent({
           >
             { name }
           </ThemedText>
-        </Pressable>
+        </ThemedPressable>
       )) }
     </View>
   );

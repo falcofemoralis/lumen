@@ -1,5 +1,6 @@
 import FilmGrid from 'Component/FilmGrid';
-import { useRef, useState } from 'react';
+import Wrapper from 'Component/Wrapper';
+import { memo,useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { NativeSyntheticEvent, Pressable, ScrollView, View } from 'react-native';
 import PagerView from 'react-native-pager-view';
 import {
@@ -13,6 +14,35 @@ import { scale } from 'Util/CreateStyles';
 import { styles } from './FilmPager.style';
 import { FilmPagerComponentProps, PagerItemInterface } from './FilmPager.type';
 
+const TabButton = memo(({
+  title,
+  isActive,
+  onPress,
+  onLayout,
+}: {
+  title: string;
+  isActive: boolean;
+  onPress: () => void;
+  onLayout: (width: number) => void;
+}) => (
+  <Pressable
+    onPress={ onPress }
+    style={ styles.tabButton }
+    onLayout={ (e) => onLayout(e.nativeEvent.layout.width) }
+    accessibilityRole="tab"
+    accessibilityState={ { selected: isActive } }
+  >
+    <Animated.Text
+      style={ [
+        styles.tabText,
+        isActive && styles.activeTabText,
+      ] }
+    >
+      { title }
+    </Animated.Text>
+  </Pressable>
+));
+
 export const FilmPagerComponent = ({
   pagerItems,
   onPreLoad,
@@ -20,14 +50,22 @@ export const FilmPagerComponent = ({
 }: FilmPagerComponentProps) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [activeTab, setActiveTab] = useState(0);
-  const [renderedTabs, setRenderedTabs] = useState<boolean[]>(Array(pagerItems.length + 1).fill(false));
+  const [renderedTabs, setRenderedTabs] = useState<boolean[]>([]);
   const scrollViewRef = useRef<ScrollView>(null);
   const pagerViewRef = useRef<PagerView>(null);
   const tabWidthsRef = useRef<number[]>([]);
-  const loadedTabsRef = useRef<boolean[]>(Array(pagerItems.length + 1).fill(false));
+  const loadedTabsRef = useRef<boolean[]>([]);
   const scrollState = useRef<'idle' | 'dragging' | 'settling'>('idle');
 
-  const updateActiveTab = (index: number) => {
+  // Initialize arrays when pagerItems changes
+  useEffect(() => {
+    const length = pagerItems.length;
+    setRenderedTabs(Array(length).fill(false));
+    loadedTabsRef.current = Array(length).fill(false);
+    tabWidthsRef.current = Array(length).fill(0);
+  }, [pagerItems.length]);
+
+  const updateActiveTab = useCallback((index: number) => {
     if (index !== activeTab) {
       setActiveTab(index);
       const offsetX = tabWidthsRef.current.slice(0, index).reduce((acc, width) => acc + width, 0);
@@ -42,25 +80,26 @@ export const FilmPagerComponent = ({
         return newLoadedTabs;
       });
     }
-  };
+  }, [activeTab, renderedTabs]);
 
-  const handleTabPress = (index: number) => {
+  const handleTabPress = useCallback((index: number) => {
     pagerViewRef.current?.setPage(index);
     updateActiveTab(index);
-  };
+  }, [updateActiveTab]);
 
-  const handlePageSelect = (e: NativeSyntheticEvent<OnPageSelectedEventData>) => {
+  const handlePageSelect = useCallback((e: NativeSyntheticEvent<OnPageSelectedEventData>) => {
     const { position } = e.nativeEvent;
 
     setActiveIndex(position);
+    updateActiveTab(position);
 
     if (!loadedTabsRef.current[position] && position !== 0) {
       onPreLoad(pagerItems[position]);
       loadedTabsRef.current[position] = true;
     }
-  };
+  }, [onPreLoad, pagerItems, updateActiveTab]);
 
-  const handlePageScroll = (e: NativeSyntheticEvent<OnPageScrollEventData>) => {
+  const handlePageScroll = useCallback((e: NativeSyntheticEvent<OnPageScrollEventData>) => {
     const { offset, position } = e.nativeEvent;
 
     if (scrollState.current !== 'dragging') {
@@ -80,44 +119,36 @@ export const FilmPagerComponent = ({
         updateActiveTab(activeIndex);
       }
     }
-  };
+  }, [activeIndex, updateActiveTab]);
 
-  const handlePageScrollStateChanged = (e: NativeSyntheticEvent<OnPageScrollStateChangedEventData>) => {
+  const handlePageScrollStateChanged = useCallback((e: NativeSyntheticEvent<OnPageScrollStateChangedEventData>) => {
     scrollState.current = e.nativeEvent.pageScrollState;
-  };
+  }, []);
 
-  const renderScrollableTabBar = () => {
-    return (
-      <View>
-        <ScrollView
-          ref={ scrollViewRef }
-          horizontal
-          showsHorizontalScrollIndicator={ false }
-          contentContainerStyle={ styles.tabBarContainer }
-        >
-          { pagerItems.map(({ key, title }, i) => (
-            <Pressable
-              key={ key }
-              onPress={ () => handleTabPress(i) }
-              style={ styles.tabButton }
-              onLayout={ (e) => tabWidthsRef.current[i] = e.nativeEvent.layout.width }
-            >
-              <Animated.Text
-                style={ [
-                  styles.tabText,
-                  activeTab === i && styles.activeTabText,
-                ] }
-              >
-                { title }
-              </Animated.Text>
-            </Pressable>
-          )) }
-        </ScrollView>
-      </View>
-    );
-  };
+  const renderScrollableTabBar = useMemo(() => (
+    <View>
+      <ScrollView
+        ref={ scrollViewRef }
+        horizontal
+        showsHorizontalScrollIndicator={ false }
+        showsVerticalScrollIndicator={ false }
+        contentContainerStyle={ styles.tabBarContainer }
+        accessibilityRole="tablist"
+      >
+        { pagerItems.map(({ key, title }, i) => (
+          <TabButton
+            key={ key }
+            title={ title }
+            isActive={ activeTab === i }
+            onPress={ () => handleTabPress(i) }
+            onLayout={ (width) => tabWidthsRef.current[i] = width }
+          />
+        )) }
+      </ScrollView>
+    </View>
+  ), [pagerItems, activeTab, handleTabPress]);
 
-  const renderPage = (pagerItem: PagerItemInterface, idx: number) => {
+  const renderPage = useCallback((pagerItem: PagerItemInterface, idx: number) => {
     if (!renderedTabs[idx] && idx !== 0) {
       return null;
     }
@@ -130,27 +161,25 @@ export const FilmPagerComponent = ({
         onNextLoad={ (isRefresh) => onNextLoad(isRefresh, pagerItem) }
       />
     );
-  };
+  }, [renderedTabs, onNextLoad]);
 
-  const renderPagerView = () => {
-    return (
-      <PagerView
-        ref={ pagerViewRef }
-        style={ { flex: 1 } }
-        initialPage={ 0 }
-        onPageScroll={ handlePageScroll }
-        onPageSelected={ handlePageSelect }
-        onPageScrollStateChanged={ handlePageScrollStateChanged }
-        pageMargin={ scale(24) }
-      >
-        { pagerItems.map((item, idx) => (
-          <View key={ item.key }>
-            { renderPage(item, idx) }
-          </View>
-        )) }
-      </PagerView>
-    );
-  };
+  const renderPagerView = useMemo(() => (
+    <PagerView
+      ref={ pagerViewRef }
+      style={ { flex: 1 } }
+      initialPage={ 0 }
+      onPageScroll={ handlePageScroll }
+      onPageSelected={ handlePageSelect }
+      onPageScrollStateChanged={ handlePageScrollStateChanged }
+      pageMargin={ scale(24) }
+    >
+      { pagerItems.map((item, idx) => (
+        <Wrapper key={ item.key }>
+          { renderPage(item, idx) }
+        </Wrapper>
+      )) }
+    </PagerView>
+  ), [pagerItems, handlePageScroll, handlePageSelect, handlePageScrollStateChanged, renderPage]);
 
   if (!pagerItems.length) {
     return renderPage(pagerItems[0], 0);
@@ -158,8 +187,8 @@ export const FilmPagerComponent = ({
 
   return (
     <View style={ { flex: 1 } }>
-      { renderPagerView() }
-      { renderScrollableTabBar() }
+      { renderPagerView }
+      { renderScrollableTabBar }
     </View>
   );
 };

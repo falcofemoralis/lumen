@@ -2,6 +2,7 @@ import ThemedButton from 'Component/ThemedButton';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import { useOverlayContext } from 'Context/OverlayContext';
+import { Plus } from 'lucide-react-native';
 import React, { useCallback, useRef } from 'react';
 import {
   ScrollView, Text, TouchableHighlight, View,
@@ -141,9 +142,15 @@ export const ThemedDropdownComponent = ({
     return (
       <ThemedButton
         style={ [styles.input, inputStyle] }
+        contentStyle={ styles.inputContent }
         textStyle={ styles.inputText }
         rightImageStyle={ styles.inputImage }
         onPress={ () => openOverlay(id.current) }
+        IconComponent={ Plus }
+        iconProps={ {
+          color: Colors.text,
+          size: 18,
+        } }
         rightImage={ endIcon }
       >
         { inputLabel ?? label }

@@ -2,7 +2,6 @@ import BookmarksSelector from 'Component/BookmarksSelector';
 import Page from 'Component/Page';
 import PlayerVideoSelector from 'Component/PlayerVideoSelector';
 import ThemedButton from 'Component/ThemedButton';
-import { ThemedImage } from 'Component/ThemedImage/ThemedImage.component';
 import ThemedImageModal from 'Component/ThemedImageModal';
 import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
@@ -17,9 +16,9 @@ import {
   Clapperboard,
   Clock,
   Download,
+  Forward,
   MessageSquareText,
   Play,
-  Share2,
   Star,
 } from 'lucide-react-native';
 import React from 'react';
@@ -247,9 +246,9 @@ export function FilmPageComponent({
           color={ Colors.white }
         />
       </ThemedPressable>
-      <ThemedText style={ styles.middleActionText }>
+      { /* <ThemedText style={ styles.middleActionText }>
         { text }
-      </ThemedText>
+      </ThemedText> */ }
     </View>
   );
 
@@ -504,7 +503,7 @@ export function FilmPageComponent({
         style={ styles.topActionsButton }
         onPress={ handleShare }
       >
-        <Share2
+        <Forward
           size={ scale(24) }
           color={ Colors.white }
         />

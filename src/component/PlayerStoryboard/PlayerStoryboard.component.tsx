@@ -100,7 +100,7 @@ const PlayerStoryboardComponent = ({
     }
 
     const item = storyboard.find((
-      { start, end },
+      { start, end }
     ) => currentTime >= start && currentTime <= end);
 
     if (item) {
@@ -120,7 +120,7 @@ const PlayerStoryboardComponent = ({
 
 function storyboardPropsAreEqual(
   prevProps: PlayerStoryboardComponentProps,
-  props: PlayerStoryboardComponentProps,
+  props: PlayerStoryboardComponentProps
 ) {
   return prevProps.storyboardUrl === props.storyboardUrl
     && prevProps.currentTime === props.currentTime;

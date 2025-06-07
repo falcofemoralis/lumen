@@ -1,10 +1,9 @@
-import Page from 'Component/Page';
 import ThemedPressable from 'Component/ThemedPressable';
 import Thumbnail from 'Component/Thumbnail';
 import Wrapper from 'Component/Wrapper';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import { ArrowLeft, Share2 } from 'lucide-react-native';
+import { ArrowLeft, Forward } from 'lucide-react-native';
 import { View } from 'react-native';
 import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
@@ -30,7 +29,7 @@ export const FilmPageThumbnail = () => (
             style={ styles.topActionsButton }
             onPress={ noopFn }
           >
-            <Share2
+            <Forward
               size={ scale(24) }
               color={ Colors.white }
             />
