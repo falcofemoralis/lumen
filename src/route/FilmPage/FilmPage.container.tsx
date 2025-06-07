@@ -111,8 +111,8 @@ export function FilmPageContainer({ link, thumbnailPoster }: FilmPageContainerPr
     });
   };
 
-  const handleSelectFilm = useCallback((filmLink: string) => {
-    openFilm(filmLink);
+  const handleSelectFilm = useCallback((f: FilmInterface) => {
+    openFilm(f);
   }, []);
 
   const handleSelectActor = useCallback((actorLink: string) => {
@@ -209,6 +209,16 @@ export function FilmPageContainer({ link, thumbnailPoster }: FilmPageContainerPr
     }
   };
 
+  const openBookmarks = () => {
+    if (!isSignedIn) {
+      NotificationStore.displayMessage(t('Sign In to an Account'));
+
+      return;
+    }
+
+    openOverlay(bookmarksOverlayId);
+  };
+
   const containerProps = () => ({
     film,
     thumbnailPoster,
@@ -228,6 +238,7 @@ export function FilmPageContainer({ link, thumbnailPoster }: FilmPageContainerPr
     handleSelectCategory,
     handleUpdateScheduleWatch,
     handleShare,
+    openBookmarks,
   };
 
   return withTV(FilmPageComponentTV, FilmPageComponent, {

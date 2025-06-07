@@ -4,7 +4,7 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { Dimensions, Modal, Pressable, ScaledSize } from 'react-native';
+import { Modal, Pressable, useWindowDimensions } from 'react-native';
 import { Colors } from 'Style/Colors';
 import { noopFn } from 'Util/Function';
 
@@ -19,28 +19,15 @@ export function ThemedOverlayComponent({
   children,
 }: ThemedOverlayComponentProps) {
   const [isLandscape, setIsLandscape] = useState(false);
+  const { width, height } = useWindowDimensions();
 
-  const updateOrientation = (args?: { window: ScaledSize }) => {
-    const { window } = args ?? {};
-    const { width, height } = window ?? Dimensions.get('window');
+  useEffect(() => {
     const newLandscape = width > height;
 
-    setIsLandscape(newLandscape);
-  };
-
-  useEffect(() => {
-    const dimensionChangeHandler = Dimensions.addEventListener('change', updateOrientation);
-
-    return () => {
-      dimensionChangeHandler.remove();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (isOpened) {
-      updateOrientation();
+    if (newLandscape !== isLandscape) {
+      setIsLandscape(newLandscape);
     }
-  }, [isOpened]);
+  }, [width, height]);
 
   return (
     <Portal>

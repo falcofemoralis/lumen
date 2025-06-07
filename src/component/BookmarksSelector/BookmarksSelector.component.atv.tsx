@@ -29,7 +29,7 @@ export const BookmarksSelectorComponent = ({
         onChange={ postBookmark }
       />
     </ThemedOverlay>
-  )
+  );
 };
 
 export default BookmarksSelectorComponent;

@@ -1,4 +1,5 @@
 import BookmarksSelector from 'Component/BookmarksSelector';
+import Header from 'Component/Header';
 import Page from 'Component/Page';
 import PlayerVideoSelector from 'Component/PlayerVideoSelector';
 import ThemedButton from 'Component/ThemedButton';
@@ -8,7 +9,7 @@ import ThemedText from 'Component/ThemedText';
 import Wrapper from 'Component/Wrapper';
 import { useOverlayContext } from 'Context/OverlayContext';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
+import { router, useRouter } from 'expo-router';
 import t from 'i18n/t';
 import {
   ArrowLeft,
@@ -69,8 +70,8 @@ export function FilmPageComponent({
   handleSelectCategory,
   handleUpdateScheduleWatch,
   handleShare,
+  openBookmarks,
 }: FilmPageComponentProps) {
-  const router = useRouter();
   const { openOverlay } = useOverlayContext();
   const { width } = useWindowDimensions();
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
@@ -151,6 +152,7 @@ export function FilmPageComponent({
             <ThemedPressable
               key={ name }
               style={ styles.genre }
+              contentStyle={ styles.genreContent }
               onPress={ () => handleSelectCategory(link) }
             >
               <ThemedText>
@@ -200,9 +202,10 @@ export function FilmPageComponent({
           { `${title}: ` }
         </ThemedText>
         { collection.map(({ name, link }) => (
-          <TouchableOpacity
+          <ThemedPressable
             key={ name }
             style={ styles.collectionButton }
+            contentStyle={ styles.collectionButtonContent }
             onPress={ () => handler && handler(link) }
           >
             <ThemedText
@@ -210,7 +213,7 @@ export function FilmPageComponent({
             >
               { name }
             </ThemedText>
-          </TouchableOpacity>
+          </ThemedPressable>
         )) }
       </View>
     );
@@ -257,7 +260,7 @@ export function FilmPageComponent({
       { renderMiddleAction(Star, 'Rate',openNotImplemented) }
       { renderMiddleAction(Clapperboard, 'Trailer', openNotImplemented) }
       { renderMiddleAction(MessageSquareText, t('Comm'), openComments) }
-      { renderMiddleAction(Bookmark, 'Bookmark', () => openOverlay(bookmarksOverlayId)) }
+      { renderMiddleAction(Bookmark, 'Bookmark', openBookmarks) }
       { renderMiddleAction(Download, 'Download', () => openOverlay(bookmarksOverlayId)) }
     </View>
   );
@@ -385,6 +388,7 @@ export function FilmPageComponent({
               <RelatedItem
                 // eslint-disable-next-line react/no-array-index-key -- idx is unique
                 key={ `${item.id}-${idx}` }
+                film={ film }
                 item={ item }
                 handleSelectFilm={ handleSelectFilm }
               />
@@ -486,29 +490,11 @@ export function FilmPageComponent({
     );
   };
 
-  // NEW
-
   const renderTopActions = () => (
-    <View style={ styles.topActions }>
-      <ThemedPressable
-        style={ styles.topActionsButton }
-        onPress={ () => router.back() }
-      >
-        <ArrowLeft
-          size={ scale(24) }
-          color={ Colors.white }
-        />
-      </ThemedPressable>
-      <ThemedPressable
-        style={ styles.topActionsButton }
-        onPress={ handleShare }
-      >
-        <Forward
-          size={ scale(24) }
-          color={ Colors.white }
-        />
-      </ThemedPressable>
-    </View>
+    <Header
+      additionalAction={ handleShare }
+      AdditionalActionIcon={ Forward }
+    />
   );
 
   const renderPosterBackground = () => {
@@ -583,8 +569,8 @@ export function FilmPageComponent({
     return (
       <View>
         <View style={ styles.upperContent }>
+          { renderTopActions() }
           <Wrapper>
-            { renderTopActions() }
             { renderTitle() }
             { renderGenres() }
             <View style={ styles.upperContentWrapper }>

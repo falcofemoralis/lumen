@@ -9,7 +9,12 @@ export const styles = CreateStyles({
     borderRadius: 8,
     color: Colors.text,
     fontSize: 16,
+  },
+  content: {
     padding: 12,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 8,
   },
   icon: {
     width: 16,

@@ -2,24 +2,6 @@ import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
-  topActions: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignContent: 'center',
-    width: '100%',
-    marginVertical: 16,
-    zIndex: 10,
-  },
-  topActionsButton: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: 40,
-    height: 40,
-    padding: 12,
-    borderRadius: 100,
-    backgroundColor: Colors.whiteTransparent,
-  },
   upperContent: {
     width: '100%',
     backgroundColor: Colors.fade,
@@ -67,6 +49,8 @@ export const styles = CreateStyles({
   genre: {
     backgroundColor: Colors.chip,
     borderRadius: 8,
+  },
+  genreContent: {
     padding: 4,
   },
   backgroundGradient: {
@@ -110,9 +94,11 @@ export const styles = CreateStyles({
   },
   collectionButton: {
     borderRadius: 8,
+    backgroundColor: Colors.chip,
+  },
+  collectionButtonContent: {
     paddingHorizontal: 6,
     paddingVertical: 1,
-    backgroundColor: Colors.chip,
   },
   collectionButtonText: {
     fontSize: 14,

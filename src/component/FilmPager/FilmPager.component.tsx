@@ -126,7 +126,7 @@ export const FilmPagerComponent = ({
   }, []);
 
   const renderScrollableTabBar = useMemo(() => (
-    <View>
+    <Wrapper>
       <ScrollView
         ref={ scrollViewRef }
         horizontal
@@ -145,7 +145,7 @@ export const FilmPagerComponent = ({
           />
         )) }
       </ScrollView>
-    </View>
+    </Wrapper>
   ), [pagerItems, activeTab, handleTabPress]);
 
   const renderPage = useCallback((pagerItem: PagerItemInterface, idx: number) => {

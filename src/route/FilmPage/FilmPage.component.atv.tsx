@@ -12,7 +12,7 @@ import ThemedText from 'Component/ThemedText';
 import { useOverlayContext } from 'Context/OverlayContext';
 import t from 'i18n/t';
 import { Bookmark, Clapperboard, Clock, MessageSquareText, Play } from 'lucide-react-native';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Dimensions, View } from 'react-native';
 import {
   DefaultFocus,
@@ -46,6 +46,7 @@ export function FilmPageComponent({
   handleSelectFilm,
   handleSelectActor,
   handleSelectCategory,
+  openBookmarks,
 }: FilmPageComponentProps) {
   const { height } = Dimensions.get('window');
   const { openOverlay, goToPreviousOverlay } = useOverlayContext();
@@ -103,7 +104,7 @@ export function FilmPageComponent({
         <View style={ styles.actions }>
           { renderPlayButton() }
           { renderAction(t('Comments'), MessageSquareText, () => openOverlay(commentsOverlayId)) }
-          { renderAction(t('Bookmark'), Bookmark, () => openOverlay(bookmarksOverlayId)) }
+          { renderAction(t('Bookmark'), Bookmark, openBookmarks) }
           { renderAction(t('Trailer'), Clapperboard, () => NotificationStore.displayMessage(t('Not implemented'))) }
         </View>
       </DefaultFocus>

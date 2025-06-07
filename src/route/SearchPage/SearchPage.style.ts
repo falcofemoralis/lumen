@@ -1,4 +1,5 @@
 import { Colors } from 'Style/Colors';
+import { CONTENT_WRAPPER_PADDING } from 'Style/Layout';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
@@ -47,9 +48,12 @@ export const styles = CreateStyles({
   },
   suggestion: {
     flexDirection: 'row',
-    padding: 12,
+  },
+  suggestionContent: {
+    flexDirection: 'row',
+    paddingVertical: 12,
+    paddingHorizontal: CONTENT_WRAPPER_PADDING,
     gap: 20,
-    borderRadius: 12,
   },
   suggestionIcon: {
     height: 20,

@@ -2,10 +2,6 @@ import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
-  container: {
-    maxHeight: 300,
-    padding: 8,
-  },
   item: {
     paddingHorizontal: 12,
     height: 48,
@@ -24,7 +20,7 @@ export const styles = CreateStyles({
     width: 20,
   },
   listContainer: {
-    height: '100%',
+    flexGrow: 0,
   },
   listHeader: {
     justifyContent: 'center',
@@ -41,7 +37,7 @@ export const styles = CreateStyles({
   },
   listItems: {
     marginTop: 8,
-    flex: 1,
+    flexGrow: 0,
     flexDirection: 'column',
   },
   listItem: {

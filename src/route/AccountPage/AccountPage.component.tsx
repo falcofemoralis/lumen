@@ -130,7 +130,7 @@ export function AccountPageComponent({
 
   const renderContent = () => {
     if (!isSignedIn) {
-      return <LoginForm />;
+      return <LoginForm withRedirect />;
     }
 
     return renderProfile();

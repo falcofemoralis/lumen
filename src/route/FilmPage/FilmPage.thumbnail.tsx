@@ -1,40 +1,21 @@
-import ThemedPressable from 'Component/ThemedPressable';
+import Header from 'Component/Header';
 import Thumbnail from 'Component/Thumbnail';
 import Wrapper from 'Component/Wrapper';
 import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
-import { ArrowLeft, Forward } from 'lucide-react-native';
+import { Forward } from 'lucide-react-native';
 import { View } from 'react-native';
 import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
-import { noopFn } from 'Util/Function';
 
 import { styles } from './FilmPage.style';
 
 export const FilmPageThumbnail = () => (
   <View>
     <View style={ styles.upperContent }>
+      <Header
+        AdditionalActionIcon={ Forward }
+      />
       <Wrapper>
-        <View style={ styles.topActions }>
-          <ThemedPressable
-            style={ styles.topActionsButton }
-            onPress={ () => router.back() }
-          >
-            <ArrowLeft
-              size={ scale(24) }
-              color={ Colors.white }
-            />
-          </ThemedPressable>
-          <ThemedPressable
-            style={ styles.topActionsButton }
-            onPress={ noopFn }
-          >
-            <Forward
-              size={ scale(24) }
-              color={ Colors.white }
-            />
-          </ThemedPressable>
-        </View>
         <Thumbnail
           height={ scale(24) }
           width="100%"

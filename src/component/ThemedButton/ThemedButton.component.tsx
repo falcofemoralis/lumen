@@ -20,7 +20,7 @@ export default function ThemedButton({
   return (
     <ThemedPressable
       style={ [styles.container, style, disabled && styles.disabled] }
-      contentStyle={ contentStyle }
+      contentStyle={ [styles.content, contentStyle] }
       onPress={ onPress }
       disabled={ disabled }
     >

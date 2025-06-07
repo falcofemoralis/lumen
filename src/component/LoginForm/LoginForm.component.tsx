@@ -6,6 +6,7 @@ import { router } from 'expo-router';
 import t from 'i18n/t';
 import { useRef } from 'react';
 import { View } from 'react-native';
+import RouterStore from 'Store/Router.store';
 
 import { styles } from './LoginForm.style';
 import { LoginFormComponentProps } from './LoginForm.type';
@@ -17,12 +18,20 @@ export function LoginFormComponent({
 }: LoginFormComponentProps) {
   const loginRef = useRef({ username: '', password: '' });
 
+  const openForm = () => {
+    router.push({ pathname: '/modal' });
+    RouterStore.pushData('modal', {
+      type: 'login',
+    });
+  };
+
   const renderForm = () => {
     if (withRedirect) {
       return (
         <ThemedButton
           style={ styles.form }
-          onPress={ () => router.navigate('/(tabs)/(account)') }
+          contentStyle={ styles.formContent }
+          onPress={ openForm }
         >
           { t('Go to login page') }
         </ThemedButton>

@@ -57,7 +57,7 @@ export const ActorView = memo(({
   } = actor;
 
   return (
-    <TouchableHighlight
+    <Pressable
       style={ styles.actor }
       onPress={ () => handleSelectActor(link ?? '') }
     >
@@ -92,7 +92,7 @@ export const ActorView = memo(({
           </ThemedText>
         ) }
       </View>
-    </TouchableHighlight>
+    </Pressable>
   );
 }, (
   prevProps: ActorProps, nextProps: ActorProps
@@ -202,7 +202,7 @@ interface FranchiseItemProps {
   film: FilmInterface,
   item: FranchiseItem,
   idx: number,
-  handleSelectFilm: (link: string) => void
+  handleSelectFilm: (film: FilmInterface) => void
 }
 
 export const FranchiseItemComponent = memo(({
@@ -223,7 +223,7 @@ export const FranchiseItemComponent = memo(({
   return (
     <TouchableOpacity
       disabled={ !link }
-      onPress={ () => handleSelectFilm(link) }
+      onPress={ () => handleSelectFilm(film) }
     >
       <View style={ styles.franchiseItem }>
         <ThemedText style={ styles.franchiseText }>
@@ -284,17 +284,19 @@ export const InfoList = memo(({
 ) => prevProps.list.link === nextProps.list.link);
 
 interface RelatedItemProps {
+  film: FilmInterface,
   item: FilmCardInterface,
-  handleSelectFilm: (link: string) => void
+  handleSelectFilm: (film: FilmInterface) => void
 }
 
 export const RelatedItem = memo(({
+  film,
   item,
   handleSelectFilm,
 }: RelatedItemProps) => (
   <Pressable
     style={ { width: scale(100) } }
-    onPress={ () => handleSelectFilm(item.link) }
+    onPress={ () => handleSelectFilm(film) }
   >
     <FilmCard
       filmCard={ item }

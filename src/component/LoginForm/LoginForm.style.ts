@@ -9,6 +9,9 @@ export const styles = CreateStyles({
   form: {
     marginTop: 16,
   },
+  formContent: {
+    paddingVertical: 12,
+  },
   input: {
     margin: 8,
   },

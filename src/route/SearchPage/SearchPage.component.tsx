@@ -99,6 +99,7 @@ export function SearchPageComponent({
             key={ suggestion }
             onPress={ () => onApplySuggestion(suggestion) }
             style={ styles.suggestion }
+            contentStyle={ styles.suggestionContent }
           >
             <History
               style={ styles.suggestionIcon }
@@ -149,13 +150,13 @@ export function SearchPageComponent({
 
   return (
     <Page>
-      <Wrapper>
-        <View style={ styles.container }>
+      <View style={ styles.container }>
+        <Wrapper>
           { renderSearchContainer() }
-          { renderSuggestions() }
-        </View>
-        { renderFilms() }
-      </Wrapper>
+        </Wrapper>
+        { renderSuggestions() }
+      </View>
+      { renderFilms() }
     </Page>
   );
 }

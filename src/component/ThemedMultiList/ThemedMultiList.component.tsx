@@ -1,3 +1,4 @@
+import { SquareCheckBig } from 'lucide-react-native';
 import React, { useCallback } from 'react';
 import {
   ScrollView, Text, TouchableHighlight, View,
@@ -31,10 +32,9 @@ export const ThemedMultiListComponent = ({
       <Text style={ styles.itemLabel }>
         { item.label }
       </Text>
-      { /* <Checkbox
-        status={ item.isChecked ? 'checked' : 'unchecked' }
-        color={ Colors.primary }
-      /> */ }
+      <SquareCheckBig
+        color={ Colors.white }
+      />
     </View>
   ), []);
 

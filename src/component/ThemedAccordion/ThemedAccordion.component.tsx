@@ -19,6 +19,7 @@ export const ThemedAccordionComponent = ({
       <View key={ id }>
         <ThemedPressable
           style={ styles.button }
+          contentStyle={ styles.buttonContent }
           onPress={ () => openAccordionGroup(id) }
         >
           <ThemedText>{ title }</ThemedText>
@@ -33,7 +34,7 @@ export const ThemedAccordionComponent = ({
   };
 
   return (
-    <View style={ styles.container }>
+    <View>
       { data.map((group) => renderAccordionGroup(group)) }
     </View>
   );

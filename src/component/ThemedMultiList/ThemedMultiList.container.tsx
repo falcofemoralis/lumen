@@ -36,7 +36,7 @@ export function ThemedMultiListContainer({
 
 function propsAreEqual(
   prevProps: ThemedMultiListContainerProps,
-  props: ThemedMultiListContainerProps,
+  props: ThemedMultiListContainerProps
 ) {
   return JSON.stringify(prevProps.data) === JSON.stringify(props.data);
 }

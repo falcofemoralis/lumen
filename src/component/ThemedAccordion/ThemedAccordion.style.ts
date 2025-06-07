@@ -4,9 +4,11 @@ import CreateStyles from 'Util/CreateStyles';
 export const styles = CreateStyles({
   button: {
     justifyContent: 'flex-start',
-    padding: 12,
-    margin: 6,
+    marginVertical: 4,
     borderRadius: 12,
     backgroundColor: Colors.backgroundLight,
+  },
+  buttonContent: {
+    padding: 12,
   },
 });

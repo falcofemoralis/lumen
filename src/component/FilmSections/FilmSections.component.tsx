@@ -81,8 +81,8 @@ export function FilmSectionsComponent({
   const data = useMemo(() => films.map(
     (row) => ({
       ...row,
-    }),
-  ), [films, width]);
+    })
+  ), [films]);
 
   return (
     <LegendList
@@ -92,6 +92,7 @@ export function FilmSectionsComponent({
       renderItem={ renderItem }
       keyExtractor={ (item) => `${item.index}-film-list-row` }
       recycleItems
+      showsVerticalScrollIndicator={ false }
     />
   );
 }
