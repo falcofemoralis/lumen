@@ -2,6 +2,7 @@ import { useOverlayContext } from 'Context/OverlayContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { router } from 'expo-router';
 import { withTV } from 'Hooks/withTV';
+import t from 'i18n/t';
 import {
   useCallback, useEffect, useId, useState,
 } from 'react';
@@ -148,45 +149,51 @@ export function FilmPageContainer({ link, thumbnailPoster }: FilmPageContainerPr
     return initialItems;
   }, [film]);
 
-  const handleUpdateScheduleWatch = useCallback((scheduleItem: ScheduleItemInterface) => {
+  const handleUpdateScheduleWatch = useCallback(async (scheduleItem: ScheduleItemInterface) => {
     const { id } = scheduleItem;
+
+    if (!isSignedIn) {
+      NotificationStore.displayMessage(t('Sign In to an Account'));
+
+      return false;
+    }
+
+    try {
+      getCurrentService().saveScheduleWatch(id);
+    } catch (error) {
+      NotificationStore.displayError(error as Error);
+
+      return false;
+    }
 
     setFilm((prevFilm) => {
       if (!prevFilm) {
         return prevFilm;
       }
 
-      const schedule = prevFilm.schedule?.[0];
-      if (!schedule) {
-        return prevFilm;
-      }
+      const { schedule = [] } = prevFilm;
 
-      const items = schedule.items.map((i) => {
-        if (i.id === id) {
-          return {
-            ...i,
-            isWatched: !i.isWatched,
-          };
-        }
+      const newSchedule = schedule.map((s) => {
+        return {
+          ...s,
+          items: s.items.map((i) => {
+            if (i.id === id) {
+              return { ...i, isWatched: !i.isWatched };
+            }
 
-        return i;
+            return i;
+          }),
+        };
       });
 
       return {
         ...prevFilm,
-        schedule: [{
-          ...schedule,
-          items,
-        }],
+        schedule: newSchedule,
       };
     });
 
-    try {
-      getCurrentService().saveScheduleWatch(id);
-    } catch (error) {
-      NotificationStore.displayError(error as Error);
-    }
-  }, []);
+    return true;
+  }, [isSignedIn]);
 
   const handleShare = async () => {
     if (!film) {

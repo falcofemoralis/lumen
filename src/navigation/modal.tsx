@@ -4,16 +4,19 @@ import RouterStore from 'Store/Router.store';
 import { FilmInterface } from 'Type/Film.interface';
 
 export default function Modal() {
-  const { type, film } = RouterStore.popData('modal') as {
+  const { type, film, additionalProps } = RouterStore.popData('modal') as {
     type: string;
     film: FilmInterface;
+    additionalProps: Record<string, any>;
   };
 
   switch (type) {
     case 'comments':
       return <CommentsModal film={ film } />;
     case 'schedule':
-      return <ScheduleModal film={ film } />;
+      const { handleUpdateScheduleWatch } = additionalProps;
+
+      return <ScheduleModal film={ film } handleUpdateScheduleWatch={ handleUpdateScheduleWatch } />;
     default:
       console.error('Unknown modal type:', type);
 

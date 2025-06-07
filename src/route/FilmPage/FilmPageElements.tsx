@@ -1,10 +1,11 @@
 import FilmCard from 'Component/FilmCard';
+import Loader from 'Component/Loader';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import t from 'i18n/t';
 import { CircleCheck, Star } from 'lucide-react-native';
-import { memo, useCallback } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import {
   Pressable, TouchableHighlight, TouchableOpacity, View,
 } from 'react-native';
@@ -99,7 +100,7 @@ export const ActorView = memo(({
 
 interface ScheduleItemProps {
   item: ScheduleItemInterface,
-  handleUpdateScheduleWatch: (scheduleItem: ScheduleItemInterface) => void
+  handleUpdateScheduleWatch: (scheduleItem: ScheduleItemInterface) => Promise<boolean>
 }
 
 export const ScheduleItem = memo(({
@@ -115,9 +116,25 @@ export const ScheduleItem = memo(({
     isWatched,
     isReleased,
   } = item;
+  const [isLoading, setIsLoading] = useState(false);
+  const [isChecked, setIsChecked] = useState(isWatched);
 
-  const handlePress = useCallback(() => {
-    handleUpdateScheduleWatch(item);
+  useEffect(() => {
+    setIsChecked(isWatched);
+  }, [isWatched]);
+
+  const handlePress = useCallback(async () => {
+    setIsLoading(true);
+
+    const result = await handleUpdateScheduleWatch(item);
+
+    setIsLoading(false);
+
+    if (!result) {
+      return;
+    }
+
+    setIsChecked((prev) => !prev);
   }, [handleUpdateScheduleWatch, item]);
 
   return (
@@ -154,10 +171,14 @@ export const ScheduleItem = memo(({
             style={ styles.scheduleItemMarkIcon }
             onPress={ handlePress }
           >
-            <CircleCheck
-              size={ scale(24) }
-              color={ isWatched ? Colors.secondary : Colors.white }
-            />
+            { isLoading ? (
+              <Loader isLoading />
+            ) : (
+              <CircleCheck
+                size={ scale(24) }
+                color={ isChecked ? Colors.secondary : Colors.white }
+              />
+            ) }
           </ThemedPressable>
         ) : (
           <ThemedText

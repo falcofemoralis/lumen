@@ -115,6 +115,9 @@ export function FilmPageComponent({
     RouterStore.pushData('modal', {
       type: 'schedule',
       film,
+      additionalProps: {
+        handleUpdateScheduleWatch,
+      },
     });
   };
 
