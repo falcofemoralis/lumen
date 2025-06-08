@@ -45,7 +45,7 @@ export function BookmarksPageContainer() {
   const onLoadFilms = async (
     menuItem: MenuItemInterface,
     currentPage: number,
-    _isRefresh: boolean,
+    _isRefresh: boolean
   ) => getCurrentService().getBookmarkedFilms({
     id: menuItem.id,
     title: menuItem.title,
@@ -72,7 +72,6 @@ export function BookmarksPageContainer() {
   };
 
   const containerProps = () => ({
-    isSignedIn,
     isLoading,
     bookmarks,
     filmPager,

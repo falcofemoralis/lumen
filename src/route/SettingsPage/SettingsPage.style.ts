@@ -1,4 +1,5 @@
 import { Colors } from 'Style/Colors';
+import { CONTENT_WRAPPER_PADDING } from 'Style/Layout';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
@@ -21,9 +22,11 @@ export const styles = CreateStyles({
     fontWeight: '600',
   },
   setting: {
+  },
+  settingContent: {
+    justifyContent: 'flex-start',
+    paddingHorizontal: CONTENT_WRAPPER_PADDING,
     paddingVertical: 12,
-    paddingHorizontal: 12,
-    borderRadius: 16,
   },
   settingContainer: {
   },
@@ -41,9 +44,7 @@ export const styles = CreateStyles({
     fontWeight: '600',
   },
   overlayInput: {
-
   },
   overlayButton: {
-
   },
 });

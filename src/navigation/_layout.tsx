@@ -69,7 +69,7 @@ export function RootLayout() {
         options={ {
           presentation: 'modal',
           animation: 'ios_from_right',
-          headerShown: true,
+          headerShown: false,
         } }
       />
     </Stack>

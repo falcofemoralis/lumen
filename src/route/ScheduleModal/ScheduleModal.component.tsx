@@ -1,30 +1,26 @@
+import Header from 'Component/Header';
 import Loader from 'Component/Loader';
 import ThemedAccordion from 'Component/ThemedAccordion';
 import Wrapper from 'Component/Wrapper';
-import { useNavigation } from 'expo-router';
 import t from 'i18n/t';
 import { useCallback, useEffect, useState } from 'react';
-import { ScrollView } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { ScheduleItem } from 'Route/FilmPage/FilmPageElements';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 
+import { styles } from './ScheduleModal.style';
 import { ScheduleModalProps } from './ScheduleModal.type';
 
 export const ScheduleModalComponent = ({ film, handleUpdateScheduleWatch }: ScheduleModalProps) => {
-  const navigation = useNavigation();
   const { schedule = [] } = film;
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    navigation.setOptions({
-      title: t('Schedule'),
-    });
-
     // prevents lagging when rendering large schedule
     setTimeout(() => {
       setIsLoading(false);
     }, 0);
-  }, [schedule, navigation]);
+  }, [schedule]);
 
   const renderItem = useCallback((item: ScheduleItemInterface, idx: number) => (
     <ScheduleItem
@@ -45,14 +41,17 @@ export const ScheduleModalComponent = ({ film, handleUpdateScheduleWatch }: Sche
   }
 
   return (
-    <Wrapper>
-      <ScrollView>
-        <ThemedAccordion
-          data={ data }
-          renderItem={ renderItem }
-        />
-      </ScrollView>
-    </Wrapper>
+    <View style={ styles.container }>
+      <Header title={ t('Schedule') } />
+      <Wrapper style={ styles.wrapper }>
+        <ScrollView>
+          <ThemedAccordion
+            data={ data }
+            renderItem={ renderItem }
+          />
+        </ScrollView>
+      </Wrapper>
+    </View>
   );
 };
 

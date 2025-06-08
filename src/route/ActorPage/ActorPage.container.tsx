@@ -34,7 +34,7 @@ export function ActorPageContainer({ link }: ActorPageContainerProps) {
   }, []);
 
   const handleSelectFilm = useCallback((film: FilmCardInterface) => {
-    openFilm(film.link);
+    openFilm(film);
   }, []);
 
   const containerFunctions = {

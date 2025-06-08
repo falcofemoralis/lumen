@@ -15,7 +15,7 @@ export function CategoryPageContainer({ link }: CategoryPageContainerProps) {
 
   const onLoadFilms = async (
     _menuItem: MenuItemInterface,
-    currentPage: number,
+    currentPage: number
   ) => getCurrentService().getFilms(currentPage, link);
 
   const onUpdateFilms = async (key: string, filmList: FilmListInterface) => {

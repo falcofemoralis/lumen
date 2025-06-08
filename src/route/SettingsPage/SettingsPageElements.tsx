@@ -4,6 +4,7 @@ import ThemedDropdown from 'Component/ThemedDropdown';
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import ThemedInput from 'Component/ThemedInput';
 import ThemedOverlay from 'Component/ThemedOverlay';
+import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import { useOverlayContext } from 'Context/OverlayContext';
 import t from 'i18n/t';
@@ -12,9 +13,7 @@ import {
   useId,
   useState,
 } from 'react';
-import { TouchableNativeFeedback, View } from 'react-native';
-import { Colors } from 'Style/Colors';
-import { noopFn } from 'Util/Function';
+import { View } from 'react-native';
 
 import { styles } from './SettingsPage.style';
 import { SettingItem } from './SettingsPage.type';
@@ -36,13 +35,10 @@ const BaseComponent = ({
   const { title, subtitle } = setting;
 
   return (
-    <TouchableNativeFeedback
+    <ThemedPressable
       style={ styles.setting }
-      onPress={ onPress ?? noopFn }
-      background={ TouchableNativeFeedback.Ripple(
-        Colors.white,
-        true,
-      ) }
+      contentStyle={ styles.settingContent }
+      onPress={ onPress }
     >
       <View style={ styles.settingContainer }>
         <ThemedText style={ styles.settingTitle }>
@@ -52,14 +48,14 @@ const BaseComponent = ({
           { subtitle }
         </ThemedText>
       </View>
-    </TouchableNativeFeedback>
+    </ThemedPressable>
   );
 };
 
 export const SettingText = memo(({
   setting,
 }: SettingProps) => <BaseComponent setting={ setting } />, (
-  prevProps: SettingProps, nextProps: SettingProps,
+  prevProps: SettingProps, nextProps: SettingProps
 ) => prevProps.setting.id === nextProps.setting.id);
 
 export const SettingSelect = memo(({
@@ -109,7 +105,7 @@ export const SettingSelect = memo(({
     </View>
   );
 }, (
-  prevProps: SettingProps, nextProps: SettingProps,
+  prevProps: SettingProps, nextProps: SettingProps
 ) => prevProps.setting.id === nextProps.setting.id
     && prevProps.setting.value === nextProps.setting.value);
 
@@ -179,7 +175,6 @@ export const SettingInput = memo(({
           onChangeText={ onChangeText }
           value={ inputValue || '' }
           multiline
-          disabled={ isLoading }
         />
         <ThemedButton
           style={ styles.overlayButton }
@@ -196,7 +191,7 @@ export const SettingInput = memo(({
     </View>
   );
 }, (
-  prevProps: SettingProps, nextProps: SettingProps,
+  prevProps: SettingProps, nextProps: SettingProps
 ) => prevProps.setting.id === nextProps.setting.id
     && prevProps.setting.value === nextProps.setting.value);
 
@@ -209,5 +204,5 @@ export const SettingLink = memo(({
     onPress={ () => onUpdate(setting.id, '') }
   />
 ), (
-  prevProps: SettingProps, nextProps: SettingProps,
+  prevProps: SettingProps, nextProps: SettingProps
 ) => prevProps.setting.id === nextProps.setting.id);

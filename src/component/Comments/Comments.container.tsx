@@ -57,7 +57,7 @@ export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>
             totalPages: newTotalsPages,
           } = await getCurrentService().getComments(
             id,
-            page,
+            page
           );
 
           paginationRef.current = {
@@ -98,7 +98,7 @@ export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>
       ...containerFunctions,
       ...containerProps(),
     });
-  },
+  }
 );
 
 export default CommentsContainer;

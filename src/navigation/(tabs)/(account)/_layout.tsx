@@ -20,7 +20,7 @@ export default function Layout() {
         name="settings"
         options={ {
           presentation: 'modal',
-          headerShown: true,
+          headerShown: false,
           headerTitle: t('Settings'),
           animation: 'ios_from_right',
         } }

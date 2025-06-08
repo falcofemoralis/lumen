@@ -8,7 +8,6 @@ export const styles = CreateStyles({
   },
   voicesContainer: {
     width: '100%',
-    maxHeight: 288,
     flexDirection: 'row',
     gap: 4,
   },
@@ -20,8 +19,10 @@ export const styles = CreateStyles({
   },
   season: {
     backgroundColor: Colors.chip,
-    padding: 8,
     borderRadius: 16,
+  },
+  seasonContent: {
+    padding: 8,
   },
   seasonSelected: {
     backgroundColor: Colors.primary,
@@ -43,8 +44,10 @@ export const styles = CreateStyles({
   },
   episode: {
     backgroundColor: Colors.chip,
-    padding: 8,
     borderRadius: 16,
+  },
+  episodeContent: {
+    padding: 8,
   },
   episodeSelected: {
     backgroundColor: Colors.primary,

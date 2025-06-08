@@ -1,10 +1,10 @@
-import LoginForm from 'Component/LoginForm';
 import Page from 'Component/Page';
 import ThemedGrid from 'Component/ThemedGrid';
 import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
+import Wrapper from 'Component/Wrapper';
 import { Trash2 } from 'lucide-react-native';
 import React, { memo, useCallback } from 'react';
 import {
@@ -35,7 +35,10 @@ function RecentItem({
   } = item;
 
   return (
-    <Pressable onPress={ () => handleOnPress(item) }>
+    <ThemedPressable
+      onPress={ () => handleOnPress(item) }
+      contentStyle={ styles.itemContentWrapper }
+    >
       <View style={ [styles.item, index !== 0 && styles.itemBorder] }>
         <View style={ styles.itemContainer }>
           <ThemedImage
@@ -62,16 +65,16 @@ function RecentItem({
           </View>
           <ThemedPressable
             onPress={ () => removeItem(item) }
+            style={ styles.deleteButton }
           >
             <Trash2
-              style={ styles.deleteButton }
               size={ scale(24) }
               color={ Colors.white }
             />
           </ThemedPressable>
         </View>
       </View>
-    </Pressable>
+    </ThemedPressable>
   );
 }
 
@@ -82,7 +85,6 @@ function rowPropsAreEqual(prevProps: RecentGridRowProps, props: RecentGridRowPro
 const MemoizedRecentItem = memo(RecentItem, rowPropsAreEqual);
 
 export function RecentPageComponent({
-  isSignedIn,
   items,
   onNextLoad,
   handleOnPress,
@@ -100,12 +102,8 @@ export function RecentPageComponent({
     [handleOnPress]
   );
 
-  const renderContent = () => {
-    if (!isSignedIn) {
-      return <LoginForm withRedirect />;
-    }
-
-    return (
+  return (
+    <Page>
       <ThemedGrid
         data={ items }
         numberOfColumns={ NUMBER_OF_COLUMNS }
@@ -114,12 +112,6 @@ export function RecentPageComponent({
         onNextLoad={ onNextLoad }
         ListEmptyComponent={ <RecentPageThumbnail /> }
       />
-    );
-  };
-
-  return (
-    <Page>
-      { renderContent() }
     </Page>
   );
 }

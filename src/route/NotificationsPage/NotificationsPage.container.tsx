@@ -19,7 +19,7 @@ export function NotificationsPageContainer() {
       setIsLoading(true);
 
       setNotifications(
-        await getCurrentService().getFilmsFromNotifications(items),
+        await getCurrentService().getFilmsFromNotifications(items)
       );
     } catch (error) {
       NotificationStore.displayError(error as Error);
@@ -41,7 +41,7 @@ export function NotificationsPageContainer() {
   }, [isSignedIn, notifications]);
 
   const handleSelectFilm = useCallback((film: FilmCardInterface) => {
-    openFilm(film.link);
+    openFilm(film);
   }, []);
 
   const getData = () => {

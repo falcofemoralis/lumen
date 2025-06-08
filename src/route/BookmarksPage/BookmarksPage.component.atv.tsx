@@ -11,7 +11,6 @@ import { BookmarksPageThumbnail } from './BookmarksPage.thumbnail.atv';
 import { BookmarksPageComponentProps } from './BookmarksPage.type';
 
 export function BookmarksPageComponent({
-  isSignedIn,
   isLoading,
   menuItems,
   filmPager,
@@ -19,10 +18,6 @@ export function BookmarksPageComponent({
   onUpdateFilms,
 }: BookmarksPageComponentProps) {
   const renderContent = () => {
-    if (!isSignedIn) {
-      return <LoginForm withRedirect />;
-    }
-
     if (isLoading) {
       return <BookmarksPageThumbnail />;
     }

@@ -1,6 +1,5 @@
 import FilmPager from 'Component/FilmPager';
 import InfoBlock from 'Component/InfoBlock';
-import LoginForm from 'Component/LoginForm';
 import Page from 'Component/Page';
 import t from 'i18n/t';
 import React from 'react';
@@ -11,7 +10,6 @@ import { BookmarksPageThumbnail } from './BookmarksPage.thumbnail';
 import { BookmarksPageComponentProps } from './BookmarksPage.type';
 
 export function BookmarksPageComponent({
-  isSignedIn,
   isLoading,
   menuItems,
   filmPager,
@@ -19,10 +17,6 @@ export function BookmarksPageComponent({
   onUpdateFilms,
 }: BookmarksPageComponentProps) {
   const renderContent = () => {
-    if (!isSignedIn) {
-      return <LoginForm withRedirect />;
-    }
-
     if (isLoading) {
       return <BookmarksPageThumbnail />;
     }

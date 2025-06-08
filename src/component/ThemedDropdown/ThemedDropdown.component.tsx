@@ -1,11 +1,14 @@
 import ThemedButton from 'Component/ThemedButton';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedOverlay from 'Component/ThemedOverlay';
+import ThemedPressable from 'Component/ThemedPressable';
 import { useOverlayContext } from 'Context/OverlayContext';
 import { Plus } from 'lucide-react-native';
 import React, { useCallback, useRef } from 'react';
 import {
-  ScrollView, Text, TouchableHighlight, View,
+  ScrollView,
+  Text,
+  View,
 } from 'react-native';
 import { Colors } from 'Style/Colors';
 import { generateId } from 'Util/Math';
@@ -78,56 +81,45 @@ export const ThemedDropdownComponent = ({
   ), []);
 
   const renderList = () => (
-    <ScrollView
-      ref={ scrollViewRef }
-      style={ styles.listItems }
-      onLayout={ handleLayout }
-    >
-      { data.map((item) => (
-        <TouchableHighlight
-          key={ item.value }
-          underlayColor={ Colors.primary }
-          onPress={ () => { onChange(item); } }
-          style={ styles.listItem }
-        >
-          <View style={ [
-            styles.listItem,
-            item.value === value && styles.listItemSelected,
-          ] }
+    <View style={ styles.listItems }>
+      <ScrollView
+        ref={ scrollViewRef }
+        onLayout={ handleLayout }
+      >
+        { data.map((item) => (
+          <ThemedPressable
+            key={ item.value }
+            onPress={ () => { onChange(item); } }
+            style={ styles.listItem }
+            contentStyle={ [styles.listItemContent, item.value === value && styles.listItemSelected] }
           >
             { renderItem(item) }
-          </View>
-        </TouchableHighlight>
-      )) }
-    </ScrollView>
+          </ThemedPressable>
+        )) }
+      </ScrollView>
+    </View>
   );
 
   const renderContent = () => (
-    <>
+    <View style={ styles.listContainer }>
       { renderHeader() }
       { renderList() }
-    </>
+    </View>
   );
 
   const renderModal = () => {
     if (asList) {
-      return (
-        <View style={ styles.listContainer }>
-          { renderContent() }
-        </View>
-      );
+      return renderContent();
     }
 
     return (
       <ThemedOverlay
         id={ id.current }
         onHide={ () => goToPreviousOverlay() }
-        containerStyle={ styles.container }
-        contentContainerStyle={ styles.contentContainer }
+        containerStyle={ styles.overlay }
+        contentContainerStyle={ styles.overlayContent }
       >
-        <View style={ styles.listContainer }>
-          { renderContent() }
-        </View>
+        { renderContent() }
       </ThemedOverlay>
     );
   };

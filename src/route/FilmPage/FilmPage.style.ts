@@ -1,4 +1,5 @@
 import { Colors } from 'Style/Colors';
+import { CONTENT_WRAPPER_PADDING } from 'Style/Layout';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
@@ -181,6 +182,9 @@ export const styles = CreateStyles({
     fontSize: 20,
     fontWeight: '700',
   },
+  sectionHeadingWrapper: {
+    paddingHorizontal: CONTENT_WRAPPER_PADDING,
+  },
   sectionContent: {
     marginTop: 8,
   },
@@ -269,10 +273,15 @@ export const styles = CreateStyles({
     borderBottomWidth: 1,
   },
   scheduleViewAll: {
-    marginTop: 16,
+    marginTop: 4,
     backgroundColor: Colors.button,
   },
   franchiseList: {
+  },
+  franchiseItemButton: {
+  },
+  franchiseItemButtonContent: {
+    paddingHorizontal: CONTENT_WRAPPER_PADDING,
   },
   franchiseItem: {
     flexDirection: 'row',
@@ -291,13 +300,15 @@ export const styles = CreateStyles({
   infoListHeader: {
     fontSize: 16,
     paddingBottom: 8,
+    paddingHorizontal: CONTENT_WRAPPER_PADDING,
   },
-  infoList: {
+  infoListItem: {
+  },
+  infoListItemContent: {
+    width: '100%',
     padding: 8,
-    borderRadius: 8,
-  },
-  infoListEven: {
-    backgroundColor: Colors.background,
+    paddingHorizontal: CONTENT_WRAPPER_PADDING,
+    justifyContent: 'flex-start',
   },
   infoListName: {
   },

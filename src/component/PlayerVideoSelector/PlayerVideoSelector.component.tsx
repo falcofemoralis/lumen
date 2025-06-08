@@ -136,6 +136,7 @@ export function PlayerVideoSelectorComponent({
             styles.season,
             selectedSeasonId === season.seasonId && styles.seasonSelected,
           ] }
+          contentStyle={ styles.seasonContent }
           onPress={ () => setSelectedSeasonId(season.seasonId) }
         >
           <ThemedText
@@ -161,6 +162,7 @@ export function PlayerVideoSelectorComponent({
             selectedEpisodeId === episodeId && styles.episodeSelected,
           ] }
           onPress={ () => handleSelectEpisode(episodeId) }
+          contentStyle={ styles.episodeContent }
         >
           <ThemedText style={ [
             styles.episodeText,

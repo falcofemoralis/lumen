@@ -1,7 +1,10 @@
-import { SquareCheckBig } from 'lucide-react-native';
+import ThemedPressable from 'Component/ThemedPressable';
+import { Square, SquareCheck } from 'lucide-react-native';
 import React, { useCallback } from 'react';
 import {
-  ScrollView, Text, TouchableHighlight, View,
+  ScrollView,
+  Text,
+  View,
 } from 'react-native';
 import { Colors } from 'Style/Colors';
 
@@ -32,29 +35,35 @@ export const ThemedMultiListComponent = ({
       <Text style={ styles.itemLabel }>
         { item.label }
       </Text>
-      <SquareCheckBig
-        color={ Colors.white }
-      />
+      { item.isChecked ? (
+        <SquareCheck
+          color={ Colors.secondary }
+        />
+      ) : (
+        <Square
+          color={ Colors.white }
+        />
+      ) }
     </View>
   ), []);
 
   const renderContent = () => (
-    <ScrollView
-      style={ styles.listItems }
-    >
-      { values.map((item) => (
-        <TouchableHighlight
-          key={ item.value }
-          underlayColor={ Colors.primary }
-          onPress={ () => handleOnChange(item.value, !item.isChecked) }
-          style={ styles.listItem }
-        >
-          <View style={ styles.listItem }>
-            { renderItem(item) }
-          </View>
-        </TouchableHighlight>
-      )) }
-    </ScrollView>
+    <View style={ styles.listItems }>
+      <ScrollView>
+        { values.map((item) => (
+          <ThemedPressable
+            key={ item.value }
+            onPress={ () => handleOnChange(item.value, !item.isChecked) }
+            style={ styles.listItem }
+            contentStyle={ styles.listItemContent }
+          >
+            <View style={ styles.listItem }>
+              { renderItem(item) }
+            </View>
+          </ThemedPressable>
+        )) }
+      </ScrollView>
+    </View>
   );
 
   return (

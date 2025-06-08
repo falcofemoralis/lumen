@@ -1,10 +1,13 @@
 import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
+const MAX_ITEMS_TO_DISPLAY = 6;
+const ITEM_HEIGHT = 48;
+
 export const styles = CreateStyles({
   item: {
     paddingHorizontal: 12,
-    height: 48,
+    height: ITEM_HEIGHT,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -20,12 +23,13 @@ export const styles = CreateStyles({
     width: 20,
   },
   listContainer: {
-    flexGrow: 0,
+    flexDirection: 'column',
   },
   listHeader: {
     justifyContent: 'center',
     alignItems: 'center',
     padding: 8,
+    marginBottom: 8,
     borderBottomColor: Colors.divider,
     borderBottomWidth: 1,
   },
@@ -36,12 +40,14 @@ export const styles = CreateStyles({
     fontWeight: '500',
   },
   listItems: {
-    marginTop: 8,
-    flexGrow: 0,
     flexDirection: 'column',
+    maxHeight: MAX_ITEMS_TO_DISPLAY * ITEM_HEIGHT - 8,
   },
   listItem: {
     borderRadius: 16,
+    flex: 1,
+  },
+  listItemContent: {
   },
   listItemSelected: {
     backgroundColor: Colors.primary,

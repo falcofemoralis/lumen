@@ -3,7 +3,8 @@ import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
   container: {
-    gap: 8,
+    flexDirection: 'column',
+    gap: 4,
   },
   iconContainer: {
     justifyContent: 'center',

@@ -230,7 +230,13 @@ export function FilmPageComponent({
   const renderDescription = () => {
     const { description } = film;
 
-    return <ThemedText style={ styles.description }>{ description }</ThemedText>;
+    return (
+      <Wrapper>
+        <ThemedText style={ styles.description }>
+          { description }
+        </ThemedText>
+      </Wrapper>
+    );
   };
 
   const renderMiddleAction = (
@@ -270,7 +276,7 @@ export function FilmPageComponent({
 
     if (isPendingRelease) {
       return (
-        <View style={ styles.pendingRelease }>
+        <Wrapper style={ styles.pendingRelease }>
           <Clock
             style={ styles.pendingReleaseIcon }
             size={ scale(24) }
@@ -279,22 +285,24 @@ export function FilmPageComponent({
           <ThemedText style={ styles.pendingReleaseText }>
             { t('We are waiting for the film in the good quality') }
           </ThemedText>
-        </View>
+        </Wrapper>
       );
     }
 
     return (
-      <ThemedButton
-        style={ styles.playBtn }
-        onPress={ playFilm }
-        IconComponent={ Play }
-        iconProps={ {
-          size: scale(18),
-          color: Colors.white,
-        } }
-      >
-        { t('Watch Now') }
-      </ThemedButton>
+      <Wrapper>
+        <ThemedButton
+          style={ styles.playBtn }
+          onPress={ playFilm }
+          IconComponent={ Play }
+          iconProps={ {
+            size: scale(18),
+            color: Colors.white,
+          } }
+        >
+          { t('Watch Now') }
+        </ThemedButton>
+      </Wrapper>
     );
   };
 
@@ -308,20 +316,22 @@ export function FilmPageComponent({
     }
 
     return (
-      <Section title={ t('Actors') }>
-        <ScrollView horizontal>
-          <View style={ styles.actorsList }>
-            { persons.map((actor, index) => (
-              <ActorView
+      <Wrapper>
+        <Section title={ t('Actors') }>
+          <ScrollView horizontal>
+            <View style={ styles.actorsList }>
+              { persons.map((actor, index) => (
+                <ActorView
                 // eslint-disable-next-line react/no-array-index-key
-                key={ `actor-${actor.name}-${index}` }
-                actor={ actor }
-                handleSelectActor={ handleSelectActor }
-              />
-            )) }
-          </View>
-        </ScrollView>
-      </Section>
+                  key={ `actor-${actor.name}-${index}` }
+                  actor={ actor }
+                  handleSelectActor={ handleSelectActor }
+                />
+              )) }
+            </View>
+          </ScrollView>
+        </Section>
+      </Wrapper>
     );
   };
 
@@ -333,23 +343,25 @@ export function FilmPageComponent({
     }
 
     return (
-      <Section title={ t('Schedule') }>
-        <View style={ styles.visibleScheduleItems }>
-          { visibleScheduleItems.map((item: ScheduleItemInterface, idx: number) => (
-            <ScheduleItem
-              key={ `schedule-visible-${item.name}` }
-              item={ item }
-              handleUpdateScheduleWatch={ handleUpdateScheduleWatch }
-            />
-          )) }
-        </View>
-        <ThemedButton
-          onPress={ openSchedule }
-          style={ styles.scheduleViewAll }
-        >
-          { t('View full schedule') }
-        </ThemedButton>
-      </Section>
+      <Wrapper>
+        <Section title={ t('Schedule') }>
+          <View style={ styles.visibleScheduleItems }>
+            { visibleScheduleItems.map((item: ScheduleItemInterface, idx: number) => (
+              <ScheduleItem
+                key={ `schedule-visible-${item.name}` }
+                item={ item }
+                handleUpdateScheduleWatch={ handleUpdateScheduleWatch }
+              />
+            )) }
+          </View>
+          <ThemedButton
+            onPress={ openSchedule }
+            style={ styles.scheduleViewAll }
+          >
+            { t('View full schedule') }
+          </ThemedButton>
+        </Section>
+      </Wrapper>
     );
   };
 
@@ -361,7 +373,10 @@ export function FilmPageComponent({
     }
 
     return (
-      <Section title={ t('Franchise') }>
+      <Section
+        title={ t('Franchise') }
+        useHeadingWrapper
+      >
         <View style={ styles.franchiseList }>
           { franchise.map((item, idx) => (
             <FranchiseItemComponent
@@ -381,21 +396,23 @@ export function FilmPageComponent({
     const { related = [] } = film;
 
     return (
-      <Section title={ t('Related') }>
-        <ScrollView horizontal>
-          <View style={ styles.relatedList }>
-            { related.map((item, idx) => (
-              <RelatedItem
+      <Wrapper>
+        <Section title={ t('Related') }>
+          <ScrollView horizontal>
+            <View style={ styles.relatedList }>
+              { related.map((item, idx) => (
+                <RelatedItem
                 // eslint-disable-next-line react/no-array-index-key -- idx is unique
-                key={ `${item.id}-${idx}` }
-                film={ film }
-                item={ item }
-                handleSelectFilm={ handleSelectFilm }
-              />
-            )) }
-          </View>
-        </ScrollView>
-      </Section>
+                  key={ `${item.id}-${idx}` }
+                  film={ film }
+                  item={ item }
+                  handleSelectFilm={ handleSelectFilm }
+                />
+              )) }
+            </View>
+          </ScrollView>
+        </Section>
+      </Wrapper>
     );
   };
 
@@ -425,7 +442,10 @@ export function FilmPageComponent({
     }
 
     return (
-      <Section title={ t('Included in') }>
+      <Section
+        title={ t('Included in') }
+        useHeadingWrapper
+      >
         <View>
           { data.map(({ id, title, items }, index) => (
             <View key={ id }>
@@ -441,7 +461,6 @@ export function FilmPageComponent({
                   <InfoList
                     key={ `info-list-${subItem.name}` }
                     list={ subItem }
-                    idx={ idx }
                     handleSelectCategory={ handleSelectCategory }
                   />
                 )) }
@@ -589,15 +608,13 @@ export function FilmPageComponent({
         </View>
         <View style={ styles.bottomContent }>
           <View style={ styles.mainContent }>
-            <Wrapper>
-              { renderDescription() }
-              { renderPlay() }
-              { renderActors() }
-              { renderFranchise() }
-              { renderSchedule() }
-              { renderInfoLists() }
-              { renderRelated() }
-            </Wrapper>
+            { renderDescription() }
+            { renderPlay() }
+            { renderActors() }
+            { renderFranchise() }
+            { renderSchedule() }
+            { renderInfoLists() }
+            { renderRelated() }
           </View>
         </View>
       </View>

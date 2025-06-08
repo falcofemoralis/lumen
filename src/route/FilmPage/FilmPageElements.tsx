@@ -3,11 +3,16 @@ import Loader from 'Component/Loader';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
+import Wrapper from 'Component/Wrapper';
 import t from 'i18n/t';
 import { CircleCheck, Star } from 'lucide-react-native';
 import { memo, useCallback, useEffect, useState } from 'react';
 import {
-  Pressable, TouchableHighlight, TouchableOpacity, View,
+  Pressable,
+  StyleProp,
+  TextStyle,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { Colors } from 'Style/Colors';
 import { ActorCardInterface } from 'Type/ActorCard.interface';
@@ -23,14 +28,16 @@ import { styles } from './FilmPage.style';
 interface SectionProps {
   title: string;
   children: React.ReactNode;
+  useHeadingWrapper?: boolean;
 }
 
 export const Section = ({
   title,
   children,
+  useHeadingWrapper,
 }: SectionProps) => (
   <View style={ styles.section }>
-    <ThemedText style={ styles.sectionHeading }>
+    <ThemedText style={ [styles.sectionHeading, useHeadingWrapper && styles.sectionHeadingWrapper] }>
       { title }
     </ThemedText>
     <View style={ styles.sectionContent }>
@@ -221,9 +228,11 @@ export const FranchiseItemComponent = memo(({
   const position = Math.abs(idx - franchise.length);
 
   return (
-    <TouchableOpacity
+    <ThemedPressable
       disabled={ !link }
       onPress={ () => handleSelectFilm(film) }
+      style={ styles.franchiseItemButton }
+      contentStyle={ styles.franchiseItemButtonContent }
     >
       <View style={ styles.franchiseItem }>
         <ThemedText style={ styles.franchiseText }>
@@ -245,7 +254,7 @@ export const FranchiseItemComponent = memo(({
           { rating }
         </ThemedText>
       </View>
-    </TouchableOpacity>
+    </ThemedPressable>
   );
 }, (
   prevProps: FranchiseItemProps, nextProps: FranchiseItemProps
@@ -253,31 +262,25 @@ export const FranchiseItemComponent = memo(({
 
 interface InfoListProps {
   list: InfoListInterface,
-  idx: number
   handleSelectCategory: (link: string) => void
 }
 
 export const InfoList = memo(({
   list,
-  idx,
   handleSelectCategory,
 }: InfoListProps) => {
   const { name, position, link } = list;
 
   return (
-    <TouchableOpacity
+    <ThemedPressable
       onPress={ () => handleSelectCategory(link) }
+      style={ styles.infoListItem }
+      contentStyle={ styles.infoListItemContent }
     >
-      <View style={ [
-        styles.infoList,
-        idx % 2 === 0 && styles.infoListEven,
-      ] }
-      >
-        <ThemedText style={ styles.infoListName }>
-          { `${name} ${position || ''}` }
-        </ThemedText>
-      </View>
-    </TouchableOpacity>
+      <ThemedText style={ styles.infoListName }>
+        { `${name} ${position || ''}` }
+      </ThemedText>
+    </ThemedPressable>
   );
 }, (
   prevProps: InfoListProps, nextProps: InfoListProps

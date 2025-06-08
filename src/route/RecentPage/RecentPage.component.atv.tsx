@@ -1,4 +1,3 @@
-import LoginForm from 'Component/LoginForm';
 import Page from 'Component/Page';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedGrid from 'Component/ThemedGrid';
@@ -18,7 +17,6 @@ import { RecentGridItem, RecentPageComponentProps } from './RecentPage.type';
 import { useFocusAnimation } from './useFocusAnimation';
 
 export function RecentPageComponent({
-  isSignedIn,
   items,
   onNextLoad,
   handleOnPress,
@@ -108,12 +106,8 @@ export function RecentPageComponent({
     );
   }, [handleOnPress]);
 
-  const renderContent = () => {
-    if (!isSignedIn) {
-      return <LoginForm withRedirect />;
-    }
-
-    return (
+  return (
+    <Page>
       <DefaultFocus>
         <ThemedGrid
           style={ styles.grid }
@@ -126,12 +120,6 @@ export function RecentPageComponent({
           ListEmptyComponent={ <RecentPageThumbnail /> }
         />
       </DefaultFocus>
-    );
-  };
-
-  return (
-    <Page>
-      { renderContent() }
     </Page>
   );
 }

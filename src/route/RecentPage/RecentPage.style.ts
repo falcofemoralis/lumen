@@ -1,4 +1,5 @@
 import { Colors } from 'Style/Colors';
+import { CONTENT_WRAPPER_PADDING } from 'Style/Layout';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
@@ -6,6 +7,9 @@ export const styles = CreateStyles({
     flexDirection: 'row',
     paddingVertical: 12,
     gap: 10,
+  },
+  itemContentWrapper: {
+    paddingHorizontal: CONTENT_WRAPPER_PADDING,
   },
   itemBorder: {
     borderTopColor: Colors.border,
@@ -22,6 +26,7 @@ export const styles = CreateStyles({
     height: 100,
     width: 'auto',
     aspectRatio: '166 / 250',
+    borderRadius: 8,
   },
   itemContent: {
     flexDirection: 'column',
@@ -38,5 +43,8 @@ export const styles = CreateStyles({
   additionalInfo: {
   },
   deleteButton: {
+    height: 40,
+    width: 40,
+    borderRadius: 50,
   },
 });

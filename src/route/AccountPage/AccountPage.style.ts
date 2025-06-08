@@ -2,6 +2,9 @@ import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
+  wrapper: {
+    flex: 1,
+  },
   topBar: {
     flexDirection: 'row',
     width: '100%',
@@ -10,8 +13,8 @@ export const styles = CreateStyles({
   },
   tobBarBtn: {
     backgroundColor: Colors.transparent,
-    width: 32,
-    height: 32,
+    width: 42,
+    height: 42,
     borderRadius: 50,
   },
   tobBarBtnIcon: {

@@ -6,8 +6,9 @@ import ThemedButton from 'Component/ThemedButton';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
+import Wrapper from 'Component/Wrapper';
 import { useServiceContext } from 'Context/ServiceContext';
-import { router } from 'expo-router';
+import { RelativePathString, router } from 'expo-router';
 import t from 'i18n/t';
 import { Bell, Settings } from 'lucide-react-native';
 import React from 'react';
@@ -25,40 +26,39 @@ export function AccountPageComponent({
 }: AccountPageComponentProps) {
   const { badgeData } = useServiceContext();
 
+  const openRoute = (route: string) => {
+    router.push({
+      pathname: route as RelativePathString,
+    });
+  };
+
+  const renderTopBarButton = (IconComponent: React.ComponentType<any>, route: string) => {
+    return (
+      <ThemedPressable
+        style={ styles.tobBarBtn }
+        onPress={ () => openRoute(route) }
+      >
+        <IconComponent
+          style={ styles.tobBarBtnIcon }
+          size={ scale(24) }
+          color={ Colors.white }
+        />
+      </ThemedPressable>
+    );
+  };
+
   const renderTopBar = () => {
     const badge = badgeData[ACCOUNT_ROUTE] ?? 0;
 
     return (
       <View style={ styles.topBar }>
         <View>
-          <ThemedPressable
-            style={ styles.tobBarBtn }
-            onPress={ () => router.push({
-              pathname: '/(tabs)/(account)/(notifications)/notifications',
-            }) }
-          >
-            <Bell
-              style={ styles.tobBarBtnIcon }
-              size={ scale(20) }
-              color={ Colors.white }
-            />
-          </ThemedPressable>
+          { renderTopBarButton(Bell, '/(tabs)/(account)/notifications') }
           { badge > 0 && (
             <View style={ styles.badge } />
           ) }
         </View>
-        <ThemedPressable
-          style={ styles.tobBarBtn }
-          onPress={ () => router.push({
-            pathname: '/(tabs)/(account)/settings',
-          }) }
-        >
-          <Settings
-            style={ styles.tobBarBtnIcon }
-            size={ scale(20) }
-            color={ Colors.white }
-          />
-        </ThemedPressable>
+        { renderTopBarButton(Settings, '/(tabs)/(account)/settings') }
       </View>
     );
   };
@@ -138,8 +138,10 @@ export function AccountPageComponent({
 
   return (
     <Page>
-      { renderTopBar() }
-      { renderContent() }
+      <Wrapper style={ styles.wrapper }>
+        { renderTopBar() }
+        { renderContent() }
+      </Wrapper>
     </Page>
   );
 }

@@ -181,14 +181,10 @@ export const FilmPagerComponent = ({
     </PagerView>
   ), [pagerItems, handlePageScroll, handlePageSelect, handlePageScrollStateChanged, renderPage]);
 
-  if (!pagerItems.length) {
-    return renderPage(pagerItems[0], 0);
-  }
-
   return (
     <View style={ { flex: 1 } }>
       { renderPagerView }
-      { renderScrollableTabBar }
+      { pagerItems.length > 1 && renderScrollableTabBar }
     </View>
   );
 };

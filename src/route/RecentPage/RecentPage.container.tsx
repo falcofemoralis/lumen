@@ -33,7 +33,7 @@ export function RecentPageContainer() {
 
   const loadRecent = async (
     page: number,
-    isRefresh: boolean,
+    isRefresh: boolean
   ) => {
     const { totalPages } = paginationRef.current;
 
@@ -50,7 +50,7 @@ export function RecentPageContainer() {
           totalPages: resTotalPages,
         } = await getCurrentService().getRecent(
           page,
-          { isRefresh },
+          { isRefresh }
         );
 
         paginationRef.current = {
@@ -77,16 +77,13 @@ export function RecentPageContainer() {
   };
 
   const handleOnPress = (item: RecentItemInterface) => {
-    openFilm(item.link);
+    openFilm({ link: item.link, poster: item.image });
   };
 
   const removeItem = async (item: RecentItemInterface) => {
     const { id } = item;
 
-    const arr = [...items];
-    const newItems = arr.filter((i) => i.id !== id);
-
-    setItems(newItems);
+    setItems((prev) => prev.filter((i) => i.id !== id));
 
     getCurrentService().removeRecent(id).catch((error) => {
       NotificationStore.displayError(error as Error);
