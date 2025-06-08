@@ -4,11 +4,9 @@ import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
-import Wrapper from 'Component/Wrapper';
 import { Trash2 } from 'lucide-react-native';
 import React, { memo, useCallback } from 'react';
 import {
-  Pressable,
   View,
 } from 'react-native';
 import { Colors } from 'Style/Colors';

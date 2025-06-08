@@ -67,10 +67,13 @@ export const styles = CreateStyles({
     alignItems: 'center',
   },
   action: {
-    padding: 8,
-    borderRadius: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 46,
+    width: 46,
   },
   focusedAction: {
+    borderRadius: 50,
     backgroundColor: Colors.whiteTransparent,
   },
   commentsOverlay: {

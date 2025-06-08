@@ -7,6 +7,7 @@ import {
   useEffect, useRef, useState,
 } from 'react';
 import { View } from 'react-native';
+import Animated from 'react-native-reanimated';
 import {
   DefaultFocus,
   SpatialNavigationRoot,
@@ -143,12 +144,12 @@ export function FilmPagerComponent({
   };
 
   const renderTopMenu = () => {
-    if (!pagerItems.length) {
+    if (pagerItems.length <= 1) {
       return null;
     }
 
     return (
-      <View
+      <Animated.View
         style={ [
           styles.menuListWrapper,
           currentRow > 0 && styles.hidden,
@@ -170,7 +171,7 @@ export function FilmPagerComponent({
             </SpatialNavigationView>
           </SpatialNavigationScrollView>
         </SpatialNavigationRoot>
-      </View>
+      </Animated.View>
     );
   };
 

@@ -1,4 +1,5 @@
-import React, { useCallback } from 'react';
+import { Square, SquareCheck } from 'lucide-react-native';
+import React from 'react';
 import {
   Text,
   View,
@@ -49,10 +50,15 @@ export const ThemedMultiListComponent = ({
               { item.label }
             </Text>
           </View>
-          { /* <Checkbox
-            status={ item.isChecked ? 'checked' : 'unchecked' }
-            color={ Colors.primary }
-          /> */ }
+          { item.isChecked ? (
+            <SquareCheck
+              color={ Colors.primary }
+            />
+          ) : (
+            <Square
+              color={ isFocused ? Colors.black : Colors.white }
+            />
+          ) }
         </View>
       ) }
     </SpatialNavigationFocusableView>

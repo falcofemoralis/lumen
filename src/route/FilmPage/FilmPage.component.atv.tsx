@@ -23,6 +23,7 @@ import {
 import NotificationStore from 'Store/Notification.store';
 import { Colors } from 'Style/Colors';
 import { CollectionItemInterface } from 'Type/CollectionItem';
+import { FilmInterface } from 'Type/Film.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { scale } from 'Util/CreateStyles';
 
@@ -47,13 +48,14 @@ export function FilmPageComponent({
   handleSelectActor,
   handleSelectCategory,
   openBookmarks,
+  handleUpdateScheduleWatch,
 }: FilmPageComponentProps) {
   const { height } = Dimensions.get('window');
   const { openOverlay, goToPreviousOverlay } = useOverlayContext();
   const [showReadMore, setShowReadMore] = useState<boolean | null>(null);
 
   if (!film) {
-    return <FilmPageThumbnail />;
+    film = null as unknown as FilmInterface; // dirty hack to avoid null checks
   }
 
   const shouldShowReadMore = (content: number) => {
@@ -62,9 +64,13 @@ export function FilmPageComponent({
     setShowReadMore(percent > 45);
   };
 
+  const openNotImplemented = () => {
+    NotificationStore.displayMessage(t('Not implemented'));
+  };
+
   const renderAction = (
-    text: string,
     IconComponent: React.ComponentType<any>,
+    text: string,
     onPress?: () => void
   ) => (
     <SpatialNavigationFocusableView>
@@ -87,15 +93,15 @@ export function FilmPageComponent({
 
     if (isPendingRelease) {
       return renderAction(
-        t('Coming Soon'),
         Clock,
+        t('Coming Soon'),
         () => {
           NotificationStore.displayMessage(t('We are waiting for the film in the good quality'));
         }
       );
     }
 
-    return renderAction(t('Watch Now'), Play, playFilm);
+    return renderAction(Play, t('Watch Now'), playFilm);
   };
 
   const renderActions = () => (
@@ -103,9 +109,10 @@ export function FilmPageComponent({
       <DefaultFocus>
         <View style={ styles.actions }>
           { renderPlayButton() }
-          { renderAction(t('Comments'), MessageSquareText, () => openOverlay(commentsOverlayId)) }
-          { renderAction(t('Bookmark'), Bookmark, openBookmarks) }
-          { renderAction(t('Trailer'), Clapperboard, () => NotificationStore.displayMessage(t('Not implemented'))) }
+          { renderAction(MessageSquareText, t('Comments'), () => openOverlay(commentsOverlayId)) }
+          { renderAction(Bookmark, t('Bookmark'), openBookmarks) }
+          { renderAction(Clapperboard, t('Trailer'), openNotImplemented) }
+          { /* { renderAction(Download, t('Download'), openNotImplemented) } */ }
         </View>
       </DefaultFocus>
     </SpatialNavigationView>
@@ -359,6 +366,12 @@ export function FilmPageComponent({
   const renderScheduleOverlay = () => {
     const { schedule = [] } = film;
 
+    const data = schedule.map(({ name, items }) => ({
+      id: name,
+      title: name,
+      items,
+    }));
+
     return (
       <ThemedOverlay
         id={ scheduleOverlayId }
@@ -366,28 +379,16 @@ export function FilmPageComponent({
         containerStyle={ styles.scheduleOverlay }
         contentContainerStyle={ styles.scheduleOverlayContent }
       >
-        <SpatialNavigationScrollView
-          offsetFromStart={ scale(32) }
-        >
-          <DefaultFocus>
-            { schedule.map(({ name, items }) => (
-              <View key={ name }>
-                <ThemedText style={ styles.scheduleSeason }>
-                  { name }
-                </ThemedText>
-                <View>
-                  { items.map((subItem, idx) => (
-                    <ScheduleItem
-                      key={ `modal-${subItem.name}` }
-                      item={ subItem }
-                      idx={ idx }
-                    />
-                  )) }
-                </View>
-              </View>
-            )) }
-          </DefaultFocus>
-        </SpatialNavigationScrollView>
+        <ThemedAccordion
+          data={ data }
+          renderItem={ (subItem) => (
+            <ScheduleItem
+              key={ `modal-${subItem.name}` }
+              item={ subItem }
+              handleUpdateScheduleWatch={ handleUpdateScheduleWatch }
+            />
+          ) }
+        />
       </ThemedOverlay>
     );
   };
@@ -411,7 +412,7 @@ export function FilmPageComponent({
                   <ScheduleItem
                     key={ `visible-${item.name}` }
                     item={ item }
-                    idx={ idx }
+                    handleUpdateScheduleWatch={ handleUpdateScheduleWatch }
                   />
                 )) }
               </View>
@@ -485,7 +486,6 @@ export function FilmPageComponent({
             <InfoList
               key={ `info-list-${subItem.name}` }
               list={ subItem }
-              idx={ idx }
               handleSelectCategory={ handleSelectCategory }
             />
           ) }
@@ -511,6 +511,7 @@ export function FilmPageComponent({
               { related.map((item) => (
                 <RelatedItem
                   key={ item.link }
+                  film={ film }
                   item={ item }
                   handleSelectFilm={ handleSelectFilm }
                 />
@@ -551,8 +552,12 @@ export function FilmPageComponent({
     </>
   );
 
-  return (
-    <Page testID="film-page">
+  const renderContent = () => {
+    if (!film) {
+      return <FilmPageThumbnail />;
+    }
+
+    return (
       <SpatialNavigationScrollView offsetFromStart={ height / 2.1 }>
         <View>
           { renderModals() }
@@ -565,6 +570,12 @@ export function FilmPageComponent({
           { renderRelated() }
         </View>
       </SpatialNavigationScrollView>
+    );
+  };
+
+  return (
+    <Page>
+      { renderContent() }
     </Page>
   );
 }

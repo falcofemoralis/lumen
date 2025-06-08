@@ -36,11 +36,17 @@ const usePreventNavigationGoBack = (isModalVisible: boolean, hideModal: () => vo
   const isFocused = useIsFocused();
 
   useEffect(() => {
+    console.log('usePreventNavigationGoBack', isFocused);
+
     if (!isFocused) {
       return () => {};
     }
 
+    console.log('set backHandler');
+
     const backAction = () => {
+      console.log('backAction', isModalVisible);
+
       try {
         if (isModalVisible) {
           hideModal();
@@ -58,6 +64,10 @@ const usePreventNavigationGoBack = (isModalVisible: boolean, hideModal: () => vo
 
     const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
 
-    return () => backHandler.remove();
-  }, [isFocused]);
+    return () => {
+      console.log('remove backHandler');
+
+      backHandler.remove();
+    };
+  }, [isFocused, isModalVisible, hideModal]);
 };

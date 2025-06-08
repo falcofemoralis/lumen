@@ -3,6 +3,10 @@ import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
   container: {
+    width: '100%',
+  },
+  groupContainer: {
+    width: '100%',
   },
   group: {
     padding: 12,
@@ -17,6 +21,7 @@ export const styles = CreateStyles({
     flexDirection: 'column',
   },
   overlay: {
-    maxHeight: '60%',
+    maxHeight: '70%',
+    maxWidth: '50%',
   },
 });

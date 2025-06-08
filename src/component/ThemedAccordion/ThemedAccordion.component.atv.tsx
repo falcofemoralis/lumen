@@ -14,11 +14,11 @@ export const ThemedAccordionComponent = ({
   data,
   renderItem,
 }: ThemedAccordionComponentProps<any>) => {
-  const { closeOverlay } = useOverlayContext();
+  const { closeOverlay, openOverlay } = useOverlayContext();
   const overlayId = useRef(generateId());
   const [openAccordionGroup, setOpenAccordionGroup] = useState<string | null>(null);
 
-  const openOverlay = (groupId: string) => {
+  const showOverlay = (groupId: string) => {
     setOpenAccordionGroup(groupId);
 
     openOverlay(overlayId.current);
@@ -34,9 +34,12 @@ export const ThemedAccordionComponent = ({
     const { id, title } = group;
 
     return (
-      <View key={ `group-${id}` }>
+      <View
+        key={ `group-${id}` }
+        style={ styles.groupContainer }
+      >
         <SpatialNavigationFocusableView
-          onSelect={ () => openOverlay(id) }
+          onSelect={ () => showOverlay(id) }
         >
           { ({ isFocused }) => (
             <ThemedText
@@ -83,7 +86,9 @@ export const ThemedAccordionComponent = ({
   return (
     <View style={ styles.container }>
       { renderOverlay() }
-      { data.map((group) => renderAccordionGroup(group)) }
+      <DefaultFocus>
+        { data.map((group) => renderAccordionGroup(group)) }
+      </DefaultFocus>
     </View>
   );
 };

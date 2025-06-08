@@ -56,10 +56,10 @@ export const styles = CreateStyles({
   voiceRatingItemContainer: {
     flexDirection: 'row',
     padding: 16,
-    borderRadius: 16,
   },
   voiceRatingItemContainerFocused: {
     backgroundColor: Colors.backgroundFocused,
+    borderRadius: 16,
   },
   voiceRatingInfo: {
     flexDirection: 'column',

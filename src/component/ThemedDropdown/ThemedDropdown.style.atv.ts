@@ -68,9 +68,11 @@ export const styles = CreateStyles({
   },
   itemFocused: {
     backgroundColor: Colors.backgroundFocused,
+    borderRadius: 12,
   },
   itemSelected: {
     backgroundColor: Colors.primary,
+    borderRadius: 12,
   },
   text: {
     color: Colors.text,

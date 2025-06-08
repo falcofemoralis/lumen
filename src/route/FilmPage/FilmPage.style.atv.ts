@@ -127,11 +127,11 @@ export const styles = CreateStyles({
   },
   actor: {
     width: 90,
-    borderRadius: 12,
     paddingBottom: 4,
   },
   actorFocused: {
     backgroundColor: Colors.backgroundFocused,
+    borderRadius: 12,
   },
   actorPhoto: {
     height: 130,
@@ -174,13 +174,13 @@ export const styles = CreateStyles({
     width: '100%',
     gap: 8,
     padding: 16,
+    marginVertical: 4,
     borderRadius: 16,
+    backgroundColor: Colors.button,
   },
   scheduleItemFocused: {
     backgroundColor: Colors.backgroundFocused,
-  },
-  scheduleItemEven: {
-    backgroundColor: Colors.background,
+    borderRadius: 16,
   },
   scheduleItemInfoWrapper: {
     flexDirection: 'column',
@@ -223,7 +223,7 @@ export const styles = CreateStyles({
     marginBottom: 4,
   },
   scheduleViewAll: {
-    marginTop: 16,
+    marginTop: 4,
     width: '25%',
   },
   scheduleOverlay: {
@@ -260,13 +260,10 @@ export const styles = CreateStyles({
   },
   infoList: {
     padding: 8,
-    borderRadius: 8,
-  },
-  infoListEven: {
-    backgroundColor: Colors.background,
   },
   infoListFocused: {
     backgroundColor: Colors.backgroundFocused,
+    borderRadius: 8,
   },
   infoListName: {
   },

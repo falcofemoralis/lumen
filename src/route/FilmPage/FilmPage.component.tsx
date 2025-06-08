@@ -9,10 +9,9 @@ import ThemedText from 'Component/ThemedText';
 import Wrapper from 'Component/Wrapper';
 import { useOverlayContext } from 'Context/OverlayContext';
 import { LinearGradient } from 'expo-linear-gradient';
-import { router, useRouter } from 'expo-router';
+import { router } from 'expo-router';
 import t from 'i18n/t';
 import {
-  ArrowLeft,
   Bookmark,
   Clapperboard,
   Clock,
@@ -26,7 +25,6 @@ import React from 'react';
 import {
   ScrollView,
   Text,
-  TouchableOpacity,
   useWindowDimensions,
   View,
 } from 'react-native';
@@ -72,7 +70,6 @@ export function FilmPageComponent({
   handleShare,
   openBookmarks,
 }: FilmPageComponentProps) {
-  const { openOverlay } = useOverlayContext();
   const { width } = useWindowDimensions();
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffset = useSharedValue(0);
@@ -265,9 +262,9 @@ export function FilmPageComponent({
     <View style={ styles.middleActions }>
       { renderMiddleAction(Star, 'Rate',openNotImplemented) }
       { renderMiddleAction(Clapperboard, 'Trailer', openNotImplemented) }
-      { renderMiddleAction(MessageSquareText, t('Comm'), openComments) }
+      { renderMiddleAction(MessageSquareText, 'Comments', openComments) }
       { renderMiddleAction(Bookmark, 'Bookmark', openBookmarks) }
-      { renderMiddleAction(Download, 'Download', () => openOverlay(bookmarksOverlayId)) }
+      { renderMiddleAction(Download, 'Download', openNotImplemented) }
     </View>
   );
 

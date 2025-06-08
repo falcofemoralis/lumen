@@ -11,7 +11,6 @@ import { View } from 'react-native';
 import {
   DefaultFocus, SpatialNavigationFocusableView, SpatialNavigationScrollView, SpatialNavigationView,
 } from 'react-tv-space-navigation';
-import { Colors } from 'Style/Colors';
 import { EpisodeInterface, SeasonInterface } from 'Type/FilmVoice.interface';
 import { scale } from 'Util/CreateStyles';
 

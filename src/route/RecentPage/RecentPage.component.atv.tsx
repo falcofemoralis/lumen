@@ -6,7 +6,8 @@ import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
 import { Trash2 } from 'lucide-react-native';
 import React, { useCallback } from 'react';
-import { Animated, Dimensions, View } from 'react-native';
+import { Dimensions, useWindowDimensions, View } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { DefaultFocus, SpatialNavigationFocusableView } from 'react-tv-space-navigation';
 import { calculateLayoutWidth } from 'Style/Layout';
 
@@ -14,7 +15,6 @@ import { NUMBER_OF_COLUMNS_TV } from './RecentPage.config';
 import { styles } from './RecentPage.style.atv';
 import { RecentPageThumbnail } from './RecentPage.thumbnail.atv';
 import { RecentGridItem, RecentPageComponentProps } from './RecentPage.type';
-import { useFocusAnimation } from './useFocusAnimation';
 
 export function RecentPageComponent({
   items,
@@ -23,7 +23,7 @@ export function RecentPageComponent({
   removeItem,
 }: RecentPageComponentProps & { items: RecentGridItem[] }) {
   const containerWidth = calculateLayoutWidth();
-  const { height } = Dimensions.get('window');
+  const { height } = useWindowDimensions();
 
   const prepareItems = () => {
     const rowsItems = [] as RecentGridItem[];
@@ -64,15 +64,12 @@ export function RecentPageComponent({
     return (
       <SpatialNavigationFocusableView onSelect={ () => handleOnPress(item) }>
         { ({ isFocused }) => {
-          const scaleAnimation = useFocusAnimation(isFocused);
-
           return (
             <Animated.View
               style={ [
                 styles.item,
                 { width },
                 isFocused && styles.itemFocused,
-                scaleAnimation,
               ] }
             >
               <ThemedImage
@@ -107,7 +104,7 @@ export function RecentPageComponent({
   }, [handleOnPress]);
 
   return (
-    <Page>
+    <Page contentStyle={ styles.page }>
       <DefaultFocus>
         <ThemedGrid
           style={ styles.grid }

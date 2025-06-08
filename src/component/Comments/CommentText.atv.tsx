@@ -27,7 +27,7 @@ export const CommentText = forwardRef<CommentTextRef, CommentTextProps>(
       textStyle,
       lines,
     },
-    ref,
+    ref
   ) => {
     const [isSpoilersVisible, setSpoilersVisible] = useState(false);
 
@@ -86,5 +86,5 @@ export const CommentText = forwardRef<CommentTextRef, CommentTextProps>(
         )) }
       </View>
     );
-  },
+  }
 );

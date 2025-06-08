@@ -51,7 +51,7 @@ export const styles = CreateStyles({
     alignItems: 'center',
     justifyContent: 'flex-start',
     paddingVertical: 12,
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
     borderRadius: 24,
     marginBottom: 12,
   },
@@ -91,7 +91,7 @@ export const styles = CreateStyles({
   profileSwitchText: {
     left: 8,
     bottom: 0,
-    color: Colors.textFocused,
+    color: Colors.textSecondary,
   },
   profileAvatar: {
     width: 32,
@@ -102,14 +102,6 @@ export const styles = CreateStyles({
     borderWidth: 1,
   },
   profileAvatarContainer: {
-  },
-  profileAvatarUnfocused: {
-    padding: 2,
-  },
-  profileAvatarFocused: {
-    borderRadius: 99,
-    borderWidth: 2,
-    borderColor: Colors.white,
   },
   badge: {
     backgroundColor: Colors.secondary,

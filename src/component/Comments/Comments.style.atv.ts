@@ -24,7 +24,7 @@ export const styles = CreateStyles({
     paddingBottom: BOTTOM_PADDING,
   },
   itemFocused: {
-    backgroundColor: Colors.button,
+    backgroundColor: Colors.backgroundLighter,
   },
   itemEven: {
   },
@@ -35,7 +35,7 @@ export const styles = CreateStyles({
   },
   comment: {
     flexDirection: 'column',
-    backgroundColor: Colors.backgroundLighter,
+    backgroundColor: Colors.button,
     borderRadius: 12,
     padding: ITEM_PADDING,
   },
@@ -66,8 +66,8 @@ export const styles = CreateStyles({
     alignItems: 'center',
   },
   spoiler: {
-    backgroundColor: Colors.darkBorder,
-    color: Colors.darkBorder,
+    backgroundColor: Colors.backgroundLight,
+    color: Colors.backgroundLight,
   },
   textFocused: {
   },

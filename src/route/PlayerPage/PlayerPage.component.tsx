@@ -24,7 +24,7 @@ export function PlayerPageComponent({ video, film, voice }: PlayerPageComponentP
   }, []);
 
   return (
-    <Page testID="player-page">
+    <Page disableStyles>
       <PlayerProvider>
         <Player
           video={ video }

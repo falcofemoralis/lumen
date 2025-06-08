@@ -8,6 +8,7 @@ export interface RecentPageComponentProps {
 }
 
 export type RecentGridItem = RecentItemInterface & {
+  idx?: number;
   isDeleteButton?: boolean;
 };
 

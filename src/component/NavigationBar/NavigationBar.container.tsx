@@ -14,7 +14,7 @@ export function NavigationBarContainer() {
   const [profile] = useProfile();
   const { isSignedIn } = useServiceContext();
 
-  const getRedirectRoute = (tab: Tab) => {
+  const getRedirectRoute = useCallback((tab: Tab) => {
     const { route } = tab;
 
     // if not signed in, we should redirect to account page
@@ -23,7 +23,7 @@ export function NavigationBarContainer() {
     }
 
     return route;
-  };
+  }, [isSignedIn]);
 
   const navigateTo = useCallback((
     tab: Tab,
@@ -61,7 +61,7 @@ export function NavigationBarContainer() {
         target: state.key,
       });
     }
-  }, []);
+  }, [getRedirectRoute]);
 
   const isFocused = useCallback((tab: Tab, state: StateType) => {
     const routeIndex = state.routes.findIndex((r) => r.name === tab.route);

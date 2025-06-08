@@ -11,7 +11,7 @@ export function HomePageComponent({
   onUpdateFilms,
 }: HomePageComponentProps) {
   return (
-    <Page testID="home-page">
+    <Page>
       <FilmPager
         menuItems={ menuItems }
         filmPager={ filmPager }

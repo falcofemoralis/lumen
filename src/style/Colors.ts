@@ -21,9 +21,9 @@ const BackgroundColors = {
   backgroundLighter: '#5B5B5B',
   backgroundFocused: '#E3E3E3',
   border: '#4E4E4E',
-  darkBorder: '#262626',
+  darkBorder: '#383838',
   divider: '#4E4E4E',
-  darkDivider: '#262626',
+  darkDivider: '#383838',
   thumbnail: '#252525',
   thumbnailHighlight: '#383838',
 };

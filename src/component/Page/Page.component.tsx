@@ -7,10 +7,11 @@ import { PageComponentProps } from './Page.type';
 export function PageComponent({
   children,
   style,
+  disableStyles,
 }: PageComponentProps) {
   return (
     <View
-      style={ [
+      style={ !disableStyles && [
         styles.container,
         style,
       ] }

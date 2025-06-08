@@ -25,9 +25,11 @@ export const RecentPageThumbnail = () => {
             { width, height },
           ] }
         >
-          <Thumbnail
-            style={ styles.poster }
-          />
+          <View>
+            <Thumbnail
+              style={ styles.poster }
+            />
+          </View>
           <View style={ styles.itemContent }>
             <Thumbnail
               height={ scale(30) }
@@ -44,10 +46,6 @@ export const RecentPageThumbnail = () => {
           </View>
         </View>
       )) }
-      <Loader
-        isLoading
-        fullScreen
-      />
     </View>
   );
 };

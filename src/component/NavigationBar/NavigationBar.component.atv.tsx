@@ -166,12 +166,7 @@ export function NavigationBarComponent({
           isf && isRootActive && styles.tabFocused,
         ] }
       >
-        <View
-          style={ [
-            styles.profileAvatarContainer,
-            focused ? styles.profileAvatarFocused : styles.profileAvatarUnfocused,
-          ] }
-        >
+        <View style={ styles.profileAvatarContainer }>
           { avatar ? (
             <ThemedImage
               src={ avatar }

@@ -3,15 +3,11 @@ import Loader from 'Component/Loader';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
-import Wrapper from 'Component/Wrapper';
 import t from 'i18n/t';
 import { CircleCheck, Star } from 'lucide-react-native';
 import { memo, useCallback, useEffect, useState } from 'react';
 import {
   Pressable,
-  StyleProp,
-  TextStyle,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import { Colors } from 'Style/Colors';
@@ -227,10 +223,16 @@ export const FranchiseItemComponent = memo(({
   } = item;
   const position = Math.abs(idx - franchise.length);
 
+  const onPress = useCallback(() => {
+    if (link) {
+      handleSelectFilm({ link } as unknown as FilmInterface);
+    }
+  }, [link, handleSelectFilm]);
+
   return (
     <ThemedPressable
       disabled={ !link }
-      onPress={ () => handleSelectFilm(film) }
+      onPress={ onPress }
       style={ styles.franchiseItemButton }
       contentStyle={ styles.franchiseItemButtonContent }
     >

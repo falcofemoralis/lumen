@@ -287,14 +287,17 @@ export function PlayerComponent({
       onFocus={ () => handleUserInteraction(() => { updateFocusedElement(el); }) }
     >
       { ({ isFocused }) => (
-        <IconComponent
+        <View
           style={ [
             styles.action,
             isFocused && styles.focusedAction,
           ] }
-          size={ scale(30) }
-          color={ Colors.white }
-        />
+        >
+          <IconComponent
+            size={ scale(28) }
+            color={ Colors.white }
+          />
+        </View>
       ) }
     </SpatialNavigationFocusableView>
   );
@@ -408,7 +411,10 @@ export function PlayerComponent({
         >
           { renderBottomAction(Sparkles, openQualitySelector, bottomActionRef) }
           { isPlaylistSelector && renderBottomAction(ListVideo, openVideoSelector) }
-          { subtitles.length > 0 && renderBottomAction(selectedSubtitle?.languageCode === '' ? Captions : CaptionsOff, openSubtitleSelector) }
+          { subtitles.length > 0 && renderBottomAction(
+            selectedSubtitle?.languageCode === '' ? Captions : CaptionsOff,
+            openSubtitleSelector
+          ) }
           { renderBottomAction(Bookmark, openBookmarksOverlay) }
         </SpatialNavigationView>
         { renderDuration() }

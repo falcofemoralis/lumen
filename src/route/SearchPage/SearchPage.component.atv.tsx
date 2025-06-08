@@ -4,6 +4,7 @@ import Page from 'Component/Page';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedInput from 'Component/ThemedInput';
 import t from 'i18n/t';
+import { Mic, Search } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { View } from 'react-native';
 import { DefaultFocus, SpatialNavigationScrollView, SpatialNavigationView } from 'react-tv-space-navigation';
@@ -53,20 +54,13 @@ export function SearchPageComponent({
         <ThemedButton
           style={ styles.actionBtn }
           styleFocused={ recognizing && styles.speakActive }
-          // iconStyleFocused={ recognizing && styles.speakActiveIcon }
-          // icon={ {
-          //   pack: IconPackType.MaterialCommunityIcons,
-          //   name: 'microphone-outline',
-          // } }
+          IconComponent={ Mic }
           onPress={ handleStartRecognition }
         />
         { renderSearchBar() }
         <ThemedButton
           style={ styles.actionBtn }
-          // icon={ {
-          //   name: 'magnify',
-          //   pack: IconPackType.MaterialCommunityIcons,
-          // } }
+          IconComponent={ Search }
           onPress={ handleApplySearch }
         />
       </SpatialNavigationView>
@@ -79,7 +73,12 @@ export function SearchPageComponent({
     }
 
     return (
-      <View style={ styles.suggestionsWrapper }>
+      <View
+        style={ {
+          ...styles.suggestionsWrapper,
+          ...(currentRow > 0 && styles.hidden),
+        } }
+      >
         <SpatialNavigationScrollView
           horizontal
           offsetFromStart={ 20 }

@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import { TextInput } from 'react-native';
 import { SpatialNavigationFocusableView } from 'react-tv-space-navigation';
 import { Colors } from 'Style/Colors';
@@ -12,26 +12,25 @@ export const ThemedInputComponent = ({
   style,
   ...props
 }: ThemedInputComponentProps) => {
-  const textInputRef = useRef<any>(null);
+  const textInputRef = useRef<TextInput>(null);
 
-  const focusInput = () => {
+  const onSelect = useCallback(() => {
     textInputRef.current?.focus();
 
     setTimeout(() => {
       // this fixes issue with unfocus on new arch
       textInputRef.current?.focus();
     }, 100);
-  };
+  }, []);
 
   return (
     <SpatialNavigationFocusableView
-      onSelect={ focusInput }
+      onSelect={ onSelect }
     >
       { ({ isFocused }) => (
         <TextInput
           autoComplete="off"
           ref={ textInputRef }
-          tvFocusable
           placeholder={ placeholder }
           onChangeText={ onChangeText }
           style={ [
@@ -42,7 +41,7 @@ export const ThemedInputComponent = ({
           placeholderTextColor={ isFocused ? Colors.textFocused : Colors.text }
           selectionColor={ Colors.primary }
           cursorColor={ Colors.primary }
-          underlineColorAndroid={ Colors.white }
+          underlineColorAndroid={ Colors.transparent }
           selectionHandleColor={ Colors.primary }
           { ...props }
         />

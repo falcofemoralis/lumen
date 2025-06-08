@@ -1,11 +1,13 @@
-import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
+  container: {
+  },
   menuListWrapper: {
     height: 48,
-    backgroundColor: Colors.background,
     zIndex: 10,
+    transitionProperty: 'all',
+    transitionDuration: '250ms',
   },
   menuListScroll: {},
   menuList: {
@@ -18,6 +20,5 @@ export const styles = CreateStyles({
   },
   hidden: {
     opacity: 0,
-    height: 0,
   },
 });

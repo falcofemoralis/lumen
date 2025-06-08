@@ -38,6 +38,8 @@ const SpatialNavigationKeyboardLocker = () => {
 export function PageComponent({
   children,
   style,
+  contentStyle,
+  disableStyles,
 }: PageComponentProps) {
   const isFocused = useIsFocused();
   const { isMenuOpen, toggleMenu, isNavigationLocked } = useNavigationContext();
@@ -55,11 +57,11 @@ export function PageComponent({
 
   return (
     <Animated.View
-      style={ [
+      style={ !disableStyles ? [
         styles.container,
         isMenuOpen && styles.containerOpened,
         style,
-      ] }
+      ] : styles.wrapper }
     >
       <ErrorBoundary>
         <SpatialNavigationRoot
@@ -68,7 +70,9 @@ export function PageComponent({
         >
           <SpatialNavigationKeyboardLocker />
           <Portal.Host>
-            { children }
+            <View style={ !disableStyles ? [styles.content, contentStyle] : styles.wrapper }>
+              { children }
+            </View>
           </Portal.Host>
         </SpatialNavigationRoot>
       </ErrorBoundary>

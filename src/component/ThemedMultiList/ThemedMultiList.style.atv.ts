@@ -29,6 +29,7 @@ export const styles = CreateStyles({
   },
   listContainer: {
     maxHeight: 300,
+    minWidth: 250,
     padding: 4,
     alignSelf: 'flex-end',
   },
@@ -56,10 +57,10 @@ export const styles = CreateStyles({
     alignItems: 'center',
     padding: 10,
     marginBlock: 5,
-    borderRadius: 12,
   },
   itemFocused: {
     backgroundColor: Colors.backgroundFocused,
+    borderRadius: 12,
   },
   itemSelected: {
     backgroundColor: Colors.primary,

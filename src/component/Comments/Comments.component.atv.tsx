@@ -59,7 +59,6 @@ export function CommentItem({
           key={ id }
           style={ [
             styles.item,
-            idx % 2 === 0 && styles.itemEven,
             {
               paddingLeft: leftIndent,
             },
@@ -263,6 +262,7 @@ export const CommentsComponent = ({
           orientation="vertical"
           additionalItemsRendered={ 1 }
           onEndReachedThresholdItemsNumber={ 5 }
+          scrollBehavior='stick-to-center'
         />
       </DefaultFocus>
     );

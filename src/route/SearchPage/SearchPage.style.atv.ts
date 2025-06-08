@@ -5,6 +5,7 @@ export const styles = CreateStyles({
   container: {
     flexDirection: 'column',
     zIndex: 10,
+    marginTop: 16,
   },
   searchContainer: {
     flexDirection: 'row',
@@ -21,6 +22,8 @@ export const styles = CreateStyles({
   searchBar: {
     width: '100%',
     height: 48,
+    borderRadius: 50,
+    paddingHorizontal: 16,
   },
   suggestionsWrapper: {
     marginTop: 16,
