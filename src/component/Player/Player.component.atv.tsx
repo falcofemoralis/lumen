@@ -101,10 +101,13 @@ export function PlayerComponent({
   const [showControls, setShowControls] = useState(false);
   const [hideActions, setHideActions] = useState(false);
   const controlsTimeout = useRef<NodeJS.Timeout | null>(null);
-  const canHideControls = useRef(isPlaying && showControls);
   const topActionRef = useRef<SpatialNavigationNodeRef | null>(null);
   const middleActionRef = useRef<SpatialNavigationNodeRef | null>(null);
   const bottomActionRef = useRef<SpatialNavigationNodeRef | null>(null);
+  const showControlsRef = useRef(showControls);
+  const currentOverlayRef = useRef(currentOverlay);
+  const isComponentMounted = useRef(true);
+  const focusedElementRef = useRef(focusedElement);
 
   const controlsAnimation = useAnimatedStyle(() => ({
     opacity: withTiming(
@@ -118,35 +121,32 @@ export function PlayerComponent({
     ),
   }));
 
-  const handleHideControls = () => {
-    canHideControls.current = isPlaying
-    && showControls
-    && !currentOverlay.length;
-  };
-
-  useEffect(() => () => {
-    if (controlsTimeout.current) {
-      clearTimeout(controlsTimeout.current);
-    }
-  }, []);
-
   useEffect(() => {
-    handleHideControls();
-  }, [isPlaying, showControls]);
-
-  useEffect(() => {
-    handleHideControls();
-
-    if (canHideControls.current) {
-      handleUserInteraction();
-    }
-  }, [currentOverlay.length]);
+    currentOverlayRef.current = currentOverlay;
+    showControlsRef.current = showControls;
+    focusedElementRef.current = focusedElement;
+  }, [showControls, currentOverlay, focusedElement]);
 
   useEffect(() => {
     const keyDownListener = (type: SupportedKeys) => {
-      if (!showControls) {
+      console.log('keyDownListener', type);
+      if (!isComponentMounted.current || !player) return false;
+
+      console.log('showControlsRef.current', showControlsRef.current);
+
+      if (showControlsRef.current) {
         if (type === SupportedKeys.BACK) {
+          console.log('BACK KEYDOWN showControlsRef.current', showControlsRef.current);
+
+          setShowControls(false);
+
           return false;
+        }
+      }
+
+      if (!showControlsRef.current) {
+        if (type === SupportedKeys.BACK) {
+          return true;
         }
 
         if (type === SupportedKeys.UP) {
@@ -158,11 +158,16 @@ export function PlayerComponent({
           || type === SupportedKeys.LEFT
           || type === SupportedKeys.RIGHT
         ) {
+          console.log('updateFocusedElement FocusedElement.PROGRESS_THUMB');
+
           updateFocusedElement(FocusedElement.PROGRESS_THUMB);
           middleActionRef.current?.focus();
 
           if (type === SupportedKeys.LEFT || type === SupportedKeys.RIGHT) {
-            return true;
+            setHideActions(true);
+            setShowControls(true);
+
+            return false;
           }
         }
 
@@ -173,10 +178,12 @@ export function PlayerComponent({
 
         setShowControls(true);
 
-        return true;
+        return false;
       }
 
-      if (focusedElement === FocusedElement.PROGRESS_THUMB) {
+      console.log('focusedElementRef.current', focusedElementRef.current);
+
+      if (focusedElementRef.current === FocusedElement.PROGRESS_THUMB) {
         if (type === SupportedKeys.ENTER) {
           togglePlayPause();
         }
@@ -184,15 +191,44 @@ export function PlayerComponent({
         if ((type === SupportedKeys.UP || type === SupportedKeys.DOWN) && hideActions) {
           setHideActions(false);
         }
+
+        if (type === SupportedKeys.LEFT || type === SupportedKeys.RIGHT) {
+          setHideActions(true);
+          setShowControls(true);
+        }
       }
 
       return false;
     };
 
+    const keyUpListener = (_type: SupportedKeys) => {
+      if (!isComponentMounted.current || !player) return false;
+
+      if (controlsTimeout.current) {
+        clearTimeout(controlsTimeout.current);
+      }
+
+      controlsTimeout.current = setTimeoutSafe(() => {
+        if (!isComponentMounted.current || !player) return;
+
+        console.log('hide', player.playing, showControlsRef.current, currentOverlayRef.current.length);
+
+        if (player.playing
+          && showControlsRef.current
+          && !currentOverlayRef.current.length
+        ) {
+          setShowControls(false);
+        }
+      }, PLAYER_CONTROLS_TIMEOUT);
+
+      return false;
+    };
+
     const backAction = () => {
-      if (showControls) {
+      console.log('BACK ACTION', showControlsRef.current);
+
+      if (showControlsRef.current) {
         setShowControls(false);
-        // setHideActions(false);
 
         return true;
       }
@@ -200,7 +236,10 @@ export function PlayerComponent({
       return false;
     };
 
-    const remoteControlDownListener = RemoteControlManager.addKeydownListener(keyDownListener);
+    // const remoteControlDownListener = RemoteControlManager.addKeydownListener(keyDownListener);
+    //const remoteControlUpListener = RemoteControlManager.addKeyupListener(keyUpListener);
+
+    console.log('set backHandler');
 
     const backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
@@ -208,35 +247,21 @@ export function PlayerComponent({
     );
 
     return () => {
-      backHandler.remove();
-      RemoteControlManager.removeKeydownListener(remoteControlDownListener);
-    };
-  });
+      //RemoteControlManager.removeKeydownListener(remoteControlDownListener);
+      //RemoteControlManager.removeKeyupListener(remoteControlUpListener);
 
-  const setControlsTimeout = () => {
-    if (controlsTimeout.current) {
-      clearTimeout(controlsTimeout.current);
-    }
-
-    controlsTimeout.current = setTimeoutSafe(() => {
-      if (canHideControls.current) {
-        setShowControls(false);
+      if (backHandler) {
+        backHandler.remove();
       }
-    }, PLAYER_CONTROLS_TIMEOUT);
-  };
 
-  const handleUserInteraction = (action?: () => void) => {
-    setControlsTimeout();
-
-    if (action) {
-      action();
-    }
-  };
-
-  const toggleSeekMode = () => {
-    setHideActions(true);
-    setShowControls(true);
-  };
+      console.log('set isComponentMounted to false');
+      isComponentMounted.current = false;
+      if (controlsTimeout.current) {
+        clearTimeout(controlsTimeout.current);
+        controlsTimeout.current = null;
+      }
+    };
+  }, []);
 
   const renderTitle = () => {
     const { title, hasSeasons } = film;
@@ -283,8 +308,8 @@ export function PlayerComponent({
   ) => (
     <SpatialNavigationFocusableView
       ref={ ref }
-      onSelect={ () => handleUserInteraction(action) }
-      onFocus={ () => handleUserInteraction(() => { updateFocusedElement(el); }) }
+      onSelect={ action }
+      onFocus={ () => updateFocusedElement(el) }
     >
       { ({ isFocused }) => (
         <View
@@ -362,9 +387,7 @@ export function PlayerComponent({
         onFocus={ () => {
           updateFocusedElement(FocusedElement.PROGRESS_THUMB);
         } }
-        toggleSeekMode={ toggleSeekMode }
         rewindPosition={ rewindPosition }
-        handleUserInteraction={ handleUserInteraction }
         togglePlayPause={ togglePlayPause }
         hideActions={ hideActions }
       />

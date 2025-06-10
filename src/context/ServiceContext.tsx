@@ -63,7 +63,9 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
   const [isSignedIn, setIsSignedIn] = useState<boolean>(!!miscStorage.getString(CREDENTIALS_STORAGE));
   const [notifications, setNotifications] = useState<NotificationInterface[] | null>(null);
   const [badgeData, setBadgeData] = useState<BadgeData>({});
-  const [profile, setProfile] = useState<ProfileInterface | null>(safeJsonParse<ProfileInterface>(miscStorage.getString(PROFILE_STORAGE)));
+  const [profile, setProfile] = useState<ProfileInterface | null>(
+    safeJsonParse<ProfileInterface>(miscStorage.getString(PROFILE_STORAGE))
+  );
 
   /**
    * Update the current service

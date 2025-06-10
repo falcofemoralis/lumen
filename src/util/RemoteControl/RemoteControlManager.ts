@@ -58,6 +58,8 @@ class RemoteControlManager implements RemoteControlManagerInterface {
     const mappedKey = {
       21: SupportedKeys.LEFT,
       22: SupportedKeys.RIGHT,
+      20: SupportedKeys.DOWN,
+      19: SupportedKeys.UP,
       66: SupportedKeys.ENTER,
       23: SupportedKeys.ENTER,
     }[keyEvent.keyCode];

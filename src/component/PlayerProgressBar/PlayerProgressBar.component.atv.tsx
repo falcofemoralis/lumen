@@ -17,7 +17,7 @@ import { DimensionValue, View } from 'react-native';
 import { SpatialNavigationFocusableView } from 'react-tv-space-navigation';
 import { noopFn } from 'Util/Function';
 import {
-  setTimeoutSafe, wait,
+  setTimeoutSafe,
 } from 'Util/Misc';
 import RemoteControlManager from 'Util/RemoteControl/RemoteControlManager';
 import { SupportedKeys } from 'Util/RemoteControl/SupportedKeys';
@@ -37,14 +37,11 @@ export const PlayerProgressBarComponent = ({
   onFocus = noopFn,
   calculateCurrentTime,
   seekToPosition,
-  toggleSeekMode = noopFn,
   rewindPosition = noopFn,
-  handleUserInteraction,
   togglePlayPause = noopFn,
 }: PlayerProgressBarComponentProps) => {
   const { progressStatus, focusedElement, updateProgressStatus } = usePlayerContext();
   const rewindTimer = useRef<number | null>(null);
-  const progressStatusRef = useRef(progressStatus);
 
   const longEvent = useRef<{[key: string]: LongEvent}>({
     [SupportedKeys.LEFT]: {
@@ -59,22 +56,17 @@ export const PlayerProgressBarComponent = ({
     },
   });
 
-  useEffect(() => {
-    progressStatusRef.current = progressStatus;
-  }, [progressStatus]);
-
-  const rewindPositionAuto = async (direction: RewindDirection) => {
+  const rewindPositionAuto = (direction: RewindDirection) => {
     const { duration = 0, playing } = player;
 
     if (autoRewindParams.active) {
       autoRewindParams.active = false;
-
-      if(rewindTimer.current) {
-        clearInterval(rewindTimer.current);
+      if (rewindTimer.current) {
+        cancelAnimationFrame(rewindTimer.current);
         rewindTimer.current = null;
       }
 
-      seekToPosition(progressStatus.progressPercentage);
+      seekToPosition(autoRewindParams.percentage);
 
       if (autoRewindParams.statusBefore !== undefined && autoRewindParams.statusBefore) {
         togglePlayPause(false);
@@ -84,58 +76,44 @@ export const PlayerProgressBarComponent = ({
       return;
     }
 
-    (Object.keys(DEFAULT_AUTO_REWIND_PARAMS) as (keyof AutoRewindParams)[]).forEach((key) => {
-      autoRewindParams[key] = DEFAULT_AUTO_REWIND_PARAMS[key] as never;
-    });
-
+    Object.assign(autoRewindParams, DEFAULT_AUTO_REWIND_PARAMS);
     togglePlayPause(true);
     autoRewindParams.statusBefore = playing;
     autoRewindParams.active = true;
+    autoRewindParams.percentage = progressStatus.progressPercentage;
 
-    while (autoRewindParams.active) {
-      // autoRewindParams.count += 1;
+    let lastUpdateTime = performance.now();
+    const updateInterval = 1000 / 16;
 
-      // if (autoRewindParams.count % autoRewindParams.factor === 0) {
-      //   autoRewindParams.factor *= DEFAULT_AUTO_REWIND_MULTIPLIER;
-      //   autoRewindParams.ms /= DEFAULT_AUTO_REWIND_MULTIPLIER;
+    const updatePosition = (timestamp: number) => {
+      if (!autoRewindParams.active) return;
 
-      //   // if ms is less than DEFAULT_AUTO_REWIND_MIN_MS ms then mobx update will throw an error
-      //   if (autoRewindParams.ms <= DEFAULT_AUTO_REWIND_MIN_MS) {
-      //     autoRewindParams.ms = DEFAULT_AUTO_REWIND_MIN_MS;
-      //   }
+      const deltaTime = timestamp - lastUpdateTime;
+      if (deltaTime >= updateInterval) {
+        const seekTime = direction === RewindDirection.BACKWARD
+          ? autoRewindParams.seconds * -1
+          : autoRewindParams.seconds;
 
-      //   // autoRewindParams.seconds += DEFAULT_AUTO_REWIND_SECONDS;
-      // }
+        const currentTime = calculateCurrentTime(autoRewindParams.percentage);
+        const newTime = currentTime + seekTime;
 
-      if (autoRewindParams.wasStarted) {
+        if (newTime < 0 || newTime > duration) {
+          updateProgressStatus(newTime < 0 ? 0 : duration, 0, duration);
+          autoRewindParams.active = false;
 
-        await wait(autoRewindParams.ms);
-      } else {
-        autoRewindParams.wasStarted = true;
+          return;
+        }
+
+        autoRewindParams.percentage = newTime * 100 / duration;
+        updateProgressStatus(newTime, 0, duration);
+
+        lastUpdateTime = timestamp;
       }
 
-      if (!autoRewindParams.active) {
-        return;
-      }
+      rewindTimer.current = requestAnimationFrame(updatePosition);
+    };
 
-      const seekTime = direction === RewindDirection.BACKWARD
-        ? autoRewindParams.seconds * -1
-        : autoRewindParams.seconds;
-      const currentTime = calculateCurrentTime(progressStatusRef.current.progressPercentage);
-      const newTime = currentTime + seekTime;
-
-      if (newTime < 0 || newTime > duration) {
-        updateProgressStatus(newTime < 0 ? 0 : duration, 0, duration);
-
-        return;
-      }
-
-      updateProgressStatus(
-        newTime,
-        0,
-        duration
-      );
-    }
+    rewindTimer.current = requestAnimationFrame(updatePosition);
   };
 
   const handleProgressThumbKeyDown = (key: SupportedKeys, direction: RewindDirection) => {
@@ -146,7 +124,6 @@ export const PlayerProgressBarComponent = ({
       e.longTimeout = setTimeoutSafe(() => {
         // Long button press
         rewindPositionAuto(direction);
-        toggleSeekMode();
 
         e.longTimeout = null;
         e.isLongFired = true;
@@ -164,14 +141,12 @@ export const PlayerProgressBarComponent = ({
       // Long button unpress
       e.isLongFired = false;
       rewindPositionAuto(direction);
-      toggleSeekMode();
     }
 
     if (e.longTimeout) {
       // Button press
       clearTimeout(e.longTimeout);
       rewindPosition(direction, REWIND_SECONDS_TV);
-      toggleSeekMode();
     }
   };
 
@@ -199,19 +174,17 @@ export const PlayerProgressBarComponent = ({
         if (type === SupportedKeys.RIGHT) {
           handleProgressThumbKeyUp(type, RewindDirection.FORWARD);
         }
-
-        handleUserInteraction();
       }
 
-      return true;
+      return false;
     };
 
-    const remoteControlDownListener = RemoteControlManager.addKeydownListener(keyDownListener);
-    const remoteControlUpListener = RemoteControlManager.addKeyupListener(keyUpListener);
+    //const remoteControlDownListener = RemoteControlManager.addKeydownListener(keyDownListener);
+    //const remoteControlUpListener = RemoteControlManager.addKeyupListener(keyUpListener);
 
     return () => {
-      RemoteControlManager.removeKeydownListener(remoteControlDownListener);
-      RemoteControlManager.removeKeyupListener(remoteControlUpListener);
+      // RemoteControlManager.removeKeydownListener(remoteControlDownListener);
+      // RemoteControlManager.removeKeyupListener(remoteControlUpListener);
     };
   });
 

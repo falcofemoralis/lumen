@@ -14,13 +14,16 @@ export function ThemedOverlayComponent({
   children,
   isOpened,
   isVisible,
+  id,
 }: ThemedOverlayComponentProps) {
   if (!isOpened) return null;
 
   return (
     <Portal>
       <SpatialNavigationOverlay
-        isModalVisible={ isOpened }
+        id={ id }
+        isModalOpened={ isOpened }
+        isModalVisible={ isOpened && isVisible }
         hideModal={ onHide }
       >
         <Portal.Host>

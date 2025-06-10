@@ -1,5 +1,4 @@
 import { RewindDirection } from 'Component/Player/Player.config';
-import { ProgressStatus } from 'Component/Player/Player.type';
 import { VideoPlayer } from 'expo-video';
 import { SpatialNavigationNodeRef } from 'react-tv-space-navigation';
 
@@ -8,7 +7,6 @@ export interface PlayerProgressBarContainerProps {
   storyboardUrl?: string;
   seekToPosition: (percent: number) => void;
   calculateCurrentTime: (percent: number) => number;
-  handleUserInteraction: () => void;
 
   // TV Only
   handleIsScrolling?: (value: boolean) => void;
@@ -17,9 +15,10 @@ export interface PlayerProgressBarContainerProps {
   thumbRef?: React.MutableRefObject<SpatialNavigationNodeRef | null>;
   hideActions?: boolean;
   onFocus?: () => void
-  toggleSeekMode?: () => void;
+  // toggleSeekMode?: () => void;
   rewindPosition?: (direction: RewindDirection, seconds?: number) => void;
   togglePlayPause?: (state?: boolean) => void;
+  handleUserInteraction?: () => void;
 }
 
 export interface PlayerProgressBarComponentProps extends PlayerProgressBarContainerProps {
