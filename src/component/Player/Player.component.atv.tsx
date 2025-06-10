@@ -132,18 +132,6 @@ export function PlayerComponent({
       console.log('keyDownListener', type);
       if (!isComponentMounted.current || !player) return false;
 
-      console.log('showControlsRef.current', showControlsRef.current);
-
-      if (showControlsRef.current) {
-        if (type === SupportedKeys.BACK) {
-          console.log('BACK KEYDOWN showControlsRef.current', showControlsRef.current);
-
-          setShowControls(false);
-
-          return false;
-        }
-      }
-
       if (!showControlsRef.current) {
         if (type === SupportedKeys.BACK) {
           return true;
@@ -225,7 +213,7 @@ export function PlayerComponent({
     };
 
     const backAction = () => {
-      console.log('BACK ACTION', showControlsRef.current);
+      console.log('backAction player component', showControlsRef.current);
 
       if (showControlsRef.current) {
         setShowControls(false);
@@ -236,10 +224,10 @@ export function PlayerComponent({
       return false;
     };
 
-    // const remoteControlDownListener = RemoteControlManager.addKeydownListener(keyDownListener);
-    //const remoteControlUpListener = RemoteControlManager.addKeyupListener(keyUpListener);
+    const remoteControlDownListener = RemoteControlManager.addKeydownListener(keyDownListener);
+    const remoteControlUpListener = RemoteControlManager.addKeyupListener(keyUpListener);
 
-    console.log('set backHandler');
+    console.log('set backHandler on player component');
 
     const backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
@@ -247,12 +235,9 @@ export function PlayerComponent({
     );
 
     return () => {
-      //RemoteControlManager.removeKeydownListener(remoteControlDownListener);
-      //RemoteControlManager.removeKeyupListener(remoteControlUpListener);
-
-      if (backHandler) {
-        backHandler.remove();
-      }
+      RemoteControlManager.removeKeydownListener(remoteControlDownListener);
+      RemoteControlManager.removeKeyupListener(remoteControlUpListener);
+      backHandler.remove();
 
       console.log('set isComponentMounted to false');
       isComponentMounted.current = false;

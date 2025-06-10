@@ -85,9 +85,13 @@ export function PlayerContainer({
     activateKeepAwakeAsync(AWAKE_TAG);
     createUpdateTimeTimeout();
 
+    console.log('set backHandler on player container');
+
     const backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
       () => {
+        console.log('backAction player container');
+
         updateTime();
 
         return false;

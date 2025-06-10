@@ -1,6 +1,6 @@
-import { useRouter } from 'expo-router';
+import { router } from 'expo-router';
 import { withTV } from 'Hooks/withTV';
-import { useEffect } from 'react';
+import { useLayoutEffect } from 'react';
 import { BackHandler } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
 
@@ -9,10 +9,10 @@ import PageComponentTV from './Page.component.atv';
 import { PageContainerProps } from './Page.type';
 
 export function PageContainer(props: PageContainerProps) {
-  const router = useRouter();
-
-  useEffect(() => {
+  useLayoutEffect(() => {
     const backAction = () => {
+      console.log(`backAction page ${props.testID}`);
+
       try {
         if (router.canDismiss()) {
           router.dismiss();
@@ -31,14 +31,19 @@ export function PageContainer(props: PageContainerProps) {
 
       //   return true;
       // }
-
       return false;
     };
 
+    console.log(`set backHandler on page ${props.testID}`);
+
     const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
 
-    return () => backHandler.remove();
-  });
+    return () => {
+      console.log(`remove backHandler on page ${props.testID}`);
+
+      backHandler.remove();
+    };
+  }, []);
 
   return withTV(PageComponentTV, PageComponent, props);
 }

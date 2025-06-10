@@ -179,12 +179,12 @@ export const PlayerProgressBarComponent = ({
       return false;
     };
 
-    //const remoteControlDownListener = RemoteControlManager.addKeydownListener(keyDownListener);
-    //const remoteControlUpListener = RemoteControlManager.addKeyupListener(keyUpListener);
+    const remoteControlDownListener = RemoteControlManager.addKeydownListener(keyDownListener);
+    const remoteControlUpListener = RemoteControlManager.addKeyupListener(keyUpListener);
 
     return () => {
-      // RemoteControlManager.removeKeydownListener(remoteControlDownListener);
-      // RemoteControlManager.removeKeyupListener(remoteControlUpListener);
+      RemoteControlManager.removeKeydownListener(remoteControlDownListener);
+      RemoteControlManager.removeKeyupListener(remoteControlUpListener);
     };
   });
 

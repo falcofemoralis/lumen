@@ -6,6 +6,7 @@ export interface PageContainerProps {
   style?: ViewStyle;
   contentStyle?: ViewStyle;
   disableStyles?: boolean;
+  testID?: string;
 }
 
 export interface PageComponentProps {

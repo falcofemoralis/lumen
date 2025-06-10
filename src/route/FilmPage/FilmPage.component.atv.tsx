@@ -574,7 +574,7 @@ export function FilmPageComponent({
   };
 
   return (
-    <Page>
+    <Page testID="film-page">
       { renderContent() }
     </Page>
   );

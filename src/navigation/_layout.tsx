@@ -5,7 +5,7 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useLocale } from 'Hooks/useLocale';
 import t from 'i18n/t';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { BackHandler } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SpatialNavigationDeviceTypeProvider } from 'react-tv-space-navigation';
@@ -18,8 +18,8 @@ import { setTimeoutSafe } from 'Util/Misc';
 SplashScreen.preventAutoHideAsync();
 
 export function RootLayout() {
-  const [backPressedOnce, setBackPressedOnce] = useState(false);
   const [languageLoaded] = useLocale();
+  const backPressedOnceRef = useRef(false);
 
   useEffect(() => {
     if (languageLoaded) {
@@ -27,20 +27,22 @@ export function RootLayout() {
     }
   }, [languageLoaded]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const backAction = () => {
+      console.log('backAction root');
+
       if (ConfigStore.isTV()) {
-        if (backPressedOnce) {
+        if (backPressedOnceRef.current) {
           BackHandler.exitApp();
 
           return true;
         }
 
-        setBackPressedOnce(true);
+        backPressedOnceRef.current = true;
         NotificationStore.displayMessage(t('Press back again to exit'));
 
         setTimeoutSafe(() => {
-          setBackPressedOnce(false);
+          backPressedOnceRef.current = false;
         }, 2000);
 
         return true;
@@ -48,6 +50,8 @@ export function RootLayout() {
 
       return false;
     };
+
+    console.log('set backHandler on root layout');
 
     const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
 
