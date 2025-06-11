@@ -11,14 +11,14 @@ import NotificationsPageComponentTV from './NotificationsPage.component.atv';
 
 export function NotificationsPageContainer() {
   const [isLoading, setIsLoading] = useState(false);
-  const [notifications, setNotifications] = useState<NotificationInterface[]>([]);
-  const { isSignedIn, getCurrentService, resetNotifications } = useServiceContext();
+  const [data, setData] = useState<NotificationInterface[]>([]);
+  const { isSignedIn, notifications, getCurrentService, resetNotifications } = useServiceContext();
 
   const loadFilms = async (items: NotificationInterface[]) => {
     try {
       setIsLoading(true);
 
-      setNotifications(
+      setData(
         await getCurrentService().getFilmsFromNotifications(items)
       );
     } catch (error) {
@@ -32,10 +32,10 @@ export function NotificationsPageContainer() {
     if (isSignedIn) {
       resetNotifications();
     }
-  }, [isSignedIn, resetNotifications]);
+  }, []);
 
   useEffect(() => {
-    if (isSignedIn && notifications) {
+    if (isSignedIn && !data.length && notifications && !isLoading) {
       loadFilms(notifications);
     }
   }, [isSignedIn, notifications]);
@@ -45,7 +45,7 @@ export function NotificationsPageContainer() {
   }, []);
 
   const getData = () => {
-    const rawData = notifications.map((notification) => ({
+    const rawData = data.map((notification) => ({
       header: notification.date,
       films: notification.items
         .filter((item) => item.film)

@@ -1,6 +1,7 @@
 import FilmSections from 'Component/FilmSections';
 import InfoBlock from 'Component/InfoBlock';
 import Page from 'Component/Page';
+import Wrapper from 'Component/Wrapper';
 import t from 'i18n/t';
 import React from 'react';
 import { View } from 'react-native';
@@ -33,12 +34,12 @@ export function NotificationsPageComponent({
 
   return (
     <Page>
-      <View style={ styles.container }>
+      <Wrapper style={ styles.container }>
         <FilmSections
           data={ data }
           handleOnPress={ handleSelectFilm }
         />
-      </View>
+      </Wrapper>
     </Page>
   );
 }

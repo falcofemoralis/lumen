@@ -1,7 +1,6 @@
 import FilmSections from 'Component/FilmSections';
 import InfoBlock from 'Component/InfoBlock';
 import Page from 'Component/Page';
-import ThemedText from 'Component/ThemedText';
 import t from 'i18n/t';
 import React from 'react';
 import { View } from 'react-native';
