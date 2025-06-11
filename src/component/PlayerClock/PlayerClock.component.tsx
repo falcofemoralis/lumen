@@ -1,14 +1,10 @@
-import ThemedText from 'Component/ThemedText';
 import { View } from 'react-native';
 
-import Clock from './Component';
+import ReactLiveClock from './ReactLiveClock';
 
 export const PlayerClockComponent = () => (
   <View>
-    <Clock
-      element={ ThemedText }
-      ticking
-    />
+    <ReactLiveClock />
   </View>
 );
 
