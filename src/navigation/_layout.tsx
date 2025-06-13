@@ -29,8 +29,6 @@ export function RootLayout() {
 
   useLayoutEffect(() => {
     const backAction = () => {
-      console.log('backAction root');
-
       if (ConfigStore.isTV()) {
         if (backPressedOnceRef.current) {
           BackHandler.exitApp();
@@ -50,8 +48,6 @@ export function RootLayout() {
 
       return false;
     };
-
-    console.log('set backHandler on root layout');
 
     const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
 

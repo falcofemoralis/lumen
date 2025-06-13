@@ -1,5 +1,5 @@
 import { Image } from 'expo-image';
-import { forwardRef, memo, useImperativeHandle } from 'react';
+import { forwardRef, useImperativeHandle } from 'react';
 
 import { ThemedImageProps } from './ThemedImage.type';
 
@@ -31,8 +31,4 @@ export const ThemedImage = forwardRef<ImageRef, ThemedImageProps>(({
   );
 });
 
-function rowPropsAreEqual(prevProps: ThemedImageProps, props: ThemedImageProps) {
-  return prevProps.src === props.src;
-}
-
-export default memo(ThemedImage, rowPropsAreEqual);
+export default ThemedImage;

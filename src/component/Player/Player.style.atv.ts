@@ -4,9 +4,9 @@ import CreateStyles from 'Util/CreateStyles';
 export const styles = CreateStyles({
   container: {
     position: 'relative',
-    backgroundColor: Colors.background,
     width: '100%',
     height: '100%',
+    backgroundColor: Colors.black,
   },
   video: {
     width: '100%',

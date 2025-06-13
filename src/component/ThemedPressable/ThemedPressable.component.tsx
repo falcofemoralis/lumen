@@ -19,6 +19,7 @@ export const ThemedPressable = ({
         android_ripple={ {
           color: mode === 'light' ? Colors.whiteTransparent : Colors.button,
         } }
+        unstable_pressDelay={ 50 }
         style={ [{
           flex: 1,
           flexDirection: 'row',

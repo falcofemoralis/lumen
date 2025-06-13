@@ -129,7 +129,6 @@ export function PlayerComponent({
 
   useEffect(() => {
     const keyDownListener = (type: SupportedKeys) => {
-      console.log('keyDownListener', type);
       if (!isComponentMounted.current || !player) return false;
 
       if (!showControlsRef.current) {
@@ -146,8 +145,6 @@ export function PlayerComponent({
           || type === SupportedKeys.LEFT
           || type === SupportedKeys.RIGHT
         ) {
-          console.log('updateFocusedElement FocusedElement.PROGRESS_THUMB');
-
           updateFocusedElement(FocusedElement.PROGRESS_THUMB);
           middleActionRef.current?.focus();
 
@@ -168,8 +165,6 @@ export function PlayerComponent({
 
         return false;
       }
-
-      console.log('focusedElementRef.current', focusedElementRef.current);
 
       if (focusedElementRef.current === FocusedElement.PROGRESS_THUMB) {
         if (type === SupportedKeys.ENTER) {
@@ -199,8 +194,6 @@ export function PlayerComponent({
       controlsTimeout.current = setTimeoutSafe(() => {
         if (!isComponentMounted.current || !player) return;
 
-        console.log('hide', player.playing, showControlsRef.current, currentOverlayRef.current.length);
-
         if (player.playing
           && showControlsRef.current
           && !currentOverlayRef.current.length
@@ -213,8 +206,6 @@ export function PlayerComponent({
     };
 
     const backAction = () => {
-      console.log('backAction player component', showControlsRef.current);
-
       if (showControlsRef.current) {
         setShowControls(false);
 
@@ -227,8 +218,6 @@ export function PlayerComponent({
     const remoteControlDownListener = RemoteControlManager.addKeydownListener(keyDownListener);
     const remoteControlUpListener = RemoteControlManager.addKeyupListener(keyUpListener);
 
-    console.log('set backHandler on player component');
-
     const backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
       backAction
@@ -239,7 +228,6 @@ export function PlayerComponent({
       RemoteControlManager.removeKeyupListener(remoteControlUpListener);
       backHandler.remove();
 
-      console.log('set isComponentMounted to false');
       isComponentMounted.current = false;
       if (controlsTimeout.current) {
         clearTimeout(controlsTimeout.current);
