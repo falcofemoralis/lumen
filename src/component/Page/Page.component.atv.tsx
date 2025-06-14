@@ -39,7 +39,7 @@ export function PageComponent({
   children,
   style,
   contentStyle,
-  disableStyles,
+  disableWrapper,
 }: PageComponentProps) {
   const isFocused = useIsFocused();
   const { isMenuOpen, toggleMenu, isNavigationLocked } = useNavigationContext();
@@ -57,7 +57,7 @@ export function PageComponent({
 
   return (
     <Animated.View
-      style={ !disableStyles ? [
+      style={ !disableWrapper ? [
         styles.container,
         isMenuOpen && styles.containerOpened,
         style,
@@ -70,7 +70,7 @@ export function PageComponent({
         >
           <SpatialNavigationKeyboardLocker />
           <Portal.Host>
-            <View style={ !disableStyles ? [styles.content, contentStyle] : styles.wrapper }>
+            <View style={ !disableWrapper ? [styles.content, contentStyle] : styles.wrapper }>
               { children }
             </View>
           </Portal.Host>

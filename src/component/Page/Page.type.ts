@@ -5,7 +5,7 @@ export interface PageContainerProps {
   children: Exclude<NonNullable<ReactNode>, string | number | boolean>
   style?: ViewStyle;
   contentStyle?: ViewStyle;
-  disableStyles?: boolean;
+  disableWrapper?: boolean;
   testID?: string;
 }
 
@@ -13,7 +13,7 @@ export interface PageComponentProps {
   children: Exclude<NonNullable<ReactNode>, string | number | boolean>
   style?: ViewStyle;
   contentStyle?: ViewStyle;
-  disableStyles?: boolean;
+  disableWrapper?: boolean;
 }
 
 export type HistoryItem = {

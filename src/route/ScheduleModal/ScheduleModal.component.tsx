@@ -19,14 +19,15 @@ export const ScheduleModalComponent = ({ film, handleUpdateScheduleWatch }: Sche
     // prevents lagging when rendering large schedule
     setTimeout(() => {
       setIsLoading(false);
-    }, 0);
-  }, [schedule]);
+    }, 25);
+  }, []);
 
   const renderItem = useCallback((item: ScheduleItemInterface, idx: number) => (
     <ScheduleItem
       key={ `modal-schedule-${item.name}` }
       item={ item }
       handleUpdateScheduleWatch={ handleUpdateScheduleWatch }
+      useInternalState
     />
   ), [handleUpdateScheduleWatch]);
 

@@ -66,6 +66,9 @@ export const styles = CreateStyles({
   poster: {
     aspectRatio: '166 / 250',
   },
+  posterPendingRelease: {
+    opacity: 0.5,
+  },
   info: {
     width: '100%',
     backgroundColor: Colors.transparent,

@@ -103,11 +103,13 @@ export const ActorView = memo(({
 
 interface ScheduleItemProps {
   item: ScheduleItemInterface,
+  useInternalState?: boolean,
   handleUpdateScheduleWatch: (scheduleItem: ScheduleItemInterface) => Promise<boolean>
 }
 
 export const ScheduleItem = memo(({
   item,
+  useInternalState,
   handleUpdateScheduleWatch,
 }: ScheduleItemProps) => {
   const {
@@ -123,6 +125,10 @@ export const ScheduleItem = memo(({
   const [isChecked, setIsChecked] = useState(isWatched);
 
   useEffect(() => {
+    if (!useInternalState) {
+      return;
+    }
+
     setIsChecked(isWatched);
   }, [isWatched]);
 
@@ -137,7 +143,9 @@ export const ScheduleItem = memo(({
       return;
     }
 
-    setIsChecked((prev) => !prev);
+    if (useInternalState) {
+      setIsChecked((prev) => !prev);
+    }
   }, [handleUpdateScheduleWatch, item]);
 
   return (
@@ -179,7 +187,7 @@ export const ScheduleItem = memo(({
             ) : (
               <CircleCheck
                 size={ scale(24) }
-                color={ isChecked ? Colors.secondary : Colors.white }
+                color={ (useInternalState ? isChecked : isWatched) ? Colors.secondary : Colors.white }
               />
             ) }
           </ThemedPressable>
@@ -198,7 +206,7 @@ export const ScheduleItem = memo(({
   );
 }, (
   prevProps: ScheduleItemProps, nextProps: ScheduleItemProps
-) => prevProps.item.name === nextProps.item.name
+) => prevProps.item.id === nextProps.item.id
   && prevProps.item.isWatched === nextProps.item.isWatched);
 
 interface FranchiseItemProps {

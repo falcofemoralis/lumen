@@ -1,13 +1,10 @@
 import ThemedImage from 'Component/ThemedImage';
-import ThemedOverlay from 'Component/ThemedOverlay';
-import { useOverlayContext } from 'Context/OverlayContext';
-import { useRef } from 'react';
-import { Dimensions, TouchableHighlight, View } from 'react-native';
+import { useState } from 'react';
+import { Dimensions, Modal, TouchableHighlight, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { generateId } from 'Util/Math';
+import { Colors } from 'Style/Colors';
 
 import ImageViewer from './ImageViewer';
-import { styles } from './ThemedImageModal.style';
 import { ThemedImageModalComponentProps } from './ThemedImageModal.type';
 
 export const ThemedImageModalComponent = ({
@@ -16,10 +13,12 @@ export const ThemedImageModalComponent = ({
   style,
   imageStyle,
 }: ThemedImageModalComponentProps) => {
-  const { openOverlay, closeOverlay } = useOverlayContext();
-  const id = useRef(generateId());
   const { width } = Dimensions.get('window');
   const height = width / (166 / 250);
+  const [isOpened, setIsOpened] = useState(false);
+
+  const handleOpen = () => setIsOpened(true);
+  const handleClose = () => setIsOpened(false);
 
   const renderOverlay = () => {
     if (!modalSrc) {
@@ -27,28 +26,29 @@ export const ThemedImageModalComponent = ({
     }
 
     return (
-      <ThemedOverlay
-        style={ styles.modal }
-        contentContainerStyle={ styles.modalContentContainer }
-        id={ id.current }
-        onHide={ () => closeOverlay(id.current) }
+      <Modal
+        presentationStyle='fullScreen'
+        animationType='fade'
+        visible={ isOpened }
+        onRequestClose={ handleClose }
+        backdropColor={ Colors.modal }
       >
         <GestureHandlerRootView style={ { flex: 1 } }>
           <ImageViewer
             imageUrl={ modalSrc }
             width={ width }
             height={ height }
-            onRequestClose={ () => closeOverlay(id.current) }
+            onRequestClose={ handleClose }
           />
         </GestureHandlerRootView>
-      </ThemedOverlay>
+      </Modal>
     );
   };
 
   return (
     <View style={ style }>
       <TouchableHighlight
-        onPress={ () => openOverlay(id.current) }
+        onPress={ handleOpen }
       >
         <ThemedImage
           src={ src }

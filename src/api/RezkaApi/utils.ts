@@ -42,6 +42,7 @@ export const parseFilmCard = (el: HTMLElementInterface): FilmCardInterface => {
     '<br/>',
     ', '
   );
+  const isPendingRelease = el.querySelector('.b-content__inline_item-cover')?.attributes.class?.includes('wait');
 
   return {
     id,
@@ -51,6 +52,7 @@ export const parseFilmCard = (el: HTMLElementInterface): FilmCardInterface => {
     title,
     subtitle,
     info,
+    isPendingRelease,
   };
 };
 

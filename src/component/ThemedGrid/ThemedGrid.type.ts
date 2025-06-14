@@ -1,3 +1,4 @@
+import React from 'react';
 import { ViewStyle } from 'react-native';
 
 export interface ThemedGridRowProps<T = any> {
@@ -11,12 +12,12 @@ export interface ThemedGridContainerProps<T = any> {
   itemSize: number;
   style?: ViewStyle;
   rowStyle?: ViewStyle;
-  header?: JSX.Element;
+  header?: React.ReactNode;
   headerSize?: number;
   ListEmptyComponent?: React.ComponentType<any>
   | React.ReactElement<any, string
   | React.JSXElementConstructor<any>>;
-  renderItem: (args: ThemedGridRowProps<T>) => JSX.Element;
+  renderItem: (args: ThemedGridRowProps<T>) => React.ReactNode;
   onNextLoad?: (isRefresh: boolean) => Promise<void>;
 }
 
@@ -27,10 +28,10 @@ export interface ThemedGridComponentProps<T = any> {
   isRefreshing?: boolean;
   style?: ViewStyle;
   rowStyle?: ViewStyle;
-  header?: JSX.Element;
+  header?: React.ReactNode;
   headerSize?: number;
   ListEmptyComponent?: any;
-  renderItem: (props: { item: T, index: number }) => JSX.Element;
+  renderItem: (props: { item: T, index: number }) => React.ReactNode;
   handleScrollEnd: () => void;
   handleRefresh?: () => void;
 }

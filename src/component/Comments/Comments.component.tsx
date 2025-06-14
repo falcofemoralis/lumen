@@ -85,6 +85,7 @@ export const CommentsComponent = ({
   comments,
   isLoading,
   loaderFullScreen,
+  style,
   onNextLoad,
 }: CommentsComponentProps) => {
   const renderItem = useCallback(
@@ -120,7 +121,7 @@ export const CommentsComponent = ({
 
   return (
     <ThemedGrid
-      style={ styles.commentsList }
+      style={ [styles.commentsList, style] }
       data={ comments }
       numberOfColumns={ 1 }
       itemSize={ scale(100) }

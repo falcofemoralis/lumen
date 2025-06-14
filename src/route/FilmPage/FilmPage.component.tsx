@@ -143,7 +143,7 @@ export function FilmPageComponent({
     const { genres = [] } = film;
 
     return (
-      <ScrollView horizontal>
+      <ScrollView horizontal showsHorizontalScrollIndicator={ false }>
         <View style={ styles.genres }>
           { genres.map(({ name, link }) => (
             <ThemedPressable
