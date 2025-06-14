@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { ActorCardInterface } from 'Type/ActorCard.interface';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { FilmListInterface } from 'Type/FilmList.interface';
@@ -217,4 +218,24 @@ export const parseActorCard = (
     job,
     isDirector,
   };
+};
+
+export const formatDurationWithMoment = (minutes: number): string => {
+  if (!minutes || minutes <= 0) {
+    return '0м';
+  }
+
+  const duration = moment.duration(minutes, 'minutes');
+  const hours = Math.floor(duration.asHours());
+  const remainingMinutes = duration.minutes();
+
+  if (hours === 0) {
+    return `${remainingMinutes} мин.`;
+  }
+
+  if (remainingMinutes === 0) {
+    return `${hours} ч`;
+  }
+
+  return `${hours} ч ${remainingMinutes} мин.`;
 };

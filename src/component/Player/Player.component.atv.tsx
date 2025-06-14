@@ -236,6 +236,11 @@ export function PlayerComponent({
     };
   }, []);
 
+  const handleOpenComments = () => {
+    setShowControls(false);
+    openCommentsOverlay();
+  };
+
   const renderTitle = () => {
     const { title, hasSeasons } = film;
 
@@ -341,7 +346,7 @@ export function PlayerComponent({
           </>
         ) }
         { renderTopAction(Gauge, openSpeedSelector) }
-        { renderTopAction(MessageSquareText, openCommentsOverlay) }
+        { renderTopAction(MessageSquareText, handleOpenComments) }
       </View>
       <PlayerClock />
     </SpatialNavigationView>

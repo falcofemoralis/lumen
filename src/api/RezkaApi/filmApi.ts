@@ -20,6 +20,7 @@ import { Variables } from 'Util/Request';
 import { NotificationInterface } from '../../type/Notification.interface';
 import configApi from './configApi';
 import {
+  formatDurationWithMoment,
   parseActorCard,
   parseFilmCard, parseFilmsListRoot, parseFilmType, parseSeasons, parseStreams,
 } from './utils';
@@ -148,7 +149,7 @@ const filmApi: FilmApiInterface = {
             // film.age = value.rawText;
             break;
           case 'Время':
-            film.duration = value.rawText;
+            film.duration = formatDurationWithMoment(Number(value.rawText.replace(' мин.', '')));
             break;
           case 'Из серии':
             film.fromCollections = value.childNodes

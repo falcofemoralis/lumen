@@ -4,7 +4,8 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { Modal, Pressable, useWindowDimensions } from 'react-native';
+import { Modal, useWindowDimensions } from 'react-native';
+import { GestureHandlerRootView, Pressable } from 'react-native-gesture-handler';
 import { Colors } from 'Style/Colors';
 import { noopFn } from 'Util/Function';
 
@@ -37,21 +38,23 @@ export function ThemedOverlayComponent({
         onRequestClose={ onHide }
         backdropColor={ Colors.modal }
       >
-        <Pressable
-          onPress={ onHide }
-          style={ [styles.modal, style] }
-        >
+        <GestureHandlerRootView>
           <Pressable
-            onPress={ noopFn }
-            style={ [
-              styles.contentContainerStyle,
-              isLandscape && styles.contentContainerStyleLandscape,
-              contentContainerStyle,
-            ] }
+            onPress={ onHide }
+            style={ [styles.modal, style] }
           >
-            { children }
+            <Pressable
+              onPress={ noopFn }
+              style={ [
+                styles.contentContainerStyle,
+                isLandscape && styles.contentContainerStyleLandscape,
+                contentContainerStyle,
+              ] }
+            >
+              { children }
+            </Pressable>
           </Pressable>
-        </Pressable>
+        </GestureHandlerRootView>
       </Modal>
     </Portal>
   );

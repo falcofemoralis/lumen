@@ -249,7 +249,7 @@ export function PlayerContainer({
     setSelectedStream(newStream);
     updateTime();
 
-    player.replace(newStream.url);
+    player.replaceAsync(newStream.url);
 
     goToPreviousOverlay();
   };
@@ -356,10 +356,15 @@ export function PlayerContainer({
 
   const createUpdateTimeTimeout = () => {
     updateTimeTimeout.current = setIntervalSafe(() => {
-      const { playing } = player;
+      try {
+        const { playing } = player;
 
-      if (playing) {
-        updateTime();
+        if (playing) {
+          updateTime();
+        }
+      } catch (_e) {
+        // If we get an error accessing the player, reset the timeout
+        resetUpdateTimeTimeout();
       }
     }, SAVE_TIME_EVERY_MS);
   };

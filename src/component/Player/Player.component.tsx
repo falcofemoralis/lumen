@@ -92,7 +92,6 @@ export function PlayerComponent({
   hideVideoSelector,
   handleVideoSelect,
   rewindPosition,
-  setPlayerRate,
   openSubtitleSelector,
   handleSubtitleChange,
   handleSpeedChange,
@@ -111,17 +110,13 @@ export function PlayerComponent({
   const canHideControls = useRef(isPlaying && showControls);
   const playerRef = useRef<VideoView>(null);
   const doubleTapTimeout = useRef<NodeJS.Timeout | null>(null);
+  const isPlayingRef = useRef(isPlaying);
+  const showControlsRef = useRef(showControls);
+  const isScrollingRef = useRef(isScrolling);
 
   const controlsAnimation = useAnimatedStyle(() => ({
     opacity: withTiming(showControls ? 1 : 0, { duration: PLAYER_CONTROLS_ANIMATION }),
   }));
-
-  const handleHideControls = () => {
-    canHideControls.current = isPlaying
-      && showControls
-      && !currentOverlay.length
-      && !isScrolling;
-  };
 
   useEffect(() => {
     ScreenOrientation.lockAsync(OrientationLock.LANDSCAPE);
@@ -139,7 +134,18 @@ export function PlayerComponent({
     };
   }, []);
 
+  const handleHideControls = () => {
+    canHideControls.current = isPlayingRef.current
+      && showControlsRef.current
+      && !currentOverlay.length
+      && !isScrollingRef.current;
+  };
+
   useEffect(() => {
+    isPlayingRef.current = isPlaying;
+    showControlsRef.current = showControls;
+    isScrollingRef.current = isScrolling;
+
     handleHideControls();
   }, [isPlaying, showControls, isScrolling]);
 
@@ -175,12 +181,17 @@ export function PlayerComponent({
     setIsScrolling(value);
   };
 
+  const handleOpenComments = () => {
+    setShowControls(false);
+    openCommentsOverlay();
+  };
+
   const handleDoubleTap = (direction: RewindDirection) => {
     const seconds = DEFAULT_REWIND_SECONDS;
 
     rewindPosition(direction, seconds);
     setDoubleTapAction({
-      seconds: seconds + (doubleTapAction?.seconds ?? 0),
+      seconds: doubleTapAction?.direction === direction ? seconds + (doubleTapAction?.seconds ?? 0) : seconds,
       direction,
     });
 
@@ -202,7 +213,7 @@ export function PlayerComponent({
   const doubleTap = Gesture.Tap()
     .numberOfTaps(2)
     .onEnd((e) => {
-      if (showControls || isLocked) {
+      if (isLocked) {
         return;
       }
 
@@ -411,7 +422,7 @@ export function PlayerComponent({
             ] }
           >
             { isPlaylistSelector && renderAction(ListVideo, openVideoSelector) }
-            { renderAction(MessageSquareText, openCommentsOverlay) }
+            { renderAction(MessageSquareText, handleOpenComments) }
             { renderAction(Bookmark, openBookmarksOverlay) }
             { renderAction(Forward, handleShare) }
           </View>

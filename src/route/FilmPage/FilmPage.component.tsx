@@ -7,7 +7,6 @@ import ThemedImageModal from 'Component/ThemedImageModal';
 import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import Wrapper from 'Component/Wrapper';
-import { useOverlayContext } from 'Context/OverlayContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import t from 'i18n/t';
