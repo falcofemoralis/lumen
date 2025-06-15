@@ -4,12 +4,17 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { useWindowDimensions, View } from 'react-native';
-import Modal from 'react-native-modal';
+import { Modal,useWindowDimensions } from 'react-native';
+import { GestureHandlerRootView, Pressable } from 'react-native-gesture-handler';
+import { Colors } from 'Style/Colors';
+import { noopFn } from 'Util/Function';
 
 import { styles } from './ThemedOverlay.style';
 import { ThemedOverlayComponentProps } from './ThemedOverlay.type';
 
+/**
+ * TODO: Replace modal with react-native-modal once it will be stable
+ */
 export function ThemedOverlayComponent({
   isOpened,
   onHide,
@@ -31,26 +36,28 @@ export function ThemedOverlayComponent({
   return (
     <Portal>
       <Modal
-        isVisible={ isOpened }
-        onModalHide={ onHide }
-        animationIn='fadeIn'
-        animationOut='fadeOut'
-        onBackButtonPress={ onHide }
-        onBackdropPress={ onHide }
-        coverScreen={ false }
-        useNativeDriver
-        useNativeDriverForBackdrop
-        hideModalContentWhileAnimating
+        animationType='fade'
+        visible={ isOpened }
+        onRequestClose={ onHide }
+        backdropColor={ Colors.modal }
       >
-        <View
-          style={ [
-            styles.contentContainerStyle,
-            isLandscape && styles.contentContainerStyleLandscape,
-            contentContainerStyle,
-          ] }
-        >
-          { children }
-        </View>
+        <GestureHandlerRootView>
+          <Pressable
+            onPress={ onHide }
+            style={ [styles.modal, style] }
+          >
+            <Pressable
+              onPress={ noopFn }
+              style={ [
+                styles.contentContainerStyle,
+                isLandscape && styles.contentContainerStyleLandscape,
+                contentContainerStyle,
+              ] }
+            >
+              { children }
+            </Pressable>
+          </Pressable>
+        </GestureHandlerRootView>
       </Modal>
     </Portal>
   );
