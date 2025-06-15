@@ -15,21 +15,21 @@ export const ThemedInputComponent = ({
   containerStyle,
   ...props
 }: ThemedInputComponentProps) => {
-  const onFocusEffect = useCallback(() => {
-    // This should be run when screen gains focus - enable the module where it's needed
-    if(useSoftInput) {
-      AvoidSoftInput.setEnabled(true);
-    }
+  // const onFocusEffect = useCallback(() => {
+  //   // This should be run when screen gains focus - enable the module where it's needed
+  //   if(useSoftInput) {
+  //     AvoidSoftInput.setEnabled(true);
+  //   }
 
-    return () => {
-      // This should be run when screen loses focus - disable the module where it's not needed, to make a cleanup
-      if(useSoftInput) {
-        AvoidSoftInput.setEnabled(false);
-      }
-    };
-  }, [useSoftInput]);
+  //   return () => {
+  //     // This should be run when screen loses focus - disable the module where it's not needed, to make a cleanup
+  //     if(useSoftInput) {
+  //       AvoidSoftInput.setEnabled(false);
+  //     }
+  //   };
+  // }, [useSoftInput]);
 
-  useFocusEffect(onFocusEffect); // register callback to focus events
+  // useFocusEffect(onFocusEffect); // register callback to focus events
 
   return (
     <View style={ [styles.container, containerStyle] }>

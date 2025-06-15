@@ -41,6 +41,7 @@ export interface Tab {
   };
   position?: TAB_POSITION;
   tabComponent?: TAB_COMPONENT;
+  IconComponent?: React.ComponentType<any>,
 }
 
 export type NavigationType = NavigationHelpers<ParamListBase, BottomTabNavigationEventMap>;

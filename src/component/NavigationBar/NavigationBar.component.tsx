@@ -3,7 +3,6 @@ import ThemedImage from 'Component/ThemedImage';
 import ThemedPressable from 'Component/ThemedPressable';
 import { useServiceContext } from 'Context/ServiceContext';
 import { Tabs } from 'expo-router';
-import { FolderHeart, History, House, Search } from 'lucide-react-native';
 import React, { useCallback } from 'react';
 import {
   Image,
@@ -15,11 +14,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 
-import { BOOKMARKS_ROUTE, HOME_ROUTE, RECENT_ROUTE, SEARCH_ROUTE, TABS_MOBILE_CONFIG } from './NavigationBar.config';
+import { TABS_MOBILE_CONFIG } from './NavigationBar.config';
 import { styles, TAB_ADDITIONAL_SIZE } from './NavigationBar.style';
 import {
   NavigationBarComponentProps,
-  NavigationRoute,
   NavigationType,
   StateType,
   Tab,
@@ -36,31 +34,18 @@ export function NavigationBarComponent({
   const { badgeData } = useServiceContext();
   const { width } = useWindowDimensions();
 
-  const renderIcon = (route: NavigationRoute) => {
-    const params = {
-      style: styles.tabIcon,
-      size: scale(24),
-      color: Colors.white,
-    };
-
-    switch(route) {
-      case HOME_ROUTE:
-        return <House { ...params } />;
-      case SEARCH_ROUTE:
-        return <Search { ...params } />;
-      case BOOKMARKS_ROUTE:
-        return <FolderHeart { ...params } />;
-      case RECENT_ROUTE:
-        return <History { ...params } />;
-      default:
-        return null;
-    }
-  };
-
   const renderDefaultTab = useCallback((tab: Tab, focused: boolean) => {
+    const { IconComponent } = tab;
+
     return (
       <Animated.View style={ [styles.tab, focused && styles.tabFocused] }>
-        { renderIcon(tab.route) }
+        { IconComponent && (
+          <IconComponent
+            style={ styles.tabIcon }
+            size={ scale(24) }
+            color={ Colors.white }
+          />
+        ) }
       </Animated.View>
     );
   }, []);
@@ -71,7 +56,7 @@ export function NavigationBarComponent({
     const badge = badgeData[tab.route] ?? 0;
 
     return (
-      <View style={ [styles.tab, styles.tabAccount] }>
+      <Animated.View style={ [styles.tab, styles.tabAccount] }>
         <View
           style={ [
             styles.profileAvatarContainer,
@@ -93,7 +78,7 @@ export function NavigationBarComponent({
             <View style={ styles.badge } />
           ) }
         </View>
-      </View>
+      </Animated.View>
     );
   }, [profile, badgeData]);
 

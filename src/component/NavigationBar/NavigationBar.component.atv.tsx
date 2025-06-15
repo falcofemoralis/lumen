@@ -5,7 +5,6 @@ import { useNavigationContext } from 'Context/NavigationContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { Tabs } from 'expo-router';
 import t from 'i18n/t';
-import { Bell, FolderHeart, History, House, Search, Settings } from 'lucide-react-native';
 import React, { useCallback, useRef } from 'react';
 import {
   Image,
@@ -24,20 +23,13 @@ import { scale } from 'Util/CreateStyles';
 import { setTimeoutSafe } from 'Util/Misc';
 
 import {
-  BOOKMARKS_ROUTE,
   DEFAULT_ROUTE,
-  HOME_ROUTE,
   LOADER_ROUTE,
-  NOTIFICATIONS_ROUTE,
-  RECENT_ROUTE,
-  SEARCH_ROUTE,
-  SETTINGS_ROUTE,
   TABS_TV_CONFIG,
 } from './NavigationBar.config';
 import { styles } from './NavigationBar.style.atv';
 import {
   NavigationBarComponentProps,
-  NavigationRoute,
   NavigationType,
   StateType,
   Tab,
@@ -87,38 +79,13 @@ export function NavigationBarComponent({
     }, 500);
   }, [navigateTo]);
 
-  const renderIcon = (route: NavigationRoute, isf: boolean) => {
-    const params = {
-      style: styles.tabIcon,
-      size: scale(20),
-      color: isf ? Colors.black : Colors.white,
-    };
-
-    switch(route) {
-      case NOTIFICATIONS_ROUTE:
-        return <Bell { ...params } />;
-      case HOME_ROUTE:
-        return <House { ...params } />;
-      case SEARCH_ROUTE:
-        return <Search { ...params } />;
-      case BOOKMARKS_ROUTE:
-        return <FolderHeart { ...params } />;
-      case RECENT_ROUTE:
-        return <History { ...params } />;
-      case SETTINGS_ROUTE:
-        return <Settings { ...params } />;
-      default:
-        return null;
-    }
-  };
-
   const renderDefaultTab = useCallback((
     tab: Tab,
     focused: boolean,
     isRootActive: boolean,
     isf: boolean
   ) => {
-    const { title } = tab;
+    const { title, IconComponent } = tab;
 
     const badge = badgeData[tab.route] ?? 0;
 
@@ -131,7 +98,13 @@ export function NavigationBarComponent({
         ] }
       >
         <View>
-          { renderIcon(tab.route, isf && isRootActive) }
+          { IconComponent && (
+            <IconComponent
+              style={ styles.tabIcon }
+              size={ scale(20) }
+              color={ isf && isRootActive ? Colors.black : Colors.white }
+            />
+          ) }
           { badge > 0 && (
             <View style={ styles.badge } />
           ) }

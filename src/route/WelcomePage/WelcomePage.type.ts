@@ -1,24 +1,8 @@
-import { ProfileInterface } from 'Type/Profile.interface';
-
 export interface WelcomePageComponentProps {
   slides: SlideInterface[];
   selectedDeviceType: DeviceType | null;
-  isLoading: boolean;
-  isProviderValid: boolean | null;
-  isCDNValid: boolean | null;
-  selectedProvider: string | null;
-  selectedCDN: string | null;
-  profile: ProfileInterface | null;
-  handleSelectTV: () => void;
-  handleSelectMobile: () => void;
-  validateProvider: () => void;
-  updateProvider: (value: string) => void;
-  validateCDN: () => void;
-  updateCDN: (value: string) => void;
+  configureDeviceType: (type: DeviceType) => void;
   complete: () => void;
-  setSelectedProvider: (value: string) => void;
-  setSelectedCDN: (value: string) => void;
-  login: (username: string, password: string) => void;
 }
 
 export enum SLIDE_TYPE {
@@ -36,7 +20,10 @@ export interface SlideInterface {
   id: SLIDE_TYPE;
   title: string;
   subtitle: string;
-  icon?: string
+  IconComponent: React.ComponentType<any>,
 }
 
-export type DeviceType = 'TV' | 'MOBILE';
+export enum DeviceType {
+  TV = 'TV',
+  MOBILE = 'MOBILE',
+}
