@@ -54,22 +54,26 @@ export const styles = CreateStyles({
     borderRadius: 99,
   },
   profileAvatarContainer: {
-  },
-  profileAvatarUnfocused: {
-    padding: 2,
-  },
-  profileAvatarFocused: {
     borderRadius: 99,
     borderWidth: 2,
+    borderColor: Colors.transparent,
+    transitionProperty: 'borderColor',
+    transitionDuration: '150ms',
+  },
+  profileAvatarFocused: {
     borderColor: Colors.white,
   },
   badge: {
     backgroundColor: Colors.secondary,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: 16,
+    height: 16,
+    borderRadius: 50,
+    fontSize: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    textAlign: 'center',
     position: 'absolute',
-    right: -4,
-    top: -4,
+    right: -8,
+    top: -8,
   },
 });

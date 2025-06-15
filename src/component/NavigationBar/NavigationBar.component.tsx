@@ -1,6 +1,7 @@
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedPressable from 'Component/ThemedPressable';
+import ThemedText from 'Component/ThemedText';
 import { useServiceContext } from 'Context/ServiceContext';
 import { Tabs } from 'expo-router';
 import React, { useCallback } from 'react';
@@ -57,10 +58,10 @@ export function NavigationBarComponent({
 
     return (
       <Animated.View style={ [styles.tab, styles.tabAccount] }>
-        <View
+        <Animated.View
           style={ [
             styles.profileAvatarContainer,
-            focused ? styles.profileAvatarFocused : styles.profileAvatarUnfocused,
+            focused && styles.profileAvatarFocused,
           ] }
         >
           { avatar ? (
@@ -75,9 +76,11 @@ export function NavigationBarComponent({
             />
           ) }
           { badge > 0 && (
-            <View style={ styles.badge } />
+            <ThemedText style={ styles.badge }>
+              { badge }
+            </ThemedText>
           ) }
-        </View>
+        </Animated.View>
       </Animated.View>
     );
   }, [profile, badgeData]);
@@ -136,9 +139,6 @@ export function NavigationBarComponent({
           tabBarInactiveTintColor: Colors.white,
           tabBarHideOnKeyboard: true,
           freezeOnBlur: true,
-          sceneStyle: {
-            // marginHorizontal: CONTENT_WRAPPER_PADDING,
-          },
           // lazy: false,
         } }
         tabBar={ renderTabBar }

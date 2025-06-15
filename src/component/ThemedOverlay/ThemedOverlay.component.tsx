@@ -4,10 +4,8 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { Modal, useWindowDimensions } from 'react-native';
-import { GestureHandlerRootView, Pressable } from 'react-native-gesture-handler';
-import { Colors } from 'Style/Colors';
-import { noopFn } from 'Util/Function';
+import { useWindowDimensions, View } from 'react-native';
+import Modal from 'react-native-modal';
 
 import { styles } from './ThemedOverlay.style';
 import { ThemedOverlayComponentProps } from './ThemedOverlay.type';
@@ -33,28 +31,26 @@ export function ThemedOverlayComponent({
   return (
     <Portal>
       <Modal
-        animationType='fade'
-        visible={ isOpened }
-        onRequestClose={ onHide }
-        backdropColor={ Colors.modal }
+        isVisible={ isOpened }
+        onModalHide={ onHide }
+        animationIn='fadeIn'
+        animationOut='fadeOut'
+        onBackButtonPress={ onHide }
+        onBackdropPress={ onHide }
+        coverScreen={ false }
+        useNativeDriver
+        useNativeDriverForBackdrop
+        hideModalContentWhileAnimating
       >
-        <GestureHandlerRootView>
-          <Pressable
-            onPress={ onHide }
-            style={ [styles.modal, style] }
-          >
-            <Pressable
-              onPress={ noopFn }
-              style={ [
-                styles.contentContainerStyle,
-                isLandscape && styles.contentContainerStyleLandscape,
-                contentContainerStyle,
-              ] }
-            >
-              { children }
-            </Pressable>
-          </Pressable>
-        </GestureHandlerRootView>
+        <View
+          style={ [
+            styles.contentContainerStyle,
+            isLandscape && styles.contentContainerStyleLandscape,
+            contentContainerStyle,
+          ] }
+        >
+          { children }
+        </View>
       </Modal>
     </Portal>
   );

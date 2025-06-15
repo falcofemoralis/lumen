@@ -106,7 +106,9 @@ export function NavigationBarComponent({
             />
           ) }
           { badge > 0 && (
-            <View style={ styles.badge } />
+            <ThemedText style={ styles.badge }>
+              { badge }
+            </ThemedText>
           ) }
         </View>
         <ThemedText.Animated

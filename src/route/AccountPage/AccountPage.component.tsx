@@ -55,7 +55,9 @@ export function AccountPageComponent({
         <View>
           { renderTopBarButton(Bell, '/(tabs)/(account)/notifications') }
           { badge > 0 && (
-            <View style={ styles.badge } />
+            <ThemedText style={ styles.badge }>
+              { badge }
+            </ThemedText>
           ) }
         </View>
         { renderTopBarButton(Settings, '/(tabs)/(account)/settings') }

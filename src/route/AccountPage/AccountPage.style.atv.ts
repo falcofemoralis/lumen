@@ -30,8 +30,5 @@ export const styles = CreateStyles({
     gap: 8,
   },
   profileAction: {
-    padding: 6,
-    paddingInline: 8,
-    borderRadius: 24,
   },
 });
