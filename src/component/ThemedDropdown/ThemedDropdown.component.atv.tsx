@@ -3,7 +3,7 @@ import ThemedImage from 'Component/ThemedImage';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import { useOverlayContext } from 'Context/OverlayContext';
 import { Plus } from 'lucide-react-native';
-import React, { memo, useCallback, useRef } from 'react';
+import React, { memo, useCallback, useEffect, useRef } from 'react';
 import { Text, View } from 'react-native';
 import {
   DefaultFocus,
@@ -31,13 +31,15 @@ export const ThemedDropdownComponent = ({
   const overlayId = useRef(overlayIdProp ?? generateId());
   const scrollViewRef = useRef<SpatialNavigationVirtualizedListRef>(null);
 
-  const handleLayout = () => {
+  useEffect(() => {
     const itemIdx = data.findIndex((item) => item.value === value);
 
     if (scrollViewRef.current) {
-      scrollViewRef.current.focus(itemIdx);
+      setTimeout(() => {
+        scrollViewRef.current?.focus(itemIdx);
+      }, 0);
     }
-  };
+  }, [data, value]);
 
   const renderHeader = () => {
     if (!header) {
@@ -100,7 +102,6 @@ export const ThemedDropdownComponent = ({
   const renderList = () => (
     <View
       style={ styles.scrollViewContainer }
-      onLayout={ handleLayout }
     >
       <SpatialNavigationVirtualizedList
         ref={ scrollViewRef }
@@ -109,7 +110,7 @@ export const ThemedDropdownComponent = ({
         renderItem={ renderItem }
         itemSize={ styles.item.height }
         orientation="vertical"
-        scrollBehavior="stick-to-end"
+        scrollBehavior='stick-to-center'
       />
     </View>
   );

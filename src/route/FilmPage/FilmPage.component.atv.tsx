@@ -41,6 +41,7 @@ export function FilmPageComponent({
   scheduleOverlayId,
   commentsOverlayId,
   bookmarksOverlayId,
+  descriptionOverlayId,
   playFilm,
   hideVideoSelector,
   handleVideoSelect,
@@ -264,7 +265,7 @@ export function FilmPageComponent({
               !showReadMore && styles.readMoreButtonHidden,
             ] }
           >
-            <ThemedButton>
+            <ThemedButton onPress={ () => openOverlay(descriptionOverlayId) }>
               { t('Read more') }
             </ThemedButton>
           </View>
@@ -543,12 +544,25 @@ export function FilmPageComponent({
     />
   );
 
+  const renderDescriptionOverlay = () => (
+    <ThemedOverlay
+      id={ descriptionOverlayId }
+      onHide={ () => goToPreviousOverlay() }
+      containerStyle={ styles.descriptionOverlay }
+    >
+      <ThemedText style={ styles.descriptionOverlayText }>
+        { film.description }
+      </ThemedText>
+    </ThemedOverlay>
+  );
+
   const renderModals = () => (
     <>
       { renderPlayerVideoSelector() }
       { renderScheduleOverlay() }
       { renderBookmarksOverlay() }
       { renderCommentsOverlay() }
+      { renderDescriptionOverlay() }
     </>
   );
 

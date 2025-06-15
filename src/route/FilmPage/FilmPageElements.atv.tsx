@@ -327,15 +327,17 @@ export const InfoList = memo(({
       } }
     >
       { ({ isFocused }) => (
-        <View style={ [
-          styles.infoList,
-          isFocused && styles.infoListFocused,
-        ] }
-        >
-          <ThemedText style={ [
-            styles.infoListName,
-            isFocused && styles.infoListNameFocused,
+        <View
+          style={ [
+            styles.infoList,
+            isFocused && styles.infoListFocused,
           ] }
+        >
+          <ThemedText
+            style={ [
+              styles.infoListName,
+              isFocused && styles.infoListNameFocused,
+            ] }
           >
             { `${name} ${position || ''}` }
           </ThemedText>

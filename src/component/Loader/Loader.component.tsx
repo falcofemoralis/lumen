@@ -16,7 +16,7 @@ export const LoaderComponent = ({
     ] }
     animating={ isLoading }
     size="large"
-    color={ Colors.primary }
+    color={ Colors.secondary }
   />
 );
 

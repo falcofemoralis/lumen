@@ -16,6 +16,7 @@ export interface FilmPageComponentProps {
   scheduleOverlayId: string;
   commentsOverlayId: string;
   bookmarksOverlayId: string;
+  descriptionOverlayId: string;
   playFilm: () => void;
   hideVideoSelector: () => void;
   handleVideoSelect: (video: FilmVideoInterface, voice: FilmVoiceInterface) => void;

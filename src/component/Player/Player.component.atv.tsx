@@ -108,6 +108,7 @@ export function PlayerComponent({
   const currentOverlayRef = useRef(currentOverlay);
   const isComponentMounted = useRef(true);
   const focusedElementRef = useRef(focusedElement);
+  const hideActionsRef = useRef(hideActions);
 
   const controlsAnimation = useAnimatedStyle(() => ({
     opacity: withTiming(
@@ -121,15 +122,22 @@ export function PlayerComponent({
     ),
   }));
 
+  const closeControls = () => {
+    setShowControls(false);
+    updateFocusedElement(FocusedElement.PROGRESS_THUMB);
+    middleActionRef.current?.focus();
+  };
+
   useEffect(() => {
     currentOverlayRef.current = currentOverlay;
     showControlsRef.current = showControls;
     focusedElementRef.current = focusedElement;
-  }, [showControls, currentOverlay, focusedElement]);
+    hideActionsRef.current = hideActions;
+  }, [showControls, currentOverlay, focusedElement, hideActions]);
 
   useEffect(() => {
     const keyDownListener = (type: SupportedKeys) => {
-      if (!isComponentMounted.current || !player) return false;
+      if (!isComponentMounted.current || !player || currentOverlayRef.current.length) return false;
 
       if (!showControlsRef.current) {
         if (type === SupportedKeys.BACK) {
@@ -171,7 +179,7 @@ export function PlayerComponent({
           togglePlayPause();
         }
 
-        if ((type === SupportedKeys.UP || type === SupportedKeys.DOWN) && hideActions) {
+        if ((type === SupportedKeys.UP || type === SupportedKeys.DOWN) && hideActionsRef.current) {
           setHideActions(false);
         }
 
@@ -198,7 +206,7 @@ export function PlayerComponent({
           && showControlsRef.current
           && !currentOverlayRef.current.length
         ) {
-          setShowControls(false);
+          closeControls();
         }
       }, PLAYER_CONTROLS_TIMEOUT);
 
@@ -234,11 +242,14 @@ export function PlayerComponent({
         controlsTimeout.current = null;
       }
     };
-  }, []);
+  }, [player]);
 
   const handleOpenComments = () => {
-    setShowControls(false);
     openCommentsOverlay();
+
+    setTimeout(() => {
+      closeControls();
+    }, 0);
   };
 
   const renderTitle = () => {

@@ -79,6 +79,7 @@ export const styles = CreateStyles({
   commentsOverlay: {
     width: '50%',
     height: '100%',
+    marginRight: 0,
   },
   commentsOverlayContent: {
     height: '100%',

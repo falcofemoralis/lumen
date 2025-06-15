@@ -16,6 +16,7 @@ export const styles = CreateStyles({
     opacity: 1,
   },
   container: {
+    flex: 0,
     minHeight: 100,
     minWidth: 100,
     width: 'auto',

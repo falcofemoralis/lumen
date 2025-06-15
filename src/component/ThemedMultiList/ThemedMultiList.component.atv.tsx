@@ -67,6 +67,7 @@ export const ThemedMultiListComponent = ({
   const renderContent = () => (
     <SpatialNavigationScrollView
       offsetFromStart={ scale(64) }
+      style={ styles.scrollView }
     >
       <DefaultFocus>
         { values.map((item, index) => renderItem(item, index)) }

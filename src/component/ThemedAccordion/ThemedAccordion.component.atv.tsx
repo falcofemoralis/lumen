@@ -67,6 +67,7 @@ export const ThemedAccordionComponent = ({
       >
         <SpatialNavigationScrollView
           offsetFromStart={ scale(32) }
+          style={ styles.overlayContent }
         >
           <DefaultFocus>
             <View style={ styles.content }>

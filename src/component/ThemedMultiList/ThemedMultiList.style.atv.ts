@@ -79,4 +79,7 @@ export const styles = CreateStyles({
   },
   iconSelected: {
   },
+  scrollView: {
+    flex: 0,
+  },
 });

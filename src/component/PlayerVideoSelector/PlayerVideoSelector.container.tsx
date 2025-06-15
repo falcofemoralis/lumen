@@ -116,28 +116,30 @@ export function PlayerVideoSelectorContainer({
       return;
     }
 
-    setIsLoading(true);
-
-    try {
-      const updatedVoice = await getCurrentService().getFilmSeasons(film, voice);
-
-      setSelectedVoice(updatedVoice);
-
-      const { seasons = [] } = updatedVoice;
-
-      if (seasons.length > 0) {
-        const season = seasons[0];
-        const { seasonId, episodes: [{ episodeId }] = [] } = season;
-        setSelectedSeasonId(seasonId);
-        setSelectedEpisodeId(episodeId);
-      }
-    } catch (error) {
-      NotificationStore.displayError(error as Error);
-    } finally {
-      setIsLoading(false);
-    }
-
     goToPreviousOverlay();
+
+    setTimeout(async () => {
+      setIsLoading(true);
+
+      try {
+        const updatedVoice = await getCurrentService().getFilmSeasons(film, voice);
+
+        setSelectedVoice(updatedVoice);
+
+        const { seasons = [] } = updatedVoice;
+
+        if (seasons.length > 0) {
+          const season = seasons[0];
+          const { seasonId, episodes: [{ episodeId }] = [] } = season;
+          setSelectedSeasonId(seasonId);
+          setSelectedEpisodeId(episodeId);
+        }
+      } catch (error) {
+        NotificationStore.displayError(error as Error);
+      } finally {
+        setIsLoading(false);
+      }
+    }, 0);
   };
 
   const handleSelectEpisode = async (episodeId: string) => {

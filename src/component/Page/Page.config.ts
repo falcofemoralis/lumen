@@ -1,0 +1,1 @@
+export const BACK_HANDLER_DELAY = 2000;

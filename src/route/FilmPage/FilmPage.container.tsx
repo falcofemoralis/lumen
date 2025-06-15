@@ -22,13 +22,14 @@ import { MINIMUM_SCHEDULE_ITEMS } from './FilmPage.config';
 import { FilmPageContainerProps } from './FilmPage.type';
 
 export function FilmPageContainer({ link, thumbnailPoster }: FilmPageContainerProps) {
+  const { isSignedIn, getCurrentService } = useServiceContext();
   const { openOverlay, goToPreviousOverlay } = useOverlayContext();
   const [film, setFilm] = useState<FilmInterface | null>(null);
   const playerVideoSelectorOverlayId = useId();
   const scheduleOverlayId = useId();
   const commentsOverlayId = useId();
   const bookmarksOverlayId = useId();
-  const { isSignedIn, getCurrentService } = useServiceContext();
+  const descriptionOverlayId = useId();
 
   useEffect(() => {
     const loadFilm = async () => {
@@ -227,6 +228,7 @@ export function FilmPageContainer({ link, thumbnailPoster }: FilmPageContainerPr
     scheduleOverlayId,
     commentsOverlayId,
     bookmarksOverlayId,
+    descriptionOverlayId,
   });
 
   const containerFunctions = {

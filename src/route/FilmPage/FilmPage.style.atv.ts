@@ -292,4 +292,10 @@ export const styles = CreateStyles({
   commentsOverlayContent: {
     height: '100%',
   },
+  descriptionOverlay: {
+    width: '80%',
+  },
+  descriptionOverlayText: {
+    fontSize: 16,
+  },
 });
