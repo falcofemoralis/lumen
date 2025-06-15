@@ -263,6 +263,7 @@ export const CommentsComponent = ({
           additionalItemsRendered={ 1 }
           onEndReachedThresholdItemsNumber={ 5 }
           scrollBehavior='stick-to-center'
+          scrollDuration={ 0 }
         />
       </DefaultFocus>
     );

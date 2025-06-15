@@ -18,7 +18,7 @@ export function PageContainer(props: PageContainerProps) {
   useLayoutEffect(() => {
     const backAction = () => {
       try {
-        if (router.canDismiss()) {
+        if (router.canDismiss() || router.canGoBack()) {
           router.dismiss();
 
           return true;

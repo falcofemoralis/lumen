@@ -16,7 +16,7 @@ const TextColors = {
 };
 
 const BackgroundColors = {
-  background: '#0D0D0D',
+  background: '#000000',
   backgroundLight: '#252525',
   backgroundLighter: '#5B5B5B',
   backgroundFocused: '#E3E3E3',
