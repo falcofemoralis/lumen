@@ -93,5 +93,10 @@
   "Yes": "Yes",
   "No": "No",
   "Press back again to exit": "Press back again to exit",
-  "Login": "Login"
+  "Login": "Login",
+  "Movie": "Movie",
+  "Series": "Series",
+  "Cartoon": "Cartoon",
+  "Anime": "Anime",
+  "TV Show": "TV Show"
 }

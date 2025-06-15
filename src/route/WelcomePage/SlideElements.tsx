@@ -118,9 +118,7 @@ export const BaseSlide = forwardRef<BaseSlideRef, BaseSlideProps>(
           { customImage && (
             <ThemedImage
               src={ customImage }
-              style={ [
-                styles.customImage,
-              ] }
+              style={ styles.customImage }
             />
           ) }
           { IconComponent && !customImage && !image && (
@@ -586,11 +584,15 @@ export const LoginSlide = ({
   const loginRef = useRef<View>(null);
 
   const handleUsernamePress = useCallback(() => {
-    usernameRef.current?.focus();
+    if (selectedDeviceType === DeviceType.TV) {
+      usernameRef.current?.focus();
+    }
   }, []);
 
   const handlePasswordPress = useCallback(() => {
-    passwordRef.current?.focus();
+    if (selectedDeviceType === DeviceType.TV) {
+      passwordRef.current?.focus();
+    }
   }, []);
 
   const handleLogin = useCallback(async () => {

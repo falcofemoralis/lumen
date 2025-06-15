@@ -1,11 +1,12 @@
+import t from 'i18n/t';
 import { FilmType } from 'Type/FilmType.type';
 
 export const TYPE_LABELS = {
-  [FilmType.FILM]: 'Movie',
-  [FilmType.SERIES]: 'Series',
-  [FilmType.CARTOON]: 'Cartoon',
-  [FilmType.ANIME]: 'Anime',
-  [FilmType.TV_SHOW]: 'TV Show',
+  [FilmType.FILM]: t('Movie'),
+  [FilmType.SERIES]: t('Series'),
+  [FilmType.CARTOON]: t('Cartoon'),
+  [FilmType.ANIME]: t('Anime'),
+  [FilmType.TV_SHOW]: t('TV Show'),
 };
 
 export const FILM_TYPE_COLORS = {

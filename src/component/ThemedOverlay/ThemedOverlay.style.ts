@@ -7,6 +7,7 @@ export const styles = CreateStyles({
     justifyContent: 'center',
     height: '100%',
     width: '100%',
+    backgroundColor: 'red',
   },
   contentContainerStyle: {
     backgroundColor: Colors.backgroundLight,

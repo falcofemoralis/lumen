@@ -6,6 +6,7 @@ import { router } from 'expo-router';
 import t from 'i18n/t';
 import { useRef } from 'react';
 import { View } from 'react-native';
+import { AvoidSoftInputView } from 'react-native-avoid-softinput';
 import { DefaultFocus } from 'react-tv-space-navigation';
 
 import { styles } from './LoginForm.style.atv';
@@ -65,15 +66,17 @@ export function LoginFormComponent({
 
   return (
     <DefaultFocus>
-      <View
-        style={ styles.container }
-      >
-        <InfoBlock
-          title={ t('You are not logged in') }
-          subtitle={ t('Sign in to sync content') }
-        />
-        { renderForm() }
-      </View>
+      <AvoidSoftInputView>
+        <View
+          style={ styles.container }
+        >
+          <InfoBlock
+            title={ t('You are not logged in') }
+            subtitle={ t('Sign in to sync content') }
+          />
+          { renderForm() }
+        </View>
+      </AvoidSoftInputView>
     </DefaultFocus>
   );
 }

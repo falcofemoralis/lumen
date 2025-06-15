@@ -153,7 +153,6 @@ export const WelcomePageComponent = ({
     >
       { slides.map((slide) => (
         <Wrapper key={ slide.id }>
-
           { renderSlide(slide) }
         </Wrapper>
       )) }

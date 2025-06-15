@@ -68,7 +68,7 @@ const BaseComponent = ({
 export const SettingText = memo(({
   setting,
 }: SettingProps) => <BaseComponent setting={ setting } />, (
-  prevProps: SettingProps, nextProps: SettingProps,
+  prevProps: SettingProps, nextProps: SettingProps
 ) => prevProps.setting.id === nextProps.setting.id);
 
 export const SettingSelect = memo(({
@@ -118,7 +118,7 @@ export const SettingSelect = memo(({
     </View>
   );
 }, (
-  prevProps: SettingProps, nextProps: SettingProps,
+  prevProps: SettingProps, nextProps: SettingProps
 ) => prevProps.setting.id === nextProps.setting.id
     && prevProps.setting.value === nextProps.setting.value);
 
@@ -189,7 +189,6 @@ export const SettingInput = memo(({
             onChangeText={ onChangeText }
             value={ inputValue || '' }
             multiline
-            disabled={ isLoading }
           />
           <ThemedButton
             style={ styles.overlayButton }
@@ -207,7 +206,7 @@ export const SettingInput = memo(({
     </View>
   );
 }, (
-  prevProps: SettingProps, nextProps: SettingProps,
+  prevProps: SettingProps, nextProps: SettingProps
 ) => prevProps.setting.id === nextProps.setting.id
     && prevProps.setting.value === nextProps.setting.value);
 
@@ -220,5 +219,5 @@ export const SettingLink = memo(({
     onPress={ () => onUpdate(setting.id, '') }
   />
 ), (
-  prevProps: SettingProps, nextProps: SettingProps,
+  prevProps: SettingProps, nextProps: SettingProps
 ) => prevProps.setting.id === nextProps.setting.id);

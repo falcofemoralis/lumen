@@ -38,6 +38,7 @@ export const styles = CreateStyles({
     height: 54,
     width: 54,
     padding: 0,
+    borderRadius: 99,
   },
   image: {
     height: 54,
