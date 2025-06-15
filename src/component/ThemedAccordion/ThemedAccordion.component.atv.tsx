@@ -12,6 +12,7 @@ import { AccordionGroupInterface, ThemedAccordionComponentProps } from './Themed
 
 export const ThemedAccordionComponent = ({
   data,
+  overlayContent,
   renderItem,
 }: ThemedAccordionComponentProps<any>) => {
   const { closeOverlay, openOverlay } = useOverlayContext();
@@ -67,7 +68,7 @@ export const ThemedAccordionComponent = ({
       >
         <SpatialNavigationScrollView
           offsetFromStart={ scale(32) }
-          style={ styles.overlayContent }
+          style={ overlayContent }
         >
           <DefaultFocus>
             <View style={ styles.content }>

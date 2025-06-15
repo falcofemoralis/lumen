@@ -24,7 +24,4 @@ export const styles = CreateStyles({
     maxHeight: '70%',
     maxWidth: '50%',
   },
-  overlayContent: {
-    flex: 0,
-  },
 });

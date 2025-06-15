@@ -228,11 +228,12 @@ export const styles = CreateStyles({
   },
   scheduleOverlay: {
     width: '50%',
-    height: '90%',
   },
   scheduleOverlayContent: {
     flexDirection: 'row',
-    height: '100%',
+  },
+  scheduleAccordionOverlay: {
+    flexGrow: 1,
   },
   franchiseList: {
   },
@@ -269,6 +270,9 @@ export const styles = CreateStyles({
   },
   infoListNameFocused: {
     color: Colors.textFocused,
+  },
+  infoListAccordionOverlay: {
+    flex: 0,
   },
   relatedListWrapper: {
     flexDirection: 'row',

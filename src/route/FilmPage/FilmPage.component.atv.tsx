@@ -382,6 +382,7 @@ export function FilmPageComponent({
       >
         <ThemedAccordion
           data={ data }
+          overlayContent={ styles.scheduleAccordionOverlay }
           renderItem={ (subItem) => (
             <ScheduleItem
               key={ `modal-${subItem.name}` }
@@ -483,7 +484,8 @@ export function FilmPageComponent({
       <Section title={ t('Included in') }>
         <ThemedAccordion
           data={ data }
-          renderItem={ (subItem, idx) => (
+          overlayContent={ styles.infoListAccordionOverlay }
+          renderItem={ (subItem) => (
             <InfoList
               key={ `info-list-${subItem.name}` }
               list={ subItem }

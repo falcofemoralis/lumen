@@ -1,3 +1,5 @@
+import { ViewStyle } from 'react-native';
+
 export interface AccordionGroupInterface<T> {
   id: string;
   title: string;
@@ -6,6 +8,7 @@ export interface AccordionGroupInterface<T> {
 
 export interface ThemedAccordionContainerProps<T> {
   data: AccordionGroupInterface<T>[];
+  overlayContent?: ViewStyle;
   renderItem: (item: T, idx: number) => React.ReactNode;
 }
 
