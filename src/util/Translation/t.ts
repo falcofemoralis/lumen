@@ -1,5 +1,3 @@
-/* eslint-disable vtex/consistent-props-type -- Required */
-/* eslint-disable functional/no-let -- Required */
 /* eslint-disable no-plusplus -- Required */
 /* eslint-disable no-underscore-dangle -- Required */
 import i18n from './i18n';

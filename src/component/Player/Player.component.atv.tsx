@@ -139,6 +139,13 @@ export function PlayerComponent({
     const keyDownListener = (type: SupportedKeys) => {
       if (!isComponentMounted.current || !player || currentOverlayRef.current.length) return false;
 
+      if (type === SupportedKeys.BACKWARD) {
+        seekToPosition(0);
+        togglePlayPause();
+
+        return true;
+      }
+
       if (!showControlsRef.current) {
         if (type === SupportedKeys.BACK) {
           return true;
