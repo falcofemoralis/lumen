@@ -72,12 +72,12 @@
     "android": {
 	    "edgeToEdgeEnabled": true,
       "icon": "./assets/images/icon.png",
-      "package": "com.falcofemoralis.lumendev",
+      "package": "com.falcofemoralis.lumen",
       "versionCode": 6,
       "googleServicesFile": "./google-services.json"
     },
     "newArchEnabled": true,
-    "name": "(DEV) Lumen App",
+    "name": "Lumen App",
     "slug": "lumen",
     "version": "1.2.0",
     "extra": {
