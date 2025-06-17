@@ -111,6 +111,7 @@ export function NavigationBarComponent({
           left: idx * (width / TABS_MOBILE_CONFIG.length) - scale(TAB_ADDITIONAL_SIZE / 2),
         }] }
         onPress={ () => navigateTo(tab, navigation, state) }
+        pressDelay={ 0 }
       >
         { renderComponent() }
       </ThemedPressable>

@@ -12,6 +12,7 @@ export const ThemedPressable = ({
   ref,
   disabled = false,
   mode = 'light',
+  pressDelay = 50,
 }: ThemedPressableProps) => {
   return (
     <View style={ [style, { overflow: 'hidden' }] }>
@@ -22,7 +23,7 @@ export const ThemedPressable = ({
         android_ripple={ {
           color: mode === 'light' ? Colors.whiteTransparent : Colors.button,
         } }
-        unstable_pressDelay={ 50 }
+        unstable_pressDelay={ pressDelay }
         style={ stateStyle ? stateStyle : [{
           flex: 1,
           flexDirection: 'row',

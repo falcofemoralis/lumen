@@ -141,7 +141,7 @@ export function PlayerComponent({
 
       if (type === SupportedKeys.BACKWARD) {
         seekToPosition(0);
-        togglePlayPause();
+        togglePlayPause(false);
 
         return true;
       }

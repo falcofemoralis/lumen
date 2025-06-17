@@ -9,5 +9,6 @@ export interface ThemedPressableProps {
   contentStyle?: StyleProp<ViewStyle>;
   disabled?: boolean;
   mode?: 'light' | 'dark';
+  pressDelay?: number;
   ref?: Ref<View>;
 }
