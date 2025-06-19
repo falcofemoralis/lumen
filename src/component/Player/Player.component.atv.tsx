@@ -334,6 +334,17 @@ export function PlayerComponent({
     ref
   );
 
+  const renderTopActionLine = () => {
+    return (
+      <View style={ styles.topActionLine }>
+        <ThemedText style={ styles.topActionLineText }>
+          { selectedQuality }
+        </ThemedText>
+        <PlayerClock />
+      </View>
+    );
+  };
+
   const renderBottomAction = (
     icon: React.ComponentType<any>,
     action?: () => void,
@@ -366,7 +377,7 @@ export function PlayerComponent({
         { renderTopAction(Gauge, openSpeedSelector) }
         { renderTopAction(MessageSquareText, handleOpenComments) }
       </View>
-      <PlayerClock />
+      { renderTopActionLine() }
     </SpatialNavigationView>
   );
 

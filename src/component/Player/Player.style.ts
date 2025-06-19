@@ -164,6 +164,10 @@ export const styles = CreateStyles({
   },
   longTapIcon: {
   },
+  topActionLine: {
+    flexDirection: 'column',
+    gap: 8,
+  },
 });
 
 export type MiddleActionVariant = 'big' | 'small';

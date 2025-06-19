@@ -84,4 +84,12 @@ export const styles = CreateStyles({
   commentsOverlayContent: {
     height: '100%',
   },
+  topActionLine: {
+    flexDirection: 'column',
+    gap: 8,
+  },
+  topActionLineText: {
+    fontSize: 16,
+    textAlign: 'right',
+  },
 });

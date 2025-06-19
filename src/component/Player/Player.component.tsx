@@ -399,6 +399,17 @@ export function PlayerComponent({
     );
   };
 
+  const renderTopActionLine = () => {
+    return (
+      <View style={ styles.topActionLine }>
+        <PlayerClock />
+        <ThemedText>
+          { selectedQuality }
+        </ThemedText>
+      </View>
+    );
+  };
+
   const renderBottomActions = () => {
     const { hasSeasons, hasVoices } = film;
 
@@ -413,7 +424,7 @@ export function PlayerComponent({
           { renderProgressBar() }
         </View>
         <View style={ styles.bottomActionsRowLine }>
-          <PlayerClock />
+          { renderTopActionLine() }
           <View
             style={ [
               styles.actionsRow,
