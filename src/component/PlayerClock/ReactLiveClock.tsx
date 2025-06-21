@@ -1,8 +1,11 @@
 import 'moment/locale/ru';
 
 import ThemedText from 'Component/ThemedText';
+import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import Moment from 'react-moment';
+
+moment.locale('ru');
 
 const ReactLiveClock = ({ style }: { style?: React.CSSProperties }) => {
   const [currentTime, setCurrentTime] = useState(Date.now());
@@ -19,7 +22,7 @@ const ReactLiveClock = ({ style }: { style?: React.CSSProperties }) => {
     <Moment
       element={ ThemedText }
       format="ddd DD MMM HH:mm"
-      locale="ru-RU"
+      locale="ru"
       style={ style }
     >
       { currentTime }

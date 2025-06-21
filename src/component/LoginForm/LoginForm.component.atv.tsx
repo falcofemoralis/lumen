@@ -45,6 +45,7 @@ export function LoginFormComponent({
             style={ styles.input }
             placeholder={ t('Password') }
             onChangeText={ (text) => { loginRef.current.password = text; } }
+            secureTextEntry
           />
         </View>
         <ThemedButton

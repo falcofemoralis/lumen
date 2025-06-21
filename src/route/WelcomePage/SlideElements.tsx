@@ -622,6 +622,7 @@ export const LoginSlide = ({
           placeholder={ t('Password') }
           onChangeText={ setPassword }
           value={ password ?? '' }
+          secureTextEntry
         />
       </View>
       <View style={ styles.providerButtonContainer }>
