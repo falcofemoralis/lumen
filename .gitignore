@@ -14,7 +14,6 @@ web-build/
 *.keystore
 *.apk
 *.apk.idsig
-google-services.json
 .kotlin/
 
 # macOS
