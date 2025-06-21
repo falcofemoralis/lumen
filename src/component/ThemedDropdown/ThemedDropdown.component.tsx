@@ -3,6 +3,7 @@ import ThemedImage from 'Component/ThemedImage';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedPressable from 'Component/ThemedPressable';
 import { useOverlayContext } from 'Context/OverlayContext';
+import { useLandscape } from 'Hooks/useLandscape';
 import { Plus } from 'lucide-react-native';
 import React, { useCallback, useRef } from 'react';
 import {
@@ -29,6 +30,7 @@ export const ThemedDropdownComponent = ({
   style,
 }: ThemedDropdownComponentProps) => {
   const { openOverlay, goToPreviousOverlay } = useOverlayContext();
+  const isLandscape = useLandscape();
   const id = useRef(overlayId ?? generateId());
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -81,7 +83,12 @@ export const ThemedDropdownComponent = ({
   ), []);
 
   const renderList = () => (
-    <View style={ styles.listItems }>
+    <View
+      style={ [
+        styles.listItems,
+        isLandscape && styles.listItemsLandscape,
+      ] }
+    >
       <ScrollView
         ref={ scrollViewRef }
         onLayout={ handleLayout }
