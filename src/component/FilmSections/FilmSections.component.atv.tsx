@@ -89,7 +89,7 @@ export function FilmSectionsComponent({
   const { width, height } = calculateCardDimensions(
     NUMBER_OF_COLUMNS_TV,
     scale(ROW_GAP),
-    scale(ROW_GAP) * 2,
+    scale(ROW_GAP) * 2
   );
 
   const containerWidth = calculateItemWidth(1);
@@ -113,7 +113,7 @@ export function FilmSectionsComponent({
   }, {} as Record<string, number>), [data]);
 
   const getCalculatedItemSize = useCallback((
-    item: FilmSectionsItem,
+    item: FilmSectionsItem
   ) => calculatedHeights[item.index], [calculatedHeights]);
 
   return (

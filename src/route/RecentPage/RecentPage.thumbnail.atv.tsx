@@ -1,4 +1,3 @@
-import Loader from 'Component/Loader';
 import Thumbnail from 'Component/Thumbnail';
 import { Dimensions, View } from 'react-native';
 import { calculateLayoutWidth } from 'Style/Layout';

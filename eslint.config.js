@@ -59,7 +59,6 @@ module.exports = defineConfig([
         ObjectExpression: 1,
         ImportDeclaration: 1,
         flatTernaryExpressions: false,
-        ignoredNodes: ['JSXElement', 'JSXElement > *', 'JSXAttribute', 'JSXIdentifier', 'JSXNamespacedName', 'JSXMemberExpression', 'JSXSpreadAttribute', 'JSXExpressionContainer', 'JSXOpeningElement', 'JSXClosingElement', 'JSXFragment', 'JSXOpeningFragment', 'JSXClosingFragment', 'JSXText', 'JSXEmptyExpression', 'JSXSpreadChild'],
         ignoreComments: false,
       }],
       'default-param-last': 'off',
@@ -103,11 +102,12 @@ module.exports = defineConfig([
       // eslint-plugin-react-perf
       'react-perf/jsx-no-new-object-as-prop': 'off',
       'react-perf/jsx-no-new-array-as-prop': 'off',
-      'react-perf/jsx-no-new-function-as-prop': 'warn',
+      'react-perf/jsx-no-new-function-as-prop': 'off',
       'react-perf/jsx-no-jsx-as-prop': 'warn',
       // eslint-plugin-simple-import-sort"
       'simple-import-sort/imports': 'warn',
       'simple-import-sort/exports': 'warn',
+      'import/no-named-as-default': 'off',
       // react
       'react/react-in-jsx-scope': 'off',
       'react-native/no-inline-styles': 0,

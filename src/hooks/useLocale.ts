@@ -1,6 +1,4 @@
-import { useEffect, useState } from 'react';
-import { getConfig } from 'Util/Config';
-import i18n from 'Util/Translation/i18n';
+import { useState } from 'react';
 
 export function useLocale() {
   const [loaded, setLoaded] = useState(true);

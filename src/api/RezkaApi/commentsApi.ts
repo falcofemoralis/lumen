@@ -48,7 +48,6 @@ export const commentsApi: CommentsApiInterface = {
         const textElements = comment.querySelector('.text div');
 
         const text = textElements?.childNodes.reduce<CommentTextInterface[]>((acc, el) => {
-          // eslint-disable-next-line functional/no-let
           let type = CommentTextType.REGULAR;
 
           switch (el.rawTagName) {
@@ -68,7 +67,7 @@ export const commentsApi: CommentsApiInterface = {
               type = CommentTextType.BREAK;
               break;
             default:
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
               if ((el as any).classList?.contains('text_spoiler')) {
                 type = CommentTextType.SPOILER;
               }
@@ -98,7 +97,6 @@ export const commentsApi: CommentsApiInterface = {
         };
       });
 
-    // eslint-disable-next-line functional/no-let
     let totalPages = 1;
 
     const navs = navigationRoot.querySelectorAll('.b-navigation a');

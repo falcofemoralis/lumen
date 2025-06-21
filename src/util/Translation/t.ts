@@ -1,5 +1,3 @@
-/* eslint-disable no-plusplus -- Required */
-/* eslint-disable no-underscore-dangle -- Required */
 import i18n from './i18n';
 
 export type TranslationValue = string | undefined;

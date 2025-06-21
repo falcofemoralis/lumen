@@ -5,12 +5,12 @@ export type EventType = string | symbol;
 export type Handler<T = unknown> = (event: T) => boolean;
 
 // An array of all currently registered event handlers for a type
-export type EventHandlerList<T = unknown> = Array<Handler<T>>;
+export type EventHandlerList<T = unknown> = Handler<T>[];
 
 // A map of event types and their corresponding event handlers.
 export type EventHandlerMap<Events extends Record<EventType, unknown>> = Map<
-keyof Events,
-EventHandlerList<Events[keyof Events]>
+  keyof Events,
+  EventHandlerList<Events[keyof Events]>
 >;
 
 export default class CustomEventEmitter<Events extends Record<EventType, unknown>> {
@@ -26,7 +26,7 @@ export default class CustomEventEmitter<Events extends Record<EventType, unknown
     this.handlers.set(
       eventType,
       // @ts-expect-error TODO fix the type error
-      this.handlers.get(eventType).filter((h) => h !== handler),
+      this.handlers.get(eventType).filter((h) => h !== handler)
     );
   };
 
@@ -37,7 +37,6 @@ export default class CustomEventEmitter<Events extends Record<EventType, unknown
       return;
     }
 
-    // eslint-disable-next-line no-plusplus
     for (let index = eventTypeHandlers.length - 1; index >= 0; index--) {
       const handler = eventTypeHandlers[index];
       // @ts-expect-error TODO fix the type error

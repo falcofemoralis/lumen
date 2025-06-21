@@ -1,9 +1,9 @@
-export async function processPromisesBatch(
-  items: Array<any>,
+export async function processPromisesBatch<S,T>(
+  items: S[],
   limit: number,
-  fn: (item: any) => Promise<any>,
-): Promise<any> {
-  let results = [];
+  fn: (item: S) => Promise<T>
+): Promise<T[]> {
+  let results: T[] = [];
   for (let start = 0; start < items.length; start += limit) {
     const end = start + limit > items.length ? items.length : start + limit;
 

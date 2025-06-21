@@ -7,7 +7,7 @@ export type FilmSectionsData = {
 
 export interface FilmSectionsContainerProps {
   data: FilmSectionsData[];
-  children?: JSX.Element;
+  children?: React.ReactNode;
   contentHeight?: number;
   handleOnPress: (film: FilmCardInterface) => void;
 }
@@ -22,7 +22,7 @@ export type FilmSectionsItem = {
   index: number;
   films?: FilmCardInterface[];
   header?: string;
-  content?: JSX.Element;
+  content?: React.ReactNode;
 }
 
 export interface FilmSectionsRowProps {

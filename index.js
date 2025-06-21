@@ -6,7 +6,7 @@ import { App } from 'expo-router/build/qualified-entry';
 import { renderRootComponent } from 'expo-router/build/renderRootComponent';
 
 Sentry.init({
-    dsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
+  dsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
 });
 
 renderRootComponent(Sentry.wrap(App));

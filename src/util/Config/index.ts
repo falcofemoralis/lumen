@@ -2,7 +2,7 @@ import { safeJsonParse } from 'Util/Json';
 import { configStorage } from 'Util/Storage';
 
 export const getConfig = (
-  key: string,
+  key: string
 ): string | null => {
   const config = configStorage.getString(key);
 
@@ -15,7 +15,7 @@ export const getConfig = (
 
 export const updateConfig = (
   key: string,
-  value: string,
+  value: string
 ): void => configStorage.set(key, value);
 
 export const getConfigJson = <T>(key: string): T | null => {

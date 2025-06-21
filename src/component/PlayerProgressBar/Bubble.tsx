@@ -26,7 +26,7 @@ export const BubbleComponent = forwardRef<BubbleRef, BubbleProps>(
     {
       storyboardUrl,
     },
-    ref,
+    ref
   ) => {
     const [time, setTime] = useState(0);
 
@@ -62,7 +62,7 @@ export const BubbleComponent = forwardRef<BubbleRef, BubbleProps>(
         </Animated.View>
       </Animated.View>
     );
-  },
+  }
 );
 
 export const Bubble = memo(BubbleComponent);

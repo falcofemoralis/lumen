@@ -1,4 +1,4 @@
-/* eslint-disable no-plusplus */
+/* eslint-disable max-len */
 const v = {
   enc2: 'h',
   bk0: '$$#!!@#!@##',

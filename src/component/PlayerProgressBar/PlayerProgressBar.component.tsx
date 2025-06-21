@@ -59,7 +59,10 @@ export const PlayerProgressBarComponent = ({
 
     seekToPosition(value);
     updateIsScrolling(false);
-    handleUserInteraction();
+
+    if (handleUserInteraction) {
+      handleUserInteraction();
+    }
   }, [seekToPosition, handleUserInteraction, updateIsScrolling]);
 
   const renderBubble = useCallback(() => (

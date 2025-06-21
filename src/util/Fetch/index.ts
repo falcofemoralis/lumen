@@ -35,7 +35,7 @@ export function customFetch(input: RequestInfo | URL, init?: RequestInit | undef
 
           return acc;
         },
-        {} as Record<string, setCookieParser.Cookie>,
+        {} as Record<string, setCookieParser.Cookie>
       );
 
     cookiesManager.set(hostname, validNewCookies);

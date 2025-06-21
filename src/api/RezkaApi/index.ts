@@ -16,7 +16,7 @@ const RezkaApi: ApiInterface = Object.assign(
   authApi,
   accountApi,
   searchApi,
-  commentsApi,
+  commentsApi
 );
 
 export default RezkaApi;

@@ -1,4 +1,3 @@
-/* eslint-disable functional/no-let */
 import { useEventListener } from 'expo';
 import React, { useEffect, useState } from 'react';
 import {
@@ -39,7 +38,7 @@ export const PlayerSubtitlesComponent = ({
       }
 
       const subtitle = subtitles.find((
-        { start, end },
+        { start, end }
       ) => currentTime >= start && currentTime <= end);
 
       if (subtitle) {
@@ -49,7 +48,7 @@ export const PlayerSubtitlesComponent = ({
       }
 
       updateText('');
-    },
+    }
   );
 
   const renderText = () => {

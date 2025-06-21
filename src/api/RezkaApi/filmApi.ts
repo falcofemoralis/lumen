@@ -569,7 +569,7 @@ const filmApi: FilmApiInterface = {
       };
     };
 
-    const results = await processPromisesBatch(links, 3, getFilm) as FilmCardInterface[];
+    const results = await processPromisesBatch<string, FilmCardInterface>(links, 3, getFilm);
 
     results.forEach((result) => {
       films[result.link] = result;

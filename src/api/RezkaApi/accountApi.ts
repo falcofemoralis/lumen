@@ -42,7 +42,7 @@ const accountApi: RezkaAccountApiInterface = {
 
     const root = await configApi.fetchPage(
       '/favorites',
-      {},
+      {}
     );
 
     root.querySelectorAll('.b-favorites_content__cats_list_item').forEach((el) => {

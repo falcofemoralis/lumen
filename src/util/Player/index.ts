@@ -18,7 +18,7 @@ const formatPlayerKeyTime = (film: FilmInterface, voice: FilmVoiceInterface) => 
 export const updatePlayerTime = (film: FilmInterface, voice: FilmVoiceInterface, time: number) => {
   playerStorage.set(
     formatPlayerKeyTime(film, voice),
-    Number(time),
+    Number(time)
   );
 };
 
@@ -35,7 +35,7 @@ export const getPlayerTime = (film: FilmInterface, voice: FilmVoiceInterface) =>
 export const updatePlayerQuality = (quality: string) => {
   playerStorage.set(
     PLAYER_QUALITY_STORAGE_KEY,
-    quality,
+    quality
   );
 };
 
@@ -79,7 +79,7 @@ export const prepareShareBody = (film: FilmInterface) => {
 export const formatFirestoreKey = (
   film: FilmInterface,
   voice: FilmVoiceInterface,
-  profile: ProfileInterface,
+  profile: ProfileInterface
 ) => {
   const { id: filmId } = film;
   const { id: voiceId, lastEpisodeId, lastSeasonId } = voice;

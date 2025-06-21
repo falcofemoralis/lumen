@@ -10,7 +10,7 @@ export const formatURI = (query: string, variables: Variables, url: string): str
 
   const stringifyVariables = Object.keys(variables).reduce(
     (acc, variable) => [...acc, `${variable}=${JSON.stringify(variables[variable])}`],
-    [''],
+    ['']
   );
 
   if (stringifyVariables.length > 0 && stringifyVariables[0] === '') {
@@ -25,7 +25,7 @@ export const formatURI = (query: string, variables: Variables, url: string): str
 export const getFetch = (
   uri: string,
   headers: HeadersInit,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ): Promise<Response> => customFetch(uri, {
   method: 'GET',
   signal,
@@ -40,7 +40,7 @@ export const postFetch = (
   uri: string,
   headers: HeadersInit,
   variables: FormData,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ): Promise<Response> => customFetch(uri, {
   method: 'POST',
   body: variables,
@@ -77,7 +77,7 @@ export const executeGet = async (
   endpoint: string,
   headers: HeadersInit,
   variables: Variables,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ): Promise<string> => {
   const uri = formatURI(query, variables, endpoint);
 
@@ -99,7 +99,7 @@ export const executePost = async (
   endpoint: string,
   headers: HeadersInit,
   variables: Variables,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ): Promise<string> => {
   const uri = formatURI(query, {}, endpoint);
 
@@ -124,7 +124,7 @@ export const executePost = async (
 
 export const requestValidator = async (
   host: string,
-  headers: HeadersInit,
+  headers: HeadersInit
 ) => {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 5000);
@@ -135,7 +135,7 @@ export const requestValidator = async (
       host,
       headers,
       {},
-      controller.signal,
+      controller.signal
     );
   } catch (error) {
     throw new Error(t('Invalid URL'));

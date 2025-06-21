@@ -1,8 +1,3 @@
-/* eslint-disable default-case -- Required */
-/* eslint-disable functional/no-let -- Required */
-/* eslint-disable no-fallthrough -- Required */
-/* eslint-disable no-bitwise -- Required */
-/* eslint-disable no-plusplus -- Required */
 export const hash = (key: string, seed = 1): number => {
   let h1;
   let h1b;

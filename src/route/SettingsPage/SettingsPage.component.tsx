@@ -1,6 +1,5 @@
 import Header from 'Component/Header';
 import Page from 'Component/Page';
-import Wrapper from 'Component/Wrapper';
 import t from 'i18n/t';
 import React from 'react';
 import { ScrollView, View } from 'react-native';
