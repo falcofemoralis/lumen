@@ -11,18 +11,14 @@ Modern application to view films on TV and Mobile. This is a continuation of [HD
 - Comments
 - Comfortable films list
 
-
 And more!
 
 ## Roadmap
 
-- ⭐️ Rework design\animations (expo 53 + react native 79 + react 19 + reanimated 4)
-- ⭐️ Fixing a bunch of bugs (Thanks for testing!!!)
 - Implement download manager
 - Support for film trailer in the app
-- Support back button for TV
 - Skip intro\opening feature
-- Include played time in series selector
+- Add played time in series selector
 - Add ability to remove search history items
 - Add ability to create a comment
 
