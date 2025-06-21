@@ -1,10 +1,11 @@
 import * as Application from 'expo-application';
 import t from 'i18n/t';
 import { CircleCheck, Clapperboard, CloudCog, FolderCog, MonitorCog, UserCog } from 'lucide-react-native';
-import { useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
 import RNRestart from 'react-native-restart';
 import ConfigStore from 'Store/Config.store';
 import NotificationStore from 'Store/Notification.store';
+import { configureRemoteControl } from 'Util/RemoteControl';
 
 import WelcomePageComponent from './WelcomePage.component';
 import { DeviceType, SLIDE_TYPE, SlideInterface } from './WelcomePage.type';
@@ -52,18 +53,23 @@ export function WelcomePageContainer() {
     },
   ];
 
+  useLayoutEffect(() => {
+    configureRemoteControl();
+  }, []);
+
   const configureDeviceType = (type: DeviceType) => {
     setSelectedDeviceType(type);
+    ConfigStore.configureDeviceType(type === DeviceType.TV);
   };
 
-  const complete = async () => {
+  const complete = () => {
     if (!selectedDeviceType) {
       NotificationStore.displayError(t('Please select a device type'));
 
       return;
     }
 
-    await ConfigStore.configureDevice(selectedDeviceType === DeviceType.TV);
+    ConfigStore.configureDevice(selectedDeviceType === DeviceType.TV);
     RNRestart.restart();
   };
 

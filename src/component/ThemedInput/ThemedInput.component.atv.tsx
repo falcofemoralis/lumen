@@ -1,3 +1,4 @@
+import ThemedText from 'Component/ThemedText';
 import { useCallback, useRef } from 'react';
 import { TextInput } from 'react-native';
 import { SpatialNavigationFocusableView } from 'react-tv-space-navigation';
@@ -43,6 +44,8 @@ export const ThemedInputComponent = ({
           cursorColor={ Colors.primary }
           underlineColorAndroid={ Colors.transparent }
           selectionHandleColor={ Colors.primary }
+          tvFocusable={ false }
+          focusable={ false }
           { ...props }
         />
       ) }

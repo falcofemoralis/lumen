@@ -7,7 +7,6 @@ import { useLocale } from 'Hooks/useLocale';
 import React, { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SpatialNavigationDeviceTypeProvider } from 'react-tv-space-navigation';
-import ConfigStore from 'Store/Config.store';
 import { DEFAULT_ROUTE_ANIMATION } from 'Style/Animations';
 import { Colors } from 'Style/Colors';
 
@@ -43,18 +42,6 @@ export function RootLayout() {
     </Stack>
   );
 
-  const renderTVLayout = () => (
-    <SpatialNavigationDeviceTypeProvider>
-      { renderStack() }
-    </SpatialNavigationDeviceTypeProvider>
-  );
-
-  const renderMobileLayout = () => (
-    <GestureHandlerRootView>
-      { renderStack() }
-    </GestureHandlerRootView>
-  );
-
   const renderApp = () => {
     if (!languageLoaded) {
       return null;
@@ -71,9 +58,13 @@ export function RootLayout() {
         } }
       >
         <AppProvider>
-          <Portal.Host>
-            { ConfigStore.isTV() ? renderTVLayout() : renderMobileLayout() }
-          </Portal.Host>
+          <SpatialNavigationDeviceTypeProvider>
+            <GestureHandlerRootView>
+              <Portal.Host>
+                { renderStack() }
+              </Portal.Host>
+            </GestureHandlerRootView>
+          </SpatialNavigationDeviceTypeProvider>
         </AppProvider>
       </ThemeProvider>
     );

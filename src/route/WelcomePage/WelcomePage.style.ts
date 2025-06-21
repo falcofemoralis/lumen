@@ -72,8 +72,10 @@ export const styles = CreateStyles({
     textAlign: 'center',
   },
   nextButton: {
-    borderRadius: 16,
     flex: 1,
+  },
+  nextButtonPressable: {
+    borderRadius: 16,
   },
   nextButtonContent: {
     flex: 1,
@@ -107,11 +109,18 @@ export const styles = CreateStyles({
     width: '80%',
   },
   configureButton: {
+  },
+  configureButtonPressable: {
     borderRadius: 16,
+    height: 86,
   },
   configureButtonContent: {
-    backgroundColor: Colors.button,
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
     padding: 12,
+    backgroundColor: Colors.button,
   },
   configureButtonSelected: {
     backgroundColor: Colors.primary,
@@ -139,6 +148,9 @@ export const styles = CreateStyles({
   providerButtonContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+    width: '50%',
   },
   providerButtonText: {
     fontSize: 16,
@@ -146,9 +158,6 @@ export const styles = CreateStyles({
   providerSelector: {
     backgroundColor: Colors.input,
     borderRadius: 16,
-  },
-  providerSelectorContent: {
-    padding: 12,
   },
   providerSelectorInput: {
     color: Colors.white,
@@ -162,10 +171,10 @@ export const styles = CreateStyles({
   },
   providerValidateButtonContent: {
     flexDirection: 'row',
-    gap: 4,
+    gap: 6,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingBlock: 6,
+    paddingBlock: 8,
     paddingInline: 12,
   },
   providerValidateButtonDisabled: {
@@ -208,7 +217,10 @@ export const styles = CreateStyles({
   completeSlide: {
   },
   TVfocused: {
-    backgroundColor: Colors.secondary,
+    backgroundColor: Colors.buttonFocused,
+  },
+  TVfocusedText: {
+    color: Colors.textFocused,
   },
   loginSlide: {
   },

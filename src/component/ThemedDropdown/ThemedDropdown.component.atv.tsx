@@ -6,7 +6,6 @@ import { Plus } from 'lucide-react-native';
 import React, { memo, useCallback, useEffect, useRef } from 'react';
 import { Text, View } from 'react-native';
 import {
-  DefaultFocus,
   SpatialNavigationFocusableView,
   SpatialNavigationVirtualizedList,
   SpatialNavigationVirtualizedListRef,
@@ -27,19 +26,21 @@ export const ThemedDropdownComponent = ({
   style,
   onChange,
 }: ThemedDropdownComponentProps) => {
-  const { openOverlay, goToPreviousOverlay } = useOverlayContext();
+  const { currentOverlay, openOverlay, goToPreviousOverlay, isOverlayOpened } = useOverlayContext();
   const overlayId = useRef(overlayIdProp ?? generateId());
   const scrollViewRef = useRef<SpatialNavigationVirtualizedListRef>(null);
 
   useEffect(() => {
-    const itemIdx = data.findIndex((item) => item.value === value);
+    if (isOverlayOpened(overlayId.current)) {
+      const itemIdx = data.findIndex((item) => item.value === value);
 
-    if (scrollViewRef.current) {
       setTimeout(() => {
-        scrollViewRef.current?.focus(itemIdx);
-      }, 0);
+        if (scrollViewRef.current) {
+          scrollViewRef.current?.focus(itemIdx);
+        }
+      }, 100);
     }
-  }, [data, value]);
+  }, [data, value, currentOverlay.length]);
 
   const renderHeader = () => {
     if (!header) {
@@ -59,43 +60,41 @@ export const ThemedDropdownComponent = ({
     const isSelected = value === item.value;
 
     return (
-      <DefaultFocus enable={ isSelected }>
-        <SpatialNavigationFocusableView
-          onSelect={ () => onChange(item) }
-        >
-          { ({ isFocused }) => (
-            <View style={ [
-              styles.item,
-              isSelected && styles.itemSelected,
-              isFocused && styles.itemFocused,
-            ] }
-            >
-              <View style={ styles.itemContainer }>
-                { item.startIcon && (
-                  <ThemedImage
-                    style={ styles.icon }
-                    src={ item.startIcon }
-                  />
-                ) }
-                <Text style={ [
-                  styles.text,
-                  isSelected && styles.textSelected,
-                  isFocused && styles.textFocused,
-                ] }
-                >
-                  { item.label }
-                </Text>
-                { item.endIcon && (
-                  <ThemedImage
-                    style={ styles.icon }
-                    src={ item.endIcon }
-                  />
-                ) }
-              </View>
+      <SpatialNavigationFocusableView
+        onSelect={ () => onChange(item) }
+      >
+        { ({ isFocused }) => (
+          <View style={ [
+            styles.item,
+            isSelected && styles.itemSelected,
+            isFocused && styles.itemFocused,
+          ] }
+          >
+            <View style={ styles.itemContainer }>
+              { item.startIcon && (
+                <ThemedImage
+                  style={ styles.icon }
+                  src={ item.startIcon }
+                />
+              ) }
+              <Text style={ [
+                styles.text,
+                isSelected && styles.textSelected,
+                isFocused && styles.textFocused,
+              ] }
+              >
+                { item.label }
+              </Text>
+              { item.endIcon && (
+                <ThemedImage
+                  style={ styles.icon }
+                  src={ item.endIcon }
+                />
+              ) }
             </View>
-          ) }
-        </SpatialNavigationFocusableView>
-      </DefaultFocus>
+          </View>
+        ) }
+      </SpatialNavigationFocusableView>
     );
   }, [value, onChange]);
 

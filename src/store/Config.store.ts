@@ -50,6 +50,15 @@ class ConfigStore {
     this.config = newConfig;
   }
 
+  async configureDeviceType(isTV: boolean) {
+    updateConfig(DEVICE_CONFIG, JSON.stringify({
+      ...this.config,
+      isTV,
+    }));
+
+    this.config.isTV = isTV;
+  }
+
   async configureDevice(isTV: boolean) {
     updateConfig(DEVICE_CONFIG, JSON.stringify({
       ...this.config,

@@ -8,7 +8,6 @@ export const ThemedPressable = ({
   children,
   style,
   contentStyle,
-  stateStyle,
   ref,
   disabled = false,
   mode = 'light',
@@ -24,13 +23,14 @@ export const ThemedPressable = ({
           color: mode === 'light' ? Colors.whiteTransparent : Colors.button,
         } }
         unstable_pressDelay={ pressDelay }
-        style={ stateStyle ? stateStyle : [{
+        style={ [{
           flex: 1,
           flexDirection: 'row',
           justifyContent: 'center',
           alignItems: 'center',
         }, contentStyle] }
-        tvFocusable
+        tvFocusable={ false }
+        focusable={ false }
       >
         { children }
       </Pressable>

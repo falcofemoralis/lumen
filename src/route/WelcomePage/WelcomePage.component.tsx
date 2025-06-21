@@ -1,14 +1,12 @@
 import Wrapper from 'Component/Wrapper';
 import React, {
-  createRef,
-  useEffect,
   useRef,
   useState,
 } from 'react';
 import PagerView from 'react-native-pager-view';
 import { noopFn } from 'Util/Function';
 
-import { BaseSlide, BaseSlideRef, CDNSlide, ConfigureSlide, LoginSlide, ProviderSlide } from './SlideElements';
+import { BaseSlide, CDNSlide, ConfigureSlide, LoginSlide, ProviderSlide } from './SlideElements';
 import { styles } from './WelcomePage.style';
 import {
   SlideInterface,
@@ -22,50 +20,24 @@ export const WelcomePageComponent = ({
   complete,
 }: WelcomePageComponentProps) => {
   const pagerViewRef = useRef<PagerView>(null);
-  const slidesRefs = useRef<{[key: string]: React.RefObject<BaseSlideRef | null>}>({});
   const [currentPage, setCurrentPage] = useState(0);
 
-  slides.forEach((slide) => {
-    slidesRefs.current[slide.id] = createRef<BaseSlideRef | null>();
-  });
-
-  useEffect(() => {
-    setTimeout(() => {
-      slidesRefs.current[slides[0].id].current?.focus();
-    }, 100);
-  }, []);
-
-  const goBack = (slide: SlideInterface) => {
-    const currentSlideIdx = slides.findIndex((s) => s.id === slide.id);
-    const prevSlide = (currentSlideIdx - 1) >= 0 ? slides[currentSlideIdx - 1] : slides[0];
-
-    setTimeout(() => {
-      slidesRefs.current[prevSlide.id].current?.focus();
-    }, 0);
-
+  const goBack = (_slide: SlideInterface) => {
     if (currentPage > 0) {
-      pagerViewRef.current?.setPage(currentPage - 1);
+      pagerViewRef.current?.setPageWithoutAnimation(currentPage - 1);
     }
   };
 
-  const goNext = (slide: SlideInterface) => {
-    const currentSlideIdx = slides.findIndex((s) => s.id === slide.id);
-    const nextSlide = (currentSlideIdx + 1) <= (slides.length - 1)
-      ? slides[currentSlideIdx + 1]
-      : slides[(slides.length - 1)];
-
-    setTimeout(() => {
-      slidesRefs.current[nextSlide.id].current?.focus();
-    }, 0);
-
+  const goNext = (_slide: SlideInterface) => {
     if (currentPage < slides.length - 1) {
-      pagerViewRef.current?.setPage(currentPage + 1);
+      pagerViewRef.current?.setPageWithoutAnimation(currentPage + 1);
     }
   };
+
+  const isSlideActive = (slide: SlideInterface) => slides.findIndex((s) => s.id === slide.id) === currentPage;
 
   const renderWelcomeSlide = (slide: SlideInterface) => (
     <BaseSlide
-      ref={ slidesRefs.current[slide.id] }
       slide={ slide }
       goBack={ goBack }
       goNext={ goNext }
@@ -76,7 +48,6 @@ export const WelcomePageComponent = ({
 
   const renderConfigureSlide = (slide: SlideInterface) => (
     <ConfigureSlide
-      ref={ slidesRefs.current[slide.id] }
       slide={ slide }
       goBack={ goBack }
       goNext={ goNext }
@@ -87,37 +58,30 @@ export const WelcomePageComponent = ({
 
   const renderProviderSlide = (slide: SlideInterface) => (
     <ProviderSlide
-      ref={ slidesRefs.current[slide.id] }
       slide={ slide }
       goBack={ goBack }
       goNext={ goNext }
-      selectedDeviceType={ selectedDeviceType }
     />
   );
 
   const renderCDNSlide = (slide: SlideInterface) => (
     <CDNSlide
-      ref={ slidesRefs.current[slide.id] }
       slide={ slide }
       goBack={ goBack }
       goNext={ goNext }
-      selectedDeviceType={ selectedDeviceType }
     />
   );
 
   const renderLoginSlide = (slide: SlideInterface) => (
     <LoginSlide
-      ref={ slidesRefs.current[slide.id] }
       slide={ slide }
       goBack={ goBack }
       goNext={ goNext }
-      selectedDeviceType={ selectedDeviceType }
     />
   );
 
   const renderCompleteSlide = (slide: SlideInterface) => (
     <BaseSlide
-      ref={ slidesRefs.current[slide.id] }
       slide={ slide }
       goBack={ goBack }
       goNext={ goNext }
@@ -140,7 +104,7 @@ export const WelcomePageComponent = ({
   const renderSlide = (slide: SlideInterface) => {
     const render = RENDER_MAP[slide.id] ?? noopFn;
 
-    return render(slide);
+    return isSlideActive(slide) ? render(slide) : null;
   };
 
   return (
