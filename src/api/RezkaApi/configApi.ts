@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { ApiServiceType, ConfigApiInterface, ServiceConfigInterface } from 'Api/index';
 import t from 'i18n/t';
 import NotificationStore from 'Store/Notification.store';
@@ -5,10 +6,8 @@ import { FilmStreamInterface } from 'Type/FilmStream.interface';
 import { getConfigJson, updateConfig } from 'Util/Config';
 import { safeJsonParse } from 'Util/Json';
 import { HTMLElementInterface, parseHtml } from 'Util/Parser';
-import { executeGet, executePost } from 'Util/Request';
+import { executeGet, executePost , Variables } from 'Util/Request';
 import { updateUrlHost } from 'Util/Url';
-
-import { Variables } from '../../util/Request/index';
 
 const REZKA_CONFIG = 'rezkaConfig';
 
@@ -52,7 +51,7 @@ const configApi: ConfigApiInterface = {
   },
 
   async updateConfig(key: keyof ServiceConfigInterface, value: unknown) {
-    await updateConfig(REZKA_CONFIG, JSON.stringify({
+    updateConfig(REZKA_CONFIG, JSON.stringify({
       ...this.config,
       [key]: value,
     }));
@@ -110,7 +109,7 @@ const configApi: ConfigApiInterface = {
       NotificationStore.displayErrorScreen(
         page.querySelector('.error-code div')?.textContent,
         page.querySelector('.error-title')?.textContent,
-        t('Try again later'),
+        t('Try again later')
       );
       throw new Error('Service temporarily unavailable');
     }
@@ -126,7 +125,7 @@ const configApi: ConfigApiInterface = {
    */
   async fetchPage(
     query: string,
-    variables: Variables = {},
+    variables: Variables = {}
   ) {
     const res = await this.getRequest(query, variables);
 
@@ -149,13 +148,13 @@ const configApi: ConfigApiInterface = {
    */
   async getRequest(
     query: string,
-    variables: Variables = {},
+    variables: Variables = {}
   ) {
     return executeGet(
       query,
       this.getProvider(),
       this.getHeaders(),
-      variables,
+      variables
     );
   },
 
@@ -167,13 +166,13 @@ const configApi: ConfigApiInterface = {
    */
   async postRequest(
     query: string,
-    variables: Record<string, string> = {},
+    variables: Record<string, string> = {}
   ) {
     return executePost(
       `${query}/?t=${Date.now()}`,
       this.getProvider(),
       this.getHeaders(),
-      variables,
+      variables
     );
   },
 

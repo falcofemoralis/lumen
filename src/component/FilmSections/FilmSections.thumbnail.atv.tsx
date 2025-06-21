@@ -10,7 +10,7 @@ export const FilmSectionsThumbnail = () => {
   const { width } = calculateCardDimensions(
     NUMBER_OF_COLUMNS_TV,
     scale(ROW_GAP),
-    scale(ROW_GAP) * 2,
+    scale(ROW_GAP) * 2
   );
 
   return (
@@ -24,7 +24,7 @@ export const FilmSectionsThumbnail = () => {
         <FilmCardThumbnail
           // eslint-disable-next-line react/no-array-index-key
           key={ `film-list-thumb-col-${index}` }
-          style={ { width } }
+          width={ width }
         />
       )) }
     </View>

@@ -1,5 +1,3 @@
-import Loader from 'Component/Loader';
-import Page from 'Component/Page';
 import Thumbnail from 'Component/Thumbnail';
 import { View } from 'react-native';
 import { scale } from 'Util/CreateStyles';
@@ -7,7 +5,7 @@ import { scale } from 'Util/CreateStyles';
 import { styles } from './FilmPage.style.atv';
 
 export const FilmPageThumbnail = () => (
-  <Page>
+  <View>
     <View style={ { flexDirection: 'row' } }>
       <View style={ styles.actions }>
         { Array(5).fill(0).map((_, index) => (
@@ -26,14 +24,10 @@ export const FilmPageThumbnail = () => (
         style={ styles.poster }
       />
       <Thumbnail
-        height="100%"
+        height="50%"
         width="100%"
         style={ styles.mainInfo }
       />
     </View>
-    <Loader
-      isLoading
-      fullScreen
-    />
-  </Page>
+  </View>
 );

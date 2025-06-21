@@ -1,11 +1,12 @@
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
   container: {
     position: 'relative',
-    height: 'auto',
     width: '100%',
+    height: '100%',
+    backgroundColor: Colors.black,
   },
   video: {
     height: '100%',
@@ -59,11 +60,14 @@ export const styles = CreateStyles({
   },
   control: {
     alignSelf: 'center',
-  },
-  controlIcon: {
+    width: 40,
+    height: 40,
     backgroundColor: Colors.modal,
-    padding: 10,
     borderRadius: 50,
+  },
+  controlBig: {
+    width: 48,
+    height: 48,
   },
   durationRow: {
     marginBottom: 16,
@@ -79,9 +83,14 @@ export const styles = CreateStyles({
     flexDirection: 'column',
     gap: 4,
   },
+  action: {
+    borderRadius: 50,
+    width: 42,
+    height: 42,
+  },
   actionsRow: {
     flexDirection: 'row',
-    gap: 32,
+    gap: 24,
   },
   bottomActionsRowLine: {
     flexDirection: 'row',
@@ -154,6 +163,10 @@ export const styles = CreateStyles({
     fontWeight: '700',
   },
   longTapIcon: {
+  },
+  topActionLine: {
+    flexDirection: 'column',
+    gap: 8,
   },
 });
 

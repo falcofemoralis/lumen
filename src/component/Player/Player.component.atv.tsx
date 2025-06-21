@@ -7,16 +7,30 @@ import PlayerProgressBar from 'Component/PlayerProgressBar';
 import PlayerSubtitles from 'Component/PlayerSubtitles';
 import PlayerVideoSelector from 'Component/PlayerVideoSelector';
 import ThemedDropdown from 'Component/ThemedDropdown';
-import ThemedIcon from 'Component/ThemedIcon';
-import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedText from 'Component/ThemedText';
-import ThemedView from 'Component/ThemedView';
+import { useOverlayContext } from 'Context/OverlayContext';
+import { usePlayerContext } from 'Context/PlayerContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { VideoView } from 'expo-video';
 import t from 'i18n/t';
-import { observer } from 'mobx-react-lite';
+import {
+  Bookmark,
+  Captions,
+  CaptionsOff,
+  FastForward,
+  Gauge,
+  ListVideo,
+  MessageSquareText,
+  Pause,
+  Play,
+  Rewind,
+  SkipBack,
+  SkipForward,
+  Sparkles,
+} from 'lucide-react-native';
 import React, {
+  Ref,
   useEffect,
   useRef,
   useState,
@@ -25,14 +39,14 @@ import {
   BackHandler,
   View,
 } from 'react-native';
-import { runOnJS, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import Animated, { runOnJS, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import {
   DefaultFocus,
   SpatialNavigationFocusableView,
   SpatialNavigationNodeRef,
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
-import OverlayStore from 'Store/Overlay.store';
+import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 import { setTimeoutSafe } from 'Util/Misc';
 import RemoteControlManager from 'Util/RemoteControl/RemoteControlManager';
@@ -46,7 +60,6 @@ import {
   PLAYER_CONTROLS_TIMEOUT,
   RewindDirection,
 } from './Player.config';
-import PlayerStore from './Player.store';
 import { styles } from './Player.style.atv';
 import { PlayerComponentProps } from './Player.type';
 
@@ -83,13 +96,19 @@ export function PlayerComponent({
   openBookmarksOverlay,
   openCommentsOverlay,
 }: PlayerComponentProps) {
+  const { focusedElement, updateFocusedElement } = usePlayerContext();
+  const { currentOverlay, goToPreviousOverlay } = useOverlayContext();
   const [showControls, setShowControls] = useState(false);
   const [hideActions, setHideActions] = useState(false);
   const controlsTimeout = useRef<NodeJS.Timeout | null>(null);
-  const canHideControls = useRef(isPlaying && showControls);
   const topActionRef = useRef<SpatialNavigationNodeRef | null>(null);
   const middleActionRef = useRef<SpatialNavigationNodeRef | null>(null);
   const bottomActionRef = useRef<SpatialNavigationNodeRef | null>(null);
+  const showControlsRef = useRef(showControls);
+  const currentOverlayRef = useRef(currentOverlay);
+  const isComponentMounted = useRef(true);
+  const focusedElementRef = useRef(focusedElement);
+  const hideActionsRef = useRef(hideActions);
 
   const controlsAnimation = useAnimatedStyle(() => ({
     opacity: withTiming(
@@ -99,43 +118,41 @@ export function PlayerComponent({
         if (!showControls && hideActions && finished) {
           runOnJS(setHideActions)(false);
         }
-      },
+      }
     ),
   }));
 
-  const handleHideControls = () => {
-    canHideControls.current = isPlaying
-    && showControls
-    && !OverlayStore.currentOverlay.length;
+  const closeControls = () => {
+    setShowControls(false);
+    updateFocusedElement(FocusedElement.PROGRESS_THUMB);
+    middleActionRef.current?.focus();
   };
 
-  useEffect(() => () => {
-    if (controlsTimeout.current) {
-      clearTimeout(controlsTimeout.current);
-    }
-  }, []);
-
   useEffect(() => {
-    handleHideControls();
-  }, [isPlaying, showControls]);
-
-  useEffect(() => {
-    handleHideControls();
-
-    if (canHideControls.current) {
-      handleUserInteraction();
-    }
-  }, [OverlayStore.currentOverlay.length]);
+    currentOverlayRef.current = currentOverlay;
+    showControlsRef.current = showControls;
+    focusedElementRef.current = focusedElement;
+    hideActionsRef.current = hideActions;
+  }, [showControls, currentOverlay, focusedElement, hideActions]);
 
   useEffect(() => {
     const keyDownListener = (type: SupportedKeys) => {
-      if (!showControls) {
+      if (!isComponentMounted.current || !player || currentOverlayRef.current.length) return false;
+
+      if (type === SupportedKeys.BACKWARD) {
+        seekToPosition(0);
+        togglePlayPause(false);
+
+        return true;
+      }
+
+      if (!showControlsRef.current) {
         if (type === SupportedKeys.BACK) {
-          return false;
+          return true;
         }
 
         if (type === SupportedKeys.UP) {
-          PlayerStore.setFocusedElement(FocusedElement.TOP_ACTION);
+          updateFocusedElement(FocusedElement.TOP_ACTION);
           topActionRef.current?.focus();
         }
 
@@ -143,41 +160,69 @@ export function PlayerComponent({
           || type === SupportedKeys.LEFT
           || type === SupportedKeys.RIGHT
         ) {
-          PlayerStore.setFocusedElement(FocusedElement.PROGRESS_THUMB);
+          updateFocusedElement(FocusedElement.PROGRESS_THUMB);
           middleActionRef.current?.focus();
 
           if (type === SupportedKeys.LEFT || type === SupportedKeys.RIGHT) {
-            return true;
+            setHideActions(true);
+            setShowControls(true);
+
+            return false;
           }
         }
 
         if (type === SupportedKeys.DOWN) {
-          PlayerStore.setFocusedElement(FocusedElement.BOTTOM_ACTION);
+          updateFocusedElement(FocusedElement.BOTTOM_ACTION);
           bottomActionRef.current?.focus();
         }
 
         setShowControls(true);
 
-        return true;
+        return false;
       }
 
-      if (PlayerStore.focusedElement === FocusedElement.PROGRESS_THUMB) {
+      if (focusedElementRef.current === FocusedElement.PROGRESS_THUMB) {
         if (type === SupportedKeys.ENTER) {
           togglePlayPause();
         }
 
-        if ((type === SupportedKeys.UP || type === SupportedKeys.DOWN) && hideActions) {
+        if ((type === SupportedKeys.UP || type === SupportedKeys.DOWN) && hideActionsRef.current) {
           setHideActions(false);
+        }
+
+        if (type === SupportedKeys.LEFT || type === SupportedKeys.RIGHT) {
+          setHideActions(true);
+          setShowControls(true);
         }
       }
 
       return false;
     };
 
+    const keyUpListener = (_type: SupportedKeys) => {
+      if (!isComponentMounted.current || !player) return false;
+
+      if (controlsTimeout.current) {
+        clearTimeout(controlsTimeout.current);
+      }
+
+      controlsTimeout.current = setTimeoutSafe(() => {
+        if (!isComponentMounted.current || !player) return;
+
+        if (player.playing
+          && showControlsRef.current
+          && !currentOverlayRef.current.length
+        ) {
+          closeControls();
+        }
+      }, PLAYER_CONTROLS_TIMEOUT);
+
+      return false;
+    };
+
     const backAction = () => {
-      if (showControls) {
+      if (showControlsRef.current) {
         setShowControls(false);
-        // setHideActions(false);
 
         return true;
       }
@@ -186,41 +231,32 @@ export function PlayerComponent({
     };
 
     const remoteControlDownListener = RemoteControlManager.addKeydownListener(keyDownListener);
+    const remoteControlUpListener = RemoteControlManager.addKeyupListener(keyUpListener);
 
     const backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
-      backAction,
+      backAction
     );
 
     return () => {
-      backHandler.remove();
       RemoteControlManager.removeKeydownListener(remoteControlDownListener);
-    };
-  });
+      RemoteControlManager.removeKeyupListener(remoteControlUpListener);
+      backHandler.remove();
 
-  const setControlsTimeout = () => {
-    if (controlsTimeout.current) {
-      clearTimeout(controlsTimeout.current);
-    }
-
-    controlsTimeout.current = setTimeoutSafe(() => {
-      if (canHideControls.current) {
-        setShowControls(false);
+      isComponentMounted.current = false;
+      if (controlsTimeout.current) {
+        clearTimeout(controlsTimeout.current);
+        controlsTimeout.current = null;
       }
-    }, PLAYER_CONTROLS_TIMEOUT);
-  };
+    };
+  }, [player]);
 
-  const handleUserInteraction = (action?: () => void) => {
-    setControlsTimeout();
+  const handleOpenComments = () => {
+    openCommentsOverlay();
 
-    if (action) {
-      action();
-    }
-  };
-
-  const toggleSeekMode = () => {
-    setHideActions(true);
-    setShowControls(true);
+    setTimeout(() => {
+      closeControls();
+    }, 0);
   };
 
   const renderTitle = () => {
@@ -261,58 +297,63 @@ export function PlayerComponent({
   };
 
   const renderAction = (
-    icon: string,
-    _name: string,
+    IconComponent: React.ComponentType<any>,
     el: FocusedElement,
     action?: () => void,
-    ref?: React.LegacyRef<SpatialNavigationNodeRef>,
+    ref?: Ref<SpatialNavigationNodeRef>
   ) => (
     <SpatialNavigationFocusableView
       ref={ ref }
-      onSelect={ () => handleUserInteraction(action) }
-      onFocus={ () => handleUserInteraction(() => { PlayerStore.setFocusedElement(el); }) }
+      onSelect={ action }
+      onFocus={ () => updateFocusedElement(el) }
     >
       { ({ isFocused }) => (
-        <ThemedIcon
+        <View
           style={ [
             styles.action,
             isFocused && styles.focusedAction,
           ] }
-          icon={ {
-            name: icon,
-            pack: IconPackType.MaterialIcons,
-          } }
-          size={ scale(30) }
-          color="white"
-        />
+        >
+          <IconComponent
+            size={ scale(28) }
+            color={ Colors.white }
+          />
+        </View>
       ) }
     </SpatialNavigationFocusableView>
   );
 
   const renderTopAction = (
-    icon: string,
-    name: string,
+    icon: React.ComponentType<any>,
     action?: () => void,
-    ref?: React.LegacyRef<SpatialNavigationNodeRef>,
+    ref?: Ref<SpatialNavigationNodeRef>
   ) => renderAction(
     icon,
-    name,
     FocusedElement.TOP_ACTION,
     action,
-    ref,
+    ref
   );
 
+  const renderTopActionLine = () => {
+    return (
+      <View style={ styles.topActionLine }>
+        <ThemedText style={ styles.topActionLineText }>
+          { selectedQuality }
+        </ThemedText>
+        <PlayerClock />
+      </View>
+    );
+  };
+
   const renderBottomAction = (
-    icon: string,
-    name: string,
+    icon: React.ComponentType<any>,
     action?: () => void,
-    ref?: React.LegacyRef<SpatialNavigationNodeRef>,
+    ref?: Ref<SpatialNavigationNodeRef>
   ) => renderAction(
     icon,
-    name,
     FocusedElement.BOTTOM_ACTION,
     action,
-    ref,
+    ref
   );
 
   const renderTopActions = () => (
@@ -324,24 +365,19 @@ export function PlayerComponent({
       } }
     >
       <View style={ styles.controlsRow }>
-        { renderTopAction(
-          isPlaying || isLoading ? 'pause' : 'play-arrow',
-          'Play',
-          togglePlayPause,
-          topActionRef,
-        ) }
-        { renderTopAction('fast-rewind', 'Rewind', () => rewindPosition(RewindDirection.BACKWARD)) }
-        { renderTopAction('fast-forward', 'Forward', () => rewindPosition(RewindDirection.FORWARD)) }
+        { renderTopAction(isPlaying || isLoading ? Pause : Play, togglePlayPause, topActionRef) }
+        { renderTopAction(Rewind, () => rewindPosition(RewindDirection.BACKWARD)) }
+        { renderTopAction(FastForward, () => rewindPosition(RewindDirection.FORWARD)) }
         { film.hasSeasons && (
           <>
-            { renderTopAction('skip-previous', 'Previous', () => handleNewEpisode(RewindDirection.BACKWARD)) }
-            { renderTopAction('skip-next', 'Next', () => handleNewEpisode(RewindDirection.FORWARD)) }
+            { renderTopAction(SkipBack, () => handleNewEpisode(RewindDirection.BACKWARD)) }
+            { renderTopAction(SkipForward, () => handleNewEpisode(RewindDirection.FORWARD)) }
           </>
         ) }
-        { renderTopAction('speed', 'Speed', openSpeedSelector) }
-        { renderTopAction('comment', 'Comments', openCommentsOverlay) }
+        { renderTopAction(Gauge, openSpeedSelector) }
+        { renderTopAction(MessageSquareText, handleOpenComments) }
       </View>
-      <PlayerClock />
+      { renderTopActionLine() }
     </SpatialNavigationView>
   );
 
@@ -356,11 +392,9 @@ export function PlayerComponent({
         seekToPosition={ seekToPosition }
         thumbRef={ middleActionRef }
         onFocus={ () => {
-          PlayerStore.setFocusedElement(FocusedElement.PROGRESS_THUMB);
+          updateFocusedElement(FocusedElement.PROGRESS_THUMB);
         } }
-        toggleSeekMode={ toggleSeekMode }
         rewindPosition={ rewindPosition }
-        handleUserInteraction={ handleUserInteraction }
         togglePlayPause={ togglePlayPause }
         hideActions={ hideActions }
       />
@@ -405,10 +439,13 @@ export function PlayerComponent({
             ...(hideActions ? styles.controlsRowHidden : {}),
           } }
         >
-          { renderBottomAction('high-quality', 'Quality', openQualitySelector, bottomActionRef) }
-          { isPlaylistSelector && renderBottomAction('playlist-play', 'Series', openVideoSelector) }
-          { subtitles.length > 0 && renderBottomAction('subtitles', 'Subtitles', openSubtitleSelector) }
-          { renderBottomAction('bookmarks', 'Bookmarks', openBookmarksOverlay) }
+          { renderBottomAction(Sparkles, openQualitySelector, bottomActionRef) }
+          { isPlaylistSelector && renderBottomAction(ListVideo, openVideoSelector) }
+          { subtitles.length > 0 && renderBottomAction(
+            selectedSubtitle?.languageCode === '' ? Captions : CaptionsOff,
+            openSubtitleSelector
+          ) }
+          { renderBottomAction(Bookmark, openBookmarksOverlay) }
         </SpatialNavigationView>
         { renderDuration() }
       </View>
@@ -416,25 +453,25 @@ export function PlayerComponent({
   };
 
   const renderBackground = () => (
-    <ThemedView.Animated style={ [styles.background, controlsAnimation] }>
+    <Animated.View style={ [styles.background, controlsAnimation] }>
       <LinearGradient
         style={ styles.backgroundGradient }
         colors={ ['rgba(0, 0, 0, 0.8)', 'transparent'] }
         start={ { x: 0, y: 1 } }
         end={ { x: 0, y: 0 } }
       />
-    </ThemedView.Animated>
+    </Animated.View>
   );
 
   const renderControls = () => (
-    <ThemedView.Animated style={ [styles.controls, controlsAnimation] }>
+    <Animated.View style={ [styles.controls, controlsAnimation] }>
       { renderTopInfo() }
       { renderTopActions() }
       <DefaultFocus>
         { renderProgressBar() }
       </DefaultFocus>
       { renderBottomActions() }
-    </ThemedView.Animated>
+    </Animated.View>
   );
 
   const renderLoader = () => (
@@ -501,7 +538,7 @@ export function PlayerComponent({
   const renderCommentsOverlay = () => (
     <ThemedOverlay
       id={ commentsOverlayId }
-      onHide={ () => OverlayStore.goToPreviousOverlay() }
+      onHide={ () => goToPreviousOverlay() }
       containerStyle={ styles.commentsOverlay }
     >
       <Comments
@@ -561,4 +598,4 @@ export function PlayerComponent({
   );
 }
 
-export default observer(PlayerComponent);
+export default PlayerComponent;

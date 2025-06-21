@@ -1,9 +1,8 @@
 import ThemedText from 'Component/ThemedText';
-import ThemedView from 'Component/ThemedView';
 import { useLocalSearchParams } from 'expo-router';
 import React from 'react';
-import { StyleSheet } from 'react-native';
-import Colors from 'Style/Colors';
+import { StyleSheet, View } from 'react-native';
+import { Colors } from 'Style/Colors';
 
 export default function ErrorScreen() {
   const { code = '500', error = 'ERROR!', info } = useLocalSearchParams() as {
@@ -13,7 +12,7 @@ export default function ErrorScreen() {
   };
 
   return (
-    <ThemedView style={ styles.container }>
+    <View style={ styles.container }>
       <ThemedText style={ styles.code }>{ code.trim() }</ThemedText>
       <ThemedText style={ styles.text }>{ error.trim() }</ThemedText>
       { info && (
@@ -21,7 +20,7 @@ export default function ErrorScreen() {
           { info.trim() }
         </ThemedText>
       ) }
-    </ThemedView>
+    </View>
   );
 }
 

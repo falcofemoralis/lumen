@@ -1,12 +1,12 @@
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
   container: {
     position: 'relative',
-    backgroundColor: Colors.background,
     width: '100%',
     height: '100%',
+    backgroundColor: Colors.black,
   },
   video: {
     width: '100%',
@@ -67,17 +67,29 @@ export const styles = CreateStyles({
     alignItems: 'center',
   },
   action: {
-    padding: 8,
-    borderRadius: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 46,
+    width: 46,
   },
   focusedAction: {
+    borderRadius: 50,
     backgroundColor: Colors.whiteTransparent,
   },
   commentsOverlay: {
     width: '50%',
     height: '100%',
+    marginRight: 0,
   },
   commentsOverlayContent: {
     height: '100%',
+  },
+  topActionLine: {
+    flexDirection: 'column',
+    gap: 8,
+  },
+  topActionLineText: {
+    fontSize: 16,
+    textAlign: 'right',
   },
 });

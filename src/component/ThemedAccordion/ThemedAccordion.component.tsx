@@ -1,5 +1,6 @@
+import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
-import { TouchableOpacity, View } from 'react-native';
+import { View } from 'react-native';
 import Expandable from 'react-native-reanimated-animated-accordion';
 
 import { styles } from './ThemedAccordion.style';
@@ -16,14 +17,13 @@ export const ThemedAccordionComponent = ({
 
     return (
       <View key={ id }>
-        <TouchableOpacity
-          style={ {
-            padding: 20,
-          } }
+        <ThemedPressable
+          style={ styles.button }
+          contentStyle={ styles.buttonContent }
           onPress={ () => openAccordionGroup(id) }
         >
           <ThemedText>{ title }</ThemedText>
-        </TouchableOpacity>
+        </ThemedPressable>
         <Expandable
           expanded={ expanded[id] }
         >
@@ -34,7 +34,7 @@ export const ThemedAccordionComponent = ({
   };
 
   return (
-    <View style={ styles.container }>
+    <View>
       { data.map((group) => renderAccordionGroup(group)) }
     </View>
   );

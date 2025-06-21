@@ -1,4 +1,4 @@
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
@@ -29,6 +29,7 @@ export const styles = CreateStyles({
   },
   listContainer: {
     maxHeight: 300,
+    minWidth: 250,
     padding: 4,
     alignSelf: 'flex-end',
   },
@@ -38,11 +39,11 @@ export const styles = CreateStyles({
     justifyContent: 'center',
     alignItems: 'center',
     paddingBottom: 10,
-    borderBottomColor: Colors.gray,
+    borderBottomColor: Colors.divider,
     borderBottomWidth: 1,
   },
   headerText: {
-    color: Colors.lightGray,
+    color: Colors.textSecondary,
     fontSize: 14,
     lineHeight: 16,
     fontWeight: '500',
@@ -56,26 +57,29 @@ export const styles = CreateStyles({
     alignItems: 'center',
     padding: 10,
     marginBlock: 5,
-    borderRadius: 12,
   },
   itemFocused: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.backgroundFocused,
+    borderRadius: 12,
   },
   itemSelected: {
     backgroundColor: Colors.primary,
   },
   text: {
-    color: Colors.white,
+    color: Colors.text,
     fontSize: 14,
     lineHeight: 20,
     fontWeight: '500',
   },
   textFocused: {
-    color: Colors.black,
+    color: Colors.textFocused,
   },
   textSelected: {
-    color: Colors.lightBlue,
+    color: Colors.textOnPrimary,
   },
   iconSelected: {
+  },
+  scrollView: {
+    flex: 0,
   },
 });

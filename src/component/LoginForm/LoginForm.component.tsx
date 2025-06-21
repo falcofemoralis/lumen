@@ -1,11 +1,12 @@
+import InfoBlock from 'Component/InfoBlock';
 import Loader from 'Component/Loader';
 import ThemedButton from 'Component/ThemedButton';
-import ThemedInfo from 'Component/ThemedInfo';
 import ThemedInput from 'Component/ThemedInput';
 import { router } from 'expo-router';
 import t from 'i18n/t';
 import { useRef } from 'react';
 import { View } from 'react-native';
+import RouterStore from 'Store/Router.store';
 
 import { styles } from './LoginForm.style';
 import { LoginFormComponentProps } from './LoginForm.type';
@@ -13,16 +14,25 @@ import { LoginFormComponentProps } from './LoginForm.type';
 export function LoginFormComponent({
   isLoading,
   withRedirect,
-  login,
+  style,
+  handleLogin,
 }: LoginFormComponentProps) {
   const loginRef = useRef({ username: '', password: '' });
+
+  const openForm = () => {
+    router.push({ pathname: '/modal' });
+    RouterStore.pushData('modal', {
+      type: 'login',
+    });
+  };
 
   const renderForm = () => {
     if (withRedirect) {
       return (
         <ThemedButton
-          style={ styles.form }
-          onPress={ () => router.navigate('/(tabs)/(account)') }
+          style={ styles.modalButton }
+          contentStyle={ styles.modalButtonContent }
+          onPress={ openForm }
         >
           { t('Go to login page') }
         </ThemedButton>
@@ -40,12 +50,13 @@ export function LoginFormComponent({
           style={ styles.input }
           placeholder={ t('Password') }
           onChangeText={ (text) => { loginRef.current.password = text; } }
+          secureTextEntry
         />
         <ThemedButton
           style={ styles.button }
-          onPress={ () => login(
+          onPress={ () => handleLogin(
             loginRef.current.username,
-            loginRef.current.password,
+            loginRef.current.password
           ) }
         >
           { t('Sign in') }
@@ -58,12 +69,18 @@ export function LoginFormComponent({
     );
   };
 
-  return (
-    <View style={ styles.container }>
-      <ThemedInfo
+  const renderInfoBlock = () => {
+    return (
+      <InfoBlock
         title={ t('You are not logged in') }
         subtitle={ t('Sign in to sync content') }
       />
+    );
+  };
+
+  return (
+    <View style={ [styles.container, withRedirect && styles.redirectContainer, style] }>
+      { renderInfoBlock() }
       { renderForm() }
     </View>
   );

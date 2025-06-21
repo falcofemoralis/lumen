@@ -20,7 +20,7 @@ export const FilmSectionsThumbnail = () => {
         <FilmCardThumbnail
           // eslint-disable-next-line react/no-array-index-key
           key={ `film-list-thumb-col-${index}` }
-          style={ { width } }
+          width={ width }
         />
       )) }
     </View>

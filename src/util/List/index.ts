@@ -6,10 +6,10 @@ export const calculateRows = <T, >(list: T[], numberOfColumns: number) => {
   });
 
   const rows: T[][] = [];
-  // eslint-disable-next-line no-plusplus
+
   for (let i = 0; i < columns[0].length; i++) {
     const row: T[] = [];
-    // eslint-disable-next-line no-plusplus
+
     for (let j = 0; j < numberOfColumns; j++) {
       if (columns[j][i] !== undefined) {
         row.push(columns[j][i]);

@@ -1,19 +1,38 @@
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
+import { CONTENT_WRAPPER_PADDING } from 'Style/Layout';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
-  topActions: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignContent: 'center',
+  upperContent: {
+    width: '100%',
+    backgroundColor: Colors.fade,
+  },
+  middleContent: {
+    width: '100%',
+    backgroundColor: Colors.fade,
+  },
+  bottomContent: {
     width: '100%',
   },
-  topActionsButton: {
+  upperContentWrapper: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: 32,
-    margin: 8,
+    gap: 16,
+    marginTop: 16,
+  },
+  upperContentInfo: {
+    flex: 1,
+  },
+  mainContent: {
+    backgroundColor: Colors.background,
+  },
+  posterBackground: {
+    aspectRatio: '166 / 250',
+    width: '100%',
+    position: 'absolute',
+  },
+  posterWrapper: {
+    width: '40%',
+    aspectRatio: '166 / 250',
   },
   title: {
     fontSize: 20,
@@ -21,7 +40,7 @@ export const styles = CreateStyles({
   },
   originalTitle: {
     fontSize: 16,
-    color: Colors.lightGray,
+    color: Colors.textSecondary,
   },
   genres: {
     flexDirection: 'row',
@@ -29,19 +48,17 @@ export const styles = CreateStyles({
     marginTop: 8,
   },
   genre: {
-    backgroundColor: Colors.gray,
+    backgroundColor: Colors.chip,
     borderRadius: 8,
+  },
+  genreContent: {
     padding: 4,
   },
-  mainContent: {
-    flexDirection: 'row',
-    gap: 12,
-    marginTop: 16,
-  },
-  posterWrapper: {
-    width: '40%',
-    aspectRatio: '166 / 250',
-    borderRadius: 16,
+  backgroundGradient: {
+    height: '100%',
+    width: '100%',
+    position: 'absolute',
+    zIndex: 1,
   },
   poster: {
     height: '100%',
@@ -49,9 +66,6 @@ export const styles = CreateStyles({
     borderRadius: 16,
   },
   mainInfo: {
-    marginTop: -8,
-    justifyContent: 'flex-start',
-    width: '55%',
   },
   rating: {
     marginTop: 8,
@@ -81,45 +95,62 @@ export const styles = CreateStyles({
   },
   collectionButton: {
     borderRadius: 8,
+    backgroundColor: Colors.chip,
+  },
+  collectionButtonContent: {
     paddingHorizontal: 6,
     paddingVertical: 1,
-    backgroundColor: Colors.gray,
   },
   collectionButtonText: {
     fontSize: 14,
     lineHeight: 20,
+    color: Colors.chipText,
   },
   playBtn: {
-    width: '100%',
+    flex: 1,
     backgroundColor: Colors.secondary,
     marginBlockStart: 16,
   },
-  actions: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 16,
-    gap: 16,
+  downloadBtn: {
+    backgroundColor: Colors.backgroundLight,
+    borderRadius: 50,
+    width: 40,
+    height: 40,
   },
-  action: {
-    flex: 1,
+  downloadBtnIcon: {
+  },
+  middleActions: {
     flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    paddingTop: 16,
+    gap: 6,
+    zIndex: 10,
+  },
+  middleAction: {
+    flex: 1,
+    borderRadius: 50,
+    padding: 4,
+    flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 8,
-    backgroundColor: Colors.gravel,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: Colors.lightGravel,
-    padding: 8,
+    gap: 4,
   },
-  actionIcon: {
-
+  middleActionButton: {
+    backgroundColor: Colors.whiteTransparent,
+    width: 44,
+    height: 44,
+    borderRadius: 100,
   },
-  actionText: {
-
+  middleActionIcon: {
+    margin: 8,
+  },
+  middleActionText: {
+    fontSize: 12,
+    textAlign: 'center',
   },
   description: {
-    color: Colors.lightGray,
+    color: Colors.textSecondary,
     fontSize: 16,
     marginTop: 16,
     textAlign: 'justify',
@@ -150,6 +181,9 @@ export const styles = CreateStyles({
   sectionHeading: {
     fontSize: 20,
     fontWeight: '700',
+  },
+  sectionHeadingWrapper: {
+    paddingHorizontal: CONTENT_WRAPPER_PADDING,
   },
   sectionContent: {
     marginTop: 8,
@@ -195,11 +229,10 @@ export const styles = CreateStyles({
     justifyContent: 'space-between',
     width: '100%',
     gap: 8,
-    padding: 8,
+    padding: 12,
+    marginVertical: 4,
     borderRadius: 16,
-  },
-  scheduleItemEven: {
-    backgroundColor: Colors.darkGray,
+    backgroundColor: Colors.backgroundLight,
   },
   scheduleItemInfoWrapper: {
     flexDirection: 'column',
@@ -227,8 +260,10 @@ export const styles = CreateStyles({
     textAlign: 'center',
   },
   scheduleItemMarkIcon: {
-    width: 32,
+    width: 40,
+    height: 40,
     alignSelf: 'center',
+    borderRadius: 100,
   },
   scheduleSeason: {
     fontSize: 18,
@@ -238,10 +273,15 @@ export const styles = CreateStyles({
     borderBottomWidth: 1,
   },
   scheduleViewAll: {
-    marginTop: 16,
-    backgroundColor: Colors.gray,
+    marginTop: 4,
+    backgroundColor: Colors.button,
   },
   franchiseList: {
+  },
+  franchiseItemButton: {
+  },
+  franchiseItemButtonContent: {
+    paddingHorizontal: CONTENT_WRAPPER_PADDING,
   },
   franchiseItem: {
     flexDirection: 'row',
@@ -260,13 +300,15 @@ export const styles = CreateStyles({
   infoListHeader: {
     fontSize: 16,
     paddingBottom: 8,
+    paddingHorizontal: CONTENT_WRAPPER_PADDING,
   },
-  infoList: {
+  infoListItem: {
+  },
+  infoListItemContent: {
+    width: '100%',
     padding: 8,
-    borderRadius: 8,
-  },
-  infoListEven: {
-    backgroundColor: Colors.darkGray,
+    paddingHorizontal: CONTENT_WRAPPER_PADDING,
+    justifyContent: 'flex-start',
   },
   infoListName: {
   },
@@ -277,5 +319,27 @@ export const styles = CreateStyles({
   commentsWrapper: {
     width: '100%',
     height: '100%',
+  },
+  ratings: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 16,
+    marginBottom: 8,
+  },
+  featuredRating: {
+    flexDirection: 'row',
+    gap: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 8,
+  },
+  featuredRatingText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: Colors.black,
+    backgroundColor: 'yellow',
+    padding: 4,
+    borderRadius: 16,
   },
 });

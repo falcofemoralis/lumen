@@ -5,7 +5,7 @@ import ThemedCardComponentTV from './ThemedCard.component.atv';
 import { ThemedCardContainerProps } from './ThemedCard.type';
 
 export const ThemedCardContainer = (
-  props: ThemedCardContainerProps,
+  props: ThemedCardContainerProps
 ) => withTV(ThemedCardComponentTV, ThemedCardComponent, props);
 
 export default ThemedCardContainer;

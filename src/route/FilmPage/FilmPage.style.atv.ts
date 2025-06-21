@@ -1,4 +1,4 @@
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
@@ -35,12 +35,12 @@ export const styles = CreateStyles({
     fontSize: 24,
     lineHeight: 32,
     fontWeight: '700',
-    color: Colors.white,
+    color: Colors.text,
   },
   originalTitle: {
     fontSize: 16,
     lineHeight: 16,
-    color: Colors.lightGray,
+    color: Colors.textSecondary,
     opacity: 0.6,
     marginTop: 4,
   },
@@ -88,6 +88,7 @@ export const styles = CreateStyles({
     borderRadius: 8,
     paddingHorizontal: 8,
     paddingVertical: 2,
+    backgroundColor: Colors.chip,
   },
   collectionButtonText: {
     fontSize: 12,
@@ -126,11 +127,11 @@ export const styles = CreateStyles({
   },
   actor: {
     width: 90,
-    borderRadius: 12,
     paddingBottom: 4,
   },
   actorFocused: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.backgroundFocused,
+    borderRadius: 12,
   },
   actorPhoto: {
     height: 130,
@@ -146,7 +147,7 @@ export const styles = CreateStyles({
     textAlign: 'center',
   },
   actorNameFocused: {
-    color: Colors.black,
+    color: Colors.textFocused,
   },
   director: {
     position: 'absolute',
@@ -173,13 +174,13 @@ export const styles = CreateStyles({
     width: '100%',
     gap: 8,
     padding: 16,
+    marginVertical: 4,
     borderRadius: 16,
+    backgroundColor: Colors.button,
   },
   scheduleItemFocused: {
-    backgroundColor: Colors.white,
-  },
-  scheduleItemEven: {
-    backgroundColor: Colors.darkGray,
+    backgroundColor: Colors.backgroundFocused,
+    borderRadius: 16,
   },
   scheduleItemInfoWrapper: {
     flexDirection: 'column',
@@ -200,7 +201,7 @@ export const styles = CreateStyles({
     fontSize: 14,
   },
   scheduleItemTextFocused: {
-    color: Colors.black,
+    color: Colors.textFocused,
   },
   scheduleItemEpisodeName: {
   },
@@ -222,16 +223,17 @@ export const styles = CreateStyles({
     marginBottom: 4,
   },
   scheduleViewAll: {
-    marginTop: 16,
+    marginTop: 4,
     width: '25%',
   },
   scheduleOverlay: {
     width: '50%',
-    height: '90%',
   },
   scheduleOverlayContent: {
     flexDirection: 'row',
-    height: '100%',
+  },
+  scheduleAccordionOverlay: {
+    flexGrow: 1,
   },
   franchiseList: {
   },
@@ -242,7 +244,7 @@ export const styles = CreateStyles({
     paddingInline: 8,
   },
   franchiseItemFocused: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.backgroundFocused,
     borderRadius: 8,
   },
   franchiseName: {
@@ -252,25 +254,25 @@ export const styles = CreateStyles({
     fontSize: 14,
   },
   franchiseTextFocused: {
-    color: Colors.black,
+    color: Colors.textFocused,
   },
   franchiseSelected: {
     color: Colors.secondary,
   },
   infoList: {
     padding: 8,
-    borderRadius: 8,
-  },
-  infoListEven: {
-    backgroundColor: Colors.darkGray,
   },
   infoListFocused: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.backgroundFocused,
+    borderRadius: 8,
   },
   infoListName: {
   },
   infoListNameFocused: {
-    color: Colors.black,
+    color: Colors.textFocused,
+  },
+  infoListAccordionOverlay: {
+    flex: 0,
   },
   relatedListWrapper: {
     flexDirection: 'row',
@@ -293,5 +295,11 @@ export const styles = CreateStyles({
   },
   commentsOverlayContent: {
     height: '100%',
+  },
+  descriptionOverlay: {
+    width: '80%',
+  },
+  descriptionOverlayText: {
+    fontSize: 16,
   },
 });

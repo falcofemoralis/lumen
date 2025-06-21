@@ -91,5 +91,12 @@
   "Welcome back, %s!": "Добро пожаловать, %s!",
   "Toggle time share. It will consume more data.": "Включить time share. Это увеличит расход трафика.",
   "Yes": "Да",
-  "No": "Нет"
+  "No": "Нет",
+  "Press back again to exit": "Нажмите назад еще раз, чтобы выйти",
+  "Login": "Авторизация",
+  "Movie": "Фильм",
+  "Series": "Сериал",
+  "Cartoon": "Мультфильм",
+  "Anime": "Аниме",
+  "TV Show": "Телешоу"
 }

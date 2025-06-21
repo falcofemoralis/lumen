@@ -1,4 +1,4 @@
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import { calculateItemWidth } from 'Style/Layout';
 import CreateStyles, { scale } from 'Util/CreateStyles';
 
@@ -14,7 +14,7 @@ export const FOCUSED_SCALE = 1.1;
 export const calculateCardDimensions = (
   numberOfColumns: number,
   gap?: number,
-  additionalWidth?: number,
+  additionalWidth?: number
 ): FilmCardDimensions => {
   const width = calculateItemWidth(numberOfColumns, gap, additionalWidth);
 
@@ -34,6 +34,12 @@ export const styles = CreateStyles({
     flex: 1,
     flexDirection: 'column',
     width: '100%',
+    transform: [{ scale: 1 }],
+    transitionProperty: 'transform',
+    transitionDuration: '250ms',
+  },
+  cardFocused: {
+    transform: [{ scale: 1.1 }],
   },
   posterWrapper: {
     width: '100%',
@@ -52,22 +58,22 @@ export const styles = CreateStyles({
     paddingVertical: INFO_PADDING_VERTICAL,
   },
   infoFocused: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.buttonFocused,
   },
   title: {
     fontSize: 12,
     fontWeight: '700',
-    color: Colors.white,
+    color: Colors.text,
   },
   titleFocused: {
-    color: Colors.darkGray,
+    color: Colors.textFocused,
   },
   subtitle: {
     fontSize: 10,
-    color: Colors.lightGray,
+    color: Colors.textSecondary,
   },
   subtitleFocused: {
-    color: Colors.darkGray,
+    color: Colors.textFocused,
   },
   typeText: {
     position: 'absolute',
@@ -83,5 +89,8 @@ export const styles = CreateStyles({
     left: 0,
     paddingHorizontal: 4,
     paddingVertical: 1,
+  },
+  posterPendingRelease: {
+    opacity: 0.5,
   },
 });

@@ -1,3 +1,4 @@
+import { useServiceContext } from 'Context/ServiceContext';
 import * as Application from 'expo-application';
 import { withTV } from 'Hooks/withTV';
 import t from 'i18n/t';
@@ -5,7 +6,6 @@ import { useState } from 'react';
 import { Linking } from 'react-native';
 import ConfigStore from 'Store/Config.store';
 import NotificationStore from 'Store/Notification.store';
-import ServiceStore from 'Store/Service.store';
 
 import SettingsPageComponent from './SettingsPage.component';
 import SettingsPageComponentTV from './SettingsPage.component.atv';
@@ -13,7 +13,13 @@ import { GITHUB_LINK } from './SettingsPage.config';
 import { SETTING_TYPE, SettingItem } from './SettingsPage.type';
 
 export function SettingsPageContainer() {
-  const currentService = ServiceStore.getCurrentService();
+  const {
+    getCurrentService,
+    updateProvider,
+    updateCDN,
+    updateUserAgent,
+  } = useServiceContext();
+  const currentService = getCurrentService();
 
   const [settings, setSettings] = useState<SettingItem[]>([
     {
@@ -82,20 +88,20 @@ export function SettingsPageContainer() {
     try {
       switch (id) {
         case 'provider':
-          await ServiceStore.updateProvider(value);
+          await updateProvider(value);
           break;
         case 'cdn':
-          await ServiceStore.updateCDN(value);
+          await updateCDN(value);
           break;
         case 'userAgent':
-          ServiceStore.updateUserAgent(value);
+          updateUserAgent(value);
           break;
         case 'github':
           Linking.openURL(GITHUB_LINK);
 
           return true;
         default:
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
           ConfigStore.updateConfig(id as any, value);
           break;
       }

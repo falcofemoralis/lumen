@@ -1,4 +1,4 @@
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
@@ -12,7 +12,7 @@ export const styles = CreateStyles({
     backgroundColor: Colors.secondary,
   },
   textStyle: {
-    color: Colors.white,
+    color: Colors.text,
     fontSize: 12,
     paddingVertical: 0,
   },

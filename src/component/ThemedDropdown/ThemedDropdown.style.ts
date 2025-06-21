@@ -1,11 +1,17 @@
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
+
+const MAX_ITEMS_TO_DISPLAY = 6;
+const ITEM_HEIGHT = 48;
 
 export const styles = CreateStyles({
   input: {
-    backgroundColor: Colors.gray,
+    backgroundColor: Colors.backgroundLighter,
+  },
+  inputContent: {
     justifyContent: 'flex-start',
-    gap: 4,
+    gap: 8,
+    padding: 8,
   },
   inputIcon: {
   },
@@ -16,15 +22,15 @@ export const styles = CreateStyles({
     width: 20,
     alignSelf: 'center',
   },
-  container: {
+  overlay: {
     padding: 8,
   },
-  contentContainer: {
-    maxHeight: 300,
+  overlayContent: {
   },
   item: {
     paddingHorizontal: 12,
-    height: 48,
+    height: ITEM_HEIGHT,
+    flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -32,7 +38,7 @@ export const styles = CreateStyles({
   itemLabel: {
     flex: 1,
     fontSize: 16,
-    color: Colors.white,
+    color: Colors.text,
   },
   icon: {
     marginRight: 5,
@@ -40,29 +46,31 @@ export const styles = CreateStyles({
     width: 20,
   },
   listContainer: {
-    height: '100%',
+    flexDirection: 'column',
   },
   listHeader: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 8,
-    borderBottomColor: Colors.gray,
+    marginBottom: 8,
+    borderBottomColor: Colors.divider,
     borderBottomWidth: 1,
   },
   listHeaderText: {
-    color: Colors.lightGray,
+    color: Colors.text,
     fontSize: 16,
     lineHeight: 16,
     fontWeight: '500',
   },
   listItems: {
-    marginTop: 8,
-    flex: 1,
     flexDirection: 'column',
+    maxHeight: MAX_ITEMS_TO_DISPLAY * ITEM_HEIGHT - 8,
   },
   listItem: {
     borderRadius: 16,
+  },
+  listItemContent: {
   },
   listItemSelected: {
     backgroundColor: Colors.primary,

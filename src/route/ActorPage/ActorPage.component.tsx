@@ -2,6 +2,7 @@ import FilmSections from 'Component/FilmSections';
 import Page from 'Component/Page';
 import ThemedImageModal from 'Component/ThemedImageModal';
 import ThemedText from 'Component/ThemedText';
+import Wrapper from 'Component/Wrapper';
 import React from 'react';
 import { View } from 'react-native';
 
@@ -108,7 +109,9 @@ export function ActorPageComponent({
 
   return (
     <Page>
-      { renderRoles() }
+      <Wrapper>
+        { renderRoles() }
+      </Wrapper>
     </Page>
   );
 }

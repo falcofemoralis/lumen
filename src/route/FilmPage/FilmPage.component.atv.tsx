@@ -6,13 +6,13 @@ import PlayerVideoSelector from 'Component/PlayerVideoSelector';
 import ThemedAccordion from 'Component/ThemedAccordion';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedCard from 'Component/ThemedCard';
-import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedText from 'Component/ThemedText';
-import ThemedView from 'Component/ThemedView';
+import { useOverlayContext } from 'Context/OverlayContext';
 import t from 'i18n/t';
-import { useState } from 'react';
+import { Bookmark, Clapperboard, Clock, MessageSquareText, Play } from 'lucide-react-native';
+import React, { useState } from 'react';
 import { Dimensions, View } from 'react-native';
 import {
   DefaultFocus,
@@ -21,9 +21,9 @@ import {
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
 import NotificationStore from 'Store/Notification.store';
-import OverlayStore from 'Store/Overlay.store';
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import { CollectionItemInterface } from 'Type/CollectionItem';
+import { FilmInterface } from 'Type/Film.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { scale } from 'Util/CreateStyles';
 
@@ -41,18 +41,22 @@ export function FilmPageComponent({
   scheduleOverlayId,
   commentsOverlayId,
   bookmarksOverlayId,
+  descriptionOverlayId,
   playFilm,
   hideVideoSelector,
   handleVideoSelect,
   handleSelectFilm,
   handleSelectActor,
   handleSelectCategory,
+  openBookmarks,
+  handleUpdateScheduleWatch,
 }: FilmPageComponentProps) {
   const { height } = Dimensions.get('window');
+  const { openOverlay, goToPreviousOverlay } = useOverlayContext();
   const [showReadMore, setShowReadMore] = useState<boolean | null>(null);
 
   if (!film) {
-    return <FilmPageThumbnail />;
+    film = null as unknown as FilmInterface; // dirty hack to avoid null checks
   }
 
   const shouldShowReadMore = (content: number) => {
@@ -61,18 +65,23 @@ export function FilmPageComponent({
     setShowReadMore(percent > 45);
   };
 
-  const renderAction = (text: string, icon: string, onPress?: () => void) => (
+  const openNotImplemented = () => {
+    NotificationStore.displayMessage(t('Not implemented'));
+  };
+
+  const renderAction = (
+    IconComponent: React.ComponentType<any>,
+    text: string,
+    onPress?: () => void
+  ) => (
     <SpatialNavigationFocusableView>
       <ThemedButton
         variant="outlined"
         onPress={ onPress }
-        icon={ {
-          name: icon,
-          pack: IconPackType.MaterialCommunityIcons,
-        } }
+        IconComponent={ IconComponent }
+        iconProps={ { size: scale(18) } }
         style={ styles.actionButton }
         textStyle={ styles.actionButtonText }
-        iconStyle={ styles.actionButtonIcon }
         disableRootActive
       >
         { text }
@@ -85,26 +94,27 @@ export function FilmPageComponent({
 
     if (isPendingRelease) {
       return renderAction(
+        Clock,
         t('Coming Soon'),
-        'clock-outline',
         () => {
           NotificationStore.displayMessage(t('We are waiting for the film in the good quality'));
-        },
+        }
       );
     }
 
-    return renderAction(t('Watch Now'), 'play-outline', playFilm);
+    return renderAction(Play, t('Watch Now'), playFilm);
   };
 
   const renderActions = () => (
     <SpatialNavigationView direction="horizontal">
       <DefaultFocus>
-        <ThemedView style={ styles.actions }>
+        <View style={ styles.actions }>
           { renderPlayButton() }
-          { renderAction(t('Comments'), 'comment-text-multiple-outline', () => OverlayStore.openOverlay(commentsOverlayId)) }
-          { renderAction(t('Bookmark'), 'movie-star-outline', () => OverlayStore.openOverlay(bookmarksOverlayId)) }
-          { renderAction(t('Trailer'), 'movie-open-check-outline') }
-        </ThemedView>
+          { renderAction(MessageSquareText, t('Comments'), () => openOverlay(commentsOverlayId)) }
+          { renderAction(Bookmark, t('Bookmark'), openBookmarks) }
+          { renderAction(Clapperboard, t('Trailer'), openNotImplemented) }
+          { /* { renderAction(Download, t('Download'), openNotImplemented) } */ }
+        </View>
       </DefaultFocus>
     </SpatialNavigationView>
   );
@@ -183,7 +193,7 @@ export function FilmPageComponent({
   const renderCollection = (
     collection: CollectionItemInterface[],
     title: string,
-    handler?: (link: string) => void,
+    handler?: (link: string) => void
   ) => (
     <View style={ styles.collectionContainer }>
       <ThemedText style={ styles.collectionTitle }>
@@ -255,7 +265,7 @@ export function FilmPageComponent({
               !showReadMore && styles.readMoreButtonHidden,
             ] }
           >
-            <ThemedButton>
+            <ThemedButton onPress={ () => openOverlay(descriptionOverlayId) }>
               { t('Read more') }
             </ThemedButton>
           </View>
@@ -357,35 +367,30 @@ export function FilmPageComponent({
   const renderScheduleOverlay = () => {
     const { schedule = [] } = film;
 
+    const data = schedule.map(({ name, items }) => ({
+      id: name,
+      title: name,
+      items,
+    }));
+
     return (
       <ThemedOverlay
         id={ scheduleOverlayId }
-        onHide={ () => OverlayStore.goToPreviousOverlay() }
+        onHide={ () => goToPreviousOverlay() }
         containerStyle={ styles.scheduleOverlay }
         contentContainerStyle={ styles.scheduleOverlayContent }
       >
-        <SpatialNavigationScrollView
-          offsetFromStart={ scale(32) }
-        >
-          <DefaultFocus>
-            { schedule.map(({ name, items }) => (
-              <View key={ name }>
-                <ThemedText style={ styles.scheduleSeason }>
-                  { name }
-                </ThemedText>
-                <View>
-                  { items.map((subItem, idx) => (
-                    <ScheduleItem
-                      key={ `modal-${subItem.name}` }
-                      item={ subItem }
-                      idx={ idx }
-                    />
-                  )) }
-                </View>
-              </View>
-            )) }
-          </DefaultFocus>
-        </SpatialNavigationScrollView>
+        <ThemedAccordion
+          data={ data }
+          overlayContent={ styles.scheduleAccordionOverlay }
+          renderItem={ (subItem) => (
+            <ScheduleItem
+              key={ `modal-${subItem.name}` }
+              item={ subItem }
+              handleUpdateScheduleWatch={ handleUpdateScheduleWatch }
+            />
+          ) }
+        />
       </ThemedOverlay>
     );
   };
@@ -409,7 +414,7 @@ export function FilmPageComponent({
                   <ScheduleItem
                     key={ `visible-${item.name}` }
                     item={ item }
-                    idx={ idx }
+                    handleUpdateScheduleWatch={ handleUpdateScheduleWatch }
                   />
                 )) }
               </View>
@@ -417,7 +422,7 @@ export function FilmPageComponent({
           </SpatialNavigationScrollView>
         </View>
         <ThemedButton
-          onPress={ () => OverlayStore.openOverlay(scheduleOverlayId) }
+          onPress={ () => openOverlay(scheduleOverlayId) }
           style={ styles.scheduleViewAll }
         >
           { t('View full schedule') }
@@ -479,11 +484,11 @@ export function FilmPageComponent({
       <Section title={ t('Included in') }>
         <ThemedAccordion
           data={ data }
-          renderItem={ (subItem, idx) => (
+          overlayContent={ styles.infoListAccordionOverlay }
+          renderItem={ (subItem) => (
             <InfoList
               key={ `info-list-${subItem.name}` }
               list={ subItem }
-              idx={ idx }
               handleSelectCategory={ handleSelectCategory }
             />
           ) }
@@ -509,6 +514,7 @@ export function FilmPageComponent({
               { related.map((item) => (
                 <RelatedItem
                   key={ item.link }
+                  film={ film }
                   item={ item }
                   handleSelectFilm={ handleSelectFilm }
                 />
@@ -523,7 +529,7 @@ export function FilmPageComponent({
   const renderCommentsOverlay = () => (
     <ThemedOverlay
       id={ commentsOverlayId }
-      onHide={ () => OverlayStore.goToPreviousOverlay() }
+      onHide={ () => goToPreviousOverlay() }
       containerStyle={ styles.commentsOverlay }
     >
       <Comments
@@ -540,17 +546,34 @@ export function FilmPageComponent({
     />
   );
 
+  const renderDescriptionOverlay = () => (
+    <ThemedOverlay
+      id={ descriptionOverlayId }
+      onHide={ () => goToPreviousOverlay() }
+      containerStyle={ styles.descriptionOverlay }
+    >
+      <ThemedText style={ styles.descriptionOverlayText }>
+        { film.description }
+      </ThemedText>
+    </ThemedOverlay>
+  );
+
   const renderModals = () => (
     <>
       { renderPlayerVideoSelector() }
       { renderScheduleOverlay() }
       { renderBookmarksOverlay() }
       { renderCommentsOverlay() }
+      { renderDescriptionOverlay() }
     </>
   );
 
-  return (
-    <Page testID="film-page">
+  const renderContent = () => {
+    if (!film) {
+      return <FilmPageThumbnail />;
+    }
+
+    return (
       <SpatialNavigationScrollView offsetFromStart={ height / 2.1 }>
         <View>
           { renderModals() }
@@ -563,6 +586,12 @@ export function FilmPageComponent({
           { renderRelated() }
         </View>
       </SpatialNavigationScrollView>
+    );
+  };
+
+  return (
+    <Page testID="film-page">
+      { renderContent() }
     </Page>
   );
 }

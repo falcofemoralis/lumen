@@ -20,11 +20,9 @@ export interface FilmPagerContainerProps {
 
 export interface FilmPagerComponentProps {
   pagerItems: PagerItemInterface[];
-  selectedPagerItem: PagerItemInterface;
-  isLoading: boolean;
   gridStyle?: StyleProp<ViewStyle>;
-  onNextLoad: (isRefresh: boolean) => Promise<void>;
-  handleMenuItemChange: (pagerItem: PagerItemInterface) => void;
+  onNextLoad: (isRefresh: boolean, item: PagerItemInterface) => Promise<void>;
+  onPreLoad: (item: PagerItemInterface) => void;
   onRowFocus?: (row: number) => void;
 }
 

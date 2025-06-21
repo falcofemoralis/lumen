@@ -1,4 +1,5 @@
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
+import { CONTENT_WRAPPER_PADDING } from 'Style/Layout';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
@@ -12,36 +13,31 @@ export const styles = CreateStyles({
     gap: 12,
   },
   actionBtn: {
-    width: 32,
-    height: 32,
-    backgroundColor: Colors.gray,
+    width: 36,
+    height: 36,
+    backgroundColor: Colors.button,
     borderRadius: 99,
     padding: 0,
   },
   actionBtnIcon: {
-    height: 18,
-    width: 18,
   },
   searchBarContainer: {
     flex: 1,
   },
   closeBtn: {
     position: 'absolute',
-    right: 8,
-    width: 20,
-    height: '100%',
+    right: 0,
+    width: 36,
+    height: 36,
     zIndex: 15,
-    backgroundColor: Colors.gray,
+    backgroundColor: Colors.button,
+    borderRadius: 50,
   },
   closeIcon: {
-    width: 20,
-    height: 20,
   },
   searchBar: {
     width: '100%',
-    height: 32,
-    backgroundColor: Colors.gray,
-    color: Colors.white,
+    height: 36,
   },
   searchBarOutline: {
     borderRadius: 24,
@@ -52,7 +48,11 @@ export const styles = CreateStyles({
   },
   suggestion: {
     flexDirection: 'row',
-    padding: 12,
+  },
+  suggestionContent: {
+    flexDirection: 'row',
+    paddingVertical: 12,
+    paddingHorizontal: CONTENT_WRAPPER_PADDING,
     gap: 20,
   },
   suggestionIcon: {

@@ -1,4 +1,4 @@
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import CreateStyles, { scale } from 'Util/CreateStyles';
 
 export const ITEM_ELEMENTS_HEIGHT = scale(20) * 2;
@@ -24,7 +24,7 @@ export const styles = CreateStyles({
     paddingBottom: BOTTOM_PADDING,
   },
   itemFocused: {
-    backgroundColor: Colors.gray,
+    backgroundColor: Colors.backgroundLighter,
   },
   itemEven: {
   },
@@ -35,7 +35,7 @@ export const styles = CreateStyles({
   },
   comment: {
     flexDirection: 'column',
-    backgroundColor: Colors.darkGray,
+    backgroundColor: Colors.button,
     borderRadius: 12,
     padding: ITEM_PADDING,
   },
@@ -50,7 +50,7 @@ export const styles = CreateStyles({
   },
   commentTextSmall: {
     fontSize: 13,
-    color: Colors.lightGray,
+    color: Colors.textSecondary,
   },
   commentTextFocused: {
   },
@@ -66,8 +66,8 @@ export const styles = CreateStyles({
     alignItems: 'center',
   },
   spoiler: {
-    backgroundColor: Colors.gray,
-    color: Colors.gray,
+    backgroundColor: Colors.backgroundLight,
+    color: Colors.backgroundLight,
   },
   textFocused: {
   },
@@ -89,7 +89,7 @@ export const styles = CreateStyles({
     alignItems: 'center',
   },
   noCommentsText: {
-    color: Colors.white,
+    color: Colors.text,
     fontSize: 16,
     textAlign: 'center',
   },

@@ -1,17 +1,16 @@
 import ThemedButton from 'Component/ThemedButton';
-import ThemedIcon from 'Component/ThemedIcon';
-import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedOverlay from 'Component/ThemedOverlay';
-import React, { memo, useCallback, useRef } from 'react';
+import { useOverlayContext } from 'Context/OverlayContext';
+import { Plus } from 'lucide-react-native';
+import React, { memo, useCallback, useEffect, useRef } from 'react';
 import { Text, View } from 'react-native';
 import {
+  DefaultFocus,
   SpatialNavigationFocusableView,
   SpatialNavigationVirtualizedList,
   SpatialNavigationVirtualizedListRef,
 } from 'react-tv-space-navigation';
-import OverlayStore from 'Store/Overlay.store';
-import { scale } from 'Util/CreateStyles';
 import { generateId } from 'Util/Math';
 
 import { styles } from './ThemedDropdown.style.atv';
@@ -28,16 +27,21 @@ export const ThemedDropdownComponent = ({
   style,
   onChange,
 }: ThemedDropdownComponentProps) => {
+  const { currentOverlay, openOverlay, goToPreviousOverlay, isOverlayOpened } = useOverlayContext();
   const overlayId = useRef(overlayIdProp ?? generateId());
   const scrollViewRef = useRef<SpatialNavigationVirtualizedListRef>(null);
 
-  const handleLayout = () => {
-    const itemIdx = data.findIndex((item) => item.value === value);
+  useEffect(() => {
+    if (isOverlayOpened(overlayId.current)) {
+      const itemIdx = data.findIndex((item) => item.value === value);
 
-    if (scrollViewRef.current) {
-      scrollViewRef.current.focus(itemIdx);
+      setTimeout(() => {
+        if (scrollViewRef.current) {
+          scrollViewRef.current?.focus(itemIdx);
+        }
+      }, 100);
     }
-  };
+  }, [data, value, currentOverlay.length]);
 
   const renderHeader = () => {
     if (!header) {
@@ -57,59 +61,49 @@ export const ThemedDropdownComponent = ({
     const isSelected = value === item.value;
 
     return (
-      <SpatialNavigationFocusableView
-        onSelect={ () => onChange(item) }
-      >
-        { ({ isFocused }) => (
-          <View style={ [
-            styles.item,
-            isSelected && styles.itemSelected,
-            isFocused && styles.itemFocused,
-          ] }
-          >
-            <View style={ styles.itemContainer }>
-              { item.startIcon && (
-                <ThemedImage
-                  style={ styles.icon }
-                  src={ item.startIcon }
-                />
-              ) }
-              <Text style={ [
-                styles.text,
-                isSelected && styles.textSelected,
-                isFocused && styles.textFocused,
-              ] }
-              >
-                { item.label }
-              </Text>
-              { item.endIcon && (
-                <ThemedImage
-                  style={ styles.icon }
-                  src={ item.endIcon }
-                />
-              ) }
+      <DefaultFocus enable={ isSelected }>
+        <SpatialNavigationFocusableView
+          onSelect={ () => onChange(item) }
+        >
+          { ({ isFocused }) => (
+            <View style={ [
+              styles.item,
+              isSelected && styles.itemSelected,
+              isFocused && styles.itemFocused,
+            ] }
+            >
+              <View style={ styles.itemContainer }>
+                { item.startIcon && (
+                  <ThemedImage
+                    style={ styles.icon }
+                    src={ item.startIcon }
+                  />
+                ) }
+                <Text style={ [
+                  styles.text,
+                  isSelected && styles.textSelected,
+                  isFocused && styles.textFocused,
+                ] }
+                >
+                  { item.label }
+                </Text>
+                { item.endIcon && (
+                  <ThemedImage
+                    style={ styles.icon }
+                    src={ item.endIcon }
+                  />
+                ) }
+              </View>
             </View>
-            { isSelected && !isFocused && (
-              <ThemedIcon
-                style={ styles.iconSelected }
-                icon={ {
-                  name: 'check',
-                  pack: IconPackType.MaterialIcons,
-                } }
-                size={ scale(16) }
-                color="white"
-              />
-            ) }
-          </View>
-        ) }
-      </SpatialNavigationFocusableView>
+          ) }
+        </SpatialNavigationFocusableView>
+      </DefaultFocus>
     );
   }, [value, onChange]);
 
   const renderList = () => (
     <View
       style={ styles.scrollViewContainer }
-      onLayout={ handleLayout }
     >
       <SpatialNavigationVirtualizedList
         ref={ scrollViewRef }
@@ -118,7 +112,7 @@ export const ThemedDropdownComponent = ({
         renderItem={ renderItem }
         itemSize={ styles.item.height }
         orientation="vertical"
-        scrollBehavior="stick-to-end"
+        scrollBehavior='stick-to-center'
       />
     </View>
   );
@@ -142,7 +136,7 @@ export const ThemedDropdownComponent = ({
     return (
       <ThemedOverlay
         id={ overlayId.current }
-        onHide={ () => OverlayStore.goToPreviousOverlay() }
+        onHide={ () => goToPreviousOverlay() }
         containerStyle={ styles.container }
         contentContainerStyle={ styles.contentContainer }
       >
@@ -162,11 +156,8 @@ export const ThemedDropdownComponent = ({
       <ThemedButton
         style={ [styles.input, inputStyle] }
         rightImageStyle={ styles.inputImage }
-        icon={ {
-          name: 'plus',
-          pack: IconPackType.Octicons,
-        } }
-        onPress={ () => OverlayStore.openOverlay(overlayId.current) }
+        IconComponent={ Plus }
+        onPress={ () => openOverlay(overlayId.current) }
         rightImage={ endIcon }
       >
         { label }

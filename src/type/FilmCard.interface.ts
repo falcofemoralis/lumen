@@ -8,4 +8,5 @@ export interface FilmCardInterface {
   title: string;
   subtitle: string;
   info?: string;
+  isPendingRelease?: boolean;
 }

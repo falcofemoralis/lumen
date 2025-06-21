@@ -1,18 +1,18 @@
 import ThemedText from 'Component/ThemedText';
+import { usePlayerContext } from 'Context/PlayerContext';
 import t from 'i18n/t';
 import { View } from 'react-native';
 
 import { styles } from './PlayerDuration.style.atv';
-import { PlayerDurationComponentProps } from './PlayerDuration.type';
 
-export const PlayerDurationComponent = ({
-  progressStatus,
-}: PlayerDurationComponentProps) => {
+export const PlayerDurationComponent = () => {
   const {
-    currentTime,
-    durationTime,
-    remainingTime,
-  } = progressStatus;
+    progressStatus: {
+      currentTime,
+      durationTime,
+      remainingTime,
+    } = {},
+  } = usePlayerContext();
 
   return (
     <View style={ styles.duration }>

@@ -9,7 +9,7 @@ import Animated, {
   withDecay,
   withTiming,
 } from 'react-native-reanimated';
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 
 export type ImageViewerProps = {
   imageUrl: string;
@@ -44,7 +44,7 @@ export default function ImageViewer({
     function ruleOfThree(
       firstValue: number,
       firstResult: number,
-      secondValue: number,
+      secondValue: number
     ) {
       const secondResult = (firstResult * secondValue) / firstValue;
 
@@ -64,7 +64,7 @@ export default function ImageViewer({
     if (width === height) {
       const smallestScreenDimension = Math.min(
         dimensions.width,
-        dimensions.height,
+        dimensions.height
       );
 
       return {
@@ -192,7 +192,7 @@ export default function ImageViewer({
     });
 
   const singleTap = Gesture.Tap().onEnd(() => {
-    // eslint-disable-next-line no-unused-expressions
+
     onSingleTap && runOnJS(onSingleTap)();
   });
 
@@ -265,7 +265,7 @@ export default function ImageViewer({
         },
       ],
     }),
-    [],
+    []
   );
 
   const composedGestures = Gesture.Simultaneous(pinchGesture, panGesture);

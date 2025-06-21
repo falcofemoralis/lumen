@@ -1,10 +1,7 @@
 import { withTV } from 'Hooks/withTV';
-import { useEffect, useRef, useState } from 'react';
-import { useLockSpatialNavigation } from 'react-tv-space-navigation';
-import ConfigStore from 'Store/Config.store';
+import { useEffect, useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
 import { PaginationInterface } from 'Type/Pagination.interface';
-import { setTimeoutSafe } from 'Util/Misc';
 
 import FilmPagerComponent from './FilmPager.component';
 import FilmPagerComponentTV from './FilmPager.component.atv';
@@ -19,7 +16,6 @@ export function FilmPagerContainer({
   onUpdateFilms,
   onRowFocus,
 }: FilmPagerContainerProps) {
-  const [isLoading, setIsLoading] = useState(false);
   const [pagerItems, setPagerItems] = useState<PagerItemInterface[]>(
     menuItems.map((item, idx) => ({
       key: String(idx + 1),
@@ -30,11 +26,8 @@ export function FilmPagerContainer({
         currentPage: 1,
         totalPages: 1,
       },
-    })),
+    }))
   );
-  const [selectedPageItemId, setSelectedPageItemId] = useState<string>(pagerItems[0]?.key);
-  const debounce = useRef<NodeJS.Timeout | null>();
-  const { lock, unlock } = useLockSpatialNavigation();
 
   useEffect(() => {
     if (loadOnInit) {
@@ -75,7 +68,7 @@ export function FilmPagerContainer({
     pagerItem: PagerItemInterface,
     pagination: PaginationInterface,
     isUpdate = false, // replace current films with new ones
-    isRefresh = false, // fetch new films
+    isRefresh = false // fetch new films
   ) => {
     const {
       key,
@@ -89,8 +82,6 @@ export function FilmPagerContainer({
     if (currentPage > currentTotalPages) {
       return;
     }
-
-    setIsLoading(true);
 
     try {
       const { films: newFilms, totalPages } = await onLoadFilms(menuItem, currentPage, isRefresh);
@@ -108,62 +99,32 @@ export function FilmPagerContainer({
       });
     } catch (error) {
       NotificationStore.displayError(error as Error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
-  const onNextLoad = async (isRefresh = false) => {
-    const pagerItem = getSelectedPagerItem();
-    const { pagination } = pagerItem;
+  const onPreLoad = async (item: PagerItemInterface) => {
+    loadFilms(item, { currentPage: 1, totalPages: 1 });
+  };
+
+  const onNextLoad = async (isRefresh = false, item: PagerItemInterface) => {
+    const { pagination } = item;
 
     const newPage = {
       ...pagination,
       currentPage: !isRefresh ? pagination.currentPage + 1 : 1,
     };
 
-    await loadFilms(pagerItem, newPage, isRefresh, isRefresh);
+    await loadFilms(item, newPage, isRefresh, isRefresh);
   };
-
-  const handleMenuItemChange = (pagerItem: PagerItemInterface) => {
-    const { key } = pagerItem;
-
-    if (key !== selectedPageItemId) {
-      if (debounce.current) {
-        clearTimeout(debounce.current);
-      }
-
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      debounce.current = setTimeoutSafe(async () => {
-        if (ConfigStore.isTV()) lock();
-
-        setSelectedPageItemId(key);
-        if (!pagerItem.films) {
-          await loadFilms(pagerItem, { currentPage: 1, totalPages: 1 }, true);
-        }
-
-        if (ConfigStore.isTV()) {
-          setTimeoutSafe(() => {
-            unlock();
-          }, 0);
-        }
-      }, 1000);
-    }
-  };
-
-  const getSelectedPagerItem = () => pagerItems.find(
-    ({ key }) => key === selectedPageItemId,
-  ) ?? pagerItems[0];
 
   const containerFunctions = {
+    loadFilms,
     onNextLoad,
-    handleMenuItemChange,
+    onPreLoad,
   };
 
   const containerProps = () => ({
-    pagerItems: pagerItems.filter(({ menuItem }) => !menuItem.isHidden),
-    selectedPagerItem: getSelectedPagerItem(),
-    isLoading,
+    pagerItems,
     gridStyle,
     onRowFocus,
   });

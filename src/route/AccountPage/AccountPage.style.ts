@@ -1,7 +1,10 @@
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
+  wrapper: {
+    flex: 1,
+  },
   topBar: {
     flexDirection: 'row',
     width: '100%',
@@ -10,16 +13,23 @@ export const styles = CreateStyles({
   },
   tobBarBtn: {
     backgroundColor: Colors.transparent,
+    width: 42,
+    height: 42,
+    borderRadius: 50,
   },
   tobBarBtnIcon: {
-    width: 24,
-    height: 24,
+    width: 20,
+    height: 20,
   },
   badge: {
     backgroundColor: Colors.secondary,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: 16,
+    height: 16,
+    borderRadius: 50,
+    fontSize: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    textAlign: 'center',
     position: 'absolute',
     right: 0,
     top: 0,
@@ -35,7 +45,7 @@ export const styles = CreateStyles({
   profileAvatar: {
     width: 64,
     height: 64,
-    backgroundColor: Colors.gray,
+    backgroundColor: Colors.backgroundLight,
     borderRadius: 99,
   },
   profileName: {
@@ -48,9 +58,7 @@ export const styles = CreateStyles({
     gap: 8,
   },
   profileAction: {
-    height: 32,
-    padding: 6,
-    paddingInline: 8,
+    flex: 1,
     borderRadius: 24,
   },
 });

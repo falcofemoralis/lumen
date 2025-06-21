@@ -1,5 +1,3 @@
-/* eslint-disable functional/no-let */
-/* eslint-disable no-bitwise */
 export const convertSecondsToTime = (seconds: number): string => {
   // Hours, minutes and seconds
   const hrs = ~~(seconds / 3600);

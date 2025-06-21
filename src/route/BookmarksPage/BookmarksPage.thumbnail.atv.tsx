@@ -19,13 +19,10 @@ export const BookmarksPageThumbnail = () => (
           // eslint-disable-next-line react/no-array-index-key
           key={ `${i}-thumb` }
           width="20%"
+          height={ scale(40) }
         />
       )) }
     </View>
     <FilmGridThumbnail />
-    <Loader
-      isLoading
-      fullScreen
-    />
   </View>
 );

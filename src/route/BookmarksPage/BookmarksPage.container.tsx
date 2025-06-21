@@ -1,9 +1,8 @@
 import { FilmPagerInterface } from 'Component/FilmPager/FilmPager.type';
+import { useServiceContext } from 'Context/ServiceContext';
 import { withTV } from 'Hooks/withTV';
-import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
-import ServiceStore from 'Store/Service.store';
 import { BookmarkInterface } from 'Type/Bookmark.interface';
 import { FilmListInterface } from 'Type/FilmList.interface';
 import { MenuItemInterface } from 'Type/MenuItem.interface';
@@ -13,15 +12,15 @@ import BookmarksPageComponentTV from './BookmarksPage.component.atv';
 
 export function BookmarksPageContainer() {
   const [isLoading, setIsLoading] = useState(true);
-  const [isSignedIn, setIsSignedIn] = useState(ServiceStore.isSignedIn);
   const [bookmarks, setBookmarks] = useState<BookmarkInterface[]>([]);
   const [filmPager, setFilmPager] = useState<FilmPagerInterface>({});
+  const { isSignedIn, getCurrentService } = useServiceContext();
 
   const loadBookmarks = async () => {
     setIsLoading(true);
 
     try {
-      const items = await ServiceStore.getCurrentService().getBookmarks();
+      const items = await getCurrentService().getBookmarks();
 
       if (items.length > 0 && items[0].filmList) {
         const { id, filmList } = items[0];
@@ -38,20 +37,16 @@ export function BookmarksPageContainer() {
   };
 
   useEffect(() => {
-    if (isSignedIn !== ServiceStore.isSignedIn) {
-      setIsSignedIn(ServiceStore.isSignedIn);
-    }
-
-    if (ServiceStore.isSignedIn) {
+    if (isSignedIn) {
       loadBookmarks();
     }
-  }, [ServiceStore.isSignedIn]);
+  }, [isSignedIn]);
 
   const onLoadFilms = async (
     menuItem: MenuItemInterface,
     currentPage: number,
-    _isRefresh: boolean,
-  ) => ServiceStore.getCurrentService().getBookmarkedFilms({
+    _isRefresh: boolean
+  ) => getCurrentService().getBookmarkedFilms({
     id: menuItem.id,
     title: menuItem.title,
   }, currentPage);
@@ -77,7 +72,6 @@ export function BookmarksPageContainer() {
   };
 
   const containerProps = () => ({
-    isSignedIn,
     isLoading,
     bookmarks,
     filmPager,
@@ -90,4 +84,4 @@ export function BookmarksPageContainer() {
   });
 }
 
-export default observer(BookmarksPageContainer);
+export default BookmarksPageContainer;

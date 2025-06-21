@@ -2,7 +2,7 @@ import { FilmCardInterface } from 'Type/FilmCard.interface';
 
 export interface FilmGridContainerProps {
   films: FilmCardInterface[];
-  header?: JSX.Element;
+  header?: React.ReactNode;
   headerSize?: number;
   onNextLoad?: (isRefresh: boolean) => Promise<void>;
   onItemFocus?: (row: number) => void;
@@ -10,7 +10,7 @@ export interface FilmGridContainerProps {
 
 export interface FilmGridComponentProps {
   films: FilmCardInterface[];
-  header?: JSX.Element;
+  header?: React.ReactNode;
   headerSize?: number;
   handleOnPress: (film: FilmCardInterface) => void;
   handleItemFocus: (index: number) => void;

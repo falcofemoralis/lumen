@@ -7,7 +7,7 @@
  */
 export const safeJsonParse = <T>(
   str: string | null | undefined,
-  fallback?: T,
+  fallback?: T
 ): T | null => {
   if (!str) {
     return fallback ?? null;

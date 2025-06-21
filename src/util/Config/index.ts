@@ -2,7 +2,7 @@ import { safeJsonParse } from 'Util/Json';
 import { configStorage } from 'Util/Storage';
 
 export const getConfig = (
-  key: string,
+  key: string
 ): string | null => {
   const config = configStorage.getString(key);
 
@@ -13,10 +13,10 @@ export const getConfig = (
   return config;
 };
 
-export const updateConfig = async (
+export const updateConfig = (
   key: string,
-  value: string,
-): Promise<boolean | null | undefined> => configStorage.setStringAsync(key, value);
+  value: string
+): void => configStorage.set(key, value);
 
 export const getConfigJson = <T>(key: string): T | null => {
   const configJson = getConfig(key);

@@ -2,7 +2,7 @@ import { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 
 export const isCloseToBottom = (
   event: NativeSyntheticEvent<NativeScrollEvent>,
-  paddingToBottom: number,
+  paddingToBottom: number
 ) => {
   const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
 

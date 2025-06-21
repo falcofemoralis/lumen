@@ -1,4 +1,4 @@
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
@@ -16,11 +16,14 @@ export const styles = CreateStyles({
     opacity: 1,
   },
   container: {
+    flex: 0,
     minHeight: 100,
     minWidth: 100,
     width: 'auto',
-    backgroundColor: '#1E1F20',
+    backgroundColor: Colors.backgroundLight,
     borderRadius: 16,
+    borderColor: Colors.darkBorder,
+    borderWidth: 1,
     padding: 12,
     alignSelf: 'flex-end',
     marginRight: 64,

@@ -20,7 +20,7 @@ export function FilmGridContainer({
   onItemFocus,
 }: FilmGridContainerProps) {
   const handleOnPress = useCallback((film: FilmCardInterface) => {
-    openFilm(film.link);
+    openFilm(film);
   }, []);
 
   const handleItemFocus = (index: number) => {

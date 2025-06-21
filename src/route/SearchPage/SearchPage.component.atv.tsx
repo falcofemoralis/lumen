@@ -1,12 +1,10 @@
 import FilmPager from 'Component/FilmPager';
+import InfoBlock from 'Component/InfoBlock';
 import Page from 'Component/Page';
 import ThemedButton from 'Component/ThemedButton';
-import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
-import ThemedInfo from 'Component/ThemedInfo';
 import ThemedInput from 'Component/ThemedInput';
-import ThemedText from 'Component/ThemedText';
-import ThemedView from 'Component/ThemedView';
 import t from 'i18n/t';
+import { Mic, Search } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { View } from 'react-native';
 import { DefaultFocus, SpatialNavigationScrollView, SpatialNavigationView } from 'react-tv-space-navigation';
@@ -56,20 +54,13 @@ export function SearchPageComponent({
         <ThemedButton
           style={ styles.actionBtn }
           styleFocused={ recognizing && styles.speakActive }
-          iconStyleFocused={ recognizing && styles.speakActiveIcon }
-          icon={ {
-            pack: IconPackType.MaterialCommunityIcons,
-            name: 'microphone-outline',
-          } }
+          IconComponent={ Mic }
           onPress={ handleStartRecognition }
         />
         { renderSearchBar() }
         <ThemedButton
           style={ styles.actionBtn }
-          icon={ {
-            name: 'magnify',
-            pack: IconPackType.MaterialCommunityIcons,
-          } }
+          IconComponent={ Search }
           onPress={ handleApplySearch }
         />
       </SpatialNavigationView>
@@ -82,7 +73,12 @@ export function SearchPageComponent({
     }
 
     return (
-      <View style={ styles.suggestionsWrapper }>
+      <View
+        style={ {
+          ...styles.suggestionsWrapper,
+          ...(currentRow > 0 && styles.hidden),
+        } }
+      >
         <SpatialNavigationScrollView
           horizontal
           offsetFromStart={ 20 }
@@ -113,7 +109,7 @@ export function SearchPageComponent({
     if (!isLoading && !filmPager.search?.filmList.films.length) {
       return (
         <View style={ styles.noResults }>
-          <ThemedInfo
+          <InfoBlock
             title={ t('No results found') }
             subtitle={ t('Try searching for something else') }
           />
@@ -135,10 +131,10 @@ export function SearchPageComponent({
 
   return (
     <Page>
-      <ThemedView style={ styles.container }>
+      <View style={ styles.container }>
         { renderSearchContainer() }
         { renderSuggestions() }
-      </ThemedView>
+      </View>
       { renderFilms() }
     </Page>
   );

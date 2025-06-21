@@ -1,8 +1,7 @@
-/* eslint-disable functional/no-let */
 import { Image } from 'expo-image';
 import { memo, useEffect, useState } from 'react';
 import { View } from 'react-native';
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import { storyboardParser, VTTItem } from 'Util/VttParser';
 
 import { STORYBOARD_TILE_HEIGHT, STORYBOARD_TILE_WIDTH, STORYBOARD_TILES_COUNT } from './PlayerStoryboard.config';
@@ -56,7 +55,7 @@ const StoryImage = ({ uri, scale = 1 }: StoryImageProps) => {
       style={ {
         width,
         height,
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.background,
         overflow: 'hidden',
       } }
     >
@@ -101,7 +100,7 @@ const PlayerStoryboardComponent = ({
     }
 
     const item = storyboard.find((
-      { start, end },
+      { start, end }
     ) => currentTime >= start && currentTime <= end);
 
     if (item) {
@@ -121,7 +120,7 @@ const PlayerStoryboardComponent = ({
 
 function storyboardPropsAreEqual(
   prevProps: PlayerStoryboardComponentProps,
-  props: PlayerStoryboardComponentProps,
+  props: PlayerStoryboardComponentProps
 ) {
   return prevProps.storyboardUrl === props.storyboardUrl
     && prevProps.currentTime === props.currentTime;

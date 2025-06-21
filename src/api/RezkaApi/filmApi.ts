@@ -20,6 +20,7 @@ import { Variables } from 'Util/Request';
 import { NotificationInterface } from '../../type/Notification.interface';
 import configApi from './configApi';
 import {
+  formatDurationWithMoment,
   parseActorCard,
   parseFilmCard, parseFilmsListRoot, parseFilmType, parseSeasons, parseStreams,
 } from './utils';
@@ -35,13 +36,13 @@ const filmApi: FilmApiInterface = {
     page: number,
     path = '',
     variables?: Variables,
-    params?: ApiParams,
+    params?: ApiParams
   ): Promise<FilmListInterface> {
     const { key } = params || {};
 
     const root = await configApi.fetchPage(
       `${path === '/' ? '' : path}/page/${page}/`,
-      variables,
+      variables
     );
 
     const content = key ? root.querySelector(key) : root;
@@ -148,7 +149,7 @@ const filmApi: FilmApiInterface = {
             // film.age = value.rawText;
             break;
           case 'Время':
-            film.duration = value.rawText;
+            film.duration = formatDurationWithMoment(Number(value.rawText.replace(' мин.', '')));
             break;
           case 'Из серии':
             film.fromCollections = value.childNodes
@@ -161,7 +162,7 @@ const filmApi: FilmApiInterface = {
           default:
             if (key.includes('В ролях актеры')) {
               film.actors = el.querySelectorAll('.person-name-item').map(
-                (node) => parseActorCard(node),
+                (node) => parseActorCard(node)
               );
               break;
             }
@@ -222,7 +223,7 @@ const filmApi: FilmApiInterface = {
           const index = stringedDoc.indexOf('initCDNMoviesEvents');
           const subString = stringedDoc.substring(
             stringedDoc.indexOf('{"id"', index),
-            stringedDoc.indexOf('});', index) + 1,
+            stringedDoc.indexOf('});', index) + 1
           );
           const jsonObject = JSON.parse(subString);
           const streams = parseStreams(jsonObject.streams);
@@ -346,7 +347,7 @@ const filmApi: FilmApiInterface = {
     });
 
     film.related = root.querySelectorAll('.b-sidelist .b-content__inline_item').map(
-      (el) => parseFilmCard(el),
+      (el) => parseFilmCard(el)
     );
 
     film.bookmarks = root.querySelectorAll('.hd-label-row').map(
@@ -354,7 +355,7 @@ const filmApi: FilmApiInterface = {
         id: el.querySelector('input')?.attributes.value ?? '',
         title: el.querySelector('label')?.rawText ?? '',
         isBookmarked: el.querySelector('input')?.attributes.checked === 'checked',
-      }),
+      })
     );
 
     const voicesRatingHtml = root.querySelector('.b-rgstats__help')?.attributes.title;
@@ -466,15 +467,15 @@ const filmApi: FilmApiInterface = {
       if (key && value) {
         switch (key) {
           case 'Дата рождения':
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+
             actor.dob = value?.rawText.trim();
             break;
           case 'Место рождения':
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+
             actor.birthPlace = value?.rawText.trim();
             break;
           case 'Рост':
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+
             actor.height = value?.rawText.trim();
             break;
           case 'Карьера':
@@ -568,7 +569,7 @@ const filmApi: FilmApiInterface = {
       };
     };
 
-    const results = await processPromisesBatch(links, 3, getFilm) as FilmCardInterface[];
+    const results = await processPromisesBatch<string, FilmCardInterface>(links, 3, getFilm);
 
     results.forEach((result) => {
       films[result.link] = result;

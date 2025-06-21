@@ -1,14 +1,16 @@
 import FilmCard from 'Component/FilmCard';
-import ThemedIcon from 'Component/ThemedIcon';
-import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
+import Loader from 'Component/Loader';
 import ThemedImage from 'Component/ThemedImage';
+import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import t from 'i18n/t';
-import { memo, useCallback, useState } from 'react';
+import { CircleCheck, Star } from 'lucide-react-native';
+import { memo, useCallback, useEffect, useState } from 'react';
 import {
-  Pressable, TouchableHighlight, TouchableOpacity, View,
+  Pressable,
+  View,
 } from 'react-native';
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import { ActorCardInterface } from 'Type/ActorCard.interface';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
@@ -22,14 +24,16 @@ import { styles } from './FilmPage.style';
 interface SectionProps {
   title: string;
   children: React.ReactNode;
+  useHeadingWrapper?: boolean;
 }
 
 export const Section = ({
   title,
   children,
+  useHeadingWrapper,
 }: SectionProps) => (
   <View style={ styles.section }>
-    <ThemedText style={ styles.sectionHeading }>
+    <ThemedText style={ [styles.sectionHeading, useHeadingWrapper && styles.sectionHeadingWrapper] }>
       { title }
     </ThemedText>
     <View style={ styles.sectionContent }>
@@ -56,7 +60,7 @@ export const ActorView = memo(({
   } = actor;
 
   return (
-    <TouchableHighlight
+    <Pressable
       style={ styles.actor }
       onPress={ () => handleSelectActor(link ?? '') }
     >
@@ -68,11 +72,7 @@ export const ActorView = memo(({
           />
           { isDirector && (
             <View style={ styles.director }>
-              <ThemedIcon
-                icon={ {
-                  pack: IconPackType.MaterialIcons,
-                  name: 'stars',
-                } }
+              <Star
                 size={ scale(12) }
                 color="yellow"
               />
@@ -95,21 +95,21 @@ export const ActorView = memo(({
           </ThemedText>
         ) }
       </View>
-    </TouchableHighlight>
+    </Pressable>
   );
 }, (
-  prevProps: ActorProps, nextProps: ActorProps,
+  prevProps: ActorProps, nextProps: ActorProps
 ) => prevProps.actor.name === nextProps.actor.name);
 
 interface ScheduleItemProps {
   item: ScheduleItemInterface,
-  idx: number
-  handleUpdateScheduleWatch: (scheduleItem: ScheduleItemInterface) => void
+  useInternalState?: boolean,
+  handleUpdateScheduleWatch: (scheduleItem: ScheduleItemInterface) => Promise<boolean>
 }
 
 export const ScheduleItem = memo(({
   item,
-  idx,
+  useInternalState,
   handleUpdateScheduleWatch,
 }: ScheduleItemProps) => {
   const {
@@ -121,18 +121,35 @@ export const ScheduleItem = memo(({
     isWatched,
     isReleased,
   } = item;
+  const [isLoading, setIsLoading] = useState(false);
+  const [isChecked, setIsChecked] = useState(isWatched);
 
-  const handlePress = useCallback(() => {
-    handleUpdateScheduleWatch(item);
+  useEffect(() => {
+    if (!useInternalState) {
+      return;
+    }
+
+    setIsChecked(isWatched);
+  }, [isWatched]);
+
+  const handlePress = useCallback(async () => {
+    setIsLoading(true);
+
+    const result = await handleUpdateScheduleWatch(item);
+
+    setIsLoading(false);
+
+    if (!result) {
+      return;
+    }
+
+    if (useInternalState) {
+      setIsChecked((prev) => !prev);
+    }
   }, [handleUpdateScheduleWatch, item]);
 
   return (
-    <View
-      style={ [
-        styles.scheduleItem,
-        idx % 2 === 0 && styles.scheduleItemEven,
-      ] }
-    >
+    <View style={ styles.scheduleItem }>
       <View style={ styles.scheduleItemInfoWrapper }>
         <View style={ styles.scheduleItemEpisodeWrapper }>
           <ThemedText style={ [
@@ -161,19 +178,19 @@ export const ScheduleItem = memo(({
       </View>
       <View style={ styles.scheduleItemReleaseWrapper }>
         { isReleased ? (
-          <TouchableOpacity
+          <ThemedPressable
+            style={ styles.scheduleItemMarkIcon }
             onPress={ handlePress }
           >
-            <ThemedIcon
-              style={ styles.scheduleItemMarkIcon }
-              icon={ {
-                name: 'checkbox-marked-circle-outline',
-                pack: IconPackType.MaterialCommunityIcons,
-              } }
-              size={ scale(32) }
-              color={ isWatched ? Colors.secondary : Colors.white }
-            />
-          </TouchableOpacity>
+            { isLoading ? (
+              <Loader isLoading />
+            ) : (
+              <CircleCheck
+                size={ scale(24) }
+                color={ (useInternalState ? isChecked : isWatched) ? Colors.secondary : Colors.white }
+              />
+            ) }
+          </ThemedPressable>
         ) : (
           <ThemedText
             style={ [
@@ -188,15 +205,15 @@ export const ScheduleItem = memo(({
     </View>
   );
 }, (
-  prevProps: ScheduleItemProps, nextProps: ScheduleItemProps,
-) => prevProps.item.name === nextProps.item.name
+  prevProps: ScheduleItemProps, nextProps: ScheduleItemProps
+) => prevProps.item.id === nextProps.item.id
   && prevProps.item.isWatched === nextProps.item.isWatched);
 
 interface FranchiseItemProps {
   film: FilmInterface,
   item: FranchiseItem,
   idx: number,
-  handleSelectFilm: (link: string) => void
+  handleSelectFilm: (film: FilmInterface) => void
 }
 
 export const FranchiseItemComponent = memo(({
@@ -214,10 +231,18 @@ export const FranchiseItemComponent = memo(({
   } = item;
   const position = Math.abs(idx - franchise.length);
 
+  const onPress = useCallback(() => {
+    if (link) {
+      handleSelectFilm({ link } as unknown as FilmInterface);
+    }
+  }, [link, handleSelectFilm]);
+
   return (
-    <TouchableOpacity
+    <ThemedPressable
       disabled={ !link }
-      onPress={ () => handleSelectFilm(link) }
+      onPress={ onPress }
+      style={ styles.franchiseItemButton }
+      contentStyle={ styles.franchiseItemButtonContent }
     >
       <View style={ styles.franchiseItem }>
         <ThemedText style={ styles.franchiseText }>
@@ -239,61 +264,57 @@ export const FranchiseItemComponent = memo(({
           { rating }
         </ThemedText>
       </View>
-    </TouchableOpacity>
+    </ThemedPressable>
   );
 }, (
-  prevProps: FranchiseItemProps, nextProps: FranchiseItemProps,
+  prevProps: FranchiseItemProps, nextProps: FranchiseItemProps
 ) => prevProps.item.link === nextProps.item.link);
 
 interface InfoListProps {
   list: InfoListInterface,
-  idx: number
   handleSelectCategory: (link: string) => void
 }
 
 export const InfoList = memo(({
   list,
-  idx,
   handleSelectCategory,
 }: InfoListProps) => {
   const { name, position, link } = list;
 
   return (
-    <TouchableOpacity
+    <ThemedPressable
       onPress={ () => handleSelectCategory(link) }
+      style={ styles.infoListItem }
+      contentStyle={ styles.infoListItemContent }
     >
-      <View style={ [
-        styles.infoList,
-        idx % 2 === 0 && styles.infoListEven,
-      ] }
-      >
-        <ThemedText style={ styles.infoListName }>
-          { `${name} ${position || ''}` }
-        </ThemedText>
-      </View>
-    </TouchableOpacity>
+      <ThemedText style={ styles.infoListName }>
+        { `${name} ${position || ''}` }
+      </ThemedText>
+    </ThemedPressable>
   );
 }, (
-  prevProps: InfoListProps, nextProps: InfoListProps,
+  prevProps: InfoListProps, nextProps: InfoListProps
 ) => prevProps.list.link === nextProps.list.link);
 
 interface RelatedItemProps {
+  film: FilmInterface,
   item: FilmCardInterface,
-  handleSelectFilm: (link: string) => void
+  handleSelectFilm: (film: FilmInterface) => void
 }
 
 export const RelatedItem = memo(({
+  film,
   item,
   handleSelectFilm,
 }: RelatedItemProps) => (
   <Pressable
     style={ { width: scale(100) } }
-    onPress={ () => handleSelectFilm(item.link) }
+    onPress={ () => handleSelectFilm(film) }
   >
     <FilmCard
       filmCard={ item }
     />
   </Pressable>
 ), (
-  prevProps: RelatedItemProps, nextProps: RelatedItemProps,
+  prevProps: RelatedItemProps, nextProps: RelatedItemProps
 ) => prevProps.item.id === nextProps.item.id);

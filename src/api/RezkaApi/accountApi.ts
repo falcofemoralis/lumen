@@ -42,7 +42,7 @@ const accountApi: RezkaAccountApiInterface = {
 
     const root = await configApi.fetchPage(
       '/favorites',
-      {},
+      {}
     );
 
     root.querySelectorAll('.b-favorites_content__cats_list_item').forEach((el) => {
@@ -109,7 +109,6 @@ const accountApi: RezkaAccountApiInterface = {
 
     const items = (this.recentItems && !isRefresh) ? this.recentItems : await loadItems();
 
-    // eslint-disable-next-line max-len
     // const items = root.querySelectorAll(`.b-videosaves__list_item:nth-child(n+${start + 1}):nth-child(-n+${end})`);
     const slicedItems = items.slice((page - 1) * itemsPerPage, (page * itemsPerPage) - 1);
 
@@ -162,8 +161,8 @@ const accountApi: RezkaAccountApiInterface = {
       const date = el.querySelector('.b-seriesupdate__block_date')?.rawText ?? '';
 
       const items = el.querySelectorAll('.tracked').map((item) => {
-        const season = el.querySelector('.season')?.rawText ?? '';
-        const episode = el.querySelector('.cell-2')?.rawText ?? '';
+        const season = item.querySelector('.season')?.rawText ?? '';
+        const episode = item.querySelector('.cell-2')?.rawText ?? '';
         const info = `${season} - ${episode}`;
 
         return {

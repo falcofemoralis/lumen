@@ -1,4 +1,5 @@
 import { CommonActions } from '@react-navigation/native';
+import { useServiceContext } from 'Context/ServiceContext';
 import { useProfile } from 'Hooks/useProfile';
 import { withTV } from 'Hooks/withTV';
 import { useCallback } from 'react';
@@ -6,21 +7,30 @@ import ConfigStore from 'Store/Config.store';
 
 import NavigationBarComponent from './NavigationBar.component';
 import NavigationBarComponentTV from './NavigationBar.component.atv';
+import { ACCOUNT_ROUTE, BOOKMARKS_ROUTE, RECENT_ROUTE } from './NavigationBar.config';
 import { NavigationType, StateType, Tab } from './NavigationBar.type';
 
 export function NavigationBarContainer() {
   const [profile] = useProfile();
-  // const badgeData = {};
+  const { isSignedIn } = useServiceContext();
 
-  // useEffect(() => {
-  // }, [NavigationStore.badgeData]);
+  const getRedirectRoute = useCallback((tab: Tab) => {
+    const { route } = tab;
+
+    // if not signed in, we should redirect to account page
+    if (!isSignedIn && (route === BOOKMARKS_ROUTE || route === RECENT_ROUTE)) {
+      return ACCOUNT_ROUTE;
+    }
+
+    return route;
+  }, [isSignedIn]);
 
   const navigateTo = useCallback((
     tab: Tab,
     navigation: NavigationType,
-    state: StateType,
+    state: StateType
   ) => {
-    const { route } = tab;
+    const route = getRedirectRoute(tab);
 
     const routes = Array.from(state.routes);
     const rn = routes.find((r) => r.name === route);
@@ -51,7 +61,7 @@ export function NavigationBarContainer() {
         target: state.key,
       });
     }
-  }, []);
+  }, [getRedirectRoute]);
 
   const isFocused = useCallback((tab: Tab, state: StateType) => {
     const routeIndex = state.routes.findIndex((r) => r.name === tab.route);

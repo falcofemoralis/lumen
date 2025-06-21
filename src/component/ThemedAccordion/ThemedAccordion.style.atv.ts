@@ -1,8 +1,12 @@
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
   container: {
+    width: '100%',
+  },
+  groupContainer: {
+    width: '100%',
   },
   group: {
     padding: 12,
@@ -10,13 +14,14 @@ export const styles = CreateStyles({
     fontSize: 14,
   },
   groupFocused: {
-    backgroundColor: Colors.white,
-    color: Colors.black,
+    backgroundColor: Colors.backgroundFocused,
+    color: Colors.textFocused,
   },
   content: {
     flexDirection: 'column',
   },
   overlay: {
-    maxHeight: '60%',
+    maxHeight: '70%',
+    maxWidth: '50%',
   },
 });

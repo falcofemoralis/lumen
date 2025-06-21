@@ -1,22 +1,26 @@
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
-  container: {
+  tabBarContainer: {
+    position: 'relative',
+    alignItems: 'center',
+    height: 42,
   },
-  lazyContainer: {
-    flex: 1,
+  tabButton: {
     alignItems: 'center',
     justifyContent: 'center',
+    paddingHorizontal: 6,
   },
-  tabBar: {
-    backgroundColor: Colors.background,
+  tabText: {
+    color: Colors.text,
+    fontSize: 12,
+    opacity: 0.7,
+    transitionProperty: 'opacity',
+    transitionDuration: '250ms',
   },
-  tabBarIndicator: {
-    backgroundColor: Colors.white,
-  },
-  tabStyle: {
-    padding: 8,
-    width: 'auto',
+  activeTabText: {
+    fontWeight: 'bold',
+    opacity: 1,
   },
 });

@@ -1,67 +1,70 @@
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
   container: {
-    backgroundColor: Colors.gray,
+    backgroundColor: Colors.button,
     paddingHorizontal: 16,
     paddingVertical: 10,
-    borderRadius: 44,
+    borderWidth: 0,
     flexDirection: 'row',
     gap: 6,
     alignItems: 'center',
   },
   // filled
-  containerFilled: {},
+  containerFilled: {
+    borderRadius: 44,
+  },
   containerFilledSelected: {
     backgroundColor: Colors.primary,
   },
   containerFilledFocused: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.buttonFocused,
   },
   textFilled: {
-    color: Colors.white,
+    color: Colors.text,
   },
   textFilledSelected: {
-    color: Colors.lightBlue,
+    color: Colors.textOnPrimary,
   },
   textFilledFocused: {
-    color: Colors.black,
+    color: Colors.textFocused,
   },
   iconFilled: {
-    color: Colors.white,
+    color: Colors.text,
   },
   iconFilledSelected: {},
   iconFilledFocused: {
-    color: Colors.black,
+    color: Colors.textFocused,
   },
   // outlined
   containerOutlined: {
+    borderRadius: 44,
     backgroundColor: Colors.transparent,
   },
   containerOutlinedSelected: {
-    backgroundColor: Colors.darkBlue,
+    backgroundColor: Colors.tertiary,
   },
   containerOutlinedFocused: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.backgroundFocused,
   },
   textOutlined: {
-    color: Colors.white,
+    color: Colors.text,
   },
   textOutlinedSelected: {
-    color: Colors.lightBlue,
+    color: Colors.textOnTertiary,
   },
   textOutlinedFocused: {
-    color: Colors.black,
+    color: Colors.textFocused,
   },
   iconOutlined: {
-    color: Colors.white,
+    color: Colors.text,
   },
   iconOutlinedSelected: {
-    color: Colors.lightBlue,
+    color: Colors.textOnTertiary,
   },
   iconOutlinedFocused: {
-    color: Colors.black,
+    color: Colors.textFocused,
   },
   rightIcon: {
   },

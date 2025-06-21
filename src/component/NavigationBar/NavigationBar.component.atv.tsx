@@ -1,18 +1,16 @@
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import ThemedIcon from 'Component/ThemedIcon';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
-import ThemedView from 'Component/ThemedView';
+import { useNavigationContext } from 'Context/NavigationContext';
+import { useServiceContext } from 'Context/ServiceContext';
 import { Tabs } from 'expo-router';
 import t from 'i18n/t';
-import { observer } from 'mobx-react-lite';
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 import {
-  Animated,
-  Dimensions,
   Image,
   View,
 } from 'react-native';
+import Animated from 'react-native-reanimated';
 import {
   DefaultFocus,
   Directions,
@@ -20,21 +18,16 @@ import {
   SpatialNavigationRoot,
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
-import NavigationStore from 'Store/Navigation.store';
-import ServiceStore from 'Store/Service.store';
-import Colors from 'Style/Colors';
-import { CONTENT_WRAPPER_PADDING_TV } from 'Style/Layout';
+import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 import { setTimeoutSafe } from 'Util/Misc';
 
-import { useMenuContext } from './MenuContext';
 import {
   DEFAULT_ROUTE,
-  LOADER_PAGE,
-  TABS_OPENING_DURATION_TV,
+  LOADER_ROUTE,
   TABS_TV_CONFIG,
 } from './NavigationBar.config';
-import { NAVIGATION_BAR_TV_WIDTH, styles } from './NavigationBar.style.atv';
+import { styles } from './NavigationBar.style.atv';
 import {
   NavigationBarComponentProps,
   NavigationType,
@@ -49,14 +42,11 @@ export function NavigationBarComponent({
   navigateTo,
   isFocused,
 }: NavigationBarComponentProps) {
-  const { isOpen: isMenuOpen, toggleMenu } = useMenuContext();
-
-  const containerWidth = Dimensions.get('window').width;
+  const { isMenuOpen, toggleMenu } = useNavigationContext();
+  const { badgeData } = useServiceContext();
+  const { isSignedIn } = useServiceContext();
   const lastPage = useRef<string | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const animatedWidth = useRef(
-    new Animated.Value(isMenuOpen ? styles.tabsOpened.width : styles.tabs.width),
-  ).current;
 
   const onDirectionHandledWithoutMovement = useCallback(
     (movement: string) => {
@@ -64,27 +54,19 @@ export function NavigationBarComponent({
         toggleMenu(false);
       }
     },
-    [toggleMenu],
+    [toggleMenu]
   );
-
-  useEffect(() => {
-    Animated.timing(animatedWidth, {
-      toValue: isMenuOpen ? styles.tabsOpened.width : styles.tabs.width,
-      duration: TABS_OPENING_DURATION_TV,
-      useNativeDriver: false,
-    }).start();
-  }, [animatedWidth, isMenuOpen]);
 
   const onTabSelect = useCallback((
     tab: Tab,
     navigation: NavigationType,
-    state: StateType,
+    state: StateType
   ) => {
-    if (lastPage.current !== LOADER_PAGE) {
+    if (lastPage.current !== LOADER_ROUTE) {
       setTimeoutSafe(() => {
-        navigateTo({ ...tab, route: LOADER_PAGE }, navigation, state);
+        navigateTo({ ...tab, route: LOADER_ROUTE }, navigation, state);
       }, 0);
-      lastPage.current = LOADER_PAGE;
+      lastPage.current = LOADER_ROUTE;
     }
 
     if (timerRef.current) {
@@ -101,11 +83,11 @@ export function NavigationBarComponent({
     tab: Tab,
     focused: boolean,
     isRootActive: boolean,
-    isf: boolean,
+    isf: boolean
   ) => {
-    const { title, icon } = tab;
+    const { title, IconComponent } = tab;
 
-    const badge = NavigationStore.badgeData[tab.route] ?? 0;
+    const badge = badgeData[tab.route] ?? 0;
 
     return (
       <View
@@ -115,22 +97,20 @@ export function NavigationBarComponent({
           isf && isRootActive && styles.tabFocused,
         ] }
       >
-        { icon && (
-          <View>
-            <ThemedIcon
-              style={ [
-                styles.tabIcon,
-                isf && isRootActive && styles.tabContentFocused,
-              ] }
-              icon={ icon }
-              size={ scale(24) }
-              color="white"
+        <View>
+          { IconComponent && (
+            <IconComponent
+              style={ styles.tabIcon }
+              size={ scale(20) }
+              color={ isf && isRootActive ? Colors.black : Colors.white }
             />
-            { badge > 0 && (
-              <View style={ styles.badge } />
-            ) }
-          </View>
-        ) }
+          ) }
+          { badge > 0 && (
+            <ThemedText style={ styles.badge }>
+              { badge }
+            </ThemedText>
+          ) }
+        </View>
         <ThemedText.Animated
           style={ [
             styles.tabText,
@@ -142,13 +122,13 @@ export function NavigationBarComponent({
         </ThemedText.Animated>
       </View>
     );
-  }, [isMenuOpen, NavigationStore.badgeData]);
+  }, [isMenuOpen, badgeData]);
 
   const renderAccountTab = useCallback((
     tab: Tab,
     focused: boolean,
     isRootActive: boolean,
-    isf: boolean,
+    isf: boolean
   ) => {
     const { title } = tab;
     const { avatar, name } = profile ?? {};
@@ -161,12 +141,7 @@ export function NavigationBarComponent({
           isf && isRootActive && styles.tabFocused,
         ] }
       >
-        <View
-          style={ [
-            styles.profileAvatarContainer,
-            focused ? styles.profileAvatarFocused : styles.profileAvatarUnfocused,
-          ] }
-        >
+        <View style={ styles.profileAvatarContainer }>
           { avatar ? (
             <ThemedImage
               src={ avatar }
@@ -198,17 +173,17 @@ export function NavigationBarComponent({
               isMenuOpen && styles.tabTextOpened,
             ] }
           >
-            { ServiceStore.isSignedIn ? name : t('Sign in') }
+            { isSignedIn ? name : t('Sign in') }
           </ThemedText.Animated>
         </View>
       </View>
     );
-  }, [isMenuOpen, profile]);
+  }, [isMenuOpen, profile, isSignedIn]);
 
   const renderTab = useCallback((
     tab: Tab,
     navigation: NavigationType,
-    state: StateType,
+    state: StateType
   ) => {
     const { title, tabComponent } = tab;
     const focused = isFocused(tab, state);
@@ -261,7 +236,12 @@ export function NavigationBarComponent({
     });
 
     return (
-      <Animated.View style={ [styles.tabs, { width: animatedWidth }] }>
+      <Animated.View
+        style={ [
+          styles.tabs,
+          isMenuOpen && styles.tabsOpened,
+        ] }
+      >
         <View>
           { topTabs.map((tab) => renderTab(tab, navigation, state)) }
         </View>
@@ -273,27 +253,18 @@ export function NavigationBarComponent({
         </View>
       </Animated.View>
     );
-  }, [renderTab, animatedWidth]);
+  }, [renderTab, isMenuOpen]);
 
   const renderTabBar = useCallback(({ navigation, state }: BottomTabBarProps) => (
     <SpatialNavigationRoot
       isActive={ isMenuOpen }
       onDirectionHandledWithoutMovement={ onDirectionHandledWithoutMovement }
     >
-      <ThemedView style={ styles.bar }>
+      <View style={ styles.bar }>
         <SpatialNavigationView direction="vertical">
           { renderTabs(navigation, state) }
         </SpatialNavigationView>
-        { /* <LinearGradient
-          style={ [
-            styles.barBackground,
-            isMenuOpen && styles.barBackgroundOpened,
-          ] }
-          colors={ ['rgba(0, 0, 0, 0.8)', 'transparent'] }
-          start={ { x: 0.5, y: 0 } }
-          end={ { x: 1, y: 0 } }
-        /> */ }
-      </ThemedView>
+      </View>
     </SpatialNavigationRoot>
   ), [renderTabs, onDirectionHandledWithoutMovement, isMenuOpen]);
 
@@ -304,16 +275,10 @@ export function NavigationBarComponent({
         tabBarActiveTintColor: Colors.primary,
         tabBarInactiveTintColor: Colors.white,
         tabBarPosition: 'left',
-        sceneStyle: {
-          width: containerWidth - scale(NAVIGATION_BAR_TV_WIDTH) - CONTENT_WRAPPER_PADDING_TV * 2,
-          marginRight: CONTENT_WRAPPER_PADDING_TV,
-          left: styles.tabs.width * -1 + CONTENT_WRAPPER_PADDING_TV,
-          marginLeft: animatedWidth,
-        },
       } }
       tabBar={ renderTabBar }
     />
   );
 }
 
-export default observer(NavigationBarComponent);
+export default NavigationBarComponent;

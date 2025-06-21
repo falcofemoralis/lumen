@@ -1,22 +1,23 @@
+import { usePlayerContext } from 'Context/PlayerContext';
 import {
   useCallback, useEffect, useRef,
 } from 'react';
 import { Slider } from 'react-native-awesome-slider';
 import { useSharedValue } from 'react-native-reanimated';
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import { noopFn } from 'Util/Function';
 
 import { Bubble, BubbleRef } from './Bubble';
 import { PlayerProgressBarComponentProps } from './PlayerProgressBar.type';
 
 export const PlayerProgressBarComponent = ({
-  progressStatus,
   storyboardUrl,
   seekToPosition,
   calculateCurrentTime,
   handleUserInteraction,
   handleIsScrolling = noopFn,
 }: PlayerProgressBarComponentProps) => {
+  const { progressStatus } = usePlayerContext();
   const bubbleRef = useRef<BubbleRef>(null);
   const progress = useSharedValue(0);
   const cache = useSharedValue(0);
@@ -58,7 +59,10 @@ export const PlayerProgressBarComponent = ({
 
     seekToPosition(value);
     updateIsScrolling(false);
-    handleUserInteraction();
+
+    if (handleUserInteraction) {
+      handleUserInteraction();
+    }
   }, [seekToPosition, handleUserInteraction, updateIsScrolling]);
 
   const renderBubble = useCallback(() => (

@@ -6,7 +6,7 @@ export const setTimeoutSafe = (callback: () => void, ms?: number): NodeJS.Timeou
       } catch (e) {
         console.error('error', e);
       }
-    }, ms);
+    }, ms) as unknown as NodeJS.Timeout;
   } catch (e) {
     // sometimes it can throw an error
     // Error: The 1st argument cannot be cast to type expo.modules.video.player.VideoPlayer
@@ -26,7 +26,7 @@ export const setIntervalSafe = (callback: () => void, ms?: number): NodeJS.Timeo
       } catch (e) {
         console.error('error', e);
       }
-    }, ms);
+    }, ms) as unknown as NodeJS.Timeout;
   } catch (e) {
     // sometimes it can throw an error
     // Error: The 1st argument cannot be cast to type expo.modules.video.player.VideoPlayer
@@ -38,5 +38,4 @@ export const setIntervalSafe = (callback: () => void, ms?: number): NodeJS.Timeo
   }
 };
 
-// eslint-disable-next-line max-len
 export const wait = (ms: number): Promise<void> => new Promise((resolve) => { setTimeoutSafe(resolve, ms); });

@@ -18,6 +18,6 @@ export type ThemedDropdownContainerProps = {
   onChange: (item: DropdownItem) => void;
   inputLabel?: string;
   style?: StyleProp<ViewStyle>;
-}
+};
 
 export type ThemedDropdownComponentProps = ThemedDropdownContainerProps;

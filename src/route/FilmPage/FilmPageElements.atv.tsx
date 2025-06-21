@@ -1,14 +1,15 @@
 import FilmCard from 'Component/FilmCard';
+import Loader from 'Component/Loader';
 import ThemedCard from 'Component/ThemedCard';
-import ThemedIcon from 'Component/ThemedIcon';
-import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
+import { useOverlayContext } from 'Context/OverlayContext';
 import t from 'i18n/t';
-import { memo } from 'react';
+import { CircleCheck, Star } from 'lucide-react-native';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { SpatialNavigationFocusableView } from 'react-tv-space-navigation';
-import OverlayStore from 'Store/Overlay.store';
+import { Colors } from 'Style/Colors';
 import { ActorCardInterface } from 'Type/ActorCard.interface';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
@@ -68,11 +69,7 @@ export const ActorView = memo(({
             />
             { isDirector && (
               <View style={ styles.director }>
-                <ThemedIcon
-                  icon={ {
-                    pack: IconPackType.MaterialIcons,
-                    name: 'stars',
-                  } }
+                <Star
                   size={ scale(12) }
                   color="yellow"
                 />
@@ -105,17 +102,17 @@ export const ActorView = memo(({
     </SpatialNavigationFocusableView>
   );
 }, (
-  prevProps: ActorProps, nextProps: ActorProps,
+  prevProps: ActorProps, nextProps: ActorProps
 ) => prevProps.actor.name === nextProps.actor.name);
 
 interface ScheduleItemProps {
   item: ScheduleItemInterface,
-  idx: number
+  handleUpdateScheduleWatch: (scheduleItem: ScheduleItemInterface) => Promise<boolean>
 }
 
 export const ScheduleItem = memo(({
   item,
-  idx,
+  handleUpdateScheduleWatch,
 }: ScheduleItemProps) => {
   const {
     name,
@@ -123,16 +120,38 @@ export const ScheduleItem = memo(({
     episodeNameOriginal,
     date,
     releaseDate,
+    isWatched,
     isReleased,
   } = item;
+  const [isLoading, setIsLoading] = useState(false);
+  const [isChecked, setIsChecked] = useState(isWatched);
+
+  useEffect(() => {
+    setIsChecked(isWatched);
+  }, [isWatched]);
+
+  const handlePress = useCallback(async () => {
+    setIsLoading(true);
+
+    const result = await handleUpdateScheduleWatch(item);
+
+    setIsLoading(false);
+
+    if (!result) {
+      return;
+    }
+
+    setIsChecked((prev) => !prev);
+  }, [handleUpdateScheduleWatch, item]);
 
   return (
-    <SpatialNavigationFocusableView>
+    <SpatialNavigationFocusableView
+      onSelect={ handlePress }
+    >
       { ({ isFocused }) => (
         <View
           style={ [
             styles.scheduleItem,
-            idx % 2 === 0 && styles.scheduleItemEven,
             isFocused && styles.scheduleItemFocused,
           ] }
         >
@@ -173,28 +192,48 @@ export const ScheduleItem = memo(({
             </View>
           </View>
           <View style={ styles.scheduleItemReleaseWrapper }>
-            <ThemedText style={ [
-              styles.scheduleItemText,
-              styles.scheduleItemReleaseDate,
-              isFocused && styles.scheduleItemTextFocused,
-            ] }
-            >
-              { !isReleased ? releaseDate : '' }
-            </ThemedText>
+            { isReleased ? (
+              <View
+                style={ styles.scheduleItemMarkIcon }
+              >
+                { isLoading ? (
+                  <Loader isLoading />
+                ) : (
+                  <CircleCheck
+                    size={ scale(24) }
+                    color={ isChecked
+                      ? Colors.secondary
+                      : isFocused
+                        ? Colors.black
+                        : Colors.white }
+                  />
+                ) }
+              </View>
+            ) : (
+              <ThemedText
+                style={ [
+                  styles.scheduleItemText,
+                  styles.scheduleItemReleaseDate,
+                  isFocused && styles.scheduleItemTextFocused,
+                ] }
+              >
+                { releaseDate }
+              </ThemedText>
+            ) }
           </View>
         </View>
       ) }
     </SpatialNavigationFocusableView>
   );
 }, (
-  prevProps: ScheduleItemProps, nextProps: ScheduleItemProps,
+  prevProps: ScheduleItemProps, nextProps: ScheduleItemProps
 ) => prevProps.item.name === nextProps.item.name);
 
 interface FranchiseItemProps {
   film: FilmInterface,
   item: FranchiseItem,
   idx: number,
-  handleSelectFilm: (link: string) => void
+  handleSelectFilm: (film: FilmInterface) => void
 }
 
 export const FranchiseItemComponent = memo(({
@@ -212,19 +251,22 @@ export const FranchiseItemComponent = memo(({
   } = item;
   const position = Math.abs(idx - franchise.length);
 
+  const onSelect = useCallback(() => {
+    if (link) {
+      handleSelectFilm({ link } as unknown as FilmInterface);
+    }
+  }, [link, handleSelectFilm]);
+
   return (
     <SpatialNavigationFocusableView
-      onSelect={ () => {
-        if (link) {
-          handleSelectFilm(link);
-        }
-      } }
+      onSelect={ onSelect }
     >
       { ({ isFocused }) => (
         <View style={ [styles.franchiseItem, isFocused && styles.franchiseItemFocused] }>
           <ThemedText
             style={ [
               styles.franchiseText,
+              !link && styles.franchiseSelected,
               isFocused && styles.franchiseTextFocused,
             ] }
           >
@@ -262,40 +304,40 @@ export const FranchiseItemComponent = memo(({
     </SpatialNavigationFocusableView>
   );
 }, (
-  prevProps: FranchiseItemProps, nextProps: FranchiseItemProps,
+  prevProps: FranchiseItemProps, nextProps: FranchiseItemProps
 ) => prevProps.item.link === nextProps.item.link);
 
 interface InfoListProps {
   list: InfoListInterface,
-  idx: number,
   handleSelectCategory: (link: string) => void
 }
 
 export const InfoList = memo(({
   list,
-  idx,
   handleSelectCategory,
 }: InfoListProps) => {
+  const { goToPreviousOverlay } = useOverlayContext();
   const { name, position, link } = list;
 
   return (
     <SpatialNavigationFocusableView
       onSelect={ () => {
         handleSelectCategory(link);
-        OverlayStore.goToPreviousOverlay();
+        goToPreviousOverlay();
       } }
     >
       { ({ isFocused }) => (
-        <View style={ [
-          styles.infoList,
-          idx % 2 === 0 && styles.infoListEven,
-          isFocused && styles.infoListFocused,
-        ] }
-        >
-          <ThemedText style={ [
-            styles.infoListName,
-            isFocused && styles.infoListNameFocused,
+        <View
+          style={ [
+            styles.infoList,
+            isFocused && styles.infoListFocused,
           ] }
+        >
+          <ThemedText
+            style={ [
+              styles.infoListName,
+              isFocused && styles.infoListNameFocused,
+            ] }
           >
             { `${name} ${position || ''}` }
           </ThemedText>
@@ -304,20 +346,22 @@ export const InfoList = memo(({
     </SpatialNavigationFocusableView>
   );
 }, (
-  prevProps: InfoListProps, nextProps: InfoListProps,
+  prevProps: InfoListProps, nextProps: InfoListProps
 ) => prevProps.list.link === nextProps.list.link);
 
 interface RelatedItemProps {
+  film: FilmInterface,
   item: FilmCardInterface,
-  handleSelectFilm: (link: string) => void
+  handleSelectFilm: (film: FilmInterface) => void
 }
 
 export const RelatedItem = memo(({
+  film,
   item,
   handleSelectFilm,
 }: RelatedItemProps) => (
   <SpatialNavigationFocusableView
-    onSelect={ () => handleSelectFilm(item.link) }
+    onSelect={ () => handleSelectFilm(film) }
   >
     { ({ isFocused }) => (
       <FilmCard
@@ -329,5 +373,5 @@ export const RelatedItem = memo(({
     ) }
   </SpatialNavigationFocusableView>
 ), (
-  prevProps: RelatedItemProps, nextProps: RelatedItemProps,
+  prevProps: RelatedItemProps, nextProps: RelatedItemProps
 ) => prevProps.item.id === nextProps.item.id);

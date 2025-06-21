@@ -1,16 +1,16 @@
 import Loader from 'Component/Loader';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedDropdown from 'Component/ThemedDropdown';
-import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedText from 'Component/ThemedText';
+import { useOverlayContext } from 'Context/OverlayContext';
 import t from 'i18n/t';
+import { CircleHelp } from 'lucide-react-native';
 import React, { useId } from 'react';
 import { View } from 'react-native';
 import {
   DefaultFocus, SpatialNavigationFocusableView, SpatialNavigationScrollView, SpatialNavigationView,
 } from 'react-tv-space-navigation';
-import OverlayStore from 'Store/Overlay.store';
 import { EpisodeInterface, SeasonInterface } from 'Type/FilmVoice.interface';
 import { scale } from 'Util/CreateStyles';
 
@@ -32,6 +32,7 @@ export function PlayerVideoSelectorComponent({
   handleSelectEpisode,
   film,
 }: PlayerVideoSelectorComponentProps) {
+  const { openOverlay, closeOverlay } = useOverlayContext();
   const ratingOverlayId = useId();
 
   const renderVoiceRating = () => {
@@ -48,18 +49,16 @@ export function PlayerVideoSelectorComponent({
     return (
       <>
         <ThemedButton
-          icon={ {
-            pack: IconPackType.Octicons,
-            name: 'question',
+          IconComponent={ CircleHelp }
+          iconProps={ {
+            size: scale(20),
           } }
-          onPress={ () => OverlayStore.openOverlay(ratingOverlayId) }
+          onPress={ () => openOverlay(ratingOverlayId) }
           style={ styles.voiceRatingInput }
-          iconStyle={ styles.voiceRatingInputIcon }
-          iconSize={ scale(20) }
         />
         <ThemedOverlay
           id={ ratingOverlayId }
-          onHide={ () => OverlayStore.closeOverlay(ratingOverlayId) }
+          onHide={ () => closeOverlay(ratingOverlayId) }
           contentContainerStyle={ styles.voiceRatingOverlay }
         >
           <View style={ styles.voiceRatingContainer }>
@@ -182,10 +181,10 @@ export function PlayerVideoSelectorComponent({
     });
 
     const rows: T[][] = [];
-    // eslint-disable-next-line no-plusplus
+
     for (let i = 0; i < columns[0].length; i++) {
       const row: T[] = [];
-      // eslint-disable-next-line no-plusplus
+
       for (let j = 0; j < numberOfColumns; j++) {
         if (columns[j][i] !== undefined) {
           row.push(columns[j][i]);

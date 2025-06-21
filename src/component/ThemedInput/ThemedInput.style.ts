@@ -1,11 +1,13 @@
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
-  input: {
-    backgroundColor: Colors.gray,
+  container: {
+    backgroundColor: Colors.input,
+    borderRadius: 16,
+    paddingHorizontal: 8,
   },
-  inputFocus: {
-    backgroundColor: Colors.lightGray,
+  input: {
+    color: Colors.text,
   },
 });

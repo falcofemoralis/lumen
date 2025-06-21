@@ -8,7 +8,7 @@ import {
 import { noopFn } from 'Util/Function';
 import { isCloseToBottom } from 'Util/Scroll';
 
-import { SCROLL_EVENT_END_PADDING, SCROLL_EVENT_UPDATES_MS } from './ThemedGrid.config';
+import { SCROLL_EVENT_END_PADDING } from './ThemedGrid.config';
 import { ThemedGridComponentProps } from './ThemedGrid.type';
 
 export const ThemedGridComponent = ({
@@ -47,11 +47,12 @@ export const ThemedGridComponent = ({
       estimatedItemSize={ itemSize }
       renderItem={ renderItem }
       onScroll={ onScroll }
-      scrollEventThrottle={ SCROLL_EVENT_UPDATES_MS }
       refreshControl={ renderRefreshControl() }
       keyExtractor={ (item, idx) => `${item.id}-row-${idx}` }
       ListEmptyComponent={ ListEmptyComponent }
       recycleItems
+      showsVerticalScrollIndicator={ false }
+      waitForInitialLayout
     />
   );
 };

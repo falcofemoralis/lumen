@@ -53,11 +53,11 @@ export class CookiesManager {
 
   public set(hostname: string, cookies: Record<string, setCookieParser.Cookie>) {
     this.cookieMap.set(hostname, cookies);
-    cookiesStorage.setString(hostname, JSON.stringify(cookies));
+    cookiesStorage.set(hostname, JSON.stringify(cookies));
   }
 
   public reset() {
-    cookiesStorage.clearStore();
+    cookiesStorage.clearAll();
   }
 }
 

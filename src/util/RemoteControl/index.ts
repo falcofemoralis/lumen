@@ -16,6 +16,7 @@ export const configureRemoteControl = () => {
         [SupportedKeys.ENTER]: Directions.ENTER,
         [SupportedKeys.LONG_ENTER]: Directions.LONG_ENTER,
         [SupportedKeys.BACK]: null,
+        [SupportedKeys.BACKWARD]: null,
       };
 
       const remoteControlListener = (keyEvent: SupportedKeys) => {

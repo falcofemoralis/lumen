@@ -1,16 +1,20 @@
 import Loader from 'Component/Loader';
 import LoginForm from 'Component/LoginForm';
+import { ACCOUNT_ROUTE } from 'Component/NavigationBar/NavigationBar.config';
 import Page from 'Component/Page';
 import ThemedButton from 'Component/ThemedButton';
-import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
+import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
-import { router } from 'expo-router';
+import Wrapper from 'Component/Wrapper';
+import { useServiceContext } from 'Context/ServiceContext';
+import { RelativePathString, router } from 'expo-router';
 import t from 'i18n/t';
+import { Bell, Settings } from 'lucide-react-native';
 import React from 'react';
 import { Image, View } from 'react-native';
-import NavigationStore from 'Store/Navigation.store';
 import NotificationStore from 'Store/Notification.store';
+import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 
 import { styles } from './AccountPage.style';
@@ -20,40 +24,43 @@ export function AccountPageComponent({
   isSignedIn,
   profile,
 }: AccountPageComponentProps) {
+  const { badgeData } = useServiceContext();
+
+  const openRoute = (route: string) => {
+    router.push({
+      pathname: route as RelativePathString,
+    });
+  };
+
+  const renderTopBarButton = (IconComponent: React.ComponentType<any>, route: string) => {
+    return (
+      <ThemedPressable
+        style={ styles.tobBarBtn }
+        onPress={ () => openRoute(route) }
+      >
+        <IconComponent
+          style={ styles.tobBarBtnIcon }
+          size={ scale(24) }
+          color={ Colors.white }
+        />
+      </ThemedPressable>
+    );
+  };
+
   const renderTopBar = () => {
-    const badge = NavigationStore.badgeData['(account)'] ?? 0;
+    const badge = badgeData[ACCOUNT_ROUTE] ?? 0;
 
     return (
       <View style={ styles.topBar }>
         <View>
-          <ThemedButton
-            style={ styles.tobBarBtn }
-            iconStyle={ styles.tobBarBtnIcon }
-            icon={ {
-              name: 'bell-outline',
-              pack: IconPackType.MaterialCommunityIcons,
-            } }
-            iconSize={ scale(24) }
-            onPress={ () => router.push({
-              pathname: '/(tabs)/(account)/(notifications)/notifications',
-            }) }
-          />
+          { renderTopBarButton(Bell, '/(tabs)/(account)/notifications') }
           { badge > 0 && (
-            <View style={ styles.badge } />
+            <ThemedText style={ styles.badge }>
+              { badge }
+            </ThemedText>
           ) }
         </View>
-        <ThemedButton
-          style={ styles.tobBarBtn }
-          iconStyle={ styles.tobBarBtnIcon }
-          icon={ {
-            name: 'settings-outline',
-            pack: IconPackType.Ionicons,
-          } }
-          iconSize={ scale(24) }
-          onPress={ () => router.push({
-            pathname: '/(tabs)/(account)/settings',
-          }) }
-        />
+        { renderTopBarButton(Settings, '/(tabs)/(account)/settings') }
       </View>
     );
   };
@@ -125,7 +132,7 @@ export function AccountPageComponent({
 
   const renderContent = () => {
     if (!isSignedIn) {
-      return <LoginForm />;
+      return <LoginForm withRedirect />;
     }
 
     return renderProfile();
@@ -133,8 +140,10 @@ export function AccountPageComponent({
 
   return (
     <Page>
-      { renderTopBar() }
-      { renderContent() }
+      <Wrapper style={ styles.wrapper }>
+        { renderTopBar() }
+        { renderContent() }
+      </Wrapper>
     </Page>
   );
 }

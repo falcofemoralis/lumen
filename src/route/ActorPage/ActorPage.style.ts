@@ -1,4 +1,4 @@
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
@@ -26,12 +26,12 @@ export const styles = CreateStyles({
     fontSize: 24,
     lineHeight: 32,
     fontWeight: '700',
-    color: Colors.white,
+    color: Colors.text,
   },
   originalName: {
     fontSize: 16,
     lineHeight: 16,
-    color: Colors.lightGray,
+    color: Colors.textSecondary,
     opacity: 0.6,
     marginTop: 4,
   },

@@ -16,7 +16,7 @@ export function FilmSectionsContainer({
   contentHeight,
 }: FilmSectionsContainerProps) {
   const handleOnPress = useCallback((film: FilmCardInterface) => {
-    openFilm(film.link);
+    openFilm(film);
   }, []);
 
   const data = useMemo(() => {

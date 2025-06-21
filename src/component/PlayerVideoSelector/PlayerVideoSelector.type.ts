@@ -25,15 +25,3 @@ export type PlayerVideoSelectorComponentProps = {
   handleSelectEpisode: (episodeId: string) => void;
   film: FilmInterface;
 };
-
-export interface RBSheetRef {
-  /**
-   * The method to open bottom sheet.
-   */
-  open: () => void;
-
-  /**
-   * The method to close bottom sheet.
-   */
-  close: () => void;
-}

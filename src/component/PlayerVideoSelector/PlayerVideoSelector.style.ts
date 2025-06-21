@@ -1,4 +1,4 @@
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
@@ -8,7 +8,6 @@ export const styles = CreateStyles({
   },
   voicesContainer: {
     width: '100%',
-    maxHeight: 288,
     flexDirection: 'row',
     gap: 4,
   },
@@ -19,16 +18,20 @@ export const styles = CreateStyles({
     marginTop: 8,
   },
   season: {
-    backgroundColor: Colors.gray,
+    backgroundColor: Colors.chip,
+    borderRadius: 16,
+  },
+  seasonContent: {
+    padding: 8,
   },
   seasonSelected: {
     backgroundColor: Colors.primary,
   },
   seasonText: {
-    color: Colors.white,
+    color: Colors.chipText,
   },
   seasonTextSelected: {
-    color: Colors.lightBlue,
+    color: Colors.textOnPrimary,
   },
   episodesContainer: {
     flexDirection: 'row',
@@ -37,17 +40,21 @@ export const styles = CreateStyles({
     marginTop: 8,
     paddingTop: 8,
     borderTopWidth: 2,
-    borderTopColor: Colors.darkGray,
+    borderTopColor: Colors.divider,
   },
   episode: {
-    backgroundColor: Colors.gray,
+    backgroundColor: Colors.chip,
+    borderRadius: 16,
+  },
+  episodeContent: {
+    padding: 8,
   },
   episodeSelected: {
     backgroundColor: Colors.primary,
   },
   episodeText: {},
   episodeTextSelected: {
-    color: Colors.lightBlue,
+    color: Colors.textOnPrimary,
   },
   playContainer: {
     flexDirection: 'row',
@@ -61,20 +68,14 @@ export const styles = CreateStyles({
   },
   voiceRatingInputContainer: {
     borderRadius: 50,
+    width: 36,
+    height: 36,
   },
   voiceDropdownInputIcon: {
     flex: 1,
   },
   voiceDropdownInputIconSeason: {
     padding: 8,
-  },
-  voiceRatingSheetContainer: {
-    backgroundColor: Colors.lightBackground,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-  },
-  voiceRatingSheetIcon: {
-    width: 80,
   },
   voiceRatingContainer: {},
   voiceRatingItemContainer: {
@@ -95,7 +96,7 @@ export const styles = CreateStyles({
   voiceRatingBar: {
     height: 10,
     width: '100%',
-    backgroundColor: Colors.darkGray,
+    backgroundColor: Colors.backgroundLighter,
     borderRadius: 16,
     marginTop: 8,
   },

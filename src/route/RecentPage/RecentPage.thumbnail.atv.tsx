@@ -1,4 +1,3 @@
-import Loader from 'Component/Loader';
 import Thumbnail from 'Component/Thumbnail';
 import { Dimensions, View } from 'react-native';
 import { calculateLayoutWidth } from 'Style/Layout';
@@ -25,9 +24,11 @@ export const RecentPageThumbnail = () => {
             { width, height },
           ] }
         >
-          <Thumbnail
-            style={ styles.poster }
-          />
+          <View>
+            <Thumbnail
+              style={ styles.poster }
+            />
+          </View>
           <View style={ styles.itemContent }>
             <Thumbnail
               height={ scale(30) }
@@ -44,10 +45,6 @@ export const RecentPageThumbnail = () => {
           </View>
         </View>
       )) }
-      <Loader
-        isLoading
-        fullScreen
-      />
     </View>
   );
 };

@@ -1,4 +1,4 @@
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
@@ -9,19 +9,19 @@ export const styles = CreateStyles({
     borderRadius: 16,
   },
   settingFocused: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.backgroundFocused,
   },
   settingTitle: {
   },
   settingTitleFocused: {
-    color: Colors.black,
+    color: Colors.textFocused,
   },
   settingSubtitle: {
-    color: Colors.lightGray,
+    color: Colors.textSecondary,
     opacity: 0.8,
   },
   settingSubtitleFocused: {
-    color: Colors.black,
+    color: Colors.textFocused,
   },
   overlay: {
     gap: 16,

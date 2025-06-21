@@ -1,6 +1,6 @@
+import { Portal } from 'Component/ThemedPortal';
 import { memo } from 'react';
 import { View } from 'react-native';
-import { Portal } from 'react-native-paper';
 
 import { SpatialNavigationOverlay } from './SpatialNavigationOverlay';
 import { styles } from './ThemedOverlay.style.atv';
@@ -14,13 +14,16 @@ export function ThemedOverlayComponent({
   children,
   isOpened,
   isVisible,
+  id,
 }: ThemedOverlayComponentProps) {
   if (!isOpened) return null;
 
   return (
     <Portal>
       <SpatialNavigationOverlay
-        isModalVisible={ isOpened }
+        id={ id }
+        isModalOpened={ isOpened }
+        isModalVisible={ isOpened && isVisible }
         hideModal={ onHide }
       >
         <Portal.Host>
@@ -44,7 +47,7 @@ export function ThemedOverlayComponent({
 
 function propsAreEqual(
   prevProps: ThemedOverlayComponentProps,
-  props: ThemedOverlayComponentProps,
+  props: ThemedOverlayComponentProps
 ) {
   return prevProps.isOpened === props.isOpened && prevProps.isVisible === props.isVisible
     && prevProps.children === props.children;

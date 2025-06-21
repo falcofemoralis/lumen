@@ -1,4 +1,3 @@
-import { makeAutoObservable } from 'mobx';
 import { getConfigJson, updateConfig } from 'Util/Config';
 import { configureRemoteControl } from 'Util/RemoteControl';
 
@@ -20,8 +19,6 @@ class ConfigStore {
   };
 
   constructor() {
-    makeAutoObservable(this);
-
     this.loadConfig();
 
     if (this.isTV()) {
@@ -48,13 +45,22 @@ class ConfigStore {
       [key]: value,
     };
 
-    await updateConfig(DEVICE_CONFIG, JSON.stringify(newConfig));
+    updateConfig(DEVICE_CONFIG, JSON.stringify(newConfig));
 
     this.config = newConfig;
   }
 
+  async configureDeviceType(isTV: boolean) {
+    updateConfig(DEVICE_CONFIG, JSON.stringify({
+      ...this.config,
+      isTV,
+    }));
+
+    this.config.isTV = isTV;
+  }
+
   async configureDevice(isTV: boolean) {
-    await updateConfig(DEVICE_CONFIG, JSON.stringify({
+    updateConfig(DEVICE_CONFIG, JSON.stringify({
       ...this.config,
       isConfigured: true,
       isTV,

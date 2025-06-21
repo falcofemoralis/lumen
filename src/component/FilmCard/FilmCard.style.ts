@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Dimensions } from 'react-native';
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import { calculateItemWidth } from 'Style/Layout';
 import CreateStyles, { scale } from 'Util/CreateStyles';
 
@@ -12,7 +12,7 @@ export const INFO_PADDING_TOP = 8;
 export const calculateCardDimensions = (
   numberOfColumns: number,
   gap?: number,
-  additionalWidth?: number,
+  additionalWidth?: number
 ): FilmCardDimensions => {
   const width = calculateItemWidth(numberOfColumns, gap, additionalWidth);
 
@@ -30,15 +30,15 @@ export const calculateCardDimensions = (
 export const useFilmCardDimensions = (
   numberOfColumns: number,
   gap?: number,
-  additionalWidth?: number,
+  additionalWidth?: number
 ): FilmCardDimensions => {
   const [dimensions, setDimensions] = useState(
-    calculateCardDimensions(numberOfColumns, gap, additionalWidth),
+    calculateCardDimensions(numberOfColumns, gap, additionalWidth)
   );
 
   const updateDimensions = () => {
     setDimensions(
-      calculateCardDimensions(numberOfColumns, gap, additionalWidth),
+      calculateCardDimensions(numberOfColumns, gap, additionalWidth)
     );
   };
 
@@ -60,9 +60,14 @@ export const styles = CreateStyles({
   posterWrapper: {
     width: '100%',
     height: 'auto',
+    overflow: 'hidden',
+    borderRadius: 8,
   },
   poster: {
     aspectRatio: '166 / 250',
+  },
+  posterPendingRelease: {
+    opacity: 0.5,
   },
   info: {
     width: '100%',
@@ -72,13 +77,13 @@ export const styles = CreateStyles({
   title: {
     fontSize: 12,
     fontWeight: '700',
-    color: Colors.white,
+    color: Colors.text,
     paddingRight: 4,
   },
   subtitle: {
     fontSize: 10,
     paddingTop: 4,
-    color: Colors.lightGray,
+    color: Colors.textSecondary,
   },
   typeText: {
     position: 'absolute',
@@ -97,5 +102,6 @@ export const styles = CreateStyles({
     paddingHorizontal: 4,
     paddingVertical: 1,
     fontSize: 10,
+    borderBottomLeftRadius: 8,
   },
 });

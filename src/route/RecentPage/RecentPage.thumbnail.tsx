@@ -1,4 +1,5 @@
 import Thumbnail from 'Component/Thumbnail';
+import Wrapper from 'Component/Wrapper';
 import { View } from 'react-native';
 import { scale } from 'Util/CreateStyles';
 
@@ -6,7 +7,7 @@ import { THUMBNAILS_AMOUNT } from './RecentPage.config';
 import { styles } from './RecentPage.style';
 
 export const RecentPageThumbnail = () => (
-  <View>
+  <Wrapper>
     { Array(THUMBNAILS_AMOUNT).fill(0).map((_, index) => (
       <View
         // eslint-disable-next-line react/no-array-index-key
@@ -14,12 +15,14 @@ export const RecentPageThumbnail = () => (
         style={ [styles.item, index !== 0 && styles.itemBorder] }
       >
         <View style={ styles.itemContainer }>
-          <Thumbnail
-            style={ styles.poster }
-          />
+          <View>
+            <Thumbnail
+              style={ styles.poster }
+            />
+          </View>
           <View style={ styles.itemContent }>
             <Thumbnail
-              width="80%"
+              width="60%"
               height={ scale(20) }
             />
             <Thumbnail
@@ -38,5 +41,5 @@ export const RecentPageThumbnail = () => (
         </View>
       </View>
     )) }
-  </View>
+  </Wrapper>
 );

@@ -1,36 +1,47 @@
-import { Rating } from '@kolking/react-native-rating';
 import BookmarksSelector from 'Component/BookmarksSelector';
-import Comments from 'Component/Comments';
-import { CommentsRef } from 'Component/Comments/Comments.container';
+import Header from 'Component/Header';
 import Page from 'Component/Page';
 import PlayerVideoSelector from 'Component/PlayerVideoSelector';
 import ThemedButton from 'Component/ThemedButton';
-import ThemedIcon from 'Component/ThemedIcon';
-import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImageModal from 'Component/ThemedImageModal';
-import ThemedOverlay from 'Component/ThemedOverlay';
+import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
-import { useRouter } from 'expo-router';
+import Wrapper from 'Component/Wrapper';
+import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
 import t from 'i18n/t';
-import React, { useCallback, useRef, useState } from 'react';
 import {
-  NativeScrollEvent,
-  NativeSyntheticEvent,
+  Bookmark,
+  Clapperboard,
+  Clock,
+  Download,
+  Forward,
+  MessageSquareText,
+  Play,
+  Star,
+} from 'lucide-react-native';
+import React from 'react';
+import {
   ScrollView,
   Text,
-  TouchableHighlight,
-  TouchableOpacity,
+  useWindowDimensions,
   View,
 } from 'react-native';
+import Animated, {
+  interpolate,
+  useAnimatedRef,
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
+} from 'react-native-reanimated';
 import NotificationStore from 'Store/Notification.store';
-import OverlayStore from 'Store/Overlay.store';
-import Colors from 'Style/Colors';
+import RouterStore from 'Store/Router.store';
+import { Colors } from 'Style/Colors';
 import { CollectionItemInterface } from 'Type/CollectionItem';
+import { FilmInterface } from 'Type/Film.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { scale } from 'Util/CreateStyles';
-import { isCloseToBottom } from 'Util/Scroll';
 
-import { SCROLL_EVENT_END_PADDING } from './FilmPage.config';
 import { styles } from './FilmPage.style';
 import { FilmPageThumbnail } from './FilmPage.thumbnail';
 import { FilmPageComponentProps } from './FilmPage.type';
@@ -44,9 +55,9 @@ import {
 
 export function FilmPageComponent({
   film,
+  thumbnailPoster,
   visibleScheduleItems,
   playerVideoSelectorOverlayId,
-  scheduleOverlayId,
   bookmarksOverlayId,
   playFilm,
   hideVideoSelector,
@@ -56,61 +67,59 @@ export function FilmPageComponent({
   handleSelectCategory,
   handleUpdateScheduleWatch,
   handleShare,
+  openBookmarks,
 }: FilmPageComponentProps) {
-  const router = useRouter();
-  const [commentsVisible, setCommentsVisible] = useState(false);
-  const commentsRef = useRef<CommentsRef>(null);
+  const { width } = useWindowDimensions();
+  const scrollRef = useAnimatedRef<Animated.ScrollView>();
+  const scrollOffset = useSharedValue(0);
+  const scrollHandler = useAnimatedScrollHandler(event => {
+    scrollOffset.value = event.contentOffset.y;
+  });
+  const imageHeight = width * (166 / 250);
 
-  const onScroll = useCallback(
-    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-      const closePadding = commentsVisible
-        ? SCROLL_EVENT_END_PADDING * 4
-        : SCROLL_EVENT_END_PADDING;
-
-      if (isCloseToBottom(event, closePadding)) {
-        if (commentsVisible) {
-          commentsRef.current?.loadComments();
-        } else {
-          setCommentsVisible(true);
-        }
-      }
-    }, [commentsVisible],
-  );
+  const imageAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          translateY: interpolate(
+            scrollOffset.value,
+            [-imageHeight, 0, imageHeight],
+            [-imageHeight / 2, 0, imageHeight * 0.75]
+          ),
+        },
+        {
+          scale: interpolate(scrollOffset.value, [-imageHeight, 0, imageHeight], [2, 1, 1]),
+        },
+      ],
+    };
+  });
 
   if (!film) {
-    return <FilmPageThumbnail />;
+    film = null as unknown as FilmInterface; // dirty hack to avoid null checks
   }
 
-  const renderTopActions = () => (
-    <View style={ styles.topActions }>
-      <TouchableOpacity
-        style={ styles.topActionsButton }
-        onPress={ () => router.back() }
-      >
-        <ThemedIcon
-          icon={ {
-            name: 'arrow-back',
-            pack: IconPackType.MaterialIcons,
-          } }
-          size={ scale(32) }
-          color="white"
-        />
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={ styles.topActionsButton }
-        onPress={ handleShare }
-      >
-        <ThemedIcon
-          icon={ {
-            name: 'share',
-            pack: IconPackType.MaterialIcons,
-          } }
-          size={ scale(32) }
-          color="white"
-        />
-      </TouchableOpacity>
-    </View>
-  );
+  const openComments = () => {
+    router.push({ pathname: '/modal' });
+    RouterStore.pushData('modal', {
+      type: 'comments',
+      film,
+    });
+  };
+
+  const openSchedule = () => {
+    router.push({ pathname: '/modal' });
+    RouterStore.pushData('modal', {
+      type: 'schedule',
+      film,
+      additionalProps: {
+        handleUpdateScheduleWatch,
+      },
+    });
+  };
+
+  const openNotImplemented = () => {
+    NotificationStore.displayMessage(t('Not implemented'));
+  };
 
   const renderTitle = () => {
     const { title, originalTitle } = film;
@@ -133,33 +142,22 @@ export function FilmPageComponent({
     const { genres = [] } = film;
 
     return (
-      <ScrollView horizontal>
+      <ScrollView horizontal showsHorizontalScrollIndicator={ false }>
         <View style={ styles.genres }>
           { genres.map(({ name, link }) => (
-            <TouchableHighlight
+            <ThemedPressable
               key={ name }
+              style={ styles.genre }
+              contentStyle={ styles.genreContent }
               onPress={ () => handleSelectCategory(link) }
             >
-              <ThemedText style={ styles.genre }>
+              <ThemedText>
                 { name }
               </ThemedText>
-            </TouchableHighlight>
+            </ThemedPressable>
           )) }
         </View>
       </ScrollView>
-    );
-  };
-
-  const renderPoster = () => {
-    const { poster, largePoster } = film;
-
-    return (
-      <ThemedImageModal
-        src={ poster }
-        modalSrc={ largePoster }
-        style={ styles.posterWrapper }
-        imageStyle={ styles.poster }
-      />
     );
   };
 
@@ -188,7 +186,7 @@ export function FilmPageComponent({
   const renderCollection = (
     collection: CollectionItemInterface[],
     title: string,
-    handler?: (link: string) => void,
+    handler?: (link: string) => void
   ) => {
     if (!collection.length) {
       return null;
@@ -200,9 +198,10 @@ export function FilmPageComponent({
           { `${title}: ` }
         </ThemedText>
         { collection.map(({ name, link }) => (
-          <TouchableOpacity
+          <ThemedPressable
             key={ name }
             style={ styles.collectionButton }
+            contentStyle={ styles.collectionButtonContent }
             onPress={ () => handler && handler(link) }
           >
             <ThemedText
@@ -210,7 +209,7 @@ export function FilmPageComponent({
             >
               { name }
             </ThemedText>
-          </TouchableOpacity>
+          </ThemedPressable>
         )) }
       </View>
     );
@@ -224,119 +223,82 @@ export function FilmPageComponent({
     return renderCollection(items, t('Director'), handleSelectActor);
   };
 
-  const renderMainInfo = () => {
-    const {
-      releaseDate,
-      ratings = [],
-      countries = [],
-      duration,
-    } = film;
-
-    return (
-      <View style={ styles.mainInfo }>
-        { ratings.map(({ name, rating, votes }) => renderInfoText(`${rating} (${votes})`, name)) }
-        { renderInfoText(releaseDate, t('Release date')) }
-        { renderInfoText(duration, t('Time')) }
-        { renderRating() }
-        { renderDirectors() }
-        { renderCollection(countries, t('Country'), handleSelectCategory) }
-      </View>
-    );
-  };
-
-  const renderMainContent = () => (
-    <View style={ styles.mainContent }>
-      { renderPoster() }
-      { renderMainInfo() }
-    </View>
-  );
-
   const renderDescription = () => {
     const { description } = film;
 
-    return <ThemedText style={ styles.description }>{ description }</ThemedText>;
+    return (
+      <Wrapper>
+        <ThemedText style={ styles.description }>
+          { description }
+        </ThemedText>
+      </Wrapper>
+    );
   };
 
-  const renderPlayFilmButton = () => {
+  const renderMiddleAction = (
+    IconComponent: React.ComponentType<any>,
+    text: string,
+    action?: () => void
+  ) => (
+    <View style={ styles.middleAction }>
+      <ThemedPressable
+        style={ styles.middleActionButton }
+        onPress={ action }
+      >
+        <IconComponent
+          style={ styles.middleActionIcon }
+          size={ scale(20) }
+          color={ Colors.white }
+        />
+      </ThemedPressable>
+      { /* <ThemedText style={ styles.middleActionText }>
+        { text }
+      </ThemedText> */ }
+    </View>
+  );
+
+  const renderMiddleActions = () => (
+    <View style={ styles.middleActions }>
+      { renderMiddleAction(Star, 'Rate',openNotImplemented) }
+      { renderMiddleAction(Clapperboard, 'Trailer', openNotImplemented) }
+      { renderMiddleAction(MessageSquareText, 'Comments', openComments) }
+      { renderMiddleAction(Bookmark, 'Bookmark', openBookmarks) }
+      { renderMiddleAction(Download, 'Download', openNotImplemented) }
+    </View>
+  );
+
+  const renderPlay = () => {
     const { isPendingRelease } = film;
 
     if (isPendingRelease) {
       return (
-        <View style={ styles.pendingRelease }>
-          <ThemedIcon
+        <Wrapper style={ styles.pendingRelease }>
+          <Clock
             style={ styles.pendingReleaseIcon }
-            icon={ {
-              pack: IconPackType.MaterialCommunityIcons,
-              name: 'clock-outline',
-            } }
-            size={ scale(32) }
-            color="white"
+            size={ scale(24) }
+            color={ Colors.white }
           />
           <ThemedText style={ styles.pendingReleaseText }>
             { t('We are waiting for the film in the good quality') }
           </ThemedText>
-        </View>
+        </Wrapper>
       );
     }
 
     return (
-      <ThemedButton
-        style={ styles.playBtn }
-        onPress={ playFilm }
-      >
-        { t('Watch Now') }
-      </ThemedButton>
-    );
-  };
-
-  const renderAction = (text: string, icon: string, onPress?: () => void) => (
-    <TouchableOpacity
-      style={ styles.action }
-      onPress={ onPress }
-    >
-      <ThemedIcon
-        style={ styles.actionIcon }
-        icon={ {
-          name: icon,
-          pack: IconPackType.MaterialCommunityIcons,
-        } }
-        size={ scale(24) }
-        color="white"
-      />
-      <ThemedText
-        style={ styles.actionText }
-      >
-        { text }
-      </ThemedText>
-    </TouchableOpacity>
-  );
-
-  const renderActions = () => (
-    <View style={ styles.actions }>
-      { renderAction(t('Trailer'), 'movie-open-check-outline', () => NotificationStore.displayMessage(t('Not implemented'))) }
-      { renderAction(t('Bookmark'), 'movie-star-outline', () => OverlayStore.openOverlay(bookmarksOverlayId)) }
-      { renderAction(t('Download'), 'folder-download-outline', () => NotificationStore.displayMessage(t('Not implemented'))) }
-    </View>
-  );
-
-  const renderRating = () => {
-    const { mainRating, ratingScale } = film;
-
-    if (!mainRating) {
-      return null;
-    }
-
-    return (
-      <View style={ styles.rating }>
-        <Rating
-          size={ scale(12) }
-          rating={ mainRating.rating || 0 }
-          scale={ 1 }
-          spacing={ scale(2) }
-          maxRating={ ratingScale || 10 }
-          fillColor={ Colors.secondary }
-        />
-      </View>
+      <Wrapper>
+        <ThemedButton
+          style={ styles.playBtn }
+          onPress={ playFilm }
+          IconComponent={ Play }
+          iconProps={ {
+            size: scale(18),
+            color: Colors.white,
+          } }
+        >
+          { t('Watch Now') }
+        </ThemedButton>
+      </Wrapper>
     );
   };
 
@@ -350,51 +312,22 @@ export function FilmPageComponent({
     }
 
     return (
-      <Section title={ t('Actors') }>
-        <ScrollView horizontal>
-          <View style={ styles.actorsList }>
-            { persons.map((actor, index) => (
-              <ActorView
+      <Wrapper>
+        <Section title={ t('Actors') }>
+          <ScrollView horizontal>
+            <View style={ styles.actorsList }>
+              { persons.map((actor, index) => (
+                <ActorView
                 // eslint-disable-next-line react/no-array-index-key
-                key={ `actor-${actor.name}-${index}` }
-                actor={ actor }
-                handleSelectActor={ handleSelectActor }
-              />
-            )) }
-          </View>
-        </ScrollView>
-      </Section>
-    );
-  };
-
-  const renderScheduleOverlay = () => {
-    const { schedule = [] } = film;
-
-    return (
-      <ThemedOverlay
-        id={ scheduleOverlayId }
-        onHide={ () => OverlayStore.goToPreviousOverlay() }
-      >
-        <ScrollView>
-          { schedule.map(({ name, items }) => (
-            <View key={ name }>
-              <ThemedText style={ styles.scheduleSeason }>
-                { name }
-              </ThemedText>
-              <View>
-                { items.map((subItem, idx) => (
-                  <ScheduleItem
-                    key={ `modal-${subItem.name}` }
-                    item={ subItem }
-                    idx={ idx }
-                    handleUpdateScheduleWatch={ handleUpdateScheduleWatch }
-                  />
-                )) }
-              </View>
+                  key={ `actor-${actor.name}-${index}` }
+                  actor={ actor }
+                  handleSelectActor={ handleSelectActor }
+                />
+              )) }
             </View>
-          )) }
-        </ScrollView>
-      </ThemedOverlay>
+          </ScrollView>
+        </Section>
+      </Wrapper>
     );
   };
 
@@ -406,24 +339,25 @@ export function FilmPageComponent({
     }
 
     return (
-      <Section title={ t('Schedule') }>
-        <View style={ styles.visibleScheduleItems }>
-          { visibleScheduleItems.map((item: ScheduleItemInterface, idx: number) => (
-            <ScheduleItem
-              key={ `schedule-visible-${item.name}` }
-              item={ item }
-              idx={ idx }
-              handleUpdateScheduleWatch={ handleUpdateScheduleWatch }
-            />
-          )) }
-        </View>
-        <ThemedButton
-          onPress={ () => OverlayStore.openOverlay(scheduleOverlayId) }
-          style={ styles.scheduleViewAll }
-        >
-          { t('View full schedule') }
-        </ThemedButton>
-      </Section>
+      <Wrapper>
+        <Section title={ t('Schedule') }>
+          <View style={ styles.visibleScheduleItems }>
+            { visibleScheduleItems.map((item: ScheduleItemInterface, idx: number) => (
+              <ScheduleItem
+                key={ `schedule-visible-${item.name}` }
+                item={ item }
+                handleUpdateScheduleWatch={ handleUpdateScheduleWatch }
+              />
+            )) }
+          </View>
+          <ThemedButton
+            onPress={ openSchedule }
+            style={ styles.scheduleViewAll }
+          >
+            { t('View full schedule') }
+          </ThemedButton>
+        </Section>
+      </Wrapper>
     );
   };
 
@@ -435,7 +369,10 @@ export function FilmPageComponent({
     }
 
     return (
-      <Section title={ t('Franchise') }>
+      <Section
+        title={ t('Franchise') }
+        useHeadingWrapper
+      >
         <View style={ styles.franchiseList }>
           { franchise.map((item, idx) => (
             <FranchiseItemComponent
@@ -455,20 +392,23 @@ export function FilmPageComponent({
     const { related = [] } = film;
 
     return (
-      <Section title={ t('Related') }>
-        <ScrollView horizontal>
-          <View style={ styles.relatedList }>
-            { related.map((item, idx) => (
-              <RelatedItem
+      <Wrapper>
+        <Section title={ t('Related') }>
+          <ScrollView horizontal>
+            <View style={ styles.relatedList }>
+              { related.map((item, idx) => (
+                <RelatedItem
                 // eslint-disable-next-line react/no-array-index-key -- idx is unique
-                key={ `${item.id}-${idx}` }
-                item={ item }
-                handleSelectFilm={ handleSelectFilm }
-              />
-            )) }
-          </View>
-        </ScrollView>
-      </Section>
+                  key={ `${item.id}-${idx}` }
+                  film={ film }
+                  item={ item }
+                  handleSelectFilm={ handleSelectFilm }
+                />
+              )) }
+            </View>
+          </ScrollView>
+        </Section>
+      </Wrapper>
     );
   };
 
@@ -498,7 +438,10 @@ export function FilmPageComponent({
     }
 
     return (
-      <Section title={ t('Included in') }>
+      <Section
+        title={ t('Included in') }
+        useHeadingWrapper
+      >
         <View>
           { data.map(({ id, title, items }, index) => (
             <View key={ id }>
@@ -514,7 +457,6 @@ export function FilmPageComponent({
                   <InfoList
                     key={ `info-list-${subItem.name}` }
                     list={ subItem }
-                    idx={ idx }
                     handleSelectCategory={ handleSelectCategory }
                   />
                 )) }
@@ -543,28 +485,6 @@ export function FilmPageComponent({
     );
   };
 
-  const renderComments = () => {
-    if (!commentsVisible) {
-      return null;
-    }
-
-    return (
-      <View>
-        <ScrollView
-          horizontal
-          contentContainerStyle={ { width: '100%', height: '100%' } }
-        >
-          <Section title={ t('Comments') }>
-            <Comments
-              ref={ commentsRef }
-              film={ film }
-            />
-          </Section>
-        </ScrollView>
-      </View>
-    );
-  };
-
   const renderBookmarksOverlay = () => (
     <BookmarksSelector
       overlayId={ bookmarksOverlayId }
@@ -572,32 +492,145 @@ export function FilmPageComponent({
     />
   );
 
-  const renderModals = () => (
-    <>
-      { renderPlayerVideoSelector() }
-      { renderScheduleOverlay() }
-      { renderBookmarksOverlay() }
-    </>
+  const renderModals = () => {
+    if (!film) {
+      return null;
+    }
+
+    return (
+      <>
+        { renderPlayerVideoSelector() }
+        { renderBookmarksOverlay() }
+      </>
+    );
+  };
+
+  const renderTopActions = () => (
+    <Header
+      additionalAction={ handleShare }
+      AdditionalActionIcon={ Forward }
+    />
   );
+
+  const renderPosterBackground = () => {
+    return (
+      <Animated.Image
+        src={ thumbnailPoster }
+        style={ [styles.posterBackground, imageAnimatedStyle] }
+        blurRadius={ 5 }
+      />
+    );
+  };
+
+  const renderGradient = () => {
+    return (
+      <LinearGradient
+        style={ styles.backgroundGradient }
+        colors={ [Colors.background, Colors.transparent] }
+        start={ { x: 0, y: 1 } }
+        end={ { x: 0, y: 0 } }
+      />
+    );
+  };
+
+  const renderPoster = () => {
+    const { poster, largePoster } = film;
+
+    return (
+      <ThemedImageModal
+        src={ poster }
+        modalSrc={ largePoster }
+        style={ styles.posterWrapper }
+        imageStyle={ styles.poster }
+      />
+    );
+  };
+
+  const renderMainInfo = () => {
+    const {
+      releaseDate,
+      countries = [],
+      duration,
+    } = film;
+
+    return (
+      <View style={ styles.mainInfo }>
+        { renderRatings() }
+        { renderInfoText(releaseDate, t('Release date')) }
+        { renderInfoText(duration, t('Time')) }
+        { renderDirectors() }
+        { renderCollection(countries, t('Country'), handleSelectCategory) }
+      </View>
+    );
+  };
+
+  const renderRatings = () => {
+    const { ratings = [] } = film;
+
+    if (!ratings.length) {
+      return null;
+    }
+
+    return ratings.map(({ name, rating, votes }) => renderInfoText(`${rating} (${votes})`, name));
+  };
+
+  const renderContent = () => {
+    if (!film) {
+      return (
+        <FilmPageThumbnail />
+      );
+    }
+
+    return (
+      <View>
+        <View style={ styles.upperContent }>
+          { renderTopActions() }
+          <Wrapper>
+            { renderTitle() }
+            { renderGenres() }
+            <View style={ styles.upperContentWrapper }>
+              { renderPoster() }
+              <View style={ styles.upperContentInfo }>
+                { renderMainInfo() }
+              </View>
+            </View>
+          </Wrapper>
+        </View>
+        <View style={ styles.middleContent }>
+          { renderGradient() }
+          <Wrapper>
+            { renderMiddleActions() }
+          </Wrapper>
+        </View>
+        <View style={ styles.bottomContent }>
+          <View style={ styles.mainContent }>
+            { renderDescription() }
+            { renderPlay() }
+            { renderActors() }
+            { renderFranchise() }
+            { renderSchedule() }
+            { renderInfoLists() }
+            { renderRelated() }
+          </View>
+        </View>
+      </View>
+    );
+  };
 
   return (
     <Page>
-      <ScrollView onScroll={ onScroll }>
-        { renderModals() }
-        { renderTopActions() }
-        { renderTitle() }
-        { renderGenres() }
-        { renderMainContent() }
-        { renderDescription() }
-        { renderActions() }
-        { renderPlayFilmButton() }
-        { renderActors() }
-        { renderFranchise() }
-        { renderSchedule() }
-        { renderInfoLists() }
-        { renderRelated() }
-        { renderComments() }
-      </ScrollView>
+      { renderModals() }
+      <Animated.ScrollView
+        ref={ scrollRef }
+        scrollEnabled={ !!film }
+        onScroll={ scrollHandler }
+        scrollEventThrottle={ 16 }
+      >
+        <View>
+          { renderPosterBackground() }
+          { renderContent() }
+        </View>
+      </Animated.ScrollView>
     </Page>
   );
 }

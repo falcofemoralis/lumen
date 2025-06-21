@@ -1,16 +1,19 @@
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
   modal: {
     paddingHorizontal: 8,
+    justifyContent: 'center',
+    height: '100%',
+    width: '100%',
     backgroundColor: Colors.modal,
   },
   contentContainerStyle: {
-    backgroundColor: '#1E1F20',
+    backgroundColor: Colors.backgroundLight,
     padding: 8,
     borderRadius: 16,
-    borderColor: Colors.lightGravel,
+    borderColor: Colors.darkBorder,
     borderWidth: 1,
     maxHeight: '50%',
     overflow: 'hidden',

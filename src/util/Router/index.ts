@@ -1,10 +1,23 @@
 import { router } from 'expo-router';
+import NotificationStore from 'Store/Notification.store';
+import { FilmCardInterface } from 'Type/FilmCard.interface';
 
-export const openFilm = (link: string) => {
+type FilmInput = Pick<FilmCardInterface, 'link' | 'poster'>;
+
+export const openFilm = (film: FilmInput) => {
+  const { link, poster } = film;
+
+  if (!link) {
+    NotificationStore.displayError('Oops! Film link is missing.');
+
+    return;
+  }
+
   router.push({
     pathname: '/film/[link]',
     params: {
       link,
+      poster,
     },
   });
 };

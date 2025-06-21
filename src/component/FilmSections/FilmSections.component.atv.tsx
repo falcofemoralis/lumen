@@ -1,7 +1,6 @@
 import FilmCard from 'Component/FilmCard';
 import { calculateCardDimensions } from 'Component/FilmCard/FilmCard.style.atv';
 import ThemedText from 'Component/ThemedText';
-import ThemedView from 'Component/ThemedView';
 import React, {
   memo,
   useCallback,
@@ -47,10 +46,11 @@ const FilmSectionsRow = ({
   );
 
   return (
-    <ThemedView style={ [
-      styles.container,
-      { width: containerWidth },
-    ] }
+    <View
+      style={ [
+        styles.container,
+        { width: containerWidth },
+      ] }
     >
       { content && renderContent() }
       { header && renderHeader() }
@@ -75,7 +75,7 @@ const FilmSectionsRow = ({
           </SpatialNavigationFocusableView>
         )) }
       </SpatialNavigationView>
-    </ThemedView>
+    </View>
   );
 };
 
@@ -89,7 +89,7 @@ export function FilmSectionsComponent({
   const { width, height } = calculateCardDimensions(
     NUMBER_OF_COLUMNS_TV,
     scale(ROW_GAP),
-    scale(ROW_GAP) * 2,
+    scale(ROW_GAP) * 2
   );
 
   const containerWidth = calculateItemWidth(1);
@@ -113,7 +113,7 @@ export function FilmSectionsComponent({
   }, {} as Record<string, number>), [data]);
 
   const getCalculatedItemSize = useCallback((
-    item: FilmSectionsItem,
+    item: FilmSectionsItem
   ) => calculatedHeights[item.index], [calculatedHeights]);
 
   return (

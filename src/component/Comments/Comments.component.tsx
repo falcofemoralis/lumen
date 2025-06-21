@@ -1,18 +1,17 @@
-import Loader from 'Component/Loader';
 import ThemedGrid from 'Component/ThemedGrid';
 import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
-import ThemedIcon from 'Component/ThemedIcon';
-import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
 import t from 'i18n/t';
+import { ThumbsUp } from 'lucide-react-native';
 import { memo, useCallback } from 'react';
 import { View } from 'react-native';
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import { CommentInterface } from 'Type/Comment.interface';
 import { scale } from 'Util/CreateStyles';
 
 import { INDENT_SIZE, styles } from './Comments.style';
+import { CommentsThumbnail } from './Comments.thumbnail';
 import { CommentItemProps, CommentsComponentProps } from './Comments.type';
 import { CommentText } from './CommentText';
 
@@ -38,7 +37,6 @@ export function CommentItem({
         idx % 2 === 0 ? styles.itemEven : null,
         {
           paddingLeft: leftIndent,
-
         },
       ] }
     >
@@ -64,11 +62,7 @@ export function CommentItem({
               <ThemedText style={ styles.commentTextSmall }>
                 { likes }
               </ThemedText>
-              <ThemedIcon
-                icon={ {
-                  pack: IconPackType.MaterialCommunityIcons,
-                  name: 'thumb-up-outline',
-                } }
+              <ThumbsUp
                 size={ scale(16) }
                 color={ Colors.white }
               />
@@ -89,7 +83,7 @@ const MemoCommentItem = memo(CommentItem, rowPropsAreEqual);
 export const CommentsComponent = ({
   comments,
   isLoading,
-  loaderFullScreen,
+  style,
   onNextLoad,
 }: CommentsComponentProps) => {
   const renderItem = useCallback(
@@ -99,16 +93,13 @@ export const CommentsComponent = ({
         idx={ index }
       />
     ),
-    [],
+    []
   );
 
   if (!comments || (isLoading && !comments.length)) {
     return (
       <View style={ styles.loader }>
-        <Loader
-          isLoading
-          fullScreen={ loaderFullScreen }
-        />
+        <CommentsThumbnail />
       </View>
     );
   }
@@ -125,7 +116,7 @@ export const CommentsComponent = ({
 
   return (
     <ThemedGrid
-      style={ styles.commentsList }
+      style={ [styles.commentsList, style] }
       data={ comments }
       numberOfColumns={ 1 }
       itemSize={ scale(100) }

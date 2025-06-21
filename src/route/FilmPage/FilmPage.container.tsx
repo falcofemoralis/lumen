@@ -1,13 +1,14 @@
+import { useOverlayContext } from 'Context/OverlayContext';
+import { useServiceContext } from 'Context/ServiceContext';
 import { router } from 'expo-router';
 import { withTV } from 'Hooks/withTV';
+import t from 'i18n/t';
 import {
   useCallback, useEffect, useId, useState,
 } from 'react';
 import { Share } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
-import OverlayStore from 'Store/Overlay.store';
 import RouterStore from 'Store/Router.store';
-import ServiceStore from 'Store/Service.store';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
@@ -20,17 +21,20 @@ import FilmPageComponentTV from './FilmPage.component.atv';
 import { MINIMUM_SCHEDULE_ITEMS } from './FilmPage.config';
 import { FilmPageContainerProps } from './FilmPage.type';
 
-export function FilmPageContainer({ link }: FilmPageContainerProps) {
+export function FilmPageContainer({ link, thumbnailPoster }: FilmPageContainerProps) {
+  const { isSignedIn, getCurrentService } = useServiceContext();
+  const { openOverlay, goToPreviousOverlay } = useOverlayContext();
   const [film, setFilm] = useState<FilmInterface | null>(null);
   const playerVideoSelectorOverlayId = useId();
   const scheduleOverlayId = useId();
   const commentsOverlayId = useId();
   const bookmarksOverlayId = useId();
+  const descriptionOverlayId = useId();
 
   useEffect(() => {
     const loadFilm = async () => {
       try {
-        const loadedFilm = await ServiceStore.getCurrentService().getFilm(link);
+        const loadedFilm = await getCurrentService().getFilm(link);
 
         setFilm(loadedFilm);
       } catch (error) {
@@ -46,11 +50,11 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
       return;
     }
 
-    OverlayStore.openOverlay(playerVideoSelectorOverlayId);
+    openOverlay(playerVideoSelectorOverlayId);
   }, [film, playerVideoSelectorOverlayId]);
 
   const hideVideoSelector = useCallback(() => {
-    OverlayStore.goToPreviousOverlay();
+    goToPreviousOverlay();
   }, []);
 
   const handleVideoSelect = (video: FilmVideoInterface, voice: FilmVoiceInterface) => {
@@ -86,8 +90,8 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
       return;
     }
 
-    if (ServiceStore.isSignedIn) {
-      ServiceStore.getCurrentService().saveWatch(film, voice)
+    if (isSignedIn) {
+      getCurrentService().saveWatch(film, voice)
         .catch((error) => {
           NotificationStore.displayError(error as Error);
         });
@@ -108,8 +112,8 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
     });
   };
 
-  const handleSelectFilm = useCallback((filmLink: string) => {
-    openFilm(filmLink);
+  const handleSelectFilm = useCallback((f: FilmInterface) => {
+    openFilm(f);
   }, []);
 
   const handleSelectActor = useCallback((actorLink: string) => {
@@ -146,45 +150,51 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
     return initialItems;
   }, [film]);
 
-  const handleUpdateScheduleWatch = useCallback((scheduleItem: ScheduleItemInterface) => {
+  const handleUpdateScheduleWatch = useCallback(async (scheduleItem: ScheduleItemInterface) => {
     const { id } = scheduleItem;
+
+    if (!isSignedIn) {
+      NotificationStore.displayMessage(t('Sign In to an Account'));
+
+      return false;
+    }
+
+    try {
+      getCurrentService().saveScheduleWatch(id);
+    } catch (error) {
+      NotificationStore.displayError(error as Error);
+
+      return false;
+    }
 
     setFilm((prevFilm) => {
       if (!prevFilm) {
         return prevFilm;
       }
 
-      const schedule = prevFilm.schedule?.[0];
-      if (!schedule) {
-        return prevFilm;
-      }
+      const { schedule = [] } = prevFilm;
 
-      const items = schedule.items.map((i) => {
-        if (i.id === id) {
-          return {
-            ...i,
-            isWatched: !i.isWatched,
-          };
-        }
+      const newSchedule = schedule.map((s) => {
+        return {
+          ...s,
+          items: s.items.map((i) => {
+            if (i.id === id) {
+              return { ...i, isWatched: !i.isWatched };
+            }
 
-        return i;
+            return i;
+          }),
+        };
       });
 
       return {
         ...prevFilm,
-        schedule: [{
-          ...schedule,
-          items,
-        }],
+        schedule: newSchedule,
       };
     });
 
-    try {
-      ServiceStore.getCurrentService().saveScheduleWatch(id);
-    } catch (error) {
-      NotificationStore.displayError(error as Error);
-    }
-  }, []);
+    return true;
+  }, [isSignedIn]);
 
   const handleShare = async () => {
     if (!film) {
@@ -200,13 +210,25 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
     }
   };
 
+  const openBookmarks = () => {
+    if (!isSignedIn) {
+      NotificationStore.displayMessage(t('Sign In to an Account'));
+
+      return;
+    }
+
+    openOverlay(bookmarksOverlayId);
+  };
+
   const containerProps = () => ({
     film,
+    thumbnailPoster,
     visibleScheduleItems: getVisibleScheduleItems(),
     playerVideoSelectorOverlayId,
     scheduleOverlayId,
     commentsOverlayId,
     bookmarksOverlayId,
+    descriptionOverlayId,
   });
 
   const containerFunctions = {
@@ -218,6 +240,7 @@ export function FilmPageContainer({ link }: FilmPageContainerProps) {
     handleSelectCategory,
     handleUpdateScheduleWatch,
     handleShare,
+    openBookmarks,
   };
 
   return withTV(FilmPageComponentTV, FilmPageComponent, {

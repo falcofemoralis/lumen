@@ -1,10 +1,11 @@
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
   container: {
     flexDirection: 'column',
     zIndex: 10,
+    marginTop: 16,
   },
   searchContainer: {
     flexDirection: 'row',
@@ -21,6 +22,8 @@ export const styles = CreateStyles({
   searchBar: {
     width: '100%',
     height: 48,
+    borderRadius: 50,
+    paddingHorizontal: 16,
   },
   suggestionsWrapper: {
     marginTop: 16,
@@ -36,7 +39,7 @@ export const styles = CreateStyles({
     backgroundColor: Colors.secondary,
   },
   speakActiveIcon: {
-    color: Colors.white,
+    color: Colors.text,
   },
   hidden: {
     opacity: 0,

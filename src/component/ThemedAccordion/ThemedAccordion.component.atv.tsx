@@ -1,9 +1,9 @@
 import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedText from 'Component/ThemedText';
+import { useOverlayContext } from 'Context/OverlayContext';
 import { useRef, useState } from 'react';
 import { View } from 'react-native';
 import { DefaultFocus, SpatialNavigationFocusableView, SpatialNavigationScrollView } from 'react-tv-space-navigation';
-import OverlayStore from 'Store/Overlay.store';
 import { scale } from 'Util/CreateStyles';
 import { generateId } from 'Util/Math';
 
@@ -12,30 +12,35 @@ import { AccordionGroupInterface, ThemedAccordionComponentProps } from './Themed
 
 export const ThemedAccordionComponent = ({
   data,
+  overlayContent,
   renderItem,
 }: ThemedAccordionComponentProps<any>) => {
+  const { closeOverlay, openOverlay } = useOverlayContext();
   const overlayId = useRef(generateId());
   const [openAccordionGroup, setOpenAccordionGroup] = useState<string | null>(null);
 
-  const openOverlay = (groupId: string) => {
+  const showOverlay = (groupId: string) => {
     setOpenAccordionGroup(groupId);
 
-    OverlayStore.openOverlay(overlayId.current);
+    openOverlay(overlayId.current);
   };
 
-  const closeOverlay = () => {
+  const handleCloseOverlay = () => {
     setOpenAccordionGroup(null);
 
-    OverlayStore.closeOverlay(overlayId.current);
+    closeOverlay(overlayId.current);
   };
 
   const renderAccordionGroup = (group: AccordionGroupInterface<any>) => {
     const { id, title } = group;
 
     return (
-      <View key={ `group-${id}` }>
+      <View
+        key={ `group-${id}` }
+        style={ styles.groupContainer }
+      >
         <SpatialNavigationFocusableView
-          onSelect={ () => openOverlay(id) }
+          onSelect={ () => showOverlay(id) }
         >
           { ({ isFocused }) => (
             <ThemedText
@@ -58,11 +63,12 @@ export const ThemedAccordionComponent = ({
     return (
       <ThemedOverlay
         id={ overlayId.current }
-        onHide={ closeOverlay }
+        onHide={ handleCloseOverlay }
         containerStyle={ styles.overlay }
       >
         <SpatialNavigationScrollView
           offsetFromStart={ scale(32) }
+          style={ overlayContent }
         >
           <DefaultFocus>
             <View style={ styles.content }>
@@ -82,7 +88,9 @@ export const ThemedAccordionComponent = ({
   return (
     <View style={ styles.container }>
       { renderOverlay() }
-      { data.map((group) => renderAccordionGroup(group)) }
+      <DefaultFocus>
+        { data.map((group) => renderAccordionGroup(group)) }
+      </DefaultFocus>
     </View>
   );
 };

@@ -1,4 +1,3 @@
-import { IconInterface } from 'Component/ThemedIcon/ThemedIcon.type';
 import {
   ImageStyle, StyleProp, TextStyle, ViewStyle,
 } from 'react-native';
@@ -9,13 +8,12 @@ export interface ThemedButtonProps {
   children?: React.ReactNode;
   style?: StyleProp<ViewStyle>;
   styleFocused?: StyleProp<ViewStyle>;
-  iconStyle?: StyleProp<TextStyle>;
-  iconStyleFocused?: StyleProp<TextStyle>;
+  contentStyle?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
   rightImageStyle?: StyleProp<ImageStyle>
   isSelected?: boolean;
-  icon?: IconInterface;
-  iconSize?: number;
+  IconComponent?: React.ComponentType<any>;
+  iconProps?: Record<string, any>;
   variant?: Variant;
   rightImage?: string;
   onPress?: () => void;

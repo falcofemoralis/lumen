@@ -17,9 +17,14 @@ export function ThemedMultiListContainer({
 
     setValues(values.map((item) => {
       if (item.value === value) {
+        const labelMatch = item.label.match(/(.*?)\((\d+)\)$/);
+        const label = labelMatch ? labelMatch[1] : item.label;
+        const number = labelMatch ? parseInt(labelMatch[2], 10) : 0;
+
         return {
           ...item,
           isChecked,
+          label: `${label}(${isChecked ? number + 1 : number - 1})`,
         };
       }
 
@@ -36,7 +41,7 @@ export function ThemedMultiListContainer({
 
 function propsAreEqual(
   prevProps: ThemedMultiListContainerProps,
-  props: ThemedMultiListContainerProps,
+  props: ThemedMultiListContainerProps
 ) {
   return JSON.stringify(prevProps.data) === JSON.stringify(props.data);
 }

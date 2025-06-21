@@ -16,14 +16,14 @@ const formatPlayerKeyTime = (film: FilmInterface, voice: FilmVoiceInterface) => 
 };
 
 export const updatePlayerTime = (film: FilmInterface, voice: FilmVoiceInterface, time: number) => {
-  playerStorage.setIntAsync(
+  playerStorage.set(
     formatPlayerKeyTime(film, voice),
-    Number(time),
+    Number(time)
   );
 };
 
 export const getPlayerTime = (film: FilmInterface, voice: FilmVoiceInterface) => {
-  const time = playerStorage.getInt(formatPlayerKeyTime(film, voice));
+  const time = playerStorage.getNumber(formatPlayerKeyTime(film, voice));
 
   if (!time) {
     return 0;
@@ -33,9 +33,9 @@ export const getPlayerTime = (film: FilmInterface, voice: FilmVoiceInterface) =>
 };
 
 export const updatePlayerQuality = (quality: string) => {
-  playerStorage.setStringAsync(
+  playerStorage.set(
     PLAYER_QUALITY_STORAGE_KEY,
-    quality,
+    quality
   );
 };
 
@@ -79,7 +79,7 @@ export const prepareShareBody = (film: FilmInterface) => {
 export const formatFirestoreKey = (
   film: FilmInterface,
   voice: FilmVoiceInterface,
-  profile: ProfileInterface,
+  profile: ProfileInterface
 ) => {
   const { id: filmId } = film;
   const { id: voiceId, lastEpisodeId, lastSeasonId } = voice;

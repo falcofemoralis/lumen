@@ -1,13 +1,16 @@
 import ThemedButton from 'Component/ThemedButton';
-import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedOverlay from 'Component/ThemedOverlay';
+import ThemedPressable from 'Component/ThemedPressable';
+import { useOverlayContext } from 'Context/OverlayContext';
+import { Plus } from 'lucide-react-native';
 import React, { useCallback, useRef } from 'react';
 import {
-  ScrollView, Text, TouchableHighlight, View,
+  ScrollView,
+  Text,
+  View,
 } from 'react-native';
-import OverlayStore from 'Store/Overlay.store';
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import { generateId } from 'Util/Math';
 
 import { styles } from './ThemedDropdown.style';
@@ -25,6 +28,7 @@ export const ThemedDropdownComponent = ({
   onChange,
   style,
 }: ThemedDropdownComponentProps) => {
+  const { openOverlay, goToPreviousOverlay } = useOverlayContext();
   const id = useRef(overlayId ?? generateId());
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -77,56 +81,45 @@ export const ThemedDropdownComponent = ({
   ), []);
 
   const renderList = () => (
-    <ScrollView
-      ref={ scrollViewRef }
-      style={ styles.listItems }
-      onLayout={ handleLayout }
-    >
-      { data.map((item) => (
-        <TouchableHighlight
-          key={ item.value }
-          underlayColor={ Colors.primary }
-          onPress={ () => { onChange(item); } }
-          style={ styles.listItem }
-        >
-          <View style={ [
-            styles.listItem,
-            item.value === value && styles.listItemSelected,
-          ] }
+    <View style={ styles.listItems }>
+      <ScrollView
+        ref={ scrollViewRef }
+        onLayout={ handleLayout }
+      >
+        { data.map((item) => (
+          <ThemedPressable
+            key={ item.value }
+            onPress={ () => { onChange(item); } }
+            style={ styles.listItem }
+            contentStyle={ [styles.listItemContent, item.value === value && styles.listItemSelected] }
           >
             { renderItem(item) }
-          </View>
-        </TouchableHighlight>
-      )) }
-    </ScrollView>
+          </ThemedPressable>
+        )) }
+      </ScrollView>
+    </View>
   );
 
   const renderContent = () => (
-    <>
+    <View style={ styles.listContainer }>
       { renderHeader() }
       { renderList() }
-    </>
+    </View>
   );
 
   const renderModal = () => {
     if (asList) {
-      return (
-        <View style={ styles.listContainer }>
-          { renderContent() }
-        </View>
-      );
+      return renderContent();
     }
 
     return (
       <ThemedOverlay
         id={ id.current }
-        onHide={ () => OverlayStore.goToPreviousOverlay() }
-        containerStyle={ styles.container }
-        contentContainerStyle={ styles.contentContainer }
+        onHide={ () => goToPreviousOverlay() }
+        containerStyle={ styles.overlay }
+        contentContainerStyle={ styles.overlayContent }
       >
-        <View style={ styles.listContainer }>
-          { renderContent() }
-        </View>
+        { renderContent() }
       </ThemedOverlay>
     );
   };
@@ -141,14 +134,15 @@ export const ThemedDropdownComponent = ({
     return (
       <ThemedButton
         style={ [styles.input, inputStyle] }
-        iconStyle={ styles.inputIcon }
+        contentStyle={ styles.inputContent }
         textStyle={ styles.inputText }
         rightImageStyle={ styles.inputImage }
-        icon={ {
-          name: 'plus',
-          pack: IconPackType.Octicons,
+        onPress={ () => openOverlay(id.current) }
+        IconComponent={ Plus }
+        iconProps={ {
+          color: Colors.text,
+          size: 18,
         } }
-        onPress={ () => OverlayStore.openOverlay(id.current) }
         rightImage={ endIcon }
       >
         { inputLabel ?? label }

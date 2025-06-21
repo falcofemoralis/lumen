@@ -1,7 +1,6 @@
 import { RecentItemInterface } from 'Type/RecentItem.interface';
 
 export interface RecentPageComponentProps {
-  isSignedIn: boolean;
   items: RecentItemInterface[];
   onNextLoad: (isRefresh: boolean) => Promise<void>;
   handleOnPress: (item: RecentItemInterface) => void;
@@ -9,6 +8,7 @@ export interface RecentPageComponentProps {
 }
 
 export type RecentGridItem = RecentItemInterface & {
+  idx?: number;
   isDeleteButton?: boolean;
 };
 

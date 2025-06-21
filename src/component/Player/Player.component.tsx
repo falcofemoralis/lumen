@@ -7,18 +7,33 @@ import PlayerProgressBar from 'Component/PlayerProgressBar';
 import PlayerSubtitles from 'Component/PlayerSubtitles';
 import PlayerVideoSelector from 'Component/PlayerVideoSelector';
 import ThemedDropdown from 'Component/ThemedDropdown';
-import ThemedIcon from 'Component/ThemedIcon';
-import { IconInterface, IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedOverlay from 'Component/ThemedOverlay';
+import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
-import ThemedView from 'Component/ThemedView';
+import { useOverlayContext } from 'Context/OverlayContext';
 import * as NavigationBar from 'expo-navigation-bar';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { OrientationLock } from 'expo-screen-orientation';
-import { StatusBar } from 'expo-status-bar';
+import * as StatusBar from 'expo-status-bar';
 import { isPictureInPictureSupported, VideoView } from 'expo-video';
 import t from 'i18n/t';
-import { observer } from 'mobx-react-lite';
+import {
+  Bookmark,
+  Captions,
+  CaptionsOff,
+  Forward,
+  Gauge,
+  ListVideo,
+  LockKeyhole,
+  LockKeyholeOpen,
+  MessageSquareText,
+  Pause,
+  PictureInPicture2,
+  Play,
+  SkipBack,
+  SkipForward,
+  Sparkles,
+} from 'lucide-react-native';
 import React, {
   useEffect, useRef, useState,
 } from 'react';
@@ -26,14 +41,13 @@ import { Dimensions, ScrollView, View } from 'react-native';
 import {
   Gesture,
   GestureDetector,
-  TouchableOpacity,
 } from 'react-native-gesture-handler';
-import {
+import Animated, {
   runOnJS,
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
-import OverlayStore from 'Store/Overlay.store';
+import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 import { setTimeoutSafe } from 'Util/Misc';
 
@@ -78,7 +92,6 @@ export function PlayerComponent({
   hideVideoSelector,
   handleVideoSelect,
   rewindPosition,
-  setPlayerRate,
   openSubtitleSelector,
   handleSubtitleChange,
   handleSpeedChange,
@@ -88,6 +101,7 @@ export function PlayerComponent({
   handleLockControls,
   handleShare,
 }: PlayerComponentProps) {
+  const { currentOverlay, goToPreviousOverlay } = useOverlayContext();
   const [showControls, setShowControls] = useState(false);
   const [isScrolling, setIsScrolling] = useState(false);
   const [doubleTapAction, setDoubleTapAction] = useState<DoubleTapAction | null>(null);
@@ -96,25 +110,23 @@ export function PlayerComponent({
   const canHideControls = useRef(isPlaying && showControls);
   const playerRef = useRef<VideoView>(null);
   const doubleTapTimeout = useRef<NodeJS.Timeout | null>(null);
+  const isPlayingRef = useRef(isPlaying);
+  const showControlsRef = useRef(showControls);
+  const isScrollingRef = useRef(isScrolling);
 
   const controlsAnimation = useAnimatedStyle(() => ({
     opacity: withTiming(showControls ? 1 : 0, { duration: PLAYER_CONTROLS_ANIMATION }),
   }));
 
-  const handleHideControls = () => {
-    canHideControls.current = isPlaying
-      && showControls
-      && !OverlayStore.currentOverlay.length
-      && !isScrolling;
-  };
-
   useEffect(() => {
     ScreenOrientation.lockAsync(OrientationLock.LANDSCAPE);
     NavigationBar.setVisibilityAsync('hidden');
+    StatusBar.setStatusBarHidden(true, 'slide');
 
     return () => {
       ScreenOrientation.unlockAsync();
       NavigationBar.setVisibilityAsync('visible');
+      StatusBar.setStatusBarHidden(false, 'slide');
 
       if (controlsTimeout.current) {
         clearTimeout(controlsTimeout.current);
@@ -122,7 +134,18 @@ export function PlayerComponent({
     };
   }, []);
 
+  const handleHideControls = () => {
+    canHideControls.current = isPlayingRef.current
+      && showControlsRef.current
+      && !currentOverlay.length
+      && !isScrollingRef.current;
+  };
+
   useEffect(() => {
+    isPlayingRef.current = isPlaying;
+    showControlsRef.current = showControls;
+    isScrollingRef.current = isScrolling;
+
     handleHideControls();
   }, [isPlaying, showControls, isScrolling]);
 
@@ -132,7 +155,7 @@ export function PlayerComponent({
     if (canHideControls.current) {
       handleUserInteraction();
     }
-  }, [OverlayStore.currentOverlay.length]);
+  }, [currentOverlay.length]);
 
   const setControlsTimeout = () => {
     if (controlsTimeout.current) {
@@ -158,12 +181,17 @@ export function PlayerComponent({
     setIsScrolling(value);
   };
 
+  const handleOpenComments = () => {
+    setShowControls(false);
+    openCommentsOverlay();
+  };
+
   const handleDoubleTap = (direction: RewindDirection) => {
     const seconds = DEFAULT_REWIND_SECONDS;
 
     rewindPosition(direction, seconds);
     setDoubleTapAction({
-      seconds: seconds + (doubleTapAction?.seconds ?? 0),
+      seconds: doubleTapAction?.direction === direction ? seconds + (doubleTapAction?.seconds ?? 0) : seconds,
       direction,
     });
 
@@ -185,7 +213,7 @@ export function PlayerComponent({
   const doubleTap = Gesture.Tap()
     .numberOfTaps(2)
     .onEnd((e) => {
-      if (showControls || isLocked) {
+      if (isLocked) {
         return;
       }
 
@@ -198,40 +226,38 @@ export function PlayerComponent({
       }
     });
 
-  const longPressGesture = Gesture.LongPress()
-    .onStart(() => {
-      if (showControls || isLocked || !isPlaying) {
-        return;
-      }
+  // const longPressGesture = Gesture.LongPress()
+  //   .onStart(() => {
+  //     if (showControls || isLocked || !isPlaying) {
+  //       return;
+  //     }
 
-      runOnJS(setPlayerRate)(1.5);
-      runOnJS(setLongTapAction)(true);
-    })
-    .onEnd(() => {
-      runOnJS(setPlayerRate)(1);
-      runOnJS(setLongTapAction)(false);
-    });
+  //     runOnJS(setPlayerRate)(1.5);
+  //     runOnJS(setLongTapAction)(true);
+  //   })
+  //   .onEnd(() => {
+  //     runOnJS(setPlayerRate)(1);
+  //     runOnJS(setLongTapAction)(false);
+  //   });
 
   const enablePIP = () => {
     playerRef.current?.startPictureInPicture();
   };
 
   const renderAction = (
-    icon: string,
-    _name: string,
-    action?: () => void,
+    IconComponent: React.ComponentType<any>,
+    action?: () => void
   ) => (
     <GestureDetector gesture={ Gesture.Tap() }>
-      <TouchableOpacity onPress={ () => handleUserInteraction(action) }>
-        <ThemedIcon
-          icon={ {
-            name: icon,
-            pack: IconPackType.MaterialCommunityIcons,
-          } }
+      <ThemedPressable
+        style={ styles.action }
+        onPress={ () => handleUserInteraction(action) }
+      >
+        <IconComponent
           size={ scale(28) }
-          color="white"
+          color={ Colors.white }
         />
-      </TouchableOpacity>
+      </ThemedPressable>
     </GestureDetector>
   );
 
@@ -273,11 +299,7 @@ export function PlayerComponent({
       return null;
     }
 
-    return renderAction(
-      selectedSubtitle?.languageCode === '' ? 'closed-caption-outline' : 'closed-caption',
-      'Subtitles',
-      openSubtitleSelector,
-    );
+    return renderAction(selectedSubtitle?.languageCode === '' ? Captions : CaptionsOff, openSubtitleSelector);
   };
 
   const renderTopActions = () => (
@@ -286,34 +308,32 @@ export function PlayerComponent({
       <View style={ styles.actionsRow }>
         { !isLocked && (
           <>
-            { isPictureInPictureSupported() && renderAction('picture-in-picture-bottom-right', 'PIP', enablePIP) }
-            { renderAction('play-speed', 'Speed', openSpeedSelector) }
-            { renderAction('quality-high', 'Quality', openQualitySelector) }
+            { isPictureInPictureSupported() && renderAction(PictureInPicture2, enablePIP) }
+            { renderAction(Gauge, openSpeedSelector) }
+            { renderAction(Sparkles, openQualitySelector) }
             { renderSubtitlesActions() }
           </>
         ) }
-        { renderAction(!isLocked ? 'lock-open-outline' : 'lock-outline', 'Lock', handleLockControls) }
+        { renderAction(!isLocked ? LockKeyholeOpen : LockKeyhole, handleLockControls) }
       </View>
     </View>
   );
 
   const renderMiddleControl = (
-    icon: IconInterface,
+    IconComponent: React.ComponentType<any>,
     action: () => void,
-    size: MiddleActionVariant = 'small',
+    size: MiddleActionVariant = 'small'
   ) => (
     <GestureDetector gesture={ Gesture.Tap() }>
-      <TouchableOpacity
-        style={ styles.control }
+      <ThemedPressable
+        style={ [styles.control, size === 'big' && styles.controlBig] }
         onPress={ () => handleUserInteraction(action) }
       >
-        <ThemedIcon
-          style={ styles.controlIcon }
-          icon={ icon }
-          size={ scale(size === 'big' ? 36 : 24) }
-          color="white"
+        <IconComponent
+          size={ scale(size === 'big' ? 28 : 20) }
+          color={ Colors.white }
         />
-      </TouchableOpacity>
+      </ThemedPressable>
     </GestureDetector>
   );
 
@@ -325,26 +345,17 @@ export function PlayerComponent({
     return (
       <View style={ styles.middleActions }>
         { film.hasSeasons && renderMiddleControl(
-          {
-            name: 'skip-previous',
-            pack: IconPackType.MaterialIcons,
-          },
-          () => handleNewEpisode(RewindDirection.BACKWARD),
+          SkipBack,
+          () => handleNewEpisode(RewindDirection.BACKWARD)
         ) }
         { renderMiddleControl(
-          {
-            name: isPlaying || isLoading ? 'pause' : 'play',
-            pack: IconPackType.MaterialCommunityIcons,
-          },
+          isPlaying || isLoading ? Pause : Play,
           togglePlayPause,
-          'big',
+          'big'
         ) }
         { film.hasSeasons && renderMiddleControl(
-          {
-            name: 'skip-next',
-            pack: IconPackType.MaterialIcons,
-          },
-          () => handleNewEpisode(RewindDirection.FORWARD),
+          SkipForward,
+          () => handleNewEpisode(RewindDirection.FORWARD)
         ) }
       </View>
     );
@@ -388,6 +399,17 @@ export function PlayerComponent({
     );
   };
 
+  const renderTopActionLine = () => {
+    return (
+      <View style={ styles.topActionLine }>
+        <PlayerClock />
+        <ThemedText>
+          { selectedQuality }
+        </ThemedText>
+      </View>
+    );
+  };
+
   const renderBottomActions = () => {
     const { hasSeasons, hasVoices } = film;
 
@@ -402,7 +424,7 @@ export function PlayerComponent({
           { renderProgressBar() }
         </View>
         <View style={ styles.bottomActionsRowLine }>
-          <PlayerClock />
+          { renderTopActionLine() }
           <View
             style={ [
               styles.actionsRow,
@@ -410,10 +432,10 @@ export function PlayerComponent({
               isLocked && styles.bottomActionsRowLocked,
             ] }
           >
-            { isPlaylistSelector && renderAction('playlist-play', 'Series', openVideoSelector) }
-            { renderAction('comment-text-outline', 'Comments', openCommentsOverlay) }
-            { renderAction('bookmark-outline', 'Bookmarks', openBookmarksOverlay) }
-            { renderAction('share-outline', 'Share', handleShare) }
+            { isPlaylistSelector && renderAction(ListVideo, openVideoSelector) }
+            { renderAction(MessageSquareText, handleOpenComments) }
+            { renderAction(Bookmark, openBookmarksOverlay) }
+            { renderAction(Forward, handleShare) }
           </View>
         </View>
       </View>
@@ -442,7 +464,7 @@ export function PlayerComponent({
           },
         ] }
         >
-          <ThemedIcon
+          { /* <ThemedIcon
             style={ styles.doubleTapIcon }
             icon={ {
               name: direction === RewindDirection.BACKWARD ? 'rewind-outline' : 'fast-forward-outline',
@@ -450,7 +472,7 @@ export function PlayerComponent({
             } }
             size={ scale(24) }
             color="white"
-          />
+          /> */ }
           <ThemedText style={ styles.longTapText }>
             { `${direction === RewindDirection.BACKWARD ? '-' : '+'}${seconds}` }
           </ThemedText>
@@ -470,7 +492,7 @@ export function PlayerComponent({
           <ThemedText style={ styles.longTapText }>
             2x
           </ThemedText>
-          <ThemedIcon
+          { /* <ThemedIcon
             style={ styles.longTapIcon }
             icon={ {
               name: 'fast-forward-outline',
@@ -478,7 +500,7 @@ export function PlayerComponent({
             } }
             size={ scale(24) }
             color="white"
-          />
+          /> */ }
         </View>
       </View>
     );
@@ -488,12 +510,12 @@ export function PlayerComponent({
     <GestureDetector
       gesture={ Gesture.Exclusive(
         doubleTap,
-        singleTap,
-        longPressGesture,
+        singleTap
+        // longPressGesture,
       ) }
     >
       <View style={ styles.controlsContainer }>
-        <ThemedView.Animated style={ [
+        <Animated.View style={ [
           styles.controls,
           controlsAnimation,
           !showControls && styles.controlsDisabled,
@@ -502,7 +524,7 @@ export function PlayerComponent({
           { renderTopActions() }
           { renderMiddleControls() }
           { renderBottomActions() }
-        </ThemedView.Animated>
+        </Animated.View>
         { renderDoubleTapAction() }
         { renderLongTapAction() }
       </View>
@@ -573,7 +595,7 @@ export function PlayerComponent({
   const renderCommentsOverlay = () => (
     <ThemedOverlay
       id={ commentsOverlayId }
-      onHide={ () => OverlayStore.goToPreviousOverlay() }
+      onHide={ () => goToPreviousOverlay() }
       containerStyle={ styles.commentsOverlay }
       contentContainerStyle={ styles.commentsOverlayContent }
     >
@@ -623,27 +645,21 @@ export function PlayerComponent({
   );
 
   return (
-    <View>
-      <StatusBar
-        hidden
-        animated
+    <View style={ styles.container }>
+      <VideoView
+        ref={ playerRef }
+        style={ styles.video }
+        player={ player }
+        contentFit="contain"
+        nativeControls={ false }
+        allowsPictureInPicture={ isPictureInPictureSupported() }
       />
-      <ThemedView style={ styles.container }>
-        <VideoView
-          ref={ playerRef }
-          style={ styles.video }
-          player={ player }
-          contentFit="contain"
-          nativeControls={ false }
-          allowsPictureInPicture={ isPictureInPictureSupported() }
-        />
-        { renderSubtitles() }
-        { renderControls() }
-        { renderLoader() }
-        { renderModals() }
-      </ThemedView>
+      { renderSubtitles() }
+      { renderControls() }
+      { renderLoader() }
+      { renderModals() }
     </View>
   );
 }
 
-export default observer(PlayerComponent);
+export default PlayerComponent;

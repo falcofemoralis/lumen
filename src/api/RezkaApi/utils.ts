@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { ActorCardInterface } from 'Type/ActorCard.interface';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { FilmListInterface } from 'Type/FilmList.interface';
@@ -40,8 +41,9 @@ export const parseFilmCard = (el: HTMLElementInterface): FilmCardInterface => {
   const subtitle = el.querySelector('.b-content__inline_item-link div')?.rawText ?? '';
   const info = (el.querySelector('.b-content__inline_item-cover .info')?.rawText ?? '').replaceAll(
     '<br/>',
-    ', ',
+    ', '
   );
+  const isPendingRelease = el.querySelector('.b-content__inline_item-cover')?.attributes.class?.includes('wait');
 
   return {
     id,
@@ -51,6 +53,7 @@ export const parseFilmCard = (el: HTMLElementInterface): FilmCardInterface => {
     title,
     subtitle,
     info,
+    isPendingRelease,
   };
 };
 
@@ -100,7 +103,7 @@ export const parseSeasons = (root: HTMLElementInterface): {
     lastEpisodeId: undefined,
   };
 
-  root.querySelectorAll('li.b-simple_season__item').forEach((el) => {
+  root.querySelectorAll('.b-simple_season__item').forEach((el) => {
     const seasonId = el.attributes['data-tab_id'];
     const episodes: EpisodeInterface[] = [];
 
@@ -163,7 +166,7 @@ export const parseFilmsListRoot = (root: HTMLElementInterface): FilmListInterfac
 export const parseSubtitles = (
   subtitle: string | undefined,
   subtitleDef: string,
-  subtitleLns: SubtitleLns,
+  subtitleLns: SubtitleLns
 ): SubtitleInterface[] => {
   if (!subtitle) {
     return [];
@@ -201,7 +204,7 @@ export const parseSubtitles = (
 
 export const parseActorCard = (
   node: HTMLElementInterface,
-  isDirector?: boolean,
+  isDirector?: boolean
 ): ActorCardInterface => {
   const name = node.querySelector('span')?.rawText ?? '';
   const photo = node.attributes['data-photo'];
@@ -215,4 +218,24 @@ export const parseActorCard = (
     job,
     isDirector,
   };
+};
+
+export const formatDurationWithMoment = (minutes: number): string => {
+  if (!minutes || minutes <= 0) {
+    return '0м';
+  }
+
+  const duration = moment.duration(minutes, 'minutes');
+  const hours = Math.floor(duration.asHours());
+  const remainingMinutes = duration.minutes();
+
+  if (hours === 0) {
+    return `${remainingMinutes} мин.`;
+  }
+
+  if (remainingMinutes === 0) {
+    return `${hours} ч`;
+  }
+
+  return `${hours} ч ${remainingMinutes} мин.`;
 };

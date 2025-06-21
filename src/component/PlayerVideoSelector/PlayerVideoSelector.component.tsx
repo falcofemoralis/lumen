@@ -1,22 +1,23 @@
 import Loader from 'Component/Loader';
+import ThemedBottomSheet from 'Component/ThemedBottomSheet';
+import { ThemedBottomSheetRef } from 'Component/ThemedBottomSheet/ThemedBottomSheet.type';
 import ThemedDropdown from 'Component/ThemedDropdown';
-import ThemedIcon from 'Component/ThemedIcon';
-import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
 import ThemedOverlay from 'Component/ThemedOverlay';
+import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import t from 'i18n/t';
+import { CircleHelp } from 'lucide-react-native';
 import React, { useRef } from 'react';
 import {
-  Dimensions, ScrollView,
-  TouchableOpacity, View,
+  Dimensions,
+  ScrollView,
+  View,
 } from 'react-native';
-import { Button } from 'react-native-paper';
-import RBSheet from 'react-native-raw-bottom-sheet';
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 
 import { styles } from './PlayerVideoSelector.style';
-import { PlayerVideoSelectorComponentProps, RBSheetRef } from './PlayerVideoSelector.type';
+import { PlayerVideoSelectorComponentProps } from './PlayerVideoSelector.type';
 
 export function PlayerVideoSelectorComponent({
   overlayId,
@@ -33,7 +34,7 @@ export function PlayerVideoSelectorComponent({
   handleSelectEpisode,
   film,
 }: PlayerVideoSelectorComponentProps) {
-  const refRBSheet = useRef<RBSheetRef>(null);
+  const bottomSheetRef = useRef<ThemedBottomSheetRef>(null);
 
   const renderVoiceRating = () => {
     const { voiceRating = [] } = film;
@@ -48,38 +49,20 @@ export function PlayerVideoSelectorComponent({
 
     return (
       <>
-        <TouchableOpacity
-          onPress={ () => refRBSheet.current?.open() }
+        <ThemedPressable
+          onPress={ () => bottomSheetRef.current?.present() }
           style={ styles.voiceRatingInputContainer }
         >
-          <ThemedIcon
+          <CircleHelp
             style={ [
               styles.voiceDropdownInputIcon,
               seasons.length ? styles.voiceDropdownInputIconSeason : undefined,
             ] }
-            icon={ {
-              pack: IconPackType.Octicons,
-              name: 'question',
-            } }
             size={ scale(24) }
             color={ Colors.white }
           />
-        </TouchableOpacity>
-        <RBSheet
-          ref={ refRBSheet }
-          draggable
-          height={ Dimensions.get('window').height / 2 }
-          closeOnPressBack
-          closeOnPressMask
-          customModalProps={ {
-            animationType: 'slide',
-            statusBarTranslucent: true,
-          } }
-          customStyles={ {
-            container: styles.voiceRatingSheetContainer,
-            draggableIcon: styles.voiceRatingSheetIcon,
-          } }
-        >
+        </ThemedPressable>
+        <ThemedBottomSheet ref={ bottomSheetRef }>
           <ScrollView style={ styles.voiceRatingContainer }>
             { voiceRating.map((item) => (
               <View
@@ -114,7 +97,7 @@ export function PlayerVideoSelectorComponent({
               </View>
             )) }
           </ScrollView>
-        </RBSheet>
+        </ThemedBottomSheet>
       </>
     );
   };
@@ -147,22 +130,24 @@ export function PlayerVideoSelectorComponent({
   const renderSeasons = () => (
     <View style={ styles.seasonsContainer }>
       { seasons.map((season) => (
-        <Button
+        <ThemedPressable
           key={ season.seasonId }
           style={ [
             styles.season,
             selectedSeasonId === season.seasonId && styles.seasonSelected,
           ] }
+          contentStyle={ styles.seasonContent }
           onPress={ () => setSelectedSeasonId(season.seasonId) }
         >
-          <ThemedText style={ [
-            styles.seasonText,
-            selectedSeasonId === season.seasonId && styles.seasonTextSelected,
-          ] }
+          <ThemedText
+            style={ [
+              styles.seasonText,
+              selectedSeasonId === season.seasonId && styles.seasonTextSelected,
+            ] }
           >
             { season.name }
           </ThemedText>
-        </Button>
+        </ThemedPressable>
       )) }
     </View>
   );
@@ -170,13 +155,14 @@ export function PlayerVideoSelectorComponent({
   const renderEpisodes = () => (
     <View style={ styles.episodesContainer }>
       { episodes.map(({ episodeId, name }) => (
-        <Button
+        <ThemedPressable
           key={ episodeId }
           style={ [
             styles.episode,
             selectedEpisodeId === episodeId && styles.episodeSelected,
           ] }
           onPress={ () => handleSelectEpisode(episodeId) }
+          contentStyle={ styles.episodeContent }
         >
           <ThemedText style={ [
             styles.episodeText,
@@ -185,7 +171,7 @@ export function PlayerVideoSelectorComponent({
           >
             { name }
           </ThemedText>
-        </Button>
+        </ThemedPressable>
       )) }
     </View>
   );

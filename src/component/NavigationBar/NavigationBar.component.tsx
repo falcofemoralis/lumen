@@ -1,25 +1,27 @@
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import ThemedIcon from 'Component/ThemedIcon';
 import ThemedImage from 'Component/ThemedImage';
+import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
-import ThemedView from 'Component/ThemedView';
+import { useServiceContext } from 'Context/ServiceContext';
 import { Tabs } from 'expo-router';
-import { observer } from 'mobx-react-lite';
 import React, { useCallback } from 'react';
 import {
   Image,
-  Pressable,
+  useWindowDimensions,
   View,
 } from 'react-native';
-import NavigationStore from 'Store/Navigation.store';
+import Animated from 'react-native-reanimated';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from 'Style/Colors';
-import { CONTENT_WRAPPER_PADDING } from 'Style/Layout';
 import { scale } from 'Util/CreateStyles';
 
 import { TABS_MOBILE_CONFIG } from './NavigationBar.config';
-import { styles } from './NavigationBar.style';
+import { styles, TAB_ADDITIONAL_SIZE } from './NavigationBar.style';
 import {
-  NavigationBarComponentProps, NavigationType, StateType, Tab,
+  NavigationBarComponentProps,
+  NavigationType,
+  StateType,
+  Tab,
   TAB_COMPONENT,
 } from './NavigationBar.type';
 
@@ -30,46 +32,36 @@ export function NavigationBarComponent({
   navigateTo,
   isFocused,
 }: NavigationBarComponentProps) {
+  const { badgeData } = useServiceContext();
+  const { width } = useWindowDimensions();
+
   const renderDefaultTab = useCallback((tab: Tab, focused: boolean) => {
-    const { title, icon, iconFocused } = tab;
+    const { IconComponent } = tab;
 
     return (
-      <View style={ styles.tab }>
-        { icon && (
-          <ThemedIcon
-            style={ [
-              styles.tabIcon,
-              focused && !iconFocused && styles.tabIconFocused,
-            ] }
-            icon={ !focused ? icon : (iconFocused ?? icon) }
+      <Animated.View style={ [styles.tab, focused && styles.tabFocused] }>
+        { IconComponent && (
+          <IconComponent
+            style={ styles.tabIcon }
             size={ scale(24) }
-            color="white"
+            color={ Colors.white }
           />
         ) }
-        <ThemedText
-          style={ [
-            styles.tabText,
-            focused && styles.tabTextFocused,
-          ] }
-        >
-          { title }
-        </ThemedText>
-      </View>
+      </Animated.View>
     );
   }, []);
 
   const renderAccountTab = useCallback((tab: Tab, focused: boolean) => {
-    const { title } = tab;
     const { avatar } = profile ?? {};
 
-    const badge = NavigationStore.badgeData[tab.route] ?? 0;
+    const badge = badgeData[tab.route] ?? 0;
 
     return (
-      <View style={ styles.tab }>
-        <View
+      <Animated.View style={ [styles.tab, styles.tabAccount] }>
+        <Animated.View
           style={ [
             styles.profileAvatarContainer,
-            focused ? styles.profileAvatarFocused : styles.profileAvatarUnfocused,
+            focused && styles.profileAvatarFocused,
           ] }
         >
           { avatar ? (
@@ -84,25 +76,20 @@ export function NavigationBarComponent({
             />
           ) }
           { badge > 0 && (
-            <View style={ styles.badge } />
+            <ThemedText style={ styles.badge }>
+              { badge }
+            </ThemedText>
           ) }
-        </View>
-        <ThemedText
-          style={ [
-            styles.tabText,
-            focused && styles.tabTextFocused,
-          ] }
-        >
-          { title }
-        </ThemedText>
-      </View>
+        </Animated.View>
+      </Animated.View>
     );
-  }, [profile, NavigationStore.badgeData]);
+  }, [profile, badgeData]);
 
   const renderTab = useCallback((
     tab: Tab,
     navigation: NavigationType,
     state: StateType,
+    idx: number
   ) => {
     const { title, tabComponent } = tab;
     const focused = isFocused(tab, state);
@@ -117,44 +104,48 @@ export function NavigationBarComponent({
     };
 
     return (
-      <Pressable
+      <ThemedPressable
         key={ title }
-        style={ styles.tabContainer }
+        style={ [styles.tabContainer, {
+          width: (width / TABS_MOBILE_CONFIG.length) + scale(TAB_ADDITIONAL_SIZE),
+          left: idx * (width / TABS_MOBILE_CONFIG.length) - scale(TAB_ADDITIONAL_SIZE / 2),
+        }] }
         onPress={ () => navigateTo(tab, navigation, state) }
+        pressDelay={ 0 }
       >
         { renderComponent() }
-      </Pressable>
+      </ThemedPressable>
     );
-  }, [navigateTo, isFocused, renderAccountTab, renderDefaultTab]);
+  }, [navigateTo, isFocused, renderAccountTab, renderDefaultTab, width]);
 
   const renderTabs = useCallback((navigation: NavigationType, state: StateType) => (
     <View style={ styles.tabs }>
-      { TABS_MOBILE_CONFIG.map((tab) => renderTab(tab, navigation, state)) }
+      { TABS_MOBILE_CONFIG.map((tab, i) => renderTab(tab, navigation, state, i)) }
     </View>
   ), [renderTab]);
 
   const renderTabBar = useCallback(({ navigation, state }: BottomTabBarProps) => (
-    <ThemedView style={ styles.tabBar }>
+    <View style={ styles.tabBar }>
       { renderTabs(navigation, state) }
-    </ThemedView>
+    </View>
   ), [renderTabs]);
 
   return (
-    <Tabs
-      screenOptions={ {
-        tabBarStyle: styles.tabBar,
-        headerShown: false,
-        tabBarActiveTintColor: Colors.primary,
-        tabBarInactiveTintColor: Colors.white,
-        tabBarHideOnKeyboard: true,
-        freezeOnBlur: true,
-        sceneStyle: {
-          marginHorizontal: CONTENT_WRAPPER_PADDING,
-        },
-      } }
-      tabBar={ renderTabBar }
-    />
+    <SafeAreaView style={ { flex: 1, backgroundColor: Colors.background } }>
+      <Tabs
+        screenOptions={ {
+          tabBarStyle: styles.tabBar,
+          headerShown: false,
+          tabBarActiveTintColor: Colors.primary,
+          tabBarInactiveTintColor: Colors.white,
+          tabBarHideOnKeyboard: true,
+          freezeOnBlur: true,
+          // lazy: false,
+        } }
+        tabBar={ renderTabBar }
+      />
+    </SafeAreaView>
   );
 }
 
-export default observer(NavigationBarComponent);
+export default NavigationBarComponent;

@@ -1,39 +1,48 @@
-import { Dimensions } from 'react-native';
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
-
-const { height } = Dimensions.get('window');
 
 export const styles = CreateStyles({
   container: {
-    paddingTop: 8,
-    flex: 1,
+    height: '100%',
     flexDirection: 'column',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    maxHeight: height * 0.85,
-    backgroundColor: Colors.background,
+    justifyContent: 'center',
+    gap: 24,
+  },
+  containerLandscape: {
+    alignSelf: 'center',
+    width: '60%',
   },
   info: {
     flexDirection: 'column',
-    gap: 8,
-    width: '90%',
+    alignItems: 'center',
+    alignSelf: 'center',
+    gap: 12,
+    width: '80%',
   },
   infoLandscape: {
     width: '70%',
   },
   iconContainer: {
-    justifyContent: 'center',
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'center',
+    backgroundColor: Colors.button,
+    borderRadius: 99,
+    height: 54,
+    width: 54,
   },
   icon: {
-    backgroundColor: Colors.darkGray,
-    borderRadius: 99,
-    padding: 12,
   },
   customImage: {
-    height: 44,
-    width: 44,
+    height: 54,
+    width: 54,
+    padding: 0,
+    borderRadius: 99,
+  },
+  image: {
+    height: 54,
+    width: 54,
     padding: 0,
   },
   title: {
@@ -43,34 +52,38 @@ export const styles = CreateStyles({
   },
   subtitle: {
     fontSize: 16,
-    color: Colors.lightGray,
+    color: Colors.textSecondary,
     textAlign: 'center',
   },
   navigation: {
     position: 'absolute',
-    bottom: 8,
-    width: '80%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    alignSelf: 'center',
     flexDirection: 'row',
-    marginTop: 16,
-    gap: 8,
-    zIndex: 10,
+    justifyContent: 'center',
+    alignSelf: 'center',
+    bottom: 24,
+    left: '50%',
+    right: 0,
+    transform: [{ translateX: '-50%' }],
+    width: '70%',
+    gap: 16,
   },
   buttonText: {
     fontSize: 16,
     textAlign: 'center',
   },
   nextButton: {
+    flex: 1,
+  },
+  nextButtonPressable: {
+    borderRadius: 16,
+  },
+  nextButtonContent: {
+    flex: 1,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: Colors.gray,
-    paddingBlock: 10,
-    paddingInline: 10,
-    borderRadius: 16,
-    flex: 1,
+    padding: 12,
+    backgroundColor: Colors.button,
   },
   nextButtonLandscape: {
     maxWidth: '50%',
@@ -80,23 +93,37 @@ export const styles = CreateStyles({
     justifyContent: 'center',
   },
   prevButton: {
+    borderRadius: 50,
+  },
+  prevButtonContent: {
+    flex: 1,
     flexDirection: 'row',
-    paddingBlock: 10,
-    paddingInline: 10,
-    borderRadius: 16,
-  },
-  welcomeSlide: {
-  },
-  configureSlide: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 12,
   },
   configureWrapper: {
+    alignSelf: 'center',
     marginTop: 16,
     gap: 12,
+    width: '80%',
   },
   configureButton: {
-    backgroundColor: Colors.lightBackground,
-    padding: 12,
+  },
+  configureButtonPressable: {
     borderRadius: 16,
+    height: 86,
+  },
+  configureButtonContent: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    padding: 12,
+    backgroundColor: Colors.button,
+  },
+  configureButtonSelected: {
+    backgroundColor: Colors.primary,
   },
   configureContainer: {
     flexDirection: 'row',
@@ -112,54 +139,62 @@ export const styles = CreateStyles({
   },
   configureSubtitle: {
   },
-  configureSelected: {
-    backgroundColor: Colors.primary,
-  },
-  providerSlide: {
-  },
   providerWrapper: {
+    alignSelf: 'center',
     marginTop: 16,
     gap: 12,
+    width: '80%',
   },
   providerButtonContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+    width: '50%',
   },
   providerButtonText: {
     fontSize: 16,
   },
   providerSelector: {
-    backgroundColor: Colors.lightBackground,
-    padding: 12,
+    backgroundColor: Colors.input,
     borderRadius: 16,
-  },
-  providerSelectorMobile: {
-    height: 44,
   },
   providerSelectorInput: {
     color: Colors.white,
+    borderRadius: 16,
+    paddingHorizontal: 8,
   },
   providerValidateButton: {
     flexDirection: 'row',
     gap: 4,
-    paddingBlock: 6,
-    paddingInline: 12,
     borderRadius: 16,
+  },
+  providerValidateButtonContent: {
+    flexDirection: 'row',
+    gap: 6,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingBlock: 8,
+    paddingInline: 12,
   },
   providerValidateButtonDisabled: {
     opacity: 0.5,
   },
   cdnWrapper: {
+    alignSelf: 'center',
     marginTop: 16,
     gap: 12,
+    width: '80%',
   },
   cdnSlide: {
   },
   cdnSelector: {
-    backgroundColor: Colors.lightBackground,
-    padding: 12,
     borderRadius: 16,
     textTransform: 'capitalize',
+  },
+  cdnSelectorContent: {
+    backgroundColor: Colors.input,
+    padding: 12,
   },
   cdnSelectorListScroll: {
     maxHeight: 160,
@@ -170,9 +205,11 @@ export const styles = CreateStyles({
     gap: 8,
   },
   cdnSelectorListItem: {
-    backgroundColor: Colors.lightBackground,
-    padding: 12,
     borderRadius: 16,
+  },
+  cdnSelectorListItemContent: {
+    backgroundColor: Colors.input,
+    padding: 12,
   },
   cdnSelectorListItemText: {
     fontSize: 14,
@@ -180,13 +217,25 @@ export const styles = CreateStyles({
   completeSlide: {
   },
   TVfocused: {
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.buttonFocused,
+  },
+  TVfocusedText: {
+    color: Colors.textFocused,
   },
   loginSlide: {
   },
   loginForm: {
+    alignSelf: 'center',
     marginBlock: 16,
     flexDirection: 'column',
     gap: 12,
+    width: '80%',
+  },
+  alert: {
+    flexDirection: 'row',
+    gap: 4,
+  },
+  valid: {
+
   },
 });

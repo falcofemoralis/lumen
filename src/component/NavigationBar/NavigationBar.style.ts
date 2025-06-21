@@ -1,21 +1,26 @@
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
+
+export const TAB_ADDITIONAL_SIZE = 20;
 
 export const styles = CreateStyles({
   tabBar: {
     width: '100%',
     borderTopWidth: 1,
-    borderTopColor: Colors.lightGravel,
+    borderColor: Colors.border,
   },
   tabs: {
     width: '100%',
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    height: 50,
+    overflow: 'hidden',
   },
   tabContainer: {
-    flex: 1,
     flexDirection: 'column',
+    height: 50 + TAB_ADDITIONAL_SIZE,
+    top: -TAB_ADDITIONAL_SIZE / 2,
     borderRadius: 99,
+    position: 'absolute',
   },
   tab: {
     flexDirection: 'column',
@@ -24,11 +29,14 @@ export const styles = CreateStyles({
     alignItems: 'center',
     paddingVertical: 8,
     borderRadius: 99,
+    opacity: 0.7,
+    transitionProperty: 'opacity',
+    transitionDuration: '150ms',
+  },
+  tabFocused: {
+    opacity: 1,
   },
   tabIcon: {
-  },
-  tabIconFocused: {
-    color: Colors.primary,
   },
   tabText: {
     fontSize: 12,
@@ -36,29 +44,36 @@ export const styles = CreateStyles({
   tabTextFocused: {
     fontWeight: 700,
   },
+  tabAccount: {
+    opacity: 1,
+  },
   profileAvatar: {
     width: 22,
     height: 22,
-    backgroundColor: Colors.black,
+    backgroundColor: Colors.background,
     borderRadius: 99,
   },
   profileAvatarContainer: {
-  },
-  profileAvatarUnfocused: {
-    padding: 2,
-  },
-  profileAvatarFocused: {
     borderRadius: 99,
     borderWidth: 2,
+    borderColor: Colors.transparent,
+    transitionProperty: 'borderColor',
+    transitionDuration: '150ms',
+  },
+  profileAvatarFocused: {
     borderColor: Colors.white,
   },
   badge: {
     backgroundColor: Colors.secondary,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: 16,
+    height: 16,
+    borderRadius: 50,
+    fontSize: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    textAlign: 'center',
     position: 'absolute',
-    right: -4,
-    top: -4,
+    right: -8,
+    top: -8,
   },
 });

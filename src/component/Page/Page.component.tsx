@@ -1,4 +1,4 @@
-import ThemedView from 'Component/ThemedView';
+import { View } from 'react-native';
 import ErrorBoundary from 'react-native-error-boundary';
 
 import { styles } from './Page.style';
@@ -7,10 +7,11 @@ import { PageComponentProps } from './Page.type';
 export function PageComponent({
   children,
   style,
+  disableWrapper,
 }: PageComponentProps) {
   return (
-    <ThemedView
-      style={ [
+    <View
+      style={ !disableWrapper && [
         styles.container,
         style,
       ] }
@@ -18,7 +19,7 @@ export function PageComponent({
       <ErrorBoundary>
         { children }
       </ErrorBoundary>
-    </ThemedView>
+    </View>
   );
 }
 

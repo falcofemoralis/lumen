@@ -1,9 +1,9 @@
-import { useLocalSearchParams } from 'expo-router';
+import { useGlobalSearchParams } from 'expo-router';
 import React from 'react';
 import FilmPage from 'Route/FilmPage';
 
 export default function FilmScreen() {
-  const { link } = useLocalSearchParams();
+  const { link, poster } = useGlobalSearchParams();
 
-  return <FilmPage link={ link as string } />;
+  return <FilmPage link={ link as string } thumbnailPoster={ poster as string } />;
 }

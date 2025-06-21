@@ -35,7 +35,7 @@ const formatFilmVideo = (json: StreamsResult): FilmVideoInterface => {
   const subtitles = parseSubtitles(
     json.subtitle,
     json.subtitle_def,
-    json.subtitle_lns,
+    json.subtitle_lns
   );
 
   return {
@@ -52,7 +52,7 @@ const playerApi: PlayerApiInterface = {
    */
   async getFilmStreamsByVoice(
     film: FilmInterface,
-    voice: FilmVoiceInterface,
+    voice: FilmVoiceInterface
   ): Promise<FilmVideoInterface> {
     const { id: filmId } = film;
     const {
@@ -95,7 +95,7 @@ const playerApi: PlayerApiInterface = {
     film: FilmInterface,
     voice: FilmVoiceInterface,
     seasonId: string,
-    episodeId: string,
+    episodeId: string
   ): Promise<FilmVideoInterface> {
     const { id: filmId } = film;
     const { id: voiceId } = voice;
@@ -130,7 +130,7 @@ const playerApi: PlayerApiInterface = {
    */
   async getFilmSeasons(
     film: FilmInterface,
-    voice: FilmVoiceInterface,
+    voice: FilmVoiceInterface
   ): Promise<FilmVoiceInterface> {
     const { id: filmId } = film;
     const { id: voiceId } = voice;
@@ -158,7 +158,7 @@ const playerApi: PlayerApiInterface = {
 
   async saveWatch(
     film: FilmInterface,
-    voice: FilmVoiceInterface,
+    voice: FilmVoiceInterface
   ): Promise<void> {
     const { id: filmId } = film;
     const { id: voiceId } = voice;

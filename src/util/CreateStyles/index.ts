@@ -1,7 +1,5 @@
-/* eslint-disable vtex/consistent-props-type -- Required */
-/* eslint-disable @typescript-eslint/no-unsafe-return -- Required */
-/* eslint-disable @typescript-eslint/no-explicit-any -- Required */
 import { Dimensions, StyleSheet } from 'react-native';
+import { moderateScale } from 'react-native-size-matters';
 import ConfigStore from 'Store/Config.store';
 
 const { width: W } = Dimensions.get('screen');
@@ -29,12 +27,16 @@ const objectMap2 = (object: any, overload: any) => Object.keys(object)
   }, {});
 
 /**
- * ATV always has size 960, so need to convert TVbox to 960
+ * TV always has size 960, so need to convert TVbox to 960
  */
-export const ratio = () => (ConfigStore.isTV() ? W / 960 : 1);
+export const tvScale = () => (W / 960);
 
 export const scale = (number: any) => {
-  const value = number * Number(ratio().toFixed(1));
+  if (!ConfigStore.isConfigured()) {
+    return Number(number.toFixed(0));
+  }
+
+  const value = ConfigStore.isTV() ? number * Number(tvScale().toFixed(1)) : moderateScale(number);
 
   return Number(value.toFixed(0));
 };
@@ -43,6 +45,6 @@ export default function CreateStyles<
   T extends StyleSheet.NamedStyles<T> | StyleSheet.NamedStyles<any>,
 >(styleSheet: T & StyleSheet.NamedStyles<any>, overload = {}): T {
   return StyleSheet.create(
-    objectMap(styleSheet, (value: any) => objectMap2(value, overload) as T),
+    objectMap(styleSheet, (value: any) => objectMap2(value, overload) as T)
   ) as T;
 }

@@ -1,9 +1,12 @@
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const ROW_GAP = 24;
 
 export const styles = CreateStyles({
+  page: {
+    marginTop: 0,
+  },
   grid: {
     padding: ROW_GAP,
     marginLeft: ROW_GAP,
@@ -17,9 +20,13 @@ export const styles = CreateStyles({
     flexDirection: 'row',
     gap: 8,
     opacity: 0.7,
+    transform: [{ scale: 1 }],
+    transitionProperty: 'all',
+    transitionDuration: '250ms',
   },
   itemFocused: {
     opacity: 1,
+    transform: [{ scale: 1.1 }],
   },
   poster: {
     height: 150,

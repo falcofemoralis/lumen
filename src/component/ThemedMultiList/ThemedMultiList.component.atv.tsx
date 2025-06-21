@@ -1,11 +1,11 @@
-import React, { useCallback } from 'react';
+import { Square, SquareCheck } from 'lucide-react-native';
+import React from 'react';
 import {
   Text,
   View,
 } from 'react-native';
-import { Checkbox } from 'react-native-paper';
 import { DefaultFocus, SpatialNavigationFocusableView, SpatialNavigationScrollView } from 'react-tv-space-navigation';
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 
 import { styles } from './ThemedMultiList.style.atv';
@@ -50,10 +50,15 @@ export const ThemedMultiListComponent = ({
               { item.label }
             </Text>
           </View>
-          <Checkbox
-            status={ item.isChecked ? 'checked' : 'unchecked' }
-            color={ Colors.primary }
-          />
+          { item.isChecked ? (
+            <SquareCheck
+              color={ Colors.primary }
+            />
+          ) : (
+            <Square
+              color={ isFocused ? Colors.black : Colors.white }
+            />
+          ) }
         </View>
       ) }
     </SpatialNavigationFocusableView>
@@ -62,6 +67,7 @@ export const ThemedMultiListComponent = ({
   const renderContent = () => (
     <SpatialNavigationScrollView
       offsetFromStart={ scale(64) }
+      style={ styles.scrollView }
     >
       <DefaultFocus>
         { values.map((item, index) => renderItem(item, index)) }

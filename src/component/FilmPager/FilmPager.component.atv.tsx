@@ -1,15 +1,13 @@
 import FilmGrid from 'Component/FilmGrid';
-import Loader from 'Component/Loader';
-import { useMenuContext } from 'Component/NavigationBar/MenuContext';
 import ThemedButton from 'Component/ThemedButton';
-import { IconPackType } from 'Component/ThemedIcon/ThemedIcon.type';
-import ThemedView from 'Component/ThemedView';
+import { useNavigationContext } from 'Context/NavigationContext';
 import { useNavigation } from 'expo-router';
 import {
   createContext,
   useEffect, useRef, useState,
 } from 'react';
 import { View } from 'react-native';
+import Animated from 'react-native-reanimated';
 import {
   DefaultFocus,
   SpatialNavigationRoot,
@@ -30,21 +28,21 @@ export const IsRootActiveContext = createContext<boolean>(true);
 
 export function FilmPagerComponent({
   pagerItems,
-  selectedPagerItem,
-  isLoading,
   gridStyle,
+  onPreLoad,
   onNextLoad,
-  handleMenuItemChange,
   onRowFocus = noopFn,
 }: FilmPagerComponentProps) {
-  const { isOpen: isMenuOpen } = useMenuContext();
+  const { isMenuOpen } = useNavigationContext();
   const { isFocused: isPageFocused } = useNavigation();
   const { lock, unlock } = useLockSpatialNavigation();
+  const [currentRow, setCurrentRow] = useState(0);
+  const [selectedPageItemId, setSelectedPageItemId] = useState<string>(pagerItems[0]?.key);
   const [isMenuActive, setIsMenuActive] = useState(false);
   const rowRef = useRef<number>(0);
   const canNavigateMenuRef = useRef<boolean>(true);
-  const timerRef = useRef<NodeJS.Timeout | null>();
-  const [currentRow, setCurrentRow] = useState(0);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const debounce = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const keyDownListener = (type: SupportedKeys) => {
@@ -98,23 +96,46 @@ export function FilmPagerComponent({
     };
   });
 
+  const getSelectedPagerItem = () => pagerItems.find(
+    ({ key }) => key === selectedPageItemId
+  ) ?? pagerItems[0];
+
+  const handleMenuItemChange = (pagerItem: PagerItemInterface) => {
+    const { key } = pagerItem;
+
+    if (key !== selectedPageItemId) {
+      if (debounce.current) {
+        clearTimeout(debounce.current);
+      }
+
+      debounce.current = setTimeoutSafe(async () => {
+        lock();
+
+        setSelectedPageItemId(key);
+        if (!pagerItem.films) {
+          await onPreLoad(pagerItem);
+        }
+
+        setTimeoutSafe(() => {
+          unlock();
+        }, 0);
+      }, 750);
+    }
+  };
+
   const renderMenuItem = (item: PagerItemInterface) => {
     const {
       menuItem: { title },
     } = item;
     const {
       menuItem: { title: selectedTitle },
-    } = selectedPagerItem;
+    } = getSelectedPagerItem();
 
     return (
       <ThemedButton
         key={ title }
         variant="outlined"
         isSelected={ selectedTitle === title }
-        icon={ {
-          name: 'dot-fill',
-          pack: IconPackType.Octicons,
-        } }
         onFocus={ () => handleMenuItemChange(item) }
       >
         { title }
@@ -123,12 +144,12 @@ export function FilmPagerComponent({
   };
 
   const renderTopMenu = () => {
-    if (!pagerItems.length) {
+    if (pagerItems.length <= 1) {
       return null;
     }
 
     return (
-      <View
+      <Animated.View
         style={ [
           styles.menuListWrapper,
           currentRow > 0 && styles.hidden,
@@ -150,19 +171,20 @@ export function FilmPagerComponent({
             </SpatialNavigationView>
           </SpatialNavigationScrollView>
         </SpatialNavigationRoot>
-      </View>
+      </Animated.View>
     );
   };
 
   const renderPage = () => {
-    const { films } = selectedPagerItem;
+    const pagerItem = getSelectedPagerItem();
+    const { films } = pagerItem;
 
     return (
-      <ThemedView style={ [styles.grid, gridStyle] }>
+      <View style={ [styles.grid, gridStyle] }>
         <DefaultFocus>
           <FilmGrid
             films={ films ?? [] }
-            onNextLoad={ onNextLoad }
+            onNextLoad={ (isRefresh) => onNextLoad(isRefresh, pagerItem) }
             onItemFocus={ (row: number) => {
               if (rowRef.current !== row) {
                 canNavigateMenuRef.current = false;
@@ -173,20 +195,12 @@ export function FilmPagerComponent({
             } }
           />
         </DefaultFocus>
-      </ThemedView>
+      </View>
     );
   };
 
-  const renderLoader = () => (
-    <Loader
-      isLoading={ isLoading }
-      fullScreen
-    />
-  );
-
   return (
     <View>
-      { renderLoader() }
       { renderTopMenu() }
       { renderPage() }
     </View>

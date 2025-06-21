@@ -33,9 +33,5 @@ export const ActorPageThumbnail = () => (
         <FilmSectionsThumbnail />
       </View>
     </View>
-    <Loader
-      isLoading
-      fullScreen
-    />
   </Page>
 );

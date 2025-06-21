@@ -1,11 +1,12 @@
+import InfoBlock from 'Component/InfoBlock';
 import Loader from 'Component/Loader';
 import ThemedButton from 'Component/ThemedButton';
-import ThemedInfo from 'Component/ThemedInfo';
 import ThemedInput from 'Component/ThemedInput';
 import { router } from 'expo-router';
 import t from 'i18n/t';
 import { useRef } from 'react';
 import { View } from 'react-native';
+import { AvoidSoftInputView } from 'react-native-avoid-softinput';
 import { DefaultFocus } from 'react-tv-space-navigation';
 
 import { styles } from './LoginForm.style.atv';
@@ -14,7 +15,7 @@ import { LoginFormComponentProps } from './LoginForm.type';
 export function LoginFormComponent({
   isLoading,
   withRedirect,
-  login,
+  handleLogin,
 }: LoginFormComponentProps) {
   const loginRef = useRef({ username: '', password: '' });
 
@@ -44,13 +45,14 @@ export function LoginFormComponent({
             style={ styles.input }
             placeholder={ t('Password') }
             onChangeText={ (text) => { loginRef.current.password = text; } }
+            secureTextEntry
           />
         </View>
         <ThemedButton
           style={ styles.button }
-          onPress={ () => login(
+          onPress={ () => handleLogin(
             loginRef.current.username,
-            loginRef.current.password,
+            loginRef.current.password
           ) }
         >
           { t('Sign in') }
@@ -65,15 +67,17 @@ export function LoginFormComponent({
 
   return (
     <DefaultFocus>
-      <View
-        style={ styles.container }
-      >
-        <ThemedInfo
-          title={ t('You are not logged in') }
-          subtitle={ t('Sign in to sync content') }
-        />
-        { renderForm() }
-      </View>
+      <AvoidSoftInputView>
+        <View
+          style={ styles.container }
+        >
+          <InfoBlock
+            title={ t('You are not logged in') }
+            subtitle={ t('Sign in to sync content') }
+          />
+          { renderForm() }
+        </View>
+      </AvoidSoftInputView>
     </DefaultFocus>
   );
 }

@@ -2,7 +2,6 @@ import { LegendList } from '@legendapp/list';
 import FilmCard from 'Component/FilmCard';
 import { useFilmCardDimensions } from 'Component/FilmCard/FilmCard.style';
 import ThemedText from 'Component/ThemedText';
-import ThemedView from 'Component/ThemedView';
 import React, { memo, useCallback, useMemo } from 'react';
 import { Pressable, View } from 'react-native';
 import { scale } from 'Util/CreateStyles';
@@ -29,11 +28,11 @@ const FilmSectionsRow = ({
   );
 
   const renderHeader = () => (
-    <ThemedView>
+    <View>
       <ThemedText style={ styles.headerText }>
         { header }
       </ThemedText>
-    </ThemedView>
+    </View>
   );
 
   return (
@@ -82,8 +81,8 @@ export function FilmSectionsComponent({
   const data = useMemo(() => films.map(
     (row) => ({
       ...row,
-    }),
-  ), [films, width]);
+    })
+  ), [films]);
 
   return (
     <LegendList
@@ -93,6 +92,7 @@ export function FilmSectionsComponent({
       renderItem={ renderItem }
       keyExtractor={ (item) => `${item.index}-film-list-row` }
       recycleItems
+      showsVerticalScrollIndicator={ false }
     />
   );
 }

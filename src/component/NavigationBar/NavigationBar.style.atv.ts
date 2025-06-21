@@ -1,11 +1,11 @@
-import Colors from 'Style/Colors';
+import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const NAVIGATION_BAR_Z_INDEX = 100;
 export const NAVIGATION_BAR_TV_WIDTH = 80;
 export const NAVIGATION_BAR_TV_WIDTH_EXPANDED = 256;
 export const NAVIGATION_BAR_TV_WIDTH_PADDING = 12;
-// eslint-disable-next-line max-len -- This is a constant
+
 export const NAVIGATION_BAR_TV_TAB_WIDTH = NAVIGATION_BAR_TV_WIDTH - NAVIGATION_BAR_TV_WIDTH_PADDING * 2;
 export const NAVIGATION_BAR_TV_TAB_WIDTH_EXPANDED = NAVIGATION_BAR_TV_TAB_WIDTH + 100;
 
@@ -39,6 +39,8 @@ export const styles = CreateStyles({
     justifyContent: 'space-between',
     overflow: 'hidden',
     zIndex: NAVIGATION_BAR_Z_INDEX + 2,
+    transitionProperty: 'width',
+    transitionDuration: '250ms',
   },
   tabsOpened: {
     width: NAVIGATION_BAR_TV_TAB_WIDTH_EXPANDED,
@@ -49,16 +51,16 @@ export const styles = CreateStyles({
     alignItems: 'center',
     justifyContent: 'flex-start',
     paddingVertical: 12,
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
     borderRadius: 24,
     marginBottom: 12,
   },
   tabSelected: {
-    backgroundColor: Colors.darkBlue,
+    backgroundColor: Colors.tertiary,
     borderRadius: 24,
   },
   tabFocused: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.backgroundFocused,
     borderRadius: 24,
   },
   tabIcon: {
@@ -69,14 +71,14 @@ export const styles = CreateStyles({
     display: 'flex',
     position: 'absolute',
     left: 48,
-    color: Colors.white,
+    color: Colors.text,
     opacity: 0,
   },
   tabTextOpened: {
     opacity: 1,
   },
   tabContentFocused: {
-    color: Colors.black,
+    color: Colors.textFocused,
   },
   profile: {
     height: 32,
@@ -89,33 +91,29 @@ export const styles = CreateStyles({
   profileSwitchText: {
     left: 8,
     bottom: 0,
-    color: Colors.lightGray,
+    color: Colors.textSecondary,
   },
   profileAvatar: {
     width: 32,
     height: 32,
-    backgroundColor: Colors.black,
+    backgroundColor: Colors.backgroundLight,
     borderRadius: 99,
-    borderColor: Colors.gray,
+    borderColor: Colors.border,
     borderWidth: 1,
   },
   profileAvatarContainer: {
   },
-  profileAvatarUnfocused: {
-    padding: 2,
-  },
-  profileAvatarFocused: {
-    borderRadius: 99,
-    borderWidth: 2,
-    borderColor: Colors.white,
-  },
   badge: {
     backgroundColor: Colors.secondary,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: 16,
+    height: 16,
+    borderRadius: 50,
+    fontSize: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    textAlign: 'center',
     position: 'absolute',
-    right: -4,
-    top: -4,
+    right: -8,
+    top: -8,
   },
 });
