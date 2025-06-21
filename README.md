@@ -34,14 +34,15 @@ To keep this app maintained and up-to-date please consider sponsoring it on GitH
 
 |Mobile|TV|
 |:-------------------------:|:-------------------------:|
-|<img src="https://github.com/user-attachments/assets/2db81415-7acf-43c0-bc99-39654a0c0f8b" width="50%" />|<img src="https://github.com/user-attachments/assets/ec7b5226-3ffb-4005-887c-0dbb5ca2e7be" width="100%" />
-|<img src="https://github.com/user-attachments/assets/3b0e4216-43d9-4a8d-9cbb-06642193e16c" width="50%" />|<img src="https://github.com/user-attachments/assets/7b42c53b-b6c1-42e5-a87d-2a2693e0db38" width="100%" />
-|<img src="https://github.com/user-attachments/assets/1597f54e-cf64-4af9-a00b-e21af89d14ac" width="50%" />|<img src="https://github.com/user-attachments/assets/cc9f0ac5-81b1-41bc-b0de-e44cc8ba1513" width="100%" />
-|<img src="https://github.com/user-attachments/assets/22134b32-064f-4fac-8717-e8d0eec122fc" width="50%" />|<img src="https://github.com/user-attachments/assets/a396afa5-efb0-4e36-bfc2-30dedc7ede7d" width="100%" />
-|<img src="https://github.com/user-attachments/assets/ae1b1f04-43d9-4eab-8ecc-5682f336d64a" width="50%" />|<img src="https://github.com/user-attachments/assets/7723c794-a368-4f8c-82ed-eebce9bc1bc6" width="100%" />
-|<img src="https://github.com/user-attachments/assets/52668bea-e383-43b1-82ae-a7daa5a07244" width="50%" />|<img src="https://github.com/user-attachments/assets/c8af9d08-fa12-4cdd-aead-0fed26fbd250" width="100%" />
-|<img src="https://github.com/user-attachments/assets/32ad1a16-c067-44a4-9649-79c9c007cc40" width="100%" />|<img src="https://github.com/user-attachments/assets/c8d4d596-b2f0-4918-becd-448e272c08b5" width="100%" />
-|<img src="https://github.com/user-attachments/assets/277de774-36ab-424f-9f9d-8aa9db3a6f7e" width="50%" />|<img src="https://github.com/user-attachments/assets/5eff73d8-fabc-4f15-bb37-dedfa30eae81" width="100%" />
+|<img src="https://github.com/user-attachments/assets/52933316-b824-4d62-bdec-0bb93059a461" width="50%" />|<img src="https://github.com/user-attachments/assets/333eb6c0-29be-41b3-b1a5-df657654e05b" width="100%" />
+|<img src="https://github.com/user-attachments/assets/e99f5a93-3fe3-4d51-9b15-49f0c625cecd" width="50%" />|<img src="https://github.com/user-attachments/assets/e9117a97-721c-422b-82b1-093f259293fa" width="100%" />
+|<img src="https://github.com/user-attachments/assets/f737a836-be53-4d36-aaf4-26c6edef673e" width="50%" />|<img src="https://github.com/user-attachments/assets/9cb63dfc-7044-4cd2-88c3-e79f48f12284" width="100%" />
+|<img src="https://github.com/user-attachments/assets/46e80ec8-9236-43d8-a14e-931a5bc94238" width="50%" />|<img src="https://github.com/user-attachments/assets/b1f0592a-1627-4439-8cc3-def3cada7899" width="100%" />
+|<img src="https://github.com/user-attachments/assets/2b3e6493-0395-4ff9-be74-049f292f143a" width="50%" />|<img src="https://github.com/user-attachments/assets/97932653-79dd-47a2-97ed-9d10062dfe00" width="100%" />
+|<img src="https://github.com/user-attachments/assets/3f3e3ccd-a22a-404a-b615-c6ddb3243082" width="50%" />|<img src="https://github.com/user-attachments/assets/582abc7d-bcb9-410e-a010-34dfaa4ea26c" width="100%" />
+|<img src="https://github.com/user-attachments/assets/dc424de3-cb65-4c38-a9d0-e78d1c974bbe" width="100%" />|<img src="https://github.com/user-attachments/assets/996fa0db-fc5f-41d7-a732-023facc6ea48" width="100%" />
+|<img src="https://github.com/user-attachments/assets/a2eb768d-5334-4b4c-a974-f7f1635f02c3" width="50%" />|<img src="https://github.com/user-attachments/assets/5614e08b-44aa-4556-945a-48cb546f1aad" width="100%" />
+|<img src="https://github.com/user-attachments/assets/2d983924-46f2-4e83-b5b2-21287d9e6974" width="50%" />|<img src="https://github.com/user-attachments/assets/09e73302-234b-4cd4-8667-5ede18e54b4d" width="100%" />
 
 ## License
 
