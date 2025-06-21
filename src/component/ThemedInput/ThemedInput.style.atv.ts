@@ -7,6 +7,7 @@ export const styles = CreateStyles({
     borderRadius: 16,
     paddingHorizontal: 8,
     color: Colors.text,
+    fontSize: 16,
   },
   inputFocus: {
     backgroundColor: Colors.inputFocused,

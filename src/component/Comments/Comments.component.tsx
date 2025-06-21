@@ -1,4 +1,3 @@
-import Loader from 'Component/Loader';
 import ThemedGrid from 'Component/ThemedGrid';
 import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
 import ThemedImage from 'Component/ThemedImage';
@@ -12,6 +11,7 @@ import { CommentInterface } from 'Type/Comment.interface';
 import { scale } from 'Util/CreateStyles';
 
 import { INDENT_SIZE, styles } from './Comments.style';
+import { CommentsThumbnail } from './Comments.thumbnail';
 import { CommentItemProps, CommentsComponentProps } from './Comments.type';
 import { CommentText } from './CommentText';
 
@@ -37,7 +37,6 @@ export function CommentItem({
         idx % 2 === 0 ? styles.itemEven : null,
         {
           paddingLeft: leftIndent,
-
         },
       ] }
     >
@@ -84,7 +83,6 @@ const MemoCommentItem = memo(CommentItem, rowPropsAreEqual);
 export const CommentsComponent = ({
   comments,
   isLoading,
-  loaderFullScreen,
   style,
   onNextLoad,
 }: CommentsComponentProps) => {
@@ -101,10 +99,7 @@ export const CommentsComponent = ({
   if (!comments || (isLoading && !comments.length)) {
     return (
       <View style={ styles.loader }>
-        <Loader
-          isLoading
-          fullScreen={ loaderFullScreen }
-        />
+        <CommentsThumbnail />
       </View>
     );
   }

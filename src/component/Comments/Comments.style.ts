@@ -57,7 +57,6 @@ export const styles = CreateStyles({
     color: Colors.button,
   },
   loader: {
-    alignSelf: 'center',
     height: '100%',
     width: '100%',
   },

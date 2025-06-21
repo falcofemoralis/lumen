@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo } from 'react';
-import { StyleSheet, View, ViewStyle, Platform } from 'react-native';
+import { StyleSheet, View, ViewStyle, Platform, StyleProp } from 'react-native';
 import { getRange } from './helpers/getRange';
 import { NodeOrientation } from '../../types/orientation';
 import { typedMemo } from '../../helpers/TypedMemo';
@@ -31,7 +31,7 @@ export interface VirtualizedListProps<T> {
   onEndReached?: () => void;
   /** Number of items left to display before triggering onEndReached */
   onEndReachedThresholdItemsNumber?: number;
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
   orientation?: NodeOrientation;
   /**
    * @deprecated

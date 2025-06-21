@@ -1,5 +1,5 @@
 import React from 'react';
-import { ViewStyle } from 'react-native';
+import { StyleProp, ViewStyle } from 'react-native';
 
 export interface ThemedGridRowProps<T = any> {
   item: T,
@@ -10,8 +10,8 @@ export interface ThemedGridContainerProps<T = any> {
   data: T[];
   numberOfColumns: number;
   itemSize: number;
-  style?: ViewStyle;
-  rowStyle?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
+  rowStyle?: StyleProp<ViewStyle>;
   header?: React.ReactNode;
   headerSize?: number;
   ListEmptyComponent?: React.ComponentType<any>
@@ -26,8 +26,8 @@ export interface ThemedGridComponentProps<T = any> {
   numberOfColumns: number;
   itemSize: number;
   isRefreshing?: boolean;
-  style?: ViewStyle;
-  rowStyle?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
+  rowStyle?: StyleProp<ViewStyle>;
   header?: React.ReactNode;
   headerSize?: number;
   ListEmptyComponent?: any;

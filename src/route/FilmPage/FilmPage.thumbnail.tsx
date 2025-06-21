@@ -63,13 +63,17 @@ export const FilmPageThumbnail = () => (
       <Wrapper>
         <View style={ styles.middleActions }>
           { Array(5).fill(0).map((_, i) => (
-            <Thumbnail
+            <View
               // eslint-disable-next-line react/no-array-index-key
               key={ `${i}-thumb-action` }
-              style={ styles.middleActionButton }
-              height={ scale(44) }
-              width="100%"
-            />
+              style={ styles.middleAction }
+            >
+              <Thumbnail
+                style={ styles.middleActionButton }
+                height={ scale(44) }
+                width="100%"
+              />
+            </View>
           )) }
         </View>
       </Wrapper>

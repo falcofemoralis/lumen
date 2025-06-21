@@ -1,5 +1,4 @@
 import { FilmSectionsThumbnail } from 'Component/FilmSections/FilmSections.thumbnail.atv';
-import Loader from 'Component/Loader';
 import Page from 'Component/Page';
 import Thumbnail from 'Component/Thumbnail';
 import { View } from 'react-native';
@@ -13,10 +12,6 @@ export const NotificationsPageThumbnail = () => (
         width={ scale(200) }
       />
       <FilmSectionsThumbnail />
-      <Loader
-        isLoading
-        fullScreen
-      />
     </View>
   </Page>
 );

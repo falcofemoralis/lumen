@@ -6,7 +6,7 @@ import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
 import { Trash2 } from 'lucide-react-native';
 import React, { useCallback } from 'react';
-import { Dimensions, useWindowDimensions, View } from 'react-native';
+import { useWindowDimensions, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { DefaultFocus, SpatialNavigationFocusableView } from 'react-tv-space-navigation';
 import { calculateLayoutWidth } from 'Style/Layout';

@@ -6,6 +6,7 @@ import { Plus } from 'lucide-react-native';
 import React, { memo, useCallback, useEffect, useRef } from 'react';
 import { Text, View } from 'react-native';
 import {
+  DefaultFocus,
   SpatialNavigationFocusableView,
   SpatialNavigationVirtualizedList,
   SpatialNavigationVirtualizedListRef,
@@ -60,41 +61,43 @@ export const ThemedDropdownComponent = ({
     const isSelected = value === item.value;
 
     return (
-      <SpatialNavigationFocusableView
-        onSelect={ () => onChange(item) }
-      >
-        { ({ isFocused }) => (
-          <View style={ [
-            styles.item,
-            isSelected && styles.itemSelected,
-            isFocused && styles.itemFocused,
-          ] }
-          >
-            <View style={ styles.itemContainer }>
-              { item.startIcon && (
-                <ThemedImage
-                  style={ styles.icon }
-                  src={ item.startIcon }
-                />
-              ) }
-              <Text style={ [
-                styles.text,
-                isSelected && styles.textSelected,
-                isFocused && styles.textFocused,
-              ] }
-              >
-                { item.label }
-              </Text>
-              { item.endIcon && (
-                <ThemedImage
-                  style={ styles.icon }
-                  src={ item.endIcon }
-                />
-              ) }
+      <DefaultFocus enable={ isSelected }>
+        <SpatialNavigationFocusableView
+          onSelect={ () => onChange(item) }
+        >
+          { ({ isFocused }) => (
+            <View style={ [
+              styles.item,
+              isSelected && styles.itemSelected,
+              isFocused && styles.itemFocused,
+            ] }
+            >
+              <View style={ styles.itemContainer }>
+                { item.startIcon && (
+                  <ThemedImage
+                    style={ styles.icon }
+                    src={ item.startIcon }
+                  />
+                ) }
+                <Text style={ [
+                  styles.text,
+                  isSelected && styles.textSelected,
+                  isFocused && styles.textFocused,
+                ] }
+                >
+                  { item.label }
+                </Text>
+                { item.endIcon && (
+                  <ThemedImage
+                    style={ styles.icon }
+                    src={ item.endIcon }
+                  />
+                ) }
+              </View>
             </View>
-          </View>
-        ) }
-      </SpatialNavigationFocusableView>
+          ) }
+        </SpatialNavigationFocusableView>
+      </DefaultFocus>
     );
   }, [value, onChange]);
 

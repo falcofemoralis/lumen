@@ -1,4 +1,3 @@
-import ThemedText from 'Component/ThemedText';
 import { useCallback, useRef } from 'react';
 import { TextInput } from 'react-native';
 import { SpatialNavigationFocusableView } from 'react-tv-space-navigation';

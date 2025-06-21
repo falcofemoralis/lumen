@@ -1,6 +1,6 @@
 import range from 'lodash/range';
 import React, { ReactNode, useCallback, useEffect, useMemo } from 'react';
-import { StyleSheet,View, ViewStyle } from 'react-native';
+import { StyleProp, StyleSheet,View, ViewStyle } from 'react-native';
 
 import { ParentIdContext, useParentId } from '../../context/ParentIdContext';
 import { useSpatialNavigator } from '../../context/SpatialNavigatorContext';
@@ -34,7 +34,7 @@ type SpatialNavigationVirtualizedGridProps<T> = Pick<
     /** Number of columns in the grid OR number of items per rows */
     numberOfColumns: number;
     /** Used to modify every row style */
-    rowContainerStyle?: ViewStyle;
+    rowContainerStyle?: StyleProp<ViewStyle>;
   };
 
 export type GridRowType<T> = {
