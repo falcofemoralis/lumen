@@ -90,4 +90,7 @@ export const styles = CreateStyles({
     paddingHorizontal: 4,
     paddingVertical: 1,
   },
+  posterPendingRelease: {
+    opacity: 0.5,
+  },
 });

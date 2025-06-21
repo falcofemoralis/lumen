@@ -23,6 +23,7 @@ export function FilmCardComponent({
     title,
     subtitle,
     info,
+    isPendingRelease,
   } = filmCard;
 
   const renderType = () => (
@@ -70,6 +71,7 @@ export function FilmCardComponent({
           styles.poster,
           stylePoster,
           isFocused && styles.posterFocused,
+          isPendingRelease && styles.posterPendingRelease,
         ] }
         src={ poster }
       />
