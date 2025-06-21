@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { ToastAndroid } from 'react-native';
+import { Platform, ToastAndroid } from 'react-native';
 
 class NotificationStore {
   private isErrorOccurred = false;
@@ -9,7 +9,13 @@ class NotificationStore {
       return;
     }
 
-    ToastAndroid.show(msg, ToastAndroid.SHORT);
+    if (Platform.OS === 'web') {
+      // For web, we can use the browser's alert or implement a custom toast
+      // You might want to use a proper toast library for better UX
+      alert(msg);
+    } else {
+      ToastAndroid.show(msg, ToastAndroid.SHORT);
+    }
   }
 
   displayError(error: string | Error) {
@@ -20,7 +26,14 @@ class NotificationStore {
     const msg = error instanceof Error ? error.message : String(error);
 
     console.error(msg);
-    ToastAndroid.show(msg, ToastAndroid.LONG);
+
+    if (Platform.OS === 'web') {
+      // For web, we can use the browser's alert or implement a custom toast
+      // You might want to use a proper toast library for better UX
+      alert(msg);
+    } else {
+      ToastAndroid.show(msg, ToastAndroid.LONG);
+    }
   }
 
   displayErrorScreen(code?: string, error?: string, info?: string) {
