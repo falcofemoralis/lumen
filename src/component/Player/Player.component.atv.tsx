@@ -136,6 +136,12 @@ export function PlayerComponent({
   }, [showControls, currentOverlay, focusedElement, hideActions]);
 
   useEffect(() => {
+    return () => {
+      isComponentMounted.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
     const keyDownListener = (type: SupportedKeys) => {
       if (!isComponentMounted.current || !player || currentOverlayRef.current.length) return false;
 
@@ -243,7 +249,6 @@ export function PlayerComponent({
       RemoteControlManager.removeKeyupListener(remoteControlUpListener);
       backHandler.remove();
 
-      isComponentMounted.current = false;
       if (controlsTimeout.current) {
         clearTimeout(controlsTimeout.current);
         controlsTimeout.current = null;

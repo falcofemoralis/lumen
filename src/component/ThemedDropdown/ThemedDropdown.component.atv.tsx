@@ -41,7 +41,7 @@ export const ThemedDropdownComponent = ({
         }
       }, 100);
     }
-  }, [data, value, currentOverlay.length]);
+  }, [currentOverlay.length]);
 
   const renderHeader = () => {
     if (!header) {
