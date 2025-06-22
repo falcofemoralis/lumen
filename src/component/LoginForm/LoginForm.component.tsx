@@ -19,6 +19,14 @@ export function LoginFormComponent({
 }: LoginFormComponentProps) {
   const loginRef = useRef({ username: '', password: '' });
 
+  const onLogin = async () => {
+    const success = await handleLogin(loginRef.current.username, loginRef.current.password);
+
+    if (success) {
+      router.back();
+    }
+  };
+
   const openForm = () => {
     router.push({ pathname: '/modal' });
     RouterStore.pushData('modal', {
@@ -54,10 +62,7 @@ export function LoginFormComponent({
         />
         <ThemedButton
           style={ styles.button }
-          onPress={ () => handleLogin(
-            loginRef.current.username,
-            loginRef.current.password
-          ) }
+          onPress={ onLogin }
         >
           { t('Sign in') }
         </ThemedButton>
