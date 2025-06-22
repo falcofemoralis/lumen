@@ -1,4 +1,5 @@
 import ThemedPressable from 'Component/ThemedPressable';
+import { useLandscape } from 'Hooks/useLandscape';
 import { Square, SquareCheck } from 'lucide-react-native';
 import React, { useCallback } from 'react';
 import {
@@ -16,6 +17,8 @@ export const ThemedMultiListComponent = ({
   header,
   handleOnChange,
 }: ThemedMultiListComponentProps) => {
+  const isLandscape = useLandscape();
+
   const renderHeader = () => {
     if (!header) {
       return null;
@@ -48,7 +51,12 @@ export const ThemedMultiListComponent = ({
   ), []);
 
   const renderContent = () => (
-    <View style={ styles.listItems }>
+    <View
+      style={ [
+        styles.listItems,
+        isLandscape && styles.listItemsLandscape,
+      ] }
+    >
       <ScrollView>
         { values.map((item) => (
           <ThemedPressable
