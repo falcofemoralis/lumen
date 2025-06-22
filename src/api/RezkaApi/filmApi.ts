@@ -21,6 +21,7 @@ import { NotificationInterface } from '../../type/Notification.interface';
 import configApi from './configApi';
 import {
   formatDurationWithMoment,
+  getStaticUrl,
   parseActorCard,
   parseFilmCard, parseFilmsListRoot, parseFilmType, parseSeasons, parseStreams,
 } from './utils';
@@ -367,10 +368,12 @@ const filmApi: FilmApiInterface = {
         const vRatingCount = (el.querySelector('.count')?.rawText ?? '')
           .replace('%', '')
           .replace(',', '.');
+        const vRatingImg = el.querySelector('.title img')?.attributes.src;
 
         return {
           title: vRatingTitle,
           rating: Number(vRatingCount),
+          img: vRatingImg ? getStaticUrl(vRatingImg) : undefined,
         } as VoiceRatingInterface;
       });
     }
