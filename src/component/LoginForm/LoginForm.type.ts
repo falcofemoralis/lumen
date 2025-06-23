@@ -8,5 +8,5 @@ export interface LoginFormComponentProps {
   isLoading: boolean;
   withRedirect?: boolean;
   style?: StyleProp<ViewStyle>;
-  handleLogin: (username: string, password: string) => void;
+  handleLogin: (username: string, password: string) => Promise<boolean>;
 }

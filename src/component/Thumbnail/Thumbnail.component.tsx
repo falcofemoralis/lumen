@@ -8,19 +8,9 @@ import { calculateLayoutWidth } from 'Style/Layout';
 import { styles } from './Thumbnail.style';
 import { ThumbnailComponentProps } from './Thumbnail.type';
 
-let lw: number|null = null;
-
-const getLayoutWidth = () => {
-  if (lw === null) {
-    lw = calculateLayoutWidth();
-  }
-
-  return lw;
-};
-
 const convertPercentageToNumber = (value: DimensionValue) => {
   if (typeof value === 'string' && value.endsWith('%')) {
-    return (parseFloat(value) / 100) * getLayoutWidth();
+    return (parseFloat(value) / 100) * calculateLayoutWidth();
   }
 
   if (typeof value === 'string' && value === 'auto') {

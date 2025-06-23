@@ -2,6 +2,7 @@ import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 const MAX_ITEMS_TO_DISPLAY = 6;
+const MAX_ITEMS_TO_DISPLAY_LANDSCAPE = 5;
 const ITEM_HEIGHT = 48;
 
 export const styles = CreateStyles({
@@ -66,6 +67,9 @@ export const styles = CreateStyles({
   listItems: {
     flexDirection: 'column',
     maxHeight: MAX_ITEMS_TO_DISPLAY * ITEM_HEIGHT - 8,
+  },
+  listItemsLandscape: {
+    maxHeight: MAX_ITEMS_TO_DISPLAY_LANDSCAPE * ITEM_HEIGHT - 8,
   },
   listItem: {
     borderRadius: 16,

@@ -7,11 +7,11 @@ import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import { useOverlayContext } from 'Context/OverlayContext';
 import { useServiceContext } from 'Context/ServiceContext';
+import { useLandscape } from 'Hooks/useLandscape';
 import t from 'i18n/t';
 import { Check, ChevronLeft, CircleAlert } from 'lucide-react-native';
 import {
   useCallback,
-  useEffect,
   useMemo,
   useRef,
   useState,
@@ -21,7 +21,6 @@ import {
   ImageSourcePropType,
   ScrollView,
   StyleProp,
-  useWindowDimensions,
   View,
   ViewStyle,
 } from 'react-native';
@@ -83,17 +82,8 @@ export const BaseSlide = ({
   goNext,
   onNext,
 }: BaseSlideProps) => {
-  const { width, height } = useWindowDimensions();
-  const [isLandscape, setIsLandscape] = useState(width > height);
+  const isLandscape = useLandscape();
   const nextButtonRef = useRef<SpatialNavigationNodeRef>(null);
-
-  useEffect(() => {
-    const newLandscape = width > height;
-
-    if (newLandscape !== isLandscape) {
-      setIsLandscape(newLandscape);
-    }
-  }, [width, height]);
 
   const renderBaseSlide = () => {
     const {

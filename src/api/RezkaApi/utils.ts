@@ -16,6 +16,18 @@ export interface JSONResult {
   message: string;
 }
 
+export const getStaticUrl = (path: string): string => {
+  if (path.startsWith('http')) {
+    return path;
+  }
+
+  if (path.startsWith('/')) {
+    return `https://statichdrezka.ac${path}`;
+  }
+
+  return `https://statichdrezka.ac/${path}`;
+};
+
 export const parseFilmType = (type = '') => {
   if (type.includes('films')) {
     return FilmType.FILM;
@@ -213,7 +225,7 @@ export const parseActorCard = (
 
   return {
     name,
-    photo: photo === 'null' ? 'https://statichdrezka.ac/i/nopersonphoto.png' : photo,
+    photo: photo === 'null' ? getStaticUrl('/i/nopersonphoto.png') : photo,
     link,
     job,
     isDirector,
