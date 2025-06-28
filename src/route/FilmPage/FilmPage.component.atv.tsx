@@ -237,8 +237,6 @@ export function FilmPageComponent({
       return null;
     }
 
-    console.log(mainRating);
-
     return (
       <AirbnbRating
         ratingContainerStyle={ styles.rating }

@@ -79,9 +79,7 @@ export const AppUpdaterProvider = ({ children }: { children: React.ReactNode }) 
     if (data?.version > currentVersion) {
       setUpdate(data);
     }
-
-    setUpdate(data);
-  }, []);
+  }, [getCachedUpdate]);
 
   const value = useMemo(() => ({
     update,
