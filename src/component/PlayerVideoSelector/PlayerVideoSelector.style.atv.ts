@@ -27,10 +27,4 @@ export const styles = CreateStyles({
   voicesContainer: {
     flex: 1,
   },
-  voicesListContainer: {
-    width: '100%',
-    maxHeight: 288,
-    flexDirection: 'column',
-    gap: 4,
-  },
 });

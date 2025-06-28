@@ -86,7 +86,6 @@ export function PlayerVideoSelectorComponent({
         value={ selectedVoice.identifier }
         onChange={ (item) => handleSelectVoice(item.value) }
         header={ t('Search voice') }
-        style={ styles.voicesListContainer }
         asList
       />
     );
