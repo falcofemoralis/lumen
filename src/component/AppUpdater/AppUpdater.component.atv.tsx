@@ -2,7 +2,6 @@ import Loader from 'Component/Loader';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedText from 'Component/ThemedText';
-import Wrapper from 'Component/Wrapper';
 import * as Application from 'expo-application';
 import t from 'i18n/t';
 import { Image, ScrollView, View } from 'react-native';
@@ -17,7 +16,6 @@ export const AppUpdaterComponent = ({
   isLoading,
   acceptUpdate,
   rejectUpdate,
-  skipUpdate,
 }: AppUpdaterComponentProps) => {
   const { versionName, description } = update;
 
@@ -57,34 +55,29 @@ export const AppUpdaterComponent = ({
       direction="horizontal"
       style={ styles.actions }
     >
-      <ThemedButton
-        style={ [
-          styles.button,
-          styles.skipButton,
-        ] }
-        onPress={ skipUpdate }
-      >
-        { t('Skip') }
-      </ThemedButton>
-      <ThemedButton
-        style={ [
-          styles.button,
-          styles.skipButton,
-        ] }
-        onPress={ rejectUpdate }
-      >
-        { t('Reject') }
-      </ThemedButton>
-      <DefaultFocus>
+      <View style={ styles.buttonContainer }>
         <ThemedButton
           style={ [
             styles.button,
-            styles.updateButton,
+            styles.skipButton,
           ] }
-          onPress={ acceptUpdate }
+          onPress={ rejectUpdate }
         >
-          { t('Update') }
+          { t('Reject') }
         </ThemedButton>
+      </View>
+      <DefaultFocus>
+        <View style={ styles.buttonContainer }>
+          <ThemedButton
+            style={ [
+              styles.button,
+              styles.updateButton,
+            ] }
+            onPress={ acceptUpdate }
+          >
+            { t('Update') }
+          </ThemedButton>
+        </View>
       </DefaultFocus>
     </SpatialNavigationView>
   );
@@ -96,15 +89,13 @@ export const AppUpdaterComponent = ({
       onHide={ rejectUpdate }
     >
       <View style={ isLoading && styles.loadingContainer }>
-        <Wrapper style={ styles.wrapper }>
-          <Loader
-            fullScreen
-            isLoading={ isLoading }
-          />
-          { renderHeader() }
-          { renderContent() }
-          { renderActions() }
-        </Wrapper>
+        <Loader
+          fullScreen
+          isLoading={ isLoading }
+        />
+        { renderHeader() }
+        { renderContent() }
+        { renderActions() }
       </View>
     </ThemedOverlay>
   );

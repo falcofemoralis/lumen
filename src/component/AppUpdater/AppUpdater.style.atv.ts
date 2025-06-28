@@ -8,9 +8,7 @@ export const styles = CreateStyles({
   },
   overlay: {
     width: '40%',
-  },
-  wrapper: {
-    paddingVertical: 16,
+    padding: 16,
   },
   header: {
     flexDirection: 'row',
@@ -63,6 +61,9 @@ export const styles = CreateStyles({
     justifyContent: 'space-between',
     gap: 8,
     marginTop: 16,
+  },
+  buttonContainer: {
+    flex: 1,
   },
   button: {
     alignItems: 'center',

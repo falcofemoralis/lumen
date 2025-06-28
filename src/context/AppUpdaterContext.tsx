@@ -1,5 +1,5 @@
 import { UPDATE_LINK } from 'Component/AppUpdater/AppUpdater.config';
-import { MetaData } from 'Component/AppUpdater/AppUpdater.type';
+import * as Application from 'expo-application';
 import {
   createContext,
   use,
@@ -12,6 +12,7 @@ import hotUpdate from 'react-native-ota-hot-update';
 import ConfigStore from 'Store/Config.store';
 import { UpdateInterface } from 'Type/Update.interface';
 import { noopFn } from 'Util/Function';
+import { versionStringToNumber } from 'Util/Misc';
 import { miscStorage } from 'Util/Storage';
 
 const UPDATE_STORAGE_KEY = 'app_update';
@@ -63,20 +64,14 @@ export const AppUpdaterProvider = ({ children }: { children: React.ReactNode }) 
       return;
     }
 
-    const currentVersion = await hotUpdate.getCurrentVersion();
-    const metaData = await hotUpdate.getUpdateMetadata() as MetaData | null;
-
     const data = await getCachedUpdate();
 
-    if (metaData) {
-      const { skipUpdate, version: metaDataVersion } = metaData;
+    const currentVersion = versionStringToNumber(Application.nativeApplicationVersion || '0.0.0');
+    const newVersion = versionStringToNumber(data?.versionName || '0.0.0');
+    const installedVersionNumber = await hotUpdate.getCurrentVersion() || 0;
+    const newVersionNumber = data?.version || 0;
 
-      if (skipUpdate && data?.version === metaDataVersion) {
-        return;
-      }
-    }
-
-    if (data?.version > currentVersion) {
+    if (newVersion > currentVersion && newVersionNumber > installedVersionNumber) {
       setUpdate(data);
     }
   }, [getCachedUpdate]);

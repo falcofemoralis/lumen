@@ -20,7 +20,6 @@ export const AppUpdaterComponent = ({
   bottomSheetRef,
   acceptUpdate,
   rejectUpdate,
-  skipUpdate,
   onBottomSheetMount,
 }: AppUpdaterComponentProps) => {
   const { versionName, description } = update;
@@ -74,9 +73,9 @@ export const AppUpdaterComponent = ({
           styles.button,
           styles.skipButton,
         ] }
-        onPress={ skipUpdate }
+        onPress={ rejectUpdate }
       >
-        { t('Skip') }
+        { t('Reject') }
       </ThemedButton>
       <ThemedButton
         style={ [

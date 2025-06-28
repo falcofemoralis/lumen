@@ -7,7 +7,6 @@ export interface AppUpdaterComponentProps {
   bottomSheetRef: React.RefObject<TrueSheet | null>;
   acceptUpdate: () => void;
   rejectUpdate: () => void;
-  skipUpdate: () => void;
   onBottomSheetMount: () => void;
 }
 

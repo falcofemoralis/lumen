@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Platform } from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import hotUpdate from 'react-native-ota-hot-update';
+import { useLockSpatialNavigation } from 'react-tv-space-navigation';
 import ConfigStore from 'Store/Config.store';
 import NotificationStore from 'Store/Notification.store';
 
@@ -18,6 +19,7 @@ export const AppUpdaterContainer = () => {
   const { openOverlay, closeOverlay } = useOverlayContext();
   const [isLoading, setIsLoading] = useState(false);
   const bottomSheetRef = useRef<ThemedBottomSheetRef>(null);
+  const { lock } = useLockSpatialNavigation();
 
   const openPopup = () => {
     if (ConfigStore.isTV()) {
@@ -60,6 +62,14 @@ export const AppUpdaterContainer = () => {
       downloadIosUrl,
     } = update;
 
+    if (isLoading) {
+      return;
+    }
+
+    if (ConfigStore.isTV()) {
+      lock();
+    }
+
     setIsLoading(true);
 
     const url = Platform.OS === 'android' ? downloadAndroidUrl : downloadIosUrl;
@@ -70,26 +80,11 @@ export const AppUpdaterContainer = () => {
         NotificationStore.displayError(message || 'Bundle update failed');
       },
       restartAfterInstall: true,
-      metadata: {
-        skipUpdate: false,
-        version,
-      },
     });
   };
 
   const rejectUpdate = () => {
     closePopup();
-  };
-
-  const skipUpdate = () => {
-    const { version } = update;
-
-    closePopup();
-
-    hotUpdate.setUpdateMetadata({
-      skipUpdate: true,
-      version,
-    });
   };
 
   const containerProps = {
@@ -98,7 +93,6 @@ export const AppUpdaterContainer = () => {
     bottomSheetRef,
     acceptUpdate,
     rejectUpdate,
-    skipUpdate,
     onBottomSheetMount,
   };
 
