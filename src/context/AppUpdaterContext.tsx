@@ -49,7 +49,7 @@ export const AppUpdaterProvider = ({ children }: { children: React.ReactNode }) 
     }
 
     const response = await fetch(UPDATE_LINK);
-    const data = await response.json() as UpdateInterface;;
+    const data = await response.json() as UpdateInterface;
 
     miscStorage.set(UPDATE_STORAGE_KEY, JSON.stringify({
       data,
