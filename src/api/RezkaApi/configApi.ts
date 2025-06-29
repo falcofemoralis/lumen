@@ -4,7 +4,7 @@ import t from 'i18n/t';
 import { Platform } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
 import { FilmStreamInterface } from 'Type/FilmStream.interface';
-import { ProxyUrl } from 'Type/ProxyUrl.interface';
+import { ModifiedProvider } from 'Type/ModifiedProvider.interface';
 import { getConfigJson, updateConfig } from 'Util/Config';
 import { safeJsonParse } from 'Util/Json';
 import { HTMLElementInterface, parseHtml } from 'Util/Parser';
@@ -13,13 +13,12 @@ import { updateUrlHost } from 'Util/Url';
 
 const REZKA_CONFIG = 'rezkaConfig';
 
-const REZKA_DEFAULT_PROVIDER = 'https://rezka-ua.org';
 const REZKA_PROXY_PROVIDER = 'http://localhost:3000';
 
 const configApi: ConfigApiInterface = {
   serviceType: ApiServiceType.REZKA,
   defaultProviders: [
-    REZKA_DEFAULT_PROVIDER,
+    'https://rezka-ua.org',
   ],
   defaultCDNs: [
     'https://prx2-cogent.ukrtelcdn.net',
@@ -147,23 +146,15 @@ const configApi: ConfigApiInterface = {
 
   /**
    * Get request
-   * @param query
+   * @param queryInput
    * @param variables
    * @returns text
    */
   async getRequest(
-    query: string,
+    queryInput: string,
     variables: Variables = {}
   ) {
-    let provider: string = this.getProvider();
-
-    // For web, we use the proxy to avoid CORS issues
-    if (Platform.OS === 'web') {
-      const proxyUrl = this.getProxy(query, provider);
-
-      query = proxyUrl.query;
-      provider = proxyUrl.provider;
-    }
+    const { query, provider } = this.modifyProvider(queryInput);
 
     return executeGet(
       query,
@@ -175,23 +166,15 @@ const configApi: ConfigApiInterface = {
 
   /**
    * Post request
-   * @param query
+   * @param queryInput
    * @param variables
    * @returns JSON object
    */
   async postRequest(
-    query: string,
+    queryInput: string,
     variables: Record<string, string> = {}
   ) {
-    let provider: string = this.getProvider();
-
-    // For web, we use the proxy to avoid CORS issues
-    if (Platform.OS === 'web') {
-      const proxyUrl = this.getProxy(query, provider);
-
-      query = proxyUrl.query;
-      provider = proxyUrl.provider;
-    }
+    const { query, provider } = this.modifyProvider(queryInput);
 
     return executePost(
       `${query}/?t=${Date.now()}`,
@@ -201,6 +184,11 @@ const configApi: ConfigApiInterface = {
     );
   },
 
+  /**
+   * Modify CDN for streams
+   * @param streams
+   * @returns streams with modified URLs
+   */
   modifyCDN(streams: FilmStreamInterface[]) {
     const cdn = this.getCDN();
 
@@ -219,19 +207,17 @@ const configApi: ConfigApiInterface = {
   },
 
   /**
-   * Get proxy URL
+   * Modify provider URL
    * @param query
-   * @param provider
-   * @returns ProxyUrl
+   * @returns ModifiedUrl
    */
-  getProxy(query: string, provider: string): ProxyUrl {
-    if (query.includes('http')) {
-      query = query.replace(REZKA_DEFAULT_PROVIDER, REZKA_PROXY_PROVIDER);
-    }
+  modifyProvider(query: string): ModifiedProvider {
+    const isWeb = Platform.OS !== 'web';
 
-    provider = REZKA_PROXY_PROVIDER;
-
-    return { query, provider };
+    return {
+      query: isWeb ? updateUrlHost(query, REZKA_PROXY_PROVIDER) : query,
+      provider: isWeb ? REZKA_PROXY_PROVIDER : this.getProvider(),
+    };
   },
 };
 
