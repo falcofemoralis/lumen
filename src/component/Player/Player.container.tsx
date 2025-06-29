@@ -9,7 +9,12 @@ import { useVideoPlayer } from 'expo-video';
 import { withTV } from 'Hooks/withTV';
 import t from 'i18n/t';
 import {
-  useEffect, useId, useRef, useState,
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
 } from 'react';
 import { BackHandler, Share } from 'react-native';
 import ConfigStore from 'Store/Config.store';
@@ -69,9 +74,11 @@ export function PlayerContainer({
   const bookmarksOverlayId = useId();
   const speedOverlayId = useId();
 
-  const firestoreDb = ConfigStore.isFirestore() && isSignedIn
-    ? getFirestore().collection<FirestoreDocument>(FIRESTORE_DB)
-    : null;
+  const firestoreDb = useMemo(() => (
+    ConfigStore.isFirestore() && isSignedIn
+      ? getFirestore().collection<FirestoreDocument>(FIRESTORE_DB)
+      : null
+  ), [isSignedIn]);
 
   const player = useVideoPlayer(selectedStream.url, (p) => {
     p.loop = false;
@@ -80,6 +87,78 @@ export function PlayerContainer({
     p.preservesPitch = true;
     p.play();
   });
+
+  const getFirestoreId = useCallback(() => {
+    if (!isSignedIn || !ConfigStore.isFirestore()) {
+      return null;
+    }
+
+    if (!profile) {
+      return null;
+    }
+
+    return formatFirestoreKey(film, selectedVoice, profile);
+  }, [film, profile, selectedVoice, isSignedIn]);
+
+  const updateTime = useCallback(() => {
+    const { currentTime } = player;
+
+    const firestoreId = getFirestoreId();
+
+    if (firestoreId && firestoreDb) {
+      firestoreDb
+        .doc(firestoreId)
+        .set({
+          deviceId: ConfigStore.getDeviceId(),
+          timestamp: currentTime,
+          updatedAt: getFormattedDate(),
+        });
+    }
+
+    updatePlayerTime(film, selectedVoice, currentTime);
+  }, [player, selectedVoice, getFirestoreId, firestoreDb, film]);
+
+  const createUpdateTimeTimeout = useCallback(() => {
+    if (updateTimeTimeout.current) {
+      clearInterval(updateTimeTimeout.current);
+      updateTimeTimeout.current = null;
+    }
+
+    updateTimeTimeout.current = setIntervalSafe(() => {
+      try {
+        const { playing } = player;
+
+        if (playing) {
+          updateTime();
+        }
+      } catch (error) {
+        console.error(error);
+
+        // If we get an error accessing the player, reset the timeout
+        createUpdateTimeTimeout();
+      }
+    }, SAVE_TIME_EVERY_MS);
+  }, [player, updateTime]);
+
+  const initFirestoreTime = useCallback(async () => {
+    const firestoreId = getFirestoreId();
+
+    if (firestoreId && firestoreDb) {
+      const doc = await firestoreDb
+        .doc(firestoreId)
+        .get();
+
+      const data = doc.data();
+
+      if (data && data.deviceId !== ConfigStore.getDeviceId()) {
+        const newTime = data.timestamp;
+        updatePlayerTime(film, selectedVoice, data.timestamp);
+
+        // eslint-disable-next-line react-compiler/react-compiler
+        player.currentTime = newTime;
+      }
+    }
+  }, [getFirestoreId, firestoreDb, film, selectedVoice, player]);
 
   useEffect(() => {
     activateKeepAwakeAsync(AWAKE_TAG);
@@ -102,7 +181,7 @@ export function PlayerContainer({
       backHandler.remove();
       resetProgressStatus();
     };
-  }, []);
+  }, [updateTime, createUpdateTimeTimeout, initFirestoreTime, resetProgressStatus]);
 
   useEventListener(
     player,
@@ -354,21 +433,6 @@ export function PlayerContainer({
     changePlayerVideo(newVideo, newVoice);
   };
 
-  const createUpdateTimeTimeout = () => {
-    updateTimeTimeout.current = setIntervalSafe(() => {
-      try {
-        const { playing } = player;
-
-        if (playing) {
-          updateTime();
-        }
-      } catch (_e) {
-        // If we get an error accessing the player, reset the timeout
-        resetUpdateTimeTimeout();
-      }
-    }, SAVE_TIME_EVERY_MS);
-  };
-
   const removeUpdateTimeTimeout = () => {
     if (updateTimeTimeout.current) {
       clearInterval(updateTimeTimeout.current);
@@ -379,55 +443,6 @@ export function PlayerContainer({
   const resetUpdateTimeTimeout = () => {
     removeUpdateTimeTimeout();
     createUpdateTimeTimeout();
-  };
-
-  const getFirestoreId = () => {
-    if (!isSignedIn || !ConfigStore.isFirestore()) {
-      return null;
-    }
-
-    if (!profile) {
-      return null;
-    }
-
-    return formatFirestoreKey(film, selectedVoice, profile);
-  };
-
-  const updateTime = () => {
-    const { currentTime } = player;
-
-    const firestoreId = getFirestoreId();
-
-    if (firestoreId && firestoreDb) {
-      firestoreDb
-        .doc(firestoreId)
-        .set({
-          deviceId: ConfigStore.getDeviceId(),
-          timestamp: currentTime,
-          updatedAt: getFormattedDate(),
-        });
-    }
-
-    updatePlayerTime(film, selectedVoice, currentTime);
-  };
-
-  const initFirestoreTime = async () => {
-    const firestoreId = getFirestoreId();
-
-    if (firestoreId && firestoreDb) {
-      const doc = await firestoreDb
-        .doc(firestoreId)
-        .get();
-
-      const data = doc.data();
-
-      if (data && data.deviceId !== ConfigStore.getDeviceId()) {
-        const newTime = data.timestamp;
-        updatePlayerTime(film, selectedVoice, data.timestamp);
-        // eslint-disable-next-line react-compiler/react-compiler
-        player.currentTime = newTime;
-      }
-    }
   };
 
   const openVideoSelector = () => {

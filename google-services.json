@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1041285802558",
+    "project_id": "lumen-91801",
+    "storage_bucket": "lumen-91801.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1041285802558:android:d61bcb86f928a736ecff6f",
+        "android_client_info": {
+          "package_name": "com.falcofemoralis.lumen"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDAkx6VsZt2xNq3kpSi143jPOXa9iu5330"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

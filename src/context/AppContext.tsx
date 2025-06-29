@@ -4,6 +4,7 @@ import {
   useMemo,
 } from 'react';
 
+import { AppUpdaterProvider } from './AppUpdaterContext';
 import { NavigationProvider } from './NavigationContext';
 import { OverlayProvider } from './OverlayContext';
 import { ServiceProvider } from './ServiceContext';
@@ -22,7 +23,9 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       <OverlayProvider>
         <NavigationProvider>
           <ServiceProvider>
-            { children }
+            <AppUpdaterProvider>
+              { children }
+            </AppUpdaterProvider>
           </ServiceProvider>
         </NavigationProvider>
       </OverlayProvider>

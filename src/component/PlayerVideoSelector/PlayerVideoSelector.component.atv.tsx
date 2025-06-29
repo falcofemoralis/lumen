@@ -1,18 +1,16 @@
 import Loader from 'Component/Loader';
+import PlayerVideoRating from 'Component/PlayerVideoRating';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedDropdown from 'Component/ThemedDropdown';
 import ThemedOverlay from 'Component/ThemedOverlay';
-import ThemedText from 'Component/ThemedText';
-import { useOverlayContext } from 'Context/OverlayContext';
 import t from 'i18n/t';
-import { CircleHelp } from 'lucide-react-native';
-import React, { useId } from 'react';
-import { View } from 'react-native';
+import React from 'react';
 import {
-  DefaultFocus, SpatialNavigationFocusableView, SpatialNavigationScrollView, SpatialNavigationView,
+  DefaultFocus,
+  SpatialNavigationScrollView,
+  SpatialNavigationView,
 } from 'react-tv-space-navigation';
 import { EpisodeInterface, SeasonInterface } from 'Type/FilmVoice.interface';
-import { scale } from 'Util/CreateStyles';
 
 import { styles } from './PlayerVideoSelector.style.atv';
 import { PlayerVideoSelectorComponentProps } from './PlayerVideoSelector.type';
@@ -32,9 +30,6 @@ export function PlayerVideoSelectorComponent({
   handleSelectEpisode,
   film,
 }: PlayerVideoSelectorComponentProps) {
-  const { openOverlay, closeOverlay } = useOverlayContext();
-  const ratingOverlayId = useId();
-
   const renderVoiceRating = () => {
     const { voiceRating = [] } = film;
 
@@ -42,86 +37,12 @@ export function PlayerVideoSelectorComponent({
       return null;
     }
 
-    const barWidth = styles.voiceRatingOverlay.width
-      - styles.voiceRatingPercentContainer.width
-      - styles.voiceRatingItemContainer.padding * 2;
-
     return (
-      <>
-        <ThemedButton
-          IconComponent={ CircleHelp }
-          iconProps={ {
-            size: scale(20),
-          } }
-          onPress={ () => openOverlay(ratingOverlayId) }
-          style={ styles.voiceRatingInput }
-        />
-        <ThemedOverlay
-          id={ ratingOverlayId }
-          onHide={ () => closeOverlay(ratingOverlayId) }
-          contentContainerStyle={ styles.voiceRatingOverlay }
-        >
-          <View style={ styles.voiceRatingContainer }>
-            <SpatialNavigationScrollView
-              offsetFromStart={ styles.voiceRatingOverlay.height / 2 }
-            >
-              <SpatialNavigationView
-                direction="vertical"
-              >
-                <DefaultFocus>
-                  { voiceRating.map((item) => (
-                    <SpatialNavigationFocusableView key={ item.title }>
-                      { ({ isFocused }) => (
-                        <View
-                          style={ [
-                            styles.voiceRatingItemContainer,
-                            isFocused && styles.voiceRatingItemContainerFocused,
-                          ] }
-                        >
-                          <View style={ styles.voiceRatingInfo }>
-                            <View style={ styles.voiceRatingTextContainer }>
-                              <ThemedText
-                                style={ [
-                                  styles.voiceRatingText,
-                                  isFocused && styles.voiceRatingTextFocused,
-                                ] }
-                              >
-                                { item.title }
-                              </ThemedText>
-                            </View>
-                            <View style={ styles.voiceRatingBarContainer }>
-                              <View style={ [
-                                styles.voiceRatingBar,
-                                { width: barWidth },
-                              ] }
-                              />
-                              <View style={ [
-                                styles.voiceRatingBar,
-                                styles.voiceRatingBarActive,
-                                { width: barWidth * (item.rating / 100) },
-                              ] }
-                              />
-                            </View>
-                          </View>
-                          <View style={ styles.voiceRatingPercentContainer }>
-                            <ThemedText style={ [
-                              styles.voiceRatingPercent,
-                              isFocused && styles.voiceRatingPercentFocused,
-                            ] }
-                            >
-                              { `${item.rating}%` }
-                            </ThemedText>
-                          </View>
-                        </View>
-                      ) }
-                    </SpatialNavigationFocusableView>
-                  )) }
-                </DefaultFocus>
-              </SpatialNavigationView>
-            </SpatialNavigationScrollView>
-          </View>
-        </ThemedOverlay>
-      </>
+      <PlayerVideoRating
+        film={ film }
+        seasons={ seasons }
+        episodes={ episodes }
+      />
     );
   };
 
@@ -165,7 +86,6 @@ export function PlayerVideoSelectorComponent({
         value={ selectedVoice.identifier }
         onChange={ (item) => handleSelectVoice(item.value) }
         header={ t('Search voice') }
-        style={ styles.voicesListContainer }
         asList
       />
     );

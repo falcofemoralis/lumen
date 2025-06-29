@@ -1,10 +1,9 @@
 import { Portal } from 'Component/ThemedPortal';
+import { useLandscape } from 'Hooks/useLandscape';
 import {
   memo,
-  useEffect,
-  useState,
 } from 'react';
-import { Modal,useWindowDimensions } from 'react-native';
+import { Modal } from 'react-native';
 import { GestureHandlerRootView, Pressable } from 'react-native-gesture-handler';
 import { Colors } from 'Style/Colors';
 import { noopFn } from 'Util/Function';
@@ -22,16 +21,7 @@ export function ThemedOverlayComponent({
   style,
   children,
 }: ThemedOverlayComponentProps) {
-  const [isLandscape, setIsLandscape] = useState(false);
-  const { width, height } = useWindowDimensions();
-
-  useEffect(() => {
-    const newLandscape = width > height;
-
-    if (newLandscape !== isLandscape) {
-      setIsLandscape(newLandscape);
-    }
-  }, [width, height]);
+  const isLandscape = useLandscape();
 
   return (
     <Portal>

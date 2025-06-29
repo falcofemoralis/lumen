@@ -21,10 +21,14 @@ export function LoginFormContainer({
       await login(username.trim(), password.trim());
 
       NotificationStore.displayMessage(t('Successfully logged in!'));
+      setIsLoading(false);
+
+      return true;
     } catch (e) {
       NotificationStore.displayError(e as Error);
-    } finally {
       setIsLoading(false);
+
+      return false;
     }
   };
 
