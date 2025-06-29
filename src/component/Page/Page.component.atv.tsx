@@ -1,4 +1,5 @@
 import { useIsFocused } from '@react-navigation/native';
+import AppUpdater from 'Component/AppUpdater';
 import { Portal } from 'Component/ThemedPortal';
 import { useNavigationContext } from 'Context/NavigationContext';
 import React, { useCallback } from 'react';
@@ -47,6 +48,7 @@ export function PageComponent({
           <SpatialNavigationKeyboardLocker />
           <Portal.Host>
             <View style={ !disableWrapper ? [styles.content, contentStyle] : styles.wrapper }>
+              <AppUpdater />
               { children }
             </View>
           </Portal.Host>

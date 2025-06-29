@@ -1,6 +1,9 @@
 import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
+const MAX_ITEMS_TO_DISPLAY = 6;
+const ITEM_HEIGHT = 48;
+
 export const styles = CreateStyles({
   input: {
     borderRadius: 12,
@@ -24,16 +27,21 @@ export const styles = CreateStyles({
   iconFocused: {
   },
   container: {
-    maxHeight: 300,
-    padding: 8,
   },
   listContainer: {
-    maxHeight: 300,
-    minWidth: 250,
-    padding: 4,
+    maxHeight: MAX_ITEMS_TO_DISPLAY * ITEM_HEIGHT - 16,
     alignSelf: 'flex-end',
+    height: '100%',
   },
   contentContainer: {
+  },
+  scrollViewContainer: {
+    overflow: 'hidden',
+    flex: 1,
+    flexDirection: 'column',
+  },
+  scrollView: {
+    width: 300,
   },
   header: {
     justifyContent: 'center',
@@ -48,22 +56,22 @@ export const styles = CreateStyles({
     lineHeight: 16,
     fontWeight: '500',
   },
-  itemContainer: {
-    flexDirection: 'row',
-  },
   item: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 10,
-    marginBlock: 5,
+    paddingHorizontal: 10,
+    height: ITEM_HEIGHT,
+    width: '100%',
+    borderRadius: 12,
   },
   itemFocused: {
     backgroundColor: Colors.backgroundFocused,
     borderRadius: 12,
   },
-  itemSelected: {
-    backgroundColor: Colors.primary,
+  itemContainer: {
+    flexDirection: 'row',
+    flex: 1,
   },
   text: {
     color: Colors.text,
@@ -78,8 +86,5 @@ export const styles = CreateStyles({
     color: Colors.textOnPrimary,
   },
   iconSelected: {
-  },
-  scrollView: {
-    flex: 0,
   },
 });

@@ -98,5 +98,12 @@
   "Series": "Сериал",
   "Cartoon": "Мультфильм",
   "Anime": "Аниме",
-  "TV Show": "Телешоу"
+  "TV Show": "Телешоу",
+  "Update Available": "Доступно обновление",
+  "What's new": "Что нового",
+  "Skip": "Пропустить",
+  "Update": "Обновить",
+  "%s to %s": "%s до %s",
+  "Reject": "Отменить",
+  "No more episodes available": "Больше нет доступных серий"
 }

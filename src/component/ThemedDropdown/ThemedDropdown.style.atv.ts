@@ -1,6 +1,9 @@
 import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
+const MAX_ITEMS_TO_DISPLAY = 6;
+const ITEM_HEIGHT = 48;
+
 export const styles = CreateStyles({
   input: {
     borderRadius: 12,
@@ -24,14 +27,14 @@ export const styles = CreateStyles({
   iconFocused: {
   },
   container: {
-    maxHeight: 288,
   },
   listContainer: {
-    maxHeight: 288,
+    maxHeight: MAX_ITEMS_TO_DISPLAY * ITEM_HEIGHT - 16,
     alignSelf: 'flex-end',
     height: '100%',
   },
   contentContainer: {
+    maxHeight: MAX_ITEMS_TO_DISPLAY * ITEM_HEIGHT - 16,
   },
   scrollViewContainer: {
     overflow: 'hidden',
@@ -39,7 +42,7 @@ export const styles = CreateStyles({
     flexDirection: 'column',
   },
   scrollView: {
-    minWidth: 250,
+    minWidth: 300,
   },
   header: {
     justifyContent: 'center',
@@ -54,17 +57,14 @@ export const styles = CreateStyles({
     lineHeight: 16,
     fontWeight: '500',
   },
-  itemContainer: {
-    flexDirection: 'row',
-  },
   item: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 10,
-    height: 48,
+    height: ITEM_HEIGHT,
+    width: '100%',
     borderRadius: 12,
-    minWidth: 250,
   },
   itemFocused: {
     backgroundColor: Colors.backgroundFocused,
@@ -73,6 +73,10 @@ export const styles = CreateStyles({
   itemSelected: {
     backgroundColor: Colors.primary,
     borderRadius: 12,
+  },
+  itemContainer: {
+    flexDirection: 'row',
+    width: '100%',
   },
   text: {
     color: Colors.text,

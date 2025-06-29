@@ -1,4 +1,6 @@
 import { DarkTheme, ThemeProvider } from '@react-navigation/native';
+import AppUpdater from 'Component/AppUpdater';
+import Root from 'Component/Root';
 import { Portal } from 'Component/ThemedPortal';
 import { AppProvider } from 'Context/AppContext';
 import { Stack } from 'expo-router';
@@ -7,6 +9,7 @@ import { useLocale } from 'Hooks/useLocale';
 import React, { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SpatialNavigationDeviceTypeProvider } from 'react-tv-space-navigation';
+import ConfigStore from 'Store/Config.store';
 import { DEFAULT_ROUTE_ANIMATION } from 'Style/Animations';
 import { Colors } from 'Style/Colors';
 
@@ -60,9 +63,12 @@ export function RootLayout() {
         <AppProvider>
           <SpatialNavigationDeviceTypeProvider>
             <GestureHandlerRootView>
-              <Portal.Host>
-                { renderStack() }
-              </Portal.Host>
+              <Root>
+                <Portal.Host>
+                  { !ConfigStore.isTV() && <AppUpdater /> }
+                  { renderStack() }
+                </Portal.Host>
+              </Root>
             </GestureHandlerRootView>
           </SpatialNavigationDeviceTypeProvider>
         </AppProvider>
