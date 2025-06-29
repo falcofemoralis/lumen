@@ -15,7 +15,6 @@ web-build/
 *.apk
 *.apk.idsig
 .kotlin/
-*.lock
 
 # IDE
 .idea/
