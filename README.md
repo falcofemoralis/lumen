@@ -15,12 +15,7 @@ And more!
 
 ## Roadmap
 
-- Implement download manager
-- Support for film trailer in the app
-- Skip intro\opening feature
-- Add played time in series selector
-- Add ability to remove search history items
-- Add ability to create a comment
+See [issues](https://github.com/falcofemoralis/lumen/issues)
 
 ## Bugs
 
