@@ -16,6 +16,10 @@ web-build/
 *.apk.idsig
 google-services.json
 .kotlin/
+*.lock
+
+# IDE
+.idea/
 
 # macOS
 .DS_Store
