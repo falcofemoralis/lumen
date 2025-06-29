@@ -1,8 +1,10 @@
 /* eslint-disable max-len */
 import { ApiServiceType, ConfigApiInterface, ServiceConfigInterface } from 'Api/index';
 import t from 'i18n/t';
+import { Platform } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
 import { FilmStreamInterface } from 'Type/FilmStream.interface';
+import { ProxyUrl } from 'Type/ProxyUrl.interface';
 import { getConfigJson, updateConfig } from 'Util/Config';
 import { safeJsonParse } from 'Util/Json';
 import { HTMLElementInterface, parseHtml } from 'Util/Parser';
@@ -11,10 +13,13 @@ import { updateUrlHost } from 'Util/Url';
 
 const REZKA_CONFIG = 'rezkaConfig';
 
+const REZKA_DEFAULT_PROVIDER = 'https://rezka-ua.org';
+const REZKA_PROXY_PROVIDER = 'http://localhost:3000';
+
 const configApi: ConfigApiInterface = {
   serviceType: ApiServiceType.REZKA,
   defaultProviders: [
-    'https://rezka-ua.org',
+    REZKA_DEFAULT_PROVIDER,
   ],
   defaultCDNs: [
     'https://prx2-cogent.ukrtelcdn.net',
@@ -150,9 +155,19 @@ const configApi: ConfigApiInterface = {
     query: string,
     variables: Variables = {}
   ) {
+    let provider: string = this.getProvider();
+
+    // For web, we use the proxy to avoid CORS issues
+    if (Platform.OS === 'web') {
+      const proxyUrl = this.getProxy(query, provider);
+
+      query = proxyUrl.query;
+      provider = proxyUrl.provider;
+    }
+
     return executeGet(
       query,
-      this.getProvider(),
+      provider,
       this.getHeaders(),
       variables
     );
@@ -168,9 +183,19 @@ const configApi: ConfigApiInterface = {
     query: string,
     variables: Record<string, string> = {}
   ) {
+    let provider: string = this.getProvider();
+
+    // For web, we use the proxy to avoid CORS issues
+    if (Platform.OS === 'web') {
+      const proxyUrl = this.getProxy(query, provider);
+
+      query = proxyUrl.query;
+      provider = proxyUrl.provider;
+    }
+
     return executePost(
       `${query}/?t=${Date.now()}`,
-      this.getProvider(),
+      provider,
       this.getHeaders(),
       variables
     );
@@ -191,6 +216,22 @@ const configApi: ConfigApiInterface = {
         url: updateUrlHost(url, cdn),
       };
     });
+  },
+
+  /**
+   * Get proxy URL
+   * @param query
+   * @param provider
+   * @returns ProxyUrl
+   */
+  getProxy(query: string, provider: string): ProxyUrl {
+    if (query.includes('http')) {
+      query = query.replace(REZKA_DEFAULT_PROVIDER, REZKA_PROXY_PROVIDER);
+    }
+
+    provider = REZKA_PROXY_PROVIDER;
+
+    return { query, provider };
   },
 };
 

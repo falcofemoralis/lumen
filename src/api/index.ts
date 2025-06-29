@@ -9,6 +9,7 @@ import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { MenuItemInterface } from 'Type/MenuItem.interface';
 import { NotificationInterface } from 'Type/Notification.interface';
 import { ProfileInterface } from 'Type/Profile.interface';
+import { ProxyUrl } from 'Type/ProxyUrl.interface';
 import { RecentListInterface } from 'Type/RecentList.interface';
 import { HTMLElementInterface } from 'Util/Parser';
 
@@ -53,6 +54,7 @@ export interface ConfigApiInterface {
   getRequest(query: string, variables?: Variables): Promise<any>;
   postRequest(query: string, variables?: Variables): Promise<any>;
   modifyCDN(streams: FilmStreamInterface[]): FilmStreamInterface[];
+  getProxy(query: string, provider: string): ProxyUrl;
 }
 
 export interface FilmApiInterface {
