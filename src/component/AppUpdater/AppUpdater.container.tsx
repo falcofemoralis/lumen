@@ -15,11 +15,11 @@ import AppUpdaterComponentTV from './AppUpdater.component.atv';
 import { OVERLAY_APP_UPDATE_ID } from './AppUpdater.config';
 
 export const AppUpdaterContainer = () => {
-  const { update, isUpdateRejected, setIsUpdateRejected } = useAppUpdaterContext();
+  const { update, isUpdateRejected, resetUpdate } = useAppUpdaterContext();
   const { openOverlay, closeOverlay } = useOverlayContext();
   const [isLoading, setIsLoading] = useState(false);
   const bottomSheetRef = useRef<ThemedBottomSheetRef>(null);
-  const { lock } = useLockSpatialNavigation();
+  const { lock, unlock } = useLockSpatialNavigation();
 
   const openPopup = () => {
     if (ConfigStore.isTV()) {
@@ -36,7 +36,7 @@ export const AppUpdaterContainer = () => {
       bottomSheetRef.current?.dismiss();
     }
 
-    setIsUpdateRejected(true);
+    resetUpdate();
   };
 
   useEffect(() => {
@@ -78,6 +78,10 @@ export const AppUpdaterContainer = () => {
       updateFail(message?: string) {
         setIsLoading(false);
         NotificationStore.displayError(message || 'Bundle update failed');
+
+        if (ConfigStore.isTV()) {
+          unlock();
+        }
       },
       restartAfterInstall: true,
     });

@@ -22,7 +22,7 @@ interface AppUpdaterContextInterface {
   isUpdateRejected: boolean;
   setUpdate: (update: UpdateInterface | null) => void;
   checkVersion: () => Promise<void>;
-  setIsUpdateRejected: (isRejected: boolean) => void;
+  resetUpdate: () => void;
 }
 
 const AppUpdaterContext = createContext<AppUpdaterContextInterface>({
@@ -30,7 +30,7 @@ const AppUpdaterContext = createContext<AppUpdaterContextInterface>({
   isUpdateRejected: false,
   setUpdate: noopFn,
   checkVersion: async () => {},
-  setIsUpdateRejected: noopFn,
+  resetUpdate: noopFn,
 });
 
 export const AppUpdaterProvider = ({ children }: { children: React.ReactNode }) => {
@@ -76,18 +76,23 @@ export const AppUpdaterProvider = ({ children }: { children: React.ReactNode }) 
     }
   }, [getCachedUpdate]);
 
+  const resetUpdate = useCallback(() => {
+    setUpdate(null);
+    setIsUpdateRejected(false);
+  }, []);
+
   const value = useMemo(() => ({
     update,
     isUpdateRejected,
     setUpdate,
     checkVersion,
-    setIsUpdateRejected,
+    resetUpdate,
   }), [
     update,
     isUpdateRejected,
     setUpdate,
     checkVersion,
-    setIsUpdateRejected,
+    resetUpdate,
   ]);
 
   return (
