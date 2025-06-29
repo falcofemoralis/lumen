@@ -98,9 +98,13 @@ const configApi: ConfigApiInterface = {
   },
 
   getHeaders(): HeadersInit {
-    const headers = {
+    const headers: HeadersInit = {
       'User-Agent': this.getUserAgent(),
     };
+
+    if (Platform.OS === 'web') {
+      headers['x-proxy-target'] = this.getProvider();
+    }
 
     return headers;
   },
@@ -212,7 +216,7 @@ const configApi: ConfigApiInterface = {
    * @returns ModifiedUrl
    */
   modifyProvider(query: string): ModifiedProvider {
-    const isWeb = Platform.OS !== 'web';
+    const isWeb = Platform.OS === 'web';
 
     return {
       query: isWeb ? updateUrlHost(query, REZKA_PROXY_PROVIDER) : query,

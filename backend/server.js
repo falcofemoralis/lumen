@@ -15,27 +15,32 @@ app.use(cors(corsOptions));
 // Middleware to parse JSON bodies
 app.use(express.json());
 
-app.use(
-  '/',
-  createProxyMiddleware({
-    target: 'https://rezka-ua.org',
-    changeOrigin: true,
-    on: {
-      proxyReq: (proxyReq, req, res) => {
-        /* handle proxyReq */
-        console.log('\nRequest: ', proxyReq.path);
-      },
-      proxyRes: (proxyRes, req, res) => {
-        /* handle proxyRes */
-        console.log('Response: ', proxyRes.statusCode);
-      },
-      error: (err, req, res) => {
-        /* handle error */
-        console.error('Proxy error:', err);
-      },
+// Middleware to proxy requests
+const proxyMiddleware = createProxyMiddleware({
+  changeOrigin: true,
+  router: (req) => {
+    // Example: get target from a custom header
+    if (req.headers['x-proxy-target']) {
+      return req.headers['x-proxy-target'];
+    }
+
+    // no target specified, error on client side
+    return undefined;
+  },
+  on: {
+    proxyReq: (proxyReq, req, res) => {
+      console.log('\nRequest: ', proxyReq.path);
     },
-  })
-);
+    proxyRes: (proxyRes, req, res) => {
+      console.log('Response: ', proxyRes.statusCode);
+    },
+    error: (err, req, res) => {
+      console.error('Proxy error:', err);
+    },
+  },
+});
+
+app.use('/', proxyMiddleware);
 
 // Start the server
 app.listen(port, () => {
