@@ -13,7 +13,7 @@ import { updateUrlHost } from 'Util/Url';
 
 const REZKA_CONFIG = 'rezkaConfig';
 
-const REZKA_PROXY_PROVIDER = 'http://localhost:3000';
+const REZKA_PROXY_PROVIDER = process.env.EXPO_PUBLIC_APP_URL ?? 'http://localhost:3000';
 
 const configApi: ConfigApiInterface = {
   serviceType: ApiServiceType.REZKA,
