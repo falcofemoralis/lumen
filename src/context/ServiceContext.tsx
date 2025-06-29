@@ -1,4 +1,5 @@
 import { ApiInterface, ApiServiceType } from 'Api/index';
+import { REZKA_PROXY_PROVIDER } from 'Api/RezkaApi/configApi';
 import { services } from 'Api/services';
 import { ACCOUNT_ROUTE, NOTIFICATIONS_ROUTE } from 'Component/NavigationBar/NavigationBar.config';
 import { BadgeData } from 'Component/NavigationBar/NavigationBar.type';
@@ -9,13 +10,14 @@ import {
   useMemo,
   useState,
 } from 'react';
+import { Platform } from 'react-native';
 import ConfigStore from 'Store/Config.store';
 import NotificationStore from 'Store/Notification.store';
 import { NotificationInterface, NotificationItemInterface } from 'Type/Notification.interface';
 import { ProfileInterface } from 'Type/Profile.interface';
 import { CookiesManager } from 'Util/Cookies';
 import { safeJsonParse } from 'Util/Json';
-import { requestValidator } from 'Util/Request';
+import { requestValidator, setProxyHeaders } from 'Util/Request';
 import { miscStorage } from 'Util/Storage';
 
 export const CREDENTIALS_STORAGE = 'CREDENTIALS_STORAGE';
@@ -200,8 +202,8 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
    * Validate the URL for the current service
    * @param {string} url - The URL to validate
    */
-  const validateUrl = useCallback(async (url: string) => {
-    await requestValidator(url, getCurrentService().getHeaders());
+  const validateUrl = useCallback(async (url: string, headers?: HeadersInit) => {
+    await requestValidator(url, headers ?? getCurrentService().getHeaders());
   }, [getCurrentService]);
 
   /**
@@ -211,7 +213,11 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
    */
   const updateProvider = useCallback(async (value: string, skipValidation = false) => {
     if (!skipValidation) {
-      await validateUrl(value);
+      const isWeb = Platform.OS === 'web';
+      const url = isWeb ? REZKA_PROXY_PROVIDER : value;
+      const headers = isWeb ? setProxyHeaders(getCurrentService().getHeaders(), value) : undefined;
+
+      await validateUrl(url, headers);
     }
 
     getCurrentService().setProvider(value);

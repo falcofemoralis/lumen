@@ -7,6 +7,7 @@ import { FilmStreamInterface } from 'Type/FilmStream.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { MenuItemInterface } from 'Type/MenuItem.interface';
+import { ModifiedProvider } from 'Type/ModifiedProvider.interface';
 import { NotificationInterface } from 'Type/Notification.interface';
 import { ProfileInterface } from 'Type/Profile.interface';
 import { RecentListInterface } from 'Type/RecentList.interface';
@@ -47,12 +48,14 @@ export interface ConfigApiInterface {
   setAuthorization(auth: string): void;
   getAuthorization(): string;
   getHeaders(): HeadersInit;
+  getProxyHeaders(): HeadersInit;
   parseContent(content: string): HTMLElementInterface;
   fetchPage(query: string, variables?: Variables): Promise<HTMLElementInterface>;
   fetchJson<T>(query: string, variables: Variables): Promise<T | null>;
   getRequest(query: string, variables?: Variables): Promise<any>;
   postRequest(query: string, variables?: Variables): Promise<any>;
   modifyCDN(streams: FilmStreamInterface[]): FilmStreamInterface[];
+  modifyProvider(query: string): ModifiedProvider;
 }
 
 export interface FilmApiInterface {

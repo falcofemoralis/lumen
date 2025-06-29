@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
+    "start:web": "expo start --web",
     "android": "expo run:android",
     "lint": "eslint src",
     "lint:fix": "yarn lint --fix",

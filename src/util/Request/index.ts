@@ -1,4 +1,5 @@
 import t from 'i18n/t';
+import { Platform } from 'react-native';
 import { customFetch } from 'Util/Fetch';
 
 export type Variables = Record<string, string>;
@@ -41,15 +42,21 @@ export const postFetch = (
   headers: HeadersInit,
   variables: FormData,
   signal?: AbortSignal
-): Promise<Response> => customFetch(uri, {
-  method: 'POST',
-  body: variables,
-  signal,
-  headers: {
-    'Content-Type': 'multipart/form-data',
-    ...headers,
-  },
-});
+): Promise<Response> => {
+  if (Platform.OS === 'android') {
+    headers = {
+      'Content-Type': 'multipart/form-data',
+      ...headers,
+    };
+  }
+
+  return customFetch(uri, {
+    method: 'POST',
+    body: variables,
+    signal,
+    headers,
+  });
+};
 
 export const parseResponse = async (response: Response): Promise<string> => {
   const promiseResponse = await response;
@@ -142,4 +149,11 @@ export const requestValidator = async (
   } finally {
     clearTimeout(timeoutId);
   }
+};
+
+export const setProxyHeaders = (headers: HeadersInit, originalHost: string): HeadersInit => {
+  return {
+    ...headers,
+    'X-Forwarded-Host': originalHost,
+  };
 };

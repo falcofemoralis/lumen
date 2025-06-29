@@ -16,6 +16,9 @@ web-build/
 *.apk.idsig
 .kotlin/
 
+# IDE
+.idea/
+
 # macOS
 .DS_Store
 
