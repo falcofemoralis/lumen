@@ -143,3 +143,10 @@ export const requestValidator = async (
     clearTimeout(timeoutId);
   }
 };
+
+export const setProxyHeaders = (headers: HeadersInit, originalHost: string): HeadersInit => {
+  return {
+    ...headers,
+    'X-Forwarded-Host': originalHost,
+  };
+};

@@ -8,7 +8,7 @@ import { ModifiedProvider } from 'Type/ModifiedProvider.interface';
 import { getConfigJson, updateConfig } from 'Util/Config';
 import { safeJsonParse } from 'Util/Json';
 import { HTMLElementInterface, parseHtml } from 'Util/Parser';
-import { executeGet, executePost , Variables } from 'Util/Request';
+import { executeGet, executePost , setProxyHeaders, Variables } from 'Util/Request';
 import { updateUrlHost } from 'Util/Url';
 
 const REZKA_CONFIG = 'rezkaConfig';
@@ -102,11 +102,13 @@ const configApi: ConfigApiInterface = {
       'User-Agent': this.getUserAgent(),
     };
 
-    if (Platform.OS === 'web') {
-      headers['x-proxy-target'] = this.getProvider();
-    }
-
     return headers;
+  },
+
+  getProxyHeaders(): HeadersInit {
+    const headers = this.getHeaders();
+
+    return setProxyHeaders(headers, this.getProvider());
   },
 
   parseContent(content: string): HTMLElementInterface {
@@ -159,11 +161,12 @@ const configApi: ConfigApiInterface = {
     variables: Variables = {}
   ) {
     const { query, provider } = this.modifyProvider(queryInput);
+    const headers = Platform.OS === 'web' ? this.getProxyHeaders() : this.getHeaders();
 
     return executeGet(
       query,
       provider,
-      this.getHeaders(),
+      headers,
       variables
     );
   },
@@ -179,11 +182,12 @@ const configApi: ConfigApiInterface = {
     variables: Record<string, string> = {}
   ) {
     const { query, provider } = this.modifyProvider(queryInput);
+    const headers = Platform.OS === 'web' ? this.getProxyHeaders() : this.getHeaders();
 
     return executePost(
       `${query}/?t=${Date.now()}`,
       provider,
-      this.getHeaders(),
+      headers,
       variables
     );
   },
@@ -224,5 +228,7 @@ const configApi: ConfigApiInterface = {
     };
   },
 };
+
+export { REZKA_PROXY_PROVIDER };
 
 export default configApi;

@@ -15,20 +15,24 @@ app.use(cors(corsOptions));
 // Middleware to parse JSON bodies
 app.use(express.json());
 
+app.use((req, res, next) => {
+  if (!req.headers['x-forwarded-host']) {
+    return res.status(400).json({ error: 'Missing X-Forwarded-Host header' });
+  }
+  next();
+});
+
 // Middleware to proxy requests
 const proxyMiddleware = createProxyMiddleware({
   changeOrigin: true,
   router: (req) => {
-    // Example: get target from a custom header
-    if (req.headers['x-proxy-target']) {
-      return req.headers['x-proxy-target'];
-    }
-
-    // no target specified, error on client side
-    return undefined;
+    // set the target based on the host header
+    // https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/X-Forwarded-Host
+    return req.headers['x-forwarded-host'];
   },
   on: {
     proxyReq: (proxyReq, req, res) => {
+      proxyReq.removeHeader('x-forwarded-host');
       console.log('\nRequest: ', proxyReq.path);
     },
     proxyRes: (proxyRes, req, res) => {
