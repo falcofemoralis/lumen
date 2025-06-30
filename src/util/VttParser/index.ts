@@ -1,5 +1,8 @@
+import { REZKA_PROXY_PROVIDER } from 'Api/RezkaApi/configApi';
 import webvtt from 'node-webvtt';
 import { customFetch } from 'Util/Fetch';
+import { setProxyHeaders } from 'Util/Request';
+import { updateUrlHost } from 'Util/Url';
 
 export interface VTTItem {
   start: number
@@ -45,7 +48,11 @@ export const subtitleParser = async (subitleUrl: string): Promise<VTTItem[]> => 
 };
 
 export const storyboardParser = async (storyboardUrl: string): Promise<VTTItem[]> => {
-  const res = await customFetch(storyboardUrl);
+  const subtitlesHostUrl = new URL(storyboardUrl).origin;
+  const headers = setProxyHeaders({}, subtitlesHostUrl);
+  const proxyUrl = updateUrlHost(storyboardUrl, REZKA_PROXY_PROVIDER);
+
+  const res = await customFetch(proxyUrl, { headers });
   const storyboardData = await res.text();
 
   const result: VTTItem[] = [];
