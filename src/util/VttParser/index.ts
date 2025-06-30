@@ -48,8 +48,8 @@ export const subtitleParser = async (subitleUrl: string): Promise<VTTItem[]> => 
 };
 
 export const storyboardParser = async (storyboardUrl: string): Promise<VTTItem[]> => {
-  const subtitlesHostUrl = new URL(storyboardUrl).origin;
-  const headers = setProxyHeaders({}, subtitlesHostUrl);
+  const storyboardHostUrl = new URL(storyboardUrl).origin;
+  const headers = setProxyHeaders({}, storyboardHostUrl);
   const proxyUrl = updateUrlHost(storyboardUrl, REZKA_PROXY_PROVIDER);
 
   const res = await customFetch(proxyUrl, { headers });
