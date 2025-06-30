@@ -7,6 +7,7 @@ import {
 import { AppUpdaterProvider } from './AppUpdaterContext';
 import { NavigationProvider } from './NavigationContext';
 import { OverlayProvider } from './OverlayContext';
+import { PlayerProvider } from './PlayerContext';
 import { ServiceProvider } from './ServiceContext';
 
 interface AppContextInterface {
@@ -23,9 +24,11 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       <OverlayProvider>
         <NavigationProvider>
           <ServiceProvider>
-            <AppUpdaterProvider>
-              { children }
-            </AppUpdaterProvider>
+            <PlayerProvider>
+              <AppUpdaterProvider>
+                { children }
+              </AppUpdaterProvider>
+            </PlayerProvider>
           </ServiceProvider>
         </NavigationProvider>
       </OverlayProvider>
