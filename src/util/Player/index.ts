@@ -1,35 +1,204 @@
+import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
+import { FirestoreDocument, SavedTime, SavedTimestamp, SavedTimeVoice } from 'Component/Player/Player.type';
 import t from 'i18n/t';
+import ConfigStore from 'Store/Config.store';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { ProfileInterface } from 'Type/Profile.interface';
+import { getFormattedDate } from 'Util/Date';
+import { safeJsonParse } from 'Util/Json';
 import { playerStorage } from 'Util/Storage';
 
-export const PLAYER_SAVE_TIME_STORAGE_KEY = 'playerTime';
+export const PLAYER_SAVED_TIME_STORAGE_KEY = 'playerTime';
 export const PLAYER_QUALITY_STORAGE_KEY = 'playerQuality';
 
-const formatPlayerKeyTime = (film: FilmInterface, voice: FilmVoiceInterface) => {
+const formatPlayerKeyTime = (film: FilmInterface) => {
   const { id: filmId } = film;
-  const { id: voiceId, lastEpisodeId, lastSeasonId } = voice;
 
-  return `${PLAYER_SAVE_TIME_STORAGE_KEY}-${filmId}-${voiceId}-${lastSeasonId}-${lastEpisodeId}`;
+  return `${PLAYER_SAVED_TIME_STORAGE_KEY}-${filmId}`;
 };
 
-export const updatePlayerTime = (film: FilmInterface, voice: FilmVoiceInterface, time: number) => {
+const formatFirestoreKey = (
+  film: FilmInterface,
+  profile: ProfileInterface
+) => {
+  const { id: userId } = profile;
+
+  return `${formatPlayerKeyTime(film)}-${userId}`;
+};
+
+const formatTimestampKey = (
+  voice: FilmVoiceInterface
+) => {
+  if (!voice.lastSeasonId || !voice.lastEpisodeId) {
+    return '0';
+  }
+
+  return `${voice.lastSeasonId}-${voice.lastEpisodeId}`;
+};
+
+const prepareSavedTimeObject = (
+  film: FilmInterface,
+  voice: FilmVoiceInterface,
+  time: number,
+  progress: number,
+  previousSavedTime?: SavedTime | null
+): SavedTime => {
+  const newSavedTime: SavedTime = previousSavedTime
+    ? { ...previousSavedTime }
+    : { filmId: film.id, voices: {} };
+
+  const voiceData = newSavedTime.voices[voice.id] ?? {} as SavedTimeVoice;
+
+  if (!voiceData.timestamps) {
+    voiceData.timestamps = {};
+  }
+
+  voiceData.timestamps[formatTimestampKey(voice)] = {
+    time,
+    progress,
+    deviceId: ConfigStore.getDeviceId(),
+  };
+
+  newSavedTime.voices[voice.id] = voiceData;
+
+  return newSavedTime;
+};
+
+export const updateSavedTime = (film: FilmInterface, voice: FilmVoiceInterface, time: number, progress: number) => {
+  const key = formatPlayerKeyTime(film);
+
+  const prevSavedTimeJson = playerStorage.getString(key);
+  const prevSavedTime = safeJsonParse<SavedTime | null>(prevSavedTimeJson, null);
+  const newSavedTime = prepareSavedTimeObject(film, voice, time, progress, prevSavedTime);
+
   playerStorage.set(
-    formatPlayerKeyTime(film, voice),
-    Number(time)
+    formatPlayerKeyTime(film),
+    JSON.stringify(newSavedTime)
   );
 };
 
-export const getPlayerTime = (film: FilmInterface, voice: FilmVoiceInterface) => {
-  const time = playerStorage.getNumber(formatPlayerKeyTime(film, voice));
+export const getSavedTime = (film: FilmInterface): SavedTime | null => {
+  const savedTimeJson = playerStorage.getString(formatPlayerKeyTime(film));
 
-  if (!time) {
+  if (!savedTimeJson) {
+    return null;
+  }
+
+  const savedTime = safeJsonParse<SavedTime | null>(savedTimeJson, null);
+
+  return savedTime;
+};
+
+export const getVideoTime = (voice: FilmVoiceInterface, savedTime: SavedTime | null) => {
+  if (!savedTime) {
     return 0;
   }
 
-  return time;
+  const voiceData = savedTime.voices[voice.id];
+
+  if (!voiceData || !voiceData.timestamps) {
+    return 0;
+  }
+
+  return voiceData.timestamps[formatTimestampKey(voice)]?.time ?? 0;
+};
+
+export const getVideoProgress = (voice: FilmVoiceInterface, timestamp: SavedTime | null) => {
+  if (!timestamp) {
+    return 0;
+  }
+
+  const voiceData = timestamp.voices[voice.id];
+
+  if (!voiceData || !voiceData.timestamps) {
+    return 0;
+  }
+
+  return voiceData.timestamps[formatTimestampKey(voice)]?.progress ?? 0;
+};
+
+export const updateFirestoreSavedTime = async (
+  film: FilmInterface,
+  voice: FilmVoiceInterface,
+  profile: ProfileInterface,
+  firestoreDb: FirebaseFirestoreTypes.CollectionReference<FirestoreDocument>,
+  time: number,
+  progress: number
+) => {
+  const key = formatFirestoreKey(film, profile);
+
+  const doc = await firestoreDb.doc(key) .get();
+  const data = doc.data();
+
+  const prevSavedTime = safeJsonParse<SavedTime | null>(data?.savedTime, null);
+  const newSavedTime = prepareSavedTimeObject(film, voice, time, progress, prevSavedTime);
+
+  firestoreDb
+    .doc(key)
+    .set({
+      savedTime: JSON.stringify(newSavedTime),
+      updatedAt: getFormattedDate(),
+    });
+};
+
+export const getFirestoreSavedTime = async (
+  film: FilmInterface,
+  profile: ProfileInterface,
+  firestoreDb: FirebaseFirestoreTypes.CollectionReference<FirestoreDocument>
+) => {
+  const key = formatFirestoreKey(film, profile);
+  const doc = await firestoreDb.doc(key).get();
+  const data = doc.data();
+
+  if (!data) {
+    return null;
+  }
+
+  const timestamp = safeJsonParse<SavedTime | null>(data?.savedTime, null);
+
+  return timestamp;
+};
+
+export const getFirestoreVideoTime = (
+  voice: FilmVoiceInterface,
+  firestoreSavedTime: SavedTime | null,
+  savedTime: SavedTime | null
+) => {
+  if (!firestoreSavedTime && !savedTime) {
+    return null;
+  }
+
+  if (!savedTime) {
+    return getVideoTime(voice, firestoreSavedTime);
+  }
+
+  if (!firestoreSavedTime) {
+    return getVideoTime(voice, savedTime);
+  }
+
+  const voiceData = savedTime.voices[voice.id];
+  const firesStoreVoiceData = firestoreSavedTime.voices[voice.id];
+
+  if (!voiceData && !firesStoreVoiceData) {
+    return null;
+  }
+
+  if (!voiceData) {
+    return firesStoreVoiceData?.timestamps[formatTimestampKey(voice)]?.time ?? 0;
+  }
+
+  if (!firesStoreVoiceData) {
+    return voiceData?.timestamps[formatTimestampKey(voice)]?.time ?? 0;
+  }
+
+  const data = voiceData?.timestamps[formatTimestampKey(voice)] ?? {} as SavedTimestamp;
+  const firestoreData = firesStoreVoiceData?.timestamps[formatTimestampKey(voice)] ?? {} as SavedTimestamp;
+
+  return firestoreData.deviceId !== data.deviceId
+    ? firestoreData.time
+    : data.time;
 };
 
 export const updatePlayerQuality = (quality: string) => {
@@ -74,16 +243,4 @@ export const prepareShareBody = (film: FilmInterface) => {
   const { title, link } = film;
 
   return t('Watch %s:\n %s', title, link);
-};
-
-export const formatFirestoreKey = (
-  film: FilmInterface,
-  voice: FilmVoiceInterface,
-  profile: ProfileInterface
-) => {
-  const { id: filmId } = film;
-  const { id: voiceId, lastEpisodeId, lastSeasonId } = voice;
-  const { id: userId } = profile;
-
-  return `${userId}-${filmId}-${voiceId}-${lastSeasonId}-${lastEpisodeId}`;
 };

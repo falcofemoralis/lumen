@@ -59,7 +59,7 @@
     "react-native-gesture-handler": "^2.26.0",
     "react-native-gradient-shimmer": "^2.0.1",
     "react-native-keyevent": "^0.3.2",
-    "react-native-mmkv": "^3.2.0",
+    "react-native-mmkv": "^3.3.0",
     "react-native-modal": "^14.0.0-rc.1",
     "react-native-nitro-modules": "^0.26.2",
     "react-native-ota-hot-update": "^2.3.0",

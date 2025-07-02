@@ -1,5 +1,5 @@
 import ThemedText from 'Component/ThemedText';
-import { usePlayerContext } from 'Context/PlayerContext';
+import { usePlayerProgressContext } from 'Context/PlayerProgressContext';
 
 export const PlayerDurationComponent = () => {
   const {
@@ -8,7 +8,7 @@ export const PlayerDurationComponent = () => {
       durationTime,
       remainingTime,
     } = {},
-  } = usePlayerContext();
+  } = usePlayerProgressContext();
 
   return (
     <ThemedText>

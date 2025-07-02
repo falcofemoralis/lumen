@@ -66,4 +66,12 @@ export const styles = CreateStyles({
   voiceDropdownInput: {
     flex: 1,
   },
+  episodeProgress: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    height: '100%',
+    width: '20%',
+    backgroundColor: '#0283d1',
+  },
 });

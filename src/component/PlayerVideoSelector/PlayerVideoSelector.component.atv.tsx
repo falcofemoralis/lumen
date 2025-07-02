@@ -4,7 +4,7 @@ import ThemedButton from 'Component/ThemedButton';
 import ThemedDropdown from 'Component/ThemedDropdown';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import t from 'i18n/t';
-import React from 'react';
+import React, { memo } from 'react';
 import {
   DefaultFocus,
   SpatialNavigationScrollView,
@@ -228,4 +228,15 @@ export function PlayerVideoSelectorComponent({
   );
 }
 
-export default PlayerVideoSelectorComponent;
+function propsAreEqual(
+  prevProps: PlayerVideoSelectorComponentProps,
+  props: PlayerVideoSelectorComponentProps
+) {
+  return prevProps.isLoading === props.isLoading
+    && prevProps.selectedVoice === props.selectedVoice
+    && prevProps.selectedSeasonId === props.selectedSeasonId
+    && prevProps.selectedEpisodeId === props.selectedEpisodeId
+    && prevProps.timestamp === props.timestamp;
+}
+
+export default memo(PlayerVideoSelectorComponent, propsAreEqual);

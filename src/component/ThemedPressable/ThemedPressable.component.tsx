@@ -12,9 +12,11 @@ export const ThemedPressable = ({
   disabled = false,
   mode = 'light',
   pressDelay = 50,
+  element,
 }: ThemedPressableProps) => {
   return (
     <View style={ [style, { overflow: 'hidden' }] }>
+      { element }
       <Pressable
         ref={ ref }
         onPress={ onPress }
