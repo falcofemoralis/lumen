@@ -21,6 +21,7 @@ export default function ThemedButton({
   rightImage,
   rightImageStyle,
   disableRootActive,
+  additionalElement,
 }: ThemedButtonProps) {
   const renderFilled = (isFocused: boolean) => (
     <View
@@ -33,6 +34,7 @@ export default function ThemedButton({
         isFocused && styleFocused,
       ] }
     >
+      { additionalElement && additionalElement(isFocused, isSelected ?? false) }
       { IconComponent && (
         <IconComponent
           style={ [
