@@ -1,3 +1,4 @@
+import { SavedTime } from 'Component/Player/Player.type';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { EpisodeInterface, FilmVoiceInterface, SeasonInterface } from 'Type/FilmVoice.interface';
@@ -5,23 +6,24 @@ import { EpisodeInterface, FilmVoiceInterface, SeasonInterface } from 'Type/Film
 export type PlayerVideoSelectorContainerProps = {
   overlayId: string;
   film: FilmInterface;
+  voice?: FilmVoiceInterface;
   onHide: () => void;
   onSelect: (video: FilmVideoInterface, voice: FilmVoiceInterface) => void;
-  voice?: FilmVoiceInterface;
 };
 
 export type PlayerVideoSelectorComponentProps = {
   overlayId: string;
+  film: FilmInterface;
   voices: FilmVoiceInterface[];
-  onHide: () => void;
   isLoading: boolean;
   selectedVoice: FilmVoiceInterface;
   selectedSeasonId: string | undefined;
   selectedEpisodeId: string | undefined;
-  handleSelectVoice: (voiceId: string) => void;
-  setSelectedSeasonId: (id: string) => void;
   seasons: SeasonInterface[];
   episodes: EpisodeInterface[];
+  savedTime: SavedTime | null;
+  handleSelectVoice: (voiceId: string) => void;
+  setSelectedSeasonId: (id: string) => void;
+  onHide: () => void;
   handleSelectEpisode: (episodeId: string) => void;
-  film: FilmInterface;
 };

@@ -9,6 +9,7 @@ import {
 import { LongEvent } from 'Component/Player/Player.type';
 import PlayerStoryboard from 'Component/PlayerStoryboard';
 import { usePlayerContext } from 'Context/PlayerContext';
+import { usePlayerProgressContext } from 'Context/PlayerProgressContext';
 import React, {
   useEffect,
   useRef,
@@ -40,7 +41,8 @@ export const PlayerProgressBarComponent = ({
   rewindPosition = noopFn,
   togglePlayPause = noopFn,
 }: PlayerProgressBarComponentProps) => {
-  const { progressStatus, focusedElement, updateProgressStatus } = usePlayerContext();
+  const { focusedElement } = usePlayerContext();
+  const { progressStatus, updateProgressStatus } = usePlayerProgressContext();
   const rewindTimer = useRef<number | null>(null);
 
   const longEvent = useRef<{[key: string]: LongEvent}>({

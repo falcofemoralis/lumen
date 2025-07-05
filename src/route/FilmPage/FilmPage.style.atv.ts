@@ -51,6 +51,9 @@ export const styles = CreateStyles({
   rating: {
     marginTop: 8,
   },
+  ratingStar: {
+    marginHorizontal: 2,
+  },
   ratingsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',

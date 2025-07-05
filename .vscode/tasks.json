@@ -1,0 +1,34 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "android",
+			"problemMatcher": [],
+			"label": "npm: android",
+			"detail": "expo run:android"
+		},
+		{
+			"type": "npm",
+			"script": "start:web",
+			"problemMatcher": [],
+			"label": "npm: start:web",
+			"detail": "expo start --web"
+		},
+		{
+			"type": "npm",
+			"script": "start",
+			"path": "backend",
+			"problemMatcher": [],
+			"label": "npm: start - proxy server",
+			"detail": "node server.js"
+		},
+		{
+			"label": "Run Web and Proxy Server",
+			"dependsOn": [
+				"npm: start - proxy server",
+				"npm: start:web"
+			],
+		}
+	]
+}

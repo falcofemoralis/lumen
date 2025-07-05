@@ -20,4 +20,5 @@ export interface ThemedButtonProps {
   onFocus?: () => void;
   disableRootActive?: boolean;
   disabled?: boolean;
+  additionalElement?: (isFocused: boolean, isSelected: boolean) => React.ReactNode;
 }

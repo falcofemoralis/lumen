@@ -1,11 +1,17 @@
+import { getFirestore } from '@react-native-firebase/firestore';
+import { FIRESTORE_DB } from 'Component/Player/Player.config';
+import { FirestoreDocument } from 'Component/Player/Player.type';
 import { useOverlayContext } from 'Context/OverlayContext';
 import { usePlayerContext } from 'Context/PlayerContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { withTV } from 'Hooks/withTV';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import ConfigStore from 'Store/Config.store';
 import NotificationStore from 'Store/Notification.store';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { EpisodeInterface, FilmVoiceInterface, SeasonInterface } from 'Type/FilmVoice.interface';
+import { getFirestoreSavedTime, getSavedTime } from 'Util/Player';
+import { combineSavedTime } from 'Util/Player/savedTimeUtil';
 
 import PlayerVideoSelectorComponent from './PlayerVideoSelector.component';
 import FilmVideoSelectorComponentTV from './PlayerVideoSelector.component.atv';
@@ -20,21 +26,27 @@ export function PlayerVideoSelectorContainer({
 }: PlayerVideoSelectorContainerProps) {
   const { voices = [] } = film;
   const { selectedVoice: contextVoice, updateSelectedVoice } = usePlayerContext();
-  const { goToPreviousOverlay } = useOverlayContext();
+  const { currentOverlay, goToPreviousOverlay, isOverlayOpened } = useOverlayContext();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedVoice, setSelectedVoice] = useState<FilmVoiceInterface>(
     voiceInput ?? voices.find(({ isActive }) => isActive) ?? voices[0]
   );
-  const { isSignedIn, getCurrentService } = useServiceContext();
-
+  const { isSignedIn, profile, getCurrentService } = useServiceContext();
   const [selectedSeasonId, setSelectedSeasonId] = useState<string | undefined>(
     selectedVoice.lastSeasonId
   );
   const [selectedEpisodeId, setSelectedEpisodeId] = useState<string | undefined>(
     selectedVoice.lastEpisodeId
   );
+  const [savedTime, setSavedTime] = useState(() => getSavedTime(film));
+  const firestoreDb = useMemo(() => (
+    ConfigStore.isFirestore() && isSignedIn
+      ? getFirestore().collection<FirestoreDocument>(FIRESTORE_DB)
+      : null
+  ), [isSignedIn]);
+  const firestoreSavedTimeRef = useRef(false);
 
-  const getStoreVoice = () => {
+  const getContextVoice = () => {
     const { id } = film;
 
     const { filmId, voice } = contextVoice || {};
@@ -46,11 +58,31 @@ export function PlayerVideoSelectorContainer({
     return null;
   };
 
+  const initFirestoreSavedTime = async () => {
+    if (firestoreSavedTimeRef.current || !firestoreDb || !profile) {
+      return;
+    }
+
+    firestoreSavedTimeRef.current = true;
+    const fireStoreSavedTime = await getFirestoreSavedTime(film, profile, firestoreDb);
+
+    if (fireStoreSavedTime) {
+      setSavedTime(combineSavedTime(savedTime, fireStoreSavedTime));
+    }
+  };
+
+  useEffect(() => {
+    if (isOverlayOpened(overlayId)) {
+      setSavedTime(getSavedTime(film));
+      initFirestoreSavedTime();
+    }
+  }, [currentOverlay]);
+
   /**
-   * In case if user selected another voice\season\episode directly in the player
+   * if user selected another voice\season\episode directly in the player
    */
   useEffect(() => {
-    const voice = getStoreVoice();
+    const voice = getContextVoice();
 
     if (voice) {
       setSelectedVoice(voice);
@@ -83,7 +115,7 @@ export function PlayerVideoSelectorContainer({
 
     onSelect(video, voice);
 
-    if (getStoreVoice()) {
+    if (getContextVoice()) {
       // if store voice was updated, re update it
       updateSelectedVoice(film.id, voice);
     }
@@ -176,20 +208,21 @@ export function PlayerVideoSelectorContainer({
 
   const containerProps = () => ({
     overlayId,
+    film,
     voices,
-    onHide,
     isLoading,
     selectedVoice,
     selectedSeasonId,
     selectedEpisodeId,
     seasons: getSeasons(),
     episodes: getEpisodes(),
-    film,
+    savedTime,
   });
 
   const containerFunctions = {
     handleSelectVoice,
     setSelectedSeasonId,
+    onHide,
     handleSelectEpisode,
   };
 

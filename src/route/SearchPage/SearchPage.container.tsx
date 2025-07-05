@@ -87,7 +87,7 @@ export function SearchPageContainer() {
   };
 
   const handleApplySearch = () => {
-    search(enteredText);
+    onApplySearch(enteredText);
   };
 
   const onApplySearch = async (q: string) => {

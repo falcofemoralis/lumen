@@ -1,15 +1,19 @@
 /* eslint-disable max-len */
 import { ApiServiceType, ConfigApiInterface, ServiceConfigInterface } from 'Api/index';
 import t from 'i18n/t';
+import { Platform } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
 import { FilmStreamInterface } from 'Type/FilmStream.interface';
+import { ModifiedProvider } from 'Type/ModifiedProvider.interface';
 import { getConfigJson, updateConfig } from 'Util/Config';
 import { safeJsonParse } from 'Util/Json';
 import { HTMLElementInterface, parseHtml } from 'Util/Parser';
-import { executeGet, executePost , Variables } from 'Util/Request';
+import { executeGet, executePost , setProxyHeaders, Variables } from 'Util/Request';
 import { updateUrlHost } from 'Util/Url';
 
 const REZKA_CONFIG = 'rezkaConfig';
+
+const REZKA_PROXY_PROVIDER = process.env.EXPO_PUBLIC_APP_URL ?? 'http://localhost:3000';
 
 const configApi: ConfigApiInterface = {
   serviceType: ApiServiceType.REZKA,
@@ -94,11 +98,17 @@ const configApi: ConfigApiInterface = {
   },
 
   getHeaders(): HeadersInit {
-    const headers = {
+    const headers: HeadersInit = {
       'User-Agent': this.getUserAgent(),
     };
 
     return headers;
+  },
+
+  getProxyHeaders(): HeadersInit {
+    const headers = this.getHeaders();
+
+    return setProxyHeaders(headers, this.getProvider());
   },
 
   parseContent(content: string): HTMLElementInterface {
@@ -142,40 +152,51 @@ const configApi: ConfigApiInterface = {
 
   /**
    * Get request
-   * @param query
+   * @param queryInput
    * @param variables
    * @returns text
    */
   async getRequest(
-    query: string,
+    queryInput: string,
     variables: Variables = {}
   ) {
+    const { query, provider } = this.modifyProvider(queryInput);
+    const headers = Platform.OS === 'web' ? this.getProxyHeaders() : this.getHeaders();
+
     return executeGet(
       query,
-      this.getProvider(),
-      this.getHeaders(),
+      provider,
+      headers,
       variables
     );
   },
 
   /**
    * Post request
-   * @param query
+   * @param queryInput
    * @param variables
    * @returns JSON object
    */
   async postRequest(
-    query: string,
+    queryInput: string,
     variables: Record<string, string> = {}
   ) {
+    const { query, provider } = this.modifyProvider(queryInput);
+    const headers = Platform.OS === 'web' ? this.getProxyHeaders() : this.getHeaders();
+
     return executePost(
       `${query}/?t=${Date.now()}`,
-      this.getProvider(),
-      this.getHeaders(),
+      provider,
+      headers,
       variables
     );
   },
 
+  /**
+   * Modify CDN for streams
+   * @param streams
+   * @returns streams with modified URLs
+   */
   modifyCDN(streams: FilmStreamInterface[]) {
     const cdn = this.getCDN();
 
@@ -192,6 +213,22 @@ const configApi: ConfigApiInterface = {
       };
     });
   },
+
+  /**
+   * Modify provider URL
+   * @param query
+   * @returns ModifiedUrl
+   */
+  modifyProvider(query: string): ModifiedProvider {
+    const isWeb = Platform.OS === 'web';
+
+    return {
+      query: isWeb ? updateUrlHost(query, REZKA_PROXY_PROVIDER) : query,
+      provider: isWeb ? REZKA_PROXY_PROVIDER : this.getProvider(),
+    };
+  },
 };
+
+export { REZKA_PROXY_PROVIDER };
 
 export default configApi;

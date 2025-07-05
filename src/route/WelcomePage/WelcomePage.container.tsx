@@ -2,6 +2,7 @@ import * as Application from 'expo-application';
 import t from 'i18n/t';
 import { CircleCheck, Clapperboard, CloudCog, FolderCog, MonitorCog, UserCog } from 'lucide-react-native';
 import { useLayoutEffect, useState } from 'react';
+import { Platform } from 'react-native';
 import RNRestart from 'react-native-restart';
 import ConfigStore from 'Store/Config.store';
 import NotificationStore from 'Store/Notification.store';
@@ -70,7 +71,12 @@ export function WelcomePageContainer() {
     }
 
     ConfigStore.configureDevice(selectedDeviceType === DeviceType.TV);
-    RNRestart.restart();
+
+    if (Platform.OS === 'web') {
+      location.replace('/');
+    } else {
+      RNRestart.restart();
+    }
   };
 
   const containerFunctions = {

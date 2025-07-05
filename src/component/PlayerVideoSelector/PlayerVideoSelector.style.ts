@@ -66,4 +66,30 @@ export const styles = CreateStyles({
   voiceDropdownInput: {
     flex: 1,
   },
+  buttonProgressContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  buttonProgressOutline: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: '#0283d1',
+    backgroundColor: 'transparent',
+  },
+  buttonProgressMask: {
+    position: 'absolute',
+    top: -2,
+    right: -2,
+    bottom: -2,
+    borderTopRightRadius: 16,
+    borderBottomRightRadius: 16,
+  },
 });

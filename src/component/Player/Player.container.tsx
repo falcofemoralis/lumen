@@ -2,10 +2,11 @@ import { getFirestore } from '@react-native-firebase/firestore';
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import { useOverlayContext } from 'Context/OverlayContext';
 import { usePlayerContext } from 'Context/PlayerContext';
+import { usePlayerProgressContext } from 'Context/PlayerProgressContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useEventListener } from 'expo';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
-import { useVideoPlayer } from 'expo-video';
+import { useVideoPlayer, VideoPlayer } from 'expo-video';
 import { withTV } from 'Hooks/withTV';
 import t from 'i18n/t';
 import {
@@ -22,15 +23,17 @@ import NotificationStore from 'Store/Notification.store';
 import { FilmStreamInterface } from 'Type/FilmStream.interface';
 import { FilmVideoInterface, SubtitleInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
-import { getFormattedDate } from 'Util/Date';
 import { setIntervalSafe } from 'Util/Misc';
 import {
-  formatFirestoreKey,
+  getFirestoreSavedTime,
+  getFirestoreVideoTime,
   getPlayerStream,
-  getPlayerTime,
+  getSavedTime,
+  getVideoTime,
   prepareShareBody,
+  updateFirestoreSavedTime,
   updatePlayerQuality,
-  updatePlayerTime,
+  updateSavedTime,
 } from 'Util/Player';
 
 import PlayerComponent from './Player.component';
@@ -43,7 +46,7 @@ import {
   RewindDirection,
   SAVE_TIME_EVERY_MS,
 } from './Player.config';
-import { FirestoreDocument, PlayerContainerProps } from './Player.type';
+import { FirestoreDocument, PlayerContainerProps, SavedTime } from './Player.type';
 
 export function PlayerContainer({
   video,
@@ -51,7 +54,8 @@ export function PlayerContainer({
   film,
   voice,
 }: PlayerContainerProps) {
-  const { updateProgressStatus, resetProgressStatus, updateSelectedVoice } = usePlayerContext();
+  const { updateSelectedVoice } = usePlayerContext();
+  const { resetProgressStatus, updateProgressStatus } = usePlayerProgressContext();
   const { isSignedIn, profile, getCurrentService } = useServiceContext();
   const { openOverlay, goToPreviousOverlay } = useOverlayContext();
   const [selectedVideo, setSelectedVideo] = useState<FilmVideoInterface>(video);
@@ -74,49 +78,64 @@ export function PlayerContainer({
   const bookmarksOverlayId = useId();
   const speedOverlayId = useId();
 
+  const firestoreSavedTimeRef = useRef(false);
   const firestoreDb = useMemo(() => (
     ConfigStore.isFirestore() && isSignedIn
       ? getFirestore().collection<FirestoreDocument>(FIRESTORE_DB)
       : null
   ), [isSignedIn]);
 
+  const initFirestoreSavedTime = useCallback(async (p: VideoPlayer, savedTime: SavedTime | null) => {
+    if (firestoreSavedTimeRef.current || !firestoreDb || !profile) {
+      return;
+    }
+
+    firestoreSavedTimeRef.current = true;
+    const fireStoreSavedTime = await getFirestoreSavedTime(film, profile, firestoreDb);
+
+    if (fireStoreSavedTime) {
+      const time = getFirestoreVideoTime(selectedVoice, fireStoreSavedTime, savedTime);
+
+      if (time) {
+        p.currentTime = time;
+      }
+    }
+  }, [firestoreDb, profile, film, selectedVoice]);
+
   const player = useVideoPlayer(selectedStream.url, (p) => {
+    const savedTime = getSavedTime(film);
+
     p.loop = false;
     p.timeUpdateEventInterval = 1;
-    p.currentTime = getPlayerTime(film, selectedVoice);
+    p.currentTime = getVideoTime(selectedVoice, savedTime);
     p.preservesPitch = true;
     p.play();
+
+    initFirestoreSavedTime(p, savedTime);
   });
 
-  const getFirestoreId = useCallback(() => {
-    if (!isSignedIn || !ConfigStore.isFirestore()) {
-      return null;
-    }
-
-    if (!profile) {
-      return null;
-    }
-
-    return formatFirestoreKey(film, selectedVoice, profile);
-  }, [film, profile, selectedVoice, isSignedIn]);
-
   const updateTime = useCallback(() => {
-    const { currentTime } = player;
-
-    const firestoreId = getFirestoreId();
-
-    if (firestoreId && firestoreDb) {
-      firestoreDb
-        .doc(firestoreId)
-        .set({
-          deviceId: ConfigStore.getDeviceId(),
-          timestamp: currentTime,
-          updatedAt: getFormattedDate(),
-        });
+    const { currentTime, duration } = player;
+    if (!duration) {
+      // video is not loaded yet, do not update time to avoid progress being null
+      return;
     }
 
-    updatePlayerTime(film, selectedVoice, currentTime);
-  }, [player, selectedVoice, getFirestoreId, firestoreDb, film]);
+    const progress = (currentTime / duration) * 100;
+
+    updateSavedTime(film, selectedVoice, currentTime, progress);
+
+    if (firestoreDb && profile) {
+      updateFirestoreSavedTime(
+        film,
+        selectedVoice,
+        profile,
+        firestoreDb,
+        currentTime,
+        progress
+      );
+    }
+  }, [player, selectedVoice, firestoreDb, profile, film]);
 
   const createUpdateTimeTimeout = useCallback(() => {
     if (updateTimeTimeout.current) {
@@ -140,26 +159,6 @@ export function PlayerContainer({
     }, SAVE_TIME_EVERY_MS);
   }, [player, updateTime]);
 
-  const initFirestoreTime = useCallback(async () => {
-    const firestoreId = getFirestoreId();
-
-    if (firestoreId && firestoreDb) {
-      const doc = await firestoreDb
-        .doc(firestoreId)
-        .get();
-
-      const data = doc.data();
-
-      if (data && data.deviceId !== ConfigStore.getDeviceId()) {
-        const newTime = data.timestamp;
-        updatePlayerTime(film, selectedVoice, data.timestamp);
-
-        // eslint-disable-next-line react-compiler/react-compiler
-        player.currentTime = newTime;
-      }
-    }
-  }, [getFirestoreId, firestoreDb, film, selectedVoice, player]);
-
   useEffect(() => {
     activateKeepAwakeAsync(AWAKE_TAG);
     createUpdateTimeTimeout();
@@ -173,15 +172,13 @@ export function PlayerContainer({
       }
     );
 
-    initFirestoreTime();
-
     return () => {
       deactivateKeepAwake(AWAKE_TAG);
       removeUpdateTimeTimeout();
       backHandler.remove();
       resetProgressStatus();
     };
-  }, [updateTime, createUpdateTimeTimeout, initFirestoreTime, resetProgressStatus]);
+  }, [updateTime, createUpdateTimeTimeout, initFirestoreSavedTime, resetProgressStatus]);
 
   useEventListener(
     player,
@@ -271,6 +268,7 @@ export function PlayerContainer({
 
     updateProgressStatus(newTime, bufferedPosition, duration);
 
+    // eslint-disable-next-line react-compiler/react-compiler
     player.currentTime = newTime;
   };
 

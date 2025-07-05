@@ -1,4 +1,4 @@
-import { Rating } from '@kolking/react-native-rating';
+import { AirbnbRating } from '@rn-vui/ratings';
 import BookmarksSelector from 'Component/BookmarksSelector';
 import Comments from 'Component/Comments';
 import Page from 'Component/Page';
@@ -238,14 +238,15 @@ export function FilmPageComponent({
     }
 
     return (
-      <Rating
-        style={ styles.rating }
+      <AirbnbRating
+        ratingContainerStyle={ styles.rating }
+        starStyle={ styles.ratingStar }
         size={ scale(14) }
-        rating={ mainRating.rating || 0 }
-        scale={ 1 }
-        spacing={ scale(2) }
-        maxRating={ ratingScale || 10 }
-        fillColor={ Colors.secondary }
+        defaultRating={ Math.round(mainRating.rating || 0) }
+        count={ ratingScale || 10 }
+        selectedColor={ Colors.secondary }
+        isDisabled
+        showRating={ false }
       />
     );
   };

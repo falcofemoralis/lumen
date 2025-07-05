@@ -104,6 +104,7 @@ export function PlayerComponent({
   const topActionRef = useRef<SpatialNavigationNodeRef | null>(null);
   const middleActionRef = useRef<SpatialNavigationNodeRef | null>(null);
   const bottomActionRef = useRef<SpatialNavigationNodeRef | null>(null);
+  const isPlayingRef = useRef(isPlaying);
   const showControlsRef = useRef(showControls);
   const currentOverlayRef = useRef(currentOverlay);
   const isComponentMounted = useRef(true);
@@ -128,12 +129,30 @@ export function PlayerComponent({
     middleActionRef.current?.focus();
   };
 
+  const setControlsTimeout = () => {
+    if (controlsTimeout.current) {
+      clearTimeout(controlsTimeout.current);
+    }
+
+    controlsTimeout.current = setTimeoutSafe(() => {
+      if (!isComponentMounted.current) return;
+
+      if (isPlayingRef.current
+          && showControlsRef.current
+          && !currentOverlayRef.current.length
+      ) {
+        closeControls();
+      }
+    }, PLAYER_CONTROLS_TIMEOUT);
+  };
+
   useEffect(() => {
     currentOverlayRef.current = currentOverlay;
     showControlsRef.current = showControls;
     focusedElementRef.current = focusedElement;
     hideActionsRef.current = hideActions;
-  }, [showControls, currentOverlay, focusedElement, hideActions]);
+    isPlayingRef.current = isPlaying;
+  }, [showControls, currentOverlay.length, focusedElement, hideActions, isPlaying]);
 
   useEffect(() => {
     return () => {
@@ -142,8 +161,12 @@ export function PlayerComponent({
   }, []);
 
   useEffect(() => {
+    setControlsTimeout();
+  }, [isPlaying, currentOverlay.length, player]);
+
+  useEffect(() => {
     const keyDownListener = (type: SupportedKeys) => {
-      if (!isComponentMounted.current || !player || currentOverlayRef.current.length) return false;
+      if (!isComponentMounted.current || currentOverlayRef.current.length) return false;
 
       if (type === SupportedKeys.BACKWARD) {
         seekToPosition(0);
@@ -206,22 +229,9 @@ export function PlayerComponent({
     };
 
     const keyUpListener = (_type: SupportedKeys) => {
-      if (!isComponentMounted.current || !player) return false;
+      if (!isComponentMounted.current) return false;
 
-      if (controlsTimeout.current) {
-        clearTimeout(controlsTimeout.current);
-      }
-
-      controlsTimeout.current = setTimeoutSafe(() => {
-        if (!isComponentMounted.current || !player) return;
-
-        if (player.playing
-          && showControlsRef.current
-          && !currentOverlayRef.current.length
-        ) {
-          closeControls();
-        }
-      }, PLAYER_CONTROLS_TIMEOUT);
+      setControlsTimeout();
 
       return false;
     };
