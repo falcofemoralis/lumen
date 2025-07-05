@@ -1,6 +1,6 @@
 import { getFirestore } from '@react-native-firebase/firestore';
 import { FIRESTORE_DB } from 'Component/Player/Player.config';
-import { FirestoreDocument } from 'Component/Player/Player.type';
+import { FirestoreDocument, SavedTime } from 'Component/Player/Player.type';
 import { useOverlayContext } from 'Context/OverlayContext';
 import { usePlayerContext } from 'Context/PlayerContext';
 import { useServiceContext } from 'Context/ServiceContext';
@@ -10,7 +10,7 @@ import ConfigStore from 'Store/Config.store';
 import NotificationStore from 'Store/Notification.store';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { EpisodeInterface, FilmVoiceInterface, SeasonInterface } from 'Type/FilmVoice.interface';
-import { getFirestoreSavedTime, getSavedTime } from 'Util/Player';
+import { getFirestoreSavedTime, getSavedTime, setSavedTime as setSavedTimeStorage } from 'Util/Player';
 import { combineSavedTime } from 'Util/Player/savedTimeUtil';
 
 import PlayerVideoSelectorComponent from './PlayerVideoSelector.component';
@@ -38,7 +38,7 @@ export function PlayerVideoSelectorContainer({
   const [selectedEpisodeId, setSelectedEpisodeId] = useState<string | undefined>(
     selectedVoice.lastEpisodeId
   );
-  const [savedTime, setSavedTime] = useState(() => getSavedTime(film));
+  const [savedTime, setSavedTime] = useState<SavedTime | null>(null);
   const firestoreDb = useMemo(() => (
     ConfigStore.isFirestore() && isSignedIn
       ? getFirestore().collection<FirestoreDocument>(FIRESTORE_DB)
@@ -67,7 +67,12 @@ export function PlayerVideoSelectorContainer({
     const fireStoreSavedTime = await getFirestoreSavedTime(film, profile, firestoreDb);
 
     if (fireStoreSavedTime) {
-      setSavedTime(combineSavedTime(savedTime, fireStoreSavedTime));
+      const combinedSavedTime = combineSavedTime(savedTime, fireStoreSavedTime);
+
+      if (combinedSavedTime) {
+        setSavedTime(combinedSavedTime);
+        setSavedTimeStorage(combinedSavedTime, film);
+      }
     }
   };
 

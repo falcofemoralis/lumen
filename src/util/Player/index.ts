@@ -79,6 +79,13 @@ export const updateSavedTime = (film: FilmInterface, voice: FilmVoiceInterface, 
   );
 };
 
+export const setSavedTime = (savedTime: SavedTime, film: FilmInterface) => {
+  playerStorage.set(
+    formatPlayerKeyTime(film),
+    JSON.stringify(savedTime)
+  );
+};
+
 export const getSavedTime = (film: FilmInterface): SavedTime | null => {
   const savedTimeJson = playerStorage.getString(formatPlayerKeyTime(film));
 
