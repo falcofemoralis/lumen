@@ -1,13 +1,13 @@
 import Loader from 'Component/Loader';
 import ThemedBottomSheet from 'Component/ThemedBottomSheet';
-import ThemedButton from 'Component/ThemedButton';
 import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import Wrapper from 'Component/Wrapper';
 import * as Application from 'expo-application';
 import t from 'i18n/t';
 import { X } from 'lucide-react-native';
-import { Image, ScrollView, View } from 'react-native';
+import { Image, Pressable, ScrollView, View } from 'react-native';
+import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 
@@ -66,26 +66,54 @@ export const AppUpdaterComponent = ({
     </>
   );
 
+  const cancelGesture = Gesture.Tap()
+    .numberOfTaps(1)
+    .maxDuration(500)
+    .runOnJS(true)
+    .onStart(() => {
+      rejectUpdate();
+    });
+
+  const acceptGesture = Gesture.Tap()
+    .numberOfTaps(1)
+    .maxDuration(500)
+    .runOnJS(true)
+    .onStart(() => {
+      acceptUpdate();
+    });
+
   const renderActions = () => (
     <View style={ styles.actions }>
-      <ThemedButton
+      <Pressable
         style={ [
           styles.button,
           styles.skipButton,
         ] }
-        onPress={ rejectUpdate }
+        android_ripple={ {
+          color: Colors.whiteTransparent,
+        } }
       >
-        { t('Reject') }
-      </ThemedButton>
-      <ThemedButton
+        <GestureDetector gesture={ cancelGesture }>
+          <ThemedText>
+            { t('Reject') }
+          </ThemedText>
+        </GestureDetector>
+      </Pressable>
+      <Pressable
         style={ [
           styles.button,
           styles.updateButton,
         ] }
-        onPress={ acceptUpdate }
+        android_ripple={ {
+          color: Colors.whiteTransparent,
+        } }
       >
-        { t('Update') }
-      </ThemedButton>
+        <GestureDetector gesture={ acceptGesture }>
+          <ThemedText>
+            { t('Update') }
+          </ThemedText>
+        </GestureDetector>
+      </Pressable>
     </View>
   );
 
@@ -96,17 +124,19 @@ export const AppUpdaterComponent = ({
       backgroundColor={ Colors.background }
       onMount={ onBottomSheetMount }
     >
-      <View style={ isLoading && styles.loadingContainer }>
-        <Wrapper style={ styles.wrapper }>
-          <Loader
-            fullScreen
-            isLoading={ isLoading }
-          />
-          { renderHeader() }
-          { renderContent() }
-          { renderActions() }
-        </Wrapper>
-      </View>
+      <GestureHandlerRootView style={ { flexGrow: 1 } }>
+        <View style={ isLoading && styles.loadingContainer }>
+          <Wrapper style={ styles.wrapper }>
+            <Loader
+              fullScreen
+              isLoading={ isLoading }
+            />
+            { renderHeader() }
+            { renderContent() }
+            { renderActions() }
+          </Wrapper>
+        </View>
+      </GestureHandlerRootView>
     </ThemedBottomSheet>
   );
 };

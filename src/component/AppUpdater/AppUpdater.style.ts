@@ -62,10 +62,11 @@ export const styles = CreateStyles({
     marginTop: 16,
   },
   button: {
-    flex: 1,
+    height: 48,
+    width: '50%',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 8,
   },
   skipButton: {
     backgroundColor: Colors.backgroundLight,
