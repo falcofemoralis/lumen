@@ -6771,7 +6771,7 @@ react-native-keyevent@^0.3.2:
   resolved "https://registry.yarnpkg.com/react-native-keyevent/-/react-native-keyevent-0.3.2.tgz#39e303492755719d2e1c1d2bfe6050a067249b20"
   integrity sha512-OHuUqj6h3GQalqGx0RwUxbSyavNbQcuua9aGDGnHjUVOdd8WyyYaiKqYkg9vtTXXKOwp6jl8bOg4nvpucC43Ng==
 
-react-native-mmkv@^3.2.0:
+react-native-mmkv@^3.3.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/react-native-mmkv/-/react-native-mmkv-3.3.0.tgz#a0816babdf68afd2bfd881a48e28c8815795286b"
   integrity sha512-2iPjIJ+IAODXN35wm53EN6nv+hR/0NXLLiLWOdPA/0gXDB2dYVrr6MqvoiFpxhLhdj0B8fkf5ARNVavJaSvuuQ==

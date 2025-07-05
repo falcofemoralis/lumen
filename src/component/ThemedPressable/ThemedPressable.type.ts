@@ -10,4 +10,5 @@ export interface ThemedPressableProps {
   mode?: 'light' | 'dark';
   pressDelay?: number;
   ref?: Ref<View>;
+  additionalElement?: React.ReactNode;
 }

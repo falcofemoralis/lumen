@@ -1,4 +1,4 @@
-import { usePlayerContext } from 'Context/PlayerContext';
+import { usePlayerProgressContext } from 'Context/PlayerProgressContext';
 import {
   useCallback, useEffect, useRef,
 } from 'react';
@@ -17,7 +17,7 @@ export const PlayerProgressBarComponent = ({
   handleUserInteraction,
   handleIsScrolling = noopFn,
 }: PlayerProgressBarComponentProps) => {
-  const { progressStatus } = usePlayerContext();
+  const { progressStatus } = usePlayerProgressContext();
   const bubbleRef = useRef<BubbleRef>(null);
   const progress = useSharedValue(0);
   const cache = useSharedValue(0);

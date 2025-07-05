@@ -4,13 +4,15 @@ import ThemedButton from 'Component/ThemedButton';
 import ThemedDropdown from 'Component/ThemedDropdown';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import t from 'i18n/t';
-import React from 'react';
+import React, { memo } from 'react';
+import { View } from 'react-native';
 import {
   DefaultFocus,
   SpatialNavigationScrollView,
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
 import { EpisodeInterface, SeasonInterface } from 'Type/FilmVoice.interface';
+import { getVideoProgress } from 'Util/Player';
 
 import { styles } from './PlayerVideoSelector.style.atv';
 import { PlayerVideoSelectorComponentProps } from './PlayerVideoSelector.type';
@@ -29,6 +31,7 @@ export function PlayerVideoSelectorComponent({
   episodes,
   handleSelectEpisode,
   film,
+  savedTime,
 }: PlayerVideoSelectorComponentProps) {
   const renderVoiceRating = () => {
     const { voiceRating = [] } = film;
@@ -153,6 +156,36 @@ export function PlayerVideoSelectorComponent({
     );
   };
 
+  const renderEpisodeTimeline = (episodeId: string, isFocused: boolean, isSelected: boolean) => {
+    if (!savedTime) {
+      return null;
+    }
+
+    const progress = getVideoProgress({
+      ...selectedVoice,
+      lastSeasonId: selectedSeasonId,
+      lastEpisodeId: episodeId,
+    }, savedTime);
+
+    if (!progress) {
+      return null;
+    }
+
+    return (
+      <View style={ styles.buttonProgressContainer }>
+        <View style={ styles.buttonProgressOutline } />
+        <View
+          style={ [
+            styles.buttonProgressMask,
+            isSelected && styles.buttonProgressMaskSelected,
+            isFocused && styles.buttonProgressMaskFocused,
+            { width: `${100 - progress}%` },
+          ] }
+        />
+      </View>
+    );
+  };
+
   const renderEpisodes = () => {
     if (!episodes.length) {
       return null;
@@ -183,6 +216,9 @@ export function PlayerVideoSelectorComponent({
                     isSelected={ selectedEpisodeId === episodeId }
                     onPress={ () => handleSelectEpisode(episodeId) }
                     style={ styles.button }
+                    additionalElement={
+                      (isFocused, isSelected) => renderEpisodeTimeline(episodeId, isFocused, isSelected)
+                    }
                   >
                     { name }
                   </ThemedButton>
@@ -228,4 +264,15 @@ export function PlayerVideoSelectorComponent({
   );
 }
 
-export default PlayerVideoSelectorComponent;
+function propsAreEqual(
+  prevProps: PlayerVideoSelectorComponentProps,
+  props: PlayerVideoSelectorComponentProps
+) {
+  return prevProps.isLoading === props.isLoading
+    && prevProps.selectedVoice.id === props.selectedVoice.id
+    && prevProps.selectedSeasonId === props.selectedSeasonId
+    && prevProps.selectedEpisodeId === props.selectedEpisodeId
+    && prevProps.savedTime === props.savedTime;
+}
+
+export default memo(PlayerVideoSelectorComponent, propsAreEqual);
