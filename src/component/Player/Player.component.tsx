@@ -107,16 +107,52 @@ export function PlayerComponent({
   const [doubleTapAction, setDoubleTapAction] = useState<DoubleTapAction | null>(null);
   const [longTapAction, setLongTapAction] = useState(false);
   const controlsTimeout = useRef<NodeJS.Timeout | null>(null);
-  const canHideControls = useRef(isPlaying && showControls);
   const playerRef = useRef<VideoView>(null);
   const doubleTapTimeout = useRef<NodeJS.Timeout | null>(null);
   const isPlayingRef = useRef(isPlaying);
   const showControlsRef = useRef(showControls);
+  const currentOverlayRef = useRef(currentOverlay);
   const isScrollingRef = useRef(isScrolling);
+  const isComponentMounted = useRef(true);
 
   const controlsAnimation = useAnimatedStyle(() => ({
     opacity: withTiming(showControls ? 1 : 0, { duration: PLAYER_CONTROLS_ANIMATION }),
   }));
+
+  const setControlsTimeout = () => {
+    if (controlsTimeout.current) {
+      clearTimeout(controlsTimeout.current);
+    }
+
+    controlsTimeout.current = setTimeoutSafe(() => {
+      if (!isComponentMounted.current) return;
+
+      if (isPlayingRef.current
+        && showControlsRef.current
+        && !currentOverlayRef.current.length
+        && !isScrollingRef.current
+      ) {
+        setShowControls(false);
+      }
+    }, PLAYER_CONTROLS_TIMEOUT);
+  };
+
+  useEffect(() => {
+    isPlayingRef.current = isPlaying;
+    showControlsRef.current = showControls;
+    isScrollingRef.current = isScrolling;
+    currentOverlayRef.current = currentOverlay;
+  }, [showControls, currentOverlay.length, isScrolling, isPlaying]);
+
+  useEffect(() => {
+    return () => {
+      isComponentMounted.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    setControlsTimeout();
+  }, [isPlaying, currentOverlay.length, player]);
 
   useEffect(() => {
     ScreenOrientation.lockAsync(OrientationLock.LANDSCAPE);
@@ -133,41 +169,6 @@ export function PlayerComponent({
       }
     };
   }, []);
-
-  const handleHideControls = () => {
-    canHideControls.current = isPlayingRef.current
-      && showControlsRef.current
-      && !currentOverlay.length
-      && !isScrollingRef.current;
-  };
-
-  useEffect(() => {
-    isPlayingRef.current = isPlaying;
-    showControlsRef.current = showControls;
-    isScrollingRef.current = isScrolling;
-
-    handleHideControls();
-  }, [isPlaying, showControls, isScrolling]);
-
-  useEffect(() => {
-    handleHideControls();
-
-    if (canHideControls.current) {
-      handleUserInteraction();
-    }
-  }, [currentOverlay.length]);
-
-  const setControlsTimeout = () => {
-    if (controlsTimeout.current) {
-      clearTimeout(controlsTimeout.current);
-    }
-
-    controlsTimeout.current = setTimeoutSafe(() => {
-      if (canHideControls.current) {
-        setShowControls(false);
-      }
-    }, PLAYER_CONTROLS_TIMEOUT);
-  };
 
   const handleUserInteraction = (action?: () => void) => {
     setControlsTimeout();
