@@ -33,9 +33,9 @@ export const vttLoader = async (url: string) => {
   return res.text();
 };
 
-export const subtitleParser = async (subitleUrl: string): Promise<VTTItem[]> => {
-  const subtitleData = await vttLoader(subitleUrl);
-  const subtitleType = subitleUrl.split('.')[subitleUrl.split('.').length - 1];
+export const subtitleParser = async (subtitleUrl: string): Promise<VTTItem[]> => {
+  const subtitleData = await vttLoader(subtitleUrl);
+  const subtitleType = subtitleUrl.split('.')[subtitleUrl.split('.').length - 1];
 
   const result: VTTItem[] = [];
 
