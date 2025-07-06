@@ -51,17 +51,14 @@ export const styles = CreateStyles({
     right: 0,
     bottom: 0,
     backgroundColor: Colors.button,
-    borderTopRightRadius: 16,
-    borderBottomRightRadius: 16,
+    borderRadius: 16,
   },
   buttonProgressMaskSelected: {
     backgroundColor: Colors.primary,
-    borderTopRightRadius: 16,
-    borderBottomRightRadius: 16,
+    borderRadius: 16,
   },
   buttonProgressMaskFocused: {
     backgroundColor: Colors.buttonFocused,
-    borderTopRightRadius: 16,
-    borderBottomRightRadius: 16,
+    borderRadius: 16,
   },
 });

@@ -89,7 +89,6 @@ export const styles = CreateStyles({
     top: -2,
     right: -2,
     bottom: -2,
-    borderTopRightRadius: 16,
-    borderBottomRightRadius: 16,
+    borderRadius: 16,
   },
 });
