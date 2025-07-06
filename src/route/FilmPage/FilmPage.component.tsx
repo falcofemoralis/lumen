@@ -161,7 +161,7 @@ export function FilmPageComponent({
     );
   };
 
-  const renderInfoText = (text: string | undefined, title?: string) => {
+  const renderInfoText = (text: string | undefined, title?: string, noMargin?: boolean) => {
     if (!text) {
       return null;
     }
@@ -169,7 +169,10 @@ export function FilmPageComponent({
     return (
       <Text
         key={ text }
-        style={ styles.textContainer }
+        style={ [
+          styles.textContainer,
+          noMargin ? styles.textContainerNoMargin : {},
+        ] }
       >
         { title && (
           <ThemedText style={ styles.textTitle }>
@@ -571,7 +574,7 @@ export function FilmPageComponent({
       return null;
     }
 
-    return ratings.map(({ name, rating, votes }) => renderInfoText(`${rating} (${votes})`, name));
+    return ratings.map(({ name, rating, votes }, i) => renderInfoText(`${rating} (${votes})`, name, i === 0));
   };
 
   const renderContent = () => {

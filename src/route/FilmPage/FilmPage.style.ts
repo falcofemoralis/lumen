@@ -74,6 +74,9 @@ export const styles = CreateStyles({
     marginTop: 8,
     flexDirection: 'row',
   },
+  textContainerNoMargin: {
+    marginTop: 0,
+  },
   textTitle: {
     fontSize: 14,
     fontWeight: '700',
