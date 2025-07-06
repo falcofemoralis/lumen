@@ -105,5 +105,13 @@
   "Update": "Обновить",
   "%s to %s": "%s до %s",
   "Reject": "Отменить",
-  "No more episodes available": "Больше нет доступных серий"
+  "No more episodes available": "Больше нет доступных серий",
+  "Error": "Ошибка",
+  "APK installation is only supported on Android": "Установка APK поддерживается только на Android",
+  "Storage permission is required to download APK": "Для загрузки APK требуется разрешение на доступ к хранилищу",
+  "Storage Permission Required": "Требуется разрешение на доступ к хранилищу",
+  "This app needs storage access to download updates to your Downloads folder.": "Это приложение требует доступа к хранилищу для загрузки обновлений в папку Загрузки.",
+  "Ask Me Later": "Спросить позже",
+  "Allow": "Разрешить",
+  "OK": "ОК"
 }

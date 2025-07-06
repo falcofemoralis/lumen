@@ -4,11 +4,9 @@ import { useOverlayContext } from 'Context/OverlayContext';
 import { withTV } from 'Hooks/withTV';
 import { useEffect, useRef, useState } from 'react';
 import { Platform } from 'react-native';
-import ReactNativeBlobUtil from 'react-native-blob-util';
-import hotUpdate from 'react-native-ota-hot-update';
 import { useLockSpatialNavigation } from 'react-tv-space-navigation';
 import ConfigStore from 'Store/Config.store';
-import NotificationStore from 'Store/Notification.store';
+import { Installer } from 'Util/App/installer';
 
 import AppUpdaterComponent from './AppUpdater.component';
 import AppUpdaterComponentTV from './AppUpdater.component.atv';
@@ -20,6 +18,7 @@ export const AppUpdaterContainer = () => {
   const [isLoading, setIsLoading] = useState(false);
   const bottomSheetRef = useRef<ThemedBottomSheetRef>(null);
   const { lock, unlock } = useLockSpatialNavigation();
+  const [progress, setProgress] = useState(0);
 
   const openPopup = () => {
     if (ConfigStore.isTV()) {
@@ -57,7 +56,6 @@ export const AppUpdaterContainer = () => {
 
   const acceptUpdate = async () => {
     const {
-      version,
       downloadAndroidUrl,
       downloadIosUrl,
     } = update;
@@ -74,17 +72,19 @@ export const AppUpdaterContainer = () => {
 
     const url = Platform.OS === 'android' ? downloadAndroidUrl : downloadIosUrl;
 
-    hotUpdate.downloadBundleUri(ReactNativeBlobUtil, url, version, {
-      updateFail(message?: string) {
-        setIsLoading(false);
-        NotificationStore.displayError(message || 'Bundle update failed');
-
-        if (ConfigStore.isTV()) {
-          unlock();
-        }
-      },
-      restartAfterInstall: true,
+    const result = await Installer.downloadAndInstallApk(url, (receivedNum, totalNum) => {
+      setProgress(Math.round((receivedNum / totalNum) * 100));
     });
+
+    if (!result) {
+      setIsLoading(false);
+
+      if (ConfigStore.isTV()) {
+        unlock();
+      }
+
+      return;
+    }
   };
 
   const rejectUpdate = () => {
@@ -95,6 +95,7 @@ export const AppUpdaterContainer = () => {
     update,
     isLoading,
     bottomSheetRef,
+    progress,
     acceptUpdate,
     rejectUpdate,
     onBottomSheetMount,

@@ -63,8 +63,7 @@
           "project": "lumen",
           "organization": "lumen-corp-m9"
         }
-      ],
-      "react-native-ota-hot-update"
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

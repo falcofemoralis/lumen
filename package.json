@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@bam.tech/lrud": "^8.0.2",
+    "@dominicvonk/react-native-apk-installer": "^2.2.2",
     "@expo/metro-runtime": "5.0.4",
     "@legendapp/list": "^1.0.17",
     "@lodev09/react-native-true-sheet": "^2.0.5",
@@ -63,7 +64,6 @@
     "react-native-mmkv": "^3.3.0",
     "react-native-modal": "^14.0.0-rc.1",
     "react-native-nitro-modules": "^0.26.2",
-    "react-native-ota-hot-update": "^2.3.0",
     "react-native-pager-view": "^6.8.1",
     "react-native-reanimated": "4.0.0-beta.5",
     "react-native-reanimated-animated-accordion": "^0.3.0",

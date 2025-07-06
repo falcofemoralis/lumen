@@ -5,6 +5,7 @@ export interface AppUpdaterComponentProps {
   update: UpdateInterface;
   isLoading: boolean;
   bottomSheetRef: React.RefObject<TrueSheet | null>;
+  progress: number;
   acceptUpdate: () => void;
   rejectUpdate: () => void;
   onBottomSheetMount: () => void;

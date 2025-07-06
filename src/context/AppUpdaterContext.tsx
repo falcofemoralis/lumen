@@ -8,7 +8,6 @@ import {
   useState,
 } from 'react';
 import { Platform } from 'react-native';
-import hotUpdate from 'react-native-ota-hot-update';
 import ConfigStore from 'Store/Config.store';
 import { UpdateInterface } from 'Type/Update.interface';
 import { noopFn } from 'Util/Function';
@@ -68,10 +67,8 @@ export const AppUpdaterProvider = ({ children }: { children: React.ReactNode }) 
 
     const currentVersion = versionStringToNumber(Application.nativeApplicationVersion || '0.0.0');
     const newVersion = versionStringToNumber(data?.versionName || '0.0.0');
-    const installedVersionNumber = await hotUpdate.getCurrentVersion() || 0;
-    const newVersionNumber = data?.version || 0;
 
-    if (newVersion > currentVersion && newVersionNumber > installedVersionNumber) {
+    if (newVersion > currentVersion) {
       setUpdate(data);
     }
   }, [getCachedUpdate]);

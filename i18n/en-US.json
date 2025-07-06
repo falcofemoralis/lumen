@@ -104,5 +104,13 @@
   "Update": "Update",
   "%s to %s": "%s to %s",
   "Reject": "Reject",
-  "No more episodes available": "No more episodes available"
+  "No more episodes available": "No more episodes available",
+  "Error": "Error",
+  "APK installation is only supported on Android": "APK installation is only supported on Android",
+  "Storage permission is required to download APK": "Storage permission is required to download APK",
+  "Storage Permission Required": "Storage Permission Required",
+  "This app needs storage access to download updates to your Downloads folder.": "This app needs storage access to download updates to your Downloads folder.",
+  "Ask Me Later": "Ask Me Later",
+  "Allow": "Allow",
+  "OK": "OK"
 }

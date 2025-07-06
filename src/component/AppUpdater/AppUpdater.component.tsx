@@ -18,6 +18,7 @@ export const AppUpdaterComponent = ({
   update,
   isLoading,
   bottomSheetRef,
+  progress,
   acceptUpdate,
   rejectUpdate,
   onBottomSheetMount,
@@ -117,6 +118,21 @@ export const AppUpdaterComponent = ({
     </View>
   );
 
+  const renderLoader = () => {
+    if (!isLoading) {
+      return null;
+    }
+
+    return (
+      <View style={ styles.loader }>
+        <Loader isLoading />
+        <ThemedText>
+          { `${progress}%` }
+        </ThemedText>
+      </View>
+    );
+  };
+
   return (
     <ThemedBottomSheet
       ref={ bottomSheetRef }
@@ -125,12 +141,9 @@ export const AppUpdaterComponent = ({
       onMount={ onBottomSheetMount }
     >
       <GestureHandlerRootView style={ { flexGrow: 1 } }>
+        { renderLoader() }
         <View style={ isLoading && styles.loadingContainer }>
           <Wrapper style={ styles.wrapper }>
-            <Loader
-              fullScreen
-              isLoading={ isLoading }
-            />
             { renderHeader() }
             { renderContent() }
             { renderActions() }

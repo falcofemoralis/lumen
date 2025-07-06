@@ -14,6 +14,7 @@ import { AppUpdaterComponentProps } from './AppUpdater.type';
 export const AppUpdaterComponent = ({
   update,
   isLoading,
+  progress,
   acceptUpdate,
   rejectUpdate,
 }: AppUpdaterComponentProps) => {
@@ -82,17 +83,29 @@ export const AppUpdaterComponent = ({
     </SpatialNavigationView>
   );
 
+  const renderLoader = () => {
+    if (!isLoading) {
+      return null;
+    }
+
+    return (
+      <View style={ styles.loader }>
+        <Loader isLoading />
+        <ThemedText>
+          { `${progress}%` }
+        </ThemedText>
+      </View>
+    );
+  };
+
   return (
     <ThemedOverlay
       id={ OVERLAY_APP_UPDATE_ID }
       containerStyle={ styles.overlay }
       onHide={ rejectUpdate }
     >
+      { renderLoader() }
       <View style={ isLoading && styles.loadingContainer }>
-        <Loader
-          fullScreen
-          isLoading={ isLoading }
-        />
         { renderHeader() }
         { renderContent() }
         { renderActions() }
