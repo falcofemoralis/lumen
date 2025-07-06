@@ -61,12 +61,23 @@ export const styles = CreateStyles({
     gap: 8,
     marginTop: 16,
   },
-  button: {
+  buttonContainer: {
+    overflow: 'hidden',
     height: 48,
     width: '50%',
-    alignItems: 'center',
-    justifyContent: 'center',
     borderRadius: 8,
+  },
+  button: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonText: {
+    height: '100%',
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   skipButton: {
     backgroundColor: Colors.backgroundLight,

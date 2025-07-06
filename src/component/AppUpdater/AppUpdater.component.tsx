@@ -85,36 +85,44 @@ export const AppUpdaterComponent = ({
 
   const renderActions = () => (
     <View style={ styles.actions }>
-      <Pressable
-        style={ [
-          styles.button,
-          styles.skipButton,
-        ] }
-        android_ripple={ {
-          color: Colors.whiteTransparent,
-        } }
-      >
-        <GestureDetector gesture={ cancelGesture }>
-          <ThemedText>
-            { t('Reject') }
-          </ThemedText>
-        </GestureDetector>
-      </Pressable>
-      <Pressable
-        style={ [
-          styles.button,
-          styles.updateButton,
-        ] }
-        android_ripple={ {
-          color: Colors.whiteTransparent,
-        } }
-      >
-        <GestureDetector gesture={ acceptGesture }>
-          <ThemedText>
-            { t('Update') }
-          </ThemedText>
-        </GestureDetector>
-      </Pressable>
+      <View style={ styles.buttonContainer }>
+        <Pressable
+          style={ [
+            styles.button,
+            styles.skipButton,
+          ] }
+          android_ripple={ {
+            color: Colors.whiteTransparent,
+          } }
+        >
+          <GestureDetector gesture={ cancelGesture }>
+            <View style={ styles.buttonText }>
+              <ThemedText>
+                { t('Reject') }
+              </ThemedText>
+            </View>
+          </GestureDetector>
+        </Pressable>
+      </View>
+      <View style={ styles.buttonContainer }>
+        <Pressable
+          style={ [
+            styles.button,
+            styles.updateButton,
+          ] }
+          android_ripple={ {
+            color: Colors.whiteTransparent,
+          } }
+        >
+          <GestureDetector gesture={ acceptGesture }>
+            <View style={ styles.buttonText }>
+              <ThemedText>
+                { t('Update') }
+              </ThemedText>
+            </View>
+          </GestureDetector>
+        </Pressable>
+      </View>
     </View>
   );
 
