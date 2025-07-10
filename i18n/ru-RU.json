@@ -113,5 +113,7 @@
   "This app needs storage access to download updates to your Downloads folder.": "Это приложение требует доступа к хранилищу для загрузки обновлений в папку Загрузки.",
   "Ask Me Later": "Спросить позже",
   "Allow": "Разрешить",
-  "OK": "ОК"
+  "OK": "ОК",
+  "No video available": "Нет доступного потока. Проверьте работоспособность на сайте.",
+  "No video streams available": "Нет доступных потоков. Проверьте работоспособность на сайте."
 }

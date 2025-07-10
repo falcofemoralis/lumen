@@ -72,30 +72,36 @@ export function PlayerVideoSelectorComponent({
     );
   };
 
-  const renderSeasons = () => (
-    <View style={ styles.seasonsContainer }>
-      { seasons.map((season) => (
-        <ThemedPressable
-          key={ season.seasonId }
-          style={ [
-            styles.season,
-            selectedSeasonId === season.seasonId && styles.seasonSelected,
-          ] }
-          contentStyle={ styles.seasonContent }
-          onPress={ () => setSelectedSeasonId(season.seasonId) }
-        >
-          <ThemedText
+  const renderSeasons = () => {
+    if (seasons.length === 1 && seasons[0].isOnlyEpisodes) {
+      return null;
+    }
+
+    return (
+      <View style={ styles.seasonsContainer }>
+        { seasons.map((season) => (
+          <ThemedPressable
+            key={ season.seasonId }
             style={ [
-              styles.seasonText,
-              selectedSeasonId === season.seasonId && styles.seasonTextSelected,
+              styles.season,
+              selectedSeasonId === season.seasonId && styles.seasonSelected,
             ] }
+            contentStyle={ styles.seasonContent }
+            onPress={ () => setSelectedSeasonId(season.seasonId) }
           >
-            { season.name }
-          </ThemedText>
-        </ThemedPressable>
-      )) }
-    </View>
-  );
+            <ThemedText
+              style={ [
+                styles.seasonText,
+                selectedSeasonId === season.seasonId && styles.seasonTextSelected,
+              ] }
+            >
+              { season.name }
+            </ThemedText>
+          </ThemedPressable>
+        )) }
+      </View>
+    );
+  };
 
   const renderEpisodeTimeline = (episodeId: string) => {
     if (!savedTime) {
@@ -128,7 +134,12 @@ export function PlayerVideoSelectorComponent({
   };
 
   const renderEpisodes = () => (
-    <View style={ styles.episodesContainer }>
+    <View
+      style={ [
+        styles.episodesContainer,
+        seasons.length === 1 && seasons[0].isOnlyEpisodes && styles.episodesContainerNoBorder,
+      ] }
+    >
       { episodes.map(({ episodeId, name }) => (
         <ThemedPressable
           key={ episodeId }

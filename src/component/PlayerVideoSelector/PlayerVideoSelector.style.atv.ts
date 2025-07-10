@@ -13,6 +13,9 @@ export const styles = CreateStyles({
     borderTopColor: Colors.border,
     paddingTop: 8,
   },
+  episodesContainerNoBorder: {
+    borderTopWidth: 0,
+  },
   button: {
     marginEnd: 10,
     marginBottom: 10,

@@ -42,6 +42,9 @@ export const styles = CreateStyles({
     borderTopWidth: 2,
     borderTopColor: Colors.divider,
   },
+  episodesContainerNoBorder: {
+    borderTopWidth: 0,
+  },
   episode: {
     backgroundColor: Colors.chip,
     borderRadius: 16,

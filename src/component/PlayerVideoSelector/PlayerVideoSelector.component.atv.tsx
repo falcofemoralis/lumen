@@ -120,7 +120,7 @@ export function PlayerVideoSelectorComponent({
   };
 
   const renderSeasons = () => {
-    if (!seasons.length) {
+    if (seasons.length === 1 && seasons[0].isOnlyEpisodes) {
       return null;
     }
 
@@ -187,9 +187,7 @@ export function PlayerVideoSelectorComponent({
   };
 
   const renderEpisodes = () => {
-    if (!episodes.length) {
-      return null;
-    }
+    console.log(episodes);
 
     const rows = calculateRows<EpisodeInterface>(episodes);
 
@@ -197,7 +195,10 @@ export function PlayerVideoSelectorComponent({
       <SpatialNavigationView
         alignInGrid
         direction="vertical"
-        style={ styles.episodesContainer }
+        style={ [
+          styles.episodesContainer,
+          seasons.length === 1 && seasons[0].isOnlyEpisodes && styles.episodesContainerNoBorder,
+        ] }
       >
         { rows.map((listRow) => (
           <SpatialNavigationView

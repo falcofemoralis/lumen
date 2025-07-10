@@ -112,5 +112,7 @@
   "This app needs storage access to download updates to your Downloads folder.": "This app needs storage access to download updates to your Downloads folder.",
   "Ask Me Later": "Ask Me Later",
   "Allow": "Allow",
-  "OK": "OK"
+  "OK": "OK",
+  "No video available": "No video available",
+  "No video streams available": "No video streams available"
 }
