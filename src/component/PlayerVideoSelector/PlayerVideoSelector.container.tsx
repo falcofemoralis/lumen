@@ -15,6 +15,7 @@ import { combineSavedTime } from 'Util/Player/savedTimeUtil';
 
 import PlayerVideoSelectorComponent from './PlayerVideoSelector.component';
 import FilmVideoSelectorComponentTV from './PlayerVideoSelector.component.atv';
+import { PROGRESS_THRESHOLD_MAX, PROGRESS_THRESHOLD_MIN } from './PlayerVideoSelector.config';
 import { PlayerVideoSelectorContainerProps } from './PlayerVideoSelector.type';
 
 export function PlayerVideoSelectorContainer({
@@ -211,6 +212,18 @@ export function PlayerVideoSelectorContainer({
     }
   };
 
+  const calculateProgressThreshold = (progress: number): number => {
+    if (progress < PROGRESS_THRESHOLD_MIN) {
+      return 0;
+    }
+
+    if ((100 - progress) < PROGRESS_THRESHOLD_MAX) {
+      return 100;
+    }
+
+    return progress;
+  };
+
   const containerProps = () => ({
     overlayId,
     film,
@@ -229,6 +242,7 @@ export function PlayerVideoSelectorContainer({
     setSelectedSeasonId,
     onHide,
     handleSelectEpisode,
+    calculateProgressThreshold,
   };
 
   return withTV(FilmVideoSelectorComponentTV, PlayerVideoSelectorComponent, {

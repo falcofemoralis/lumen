@@ -26,4 +26,5 @@ export type PlayerVideoSelectorComponentProps = {
   setSelectedSeasonId: (id: string) => void;
   onHide: () => void;
   handleSelectEpisode: (episodeId: string) => void;
+  calculateProgressThreshold: (progress: number) => number;
 };

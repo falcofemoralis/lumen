@@ -43,10 +43,10 @@ export const styles = CreateStyles({
     left: 0,
     right: 0,
     bottom: 0,
-    borderRadius: 16,
+    borderRadius: 18,
     borderWidth: 2,
     borderColor: '#0283d1',
-    backgroundColor: 'transparent',
+    backgroundColor: Colors.transparent,
   },
   buttonProgressMask: {
     position: 'absolute',
@@ -54,14 +54,11 @@ export const styles = CreateStyles({
     right: 0,
     bottom: 0,
     backgroundColor: Colors.button,
-    borderRadius: 16,
   },
   buttonProgressMaskSelected: {
     backgroundColor: Colors.primary,
-    borderRadius: 16,
   },
   buttonProgressMaskFocused: {
     backgroundColor: Colors.buttonFocused,
-    borderRadius: 16,
   },
 });

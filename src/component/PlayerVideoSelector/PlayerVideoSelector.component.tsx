@@ -30,6 +30,7 @@ export function PlayerVideoSelectorComponent({
   handleSelectEpisode,
   film,
   savedTime,
+  calculateProgressThreshold,
 }: PlayerVideoSelectorComponentProps) {
   const renderVoiceRating = () => {
     const { voiceRating = [] } = film;
@@ -124,9 +125,8 @@ export function PlayerVideoSelectorComponent({
         <View
           style={ [
             styles.buttonProgressMask,
-            styles.episode,
             selectedEpisodeId === episodeId && styles.episodeSelected,
-            { width: `${100 - progress}%` },
+            { width: `${100 - calculateProgressThreshold(progress)}%` },
           ] }
         />
       </View>

@@ -10,6 +10,7 @@ export const styles = CreateStyles({
     flexDirection: 'row',
     gap: 6,
     alignItems: 'center',
+    overflow: 'hidden',
   },
   // filled
   containerFilled: {

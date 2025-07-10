@@ -1,0 +1,2 @@
+export const PROGRESS_THRESHOLD_MIN = 3;
+export const PROGRESS_THRESHOLD_MAX = 3;
