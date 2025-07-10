@@ -187,8 +187,6 @@ export function PlayerVideoSelectorComponent({
   };
 
   const renderEpisodes = () => {
-    console.log(episodes);
-
     const rows = calculateRows<EpisodeInterface>(episodes);
 
     return (
