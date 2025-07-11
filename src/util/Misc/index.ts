@@ -39,3 +39,11 @@ export const setIntervalSafe = (callback: () => void, ms?: number): NodeJS.Timeo
 };
 
 export const wait = (ms: number): Promise<void> => new Promise((resolve) => { setTimeoutSafe(resolve, ms); });
+
+export const versionStringToNumber = (versionString: string): number => {
+  const parts = versionString.replace(/[^\d.]/g, '').split('.');
+
+  const numberString = parts.join('');
+
+  return parseInt(numberString, 10) || 0;
+};

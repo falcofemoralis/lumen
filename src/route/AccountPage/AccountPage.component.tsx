@@ -7,7 +7,7 @@ import ThemedImage from 'Component/ThemedImage';
 import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import Wrapper from 'Component/Wrapper';
-import { useServiceContext } from 'Context/ServiceContext';
+import { useNotificationsContext } from 'Context/NotificationsContext';
 import { RelativePathString, router } from 'expo-router';
 import t from 'i18n/t';
 import { Bell, Settings } from 'lucide-react-native';
@@ -24,7 +24,7 @@ export function AccountPageComponent({
   isSignedIn,
   profile,
 }: AccountPageComponentProps) {
-  const { badgeData } = useServiceContext();
+  const { badgeData } = useNotificationsContext();
 
   const openRoute = (route: string) => {
     router.push({

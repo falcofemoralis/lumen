@@ -9,6 +9,7 @@ export interface SeasonInterface {
   name: string;
   seasonId: string;
   episodes: EpisodeInterface[];
+  isOnlyEpisodes?: boolean;
 }
 
 export interface FilmVoiceInterface {

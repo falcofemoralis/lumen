@@ -2,7 +2,7 @@ import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
-import { useServiceContext } from 'Context/ServiceContext';
+import { useNotificationsContext } from 'Context/NotificationsContext';
 import { Tabs } from 'expo-router';
 import React, { useCallback } from 'react';
 import {
@@ -32,7 +32,7 @@ export function NavigationBarComponent({
   navigateTo,
   isFocused,
 }: NavigationBarComponentProps) {
-  const { badgeData } = useServiceContext();
+  const { badgeData } = useNotificationsContext();
   const { width } = useWindowDimensions();
 
   const renderDefaultTab = useCallback((tab: Tab, focused: boolean) => {

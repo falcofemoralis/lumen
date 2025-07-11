@@ -24,6 +24,7 @@ import {
   getStaticUrl,
   parseActorCard,
   parseFilmCard, parseFilmsListRoot, parseFilmType, parseSeasons, parseStreams,
+  parseSubtitles,
 } from './utils';
 
 const filmApi: FilmApiInterface = {
@@ -227,10 +228,15 @@ const filmApi: FilmApiInterface = {
             stringedDoc.indexOf('});', index) + 1
           );
           const jsonObject = JSON.parse(subString);
-          const streams = parseStreams(jsonObject.streams);
 
           const video: FilmVideoInterface = {
-            streams,
+            streams: parseStreams(jsonObject.streams),
+            storyboardUrl: configApi.getProvider() + jsonObject.thumbnails,
+            subtitles: parseSubtitles(
+              jsonObject.subtitle,
+              jsonObject.subtitle_def,
+              jsonObject.subtitle_lns
+            ),
           };
 
           film.voices.push({

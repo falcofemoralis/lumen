@@ -1,5 +1,9 @@
+import { REZKA_PROXY_PROVIDER } from 'Api/RezkaApi/configApi';
 import webvtt from 'node-webvtt';
+import { Platform } from 'react-native';
 import { customFetch } from 'Util/Fetch';
+import { setProxyHeaders } from 'Util/Request';
+import { updateUrlHost } from 'Util/Url';
 
 export interface VTTItem {
   start: number
@@ -19,11 +23,19 @@ export interface ParsedVTTResult {
   valid: boolean
 }
 
-export const subtitleParser = async (subitleUrl: string): Promise<VTTItem[]> => {
-  const res = await customFetch(subitleUrl);
-  const subtitleData = await res.text();
+export const vttLoader = async (url: string) => {
+  const isWeb = Platform.OS === 'web';
+  const input = isWeb ? updateUrlHost(url, REZKA_PROXY_PROVIDER) : url;
+  const headers = isWeb ? setProxyHeaders({}, (new URL(url).origin)) : undefined;
 
-  const subtitleType = subitleUrl.split('.')[subitleUrl.split('.').length - 1];
+  const res = await customFetch(input, headers ? { headers } : undefined);
+
+  return res.text();
+};
+
+export const subtitleParser = async (subtitleUrl: string): Promise<VTTItem[]> => {
+  const subtitleData = await vttLoader(subtitleUrl);
+  const subtitleType = subtitleUrl.split('.')[subtitleUrl.split('.').length - 1];
 
   const result: VTTItem[] = [];
 
@@ -45,9 +57,7 @@ export const subtitleParser = async (subitleUrl: string): Promise<VTTItem[]> => 
 };
 
 export const storyboardParser = async (storyboardUrl: string): Promise<VTTItem[]> => {
-  const res = await customFetch(storyboardUrl);
-  const storyboardData = await res.text();
-
+  const storyboardData = await vttLoader(storyboardUrl);
   const result: VTTItem[] = [];
   const parsedStoryboard = webvtt.parse(storyboardData) as ParsedVTTResult;
 

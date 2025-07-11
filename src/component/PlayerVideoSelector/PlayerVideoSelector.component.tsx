@@ -5,11 +5,12 @@ import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import t from 'i18n/t';
-import React from 'react';
+import React, { memo } from 'react';
 import {
   ScrollView,
   View,
 } from 'react-native';
+import { getVideoProgress } from 'Util/Player';
 
 import { styles } from './PlayerVideoSelector.style';
 import { PlayerVideoSelectorComponentProps } from './PlayerVideoSelector.type';
@@ -28,6 +29,8 @@ export function PlayerVideoSelectorComponent({
   episodes,
   handleSelectEpisode,
   film,
+  savedTime,
+  calculateProgressThreshold,
 }: PlayerVideoSelectorComponentProps) {
   const renderVoiceRating = () => {
     const { voiceRating = [] } = film;
@@ -70,33 +73,73 @@ export function PlayerVideoSelectorComponent({
     );
   };
 
-  const renderSeasons = () => (
-    <View style={ styles.seasonsContainer }>
-      { seasons.map((season) => (
-        <ThemedPressable
-          key={ season.seasonId }
-          style={ [
-            styles.season,
-            selectedSeasonId === season.seasonId && styles.seasonSelected,
-          ] }
-          contentStyle={ styles.seasonContent }
-          onPress={ () => setSelectedSeasonId(season.seasonId) }
-        >
-          <ThemedText
+  const renderSeasons = () => {
+    if (seasons.length === 1 && seasons[0].isOnlyEpisodes) {
+      return null;
+    }
+
+    return (
+      <View style={ styles.seasonsContainer }>
+        { seasons.map((season) => (
+          <ThemedPressable
+            key={ season.seasonId }
             style={ [
-              styles.seasonText,
-              selectedSeasonId === season.seasonId && styles.seasonTextSelected,
+              styles.season,
+              selectedSeasonId === season.seasonId && styles.seasonSelected,
             ] }
+            contentStyle={ styles.seasonContent }
+            onPress={ () => setSelectedSeasonId(season.seasonId) }
           >
-            { season.name }
-          </ThemedText>
-        </ThemedPressable>
-      )) }
-    </View>
-  );
+            <ThemedText
+              style={ [
+                styles.seasonText,
+                selectedSeasonId === season.seasonId && styles.seasonTextSelected,
+              ] }
+            >
+              { season.name }
+            </ThemedText>
+          </ThemedPressable>
+        )) }
+      </View>
+    );
+  };
+
+  const renderEpisodeTimeline = (episodeId: string) => {
+    if (!savedTime) {
+      return null;
+    }
+
+    const progress = getVideoProgress({
+      ...selectedVoice,
+      lastSeasonId: selectedSeasonId,
+      lastEpisodeId: episodeId,
+    }, savedTime);
+
+    if (!progress) {
+      return null;
+    }
+
+    return (
+      <View style={ styles.buttonProgressContainer }>
+        <View style={ styles.buttonProgressOutline } />
+        <View
+          style={ [
+            styles.buttonProgressMask,
+            selectedEpisodeId === episodeId && styles.episodeSelected,
+            { width: `${100 - calculateProgressThreshold(progress)}%` },
+          ] }
+        />
+      </View>
+    );
+  };
 
   const renderEpisodes = () => (
-    <View style={ styles.episodesContainer }>
+    <View
+      style={ [
+        styles.episodesContainer,
+        seasons.length === 1 && seasons[0].isOnlyEpisodes && styles.episodesContainerNoBorder,
+      ] }
+    >
       { episodes.map(({ episodeId, name }) => (
         <ThemedPressable
           key={ episodeId }
@@ -106,11 +149,13 @@ export function PlayerVideoSelectorComponent({
           ] }
           onPress={ () => handleSelectEpisode(episodeId) }
           contentStyle={ styles.episodeContent }
+          additionalElement={ renderEpisodeTimeline(episodeId) }
         >
-          <ThemedText style={ [
-            styles.episodeText,
-            selectedEpisodeId === episodeId && styles.episodeTextSelected,
-          ] }
+          <ThemedText
+            style={ [
+              styles.episodeText,
+              selectedEpisodeId === episodeId && styles.episodeTextSelected,
+            ] }
           >
             { name }
           </ThemedText>
@@ -165,4 +210,15 @@ export function PlayerVideoSelectorComponent({
   );
 }
 
-export default PlayerVideoSelectorComponent;
+function propsAreEqual(
+  prevProps: PlayerVideoSelectorComponentProps,
+  props: PlayerVideoSelectorComponentProps
+) {
+  return prevProps.isLoading === props.isLoading
+    && prevProps.selectedVoice.id === props.selectedVoice.id
+    && prevProps.selectedSeasonId === props.selectedSeasonId
+    && prevProps.selectedEpisodeId === props.selectedEpisodeId
+    && prevProps.savedTime === props.savedTime;
+}
+
+export default memo(PlayerVideoSelectorComponent, propsAreEqual);

@@ -115,7 +115,8 @@ export const parseSeasons = (root: HTMLElementInterface): {
     lastEpisodeId: undefined,
   };
 
-  root.querySelectorAll('.b-simple_season__item').forEach((el) => {
+  const seasonItems = root.querySelectorAll('.b-simple_season__item') ?? [];
+  seasonItems.forEach((el) => {
     const seasonId = el.attributes['data-tab_id'];
     const episodes: EpisodeInterface[] = [];
 
@@ -141,6 +142,33 @@ export const parseSeasons = (root: HTMLElementInterface): {
 
     seasons.push(season);
   });
+
+  // some films have no seasons, but episodes are still available
+  if (!seasonItems.length) {
+    const episodes: EpisodeInterface[] = [];
+
+    const episodeItems = root.querySelectorAll('.b-simple_episode__item');
+    if (episodeItems.length > 0) {
+      episodeItems.forEach((el) => {
+        if (el.classList.contains('active')) {
+          lastWatch.lastSeasonId = el.attributes['data-season_id'];
+          lastWatch.lastEpisodeId = el.attributes['data-episode_id'];
+        }
+
+        episodes.push({
+          name: el.rawText,
+          episodeId: el.attributes['data-episode_id'],
+        });
+      });
+
+      seasons.push({
+        name: '',
+        seasonId: '1',
+        episodes,
+        isOnlyEpisodes: true,
+      });
+    }
+  }
 
   return {
     seasons,

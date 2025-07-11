@@ -62,7 +62,6 @@ export const FilmPagerComponent = ({
     const length = pagerItems.length;
     setRenderedTabs(Array(length).fill(false));
     loadedTabsRef.current = Array(length).fill(false);
-    tabWidthsRef.current = Array(length).fill(0);
   }, [pagerItems.length]);
 
   const updateActiveTab = useCallback((index: number) => {

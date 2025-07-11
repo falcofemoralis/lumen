@@ -1,3 +1,5 @@
+import { createApi } from 'Util/Api';
+
 import { ApiInterface } from '..';
 import accountApi from './accountApi';
 import authApi from './authApi';
@@ -8,7 +10,7 @@ import menuApi from './menuApi';
 import playerApi from './playerApi';
 import searchApi from './searchApi';
 
-const RezkaApi: ApiInterface = Object.assign(
+const RezkaApi: ApiInterface = createApi([
   configApi,
   filmApi,
   menuApi,
@@ -16,7 +18,7 @@ const RezkaApi: ApiInterface = Object.assign(
   authApi,
   accountApi,
   searchApi,
-  commentsApi
-);
+  commentsApi,
+]);
 
 export default RezkaApi;
