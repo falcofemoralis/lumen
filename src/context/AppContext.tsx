@@ -6,6 +6,7 @@ import {
 
 import { AppUpdaterProvider } from './AppUpdaterContext';
 import { NavigationProvider } from './NavigationContext';
+import { NotificationsProvider } from './NotificationsContext';
 import { OverlayProvider } from './OverlayContext';
 import { PlayerProvider } from './PlayerContext';
 import { PlayerProgressProvider } from './PlayerProgressContext';
@@ -25,13 +26,15 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       <OverlayProvider>
         <NavigationProvider>
           <ServiceProvider>
-            <PlayerProvider>
-              <PlayerProgressProvider>
-                <AppUpdaterProvider>
-                  { children }
-                </AppUpdaterProvider>
-              </PlayerProgressProvider>
-            </PlayerProvider>
+            <NotificationsProvider>
+              <PlayerProvider>
+                <PlayerProgressProvider>
+                  <AppUpdaterProvider>
+                    { children }
+                  </AppUpdaterProvider>
+                </PlayerProgressProvider>
+              </PlayerProvider>
+            </NotificationsProvider>
           </ServiceProvider>
         </NavigationProvider>
       </OverlayProvider>
