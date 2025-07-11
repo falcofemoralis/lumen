@@ -42,6 +42,9 @@ export const styles = CreateStyles({
     borderTopWidth: 2,
     borderTopColor: Colors.divider,
   },
+  episodesContainerNoBorder: {
+    borderTopWidth: 0,
+  },
   episode: {
     backgroundColor: Colors.chip,
     borderRadius: 16,
@@ -65,5 +68,30 @@ export const styles = CreateStyles({
   },
   voiceDropdownInput: {
     flex: 1,
+  },
+  buttonProgressContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  buttonProgressOutline: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: 18,
+    borderWidth: 2,
+    borderColor: '#0283d1',
+    backgroundColor: Colors.transparent,
+  },
+  buttonProgressMask: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: Colors.chip,
   },
 });

@@ -1,4 +1,8 @@
 export const updateUrlHost = (url: string, newHost: string): string => {
+  if (!url.includes('http')) {
+    return url;
+  }
+
   const urlObj = new URL(url);
   const hostObj = new URL(newHost);
 

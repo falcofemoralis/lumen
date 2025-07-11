@@ -73,13 +73,13 @@
 	    "edgeToEdgeEnabled": true,
       "icon": "./assets/images/icon.png",
       "package": "com.falcofemoralis.lumen",
-      "versionCode": 7,
+      "versionCode": 8,
       "googleServicesFile": "./google-services.json"
     },
     "newArchEnabled": true,
     "name": "Lumen App",
     "slug": "lumen",
-    "version": "1.2.1",
+    "version": "1.3.0",
     "extra": {
       "eas": {
         "projectId": "ad7c3459-7949-4f54-9d83-5e8a400a0af4"

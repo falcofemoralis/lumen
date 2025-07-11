@@ -1,3 +1,4 @@
+import Loader from 'Component/Loader';
 import ThemedGrid from 'Component/ThemedGrid';
 import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
 import ThemedImage from 'Component/ThemedImage';
@@ -11,7 +12,6 @@ import { CommentInterface } from 'Type/Comment.interface';
 import { scale } from 'Util/CreateStyles';
 
 import { INDENT_SIZE, styles } from './Comments.style';
-import { CommentsThumbnail } from './Comments.thumbnail';
 import { CommentItemProps, CommentsComponentProps } from './Comments.type';
 import { CommentText } from './CommentText';
 
@@ -99,7 +99,7 @@ export const CommentsComponent = ({
   if (!comments || (isLoading && !comments.length)) {
     return (
       <View style={ styles.loader }>
-        <CommentsThumbnail />
+        <Loader isLoading fullScreen />
       </View>
     );
   }

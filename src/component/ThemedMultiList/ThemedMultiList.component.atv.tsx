@@ -4,9 +4,12 @@ import {
   Text,
   View,
 } from 'react-native';
-import { DefaultFocus, SpatialNavigationFocusableView, SpatialNavigationScrollView } from 'react-tv-space-navigation';
+import {
+  DefaultFocus,
+  SpatialNavigationFocusableView,
+  SpatialNavigationVirtualizedList,
+} from 'react-tv-space-navigation';
 import { Colors } from 'Style/Colors';
-import { scale } from 'Util/CreateStyles';
 
 import { styles } from './ThemedMultiList.style.atv';
 import { ListItem, ThemedMultiListComponentProps } from './ThemedMultiList.type';
@@ -30,9 +33,9 @@ export const ThemedMultiListComponent = ({
     );
   };
 
-  const renderItem = (item: ListItem, idx: number) => (
+  const renderItem = ({ item }: { item: ListItem }) => (
     <SpatialNavigationFocusableView
-      key={ `${item.value}-${idx}1` }
+      key={ `${item.value}-multilist-item` }
       onSelect={ () => { handleOnChange(item.value, !item.isChecked); } }
     >
       { ({ isFocused }) => (
@@ -65,14 +68,20 @@ export const ThemedMultiListComponent = ({
   );
 
   const renderContent = () => (
-    <SpatialNavigationScrollView
-      offsetFromStart={ scale(64) }
-      style={ styles.scrollView }
+    <View
+      style={ styles.scrollViewContainer }
     >
       <DefaultFocus>
-        { values.map((item, index) => renderItem(item, index)) }
+        <SpatialNavigationVirtualizedList
+          style={ styles.scrollView }
+          data={ values }
+          renderItem={ renderItem }
+          itemSize={ styles.item.height }
+          orientation="vertical"
+          scrollBehavior='stick-to-center'
+        />
       </DefaultFocus>
-    </SpatialNavigationScrollView>
+    </View>
   );
 
   return (

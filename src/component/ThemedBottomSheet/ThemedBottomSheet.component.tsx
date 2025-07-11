@@ -9,15 +9,19 @@ import { ThemedBottomSheetComponentProps } from './ThemedBottomSheet.type';
 export const ThemedBottomSheetComponent = ({
   ref,
   children,
+  sizes = ['40%', 'large'],
+  backgroundColor = Colors.backgroundLight,
+  onMount,
 }: ThemedBottomSheetComponentProps) => {
   return (
     <View>
       <Portal>
         <TrueSheet
           ref={ ref }
-          sizes={ ['40%', 'large'] }
+          sizes={ sizes }
           cornerRadius={ 24 }
-          backgroundColor={ Colors.backgroundLight }
+          backgroundColor={ backgroundColor }
+          onMount={ onMount }
         >
           { children }
         </TrueSheet>

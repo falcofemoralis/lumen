@@ -1,3 +1,4 @@
+import { useNotificationsContext } from 'Context/NotificationsContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { withTV } from 'Hooks/withTV';
 import { useCallback, useEffect, useState } from 'react';
@@ -10,14 +11,13 @@ import NotificationsPageComponent from './NotificationsPage.component';
 import NotificationsPageComponentTV from './NotificationsPage.component.atv';
 
 export function NotificationsPageContainer() {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState<NotificationInterface[]>([]);
-  const { isSignedIn, notifications, getCurrentService, resetNotifications } = useServiceContext();
+  const { isSignedIn, getCurrentService } = useServiceContext();
+  const { resetNotifications, getNotifications } = useNotificationsContext();
 
   const loadFilms = async (items: NotificationInterface[]) => {
     try {
-      setIsLoading(true);
-
       setData(
         await getCurrentService().getFilmsFromNotifications(items)
       );
@@ -28,17 +28,28 @@ export function NotificationsPageContainer() {
     }
   };
 
-  useEffect(() => {
-    if (isSignedIn) {
-      resetNotifications();
+  const prepareNotifications = async () => {
+    if (isSignedIn && !data.length) {
+
+      const notifications = await getNotifications();
+
+      if (notifications) {
+        resetNotifications();
+
+        loadFilms(notifications);
+
+        return;
+      }
     }
-  }, []);
+
+    setIsLoading(false);
+  };
 
   useEffect(() => {
-    if (isSignedIn && !data.length && notifications && !isLoading) {
-      loadFilms(notifications);
+    if (isSignedIn) {
+      prepareNotifications();
     }
-  }, [isSignedIn, notifications]);
+  }, [isSignedIn]);
 
   const handleSelectFilm = useCallback((film: FilmCardInterface) => {
     openFilm(film);

@@ -1,7 +1,6 @@
 import Page from 'Component/Page';
 import Player from 'Component/Player';
 import { useNavigationContext } from 'Context/NavigationContext';
-import { PlayerProvider } from 'Context/PlayerContext';
 import { useEffect } from 'react';
 import ConfigStore from 'Store/Config.store';
 import { getPlayerStream } from 'Util/Player';
@@ -25,14 +24,12 @@ export function PlayerPageComponent({ video, film, voice }: PlayerPageComponentP
 
   return (
     <Page testID="player-page" disableWrapper>
-      <PlayerProvider>
-        <Player
-          video={ video }
-          film={ film }
-          voice={ voice }
-          stream={ getPlayerStream(video) }
-        />
-      </PlayerProvider>
+      <Player
+        video={ video }
+        film={ film }
+        voice={ voice }
+        stream={ getPlayerStream(video) }
+      />
     </Page>
   );
 }

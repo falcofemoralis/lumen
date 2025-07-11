@@ -13,13 +13,13 @@ import { ScheduleModalProps } from './ScheduleModal.type';
 
 export const ScheduleModalComponent = ({ film, handleUpdateScheduleWatch }: ScheduleModalProps) => {
   const { schedule = [] } = film;
-  const [isLoading, setIsLoading] = useState(true);
+  const [rendered, setRendered] = useState(false);
 
   useEffect(() => {
-    // prevents lagging when rendering large schedule
+    // prevents lagging when rendering
     setTimeout(() => {
-      setIsLoading(false);
-    }, 25);
+      setRendered(true);
+    }, 50);
   }, []);
 
   const renderItem = useCallback((item: ScheduleItemInterface, idx: number) => (
@@ -37,7 +37,7 @@ export const ScheduleModalComponent = ({ film, handleUpdateScheduleWatch }: Sche
     items,
   }));
 
-  if (isLoading) {
+  if (!rendered) {
     return <Loader isLoading fullScreen />;
   }
 

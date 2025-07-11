@@ -70,7 +70,7 @@ export function FilmPageContainer({ link, thumbnailPoster }: FilmPageContainerPr
     const { voices, hasVoices, hasSeasons } = film;
 
     if (voices.length <= 0) {
-      NotificationStore.displayMessage('No video available');
+      NotificationStore.displayMessage(t('No video available'));
 
       return;
     }
@@ -85,7 +85,7 @@ export function FilmPageContainer({ link, thumbnailPoster }: FilmPageContainerPr
     const { video } = voice;
 
     if (!video) {
-      NotificationStore.displayMessage('No video streams available');
+      NotificationStore.displayMessage(t('No video streams available'));
 
       return;
     }

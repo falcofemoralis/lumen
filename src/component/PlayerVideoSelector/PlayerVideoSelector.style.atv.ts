@@ -13,6 +13,9 @@ export const styles = CreateStyles({
     borderTopColor: Colors.border,
     paddingTop: 8,
   },
+  episodesContainerNoBorder: {
+    borderTopWidth: 0,
+  },
   button: {
     marginEnd: 10,
     marginBottom: 10,
@@ -27,10 +30,35 @@ export const styles = CreateStyles({
   voicesContainer: {
     flex: 1,
   },
-  voicesListContainer: {
-    width: '100%',
-    maxHeight: 288,
-    flexDirection: 'column',
-    gap: 4,
+  buttonProgressContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  buttonProgressOutline: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: 18,
+    borderWidth: 2,
+    borderColor: '#0283d1',
+    backgroundColor: Colors.transparent,
+  },
+  buttonProgressMask: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: Colors.button,
+  },
+  buttonProgressMaskSelected: {
+    backgroundColor: Colors.primary,
+  },
+  buttonProgressMaskFocused: {
+    backgroundColor: Colors.buttonFocused,
   },
 });

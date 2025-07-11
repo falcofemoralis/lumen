@@ -71,8 +71,22 @@ export interface DoubleTapAction {
   direction: RewindDirection;
 }
 
+export interface SavedTimestamp {
+  time: number;
+  progress: number;
+  deviceId?: string;
+}
+
+export interface SavedTimeVoice {
+  timestamps: Record<string, SavedTimestamp | null>; // seasonId+episodeId - time
+}
+
+export interface SavedTime {
+  filmId: string;
+  voices: Record<string, SavedTimeVoice | null>; // voiceId - data
+}
+
 export interface FirestoreDocument {
-  deviceId: string;
-  timestamp: number;
+  savedTime: string;
   updatedAt: string;
 }

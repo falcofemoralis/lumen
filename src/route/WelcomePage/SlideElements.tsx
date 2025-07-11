@@ -590,7 +590,7 @@ export const LoginSlide = ({
     try {
       await login(username, password);
     } catch (e) {
-      NotificationStore.displayError(t('Invalid credentials'));
+      NotificationStore.displayError(e as Error);
 
       console.error(e);
     } finally {
