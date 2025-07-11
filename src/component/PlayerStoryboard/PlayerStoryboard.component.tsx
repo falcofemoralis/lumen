@@ -83,6 +83,8 @@ const PlayerStoryboardComponent = ({
   const [img, setImg] = useState<string>('');
 
   useEffect(() => {
+    updateImg('');
+
     storyboardParser(storyboardUrl).then((parsedStoryboard) => {
       setStoryboard(parsedStoryboard);
     });
