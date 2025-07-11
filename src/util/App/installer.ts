@@ -45,7 +45,7 @@ export class Installer {
 
       await wait(1000); // Wait a bit to ensure the download is complete before installing
 
-      return this.installApk(apkPath);;
+      return this.installApk(apkPath);
     } catch (error) {
       console.error('APK installation failed:', error);
       const errorMessage = (error as Error).message;
