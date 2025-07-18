@@ -1,3 +1,4 @@
+import { exitApp } from '@logicwind/react-native-exit-app';
 import { router } from 'expo-router';
 import { withTV } from 'Hooks/withTV';
 import t from 'i18n/t';
@@ -31,7 +32,7 @@ export function PageContainer(props: PageContainerProps) {
 
       if (ConfigStore.isTV()) {
         if (backPressedOnceRef.current) {
-          BackHandler.exitApp();
+          exitApp();
 
           return true;
         }

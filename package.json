@@ -20,6 +20,7 @@
     "@expo/metro-runtime": "5.0.4",
     "@legendapp/list": "^1.0.17",
     "@lodev09/react-native-true-sheet": "^2.0.5",
+    "@logicwind/react-native-exit-app": "^0.1.0",
     "@react-native-firebase/analytics": "^22.2.1",
     "@react-native-firebase/app": "^22.2.1",
     "@react-native-firebase/firestore": "^22.2.1",

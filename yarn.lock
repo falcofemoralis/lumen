@@ -1793,6 +1793,11 @@
   resolved "https://registry.yarnpkg.com/@lodev09/react-native-true-sheet/-/react-native-true-sheet-2.0.5.tgz#4741ae23a14838aa4f7c85b576782a072e31c40c"
   integrity sha512-io836GkxMDL48/oHiSvo0/WeiaOrCBwGTsCxVaydF6aHcbewDD/gFcLvJKLIZ7raQqiymZLiSKGWLwNAPKlIrw==
 
+"@logicwind/react-native-exit-app@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@logicwind/react-native-exit-app/-/react-native-exit-app-0.1.0.tgz#f218f98ee30ffa1dd4ef26812af002bdf9a2059e"
+  integrity sha512-Dt1Nz/MYEOb1qqSx5mw+XjyeOlb8xMNR26UqQXM5NkuPU4WVX2thqDv21y/7bHTLway6xlgt2kpNaP25H2Z7Aw==
+
 "@napi-rs/wasm-runtime@^0.2.11":
   version "0.2.11"
   resolved "https://registry.yarnpkg.com/@napi-rs/wasm-runtime/-/wasm-runtime-0.2.11.tgz#192c1610e1625048089ab4e35bc0649ce478500e"
