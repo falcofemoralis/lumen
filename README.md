@@ -20,6 +20,7 @@ See [issues](https://github.com/falcofemoralis/lumen/issues)
 ## Bugs
 
 Found a bug? Post it here! [Баги приложения](https://github.com/falcofemoralis/lumen/issues/8)
+
 Want to improve the app? Write it here [Пожелания](https://github.com/falcofemoralis/lumen/issues/73)
 
 ## Sponsor & Support
