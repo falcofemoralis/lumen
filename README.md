@@ -19,7 +19,8 @@ See [issues](https://github.com/falcofemoralis/lumen/issues)
 
 ## Bugs
 
-Found a bug? Post it here! [Known bugs](https://github.com/falcofemoralis/lumen/issues/8)
+Found a bug? Post it here! [Баги приложения](https://github.com/falcofemoralis/lumen/issues/8)
+Want to improve the app? Write it here [Пожелания](https://github.com/falcofemoralis/lumen/issues/73)
 
 ## Sponsor & Support
 
@@ -29,7 +30,6 @@ To keep this app maintained and up-to-date please consider sponsoring it on GitH
 
 |Mobile|TV|
 |:-------------------------:|:-------------------------:|
-|<img src="https://github.com/user-attachments/assets/52933316-b824-4d62-bdec-0bb93059a461" width="50%" />|<img src="https://github.com/user-attachments/assets/333eb6c0-29be-41b3-b1a5-df657654e05b" width="100%" />
 |<img src="https://github.com/user-attachments/assets/e99f5a93-3fe3-4d51-9b15-49f0c625cecd" width="50%" />|<img src="https://github.com/user-attachments/assets/e9117a97-721c-422b-82b1-093f259293fa" width="100%" />
 |<img src="https://github.com/user-attachments/assets/f737a836-be53-4d36-aaf4-26c6edef673e" width="50%" />|<img src="https://github.com/user-attachments/assets/9cb63dfc-7044-4cd2-88c3-e79f48f12284" width="100%" />
 |<img src="https://github.com/user-attachments/assets/46e80ec8-9236-43d8-a14e-931a5bc94238" width="50%" />|<img src="https://github.com/user-attachments/assets/b1f0592a-1627-4439-8cc3-def3cada7899" width="100%" />
