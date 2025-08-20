@@ -72,7 +72,7 @@
     "android": {
 	    "edgeToEdgeEnabled": true,
       "icon": "./assets/images/icon.png",
-      "package": "com.falcofemoralis.lumen",
+      "package": "com.falcofemoralis.lumendev",
       "versionCode": 8,
       "googleServicesFile": "./google-services.json"
     },
