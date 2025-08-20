@@ -21,14 +21,12 @@ const configApi: ConfigApiInterface = {
     'https://rezka-ua.org',
   ],
   defaultCDNs: [
+    'https://prx-cogent.ukrtelcdn.net',
     'https://prx2-cogent.ukrtelcdn.net',
-    'https://prx-ams.ukrtelcdn.net',
-    'https://prx2-ams.ukrtelcdn.net',
-    'http://ukrtelcdn.net',
-    'https://stream.voidboost.cc',
-    'https://stream.voidboost.top',
-    'https://stream.voidboost.link',
-    'https://stream.voidboost.club',
+    'https://prx3-cogent.ukrtelcdn.net',
+    'https://prx4-cogent.ukrtelcdn.net',
+    'https://prx5-cogent.ukrtelcdn.net',
+    'https://prx6-cogent.ukrtelcdn.net',
   ],
   config: null,
 
@@ -38,7 +36,7 @@ const configApi: ConfigApiInterface = {
         provider: this.defaultProviders[0],
         cdn: 'auto',
         auth: '',
-        userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0',
+        userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0',
       };
 
       const config = getConfigJson<ServiceConfigInterface>(REZKA_CONFIG);

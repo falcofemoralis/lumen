@@ -1,5 +1,6 @@
 import {
   createContext,
+  JSX,
   use,
   useMemo,
 } from 'react';
@@ -18,26 +19,34 @@ interface AppContextInterface {
 const AppContext = createContext<AppContextInterface>({
 });
 
+type Props = { children: React.ReactNode };
+type Provider = (p: Props) => JSX.Element;
+
+export const composeProviders = (...p: Provider[]) =>
+  p.reduceRight(
+    (Acc, P) => ({ children }: Props) =>
+      <P><Acc>{ children }</Acc></P>,
+    ({ children }: Props) => <>{ children }</>
+  );
+
+export const AppProviders = composeProviders(
+  OverlayProvider,
+  NavigationProvider,
+  ServiceProvider,
+  NotificationsProvider,
+  PlayerProvider,
+  PlayerProgressProvider,
+  AppUpdaterProvider
+);
+
 export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const value = useMemo(() => ({}), []);
 
   return (
     <AppContext.Provider value={ value }>
-      <OverlayProvider>
-        <NavigationProvider>
-          <ServiceProvider>
-            <NotificationsProvider>
-              <PlayerProvider>
-                <PlayerProgressProvider>
-                  <AppUpdaterProvider>
-                    { children }
-                  </AppUpdaterProvider>
-                </PlayerProgressProvider>
-              </PlayerProvider>
-            </NotificationsProvider>
-          </ServiceProvider>
-        </NavigationProvider>
-      </OverlayProvider>
+      <AppProviders>
+        { children }
+      </AppProviders>
     </AppContext.Provider>
   );
 };
