@@ -1,0 +1,22 @@
+ThemedAccordion
+ThemedBottomSheet
+ThemedButton - Button
+    //ThemedCard <-- can be deleted
+ThemedDropdown <-- would be better to split it to ThemedList - button that opens list
+##ThemedList <-- simple list of items
+##ThemedGrid <-- adjust for TV?
+ThemedImage
+    //ThemedImageModal <-- would be good to merge it with ThemedImage
+ThemedInput - TextInput
+ThemedMultiList - Switch (checkbox)
+ThemedOverlay
+ThemedPortal
+    //ThemedPressable same as ThemedButton?
+ThemedText
+##ThemedToggle - Switch (toggle)
+##ThemedSlider - Slider
+##ThemedProgress - LinearProgress
+ThemedLoader - CircularProgress
+
+
+Is it possible to use LegendList for TV?
