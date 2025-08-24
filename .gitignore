@@ -3,6 +3,8 @@ node_modules/
 dist/
 ios/
 android/
+!modules/react-native-jsoup/android/
+modules/react-native-jsoup/android/build
 npm-debug.*
 *.jks
 *.p8

@@ -1,4 +1,6 @@
 import { ApiParams, FilmApiInterface } from 'Api/index';
+import { ReactNativeJsoup } from 'Modules/react-native-jsoup';
+import NotificationStore from 'Store/Notification.store';
 import { ActorInterface, ActorRole } from 'Type/Actor.interface';
 import { BookmarkInterface } from 'Type/Bookmark.interface';
 import { FilmInterface } from 'Type/Film.interface';
@@ -397,33 +399,108 @@ const filmApi: FilmApiInterface = {
   async getHomeMenuFilms(menuItem: MenuItemInterface, page: number, params?: ApiParams) {
     const { path, key, variables } = menuItem;
 
-    if (key === '.b-newest_slider__wrapper') {
-      const films: FilmCardInterface[] = [];
+    const films: FilmCardInterface[] = [];
 
-      const res = await configApi.postRequest(path, variables);
-      const root = configApi.parseContent(`<div>${res}</div>`);
-      const filmElements = root.querySelectorAll('.b-content__inline_item');
+    // const t3 = performance.now();
+    // const root = await configApi.fetchPage('https://rezka-ua.org/new/');
+    // const filmElements = root.querySelectorAll('.b-content__inline_item');
 
-      filmElements.forEach((el) => {
-        const film = parseFilmCard(el);
+    // filmElements.forEach((el) => {
+    //   const id = el.attributes['data-id'];
+    //   const link = el.querySelector('.b-content__inline_item-link a')?.attributes.href ?? '';
+    //   const type = parseFilmType(el.querySelector('.cat')?.attributes.class);
+    //   const poster = el.querySelector('.b-content__inline_item-cover img')?.attributes.src ?? '';
+    //   const title = el.querySelector('.b-content__inline_item-link a')?.rawText ?? '';
+    //   const subtitle = el.querySelector('.b-content__inline_item-link div')?.rawText ?? '';
+    //   const info = (el.querySelector('.b-content__inline_item-cover .info')?.rawText ?? '').replaceAll(
+    //     '<br/>',
+    //     ', '
+    //   );
+    //   const isPendingRelease = el.querySelector('.b-content__inline_item-cover')?.attributes.class?.includes('wait');
 
-        if (film) {
-          films.push(film);
-        }
+    //   films.push({
+    //     id,
+    //     link,
+    //     type,
+    //     poster,
+    //     title,
+    //     subtitle,
+    //     info,
+    //     isPendingRelease,
+    //   });
+    // });
+
+    // const t4 = performance.now();
+    // console.log(`Node time taken: ${t4 - t3} milliseconds`);
+    // NotificationStore.displayMessage(`Node time taken: ${t4 - t3} milliseconds`);
+
+    const t1 = performance.now();
+    const jsoup = new ReactNativeJsoup();
+    const connection = await jsoup.connect('https://rezka-ua.org/new/', '');
+
+    const elements = connection.select('.b-content__inline_item');
+    for (const element of elements) {
+      const id = element.attr('data-id');
+      const link = element.select('.b-content__inline_item-link a')?.attr('href') ?? '';
+      const type = parseFilmType(element.select('.cat')?.attr('class') ?? '');
+      const poster = element.select('.b-content__inline_item-cover img')?.attr('src') ?? '';
+      const title = element.select('.b-content__inline_item-link a')?.text() ?? '';
+      const subtitle = element.select('.b-content__inline_item-link div')?.text() ?? '';
+      const info = element.select('.b-content__inline_item-cover .info')?.text().replaceAll(
+        '<br/>',
+        ', '
+      );
+      const isPendingRelease = element
+        .select('.b-content__inline_item-cover')?.attr('class')?.includes('wait') ?? false;
+
+      films.push({
+        id,
+        link,
+        type,
+        poster,
+        title,
+        subtitle,
+        info,
+        isPendingRelease,
       });
-
-      return {
-        films,
-        totalPages: 1,
-      };
     }
 
-    const filmsList = await this.getFilms(page, path, variables, {
-      ...params,
-      key,
-    });
+    const t2 = performance.now();
+    console.log(`Native time taken: ${t2 - t1} milliseconds`);
+    NotificationStore.displayMessage(`Native time taken: ${t2 - t1} milliseconds`);
 
-    return filmsList;
+    return {
+      films,
+      totalPages: 1,
+    };
+
+    // if (key === '.b-newest_slider__wrapper') {
+    //   const films: FilmCardInterface[] = [];
+
+    //   const res = await configApi.postRequest(path, variables);
+    //   const root = configApi.parseContent(`<div>${res}</div>`);
+    //   const filmElements = root.querySelectorAll('.b-content__inline_item');
+
+    //   filmElements.forEach((el) => {
+    //     const film = parseFilmCard(el);
+
+    //     if (film) {
+    //       films.push(film);
+    //     }
+    //   });
+
+    //   return {
+    //     films,
+    //     totalPages: 1,
+    //   };
+    // }
+
+    // const filmsList = await this.getFilms(page, path, variables, {
+    //   ...params,
+    //   key,
+    // });
+
+    // return filmsList;
   },
 
   /**

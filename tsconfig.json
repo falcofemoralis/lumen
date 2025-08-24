@@ -14,7 +14,8 @@
       "Store/*": ["./src/store/*"],
       "Type/*": ["./src/type/*"],
       "Util/*": ["./src/util/*"],
-      "react-tv-space-navigation": ["./src/libs/react-tv-space-navigation"]
+      "react-tv-space-navigation": ["./src/libs/react-tv-space-navigation"],
+      "Modules/*": ["./modules/*"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"]
