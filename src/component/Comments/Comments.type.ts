@@ -26,9 +26,11 @@ export interface CommentItemProps {
 export type CalculatedLine = {
   lines: string[];
   type: CommentTextType;
+  totalHeight: number;
 }
 
 export type CalculatedText = {
   height: number;
+  lineHeight: number;
   lines: CalculatedLine[] | null;
 }

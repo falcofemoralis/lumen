@@ -3,6 +3,7 @@ import PlayerVideoRating from 'Component/PlayerVideoRating';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedDropdown from 'Component/ThemedDropdown';
 import ThemedOverlay from 'Component/ThemedOverlay';
+import ThemedSimpleList from 'Component/ThemedSimpleList';
 import t from 'i18n/t';
 import React, { memo } from 'react';
 import { View } from 'react-native';
@@ -74,13 +75,13 @@ export function PlayerVideoSelectorComponent({
             inputStyle={ styles.voicesInput }
             style={ styles.voicesContainer }
           />
-          { seasons.length ? renderVoiceRating() : null }
+          { renderVoiceRating() }
         </SpatialNavigationView>
       );
     }
 
     return (
-      <ThemedDropdown
+      <ThemedSimpleList
         data={ voices.map((voice) => ({
           label: voice.title,
           value: voice.identifier,
@@ -90,7 +91,6 @@ export function PlayerVideoSelectorComponent({
         value={ selectedVoice.identifier }
         onChange={ (item) => handleSelectVoice(item.value) }
         header={ t('Search voice') }
-        asList
       />
     );
   };

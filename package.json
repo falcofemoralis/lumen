@@ -12,13 +12,15 @@
     "ios": "expo run:ios",
     "measure": "flashlight measure",
     "sign": "zipalign -f -v 4 android\\app\\build\\outputs\\apk\\release\\app-release.apk release-signed.apk && apksigner sign --ks lumen.keystore --ks-key-alias lumen release-signed.apk",
-    "export-android": "if not exist android\\output mkdir android\\output && npx expo export:embed --platform android --entry-file index.js --bundle-output android/output/index.android.bundle --dev false --assets-dest android/output --sourcemap-output android/sourcemap.js && cd android && powershell Compress-Archive -Path output -DestinationPath index.android.bundle.zip -Force && powershell Compress-Archive -Path sourcemap.js -DestinationPath sourcemap.zip -Force && cd .. && rmdir /s /q android\\output && del android\\sourcemap.js"
+    "adb:connect": "adb connect 192.168.1.110",
+    "adb:disconnect": "adb disconnect 192.168.1.110",
+    "adb:install": "adb install android/app/build/outputs/apk/release/app-release.apk"
   },
   "dependencies": {
     "@bam.tech/lrud": "^8.0.2",
     "@dominicvonk/react-native-apk-installer": "^2.2.2",
     "@expo/metro-runtime": "5.0.4",
-    "@legendapp/list": "^1.0.17",
+    "@legendapp/list": "^2.0.0-beta.4",
     "@lodev09/react-native-true-sheet": "^2.0.5",
     "@logicwind/react-native-exit-app": "^0.1.0",
     "@react-native-firebase/analytics": "^22.2.1",

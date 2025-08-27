@@ -72,7 +72,7 @@ const useUpdateRegistration = <T,>({
   }, [allItems]);
 };
 
-const useRegisterVirtualNodes = <T,>({
+export const useRegisterVirtualNodes = <T,>({
   allItems,
   orientation,
   isGrid,
@@ -116,7 +116,7 @@ const useRegisterVirtualNodes = <T,>({
   return { getNthVirtualNodeID };
 };
 
-const ItemWrapperWithVirtualParentContext = typedMemo(
+export const ItemWrapperWithVirtualParentContext = typedMemo(
   <T,>({
     virtualParentID,
     index,

@@ -1,13 +1,15 @@
 import { Colors } from 'Style/Colors';
 import CreateStyles, { scale } from 'Util/CreateStyles';
 
-export const ITEM_ELEMENTS_HEIGHT = scale(20) * 2;
+export const ITEM_ELEMENTS_HEIGHT = scale(20);
+export const OVERLAY_PADDING = scale(16) * 2;
 export const INDENT_SIZE = scale(16);
 
 export const ITEM_PADDING = scale(8);
-export const BOTTOM_PADDING = scale(16);
+export const BOTTOM_PADDING = scale(8);
 
-export const ITEM_ADDITIONAL_HEIGHT = ITEM_ELEMENTS_HEIGHT
+export const ITEM_ADDITIONAL_HEIGHT =
+  + ITEM_ELEMENTS_HEIGHT * 2
   + ITEM_PADDING * 2
   + BOTTOM_PADDING;
 
@@ -25,8 +27,6 @@ export const styles = CreateStyles({
   },
   itemFocused: {
     backgroundColor: Colors.backgroundLighter,
-  },
-  itemEven: {
   },
   avatar: {
     height: 32,

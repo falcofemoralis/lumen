@@ -14,7 +14,6 @@ export type ThemedDropdownContainerProps = {
   inputStyle?: StyleProp<ViewStyle>;
   asOverlay?: boolean;
   overlayId?: string;
-  asList?: boolean;
   onChange: (item: DropdownItem) => void;
   inputLabel?: string;
   style?: StyleProp<ViewStyle>;
