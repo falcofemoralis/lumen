@@ -2,36 +2,22 @@ import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const NAVIGATION_BAR_Z_INDEX = 100;
-export const NAVIGATION_BAR_TV_WIDTH = 80;
-export const NAVIGATION_BAR_TV_WIDTH_EXPANDED = 256;
+export const NAVIGATION_BAR_TV_WIDTH = 68;
 export const NAVIGATION_BAR_TV_WIDTH_PADDING = 12;
 
 export const NAVIGATION_BAR_TV_TAB_WIDTH = NAVIGATION_BAR_TV_WIDTH - NAVIGATION_BAR_TV_WIDTH_PADDING * 2;
-export const NAVIGATION_BAR_TV_TAB_WIDTH_EXPANDED = NAVIGATION_BAR_TV_TAB_WIDTH + 100;
+export const NAVIGATION_BAR_TV_TAB_WIDTH_EXPANDED = 100;
 
 export const styles = CreateStyles({
-  layout: {
-    flex: 1,
-    flexDirection: 'row',
-    width: '100%',
-    height: '100%',
-  },
-  slot: {
-    width: '100%',
-    height: '100%',
-  },
   bar: {
     left: 0,
     top: 0,
-    height: '100%',
     width: NAVIGATION_BAR_TV_WIDTH,
+    height: '100%',
     paddingHorizontal: NAVIGATION_BAR_TV_WIDTH_PADDING,
     justifyContent: 'center',
     alignItems: 'flex-start',
     zIndex: NAVIGATION_BAR_Z_INDEX,
-  },
-  barBackgroundOpened: {
-    width: NAVIGATION_BAR_TV_WIDTH_EXPANDED + 200,
   },
   tabs: {
     width: NAVIGATION_BAR_TV_TAB_WIDTH,
@@ -41,17 +27,17 @@ export const styles = CreateStyles({
     zIndex: NAVIGATION_BAR_Z_INDEX + 2,
     transitionProperty: 'width',
     transitionDuration: '250ms',
+    transitionTimingFunction: 'ease-in-out',
   },
   tabsOpened: {
-    width: NAVIGATION_BAR_TV_TAB_WIDTH_EXPANDED,
+    width: NAVIGATION_BAR_TV_TAB_WIDTH + NAVIGATION_BAR_TV_TAB_WIDTH_EXPANDED,
   },
   tab: {
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    paddingVertical: 12,
-    paddingHorizontal: 14,
+    padding: 12,
     borderRadius: 24,
     marginBottom: 12,
   },
@@ -65,14 +51,15 @@ export const styles = CreateStyles({
   },
   tabIcon: {
     opacity: 1,
-    marginLeft: 3,
   },
   tabText: {
     display: 'flex',
     position: 'absolute',
-    left: 48,
+    left: 44,
     color: Colors.text,
     opacity: 0,
+    transitionProperty: 'opacity',
+    transitionDuration: '250ms',
   },
   tabTextOpened: {
     opacity: 1,
