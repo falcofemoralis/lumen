@@ -7,6 +7,12 @@ export const styles = CreateStyles({
     width: '100%',
     height: '100%',
     backgroundColor: Colors.black,
+    transitionProperty: 'width',
+    transitionDuration: '250ms',
+    transitionTimingFunction: 'ease-in-out',
+  },
+  containerWithComments: {
+    width: '50%',
   },
   video: {
     width: '100%',
@@ -80,6 +86,9 @@ export const styles = CreateStyles({
     width: '50%',
     height: '100%',
     marginRight: 0,
+  },
+  commentsOverlayModal: {
+    backgroundColor: Colors.transparent,
   },
   commentsOverlayContent: {
     height: '100%',

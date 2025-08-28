@@ -100,6 +100,7 @@ export function PlayerComponent({
   const { currentOverlay, goToPreviousOverlay } = useOverlayContext();
   const [showControls, setShowControls] = useState(false);
   const [hideActions, setHideActions] = useState(false);
+  const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const controlsTimeout = useRef<NodeJS.Timeout | null>(null);
   const topActionRef = useRef<SpatialNavigationNodeRef | null>(null);
   const middleActionRef = useRef<SpatialNavigationNodeRef | null>(null);
@@ -267,6 +268,7 @@ export function PlayerComponent({
   }, [player]);
 
   const handleOpenComments = () => {
+    setIsCommentsOpen(true);
     openCommentsOverlay();
 
     setTimeout(() => {
@@ -553,7 +555,11 @@ export function PlayerComponent({
   const renderCommentsOverlay = () => (
     <ThemedOverlay
       id={ commentsOverlayId }
-      onHide={ () => goToPreviousOverlay() }
+      onHide={ () => {
+        goToPreviousOverlay();
+        setIsCommentsOpen(false);
+      } }
+      style={ styles.commentsOverlayModal }
       containerStyle={ styles.commentsOverlay }
     >
       <Comments
@@ -596,7 +602,12 @@ export function PlayerComponent({
   );
 
   return (
-    <View style={ styles.container }>
+    <Animated.View
+      style={ [
+        styles.container,
+        isCommentsOpen && styles.containerWithComments,
+      ] }
+    >
       <VideoView
         style={ styles.video }
         player={ player }
@@ -609,7 +620,7 @@ export function PlayerComponent({
       { renderControls() }
       { renderLoader() }
       { renderModals() }
-    </View>
+    </Animated.View>
   );
 }
 
