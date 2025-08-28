@@ -8,7 +8,7 @@
     "android": "expo run:android",
     "lint": "eslint src",
     "lint:fix": "yarn lint --fix",
-    "build": "cd android && gradlew assembleRelease",
+    "build": "rm -rf android && npx expo prebuild --platform android && cd android && ./gradlew assembleRelease",
     "ios": "expo run:ios",
     "measure": "flashlight measure",
     "sign": "zipalign -f -v 4 android\\app\\build\\outputs\\apk\\release\\app-release.apk release-signed.apk && apksigner sign --ks lumen.keystore --ks-key-alias lumen release-signed.apk",
