@@ -359,19 +359,29 @@ export const RelatedItem = memo(({
   film,
   item,
   handleSelectFilm,
-}: RelatedItemProps) => (
-  <SpatialNavigationFocusableView
-    onSelect={ () => handleSelectFilm(film) }
-  >
-    { ({ isFocused }) => (
-      <FilmCard
-        filmCard={ item }
-        isFocused={ isFocused }
-        style={ styles.relatedListItem }
-        stylePoster={ styles.relatedListItemPoster }
-      />
-    ) }
-  </SpatialNavigationFocusableView>
-), (
+}: RelatedItemProps) => {
+  const { link } = item;
+
+  const onSelect = useCallback(() => {
+    if (link) {
+      handleSelectFilm({ link } as unknown as FilmInterface);
+    }
+  }, [link, handleSelectFilm]);
+
+  return (
+    <SpatialNavigationFocusableView
+      onSelect={ onSelect }
+    >
+      { ({ isFocused }) => (
+        <FilmCard
+          filmCard={ item }
+          isFocused={ isFocused }
+          style={ styles.relatedListItem }
+          stylePoster={ styles.relatedListItemPoster }
+        />
+      ) }
+    </SpatialNavigationFocusableView>
+  );
+}, (
   prevProps: RelatedItemProps, nextProps: RelatedItemProps
 ) => prevProps.item.id === nextProps.item.id);
