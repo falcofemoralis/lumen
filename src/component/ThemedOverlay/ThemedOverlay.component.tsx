@@ -20,6 +20,7 @@ export function ThemedOverlayComponent({
   contentContainerStyle,
   style,
   children,
+  backdropColor,
 }: ThemedOverlayComponentProps) {
   const isLandscape = useLandscape();
 
@@ -29,7 +30,7 @@ export function ThemedOverlayComponent({
         animationType='fade'
         visible={ isOpened }
         onRequestClose={ onHide }
-        backdropColor={ Colors.modal }
+        backdropColor={ backdropColor || Colors.modal }
       >
         <GestureHandlerRootView>
           <Pressable

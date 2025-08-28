@@ -1,4 +1,4 @@
-import { StyleProp, ViewStyle } from 'react-native';
+import { ColorValue, StyleProp, ViewStyle } from 'react-native';
 
 export interface ThemedOverlayContainerProps {
   id: string;
@@ -7,6 +7,7 @@ export interface ThemedOverlayContainerProps {
   style?: StyleProp<ViewStyle>;
   containerStyle?: StyleProp<ViewStyle>;
   contentContainerStyle?: StyleProp<ViewStyle>;
+  backdropColor?: ColorValue; // mobile only
 }
 
 export interface ThemedOverlayComponentProps {
@@ -18,4 +19,5 @@ export interface ThemedOverlayComponentProps {
   style?: StyleProp<ViewStyle>;
   containerStyle?: StyleProp<ViewStyle>;
   contentContainerStyle?: StyleProp<ViewStyle>;
+  backdropColor?: ColorValue;
 }

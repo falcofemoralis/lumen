@@ -106,6 +106,7 @@ export function PlayerComponent({
   const [isScrolling, setIsScrolling] = useState(false);
   const [doubleTapAction, setDoubleTapAction] = useState<DoubleTapAction | null>(null);
   const [longTapAction, setLongTapAction] = useState(false);
+  const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const controlsTimeout = useRef<NodeJS.Timeout | null>(null);
   const playerRef = useRef<VideoView>(null);
   const doubleTapTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -183,8 +184,12 @@ export function PlayerComponent({
   };
 
   const handleOpenComments = () => {
-    setShowControls(false);
+    setIsCommentsOpen(true);
     openCommentsOverlay();
+
+    setTimeout(() => {
+      setShowControls(false);
+    }, 0);
   };
 
   const handleDoubleTap = (direction: RewindDirection) => {
@@ -596,9 +601,14 @@ export function PlayerComponent({
   const renderCommentsOverlay = () => (
     <ThemedOverlay
       id={ commentsOverlayId }
-      onHide={ () => goToPreviousOverlay() }
+      onHide={ () => {
+        goToPreviousOverlay();
+        setIsCommentsOpen(false);
+      } }
+      style={ styles.commentsOverlayModal }
       containerStyle={ styles.commentsOverlay }
       contentContainerStyle={ styles.commentsOverlayContent }
+      backdropColor={ Colors.transparent }
     >
       <ScrollView
         horizontal
@@ -646,7 +656,12 @@ export function PlayerComponent({
   );
 
   return (
-    <View style={ styles.container }>
+    <Animated.View
+      style={ [
+        styles.container,
+        isCommentsOpen && styles.containerWithComments,
+      ] }
+    >
       <VideoView
         ref={ playerRef }
         style={ styles.video }
@@ -659,7 +674,7 @@ export function PlayerComponent({
       { renderControls() }
       { renderLoader() }
       { renderModals() }
-    </View>
+    </Animated.View>
   );
 }
 
