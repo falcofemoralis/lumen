@@ -608,7 +608,7 @@ export function PlayerComponent({
       style={ styles.commentsOverlayModal }
       containerStyle={ styles.commentsOverlay }
       contentContainerStyle={ styles.commentsOverlayContent }
-      backdropColor={ Colors.transparent }
+      transparent
     >
       <ScrollView
         horizontal
@@ -659,7 +659,7 @@ export function PlayerComponent({
     <Animated.View
       style={ [
         styles.container,
-        isCommentsOpen && styles.containerWithComments,
+        isCommentsOpen && { width: (Dimensions.get('window').width) / 2 },
       ] }
     >
       <VideoView

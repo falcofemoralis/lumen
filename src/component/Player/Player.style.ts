@@ -11,9 +11,6 @@ export const styles = CreateStyles({
     transitionDuration: '250ms',
     transitionTimingFunction: 'ease-in-out',
   },
-  containerWithComments: {
-    width: '50%',
-  },
   video: {
     width: '100%',
     height: '100%',
@@ -118,13 +115,13 @@ export const styles = CreateStyles({
     backgroundColor: Colors.transparent,
   },
   commentsOverlay: {
-    width: '45%',
+    width: '100%',
     height: '100%',
   },
   commentsOverlayContent: {
     height: '100%',
-    maxHeight: '90%',
-    maxWidth: '45%',
+    maxHeight: '100%',
+    maxWidth: '50%',
     right: 0,
   },
   commentsOverlayList: {

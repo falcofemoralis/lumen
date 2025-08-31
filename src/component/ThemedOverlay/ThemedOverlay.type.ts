@@ -7,7 +7,7 @@ export interface ThemedOverlayContainerProps {
   style?: StyleProp<ViewStyle>;
   containerStyle?: StyleProp<ViewStyle>;
   contentContainerStyle?: StyleProp<ViewStyle>;
-  backdropColor?: ColorValue; // mobile only
+  transparent?: boolean;
 }
 
 export interface ThemedOverlayComponentProps {
@@ -19,5 +19,5 @@ export interface ThemedOverlayComponentProps {
   style?: StyleProp<ViewStyle>;
   containerStyle?: StyleProp<ViewStyle>;
   contentContainerStyle?: StyleProp<ViewStyle>;
-  backdropColor?: ColorValue;
+  transparent?: boolean;
 }
