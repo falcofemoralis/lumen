@@ -91,7 +91,7 @@ export function SettingsPageContainer() {
           await updateProvider(value);
           break;
         case 'cdn':
-          await updateCDN(value);
+          await updateCDN(value, true);
           break;
         case 'userAgent':
           updateUserAgent(value);
