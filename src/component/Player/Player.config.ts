@@ -19,25 +19,31 @@ export enum FocusedElement {
   BOTTOM_ACTION = 'BOTTOM_ACTION',
 }
 
-export interface AutoRewindParams {
+export interface SmartSeekingParams {
   seconds: number;
   active?: boolean;
+  seeking?: boolean;
   statusBefore?: boolean;
   percentage: number;
+  iterations: number;
+  velocity: number;
+  delta: number;
 }
 
 export const AWAKE_TAG = 'player';
 
 export const DEFAULT_REWIND_SECONDS = 10;
 export const REWIND_SECONDS_TV = 30;
-export const DEFAULT_AUTO_REWIND_SECONDS = 30;
 
-export const DEFAULT_AUTO_REWIND_PARAMS: AutoRewindParams = {
-  seconds: DEFAULT_AUTO_REWIND_SECONDS,
+export const DEFAULT_SMART_SEEKING_PARAMS: SmartSeekingParams = {
+  seconds: 30,
   percentage: 0,
+  iterations: 0,
+  velocity: 0.05,
+  delta: 65,
 };
 
-export const LONG_PRESS_DURATION = 350;
+export const LONG_PRESS_DURATION = 250;
 
 // 1 minutes * 60 seconds/minute * 1000 milliseconds/second
 export const SAVE_TIME_EVERY_MS = 60000;

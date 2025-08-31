@@ -31,7 +31,7 @@ export interface PlayerComponentProps {
   speedOverlayId: string;
   selectedSpeed: number;
   isLocked: boolean;
-  togglePlayPause: (state?: boolean) => void;
+  togglePlayPause: (state?: boolean, stopEvents?: boolean) => void;
   rewindPosition: (type: RewindDirection, seconds?: number) => void;
   seekToPosition: (percent: number) => void;
   calculateCurrentTime: (percent: number) => number;

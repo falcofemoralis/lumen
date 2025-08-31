@@ -70,6 +70,7 @@ export function PlayerContainer({
   const [selectedSpeed, setSelectedSpeed] = useState<number>(DEFAULT_SPEED);
   const [isLocked, setIsLocked] = useState<boolean>(false);
 
+  const stopEventsRef = useRef<boolean>(false);
   const updateTimeTimeout = useRef<NodeJS.Timeout | null>(null);
   const qualityOverlayId = useId();
   const subtitleOverlayId = useId();
@@ -109,6 +110,10 @@ export function PlayerContainer({
     p.timeUpdateEventInterval = 1;
     p.currentTime = getVideoTime(selectedVoice, savedTime);
     p.preservesPitch = true;
+    p.bufferOptions = {
+      ...p.bufferOptions,
+      preferredForwardBufferDuration: 180,
+    };
     p.play();
 
     initFirestoreSavedTime(p, savedTime);
@@ -184,13 +189,21 @@ export function PlayerContainer({
     player,
     'timeUpdate',
     ({ currentTime, bufferedPosition }) => {
+      if (stopEventsRef.current) {
+        return;
+      }
+
       const { duration, playing } = player;
 
-      if (!playing) {
+      if (duration <= 0) {
         return;
       }
 
       updateProgressStatus(currentTime, bufferedPosition, duration);
+
+      if (!playing) {
+        return;
+      }
 
       onPlaybackEnd(currentTime, duration);
     }
@@ -203,6 +216,8 @@ export function PlayerContainer({
   });
 
   useEventListener(player, 'statusChange', ({ status: playerStatus, error }) => {
+    console.log('playerStatus', playerStatus);
+
     const loading = playerStatus === 'loading';
 
     if (playerStatus === 'error') {
@@ -240,8 +255,12 @@ export function PlayerContainer({
     updateSelectedVoice(film.id, newVoice);
   };
 
-  const togglePlayPause = (pause?: boolean) => {
+  const togglePlayPause = (pause?: boolean, stopEvents?: boolean) => {
     const { playing } = player;
+
+    if (stopEvents !== undefined) {
+      stopEventsRef.current = stopEvents;
+    }
 
     const newPlaying = pause !== undefined ? pause : playing;
 
