@@ -13,19 +13,20 @@ Modern application to view films on TV and Mobile. This is a continuation of [HD
 
 And more!
 
+## Contact me!
+
+Проблемы с приложением? Есть идеи как его улучшить? Заходите в группу в [Telegram](https://t.me/+aTvx8zYSnVszZmVi).
+
+##  Compatibility
+Lumen app requires Android 7.0 or above and it should work on any android device:
+
+- Mobile phones, Tablets
+- Android TVs & Google TVs
+- TV boxes running Android
+
 ## Roadmap
 
 See [issues](https://github.com/falcofemoralis/lumen/issues)
-
-## Bugs
-
-Found a bug? Post it here! [Баги приложения](https://github.com/falcofemoralis/lumen/issues/8)
-
-Want to improve the app? Write it here [Пожелания](https://github.com/falcofemoralis/lumen/issues/73)
-
-## Sponsor & Support
-
-To keep this app maintained and up-to-date please consider sponsoring it on GitHub. Or if you are looking for a private support or help in customizing the experience, then reach out to me on Telegram [@falcofemoralis](https://t.me/falcofemoralis).
 
 ## Screenshots
 
@@ -39,6 +40,28 @@ To keep this app maintained and up-to-date please consider sponsoring it on GitH
 |<img src="https://github.com/user-attachments/assets/dc424de3-cb65-4c38-a9d0-e78d1c974bbe" width="100%" />|<img src="https://github.com/user-attachments/assets/996fa0db-fc5f-41d7-a732-023facc6ea48" width="100%" />
 |<img src="https://github.com/user-attachments/assets/a2eb768d-5334-4b4c-a974-f7f1635f02c3" width="50%" />|<img src="https://github.com/user-attachments/assets/5614e08b-44aa-4556-945a-48cb546f1aad" width="100%" />
 |<img src="https://github.com/user-attachments/assets/2d983924-46f2-4e83-b5b2-21287d9e6974" width="50%" />|<img src="https://github.com/user-attachments/assets/09e73302-234b-4cd4-8667-5ede18e54b4d" width="100%" />
+
+## FAQ
+
+### Q: Почему нету поддержки стороннего плеера? Будет ли она добавлена?
+
+Нет не будет, использование стороннего плеера ограничивает функционал самого сайта.
+
+### Q: Почему нету поддержки разных языков?
+
+Банально нету смысла, через то что сам сайт имеет поддержку только одного языка. Если это будет изменено, приложение будет адаптировано.
+
+### Q: Почему приложение бесконечно что-то грузит?
+
+A: Проверьте роботоспособнсть в самом браузере. Если работает там - тогда будет работать и здесь. Приложение просто предостовляет "более удобный" способ взаимодействия с сайтом.
+
+### Q: Что такое сменить сайт?
+
+Я планирую добавить поддержку и других ресурсов (с ограничениями), но это пока-что только в планах.
+
+### Q: Будет ли приложение опоблуковано на 4pda?
+
+Нет.
 
 ## License
 
