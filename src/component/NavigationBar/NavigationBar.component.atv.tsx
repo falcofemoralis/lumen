@@ -116,7 +116,6 @@ export function NavigationBarComponent({
           style={ [
             styles.tabText,
             isf && isRootActive && styles.tabContentFocused,
-            isMenuOpen && styles.tabTextOpened,
           ] }
         >
           { title }
@@ -161,7 +160,6 @@ export function NavigationBarComponent({
               styles.tabText,
               styles.profileNameText,
               isf && isRootActive && styles.tabContentFocused,
-              isMenuOpen && styles.tabTextOpened,
             ] }
           >
             { title }
@@ -171,7 +169,6 @@ export function NavigationBarComponent({
               styles.tabText,
               styles.profileSwitchText,
               isf && isRootActive && styles.tabContentFocused,
-              isMenuOpen && styles.tabTextOpened,
             ] }
           >
             { isSignedIn ? name : t('Sign in') }

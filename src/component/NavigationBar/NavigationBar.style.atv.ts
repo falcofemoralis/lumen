@@ -57,12 +57,6 @@ export const styles = CreateStyles({
     position: 'absolute',
     left: 44,
     color: Colors.text,
-    opacity: 0,
-    transitionProperty: 'opacity',
-    transitionDuration: '250ms',
-  },
-  tabTextOpened: {
-    opacity: 1,
   },
   tabContentFocused: {
     color: Colors.textFocused,
