@@ -202,6 +202,7 @@ export function NavigationBarComponent({
       >
         <SpatialNavigationFocusableView
           onFocus={ () => isMenuOpen && onTabSelect(tab, navigation, state) }
+          onSelect={ () => onTabSelect(tab, navigation, state) }
         >
           { ({ isRootActive, isFocused: isf }) => (
             renderComponent(isRootActive, isf)
