@@ -114,5 +114,13 @@
   "Allow": "Allow",
   "OK": "OK",
   "No video available": "No video available",
-  "No video streams available": "No video streams available"
+  "No video streams available": "No video streams available",
+  "Invalid provider": "Invalid provider",
+  "You are blocked": "You are blocked",
+  "Not found": "Not found",
+  "Official mode": "Official mode",
+  "Links will be used as in the official application.": "Links will be used as in the official application.",
+  "Off": "Off",
+  "Main": "Main",
+  "Additional": "Additional"
 }

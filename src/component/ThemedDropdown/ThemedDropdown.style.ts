@@ -23,5 +23,7 @@ export const styles = CreateStyles({
     padding: 8,
   },
   overlayContent: {
+    width: '100%',
+    flexDirection: 'row',
   },
 });

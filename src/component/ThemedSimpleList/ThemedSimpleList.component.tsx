@@ -1,14 +1,11 @@
 import ThemedImage from 'Component/ThemedImage';
-import ThemedList from 'Component/ThemedList';
-import { ThemedListRef } from 'Component/ThemedList/ThemedList.type';
 import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import { useLandscape } from 'Hooks/useLandscape';
-import { useCallback, useEffect, useRef } from 'react';
-import { View } from 'react-native';
-import { scale } from 'Util/CreateStyles';
+import { useCallback, useRef } from 'react';
+import { ScrollView, View } from 'react-native';
 
-import { ITEM_HEIGHT, styles } from './ThemedSimpleList.style';
+import { styles } from './ThemedSimpleList.style';
 import { ListItem, ThemedSimpleListComponentProps } from './ThemedSimpleList.type';
 
 export const ThemedListComponent = ({
@@ -18,20 +15,22 @@ export const ThemedListComponent = ({
   style,
   onChange,
 }: ThemedSimpleListComponentProps) => {
-  const listRef = useRef<ThemedListRef>(null);
+  const scrollViewRef = useRef<ScrollView>(null);
   const isLandscape = useLandscape();
 
-  useEffect(() => {
-    setTimeout(() => {
-      const itemIdx = data.findIndex((item) => item.value === value);
+  const handleLayout = () => {
+    const itemIdx = data.findIndex((item) => item.value === value);
 
-      if (itemIdx <= 5) {
-        return;
-      }
+    if (itemIdx <= 5) {
+      return;
+    }
 
-      listRef.current?.scrollTo(itemIdx);
-    }, 0);
-  }, [value]);
+    const scrollIndex = itemIdx + 2;
+
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollTo({ y: scrollIndex * styles.item.height, animated: false });
+    }
+  };
 
   const renderHeader = () => {
     if (!header) {
@@ -81,12 +80,12 @@ export const ThemedListComponent = ({
         isLandscape && styles.listItemsLandscape,
       ] }
     >
-      <ThemedList
-        ref={ listRef }
-        data={ data }
-        renderItem={ renderItem }
-        estimatedItemSize={ scale(ITEM_HEIGHT) }
-      />
+      <ScrollView
+        ref={ scrollViewRef }
+        onLayout={ handleLayout }
+      >
+        { data.map((item) => renderItem({ item })) }
+      </ScrollView>
     </View>
   );
 

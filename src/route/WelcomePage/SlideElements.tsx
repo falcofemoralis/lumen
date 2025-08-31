@@ -360,16 +360,21 @@ export const ProviderSlide = ({
   goBack,
   goNext,
 }: ProviderSlideProps) => {
-  const { getCurrentService, updateProvider } = useServiceContext();
+  const { getCurrentService, updateProvider, updateOfficialMode } = useServiceContext();
+  const { goToPreviousOverlay } = useOverlayContext();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [selectedProvider, setSelectedProvider] = useState<string | null>(getCurrentService().getProvider());
   const [isProviderValid, setIsProviderValid] = useState<boolean | null>(null);
+  const [selectedMode, setSelectedMode] = useState<string>(getCurrentService().getOfficialMode()); // actually it is a provider link
 
   const validateProvider = useCallback(async () => {
     setIsLoading(true);
 
     try {
-      await updateProvider(selectedProvider ?? '', true);
+      updateOfficialMode(selectedMode);
+
+      // with official mode, we don't need to set provider, because official mode will use separate provider
+      await updateProvider(selectedMode ? '' : (selectedProvider ?? ''), true);
       await getCurrentService().getFilm(TEST_URL);
 
       setIsProviderValid(true);
@@ -380,11 +385,17 @@ export const ProviderSlide = ({
     } finally {
       setIsLoading(false);
     }
-  }, [selectedProvider]);
+  }, [selectedProvider, selectedMode]);
 
   const handleUpdateProvider = useCallback(() => {
-    updateProvider(selectedProvider ?? '', true);
-  }, [selectedProvider, updateProvider]);
+    updateOfficialMode(selectedMode);
+    updateProvider(selectedMode ? '' : (selectedProvider ?? ''), true);
+  }, [selectedProvider, selectedMode, updateProvider]);
+
+  const handleSelectMode = useCallback(({ value }: DropdownItem) => {
+    setSelectedMode(value);
+    goToPreviousOverlay();
+  }, [goToPreviousOverlay]);
 
   return (
     <BaseSlide
@@ -398,10 +409,20 @@ export const ProviderSlide = ({
           style={ [
             styles.providerSelectorInput,
             isLoading && styles.providerValidateButtonDisabled,
+            selectedMode && styles.providerValidateButtonDisabled,
           ] }
           placeholder={ t('Provider') }
           onChangeText={ setSelectedProvider }
           value={ selectedProvider ?? '' }
+        />
+        <ThemedText>
+          { t('Official mode') }
+        </ThemedText>
+        <ThemedDropdown
+          data={ getCurrentService().officialMirrors }
+          onChange={ handleSelectMode }
+          header={ t('Official mode') }
+          value={ selectedMode ?? '' }
         />
         <SpatialNavigationFocusableView
           onSelect={ validateProvider }

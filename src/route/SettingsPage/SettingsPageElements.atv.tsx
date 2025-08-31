@@ -26,7 +26,7 @@ type BaseComponentProps = {
 
 type SettingProps = {
   setting: SettingItem;
-  onUpdate: (id: string, value: string) => Promise<boolean>;
+  onUpdate: (setting: SettingItem, value: string) => Promise<boolean>;
 };
 
 const BaseComponent = ({
@@ -88,7 +88,7 @@ export const SettingSelect = memo(({
   const onChange = useCallback(async (option: DropdownItem) => {
     setIsLoading(true);
 
-    const success = await onUpdate(id, option.value);
+    const success = await onUpdate(setting, option.value);
 
     if (success) {
       closeOverlay(overlayId);
@@ -157,7 +157,7 @@ export const SettingInput = memo(({
 
     setIsLoading(true);
 
-    const success = await onUpdate(setting.id, inputValue);
+    const success = await onUpdate(setting, inputValue);
 
     if (success) {
       closeOverlay(overlayId);
@@ -216,7 +216,7 @@ export const SettingLink = memo(({
 }: SettingProps) => (
   <BaseComponent
     setting={ setting }
-    onPress={ () => onUpdate(setting.id, '') }
+    onPress={ () => onUpdate(setting, '') }
   />
 ), (
   prevProps: SettingProps, nextProps: SettingProps

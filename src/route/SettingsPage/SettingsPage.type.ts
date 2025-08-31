@@ -1,6 +1,6 @@
 export interface SettingsPageComponentProps {
   settings: SettingItem[];
-  onSettingUpdate: (id: string, value: string) => Promise<boolean>;
+  onSettingUpdate: (setting: SettingItem, value: string) => Promise<boolean>;
 }
 
 export enum SETTING_TYPE {
@@ -24,4 +24,5 @@ export type SettingItem = {
   subtitle: string;
   value?: string | null;
   options?: SettingItemOption[];
+  onPress?: (value: string, key: any) => void;
 }

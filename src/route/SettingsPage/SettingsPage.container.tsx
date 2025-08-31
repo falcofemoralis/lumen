@@ -2,10 +2,9 @@ import { useServiceContext } from 'Context/ServiceContext';
 import * as Application from 'expo-application';
 import { withTV } from 'Hooks/withTV';
 import t from 'i18n/t';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Linking } from 'react-native';
 import ConfigStore from 'Store/Config.store';
-import NotificationStore from 'Store/Notification.store';
 
 import SettingsPageComponent from './SettingsPage.component';
 import SettingsPageComponentTV from './SettingsPage.component.atv';
@@ -18,8 +17,13 @@ export function SettingsPageContainer() {
     updateProvider,
     updateCDN,
     updateUserAgent,
+    updateOfficialMode,
   } = useServiceContext();
   const currentService = getCurrentService();
+
+  const updateConfig = useCallback((value: string, key: any) => {
+    ConfigStore.updateConfig(key, value);
+  }, []);
 
   const [settings, setSettings] = useState<SettingItem[]>([
     {
@@ -28,6 +32,7 @@ export function SettingsPageContainer() {
       subtitle: t('Change provider'),
       type: SETTING_TYPE.INPUT,
       value: currentService.getProvider(),
+      onPress: updateProvider,
     },
     {
       id: 'cdn',
@@ -44,6 +49,7 @@ export function SettingsPageContainer() {
         value: cdn,
         label: cdn,
       }))),
+      onPress: (value) => updateCDN(value, true),
     },
     {
       id: 'userAgent',
@@ -51,6 +57,7 @@ export function SettingsPageContainer() {
       subtitle: t('Change useragent'),
       type: SETTING_TYPE.INPUT,
       value: currentService.getUserAgent(),
+      onPress: updateUserAgent,
     },
     {
       id: 'isFirestore',
@@ -68,6 +75,16 @@ export function SettingsPageContainer() {
           label: t('No'),
         },
       ],
+      onPress: updateConfig,
+    },
+    {
+      id: 'officialMode',
+      title: t('Official mode'),
+      subtitle: t('Links will be used as in the official application.'),
+      type: SETTING_TYPE.SELECT,
+      value: currentService.getOfficialMode(),
+      options: currentService.officialMirrors,
+      onPress: updateOfficialMode,
     },
     {
       id: 'github',
@@ -75,6 +92,7 @@ export function SettingsPageContainer() {
       subtitle: t('Go to GitHub'),
       type: SETTING_TYPE.LINK,
       value: 'link',
+      onPress: () => Linking.openURL(GITHUB_LINK),
     },
     {
       id: 'version',
@@ -84,37 +102,15 @@ export function SettingsPageContainer() {
     },
   ]);
 
-  const onSettingUpdate = async (id: string, value: string) => {
-    try {
-      switch (id) {
-        case 'provider':
-          await updateProvider(value);
-          break;
-        case 'cdn':
-          await updateCDN(value, true);
-          break;
-        case 'userAgent':
-          updateUserAgent(value);
-          break;
-        case 'github':
-          Linking.openURL(GITHUB_LINK);
+  const onSettingUpdate = async (setting: SettingItem, value: string) => {
+    const { id, onPress } = setting;
 
-          return true;
-        default:
-
-          ConfigStore.updateConfig(id as any, value);
-          break;
-      }
-    } catch (error) {
-      NotificationStore.displayError(error as Error);
-
-      return false;
-    }
-
-    setSettings((prevSettings) => prevSettings.map((setting) => ({
-      ...setting,
-      value: setting.id === id ? value : setting.value,
+    setSettings((prevSettings) => prevSettings.map((st) => ({
+      ...st,
+      value: st.id === id ? value : st.value,
     })));
+
+    onPress?.(value, id);
 
     return true;
   };

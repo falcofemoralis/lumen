@@ -12,7 +12,7 @@ import { Platform } from 'react-native';
 import { ProfileInterface } from 'Type/Profile.interface';
 import { CookiesManager } from 'Util/Cookies';
 import { safeJsonParse } from 'Util/Json';
-import { requestValidator, setProxyHeaders } from 'Util/Request';
+import { addProxyHeaders,requestValidator } from 'Util/Request';
 import { miscStorage } from 'Util/Storage';
 
 export const CREDENTIALS_STORAGE = 'CREDENTIALS_STORAGE';
@@ -29,6 +29,7 @@ interface ServiceContextInterface {
   updateProvider: (value: string, skipValidation?: boolean) => Promise<void>;
   updateCDN: (value: string, skipValidation?: boolean) => Promise<void>;
   updateUserAgent: (value: string) => void;
+  updateOfficialMode: (value: string) => void;
   validateUrl: (url: string) => Promise<void>;
 }
 
@@ -43,6 +44,7 @@ const ServiceContext = createContext<ServiceContextInterface>({
   updateProvider: async () => {},
   updateCDN: async () => {},
   updateUserAgent: () => {},
+  updateOfficialMode: () => {},
   validateUrl: async () => {},
 });
 
@@ -142,12 +144,14 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
     if (!skipValidation) {
       const isWeb = Platform.OS === 'web';
       const url = isWeb ? REZKA_PROXY_PROVIDER : value;
-      const headers = isWeb ? setProxyHeaders(getCurrentService().getHeaders(), value) : undefined;
+      const headers = isWeb ? addProxyHeaders(getCurrentService().getHeaders(), value) : undefined;
 
       await validateUrl(url, headers);
     }
 
-    getCurrentService().setProvider(value);
+    if (value !== '') {
+      getCurrentService().setProvider(value);
+    }
 
     // Reset cookies
     (new CookiesManager()).reset();
@@ -186,6 +190,14 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
     getCurrentService().setUserAgent(value);
   }, [getCurrentService]);
 
+  /**
+   * Update the official mode for the current service
+   * @param {string} value - The official mode string
+   */
+  const updateOfficialMode = useCallback((value: string) => {
+    getCurrentService().setOfficialMode(value);
+  }, [getCurrentService]);
+
   const value = useMemo(() => ({
     isSignedIn,
     profile,
@@ -199,6 +211,7 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
     updateCDN,
     updateUserAgent,
     validateUrl,
+    updateOfficialMode,
   }), [
     isSignedIn,
     profile,
@@ -212,6 +225,7 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
     updateCDN,
     updateUserAgent,
     validateUrl,
+    updateOfficialMode,
   ]);
 
   return (
