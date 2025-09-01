@@ -112,14 +112,14 @@ export function NavigationBarComponent({
             </ThemedText>
           ) }
         </View>
-        <ThemedText.Animated
+        <ThemedText
           style={ [
             styles.tabText,
             isf && isRootActive && styles.tabContentFocused,
           ] }
         >
           { title }
-        </ThemedText.Animated>
+        </ThemedText>
       </View>
     );
   }, [isMenuOpen, badgeData]);
@@ -155,7 +155,7 @@ export function NavigationBarComponent({
           ) }
         </View>
         <View style={ styles.profile }>
-          <ThemedText.Animated
+          <ThemedText
             style={ [
               styles.tabText,
               styles.profileNameText,
@@ -163,8 +163,8 @@ export function NavigationBarComponent({
             ] }
           >
             { title }
-          </ThemedText.Animated>
-          <ThemedText.Animated
+          </ThemedText>
+          <ThemedText
             style={ [
               styles.tabText,
               styles.profileSwitchText,
@@ -172,7 +172,7 @@ export function NavigationBarComponent({
             ] }
           >
             { isSignedIn ? name : t('Sign in') }
-          </ThemedText.Animated>
+          </ThemedText>
         </View>
       </View>
     );
