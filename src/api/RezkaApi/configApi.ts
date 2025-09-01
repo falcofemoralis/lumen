@@ -1,5 +1,6 @@
 /* eslint-disable max-len */
 import { ApiServiceType, ConfigApiInterface, ServiceConfigInterface } from 'Api/index';
+import * as Device from 'expo-device';
 import t from 'i18n/t';
 import { Platform } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
@@ -28,7 +29,7 @@ const configApi: ConfigApiInterface = {
     'https://prx5-cogent.ukrtelcdn.net',
     'https://prx6-cogent.ukrtelcdn.net',
   ],
-  defaultUserAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0',
+  defaultUserAgent: `Mozilla/5.0 (Linux; Android ${Device.osVersion}; ${Device.manufacturer} ${Device.modelName}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36`,
   officialMirrors: [
     {
       label: t('Off'),
