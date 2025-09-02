@@ -1,4 +1,5 @@
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
+import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { VideoPlayer } from 'expo-video';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmStreamInterface } from 'Type/FilmStream.interface';
@@ -23,14 +24,15 @@ export interface PlayerComponentProps {
   voice: FilmVoiceInterface;
   selectedQuality: string;
   selectedSubtitle?: SubtitleInterface;
-  qualityOverlayId: string;
-  subtitleOverlayId: string;
-  playerVideoSelectorOverlayId: string;
-  commentsOverlayId: string;
-  bookmarksOverlayId: string;
-  speedOverlayId: string;
+  qualityOverlayRef: React.RefObject<ThemedOverlayRef | null>;
+  subtitleOverlayRef: React.RefObject<ThemedOverlayRef | null>;
+  playerVideoSelectorOverlayRef: React.RefObject<ThemedOverlayRef | null>;
+  commentsOverlayRef: React.RefObject<ThemedOverlayRef | null>;
+  bookmarksOverlayRef: React.RefObject<ThemedOverlayRef | null>;
+  speedOverlayRef: React.RefObject<ThemedOverlayRef | null>;
   selectedSpeed: number;
   isLocked: boolean;
+  isOverlayOpen: boolean;
   togglePlayPause: (state?: boolean, stopEvents?: boolean) => void;
   rewindPosition: (type: RewindDirection, seconds?: number) => void;
   seekToPosition: (percent: number) => void;
@@ -39,7 +41,6 @@ export interface PlayerComponentProps {
   handleQualityChange: (item: DropdownItem) => void;
   handleNewEpisode: (type: RewindDirection) => void;
   openVideoSelector: () => void;
-  hideVideoSelector: () => void;
   handleVideoSelect: (video: FilmVideoInterface, voice: FilmVoiceInterface) => void;
   setPlayerRate: (rate: number) => void;
   openSubtitleSelector: () => void;
@@ -50,6 +51,7 @@ export interface PlayerComponentProps {
   openBookmarksOverlay: () => void;
   handleLockControls: () => void;
   handleShare: () => void;
+  closeOverlay: () => void;
 }
 
 export type ProgressStatus = {

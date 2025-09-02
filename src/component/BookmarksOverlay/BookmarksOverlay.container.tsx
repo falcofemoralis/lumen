@@ -1,20 +1,21 @@
-import { useOverlayContext } from 'Context/OverlayContext';
+import { ListItem } from 'Component/ThemedMultiList/ThemedMultiList.type';
 import { useServiceContext } from 'Context/ServiceContext';
 import { withTV } from 'Hooks/withTV';
-import { useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
 
-import BookmarksSelectorComponent from './BookmarksSelector.component';
-import BookmarksSelectorComponentTV from './BookmarksSelector.component.atv';
-import { BookmarksSelectorContainerProps } from './BookmarksSelector.type';
+import BookmarksOverlayComponent from './BookmarksOverlay.component';
+import BookmarksOverlayComponentTV from './BookmarksOverlay.component.atv';
+import { BookmarksOverlayContainerProps } from './BookmarksOverlay.type';
 
-export const BookmarksSelectorContainer = ({
-  overlayId,
+export const BookmarksOverlayContainer = ({
+  overlayRef,
   film,
-}: BookmarksSelectorContainerProps) => {
-  const { currentOverlay, isOverlayOpened } = useOverlayContext();
+  onClose,
+}: BookmarksOverlayContainerProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { getCurrentService } = useServiceContext();
+  const [items, setItems] = useState<ListItem[]>([]);
 
   const postBookmark = async (bookmarkId: string, isChecked: boolean) => {
     const { id } = film;
@@ -40,41 +41,33 @@ export const BookmarksSelectorContainer = ({
     }
   };
 
-  const prepareData = () => {
+  const onOverlayVisible = useCallback(() => {
     const { bookmarks = [] } = film;
 
-    return bookmarks.map((bookmark) => ({
+    setItems(bookmarks.map((bookmark) => ({
       label: bookmark.title,
       value: bookmark.id,
       isChecked: bookmark.isBookmarked ?? false,
-    }));
-  };
-
-  const [data, setData] = useState(prepareData());
-
-  useEffect(() => {
-    const opened = isOverlayOpened(overlayId);
-
-    if (opened) {
-      setData(prepareData());
-    }
-  }, [currentOverlay.length]);
+    })));
+  }, [film]);
 
   const containerProps = {
-    overlayId,
+    overlayRef,
     film,
     isLoading,
-    data,
+    items,
+    onClose,
+    onOverlayVisible,
   };
 
   const containerFunctions = {
     postBookmark,
   };
 
-  return withTV(BookmarksSelectorComponentTV, BookmarksSelectorComponent, {
+  return withTV(BookmarksOverlayComponentTV, BookmarksOverlayComponent, {
     ...containerProps,
     ...containerFunctions,
   });
 };
 
-export default BookmarksSelectorContainer;
+export default BookmarksOverlayContainer;

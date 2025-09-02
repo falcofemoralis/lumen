@@ -1,11 +1,10 @@
 import ThemedButton from 'Component/ThemedButton';
 import ThemedOverlay from 'Component/ThemedOverlay';
+import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import ThemedSimpleList from 'Component/ThemedSimpleList';
-import { useOverlayContext } from 'Context/OverlayContext';
 import { Plus } from 'lucide-react-native';
 import React, { memo, useRef } from 'react';
 import { View } from 'react-native';
-import { generateId } from 'Util/Math';
 
 import { styles } from './ThemedDropdown.style.atv';
 import { ThemedDropdownComponentProps } from './ThemedDropdown.type';
@@ -16,18 +15,16 @@ export const ThemedDropdownComponent = ({
   value,
   header,
   asOverlay,
-  overlayId: overlayIdProp,
   style,
   onChange,
+  overlayRef,
 }: ThemedDropdownComponentProps) => {
-  const { openOverlay, goToPreviousOverlay } = useOverlayContext();
-  const overlayId = useRef(overlayIdProp ?? generateId());
+  const componentOverlayRef = useRef<ThemedOverlayRef>(null);
 
   const renderModal = () => {
     return (
       <ThemedOverlay
-        id={ overlayId.current }
-        onHide={ () => goToPreviousOverlay() }
+        ref={ overlayRef || componentOverlayRef }
         containerStyle={ styles.container }
         contentContainerStyle={ styles.contentContainer }
       >
@@ -53,7 +50,7 @@ export const ThemedDropdownComponent = ({
         style={ [styles.input, inputStyle] }
         rightImageStyle={ styles.inputImage }
         IconComponent={ Plus }
-        onPress={ () => openOverlay(overlayId.current) }
+        onPress={ () => (overlayRef || componentOverlayRef).current?.open() }
         rightImage={ endIcon }
       >
         { label }

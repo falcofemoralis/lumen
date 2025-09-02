@@ -1,5 +1,5 @@
-import BookmarksSelector from 'Component/BookmarksSelector';
-import Comments from 'Component/Comments';
+import BookmarksSelector from 'Component/BookmarksOverlay';
+import CommentsOverlay from 'Component/CommentsOverlay';
 import Loader from 'Component/Loader';
 import PlayerClock from 'Component/PlayerClock';
 import PlayerDuration from 'Component/PlayerDuration';
@@ -7,10 +7,8 @@ import PlayerProgressBar from 'Component/PlayerProgressBar';
 import PlayerSubtitles from 'Component/PlayerSubtitles';
 import PlayerVideoSelector from 'Component/PlayerVideoSelector';
 import ThemedDropdown from 'Component/ThemedDropdown';
-import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
-import { useOverlayContext } from 'Context/OverlayContext';
 import * as NavigationBar from 'expo-navigation-bar';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { OrientationLock } from 'expo-screen-orientation';
@@ -37,7 +35,7 @@ import {
 import React, {
   useEffect, useRef, useState,
 } from 'react';
-import { Dimensions, ScrollView, View } from 'react-native';
+import { Dimensions, View } from 'react-native';
 import {
   Gesture,
   GestureDetector,
@@ -74,14 +72,15 @@ export function PlayerComponent({
   voice,
   selectedQuality,
   selectedSubtitle,
-  qualityOverlayId,
-  subtitleOverlayId,
-  playerVideoSelectorOverlayId,
-  commentsOverlayId,
-  bookmarksOverlayId,
-  speedOverlayId,
+  qualityOverlayRef,
+  subtitleOverlayRef,
+  playerVideoSelectorOverlayRef,
+  commentsOverlayRef,
+  bookmarksOverlayRef,
+  speedOverlayRef,
   selectedSpeed,
   isLocked,
+  isOverlayOpen,
   togglePlayPause,
   seekToPosition,
   calculateCurrentTime,
@@ -89,7 +88,6 @@ export function PlayerComponent({
   handleQualityChange,
   openQualitySelector,
   openVideoSelector,
-  hideVideoSelector,
   handleVideoSelect,
   rewindPosition,
   openSubtitleSelector,
@@ -100,8 +98,8 @@ export function PlayerComponent({
   openCommentsOverlay,
   handleLockControls,
   handleShare,
+  closeOverlay,
 }: PlayerComponentProps) {
-  const { currentOverlay, goToPreviousOverlay } = useOverlayContext();
   const [showControls, setShowControls] = useState(false);
   const [isScrolling, setIsScrolling] = useState(false);
   const [doubleTapAction, setDoubleTapAction] = useState<DoubleTapAction | null>(null);
@@ -112,7 +110,7 @@ export function PlayerComponent({
   const doubleTapTimeout = useRef<NodeJS.Timeout | null>(null);
   const isPlayingRef = useRef(isPlaying);
   const showControlsRef = useRef(showControls);
-  const currentOverlayRef = useRef(currentOverlay);
+  const isOverlayOpenRef = useRef(isOverlayOpen);
   const isScrollingRef = useRef(isScrolling);
   const isComponentMounted = useRef(true);
 
@@ -130,7 +128,7 @@ export function PlayerComponent({
 
       if (isPlayingRef.current
         && showControlsRef.current
-        && !currentOverlayRef.current.length
+        && !isOverlayOpenRef.current
         && !isScrollingRef.current
       ) {
         setShowControls(false);
@@ -142,8 +140,8 @@ export function PlayerComponent({
     isPlayingRef.current = isPlaying;
     showControlsRef.current = showControls;
     isScrollingRef.current = isScrolling;
-    currentOverlayRef.current = currentOverlay;
-  }, [showControls, currentOverlay.length, isScrolling, isPlaying]);
+    isOverlayOpenRef.current = isOverlayOpen;
+  }, [showControls, isOverlayOpen, isScrolling, isPlaying]);
 
   useEffect(() => {
     return () => {
@@ -153,7 +151,7 @@ export function PlayerComponent({
 
   useEffect(() => {
     setControlsTimeout();
-  }, [isPlaying, currentOverlay.length, player]);
+  }, [isPlaying, isOverlayOpen, player]);
 
   useEffect(() => {
     ScreenOrientation.lockAsync(OrientationLock.LANDSCAPE);
@@ -550,7 +548,7 @@ export function PlayerComponent({
     return (
       <ThemedDropdown
         asOverlay
-        overlayId={ qualityOverlayId }
+        overlayRef={ qualityOverlayRef }
         header={ t('Quality') }
         value={ selectedQuality }
         data={ streams.map((stream) => ({
@@ -571,9 +569,8 @@ export function PlayerComponent({
 
     return (
       <PlayerVideoSelector
-        overlayId={ playerVideoSelectorOverlayId }
+        overlayRef={ playerVideoSelectorOverlayRef }
         film={ film }
-        onHide={ hideVideoSelector }
         onSelect={ handleVideoSelect }
         voice={ voice }
       />
@@ -586,7 +583,7 @@ export function PlayerComponent({
     return (
       <ThemedDropdown
         asOverlay
-        overlayId={ subtitleOverlayId }
+        overlayRef={ subtitleOverlayRef }
         header={ t('Subtitles') }
         value={ selectedSubtitle?.languageCode }
         data={ subtitles.map((subtitle) => ({
@@ -599,41 +596,32 @@ export function PlayerComponent({
   };
 
   const renderCommentsOverlay = () => (
-    <ThemedOverlay
-      id={ commentsOverlayId }
-      onHide={ () => {
-        goToPreviousOverlay();
-        setIsCommentsOpen(false);
-      } }
+    <CommentsOverlay
+      overlayRef={ commentsOverlayRef }
+      film={ film }
       style={ styles.commentsOverlayModal }
       containerStyle={ styles.commentsOverlay }
       contentContainerStyle={ styles.commentsOverlayContent }
-      transparent
-    >
-      <ScrollView
-        horizontal
-        contentContainerStyle={ { width: '100%', height: '100%' } }
-      >
-        <Comments
-          style={ styles.commentsOverlayList }
-          film={ film }
-          loaderFullScreen
-        />
-      </ScrollView>
-    </ThemedOverlay>
+      contentStyle={ styles.commentsOverlayList }
+      onClose={ () => {
+        closeOverlay();
+        setIsCommentsOpen(false);
+      } }
+    />
   );
 
   const renderBookmarksOverlay = () => (
     <BookmarksSelector
-      overlayId={ bookmarksOverlayId }
+      overlayRef={ bookmarksOverlayRef }
       film={ film }
+      onClose={ closeOverlay }
     />
   );
 
   const renderSpeedSelector = () => (
     <ThemedDropdown
       asOverlay
-      overlayId={ speedOverlayId }
+      overlayRef={ speedOverlayRef }
       header={ t('Speed') }
       value={ String(selectedSpeed) }
       data={ DEFAULT_SPEEDS.map((speed) => ({

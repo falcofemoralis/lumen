@@ -27,16 +27,12 @@ export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>
     const { getCurrentService } = useServiceContext();
 
     useEffect(() => {
-      loadComments(1);
-    }, []);
-
-    useEffect(() => {
       updatingStateRef.current = false;
     }, [comments]);
 
     useImperativeHandle(ref, () => ({
       loadComments: () => {
-        onNextLoad();
+        loadComments(1);
       },
     }));
 

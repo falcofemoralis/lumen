@@ -1,23 +1,31 @@
-import { ColorValue, StyleProp, ViewStyle } from 'react-native';
+import { StyleProp, ViewStyle } from 'react-native';
 
 export interface ThemedOverlayContainerProps {
-  id: string;
-  onHide: () => void;
   children: React.ReactNode;
   style?: StyleProp<ViewStyle>;
   containerStyle?: StyleProp<ViewStyle>;
   contentContainerStyle?: StyleProp<ViewStyle>;
   transparent?: boolean;
+  onOpen?: () => void;
+  onClose?: () => void;
 }
 
 export interface ThemedOverlayComponentProps {
-  id: string;
   isOpened: boolean;
   isVisible: boolean;
-  onHide: () => void;
   children: React.ReactNode;
   style?: StyleProp<ViewStyle>;
   containerStyle?: StyleProp<ViewStyle>;
   contentContainerStyle?: StyleProp<ViewStyle>;
   transparent?: boolean;
+  onOpen?: () => void;
+  onClose?: () => void;
+  handleModalRequestClose: () => void;
 }
+
+export type ThemedOverlayRef = {
+  open: () => void;
+  close: () => void;
+  hide: () => void;
+  show: () => void;
+};

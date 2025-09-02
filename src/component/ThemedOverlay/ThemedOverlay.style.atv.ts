@@ -11,6 +11,9 @@ export const styles = CreateStyles({
     backgroundColor: Colors.modal,
     zIndex: 1000,
     opacity: 0,
+    transitionProperty: 'opacity',
+    transitionDuration: '250ms',
+    transitionTimingFunction: 'ease-in-out',
   },
   modalVisible: {
     opacity: 1,

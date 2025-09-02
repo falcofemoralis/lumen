@@ -1,10 +1,13 @@
-import { useOverlayContext } from 'Context/OverlayContext';
+import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useServiceContext } from 'Context/ServiceContext';
 import { router } from 'expo-router';
 import { withTV } from 'Hooks/withTV';
 import t from 'i18n/t';
 import {
-  useCallback, useEffect, useId, useState,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
 } from 'react';
 import { Share } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
@@ -23,13 +26,12 @@ import { FilmPageContainerProps } from './FilmPage.type';
 
 export function FilmPageContainer({ link, thumbnailPoster }: FilmPageContainerProps) {
   const { isSignedIn, getCurrentService } = useServiceContext();
-  const { openOverlay, goToPreviousOverlay } = useOverlayContext();
   const [film, setFilm] = useState<FilmInterface | null>(null);
-  const playerVideoSelectorOverlayId = useId();
-  const scheduleOverlayId = useId();
-  const commentsOverlayId = useId();
-  const bookmarksOverlayId = useId();
-  const descriptionOverlayId = useId();
+  const playerVideoSelectorOverlayRef = useRef<ThemedOverlayRef>(null);
+  const scheduleOverlayRef = useRef<ThemedOverlayRef>(null);
+  const commentsOverlayRef = useRef<ThemedOverlayRef>(null);
+  const bookmarksOverlayRef = useRef<ThemedOverlayRef>(null);
+  const descriptionOverlayRef = useRef<ThemedOverlayRef>(null);
 
   useEffect(() => {
     const loadFilm = async () => {
@@ -50,15 +52,11 @@ export function FilmPageContainer({ link, thumbnailPoster }: FilmPageContainerPr
       return;
     }
 
-    openOverlay(playerVideoSelectorOverlayId);
-  }, [film, playerVideoSelectorOverlayId]);
-
-  const hideVideoSelector = useCallback(() => {
-    goToPreviousOverlay();
-  }, []);
+    playerVideoSelectorOverlayRef.current?.open();
+  }, [film]);
 
   const handleVideoSelect = (video: FilmVideoInterface, voice: FilmVoiceInterface) => {
-    hideVideoSelector();
+    playerVideoSelectorOverlayRef.current?.close();
     openPlayer(video, voice);
   };
 
@@ -217,23 +215,22 @@ export function FilmPageContainer({ link, thumbnailPoster }: FilmPageContainerPr
       return;
     }
 
-    openOverlay(bookmarksOverlayId);
+    bookmarksOverlayRef.current?.open();
   };
 
   const containerProps = () => ({
     film,
     thumbnailPoster,
     visibleScheduleItems: getVisibleScheduleItems(),
-    playerVideoSelectorOverlayId,
-    scheduleOverlayId,
-    commentsOverlayId,
-    bookmarksOverlayId,
-    descriptionOverlayId,
+    playerVideoSelectorOverlayRef,
+    scheduleOverlayRef,
+    commentsOverlayRef,
+    bookmarksOverlayRef,
+    descriptionOverlayRef,
   });
 
   const containerFunctions = {
     playFilm,
-    hideVideoSelector,
     handleVideoSelect,
     handleSelectFilm,
     handleSelectActor,

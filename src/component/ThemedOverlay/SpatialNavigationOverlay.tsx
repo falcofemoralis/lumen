@@ -19,5 +19,5 @@ export const SpatialNavigationOverlay = ({
 }: SpatialNavigationOverlayProps) => {
   useLockOverlay({ isModalOpened, isModalVisible, hideModal, id });
 
-  return <SpatialNavigationRoot>{ children }</SpatialNavigationRoot>;
+  return <SpatialNavigationRoot isActive={ isModalOpened }>{ children }</SpatialNavigationRoot>;
 };

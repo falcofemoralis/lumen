@@ -11,16 +11,13 @@ import { noopFn } from 'Util/Function';
 import { styles } from './ThemedOverlay.style';
 import { ThemedOverlayComponentProps } from './ThemedOverlay.type';
 
-/**
- * TODO: Replace modal with react-native-modal once it will be stable
- */
 export function ThemedOverlayComponent({
   isOpened,
-  onHide,
   contentContainerStyle,
   style,
   children,
   transparent,
+  handleModalRequestClose,
 }: ThemedOverlayComponentProps) {
   const isLandscape = useLandscape();
 
@@ -29,13 +26,13 @@ export function ThemedOverlayComponent({
       <Modal
         animationType='fade'
         visible={ isOpened }
-        onRequestClose={ onHide }
+        onRequestClose={ handleModalRequestClose }
         backdropColor={ Colors.modal }
         transparent={ transparent }
       >
         <GestureHandlerRootView>
           <Pressable
-            onPress={ onHide }
+            onPress={ handleModalRequestClose }
             style={ [styles.modal, style] }
           >
             <Pressable

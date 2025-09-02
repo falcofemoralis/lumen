@@ -1,9 +1,12 @@
 import FilmCard from 'Component/FilmCard';
 import Loader from 'Component/Loader';
+import ThemedAccordion from 'Component/ThemedAccordion';
+import { AccordionGroupInterface } from 'Component/ThemedAccordion/ThemedAccordion.type';
 import ThemedCard from 'Component/ThemedCard';
 import ThemedImage from 'Component/ThemedImage';
+import ThemedOverlay from 'Component/ThemedOverlay';
+import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import ThemedText from 'Component/ThemedText';
-import { useOverlayContext } from 'Context/OverlayContext';
 import t from 'i18n/t';
 import { CircleCheck, Star } from 'lucide-react-native';
 import { memo, useCallback, useEffect, useState } from 'react';
@@ -229,6 +232,51 @@ export const ScheduleItem = memo(({
   prevProps: ScheduleItemProps, nextProps: ScheduleItemProps
 ) => prevProps.item.name === nextProps.item.name);
 
+interface ScheduleOverlayProps {
+  scheduleOverlayRef: React.RefObject<ThemedOverlayRef | null>;
+  film: FilmInterface;
+  handleUpdateScheduleWatch: (scheduleItem: ScheduleItemInterface) => Promise<boolean>;
+}
+
+export const ScheduleOverlay = ({
+  scheduleOverlayRef,
+  film,
+  handleUpdateScheduleWatch,
+}: ScheduleOverlayProps) => {
+  const [items, setItems] = useState<AccordionGroupInterface<ScheduleItemInterface>[]>([]);
+
+  const onOverlayVisible = useCallback(() => {
+    const { schedule = [] } = film;
+
+    setItems(schedule.map(({ name, items: scheduleItems }) => ({
+      id: name,
+      title: name,
+      items: scheduleItems,
+    })));
+  }, [film]);
+
+  return (
+    <ThemedOverlay
+      ref={ scheduleOverlayRef }
+      containerStyle={ styles.scheduleOverlay }
+      contentContainerStyle={ styles.scheduleOverlayContent }
+      onOpen={ onOverlayVisible }
+    >
+      <ThemedAccordion
+        data={ items }
+        overlayContent={ styles.scheduleAccordionOverlay }
+        renderItem={ (subItem) => (
+          <ScheduleItem
+            key={ `modal-${subItem.name}` }
+            item={ subItem }
+            handleUpdateScheduleWatch={ handleUpdateScheduleWatch }
+          />
+        ) }
+      />
+    </ThemedOverlay>
+  );
+};
+
 interface FranchiseItemProps {
   film: FilmInterface,
   item: FranchiseItem,
@@ -316,14 +364,12 @@ export const InfoList = memo(({
   list,
   handleSelectCategory,
 }: InfoListProps) => {
-  const { goToPreviousOverlay } = useOverlayContext();
   const { name, position, link } = list;
 
   return (
     <SpatialNavigationFocusableView
       onSelect={ () => {
         handleSelectCategory(link);
-        goToPreviousOverlay();
       } }
     >
       { ({ isFocused }) => (
@@ -356,7 +402,6 @@ interface RelatedItemProps {
 }
 
 export const RelatedItem = memo(({
-  film,
   item,
   handleSelectFilm,
 }: RelatedItemProps) => {

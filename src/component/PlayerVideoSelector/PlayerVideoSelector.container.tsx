@@ -1,7 +1,7 @@
 import { getFirestore } from '@react-native-firebase/firestore';
 import { FIRESTORE_DB } from 'Component/Player/Player.config';
 import { FirestoreDocument, SavedTime } from 'Component/Player/Player.type';
-import { useOverlayContext } from 'Context/OverlayContext';
+import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { usePlayerContext } from 'Context/PlayerContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { withTV } from 'Hooks/withTV';
@@ -19,15 +19,13 @@ import { PROGRESS_THRESHOLD_MAX, PROGRESS_THRESHOLD_MIN } from './PlayerVideoSel
 import { PlayerVideoSelectorContainerProps } from './PlayerVideoSelector.type';
 
 export function PlayerVideoSelectorContainer({
-  overlayId,
+  overlayRef,
   film,
   voice: voiceInput,
-  onHide,
   onSelect,
 }: PlayerVideoSelectorContainerProps) {
   const { voices = [] } = film;
   const { selectedVoice: contextVoice, updateSelectedVoice } = usePlayerContext();
-  const { currentOverlay, goToPreviousOverlay, isOverlayOpened } = useOverlayContext();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedVoice, setSelectedVoice] = useState<FilmVoiceInterface>(
     voiceInput ?? voices.find(({ isActive }) => isActive) ?? voices[0]
@@ -46,6 +44,7 @@ export function PlayerVideoSelectorContainer({
       : null
   ), [isSignedIn]);
   const firestoreSavedTimeRef = useRef(false);
+  const voiceOverlayRef = useRef<ThemedOverlayRef>(null);
 
   const getContextVoice = () => {
     const { id } = film;
@@ -76,13 +75,6 @@ export function PlayerVideoSelectorContainer({
       }
     }
   };
-
-  useEffect(() => {
-    if (isOverlayOpened(overlayId)) {
-      setSavedTime(getSavedTime(film));
-      initFirestoreSavedTime();
-    }
-  }, [currentOverlay]);
 
   /**
    * if user selected another voice\season\episode directly in the player
@@ -154,7 +146,7 @@ export function PlayerVideoSelectorContainer({
       return;
     }
 
-    goToPreviousOverlay();
+    voiceOverlayRef?.current?.close();
 
     setTimeout(async () => {
       setIsLoading(true);
@@ -224,8 +216,13 @@ export function PlayerVideoSelectorContainer({
     return progress;
   };
 
+  const onOverlayOpen = () => {
+    setSavedTime(getSavedTime(film));
+    initFirestoreSavedTime();
+  };
+
   const containerProps = () => ({
-    overlayId,
+    overlayRef,
     film,
     voices,
     isLoading,
@@ -235,14 +232,15 @@ export function PlayerVideoSelectorContainer({
     seasons: getSeasons(),
     episodes: getEpisodes(),
     savedTime,
+    voiceOverlayRef,
   });
 
   const containerFunctions = {
     handleSelectVoice,
     setSelectedSeasonId,
-    onHide,
     handleSelectEpisode,
     calculateProgressThreshold,
+    onOverlayOpen,
   };
 
   return withTV(FilmVideoSelectorComponentTV, PlayerVideoSelectorComponent, {

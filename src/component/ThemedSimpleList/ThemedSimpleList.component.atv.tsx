@@ -1,12 +1,14 @@
 import ThemedImage from 'Component/ThemedImage';
-import ThemedList from 'Component/ThemedList';
 import ThemedText from 'Component/ThemedText';
 import { useCallback, useEffect, useRef } from 'react';
 import { View } from 'react-native';
-import { SpatialNavigationFocusableView, SpatialNavigationNodeRef } from 'react-tv-space-navigation';
-import { scale } from 'Util/CreateStyles';
+import {
+  SpatialNavigationFocusableView,
+  SpatialNavigationNodeRef,
+  SpatialNavigationScrollView,
+} from 'react-tv-space-navigation';
 
-import { ITEM_HEIGHT, styles } from './ThemedSimpleList.style.atv';
+import { styles } from './ThemedSimpleList.style.atv';
 import { ListItem, ThemedSimpleListComponentProps } from './ThemedSimpleList.type';
 
 export const ThemedListComponent = ({
@@ -45,6 +47,7 @@ export const ThemedListComponent = ({
 
     return (
       <SpatialNavigationFocusableView
+        key={ `${item.value}-simplelist-item` }
         // this should fix the issue when list scrolls to the top
         // but seems like it's not working
         ref={ isSelected ? defaultItemRef : null }
@@ -88,15 +91,9 @@ export const ThemedListComponent = ({
   }, [value, onChange]);
 
   const renderList = () => (
-    <View
-      style={ styles.scrollViewContainer }
-    >
-      <ThemedList
-        data={ data }
-        renderItem={ renderItem }
-        estimatedItemSize={ scale(ITEM_HEIGHT) }
-      />
-    </View>
+    <SpatialNavigationScrollView style={ styles.scrollViewContainer }>
+      { data.map((item) => renderItem({ item })) }
+    </SpatialNavigationScrollView>
   );
 
   const renderContent = () => (

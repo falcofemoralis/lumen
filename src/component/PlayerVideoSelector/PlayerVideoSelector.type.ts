@@ -1,18 +1,18 @@
 import { SavedTime } from 'Component/Player/Player.type';
+import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { EpisodeInterface, FilmVoiceInterface, SeasonInterface } from 'Type/FilmVoice.interface';
 
 export type PlayerVideoSelectorContainerProps = {
-  overlayId: string;
+  overlayRef: React.RefObject<ThemedOverlayRef | null>;
   film: FilmInterface;
   voice?: FilmVoiceInterface;
-  onHide: () => void;
   onSelect: (video: FilmVideoInterface, voice: FilmVoiceInterface) => void;
 };
 
 export type PlayerVideoSelectorComponentProps = {
-  overlayId: string;
+  overlayRef: React.RefObject<ThemedOverlayRef | null>;
   film: FilmInterface;
   voices: FilmVoiceInterface[];
   isLoading: boolean;
@@ -22,9 +22,10 @@ export type PlayerVideoSelectorComponentProps = {
   seasons: SeasonInterface[];
   episodes: EpisodeInterface[];
   savedTime: SavedTime | null;
+  voiceOverlayRef: React.RefObject<ThemedOverlayRef | null>;
   handleSelectVoice: (voiceId: string) => void;
   setSelectedSeasonId: (id: string) => void;
-  onHide: () => void;
   handleSelectEpisode: (episodeId: string) => void;
   calculateProgressThreshold: (progress: number) => number;
+  onOverlayOpen: () => void;
 };

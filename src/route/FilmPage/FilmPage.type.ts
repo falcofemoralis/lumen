@@ -1,3 +1,4 @@
+import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
@@ -12,13 +13,12 @@ export interface FilmPageComponentProps {
   film: FilmInterface | null;
   thumbnailPoster: string;
   visibleScheduleItems: ScheduleItemInterface[];
-  playerVideoSelectorOverlayId: string;
-  scheduleOverlayId: string;
-  commentsOverlayId: string;
-  bookmarksOverlayId: string;
-  descriptionOverlayId: string;
+  playerVideoSelectorOverlayRef: React.RefObject<ThemedOverlayRef | null>;
+  scheduleOverlayRef: React.RefObject<ThemedOverlayRef | null>;
+  commentsOverlayRef: React.RefObject<ThemedOverlayRef | null>;
+  bookmarksOverlayRef: React.RefObject<ThemedOverlayRef | null>;
+  descriptionOverlayRef: React.RefObject<ThemedOverlayRef | null>;
   playFilm: () => void;
-  hideVideoSelector: () => void;
   handleVideoSelect: (video: FilmVideoInterface, voice: FilmVoiceInterface) => void;
   handleSelectFilm: (film: FilmInterface) => void;
   handleSelectActor: (actorLink: string) => void;

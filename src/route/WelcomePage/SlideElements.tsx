@@ -5,7 +5,6 @@ import ThemedInput from 'Component/ThemedInput';
 import { Portal } from 'Component/ThemedPortal';
 import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
-import { useOverlayContext } from 'Context/OverlayContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useLandscape } from 'Hooks/useLandscape';
 import t from 'i18n/t';
@@ -361,7 +360,6 @@ export const ProviderSlide = ({
   goNext,
 }: ProviderSlideProps) => {
   const { getCurrentService, updateProvider, updateOfficialMode } = useServiceContext();
-  const { goToPreviousOverlay } = useOverlayContext();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [selectedProvider, setSelectedProvider] = useState<string | null>(getCurrentService().getProvider());
   const [isProviderValid, setIsProviderValid] = useState<boolean | null>(null);
@@ -394,8 +392,7 @@ export const ProviderSlide = ({
 
   const handleSelectMode = useCallback(({ value }: DropdownItem) => {
     setSelectedMode(value);
-    goToPreviousOverlay();
-  }, [goToPreviousOverlay]);
+  }, []);
 
   return (
     <BaseSlide
@@ -470,7 +467,6 @@ export const CDNSlide = ({
   goNext,
 }: CDNSlideProps) => {
   const { getCurrentService, validateUrl, updateCDN } = useServiceContext();
-  const { goToPreviousOverlay } = useOverlayContext();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [selectedCDN, setSelectedCDN] = useState<string | null>(getCurrentService().getCDN());
   const [isCDNValid, setIsCDNValid] = useState<boolean | null>(null);
@@ -522,12 +518,11 @@ export const CDNSlide = ({
 
   const handleUpdateCDN = useCallback(() => {
     updateCDN(selectedCDN ?? '', true);
-  }, [selectedCDN, updateCDN, goToPreviousOverlay]);
+  }, [selectedCDN, updateCDN]);
 
   const handleSelect = useCallback(({ value }: DropdownItem) => {
     updateCDN(value);
     setSelectedCDN(value);
-    goToPreviousOverlay();
   }, [updateCDN]);
 
   const options = useMemo(() => [

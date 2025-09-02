@@ -1,4 +1,4 @@
-import BookmarksSelector from 'Component/BookmarksSelector';
+import BookmarksOverlay from 'Component/BookmarksOverlay';
 import Header from 'Component/Header';
 import Page from 'Component/Page';
 import PlayerVideoSelector from 'Component/PlayerVideoSelector';
@@ -57,10 +57,9 @@ export function FilmPageComponent({
   film,
   thumbnailPoster,
   visibleScheduleItems,
-  playerVideoSelectorOverlayId,
-  bookmarksOverlayId,
+  playerVideoSelectorOverlayRef,
+  bookmarksOverlayRef,
   playFilm,
-  hideVideoSelector,
   handleVideoSelect,
   handleSelectFilm,
   handleSelectActor,
@@ -480,17 +479,16 @@ export function FilmPageComponent({
 
     return (
       <PlayerVideoSelector
-        overlayId={ playerVideoSelectorOverlayId }
+        overlayRef={ playerVideoSelectorOverlayRef }
         film={ film }
-        onHide={ hideVideoSelector }
         onSelect={ handleVideoSelect }
       />
     );
   };
 
   const renderBookmarksOverlay = () => (
-    <BookmarksSelector
-      overlayId={ bookmarksOverlayId }
+    <BookmarksOverlay
+      overlayRef={ bookmarksOverlayRef }
       film={ film }
     />
   );

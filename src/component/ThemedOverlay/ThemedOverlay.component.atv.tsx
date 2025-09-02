@@ -1,22 +1,23 @@
 import { Portal } from 'Component/ThemedPortal';
-import { memo } from 'react';
-import { View } from 'react-native';
+import { memo, useEffect, useId, useState } from 'react';
+import { Modal, View } from 'react-native';
+import Animated from 'react-native-reanimated';
+import { Colors } from 'Style/Colors';
 
 import { SpatialNavigationOverlay } from './SpatialNavigationOverlay';
 import { styles } from './ThemedOverlay.style.atv';
 import { ThemedOverlayComponentProps } from './ThemedOverlay.type';
 
 export function ThemedOverlayComponent({
-  onHide,
   style,
   containerStyle,
   contentContainerStyle,
   children,
   isOpened,
   isVisible,
-  id,
+  handleModalRequestClose,
 }: ThemedOverlayComponentProps) {
-  if (!isOpened) return null;
+  const id = useId();
 
   return (
     <Portal>
@@ -24,21 +25,22 @@ export function ThemedOverlayComponent({
         id={ id }
         isModalOpened={ isOpened }
         isModalVisible={ isOpened && isVisible }
-        hideModal={ onHide }
+        hideModal={ handleModalRequestClose }
       >
         <Portal.Host>
-          <View style={ [
-            styles.modal,
-            style,
-            isVisible && styles.modalVisible,
-          ] }
+          <Animated.View
+            style={ [
+              styles.modal,
+              style,
+              isVisible && styles.modalVisible,
+            ] }
           >
             <View style={ [styles.container, containerStyle] }>
               <View style={ [styles.contentContainer, contentContainerStyle] }>
                 { children }
               </View>
             </View>
-          </View>
+          </Animated.View>
         </Portal.Host>
       </SpatialNavigationOverlay>
     </Portal>

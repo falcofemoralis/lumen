@@ -28,6 +28,7 @@ export const styles = CreateStyles({
     flex: 1,
     flexDirection: 'column',
     minWidth: 300,
+    width: 340,
   },
   item: {
     flexDirection: 'row',

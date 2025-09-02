@@ -14,11 +14,11 @@ interface UseLockProps {
 // This hook is used to lock the spatial navigation of parent navigator when a modal is open
 // and to prevent the user from closing the modal by pressing the back button
 export const useLockOverlay = ({ isModalOpened,isModalVisible, hideModal, id }: UseLockProps) => {
-  useLockParentSpatialNavigator(isModalOpened);
+  useLockParentSpatialNavigator(isModalOpened, id);
   usePreventNavigationGoBack(isModalVisible, hideModal, id);
 };
 
-const useLockParentSpatialNavigator = (isModalOpened: boolean) => {
+const useLockParentSpatialNavigator = (isModalOpened: boolean, id: string) => {
   const { lock, unlock } = useLockSpatialNavigation();
 
   useEffect(() => {

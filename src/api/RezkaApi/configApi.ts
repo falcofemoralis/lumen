@@ -122,8 +122,6 @@ const configApi: ConfigApiInterface = {
     };
 
     if (this.isOfficialMode()) {
-      console.log('official mode');
-
       headers['X-Hdrezka-Android-App'] = '1';
       headers['X-Hdrezka-Android-App-Version'] = '2.2.1';
     }

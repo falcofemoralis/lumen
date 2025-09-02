@@ -17,9 +17,8 @@ import { styles } from './PlayerVideoSelector.style';
 import { PlayerVideoSelectorComponentProps } from './PlayerVideoSelector.type';
 
 export function PlayerVideoSelectorComponent({
-  overlayId,
+  overlayRef,
   voices,
-  onHide,
   isLoading,
   selectedVoice,
   selectedSeasonId,
@@ -32,6 +31,8 @@ export function PlayerVideoSelectorComponent({
   film,
   savedTime,
   calculateProgressThreshold,
+  onOverlayOpen,
+  voiceOverlayRef,
 }: PlayerVideoSelectorComponentProps) {
   const renderVoiceRating = () => {
     const { voiceRating = [] } = film;
@@ -69,6 +70,7 @@ export function PlayerVideoSelectorComponent({
             header={ t('Search voice') }
             inputStyle={ styles.voiceDropdownInput }
             style={ styles.voicesContainer }
+            overlayRef={ voiceOverlayRef }
           />
           { renderVoiceRating() }
         </View>
@@ -218,10 +220,10 @@ export function PlayerVideoSelectorComponent({
 
   return (
     <ThemedOverlay
-      id={ overlayId }
-      onHide={ onHide }
+      ref={ overlayRef }
       contentContainerStyle={ styles.container }
       style={ styles.background }
+      onOpen={ onOverlayOpen }
     >
       { renderLoader() }
       { renderContent() }
