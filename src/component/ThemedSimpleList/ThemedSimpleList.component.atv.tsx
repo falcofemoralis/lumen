@@ -91,23 +91,19 @@ export const ThemedListComponent = ({
   }, [value, onChange]);
 
   const renderList = () => (
-    <SpatialNavigationScrollView style={ styles.scrollViewContainer }>
-      { data.map((item) => renderItem({ item })) }
-    </SpatialNavigationScrollView>
-  );
-
-  const renderContent = () => (
-    <>
-      { renderHeader() }
-      { renderList() }
-    </>
+    <View style={ styles.listItems }>
+      <SpatialNavigationScrollView
+        useNativeScroll
+      >
+        { data.map((item) => renderItem({ item })) }
+      </SpatialNavigationScrollView>
+    </View>
   );
 
   return (
-    <View style={ style }>
-      <View style={ styles.listContainer }>
-        { renderContent() }
-      </View>
+    <View style={ [styles.listContainer, style] }>
+      { renderHeader() }
+      { renderList() }
     </View>
   );
 };

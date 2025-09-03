@@ -33,6 +33,7 @@ export function PlayerVideoSelectorComponent({
   calculateProgressThreshold,
   onOverlayOpen,
   voiceOverlayRef,
+  onClose,
 }: PlayerVideoSelectorComponentProps) {
   const renderVoiceRating = () => {
     const { voiceRating = [] } = film;
@@ -224,6 +225,7 @@ export function PlayerVideoSelectorComponent({
       contentContainerStyle={ styles.container }
       style={ styles.background }
       onOpen={ onOverlayOpen }
+      onClose={ onClose }
     >
       { renderLoader() }
       { renderContent() }

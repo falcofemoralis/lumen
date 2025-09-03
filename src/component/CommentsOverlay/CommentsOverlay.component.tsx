@@ -4,7 +4,6 @@ import ThemedOverlay from 'Component/ThemedOverlay';
 import { useCallback, useRef } from 'react';
 
 import { CommentsOverlayComponentProps } from './CommentsOverlay.type';
-import { ScrollView } from 'react-native';
 
 export const CommentsOverlayComponent = ({
   overlayRef,
@@ -27,20 +26,16 @@ export const CommentsOverlayComponent = ({
       style={ style }
       containerStyle={ containerStyle }
       contentContainerStyle={ contentContainerStyle }
-      onOpen={ onOverlayVisible }
+      onShow={ onOverlayVisible }
       onClose={ onClose }
       transparent
     >
-      <ScrollView
-        horizontal
-        contentContainerStyle={ { width: '100%', height: '100%' } }
-      >
-        <Comments
-          style={ contentStyle }
-          film={ film }
-          loaderFullScreen
-        />
-      </ScrollView>
+      <Comments
+        ref={ commentsRef }
+        style={ contentStyle }
+        film={ film }
+        loaderFullScreen
+      />
     </ThemedOverlay>
   );
 };

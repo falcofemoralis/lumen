@@ -359,11 +359,11 @@ export const ProviderSlide = ({
   goBack,
   goNext,
 }: ProviderSlideProps) => {
-  const { getCurrentService, updateProvider, updateOfficialMode } = useServiceContext();
+  const { currentService, updateProvider, updateOfficialMode } = useServiceContext();
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [selectedProvider, setSelectedProvider] = useState<string | null>(getCurrentService().getProvider());
+  const [selectedProvider, setSelectedProvider] = useState<string | null>(currentService.getProvider());
   const [isProviderValid, setIsProviderValid] = useState<boolean | null>(null);
-  const [selectedMode, setSelectedMode] = useState<string>(getCurrentService().getOfficialMode()); // actually it is a provider link
+  const [selectedMode, setSelectedMode] = useState<string>(currentService.getOfficialMode()); // actually it is a provider link
 
   const validateProvider = useCallback(async () => {
     setIsLoading(true);
@@ -373,7 +373,7 @@ export const ProviderSlide = ({
 
       // with official mode, we don't need to set provider, because official mode will use separate provider
       await updateProvider(selectedMode ? '' : (selectedProvider ?? ''), true);
-      await getCurrentService().getFilm(TEST_URL);
+      await currentService.getFilm(TEST_URL);
 
       setIsProviderValid(true);
     } catch (e) {
@@ -383,12 +383,12 @@ export const ProviderSlide = ({
     } finally {
       setIsLoading(false);
     }
-  }, [selectedProvider, selectedMode]);
+  }, [selectedProvider, selectedMode, currentService, updateProvider, updateOfficialMode]);
 
   const handleUpdateProvider = useCallback(() => {
     updateOfficialMode(selectedMode);
     updateProvider(selectedMode ? '' : (selectedProvider ?? ''), true);
-  }, [selectedProvider, selectedMode, updateProvider]);
+  }, [selectedProvider, selectedMode, updateProvider, updateOfficialMode]);
 
   const handleSelectMode = useCallback(({ value }: DropdownItem) => {
     setSelectedMode(value);
@@ -416,7 +416,7 @@ export const ProviderSlide = ({
           { t('Official mode') }
         </ThemedText>
         <ThemedDropdown
-          data={ getCurrentService().officialMirrors }
+          data={ currentService.officialMirrors }
           onChange={ handleSelectMode }
           header={ t('Official mode') }
           value={ selectedMode ?? '' }
@@ -466,9 +466,9 @@ export const CDNSlide = ({
   goBack,
   goNext,
 }: CDNSlideProps) => {
-  const { getCurrentService, validateUrl, updateCDN } = useServiceContext();
+  const { currentService, validateUrl, updateCDN } = useServiceContext();
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [selectedCDN, setSelectedCDN] = useState<string | null>(getCurrentService().getCDN());
+  const [selectedCDN, setSelectedCDN] = useState<string | null>(currentService.getCDN());
   const [isCDNValid, setIsCDNValid] = useState<boolean | null>(null);
 
   const handleValidateCDN = useCallback(async () => {
@@ -478,7 +478,7 @@ export const CDNSlide = ({
 
     try {
       updateCDN(selectedCDN ?? '', true);
-      film = await getCurrentService().getFilm(TEST_URL);
+      film = await currentService.getFilm(TEST_URL);
     } catch (error) {
       NotificationStore.displayError(t('Invalid Provider'));
       console.error(error);
@@ -502,7 +502,7 @@ export const CDNSlide = ({
       return;
     }
 
-    const { url } = getCurrentService().modifyCDN(voices[0].video.streams)[0];
+    const { url } = currentService.modifyCDN(voices[0].video.streams)[0];
 
     try {
       await validateUrl((new URL(url)).origin);
@@ -530,10 +530,10 @@ export const CDNSlide = ({
       value: 'auto',
       label: t('Automatic'),
     },
-  ].concat(getCurrentService().defaultCDNs.map((cdn) => ({
+  ].concat(currentService.defaultCDNs.map((cdn) => ({
     value: cdn,
     label: cdn,
-  }))), [getCurrentService]);
+  }))), [currentService]);
 
   return (
     <BaseSlide

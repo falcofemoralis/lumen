@@ -17,12 +17,9 @@ export function ThemedOverlayComponent({
   isVisible,
   handleModalRequestClose,
 }: ThemedOverlayComponentProps) {
-  const id = useId();
-
   return (
     <Portal>
       <SpatialNavigationOverlay
-        id={ id }
         isModalOpened={ isOpened }
         isModalVisible={ isOpened && isVisible }
         hideModal={ handleModalRequestClose }

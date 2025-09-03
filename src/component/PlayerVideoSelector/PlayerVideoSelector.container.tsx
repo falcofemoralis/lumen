@@ -23,6 +23,7 @@ export function PlayerVideoSelectorContainer({
   film,
   voice: voiceInput,
   onSelect,
+  onClose,
 }: PlayerVideoSelectorContainerProps) {
   const { voices = [] } = film;
   const { selectedVoice: contextVoice, updateSelectedVoice } = usePlayerContext();
@@ -30,7 +31,7 @@ export function PlayerVideoSelectorContainer({
   const [selectedVoice, setSelectedVoice] = useState<FilmVoiceInterface>(
     voiceInput ?? voices.find(({ isActive }) => isActive) ?? voices[0]
   );
-  const { isSignedIn, profile, getCurrentService } = useServiceContext();
+  const { isSignedIn, profile, currentService } = useServiceContext();
   const [selectedSeasonId, setSelectedSeasonId] = useState<string | undefined>(
     selectedVoice.lastSeasonId
   );
@@ -105,7 +106,7 @@ export function PlayerVideoSelectorContainer({
 
   const handleSelectVideo = (video: FilmVideoInterface, voice: FilmVoiceInterface) => {
     if (isSignedIn) {
-      getCurrentService().saveWatch(film, voice)
+      currentService.saveWatch(film, voice)
         .catch((error) => {
           NotificationStore.displayError(error as Error);
         });
@@ -133,7 +134,7 @@ export function PlayerVideoSelectorContainer({
       setIsLoading(true);
 
       try {
-        const video = await getCurrentService()
+        const video = await currentService
           .getFilmStreamsByVoice(film, voice);
 
         handleSelectVideo(video, voice);
@@ -152,7 +153,7 @@ export function PlayerVideoSelectorContainer({
       setIsLoading(true);
 
       try {
-        const updatedVoice = await getCurrentService().getFilmSeasons(film, voice);
+        const updatedVoice = await currentService.getFilmSeasons(film, voice);
 
         setSelectedVoice(updatedVoice);
 
@@ -179,7 +180,7 @@ export function PlayerVideoSelectorContainer({
     setIsLoading(true);
 
     try {
-      const video = await getCurrentService()
+      const video = await currentService
         .getFilmStreamsByEpisodeId(
           film,
           selectedVoice,
@@ -241,6 +242,7 @@ export function PlayerVideoSelectorContainer({
     handleSelectEpisode,
     calculateProgressThreshold,
     onOverlayOpen,
+    onClose,
   };
 
   return withTV(FilmVideoSelectorComponentTV, PlayerVideoSelectorComponent, {

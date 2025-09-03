@@ -15,7 +15,7 @@ export type CommentsRef = {
 };
 
 export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>(
-  ({ film, loaderFullScreen, style }, ref) => {
+  ({ film, loaderFullScreen, style, initialLoad }, ref) => {
     const { id } = film;
     const [comments, setComments] = useState<CommentInterface[] | null>(null);
     const paginationRef = useRef({
@@ -24,7 +24,13 @@ export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>
     });
     const updatingStateRef = useRef(false);
     const [isLoading, setIsLoading] = useState(false);
-    const { getCurrentService } = useServiceContext();
+    const { currentService } = useServiceContext();
+
+    useEffect(() => {
+      if (initialLoad) {
+        loadComments(1);
+      }
+    }, [initialLoad]);
 
     useEffect(() => {
       updatingStateRef.current = false;
@@ -51,7 +57,7 @@ export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>
           const {
             items: newItems,
             totalPages: newTotalsPages,
-          } = await getCurrentService().getComments(
+          } = await currentService.getComments(
             id,
             page
           );

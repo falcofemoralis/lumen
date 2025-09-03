@@ -18,14 +18,18 @@ export function ThemedOverlayComponent({
   children,
   transparent,
   handleModalRequestClose,
+  onShow,
 }: ThemedOverlayComponentProps) {
   const isLandscape = useLandscape();
+
+  console.log('render overlay');
 
   return (
     <Portal>
       <Modal
         animationType='fade'
         visible={ isOpened }
+        onShow={ onShow }
         onRequestClose={ handleModalRequestClose }
         backdropColor={ Colors.modal }
         transparent={ transparent }

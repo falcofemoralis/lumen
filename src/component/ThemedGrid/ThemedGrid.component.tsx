@@ -40,8 +40,6 @@ export const ThemedGridComponent = ({
     />
   ), [isRefreshing, handleRefresh]);
 
-  console.log('render list', data.length);
-
   return (
     <LegendList
       data={ data }

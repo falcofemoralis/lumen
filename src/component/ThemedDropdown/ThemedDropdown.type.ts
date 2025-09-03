@@ -18,6 +18,7 @@ export type ThemedDropdownContainerProps = {
   onChange: (item: DropdownItem) => void;
   inputLabel?: string;
   style?: StyleProp<ViewStyle>;
+  onClose?: () => void;
 };
 
 export type ThemedDropdownComponentProps = ThemedDropdownContainerProps;

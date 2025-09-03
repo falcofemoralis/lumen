@@ -19,16 +19,13 @@ export const styles = CreateStyles({
     fontWeight: '500',
   },
   listContainer: {
-    maxHeight: MAX_ITEMS_TO_DISPLAY * ITEM_HEIGHT - 16,
-    alignSelf: 'flex-end',
-    height: '100%',
-  },
-  scrollViewContainer: {
-    overflow: 'hidden',
-    flex: 1,
     flexDirection: 'column',
-    minWidth: 300,
-    width: 340,
+    flex: 0,
+  },
+  listItems: {
+    flexDirection: 'column',
+    maxHeight: MAX_ITEMS_TO_DISPLAY * ITEM_HEIGHT - 42,
+    width: 300,
   },
   item: {
     flexDirection: 'row',

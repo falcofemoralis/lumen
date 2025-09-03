@@ -28,9 +28,7 @@ export const AppUpdaterContainer = () => {
   };
 
   const closePopup = () => {
-    if (ConfigStore.isTV()) {
-      overlayRef.current?.close();
-    } else {
+    if (!ConfigStore.isTV()) {
       bottomSheetRef.current?.dismiss();
     }
 

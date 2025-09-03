@@ -13,13 +13,12 @@ import { SETTING_TYPE, SettingItem } from './SettingsPage.type';
 
 export function SettingsPageContainer() {
   const {
-    getCurrentService,
+    currentService,
     updateProvider,
     updateCDN,
     updateUserAgent,
     updateOfficialMode,
   } = useServiceContext();
-  const currentService = getCurrentService();
 
   const updateConfig = useCallback((value: string, key: any) => {
     ConfigStore.updateConfig(key, value);

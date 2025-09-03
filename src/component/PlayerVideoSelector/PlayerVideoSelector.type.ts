@@ -9,6 +9,7 @@ export type PlayerVideoSelectorContainerProps = {
   film: FilmInterface;
   voice?: FilmVoiceInterface;
   onSelect: (video: FilmVideoInterface, voice: FilmVoiceInterface) => void;
+  onClose?: () => void;
 };
 
 export type PlayerVideoSelectorComponentProps = {
@@ -28,4 +29,5 @@ export type PlayerVideoSelectorComponentProps = {
   handleSelectEpisode: (episodeId: string) => void;
   calculateProgressThreshold: (progress: number) => number;
   onOverlayOpen: () => void;
+  onClose?: () => void;
 };

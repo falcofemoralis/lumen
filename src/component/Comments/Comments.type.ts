@@ -6,6 +6,7 @@ export interface CommentsContainerProps {
   film: FilmInterface;
   loaderFullScreen?: boolean;
   style?: StyleProp<ViewStyle> | undefined;
+  initialLoad?: boolean;
 }
 
 export interface CommentsComponentProps {

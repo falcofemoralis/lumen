@@ -20,6 +20,7 @@ export const ThemedDropdownComponent = ({
   overlayRef,
   onChange,
   style,
+  onClose,
 }: ThemedDropdownComponentProps) => {
   const componentOverlayRef = useRef<ThemedOverlayRef>(null);
 
@@ -29,6 +30,7 @@ export const ThemedDropdownComponent = ({
         ref={ overlayRef || componentOverlayRef }
         containerStyle={ styles.overlay }
         contentContainerStyle={ styles.overlayContent }
+        onClose={ onClose }
       >
         <ThemedSimpleList
           data={ data }

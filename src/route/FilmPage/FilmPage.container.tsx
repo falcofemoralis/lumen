@@ -25,7 +25,7 @@ import { MINIMUM_SCHEDULE_ITEMS } from './FilmPage.config';
 import { FilmPageContainerProps } from './FilmPage.type';
 
 export function FilmPageContainer({ link, thumbnailPoster }: FilmPageContainerProps) {
-  const { isSignedIn, getCurrentService } = useServiceContext();
+  const { isSignedIn, currentService } = useServiceContext();
   const [film, setFilm] = useState<FilmInterface | null>(null);
   const playerVideoSelectorOverlayRef = useRef<ThemedOverlayRef>(null);
   const scheduleOverlayRef = useRef<ThemedOverlayRef>(null);
@@ -36,7 +36,7 @@ export function FilmPageContainer({ link, thumbnailPoster }: FilmPageContainerPr
   useEffect(() => {
     const loadFilm = async () => {
       try {
-        const loadedFilm = await getCurrentService().getFilm(link);
+        const loadedFilm = await currentService.getFilm(link);
 
         setFilm(loadedFilm);
       } catch (error) {
@@ -89,7 +89,7 @@ export function FilmPageContainer({ link, thumbnailPoster }: FilmPageContainerPr
     }
 
     if (isSignedIn) {
-      getCurrentService().saveWatch(film, voice)
+      currentService.saveWatch(film, voice)
         .catch((error) => {
           NotificationStore.displayError(error as Error);
         });
@@ -158,7 +158,7 @@ export function FilmPageContainer({ link, thumbnailPoster }: FilmPageContainerPr
     }
 
     try {
-      getCurrentService().saveScheduleWatch(id);
+      currentService.saveScheduleWatch(id);
     } catch (error) {
       NotificationStore.displayError(error as Error);
 

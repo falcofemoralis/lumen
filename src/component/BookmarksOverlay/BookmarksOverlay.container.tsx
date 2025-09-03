@@ -14,20 +14,19 @@ export const BookmarksOverlayContainer = ({
   onClose,
 }: BookmarksOverlayContainerProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const { getCurrentService } = useServiceContext();
+  const { currentService } = useServiceContext();
   const [items, setItems] = useState<ListItem[]>([]);
 
   const postBookmark = async (bookmarkId: string, isChecked: boolean) => {
     const { id } = film;
-    const service = getCurrentService();
 
     try {
       setIsLoading(true);
 
       if (isChecked) {
-        await service.addBookmark(id, bookmarkId);
+        await currentService.addBookmark(id, bookmarkId);
       } else {
-        await service.removeBookmark(id, bookmarkId);
+        await currentService.removeBookmark(id, bookmarkId);
       }
 
       const bk = film.bookmarks?.findIndex((b) => b.id === bookmarkId) ?? -1;

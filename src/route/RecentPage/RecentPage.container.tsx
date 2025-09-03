@@ -9,7 +9,7 @@ import RecentPageComponent from './RecentPage.component';
 import RecentPageComponentTV from './RecentPage.component.atv';
 
 export function RecentPageContainer() {
-  const { isSignedIn, getCurrentService } = useServiceContext();
+  const { isSignedIn, currentService } = useServiceContext();
   const [items, setItems] = useState<RecentItemInterface[]>([]);
   const paginationRef = useRef({
     page: 1,
@@ -23,9 +23,9 @@ export function RecentPageContainer() {
     }
 
     return () => {
-      getCurrentService().unloadRecentPage();
+      currentService.unloadRecentPage();
     };
-  }, [isSignedIn, getCurrentService]);
+  }, [isSignedIn, currentService]);
 
   useEffect(() => {
     updatingStateRef.current = false;
@@ -48,7 +48,7 @@ export function RecentPageContainer() {
         const {
           items: resItems,
           totalPages: resTotalPages,
-        } = await getCurrentService().getRecent(
+        } = await currentService.getRecent(
           page,
           { isRefresh }
         );
@@ -85,7 +85,7 @@ export function RecentPageContainer() {
 
     setItems((prev) => prev.filter((i) => i.id !== id));
 
-    getCurrentService().removeRecent(id).catch((error) => {
+    currentService.removeRecent(id).catch((error) => {
       NotificationStore.displayError(error as Error);
     });
   };

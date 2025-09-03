@@ -89,16 +89,10 @@ export const ThemedListComponent = ({
     </View>
   );
 
-  const renderContent = () => (
-    <>
-      { renderHeader() }
-      { renderList() }
-    </>
-  );
-
   return (
     <View style={ [styles.listContainer, style] }>
-      { renderContent() }
+      { renderHeader() }
+      { renderList() }
     </View>
   );
 };

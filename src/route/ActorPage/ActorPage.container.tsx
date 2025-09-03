@@ -13,13 +13,13 @@ import { ActorPageContainerProps } from './ActorPage.type';
 export function ActorPageContainer({ link }: ActorPageContainerProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [actor, setActor] = useState<ActorInterface | null>(null);
-  const { getCurrentService } = useServiceContext();
+  const { currentService } = useServiceContext();
 
   const fetchActor = async () => {
     try {
       setIsLoading(true);
 
-      const data = await getCurrentService().getActorDetails(link);
+      const data = await currentService.getActorDetails(link);
 
       setActor(data);
     } catch (error) {

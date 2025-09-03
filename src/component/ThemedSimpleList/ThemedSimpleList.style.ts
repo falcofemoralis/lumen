@@ -24,10 +24,6 @@ export const styles = CreateStyles({
     height: 20,
     width: 20,
   },
-  listContainer: {
-    flexDirection: 'column',
-    flex: 1,
-  },
   header: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -42,6 +38,10 @@ export const styles = CreateStyles({
     fontSize: 16,
     lineHeight: 16,
     fontWeight: '500',
+  },
+  listContainer: {
+    flexDirection: 'column',
+    flex: 1,
   },
   listItems: {
     flexDirection: 'column',

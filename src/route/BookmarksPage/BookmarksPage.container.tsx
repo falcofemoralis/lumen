@@ -14,13 +14,13 @@ export function BookmarksPageContainer() {
   const [isLoading, setIsLoading] = useState(true);
   const [bookmarks, setBookmarks] = useState<BookmarkInterface[]>([]);
   const [filmPager, setFilmPager] = useState<FilmPagerInterface>({});
-  const { isSignedIn, getCurrentService } = useServiceContext();
+  const { isSignedIn, currentService } = useServiceContext();
 
   const loadBookmarks = async () => {
     setIsLoading(true);
 
     try {
-      const items = await getCurrentService().getBookmarks();
+      const items = await currentService.getBookmarks();
 
       if (items.length > 0 && items[0].filmList) {
         const { id, filmList } = items[0];
@@ -46,7 +46,7 @@ export function BookmarksPageContainer() {
     menuItem: MenuItemInterface,
     currentPage: number,
     _isRefresh: boolean
-  ) => getCurrentService().getBookmarkedFilms({
+  ) => currentService.getBookmarkedFilms({
     id: menuItem.id,
     title: menuItem.title,
   }, currentPage);

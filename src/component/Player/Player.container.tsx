@@ -2,7 +2,7 @@ import { getFirestore } from '@react-native-firebase/firestore';
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { usePlayerContext } from 'Context/PlayerContext';
-import { usePlayerProgressContext } from 'Context/PlayerProgressContext';
+import { usePlayerProgressActions } from 'Context/PlayerProgressContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useEventListener } from 'expo';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
@@ -54,8 +54,8 @@ export function PlayerContainer({
   voice,
 }: PlayerContainerProps) {
   const { updateSelectedVoice } = usePlayerContext();
-  const { resetProgressStatus, updateProgressStatus } = usePlayerProgressContext();
-  const { isSignedIn, profile, getCurrentService } = useServiceContext();
+  const { resetProgressStatus, updateProgressStatus } = usePlayerProgressActions();
+  const { isSignedIn, profile, currentService } = useServiceContext();
   const [selectedVideo, setSelectedVideo] = useState<FilmVideoInterface>(video);
   const [selectedStream, setSelectedStream] = useState<FilmStreamInterface>(stream);
   const [selectedVoice, setSelectedVoice] = useState<FilmVoiceInterface>(voice);
@@ -215,8 +215,6 @@ export function PlayerContainer({
   });
 
   useEventListener(player, 'statusChange', ({ status: playerStatus, error }) => {
-    console.log('playerStatus', playerStatus);
-
     const loading = playerStatus === 'loading';
 
     if (playerStatus === 'error') {
@@ -234,7 +232,7 @@ export function PlayerContainer({
 
   const changePlayerVideo = (newVideo: FilmVideoInterface, newVoice: FilmVoiceInterface) => {
     if (isSignedIn) {
-      getCurrentService().saveWatch(film, newVoice)
+      currentService.saveWatch(film, newVoice)
         .catch((error) => {
           NotificationStore.displayError(error as Error);
         });
@@ -345,7 +343,6 @@ export function PlayerContainer({
 
     if (selectedQuality === quality) {
       qualityOverlayRef.current?.close();
-      closeOverlay();
 
       return;
     }
@@ -363,7 +360,6 @@ export function PlayerContainer({
 
     player.replaceAsync(newStream.url);
     qualityOverlayRef.current?.close();
-    closeOverlay();
   };
 
   const handleSubtitleChange = (item: DropdownItem) => {
@@ -371,7 +367,6 @@ export function PlayerContainer({
 
     if (selectedSubtitle?.languageCode === languageCode) {
       subtitleOverlayRef.current?.close();
-      closeOverlay();
 
       return;
     }
@@ -386,7 +381,6 @@ export function PlayerContainer({
     updateTime();
 
     subtitleOverlayRef.current?.close();
-    closeOverlay();
   };
 
   const handleNewEpisode = async (direction: RewindDirection) => {
@@ -452,7 +446,7 @@ export function PlayerContainer({
     const { seasonId } = seasons[newSeasonIndex];
     const { episodeId } = episodes[newEpisodeIndex];
 
-    const newVideo = await getCurrentService().getFilmStreamsByEpisodeId(
+    const newVideo = await currentService.getFilmStreamsByEpisodeId(
       film,
       selectedVoice,
       seasonId,
@@ -482,7 +476,6 @@ export function PlayerContainer({
 
   const handleVideoSelect = (newVideo: FilmVideoInterface, newVoice: FilmVoiceInterface) => {
     playerVideoSelectorOverlayRef.current?.close();
-    closeOverlay();
     setSelectedVoice(newVoice);
     changePlayerVideo(newVideo, newVoice);
   };
@@ -496,7 +489,6 @@ export function PlayerContainer({
 
     if (String(selectedSpeed) === speed) {
       speedOverlayRef.current?.close();
-      closeOverlay();
 
       return;
     }
@@ -505,7 +497,6 @@ export function PlayerContainer({
     setPlayerRate(Number(speed));
 
     speedOverlayRef.current?.close();
-    closeOverlay();
   };
 
   const handleLockControls = () => {

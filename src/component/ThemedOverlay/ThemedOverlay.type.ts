@@ -8,6 +8,7 @@ export interface ThemedOverlayContainerProps {
   transparent?: boolean;
   onOpen?: () => void;
   onClose?: () => void;
+  onShow?: () => void;
 }
 
 export interface ThemedOverlayComponentProps {
@@ -20,6 +21,7 @@ export interface ThemedOverlayComponentProps {
   transparent?: boolean;
   onOpen?: () => void;
   onClose?: () => void;
+  onShow?: () => void;
   handleModalRequestClose: () => void;
 }
 

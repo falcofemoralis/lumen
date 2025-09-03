@@ -266,12 +266,12 @@ export function PlayerComponent({
   }, [player]);
 
   const handleOpenComments = () => {
+    closeControls();
     setIsCommentsOpen(true);
-    openCommentsOverlay();
 
     setTimeout(() => {
-      closeControls();
-    }, 0);
+      openCommentsOverlay();
+    }, 250);
   };
 
   const renderTitle = () => {
@@ -510,6 +510,7 @@ export function PlayerComponent({
           value: stream.quality,
         })).reverse() }
         onChange={ handleQualityChange }
+        onClose={ closeOverlay }
       />
     );
   };
@@ -527,6 +528,7 @@ export function PlayerComponent({
         film={ film }
         onSelect={ handleVideoSelect }
         voice={ voice }
+        onClose={ closeOverlay }
       />
     );
   };
@@ -545,6 +547,7 @@ export function PlayerComponent({
           value: subtitle.languageCode,
         })) }
         onChange={ handleSubtitleChange }
+        onClose={ closeOverlay }
       />
     );
   };
@@ -582,6 +585,7 @@ export function PlayerComponent({
         value: String(speed),
       })) }
       onChange={ handleSpeedChange }
+      onClose={ closeOverlay }
     />
   );
 

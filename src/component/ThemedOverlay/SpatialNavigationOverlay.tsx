@@ -7,7 +7,6 @@ type SpatialNavigationOverlayProps = {
   isModalVisible: boolean;
   hideModal: () => void;
   children: React.ReactNode;
-  id: string;
 };
 
 export const SpatialNavigationOverlay = ({
@@ -15,9 +14,8 @@ export const SpatialNavigationOverlay = ({
   isModalVisible,
   hideModal,
   children,
-  id,
 }: SpatialNavigationOverlayProps) => {
-  useLockOverlay({ isModalOpened, isModalVisible, hideModal, id });
+  useLockOverlay({ isModalOpened, isModalVisible, hideModal });
 
   return <SpatialNavigationRoot isActive={ isModalOpened }>{ children }</SpatialNavigationRoot>;
 };
