@@ -55,15 +55,7 @@
           "imageWidth": 100
         }
       ],
-      "@react-native-firebase/app",
-      [
-        "@sentry/react-native/expo",
-        {
-          "url": "https://sentry.io/",
-          "project": "lumen",
-          "organization": "lumen-corp-m9"
-        }
-      ]
+      "@react-native-firebase/app"
     ],
     "experiments": {
       "typedRoutes": true,
