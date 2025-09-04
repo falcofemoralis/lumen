@@ -33,6 +33,7 @@ export interface PlayerComponentProps {
   selectedSpeed: number;
   isLocked: boolean;
   isOverlayOpen: boolean;
+  isFilmBookmarked: boolean;
   togglePlayPause: (state?: boolean, stopEvents?: boolean) => void;
   rewindPosition: (type: RewindDirection, seconds?: number) => void;
   seekToPosition: (percent: number) => void;
@@ -52,6 +53,7 @@ export interface PlayerComponentProps {
   handleLockControls: () => void;
   handleShare: () => void;
   closeOverlay: () => void;
+  onBookmarkChange: (film: FilmInterface) => void;
 }
 
 export type ProgressStatus = {

@@ -218,6 +218,19 @@ export function FilmPageContainer({ link, thumbnailPoster }: FilmPageContainerPr
     bookmarksOverlayRef.current?.open();
   };
 
+  const handleBookmarkChange = (f: FilmInterface) => {
+    setFilm((prevFilm) => {
+      if (!prevFilm) {
+        return prevFilm;
+      }
+
+      return {
+        ...prevFilm,
+        bookmarks: f.bookmarks,
+      };
+    });
+  };
+
   const containerProps = () => ({
     film,
     thumbnailPoster,
@@ -238,6 +251,7 @@ export function FilmPageContainer({ link, thumbnailPoster }: FilmPageContainerPr
     handleUpdateScheduleWatch,
     handleShare,
     openBookmarks,
+    handleBookmarkChange,
   };
 
   return withTV(FilmPageComponentTV, FilmPageComponent, {

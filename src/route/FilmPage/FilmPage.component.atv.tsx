@@ -1,6 +1,5 @@
 import { AirbnbRating } from '@rn-vui/ratings';
 import BookmarksOverlay from 'Component/BookmarksOverlay';
-import Comments from 'Component/Comments';
 import CommentsOverlay from 'Component/CommentsOverlay';
 import Page from 'Component/Page';
 import PlayerVideoSelector from 'Component/PlayerVideoSelector';
@@ -11,7 +10,7 @@ import ThemedImage from 'Component/ThemedImage';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedText from 'Component/ThemedText';
 import t from 'i18n/t';
-import { Bookmark, Clapperboard, Clock, MessageSquareText, Play } from 'lucide-react-native';
+import { Bookmark, BookmarkCheck, Clapperboard, Clock, MessageSquareText, Play } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { Dimensions, useWindowDimensions, View } from 'react-native';
 import {
@@ -26,6 +25,7 @@ import { CollectionItemInterface } from 'Type/CollectionItem';
 import { FilmInterface } from 'Type/Film.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { scale } from 'Util/CreateStyles';
+import { isBookmarked } from 'Util/Film';
 
 import { styles } from './FilmPage.style.atv';
 import { FilmPageThumbnail } from './FilmPage.thumbnail.atv';
@@ -49,6 +49,7 @@ export function FilmPageComponent({
   handleSelectCategory,
   openBookmarks,
   handleUpdateScheduleWatch,
+  handleBookmarkChange,
 }: FilmPageComponentProps) {
   const { height } = useWindowDimensions();
   const [showReadMore, setShowReadMore] = useState<boolean | null>(null);
@@ -109,7 +110,7 @@ export function FilmPageComponent({
         <View style={ styles.actions }>
           { renderPlayButton() }
           { renderAction(MessageSquareText, t('Comments'), () => commentsOverlayRef?.current?.open()) }
-          { renderAction(Bookmark, t('Bookmark'), openBookmarks) }
+          { renderAction(isBookmarked(film) ? BookmarkCheck : Bookmark, t('Bookmark'), openBookmarks) }
           { renderAction(Clapperboard, t('Trailer'), openNotImplemented) }
           { /* { renderAction(Download, t('Download'), openNotImplemented) } */ }
         </View>
@@ -514,6 +515,7 @@ export function FilmPageComponent({
     <BookmarksOverlay
       overlayRef={ bookmarksOverlayRef }
       film={ film }
+      onBookmarkChange={ handleBookmarkChange }
     />
   );
 

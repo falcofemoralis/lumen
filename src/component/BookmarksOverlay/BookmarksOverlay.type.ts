@@ -6,6 +6,7 @@ export interface BookmarksOverlayContainerProps {
   overlayRef: React.RefObject<ThemedOverlayRef | null>;
   film: FilmInterface;
   onClose?: () => void;
+  onBookmarkChange?: (film: FilmInterface) => void;
 }
 
 export interface BookmarksOverlayComponentProps {

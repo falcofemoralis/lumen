@@ -12,6 +12,7 @@ export const BookmarksOverlayContainer = ({
   overlayRef,
   film,
   onClose,
+  onBookmarkChange,
 }: BookmarksOverlayContainerProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { currentService } = useServiceContext();
@@ -32,6 +33,7 @@ export const BookmarksOverlayContainer = ({
       const bk = film.bookmarks?.findIndex((b) => b.id === bookmarkId) ?? -1;
       if (bk !== -1 && film.bookmarks) {
         film.bookmarks[bk].isBookmarked = isChecked;
+        onBookmarkChange?.(film);
       }
     } catch (error) {
       NotificationStore.displayError(error as Error);

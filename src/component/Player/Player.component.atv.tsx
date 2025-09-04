@@ -1,4 +1,4 @@
-import BookmarksSelector from 'Component/BookmarksOverlay';
+import BookmarksOverlay from 'Component/BookmarksOverlay';
 import CommentsOverlay from 'Component/CommentsOverlay';
 import Loader from 'Component/Loader';
 import PlayerClock from 'Component/PlayerClock';
@@ -14,6 +14,7 @@ import { VideoView } from 'expo-video';
 import t from 'i18n/t';
 import {
   Bookmark,
+  BookmarkCheck,
   Captions,
   CaptionsOff,
   FastForward,
@@ -78,6 +79,7 @@ export function PlayerComponent({
   speedOverlayRef,
   selectedSpeed,
   isOverlayOpen,
+  isFilmBookmarked,
   togglePlayPause,
   rewindPosition,
   openQualitySelector,
@@ -94,6 +96,7 @@ export function PlayerComponent({
   openBookmarksOverlay,
   openCommentsOverlay,
   closeOverlay,
+  onBookmarkChange,
 }: PlayerComponentProps) {
   const { focusedElement, updateFocusedElement } = usePlayerContext();
   const [showControls, setShowControls] = useState(false);
@@ -460,7 +463,7 @@ export function PlayerComponent({
             selectedSubtitle?.languageCode === '' ? Captions : CaptionsOff,
             openSubtitleSelector
           ) }
-          { renderBottomAction(Bookmark, openBookmarksOverlay) }
+          { renderBottomAction(isFilmBookmarked ? BookmarkCheck : Bookmark, openBookmarksOverlay) }
         </SpatialNavigationView>
         { renderDuration() }
       </View>
@@ -567,10 +570,11 @@ export function PlayerComponent({
   );
 
   const renderBookmarksOverlay = () => (
-    <BookmarksSelector
+    <BookmarksOverlay
       overlayRef={ bookmarksOverlayRef }
       film={ film }
       onClose={ closeOverlay }
+      onBookmarkChange={ onBookmarkChange }
     />
   );
 

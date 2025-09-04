@@ -26,4 +26,5 @@ export interface FilmPageComponentProps {
   handleUpdateScheduleWatch: (scheduleItem: ScheduleItemInterface) => Promise<boolean>;
   handleShare: () => void;
   openBookmarks: () => void;
+  handleBookmarkChange: (film: FilmInterface) => void;
 }

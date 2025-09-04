@@ -1,4 +1,4 @@
-import BookmarksSelector from 'Component/BookmarksOverlay';
+import BookmarksOverlay from 'Component/BookmarksOverlay';
 import CommentsOverlay from 'Component/CommentsOverlay';
 import Loader from 'Component/Loader';
 import PlayerClock from 'Component/PlayerClock';
@@ -17,6 +17,7 @@ import { isPictureInPictureSupported, VideoView } from 'expo-video';
 import t from 'i18n/t';
 import {
   Bookmark,
+  BookmarkCheck,
   Captions,
   CaptionsOff,
   Forward,
@@ -81,6 +82,7 @@ export function PlayerComponent({
   selectedSpeed,
   isLocked,
   isOverlayOpen,
+  isFilmBookmarked,
   togglePlayPause,
   seekToPosition,
   calculateCurrentTime,
@@ -99,6 +101,7 @@ export function PlayerComponent({
   handleLockControls,
   handleShare,
   closeOverlay,
+  onBookmarkChange,
 }: PlayerComponentProps) {
   const [showControls, setShowControls] = useState(false);
   const [isScrolling, setIsScrolling] = useState(false);
@@ -438,7 +441,7 @@ export function PlayerComponent({
           >
             { isPlaylistSelector && renderAction(ListVideo, openVideoSelector) }
             { renderAction(MessageSquareText, handleOpenComments) }
-            { renderAction(Bookmark, openBookmarksOverlay) }
+            { renderAction(isFilmBookmarked ? BookmarkCheck : Bookmark, openBookmarksOverlay) }
             { renderAction(Forward, handleShare) }
           </View>
         </View>
@@ -614,10 +617,11 @@ export function PlayerComponent({
   );
 
   const renderBookmarksOverlay = () => (
-    <BookmarksSelector
+    <BookmarksOverlay
       overlayRef={ bookmarksOverlayRef }
       film={ film }
       onClose={ closeOverlay }
+      onBookmarkChange={ onBookmarkChange }
     />
   );
 

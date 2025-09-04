@@ -19,9 +19,11 @@ import {
 import { BackHandler, Share } from 'react-native';
 import ConfigStore from 'Store/Config.store';
 import NotificationStore from 'Store/Notification.store';
+import { FilmInterface } from 'Type/Film.interface';
 import { FilmStreamInterface } from 'Type/FilmStream.interface';
 import { FilmVideoInterface, SubtitleInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
+import { isBookmarked } from 'Util/Film';
 import { setIntervalSafe } from 'Util/Misc';
 import {
   getFirestoreSavedTime,
@@ -68,6 +70,7 @@ export function PlayerContainer({
   const [selectedSpeed, setSelectedSpeed] = useState<number>(DEFAULT_SPEED);
   const [isLocked, setIsLocked] = useState<boolean>(false);
   const [isOverlayOpen, setIsOverlayOpen] = useState<boolean>(false);
+  const [isFilmBookmarked, setIsFilmBookmarked] = useState<boolean>(isBookmarked(film));
 
   const stopEventsRef = useRef<boolean>(false);
   const updateTimeTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -329,6 +332,12 @@ export function PlayerContainer({
   };
 
   const openBookmarksOverlay = () => {
+    if (!isSignedIn) {
+      NotificationStore.displayMessage(t('Sign In to an Account'));
+
+      return;
+    }
+
     bookmarksOverlayRef.current?.open();
     openOverlay();
   };
@@ -513,6 +522,11 @@ export function PlayerContainer({
     }
   };
 
+  const onBookmarkChange = (f: FilmInterface) => {
+    film.bookmarks = f.bookmarks;
+    setIsFilmBookmarked(isBookmarked(film));
+  };
+
   const containerProps = () => ({
     player,
     isLoading,
@@ -531,6 +545,7 @@ export function PlayerContainer({
     selectedSpeed,
     isLocked,
     isOverlayOpen,
+    isFilmBookmarked,
   });
 
   const containerFunctions = {
@@ -553,6 +568,7 @@ export function PlayerContainer({
     handleLockControls,
     handleShare,
     closeOverlay,
+    onBookmarkChange,
   };
 
   return withTV(PlayerComponentTV, PlayerComponent, {
