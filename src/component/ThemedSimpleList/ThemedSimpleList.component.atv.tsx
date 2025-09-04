@@ -1,11 +1,12 @@
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import { View } from 'react-native';
 import {
+  DefaultFocus,
   SpatialNavigationFocusableView,
-  SpatialNavigationNodeRef,
-  SpatialNavigationScrollView,
+  SpatialNavigationVirtualizedList,
+  SpatialNavigationVirtualizedListRef,
 } from 'react-tv-space-navigation';
 
 import { styles } from './ThemedSimpleList.style.atv';
@@ -18,15 +19,17 @@ export const ThemedListComponent = ({
   style,
   onChange,
 }: ThemedSimpleListComponentProps) => {
-  const defaultItemRef = useRef<SpatialNavigationNodeRef>(null);
+  const scrollViewRef = useRef<SpatialNavigationVirtualizedListRef>(null);
 
-  useEffect(() => {
+  const handleLayout = () => {
     setTimeout(() => {
-      if (defaultItemRef.current) {
-        defaultItemRef.current?.focus();
+      const itemIdx = data.findIndex((item) => item.value === value);
+
+      if (scrollViewRef.current) {
+        scrollViewRef.current?.focus(itemIdx);
       }
     }, 0);
-  }, []);
+  };
 
   const renderHeader = () => {
     if (!header) {
@@ -46,57 +49,57 @@ export const ThemedListComponent = ({
     const isSelected = value === item.value;
 
     return (
-      <SpatialNavigationFocusableView
-        key={ `${item.value}-simplelist-item` }
-        // this should fix the issue when list scrolls to the top
-        // but seems like it's not working
-        ref={ isSelected ? defaultItemRef : null }
-        onSelect={ () => onChange(item) }
-      >
-        { ({ isFocused }) => (
-          <View
-            style={ [
-              styles.item,
-              isSelected && styles.itemSelected,
-              isFocused && styles.itemFocused,
-            ] }
-          >
-            <View style={ styles.itemContainer }>
-              { item.startIcon && (
-                <ThemedImage
-                  style={ styles.icon }
-                  src={ item.startIcon }
-                />
-              ) }
-              <ThemedText
-                style={ [
-                  styles.text,
-                  isSelected && styles.textSelected,
-                  isFocused && styles.textFocused,
-                ] }
-              >
-                { item.label }
-              </ThemedText>
-              { item.endIcon && (
-                <ThemedImage
-                  style={ styles.icon }
-                  src={ item.endIcon }
-                />
-              ) }
+      <DefaultFocus enable={ isSelected }>
+        <SpatialNavigationFocusableView
+          onSelect={ () => onChange(item) }
+        >
+          { ({ isFocused }) => (
+            <View
+              style={ [
+                styles.item,
+                isSelected && styles.itemSelected,
+                isFocused && styles.itemFocused,
+              ] }
+            >
+              <View style={ styles.itemContainer }>
+                { item.startIcon && (
+                  <ThemedImage
+                    style={ styles.icon }
+                    src={ item.startIcon }
+                  />
+                ) }
+                <ThemedText
+                  style={ [
+                    styles.text,
+                    isSelected && styles.textSelected,
+                    isFocused && styles.textFocused,
+                  ] }
+                >
+                  { item.label }
+                </ThemedText>
+                { item.endIcon && (
+                  <ThemedImage
+                    style={ styles.icon }
+                    src={ item.endIcon }
+                  />
+                ) }
+              </View>
             </View>
-          </View>
-        ) }
-      </SpatialNavigationFocusableView>
+          ) }
+        </SpatialNavigationFocusableView>
+      </DefaultFocus>
     );
   }, [value, onChange]);
 
   const renderList = () => (
-    <View style={ styles.listItems }>
-      <SpatialNavigationScrollView
-        useNativeScroll
-      >
-        { data.map((item) => renderItem({ item })) }
-      </SpatialNavigationScrollView>
+    <View style={ styles.listItems } onLayout={ handleLayout }>
+      <SpatialNavigationVirtualizedList
+        ref={ scrollViewRef }
+        data={ data }
+        renderItem={ renderItem }
+        itemSize={ styles.item.height }
+        orientation="vertical"
+      />
     </View>
   );
 

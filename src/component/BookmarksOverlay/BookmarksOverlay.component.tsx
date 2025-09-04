@@ -21,13 +21,11 @@ export const BookmarksOverlayComponent = ({
         isLoading={ isLoading }
         fullScreen
       />
-      { items.length > 0 && (
-        <ThemedMultiList
-          header={ t('Bookmarks') }
-          data={ items }
-          onChange={ postBookmark }
-        />
-      ) }
+      <ThemedMultiList
+        header={ t('Bookmarks') }
+        data={ items }
+        onChange={ postBookmark }
+      />
     </ThemedOverlay>
   );
 };

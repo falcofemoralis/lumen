@@ -1,8 +1,7 @@
 import { Portal } from 'Component/ThemedPortal';
-import { memo, useEffect, useId, useState } from 'react';
-import { Modal, View } from 'react-native';
+import { memo } from 'react';
+import { View } from 'react-native';
 import Animated from 'react-native-reanimated';
-import { Colors } from 'Style/Colors';
 
 import { SpatialNavigationOverlay } from './SpatialNavigationOverlay';
 import { styles } from './ThemedOverlay.style.atv';
@@ -15,6 +14,7 @@ export function ThemedOverlayComponent({
   children,
   isOpened,
   isVisible,
+  contentVisible,
   handleModalRequestClose,
 }: ThemedOverlayComponentProps) {
   return (
@@ -34,7 +34,7 @@ export function ThemedOverlayComponent({
           >
             <View style={ [styles.container, containerStyle] }>
               <View style={ [styles.contentContainer, contentContainerStyle] }>
-                { children }
+                { contentVisible && children }
               </View>
             </View>
           </Animated.View>
@@ -48,7 +48,8 @@ function propsAreEqual(
   prevProps: ThemedOverlayComponentProps,
   props: ThemedOverlayComponentProps
 ) {
-  return prevProps.isOpened === props.isOpened && prevProps.isVisible === props.isVisible
+  return prevProps.isOpened === props.isOpened
+    && prevProps.isVisible === props.isVisible
     && prevProps.children === props.children;
 }
 

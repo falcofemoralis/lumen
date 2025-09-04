@@ -1,7 +1,6 @@
-import { ListItem } from 'Component/ThemedMultiList/ThemedMultiList.type';
 import { useServiceContext } from 'Context/ServiceContext';
 import { withTV } from 'Hooks/withTV';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
 
 import BookmarksOverlayComponent from './BookmarksOverlay.component';
@@ -16,7 +15,6 @@ export const BookmarksOverlayContainer = ({
 }: BookmarksOverlayContainerProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { currentService } = useServiceContext();
-  const [items, setItems] = useState<ListItem[]>([]);
 
   const postBookmark = async (bookmarkId: string, isChecked: boolean) => {
     const { id } = film;
@@ -42,23 +40,22 @@ export const BookmarksOverlayContainer = ({
     }
   };
 
-  const onOverlayVisible = useCallback(() => {
+  const prepareItems = () => {
     const { bookmarks = [] } = film;
 
-    setItems(bookmarks.map((bookmark) => ({
+    return bookmarks.map((bookmark) => ({
       label: bookmark.title,
       value: bookmark.id,
       isChecked: bookmark.isBookmarked ?? false,
-    })));
-  }, [film]);
+    }));
+  };
 
   const containerProps = {
     overlayRef,
     film,
     isLoading,
-    items,
+    items: prepareItems(),
     onClose,
-    onOverlayVisible,
   };
 
   const containerFunctions = {

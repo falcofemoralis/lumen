@@ -61,7 +61,7 @@ export function FilmPageComponent({
   const shouldShowReadMore = (content: number) => {
     const percent = ((content - scale(40)) / height) * 100;
 
-    setShowReadMore(percent > 45);
+    setShowReadMore(percent > 44);
   };
 
   const openNotImplemented = () => {

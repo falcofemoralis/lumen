@@ -15,5 +15,4 @@ export interface BookmarksOverlayComponentProps {
   isLoading: boolean;
   postBookmark: (id: string, isChecked: boolean) => Promise<void>;
   onClose?: () => void;
-  onOverlayVisible?: () => void;
 }

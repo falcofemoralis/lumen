@@ -11,26 +11,21 @@ export const BookmarksOverlayComponent = ({
   isLoading,
   postBookmark,
   onClose,
-  onOverlayVisible,
 }: BookmarksOverlayComponentProps) => {
-
   return (
     <ThemedOverlay
       ref={ overlayRef }
-      onOpen={ onOverlayVisible }
       onClose={ onClose }
     >
       <Loader
         isLoading={ isLoading }
         fullScreen
       />
-      { items.length > 0 && (
-        <ThemedMultiList
-          header={ t('Bookmarks') }
-          data={ items }
-          onChange={ postBookmark }
-        />
-      ) }
+      <ThemedMultiList
+        header={ t('Bookmarks') }
+        data={ items }
+        onChange={ postBookmark }
+      />
     </ThemedOverlay>
   );
 };

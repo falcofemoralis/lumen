@@ -1,4 +1,3 @@
-import ThemedList from 'Component/ThemedList';
 import { Square, SquareCheck } from 'lucide-react-native';
 import React from 'react';
 import {
@@ -8,6 +7,7 @@ import {
 import {
   DefaultFocus,
   SpatialNavigationFocusableView,
+  SpatialNavigationVirtualizedList,
 } from 'react-tv-space-navigation';
 import { Colors } from 'Style/Colors';
 
@@ -35,7 +35,6 @@ export const ThemedMultiListComponent = ({
 
   const renderItem = ({ item }: { item: ListItem }) => (
     <SpatialNavigationFocusableView
-      key={ `${item.value}-multilist-item` }
       onSelect={ () => { handleOnChange(item.value, !item.isChecked); } }
     >
       { ({ isFocused }) => (
@@ -72,10 +71,11 @@ export const ThemedMultiListComponent = ({
       style={ styles.scrollViewContainer }
     >
       <DefaultFocus>
-        <ThemedList
+        <SpatialNavigationVirtualizedList
           data={ values }
           renderItem={ renderItem }
-          estimatedItemSize={ styles.item.height }
+          itemSize={ styles.item.height }
+          orientation="vertical"
         />
       </DefaultFocus>
     </View>

@@ -17,12 +17,11 @@ export function ThemedOverlayComponent({
   style,
   children,
   transparent,
+  contentVisible,
   handleModalRequestClose,
   onShow,
 }: ThemedOverlayComponentProps) {
   const isLandscape = useLandscape();
-
-  console.log('render overlay');
 
   return (
     <Portal>
@@ -47,7 +46,7 @@ export function ThemedOverlayComponent({
                 contentContainerStyle,
               ] }
             >
-              { children }
+              { contentVisible && children }
             </Pressable>
           </Pressable>
         </GestureHandlerRootView>

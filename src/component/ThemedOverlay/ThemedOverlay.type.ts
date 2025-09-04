@@ -19,6 +19,7 @@ export interface ThemedOverlayComponentProps {
   containerStyle?: StyleProp<ViewStyle>;
   contentContainerStyle?: StyleProp<ViewStyle>;
   transparent?: boolean;
+  contentVisible: boolean;
   onOpen?: () => void;
   onClose?: () => void;
   onShow?: () => void;
