@@ -527,6 +527,11 @@ export function PlayerContainer({
     setIsFilmBookmarked(isBookmarked(film));
   };
 
+  const backwardToStart = () => {
+    seekToPosition(0);
+    togglePlayPause(false);
+  };
+
   const containerProps = () => ({
     player,
     isLoading,
@@ -569,6 +574,7 @@ export function PlayerContainer({
     handleShare,
     closeOverlay,
     onBookmarkChange,
+    backwardToStart,
   };
 
   return withTV(PlayerComponentTV, PlayerComponent, {

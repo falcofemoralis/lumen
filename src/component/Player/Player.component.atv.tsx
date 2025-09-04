@@ -17,16 +17,14 @@ import {
   BookmarkCheck,
   Captions,
   CaptionsOff,
-  FastForward,
   Gauge,
   ListVideo,
   MessageSquareText,
   Pause,
   Play,
-  Rewind,
   SkipBack,
   SkipForward,
-  Sparkles,
+  Undo2,
 } from 'lucide-react-native';
 import React, {
   Ref,
@@ -46,6 +44,7 @@ import {
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
 import { Colors } from 'Style/Colors';
+import { HighQuality } from 'Style/Icons';
 import { scale } from 'Util/CreateStyles';
 import { setTimeoutSafe } from 'Util/Misc';
 import RemoteControlManager from 'Util/RemoteControl/RemoteControlManager';
@@ -97,6 +96,7 @@ export function PlayerComponent({
   openCommentsOverlay,
   closeOverlay,
   onBookmarkChange,
+  backwardToStart,
 }: PlayerComponentProps) {
   const { focusedElement, updateFocusedElement } = usePlayerContext();
   const [showControls, setShowControls] = useState(false);
@@ -171,8 +171,7 @@ export function PlayerComponent({
       if (!isComponentMounted.current || isOverlayOpenRef.current) return false;
 
       if (type === SupportedKeys.BACKWARD) {
-        seekToPosition(0);
-        togglePlayPause(false);
+        backwardToStart();
 
         return true;
       }
@@ -333,7 +332,7 @@ export function PlayerComponent({
           ] }
         >
           <IconComponent
-            size={ scale(28) }
+            size={ scale(26) }
             color={ Colors.white }
           />
         </View>
@@ -384,8 +383,6 @@ export function PlayerComponent({
     >
       <View style={ styles.controlsRow }>
         { renderTopAction(isPlaying || isLoading ? Pause : Play, togglePlayPause, topActionRef) }
-        { renderTopAction(Rewind, () => rewindPosition(RewindDirection.BACKWARD)) }
-        { renderTopAction(FastForward, () => rewindPosition(RewindDirection.FORWARD)) }
         { film.hasSeasons && (
           <>
             { renderTopAction(SkipBack, () => handleNewEpisode(RewindDirection.BACKWARD)) }
@@ -394,6 +391,7 @@ export function PlayerComponent({
         ) }
         { renderTopAction(Gauge, openSpeedSelector) }
         { renderTopAction(MessageSquareText, handleOpenComments) }
+        { renderTopAction(Undo2, backwardToStart) }
       </View>
       { renderTopActionLine() }
     </SpatialNavigationView>
@@ -457,7 +455,7 @@ export function PlayerComponent({
             ...(hideActions ? styles.controlsRowHidden : {}),
           } }
         >
-          { renderBottomAction(Sparkles, openQualitySelector, bottomActionRef) }
+          { renderBottomAction(HighQuality , openQualitySelector, bottomActionRef) }
           { isPlaylistSelector && renderBottomAction(ListVideo, openVideoSelector) }
           { subtitles.length > 0 && renderBottomAction(
             selectedSubtitle?.languageCode === '' ? Captions : CaptionsOff,

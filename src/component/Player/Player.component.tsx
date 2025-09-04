@@ -31,7 +31,6 @@ import {
   Play,
   SkipBack,
   SkipForward,
-  Sparkles,
 } from 'lucide-react-native';
 import React, {
   useEffect, useRef, useState,
@@ -47,6 +46,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { Colors } from 'Style/Colors';
+import { HighQuality } from 'Style/Icons';
 import { scale } from 'Util/CreateStyles';
 import { setTimeoutSafe } from 'Util/Misc';
 
@@ -317,7 +317,7 @@ export function PlayerComponent({
           <>
             { isPictureInPictureSupported() && renderAction(PictureInPicture2, enablePIP) }
             { renderAction(Gauge, openSpeedSelector) }
-            { renderAction(Sparkles, openQualitySelector) }
+            { renderAction(HighQuality, openQualitySelector) }
             { renderSubtitlesActions() }
           </>
         ) }
