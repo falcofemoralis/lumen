@@ -18,8 +18,7 @@ import t from 'i18n/t';
 import {
   Bookmark,
   BookmarkCheck,
-  Captions,
-  CaptionsOff,
+  ClosedCaption,
   Forward,
   Gauge,
   ListVideo,
@@ -29,6 +28,7 @@ import {
   Pause,
   PictureInPicture2,
   Play,
+  Settings2,
   SkipBack,
   SkipForward,
 } from 'lucide-react-native';
@@ -46,7 +46,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { Colors } from 'Style/Colors';
-import { HighQuality } from 'Style/Icons';
+import { ClosedCaptionFilled } from 'Style/Icons';
 import { scale } from 'Util/CreateStyles';
 import { setTimeoutSafe } from 'Util/Misc';
 
@@ -306,7 +306,10 @@ export function PlayerComponent({
       return null;
     }
 
-    return renderAction(selectedSubtitle?.languageCode === '' ? Captions : CaptionsOff, openSubtitleSelector);
+    return renderAction(
+      selectedSubtitle?.languageCode === '' ? ClosedCaption : ClosedCaptionFilled,
+      openSubtitleSelector
+    );
   };
 
   const renderTopActions = () => (
@@ -317,7 +320,7 @@ export function PlayerComponent({
           <>
             { isPictureInPictureSupported() && renderAction(PictureInPicture2, enablePIP) }
             { renderAction(Gauge, openSpeedSelector) }
-            { renderAction(HighQuality, openQualitySelector) }
+            { renderAction(Settings2, openQualitySelector) }
             { renderSubtitlesActions() }
           </>
         ) }

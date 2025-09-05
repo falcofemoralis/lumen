@@ -15,13 +15,13 @@ import t from 'i18n/t';
 import {
   Bookmark,
   BookmarkCheck,
-  Captions,
-  CaptionsOff,
+  ClosedCaption,
   Gauge,
   ListVideo,
   MessageSquareText,
   Pause,
   Play,
+  Settings2,
   SkipBack,
   SkipForward,
   Undo2,
@@ -44,7 +44,7 @@ import {
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
 import { Colors } from 'Style/Colors';
-import { HighQuality } from 'Style/Icons';
+import { ClosedCaptionFilled } from 'Style/Icons';
 import { scale } from 'Util/CreateStyles';
 import { setTimeoutSafe } from 'Util/Misc';
 import RemoteControlManager from 'Util/RemoteControl/RemoteControlManager';
@@ -455,10 +455,10 @@ export function PlayerComponent({
             ...(hideActions ? styles.controlsRowHidden : {}),
           } }
         >
-          { renderBottomAction(HighQuality , openQualitySelector, bottomActionRef) }
+          { renderBottomAction(Settings2 , openQualitySelector, bottomActionRef) }
           { isPlaylistSelector && renderBottomAction(ListVideo, openVideoSelector) }
           { subtitles.length > 0 && renderBottomAction(
-            selectedSubtitle?.languageCode === '' ? Captions : CaptionsOff,
+            selectedSubtitle?.languageCode === '' ? ClosedCaption : ClosedCaptionFilled,
             openSubtitleSelector
           ) }
           { renderBottomAction(isFilmBookmarked ? BookmarkCheck : Bookmark, openBookmarksOverlay) }

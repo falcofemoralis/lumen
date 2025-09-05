@@ -49,7 +49,7 @@
     "expo-video": "^2.2.1",
     "html-entities": "^2.6.0",
     "i18n-js": "^4.5.1",
-    "lucide-react-native": "^0.515.0",
+    "lucide-react-native": "^0.542.0",
     "moment": "^2.30.1",
     "node-html-parser": "^7.0.1",
     "node-webvtt": "^1.9.4",
