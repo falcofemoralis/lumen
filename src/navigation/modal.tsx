@@ -11,7 +11,11 @@ export default function Modal() {
     type: string;
     film: FilmInterface;
     additionalProps: Record<string, any>;
-  };
+  } ?? {};
+
+  if (!type) {
+    return null;
+  }
 
   const renderContent = () => {
     switch (type) {

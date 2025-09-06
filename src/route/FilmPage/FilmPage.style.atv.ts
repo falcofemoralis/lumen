@@ -306,4 +306,10 @@ export const styles = CreateStyles({
     fontSize: 16,
     lineHeight: 24,
   },
+  card: {
+    backgroundColor: Colors.backgroundLight,
+    borderRadius: 16,
+    borderColor: Colors.darkBorder,
+    borderWidth: 1,
+  },
 });

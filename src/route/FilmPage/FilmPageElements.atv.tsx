@@ -2,7 +2,6 @@ import FilmCard from 'Component/FilmCard';
 import Loader from 'Component/Loader';
 import ThemedAccordion from 'Component/ThemedAccordion';
 import { AccordionGroupInterface } from 'Component/ThemedAccordion/ThemedAccordion.type';
-import ThemedCard from 'Component/ThemedCard';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
@@ -32,14 +31,14 @@ export const Section = ({
   title,
   children,
 }: SectionProps) => (
-  <ThemedCard style={ styles.section }>
+  <View style={ [styles.card, styles.section] }>
     <ThemedText style={ styles.sectionHeading }>
       { title }
     </ThemedText>
     <View style={ styles.sectionContent }>
       { children }
     </View>
-  </ThemedCard>
+  </View>
 );
 
 interface ActorProps {

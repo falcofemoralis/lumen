@@ -5,7 +5,6 @@ import Page from 'Component/Page';
 import PlayerVideoSelector from 'Component/PlayerVideoSelector';
 import ThemedAccordion from 'Component/ThemedAccordion';
 import ThemedButton from 'Component/ThemedButton';
-import ThemedCard from 'Component/ThemedCard';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedText from 'Component/ThemedText';
@@ -284,7 +283,7 @@ export function FilmPageComponent({
     } = film;
 
     return (
-      <ThemedCard style={ styles.mainInfo }>
+      <View style={ [styles.card, styles.mainInfo ]}>
         <ThemedText style={ styles.title }>{ title }</ThemedText>
         { originalTitle && (
           <ThemedText style={ styles.originalTitle }>
@@ -301,7 +300,7 @@ export function FilmPageComponent({
         { renderDirectors() }
         { renderCollection(countries, t('Country'), handleSelectCategory) }
         { renderDescription() }
-      </ThemedCard>
+      </View>
     );
   };
 
