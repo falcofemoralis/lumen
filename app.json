@@ -62,11 +62,12 @@
       "reactCompiler": true
     },
     "android": {
-	    "edgeToEdgeEnabled": true,
       "icon": "./assets/images/icon.png",
       "package": "com.falcofemoralis.lumendev",
       "versionCode": 8,
-      "googleServicesFile": "./google-services.json"
+      "googleServicesFile": "./google-services.json",
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false
     },
     "newArchEnabled": true,
     "name": "Lumen App (DEV)",
