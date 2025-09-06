@@ -16,7 +16,7 @@ export enum TAB_COMPONENT {
 
 export type NavigationRoute = '(account)'
 | '(notifications)'
-| '(+home)'
+| '(home)'
 | '(recent)'
 | '(search)'
 | '(bookmarks)'

@@ -10,13 +10,13 @@ import HomePageComponentTV from './HomePage.component.atv';
 
 export function HomePageContainer() {
   const [filmPager, setFilmPager] = useState<FilmPagerInterface>({});
-  const { getCurrentService } = useServiceContext();
+  const { currentService } = useServiceContext();
 
   const onLoadFilms = async (
     menuItem: MenuItemInterface,
     currentPage: number,
     isRefresh: boolean
-  ) => getCurrentService().getHomeMenuFilms(menuItem, currentPage, {
+  ) => currentService.getHomeMenuFilms(menuItem, currentPage, {
     isRefresh,
   });
 
@@ -29,7 +29,7 @@ export function HomePageContainer() {
     }));
   };
 
-  const getMenuItems = () => getCurrentService().getHomeMenu();
+  const getMenuItems = () => currentService.getHomeMenu();
 
   const containerProps = () => ({
     menuItems: getMenuItems(),

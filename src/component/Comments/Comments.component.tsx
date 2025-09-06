@@ -1,7 +1,7 @@
 import Loader from 'Component/Loader';
-import ThemedGrid from 'Component/ThemedGrid';
 import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
 import ThemedImage from 'Component/ThemedImage';
+import ThemedList from 'Component/ThemedList';
 import ThemedText from 'Component/ThemedText';
 import t from 'i18n/t';
 import { ThumbsUp } from 'lucide-react-native';
@@ -115,11 +115,10 @@ export const CommentsComponent = ({
   }
 
   return (
-    <ThemedGrid
-      style={ [styles.commentsList, style] }
+    <ThemedList
+      // style={ [styles.commentsList, style] }
       data={ comments }
-      numberOfColumns={ 1 }
-      itemSize={ scale(100) }
+      estimatedItemSize={ scale(100) }
       renderItem={ renderItem }
       onNextLoad={ onNextLoad }
     />

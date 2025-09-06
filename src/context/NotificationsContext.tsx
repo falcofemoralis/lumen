@@ -31,7 +31,7 @@ const NotificationsContext = createContext<NotificationsContextInterface>({
 });
 
 export const NotificationsProvider = ({ children }: { children: React.ReactNode }) => {
-  const { getCurrentService } = useServiceContext();
+  const { currentService } = useServiceContext();
   const [badgeData, setBadgeData] = useState<BadgeData>({});
 
   const updateBadge = useCallback((data: NotificationInterface[]) => {
@@ -75,7 +75,7 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
         }
       }
 
-      const data = await getCurrentService().getNotifications();
+      const data = await currentService.getNotifications();
 
       miscStorage.set(NOTIFICATIONS_STORAGE_CACHE, JSON.stringify({
         data,
@@ -90,7 +90,7 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
 
       return null;
     }
-  }, [updateBadge]);
+  }, [updateBadge, currentService]);
 
   /**
    * Reset notifications for the current service

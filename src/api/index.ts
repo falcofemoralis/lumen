@@ -1,3 +1,4 @@
+import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import { ActorInterface } from 'Type/Actor.interface';
 import { BookmarkInterface } from 'Type/Bookmark.interface';
 import { CommentListInterface } from 'Type/CommentList.interface';
@@ -30,12 +31,15 @@ export interface ServiceConfigInterface {
   cdn: string;
   auth: string;
   userAgent: string;
+  officialMode: string;
 }
 
 export interface ConfigApiInterface {
   serviceType: ApiServiceType;
   defaultProviders: string[];
   defaultCDNs: string[];
+  defaultUserAgent: string;
+  officialMirrors: DropdownItem[];
   config: ServiceConfigInterface | null;
   loadConfig(): ServiceConfigInterface;
   updateConfig(key: keyof ServiceConfigInterface, value: string): Promise<void>;
@@ -56,6 +60,9 @@ export interface ConfigApiInterface {
   postRequest(query: string, variables?: Variables): Promise<any>;
   modifyCDN(streams: FilmStreamInterface[]): FilmStreamInterface[];
   modifyProvider(query: string): ModifiedProvider;
+  setOfficialMode(mode: string): void;
+  getOfficialMode(): string;
+  isOfficialMode(): boolean;
 }
 
 export interface FilmApiInterface {

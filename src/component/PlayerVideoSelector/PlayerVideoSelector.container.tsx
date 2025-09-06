@@ -1,7 +1,7 @@
 import { getFirestore } from '@react-native-firebase/firestore';
 import { FIRESTORE_DB } from 'Component/Player/Player.config';
 import { FirestoreDocument, SavedTime } from 'Component/Player/Player.type';
-import { useOverlayContext } from 'Context/OverlayContext';
+import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { usePlayerContext } from 'Context/PlayerContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { withTV } from 'Hooks/withTV';
@@ -19,20 +19,19 @@ import { PROGRESS_THRESHOLD_MAX, PROGRESS_THRESHOLD_MIN } from './PlayerVideoSel
 import { PlayerVideoSelectorContainerProps } from './PlayerVideoSelector.type';
 
 export function PlayerVideoSelectorContainer({
-  overlayId,
+  overlayRef,
   film,
   voice: voiceInput,
-  onHide,
   onSelect,
+  onClose,
 }: PlayerVideoSelectorContainerProps) {
   const { voices = [] } = film;
   const { selectedVoice: contextVoice, updateSelectedVoice } = usePlayerContext();
-  const { currentOverlay, goToPreviousOverlay, isOverlayOpened } = useOverlayContext();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedVoice, setSelectedVoice] = useState<FilmVoiceInterface>(
     voiceInput ?? voices.find(({ isActive }) => isActive) ?? voices[0]
   );
-  const { isSignedIn, profile, getCurrentService } = useServiceContext();
+  const { isSignedIn, profile, currentService } = useServiceContext();
   const [selectedSeasonId, setSelectedSeasonId] = useState<string | undefined>(
     selectedVoice.lastSeasonId
   );
@@ -46,6 +45,7 @@ export function PlayerVideoSelectorContainer({
       : null
   ), [isSignedIn]);
   const firestoreSavedTimeRef = useRef(false);
+  const voiceOverlayRef = useRef<ThemedOverlayRef>(null);
 
   const getContextVoice = () => {
     const { id } = film;
@@ -77,13 +77,6 @@ export function PlayerVideoSelectorContainer({
     }
   };
 
-  useEffect(() => {
-    if (isOverlayOpened(overlayId)) {
-      setSavedTime(getSavedTime(film));
-      initFirestoreSavedTime();
-    }
-  }, [currentOverlay]);
-
   /**
    * if user selected another voice\season\episode directly in the player
    */
@@ -113,7 +106,7 @@ export function PlayerVideoSelectorContainer({
 
   const handleSelectVideo = (video: FilmVideoInterface, voice: FilmVoiceInterface) => {
     if (isSignedIn) {
-      getCurrentService().saveWatch(film, voice)
+      currentService.saveWatch(film, voice)
         .catch((error) => {
           NotificationStore.displayError(error as Error);
         });
@@ -141,7 +134,7 @@ export function PlayerVideoSelectorContainer({
       setIsLoading(true);
 
       try {
-        const video = await getCurrentService()
+        const video = await currentService
           .getFilmStreamsByVoice(film, voice);
 
         handleSelectVideo(video, voice);
@@ -154,13 +147,13 @@ export function PlayerVideoSelectorContainer({
       return;
     }
 
-    goToPreviousOverlay();
+    voiceOverlayRef?.current?.close();
 
     setTimeout(async () => {
       setIsLoading(true);
 
       try {
-        const updatedVoice = await getCurrentService().getFilmSeasons(film, voice);
+        const updatedVoice = await currentService.getFilmSeasons(film, voice);
 
         setSelectedVoice(updatedVoice);
 
@@ -187,7 +180,7 @@ export function PlayerVideoSelectorContainer({
     setIsLoading(true);
 
     try {
-      const video = await getCurrentService()
+      const video = await currentService
         .getFilmStreamsByEpisodeId(
           film,
           selectedVoice,
@@ -224,8 +217,13 @@ export function PlayerVideoSelectorContainer({
     return progress;
   };
 
+  const onOverlayOpen = () => {
+    setSavedTime(getSavedTime(film));
+    initFirestoreSavedTime();
+  };
+
   const containerProps = () => ({
-    overlayId,
+    overlayRef,
     film,
     voices,
     isLoading,
@@ -235,14 +233,16 @@ export function PlayerVideoSelectorContainer({
     seasons: getSeasons(),
     episodes: getEpisodes(),
     savedTime,
+    voiceOverlayRef,
   });
 
   const containerFunctions = {
     handleSelectVoice,
     setSelectedSeasonId,
-    onHide,
     handleSelectEpisode,
     calculateProgressThreshold,
+    onOverlayOpen,
+    onClose,
   };
 
   return withTV(FilmVideoSelectorComponentTV, PlayerVideoSelectorComponent, {

@@ -1,6 +1,6 @@
 import { AirbnbRating } from '@rn-vui/ratings';
-import BookmarksSelector from 'Component/BookmarksSelector';
-import Comments from 'Component/Comments';
+import BookmarksOverlay from 'Component/BookmarksOverlay';
+import CommentsOverlay from 'Component/CommentsOverlay';
 import Page from 'Component/Page';
 import PlayerVideoSelector from 'Component/PlayerVideoSelector';
 import ThemedAccordion from 'Component/ThemedAccordion';
@@ -9,11 +9,10 @@ import ThemedCard from 'Component/ThemedCard';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedText from 'Component/ThemedText';
-import { useOverlayContext } from 'Context/OverlayContext';
 import t from 'i18n/t';
-import { Bookmark, Clapperboard, Clock, MessageSquareText, Play } from 'lucide-react-native';
+import { Bookmark, BookmarkCheck, Clapperboard, Clock, MessageSquareText, Play } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { Dimensions, View } from 'react-native';
+import { Dimensions, useWindowDimensions, View } from 'react-native';
 import {
   DefaultFocus,
   SpatialNavigationFocusableView,
@@ -26,33 +25,33 @@ import { CollectionItemInterface } from 'Type/CollectionItem';
 import { FilmInterface } from 'Type/Film.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { scale } from 'Util/CreateStyles';
+import { isBookmarked } from 'Util/Film';
 
 import { styles } from './FilmPage.style.atv';
 import { FilmPageThumbnail } from './FilmPage.thumbnail.atv';
 import { FilmPageComponentProps } from './FilmPage.type';
 import {
-  ActorView, FranchiseItemComponent, InfoList, RelatedItem, ScheduleItem, Section,
+  ActorView, FranchiseItemComponent, InfoList, RelatedItem, ScheduleItem, ScheduleOverlay, Section,
 } from './FilmPageElements.atv';
 
 export function FilmPageComponent({
   film,
   visibleScheduleItems,
-  playerVideoSelectorOverlayId,
-  scheduleOverlayId,
-  commentsOverlayId,
-  bookmarksOverlayId,
-  descriptionOverlayId,
+  playerVideoSelectorOverlayRef,
+  scheduleOverlayRef,
+  commentsOverlayRef,
+  bookmarksOverlayRef,
+  descriptionOverlayRef,
   playFilm,
-  hideVideoSelector,
   handleVideoSelect,
   handleSelectFilm,
   handleSelectActor,
   handleSelectCategory,
   openBookmarks,
   handleUpdateScheduleWatch,
+  handleBookmarkChange,
 }: FilmPageComponentProps) {
-  const { height } = Dimensions.get('window');
-  const { openOverlay, goToPreviousOverlay } = useOverlayContext();
+  const { height } = useWindowDimensions();
   const [showReadMore, setShowReadMore] = useState<boolean | null>(null);
 
   if (!film) {
@@ -62,7 +61,7 @@ export function FilmPageComponent({
   const shouldShowReadMore = (content: number) => {
     const percent = ((content - scale(40)) / height) * 100;
 
-    setShowReadMore(percent > 45);
+    setShowReadMore(percent > 44);
   };
 
   const openNotImplemented = () => {
@@ -110,8 +109,8 @@ export function FilmPageComponent({
       <DefaultFocus>
         <View style={ styles.actions }>
           { renderPlayButton() }
-          { renderAction(MessageSquareText, t('Comments'), () => openOverlay(commentsOverlayId)) }
-          { renderAction(Bookmark, t('Bookmark'), openBookmarks) }
+          { renderAction(MessageSquareText, t('Comments'), () => commentsOverlayRef?.current?.open()) }
+          { renderAction(isBookmarked(film) ? BookmarkCheck : Bookmark, t('Bookmark'), openBookmarks) }
           { renderAction(Clapperboard, t('Trailer'), openNotImplemented) }
           { /* { renderAction(Download, t('Download'), openNotImplemented) } */ }
         </View>
@@ -266,7 +265,7 @@ export function FilmPageComponent({
               !showReadMore && styles.readMoreButtonHidden,
             ] }
           >
-            <ThemedButton onPress={ () => openOverlay(descriptionOverlayId) }>
+            <ThemedButton onPress={ () => descriptionOverlayRef?.current?.open() }>
               { t('Read more') }
             </ThemedButton>
           </View>
@@ -322,9 +321,8 @@ export function FilmPageComponent({
 
     return (
       <PlayerVideoSelector
-        overlayId={ playerVideoSelectorOverlayId }
+        overlayRef={ playerVideoSelectorOverlayRef }
         film={ film }
-        onHide={ hideVideoSelector }
         onSelect={ handleVideoSelect }
       />
     );
@@ -365,36 +363,13 @@ export function FilmPageComponent({
     );
   };
 
-  const renderScheduleOverlay = () => {
-    const { schedule = [] } = film;
-
-    const data = schedule.map(({ name, items }) => ({
-      id: name,
-      title: name,
-      items,
-    }));
-
-    return (
-      <ThemedOverlay
-        id={ scheduleOverlayId }
-        onHide={ () => goToPreviousOverlay() }
-        containerStyle={ styles.scheduleOverlay }
-        contentContainerStyle={ styles.scheduleOverlayContent }
-      >
-        <ThemedAccordion
-          data={ data }
-          overlayContent={ styles.scheduleAccordionOverlay }
-          renderItem={ (subItem) => (
-            <ScheduleItem
-              key={ `modal-${subItem.name}` }
-              item={ subItem }
-              handleUpdateScheduleWatch={ handleUpdateScheduleWatch }
-            />
-          ) }
-        />
-      </ThemedOverlay>
-    );
-  };
+  const renderScheduleOverlay = () => (
+    <ScheduleOverlay
+      scheduleOverlayRef={ scheduleOverlayRef }
+      film={ film }
+      handleUpdateScheduleWatch={ handleUpdateScheduleWatch }
+    />
+  );
 
   const renderSchedule = () => {
     const { schedule = [] } = film;
@@ -423,7 +398,7 @@ export function FilmPageComponent({
           </SpatialNavigationScrollView>
         </View>
         <ThemedButton
-          onPress={ () => openOverlay(scheduleOverlayId) }
+          onPress={ () => scheduleOverlayRef?.current?.open() }
           style={ styles.scheduleViewAll }
         >
           { t('View full schedule') }
@@ -528,29 +503,25 @@ export function FilmPageComponent({
   };
 
   const renderCommentsOverlay = () => (
-    <ThemedOverlay
-      id={ commentsOverlayId }
-      onHide={ () => goToPreviousOverlay() }
+    <CommentsOverlay
+      overlayRef={ commentsOverlayRef }
+      film={ film }
       containerStyle={ styles.commentsOverlay }
-    >
-      <Comments
-        style={ styles.commentsOverlayContent }
-        film={ film }
-      />
-    </ThemedOverlay>
+      contentStyle={ styles.commentsOverlayContent }
+    />
   );
 
   const renderBookmarksOverlay = () => (
-    <BookmarksSelector
-      overlayId={ bookmarksOverlayId }
+    <BookmarksOverlay
+      overlayRef={ bookmarksOverlayRef }
       film={ film }
+      onBookmarkChange={ handleBookmarkChange }
     />
   );
 
   const renderDescriptionOverlay = () => (
     <ThemedOverlay
-      id={ descriptionOverlayId }
-      onHide={ () => goToPreviousOverlay() }
+      ref={ descriptionOverlayRef }
       containerStyle={ styles.descriptionOverlay }
     >
       <ThemedText style={ styles.descriptionOverlayText }>

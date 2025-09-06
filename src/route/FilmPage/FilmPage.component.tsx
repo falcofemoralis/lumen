@@ -1,4 +1,4 @@
-import BookmarksSelector from 'Component/BookmarksSelector';
+import BookmarksOverlay from 'Component/BookmarksOverlay';
 import Header from 'Component/Header';
 import Page from 'Component/Page';
 import PlayerVideoSelector from 'Component/PlayerVideoSelector';
@@ -12,6 +12,7 @@ import { router } from 'expo-router';
 import t from 'i18n/t';
 import {
   Bookmark,
+  BookmarkCheck,
   Clapperboard,
   Clock,
   Download,
@@ -41,6 +42,7 @@ import { CollectionItemInterface } from 'Type/CollectionItem';
 import { FilmInterface } from 'Type/Film.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { scale } from 'Util/CreateStyles';
+import { isBookmarked } from 'Util/Film';
 
 import { styles } from './FilmPage.style';
 import { FilmPageThumbnail } from './FilmPage.thumbnail';
@@ -57,10 +59,9 @@ export function FilmPageComponent({
   film,
   thumbnailPoster,
   visibleScheduleItems,
-  playerVideoSelectorOverlayId,
-  bookmarksOverlayId,
+  playerVideoSelectorOverlayRef,
+  bookmarksOverlayRef,
   playFilm,
-  hideVideoSelector,
   handleVideoSelect,
   handleSelectFilm,
   handleSelectActor,
@@ -68,6 +69,7 @@ export function FilmPageComponent({
   handleUpdateScheduleWatch,
   handleShare,
   openBookmarks,
+  handleBookmarkChange,
 }: FilmPageComponentProps) {
   const { width } = useWindowDimensions();
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
@@ -265,7 +267,7 @@ export function FilmPageComponent({
       { renderMiddleAction(Star, 'Rate',openNotImplemented) }
       { renderMiddleAction(Clapperboard, 'Trailer', openNotImplemented) }
       { renderMiddleAction(MessageSquareText, 'Comments', openComments) }
-      { renderMiddleAction(Bookmark, 'Bookmark', openBookmarks) }
+      { renderMiddleAction(isBookmarked(film) ? BookmarkCheck : Bookmark, 'Bookmark', openBookmarks) }
       { renderMiddleAction(Download, 'Download', openNotImplemented) }
     </View>
   );
@@ -480,18 +482,18 @@ export function FilmPageComponent({
 
     return (
       <PlayerVideoSelector
-        overlayId={ playerVideoSelectorOverlayId }
+        overlayRef={ playerVideoSelectorOverlayRef }
         film={ film }
-        onHide={ hideVideoSelector }
         onSelect={ handleVideoSelect }
       />
     );
   };
 
   const renderBookmarksOverlay = () => (
-    <BookmarksSelector
-      overlayId={ bookmarksOverlayId }
+    <BookmarksOverlay
+      overlayRef={ bookmarksOverlayRef }
       film={ film }
+      onBookmarkChange={ handleBookmarkChange }
     />
   );
 

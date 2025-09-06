@@ -1,42 +1,59 @@
-import { useOverlayContext } from 'Context/OverlayContext';
 import { withTV } from 'Hooks/withTV';
-import { useEffect, useState } from 'react';
+import { forwardRef, useImperativeHandle, useState } from 'react';
 
 import ThemedOverlayComponent from './ThemedOverlay.component';
 import ThemedOverlayComponentTV from './ThemedOverlay.component.atv';
-import { ThemedOverlayContainerProps } from './ThemedOverlay.type';
+import { ThemedOverlayContainerProps, ThemedOverlayRef } from './ThemedOverlay.type';
 
-export function ThemedOverlayContainer({
-  id,
-  ...props
-}: ThemedOverlayContainerProps) {
-  const { currentOverlay, isOverlayOpened, isOverlayVisible } = useOverlayContext();
+export const ThemedOverlayContainer = forwardRef<ThemedOverlayRef, ThemedOverlayContainerProps>((props, ref) => {
   const [isOpened, setIsOpened] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [contentVisible, setContentVisible] = useState(false);
 
-  useEffect(() => {
-    const opened = isOverlayOpened(id);
-    const visible = isOverlayVisible(id);
+  useImperativeHandle(ref, () => ({
+    open: () => {
+      setIsOpened(true);
+      setIsVisible(true);
+      setContentVisible(true);
 
-    if (opened !== isOpened) {
-      setIsOpened(opened);
-    }
+      setTimeout(() => {
+        props.onOpen?.();
+      }, 250);
+    },
+    close: () => {
+      setIsOpened(false);
+      setIsVisible(false);
 
-    if (visible !== isVisible) {
-      setIsVisible(visible);
-    }
-  }, [currentOverlay.length]);
+      setTimeout(() => {
+        setContentVisible(false);
+        props.onClose?.();
+      }, 250);
+    },
+    hide: () => setIsVisible(false),
+    show: () => setIsVisible(true),
+  }));
+
+  const handleModalRequestClose = () => {
+    setIsOpened(false);
+    setIsVisible(false);
+
+    setTimeout(() => {
+      setContentVisible(false);
+      props.onClose?.();
+    }, 250);
+  };
 
   const containerProps = () => ({
     ...props,
     isOpened,
     isVisible,
-    id,
+    contentVisible,
+    handleModalRequestClose,
   });
 
   return withTV(ThemedOverlayComponentTV, ThemedOverlayComponent, {
     ...containerProps(),
   });
-}
+});
 
 export default ThemedOverlayContainer;

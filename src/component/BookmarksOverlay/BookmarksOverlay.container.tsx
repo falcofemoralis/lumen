@@ -1,37 +1,37 @@
-import { useOverlayContext } from 'Context/OverlayContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { withTV } from 'Hooks/withTV';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
 
-import BookmarksSelectorComponent from './BookmarksSelector.component';
-import BookmarksSelectorComponentTV from './BookmarksSelector.component.atv';
-import { BookmarksSelectorContainerProps } from './BookmarksSelector.type';
+import BookmarksOverlayComponent from './BookmarksOverlay.component';
+import BookmarksOverlayComponentTV from './BookmarksOverlay.component.atv';
+import { BookmarksOverlayContainerProps } from './BookmarksOverlay.type';
 
-export const BookmarksSelectorContainer = ({
-  overlayId,
+export const BookmarksOverlayContainer = ({
+  overlayRef,
   film,
-}: BookmarksSelectorContainerProps) => {
-  const { currentOverlay, isOverlayOpened } = useOverlayContext();
+  onClose,
+  onBookmarkChange,
+}: BookmarksOverlayContainerProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const { getCurrentService } = useServiceContext();
+  const { currentService } = useServiceContext();
 
   const postBookmark = async (bookmarkId: string, isChecked: boolean) => {
     const { id } = film;
-    const service = getCurrentService();
 
     try {
       setIsLoading(true);
 
       if (isChecked) {
-        await service.addBookmark(id, bookmarkId);
+        await currentService.addBookmark(id, bookmarkId);
       } else {
-        await service.removeBookmark(id, bookmarkId);
+        await currentService.removeBookmark(id, bookmarkId);
       }
 
       const bk = film.bookmarks?.findIndex((b) => b.id === bookmarkId) ?? -1;
       if (bk !== -1 && film.bookmarks) {
         film.bookmarks[bk].isBookmarked = isChecked;
+        onBookmarkChange?.(film);
       }
     } catch (error) {
       NotificationStore.displayError(error as Error);
@@ -40,7 +40,7 @@ export const BookmarksSelectorContainer = ({
     }
   };
 
-  const prepareData = () => {
+  const prepareItems = () => {
     const { bookmarks = [] } = film;
 
     return bookmarks.map((bookmark) => ({
@@ -50,31 +50,22 @@ export const BookmarksSelectorContainer = ({
     }));
   };
 
-  const [data, setData] = useState(prepareData());
-
-  useEffect(() => {
-    const opened = isOverlayOpened(overlayId);
-
-    if (opened) {
-      setData(prepareData());
-    }
-  }, [currentOverlay.length]);
-
   const containerProps = {
-    overlayId,
+    overlayRef,
     film,
     isLoading,
-    data,
+    items: prepareItems(),
+    onClose,
   };
 
   const containerFunctions = {
     postBookmark,
   };
 
-  return withTV(BookmarksSelectorComponentTV, BookmarksSelectorComponent, {
+  return withTV(BookmarksOverlayComponentTV, BookmarksOverlayComponent, {
     ...containerProps,
     ...containerFunctions,
   });
 };
 
-export default BookmarksSelectorContainer;
+export default BookmarksOverlayContainer;

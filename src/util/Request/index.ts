@@ -71,11 +71,11 @@ export const handleRequestError = (response: Response): void => {
   }
 
   if (response.status === 403) {
-    throw new Error('You are blocked');
+    throw new Error(t('You are blocked'));
   }
 
   if (response.status === 404) {
-    throw new Error('Not found');
+    throw new Error(t('Not found'));
   }
 };
 
@@ -151,7 +151,7 @@ export const requestValidator = async (
   }
 };
 
-export const setProxyHeaders = (headers: HeadersInit, originalHost: string): HeadersInit => {
+export const addProxyHeaders = (headers: HeadersInit, originalHost: string): HeadersInit => {
   return {
     ...headers,
     'X-Forwarded-Host': originalHost,

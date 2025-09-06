@@ -1,34 +1,33 @@
 import {
-  AutoRewindParams,
-  DEFAULT_AUTO_REWIND_PARAMS,
+  DEFAULT_SMART_SEEKING_PARAMS,
   FocusedElement,
   LONG_PRESS_DURATION,
   REWIND_SECONDS_TV,
   RewindDirection,
+  SmartSeekingParams,
 } from 'Component/Player/Player.config';
 import { LongEvent } from 'Component/Player/Player.type';
 import PlayerStoryboard from 'Component/PlayerStoryboard';
 import { usePlayerContext } from 'Context/PlayerContext';
 import { usePlayerProgressContext } from 'Context/PlayerProgressContext';
 import React, {
+  useCallback,
   useEffect,
+  useMemo,
   useRef,
 } from 'react';
-import { DimensionValue, View } from 'react-native';
+import { View } from 'react-native';
+import { Slider } from 'react-native-awesome-slider';
+import { useSharedValue } from 'react-native-reanimated';
 import { SpatialNavigationFocusableView } from 'react-tv-space-navigation';
+import { Colors } from 'Style/Colors';
 import { noopFn } from 'Util/Function';
-import {
-  setTimeoutSafe,
-} from 'Util/Misc';
+import { setTimeoutSafe } from 'Util/Misc';
 import RemoteControlManager from 'Util/RemoteControl/RemoteControlManager';
 import { SupportedKeys } from 'Util/RemoteControl/SupportedKeys';
 
 import { styles } from './PlayerProgressBar.style.atv';
 import { PlayerProgressBarComponentProps } from './PlayerProgressBar.type';
-
-const autoRewindParams: AutoRewindParams = {
-  ...DEFAULT_AUTO_REWIND_PARAMS,
-};
 
 export const PlayerProgressBarComponent = ({
   player,
@@ -45,7 +44,17 @@ export const PlayerProgressBarComponent = ({
   const { progressStatus, updateProgressStatus } = usePlayerProgressContext();
   const rewindTimer = useRef<number | null>(null);
 
-  const longEvent = useRef<{[key: string]: LongEvent}>({
+  // Refs for performance-critical values to avoid re-renders
+  const smartSeekingRef = useRef<SmartSeekingParams>({ ...DEFAULT_SMART_SEEKING_PARAMS });
+
+  // Shared values for smooth animations
+  const progress = useSharedValue(0);
+  const cache = useSharedValue(0);
+  const minimumValue = useSharedValue(0);
+  const maximumValue = useSharedValue(100);
+
+  // Memoized long event handlers to prevent recreation
+  const longEventRef = useRef<{[key: string]: LongEvent}>({
     [SupportedKeys.LEFT]: {
       isKeyDownPressed: false,
       longTimeout: null,
@@ -58,55 +67,79 @@ export const PlayerProgressBarComponent = ({
     },
   });
 
-  const rewindPositionAuto = (direction: RewindDirection) => {
+  useEffect(() => {
+    const { progressPercentage, playablePercentage } = progressStatus;
+
+    if (smartSeekingRef.current.seeking) {
+      return;
+    }
+
+    progress.value = progressPercentage;
+    cache.value = playablePercentage;
+  }, [progressStatus]);
+
+  const toggleSmartSeeking = useCallback((direction: RewindDirection) => {
     const { duration = 0, playing } = player;
 
-    if (autoRewindParams.active) {
-      autoRewindParams.active = false;
+    if (smartSeekingRef.current.active) {
+      smartSeekingRef.current.active = false;
+
       if (rewindTimer.current) {
         cancelAnimationFrame(rewindTimer.current);
         rewindTimer.current = null;
       }
 
-      seekToPosition(autoRewindParams.percentage);
+      seekToPosition(smartSeekingRef.current.percentage);
 
-      if (autoRewindParams.statusBefore !== undefined && autoRewindParams.statusBefore) {
-        togglePlayPause(false);
-        autoRewindParams.statusBefore = undefined;
-      }
+      setTimeoutSafe(() => {
+        smartSeekingRef.current.seeking = false;
+        togglePlayPause(!smartSeekingRef.current.statusBefore, false);
+      }, 50);
 
       return;
     }
 
-    Object.assign(autoRewindParams, DEFAULT_AUTO_REWIND_PARAMS);
-    togglePlayPause(true);
-    autoRewindParams.statusBefore = playing;
-    autoRewindParams.active = true;
-    autoRewindParams.percentage = progressStatus.progressPercentage;
+    togglePlayPause(true, true);
 
-    let lastUpdateTime = performance.now();
-    const updateInterval = 1000 / 16;
+    Object.assign(smartSeekingRef.current, DEFAULT_SMART_SEEKING_PARAMS);
+
+    smartSeekingRef.current.active = true;
+    smartSeekingRef.current.percentage = progressStatus.progressPercentage;
+    smartSeekingRef.current.seeking = true;
+    smartSeekingRef.current.statusBefore = playing;
+
+    let lastUpdateTime = 0;
 
     const updatePosition = (timestamp: number) => {
-      if (!autoRewindParams.active) return;
+      if (!smartSeekingRef.current.active) {
+        return;
+      }
 
       const deltaTime = timestamp - lastUpdateTime;
-      if (deltaTime >= updateInterval) {
-        const seekTime = direction === RewindDirection.BACKWARD
-          ? autoRewindParams.seconds * -1
-          : autoRewindParams.seconds;
 
-        const currentTime = calculateCurrentTime(autoRewindParams.percentage);
+      if (deltaTime >= smartSeekingRef.current.delta) {
+        const seconds = direction === RewindDirection.BACKWARD
+          ? smartSeekingRef.current.seconds * -1
+          : smartSeekingRef.current.seconds;
+
+        const seekTime = Math.exp(smartSeekingRef.current.iterations * smartSeekingRef.current.velocity) * seconds;
+
+        const currentTime = calculateCurrentTime(smartSeekingRef.current.percentage);
         const newTime = currentTime + seekTime;
 
         if (newTime <= 0 || newTime > duration) {
-          autoRewindParams.percentage = 0;
+          smartSeekingRef.current.percentage = 0;
+          // eslint-disable-next-line react-compiler/react-compiler
+          progress.value = smartSeekingRef.current.percentage;
           updateProgressStatus(newTime <= 0 ? 0 : duration, 0, duration);
 
           return;
         }
 
-        autoRewindParams.percentage = newTime * 100 / duration;
+        smartSeekingRef.current.percentage = newTime * 100 / duration;
+        smartSeekingRef.current.iterations++;
+
+        progress.value = smartSeekingRef.current.percentage;
         updateProgressStatus(newTime, 0, duration);
 
         lastUpdateTime = timestamp;
@@ -116,16 +149,17 @@ export const PlayerProgressBarComponent = ({
     };
 
     rewindTimer.current = requestAnimationFrame(updatePosition);
-  };
+  }, [player, seekToPosition, togglePlayPause, calculateCurrentTime, updateProgressStatus]);
 
-  const handleProgressThumbKeyDown = (key: SupportedKeys, direction: RewindDirection) => {
-    const e = longEvent.current[key];
+  // Memoized key handlers to prevent recreation
+  const handleProgressThumbKeyDown = useCallback((key: SupportedKeys, direction: RewindDirection) => {
+    const e = longEventRef.current[key];
 
     if (!e.isKeyDownPressed) {
       e.isKeyDownPressed = true;
       e.longTimeout = setTimeoutSafe(() => {
         // Long button press
-        rewindPositionAuto(direction);
+        toggleSmartSeeking(direction);
 
         e.longTimeout = null;
         e.isLongFired = true;
@@ -133,16 +167,16 @@ export const PlayerProgressBarComponent = ({
     }
 
     return true;
-  };
+  }, [toggleSmartSeeking]);
 
-  const handleProgressThumbKeyUp = (key: SupportedKeys, direction: RewindDirection) => {
-    const e = longEvent.current[key];
+  const handleProgressThumbKeyUp = useCallback((key: SupportedKeys, direction: RewindDirection) => {
+    const e = longEventRef.current[key];
     e.isKeyDownPressed = false;
 
     if (e.isLongFired) {
       // Long button unpress
       e.isLongFired = false;
-      rewindPositionAuto(direction);
+      toggleSmartSeeking(direction);
     }
 
     if (e.longTimeout) {
@@ -150,9 +184,10 @@ export const PlayerProgressBarComponent = ({
       clearTimeout(e.longTimeout);
       rewindPosition(direction, REWIND_SECONDS_TV);
     }
-  };
+  }, [toggleSmartSeeking, rewindPosition]);
 
-  useEffect(() => {
+  // Memoized remote control event listeners
+  const remoteControlListeners = useMemo(() => {
     const keyDownListener = (type: SupportedKeys) => {
       if (focusedElement === FocusedElement.PROGRESS_THUMB) {
         if (type === SupportedKeys.LEFT) {
@@ -181,6 +216,13 @@ export const PlayerProgressBarComponent = ({
       return false;
     };
 
+    return { keyDownListener, keyUpListener };
+  }, [focusedElement, handleProgressThumbKeyDown, handleProgressThumbKeyUp]);
+
+  // Remote control event listeners setup
+  useEffect(() => {
+    const { keyDownListener, keyUpListener } = remoteControlListeners;
+
     const remoteControlDownListener = RemoteControlManager.addKeydownListener(keyDownListener);
     const remoteControlUpListener = RemoteControlManager.addKeyupListener(keyUpListener);
 
@@ -188,7 +230,24 @@ export const PlayerProgressBarComponent = ({
       RemoteControlManager.removeKeydownListener(remoteControlDownListener);
       RemoteControlManager.removeKeyupListener(remoteControlUpListener);
     };
-  });
+  }, [remoteControlListeners]);
+
+  // Memoized thumb render to prevent unnecessary re-renders
+  const renderThumb = useCallback(() => (
+    <SpatialNavigationFocusableView
+      ref={ thumbRef }
+      onFocus={ onFocus }
+    >
+      { ({ isFocused }) => (
+        <View
+          style={ [
+            styles.thumb,
+            isFocused && styles.focusedThumb,
+          ] }
+        />
+      ) }
+    </SpatialNavigationFocusableView>
+  ), [thumbRef, onFocus]);
 
   const renderStoryboard = () => {
     if (!storyboardUrl) {
@@ -209,43 +268,23 @@ export const PlayerProgressBarComponent = ({
     );
   };
 
-  const renderThumb = (isFocused: boolean) => (
-    <View
-      style={ [
-        styles.thumb,
-        isFocused && styles.focusedThumb,
-      ] }
-    />
-  );
-
   return (
-    <View>
+    <View style={ styles.progressBarContainer }>
       { renderStoryboard() }
-      <View style={ styles.progressBarContainer }>
-        { /* Playable Duration */ }
-        <View
-          style={ [
-            styles.playableBar,
-            { width: (`${progressStatus.playablePercentage}%`) as DimensionValue },
-          ] }
-        />
-        { /* Progress Playback */ }
-        <View
-          style={ [
-            styles.progressBar,
-            { width: (`${progressStatus.progressPercentage}%`) as DimensionValue },
-          ] }
-        >
-          { /* Progress Thumb */ }
-          <SpatialNavigationFocusableView
-            ref={ thumbRef }
-            style={ styles.thumbContainer }
-            onFocus={ onFocus }
-          >
-            { ({ isFocused }) => renderThumb(isFocused) }
-          </SpatialNavigationFocusableView>
-        </View>
-      </View>
+      <Slider
+        progress={ progress }
+        cache={ cache }
+        minimumValue={ minimumValue }
+        maximumValue={ maximumValue }
+        style={ styles.progressBar }
+        theme={ {
+          minimumTrackTintColor: Colors.secondary,
+          cacheTrackTintColor: '#F97F87',
+          maximumTrackTintColor: '#8B8B8B',
+          bubbleBackgroundColor: Colors.secondary,
+        } }
+        renderThumb={ renderThumb }
+      />
     </View>
   );
 };

@@ -13,6 +13,7 @@ export const CommentsModalComponent = ({ film }: CommentsModalProps) => {
       <Wrapper style={ { flex: 1 } }>
         <Comments
           film={ film }
+          initialLoad
         />
       </Wrapper>
     </View>

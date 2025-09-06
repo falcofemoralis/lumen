@@ -1,44 +1,43 @@
 import { Portal } from 'Component/ThemedPortal';
 import { memo } from 'react';
 import { View } from 'react-native';
+import Animated from 'react-native-reanimated';
 
 import { SpatialNavigationOverlay } from './SpatialNavigationOverlay';
 import { styles } from './ThemedOverlay.style.atv';
 import { ThemedOverlayComponentProps } from './ThemedOverlay.type';
 
 export function ThemedOverlayComponent({
-  onHide,
   style,
   containerStyle,
   contentContainerStyle,
   children,
   isOpened,
   isVisible,
-  id,
+  contentVisible,
+  handleModalRequestClose,
 }: ThemedOverlayComponentProps) {
-  if (!isOpened) return null;
-
   return (
     <Portal>
       <SpatialNavigationOverlay
-        id={ id }
         isModalOpened={ isOpened }
         isModalVisible={ isOpened && isVisible }
-        hideModal={ onHide }
+        hideModal={ handleModalRequestClose }
       >
         <Portal.Host>
-          <View style={ [
-            styles.modal,
-            style,
-            isVisible && styles.modalVisible,
-          ] }
+          <Animated.View
+            style={ [
+              styles.modal,
+              style,
+              isVisible && styles.modalVisible,
+            ] }
           >
             <View style={ [styles.container, containerStyle] }>
               <View style={ [styles.contentContainer, contentContainerStyle] }>
-                { children }
+                { contentVisible && children }
               </View>
             </View>
-          </View>
+          </Animated.View>
         </Portal.Host>
       </SpatialNavigationOverlay>
     </Portal>
@@ -49,7 +48,8 @@ function propsAreEqual(
   prevProps: ThemedOverlayComponentProps,
   props: ThemedOverlayComponentProps
 ) {
-  return prevProps.isOpened === props.isOpened && prevProps.isVisible === props.isVisible
+  return prevProps.isOpened === props.isOpened
+    && prevProps.isVisible === props.isVisible
     && prevProps.children === props.children;
 }
 

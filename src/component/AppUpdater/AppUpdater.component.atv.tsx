@@ -7,7 +7,6 @@ import t from 'i18n/t';
 import { Image, ScrollView, View } from 'react-native';
 import { DefaultFocus, SpatialNavigationView } from 'react-tv-space-navigation';
 
-import { OVERLAY_APP_UPDATE_ID } from './AppUpdater.config';
 import { styles } from './AppUpdater.style.atv';
 import { AppUpdaterComponentProps } from './AppUpdater.type';
 
@@ -15,6 +14,7 @@ export const AppUpdaterComponent = ({
   update,
   isLoading,
   progress,
+  overlayRef,
   acceptUpdate,
   rejectUpdate,
 }: AppUpdaterComponentProps) => {
@@ -100,9 +100,9 @@ export const AppUpdaterComponent = ({
 
   return (
     <ThemedOverlay
-      id={ OVERLAY_APP_UPDATE_ID }
+      ref={ overlayRef }
       containerStyle={ styles.overlay }
-      onHide={ rejectUpdate }
+      onClose={ rejectUpdate }
     >
       { renderLoader() }
       <View style={ isLoading && styles.loadingContainer }>

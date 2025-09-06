@@ -1,11 +1,10 @@
 import ThemedOverlay from 'Component/ThemedOverlay';
+import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import ThemedText from 'Component/ThemedText';
-import { useOverlayContext } from 'Context/OverlayContext';
 import { useRef, useState } from 'react';
 import { View } from 'react-native';
 import { DefaultFocus, SpatialNavigationFocusableView, SpatialNavigationScrollView } from 'react-tv-space-navigation';
 import { scale } from 'Util/CreateStyles';
-import { generateId } from 'Util/Math';
 
 import { styles } from './ThemedAccordion.style.atv';
 import { AccordionGroupInterface, ThemedAccordionComponentProps } from './ThemedAccordion.type';
@@ -15,20 +14,19 @@ export const ThemedAccordionComponent = ({
   overlayContent,
   renderItem,
 }: ThemedAccordionComponentProps<any>) => {
-  const { closeOverlay, openOverlay } = useOverlayContext();
-  const overlayId = useRef(generateId());
+  const overlayRef = useRef<ThemedOverlayRef>(null);
   const [openAccordionGroup, setOpenAccordionGroup] = useState<string | null>(null);
 
   const showOverlay = (groupId: string) => {
     setOpenAccordionGroup(groupId);
 
-    openOverlay(overlayId.current);
+    overlayRef.current?.open();
   };
 
   const handleCloseOverlay = () => {
-    setOpenAccordionGroup(null);
-
-    closeOverlay(overlayId.current);
+    setTimeout(() => {
+      setOpenAccordionGroup(null);
+    }, 250);
   };
 
   const renderAccordionGroup = (group: AccordionGroupInterface<any>) => {
@@ -62,9 +60,9 @@ export const ThemedAccordionComponent = ({
 
     return (
       <ThemedOverlay
-        id={ overlayId.current }
-        onHide={ handleCloseOverlay }
+        ref={ overlayRef }
         containerStyle={ styles.overlay }
+        onClose={ handleCloseOverlay }
       >
         <SpatialNavigationScrollView
           offsetFromStart={ scale(32) }

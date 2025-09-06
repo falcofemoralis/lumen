@@ -1,4 +1,4 @@
-import { NAVIGATION_BAR_TV_WIDTH, styles as navBarStyles } from 'Component/NavigationBar/NavigationBar.style.atv';
+import { NAVIGATION_BAR_TV_WIDTH } from 'Component/NavigationBar/NavigationBar.style.atv';
 import { Dimensions, StyleSheet } from 'react-native';
 import { CONTENT_WRAPPER_PADDING_TV } from 'Style/Layout';
 import { scale } from 'Util/CreateStyles';
@@ -13,14 +13,14 @@ export const styles = StyleSheet.create({
   container: {
     height: '100%',
     width: containerWidth - scale(NAVIGATION_BAR_TV_WIDTH) - CONTENT_WRAPPER_PADDING_TV * 2,
-    marginRight: CONTENT_WRAPPER_PADDING_TV,
-    marginLeft: navBarStyles.tabs.width,
-    left: navBarStyles.tabs.width * -1 + CONTENT_WRAPPER_PADDING_TV,
-    transitionProperty: 'marginLeft',
+    marginInline: CONTENT_WRAPPER_PADDING_TV,
+    transform: [{ translateX: 0 }],
+    transitionProperty: 'transform',
     transitionDuration: '250ms',
+    transitionTimingFunction: 'ease-in-out',
   },
   containerOpened: {
-    marginLeft: navBarStyles.tabsOpened.width,
+    transform: [{ translateX: scale(NAVIGATION_BAR_TV_WIDTH + CONTENT_WRAPPER_PADDING_TV) }],
   },
   content: {
     height: '100%',

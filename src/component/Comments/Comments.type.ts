@@ -6,6 +6,7 @@ export interface CommentsContainerProps {
   film: FilmInterface;
   loaderFullScreen?: boolean;
   style?: StyleProp<ViewStyle> | undefined;
+  initialLoad?: boolean;
 }
 
 export interface CommentsComponentProps {
@@ -26,9 +27,11 @@ export interface CommentItemProps {
 export type CalculatedLine = {
   lines: string[];
   type: CommentTextType;
+  totalHeight: number;
 }
 
 export type CalculatedText = {
   height: number;
+  lineHeight: number;
   lines: CalculatedLine[] | null;
 }

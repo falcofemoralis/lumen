@@ -1,5 +1,5 @@
 import { withTV } from 'Hooks/withTV';
-import { memo, useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 
 import ThemedMultiListComponent from './ThemedMultiList.component';
 import ThemedMultiListComponentTV from './ThemedMultiList.component.atv';
@@ -12,7 +12,7 @@ export function ThemedMultiListContainer({
 }: ThemedMultiListContainerProps) {
   const [values, setValues] = useState<ListItem[]>(data);
 
-  const handleOnChange = (value: string, isChecked: boolean) => {
+  const handleOnChange = useCallback((value: string, isChecked: boolean) => {
     onChange(value, isChecked);
 
     setValues(values.map((item) => {
@@ -30,7 +30,7 @@ export function ThemedMultiListContainer({
 
       return item;
     }));
-  };
+  }, [onChange, values]);
 
   return withTV(ThemedMultiListComponentTV, ThemedMultiListComponent, {
     values,

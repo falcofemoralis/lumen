@@ -1,23 +1,21 @@
 import Loader from 'Component/Loader';
 import ThemedMultiList from 'Component/ThemedMultiList';
 import ThemedOverlay from 'Component/ThemedOverlay';
-import { useOverlayContext } from 'Context/OverlayContext';
 import t from 'i18n/t';
 
-import { BookmarksSelectorComponentProps } from './BookmarksSelector.type';
+import { BookmarksOverlayComponentProps } from './BookmarksOverlay.type';
 
-export const BookmarksSelectorComponent = ({
-  overlayId,
-  data,
+export const BookmarksOverlayComponent = ({
+  overlayRef,
+  items,
   isLoading,
   postBookmark,
-}: BookmarksSelectorComponentProps) => {
-  const { goToPreviousOverlay } = useOverlayContext();
-
+  onClose,
+}: BookmarksOverlayComponentProps) => {
   return (
     <ThemedOverlay
-      id={ overlayId }
-      onHide={ () => goToPreviousOverlay() }
+      ref={ overlayRef }
+      onClose={ onClose }
     >
       <Loader
         isLoading={ isLoading }
@@ -25,11 +23,11 @@ export const BookmarksSelectorComponent = ({
       />
       <ThemedMultiList
         header={ t('Bookmarks') }
-        data={ data }
+        data={ items }
         onChange={ postBookmark }
       />
     </ThemedOverlay>
   );
 };
 
-export default BookmarksSelectorComponent;
+export default BookmarksOverlayComponent;

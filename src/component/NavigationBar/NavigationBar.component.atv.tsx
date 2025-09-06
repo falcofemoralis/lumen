@@ -112,15 +112,14 @@ export function NavigationBarComponent({
             </ThemedText>
           ) }
         </View>
-        <ThemedText.Animated
+        <ThemedText
           style={ [
             styles.tabText,
             isf && isRootActive && styles.tabContentFocused,
-            isMenuOpen && styles.tabTextOpened,
           ] }
         >
           { title }
-        </ThemedText.Animated>
+        </ThemedText>
       </View>
     );
   }, [isMenuOpen, badgeData]);
@@ -156,26 +155,24 @@ export function NavigationBarComponent({
           ) }
         </View>
         <View style={ styles.profile }>
-          <ThemedText.Animated
+          <ThemedText
             style={ [
               styles.tabText,
               styles.profileNameText,
               isf && isRootActive && styles.tabContentFocused,
-              isMenuOpen && styles.tabTextOpened,
             ] }
           >
             { title }
-          </ThemedText.Animated>
-          <ThemedText.Animated
+          </ThemedText>
+          <ThemedText
             style={ [
               styles.tabText,
               styles.profileSwitchText,
               isf && isRootActive && styles.tabContentFocused,
-              isMenuOpen && styles.tabTextOpened,
             ] }
           >
             { isSignedIn ? name : t('Sign in') }
-          </ThemedText.Animated>
+          </ThemedText>
         </View>
       </View>
     );
@@ -205,6 +202,7 @@ export function NavigationBarComponent({
       >
         <SpatialNavigationFocusableView
           onFocus={ () => isMenuOpen && onTabSelect(tab, navigation, state) }
+          onSelect={ () => onTabSelect(tab, navigation, state) }
         >
           { ({ isRootActive, isFocused: isf }) => (
             renderComponent(isRootActive, isf)

@@ -1,5 +1,6 @@
 /* eslint-disable max-len */
 import { ApiServiceType, ConfigApiInterface, ServiceConfigInterface } from 'Api/index';
+import * as Device from 'expo-device';
 import t from 'i18n/t';
 import { Platform } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
@@ -8,7 +9,7 @@ import { ModifiedProvider } from 'Type/ModifiedProvider.interface';
 import { getConfigJson, updateConfig } from 'Util/Config';
 import { safeJsonParse } from 'Util/Json';
 import { HTMLElementInterface, parseHtml } from 'Util/Parser';
-import { executeGet, executePost , setProxyHeaders, Variables } from 'Util/Request';
+import { addProxyHeaders, executeGet, executePost, Variables } from 'Util/Request';
 import { updateUrlHost } from 'Util/Url';
 
 const REZKA_CONFIG = 'rezkaConfig';
@@ -21,14 +22,27 @@ const configApi: ConfigApiInterface = {
     'https://rezka-ua.org',
   ],
   defaultCDNs: [
+    'https://prx-cogent.ukrtelcdn.net',
     'https://prx2-cogent.ukrtelcdn.net',
-    'https://prx-ams.ukrtelcdn.net',
-    'https://prx2-ams.ukrtelcdn.net',
-    'http://ukrtelcdn.net',
-    'https://stream.voidboost.cc',
-    'https://stream.voidboost.top',
-    'https://stream.voidboost.link',
-    'https://stream.voidboost.club',
+    'https://prx3-cogent.ukrtelcdn.net',
+    'https://prx4-cogent.ukrtelcdn.net',
+    'https://prx5-cogent.ukrtelcdn.net',
+    'https://prx6-cogent.ukrtelcdn.net',
+  ],
+  defaultUserAgent: `Mozilla/5.0 (Linux; Android ${Device.osVersion}; ${Device.manufacturer} ${Device.modelName}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36`,
+  officialMirrors: [
+    {
+      label: t('Off'),
+      value: '',
+    },
+    {
+      label: t('Main'),
+      value: 'https://hdrzk.org',
+    },
+    {
+      label: t('Additional'),
+      value: 'https://stepnet.video',
+    },
   ],
   config: null,
 
@@ -38,7 +52,8 @@ const configApi: ConfigApiInterface = {
         provider: this.defaultProviders[0],
         cdn: 'auto',
         auth: '',
-        userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0',
+        userAgent: this.defaultUserAgent,
+        officialMode: '',
       };
 
       const config = getConfigJson<ServiceConfigInterface>(REZKA_CONFIG);
@@ -67,6 +82,10 @@ const configApi: ConfigApiInterface = {
   },
 
   getProvider(): string {
+    if (this.isOfficialMode()) {
+      return this.getOfficialMode();
+    }
+
     return this.loadConfig().provider;
   },
 
@@ -102,13 +121,18 @@ const configApi: ConfigApiInterface = {
       'User-Agent': this.getUserAgent(),
     };
 
+    if (this.isOfficialMode()) {
+      headers['X-Hdrezka-Android-App'] = '1';
+      headers['X-Hdrezka-Android-App-Version'] = '2.2.1';
+    }
+
     return headers;
   },
 
   getProxyHeaders(): HeadersInit {
     const headers = this.getHeaders();
 
-    return setProxyHeaders(headers, this.getProvider());
+    return addProxyHeaders(headers, this.getProvider());
   },
 
   parseContent(content: string): HTMLElementInterface {
@@ -226,6 +250,31 @@ const configApi: ConfigApiInterface = {
       query: isWeb ? updateUrlHost(query, REZKA_PROXY_PROVIDER) : query,
       provider: isWeb ? REZKA_PROXY_PROVIDER : this.getProvider(),
     };
+  },
+
+  /**
+   * Set official mode
+   * @param mode
+   */
+  setOfficialMode(mode: string): void {
+    this.updateConfig('officialMode', mode);
+    this.loadConfig().officialMode = mode;
+  },
+
+  /**
+   * Get official mode
+   * @returns string
+   */
+  getOfficialMode(): string {
+    return this.loadConfig().officialMode;
+  },
+
+  /**
+   * Check if official mode is enabled
+   * @returns boolean
+   */
+  isOfficialMode() {
+    return !!this.getOfficialMode();
   },
 };
 

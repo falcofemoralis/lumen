@@ -49,6 +49,7 @@ export const SpatialNavigationRoot = ({
   const { isLocked, lockActions } = useIsLocked();
 
   const isRootActive = isActive && !isLocked;
+  
   useRemoteControl({ spatialNavigator, isActive: isRootActive });
 
   useEffect(() => {

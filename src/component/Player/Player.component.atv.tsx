@@ -1,5 +1,5 @@
-import BookmarksSelector from 'Component/BookmarksSelector';
-import Comments from 'Component/Comments';
+import BookmarksOverlay from 'Component/BookmarksOverlay';
+import CommentsOverlay from 'Component/CommentsOverlay';
 import Loader from 'Component/Loader';
 import PlayerClock from 'Component/PlayerClock';
 import PlayerDuration from 'Component/PlayerDuration';
@@ -7,27 +7,24 @@ import PlayerProgressBar from 'Component/PlayerProgressBar';
 import PlayerSubtitles from 'Component/PlayerSubtitles';
 import PlayerVideoSelector from 'Component/PlayerVideoSelector';
 import ThemedDropdown from 'Component/ThemedDropdown';
-import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedText from 'Component/ThemedText';
-import { useOverlayContext } from 'Context/OverlayContext';
 import { usePlayerContext } from 'Context/PlayerContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { VideoView } from 'expo-video';
 import t from 'i18n/t';
 import {
   Bookmark,
-  Captions,
-  CaptionsOff,
-  FastForward,
+  BookmarkCheck,
+  ClosedCaption,
   Gauge,
   ListVideo,
   MessageSquareText,
   Pause,
   Play,
-  Rewind,
+  Settings2,
   SkipBack,
   SkipForward,
-  Sparkles,
+  Undo2,
 } from 'lucide-react-native';
 import React, {
   Ref,
@@ -47,6 +44,7 @@ import {
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
 import { Colors } from 'Style/Colors';
+import { ClosedCaptionFilled } from 'Style/Icons';
 import { scale } from 'Util/CreateStyles';
 import { setTimeoutSafe } from 'Util/Misc';
 import RemoteControlManager from 'Util/RemoteControl/RemoteControlManager';
@@ -72,13 +70,15 @@ export function PlayerComponent({
   voice,
   selectedQuality,
   selectedSubtitle,
-  qualityOverlayId,
-  subtitleOverlayId,
-  playerVideoSelectorOverlayId,
-  commentsOverlayId,
-  bookmarksOverlayId,
-  speedOverlayId,
+  qualityOverlayRef,
+  subtitleOverlayRef,
+  playerVideoSelectorOverlayRef,
+  commentsOverlayRef,
+  bookmarksOverlayRef,
+  speedOverlayRef,
   selectedSpeed,
+  isOverlayOpen,
+  isFilmBookmarked,
   togglePlayPause,
   rewindPosition,
   openQualitySelector,
@@ -86,7 +86,6 @@ export function PlayerComponent({
   handleNewEpisode,
   openVideoSelector,
   handleVideoSelect,
-  hideVideoSelector,
   openSubtitleSelector,
   handleSubtitleChange,
   calculateCurrentTime,
@@ -95,18 +94,21 @@ export function PlayerComponent({
   openSpeedSelector,
   openBookmarksOverlay,
   openCommentsOverlay,
+  closeOverlay,
+  onBookmarkChange,
+  backwardToStart,
 }: PlayerComponentProps) {
   const { focusedElement, updateFocusedElement } = usePlayerContext();
-  const { currentOverlay, goToPreviousOverlay } = useOverlayContext();
   const [showControls, setShowControls] = useState(false);
   const [hideActions, setHideActions] = useState(false);
+  const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const controlsTimeout = useRef<NodeJS.Timeout | null>(null);
   const topActionRef = useRef<SpatialNavigationNodeRef | null>(null);
   const middleActionRef = useRef<SpatialNavigationNodeRef | null>(null);
   const bottomActionRef = useRef<SpatialNavigationNodeRef | null>(null);
   const isPlayingRef = useRef(isPlaying);
   const showControlsRef = useRef(showControls);
-  const currentOverlayRef = useRef(currentOverlay);
+  const isOverlayOpenRef = useRef(isOverlayOpen);
   const isComponentMounted = useRef(true);
   const focusedElementRef = useRef(focusedElement);
   const hideActionsRef = useRef(hideActions);
@@ -139,7 +141,7 @@ export function PlayerComponent({
 
       if (isPlayingRef.current
           && showControlsRef.current
-          && !currentOverlayRef.current.length
+          && !isOverlayOpenRef.current
       ) {
         closeControls();
       }
@@ -147,12 +149,12 @@ export function PlayerComponent({
   };
 
   useEffect(() => {
-    currentOverlayRef.current = currentOverlay;
+    isOverlayOpenRef.current = isOverlayOpen;
     showControlsRef.current = showControls;
     focusedElementRef.current = focusedElement;
     hideActionsRef.current = hideActions;
     isPlayingRef.current = isPlaying;
-  }, [showControls, currentOverlay.length, focusedElement, hideActions, isPlaying]);
+  }, [showControls, isOverlayOpen, focusedElement, hideActions, isPlaying]);
 
   useEffect(() => {
     return () => {
@@ -162,15 +164,14 @@ export function PlayerComponent({
 
   useEffect(() => {
     setControlsTimeout();
-  }, [isPlaying, currentOverlay.length, player]);
+  }, [isPlaying, isOverlayOpen, player]);
 
   useEffect(() => {
     const keyDownListener = (type: SupportedKeys) => {
-      if (!isComponentMounted.current || currentOverlayRef.current.length) return false;
+      if (!isComponentMounted.current || isOverlayOpenRef.current) return false;
 
       if (type === SupportedKeys.BACKWARD) {
-        seekToPosition(0);
-        togglePlayPause(false);
+        backwardToStart();
 
         return true;
       }
@@ -267,11 +268,12 @@ export function PlayerComponent({
   }, [player]);
 
   const handleOpenComments = () => {
-    openCommentsOverlay();
+    closeControls();
+    setIsCommentsOpen(true);
 
     setTimeout(() => {
-      closeControls();
-    }, 0);
+      openCommentsOverlay();
+    }, 250);
   };
 
   const renderTitle = () => {
@@ -330,7 +332,7 @@ export function PlayerComponent({
           ] }
         >
           <IconComponent
-            size={ scale(28) }
+            size={ scale(26) }
             color={ Colors.white }
           />
         </View>
@@ -381,8 +383,6 @@ export function PlayerComponent({
     >
       <View style={ styles.controlsRow }>
         { renderTopAction(isPlaying || isLoading ? Pause : Play, togglePlayPause, topActionRef) }
-        { renderTopAction(Rewind, () => rewindPosition(RewindDirection.BACKWARD)) }
-        { renderTopAction(FastForward, () => rewindPosition(RewindDirection.FORWARD)) }
         { film.hasSeasons && (
           <>
             { renderTopAction(SkipBack, () => handleNewEpisode(RewindDirection.BACKWARD)) }
@@ -391,6 +391,7 @@ export function PlayerComponent({
         ) }
         { renderTopAction(Gauge, openSpeedSelector) }
         { renderTopAction(MessageSquareText, handleOpenComments) }
+        { renderTopAction(Undo2, backwardToStart) }
       </View>
       { renderTopActionLine() }
     </SpatialNavigationView>
@@ -454,13 +455,13 @@ export function PlayerComponent({
             ...(hideActions ? styles.controlsRowHidden : {}),
           } }
         >
-          { renderBottomAction(Sparkles, openQualitySelector, bottomActionRef) }
+          { renderBottomAction(Settings2 , openQualitySelector, bottomActionRef) }
           { isPlaylistSelector && renderBottomAction(ListVideo, openVideoSelector) }
           { subtitles.length > 0 && renderBottomAction(
-            selectedSubtitle?.languageCode === '' ? Captions : CaptionsOff,
+            selectedSubtitle?.languageCode === '' ? ClosedCaption : ClosedCaptionFilled,
             openSubtitleSelector
           ) }
-          { renderBottomAction(Bookmark, openBookmarksOverlay) }
+          { renderBottomAction(isFilmBookmarked ? BookmarkCheck : Bookmark, openBookmarksOverlay) }
         </SpatialNavigationView>
         { renderDuration() }
       </View>
@@ -502,7 +503,7 @@ export function PlayerComponent({
     return (
       <ThemedDropdown
         asOverlay
-        overlayId={ qualityOverlayId }
+        overlayRef={ qualityOverlayRef }
         header={ t('Quality') }
         value={ selectedQuality }
         data={ streams.map((stream) => ({
@@ -510,6 +511,7 @@ export function PlayerComponent({
           value: stream.quality,
         })).reverse() }
         onChange={ handleQualityChange }
+        onClose={ closeOverlay }
       />
     );
   };
@@ -523,11 +525,11 @@ export function PlayerComponent({
 
     return (
       <PlayerVideoSelector
-        overlayId={ playerVideoSelectorOverlayId }
+        overlayRef={ playerVideoSelectorOverlayRef }
         film={ film }
-        onHide={ hideVideoSelector }
         onSelect={ handleVideoSelect }
         voice={ voice }
+        onClose={ closeOverlay }
       />
     );
   };
@@ -538,7 +540,7 @@ export function PlayerComponent({
     return (
       <ThemedDropdown
         asOverlay
-        overlayId={ subtitleOverlayId }
+        overlayRef={ subtitleOverlayRef }
         header={ t('Subtitles') }
         value={ selectedSubtitle?.languageCode }
         data={ subtitles.map((subtitle) => ({
@@ -546,34 +548,38 @@ export function PlayerComponent({
           value: subtitle.languageCode,
         })) }
         onChange={ handleSubtitleChange }
+        onClose={ closeOverlay }
       />
     );
   };
 
   const renderCommentsOverlay = () => (
-    <ThemedOverlay
-      id={ commentsOverlayId }
-      onHide={ () => goToPreviousOverlay() }
+    <CommentsOverlay
+      overlayRef={ commentsOverlayRef }
+      film={ film }
+      style={ styles.commentsOverlayModal }
       containerStyle={ styles.commentsOverlay }
-    >
-      <Comments
-        style={ styles.commentsOverlayContent }
-        film={ film }
-      />
-    </ThemedOverlay>
+      contentStyle={ styles.commentsOverlayContent }
+      onClose={ () => {
+        closeOverlay();
+        setIsCommentsOpen(false);
+      } }
+    />
   );
 
   const renderBookmarksOverlay = () => (
-    <BookmarksSelector
-      overlayId={ bookmarksOverlayId }
+    <BookmarksOverlay
+      overlayRef={ bookmarksOverlayRef }
       film={ film }
+      onClose={ closeOverlay }
+      onBookmarkChange={ onBookmarkChange }
     />
   );
 
   const renderSpeedSelector = () => (
     <ThemedDropdown
       asOverlay
-      overlayId={ speedOverlayId }
+      overlayRef={ speedOverlayRef }
       header={ t('Speed') }
       value={ String(selectedSpeed) }
       data={ DEFAULT_SPEEDS.map((speed) => ({
@@ -581,6 +587,7 @@ export function PlayerComponent({
         value: String(speed),
       })) }
       onChange={ handleSpeedChange }
+      onClose={ closeOverlay }
     />
   );
 
@@ -596,7 +603,12 @@ export function PlayerComponent({
   );
 
   return (
-    <View style={ styles.container }>
+    <Animated.View
+      style={ [
+        styles.container,
+        isCommentsOpen && styles.containerWithComments,
+      ] }
+    >
       <VideoView
         style={ styles.video }
         player={ player }
@@ -609,7 +621,7 @@ export function PlayerComponent({
       { renderControls() }
       { renderLoader() }
       { renderModals() }
-    </View>
+    </Animated.View>
   );
 }
 

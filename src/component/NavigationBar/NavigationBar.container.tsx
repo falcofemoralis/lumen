@@ -7,7 +7,7 @@ import ConfigStore from 'Store/Config.store';
 
 import NavigationBarComponent from './NavigationBar.component';
 import NavigationBarComponentTV from './NavigationBar.component.atv';
-import { ACCOUNT_ROUTE, BOOKMARKS_ROUTE, RECENT_ROUTE } from './NavigationBar.config';
+import { ACCOUNT_ROUTE, BOOKMARKS_ROUTE, NOTIFICATIONS_ROUTE, RECENT_ROUTE } from './NavigationBar.config';
 import { NavigationType, StateType, Tab } from './NavigationBar.type';
 
 export function NavigationBarContainer() {
@@ -18,7 +18,10 @@ export function NavigationBarContainer() {
     const { route } = tab;
 
     // if not signed in, we should redirect to account page
-    if (!isSignedIn && (route === BOOKMARKS_ROUTE || route === RECENT_ROUTE)) {
+    if (!isSignedIn && (route === BOOKMARKS_ROUTE
+      || route === RECENT_ROUTE
+      || route === NOTIFICATIONS_ROUTE
+    )) {
       return ACCOUNT_ROUTE;
     }
 

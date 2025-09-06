@@ -1,5 +1,5 @@
-import BookmarksSelector from 'Component/BookmarksSelector';
-import Comments from 'Component/Comments';
+import BookmarksOverlay from 'Component/BookmarksOverlay';
+import CommentsOverlay from 'Component/CommentsOverlay';
 import Loader from 'Component/Loader';
 import PlayerClock from 'Component/PlayerClock';
 import PlayerDuration from 'Component/PlayerDuration';
@@ -7,10 +7,8 @@ import PlayerProgressBar from 'Component/PlayerProgressBar';
 import PlayerSubtitles from 'Component/PlayerSubtitles';
 import PlayerVideoSelector from 'Component/PlayerVideoSelector';
 import ThemedDropdown from 'Component/ThemedDropdown';
-import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
-import { useOverlayContext } from 'Context/OverlayContext';
 import * as NavigationBar from 'expo-navigation-bar';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { OrientationLock } from 'expo-screen-orientation';
@@ -19,8 +17,8 @@ import { isPictureInPictureSupported, VideoView } from 'expo-video';
 import t from 'i18n/t';
 import {
   Bookmark,
-  Captions,
-  CaptionsOff,
+  BookmarkCheck,
+  ClosedCaption,
   Forward,
   Gauge,
   ListVideo,
@@ -30,14 +28,14 @@ import {
   Pause,
   PictureInPicture2,
   Play,
+  Settings2,
   SkipBack,
   SkipForward,
-  Sparkles,
 } from 'lucide-react-native';
 import React, {
   useEffect, useRef, useState,
 } from 'react';
-import { Dimensions, ScrollView, View } from 'react-native';
+import { Dimensions, View } from 'react-native';
 import {
   Gesture,
   GestureDetector,
@@ -48,6 +46,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { Colors } from 'Style/Colors';
+import { ClosedCaptionFilled } from 'Style/Icons';
 import { scale } from 'Util/CreateStyles';
 import { setTimeoutSafe } from 'Util/Misc';
 
@@ -74,14 +73,16 @@ export function PlayerComponent({
   voice,
   selectedQuality,
   selectedSubtitle,
-  qualityOverlayId,
-  subtitleOverlayId,
-  playerVideoSelectorOverlayId,
-  commentsOverlayId,
-  bookmarksOverlayId,
-  speedOverlayId,
+  qualityOverlayRef,
+  subtitleOverlayRef,
+  playerVideoSelectorOverlayRef,
+  commentsOverlayRef,
+  bookmarksOverlayRef,
+  speedOverlayRef,
   selectedSpeed,
   isLocked,
+  isOverlayOpen,
+  isFilmBookmarked,
   togglePlayPause,
   seekToPosition,
   calculateCurrentTime,
@@ -89,7 +90,6 @@ export function PlayerComponent({
   handleQualityChange,
   openQualitySelector,
   openVideoSelector,
-  hideVideoSelector,
   handleVideoSelect,
   rewindPosition,
   openSubtitleSelector,
@@ -100,18 +100,20 @@ export function PlayerComponent({
   openCommentsOverlay,
   handleLockControls,
   handleShare,
+  closeOverlay,
+  onBookmarkChange,
 }: PlayerComponentProps) {
-  const { currentOverlay, goToPreviousOverlay } = useOverlayContext();
   const [showControls, setShowControls] = useState(false);
   const [isScrolling, setIsScrolling] = useState(false);
   const [doubleTapAction, setDoubleTapAction] = useState<DoubleTapAction | null>(null);
   const [longTapAction, setLongTapAction] = useState(false);
+  const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const controlsTimeout = useRef<NodeJS.Timeout | null>(null);
   const playerRef = useRef<VideoView>(null);
   const doubleTapTimeout = useRef<NodeJS.Timeout | null>(null);
   const isPlayingRef = useRef(isPlaying);
   const showControlsRef = useRef(showControls);
-  const currentOverlayRef = useRef(currentOverlay);
+  const isOverlayOpenRef = useRef(isOverlayOpen);
   const isScrollingRef = useRef(isScrolling);
   const isComponentMounted = useRef(true);
 
@@ -129,7 +131,7 @@ export function PlayerComponent({
 
       if (isPlayingRef.current
         && showControlsRef.current
-        && !currentOverlayRef.current.length
+        && !isOverlayOpenRef.current
         && !isScrollingRef.current
       ) {
         setShowControls(false);
@@ -141,8 +143,8 @@ export function PlayerComponent({
     isPlayingRef.current = isPlaying;
     showControlsRef.current = showControls;
     isScrollingRef.current = isScrolling;
-    currentOverlayRef.current = currentOverlay;
-  }, [showControls, currentOverlay.length, isScrolling, isPlaying]);
+    isOverlayOpenRef.current = isOverlayOpen;
+  }, [showControls, isOverlayOpen, isScrolling, isPlaying]);
 
   useEffect(() => {
     return () => {
@@ -152,7 +154,7 @@ export function PlayerComponent({
 
   useEffect(() => {
     setControlsTimeout();
-  }, [isPlaying, currentOverlay.length, player]);
+  }, [isPlaying, isOverlayOpen, player]);
 
   useEffect(() => {
     ScreenOrientation.lockAsync(OrientationLock.LANDSCAPE);
@@ -184,7 +186,11 @@ export function PlayerComponent({
 
   const handleOpenComments = () => {
     setShowControls(false);
-    openCommentsOverlay();
+    setIsCommentsOpen(true);
+
+    setTimeout(() => {
+      openCommentsOverlay();
+    }, 250);
   };
 
   const handleDoubleTap = (direction: RewindDirection) => {
@@ -300,7 +306,10 @@ export function PlayerComponent({
       return null;
     }
 
-    return renderAction(selectedSubtitle?.languageCode === '' ? Captions : CaptionsOff, openSubtitleSelector);
+    return renderAction(
+      selectedSubtitle?.languageCode === '' ? ClosedCaption : ClosedCaptionFilled,
+      openSubtitleSelector
+    );
   };
 
   const renderTopActions = () => (
@@ -311,7 +320,7 @@ export function PlayerComponent({
           <>
             { isPictureInPictureSupported() && renderAction(PictureInPicture2, enablePIP) }
             { renderAction(Gauge, openSpeedSelector) }
-            { renderAction(Sparkles, openQualitySelector) }
+            { renderAction(Settings2, openQualitySelector) }
             { renderSubtitlesActions() }
           </>
         ) }
@@ -435,7 +444,7 @@ export function PlayerComponent({
           >
             { isPlaylistSelector && renderAction(ListVideo, openVideoSelector) }
             { renderAction(MessageSquareText, handleOpenComments) }
-            { renderAction(Bookmark, openBookmarksOverlay) }
+            { renderAction(isFilmBookmarked ? BookmarkCheck : Bookmark, openBookmarksOverlay) }
             { renderAction(Forward, handleShare) }
           </View>
         </View>
@@ -545,7 +554,7 @@ export function PlayerComponent({
     return (
       <ThemedDropdown
         asOverlay
-        overlayId={ qualityOverlayId }
+        overlayRef={ qualityOverlayRef }
         header={ t('Quality') }
         value={ selectedQuality }
         data={ streams.map((stream) => ({
@@ -553,6 +562,7 @@ export function PlayerComponent({
           value: stream.quality,
         })).reverse() }
         onChange={ handleQualityChange }
+        onClose={ closeOverlay }
       />
     );
   };
@@ -566,11 +576,11 @@ export function PlayerComponent({
 
     return (
       <PlayerVideoSelector
-        overlayId={ playerVideoSelectorOverlayId }
+        overlayRef={ playerVideoSelectorOverlayRef }
         film={ film }
-        onHide={ hideVideoSelector }
         onSelect={ handleVideoSelect }
         voice={ voice }
+        onClose={ closeOverlay }
       />
     );
   };
@@ -581,7 +591,7 @@ export function PlayerComponent({
     return (
       <ThemedDropdown
         asOverlay
-        overlayId={ subtitleOverlayId }
+        overlayRef={ subtitleOverlayRef }
         header={ t('Subtitles') }
         value={ selectedSubtitle?.languageCode }
         data={ subtitles.map((subtitle) => ({
@@ -589,41 +599,39 @@ export function PlayerComponent({
           value: subtitle.languageCode,
         })) }
         onChange={ handleSubtitleChange }
+        onClose={ closeOverlay }
       />
     );
   };
 
   const renderCommentsOverlay = () => (
-    <ThemedOverlay
-      id={ commentsOverlayId }
-      onHide={ () => goToPreviousOverlay() }
+    <CommentsOverlay
+      overlayRef={ commentsOverlayRef }
+      film={ film }
+      style={ styles.commentsOverlayModal }
       containerStyle={ styles.commentsOverlay }
       contentContainerStyle={ styles.commentsOverlayContent }
-    >
-      <ScrollView
-        horizontal
-        contentContainerStyle={ { width: '100%', height: '100%' } }
-      >
-        <Comments
-          style={ styles.commentsOverlayList }
-          film={ film }
-          loaderFullScreen
-        />
-      </ScrollView>
-    </ThemedOverlay>
+      contentStyle={ styles.commentsOverlayList }
+      onClose={ () => {
+        closeOverlay();
+        setIsCommentsOpen(false);
+      } }
+    />
   );
 
   const renderBookmarksOverlay = () => (
-    <BookmarksSelector
-      overlayId={ bookmarksOverlayId }
+    <BookmarksOverlay
+      overlayRef={ bookmarksOverlayRef }
       film={ film }
+      onClose={ closeOverlay }
+      onBookmarkChange={ onBookmarkChange }
     />
   );
 
   const renderSpeedSelector = () => (
     <ThemedDropdown
       asOverlay
-      overlayId={ speedOverlayId }
+      overlayRef={ speedOverlayRef }
       header={ t('Speed') }
       value={ String(selectedSpeed) }
       data={ DEFAULT_SPEEDS.map((speed) => ({
@@ -631,6 +639,7 @@ export function PlayerComponent({
         value: String(speed),
       })) }
       onChange={ handleSpeedChange }
+      onClose={ closeOverlay }
     />
   );
 
@@ -646,7 +655,12 @@ export function PlayerComponent({
   );
 
   return (
-    <View style={ styles.container }>
+    <Animated.View
+      style={ [
+        styles.container,
+        isCommentsOpen && { width: (Dimensions.get('window').width) / 2 },
+      ] }
+    >
       <VideoView
         ref={ playerRef }
         style={ styles.video }
@@ -659,7 +673,7 @@ export function PlayerComponent({
       { renderControls() }
       { renderLoader() }
       { renderModals() }
-    </View>
+    </Animated.View>
   );
 }
 

@@ -1,8 +1,8 @@
 import { getFirestore } from '@react-native-firebase/firestore';
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
-import { useOverlayContext } from 'Context/OverlayContext';
+import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { usePlayerContext } from 'Context/PlayerContext';
-import { usePlayerProgressContext } from 'Context/PlayerProgressContext';
+import { usePlayerProgressActions } from 'Context/PlayerProgressContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useEventListener } from 'expo';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
@@ -12,7 +12,6 @@ import t from 'i18n/t';
 import {
   useCallback,
   useEffect,
-  useId,
   useMemo,
   useRef,
   useState,
@@ -20,9 +19,11 @@ import {
 import { BackHandler, Share } from 'react-native';
 import ConfigStore from 'Store/Config.store';
 import NotificationStore from 'Store/Notification.store';
+import { FilmInterface } from 'Type/Film.interface';
 import { FilmStreamInterface } from 'Type/FilmStream.interface';
 import { FilmVideoInterface, SubtitleInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
+import { isBookmarked } from 'Util/Film';
 import { setIntervalSafe } from 'Util/Misc';
 import {
   getFirestoreSavedTime,
@@ -55,9 +56,8 @@ export function PlayerContainer({
   voice,
 }: PlayerContainerProps) {
   const { updateSelectedVoice } = usePlayerContext();
-  const { resetProgressStatus, updateProgressStatus } = usePlayerProgressContext();
-  const { isSignedIn, profile, getCurrentService } = useServiceContext();
-  const { openOverlay, goToPreviousOverlay } = useOverlayContext();
+  const { resetProgressStatus, updateProgressStatus } = usePlayerProgressActions();
+  const { isSignedIn, profile, currentService } = useServiceContext();
   const [selectedVideo, setSelectedVideo] = useState<FilmVideoInterface>(video);
   const [selectedStream, setSelectedStream] = useState<FilmStreamInterface>(stream);
   const [selectedVoice, setSelectedVoice] = useState<FilmVoiceInterface>(voice);
@@ -69,14 +69,17 @@ export function PlayerContainer({
   );
   const [selectedSpeed, setSelectedSpeed] = useState<number>(DEFAULT_SPEED);
   const [isLocked, setIsLocked] = useState<boolean>(false);
+  const [isOverlayOpen, setIsOverlayOpen] = useState<boolean>(false);
+  const [isFilmBookmarked, setIsFilmBookmarked] = useState<boolean>(isBookmarked(film));
 
+  const stopEventsRef = useRef<boolean>(false);
   const updateTimeTimeout = useRef<NodeJS.Timeout | null>(null);
-  const qualityOverlayId = useId();
-  const subtitleOverlayId = useId();
-  const playerVideoSelectorOverlayId = useId();
-  const commentsOverlayId = useId();
-  const bookmarksOverlayId = useId();
-  const speedOverlayId = useId();
+  const qualityOverlayRef = useRef<ThemedOverlayRef>(null);
+  const subtitleOverlayRef = useRef<ThemedOverlayRef>(null);
+  const playerVideoSelectorOverlayRef = useRef<ThemedOverlayRef>(null);
+  const commentsOverlayRef = useRef<ThemedOverlayRef>(null);
+  const bookmarksOverlayRef = useRef<ThemedOverlayRef>(null);
+  const speedOverlayRef = useRef<ThemedOverlayRef>(null);
 
   const firestoreSavedTimeRef = useRef(false);
   const firestoreDb = useMemo(() => (
@@ -109,6 +112,10 @@ export function PlayerContainer({
     p.timeUpdateEventInterval = 1;
     p.currentTime = getVideoTime(selectedVoice, savedTime);
     p.preservesPitch = true;
+    p.bufferOptions = {
+      ...p.bufferOptions,
+      preferredForwardBufferDuration: 180,
+    };
     p.play();
 
     initFirestoreSavedTime(p, savedTime);
@@ -184,13 +191,21 @@ export function PlayerContainer({
     player,
     'timeUpdate',
     ({ currentTime, bufferedPosition }) => {
+      if (stopEventsRef.current) {
+        return;
+      }
+
       const { duration, playing } = player;
 
-      if (!playing) {
+      if (duration <= 0) {
         return;
       }
 
       updateProgressStatus(currentTime, bufferedPosition, duration);
+
+      if (!playing) {
+        return;
+      }
 
       onPlaybackEnd(currentTime, duration);
     }
@@ -209,9 +224,7 @@ export function PlayerContainer({
       NotificationStore.displayError(`An error occurred : ${error?.message}`);
     }
 
-    if (isLoading !== loading) {
-      setIsLoading(loading);
-    }
+    setIsLoading(loading);
   });
 
   const onPlaybackEnd = (currentTime: number, duration: number) => {
@@ -222,7 +235,7 @@ export function PlayerContainer({
 
   const changePlayerVideo = (newVideo: FilmVideoInterface, newVoice: FilmVoiceInterface) => {
     if (isSignedIn) {
-      getCurrentService().saveWatch(film, newVoice)
+      currentService.saveWatch(film, newVoice)
         .catch((error) => {
           NotificationStore.displayError(error as Error);
         });
@@ -240,8 +253,12 @@ export function PlayerContainer({
     updateSelectedVoice(film.id, newVoice);
   };
 
-  const togglePlayPause = (pause?: boolean) => {
+  const togglePlayPause = (pause?: boolean, stopEvents?: boolean) => {
     const { playing } = player;
+
+    if (stopEvents !== undefined) {
+      stopEventsRef.current = stopEvents;
+    }
 
     const newPlaying = pause !== undefined ? pause : playing;
 
@@ -286,31 +303,55 @@ export function PlayerContainer({
     player.seekBy(seekTime);
   };
 
+  const openOverlay = () => {
+    setIsOverlayOpen(true);
+  };
+
+  const closeOverlay = () => {
+    setIsOverlayOpen(false);
+  };
+
   const openQualitySelector = () => {
-    openOverlay(qualityOverlayId);
+    qualityOverlayRef.current?.open();
+    openOverlay();
+  };
+
+  const openVideoSelector = () => {
+    playerVideoSelectorOverlayRef.current?.open();
+    openOverlay();
   };
 
   const openSubtitleSelector = () => {
-    openOverlay(subtitleOverlayId);
+    subtitleOverlayRef.current?.open();
+    openOverlay();
   };
 
   const openCommentsOverlay = () => {
-    openOverlay(commentsOverlayId);
+    commentsOverlayRef.current?.open();
+    openOverlay();
   };
 
   const openBookmarksOverlay = () => {
-    openOverlay(bookmarksOverlayId);
+    if (!isSignedIn) {
+      NotificationStore.displayMessage(t('Sign In to an Account'));
+
+      return;
+    }
+
+    bookmarksOverlayRef.current?.open();
+    openOverlay();
   };
 
   const openSpeedSelector = () => {
-    openOverlay(speedOverlayId);
+    speedOverlayRef.current?.open();
+    openOverlay();
   };
 
   const handleQualityChange = (item: DropdownItem) => {
     const { value: quality } = item;
 
     if (selectedQuality === quality) {
-      goToPreviousOverlay();
+      qualityOverlayRef.current?.close();
 
       return;
     }
@@ -327,15 +368,14 @@ export function PlayerContainer({
     updateTime();
 
     player.replaceAsync(newStream.url);
-
-    goToPreviousOverlay();
+    qualityOverlayRef.current?.close();
   };
 
   const handleSubtitleChange = (item: DropdownItem) => {
     const { value: languageCode } = item;
 
     if (selectedSubtitle?.languageCode === languageCode) {
-      goToPreviousOverlay();
+      subtitleOverlayRef.current?.close();
 
       return;
     }
@@ -349,7 +389,7 @@ export function PlayerContainer({
     setSelectedSubtitle(newSubtitle);
     updateTime();
 
-    goToPreviousOverlay();
+    subtitleOverlayRef.current?.close();
   };
 
   const handleNewEpisode = async (direction: RewindDirection) => {
@@ -415,7 +455,7 @@ export function PlayerContainer({
     const { seasonId } = seasons[newSeasonIndex];
     const { episodeId } = episodes[newEpisodeIndex];
 
-    const newVideo = await getCurrentService().getFilmStreamsByEpisodeId(
+    const newVideo = await currentService.getFilmStreamsByEpisodeId(
       film,
       selectedVoice,
       seasonId,
@@ -443,16 +483,8 @@ export function PlayerContainer({
     createUpdateTimeTimeout();
   };
 
-  const openVideoSelector = () => {
-    openOverlay(playerVideoSelectorOverlayId);
-  };
-
-  const hideVideoSelector = () => {
-    goToPreviousOverlay();
-  };
-
   const handleVideoSelect = (newVideo: FilmVideoInterface, newVoice: FilmVoiceInterface) => {
-    hideVideoSelector();
+    playerVideoSelectorOverlayRef.current?.close();
     setSelectedVoice(newVoice);
     changePlayerVideo(newVideo, newVoice);
   };
@@ -465,7 +497,7 @@ export function PlayerContainer({
     const { value: speed } = item;
 
     if (String(selectedSpeed) === speed) {
-      goToPreviousOverlay();
+      speedOverlayRef.current?.close();
 
       return;
     }
@@ -473,7 +505,7 @@ export function PlayerContainer({
     setSelectedSpeed(Number(speed));
     setPlayerRate(Number(speed));
 
-    goToPreviousOverlay();
+    speedOverlayRef.current?.close();
   };
 
   const handleLockControls = () => {
@@ -490,6 +522,16 @@ export function PlayerContainer({
     }
   };
 
+  const onBookmarkChange = (f: FilmInterface) => {
+    film.bookmarks = f.bookmarks;
+    setIsFilmBookmarked(isBookmarked(film));
+  };
+
+  const backwardToStart = () => {
+    seekToPosition(0);
+    togglePlayPause(false);
+  };
+
   const containerProps = () => ({
     player,
     isLoading,
@@ -499,14 +541,16 @@ export function PlayerContainer({
     voice: selectedVoice,
     selectedQuality,
     selectedSubtitle,
-    qualityOverlayId,
-    subtitleOverlayId,
-    playerVideoSelectorOverlayId,
-    commentsOverlayId,
-    bookmarksOverlayId,
-    speedOverlayId,
+    qualityOverlayRef,
+    subtitleOverlayRef,
+    playerVideoSelectorOverlayRef,
+    commentsOverlayRef,
+    bookmarksOverlayRef,
+    speedOverlayRef,
     selectedSpeed,
     isLocked,
+    isOverlayOpen,
+    isFilmBookmarked,
   });
 
   const containerFunctions = {
@@ -518,7 +562,6 @@ export function PlayerContainer({
     handleQualityChange,
     handleNewEpisode,
     openVideoSelector,
-    hideVideoSelector,
     handleVideoSelect,
     setPlayerRate,
     openSubtitleSelector,
@@ -529,6 +572,9 @@ export function PlayerContainer({
     openBookmarksOverlay,
     handleLockControls,
     handleShare,
+    closeOverlay,
+    onBookmarkChange,
+    backwardToStart,
   };
 
   return withTV(PlayerComponentTV, PlayerComponent, {

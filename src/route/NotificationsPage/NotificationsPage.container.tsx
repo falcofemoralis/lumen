@@ -13,13 +13,13 @@ import NotificationsPageComponentTV from './NotificationsPage.component.atv';
 export function NotificationsPageContainer() {
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState<NotificationInterface[]>([]);
-  const { isSignedIn, getCurrentService } = useServiceContext();
+  const { isSignedIn, currentService } = useServiceContext();
   const { resetNotifications, getNotifications } = useNotificationsContext();
 
   const loadFilms = async (items: NotificationInterface[]) => {
     try {
       setData(
-        await getCurrentService().getFilmsFromNotifications(items)
+        await currentService.getFilmsFromNotifications(items)
       );
     } catch (error) {
       NotificationStore.displayError(error as Error);
