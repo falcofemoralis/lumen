@@ -10,6 +10,7 @@ export function HomePageComponent({
   onLoadFilms,
   onUpdateFilms,
 }: HomePageComponentProps) {
+
   return (
     <Page testID="home-page">
       <FilmPager

@@ -6,12 +6,18 @@ import t from 'i18n/t';
 import { useCallback, useEffect, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { ScheduleItem } from 'Route/FilmPage/FilmPageElements';
+import RouterStore from 'Store/Router.store';
+import { FilmInterface } from 'Type/Film.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 
+import { SCHEDULE_MODAL_ROUTE } from './ScheduleModal.config';
 import { styles } from './ScheduleModal.style';
-import { ScheduleModalProps } from './ScheduleModal.type';
 
-export const ScheduleModalComponent = ({ film, handleUpdateScheduleWatch }: ScheduleModalProps) => {
+export const ScheduleModalComponent = () => {
+  const { film, handleUpdateScheduleWatch } = RouterStore.popData(SCHEDULE_MODAL_ROUTE) as {
+    film: FilmInterface;
+    handleUpdateScheduleWatch: (scheduleItem: ScheduleItemInterface) => Promise<boolean>;
+  } ?? {};
   const { schedule = [] } = film;
   const [rendered, setRendered] = useState(false);
 

@@ -1,6 +1,6 @@
+import { useNavigation } from '@react-navigation/native';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useServiceContext } from 'Context/ServiceContext';
-import { router } from 'expo-router';
 import { withTV } from 'Hooks/withTV';
 import t from 'i18n/t';
 import {
@@ -10,6 +10,7 @@ import {
   useState,
 } from 'react';
 import { Share } from 'react-native';
+import { PLAYER_ROUTE } from 'Route/PlayerPage/PlayerPage.config';
 import NotificationStore from 'Store/Notification.store';
 import RouterStore from 'Store/Router.store';
 import { FilmInterface } from 'Type/Film.interface';
@@ -24,7 +25,9 @@ import FilmPageComponentTV from './FilmPage.component.atv';
 import { MINIMUM_SCHEDULE_ITEMS } from './FilmPage.config';
 import { FilmPageContainerProps } from './FilmPage.type';
 
-export function FilmPageContainer({ link, thumbnailPoster }: FilmPageContainerProps) {
+export function FilmPageContainer({ route }: FilmPageContainerProps) {
+  const { link, thumbnailPoster } = route.params as { link: string, thumbnailPoster: string };
+  const navigation = useNavigation();
   const { isSignedIn, currentService } = useServiceContext();
   const [film, setFilm] = useState<FilmInterface | null>(null);
   const playerVideoSelectorOverlayRef = useRef<ThemedOverlayRef>(null);
@@ -99,27 +102,25 @@ export function FilmPageContainer({ link, thumbnailPoster }: FilmPageContainerPr
   };
 
   const openPlayer = (video: FilmVideoInterface, voice: FilmVoiceInterface) => {
-    RouterStore.pushData('player', {
+    RouterStore.pushData(PLAYER_ROUTE, {
       video,
       film,
       voice,
     });
 
-    router.push({
-      pathname: '/player',
-    });
+    navigation.navigate(PLAYER_ROUTE);
   };
 
   const handleSelectFilm = useCallback((f: FilmInterface) => {
-    openFilm(f);
+    openFilm(f, navigation);
   }, []);
 
   const handleSelectActor = useCallback((actorLink: string) => {
-    openActor(actorLink);
+    openActor(actorLink, navigation);
   }, []);
 
   const handleSelectCategory = useCallback((categoryLink: string) => {
-    openCategory(categoryLink);
+    openCategory(categoryLink, navigation);
   }, []);
 
   const getVisibleScheduleItems = useCallback(() => {
@@ -192,7 +193,7 @@ export function FilmPageContainer({ link, thumbnailPoster }: FilmPageContainerPr
     });
 
     return true;
-  }, [isSignedIn]);
+  }, [isSignedIn, currentService]);
 
   const handleShare = async () => {
     if (!film) {

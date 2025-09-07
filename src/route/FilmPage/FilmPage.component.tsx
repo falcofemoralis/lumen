@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import BookmarksOverlay from 'Component/BookmarksOverlay';
 import Header from 'Component/Header';
 import Page from 'Component/Page';
@@ -8,7 +9,6 @@ import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import Wrapper from 'Component/Wrapper';
 import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
 import t from 'i18n/t';
 import {
   Bookmark,
@@ -35,6 +35,8 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from 'react-native-reanimated';
+import { COMMENTS_MODAL_ROUTE } from 'Route/CommentsModal/CommentsModal.config';
+import { SCHEDULE_MODAL_ROUTE } from 'Route/ScheduleModal/ScheduleModal.config';
 import NotificationStore from 'Store/Notification.store';
 import RouterStore from 'Store/Router.store';
 import { Colors } from 'Style/Colors';
@@ -71,6 +73,7 @@ export function FilmPageComponent({
   openBookmarks,
   handleBookmarkChange,
 }: FilmPageComponentProps) {
+  const navigation = useNavigation();
   const { width } = useWindowDimensions();
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffset = useSharedValue(0);
@@ -101,22 +104,16 @@ export function FilmPageComponent({
   }
 
   const openComments = () => {
-    router.push({ pathname: '/modal' });
-    RouterStore.pushData('modal', {
-      type: 'comments',
-      film,
-    });
+    RouterStore.pushData(COMMENTS_MODAL_ROUTE, { film });
+    navigation.navigate(COMMENTS_MODAL_ROUTE);
   };
 
   const openSchedule = () => {
-    router.push({ pathname: '/modal' });
-    RouterStore.pushData('modal', {
-      type: 'schedule',
+    RouterStore.pushData(SCHEDULE_MODAL_ROUTE, {
       film,
-      additionalProps: {
-        handleUpdateScheduleWatch,
-      },
+      handleUpdateScheduleWatch,
     });
+    navigation.navigate(SCHEDULE_MODAL_ROUTE);
   };
 
   const openNotImplemented = () => {

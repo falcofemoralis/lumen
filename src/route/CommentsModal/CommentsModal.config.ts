@@ -1,0 +1,1 @@
+export const COMMENTS_MODAL_ROUTE = 'CommentsModal';

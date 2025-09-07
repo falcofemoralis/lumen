@@ -1,3 +1,4 @@
+import { ParamListBase, RouteProp } from '@react-navigation/native';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
@@ -5,8 +6,7 @@ import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 
 export interface FilmPageContainerProps {
-  link: string;
-  thumbnailPoster: string;
+  route: RouteProp<ParamListBase, string>;
 }
 
 export interface FilmPageComponentProps {

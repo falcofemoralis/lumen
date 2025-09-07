@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import { useServiceContext } from 'Context/ServiceContext';
 import { withTV } from 'Hooks/withTV';
 import { useEffect, useRef, useState } from 'react';
@@ -16,6 +17,7 @@ export function RecentPageContainer() {
     totalPages: 1,
   });
   const updatingStateRef = useRef(false);
+  const navigation = useNavigation();
 
   useEffect(() => {
     if (isSignedIn) {
@@ -77,7 +79,7 @@ export function RecentPageContainer() {
   };
 
   const handleOnPress = (item: RecentItemInterface) => {
-    openFilm({ link: item.link, poster: item.image });
+    openFilm({ link: item.link, poster: item.image }, navigation);
   };
 
   const removeItem = async (item: RecentItemInterface) => {

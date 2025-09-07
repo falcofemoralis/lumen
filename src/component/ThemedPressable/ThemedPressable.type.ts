@@ -3,6 +3,7 @@ import { StyleProp, View, ViewStyle } from 'react-native';
 
 export interface ThemedPressableProps {
   onPress?: () => void;
+  onLongPress?: () => void;
   children?: React.ReactNode;
   style?: StyleProp<ViewStyle>;
   contentStyle?: StyleProp<ViewStyle>;

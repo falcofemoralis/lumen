@@ -1,5 +1,5 @@
 import { exitApp } from '@logicwind/react-native-exit-app';
-import { router } from 'expo-router';
+import { useNavigation } from '@react-navigation/native';
 import { withTV } from 'Hooks/withTV';
 import t from 'i18n/t';
 import { useLayoutEffect, useRef } from 'react';
@@ -15,22 +15,19 @@ import { PageContainerProps } from './Page.type';
 
 export function PageContainer(props: PageContainerProps) {
   const backPressedOnceRef = useRef(false);
+  const navigation = useNavigation();
 
   useLayoutEffect(() => {
     const backAction = () => {
-      try {
-        if (router.canDismiss()) {
-          router.dismiss();
+      if (ConfigStore.isTV()) {
+        const { routes = [] } = navigation.getState() ?? {};
+
+        if (routes.length > 1) {
+          navigation.goBack();
 
           return true;
         }
-      } catch (e) {
-        NotificationStore.displayError(e as Error);
 
-        return true;
-      }
-
-      if (ConfigStore.isTV()) {
         if (backPressedOnceRef.current) {
           exitApp();
 

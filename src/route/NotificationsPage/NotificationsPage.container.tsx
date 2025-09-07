@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import { useNotificationsContext } from 'Context/NotificationsContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { withTV } from 'Hooks/withTV';
@@ -15,6 +16,7 @@ export function NotificationsPageContainer() {
   const [data, setData] = useState<NotificationInterface[]>([]);
   const { isSignedIn, currentService } = useServiceContext();
   const { resetNotifications, getNotifications } = useNotificationsContext();
+  const navigation = useNavigation();
 
   const loadFilms = async (items: NotificationInterface[]) => {
     try {
@@ -52,7 +54,7 @@ export function NotificationsPageContainer() {
   }, [isSignedIn]);
 
   const handleSelectFilm = useCallback((film: FilmCardInterface) => {
-    openFilm(film);
+    openFilm(film, navigation);
   }, []);
 
   const getData = () => {

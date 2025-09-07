@@ -1,12 +1,12 @@
+import { useNavigation } from '@react-navigation/native';
 import InfoBlock from 'Component/InfoBlock';
 import Loader from 'Component/Loader';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedInput from 'Component/ThemedInput';
-import { router } from 'expo-router';
 import t from 'i18n/t';
 import { useRef } from 'react';
 import { View } from 'react-native';
-import RouterStore from 'Store/Router.store';
+import { LOGIN_MODAL_ROUTE } from 'Route/LoginModal/LoginModal.config';
 
 import { styles } from './LoginForm.style';
 import { LoginFormComponentProps } from './LoginForm.type';
@@ -17,21 +17,19 @@ export function LoginFormComponent({
   style,
   handleLogin,
 }: LoginFormComponentProps) {
+  const navigation = useNavigation();
   const loginRef = useRef({ username: '', password: '' });
 
   const onLogin = async () => {
     const success = await handleLogin(loginRef.current.username, loginRef.current.password);
 
     if (success) {
-      router.back();
+      navigation.goBack();
     }
   };
 
   const openForm = () => {
-    router.push({ pathname: '/modal' });
-    RouterStore.pushData('modal', {
-      type: 'login',
-    });
+    navigation.navigate(LOGIN_MODAL_ROUTE);
   };
 
   const renderForm = () => {

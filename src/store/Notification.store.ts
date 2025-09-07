@@ -1,5 +1,7 @@
-import { router } from 'expo-router';
 import { Platform, ToastAndroid } from 'react-native';
+import { ERROR_ROUTE } from 'Route/ErrorPage/ErrorPage.config';
+
+import { navigationRef } from '../navigation/container';
 
 class NotificationStore {
   private isErrorOccurred = false;
@@ -43,14 +45,11 @@ class NotificationStore {
 
     this.isErrorOccurred = true;
 
-    router.replace({
-      pathname: '/error',
-      params: {
-        code,
-        error,
-        info,
-      },
-    });
+    navigationRef.current?.navigate(ERROR_ROUTE, {
+      code,
+      error,
+      info,
+    } as never);
   }
 }
 

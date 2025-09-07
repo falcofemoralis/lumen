@@ -22,12 +22,6 @@
           }
         }
       ],
-      [
-        "expo-router",
-        {
-          "root": "./src/navigation"
-        }
-      ],
       "expo-font",
       [
         "expo-video",

@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import { useServiceContext } from 'Context/ServiceContext';
 import { withTV } from 'Hooks/withTV';
 import { useCallback, useEffect, useState } from 'react';
@@ -10,10 +11,12 @@ import ActorPageComponent from './ActorPage.component';
 import ActorPageComponentTV from './ActorPage.component.atv';
 import { ActorPageContainerProps } from './ActorPage.type';
 
-export function ActorPageContainer({ link }: ActorPageContainerProps) {
+export function ActorPageContainer({ route }: ActorPageContainerProps) {
+  const { link } = route.params as { link: string };
   const [isLoading, setIsLoading] = useState(true);
   const [actor, setActor] = useState<ActorInterface | null>(null);
   const { currentService } = useServiceContext();
+  const navigation = useNavigation();
 
   const fetchActor = async () => {
     try {
@@ -34,7 +37,7 @@ export function ActorPageContainer({ link }: ActorPageContainerProps) {
   }, []);
 
   const handleSelectFilm = useCallback((film: FilmCardInterface) => {
-    openFilm(film);
+    openFilm(film, navigation);
   }, []);
 
   const containerFunctions = {

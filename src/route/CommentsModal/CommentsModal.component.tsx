@@ -3,10 +3,16 @@ import Header from 'Component/Header';
 import Wrapper from 'Component/Wrapper';
 import t from 'i18n/t';
 import { View } from 'react-native';
+import RouterStore from 'Store/Router.store';
+import { FilmInterface } from 'Type/Film.interface';
 
-import { CommentsModalProps } from './CommentsModal.type';
+import { COMMENTS_MODAL_ROUTE } from './CommentsModal.config';
 
-export const CommentsModalComponent = ({ film }: CommentsModalProps) => {
+export const CommentsModalComponent = () => {
+  const { film } = RouterStore.popData(COMMENTS_MODAL_ROUTE) as {
+    film: FilmInterface;
+  } ?? {};
+
   return (
     <View style={ { flex: 1 } }>
       <Header title={ t('Comments') } />

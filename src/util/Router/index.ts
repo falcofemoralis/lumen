@@ -1,10 +1,12 @@
-import { router } from 'expo-router';
+import { ACTOR_ROUTE } from 'Route/ActorPage/ActorPage.config';
+import { CATEGORY_ROUTE } from 'Route/CategoryPage/CategoryPage.config';
+import { FILM_ROUTE } from 'Route/FilmPage/FilmPage.config';
 import NotificationStore from 'Store/Notification.store';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 
 type FilmInput = Pick<FilmCardInterface, 'link' | 'poster'>;
 
-export const openFilm = (film: FilmInput) => {
+export const openFilm = (film: FilmInput, navigation: any) => {
   const { link, poster } = film;
 
   if (!link) {
@@ -13,29 +15,22 @@ export const openFilm = (film: FilmInput) => {
     return;
   }
 
-  router.push({
-    pathname: '/film/[link]',
-    params: {
-      link,
-      poster,
-    },
-  });
+  navigation.push(
+    FILM_ROUTE,
+    { link, thumbnailPoster: poster } as never
+  );
 };
 
-export const openActor = (link: string) => {
-  router.push({
-    pathname: '/actor/[link]',
-    params: {
-      link,
-    },
-  });
+export const openActor = (link: string, navigation: any) => {
+  navigation.push(
+    ACTOR_ROUTE,
+    { link } as never
+  );
 };
 
-export const openCategory = (link: string) => {
-  router.push({
-    pathname: '/category/[link]',
-    params: {
-      link,
-    },
-  });
+export const openCategory = (link: string, navigation: any) => {
+  navigation.push(
+    CATEGORY_ROUTE,
+    { link } as never
+  );
 };
