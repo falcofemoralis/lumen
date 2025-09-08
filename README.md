@@ -15,7 +15,7 @@ And more!
 
 ## Contact me!
 
-Проблемы с приложением? Есть идеи как его улучшить? Заходите в группу в [Telegram](https://t.me/+aTvx8zYSnVszZmVi).
+Проблемы с приложением? Есть идеи как его улучшить? Заходите в группу в [Telegram](https://t.me/lumen_app).
 
 ##  Compatibility
 Lumen app requires Android 7.0 or above and it should work on any android device:
