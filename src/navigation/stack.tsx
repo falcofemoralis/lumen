@@ -74,6 +74,9 @@ const AccountStack = ({ name, component }: { name: string, component: any }) => 
         <Stack.Screen
           name={ SETTINGS_ROUTE }
           component={ SettingsPage }
+          options={ {
+            animation: 'ios_from_right',
+          } }
         />
       </Stack.Group>
     </Stack.Navigator>

@@ -20,6 +20,7 @@ import {
 } from 'react-tv-space-navigation';
 import { ACCOUNT_ROUTE } from 'Route/AccountPage/AccountPage.config';
 import { HOME_ROUTE } from 'Route/HomePage/HomePage.config';
+import { LOADER_ROUTE } from 'Route/LoaderPage/LoaderPage.config';
 import { SETTINGS_ROUTE } from 'Route/SettingsPage/SettingsPage.config';
 import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
@@ -39,6 +40,7 @@ export function NavigationBarComponent({
   const { isMenuOpen, toggleMenu } = useNavigationContext();
   const { isSignedIn } = useServiceContext();
   const { badgeData } = useNotificationsContext();
+  const lastPage = useRef<string | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const onDirectionHandledWithoutMovement = useCallback(
@@ -51,13 +53,21 @@ export function NavigationBarComponent({
   );
 
   const onTabSelect = useCallback((name: string) => {
+    if (lastPage.current !== LOADER_ROUTE) {
+      setTimeoutSafe(() => {
+        onPress(LOADER_ROUTE);
+      }, 0);
+      lastPage.current = LOADER_ROUTE;
+    }
+
     if (timerRef.current) {
       clearTimeout(timerRef.current);
     }
 
     timerRef.current = setTimeoutSafe(() => {
       onPress(name);
-    }, 750);
+      lastPage.current = name;
+    }, 500);
   }, [onPress]);
 
   const renderDefaultTab = (
@@ -221,6 +231,8 @@ export function NavigationBarComponent({
           break;
         case SETTINGS_ROUTE:
           bottomTabs.push({ route, index });
+          break;
+        case LOADER_ROUTE:
           break;
         default:
           middleTabs.push({ route, index });

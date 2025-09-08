@@ -7,12 +7,17 @@ import RouterStore from 'Store/Router.store';
 import { FilmInterface } from 'Type/Film.interface';
 
 import { COMMENTS_MODAL_ROUTE } from './CommentsModal.config';
+import { CommentsModalProps } from './CommentsModal.type';
 
-export const CommentsModalComponent = () => {
+export const CommentsModal = () => {
   const { film } = RouterStore.popData(COMMENTS_MODAL_ROUTE) as {
     film: FilmInterface;
   } ?? {};
 
+  return <CommentsModalComponent film={ film } />;
+};
+
+export const CommentsModalComponent = ({ film }: CommentsModalProps) => {
   return (
     <View style={ { flex: 1 } }>
       <Header title={ t('Comments') } />
@@ -26,4 +31,4 @@ export const CommentsModalComponent = () => {
   );
 };
 
-export default CommentsModalComponent;
+export default CommentsModal;

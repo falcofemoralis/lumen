@@ -395,7 +395,6 @@ export const InfoList = memo(({
 ) => prevProps.list.link === nextProps.list.link);
 
 interface RelatedItemProps {
-  film: FilmInterface,
   item: FilmCardInterface,
   handleSelectFilm: (film: FilmInterface) => void
 }

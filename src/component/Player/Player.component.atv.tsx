@@ -36,7 +36,8 @@ import {
   BackHandler,
   View,
 } from 'react-native';
-import Animated, { runOnJS, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
 import {
   DefaultFocus,
   SpatialNavigationFocusableView,
@@ -63,7 +64,7 @@ import { PlayerComponentProps } from './Player.type';
 
 export function PlayerComponent({
   player,
-  isLoading,
+  status,
   isPlaying,
   video,
   film,
@@ -119,7 +120,7 @@ export function PlayerComponent({
       { duration: PLAYER_CONTROLS_ANIMATION },
       (finished) => {
         if (!showControls && hideActions && finished) {
-          runOnJS(setHideActions)(false);
+          scheduleOnRN(setHideActions, false);
         }
       }
     ),
@@ -382,7 +383,7 @@ export function PlayerComponent({
       } }
     >
       <View style={ styles.controlsRow }>
-        { renderTopAction(isPlaying || isLoading ? Pause : Play, togglePlayPause, topActionRef) }
+        { renderTopAction(isPlaying || status === 'loading' ? Pause : Play, togglePlayPause, topActionRef) }
         { film.hasSeasons && (
           <>
             { renderTopAction(SkipBack, () => handleNewEpisode(RewindDirection.BACKWARD)) }
@@ -492,7 +493,7 @@ export function PlayerComponent({
 
   const renderLoader = () => (
     <Loader
-      isLoading={ isLoading }
+      isLoading={ status === 'loading' }
       fullScreen
     />
   );

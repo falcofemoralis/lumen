@@ -1,5 +1,7 @@
+import Loader from 'Component/Loader';
+
 export const LoaderPageComponent = () => {
-  return null;
+  return <Loader isLoading fullScreen />;
 };
 
 export default LoaderPageComponent;

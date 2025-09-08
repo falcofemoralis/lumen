@@ -1,6 +1,6 @@
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
-import { VideoPlayer } from 'expo-video';
+import { VideoPlayer, VideoPlayerStatus } from 'expo-video';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmStreamInterface } from 'Type/FilmStream.interface';
 import { FilmVideoInterface, SubtitleInterface } from 'Type/FilmVideo.interface';
@@ -17,7 +17,7 @@ export interface PlayerContainerProps {
 
 export interface PlayerComponentProps {
   player: VideoPlayer;
-  isLoading: boolean;
+  status: VideoPlayerStatus;
   isPlaying: boolean;
   video: FilmVideoInterface;
   film: FilmInterface;

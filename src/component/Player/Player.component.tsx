@@ -41,10 +41,10 @@ import {
   GestureDetector,
 } from 'react-native-gesture-handler';
 import Animated, {
-  runOnJS,
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
 import { Colors } from 'Style/Colors';
 import { ClosedCaptionFilled } from 'Style/Icons';
 import { scale } from 'Util/CreateStyles';
@@ -66,7 +66,7 @@ const { width: screenWidth } = Dimensions.get('window');
 
 export function PlayerComponent({
   player,
-  isLoading,
+  status,
   isPlaying,
   video,
   film,
@@ -213,8 +213,8 @@ export function PlayerComponent({
 
   const singleTap = Gesture.Tap()
     .onEnd(() => {
-      runOnJS(setShowControls)(!showControls);
-      runOnJS(handleUserInteraction)();
+      scheduleOnRN(setShowControls, !showControls);
+      scheduleOnRN(handleUserInteraction);
     });
 
   const doubleTap = Gesture.Tap()
@@ -227,9 +227,9 @@ export function PlayerComponent({
       const { absoluteX } = e;
 
       if (absoluteX < (screenWidth / 2)) {
-        runOnJS(handleDoubleTap)(RewindDirection.BACKWARD);
+        scheduleOnRN(handleDoubleTap, RewindDirection.BACKWARD);
       } else {
-        runOnJS(handleDoubleTap)(RewindDirection.FORWARD);
+        scheduleOnRN(handleDoubleTap, RewindDirection.FORWARD);
       }
     });
 
@@ -359,7 +359,7 @@ export function PlayerComponent({
           () => handleNewEpisode(RewindDirection.BACKWARD)
         ) }
         { renderMiddleControl(
-          isPlaying || isLoading ? Pause : Play,
+          isPlaying || status === 'loading' ? Pause : Play,
           togglePlayPause,
           'big'
         ) }
@@ -543,7 +543,7 @@ export function PlayerComponent({
 
   const renderLoader = () => (
     <Loader
-      isLoading={ isLoading }
+      isLoading={ status === 'loading' }
       fullScreen
     />
   );

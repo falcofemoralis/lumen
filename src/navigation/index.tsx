@@ -1,16 +1,14 @@
 import { NavigationProp, NavigationState, StaticParamList } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import CommentsModal from 'Route/CommentsModal';
+import CommentsModal from 'Route/CommentsModal/CommentsModal.component';
 import { COMMENTS_MODAL_ROUTE } from 'Route/CommentsModal/CommentsModal.config';
 import ErrorPage from 'Route/ErrorPage';
 import { ERROR_ROUTE } from 'Route/ErrorPage/ErrorPage.config';
-import LoaderPage from 'Route/LoaderPage';
-import { LOADER_ROUTE } from 'Route/LoaderPage/LoaderPage.config';
 import LoginModal from 'Route/LoginModal';
 import { LOGIN_MODAL_ROUTE } from 'Route/LoginModal/LoginModal.config';
 import PlayerPage from 'Route/PlayerPage';
 import { PLAYER_ROUTE } from 'Route/PlayerPage/PlayerPage.config';
-import ScheduleModal from 'Route/ScheduleModal';
+import ScheduleModal from 'Route/ScheduleModal/ScheduleModal.component';
 import { SCHEDULE_MODAL_ROUTE } from 'Route/ScheduleModal/ScheduleModal.config';
 import WelcomePage from 'Route/WelcomePage';
 import { WELCOME_ROUTE } from 'Route/WelcomePage/WelcomePage.config';
@@ -59,10 +57,6 @@ export function RootStack() {
         <Stack.Screen
           name={ PLAYER_ROUTE }
           component={ PlayerPage }
-        />
-        <Stack.Screen
-          name={ LOADER_ROUTE }
-          component={ LoaderPage }
         />
       </Stack.Group>
       <Stack.Group

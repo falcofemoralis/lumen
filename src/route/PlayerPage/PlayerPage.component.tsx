@@ -10,15 +10,26 @@ import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { getPlayerStream } from 'Util/Player';
 
 import { PLAYER_ROUTE } from './PlayerPage.config';
+import { PlayerPageComponentProps } from './PlayerPage.type';
 
-export function PlayerPageComponent() {
-  const { lockNavigation, unlockNavigation } = useNavigationContext();
-
+export const PlayerPage = () => {
   const { video, film, voice } = RouterStore.popData(PLAYER_ROUTE) as {
     video: FilmVideoInterface;
     film: FilmInterface;
     voice: FilmVoiceInterface;
   };
+
+  return (
+    <PlayerPageComponent
+      video={ video }
+      film={ film }
+      voice={ voice }
+    />
+  );
+};
+
+export function PlayerPageComponent({ video, film, voice }: PlayerPageComponentProps) {
+  const { lockNavigation, unlockNavigation } = useNavigationContext();
 
   useEffect(() => {
     if (ConfigStore.isTV()) {
@@ -44,4 +55,4 @@ export function PlayerPageComponent() {
   );
 }
 
-export default PlayerPageComponent;
+export default PlayerPage;

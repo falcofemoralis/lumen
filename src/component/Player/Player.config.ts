@@ -36,7 +36,7 @@ export const DEFAULT_REWIND_SECONDS = 10;
 export const REWIND_SECONDS_TV = 30;
 
 export const DEFAULT_SMART_SEEKING_PARAMS: SmartSeekingParams = {
-  seconds: 30,
+  seconds: 15,
   percentage: 0,
   iterations: 0,
   velocity: 0.05,

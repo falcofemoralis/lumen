@@ -283,7 +283,7 @@ export function FilmPageComponent({
     } = film;
 
     return (
-      <View style={ [styles.card, styles.mainInfo ]}>
+      <View style={ [styles.card, styles.mainInfo ] }>
         <ThemedText style={ styles.title }>{ title }</ThemedText>
         { originalTitle && (
           <ThemedText style={ styles.originalTitle }>
@@ -486,10 +486,10 @@ export function FilmPageComponent({
               style={ styles.relatedList }
               direction="horizontal"
             >
-              { related.map((item) => (
+              { related.map((item, idx) => (
                 <RelatedItem
-                  key={ item.link }
-                  film={ film }
+                  // eslint-disable-next-line react/no-array-index-key -- idx is unique
+                  key={ `${item.id}-${idx}` }
                   item={ item }
                   handleSelectFilm={ handleSelectFilm }
                 />

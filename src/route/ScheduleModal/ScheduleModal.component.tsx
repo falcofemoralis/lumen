@@ -12,12 +12,23 @@ import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 
 import { SCHEDULE_MODAL_ROUTE } from './ScheduleModal.config';
 import { styles } from './ScheduleModal.style';
+import { ScheduleModalProps } from './ScheduleModal.type';
 
-export const ScheduleModalComponent = () => {
+export const ScheduleModal = () => {
   const { film, handleUpdateScheduleWatch } = RouterStore.popData(SCHEDULE_MODAL_ROUTE) as {
     film: FilmInterface;
     handleUpdateScheduleWatch: (scheduleItem: ScheduleItemInterface) => Promise<boolean>;
   } ?? {};
+
+  return (
+    <ScheduleModalComponent
+      film={ film }
+      handleUpdateScheduleWatch={ handleUpdateScheduleWatch }
+    />
+  );
+};
+
+export const ScheduleModalComponent = ({ film, handleUpdateScheduleWatch }: ScheduleModalProps) => {
   const { schedule = [] } = film;
   const [rendered, setRendered] = useState(false);
 
@@ -62,4 +73,4 @@ export const ScheduleModalComponent = () => {
   );
 };
 
-export default ScheduleModalComponent;
+export default ScheduleModal;

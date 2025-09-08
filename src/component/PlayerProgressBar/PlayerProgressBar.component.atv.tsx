@@ -149,7 +149,7 @@ export const PlayerProgressBarComponent = ({
     };
 
     rewindTimer.current = requestAnimationFrame(updatePosition);
-  }, [player, seekToPosition, togglePlayPause, calculateCurrentTime, updateProgressStatus]);
+  }, [player, progressStatus, seekToPosition, togglePlayPause, calculateCurrentTime, updateProgressStatus]);
 
   // Memoized key handlers to prevent recreation
   const handleProgressThumbKeyDown = useCallback((key: SupportedKeys, direction: RewindDirection) => {

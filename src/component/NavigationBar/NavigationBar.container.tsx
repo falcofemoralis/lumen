@@ -42,6 +42,7 @@ export function NavigationBarContainer(props: NavigationBarContainerProps) {
 
     // we should unload current row on TV
     if (ConfigStore.isTV()) {
+
       navigation.reset({
         index: 0,
         routes: [{ key: rn.key, name: rn.name }], // your stack screen name

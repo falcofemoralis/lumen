@@ -4,7 +4,7 @@ import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { usePlayerContext } from 'Context/PlayerContext';
 import { usePlayerProgressActions } from 'Context/PlayerProgressContext';
 import { useServiceContext } from 'Context/ServiceContext';
-import { useEventListener } from 'expo';
+import { useEvent, useEventListener } from 'expo';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { useVideoPlayer, VideoPlayer } from 'expo-video';
 import { withTV } from 'Hooks/withTV';
@@ -61,8 +61,6 @@ export function PlayerContainer({
   const [selectedVideo, setSelectedVideo] = useState<FilmVideoInterface>(video);
   const [selectedStream, setSelectedStream] = useState<FilmStreamInterface>(stream);
   const [selectedVoice, setSelectedVoice] = useState<FilmVoiceInterface>(voice);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [selectedQuality, setSelectedQuality] = useState<string>(selectedStream.quality);
   const [selectedSubtitle, setSelectedSubtitle] = useState<SubtitleInterface|undefined>(
     selectedVideo.subtitles?.find(({ isDefault }) => isDefault)
@@ -120,6 +118,9 @@ export function PlayerContainer({
 
     initFirestoreSavedTime(p, savedTime);
   });
+
+  const { isPlaying } = useEvent(player, 'playingChange', { isPlaying: player.playing });
+  const { status } = useEvent(player, 'statusChange', { status: player.status });
 
   const updateTime = useCallback(() => {
     const { currentTime, duration } = player;
@@ -211,20 +212,10 @@ export function PlayerContainer({
     }
   );
 
-  useEventListener(player, 'playingChange', ({ isPlaying: playing }) => {
-    if (isPlaying !== playing) {
-      setIsPlaying(playing);
-    }
-  });
-
   useEventListener(player, 'statusChange', ({ status: playerStatus, error }) => {
-    const loading = playerStatus === 'loading';
-
     if (playerStatus === 'error') {
       NotificationStore.displayError(`An error occurred : ${error?.message}`);
     }
-
-    setIsLoading(loading);
   });
 
   const onPlaybackEnd = (currentTime: number, duration: number) => {
@@ -243,7 +234,6 @@ export function PlayerContainer({
 
     updateTime();
     resetProgressStatus();
-    setIsLoading(true);
     setSelectedVideo(newVideo);
     setSelectedVoice(newVoice);
     setSelectedStream(getPlayerStream(newVideo));
@@ -534,7 +524,7 @@ export function PlayerContainer({
 
   const containerProps = () => ({
     player,
-    isLoading,
+    status,
     isPlaying,
     video: selectedVideo,
     film,

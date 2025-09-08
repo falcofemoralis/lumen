@@ -400,9 +400,8 @@ export function FilmPageComponent({
             <View style={ styles.relatedList }>
               { related.map((item, idx) => (
                 <RelatedItem
-                // eslint-disable-next-line react/no-array-index-key -- idx is unique
+                  // eslint-disable-next-line react/no-array-index-key -- idx is unique
                   key={ `${item.id}-${idx}` }
-                  film={ film }
                   item={ item }
                   handleSelectFilm={ handleSelectFilm }
                 />

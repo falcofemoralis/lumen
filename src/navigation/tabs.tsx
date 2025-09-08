@@ -8,6 +8,8 @@ import BookmarksPage from 'Route/BookmarksPage';
 import { BOOKMARKS_ROUTE } from 'Route/BookmarksPage/BookmarksPage.config';
 import HomePage from 'Route/HomePage';
 import { HOME_ROUTE } from 'Route/HomePage/HomePage.config';
+import LoaderPage from 'Route/LoaderPage';
+import { LOADER_ROUTE } from 'Route/LoaderPage/LoaderPage.config';
 import NotificationsPage from 'Route/NotificationsPage';
 import { NOTIFICATIONS_ROUTE } from 'Route/NotificationsPage/NotificationsPage.config';
 import RecentPage from 'Route/RecentPage';
@@ -17,7 +19,6 @@ import { SEARCH_ROUTE } from 'Route/SearchPage/SearchPage.config';
 import SettingsPage from 'Route/SettingsPage';
 import { SETTINGS_ROUTE } from 'Route/SettingsPage/SettingsPage.config';
 import ConfigStore from 'Store/Config.store';
-import { Colors } from 'Style/Colors';
 
 import { createAccountStack, createFilmStack } from './stack';
 
@@ -76,6 +77,10 @@ export const TabsStack = () => {
           tabBarLabel: t('Settings'),
           tabBarIcon: Settings,
         },
+      },
+      [LOADER_ROUTE]: {
+        screen: LoaderPage,
+        options: {},
       },
     } :
     {

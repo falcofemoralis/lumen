@@ -113,15 +113,15 @@ export function FilmPageContainer({ route }: FilmPageContainerProps) {
 
   const handleSelectFilm = useCallback((f: FilmInterface) => {
     openFilm(f, navigation);
-  }, []);
+  }, [navigation]);
 
   const handleSelectActor = useCallback((actorLink: string) => {
     openActor(actorLink, navigation);
-  }, []);
+  }, [navigation]);
 
   const handleSelectCategory = useCallback((categoryLink: string) => {
     openCategory(categoryLink, navigation);
-  }, []);
+  }, [navigation]);
 
   const getVisibleScheduleItems = useCallback(() => {
     if (!film) {
