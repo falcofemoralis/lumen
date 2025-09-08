@@ -26,6 +26,7 @@ export const styles = CreateStyles({
     flexDirection: 'column',
     maxHeight: MAX_ITEMS_TO_DISPLAY * ITEM_HEIGHT - 42,
     width: 300,
+    overflow: 'hidden',
   },
   item: {
     flexDirection: 'row',
@@ -52,6 +53,7 @@ export const styles = CreateStyles({
     fontSize: 14,
     lineHeight: 20,
     fontWeight: '500',
+    maxWidth: '90%',
   },
   textFocused: {
     color: Colors.textFocused,
@@ -63,6 +65,7 @@ export const styles = CreateStyles({
     marginRight: 5,
     height: 20,
     width: 20,
+    minWidth: 20,
   },
   iconFocused: {
   },
