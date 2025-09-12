@@ -14,7 +14,8 @@
     "sign": "zipalign -f -v 4 android\\app\\build\\outputs\\apk\\release\\app-release.apk release-signed.apk && apksigner sign --ks lumen.keystore --ks-key-alias lumen release-signed.apk",
     "adb:connect": "adb connect 192.168.1.110",
     "adb:disconnect": "adb disconnect 192.168.1.110",
-    "adb:install": "adb install android/app/build/outputs/apk/release/app-release.apk"
+    "adb:install:dev": "adb install android/app/build/outputs/apk/release/app-release.apk",
+    "adb:install:prod": "adb install release-signed.apk"
   },
   "dependencies": {
     "@bam.tech/lrud": "^8.0.2",
