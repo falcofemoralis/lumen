@@ -20,7 +20,9 @@ import SettingsPage from 'Route/SettingsPage';
 import { SETTINGS_ROUTE } from 'Route/SettingsPage/SettingsPage.config';
 import ConfigStore from 'Store/Config.store';
 
-import { createAccountStack, createFilmStack } from './stack';
+import { createAccountStack } from './accountStack';
+import { createFilmStack } from './filmStack';
+import { createSettingsStack } from './settingsStack';
 
 const Tabs = createBottomTabNavigator();
 
@@ -72,7 +74,7 @@ export const TabsStack = () => {
         },
       },
       [SETTINGS_ROUTE]: {
-        screen: SettingsPage,
+        screen: createSettingsStack(SETTINGS_ROUTE, SettingsPage),
         options: {
           tabBarLabel: t('Settings'),
           tabBarIcon: Settings,
@@ -126,6 +128,7 @@ export const TabsStack = () => {
       initialRouteName={ HOME_ROUTE }
       screenOptions={ {
         tabBarPosition: ConfigStore.isTV() ? 'left' : 'bottom',
+        popToTopOnBlur: ConfigStore.isTV(),
       } }
     >
       <Tabs.Group

@@ -11,6 +11,7 @@ import {
 } from 'react';
 import { Share } from 'react-native';
 import { PLAYER_ROUTE } from 'Route/PlayerPage/PlayerPage.config';
+import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
 import RouterStore from 'Store/Router.store';
 import { FilmInterface } from 'Type/Film.interface';
@@ -43,6 +44,8 @@ export function FilmPageContainer({ route }: FilmPageContainerProps) {
 
         setFilm(loadedFilm);
       } catch (error) {
+        LoggerStore.error('filmPageLoadFilm', { error });
+
         NotificationStore.displayError(error as Error);
       }
     };
@@ -94,6 +97,8 @@ export function FilmPageContainer({ route }: FilmPageContainerProps) {
     if (isSignedIn) {
       currentService.saveWatch(film, voice)
         .catch((error) => {
+          LoggerStore.error('playFilmSaveWatch', { error });
+
           NotificationStore.displayError(error as Error);
         });
     }
@@ -161,6 +166,8 @@ export function FilmPageContainer({ route }: FilmPageContainerProps) {
     try {
       currentService.saveScheduleWatch(id);
     } catch (error) {
+      LoggerStore.error('handleUpdateScheduleWatch', { error });
+
       NotificationStore.displayError(error as Error);
 
       return false;
@@ -205,6 +212,8 @@ export function FilmPageContainer({ route }: FilmPageContainerProps) {
         message: prepareShareBody(film),
       });
     } catch (error) {
+      LoggerStore.error('handleShare', { error });
+
       NotificationStore.displayError(error as Error);
     }
   };

@@ -11,6 +11,9 @@ export const styles = CreateStyles({
   settingFocused: {
     backgroundColor: Colors.backgroundFocused,
   },
+  settingHidden: {
+    opacity: 0.5,
+  },
   settingTitle: {
   },
   settingTitleFocused: {

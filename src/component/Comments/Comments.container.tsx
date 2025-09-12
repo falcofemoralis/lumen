@@ -3,6 +3,7 @@ import { withTV } from 'Hooks/withTV';
 import {
   forwardRef, useEffect, useImperativeHandle, useRef, useState,
 } from 'react';
+import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
 import { CommentInterface } from 'Type/Comment.interface';
 
@@ -69,6 +70,7 @@ export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>
 
           setComments([...(comments ?? []), ...newItems]);
         } catch (error) {
+          LoggerStore.error('loadComments', { error });
           NotificationStore.displayError(error as Error);
           updatingStateRef.current = false;
         } finally {

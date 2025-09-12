@@ -1,10 +1,15 @@
+import { useNavigation } from '@react-navigation/native';
 import { useServiceContext } from 'Context/ServiceContext';
 import * as Application from 'expo-application';
 import { withTV } from 'Hooks/withTV';
 import t from 'i18n/t';
 import { useCallback, useState } from 'react';
 import { Linking } from 'react-native';
+import { LOGGER_ROUTE } from 'Route/LoggerPage/LoggerPage.config';
 import ConfigStore from 'Store/Config.store';
+import { yesNoOptions } from 'Util/Settings';
+import { useTripleTap } from 'Util/Settings/useTripleTap';
+import { convertBooleanToString, convertStringToBoolean } from 'Util/Type';
 
 import SettingsPageComponent from './SettingsPage.component';
 import SettingsPageComponentTV from './SettingsPage.component.atv';
@@ -18,10 +23,13 @@ export function SettingsPageContainer() {
     updateCDN,
     updateUserAgent,
     updateOfficialMode,
+    getCDNs,
   } = useServiceContext();
+  const navigation = useNavigation();
+  const { handleTap } = useTripleTap();
 
-  const updateConfig = useCallback((value: string, key: any) => {
-    ConfigStore.updateConfig(key, value);
+  const onPress = useCallback((value: string | null, key: any) => {
+    ConfigStore.updateConfig(key, convertStringToBoolean(value));
   }, []);
 
   const [settings, setSettings] = useState<SettingItem[]>([
@@ -31,7 +39,7 @@ export function SettingsPageContainer() {
       subtitle: t('Change provider'),
       type: SETTING_TYPE.INPUT,
       value: currentService.getProvider(),
-      onPress: updateProvider,
+      onPress: (value) => updateProvider(value as string),
     },
     {
       id: 'cdn',
@@ -39,16 +47,8 @@ export function SettingsPageContainer() {
       subtitle: t('Change CDN'),
       type: SETTING_TYPE.SELECT,
       value: currentService.getCDN(),
-      options: [
-        {
-          value: 'auto',
-          label: t('Automatic'),
-        },
-      ].concat(currentService.defaultCDNs.map((cdn) => ({
-        value: cdn,
-        label: cdn,
-      }))),
-      onPress: (value) => updateCDN(value, true),
+      options: getCDNs(),
+      onPress: (value) => updateCDN(value as string, true),
     },
     {
       id: 'userAgent',
@@ -56,25 +56,7 @@ export function SettingsPageContainer() {
       subtitle: t('Change useragent'),
       type: SETTING_TYPE.INPUT,
       value: currentService.getUserAgent(),
-      onPress: updateUserAgent,
-    },
-    {
-      id: 'isFirestore',
-      title: t('Time share'),
-      subtitle: t('Toggle time share. It will consume more data.'),
-      type: SETTING_TYPE.SELECT,
-      value: ConfigStore.isFirestore() ? 'true' : 'false',
-      options: [
-        {
-          value: 'true',
-          label: t('Yes'),
-        },
-        {
-          value: 'false',
-          label: t('No'),
-        },
-      ],
-      onPress: updateConfig,
+      onPress: (value) => updateUserAgent(value as string),
     },
     {
       id: 'officialMode',
@@ -83,7 +65,27 @@ export function SettingsPageContainer() {
       type: SETTING_TYPE.SELECT,
       value: currentService.getOfficialMode(),
       options: currentService.officialMirrors,
-      onPress: updateOfficialMode,
+      onPress: (value) => updateOfficialMode(value as string),
+    },
+    {
+      id: 'loggerEnabled',
+      title: t('Enable logger'),
+      subtitle: t('Enable logger to send logs to the developer.'),
+      type: SETTING_TYPE.SELECT,
+      value: convertBooleanToString(ConfigStore.isLoggerEnabled()),
+      options: yesNoOptions,
+      onPress,
+    },
+    {
+      id: 'seeLogs',
+      title: t('See logs'),
+      subtitle: t('Check and send logs to the developer.'),
+      type: SETTING_TYPE.LINK,
+      dependsOn: {
+        field: 'loggerEnabled',
+        value: convertBooleanToString(true),
+      },
+      onPress: () => navigation.navigate(LOGGER_ROUTE),
     },
     {
       id: 'github',
@@ -98,24 +100,81 @@ export function SettingsPageContainer() {
       title: t('App version'),
       subtitle: Application.nativeApplicationVersion ?? '0.0.0',
       type: SETTING_TYPE.TEXT,
+      disableUpdate: true,
+      onPress: () => {
+        const result = handleTap();
+
+        if (result) {
+          ConfigStore.setSecuredSettings(true);
+
+          setSettings((prevSettings) => prevSettings.map((st) => {
+            if (st.id === 'isFirestore') {
+              return {
+                ...st,
+                isHidden: false,
+              };
+            }
+
+            return st;
+          }));
+        }
+      },
+    },
+    {
+      id: 'isFirestore',
+      title: t('Time share'),
+      subtitle: t('Toggle time share. It will consume more data.'),
+      type: SETTING_TYPE.SELECT,
+      value: convertBooleanToString(ConfigStore.isFirestore()),
+      options: yesNoOptions,
+      onPress,
+      isHidden: !ConfigStore.isSecuredSettings(),
     },
   ]);
 
   const onSettingUpdate = async (setting: SettingItem, value: string) => {
-    const { id, onPress } = setting;
+    const { id, onPress: onPressSetting, disableUpdate } = setting;
 
-    setSettings((prevSettings) => prevSettings.map((st) => ({
-      ...st,
-      value: st.id === id ? value : st.value,
-    })));
+    if (!onPressSetting) {
+      return true;
+    }
 
-    onPress?.(value, id);
+    if (!disableUpdate) {
+      setSettings((prevSettings) => prevSettings.map((st) => ({
+        ...st,
+        value: st.id === id ? value : st.value,
+        isEnabled: checkEnabled(st, prevSettings),
+      })));
+    }
+
+    onPressSetting?.(value, id);
 
     return true;
   };
 
+  const checkEnabled = (setting: SettingItem, allSettings: SettingItem[]) => {
+    const { dependsOn } = setting;
+
+    if (!dependsOn) {
+      return setting.isEnabled !== undefined ? setting.isEnabled : true;
+    }
+
+    const { field, value } = dependsOn;
+
+    const dependedSetting = allSettings.find((s) => s.id === field);
+
+    return dependedSetting?.value === value;
+  };
+
+  const prepareSettings = () => {
+    return settings.map((setting) => ({
+      ...setting,
+      isEnabled: checkEnabled(setting, settings),
+    }));
+  };
+
   const containerProps = () => ({
-    settings,
+    settings: prepareSettings(),
   });
 
   const containerFunctions = {

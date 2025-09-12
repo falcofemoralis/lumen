@@ -18,6 +18,7 @@ import {
 } from 'react';
 import { BackHandler, Share } from 'react-native';
 import ConfigStore from 'Store/Config.store';
+import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmStreamInterface } from 'Type/FilmStream.interface';
@@ -159,7 +160,7 @@ export function PlayerContainer({
           updateTime();
         }
       } catch (error) {
-        console.error(error);
+        LoggerStore.error('createUpdateTimeTimeout', { error });
 
         // If we get an error accessing the player, reset the timeout
         createUpdateTimeTimeout();
@@ -508,6 +509,8 @@ export function PlayerContainer({
         message: prepareShareBody(film),
       });
     } catch (error) {
+      LoggerStore.error('handleShare', { error });
+
       NotificationStore.displayError(error as Error);
     }
   };

@@ -3,6 +3,7 @@ import { useNotificationsContext } from 'Context/NotificationsContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { withTV } from 'Hooks/withTV';
 import { useCallback, useEffect, useState } from 'react';
+import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { NotificationInterface } from 'Type/Notification.interface';
@@ -24,6 +25,8 @@ export function NotificationsPageContainer() {
         await currentService.getFilmsFromNotifications(items)
       );
     } catch (error) {
+      LoggerStore.error('notificationsLoadFilms', { error });
+
       NotificationStore.displayError(error as Error);
     } finally {
       setIsLoading(false);

@@ -3,6 +3,7 @@ import { ApiServiceType, ConfigApiInterface, ServiceConfigInterface } from 'Api/
 import * as Device from 'expo-device';
 import t from 'i18n/t';
 import { Platform } from 'react-native';
+import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
 import { FilmStreamInterface } from 'Type/FilmStream.interface';
 import { ModifiedProvider } from 'Type/ModifiedProvider.interface';
@@ -52,7 +53,7 @@ const configApi: ConfigApiInterface = {
         provider: this.defaultProviders[0],
         cdn: 'auto',
         auth: '',
-        userAgent: this.defaultUserAgent,
+        userAgentNew: this.defaultUserAgent,
         officialMode: '',
       };
 
@@ -99,12 +100,12 @@ const configApi: ConfigApiInterface = {
   },
 
   setUserAgent(agent: string): void {
-    this.updateConfig('userAgent', agent);
-    this.loadConfig().userAgent = agent;
+    this.updateConfig('userAgentNew', agent);
+    this.loadConfig().userAgentNew = agent;
   },
 
   getUserAgent(): string {
-    return this.loadConfig().userAgent;
+    return this.loadConfig().userAgentNew;
   },
 
   setAuthorization(auth: string): void {
@@ -187,6 +188,8 @@ const configApi: ConfigApiInterface = {
     const { query, provider } = this.modifyProvider(queryInput);
     const headers = Platform.OS === 'web' ? this.getProxyHeaders() : this.getHeaders();
 
+    LoggerStore.debug('getRequest', { query, provider, variables, headers });
+
     return executeGet(
       query,
       provider,
@@ -207,6 +210,11 @@ const configApi: ConfigApiInterface = {
   ) {
     const { query, provider } = this.modifyProvider(queryInput);
     const headers = Platform.OS === 'web' ? this.getProxyHeaders() : this.getHeaders();
+
+    if (!query.includes('/login')) {
+      // do not include login request
+      LoggerStore.debug('postRequest', { query, provider, headers, variables });
+    }
 
     return executePost(
       `${query}/?t=${Date.now()}`,

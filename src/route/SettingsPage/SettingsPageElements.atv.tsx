@@ -8,13 +8,12 @@ import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import ThemedText from 'Component/ThemedText';
 import t from 'i18n/t';
 import {
-  memo, useCallback,
+  useCallback,
   useRef,
   useState,
 } from 'react';
 import { View } from 'react-native';
 import { DefaultFocus, SpatialNavigationFocusableView } from 'react-tv-space-navigation';
-import { noopFn } from 'Util/Function';
 
 import { styles } from './SettingsPage.style.atv';
 import { SettingItem } from './SettingsPage.type';
@@ -33,16 +32,21 @@ const BaseComponent = ({
   setting,
   onPress,
 }: BaseComponentProps) => {
-  const { title, subtitle } = setting;
+  const { title, subtitle, isHidden, isEnabled } = setting;
+
+  if (isHidden) {
+    return null;
+  }
 
   return (
     <SpatialNavigationFocusableView
-      onSelect={ onPress ?? noopFn }
+      onSelect={ () => isEnabled && onPress?.() }
     >
       { ({ isFocused, isRootActive }) => (
         <View style={ [
           styles.setting,
           isFocused && isRootActive && styles.settingFocused,
+          !isEnabled && styles.settingHidden,
         ] }
         >
           <ThemedText style={ [
@@ -65,13 +69,12 @@ const BaseComponent = ({
   );
 };
 
-export const SettingText = memo(({
+export const SettingText = ({
   setting,
-}: SettingProps) => <BaseComponent setting={ setting } />, (
-  prevProps: SettingProps, nextProps: SettingProps
-) => prevProps.setting.id === nextProps.setting.id);
+  onUpdate,
+}: SettingProps) => <BaseComponent setting={ setting } onPress={ () => onUpdate(setting, '') } />;
 
-export const SettingSelect = memo(({
+export const SettingSelect = ({
   setting,
   onUpdate,
 }: SettingProps) => {
@@ -116,12 +119,9 @@ export const SettingSelect = memo(({
       />
     </View>
   );
-}, (
-  prevProps: SettingProps, nextProps: SettingProps
-) => prevProps.setting.id === nextProps.setting.id
-    && prevProps.setting.value === nextProps.setting.value);
+};
 
-export const SettingInput = memo(({
+export const SettingInput = ({
   setting,
   onUpdate,
 }: SettingProps) => {
@@ -202,12 +202,9 @@ export const SettingInput = memo(({
       </ThemedOverlay>
     </View>
   );
-}, (
-  prevProps: SettingProps, nextProps: SettingProps
-) => prevProps.setting.id === nextProps.setting.id
-    && prevProps.setting.value === nextProps.setting.value);
+};
 
-export const SettingLink = memo(({
+export const SettingLink = ({
   setting,
   onUpdate,
 }: SettingProps) => (
@@ -215,6 +212,4 @@ export const SettingLink = memo(({
     setting={ setting }
     onPress={ () => onUpdate(setting, '') }
   />
-), (
-  prevProps: SettingProps, nextProps: SettingProps
-) => prevProps.setting.id === nextProps.setting.id);
+);

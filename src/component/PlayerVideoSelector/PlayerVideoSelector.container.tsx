@@ -7,6 +7,7 @@ import { useServiceContext } from 'Context/ServiceContext';
 import { withTV } from 'Hooks/withTV';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import ConfigStore from 'Store/Config.store';
+import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { EpisodeInterface, FilmVoiceInterface, SeasonInterface } from 'Type/FilmVoice.interface';
@@ -108,6 +109,8 @@ export function PlayerVideoSelectorContainer({
     if (isSignedIn) {
       currentService.saveWatch(film, voice)
         .catch((error) => {
+          LoggerStore.error('handleSelectVideoSaveWatch', { error });
+
           NotificationStore.displayError(error as Error);
         });
     }
@@ -139,6 +142,8 @@ export function PlayerVideoSelectorContainer({
 
         handleSelectVideo(video, voice);
       } catch (error) {
+        LoggerStore.error('handleSelectVoiceNoSeasons', { error });
+
         NotificationStore.displayError(error as Error);
       } finally {
         setIsLoading(false);
@@ -166,6 +171,8 @@ export function PlayerVideoSelectorContainer({
           setSelectedEpisodeId(episodeId);
         }
       } catch (error) {
+        LoggerStore.error('handleSelectVoice', { error });
+
         NotificationStore.displayError(error as Error);
       } finally {
         setIsLoading(false);
@@ -199,6 +206,8 @@ export function PlayerVideoSelectorContainer({
 
       handleSelectVideo(video, voice);
     } catch (error) {
+      LoggerStore.error('handleSelectEpisode', { error });
+
       NotificationStore.displayError(error as Error);
     } finally {
       setIsLoading(false);

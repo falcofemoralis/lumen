@@ -122,5 +122,18 @@
   "Links will be used as in the official application.": "Links will be used as in the official application.",
   "Off": "Off",
   "Main": "Main",
-  "Additional": "Additional"
+  "Additional": "Additional",
+  "Clear": "Clear",
+  "Send": "Send",
+  "Device id": "Device id",
+  "No logs to send!": "No logs to send!",
+  "Logs sent successfully!": "Logs sent successfully!",
+  "Logs cleared successfully!": "Logs cleared successfully!",
+  "No logs": "No logs",
+  "You have no logs yet": "You have no logs yet",
+  "Logger": "Logger",
+  "Enable logger": "Enable logger",
+  "Enable logger to send logs to the developer.": "Enable logger to send logs to the developer.",
+  "See logs": "See logs",
+  "Check and send logs to the developer.": "Check and send logs to the developer."
 }

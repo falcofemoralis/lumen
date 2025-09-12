@@ -35,8 +35,8 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from 'react-native-reanimated';
-import { COMMENTS_MODAL_ROUTE } from 'Route/CommentsModal/CommentsModal.config';
-import { SCHEDULE_MODAL_ROUTE } from 'Route/ScheduleModal/ScheduleModal.config';
+import { COMMENTS_MODAL_ROUTE } from 'Route/modal/CommentsModal/CommentsModal.config';
+import { SCHEDULE_MODAL_ROUTE } from 'Route/modal/ScheduleModal/ScheduleModal.config';
 import NotificationStore from 'Store/Notification.store';
 import RouterStore from 'Store/Router.store';
 import { Colors } from 'Style/Colors';

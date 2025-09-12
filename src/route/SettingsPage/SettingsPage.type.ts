@@ -17,6 +17,11 @@ export type SettingItemOption = {
   value: string;
 }
 
+export type SettingItemDependsOn = {
+  field: string;
+  value: string | null;
+}
+
 export type SettingItem = {
   id: string;
   type: SettingType;
@@ -24,5 +29,9 @@ export type SettingItem = {
   subtitle: string;
   value?: string | null;
   options?: SettingItemOption[];
-  onPress?: (value: string, key: any) => void;
+  dependsOn?: SettingItemDependsOn;
+  isEnabled?: boolean;
+  isHidden?: boolean;
+  disableUpdate?: boolean;
+  onPress?: (value: string | null, key: any) => void;
 }

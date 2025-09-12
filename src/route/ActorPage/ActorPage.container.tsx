@@ -2,6 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useServiceContext } from 'Context/ServiceContext';
 import { withTV } from 'Hooks/withTV';
 import { useCallback, useEffect, useState } from 'react';
+import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
 import { ActorInterface } from 'Type/Actor.interface';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
@@ -26,6 +27,8 @@ export function ActorPageContainer({ route }: ActorPageContainerProps) {
 
       setActor(data);
     } catch (error) {
+      LoggerStore.error('actorPageFetchActor', { error });
+
       NotificationStore.displayError(error as Error);
     } finally {
       setIsLoading(false);

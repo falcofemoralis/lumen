@@ -2,6 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useServiceContext } from 'Context/ServiceContext';
 import { withTV } from 'Hooks/withTV';
 import { useEffect, useRef, useState } from 'react';
+import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
 import { RecentItemInterface } from 'Type/RecentItem.interface';
 import { openFilm } from 'Util/Router';
@@ -64,6 +65,8 @@ export function RecentPageContainer() {
 
         setItems(newItems);
       } catch (error) {
+        LoggerStore.error('recentPageLoadRecent', { error });
+
         NotificationStore.displayError(error as Error);
         updatingStateRef.current = false;
       }
@@ -87,7 +90,11 @@ export function RecentPageContainer() {
 
     setItems((prev) => prev.filter((i) => i.id !== id));
 
+    LoggerStore.debug('removeItem', { id, items });
+
     currentService.removeRecent(id).catch((error) => {
+      LoggerStore.error('removeItem', { error });
+
       NotificationStore.displayError(error as Error);
     });
   };

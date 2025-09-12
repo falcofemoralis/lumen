@@ -2,6 +2,7 @@ import { useIsFocused } from '@react-navigation/native';
 import { useEffect } from 'react';
 import { BackHandler } from 'react-native';
 import { useLockSpatialNavigation } from 'react-tv-space-navigation';
+import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
 
 interface UseLockProps {
@@ -48,8 +49,10 @@ const usePreventNavigationGoBack = (isModalVisible: boolean, hideModal: () => vo
 
           return true;
         }
-      } catch (e) {
-        NotificationStore.displayError(e as Error);
+      } catch (error) {
+        LoggerStore.error('usePreventNavigationGoBack', { error });
+
+        NotificationStore.displayError(error as Error);
 
         return true;
       }

@@ -123,5 +123,18 @@
   "Links will be used as in the official application.": "Будут использованы ссылки, как в официальном приложении.",
   "Off": "Отключен",
   "Main": "Основной",
-  "Additional": "Запасной"
+  "Additional": "Запасной",
+  "Clear": "Очистить",
+  "Send": "Отправить",
+  "Device id": "Ваш ID устройства",
+  "No logs to send!": "Нет логов для отправки!",
+  "Logs sent successfully!": "Логи отправлены успешно!",
+  "Logs cleared successfully!": "Логи очищены успешно!",
+  "No logs": "Нет логов",
+  "You have no logs yet": "У вас пока нет логов",
+  "Logger": "Логи",
+  "Enable logger": "Включить логирование",
+  "Enable logger to send logs to the developer.": "Включите логирование для отправки логов разработчику.",
+  "See logs": "Просмотреть логи",
+  "Check and send logs to the developer.": "Проверьте и отправьте логи разработчику."
 }

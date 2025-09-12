@@ -4,6 +4,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import LoggerStore from 'Store/Logger.store';
 import { noopFn } from 'Util/Function';
 
 import ThemedGridComponent from './ThemedGrid.component';
@@ -39,7 +40,9 @@ export function ThemedGridContainer({
         if (onNextLoad) {
           await onNextLoad(isRefresh);
         }
-      } catch (e) {
+      } catch (error) {
+        LoggerStore.error('loadNextPage', { error });
+
         updatingStateRef.current = false;
       } finally {
         onLoading(false);

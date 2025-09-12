@@ -1,6 +1,7 @@
 import { useServiceContext } from 'Context/ServiceContext';
 import { withTV } from 'Hooks/withTV';
 import { useState } from 'react';
+import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
 
 import BookmarksOverlayComponent from './BookmarksOverlay.component';
@@ -23,8 +24,12 @@ export const BookmarksOverlayContainer = ({
       setIsLoading(true);
 
       if (isChecked) {
+        LoggerStore.debug('postBookmark', { filmId: id, bookmarkId });
+
         await currentService.addBookmark(id, bookmarkId);
       } else {
+        LoggerStore.debug('removeBookmark', { filmId: id, bookmarkId });
+
         await currentService.removeBookmark(id, bookmarkId);
       }
 
@@ -34,6 +39,8 @@ export const BookmarksOverlayContainer = ({
         onBookmarkChange?.(film);
       }
     } catch (error) {
+      LoggerStore.error('postBookmark', { error });
+
       NotificationStore.displayError(error as Error);
     } finally {
       setIsLoading(false);

@@ -9,6 +9,7 @@ import {
 import { ACCOUNT_ROUTE } from 'Route/AccountPage/AccountPage.config';
 import { NOTIFICATIONS_ROUTE } from 'Route/NotificationsPage/NotificationsPage.config';
 import ConfigStore from 'Store/Config.store';
+import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
 import { NotificationInterface, NotificationItemInterface } from 'Type/Notification.interface';
 import { safeJsonParse } from 'Util/Json';
@@ -91,6 +92,8 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
 
       return data;
     } catch (error) {
+      LoggerStore.error('getNotifications', { error });
+
       NotificationStore.displayError(error as Error);
 
       return null;

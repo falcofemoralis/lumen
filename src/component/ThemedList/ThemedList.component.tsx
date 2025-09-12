@@ -10,6 +10,7 @@ export const ThemedListComponent = forwardRef<ThemedListRef, ThemedListComponent
   getEstimatedItemSize,
   renderItem,
   onNextLoad,
+  keyExtractor,
 }, ref) => {
   const legendListRef = useRef<LegendListRef>(null);
   const { height } = useWindowDimensions();
@@ -28,7 +29,7 @@ export const ThemedListComponent = forwardRef<ThemedListRef, ThemedListComponent
       estimatedItemSize={ estimatedItemSize }
       getEstimatedItemSize={ getEstimatedItemSize }
       renderItem={ renderItem }
-      keyExtractor={ (item, idx) => `${item.id}-row-${idx}` }
+      keyExtractor={ keyExtractor ? keyExtractor : (item, idx) => `${item.id}-row-${idx}` }
       recycleItems
       showsVerticalScrollIndicator={ false }
       onEndReached={ () => {

@@ -6,7 +6,7 @@ import ThemedInput from 'Component/ThemedInput';
 import t from 'i18n/t';
 import { useRef } from 'react';
 import { View } from 'react-native';
-import { LOGIN_MODAL_ROUTE } from 'Route/LoginModal/LoginModal.config';
+import { LOGIN_MODAL_ROUTE } from 'Route/modal/LoginModal/LoginModal.config';
 
 import { styles } from './LoginForm.style';
 import { LoginFormComponentProps } from './LoginForm.type';

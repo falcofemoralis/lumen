@@ -8,6 +8,8 @@ type DeviceConfigType = {
   isTV: boolean;
   isFirestore: boolean;
   deviceId: string | null;
+  loggerEnabled: boolean;
+  securedSettings: boolean;
 }
 
 class ConfigStore {
@@ -16,6 +18,8 @@ class ConfigStore {
     isTV: false,
     isFirestore: false,
     deviceId: null,
+    loggerEnabled: false,
+    securedSettings: false,
   };
 
   constructor() {
@@ -77,6 +81,18 @@ class ConfigStore {
 
   isFirestore() {
     return this.config.isFirestore;
+  }
+
+  isLoggerEnabled() {
+    return this.config.loggerEnabled;
+  }
+
+  isSecuredSettings() {
+    return this.config.securedSettings;
+  }
+
+  setSecuredSettings(value: boolean) {
+    this.updateConfig('securedSettings', value);
   }
 
   setUpTV() {

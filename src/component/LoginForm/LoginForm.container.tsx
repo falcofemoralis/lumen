@@ -2,6 +2,7 @@ import { useServiceContext } from 'Context/ServiceContext';
 import { withTV } from 'Hooks/withTV';
 import t from 'i18n/t';
 import { useState } from 'react';
+import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
 
 import LoginFormComponent from './LoginForm.component';
@@ -24,8 +25,9 @@ export function LoginFormContainer({
       setIsLoading(false);
 
       return true;
-    } catch (e) {
-      NotificationStore.displayError(e as Error);
+    } catch (error) {
+      LoggerStore.error('handleLogin', { error });
+      NotificationStore.displayError(error as Error);
       setIsLoading(false);
 
       return false;

@@ -30,7 +30,7 @@ export interface ServiceConfigInterface {
   provider: string;
   cdn: string;
   auth: string;
-  userAgent: string;
+  userAgentNew: string;
   officialMode: string;
 }
 

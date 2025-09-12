@@ -1,6 +1,8 @@
 import { ApiInterface, ApiServiceType } from 'Api/index';
 import { REZKA_PROXY_PROVIDER } from 'Api/RezkaApi/configApi';
 import { services } from 'Api/services';
+import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
+import t from 'i18n/t';
 import {
   createContext,
   use,
@@ -33,6 +35,7 @@ interface ServiceContextInterface {
   updateUserAgent: (value: string) => void;
   updateOfficialMode: (value: string) => void;
   validateUrl: (url: string) => Promise<void>;
+  getCDNs: () => DropdownItem[];
 }
 
 const ServiceContext = createContext<ServiceContextInterface>({
@@ -48,6 +51,7 @@ const ServiceContext = createContext<ServiceContextInterface>({
   updateUserAgent: () => {},
   updateOfficialMode: () => {},
   validateUrl: async () => {},
+  getCDNs: () => [],
 });
 
 export const ServiceProvider = ({ children }: { children: React.ReactNode }) => {
@@ -112,9 +116,8 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
    * Logout from the current service
    */
   const logout = useCallback(() => {
-    const service = currentService;
-    service.logout();
-    service.setAuthorization('');
+    currentService.logout();
+    currentService.setAuthorization('');
     setIsSignedIn(false);
     removeProfile();
     miscStorage.set(CREDENTIALS_STORAGE, '');
@@ -191,6 +194,21 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
     currentService.setOfficialMode(value);
   }, [currentService]);
 
+  /**
+   * Get the CDNs for the current service
+   */
+  const getCDNs = useCallback(() => {
+    return [
+      {
+        value: 'auto',
+        label: t('Automatic'),
+      },
+    ].concat(currentService.defaultCDNs.map((cdn) => ({
+      value: cdn,
+      label: cdn,
+    }))) ;
+  }, [currentService]);
+
   const value = useMemo(() => ({
     isSignedIn,
     profile,
@@ -205,6 +223,7 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
     updateUserAgent,
     validateUrl,
     updateOfficialMode,
+    getCDNs,
   }), [
     isSignedIn,
     profile,
@@ -219,6 +238,7 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
     updateUserAgent,
     validateUrl,
     updateOfficialMode,
+    getCDNs,
   ]);
 
   return (

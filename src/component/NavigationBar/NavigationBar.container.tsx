@@ -40,17 +40,6 @@ export function NavigationBarContainer(props: NavigationBarContainerProps) {
       return;
     }
 
-    // we should unload current row on TV
-    if (ConfigStore.isTV()) {
-
-      navigation.reset({
-        index: 0,
-        routes: [{ key: rn.key, name: rn.name }], // your stack screen name
-      });
-
-      return;
-    }
-
     const event = navigation.emit({
       type: 'tabPress',
       target: rn.key,

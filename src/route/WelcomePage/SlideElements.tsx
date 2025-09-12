@@ -31,6 +31,7 @@ import {
   SpatialNavigationRoot,
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
+import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
 import { Colors } from 'Style/Colors';
 import { FilmInterface } from 'Type/Film.interface';
@@ -376,9 +377,11 @@ export const ProviderSlide = ({
       await currentService.getFilm(TEST_URL);
 
       setIsProviderValid(true);
-    } catch (e) {
+    } catch (error) {
+      LoggerStore.error('validateProvider', { error });
+
       NotificationStore.displayError(t('Invalid provider'));
-      console.error(e);
+
       setIsProviderValid(false);
     } finally {
       setIsLoading(false);
@@ -466,7 +469,7 @@ export const CDNSlide = ({
   goBack,
   goNext,
 }: CDNSlideProps) => {
-  const { currentService, validateUrl, updateCDN } = useServiceContext();
+  const { currentService, validateUrl, updateCDN, getCDNs } = useServiceContext();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [selectedCDN, setSelectedCDN] = useState<string | null>(currentService.getCDN());
   const [isCDNValid, setIsCDNValid] = useState<boolean | null>(null);
@@ -480,8 +483,9 @@ export const CDNSlide = ({
       updateCDN(selectedCDN ?? '', true);
       film = await currentService.getFilm(TEST_URL);
     } catch (error) {
+      LoggerStore.error('handleValidateCDN', { error });
+
       NotificationStore.displayError(t('Invalid Provider'));
-      console.error(error);
 
       return;
     }
@@ -509,7 +513,10 @@ export const CDNSlide = ({
 
       setIsCDNValid(true);
     } catch (error) {
+      LoggerStore.error('handleLogin', { error });
+
       NotificationStore.displayError(error as Error);
+
       setIsCDNValid(false);
     } finally {
       setIsLoading(false);
@@ -525,16 +532,6 @@ export const CDNSlide = ({
     setSelectedCDN(value);
   }, [updateCDN]);
 
-  const options = useMemo(() => [
-    {
-      value: 'auto',
-      label: t('Automatic'),
-    },
-  ].concat(currentService.defaultCDNs.map((cdn) => ({
-    value: cdn,
-    label: cdn,
-  }))), [currentService]);
-
   return (
     <BaseSlide
       slide={ slide }
@@ -545,7 +542,7 @@ export const CDNSlide = ({
     >
       <View style={ styles.cdnWrapper }>
         <ThemedDropdown
-          data={ options }
+          data={ getCDNs() }
           onChange={ handleSelect }
           header={ t('CDN') }
           value={ selectedCDN ?? '' }
@@ -605,10 +602,10 @@ export const LoginSlide = ({
 
     try {
       await login(username, password);
-    } catch (e) {
-      NotificationStore.displayError(e as Error);
+    } catch (error) {
+      NotificationStore.displayError(error as Error);
 
-      console.error(e);
+      LoggerStore.error('handleLogin', { error });
     } finally {
       setIsLoading(false);
     }

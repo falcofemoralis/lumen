@@ -15,6 +15,7 @@ web-build/
 *.apk
 *.apk.idsig
 .kotlin/
+uat.xlsx
 
 # IDE
 .idea/

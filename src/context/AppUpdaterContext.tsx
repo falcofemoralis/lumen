@@ -9,6 +9,7 @@ import {
 } from 'react';
 import { Platform } from 'react-native';
 import ConfigStore from 'Store/Config.store';
+import LoggerStore from 'Store/Logger.store';
 import { UpdateInterface } from 'Type/Update.interface';
 import { noopFn } from 'Util/Function';
 import { versionStringToNumber } from 'Util/Misc';
@@ -64,6 +65,8 @@ export const AppUpdaterProvider = ({ children }: { children: React.ReactNode }) 
     }
 
     const data = await getCachedUpdate();
+
+    LoggerStore.debug('checkVersion', { data });
 
     const currentVersion = versionStringToNumber(Application.nativeApplicationVersion || '0.0.0');
     const newVersion = versionStringToNumber(data?.versionName || '0.0.0');

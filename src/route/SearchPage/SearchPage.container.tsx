@@ -7,6 +7,7 @@ import {
 import { withTV } from 'Hooks/withTV';
 import { useRef, useState } from 'react';
 import { Keyboard } from 'react-native';
+import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
 import { FilmListInterface } from 'Type/FilmList.interface';
 import { MenuItemInterface } from 'Type/MenuItem.interface';
@@ -38,11 +39,15 @@ export function SearchPageContainer() {
 
   const searchSuggestions = async (q: string) => {
     try {
+      LoggerStore.debug('searchSuggestions', { q });
+
       const res = await currentService.searchSuggestions(q);
 
       setSuggestions(res);
-    } catch (e) {
-      NotificationStore.displayError(e as Error);
+    } catch (error) {
+      LoggerStore.error('searchSuggestions', { error });
+
+      NotificationStore.displayError(error as Error);
     }
   };
 
@@ -54,11 +59,15 @@ export function SearchPageContainer() {
     setIsLoading(true);
 
     try {
+      LoggerStore.debug('search', { q });
+
       const films = await currentService.search(q, 1);
 
       onUpdateFilms('search', films);
-    } catch (e) {
-      NotificationStore.displayError(e as Error);
+    } catch (error) {
+      LoggerStore.error('search', { error });
+
+      NotificationStore.displayError(error as Error);
     } finally {
       setIsLoading(false);
     }
@@ -101,6 +110,8 @@ export function SearchPageContainer() {
     setEnteredText(q);
     updateUserSuggestions(q);
 
+    LoggerStore.debug('onApplySearch', { q });
+
     search(q);
   };
 
@@ -112,6 +123,8 @@ export function SearchPageContainer() {
     setQuery(q);
     setEnteredText(q);
     updateUserSuggestions(q);
+
+    LoggerStore.debug('onApplySuggestion', { q });
 
     search(q);
   };

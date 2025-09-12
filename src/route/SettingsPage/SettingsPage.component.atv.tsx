@@ -2,7 +2,6 @@ import Page from 'Component/Page';
 import React from 'react';
 import { View } from 'react-native';
 import { DefaultFocus, SpatialNavigationScrollView } from 'react-tv-space-navigation';
-import { Colors } from 'Style/Colors';
 
 import {
   SettingItem, SettingsPageComponentProps,
