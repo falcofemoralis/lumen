@@ -13,7 +13,7 @@ import { convertBooleanToString, convertStringToBoolean } from 'Util/Type';
 
 import SettingsPageComponent from './SettingsPage.component';
 import SettingsPageComponentTV from './SettingsPage.component.atv';
-import { GITHUB_LINK } from './SettingsPage.config';
+import { GITHUB_LINK, TELEGRAM_LINK } from './SettingsPage.config';
 import { SETTING_TYPE, SettingItem } from './SettingsPage.type';
 
 export function SettingsPageContainer() {
@@ -68,11 +68,31 @@ export function SettingsPageContainer() {
       onPress: (value) => updateOfficialMode(value as string),
     },
     {
+      id: 'isTVGridAnimation',
+      title: t('Grid animation'),
+      subtitle: t('Toggle grid animation.'),
+      type: SETTING_TYPE.SELECT,
+      value: convertBooleanToString(ConfigStore.getConfig().isTVGridAnimation),
+      options: yesNoOptions,
+      onPress,
+      isHidden: !ConfigStore.isTV(),
+    },
+    {
+      id: 'isTVAwake',
+      title: t('TV awake'),
+      subtitle: t('Toggle TV awake.'),
+      type: SETTING_TYPE.SELECT,
+      value: convertBooleanToString(ConfigStore.getConfig().isTVAwake),
+      options: yesNoOptions,
+      onPress,
+      isHidden: !ConfigStore.isTV(),
+    },
+    {
       id: 'loggerEnabled',
       title: t('Enable logger'),
       subtitle: t('Enable logger to send logs to the developer.'),
       type: SETTING_TYPE.SELECT,
-      value: convertBooleanToString(ConfigStore.isLoggerEnabled()),
+      value: convertBooleanToString(ConfigStore.getConfig().loggerEnabled),
       options: yesNoOptions,
       onPress,
     },
@@ -86,6 +106,14 @@ export function SettingsPageContainer() {
         value: convertBooleanToString(true),
       },
       onPress: () => navigation.navigate(LOGGER_ROUTE),
+    },
+    {
+      id: 'telegram',
+      title: 'Telegram',
+      subtitle: t('Go to Telegram'),
+      type: SETTING_TYPE.LINK,
+      value: 'link',
+      onPress: () => Linking.openURL(TELEGRAM_LINK),
     },
     {
       id: 'github',
@@ -105,7 +133,7 @@ export function SettingsPageContainer() {
         const result = handleTap();
 
         if (result) {
-          ConfigStore.setSecuredSettings(true);
+          ConfigStore.updateConfig('securedSettings', true);
 
           setSettings((prevSettings) => prevSettings.map((st) => {
             if (st.id === 'isFirestore') {
@@ -125,10 +153,10 @@ export function SettingsPageContainer() {
       title: t('Time share'),
       subtitle: t('Toggle time share. It will consume more data.'),
       type: SETTING_TYPE.SELECT,
-      value: convertBooleanToString(ConfigStore.isFirestore()),
+      value: convertBooleanToString(ConfigStore.getConfig().isFirestore),
       options: yesNoOptions,
       onPress,
-      isHidden: !ConfigStore.isSecuredSettings(),
+      isHidden: !ConfigStore.getConfig().securedSettings,
     },
   ]);
 

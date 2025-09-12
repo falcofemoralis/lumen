@@ -9,7 +9,7 @@ export const styles = CreateStyles({
     backgroundColor: Colors.black,
   },
   containerWithComments: {
-    width: '50%',
+    width: '60%',
   },
   video: {
     width: '100%',
@@ -80,7 +80,7 @@ export const styles = CreateStyles({
     backgroundColor: Colors.whiteTransparent,
   },
   commentsOverlay: {
-    width: '50%',
+    width: '40%',
     height: '100%',
     marginRight: 0,
   },

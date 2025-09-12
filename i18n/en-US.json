@@ -135,5 +135,10 @@
   "Enable logger": "Enable logger",
   "Enable logger to send logs to the developer.": "Enable logger to send logs to the developer.",
   "See logs": "See logs",
-  "Check and send logs to the developer.": "Check and send logs to the developer."
+  "Check and send logs to the developer.": "Check and send logs to the developer.",
+  "Go to Telegram": "Go to Telegram",
+  "Grid animation": "Grid animation",
+  "Toggle grid animation.": "Toggle grid animation.",
+  "TV awake": "TV awake",
+  "Toggle TV awake.": "Toggle TV awake."
 }

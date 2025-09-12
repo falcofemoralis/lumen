@@ -26,13 +26,17 @@ export const useAwake = () => {
 
       LoggerStore.debug('focusHandler', { blurTime, focusTime });
 
-      if (focusTime - blurTime > 1000 * 60 * 60) { // 1 hour
+      if (focusTime - blurTime > 1000 * 60 * 60 * 4) { // 4 hours
         RNRestart.restart();
       }
     }
   };
 
   useEffect(() => {
+    if (!ConfigStore.getConfig().isTVAwake) {
+      return () => {};
+    }
+
     const blurSubscription = AppState.addEventListener('blur', blurHandler);
     const focusSubscription = AppState.addEventListener('focus', focusHandler);
 

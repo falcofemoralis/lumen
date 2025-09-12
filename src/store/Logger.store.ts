@@ -60,7 +60,7 @@ class Logger {
   }
 
   private publishLog(type: 'debug' | 'error', message: string, context?: Record<string, any>) {
-    if (!ConfigStore.isLoggerEnabled()) {
+    if (!ConfigStore.getConfig().loggerEnabled) {
       return;
     }
 

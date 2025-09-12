@@ -134,7 +134,12 @@
   "You have no logs yet": "У вас пока нет логов",
   "Logger": "Логи",
   "Enable logger": "Включить логирование",
-  "Enable logger to send logs to the developer.": "Включите логирование для отправки логов разработчику.",
+  "Enable logger to send logs to the developer.": "Включить логирование для отправки логов разработчику.",
   "See logs": "Просмотреть логи",
-  "Check and send logs to the developer.": "Проверьте и отправьте логи разработчику."
+  "Check and send logs to the developer.": "Проверьте и отправьте логи разработчику.",
+  "Go to Telegram": "Перейти в Telegram",
+  "Grid animation": "Анимация сетки фильмов",
+  "Toggle grid animation.": "Включить анимацию сетки фильмов.",
+  "TV awake": "Пробуждение телевизора",
+  "Toggle TV awake.": "После 4 часов бездействия приложение будет принудительно перезагружено."
 }

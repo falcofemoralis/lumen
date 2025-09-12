@@ -41,7 +41,7 @@ export function PlayerVideoSelectorContainer({
   );
   const [savedTime, setSavedTime] = useState<SavedTime | null>(null);
   const firestoreDb = useMemo(() => (
-    ConfigStore.isFirestore() && isSignedIn
+    ConfigStore.getConfig().isFirestore && isSignedIn
       ? getFirestore().collection<FirestoreDocument>(FIRESTORE_DB)
       : null
   ), [isSignedIn]);
