@@ -297,24 +297,32 @@ export const InfoList = memo(({
 ) => prevProps.list.link === nextProps.list.link);
 
 interface RelatedItemProps {
-  film: FilmInterface,
   item: FilmCardInterface,
   handleSelectFilm: (film: FilmInterface) => void
 }
 
 export const RelatedItem = memo(({
-  film,
   item,
   handleSelectFilm,
-}: RelatedItemProps) => (
-  <Pressable
-    style={ { width: scale(100) } }
-    onPress={ () => handleSelectFilm(film) }
-  >
-    <FilmCard
-      filmCard={ item }
-    />
-  </Pressable>
-), (
+}: RelatedItemProps) => {
+  const { link } = item;
+
+  const onSelect = useCallback(() => {
+    if (link) {
+      handleSelectFilm({ link } as unknown as FilmInterface);
+    }
+  }, [link, handleSelectFilm]);
+
+  return (
+    <Pressable
+      style={ { width: scale(100) } }
+      onPress={ onSelect }
+    >
+      <FilmCard
+        filmCard={ item }
+      />
+    </Pressable>
+  );
+}, (
   prevProps: RelatedItemProps, nextProps: RelatedItemProps
 ) => prevProps.item.id === nextProps.item.id);

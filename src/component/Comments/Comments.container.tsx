@@ -3,6 +3,7 @@ import { withTV } from 'Hooks/withTV';
 import {
   forwardRef, useEffect, useImperativeHandle, useRef, useState,
 } from 'react';
+import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
 import { CommentInterface } from 'Type/Comment.interface';
 
@@ -15,7 +16,7 @@ export type CommentsRef = {
 };
 
 export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>(
-  ({ film, loaderFullScreen, style }, ref) => {
+  ({ film, loaderFullScreen, style, initialLoad }, ref) => {
     const { id } = film;
     const [comments, setComments] = useState<CommentInterface[] | null>(null);
     const paginationRef = useRef({
@@ -24,11 +25,13 @@ export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>
     });
     const updatingStateRef = useRef(false);
     const [isLoading, setIsLoading] = useState(false);
-    const { getCurrentService } = useServiceContext();
+    const { currentService } = useServiceContext();
 
     useEffect(() => {
-      loadComments(1);
-    }, []);
+      if (initialLoad) {
+        loadComments(1);
+      }
+    }, [initialLoad]);
 
     useEffect(() => {
       updatingStateRef.current = false;
@@ -36,7 +39,7 @@ export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>
 
     useImperativeHandle(ref, () => ({
       loadComments: () => {
-        onNextLoad();
+        loadComments(1);
       },
     }));
 
@@ -55,7 +58,7 @@ export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>
           const {
             items: newItems,
             totalPages: newTotalsPages,
-          } = await getCurrentService().getComments(
+          } = await currentService.getComments(
             id,
             page
           );
@@ -67,6 +70,7 @@ export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>
 
           setComments([...(comments ?? []), ...newItems]);
         } catch (error) {
+          LoggerStore.error('loadComments', { error });
           NotificationStore.displayError(error as Error);
           updatingStateRef.current = false;
         } finally {

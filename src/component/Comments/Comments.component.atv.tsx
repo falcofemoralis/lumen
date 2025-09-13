@@ -1,21 +1,24 @@
 import Loader from 'Component/Loader';
 import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
 import ThemedImage from 'Component/ThemedImage';
+import ThemedList from 'Component/ThemedList';
 import ThemedText from 'Component/ThemedText';
 import t from 'i18n/t';
 import { ThumbsUp } from 'lucide-react-native';
-import {
+import React, {
+  forwardRef,
   memo,
   useCallback,
+  useEffect,
+  useImperativeHandle,
   useMemo,
   useRef,
   useState,
 } from 'react';
-import { LayoutRectangle, View } from 'react-native';
+import { LayoutRectangle, useWindowDimensions, View } from 'react-native';
 import {
-  DefaultFocus,
   SpatialNavigationFocusableView,
-  SpatialNavigationVirtualizedList,
+  SpatialNavigationNodeRef,
 } from 'react-tv-space-navigation';
 import { Colors } from 'Style/Colors';
 import { CommentInterface, CommentTextType } from 'Type/Comment.interface';
@@ -25,6 +28,7 @@ import { MEASURE_TEXT_STRING } from './Comments.config';
 import {
   INDENT_SIZE,
   ITEM_ADDITIONAL_HEIGHT,
+  OVERLAY_PADDING,
   styles,
 } from './Comments.style.atv';
 import {
@@ -32,12 +36,15 @@ import {
 } from './Comments.type';
 import { CommentText, CommentTextRef } from './CommentText.atv';
 
-export function CommentItem({
+type CommentItemRef = {
+  focus: () => void;
+};
+
+export const CommentItem = forwardRef<CommentItemRef, CommentItemProps>(({
   comment,
-  idx,
   containerWidth = 0,
   lines = [],
-}: CommentItemProps) {
+}, ref) => {
   const {
     id,
     avatar,
@@ -46,12 +53,18 @@ export function CommentItem({
     likes,
   } = comment;
 
+  const commentRef = useRef<SpatialNavigationNodeRef>(null);
   const commentTextRef = useRef<CommentTextRef>(null);
 
   const leftIndent = INDENT_SIZE * comment.indent;
 
+  useImperativeHandle(ref, () => ({
+    focus: () => commentRef.current?.focus(),
+  }), [commentRef]);
+
   return (
     <SpatialNavigationFocusableView
+      ref={ commentRef }
       onSelect={ () => commentTextRef.current?.openSpoilers() }
     >
       { ({ isFocused }) => (
@@ -120,7 +133,7 @@ export function CommentItem({
       ) }
     </SpatialNavigationFocusableView>
   );
-}
+});
 
 function rowPropsAreEqual(prevProps: CommentItemProps, props: CommentItemProps) {
   return prevProps.comment.id === props.comment.id || prevProps.lines === props.lines;
@@ -128,17 +141,29 @@ function rowPropsAreEqual(prevProps: CommentItemProps, props: CommentItemProps) 
 
 const MemoCommentItem = memo(CommentItem, rowPropsAreEqual);
 
-export const CommentsComponent = ({
+const CommentsList = ({
   comments,
-  style,
-  isLoading,
   onNextLoad,
-}: CommentsComponentProps) => {
-  const [containerWidth, setContainerWidth] = useState(0);
-  const [charLayout, setCharLayout] = useState<LayoutRectangle|null>(null);
+  containerWidth,
+  charLayout,
+}: CommentsComponentProps & {
+  containerWidth: number;
+  charLayout: LayoutRectangle | null;
+}) => {
+  const { height } = useWindowDimensions();
+  const defaultItemRef = useRef<CommentItemRef>(null);
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (defaultItemRef.current) {
+        defaultItemRef.current?.focus();
+      }
+    }, 0);
+  }, []);
 
   const splitText = useCallback((str: string, indent: number) => {
     const width = containerWidth - (indent * INDENT_SIZE);
+
     const charWidth = Math.ceil((charLayout?.width || 1) / MEASURE_TEXT_STRING.length);
 
     const words = str.split(' ');
@@ -188,21 +213,22 @@ export const CommentsComponent = ({
         return acc;
       }
 
+      const lines = splitText(textObj.text, item.indent);
+
       acc.push({
         lines: splitText(textObj.text, item.indent),
+        totalHeight: lines.length * (charLayout?.height || 0),
         type: textObj.type,
       });
 
       return acc;
     }, []);
 
-    const numberOfLines = calculatedLines.reduce((acc, textObj) => acc + textObj.lines.length, 0);
-
-    const charHeight = charLayout?.height || 0;
-    const textHeight = numberOfLines * charHeight;
+    const textHeight = calculatedLines.reduce((acc, textObj) => acc + textObj.totalHeight, 0);
 
     return {
       height: textHeight + ITEM_ADDITIONAL_HEIGHT,
+      lineHeight: charLayout?.height || 0,
       lines: calculatedLines,
     };
   }, [charLayout, splitText]);
@@ -212,6 +238,101 @@ export const CommentsComponent = ({
 
     return acc;
   }, {} as Record<string, CalculatedText>), [comments, calculateItemSize]);
+
+  const stringifiedComments = useMemo(() => (comments ?? []).reduce((acc, comment) => {
+    const commentHeight = commentCalculatedHeights[comment.id].height;
+    const containerHeight = height - ITEM_ADDITIONAL_HEIGHT - OVERLAY_PADDING;
+
+    // if comment height is more than possible to show on the screen, we need to split it into multiple comments
+    if (commentHeight > containerHeight) {
+      let accumulatedHeight = 0;
+      let lineIndex = 0;
+      const calculatedText = commentCalculatedHeights[comment.id] ?? { lines: [] };
+      const splittedLines = [] as Record<number, CalculatedLine[]>;
+
+      // sum up lines container height until it reaches the container height
+      calculatedText.lines?.forEach((line, idx) => {
+        if (!splittedLines[lineIndex]) {
+          splittedLines[lineIndex] = [];
+        }
+
+        if ((accumulatedHeight + line.totalHeight) > containerHeight) {
+          lineIndex++;
+
+          if (!splittedLines[lineIndex]) {
+            splittedLines[lineIndex] = [];
+          }
+
+          // if comment line is a single line, that can't be easily splitted, we need to split its text into multiple lines
+          // if (line.totalHeight > containerHeight) {
+          const innerLines = [] as Record<number, string[]>;
+          let innerAccumulatedHeight = 0;
+          let innerLineIndex = 0;
+
+          // sum up lines text height until it reaches the container height
+          line.lines.forEach((innerLine) => {
+            if (!innerLines[innerLineIndex]) {
+              innerLines[innerLineIndex] = [];
+            }
+
+            if ((innerAccumulatedHeight + calculatedText.lineHeight) > containerHeight) {
+              innerLineIndex++;
+
+              if (!innerLines[innerLineIndex]) {
+                innerLines[innerLineIndex] = [];
+              }
+
+              innerLines[innerLineIndex].push(innerLine);
+              innerAccumulatedHeight = 0;
+            } else {
+              innerLines[innerLineIndex].push(innerLine);
+              innerAccumulatedHeight += calculatedText.lineHeight;
+            }
+          });
+
+          Object.values(innerLines).forEach((lns) => {
+            if (!splittedLines[lineIndex]) {
+              splittedLines[lineIndex] = [];
+            }
+
+            splittedLines[lineIndex].push({
+              ...line,
+              lines: lns,
+            });
+            lineIndex++;
+          });
+
+          accumulatedHeight = 0;
+        } else {
+          splittedLines[lineIndex].push(line);
+          accumulatedHeight += line.totalHeight;
+        }
+      });
+
+      Object.values(splittedLines).forEach((lns, idx) => {
+        const virtualId = `${comment.id}-${idx}`;
+
+        if (!commentCalculatedHeights[virtualId]) {
+          commentCalculatedHeights[virtualId] = { ...calculatedText };
+        }
+
+        commentCalculatedHeights[virtualId] = {
+          ...calculatedText,
+          lines: lns,
+          height: lns.length * calculatedText.lineHeight,
+        } as CalculatedText;
+
+        acc.push({
+          ...comment,
+          id: virtualId,
+        });
+      });
+    } else {
+      acc.push(comment);
+    }
+
+    return acc;
+  }, [] as CommentInterface[]), [commentCalculatedHeights, comments, height]);
 
   const getCalculatedItemSize = useCallback((
     item: CommentInterface
@@ -223,12 +344,32 @@ export const CommentsComponent = ({
 
   const renderItem = useCallback(({ item, index }: ThemedGridRowProps<CommentInterface>) => (
     <MemoCommentItem
+      ref={ index === 0 ? defaultItemRef : null }
       comment={ item }
       idx={ index }
       containerWidth={ containerWidth }
       lines={ getCalculatedItemLines(item) }
     />
   ), [getCalculatedItemLines, containerWidth]);
+
+  return (
+    <ThemedList
+      data={ stringifiedComments ?? [] }
+      renderItem={ renderItem }
+      getEstimatedItemSize={ (_, item) => getCalculatedItemSize(item) }
+      onNextLoad={ onNextLoad }
+    />
+  );
+};
+
+export const CommentsComponent = ({
+  comments,
+  style,
+  isLoading,
+  onNextLoad,
+}: CommentsComponentProps) => {
+  const [containerWidth, setContainerWidth] = useState(0);
+  const [charLayout, setCharLayout] = useState<LayoutRectangle|null>(null);
 
   const renderComments = () => {
     if (!comments || (isLoading && !comments.length)) {
@@ -253,24 +394,21 @@ export const CommentsComponent = ({
     }
 
     return (
-      <DefaultFocus>
-        <SpatialNavigationVirtualizedList
-          data={ comments }
-          itemSize={ getCalculatedItemSize }
-          renderItem={ renderItem }
-          onEndReached={ onNextLoad }
-          orientation="vertical"
-          additionalItemsRendered={ 1 }
-          onEndReachedThresholdItemsNumber={ 5 }
-          scrollBehavior='stick-to-center'
-          scrollDuration={ 0 }
-        />
-      </DefaultFocus>
+      // <DefaultFocus>
+      <CommentsList
+        comments={ comments }
+        style={ style }
+        isLoading={ isLoading }
+        onNextLoad={ onNextLoad }
+        containerWidth={ containerWidth }
+        charLayout={ charLayout }
+      />
+      // </DefaultFocus>
     );
   };
 
   /**
-   * This is required for correct text height calcluation
+   * This is required for correct text height calculation
    */
   const renderMeasureText = () => (
     <View

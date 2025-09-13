@@ -1,5 +1,4 @@
-import { ACCOUNT_ROUTE, NOTIFICATIONS_ROUTE } from 'Component/NavigationBar/NavigationBar.config';
-import { BadgeData } from 'Component/NavigationBar/NavigationBar.type';
+import { NavigationRoute, ParamListBase } from '@react-navigation/native';
 import {
   createContext,
   use,
@@ -7,7 +6,10 @@ import {
   useMemo,
   useState,
 } from 'react';
+import { ACCOUNT_ROUTE } from 'Route/AccountPage/AccountPage.config';
+import { NOTIFICATIONS_ROUTE } from 'Route/NotificationsPage/NotificationsPage.config';
 import ConfigStore from 'Store/Config.store';
+import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
 import { NotificationInterface, NotificationItemInterface } from 'Type/Notification.interface';
 import { safeJsonParse } from 'Util/Json';
@@ -17,6 +19,10 @@ import { useServiceContext } from './ServiceContext';
 
 export const NOTIFICATIONS_STORAGE = 'NOTIFICATIONS_STORAGE';
 export const NOTIFICATIONS_STORAGE_CACHE = 'NOTIFICATIONS_STORAGE_CACHE';
+
+export type BadgeData = {
+  [key in NavigationRoute<ParamListBase, string>['name']]?: number;
+}
 
 interface NotificationsContextInterface {
   badgeData: BadgeData;
@@ -31,7 +37,7 @@ const NotificationsContext = createContext<NotificationsContextInterface>({
 });
 
 export const NotificationsProvider = ({ children }: { children: React.ReactNode }) => {
-  const { getCurrentService } = useServiceContext();
+  const { currentService } = useServiceContext();
   const [badgeData, setBadgeData] = useState<BadgeData>({});
 
   const updateBadge = useCallback((data: NotificationInterface[]) => {
@@ -75,7 +81,7 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
         }
       }
 
-      const data = await getCurrentService().getNotifications();
+      const data = await currentService.getNotifications();
 
       miscStorage.set(NOTIFICATIONS_STORAGE_CACHE, JSON.stringify({
         data,
@@ -86,11 +92,13 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
 
       return data;
     } catch (error) {
+      LoggerStore.error('getNotifications', { error });
+
       NotificationStore.displayError(error as Error);
 
       return null;
     }
-  }, [updateBadge]);
+  }, [updateBadge, currentService]);
 
   /**
    * Reset notifications for the current service

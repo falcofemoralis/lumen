@@ -3,49 +3,40 @@ import { useServiceContext } from 'Context/ServiceContext';
 import { useProfile } from 'Hooks/useProfile';
 import { withTV } from 'Hooks/withTV';
 import { useCallback } from 'react';
+import { ACCOUNT_ROUTE } from 'Route/AccountPage/AccountPage.config';
+import { BOOKMARKS_ROUTE } from 'Route/BookmarksPage/BookmarksPage.config';
+import { NOTIFICATIONS_ROUTE } from 'Route/NotificationsPage/NotificationsPage.config';
+import { RECENT_ROUTE } from 'Route/RecentPage/RecentPage.config';
 import ConfigStore from 'Store/Config.store';
 
 import NavigationBarComponent from './NavigationBar.component';
 import NavigationBarComponentTV from './NavigationBar.component.atv';
-import { ACCOUNT_ROUTE, BOOKMARKS_ROUTE, RECENT_ROUTE } from './NavigationBar.config';
-import { NavigationType, StateType, Tab } from './NavigationBar.type';
+import { NavigationBarContainerProps } from './NavigationBar.type';
 
-export function NavigationBarContainer() {
+export function NavigationBarContainer(props: NavigationBarContainerProps) {
   const [profile] = useProfile();
   const { isSignedIn } = useServiceContext();
+  const { navigation, state } = props;
 
-  const getRedirectRoute = useCallback((tab: Tab) => {
-    const { route } = tab;
-
+  const getRedirectRoute = useCallback((name: string) => {
     // if not signed in, we should redirect to account page
-    if (!isSignedIn && (route === BOOKMARKS_ROUTE || route === RECENT_ROUTE)) {
+    if (!isSignedIn && (name === BOOKMARKS_ROUTE
+      || name === RECENT_ROUTE
+      || name === NOTIFICATIONS_ROUTE
+    )) {
       return ACCOUNT_ROUTE;
     }
 
-    return route;
+    return name;
   }, [isSignedIn]);
 
-  const navigateTo = useCallback((
-    tab: Tab,
-    navigation: NavigationType,
-    state: StateType
-  ) => {
-    const route = getRedirectRoute(tab);
+  const onPress = useCallback((name: string) => {
+    const route = getRedirectRoute(name);
 
     const routes = Array.from(state.routes);
     const rn = routes.find((r) => r.name === route);
 
     if (!rn) {
-      return;
-    }
-
-    // we should unload current row on TV
-    if (ConfigStore.isTV()) {
-      navigation.reset({
-        index: 0,
-        routes: [{ name: rn.name }], // your stack screen name
-      });
-
       return;
     }
 
@@ -61,27 +52,32 @@ export function NavigationBarContainer() {
         target: state.key,
       });
     }
-  }, [getRedirectRoute]);
+  }, [getRedirectRoute, navigation, state]);
 
-  const isFocused = useCallback((tab: Tab, state: StateType) => {
-    const routeIndex = state.routes.findIndex((r) => r.name === tab.route);
+  const onLongPress = useCallback((name: string) => {
+    const route = getRedirectRoute(name);
 
-    return state.index === routeIndex;
-  }, []);
+    const routes = Array.from(state.routes);
+    const rn = routes.find((r) => r.name === route);
+
+    if (!rn) {
+      return;
+    }
+
+    navigation.emit({
+      type: 'tabLongPress',
+      target: rn.key,
+    });
+  }, [getRedirectRoute, navigation, state]);
 
   const containerProps = {
+    ...props,
     profile,
+    onPress,
+    onLongPress,
   };
 
-  const containerFunctions = {
-    navigateTo,
-    isFocused,
-  };
-
-  return withTV(NavigationBarComponentTV, NavigationBarComponent, {
-    ...containerFunctions,
-    ...containerProps,
-  });
+  return withTV(NavigationBarComponentTV, NavigationBarComponent, containerProps);
 }
 
 export default NavigationBarContainer;

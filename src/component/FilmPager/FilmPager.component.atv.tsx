@@ -1,7 +1,7 @@
+import { useNavigation } from '@react-navigation/native';
 import FilmGrid from 'Component/FilmGrid';
 import ThemedButton from 'Component/ThemedButton';
 import { useNavigationContext } from 'Context/NavigationContext';
-import { useNavigation } from 'expo-router';
 import {
   createContext,
   useEffect, useRef, useState,

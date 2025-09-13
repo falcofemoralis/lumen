@@ -1,6 +1,6 @@
 const { defineConfig } = require('eslint/config');
 const expoConfig = require('eslint-config-expo/flat');
-const stylisticTs = require('@stylistic/eslint-plugin-ts');
+const stylistic = require('@stylistic/eslint-plugin');
 const eslintComments = require('eslint-plugin-eslint-comments');
 const etc = require('eslint-plugin-etc');
 const reactPerf = require('eslint-plugin-react-perf');
@@ -14,7 +14,7 @@ module.exports = defineConfig([
   {
     ignores: ['dist/*'],
     plugins: {
-      '@stylistic-plugin-ts': stylisticTs,
+      '@stylistic-plugin': stylistic,
       'eslint-comments': eslintComments,
       etc,
       'react-perf': reactPerf,
@@ -39,27 +39,6 @@ module.exports = defineConfig([
       'prefer-template': 'warn',
       'no-else-return': ['warn', {
         allowElseIf: false,
-      }],
-      indent: ['error', 2, {
-        SwitchCase: 1,
-        VariableDeclarator: 1,
-        outerIIFEBody: 1,
-        FunctionDeclaration: {
-          parameters: 1,
-          body: 1,
-        },
-        FunctionExpression: {
-          parameters: 1,
-          body: 1,
-        },
-        CallExpression: {
-          arguments: 1,
-        },
-        ArrayExpression: 1,
-        ObjectExpression: 1,
-        ImportDeclaration: 1,
-        flatTernaryExpressions: false,
-        ignoreComments: false,
       }],
       'default-param-last': 'off',
       'no-param-reassign': 0,
@@ -89,7 +68,7 @@ module.exports = defineConfig([
       }],
       'semi': ['error', 'always'],
       // @typescript-eslint
-      '@stylistic-plugin-ts/indent': [2, 2],
+      '@stylistic-plugin/indent': [2, 2],
       '@typescript-eslint/no-unnecessary-condition': 'off',
       '@typescript-eslint/no-shadow': 'error',
       '@typescript-eslint/no-use-before-define': 'off',

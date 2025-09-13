@@ -1,13 +1,14 @@
+import { useNavigation } from '@react-navigation/native';
 import InfoBlock from 'Component/InfoBlock';
 import Loader from 'Component/Loader';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedInput from 'Component/ThemedInput';
-import { router } from 'expo-router';
 import t from 'i18n/t';
 import { useRef } from 'react';
 import { View } from 'react-native';
 import { AvoidSoftInputView } from 'react-native-avoid-softinput';
 import { DefaultFocus } from 'react-tv-space-navigation';
+import { ACCOUNT_ROUTE } from 'Route/AccountPage/AccountPage.config';
 
 import { styles } from './LoginForm.style.atv';
 import { LoginFormComponentProps } from './LoginForm.type';
@@ -17,6 +18,7 @@ export function LoginFormComponent({
   withRedirect,
   handleLogin,
 }: LoginFormComponentProps) {
+  const navigation = useNavigation();
   const loginRef = useRef({ username: '', password: '' });
 
   const renderForm = () => {
@@ -24,7 +26,7 @@ export function LoginFormComponent({
       return (
         <ThemedButton
           style={ styles.form }
-          onPress={ () => router.navigate('/(tabs)/(account)') }
+          onPress={ () => navigation.navigate(ACCOUNT_ROUTE) }
         >
           { t('Go to login page') }
         </ThemedButton>

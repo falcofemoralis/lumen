@@ -39,9 +39,9 @@ export const styles = CreateStyles({
     overflow: 'hidden',
     flex: 1,
     flexDirection: 'column',
+    minWidth: 300,
   },
   scrollView: {
-    width: 300,
   },
   header: {
     justifyContent: 'center',

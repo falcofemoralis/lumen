@@ -108,7 +108,7 @@ export const styles = CreateStyles({
     marginTop: 8,
   },
   readMoreButtonHidden: {
-    opacity: 0,
+    display: 'none',
   },
   section: {
     marginTop: 16,
@@ -304,5 +304,12 @@ export const styles = CreateStyles({
   },
   descriptionOverlayText: {
     fontSize: 16,
+    lineHeight: 24,
+  },
+  card: {
+    backgroundColor: Colors.backgroundLight,
+    borderRadius: 16,
+    borderColor: Colors.darkBorder,
+    borderWidth: 1,
   },
 });

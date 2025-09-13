@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import { withTV } from 'Hooks/withTV';
 import { useCallback } from 'react';
 import ConfigStore from 'Store/Config.store';
@@ -19,8 +20,10 @@ export function FilmGridContainer({
   onNextLoad,
   onItemFocus,
 }: FilmGridContainerProps) {
+  const navigation = useNavigation();
+
   const handleOnPress = useCallback((film: FilmCardInterface) => {
-    openFilm(film);
+    openFilm(film, navigation);
   }, []);
 
   const handleItemFocus = (index: number) => {

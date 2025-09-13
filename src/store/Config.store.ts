@@ -8,6 +8,10 @@ type DeviceConfigType = {
   isTV: boolean;
   isFirestore: boolean;
   deviceId: string | null;
+  loggerEnabled: boolean;
+  securedSettings: boolean;
+  isTVGridAnimation: boolean;
+  isTVAwake: boolean;
 }
 
 class ConfigStore {
@@ -16,6 +20,10 @@ class ConfigStore {
     isTV: false,
     isFirestore: false,
     deviceId: null,
+    loggerEnabled: false,
+    securedSettings: false,
+    isTVGridAnimation: true,
+    isTVAwake: false,
   };
 
   constructor() {
@@ -26,7 +34,7 @@ class ConfigStore {
     }
   }
 
-  async loadConfig() {
+  loadConfig() {
     const config = getConfigJson<DeviceConfigType>(DEVICE_CONFIG);
 
     if (!config) {
@@ -39,7 +47,7 @@ class ConfigStore {
     };
   }
 
-  async updateConfig(key: keyof DeviceConfigType, value: unknown) {
+  updateConfig(key: keyof DeviceConfigType, value: unknown) {
     const newConfig = {
       ...this.config,
       [key]: value,
@@ -50,7 +58,7 @@ class ConfigStore {
     this.config = newConfig;
   }
 
-  async configureDeviceType(isTV: boolean) {
+  configureDeviceType(isTV: boolean) {
     updateConfig(DEVICE_CONFIG, JSON.stringify({
       ...this.config,
       isTV,
@@ -59,12 +67,16 @@ class ConfigStore {
     this.config.isTV = isTV;
   }
 
-  async configureDevice(isTV: boolean) {
+  configureDevice(isTV: boolean) {
     updateConfig(DEVICE_CONFIG, JSON.stringify({
       ...this.config,
       isConfigured: true,
       isTV,
     }));
+  }
+
+  getConfig() {
+    return this.config;
   }
 
   isConfigured() {
@@ -73,10 +85,6 @@ class ConfigStore {
 
   isTV() {
     return this.config.isTV;
-  }
-
-  isFirestore() {
-    return this.config.isFirestore;
   }
 
   setUpTV() {

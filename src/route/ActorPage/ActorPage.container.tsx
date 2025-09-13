@@ -1,6 +1,8 @@
+import { useNavigation } from '@react-navigation/native';
 import { useServiceContext } from 'Context/ServiceContext';
 import { withTV } from 'Hooks/withTV';
 import { useCallback, useEffect, useState } from 'react';
+import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
 import { ActorInterface } from 'Type/Actor.interface';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
@@ -10,19 +12,23 @@ import ActorPageComponent from './ActorPage.component';
 import ActorPageComponentTV from './ActorPage.component.atv';
 import { ActorPageContainerProps } from './ActorPage.type';
 
-export function ActorPageContainer({ link }: ActorPageContainerProps) {
+export function ActorPageContainer({ route }: ActorPageContainerProps) {
+  const { link } = route.params as { link: string };
   const [isLoading, setIsLoading] = useState(true);
   const [actor, setActor] = useState<ActorInterface | null>(null);
-  const { getCurrentService } = useServiceContext();
+  const { currentService } = useServiceContext();
+  const navigation = useNavigation();
 
   const fetchActor = async () => {
     try {
       setIsLoading(true);
 
-      const data = await getCurrentService().getActorDetails(link);
+      const data = await currentService.getActorDetails(link);
 
       setActor(data);
     } catch (error) {
+      LoggerStore.error('actorPageFetchActor', { error });
+
       NotificationStore.displayError(error as Error);
     } finally {
       setIsLoading(false);
@@ -34,7 +40,7 @@ export function ActorPageContainer({ link }: ActorPageContainerProps) {
   }, []);
 
   const handleSelectFilm = useCallback((film: FilmCardInterface) => {
-    openFilm(film);
+    openFilm(film, navigation);
   }, []);
 
   const containerFunctions = {

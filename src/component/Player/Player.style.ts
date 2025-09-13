@@ -7,16 +7,19 @@ export const styles = CreateStyles({
     width: '100%',
     height: '100%',
     backgroundColor: Colors.black,
+    transitionProperty: 'width',
+    transitionDuration: '250ms',
+    transitionTimingFunction: 'ease-in-out',
   },
   video: {
-    height: '100%',
     width: '100%',
+    height: '100%',
   },
   controlsContainer: {
     position: 'absolute',
     backgroundColor: Colors.transparent,
-    height: '100%',
     width: '100%',
+    height: '100%',
     left: 0,
     top: 0,
     zIndex: 55,
@@ -108,15 +111,18 @@ export const styles = CreateStyles({
     fontWeight: '700',
   },
   subtitle: {},
+  commentsOverlayModal: {
+    backgroundColor: Colors.transparent,
+  },
   commentsOverlay: {
-    width: '50%',
+    width: '100%',
     height: '100%',
   },
   commentsOverlayContent: {
     height: '100%',
-    maxHeight: '90%',
+    maxHeight: '100%',
     maxWidth: '50%',
-    right: '5%',
+    right: 0,
   },
   commentsOverlayList: {
     height: '100%',

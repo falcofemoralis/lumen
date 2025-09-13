@@ -1,4 +1,5 @@
-import BookmarksSelector from 'Component/BookmarksSelector';
+import { useNavigation } from '@react-navigation/native';
+import BookmarksOverlay from 'Component/BookmarksOverlay';
 import Header from 'Component/Header';
 import Page from 'Component/Page';
 import PlayerVideoSelector from 'Component/PlayerVideoSelector';
@@ -8,10 +9,10 @@ import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import Wrapper from 'Component/Wrapper';
 import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
 import t from 'i18n/t';
 import {
   Bookmark,
+  BookmarkCheck,
   Clapperboard,
   Clock,
   Download,
@@ -34,6 +35,8 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from 'react-native-reanimated';
+import { COMMENTS_MODAL_ROUTE } from 'Route/modal/CommentsModal/CommentsModal.config';
+import { SCHEDULE_MODAL_ROUTE } from 'Route/modal/ScheduleModal/ScheduleModal.config';
 import NotificationStore from 'Store/Notification.store';
 import RouterStore from 'Store/Router.store';
 import { Colors } from 'Style/Colors';
@@ -41,6 +44,7 @@ import { CollectionItemInterface } from 'Type/CollectionItem';
 import { FilmInterface } from 'Type/Film.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { scale } from 'Util/CreateStyles';
+import { isBookmarked } from 'Util/Film';
 
 import { styles } from './FilmPage.style';
 import { FilmPageThumbnail } from './FilmPage.thumbnail';
@@ -57,10 +61,9 @@ export function FilmPageComponent({
   film,
   thumbnailPoster,
   visibleScheduleItems,
-  playerVideoSelectorOverlayId,
-  bookmarksOverlayId,
+  playerVideoSelectorOverlayRef,
+  bookmarksOverlayRef,
   playFilm,
-  hideVideoSelector,
   handleVideoSelect,
   handleSelectFilm,
   handleSelectActor,
@@ -68,7 +71,9 @@ export function FilmPageComponent({
   handleUpdateScheduleWatch,
   handleShare,
   openBookmarks,
+  handleBookmarkChange,
 }: FilmPageComponentProps) {
+  const navigation = useNavigation();
   const { width } = useWindowDimensions();
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffset = useSharedValue(0);
@@ -99,22 +104,16 @@ export function FilmPageComponent({
   }
 
   const openComments = () => {
-    router.push({ pathname: '/modal' });
-    RouterStore.pushData('modal', {
-      type: 'comments',
-      film,
-    });
+    RouterStore.pushData(COMMENTS_MODAL_ROUTE, { film });
+    navigation.navigate(COMMENTS_MODAL_ROUTE);
   };
 
   const openSchedule = () => {
-    router.push({ pathname: '/modal' });
-    RouterStore.pushData('modal', {
-      type: 'schedule',
+    RouterStore.pushData(SCHEDULE_MODAL_ROUTE, {
       film,
-      additionalProps: {
-        handleUpdateScheduleWatch,
-      },
+      handleUpdateScheduleWatch,
     });
+    navigation.navigate(SCHEDULE_MODAL_ROUTE);
   };
 
   const openNotImplemented = () => {
@@ -265,7 +264,7 @@ export function FilmPageComponent({
       { renderMiddleAction(Star, 'Rate',openNotImplemented) }
       { renderMiddleAction(Clapperboard, 'Trailer', openNotImplemented) }
       { renderMiddleAction(MessageSquareText, 'Comments', openComments) }
-      { renderMiddleAction(Bookmark, 'Bookmark', openBookmarks) }
+      { renderMiddleAction(isBookmarked(film) ? BookmarkCheck : Bookmark, 'Bookmark', openBookmarks) }
       { renderMiddleAction(Download, 'Download', openNotImplemented) }
     </View>
   );
@@ -401,9 +400,8 @@ export function FilmPageComponent({
             <View style={ styles.relatedList }>
               { related.map((item, idx) => (
                 <RelatedItem
-                // eslint-disable-next-line react/no-array-index-key -- idx is unique
+                  // eslint-disable-next-line react/no-array-index-key -- idx is unique
                   key={ `${item.id}-${idx}` }
-                  film={ film }
                   item={ item }
                   handleSelectFilm={ handleSelectFilm }
                 />
@@ -480,18 +478,18 @@ export function FilmPageComponent({
 
     return (
       <PlayerVideoSelector
-        overlayId={ playerVideoSelectorOverlayId }
+        overlayRef={ playerVideoSelectorOverlayRef }
         film={ film }
-        onHide={ hideVideoSelector }
         onSelect={ handleVideoSelect }
       />
     );
   };
 
   const renderBookmarksOverlay = () => (
-    <BookmarksSelector
-      overlayId={ bookmarksOverlayId }
+    <BookmarksOverlay
+      overlayRef={ bookmarksOverlayRef }
       film={ film }
+      onBookmarkChange={ handleBookmarkChange }
     />
   );
 

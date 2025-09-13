@@ -52,7 +52,6 @@ export const ThemedGridComponent = ({
       ListEmptyComponent={ ListEmptyComponent }
       recycleItems
       showsVerticalScrollIndicator={ false }
-      waitForInitialLayout
     />
   );
 };

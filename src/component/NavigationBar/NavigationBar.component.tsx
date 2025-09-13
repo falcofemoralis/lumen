@@ -1,9 +1,8 @@
-import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import { NavigationRoute, ParamListBase } from '@react-navigation/native';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import { useNotificationsContext } from 'Context/NotificationsContext';
-import { Tabs } from 'expo-router';
 import React, { useCallback } from 'react';
 import {
   Image,
@@ -11,32 +10,31 @@ import {
   View,
 } from 'react-native';
 import Animated from 'react-native-reanimated';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { ACCOUNT_ROUTE } from 'Route/AccountPage/AccountPage.config';
 import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 
-import { TABS_MOBILE_CONFIG } from './NavigationBar.config';
 import { styles, TAB_ADDITIONAL_SIZE } from './NavigationBar.style';
 import {
   NavigationBarComponentProps,
-  NavigationType,
-  StateType,
-  Tab,
-  TAB_COMPONENT,
 } from './NavigationBar.type';
 
-export { Tabs } from 'expo-router';
-
 export function NavigationBarComponent({
+  state,
+  descriptors,
   profile,
-  navigateTo,
-  isFocused,
+  onPress,
+  onLongPress,
 }: NavigationBarComponentProps) {
   const { badgeData } = useNotificationsContext();
   const { width } = useWindowDimensions();
 
-  const renderDefaultTab = useCallback((tab: Tab, focused: boolean) => {
-    const { IconComponent } = tab;
+  const renderDefaultTab = useCallback((
+    route: NavigationRoute<ParamListBase, string>,
+    focused: boolean
+  ) => {
+    const { options } = descriptors[route.key] ?? {};
+    const { tabBarIcon: IconComponent } = options as { tabBarIcon: React.ComponentType<any> };
 
     return (
       <Animated.View style={ [styles.tab, focused && styles.tabFocused] }>
@@ -49,12 +47,14 @@ export function NavigationBarComponent({
         ) }
       </Animated.View>
     );
-  }, []);
+  }, [descriptors]);
 
-  const renderAccountTab = useCallback((tab: Tab, focused: boolean) => {
+  const renderAccountTab = useCallback((
+    route: NavigationRoute<ParamListBase, string>,
+    focused: boolean
+  ) => {
     const { avatar } = profile ?? {};
-
-    const badge = badgeData[tab.route] ?? 0;
+    const badgeCount = badgeData[route.name] || 0;
 
     return (
       <Animated.View style={ [styles.tab, styles.tabAccount] }>
@@ -75,9 +75,9 @@ export function NavigationBarComponent({
               style={ styles.profileAvatar }
             />
           ) }
-          { badge > 0 && (
+          { badgeCount > 0 && (
             <ThemedText style={ styles.badge }>
-              { badge }
+              { badgeCount }
             </ThemedText>
           ) }
         </Animated.View>
@@ -86,65 +86,43 @@ export function NavigationBarComponent({
   }, [profile, badgeData]);
 
   const renderTab = useCallback((
-    tab: Tab,
-    navigation: NavigationType,
-    state: StateType,
-    idx: number
+    route: NavigationRoute<ParamListBase, string>,
+    index: number
   ) => {
-    const { title, tabComponent } = tab;
-    const focused = isFocused(tab, state);
+    const { name } = route;
+    const isFocused = state.index === index;
 
     const renderComponent = () => {
-      switch (tabComponent) {
-        case TAB_COMPONENT.ACCOUNT:
-          return renderAccountTab(tab, focused);
+      switch (name) {
+        case ACCOUNT_ROUTE:
+          return renderAccountTab(route, isFocused);
         default:
-          return renderDefaultTab(tab, focused);
+          return renderDefaultTab(route, isFocused);
       }
     };
 
     return (
       <ThemedPressable
-        key={ title }
+        key={ name }
         style={ [styles.tabContainer, {
-          width: (width / TABS_MOBILE_CONFIG.length) + scale(TAB_ADDITIONAL_SIZE),
-          left: idx * (width / TABS_MOBILE_CONFIG.length) - scale(TAB_ADDITIONAL_SIZE / 2),
+          width: (width / state.routes.length) + scale(TAB_ADDITIONAL_SIZE),
+          left: index * (width / state.routes.length) - scale(TAB_ADDITIONAL_SIZE / 2),
         }] }
-        onPress={ () => navigateTo(tab, navigation, state) }
+        onPress={ () => onPress(name) }
+        onLongPress={ () => onLongPress(name) }
         pressDelay={ 0 }
       >
         { renderComponent() }
       </ThemedPressable>
     );
-  }, [navigateTo, isFocused, renderAccountTab, renderDefaultTab, width]);
-
-  const renderTabs = useCallback((navigation: NavigationType, state: StateType) => (
-    <View style={ styles.tabs }>
-      { TABS_MOBILE_CONFIG.map((tab, i) => renderTab(tab, navigation, state, i)) }
-    </View>
-  ), [renderTab]);
-
-  const renderTabBar = useCallback(({ navigation, state }: BottomTabBarProps) => (
-    <View style={ styles.tabBar }>
-      { renderTabs(navigation, state) }
-    </View>
-  ), [renderTabs]);
+  }, [renderAccountTab, renderDefaultTab, width, onPress, onLongPress, state]);
 
   return (
-    <SafeAreaView style={ { flex: 1, backgroundColor: Colors.background } }>
-      <Tabs
-        screenOptions={ {
-          tabBarStyle: styles.tabBar,
-          headerShown: false,
-          tabBarActiveTintColor: Colors.primary,
-          tabBarInactiveTintColor: Colors.white,
-          tabBarHideOnKeyboard: true,
-          freezeOnBlur: true,
-          // lazy: false,
-        } }
-        tabBar={ renderTabBar }
-      />
-    </SafeAreaView>
+    <View style={ styles.tabBar }>
+      <View style={ styles.tabs }>
+        { state.routes.map((route, i) => renderTab(route, i)) }
+      </View>
+    </View>
   );
 }
 

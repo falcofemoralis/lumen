@@ -1,12 +1,17 @@
-import { useOverlayContext } from 'Context/OverlayContext';
+import { useNavigation } from '@react-navigation/native';
+import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useServiceContext } from 'Context/ServiceContext';
-import { router } from 'expo-router';
 import { withTV } from 'Hooks/withTV';
 import t from 'i18n/t';
 import {
-  useCallback, useEffect, useId, useState,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
 } from 'react';
 import { Share } from 'react-native';
+import { PLAYER_ROUTE } from 'Route/PlayerPage/PlayerPage.config';
+import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
 import RouterStore from 'Store/Router.store';
 import { FilmInterface } from 'Type/Film.interface';
@@ -21,23 +26,26 @@ import FilmPageComponentTV from './FilmPage.component.atv';
 import { MINIMUM_SCHEDULE_ITEMS } from './FilmPage.config';
 import { FilmPageContainerProps } from './FilmPage.type';
 
-export function FilmPageContainer({ link, thumbnailPoster }: FilmPageContainerProps) {
-  const { isSignedIn, getCurrentService } = useServiceContext();
-  const { openOverlay, goToPreviousOverlay } = useOverlayContext();
+export function FilmPageContainer({ route }: FilmPageContainerProps) {
+  const { link, thumbnailPoster } = route.params as { link: string, thumbnailPoster: string };
+  const navigation = useNavigation();
+  const { isSignedIn, currentService } = useServiceContext();
   const [film, setFilm] = useState<FilmInterface | null>(null);
-  const playerVideoSelectorOverlayId = useId();
-  const scheduleOverlayId = useId();
-  const commentsOverlayId = useId();
-  const bookmarksOverlayId = useId();
-  const descriptionOverlayId = useId();
+  const playerVideoSelectorOverlayRef = useRef<ThemedOverlayRef>(null);
+  const scheduleOverlayRef = useRef<ThemedOverlayRef>(null);
+  const commentsOverlayRef = useRef<ThemedOverlayRef>(null);
+  const bookmarksOverlayRef = useRef<ThemedOverlayRef>(null);
+  const descriptionOverlayRef = useRef<ThemedOverlayRef>(null);
 
   useEffect(() => {
     const loadFilm = async () => {
       try {
-        const loadedFilm = await getCurrentService().getFilm(link);
+        const loadedFilm = await currentService.getFilm(link);
 
         setFilm(loadedFilm);
       } catch (error) {
+        LoggerStore.error('filmPageLoadFilm', { error });
+
         NotificationStore.displayError(error as Error);
       }
     };
@@ -50,15 +58,11 @@ export function FilmPageContainer({ link, thumbnailPoster }: FilmPageContainerPr
       return;
     }
 
-    openOverlay(playerVideoSelectorOverlayId);
-  }, [film, playerVideoSelectorOverlayId]);
-
-  const hideVideoSelector = useCallback(() => {
-    goToPreviousOverlay();
-  }, []);
+    playerVideoSelectorOverlayRef.current?.open();
+  }, [film]);
 
   const handleVideoSelect = (video: FilmVideoInterface, voice: FilmVoiceInterface) => {
-    hideVideoSelector();
+    playerVideoSelectorOverlayRef.current?.close();
     openPlayer(video, voice);
   };
 
@@ -91,8 +95,10 @@ export function FilmPageContainer({ link, thumbnailPoster }: FilmPageContainerPr
     }
 
     if (isSignedIn) {
-      getCurrentService().saveWatch(film, voice)
+      currentService.saveWatch(film, voice)
         .catch((error) => {
+          LoggerStore.error('playFilmSaveWatch', { error });
+
           NotificationStore.displayError(error as Error);
         });
     }
@@ -101,28 +107,26 @@ export function FilmPageContainer({ link, thumbnailPoster }: FilmPageContainerPr
   };
 
   const openPlayer = (video: FilmVideoInterface, voice: FilmVoiceInterface) => {
-    RouterStore.pushData('player', {
+    RouterStore.pushData(PLAYER_ROUTE, {
       video,
       film,
       voice,
     });
 
-    router.push({
-      pathname: '/player',
-    });
+    navigation.navigate(PLAYER_ROUTE);
   };
 
   const handleSelectFilm = useCallback((f: FilmInterface) => {
-    openFilm(f);
-  }, []);
+    openFilm(f, navigation);
+  }, [navigation]);
 
   const handleSelectActor = useCallback((actorLink: string) => {
-    openActor(actorLink);
-  }, []);
+    openActor(actorLink, navigation);
+  }, [navigation]);
 
   const handleSelectCategory = useCallback((categoryLink: string) => {
-    openCategory(categoryLink);
-  }, []);
+    openCategory(categoryLink, navigation);
+  }, [navigation]);
 
   const getVisibleScheduleItems = useCallback(() => {
     if (!film) {
@@ -160,8 +164,10 @@ export function FilmPageContainer({ link, thumbnailPoster }: FilmPageContainerPr
     }
 
     try {
-      getCurrentService().saveScheduleWatch(id);
+      currentService.saveScheduleWatch(id);
     } catch (error) {
+      LoggerStore.error('handleUpdateScheduleWatch', { error });
+
       NotificationStore.displayError(error as Error);
 
       return false;
@@ -194,7 +200,7 @@ export function FilmPageContainer({ link, thumbnailPoster }: FilmPageContainerPr
     });
 
     return true;
-  }, [isSignedIn]);
+  }, [isSignedIn, currentService]);
 
   const handleShare = async () => {
     if (!film) {
@@ -206,6 +212,8 @@ export function FilmPageContainer({ link, thumbnailPoster }: FilmPageContainerPr
         message: prepareShareBody(film),
       });
     } catch (error) {
+      LoggerStore.error('handleShare', { error });
+
       NotificationStore.displayError(error as Error);
     }
   };
@@ -217,23 +225,35 @@ export function FilmPageContainer({ link, thumbnailPoster }: FilmPageContainerPr
       return;
     }
 
-    openOverlay(bookmarksOverlayId);
+    bookmarksOverlayRef.current?.open();
+  };
+
+  const handleBookmarkChange = (f: FilmInterface) => {
+    setFilm((prevFilm) => {
+      if (!prevFilm) {
+        return prevFilm;
+      }
+
+      return {
+        ...prevFilm,
+        bookmarks: f.bookmarks,
+      };
+    });
   };
 
   const containerProps = () => ({
     film,
     thumbnailPoster,
     visibleScheduleItems: getVisibleScheduleItems(),
-    playerVideoSelectorOverlayId,
-    scheduleOverlayId,
-    commentsOverlayId,
-    bookmarksOverlayId,
-    descriptionOverlayId,
+    playerVideoSelectorOverlayRef,
+    scheduleOverlayRef,
+    commentsOverlayRef,
+    bookmarksOverlayRef,
+    descriptionOverlayRef,
   });
 
   const containerFunctions = {
     playFilm,
-    hideVideoSelector,
     handleVideoSelect,
     handleSelectFilm,
     handleSelectActor,
@@ -241,6 +261,7 @@ export function FilmPageContainer({ link, thumbnailPoster }: FilmPageContainerPr
     handleUpdateScheduleWatch,
     handleShare,
     openBookmarks,
+    handleBookmarkChange,
   };
 
   return withTV(FilmPageComponentTV, FilmPageComponent, {

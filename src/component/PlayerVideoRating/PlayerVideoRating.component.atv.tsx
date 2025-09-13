@@ -1,10 +1,10 @@
 import ThemedButton from 'Component/ThemedButton';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedOverlay from 'Component/ThemedOverlay';
+import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import ThemedText from 'Component/ThemedText';
-import { useOverlayContext } from 'Context/OverlayContext';
 import { CircleHelp } from 'lucide-react-native';
-import { useId, useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import { View } from 'react-native';
 import {
   DefaultFocus,
@@ -21,8 +21,7 @@ import { PlayerVideoRatingComponentProps } from './PlayerVideoRating.type';
 export const PlayerVideoRatingComponent = ({
   film,
 }: PlayerVideoRatingComponentProps) => {
-  const { openOverlay, closeOverlay } = useOverlayContext();
-  const ratingOverlayId = useId();
+  const ratingOverlayRef = useRef<ThemedOverlayRef>(null);
 
   const barWidth = useMemo(() => (
     styles.voiceRatingOverlay.width
@@ -37,7 +36,7 @@ export const PlayerVideoRatingComponent = ({
         iconProps={ {
           size: scale(20),
         } }
-        onPress={ () => openOverlay(ratingOverlayId) }
+        onPress={ () => ratingOverlayRef.current?.open() }
         style={ styles.voiceRatingInput }
       />
     );
@@ -104,8 +103,7 @@ export const PlayerVideoRatingComponent = ({
 
     return (
       <ThemedOverlay
-        id={ ratingOverlayId }
-        onHide={ () => closeOverlay(ratingOverlayId) }
+        ref={ ratingOverlayRef }
         contentContainerStyle={ styles.voiceRatingOverlay }
       >
         <View style={ styles.voiceRatingContainer }>

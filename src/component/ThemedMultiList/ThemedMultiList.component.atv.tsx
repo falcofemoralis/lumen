@@ -35,7 +35,6 @@ export const ThemedMultiListComponent = ({
 
   const renderItem = ({ item }: { item: ListItem }) => (
     <SpatialNavigationFocusableView
-      key={ `${item.value}-multilist-item` }
       onSelect={ () => { handleOnChange(item.value, !item.isChecked); } }
     >
       { ({ isFocused }) => (
@@ -73,12 +72,10 @@ export const ThemedMultiListComponent = ({
     >
       <DefaultFocus>
         <SpatialNavigationVirtualizedList
-          style={ styles.scrollView }
           data={ values }
           renderItem={ renderItem }
           itemSize={ styles.item.height }
           orientation="vertical"
-          scrollBehavior='stick-to-center'
         />
       </DefaultFocus>
     </View>

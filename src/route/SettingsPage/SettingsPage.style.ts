@@ -23,6 +23,9 @@ export const styles = CreateStyles({
   },
   setting: {
   },
+  settingHidden: {
+    opacity: 0.5,
+  },
   settingContent: {
     justifyContent: 'flex-start',
     paddingHorizontal: CONTENT_WRAPPER_PADDING,

@@ -1,5 +1,6 @@
 import { withTV } from 'Hooks/withTV';
 import { useEffect, useState } from 'react';
+import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
 import { PaginationInterface } from 'Type/Pagination.interface';
 
@@ -98,6 +99,8 @@ export function FilmPagerContainer({
         totalPages,
       });
     } catch (error) {
+      LoggerStore.error('loadFilms', { error });
+
       NotificationStore.displayError(error as Error);
     }
   };
