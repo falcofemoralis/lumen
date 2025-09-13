@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { AppState } from 'react-native';
 import RNRestart from 'react-native-restart';
 import ConfigStore from 'Store/Config.store';
@@ -32,8 +32,8 @@ export const useAwake = () => {
     }
   };
 
-  useEffect(() => {
-    if (!ConfigStore.getConfig().isTVAwake) {
+  const startAwake = () => {
+    if (ConfigStore.getConfig().isTVAwake) {
       return () => {};
     }
 
@@ -44,7 +44,7 @@ export const useAwake = () => {
       blurSubscription.remove();
       focusSubscription.remove();
     };
-  }, []);
+  };
 
-  return null;
+  return { startAwake };
 };

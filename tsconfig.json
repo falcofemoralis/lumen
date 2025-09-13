@@ -11,6 +11,7 @@
       "Hooks/*": ["./src/hooks/*"],
       "Route/*": ["./src/route/*"],
       "Style/*": ["./src/style/*"],
+      "Services/*": ["./src/services/*"],
       "Store/*": ["./src/store/*"],
       "Type/*": ["./src/type/*"],
       "Util/*": ["./src/util/*"],

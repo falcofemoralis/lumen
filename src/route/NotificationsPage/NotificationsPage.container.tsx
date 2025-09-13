@@ -35,7 +35,6 @@ export function NotificationsPageContainer() {
 
   const prepareNotifications = async () => {
     if (isSignedIn && !data.length) {
-
       const notifications = await getNotifications();
 
       if (notifications) {

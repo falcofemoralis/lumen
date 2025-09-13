@@ -1,4 +1,4 @@
-import { useCallback,useRef } from 'react';
+import { useCallback, useRef } from 'react';
 
 export const useTripleTap = () => {
   const tapTimesRef = useRef<number>(0);

@@ -6,6 +6,7 @@ import t from 'i18n/t';
 import { useCallback, useState } from 'react';
 import { Linking } from 'react-native';
 import { LOGGER_ROUTE } from 'Route/LoggerPage/LoggerPage.config';
+import useNotifications from 'Services/Notifications';
 import ConfigStore from 'Store/Config.store';
 import { yesNoOptions } from 'Util/Settings';
 import { useTripleTap } from 'Util/Settings/useTripleTap';
@@ -25,6 +26,7 @@ export function SettingsPageContainer() {
     updateOfficialMode,
     getCDNs,
   } = useServiceContext();
+  const { registerNotifications, unregisterNotifications } = useNotifications();
   const navigation = useNavigation();
   const { handleTap } = useTripleTap();
 
@@ -66,6 +68,26 @@ export function SettingsPageContainer() {
       value: currentService.getOfficialMode(),
       options: currentService.officialMirrors,
       onPress: (value) => updateOfficialMode(value as string),
+    },
+    {
+      id: 'notificationsEnabled',
+      title: t('Notifications service'),
+      subtitle: t('Toggle notifications.'),
+      type: SETTING_TYPE.SELECT,
+      value: convertBooleanToString(ConfigStore.getConfig().notificationsEnabled),
+      options: yesNoOptions,
+      onPress: (value, key) => {
+        console.log('onPress', value, key);
+
+        onPress(value, key);
+
+        if (value === convertBooleanToString(true)) {
+          registerNotifications();
+        } else {
+          unregisterNotifications();
+        }
+      },
+      isHidden: ConfigStore.isTV(),
     },
     {
       id: 'isTVGridAnimation',

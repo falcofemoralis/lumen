@@ -1,6 +1,6 @@
 {
   "expo": {
-    "scheme": "routertv",
+    "scheme": "lumen",
     "plugins": [
       "./plugins/withReactNativeKeyevent.js",
       [
@@ -49,7 +49,9 @@
           "imageWidth": 100
         }
       ],
-      "@react-native-firebase/app"
+      "@react-native-firebase/app",
+      "expo-background-task",
+      "expo-notifications"
     ],
     "experiments": {
       "typedRoutes": true,
@@ -61,7 +63,18 @@
       "versionCode": 8,
       "googleServicesFile": "./google-services.json",
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "android.permission.WAKE_LOCK",
+        "android.permission.VIBRATE",
+        "android.permission.USE_FULL_SCREEN_INTENT"
+      ]
+    },
+    "ios": {
+      "infoPlist": {
+        "UIBackgroundModes": ["background-processing", "background-fetch"]
+      }
     },
     "newArchEnabled": true,
     "name": "Lumen App (DEV)",

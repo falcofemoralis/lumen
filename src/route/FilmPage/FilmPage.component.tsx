@@ -516,7 +516,7 @@ export function FilmPageComponent({
   const renderPosterBackground = () => {
     return (
       <Animated.Image
-        src={ thumbnailPoster }
+        src={ thumbnailPoster ?? film?.poster }
         style={ [styles.posterBackground, imageAnimatedStyle] }
         blurRadius={ 5 }
       />

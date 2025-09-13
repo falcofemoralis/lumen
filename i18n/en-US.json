@@ -140,5 +140,9 @@
   "Grid animation": "Grid animation",
   "Toggle grid animation.": "Toggle grid animation.",
   "TV awake": "TV awake",
-  "Toggle TV awake.": "Toggle TV awake."
+  "Toggle TV awake.": "Toggle TV awake.",
+  "\"%s\" %s is available": "\"%s\" %s is available",
+  "Tap here to open in the app": "Tap here to open in the app",
+  "Notifications service": "Notifications service",
+  "Toggle notifications.": "Toggle notifications."
 }

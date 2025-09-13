@@ -11,7 +11,6 @@ import t from 'i18n/t';
 import { Check, ChevronLeft, CircleAlert } from 'lucide-react-native';
 import {
   useCallback,
-  useMemo,
   useRef,
   useState,
 } from 'react';

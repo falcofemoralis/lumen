@@ -5,9 +5,9 @@ import { MMKV } from 'react-native-mmkv';
 import { ProfileInterface } from 'Type/Profile.interface';
 import { getFormattedDate } from 'Util/Date';
 import { safeJsonParse } from 'Util/Json';
-import { miscStorage } from 'Util/Storage';
 
 import ConfigStore from './Config.store';
+import StorageStore from './Storage.store';
 
 export interface LogEntry {
   type: 'debug' | 'error';
@@ -29,9 +29,9 @@ class Logger {
   private deviceInfo: Record<string, any> | null = null;
 
   private initLogger() {
-    this.storage = new MMKV({ id: this.logKey });
+    this.storage = StorageStore.getDebugStorage();
 
-    const profile = safeJsonParse<ProfileInterface>(miscStorage.getString('PROFILE_STORAGE'));
+    const profile = safeJsonParse<ProfileInterface>(StorageStore.getMiscStorage().getString('PROFILE_STORAGE'));
 
     this.deviceInfo = {
       isLoggedIn: !!profile?.id,
@@ -112,7 +112,7 @@ class Logger {
       return;
     }
 
-    await firestoreDb.doc(`${ConfigStore.getDeviceId() }-${ Date.now()}`).set({
+    await firestoreDb.doc(`${ConfigStore.getDeviceId()}-${Date.now()}`).set({
       data,
       timestamp: getFormattedDate(),
     });

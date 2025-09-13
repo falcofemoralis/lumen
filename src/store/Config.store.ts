@@ -12,6 +12,7 @@ type DeviceConfigType = {
   securedSettings: boolean;
   isTVGridAnimation: boolean;
   isTVAwake: boolean;
+  notificationsEnabled: boolean;
 }
 
 class ConfigStore {
@@ -24,6 +25,7 @@ class ConfigStore {
     securedSettings: false,
     isTVGridAnimation: true,
     isTVAwake: false,
+    notificationsEnabled: true,
   };
 
   constructor() {

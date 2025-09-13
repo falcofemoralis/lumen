@@ -11,14 +11,15 @@ import { NOTIFICATIONS_ROUTE } from 'Route/NotificationsPage/NotificationsPage.c
 import ConfigStore from 'Store/Config.store';
 import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
+import StorageStore from 'Store/Storage.store';
 import { NotificationInterface, NotificationItemInterface } from 'Type/Notification.interface';
 import { safeJsonParse } from 'Util/Json';
-import { miscStorage } from 'Util/Storage';
 
 import { useServiceContext } from './ServiceContext';
 
 export const NOTIFICATIONS_STORAGE = 'NOTIFICATIONS_STORAGE';
 export const NOTIFICATIONS_STORAGE_CACHE = 'NOTIFICATIONS_STORAGE_CACHE';
+export const NOTIFICATIONS_STORAGE_CACHE_TTL = 1000 * 60 * 60; // 1 hour
 
 export type BadgeData = {
   [key in NavigationRoute<ParamListBase, string>['name']]?: number;
@@ -48,7 +49,7 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
     }, []);
 
     const previousItems = safeJsonParse<NotificationItemInterface[]>(
-      miscStorage.getString(NOTIFICATIONS_STORAGE)
+      StorageStore.getMiscStorage().getString(NOTIFICATIONS_STORAGE)
     ) ?? [];
 
     const badgeCount = newItems.reduce((acc, item) => {
@@ -69,7 +70,9 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
    */
   const getNotifications = useCallback(async () => {
     try {
-      const cachedData = miscStorage.getString(NOTIFICATIONS_STORAGE_CACHE);
+      const cachedData = StorageStore.getMiscStorage().getString(NOTIFICATIONS_STORAGE_CACHE);
+
+      LoggerStore.debug('getNotifications', { cachedData });
 
       if (cachedData) {
         const { data, ttl } = JSON.parse(cachedData) as { data: NotificationInterface[]; ttl: number };
@@ -83,9 +86,9 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
 
       const data = await currentService.getNotifications();
 
-      miscStorage.set(NOTIFICATIONS_STORAGE_CACHE, JSON.stringify({
+      StorageStore.getMiscStorage().set(NOTIFICATIONS_STORAGE_CACHE, JSON.stringify({
         data,
-        ttl: Date.now() + 1000 * 60 * 60, // 1 hour
+        ttl: Date.now() + NOTIFICATIONS_STORAGE_CACHE_TTL,
       }));
 
       updateBadge(data);
@@ -104,7 +107,7 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
    * Reset notifications for the current service
    */
   const resetNotifications = useCallback(async () => {
-    const cachedData = miscStorage.getString(NOTIFICATIONS_STORAGE_CACHE);
+    const cachedData = StorageStore.getMiscStorage().getString(NOTIFICATIONS_STORAGE_CACHE);
     const { data: notifications } = safeJsonParse<{ data: NotificationInterface[] }>(cachedData) || { data: null };
 
     if (notifications) {
@@ -114,7 +117,7 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
         return acc;
       }, []);
 
-      miscStorage.set(NOTIFICATIONS_STORAGE, JSON.stringify(newItems));
+      StorageStore.getMiscStorage().set(NOTIFICATIONS_STORAGE, JSON.stringify(newItems));
     }
 
     setBadgeData({

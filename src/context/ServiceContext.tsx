@@ -11,16 +11,16 @@ import {
   useState,
 } from 'react';
 import { Platform } from 'react-native';
+import StorageStore from 'Store/Storage.store';
 import { ProfileInterface } from 'Type/Profile.interface';
 import { CookiesManager } from 'Util/Cookies';
 import { safeJsonParse } from 'Util/Json';
-import { addProxyHeaders,requestValidator } from 'Util/Request';
-import { miscStorage } from 'Util/Storage';
+import { addProxyHeaders, requestValidator } from 'Util/Request';
 
 export const CREDENTIALS_STORAGE = 'CREDENTIALS_STORAGE';
 export const PROFILE_STORAGE = 'PROFILE_STORAGE';
 
-const defaultService = ApiServiceType.REZKA;
+export const defaultService = ApiServiceType.REZKA;
 
 interface ServiceContextInterface {
   isSignedIn: boolean;
@@ -56,9 +56,9 @@ const ServiceContext = createContext<ServiceContextInterface>({
 
 export const ServiceProvider = ({ children }: { children: React.ReactNode }) => {
   const [currentService, setCurrentService] = useState<ApiInterface>(services[defaultService]);
-  const [isSignedIn, setIsSignedIn] = useState<boolean>(!!miscStorage.getString(CREDENTIALS_STORAGE));
+  const [isSignedIn, setIsSignedIn] = useState<boolean>(!!StorageStore.getMiscStorage().getString(CREDENTIALS_STORAGE));
   const [profile, setProfile] = useState<ProfileInterface | null>(
-    safeJsonParse<ProfileInterface>(miscStorage.getString(PROFILE_STORAGE))
+    safeJsonParse<ProfileInterface>(StorageStore.getMiscStorage().getString(PROFILE_STORAGE))
   );
 
   /**
@@ -77,7 +77,7 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
    */
   const setAuthorization = useCallback((auth: string, name: string, password: string) => {
     currentService.setAuthorization(auth);
-    miscStorage.set(CREDENTIALS_STORAGE, JSON.stringify({ name, password }));
+    StorageStore.getMiscStorage().set(CREDENTIALS_STORAGE, JSON.stringify({ name, password }));
   }, [currentService]);
 
   /**
@@ -86,7 +86,7 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
   const loadProfile = useCallback(async () => {
     const value = await currentService.getProfile();
 
-    miscStorage.set(PROFILE_STORAGE, JSON.stringify(value));
+    StorageStore.getMiscStorage().set(PROFILE_STORAGE, JSON.stringify(value));
     setProfile(value);
   }, [currentService]);
 
@@ -94,7 +94,7 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
    * Remove the profile for the current service
    */
   const removeProfile = useCallback(() => {
-    miscStorage.delete(PROFILE_STORAGE);
+    StorageStore.getMiscStorage().delete(PROFILE_STORAGE);
     setProfile(null);
   }, []);
 
@@ -120,7 +120,7 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
     currentService.setAuthorization('');
     setIsSignedIn(false);
     removeProfile();
-    miscStorage.set(CREDENTIALS_STORAGE, '');
+    StorageStore.getMiscStorage().set(CREDENTIALS_STORAGE, '');
   }, [currentService, removeProfile]);
 
   /**
@@ -154,7 +154,7 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
 
     if (isSignedIn) {
       const { name, password } = safeJsonParse<{ name: string; password: string }>(
-        miscStorage.getString(CREDENTIALS_STORAGE)
+        StorageStore.getMiscStorage().getString(CREDENTIALS_STORAGE)
       ) ?? {};
 
       logout();

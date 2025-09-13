@@ -3,13 +3,13 @@ import { FirestoreDocument, SavedTime, SavedTimestamp, SavedTimeVoice } from 'Co
 import t from 'i18n/t';
 import ConfigStore from 'Store/Config.store';
 import LoggerStore from 'Store/Logger.store';
+import StorageStore from 'Store/Storage.store';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { ProfileInterface } from 'Type/Profile.interface';
 import { getFormattedDate } from 'Util/Date';
 import { safeJsonParse } from 'Util/Json';
-import { playerStorage } from 'Util/Storage';
 
 export const PLAYER_SAVED_TIME_STORAGE_KEY = 'playerTime';
 export const PLAYER_QUALITY_STORAGE_KEY = 'playerQuality';
@@ -70,13 +70,13 @@ const prepareSavedTimeObject = (
 export const updateSavedTime = (film: FilmInterface, voice: FilmVoiceInterface, time: number, progress: number) => {
   const key = formatPlayerKeyTime(film);
 
-  const prevSavedTimeJson = playerStorage.getString(key);
+  const prevSavedTimeJson = StorageStore.getPlayerStorage().getString(key);
   const prevSavedTime = safeJsonParse<SavedTime | null>(prevSavedTimeJson, null);
   const newSavedTime = prepareSavedTimeObject(film, voice, time, progress, prevSavedTime);
 
   LoggerStore.debug('updateSavedTime', { key, newSavedTime });
 
-  playerStorage.set(
+  StorageStore.getPlayerStorage().set(
     key,
     JSON.stringify(newSavedTime)
   );
@@ -87,7 +87,7 @@ export const setSavedTime = (savedTime: SavedTime, film: FilmInterface) => {
 
   LoggerStore.debug('setSavedTime', { key, savedTime });
 
-  playerStorage.set(
+  StorageStore.getPlayerStorage().set(
     key,
     JSON.stringify(savedTime)
   );
@@ -95,7 +95,7 @@ export const setSavedTime = (savedTime: SavedTime, film: FilmInterface) => {
 
 export const getSavedTime = (film: FilmInterface): SavedTime | null => {
   const key = formatPlayerKeyTime(film);
-  const savedTimeJson = playerStorage.getString(key);
+  const savedTimeJson = StorageStore.getPlayerStorage().getString(key);
 
   if (!savedTimeJson) {
     return null;
@@ -225,13 +225,13 @@ export const getFirestoreVideoTime = (
 export const updatePlayerQuality = (quality: string) => {
   LoggerStore.debug('updatePlayerQuality', { quality });
 
-  playerStorage.set(
+  StorageStore.getPlayerStorage().set(
     PLAYER_QUALITY_STORAGE_KEY,
     quality
   );
 };
 
-export const getPlayerQuality = () => playerStorage.getString(PLAYER_QUALITY_STORAGE_KEY);
+export const getPlayerQuality = () => StorageStore.getPlayerStorage().getString(PLAYER_QUALITY_STORAGE_KEY);
 
 export const getPlayerStream = (video: FilmVideoInterface) => {
   const { streams } = video;
