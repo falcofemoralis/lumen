@@ -108,13 +108,13 @@ export default function useNotifications() {
   const registerNotifications = useCallback(() => {
     BackgroundTask.registerTaskAsync(BACKGROUND_TASK_IDENTIFIER, { minimumInterval: 15 });
 
-    LoggerStore.debug('registerNotifications', { tasks: TaskManager.getRegisteredTasksAsync() });
+    LoggerStore.debug('registerNotifications');
   }, []);
 
   const unregisterNotifications = useCallback(() => {
     BackgroundTask.unregisterTaskAsync(BACKGROUND_TASK_IDENTIFIER);
 
-    LoggerStore.debug('unregisterNotifications', { tasks: TaskManager.getRegisteredTasksAsync() });
+    LoggerStore.debug('unregisterNotifications');
   }, []);
 
   const startNotificationsTask = useCallback(() => {
