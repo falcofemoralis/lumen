@@ -293,7 +293,6 @@ export const styles = CreateStyles({
     width: 100,
   },
   relatedListItemPoster: {
-    height: 160,
   },
   commentsOverlay: {
     width: '50%',

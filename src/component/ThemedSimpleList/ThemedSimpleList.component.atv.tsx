@@ -8,7 +8,6 @@ import {
   SpatialNavigationVirtualizedList,
   SpatialNavigationVirtualizedListRef,
 } from 'react-tv-space-navigation';
-import { scale } from 'Util/CreateStyles';
 
 import { MAX_ITEMS_TO_DISPLAY, styles } from './ThemedSimpleList.style.atv';
 import { ListItem, ThemedSimpleListComponentProps } from './ThemedSimpleList.type';
@@ -96,7 +95,7 @@ export const ThemedListComponent = ({
     <View
       style={ [
         styles.listItemsWrapper,
-        { height: data.length > MAX_ITEMS_TO_DISPLAY ? 'auto' : (data.length * styles.item.height) },
+        { height: data.length >= (MAX_ITEMS_TO_DISPLAY - 1) ? undefined : (data.length * styles.item.height) },
       ] }
       onLayout={ handleLayout }
     >

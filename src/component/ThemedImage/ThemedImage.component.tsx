@@ -1,6 +1,5 @@
 import { Image } from 'expo-image';
-import { forwardRef, memo, useEffect, useImperativeHandle, useState } from 'react';
-import { Colors } from 'Style/Colors';
+import { forwardRef, memo, useImperativeHandle } from 'react';
 
 import { ThemedImageProps } from './ThemedImage.type';
 

@@ -10,6 +10,7 @@ export const styles = CreateStyles({
     flexDirection: 'row',
     gap: 6,
     alignItems: 'center',
+    justifyContent: 'center',
     overflow: 'hidden',
   },
   text: {

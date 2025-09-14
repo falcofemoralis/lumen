@@ -9,7 +9,7 @@ export const ThemedInputComponent = ({
   onChangeText,
   style,
   containerStyle,
-  editable,
+  editable = true,
   ...props
 }: ThemedInputComponentProps) => {
   return (

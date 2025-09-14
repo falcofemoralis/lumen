@@ -106,11 +106,15 @@ export default function useNotifications() {
   }, [navigation]);
 
   const registerNotifications = useCallback(() => {
-    BackgroundTask.registerTaskAsync(BACKGROUND_TASK_IDENTIFIER, { minimumInterval: 60 }); // 1 hour
+    BackgroundTask.registerTaskAsync(BACKGROUND_TASK_IDENTIFIER, { minimumInterval: 15 });
+
+    LoggerStore.debug('registerNotifications', { tasks: TaskManager.getRegisteredTasksAsync() });
   }, []);
 
   const unregisterNotifications = useCallback(() => {
     BackgroundTask.unregisterTaskAsync(BACKGROUND_TASK_IDENTIFIER);
+
+    LoggerStore.debug('unregisterNotifications', { tasks: TaskManager.getRegisteredTasksAsync() });
   }, []);
 
   const startNotificationsTask = useCallback(() => {

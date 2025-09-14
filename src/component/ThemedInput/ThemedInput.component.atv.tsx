@@ -10,7 +10,7 @@ export const ThemedInputComponent = ({
   placeholder,
   onChangeText,
   style,
-  editable,
+  editable = true,
   ...props
 }: ThemedInputComponentProps) => {
   const textInputRef = useRef<TextInput>(null);
@@ -19,8 +19,6 @@ export const ThemedInputComponent = ({
     if (!editable) {
       return;
     }
-
-    textInputRef.current?.focus();
 
     setTimeout(() => {
       // this fixes issue with unfocus on new arch
