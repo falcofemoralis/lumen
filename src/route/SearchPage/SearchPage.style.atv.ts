@@ -27,7 +27,7 @@ export const styles = CreateStyles({
   },
   suggestionsWrapper: {
     marginTop: 16,
-    height: 36,
+    height: 48,
   },
   suggestions: {
     gap: 12,
