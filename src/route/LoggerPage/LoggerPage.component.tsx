@@ -10,14 +10,14 @@ import React, { useState } from 'react';
 import { View } from 'react-native';
 import ConfigStore from 'Store/Config.store';
 import { LogEntry } from 'Store/Logger.store';
+import NotificationStore from 'Store/Notification.store';
 import { scale } from 'Util/CreateStyles';
 import { simpleHash } from 'Util/Hash';
 
-import NotificationStore from 'Store/Notification.store';
 import { styles } from './LoggerPage.style';
 import { LoggerPageProps } from './LoggerPage.type';
 
-const SendModal = ({onClose}: {onClose: () => void}) => {
+const SendModal = ({ onClose }: {onClose: () => void}) => {
   const [key, setKey] = useState('');
 
   const sendLogs = () => {
@@ -38,20 +38,20 @@ const SendModal = ({onClose}: {onClose: () => void}) => {
 
   return (
     <View>
-        <ThemedText style={ styles.hint }>
-          { t('Contact developer') }
-        </ThemedText>
-        <ThemedInput
-          placeholder={ t('Enter developer key') }
-          onChangeText={ (text) => setKey(text) }
-        />
-        <ThemedText />
-        <ThemedButton
-          onPress={ sendLogs }
-          disabled={ !key }
-        >
-          { t('Send') }
-        </ThemedButton>
+      <ThemedText style={ styles.hint }>
+        { t('Contact developer') }
+      </ThemedText>
+      <ThemedInput
+        placeholder={ t('Enter developer key') }
+        onChangeText={ (text) => setKey(text) }
+      />
+      <ThemedText />
+      <ThemedButton
+        onPress={ sendLogs }
+        disabled={ !key }
+      >
+        { t('Send') }
+      </ThemedButton>
     </View>
   );
 };
@@ -148,7 +148,7 @@ export const LoggerPageComponent = ({
         </ThemedButton>
         <ThemedButton
           onPress={ sendLogs }
-          style={[ styles.action, styles.actionPrimary ]}
+          style={ [ styles.action, styles.actionPrimary ] }
           disabled={ isSending || !data.length }
         >
           { t('Send') }

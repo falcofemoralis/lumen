@@ -1,23 +1,21 @@
 import InfoBlock from 'Component/InfoBlock';
 import Page from 'Component/Page';
 import ThemedButton from 'Component/ThemedButton';
+import ThemedInput from 'Component/ThemedInput';
 import ThemedList from 'Component/ThemedList';
-import ThemedOverlay from 'Component/ThemedOverlay';
-import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import ThemedText from 'Component/ThemedText';
 import t from 'i18n/t';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { View } from 'react-native';
 import { DefaultFocus, SpatialNavigationFocusableView, SpatialNavigationView } from 'react-tv-space-navigation';
 import ConfigStore from 'Store/Config.store';
 import { LogEntry } from 'Store/Logger.store';
+import NotificationStore from 'Store/Notification.store';
 import { scale } from 'Util/CreateStyles';
+import { simpleHash } from 'Util/Hash';
 
 import { styles } from './LoggerPage.style.atv';
 import { LoggerPageProps } from './LoggerPage.type';
-import { simpleHash } from 'Util/Hash';
-import NotificationStore from 'Store/Notification.store';
-import ThemedInput from 'Component/ThemedInput';
 
 const SendModal = ({ onClose }: {onClose: () => void}) => {
   const [key, setKey] = useState('');

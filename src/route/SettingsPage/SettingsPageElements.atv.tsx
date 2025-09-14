@@ -175,6 +175,7 @@ export const SettingInput = ({
       <ThemedOverlay
         ref={ overlayRef }
         contentContainerStyle={ styles.overlay }
+        onClose={ () => setInputValue(value) }
       >
         <DefaultFocus>
           <ThemedText style={ styles.overlayTitle }>
@@ -184,7 +185,7 @@ export const SettingInput = ({
             style={ styles.overlayInput }
             placeholder={ title }
             onChangeText={ onChangeText }
-            value={ inputValue || '' }
+            defaultValue={ value || '' }
             multiline
           />
           <ThemedButton
