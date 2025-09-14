@@ -1,7 +1,7 @@
 import { getConfigJson, updateConfig } from 'Util/Config';
 import { configureRemoteControl } from 'Util/RemoteControl';
 
-const DEVICE_CONFIG = 'deviceConfig';
+export const DEVICE_CONFIG = 'deviceConfig';
 
 type DeviceConfigType = {
   isConfigured: boolean;
@@ -93,11 +93,15 @@ class ConfigStore {
     configureRemoteControl();
   }
 
-  getDeviceId() {
+  getDeviceId(isShort = false) {
     if (!this.config.deviceId) {
       this.config.deviceId = String(Date.now());
 
       this.updateConfig('deviceId', this.config.deviceId);
+    }
+
+    if (isShort) {
+      return this.config.deviceId.slice(-5);
     }
 
     return this.config.deviceId;

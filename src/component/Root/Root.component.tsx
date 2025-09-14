@@ -4,8 +4,10 @@ import { useServiceContext } from 'Context/ServiceContext';
 import * as StatusBar from 'expo-status-bar';
 import { useAwake } from 'Hooks/useAwake';
 import { useEffect } from 'react';
+import { useMMKVString } from 'react-native-mmkv';
 import useNotifications from 'Services/Notifications';
-import ConfigStore from 'Store/Config.store';
+import ConfigStore, { DEVICE_CONFIG } from 'Store/Config.store';
+import StorageStore from 'Store/Storage.store';
 
 export const Root = ({ children }: { children: React.ReactNode }) => {
   const { isSignedIn } = useServiceContext();
@@ -13,6 +15,7 @@ export const Root = ({ children }: { children: React.ReactNode }) => {
   const { startNotificationsTask } = useNotifications();
   const { checkVersion } = useAppUpdaterContext();
   const { startAwake } = useAwake();
+  const config = useMMKVString(DEVICE_CONFIG, StorageStore.getConfigStorage());
 
   useEffect(() => {
     checkVersion();
@@ -30,7 +33,7 @@ export const Root = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     return startAwake();
-  }, [startAwake]);
+  }, [startAwake, config]);
 
   useEffect(() => {
     if (ConfigStore.isTV()) {

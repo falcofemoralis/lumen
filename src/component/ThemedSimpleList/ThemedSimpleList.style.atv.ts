@@ -22,7 +22,7 @@ export const styles = CreateStyles({
     flexDirection: 'column',
     flex: 0,
   },
-  listItems: {
+  listItemsWrapper: {
     flexDirection: 'column',
     maxHeight: MAX_ITEMS_TO_DISPLAY * ITEM_HEIGHT - 42,
     width: 300,

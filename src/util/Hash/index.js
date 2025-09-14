@@ -1,4 +1,4 @@
-export const hash = (key: string, seed = 1): number => {
+export const hash = (key, seed = 1) => {
   let h1;
   let h1b;
   let k1;
@@ -60,4 +60,16 @@ export const hash = (key: string, seed = 1): number => {
   h1 ^= h1 >>> 16;
 
   return h1 >>> 0;
+};
+
+export const simpleHash = (key) => {
+  let h = key;
+  h = ((h << 5) - h) + 0x9e3779b9;
+  h = h ^ (h >>> 16);
+  h = h * 0x85ebca6b;
+  h = h ^ (h >>> 13);
+  h = h * 0xc2b2ae35;
+  h = h ^ (h >>> 16);
+
+  return (h >>> 0).toString(16).padStart(8, '0').substring(0, 5);
 };

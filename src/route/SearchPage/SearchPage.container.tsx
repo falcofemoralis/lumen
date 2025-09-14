@@ -39,8 +39,6 @@ export function SearchPageContainer() {
 
   const searchSuggestions = async (q: string) => {
     try {
-      LoggerStore.debug('searchSuggestions', { q });
-
       const res = await currentService.searchSuggestions(q);
 
       setSuggestions(res);
@@ -59,8 +57,6 @@ export function SearchPageContainer() {
     setIsLoading(true);
 
     try {
-      LoggerStore.debug('search', { q });
-
       const films = await currentService.search(q, 1);
 
       onUpdateFilms('search', films);
@@ -110,8 +106,6 @@ export function SearchPageContainer() {
     setEnteredText(q);
     updateUserSuggestions(q);
 
-    LoggerStore.debug('onApplySearch', { q });
-
     search(q);
   };
 
@@ -123,8 +117,6 @@ export function SearchPageContainer() {
     setQuery(q);
     setEnteredText(q);
     updateUserSuggestions(q);
-
-    LoggerStore.debug('onApplySuggestion', { q });
 
     search(q);
   };

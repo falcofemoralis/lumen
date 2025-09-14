@@ -45,7 +45,7 @@ const formatFilmVideo = (json: StreamsResult): FilmVideoInterface => {
     storyboardUrl: configApi.getProvider() + json.thumbnails,
   };
 
-  LoggerStore.debug('formatFilmVideo', result);
+  LoggerStore.debug('playerApi::formatFilmVideo', result);
 
   return result;
 };

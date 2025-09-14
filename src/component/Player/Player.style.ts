@@ -7,9 +7,6 @@ export const styles = CreateStyles({
     width: '100%',
     height: '100%',
     backgroundColor: Colors.black,
-    transitionProperty: 'width',
-    transitionDuration: '250ms',
-    transitionTimingFunction: 'ease-in-out',
   },
   video: {
     width: '100%',

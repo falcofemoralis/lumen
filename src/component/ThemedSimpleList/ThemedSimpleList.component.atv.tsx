@@ -8,8 +8,9 @@ import {
   SpatialNavigationVirtualizedList,
   SpatialNavigationVirtualizedListRef,
 } from 'react-tv-space-navigation';
+import { scale } from 'Util/CreateStyles';
 
-import { styles } from './ThemedSimpleList.style.atv';
+import { MAX_ITEMS_TO_DISPLAY, styles } from './ThemedSimpleList.style.atv';
 import { ListItem, ThemedSimpleListComponentProps } from './ThemedSimpleList.type';
 
 export const ThemedListComponent = ({
@@ -92,7 +93,13 @@ export const ThemedListComponent = ({
   }, [value, onChange]);
 
   const renderList = () => (
-    <View style={ styles.listItems } onLayout={ handleLayout }>
+    <View
+      style={ [
+        styles.listItemsWrapper,
+        { height: data.length > MAX_ITEMS_TO_DISPLAY ? 'auto' : (data.length * styles.item.height) },
+      ] }
+      onLayout={ handleLayout }
+    >
       <SpatialNavigationVirtualizedList
         ref={ scrollViewRef }
         data={ data }

@@ -2,6 +2,7 @@ import ThemedDropdown from 'Component/ThemedDropdown';
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedInput from 'Component/ThemedInput';
+import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { Portal } from 'Component/ThemedPortal';
 import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
@@ -361,9 +362,10 @@ export const ProviderSlide = ({
 }: ProviderSlideProps) => {
   const { currentService, updateProvider, updateOfficialMode } = useServiceContext();
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [selectedProvider, setSelectedProvider] = useState<string | null>(currentService.getProvider());
+  const [selectedProvider, setSelectedProvider] = useState<string | null>(currentService.getDefaultProvider());
   const [isProviderValid, setIsProviderValid] = useState<boolean | null>(null);
   const [selectedMode, setSelectedMode] = useState<string>(currentService.getOfficialMode()); // actually it is a provider link
+  const overlayRef = useRef<ThemedOverlayRef>(null);
 
   const validateProvider = useCallback(async () => {
     setIsLoading(true);
@@ -394,6 +396,7 @@ export const ProviderSlide = ({
 
   const handleSelectMode = useCallback(({ value }: DropdownItem) => {
     setSelectedMode(value);
+    overlayRef.current?.close();
   }, []);
 
   return (
@@ -413,11 +416,13 @@ export const ProviderSlide = ({
           placeholder={ t('Provider') }
           onChangeText={ setSelectedProvider }
           value={ selectedProvider ?? '' }
+          editable={ !selectedMode }
         />
         <ThemedText>
           { t('Official mode') }
         </ThemedText>
         <ThemedDropdown
+          overlayRef={ overlayRef }
           data={ currentService.officialMirrors }
           onChange={ handleSelectMode }
           header={ t('Official mode') }
@@ -472,6 +477,7 @@ export const CDNSlide = ({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [selectedCDN, setSelectedCDN] = useState<string | null>(currentService.getCDN());
   const [isCDNValid, setIsCDNValid] = useState<boolean | null>(null);
+  const overlayRef = useRef<ThemedOverlayRef>(null);
 
   const handleValidateCDN = useCallback(async () => {
     let film: FilmInterface | null = null;
@@ -529,6 +535,7 @@ export const CDNSlide = ({
   const handleSelect = useCallback(({ value }: DropdownItem) => {
     updateCDN(value);
     setSelectedCDN(value);
+    overlayRef.current?.close();
   }, [updateCDN]);
 
   return (
@@ -541,6 +548,7 @@ export const CDNSlide = ({
     >
       <View style={ styles.cdnWrapper }>
         <ThemedDropdown
+          overlayRef={ overlayRef }
           data={ getCDNs() }
           onChange={ handleSelect }
           header={ t('CDN') }

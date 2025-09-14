@@ -11,7 +11,7 @@ export const useAwake = () => {
     if (ConfigStore.isTV()) {
       exitAppStateRef.current = Date.now();
 
-      LoggerStore.debug('blurHandler', { exitAppStateRef: exitAppStateRef.current });
+      LoggerStore.debug('useAwake::blurHandler', { exitAppStateRef: exitAppStateRef.current });
     }
   };
 
@@ -24,7 +24,7 @@ export const useAwake = () => {
       const blurTime = exitAppStateRef.current;
       const focusTime = Date.now();
 
-      LoggerStore.debug('focusHandler', { blurTime, focusTime });
+      LoggerStore.debug('useAwake::focusHandler', { blurTime, focusTime });
 
       if (focusTime - blurTime > 1000 * 60 * 60 * 4) { // 4 hours
         RNRestart.restart();
@@ -33,7 +33,7 @@ export const useAwake = () => {
   };
 
   const startAwake = () => {
-    if (ConfigStore.getConfig().isTVAwake) {
+    if (!ConfigStore.getConfig().isTVAwake) {
       return () => {};
     }
 

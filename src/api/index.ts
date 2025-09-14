@@ -43,6 +43,7 @@ export interface ConfigApiInterface {
   config: ServiceConfigInterface | null;
   loadConfig(): ServiceConfigInterface;
   updateConfig(key: keyof ServiceConfigInterface, value: string): Promise<void>;
+  getDefaultProvider(): string;
   setProvider(provider: string): void;
   getProvider(): string;
   setCDN(cdn: string): void;

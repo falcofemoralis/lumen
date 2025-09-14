@@ -1,5 +1,6 @@
 import { Image } from 'expo-image';
-import { forwardRef, memo, useImperativeHandle } from 'react';
+import { forwardRef, memo, useEffect, useImperativeHandle, useState } from 'react';
+import { Colors } from 'Style/Colors';
 
 import { ThemedImageProps } from './ThemedImage.type';
 
@@ -10,7 +11,7 @@ export const ThemedImage = forwardRef<ImageRef, ThemedImageProps>(({
   src,
   style,
   blurRadius,
-  transition = 350,
+  transition = 250,
 }, ref) => {
   useImperativeHandle(ref, () => ({
   }));
@@ -19,13 +20,9 @@ export const ThemedImage = forwardRef<ImageRef, ThemedImageProps>(({
     <Image
       style={ style }
       source={ src }
-      // cachePolicy="memory-disk"
-      placeholder={ { blurhash: 'L03IYJj[fQj[j[fQfQfQfQfQfQfQ' } }
       contentFit="cover"
-      placeholderContentFit="cover"
       transition={ transition }
       recyclingKey={ src }
-      // onError={(e) => console.error(e.error)}
       blurRadius={ blurRadius }
     />
   );

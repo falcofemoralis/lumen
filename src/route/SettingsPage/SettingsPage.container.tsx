@@ -40,8 +40,21 @@ export function SettingsPageContainer() {
       title: t('Provider'),
       subtitle: t('Change provider'),
       type: SETTING_TYPE.INPUT,
-      value: currentService.getProvider(),
+      value: currentService.getDefaultProvider(),
       onPress: (value) => updateProvider(value as string),
+      dependsOn: {
+        field: 'officialMode',
+        value: '',
+      },
+    },
+    {
+      id: 'officialMode',
+      title: t('Official mode'),
+      subtitle: t('Links will be used as in the official application.'),
+      type: SETTING_TYPE.SELECT,
+      value: currentService.getOfficialMode(),
+      options: currentService.officialMirrors,
+      onPress: (value) => updateOfficialMode(value as string),
     },
     {
       id: 'cdn',
@@ -61,15 +74,6 @@ export function SettingsPageContainer() {
       onPress: (value) => updateUserAgent(value as string),
     },
     {
-      id: 'officialMode',
-      title: t('Official mode'),
-      subtitle: t('Links will be used as in the official application.'),
-      type: SETTING_TYPE.SELECT,
-      value: currentService.getOfficialMode(),
-      options: currentService.officialMirrors,
-      onPress: (value) => updateOfficialMode(value as string),
-    },
-    {
       id: 'notificationsEnabled',
       title: t('Notifications service'),
       subtitle: t('Toggle notifications.'),
@@ -77,8 +81,6 @@ export function SettingsPageContainer() {
       value: convertBooleanToString(ConfigStore.getConfig().notificationsEnabled),
       options: yesNoOptions,
       onPress: (value, key) => {
-        console.log('onPress', value, key);
-
         onPress(value, key);
 
         if (value === convertBooleanToString(true)) {

@@ -38,8 +38,6 @@ export const AppUpdaterContainer = () => {
 
   useEffect(() => {
     if (update && ConfigStore.isTV()) {
-      LoggerStore.debug('openUpdatePopup', { update });
-
       setTimeout(() => {
         openPopup();
       }, 0);

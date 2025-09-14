@@ -9,6 +9,7 @@ export const ThemedInputComponent = ({
   onChangeText,
   style,
   containerStyle,
+  editable,
   ...props
 }: ThemedInputComponentProps) => {
   return (
@@ -23,7 +24,7 @@ export const ThemedInputComponent = ({
         underlineColorAndroid={ Colors.transparent }
         selectionHandleColor={ Colors.secondary }
         tvFocusable={ false }
-        focusable={ false }
+        editable={ editable }
         { ...props }
       />
     </View>

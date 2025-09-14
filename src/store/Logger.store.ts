@@ -14,11 +14,11 @@ export interface LogEntry {
   timestamp: string;
   message: string;
   context?: Record<string, any>;
-  deviceInfo?: Record<string, any> | null;
 }
 
 interface FirestoreDocument {
   data: string;
+  deviceInfo: string;
   timestamp: string;
 }
 
@@ -26,24 +26,12 @@ class Logger {
   private storage: MMKV | null = null;
   private logKey: string = 'debug';
   private maxLogs: number = 500;
-  private deviceInfo: Record<string, any> | null = null;
 
   private initLogger() {
     this.storage = StorageStore.getDebugStorage();
-
-    const profile = safeJsonParse<ProfileInterface>(StorageStore.getMiscStorage().getString('PROFILE_STORAGE'));
-
-    this.deviceInfo = {
-      isLoggedIn: !!profile?.id,
-      userId: profile?.id,
-      isTV: ConfigStore.isTV(),
-      osVersion: Device.osVersion,
-      totalMemory: Device.totalMemory,
-      appVersion: Application.nativeApplicationVersion ?? '0.0.0',
-    };
   }
 
-  private getLogs(parsed = false): LogEntry[] {
+  private getLogs(): LogEntry[] {
     const raw = this.storage?.getString(this.logKey);
 
     return raw ? JSON.parse(raw) : [];
@@ -73,7 +61,6 @@ class Logger {
       timestamp: new Date().toISOString(),
       message,
       context,
-      deviceInfo: this.deviceInfo,
     });
 
     if (type === 'error') {
@@ -112,8 +99,20 @@ class Logger {
       return;
     }
 
-    await firestoreDb.doc(`${ConfigStore.getDeviceId()}-${Date.now()}`).set({
+    const profile = safeJsonParse<ProfileInterface>(StorageStore.getMiscStorage().getString('PROFILE_STORAGE'));
+
+    const deviceInfo = {
+      isLoggedIn: !!profile?.id,
+      userId: profile?.id,
+      isTV: ConfigStore.isTV(),
+      osVersion: Device.osVersion,
+      totalMemory: Device.totalMemory,
+      appVersion: Application.nativeApplicationVersion ?? '0.0.0',
+    };
+
+    await firestoreDb.doc(`${ConfigStore.getDeviceId(true)}-${Date.now()}`).set({
       data,
+      deviceInfo: JSON.stringify(deviceInfo),
       timestamp: getFormattedDate(),
     });
 

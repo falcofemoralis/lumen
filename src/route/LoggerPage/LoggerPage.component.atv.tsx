@@ -2,8 +2,11 @@ import InfoBlock from 'Component/InfoBlock';
 import Page from 'Component/Page';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedList from 'Component/ThemedList';
+import ThemedOverlay from 'Component/ThemedOverlay';
+import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import ThemedText from 'Component/ThemedText';
 import t from 'i18n/t';
+import { useRef, useState } from 'react';
 import { View } from 'react-native';
 import { DefaultFocus, SpatialNavigationFocusableView, SpatialNavigationView } from 'react-tv-space-navigation';
 import ConfigStore from 'Store/Config.store';
@@ -12,6 +15,50 @@ import { scale } from 'Util/CreateStyles';
 
 import { styles } from './LoggerPage.style.atv';
 import { LoggerPageProps } from './LoggerPage.type';
+import { simpleHash } from 'Util/Hash';
+import NotificationStore from 'Store/Notification.store';
+import ThemedInput from 'Component/ThemedInput';
+
+const SendModal = ({ onClose }: {onClose: () => void}) => {
+  const [key, setKey] = useState('');
+
+  const sendLogs = () => {
+    if (!key) {
+      return;
+    }
+
+    const generatedKey = simpleHash(ConfigStore.getDeviceId(true));
+
+    if (generatedKey !== key) {
+      NotificationStore.displayError(new Error('Invalid key'));
+
+      return;
+    }
+
+    onClose();
+  };
+
+  return (
+    <View>
+      <DefaultFocus>
+        <ThemedText style={ styles.hint }>
+          { t('Contact developer') }
+        </ThemedText>
+        <ThemedInput
+          placeholder={ t('Enter developer key') }
+          onChangeText={ (text) => setKey(text) }
+        />
+        <ThemedText />
+        <ThemedButton
+          onPress={ sendLogs }
+          disabled={ !key }
+        >
+          { t('Send') }
+        </ThemedButton>
+      </DefaultFocus>
+    </View>
+  );
+};
 
 export const LoggerPageComponent = ({
   data,
@@ -25,7 +72,6 @@ export const LoggerPageComponent = ({
       timestamp,
       message,
       context,
-      deviceInfo,
     } = item;
 
     return (
@@ -54,13 +100,6 @@ export const LoggerPageComponent = ({
               </ThemedText>
               { ' ' }
               { JSON.stringify(context) }
-            </ThemedText>
-            <ThemedText>
-              <ThemedText style={ styles.itemTitle }>
-                Device Info:
-              </ThemedText>
-              { ' ' }
-              { JSON.stringify(deviceInfo) }
             </ThemedText>
           </View>
         ) }
@@ -101,7 +140,7 @@ export const LoggerPageComponent = ({
           { t('Device id') }
         </ThemedText>
         <ThemedText style={ styles.deviceValue }>
-          { ConfigStore.getDeviceId() }
+          { ConfigStore.getDeviceId(true) }
         </ThemedText>
       </View>
     );
@@ -116,7 +155,7 @@ export const LoggerPageComponent = ({
         >
           <ThemedButton
             onPress={ sendLogs }
-            style={ styles.action }
+            style={ [styles.action, styles.actionPrimary] }
             disabled={ isSending || !data.length }
           >
             { t('Send') }

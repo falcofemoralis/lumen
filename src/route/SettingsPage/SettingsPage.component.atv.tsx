@@ -1,6 +1,6 @@
 import Page from 'Component/Page';
 import React from 'react';
-import { View } from 'react-native';
+import { useWindowDimensions, View } from 'react-native';
 import { DefaultFocus, SpatialNavigationScrollView } from 'react-tv-space-navigation';
 
 import {
@@ -18,6 +18,8 @@ export function SettingsPageComponent({
   settings,
   onSettingUpdate,
 }: SettingsPageComponentProps) {
+  const { height } = useWindowDimensions();
+
   const renderSetting = (setting: SettingItem): Record<SettingType, React.ReactNode> => ({
     TEXT: (
       <SettingText
@@ -47,7 +49,7 @@ export function SettingsPageComponent({
 
   const renderSettings = () => (
     <DefaultFocus>
-      <SpatialNavigationScrollView>
+      <SpatialNavigationScrollView offsetFromStart={ height / 2.1 }>
         { settings.map((setting) => (
           <View key={ setting.id }>
             { renderSetting(setting)[setting.type] }

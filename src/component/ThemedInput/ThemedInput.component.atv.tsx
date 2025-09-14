@@ -10,18 +10,23 @@ export const ThemedInputComponent = ({
   placeholder,
   onChangeText,
   style,
+  editable,
   ...props
 }: ThemedInputComponentProps) => {
   const textInputRef = useRef<TextInput>(null);
 
   const onSelect = useCallback(() => {
+    if (!editable) {
+      return;
+    }
+
     textInputRef.current?.focus();
 
     setTimeout(() => {
       // this fixes issue with unfocus on new arch
       textInputRef.current?.focus();
     }, 100);
-  }, []);
+  }, [editable]);
 
   return (
     <SpatialNavigationFocusableView
@@ -45,6 +50,7 @@ export const ThemedInputComponent = ({
           selectionHandleColor={ Colors.primary }
           tvFocusable={ false }
           focusable={ false }
+          editable={ editable }
           { ...props }
         />
       ) }

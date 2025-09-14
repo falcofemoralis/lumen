@@ -30,6 +30,8 @@ Notifications.setNotificationHandler({
 
 TaskManager.defineTask(BACKGROUND_TASK_IDENTIFIER, async () => {
   try {
+    LoggerStore.debug('notificationsServiceTask started');
+
     const currentService = services[defaultService];
     const data = await currentService.getNotifications();
 
@@ -104,7 +106,7 @@ export default function useNotifications() {
   }, [navigation]);
 
   const registerNotifications = useCallback(() => {
-    BackgroundTask.registerTaskAsync(BACKGROUND_TASK_IDENTIFIER, { minimumInterval: 60 * 4 }); // 4 hours
+    BackgroundTask.registerTaskAsync(BACKGROUND_TASK_IDENTIFIER, { minimumInterval: 60 }); // 1 hour
   }, []);
 
   const unregisterNotifications = useCallback(() => {

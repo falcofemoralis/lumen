@@ -82,12 +82,16 @@ const configApi: ConfigApiInterface = {
     this.loadConfig().provider = provider;
   },
 
+  getDefaultProvider(): string {
+    return this.loadConfig().provider;
+  },
+
   getProvider(): string {
     if (this.isOfficialMode()) {
       return this.getOfficialMode();
     }
 
-    return this.loadConfig().provider;
+    return this.getDefaultProvider();
   },
 
   setCDN(cdn: string): void {
@@ -188,7 +192,7 @@ const configApi: ConfigApiInterface = {
     const { query, provider } = this.modifyProvider(queryInput);
     const headers = Platform.OS === 'web' ? this.getProxyHeaders() : this.getHeaders();
 
-    LoggerStore.debug('getRequest', { query, provider, variables, headers });
+    LoggerStore.debug('configApi::getRequest', { query, provider, variables });
 
     return executeGet(
       query,
@@ -213,7 +217,7 @@ const configApi: ConfigApiInterface = {
 
     if (!query.includes('/login')) {
       // do not include login request
-      LoggerStore.debug('postRequest', { query, provider, headers, variables });
+      LoggerStore.debug('configApi::postRequest', { query, provider, variables });
     }
 
     return executePost(

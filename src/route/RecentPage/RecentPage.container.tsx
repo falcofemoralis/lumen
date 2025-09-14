@@ -90,8 +90,6 @@ export function RecentPageContainer() {
 
     setItems((prev) => prev.filter((i) => i.id !== id));
 
-    LoggerStore.debug('removeItem', { id, items });
-
     currentService.removeRecent(id).catch((error) => {
       LoggerStore.error('removeItem', { error });
 

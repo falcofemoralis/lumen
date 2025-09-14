@@ -24,12 +24,8 @@ export const BookmarksOverlayContainer = ({
       setIsLoading(true);
 
       if (isChecked) {
-        LoggerStore.debug('postBookmark', { filmId: id, bookmarkId });
-
         await currentService.addBookmark(id, bookmarkId);
       } else {
-        LoggerStore.debug('removeBookmark', { filmId: id, bookmarkId });
-
         await currentService.removeBookmark(id, bookmarkId);
       }
 

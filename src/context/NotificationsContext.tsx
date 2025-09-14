@@ -72,7 +72,7 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
     try {
       const cachedData = StorageStore.getMiscStorage().getString(NOTIFICATIONS_STORAGE_CACHE);
 
-      LoggerStore.debug('getNotifications', { cachedData });
+      LoggerStore.debug('NotificationsContext::getNotifications', { cachedData });
 
       if (cachedData) {
         const { data, ttl } = JSON.parse(cachedData) as { data: NotificationInterface[]; ttl: number };

@@ -38,6 +38,10 @@ export const styles = CreateStyles({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  actionPrimary: {
+    backgroundColor: Colors.primary,
+    color: Colors.textOnPrimary,
+  },
   empty: {
     flex: 1,
     height: '100%',
@@ -55,5 +59,10 @@ export const styles = CreateStyles({
   deviceValue: {
     fontSize: 20,
     fontWeight: 'bold',
+  },
+  hint: {
+    fontSize: 14,
+    paddingTop: 8,
+    paddingBottom: 16,
   },
 });

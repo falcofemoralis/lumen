@@ -190,7 +190,7 @@ export function PlayerComponent({
 
     setTimeout(() => {
       openCommentsOverlay();
-    }, 250);
+    }, 0);
   };
 
   const handleDoubleTap = (direction: RewindDirection) => {
@@ -655,7 +655,7 @@ export function PlayerComponent({
   );
 
   return (
-    <Animated.View
+    <View
       style={ [
         styles.container,
         isCommentsOpen && { width: (Dimensions.get('window').width) / 2 },
@@ -673,7 +673,7 @@ export function PlayerComponent({
       { renderControls() }
       { renderLoader() }
       { renderModals() }
-    </Animated.View>
+    </View>
   );
 }
 
