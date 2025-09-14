@@ -2,6 +2,9 @@ import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
+  page: {
+    paddingBottom: 16,
+  },
   actions: {
     flex: 1,
     flexDirection: 'row',

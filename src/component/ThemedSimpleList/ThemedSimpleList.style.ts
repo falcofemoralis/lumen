@@ -46,7 +46,7 @@ export const styles = CreateStyles({
   listItems: {
     flexDirection: 'column',
     maxHeight: MAX_ITEMS_TO_DISPLAY * ITEM_HEIGHT - 8,
-    minWidth: 300,
+    // minWidth: 300,
   },
   listItemsLandscape: {
     maxHeight: MAX_ITEMS_TO_DISPLAY_LANDSCAPE * ITEM_HEIGHT - 8,

@@ -3,6 +3,9 @@ import { CONTENT_WRAPPER_PADDING } from 'Style/Layout';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
+  page: {
+    paddingBottom: 16,
+  },
   upperContent: {
     width: '100%',
     backgroundColor: Colors.fade,
@@ -113,6 +116,10 @@ export const styles = CreateStyles({
     flex: 1,
     backgroundColor: Colors.secondary,
     marginBlockStart: 16,
+  },
+  playBtnText: {
+    fontSize: 14,
+    fontWeight: '700',
   },
   downloadBtn: {
     backgroundColor: Colors.backgroundLight,

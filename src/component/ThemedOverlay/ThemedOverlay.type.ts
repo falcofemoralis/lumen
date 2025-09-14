@@ -13,7 +13,6 @@ export interface ThemedOverlayContainerProps {
 
 export interface ThemedOverlayComponentProps {
   isOpened: boolean;
-  isVisible: boolean;
   children: React.ReactNode;
   style?: StyleProp<ViewStyle>;
   containerStyle?: StyleProp<ViewStyle>;
@@ -29,6 +28,4 @@ export interface ThemedOverlayComponentProps {
 export type ThemedOverlayRef = {
   open: () => void;
   close: () => void;
-  hide: () => void;
-  show: () => void;
 };

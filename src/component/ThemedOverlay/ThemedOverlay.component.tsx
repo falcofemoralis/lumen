@@ -60,7 +60,6 @@ function propsAreEqual(
   props: ThemedOverlayComponentProps
 ) {
   return prevProps.isOpened === props.isOpened
-    && prevProps.isVisible === props.isVisible
     && prevProps.children === props.children;
 }
 

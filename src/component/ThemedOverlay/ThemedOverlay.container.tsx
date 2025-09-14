@@ -7,13 +7,11 @@ import { ThemedOverlayContainerProps, ThemedOverlayRef } from './ThemedOverlay.t
 
 export const ThemedOverlayContainer = forwardRef<ThemedOverlayRef, ThemedOverlayContainerProps>((props, ref) => {
   const [isOpened, setIsOpened] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
   const [contentVisible, setContentVisible] = useState(false);
 
   useImperativeHandle(ref, () => ({
     open: () => {
       setIsOpened(true);
-      setIsVisible(true);
       setContentVisible(true);
 
       setTimeout(() => {
@@ -22,20 +20,16 @@ export const ThemedOverlayContainer = forwardRef<ThemedOverlayRef, ThemedOverlay
     },
     close: () => {
       setIsOpened(false);
-      setIsVisible(false);
 
       setTimeout(() => {
         setContentVisible(false);
         props.onClose?.();
       }, 250);
     },
-    hide: () => setIsVisible(false),
-    show: () => setIsVisible(true),
   }));
 
   const handleModalRequestClose = () => {
     setIsOpened(false);
-    setIsVisible(false);
 
     setTimeout(() => {
       setContentVisible(false);
@@ -46,7 +40,6 @@ export const ThemedOverlayContainer = forwardRef<ThemedOverlayRef, ThemedOverlay
   const containerProps = () => ({
     ...props,
     isOpened,
-    isVisible,
     contentVisible,
     handleModalRequestClose,
   });

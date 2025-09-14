@@ -561,7 +561,7 @@ export function FilmPageComponent({
   };
 
   return (
-    <Page testID="film-page">
+    <Page testID="film-page" style={ styles.page }>
       { renderContent() }
     </Page>
   );

@@ -58,6 +58,7 @@ export class CookiesManager {
 
   public reset() {
     StorageStore.getCookiesStorage().clearAll();
+    this.cookieMap.clear();
   }
 }
 

@@ -13,7 +13,6 @@ export function ThemedOverlayComponent({
   contentContainerStyle,
   children,
   isOpened,
-  isVisible,
   contentVisible,
   handleModalRequestClose,
 }: ThemedOverlayComponentProps) {
@@ -21,7 +20,7 @@ export function ThemedOverlayComponent({
     <Portal>
       <SpatialNavigationOverlay
         isModalOpened={ isOpened }
-        isModalVisible={ isOpened && isVisible }
+        isModalVisible={ isOpened }
         hideModal={ handleModalRequestClose }
       >
         <Portal.Host>
@@ -29,7 +28,7 @@ export function ThemedOverlayComponent({
             style={ [
               styles.modal,
               style,
-              isVisible && styles.modalVisible,
+              isOpened && styles.modalVisible,
             ] }
           >
             <View style={ [styles.container, containerStyle] }>
@@ -49,7 +48,6 @@ function propsAreEqual(
   props: ThemedOverlayComponentProps
 ) {
   return prevProps.isOpened === props.isOpened
-    && prevProps.isVisible === props.isVisible
     && prevProps.children === props.children;
 }
 

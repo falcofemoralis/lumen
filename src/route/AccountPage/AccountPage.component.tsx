@@ -8,6 +8,7 @@ import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import Wrapper from 'Component/Wrapper';
 import { useNotificationsContext } from 'Context/NotificationsContext';
+import { useServiceContext } from 'Context/ServiceContext';
 import t from 'i18n/t';
 import { Bell, Settings } from 'lucide-react-native';
 import React from 'react';
@@ -26,7 +27,8 @@ export function AccountPageComponent({
   isSignedIn,
   profile,
 }: AccountPageComponentProps) {
-  const { badgeData } = useNotificationsContext();
+  const { logout, viewProfile } = useServiceContext();
+  const { badgeData, resetNotifications } = useNotificationsContext();
   const navigation = useNavigation();
 
   const renderTopBarButton = (IconComponent: React.ComponentType<any>, route: string) => {
@@ -106,19 +108,16 @@ export function AccountPageComponent({
         <View style={ styles.profileActions }>
           <ThemedButton
             style={ styles.profileAction }
-            onPress={ () => NotificationStore.displayMessage(t('Not implemented')) }
+            onPress={ () => {
+              logout();
+              resetNotifications();
+            } }
           >
             { t('Log out') }
           </ThemedButton>
           <ThemedButton
             style={ styles.profileAction }
-            onPress={ () => NotificationStore.displayMessage(t('Not implemented')) }
-          >
-            { t('Switch service') }
-          </ThemedButton>
-          <ThemedButton
-            style={ styles.profileAction }
-            onPress={ () => NotificationStore.displayMessage(t('Not implemented')) }
+            onPress={ viewProfile }
           >
             { t('View Profile') }
           </ThemedButton>

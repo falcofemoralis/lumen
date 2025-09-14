@@ -190,7 +190,7 @@ export function PlayerComponent({
 
     setTimeout(() => {
       openCommentsOverlay();
-    }, 0);
+    }, 250);
   };
 
   const handleDoubleTap = (direction: RewindDirection) => {

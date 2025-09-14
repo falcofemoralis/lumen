@@ -297,6 +297,7 @@ export function FilmPageComponent({
             size: scale(18),
             color: Colors.white,
           } }
+          textStyle={ styles.playBtnText }
         >
           { t('Watch Now') }
         </ThemedButton>
@@ -316,7 +317,7 @@ export function FilmPageComponent({
     return (
       <Wrapper>
         <Section title={ t('Actors') }>
-          <ScrollView horizontal>
+          <ScrollView horizontal showsHorizontalScrollIndicator={ false }>
             <View style={ styles.actorsList }>
               { persons.map((actor, index) => (
                 <ActorView
@@ -396,7 +397,7 @@ export function FilmPageComponent({
     return (
       <Wrapper>
         <Section title={ t('Related') }>
-          <ScrollView horizontal>
+          <ScrollView horizontal showsHorizontalScrollIndicator={ false }>
             <View style={ styles.relatedList }>
               { related.map((item, idx) => (
                 <RelatedItem
@@ -583,7 +584,7 @@ export function FilmPageComponent({
     }
 
     return (
-      <View>
+      <View style={ styles.page }>
         <View style={ styles.upperContent }>
           { renderTopActions() }
           <Wrapper>
@@ -626,6 +627,7 @@ export function FilmPageComponent({
         scrollEnabled={ !!film }
         onScroll={ scrollHandler }
         scrollEventThrottle={ 16 }
+        showsVerticalScrollIndicator={ false }
       >
         <View>
           { renderPosterBackground() }

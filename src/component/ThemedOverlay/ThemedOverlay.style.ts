@@ -7,7 +7,6 @@ export const styles = CreateStyles({
     justifyContent: 'center',
     height: '100%',
     width: '100%',
-    backgroundColor: Colors.modal,
   },
   contentContainerStyle: {
     backgroundColor: Colors.backgroundLight,

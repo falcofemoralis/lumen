@@ -79,12 +79,6 @@ export function AccountPageComponent({
                   style={ styles.profileAction }
                   onPress={ () => NotificationStore.displayMessage(t('Not implemented')) }
                 >
-                  { t('Switch service') }
-                </ThemedButton>
-                <ThemedButton
-                  style={ styles.profileAction }
-                  onPress={ () => NotificationStore.displayMessage(t('Not implemented')) }
-                >
                   { t('View Profile') }
                 </ThemedButton>
               </DefaultFocus>

@@ -10,7 +10,7 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { Platform } from 'react-native';
+import { Linking, Platform } from 'react-native';
 import StorageStore from 'Store/Storage.store';
 import { ProfileInterface } from 'Type/Profile.interface';
 import { CookiesManager } from 'Util/Cookies';
@@ -36,6 +36,7 @@ interface ServiceContextInterface {
   updateOfficialMode: (value: string) => void;
   validateUrl: (url: string) => Promise<void>;
   getCDNs: () => DropdownItem[];
+  viewProfile: () => void;
 }
 
 const ServiceContext = createContext<ServiceContextInterface>({
@@ -52,6 +53,7 @@ const ServiceContext = createContext<ServiceContextInterface>({
   updateOfficialMode: () => {},
   validateUrl: async () => {},
   getCDNs: () => [],
+  viewProfile: () => {},
 });
 
 export const ServiceProvider = ({ children }: { children: React.ReactNode }) => {
@@ -121,6 +123,7 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
     setIsSignedIn(false);
     removeProfile();
     StorageStore.getMiscStorage().set(CREDENTIALS_STORAGE, '');
+    (new CookiesManager()).reset();
   }, [currentService, removeProfile]);
 
   /**
@@ -209,6 +212,10 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
     }))) ;
   }, [currentService]);
 
+  const viewProfile = useCallback(() => {
+    Linking.openURL(`${currentService.getProvider()}/user/${profile?.id}/`);
+  }, [currentService, profile]);
+
   const value = useMemo(() => ({
     isSignedIn,
     profile,
@@ -224,6 +231,7 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
     validateUrl,
     updateOfficialMode,
     getCDNs,
+    viewProfile,
   }), [
     isSignedIn,
     profile,
@@ -239,6 +247,7 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
     validateUrl,
     updateOfficialMode,
     getCDNs,
+    viewProfile,
   ]);
 
   return (

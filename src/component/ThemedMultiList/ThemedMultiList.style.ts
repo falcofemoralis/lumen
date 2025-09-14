@@ -12,6 +12,7 @@ export const styles = CreateStyles({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    flex: 1,
   },
   itemLabel: {
     flex: 1,
