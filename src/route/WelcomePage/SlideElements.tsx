@@ -625,13 +625,13 @@ export const LoginSlide = ({
           style={ isLoading && styles.providerValidateButtonDisabled }
           placeholder={ t('Login or email') }
           onChangeText={ setUsername }
-          value={ username ?? '' }
+          defaultValue={ username ?? '' }
         />
         <ThemedInput
           style={ isLoading && styles.providerValidateButtonDisabled }
           placeholder={ t('Password') }
           onChangeText={ setPassword }
-          value={ password ?? '' }
+          defaultValue={ password ?? '' }
           secureTextEntry
         />
       </View>

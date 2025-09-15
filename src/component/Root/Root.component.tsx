@@ -5,7 +5,7 @@ import * as StatusBar from 'expo-status-bar';
 import { useAwake } from 'Hooks/useAwake';
 import { useEffect } from 'react';
 import { useMMKVString } from 'react-native-mmkv';
-import useNotifications from 'Services/Notifications';
+import useNotifications from 'Service/Notifications';
 import ConfigStore, { DEVICE_CONFIG } from 'Store/Config.store';
 import StorageStore from 'Store/Storage.store';
 

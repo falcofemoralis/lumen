@@ -106,7 +106,7 @@ export default function useNotifications() {
   }, [navigation]);
 
   const registerNotifications = useCallback(() => {
-    BackgroundTask.registerTaskAsync(BACKGROUND_TASK_IDENTIFIER, { minimumInterval: 15 });
+    BackgroundTask.registerTaskAsync(BACKGROUND_TASK_IDENTIFIER, { minimumInterval: 60 }); // 1 hour
 
     LoggerStore.debug('registerNotifications');
   }, []);

@@ -6,7 +6,7 @@ import t from 'i18n/t';
 import { useCallback, useState } from 'react';
 import { Linking } from 'react-native';
 import { LOGGER_ROUTE } from 'Route/LoggerPage/LoggerPage.config';
-import useNotifications from 'Services/Notifications';
+import useNotifications from 'Service/Notifications';
 import ConfigStore from 'Store/Config.store';
 import { yesNoOptions } from 'Util/Settings';
 import { useTripleTap } from 'Util/Settings/useTripleTap';
