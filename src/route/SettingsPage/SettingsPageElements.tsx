@@ -9,6 +9,7 @@ import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import t from 'i18n/t';
 import {
+  memo,
   useCallback,
   useRef,
   useState,
@@ -28,7 +29,23 @@ type SettingProps = {
   onUpdate: (setting: SettingItem, value: string) => Promise<boolean>;
 };
 
-const BaseComponent = ({
+function propsAreEqual(prevProps: BaseComponentProps, props: BaseComponentProps) {
+  const {
+    setting: {
+      id,
+      value,
+      isEnabled,
+      isHidden,
+    },
+  } = props;
+
+  return prevProps.setting.id === id
+    && prevProps.setting.value === value
+    && prevProps.setting.isEnabled === isEnabled
+    && prevProps.setting.isHidden === isHidden;
+}
+
+const BaseComponent = memo(({
   setting,
   onPress,
 }: BaseComponentProps) => {
@@ -54,14 +71,14 @@ const BaseComponent = ({
       </View>
     </ThemedPressable>
   );
-};
+}, propsAreEqual);
 
 export const SettingText = ({
   setting,
   onUpdate,
 }: SettingProps) => <BaseComponent setting={ setting } onPress={ () => onUpdate(setting, '') } />;
 
-export const SettingSelect = ({
+export const SettingSelect = memo(({
   setting,
   onUpdate,
 }: SettingProps) => {
@@ -106,9 +123,9 @@ export const SettingSelect = ({
       />
     </View>
   );
-};
+}, propsAreEqual);
 
-export const SettingInput = ({
+export const SettingInput = memo(({
   setting,
   onUpdate,
 }: SettingProps) => {
@@ -188,9 +205,9 @@ export const SettingInput = ({
       </ThemedOverlay>
     </View>
   );
-};
+}, propsAreEqual);
 
-export const SettingLink = ({
+export const SettingLink = memo(({
   setting,
   onUpdate,
 }: SettingProps) => (
@@ -198,4 +215,4 @@ export const SettingLink = ({
     setting={ setting }
     onPress={ () => onUpdate(setting, '') }
   />
-);
+), propsAreEqual);

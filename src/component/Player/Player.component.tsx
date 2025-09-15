@@ -252,7 +252,7 @@ export function PlayerComponent({
         return;
       }
 
-      scheduleOnRN(setPlayerRate, 2);
+      scheduleOnRN(setPlayerRate, 1.5);
       scheduleOnRN(setLongTapAction,true);
     })
     .onEnd(() => {
@@ -516,7 +516,7 @@ export function PlayerComponent({
           ] }
         >
           <ThemedText style={ styles.longTapText }>
-            2x
+            1.5x
           </ThemedText>
           <FastForward
             size={ scale(18) }
