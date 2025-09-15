@@ -3,10 +3,11 @@ import InfoBlock from 'Component/InfoBlock';
 import Loader from 'Component/Loader';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedInput from 'Component/ThemedInput';
+import { useGradualAnimation } from 'Hooks/useGradualAnimation';
 import t from 'i18n/t';
 import { useRef } from 'react';
 import { View } from 'react-native';
-import { AvoidSoftInputView } from 'react-native-avoid-softinput';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { DefaultFocus } from 'react-tv-space-navigation';
 import { ACCOUNT_ROUTE } from 'Route/AccountPage/AccountPage.config';
 
@@ -18,6 +19,7 @@ export function LoginFormComponent({
   withRedirect,
   handleLogin,
 }: LoginFormComponentProps) {
+  const { height } = useGradualAnimation();
   const navigation = useNavigation();
   const loginRef = useRef({ username: '', password: '' });
 
@@ -67,19 +69,24 @@ export function LoginFormComponent({
     );
   };
 
+  const keyboardPadding = useAnimatedStyle(() => {
+    return {
+      height: height.value,
+    };
+  }, []);
+
   return (
     <DefaultFocus>
-      <AvoidSoftInputView>
-        <View
-          style={ styles.container }
-        >
-          <InfoBlock
-            title={ t('You are not logged in') }
-            subtitle={ t('Sign in to sync content') }
-          />
-          { renderForm() }
-        </View>
-      </AvoidSoftInputView>
+      <View
+        style={ styles.container }
+      >
+        <InfoBlock
+          title={ t('You are not logged in') }
+          subtitle={ t('Sign in to sync content') }
+        />
+        { renderForm() }
+        <Animated.View style={ keyboardPadding } />
+      </View>
     </DefaultFocus>
   );
 }

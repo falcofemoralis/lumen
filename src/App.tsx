@@ -6,6 +6,7 @@ import { AppProvider } from 'Context/AppContext';
 import * as SplashScreen from 'expo-splash-screen';
 import * as React from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { SpatialNavigationDeviceTypeProvider } from 'react-tv-space-navigation';
 import ConfigStore from 'Store/Config.store';
@@ -26,16 +27,18 @@ export function App() {
     >
       <AppProvider>
         <SpatialNavigationDeviceTypeProvider>
-          <GestureHandlerRootView>
-            <Root>
-              <SafeAreaView style={ { flex: 1, backgroundColor: Colors.background } }>
-                <Portal.Host>
-                  { !ConfigStore.isTV() && <AppUpdater /> }
-                  <RootStack />
-                </Portal.Host>
-              </SafeAreaView>
-            </Root>
-          </GestureHandlerRootView>
+          <KeyboardProvider>
+            <GestureHandlerRootView>
+              <Root>
+                <SafeAreaView style={ { flex: 1, backgroundColor: Colors.background } }>
+                  <Portal.Host>
+                    { !ConfigStore.isTV() && <AppUpdater /> }
+                    <RootStack />
+                  </Portal.Host>
+                </SafeAreaView>
+              </Root>
+            </GestureHandlerRootView>
+          </KeyboardProvider>
         </SpatialNavigationDeviceTypeProvider>
       </AppProvider>
     </Navigation>

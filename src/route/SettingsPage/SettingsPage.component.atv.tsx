@@ -3,6 +3,7 @@ import React from 'react';
 import { useWindowDimensions, View } from 'react-native';
 import { DefaultFocus, SpatialNavigationScrollView } from 'react-tv-space-navigation';
 
+import { styles } from './SettingsPage.style.atv';
 import {
   SettingItem, SettingsPageComponentProps,
   SettingType,
@@ -60,7 +61,7 @@ export function SettingsPageComponent({
   );
 
   return (
-    <Page>
+    <Page style={ styles.page }>
       { renderSettings() }
     </Page>
   );

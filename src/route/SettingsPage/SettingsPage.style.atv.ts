@@ -2,6 +2,9 @@ import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
+  page: {
+    paddingBottom: 32,
+  },
   setting: {
     paddingVertical: 12,
     paddingHorizontal: 12,
