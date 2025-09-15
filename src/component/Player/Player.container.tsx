@@ -219,6 +219,8 @@ export function PlayerContainer({
 
   useEventListener(player, 'statusChange', ({ status: playerStatus, error }) => {
     if (playerStatus === 'error') {
+      LoggerStore.error('Player', { error: error?.message });
+
       NotificationStore.displayError(`An error occurred : ${error?.message}`);
     }
   });

@@ -2,6 +2,7 @@ import Comments from 'Component/Comments';
 import { CommentsRef } from 'Component/Comments/Comments.container';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import { useCallback, useRef } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { CommentsOverlayComponentProps } from './CommentsOverlay.type';
 
@@ -30,12 +31,14 @@ export const CommentsOverlayComponent = ({
       onClose={ onClose }
       transparent
     >
-      <Comments
-        ref={ commentsRef }
-        style={ contentStyle }
-        film={ film }
-        loaderFullScreen
-      />
+      <SafeAreaView style={ { flex: 1 } }>
+        <Comments
+          ref={ commentsRef }
+          style={ contentStyle }
+          film={ film }
+          loaderFullScreen
+        />
+      </SafeAreaView>
     </ThemedOverlay>
   );
 };

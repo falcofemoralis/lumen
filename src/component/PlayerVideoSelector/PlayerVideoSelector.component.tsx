@@ -70,7 +70,7 @@ export function PlayerVideoSelectorComponent({
             onChange={ (item) => handleSelectVoice(item.value) }
             header={ t('Search voice') }
             inputStyle={ styles.voiceDropdownInput }
-            style={ styles.voicesContainer }
+            style={ styles.voicesDropdown }
             overlayRef={ voiceOverlayRef }
           />
           { renderVoiceRating() }

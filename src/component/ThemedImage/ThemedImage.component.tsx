@@ -19,8 +19,6 @@ export const ThemedImage = forwardRef<ImageRef, ThemedImageProps>(({
     <Image
       style={ style }
       source={ src }
-      placeholder={ { blurhash: 'L03IYJj[fQj[j[fQfQfQfQfQfQfQ' } }
-      placeholderContentFit="cover"
       contentFit="cover"
       transition={ transition }
       recyclingKey={ src }

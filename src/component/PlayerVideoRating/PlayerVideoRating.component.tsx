@@ -81,7 +81,7 @@ export const PlayerVideoRatingComponent = ({
     const { voiceRating = [] } = film;
 
     return (
-      <ThemedBottomSheet ref={ bottomSheetRef }>
+      <ThemedBottomSheet ref={ bottomSheetRef } sizes={ ['40%', 'auto'] }>
         <ScrollView style={ styles.voiceRatingContainer }>
           { voiceRating.map((item) => renderRating(item)) }
         </ScrollView>

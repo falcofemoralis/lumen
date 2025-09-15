@@ -129,21 +129,32 @@ export const styles = CreateStyles({
     top: '50%',
     transform: [{ translateX: '-50%' }, { translateY: '-50%' }],
     alignItems: 'center',
+    opacity: 0,
+    transitionProperty: 'opacity',
+    transitionDuration: '150ms',
+  },
+  doubleTapActionVisible: {
+    opacity: 1,
+  },
+  doubleTapActionLeft: {
+    left: '20%',
+  },
+  doubleTapActionRight: {
+    left: '80%',
   },
   doubleTapContainer: {
-    backgroundColor: Colors.modal,
-    paddingBlock: 4,
-    paddingInline: 12,
-    borderRadius: 50,
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'center',
     gap: 8,
+  },
+  doubleTapIcon: {
+    backgroundColor: Colors.modal,
+    padding: 10,
+    borderRadius: 50,
   },
   doubleTapText: {
     fontSize: 16,
     fontWeight: '700',
-  },
-  doubleTapIcon: {
   },
   longTapAction: {
     position: 'absolute',
@@ -160,6 +171,12 @@ export const styles = CreateStyles({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+    opacity: 0,
+    transitionProperty: 'opacity',
+    transitionDuration: '150ms',
+  },
+  longTapActionVisible: {
+    opacity: 1,
   },
   longTapText: {
     fontSize: 16,

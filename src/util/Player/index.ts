@@ -74,8 +74,6 @@ export const updateSavedTime = (film: FilmInterface, voice: FilmVoiceInterface, 
   const prevSavedTime = safeJsonParse<SavedTime | null>(prevSavedTimeJson, null);
   const newSavedTime = prepareSavedTimeObject(film, voice, time, progress, prevSavedTime);
 
-  LoggerStore.debug('updateSavedTime', { key, newSavedTime });
-
   StorageStore.getPlayerStorage().set(
     key,
     JSON.stringify(newSavedTime)
@@ -84,8 +82,6 @@ export const updateSavedTime = (film: FilmInterface, voice: FilmVoiceInterface, 
 
 export const setSavedTime = (savedTime: SavedTime, film: FilmInterface) => {
   const key = formatPlayerKeyTime(film);
-
-  LoggerStore.debug('setSavedTime', { key, savedTime });
 
   StorageStore.getPlayerStorage().set(
     key,
@@ -102,8 +98,6 @@ export const getSavedTime = (film: FilmInterface): SavedTime | null => {
   }
 
   const savedTime = safeJsonParse<SavedTime | null>(savedTimeJson, null);
-
-  LoggerStore.debug('getSavedTime', { key, savedTime });
 
   return savedTime;
 };
@@ -152,8 +146,6 @@ export const updateFirestoreSavedTime = async (
   const prevSavedTime = safeJsonParse<SavedTime | null>(data?.savedTime, null);
   const newSavedTime = prepareSavedTimeObject(film, voice, time, progress, prevSavedTime);
 
-  LoggerStore.debug('updateFirestoreSavedTime', { key, newSavedTime });
-
   firestoreDb
     .doc(key)
     .set({
@@ -170,8 +162,6 @@ export const getFirestoreSavedTime = async (
   const key = formatFirestoreKey(film, profile);
   const doc = await firestoreDb.doc(key).get();
   const data = doc.data();
-
-  LoggerStore.debug('getFirestoreSavedTime', { key, data });
 
   if (!data) {
     return null;

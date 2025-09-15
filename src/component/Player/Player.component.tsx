@@ -19,6 +19,7 @@ import {
   Bookmark,
   BookmarkCheck,
   ClosedCaption,
+  FastForward,
   Forward,
   Gauge,
   ListVideo,
@@ -28,6 +29,7 @@ import {
   Pause,
   PictureInPicture2,
   Play,
+  Rewind,
   Settings2,
   SkipBack,
   SkipForward,
@@ -104,6 +106,7 @@ export function PlayerComponent({
   handleShare,
   closeOverlay,
   onBookmarkChange,
+  setPlayerRate,
 }: PlayerComponentProps) {
   const [showControls, setShowControls] = useState(false);
   const [isScrolling, setIsScrolling] = useState(false);
@@ -214,13 +217,19 @@ export function PlayerComponent({
   };
 
   const singleTap = Gesture.Tap()
+    .maxDuration(250)
     .onEnd(() => {
+      if (doubleTapAction) {
+        return;
+      }
+
       scheduleOnRN(setShowControls, !showControls);
       scheduleOnRN(handleUserInteraction);
     });
 
   const doubleTap = Gesture.Tap()
     .numberOfTaps(2)
+    .maxDuration(300)
     .onEnd((e) => {
       if (isLocked) {
         return;
@@ -233,21 +242,23 @@ export function PlayerComponent({
       } else {
         scheduleOnRN(handleDoubleTap, RewindDirection.FORWARD);
       }
+
+      scheduleOnRN(setShowControls, false);
     });
 
-  // const longPressGesture = Gesture.LongPress()
-  //   .onStart(() => {
-  //     if (showControls || isLocked || !isPlaying) {
-  //       return;
-  //     }
+  const longPressGesture = Gesture.LongPress()
+    .onStart(() => {
+      if (showControls || isLocked || !isPlaying) {
+        return;
+      }
 
-  //     runOnJS(setPlayerRate)(1.5);
-  //     runOnJS(setLongTapAction)(true);
-  //   })
-  //   .onEnd(() => {
-  //     runOnJS(setPlayerRate)(1);
-  //     runOnJS(setLongTapAction)(false);
-  //   });
+      scheduleOnRN(setPlayerRate, 2);
+      scheduleOnRN(setLongTapAction,true);
+    })
+    .onEnd(() => {
+      scheduleOnRN(setPlayerRate,1);
+      scheduleOnRN(setLongTapAction,false);
+    });
 
   const enablePIP = () => {
     playerRef.current?.startPictureInPicture();
@@ -455,64 +466,62 @@ export function PlayerComponent({
   };
 
   const renderDoubleTapAction = () => {
-    if (!doubleTapAction) {
-      return null;
-    }
-
-    const { seconds, direction } = doubleTapAction;
+    const { seconds = 10, direction } = doubleTapAction ?? {};
 
     return (
-      <View style={ [
-        styles.doubleTapAction,
-        {
-          left: direction === RewindDirection.BACKWARD ? '20%' : '80%',
-        },
-      ] }
-      >
-        <View style={ [
-          styles.doubleTapContainer,
-          {
-            flexDirection: direction === RewindDirection.BACKWARD ? 'row-reverse' : 'row',
-          },
-        ] }
+      <React.Fragment>
+        <Animated.View
+          style={ [
+            styles.doubleTapAction,
+            styles.doubleTapActionLeft,
+            direction === RewindDirection.BACKWARD && styles.doubleTapActionVisible,
+          ] }
         >
-          { /* <ThemedIcon
-            style={ styles.doubleTapIcon }
-            icon={ {
-              name: direction === RewindDirection.BACKWARD ? 'rewind-outline' : 'fast-forward-outline',
-              pack: IconPackType.MaterialCommunityIcons,
-            } }
-            size={ scale(24) }
-            color="white"
-          /> */ }
-          <ThemedText style={ styles.longTapText }>
-            { `${direction === RewindDirection.BACKWARD ? '-' : '+'}${seconds}` }
-          </ThemedText>
-        </View>
-      </View>
+          <View style={ styles.doubleTapContainer }>
+            <View style={ styles.doubleTapIcon }>
+              <Rewind color={ Colors.white } />
+            </View>
+            <ThemedText style={ styles.longTapText }>
+              { t('%s seconds', `-${seconds}`) }
+            </ThemedText>
+          </View>
+        </Animated.View>
+        <Animated.View
+          style={ [
+            styles.doubleTapAction,
+            styles.doubleTapActionRight,
+            direction === RewindDirection.FORWARD && styles.doubleTapActionVisible,
+          ] }
+        >
+          <View style={ styles.doubleTapContainer }>
+            <View style={ styles.doubleTapIcon }>
+              <FastForward color={ Colors.white } />
+            </View>
+            <ThemedText style={ styles.longTapText }>
+              { t('%s seconds', `${seconds}`) }
+            </ThemedText>
+          </View>
+        </Animated.View>
+      </React.Fragment>
     );
   };
 
   const renderLongTapAction = () => {
-    if (!longTapAction) {
-      return null;
-    }
-
     return (
       <View style={ styles.longTapAction }>
-        <View style={ styles.longTapContainer }>
+        <View
+          style={ [
+            styles.longTapContainer,
+            longTapAction && styles.longTapActionVisible,
+          ] }
+        >
           <ThemedText style={ styles.longTapText }>
             2x
           </ThemedText>
-          { /* <ThemedIcon
-            style={ styles.longTapIcon }
-            icon={ {
-              name: 'fast-forward-outline',
-              pack: IconPackType.MaterialCommunityIcons,
-            } }
-            size={ scale(24) }
-            color="white"
-          /> */ }
+          <FastForward
+            size={ scale(18) }
+            color={ Colors.white }
+          />
         </View>
       </View>
     );
@@ -520,10 +529,10 @@ export function PlayerComponent({
 
   const renderControls = () => (
     <GestureDetector
-      gesture={ Gesture.Exclusive(
+      gesture={ Gesture.Race(
         doubleTap,
-        singleTap
-        // longPressGesture,
+        singleTap,
+        longPressGesture
       ) }
     >
       <View style={ styles.controlsContainer }>
@@ -660,7 +669,7 @@ export function PlayerComponent({
     <View
       style={ [
         styles.container,
-        isCommentsOpen && { width: (Dimensions.get('window').width) / 2 },
+        isCommentsOpen && { width: (Dimensions.get('window').width) * 0.55 },
       ] }
     >
       <VideoView
