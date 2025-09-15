@@ -1,152 +1,191 @@
-import { useNavigation } from '@react-navigation/native';
-import { services } from 'Api/services';
-import {
-  NOTIFICATIONS_STORAGE_CACHE,
-  NOTIFICATIONS_STORAGE_CACHE_TTL,
-} from 'Context/NotificationsContext';
-import { defaultService, useServiceContext } from 'Context/ServiceContext';
-import * as BackgroundTask from 'expo-background-task';
-import * as Notifications from 'expo-notifications';
-import * as TaskManager from 'expo-task-manager';
-import t from 'i18n/t';
-import { useCallback } from 'react';
-import { FILM_ROUTE } from 'Route/FilmPage/FilmPage.config';
-import ConfigStore from 'Store/Config.store';
-import LoggerStore from 'Store/Logger.store';
-import StorageStore from 'Store/Storage.store';
-import { NotificationInterface, NotificationItemInterface } from 'Type/Notification.interface';
-import { safeJsonParse } from 'Util/Json';
+/**
+ * Unfortunately, it doesn't work, background task is not triggered as expected.
+ */
 
-const BACKGROUND_TASK_IDENTIFIER = 'notifications-task';
+// import { useNavigation } from '@react-navigation/native';
+// import { services } from 'Api/services';
+// import {
+//   NOTIFICATIONS_STORAGE_CACHE,
+//   NOTIFICATIONS_STORAGE_CACHE_TTL,
+// } from 'Context/NotificationsContext';
+// import { defaultService, useServiceContext } from 'Context/ServiceContext';
+// import * as BackgroundTask from 'expo-background-task';
+// import * as Notifications from 'expo-notifications';
+// import * as TaskManager from 'expo-task-manager';
+// import t from 'i18n/t';
+// import { useCallback } from 'react';
+// import { FILM_ROUTE } from 'Route/FilmPage/FilmPage.config';
+// import ConfigStore from 'Store/Config.store';
+// import LoggerStore from 'Store/Logger.store';
+// import StorageStore from 'Store/Storage.store';
+// import { NotificationInterface, NotificationItemInterface } from 'Type/Notification.interface';
+// import { safeJsonParse } from 'Util/Json';
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldPlaySound: false,
-    shouldSetBadge: true,
-    shouldShowBanner: true,
-    shouldShowList: true,
-  }),
-});
+// const BACKGROUND_TASK_IDENTIFIER = 'notifications-task';
 
-TaskManager.defineTask(BACKGROUND_TASK_IDENTIFIER, async () => {
-  try {
-    LoggerStore.debug('notificationsServiceTask started');
+// {
+//   id: 'notificationsEnabled',
+//   title: t('Notifications service'),
+//   subtitle: t('Toggle notifications.'),
+//   type: SETTING_TYPE.SELECT,
+//   value: convertBooleanToString(ConfigStore.getConfig().notificationsEnabled),
+//   options: yesNoOptions,
+//   onPress: (value, key) => {
+//     onPress(value, key);
 
-    const currentService = services[defaultService];
-    const data = await currentService.getNotifications();
+//     if (value === convertBooleanToString(true)) {
+//       registerNotifications();
+//     } else {
+//       unregisterNotifications();
+//     }
+//   },
+//   isHidden: ConfigStore.isTV(),
+// },
 
-    const newItems = data.reduce((acc: NotificationItemInterface[], item) => {
-      acc.push(...item.items);
+// "\"%s\" %s is available": "\"%s\" %s is available",
+// "Tap here to open in the app": "Tap here to open in the app",
+// "Notifications service": "Notifications service",
+// "Toggle notifications.": "Toggle notifications.",
 
-      return acc;
-    }, []);
+// "%s is available": "🔥%s - новый эпизод!",
+// "%s watch now": "%s",
+// "Notifications service": "Оповещения о новых эпизодах",
+// "Toggle notifications.": "Включить оповещения о новых эпизодах.",
 
-    const cachedData = StorageStore.getMiscStorage().getString(NOTIFICATIONS_STORAGE_CACHE);
+// Notifications.setNotificationHandler({
+//   handleNotification: async () => ({
+//     shouldPlaySound: false,
+//     shouldSetBadge: true,
+//     shouldShowBanner: true,
+//     shouldShowList: true,
+//   }),
+// });
 
-    const { data: previousData = [] } = safeJsonParse<
-      { data: NotificationInterface[]; ttl: number }
-    >(cachedData) ?? {};
+// const initBackgroundTask = async (innerAppMountedPromise: Promise<void>) => {
+//   TaskManager.defineTask(BACKGROUND_TASK_IDENTIFIER, async () => {
+//     try {
+//       LoggerStore.debug('notificationsServiceTask started');
 
-    const previousItems = previousData.reduce((acc: NotificationItemInterface[], item) => {
-      acc.push(...item.items);
+//       await innerAppMountedPromise;
 
-      return acc;
-    }, []);
+//       const currentService = services[defaultService];
+//       const data = await currentService.getNotifications();
 
-    const shouldNotifyItems = newItems.reduce((acc, item) => {
-      if (!previousItems.find((prevItem) => prevItem.link === item.link)) {
-        acc.push(item);
-      }
+//       const newItems = data.reduce((acc: NotificationItemInterface[], item) => {
+//         acc.push(...item.items);
 
-      return acc;
-    }, [] as NotificationItemInterface[]);
+//         return acc;
+//       }, []);
 
-    StorageStore.getMiscStorage().set(NOTIFICATIONS_STORAGE_CACHE, JSON.stringify({
-      data,
-      ttl: Date.now() + NOTIFICATIONS_STORAGE_CACHE_TTL,
-    }));
+//       const cachedData = StorageStore.getMiscStorage().getString(NOTIFICATIONS_STORAGE_CACHE);
 
-    const shouldNotifyItemsUnique = Array.from(
-      new Map(shouldNotifyItems.reverse().map(item => [item.link, item])).values()
-    );
+//       const { data: previousData = [] } = safeJsonParse<
+//         { data: NotificationInterface[]; ttl: number }
+//       >(cachedData) ?? {};
 
-    LoggerStore.debug('notificationsServiceTask', { newItems, previousItems, shouldNotifyItemsUnique });
+//       const previousItems = previousData.reduce((acc: NotificationItemInterface[], item) => {
+//         acc.push(...item.items);
 
-    if (shouldNotifyItemsUnique.length) {
-      shouldNotifyItemsUnique.forEach((item) => {
-        Notifications.scheduleNotificationAsync({
-          content: {
-            title: t('%s is available', item.name),
-            body: t('%s watch now', item.info),
-            data: { link: item.link },
-          },
-          trigger: null,
-        });
-      });
-    }
-  } catch (error) {
-    LoggerStore.error('Failed to execute the background task:', { error });
+//         return acc;
+//       }, []);
 
-    return BackgroundTask.BackgroundTaskResult.Failed;
-  }
+//       const shouldNotifyItems = newItems.reduce((acc, item) => {
+//         if (!previousItems.find((prevItem) => prevItem.link === item.link)) {
+//           acc.push(item);
+//         }
 
-  return BackgroundTask.BackgroundTaskResult.Success;
-});
+//         return acc;
+//       }, [] as NotificationItemInterface[]);
 
-export default function useNotifications() {
-  const navigation = useNavigation();
-  const { isSignedIn } = useServiceContext();
+//       StorageStore.getMiscStorage().set(NOTIFICATIONS_STORAGE_CACHE, JSON.stringify({
+//         data,
+//         ttl: Date.now() + NOTIFICATIONS_STORAGE_CACHE_TTL,
+//       }));
 
-  const navigateToFilm = useCallback((notification: Notifications.Notification) => {
-    const { data: { link } = {} } = notification.request.content;
+//       const shouldNotifyItemsUnique = Array.from(
+//         new Map(shouldNotifyItems.reverse().map(item => [item.link, item])).values()
+//       );
 
-    navigation.navigate(FILM_ROUTE, {
-      link: link as string,
-    } as never);
-  }, [navigation]);
+//       LoggerStore.debug('notificationsServiceTask', { newItems, previousItems, shouldNotifyItemsUnique });
 
-  const registerNotifications = useCallback(() => {
-    BackgroundTask.registerTaskAsync(BACKGROUND_TASK_IDENTIFIER, { minimumInterval: 60 }); // 1 hour
+//       if (shouldNotifyItemsUnique.length) {
+//         shouldNotifyItemsUnique.forEach((item) => {
+//           Notifications.scheduleNotificationAsync({
+//             content: {
+//               title: t('%s is available', item.name),
+//               body: t('%s watch now', item.info),
+//               data: { link: item.link },
+//             },
+//             trigger: null,
+//           });
+//         });
+//       }
+//     } catch (error) {
+//       LoggerStore.error('Failed to execute the background task:', { error });
 
-    LoggerStore.debug('registerNotifications');
-  }, []);
+//       return BackgroundTask.BackgroundTaskResult.Failed;
+//     }
 
-  const unregisterNotifications = useCallback(() => {
-    BackgroundTask.unregisterTaskAsync(BACKGROUND_TASK_IDENTIFIER);
+//     return BackgroundTask.BackgroundTaskResult.Success;
+//   });
+// };
 
-    LoggerStore.debug('unregisterNotifications');
-  }, []);
+// export const useNotifications = () => {
+//   const navigation = useNavigation();
+//   const { isSignedIn } = useServiceContext();
 
-  const startNotificationsTask = useCallback(() => {
-    if (!ConfigStore.isConfigured()
-      || ConfigStore.isTV()
-      || !isSignedIn
-      || !ConfigStore.getConfig().notificationsEnabled
-    ) {
-      return () => {};
-    }
+//   const navigateToFilm = useCallback((notification: Notifications.Notification) => {
+//     const { data: { link } = {} } = notification.request.content;
 
-    registerNotifications();
+//     navigation.navigate(FILM_ROUTE, {
+//       link: link as string,
+//     } as never);
+//   }, [navigation]);
 
-    const lastResponse = Notifications.getLastNotificationResponse();
-    if (lastResponse) {
-      navigateToFilm(lastResponse.notification);
-    }
+//   const registerNotifications = useCallback(() => {
+//     BackgroundTask.registerTaskAsync(BACKGROUND_TASK_IDENTIFIER, { minimumInterval: 60 }); // 1 hour
 
-    const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
-      if (response) {
-        navigateToFilm(response.notification);
-      }
-    });
+//     LoggerStore.debug('registerNotifications');
+//   }, []);
 
-    return () => {
-      subscription.remove();
-    };
-  }, [isSignedIn, navigateToFilm, registerNotifications]);
+//   const unregisterNotifications = useCallback(() => {
+//     BackgroundTask.unregisterTaskAsync(BACKGROUND_TASK_IDENTIFIER);
 
-  return {
-    startNotificationsTask,
-    registerNotifications,
-    unregisterNotifications,
-  };
-}
+//     LoggerStore.debug('unregisterNotifications');
+//   }, []);
+
+//   const startNotificationsTask = useCallback(async() => {
+//     if (!ConfigStore.isConfigured()
+//       || ConfigStore.isTV()
+//       || !isSignedIn
+//       || !ConfigStore.getConfig().notificationsEnabled
+//     ) {
+//       return () => {};
+//     }
+
+//     if (!(await TaskManager.isTaskRegisteredAsync(BACKGROUND_TASK_IDENTIFIER))) {
+//       registerNotifications();
+//     }
+
+//     const lastResponse = Notifications.getLastNotificationResponse();
+//     if (lastResponse) {
+//       navigateToFilm(lastResponse.notification);
+//     }
+
+//     const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
+//       if (response) {
+//         navigateToFilm(response.notification);
+//       }
+//     });
+
+//     return () => {
+//       subscription.remove();
+//     };
+//   }, [isSignedIn, navigateToFilm, registerNotifications]);
+
+//   return {
+//     startNotificationsTask,
+//     registerNotifications,
+//     unregisterNotifications,
+//   };
+// };

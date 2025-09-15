@@ -140,10 +140,6 @@
   "Toggle grid animation.": "Toggle grid animation.",
   "TV awake": "TV awake",
   "Toggle TV awake.": "Toggle TV awake.",
-  "\"%s\" %s is available": "\"%s\" %s is available",
-  "Tap here to open in the app": "Tap here to open in the app",
-  "Notifications service": "Notifications service",
-  "Toggle notifications.": "Toggle notifications.",
   "Contact developer": "Contact developer to get the key to send logs.\n1) Contact via Telegram group\n2) Send me your device id.\n3) I will send you the key.",
   "Enter developer key": "Enter developer key"
 }

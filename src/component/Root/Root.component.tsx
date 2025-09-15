@@ -5,14 +5,12 @@ import * as StatusBar from 'expo-status-bar';
 import { useAwake } from 'Hooks/useAwake';
 import { useEffect } from 'react';
 import { useMMKVString } from 'react-native-mmkv';
-import useNotifications from 'Service/Notifications';
 import ConfigStore, { DEVICE_CONFIG } from 'Store/Config.store';
 import StorageStore from 'Store/Storage.store';
 
 export const Root = ({ children }: { children: React.ReactNode }) => {
   const { isSignedIn } = useServiceContext();
   const { getNotifications } = useNotificationsContext();
-  const { startNotificationsTask } = useNotifications();
   const { checkVersion } = useAppUpdaterContext();
   const { startAwake } = useAwake();
   const config = useMMKVString(DEVICE_CONFIG, StorageStore.getConfigStorage());
@@ -26,10 +24,6 @@ export const Root = ({ children }: { children: React.ReactNode }) => {
       getNotifications();
     }
   }, [isSignedIn, getNotifications]);
-
-  useEffect(() => {
-    return startNotificationsTask();
-  }, [startNotificationsTask]);
 
   useEffect(() => {
     return startAwake();

@@ -49,9 +49,7 @@
           "imageWidth": 100
         }
       ],
-      "@react-native-firebase/app",
-      "expo-background-task",
-      "expo-notifications"
+      "@react-native-firebase/app"
     ],
     "experiments": {
       "typedRoutes": true,
@@ -63,18 +61,7 @@
       "versionCode": 8,
       "googleServicesFile": "./google-services.json",
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false,
-      "permissions": [
-        "android.permission.RECEIVE_BOOT_COMPLETED",
-        "android.permission.WAKE_LOCK",
-        "android.permission.VIBRATE",
-        "android.permission.USE_FULL_SCREEN_INTENT"
-      ]
-    },
-    "ios": {
-      "infoPlist": {
-        "UIBackgroundModes": ["background-processing", "background-fetch"]
-      }
+      "predictiveBackGestureEnabled": false
     },
     "newArchEnabled": true,
     "name": "Lumen App (DEV)",
