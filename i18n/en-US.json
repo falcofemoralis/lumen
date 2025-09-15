@@ -141,5 +141,6 @@
   "TV awake": "TV awake",
   "Toggle TV awake.": "Toggle TV awake.",
   "Contact developer": "Contact developer to get the key to send logs.\n1) Contact via Telegram group\n2) Send me your device id.\n3) I will send you the key.",
-  "Enter developer key": "Enter developer key"
+  "Enter developer key": "Enter developer key",
+  "Maximum": "Maximum"
 }

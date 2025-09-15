@@ -55,6 +55,7 @@ import {
   DEFAULT_SPEED,
   DEFAULT_SPEEDS,
   DOUBLE_TAP_ANIMATION,
+  MAX_QUALITY,
   PLAYER_CONTROLS_ANIMATION,
   PLAYER_CONTROLS_TIMEOUT,
   RewindDirection,
@@ -71,6 +72,7 @@ export function PlayerComponent({
   video,
   film,
   voice,
+  stream,
   selectedQuality,
   selectedSubtitle,
   qualityOverlayRef,
@@ -414,7 +416,7 @@ export function PlayerComponent({
       <View style={ styles.topActionLine }>
         <PlayerClock />
         <ThemedText>
-          { selectedQuality }
+          { stream.quality }
         </ThemedText>
       </View>
     );
@@ -557,10 +559,10 @@ export function PlayerComponent({
         overlayRef={ qualityOverlayRef }
         header={ t('Quality') }
         value={ selectedQuality }
-        data={ streams.map((stream) => ({
-          label: stream.quality,
-          value: stream.quality,
-        })).reverse() }
+        data={ streams.map((s) => ({
+          label: s.quality,
+          value: s.quality,
+        })).concat(MAX_QUALITY).reverse() }
         onChange={ handleQualityChange }
         onClose={ closeOverlay }
       />

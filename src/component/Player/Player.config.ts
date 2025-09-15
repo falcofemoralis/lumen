@@ -1,3 +1,6 @@
+import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
+import t from 'i18n/t';
+
 import { ProgressStatus } from './Player.type';
 
 export const DEFAULT_PROGRESS_STATUS: ProgressStatus = {
@@ -57,3 +60,8 @@ export const DEFAULT_SPEEDS = [0.25, 0.5, 1, 1.5, 2];
 export const DOUBLE_TAP_ANIMATION = 2000;
 
 export const FIRESTORE_DB = 'timestamps';
+
+export const MAX_QUALITY: DropdownItem = {
+  label: t('Maximum'),
+  value: 'max',
+};

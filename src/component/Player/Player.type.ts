@@ -22,6 +22,7 @@ export interface PlayerComponentProps {
   video: FilmVideoInterface;
   film: FilmInterface;
   voice: FilmVoiceInterface;
+  stream: FilmStreamInterface;
   selectedQuality: string;
   selectedSubtitle?: SubtitleInterface;
   qualityOverlayRef: React.RefObject<ThemedOverlayRef | null>;

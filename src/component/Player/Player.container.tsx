@@ -29,6 +29,7 @@ import { setIntervalSafe } from 'Util/Misc';
 import {
   getFirestoreSavedTime,
   getFirestoreVideoTime,
+  getPlayerQuality,
   getPlayerStream,
   getSavedTime,
   getVideoTime,
@@ -45,6 +46,7 @@ import {
   DEFAULT_REWIND_SECONDS,
   DEFAULT_SPEED,
   FIRESTORE_DB,
+  MAX_QUALITY,
   RewindDirection,
   SAVE_TIME_EVERY_MS,
 } from './Player.config';
@@ -62,7 +64,9 @@ export function PlayerContainer({
   const [selectedVideo, setSelectedVideo] = useState<FilmVideoInterface>(video);
   const [selectedStream, setSelectedStream] = useState<FilmStreamInterface>(stream);
   const [selectedVoice, setSelectedVoice] = useState<FilmVoiceInterface>(voice);
-  const [selectedQuality, setSelectedQuality] = useState<string>(selectedStream.quality);
+  const [selectedQuality, setSelectedQuality] = useState<string>(
+    getPlayerQuality() === MAX_QUALITY.value ? MAX_QUALITY.value : selectedStream.quality
+  );
   const [selectedSubtitle, setSelectedSubtitle] = useState<SubtitleInterface|undefined>(
     selectedVideo.subtitles?.find(({ isDefault }) => isDefault)
   );
@@ -347,7 +351,9 @@ export function PlayerContainer({
       return;
     }
 
-    const newStream = selectedVideo.streams.find((s) => s.quality === quality);
+    const newStream = quality !== MAX_QUALITY.value
+      ? selectedVideo.streams.find((s) => s.quality === quality)
+      : selectedVideo.streams[selectedVideo.streams.length - 1];
 
     if (!newStream) {
       return;
@@ -532,6 +538,7 @@ export function PlayerContainer({
     video: selectedVideo,
     film,
     voice: selectedVoice,
+    stream: selectedStream,
     selectedQuality,
     selectedSubtitle,
     qualityOverlayRef,
