@@ -1,3 +1,4 @@
+import KeyboardAdjuster from 'Component/KeyboardAdjuster';
 import ThemedDropdown from 'Component/ThemedDropdown';
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import ThemedImage from 'Component/ThemedImage';
@@ -7,7 +8,6 @@ import { Portal } from 'Component/ThemedPortal';
 import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import { useServiceContext } from 'Context/ServiceContext';
-import { useGradualAnimation } from 'Hooks/useGradualAnimation';
 import { useLandscape } from 'Hooks/useLandscape';
 import t from 'i18n/t';
 import { Check, ChevronLeft, CircleAlert } from 'lucide-react-native';
@@ -24,7 +24,6 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
-import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import {
   DefaultFocus,
   SpatialNavigationFocusableView,
@@ -83,15 +82,8 @@ export const BaseSlide = ({
   goNext,
   onNext,
 }: BaseSlideProps) => {
-  const { height } = useGradualAnimation();
   const isLandscape = useLandscape();
   const nextButtonRef = useRef<SpatialNavigationNodeRef>(null);
-
-  const keyboardPadding = useAnimatedStyle(() => {
-    return {
-      height: height.value,
-    };
-  }, []);
 
   const renderBaseSlide = () => {
     const {
@@ -225,7 +217,7 @@ export const BaseSlide = ({
         >
           { renderBaseSlide() }
           { children }
-          <Animated.View style={ keyboardPadding } />
+          <KeyboardAdjuster />
           { renderBaseNavigation() }
         </ScrollView>
       </Portal.Host>

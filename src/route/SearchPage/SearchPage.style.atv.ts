@@ -15,6 +15,7 @@ export const styles = CreateStyles({
   actionBtn: {
     width: 48,
     height: 48,
+    justifyContent: 'center',
   },
   searchBarContainer: {
     flex: 1,

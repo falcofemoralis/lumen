@@ -3,8 +3,9 @@ import { useServiceContext } from 'Context/ServiceContext';
 import * as Application from 'expo-application';
 import { withTV } from 'Hooks/withTV';
 import t from 'i18n/t';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Linking } from 'react-native';
+import { useKeyboardController } from 'react-native-keyboard-controller';
 import { LOGGER_ROUTE } from 'Route/LoggerPage/LoggerPage.config';
 import ConfigStore from 'Store/Config.store';
 import { yesNoOptions } from 'Util/Settings';
@@ -26,7 +27,16 @@ export function SettingsPageContainer() {
     getCDNs,
   } = useServiceContext();
   const navigation = useNavigation();
+  const { setEnabled } = useKeyboardController();
   const { handleTap } = useTripleTap();
+
+  useEffect(() => {
+    setEnabled(true);
+
+    return () => {
+      setEnabled(false);
+    };
+  }, []);
 
   const onPress = useCallback((value: string | null, key: any) => {
     ConfigStore.updateConfig(key, convertStringToBoolean(value));

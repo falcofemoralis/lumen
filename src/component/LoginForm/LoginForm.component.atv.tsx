@@ -1,13 +1,13 @@
 import { useNavigation } from '@react-navigation/native';
 import InfoBlock from 'Component/InfoBlock';
+import KeyboardAdjuster from 'Component/KeyboardAdjuster/KeyboardAdjuster.component';
 import Loader from 'Component/Loader';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedInput from 'Component/ThemedInput';
-import { useGradualAnimation } from 'Hooks/useGradualAnimation';
 import t from 'i18n/t';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { View } from 'react-native';
-import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import { useKeyboardController } from 'react-native-keyboard-controller';
 import { DefaultFocus } from 'react-tv-space-navigation';
 import { ACCOUNT_ROUTE } from 'Route/AccountPage/AccountPage.config';
 
@@ -19,9 +19,17 @@ export function LoginFormComponent({
   withRedirect,
   handleLogin,
 }: LoginFormComponentProps) {
-  const { height } = useGradualAnimation();
   const navigation = useNavigation();
   const loginRef = useRef({ username: '', password: '' });
+  const { setEnabled } = useKeyboardController();
+
+  useEffect(() => {
+    setEnabled(false);
+
+    return () => {
+      setEnabled(true);
+    };
+  }, []);
 
   const renderForm = () => {
     if (withRedirect) {
@@ -69,12 +77,6 @@ export function LoginFormComponent({
     );
   };
 
-  const keyboardPadding = useAnimatedStyle(() => {
-    return {
-      height: height.value,
-    };
-  }, []);
-
   return (
     <DefaultFocus>
       <View
@@ -85,7 +87,7 @@ export function LoginFormComponent({
           subtitle={ t('Sign in to sync content') }
         />
         { renderForm() }
-        <Animated.View style={ keyboardPadding } />
+        <KeyboardAdjuster />
       </View>
     </DefaultFocus>
   );

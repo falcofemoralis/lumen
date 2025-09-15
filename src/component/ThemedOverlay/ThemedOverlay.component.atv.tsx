@@ -1,8 +1,8 @@
+import KeyboardAdjuster from 'Component/KeyboardAdjuster/KeyboardAdjuster.component';
 import { Portal } from 'Component/ThemedPortal';
-import { useGradualAnimation } from 'Hooks/useGradualAnimation';
 import { memo } from 'react';
 import { View } from 'react-native';
-import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 
 import { SpatialNavigationOverlay } from './SpatialNavigationOverlay';
 import { styles } from './ThemedOverlay.style.atv';
@@ -15,16 +15,9 @@ export function ThemedOverlayComponent({
   children,
   isOpened,
   contentVisible,
+  useKeyboardAdjustment,
   handleModalRequestClose,
 }: ThemedOverlayComponentProps) {
-  const { height } = useGradualAnimation();
-
-  const keyboardPadding = useAnimatedStyle(() => {
-    return {
-      height: height.value > 0 ? height.value / 2 : 0,
-    };
-  }, []);
-
   return (
     <Portal>
       <SpatialNavigationOverlay
@@ -45,7 +38,7 @@ export function ThemedOverlayComponent({
                 { contentVisible && children }
               </View>
             </View>
-            <Animated.View style={ keyboardPadding } />
+            { useKeyboardAdjustment && <KeyboardAdjuster scale={ 2 } /> }
           </Animated.View>
         </Portal.Host>
       </SpatialNavigationOverlay>

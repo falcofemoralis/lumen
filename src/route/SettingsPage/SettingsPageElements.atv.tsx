@@ -193,6 +193,7 @@ export const SettingInput = memo(({
         ref={ overlayRef }
         contentContainerStyle={ styles.overlay }
         onClose={ () => setInputValue(value) }
+        useKeyboardAdjustment
       >
         <DefaultFocus>
           <ThemedText style={ styles.overlayTitle }>

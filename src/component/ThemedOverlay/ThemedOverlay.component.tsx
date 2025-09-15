@@ -1,12 +1,11 @@
+import KeyboardAdjuster from 'Component/KeyboardAdjuster/KeyboardAdjuster.component';
 import { Portal } from 'Component/ThemedPortal';
-import { useGradualAnimation } from 'Hooks/useGradualAnimation';
 import { useLandscape } from 'Hooks/useLandscape';
 import {
   memo,
 } from 'react';
 import { Modal } from 'react-native';
 import { GestureHandlerRootView, Pressable } from 'react-native-gesture-handler';
-import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { Colors } from 'Style/Colors';
 import { noopFn } from 'Util/Function';
 
@@ -20,17 +19,11 @@ export function ThemedOverlayComponent({
   children,
   transparent,
   contentVisible,
+  useKeyboardAdjustment,
   handleModalRequestClose,
   onShow,
 }: ThemedOverlayComponentProps) {
   const isLandscape = useLandscape();
-  const { height } = useGradualAnimation();
-
-  const keyboardPadding = useAnimatedStyle(() => {
-    return {
-      height: height.value > 0 ? height.value / 2 : 0,
-    };
-  }, []);
 
   return (
     <Portal>
@@ -57,7 +50,7 @@ export function ThemedOverlayComponent({
             >
               { contentVisible && children }
             </Pressable>
-            <Animated.View style={ keyboardPadding } />
+            { useKeyboardAdjustment && <KeyboardAdjuster scale={ 2 } /> }
           </Pressable>
         </GestureHandlerRootView>
       </Modal>

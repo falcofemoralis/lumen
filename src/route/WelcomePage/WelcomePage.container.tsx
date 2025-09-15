@@ -1,8 +1,9 @@
 import * as Application from 'expo-application';
 import t from 'i18n/t';
 import { CircleCheck, Clapperboard, CloudCog, FolderCog, MonitorCog, UserCog } from 'lucide-react-native';
-import { useLayoutEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { Platform } from 'react-native';
+import { useKeyboardController } from 'react-native-keyboard-controller';
 import RNRestart from 'react-native-restart';
 import ConfigStore from 'Store/Config.store';
 import NotificationStore from 'Store/Notification.store';
@@ -12,6 +13,7 @@ import WelcomePageComponent from './WelcomePage.component';
 import { DeviceType, SLIDE_TYPE, SlideInterface } from './WelcomePage.type';
 
 export function WelcomePageContainer() {
+  const { setEnabled } = useKeyboardController();
   const [selectedDeviceType, setSelectedDeviceType] = useState<DeviceType | null>(null);
 
   const slides: SlideInterface[] = [
@@ -56,6 +58,14 @@ export function WelcomePageContainer() {
 
   useLayoutEffect(() => {
     configureRemoteControl();
+  }, []);
+
+  useEffect(() => {
+    setEnabled(true);
+
+    return () => {
+      setEnabled(false);
+    };
   }, []);
 
   const configureDeviceType = (type: DeviceType) => {

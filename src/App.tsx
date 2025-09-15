@@ -27,8 +27,8 @@ export function App() {
     >
       <AppProvider>
         <SpatialNavigationDeviceTypeProvider>
-          <KeyboardProvider>
-            <GestureHandlerRootView>
+          <GestureHandlerRootView>
+            <KeyboardProvider enabled={ false }>
               <Root>
                 <SafeAreaView style={ { flex: 1, backgroundColor: Colors.background } }>
                   <Portal.Host>
@@ -37,8 +37,8 @@ export function App() {
                   </Portal.Host>
                 </SafeAreaView>
               </Root>
-            </GestureHandlerRootView>
-          </KeyboardProvider>
+            </KeyboardProvider>
+          </GestureHandlerRootView>
         </SpatialNavigationDeviceTypeProvider>
       </AppProvider>
     </Navigation>

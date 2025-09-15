@@ -6,6 +6,7 @@ export interface ThemedOverlayContainerProps {
   containerStyle?: StyleProp<ViewStyle>;
   contentContainerStyle?: StyleProp<ViewStyle>;
   transparent?: boolean;
+  useKeyboardAdjustment?: boolean;
   onOpen?: () => void;
   onClose?: () => void;
   onShow?: () => void;
@@ -19,6 +20,7 @@ export interface ThemedOverlayComponentProps {
   contentContainerStyle?: StyleProp<ViewStyle>;
   transparent?: boolean;
   contentVisible: boolean;
+  useKeyboardAdjustment?: boolean;
   onOpen?: () => void;
   onClose?: () => void;
   onShow?: () => void;
