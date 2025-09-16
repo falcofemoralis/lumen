@@ -6,7 +6,7 @@ export const KeyboardAdjuster = ({ scale = 1 }: {scale?: number}) => {
 
   const keyboardPadding = useAnimatedStyle(() => {
     return {
-      height: height.value > 0 ? height.value / scale : 0,
+      height: height.value > 0 ? (height.value / scale) : 0,
     };
   }, []);
 

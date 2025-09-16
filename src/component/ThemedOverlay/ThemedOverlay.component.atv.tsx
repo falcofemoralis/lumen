@@ -38,7 +38,7 @@ export function ThemedOverlayComponent({
                 { contentVisible && children }
               </View>
             </View>
-            { useKeyboardAdjustment && <KeyboardAdjuster scale={ 2 } /> }
+            { useKeyboardAdjustment && <KeyboardAdjuster /> }
           </Animated.View>
         </Portal.Host>
       </SpatialNavigationOverlay>
