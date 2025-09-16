@@ -1,9 +1,9 @@
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useServiceContext } from 'Context/ServiceContext';
 import * as Application from 'expo-application';
 import { withTV } from 'Hooks/withTV';
 import t from 'i18n/t';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Linking } from 'react-native';
 import { useKeyboardController } from 'react-native-keyboard-controller';
 import { LOGGER_ROUTE } from 'Route/LoggerPage/LoggerPage.config';
@@ -30,13 +30,13 @@ export function SettingsPageContainer() {
   const { setEnabled } = useKeyboardController();
   const { handleTap } = useTripleTap();
 
-  useEffect(() => {
+  useFocusEffect(() => {
     setEnabled(true);
 
     return () => {
       setEnabled(false);
     };
-  }, []);
+  });
 
   const onPress = useCallback((value: string | null, key: any) => {
     ConfigStore.updateConfig(key, convertStringToBoolean(value));

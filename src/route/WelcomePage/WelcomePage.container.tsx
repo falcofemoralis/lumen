@@ -62,10 +62,6 @@ export function WelcomePageContainer() {
 
   useEffect(() => {
     setEnabled(true);
-
-    return () => {
-      setEnabled(false);
-    };
   }, []);
 
   const configureDeviceType = (type: DeviceType) => {

@@ -1,11 +1,11 @@
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import InfoBlock from 'Component/InfoBlock';
 import KeyboardAdjuster from 'Component/KeyboardAdjuster/KeyboardAdjuster.component';
 import Loader from 'Component/Loader';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedInput from 'Component/ThemedInput';
 import t from 'i18n/t';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { View } from 'react-native';
 import { useKeyboardController } from 'react-native-keyboard-controller';
 import { DefaultFocus } from 'react-tv-space-navigation';
@@ -23,13 +23,13 @@ export function LoginFormComponent({
   const loginRef = useRef({ username: '', password: '' });
   const { setEnabled } = useKeyboardController();
 
-  useEffect(() => {
-    setEnabled(false);
+  useFocusEffect(() => {
+    setEnabled(true);
 
     return () => {
-      setEnabled(true);
+      setEnabled(false);
     };
-  }, []);
+  });
 
   const renderForm = () => {
     if (withRedirect) {
