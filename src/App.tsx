@@ -15,6 +15,11 @@ import { Colors } from 'Style/Colors';
 import { RootStack } from './navigation';
 import { Navigation } from './navigation/container';
 
+SplashScreen.setOptions({
+  duration: 750,
+  fade: true,
+});
+
 SplashScreen.preventAutoHideAsync();
 
 export function App() {
@@ -22,7 +27,9 @@ export function App() {
     <Navigation
       theme={ DarkTheme }
       onReady={ () => {
-        SplashScreen.hideAsync();
+        setTimeout(() => {
+          SplashScreen.hideAsync();
+        }, 250);
       } }
     >
       <AppProvider>
