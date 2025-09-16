@@ -75,6 +75,7 @@ export interface LongEvent {
 export interface DoubleTapAction {
   seconds: number;
   direction: RewindDirection;
+  isVisible: boolean;
 }
 
 export interface SavedTimestamp {

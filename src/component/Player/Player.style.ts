@@ -1,6 +1,8 @@
 import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
+import { DOUBLE_TAP_ANIMATION_DELAY } from './Player.config';
+
 export const styles = CreateStyles({
   container: {
     position: 'relative',
@@ -131,7 +133,7 @@ export const styles = CreateStyles({
     alignItems: 'center',
     opacity: 0,
     transitionProperty: 'opacity',
-    transitionDuration: '150ms',
+    transitionDuration: `${DOUBLE_TAP_ANIMATION_DELAY}ms`,
   },
   doubleTapActionVisible: {
     opacity: 1,

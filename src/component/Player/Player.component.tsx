@@ -57,6 +57,7 @@ import {
   DEFAULT_SPEED,
   DEFAULT_SPEEDS,
   DOUBLE_TAP_ANIMATION,
+  DOUBLE_TAP_ANIMATION_DELAY,
   MAX_QUALITY,
   PLAYER_CONTROLS_ANIMATION,
   PLAYER_CONTROLS_TIMEOUT,
@@ -205,6 +206,7 @@ export function PlayerComponent({
     setDoubleTapAction({
       seconds: doubleTapAction?.direction === direction ? seconds + (doubleTapAction?.seconds ?? 0) : seconds,
       direction,
+      isVisible: true,
     });
 
     if (doubleTapTimeout.current) {
@@ -212,7 +214,11 @@ export function PlayerComponent({
     }
 
     doubleTapTimeout.current = setTimeoutSafe(() => {
-      setDoubleTapAction(null);
+      setDoubleTapAction((prev) => prev ? { ...prev, isVisible: false } : null);
+
+      setTimeout(() => {
+        setDoubleTapAction(null);
+      }, DOUBLE_TAP_ANIMATION_DELAY);
     }, DOUBLE_TAP_ANIMATION);
   };
 
@@ -466,7 +472,7 @@ export function PlayerComponent({
   };
 
   const renderDoubleTapAction = () => {
-    const { seconds = 10, direction } = doubleTapAction ?? {};
+    const { seconds = 10, direction, isVisible } = doubleTapAction ?? {};
 
     return (
       <React.Fragment>
@@ -474,7 +480,7 @@ export function PlayerComponent({
           style={ [
             styles.doubleTapAction,
             styles.doubleTapActionLeft,
-            direction === RewindDirection.BACKWARD && styles.doubleTapActionVisible,
+            (direction === RewindDirection.BACKWARD && isVisible) && styles.doubleTapActionVisible,
           ] }
         >
           <View style={ styles.doubleTapContainer }>
@@ -490,7 +496,7 @@ export function PlayerComponent({
           style={ [
             styles.doubleTapAction,
             styles.doubleTapActionRight,
-            direction === RewindDirection.FORWARD && styles.doubleTapActionVisible,
+            (direction === RewindDirection.FORWARD && isVisible) && styles.doubleTapActionVisible,
           ] }
         >
           <View style={ styles.doubleTapContainer }>

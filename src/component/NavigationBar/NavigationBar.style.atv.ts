@@ -57,6 +57,7 @@ export const styles = CreateStyles({
     position: 'absolute',
     left: 44,
     color: Colors.text,
+    fontSize: 14,
   },
   tabContentFocused: {
     color: Colors.textFocused,
@@ -66,13 +67,16 @@ export const styles = CreateStyles({
   },
   profileNameText: {
     left: 8,
-    top: 0,
+    top: -2,
     fontWeight: '700',
   },
   profileSwitchText: {
     left: 8,
-    bottom: 0,
+    bottom: -2,
     color: Colors.textSecondary,
+  },
+  profileAvatarContainer: {
+    left: -4,
   },
   profileAvatar: {
     width: 32,
@@ -81,8 +85,6 @@ export const styles = CreateStyles({
     borderRadius: 99,
     borderColor: Colors.border,
     borderWidth: 1,
-  },
-  profileAvatarContainer: {
   },
   badge: {
     backgroundColor: Colors.secondary,
