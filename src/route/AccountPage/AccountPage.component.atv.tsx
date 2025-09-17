@@ -4,11 +4,12 @@ import Page from 'Component/Page';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
+import { useNotificationsContext } from 'Context/NotificationsContext';
+import { useServiceContext } from 'Context/ServiceContext';
 import t from 'i18n/t';
 import React from 'react';
 import { Image, View } from 'react-native';
 import { DefaultFocus, SpatialNavigationScrollView, SpatialNavigationView } from 'react-tv-space-navigation';
-import NotificationStore from 'Store/Notification.store';
 import { scale } from 'Util/CreateStyles';
 
 import { styles } from './AccountPage.style.atv';
@@ -18,6 +19,9 @@ export function AccountPageComponent({
   isSignedIn,
   profile,
 }: AccountPageComponentProps) {
+  const { logout, viewProfile } = useServiceContext();
+  const { resetNotifications } = useNotificationsContext();
+
   const renderProfile = () => {
     if (!profile) {
       return (
@@ -71,13 +75,16 @@ export function AccountPageComponent({
               <DefaultFocus>
                 <ThemedButton
                   style={ styles.profileAction }
-                  onPress={ () => NotificationStore.displayMessage(t('Not implemented')) }
+                  onPress={ () => {
+                    logout();
+                    resetNotifications();
+                  } }
                 >
                   { t('Log out') }
                 </ThemedButton>
                 <ThemedButton
                   style={ styles.profileAction }
-                  onPress={ () => NotificationStore.displayMessage(t('Not implemented')) }
+                  onPress={ viewProfile }
                 >
                   { t('View Profile') }
                 </ThemedButton>
