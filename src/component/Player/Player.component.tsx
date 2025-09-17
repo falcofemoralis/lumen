@@ -1,5 +1,5 @@
-import BookmarksSelector from 'Component/BookmarksSelector';
-import Comments from 'Component/Comments';
+import BookmarksOverlay from 'Component/BookmarksOverlay';
+import CommentsOverlay from 'Component/CommentsOverlay';
 import Loader from 'Component/Loader';
 import PlayerClock from 'Component/PlayerClock';
 import PlayerDuration from 'Component/PlayerDuration';
@@ -7,10 +7,8 @@ import PlayerProgressBar from 'Component/PlayerProgressBar';
 import PlayerSubtitles from 'Component/PlayerSubtitles';
 import PlayerVideoSelector from 'Component/PlayerVideoSelector';
 import ThemedDropdown from 'Component/ThemedDropdown';
-import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
-import { useOverlayContext } from 'Context/OverlayContext';
 import * as NavigationBar from 'expo-navigation-bar';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { OrientationLock } from 'expo-screen-orientation';
@@ -19,8 +17,9 @@ import { isPictureInPictureSupported, VideoView } from 'expo-video';
 import t from 'i18n/t';
 import {
   Bookmark,
-  Captions,
-  CaptionsOff,
+  BookmarkCheck,
+  ClosedCaption,
+  FastForward,
   Forward,
   Gauge,
   ListVideo,
@@ -30,24 +29,26 @@ import {
   Pause,
   PictureInPicture2,
   Play,
+  Rewind,
+  Settings2,
   SkipBack,
   SkipForward,
-  Sparkles,
 } from 'lucide-react-native';
 import React, {
   useEffect, useRef, useState,
 } from 'react';
-import { Dimensions, ScrollView, View } from 'react-native';
+import { Dimensions, View } from 'react-native';
 import {
   Gesture,
   GestureDetector,
 } from 'react-native-gesture-handler';
 import Animated, {
-  runOnJS,
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
 import { Colors } from 'Style/Colors';
+import { ClosedCaptionFilled } from 'Style/Icons';
 import { scale } from 'Util/CreateStyles';
 import { setTimeoutSafe } from 'Util/Misc';
 
@@ -56,6 +57,8 @@ import {
   DEFAULT_SPEED,
   DEFAULT_SPEEDS,
   DOUBLE_TAP_ANIMATION,
+  DOUBLE_TAP_ANIMATION_DELAY,
+  MAX_QUALITY,
   PLAYER_CONTROLS_ANIMATION,
   PLAYER_CONTROLS_TIMEOUT,
   RewindDirection,
@@ -67,21 +70,24 @@ const { width: screenWidth } = Dimensions.get('window');
 
 export function PlayerComponent({
   player,
-  isLoading,
+  status,
   isPlaying,
   video,
   film,
   voice,
+  stream,
   selectedQuality,
   selectedSubtitle,
-  qualityOverlayId,
-  subtitleOverlayId,
-  playerVideoSelectorOverlayId,
-  commentsOverlayId,
-  bookmarksOverlayId,
-  speedOverlayId,
+  qualityOverlayRef,
+  subtitleOverlayRef,
+  playerVideoSelectorOverlayRef,
+  commentsOverlayRef,
+  bookmarksOverlayRef,
+  speedOverlayRef,
   selectedSpeed,
   isLocked,
+  isOverlayOpen,
+  isFilmBookmarked,
   togglePlayPause,
   seekToPosition,
   calculateCurrentTime,
@@ -89,7 +95,6 @@ export function PlayerComponent({
   handleQualityChange,
   openQualitySelector,
   openVideoSelector,
-  hideVideoSelector,
   handleVideoSelect,
   rewindPosition,
   openSubtitleSelector,
@@ -100,18 +105,21 @@ export function PlayerComponent({
   openCommentsOverlay,
   handleLockControls,
   handleShare,
+  closeOverlay,
+  onBookmarkChange,
+  setPlayerRate,
 }: PlayerComponentProps) {
-  const { currentOverlay, goToPreviousOverlay } = useOverlayContext();
   const [showControls, setShowControls] = useState(false);
   const [isScrolling, setIsScrolling] = useState(false);
   const [doubleTapAction, setDoubleTapAction] = useState<DoubleTapAction | null>(null);
   const [longTapAction, setLongTapAction] = useState(false);
+  const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const controlsTimeout = useRef<NodeJS.Timeout | null>(null);
   const playerRef = useRef<VideoView>(null);
   const doubleTapTimeout = useRef<NodeJS.Timeout | null>(null);
   const isPlayingRef = useRef(isPlaying);
   const showControlsRef = useRef(showControls);
-  const currentOverlayRef = useRef(currentOverlay);
+  const isOverlayOpenRef = useRef(isOverlayOpen);
   const isScrollingRef = useRef(isScrolling);
   const isComponentMounted = useRef(true);
 
@@ -129,7 +137,7 @@ export function PlayerComponent({
 
       if (isPlayingRef.current
         && showControlsRef.current
-        && !currentOverlayRef.current.length
+        && !isOverlayOpenRef.current
         && !isScrollingRef.current
       ) {
         setShowControls(false);
@@ -141,8 +149,8 @@ export function PlayerComponent({
     isPlayingRef.current = isPlaying;
     showControlsRef.current = showControls;
     isScrollingRef.current = isScrolling;
-    currentOverlayRef.current = currentOverlay;
-  }, [showControls, currentOverlay.length, isScrolling, isPlaying]);
+    isOverlayOpenRef.current = isOverlayOpen;
+  }, [showControls, isOverlayOpen, isScrolling, isPlaying]);
 
   useEffect(() => {
     return () => {
@@ -152,7 +160,7 @@ export function PlayerComponent({
 
   useEffect(() => {
     setControlsTimeout();
-  }, [isPlaying, currentOverlay.length, player]);
+  }, [isPlaying, isOverlayOpen, player]);
 
   useEffect(() => {
     ScreenOrientation.lockAsync(OrientationLock.LANDSCAPE);
@@ -184,7 +192,11 @@ export function PlayerComponent({
 
   const handleOpenComments = () => {
     setShowControls(false);
-    openCommentsOverlay();
+    setIsCommentsOpen(true);
+
+    setTimeout(() => {
+      openCommentsOverlay();
+    }, 250);
   };
 
   const handleDoubleTap = (direction: RewindDirection) => {
@@ -194,6 +206,7 @@ export function PlayerComponent({
     setDoubleTapAction({
       seconds: doubleTapAction?.direction === direction ? seconds + (doubleTapAction?.seconds ?? 0) : seconds,
       direction,
+      isVisible: true,
     });
 
     if (doubleTapTimeout.current) {
@@ -201,18 +214,28 @@ export function PlayerComponent({
     }
 
     doubleTapTimeout.current = setTimeoutSafe(() => {
-      setDoubleTapAction(null);
+      setDoubleTapAction((prev) => prev ? { ...prev, isVisible: false } : null);
+
+      setTimeout(() => {
+        setDoubleTapAction(null);
+      }, DOUBLE_TAP_ANIMATION_DELAY);
     }, DOUBLE_TAP_ANIMATION);
   };
 
   const singleTap = Gesture.Tap()
+    .maxDuration(250)
     .onEnd(() => {
-      runOnJS(setShowControls)(!showControls);
-      runOnJS(handleUserInteraction)();
+      if (doubleTapAction) {
+        return;
+      }
+
+      scheduleOnRN(setShowControls, !showControls);
+      scheduleOnRN(handleUserInteraction);
     });
 
   const doubleTap = Gesture.Tap()
     .numberOfTaps(2)
+    .maxDuration(300)
     .onEnd((e) => {
       if (isLocked) {
         return;
@@ -221,25 +244,27 @@ export function PlayerComponent({
       const { absoluteX } = e;
 
       if (absoluteX < (screenWidth / 2)) {
-        runOnJS(handleDoubleTap)(RewindDirection.BACKWARD);
+        scheduleOnRN(handleDoubleTap, RewindDirection.BACKWARD);
       } else {
-        runOnJS(handleDoubleTap)(RewindDirection.FORWARD);
+        scheduleOnRN(handleDoubleTap, RewindDirection.FORWARD);
       }
+
+      scheduleOnRN(setShowControls, false);
     });
 
-  // const longPressGesture = Gesture.LongPress()
-  //   .onStart(() => {
-  //     if (showControls || isLocked || !isPlaying) {
-  //       return;
-  //     }
+  const longPressGesture = Gesture.LongPress()
+    .onStart(() => {
+      if (showControls || isLocked || !isPlaying) {
+        return;
+      }
 
-  //     runOnJS(setPlayerRate)(1.5);
-  //     runOnJS(setLongTapAction)(true);
-  //   })
-  //   .onEnd(() => {
-  //     runOnJS(setPlayerRate)(1);
-  //     runOnJS(setLongTapAction)(false);
-  //   });
+      scheduleOnRN(setPlayerRate, 1.5);
+      scheduleOnRN(setLongTapAction,true);
+    })
+    .onEnd(() => {
+      scheduleOnRN(setPlayerRate,1);
+      scheduleOnRN(setLongTapAction,false);
+    });
 
   const enablePIP = () => {
     playerRef.current?.startPictureInPicture();
@@ -300,7 +325,10 @@ export function PlayerComponent({
       return null;
     }
 
-    return renderAction(selectedSubtitle?.languageCode === '' ? Captions : CaptionsOff, openSubtitleSelector);
+    return renderAction(
+      selectedSubtitle?.languageCode === '' ? ClosedCaption : ClosedCaptionFilled,
+      openSubtitleSelector
+    );
   };
 
   const renderTopActions = () => (
@@ -311,7 +339,7 @@ export function PlayerComponent({
           <>
             { isPictureInPictureSupported() && renderAction(PictureInPicture2, enablePIP) }
             { renderAction(Gauge, openSpeedSelector) }
-            { renderAction(Sparkles, openQualitySelector) }
+            { renderAction(Settings2, openQualitySelector) }
             { renderSubtitlesActions() }
           </>
         ) }
@@ -350,7 +378,7 @@ export function PlayerComponent({
           () => handleNewEpisode(RewindDirection.BACKWARD)
         ) }
         { renderMiddleControl(
-          isPlaying || isLoading ? Pause : Play,
+          isPlaying || status === 'loading' ? Pause : Play,
           togglePlayPause,
           'big'
         ) }
@@ -405,7 +433,7 @@ export function PlayerComponent({
       <View style={ styles.topActionLine }>
         <PlayerClock />
         <ThemedText>
-          { selectedQuality }
+          { stream.quality }
         </ThemedText>
       </View>
     );
@@ -435,7 +463,7 @@ export function PlayerComponent({
           >
             { isPlaylistSelector && renderAction(ListVideo, openVideoSelector) }
             { renderAction(MessageSquareText, handleOpenComments) }
-            { renderAction(Bookmark, openBookmarksOverlay) }
+            { renderAction(isFilmBookmarked ? BookmarkCheck : Bookmark, openBookmarksOverlay) }
             { renderAction(Forward, handleShare) }
           </View>
         </View>
@@ -444,64 +472,62 @@ export function PlayerComponent({
   };
 
   const renderDoubleTapAction = () => {
-    if (!doubleTapAction) {
-      return null;
-    }
-
-    const { seconds, direction } = doubleTapAction;
+    const { seconds = 10, direction, isVisible } = doubleTapAction ?? {};
 
     return (
-      <View style={ [
-        styles.doubleTapAction,
-        {
-          left: direction === RewindDirection.BACKWARD ? '20%' : '80%',
-        },
-      ] }
-      >
-        <View style={ [
-          styles.doubleTapContainer,
-          {
-            flexDirection: direction === RewindDirection.BACKWARD ? 'row-reverse' : 'row',
-          },
-        ] }
+      <React.Fragment>
+        <Animated.View
+          style={ [
+            styles.doubleTapAction,
+            styles.doubleTapActionLeft,
+            (direction === RewindDirection.BACKWARD && isVisible) && styles.doubleTapActionVisible,
+          ] }
         >
-          { /* <ThemedIcon
-            style={ styles.doubleTapIcon }
-            icon={ {
-              name: direction === RewindDirection.BACKWARD ? 'rewind-outline' : 'fast-forward-outline',
-              pack: IconPackType.MaterialCommunityIcons,
-            } }
-            size={ scale(24) }
-            color="white"
-          /> */ }
-          <ThemedText style={ styles.longTapText }>
-            { `${direction === RewindDirection.BACKWARD ? '-' : '+'}${seconds}` }
-          </ThemedText>
-        </View>
-      </View>
+          <View style={ styles.doubleTapContainer }>
+            <View style={ styles.doubleTapIcon }>
+              <Rewind color={ Colors.white } />
+            </View>
+            <ThemedText style={ styles.longTapText }>
+              { t('%s seconds', `-${seconds}`) }
+            </ThemedText>
+          </View>
+        </Animated.View>
+        <Animated.View
+          style={ [
+            styles.doubleTapAction,
+            styles.doubleTapActionRight,
+            (direction === RewindDirection.FORWARD && isVisible) && styles.doubleTapActionVisible,
+          ] }
+        >
+          <View style={ styles.doubleTapContainer }>
+            <View style={ styles.doubleTapIcon }>
+              <FastForward color={ Colors.white } />
+            </View>
+            <ThemedText style={ styles.longTapText }>
+              { t('%s seconds', `${seconds}`) }
+            </ThemedText>
+          </View>
+        </Animated.View>
+      </React.Fragment>
     );
   };
 
   const renderLongTapAction = () => {
-    if (!longTapAction) {
-      return null;
-    }
-
     return (
       <View style={ styles.longTapAction }>
-        <View style={ styles.longTapContainer }>
+        <View
+          style={ [
+            styles.longTapContainer,
+            longTapAction && styles.longTapActionVisible,
+          ] }
+        >
           <ThemedText style={ styles.longTapText }>
-            2x
+            1.5x
           </ThemedText>
-          { /* <ThemedIcon
-            style={ styles.longTapIcon }
-            icon={ {
-              name: 'fast-forward-outline',
-              pack: IconPackType.MaterialCommunityIcons,
-            } }
-            size={ scale(24) }
-            color="white"
-          /> */ }
+          <FastForward
+            size={ scale(18) }
+            color={ Colors.white }
+          />
         </View>
       </View>
     );
@@ -509,10 +535,10 @@ export function PlayerComponent({
 
   const renderControls = () => (
     <GestureDetector
-      gesture={ Gesture.Exclusive(
+      gesture={ Gesture.Race(
         doubleTap,
-        singleTap
-        // longPressGesture,
+        singleTap,
+        longPressGesture
       ) }
     >
       <View style={ styles.controlsContainer }>
@@ -534,7 +560,7 @@ export function PlayerComponent({
 
   const renderLoader = () => (
     <Loader
-      isLoading={ isLoading }
+      isLoading={ status === 'loading' }
       fullScreen
     />
   );
@@ -545,14 +571,15 @@ export function PlayerComponent({
     return (
       <ThemedDropdown
         asOverlay
-        overlayId={ qualityOverlayId }
+        overlayRef={ qualityOverlayRef }
         header={ t('Quality') }
         value={ selectedQuality }
-        data={ streams.map((stream) => ({
-          label: stream.quality,
-          value: stream.quality,
-        })).reverse() }
+        data={ streams.map((s) => ({
+          label: s.quality,
+          value: s.quality,
+        })).concat(MAX_QUALITY).reverse() }
         onChange={ handleQualityChange }
+        onClose={ closeOverlay }
       />
     );
   };
@@ -566,11 +593,11 @@ export function PlayerComponent({
 
     return (
       <PlayerVideoSelector
-        overlayId={ playerVideoSelectorOverlayId }
+        overlayRef={ playerVideoSelectorOverlayRef }
         film={ film }
-        onHide={ hideVideoSelector }
         onSelect={ handleVideoSelect }
         voice={ voice }
+        onClose={ closeOverlay }
       />
     );
   };
@@ -581,7 +608,7 @@ export function PlayerComponent({
     return (
       <ThemedDropdown
         asOverlay
-        overlayId={ subtitleOverlayId }
+        overlayRef={ subtitleOverlayRef }
         header={ t('Subtitles') }
         value={ selectedSubtitle?.languageCode }
         data={ subtitles.map((subtitle) => ({
@@ -589,41 +616,39 @@ export function PlayerComponent({
           value: subtitle.languageCode,
         })) }
         onChange={ handleSubtitleChange }
+        onClose={ closeOverlay }
       />
     );
   };
 
   const renderCommentsOverlay = () => (
-    <ThemedOverlay
-      id={ commentsOverlayId }
-      onHide={ () => goToPreviousOverlay() }
+    <CommentsOverlay
+      overlayRef={ commentsOverlayRef }
+      film={ film }
+      style={ styles.commentsOverlayModal }
       containerStyle={ styles.commentsOverlay }
       contentContainerStyle={ styles.commentsOverlayContent }
-    >
-      <ScrollView
-        horizontal
-        contentContainerStyle={ { width: '100%', height: '100%' } }
-      >
-        <Comments
-          style={ styles.commentsOverlayList }
-          film={ film }
-          loaderFullScreen
-        />
-      </ScrollView>
-    </ThemedOverlay>
+      contentStyle={ styles.commentsOverlayList }
+      onClose={ () => {
+        closeOverlay();
+        setIsCommentsOpen(false);
+      } }
+    />
   );
 
   const renderBookmarksOverlay = () => (
-    <BookmarksSelector
-      overlayId={ bookmarksOverlayId }
+    <BookmarksOverlay
+      overlayRef={ bookmarksOverlayRef }
       film={ film }
+      onClose={ closeOverlay }
+      onBookmarkChange={ onBookmarkChange }
     />
   );
 
   const renderSpeedSelector = () => (
     <ThemedDropdown
       asOverlay
-      overlayId={ speedOverlayId }
+      overlayRef={ speedOverlayRef }
       header={ t('Speed') }
       value={ String(selectedSpeed) }
       data={ DEFAULT_SPEEDS.map((speed) => ({
@@ -631,6 +656,7 @@ export function PlayerComponent({
         value: String(speed),
       })) }
       onChange={ handleSpeedChange }
+      onClose={ closeOverlay }
     />
   );
 
@@ -646,7 +672,12 @@ export function PlayerComponent({
   );
 
   return (
-    <View style={ styles.container }>
+    <View
+      style={ [
+        styles.container,
+        isCommentsOpen && { width: (Dimensions.get('window').width) * 0.55 },
+      ] }
+    >
       <VideoView
         ref={ playerRef }
         style={ styles.video }

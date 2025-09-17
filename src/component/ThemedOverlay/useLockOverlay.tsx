@@ -2,20 +2,20 @@ import { useIsFocused } from '@react-navigation/native';
 import { useEffect } from 'react';
 import { BackHandler } from 'react-native';
 import { useLockSpatialNavigation } from 'react-tv-space-navigation';
+import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
 
 interface UseLockProps {
   isModalOpened: boolean;
   isModalVisible: boolean;
   hideModal: () => void;
-  id: string;
 }
 
 // This hook is used to lock the spatial navigation of parent navigator when a modal is open
 // and to prevent the user from closing the modal by pressing the back button
-export const useLockOverlay = ({ isModalOpened,isModalVisible, hideModal, id }: UseLockProps) => {
+export const useLockOverlay = ({ isModalOpened,isModalVisible, hideModal }: UseLockProps) => {
   useLockParentSpatialNavigator(isModalOpened);
-  usePreventNavigationGoBack(isModalVisible, hideModal, id);
+  usePreventNavigationGoBack(isModalVisible, hideModal);
 };
 
 const useLockParentSpatialNavigator = (isModalOpened: boolean) => {
@@ -34,7 +34,7 @@ const useLockParentSpatialNavigator = (isModalOpened: boolean) => {
   }, [isModalOpened, lock, unlock]);
 };
 
-const usePreventNavigationGoBack = (isModalVisible: boolean, hideModal: () => void, id: string) => {
+const usePreventNavigationGoBack = (isModalVisible: boolean, hideModal: () => void) => {
   const isFocused = useIsFocused();
 
   useEffect(() => {
@@ -49,8 +49,10 @@ const usePreventNavigationGoBack = (isModalVisible: boolean, hideModal: () => vo
 
           return true;
         }
-      } catch (e) {
-        NotificationStore.displayError(e as Error);
+      } catch (error) {
+        LoggerStore.error('usePreventNavigationGoBack', { error });
+
+        NotificationStore.displayError(error as Error);
 
         return true;
       }

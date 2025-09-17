@@ -12,6 +12,9 @@ export const styles = CreateStyles({
     alignItems: 'center',
     overflow: 'hidden',
   },
+  text: {
+    fontSize: 14,
+  },
   // filled
   containerFilled: {
     borderRadius: 44,

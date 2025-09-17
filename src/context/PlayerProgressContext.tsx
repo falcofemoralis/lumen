@@ -15,8 +15,19 @@ interface PlayerProgressContextInterface {
   resetProgressStatus: () => void;
 }
 
+interface PlayerProgressActionsInterface {
+  updateProgressStatus: (currentTime: number, bufferedPosition: number, duration: number) => void;
+  resetProgressStatus: () => void;
+}
+
 const PlayerProgressContext = createContext<PlayerProgressContextInterface>({
   progressStatus: DEFAULT_PROGRESS_STATUS,
+  updateProgressStatus: () => {},
+  resetProgressStatus: () => {},
+});
+
+// Separate context for actions only - this won't cause re-renders when state changes
+const PlayerProgressActionsContext = createContext<PlayerProgressActionsInterface>({
   updateProgressStatus: () => {},
   resetProgressStatus: () => {},
 });
@@ -51,11 +62,21 @@ export const PlayerProgressProvider = ({ children }: { children: React.ReactNode
     resetProgressStatus,
   ]);
 
+  const actionsValue = useMemo(() => ({
+    updateProgressStatus,
+    resetProgressStatus,
+  }), [updateProgressStatus, resetProgressStatus]);
+
   return (
     <PlayerProgressContext.Provider value={ value }>
-      { children }
+      <PlayerProgressActionsContext.Provider value={ actionsValue }>
+        { children }
+      </PlayerProgressActionsContext.Provider>
     </PlayerProgressContext.Provider>
   );
 };
 
 export const usePlayerProgressContext = () => use(PlayerProgressContext);
+
+// Hook to get only the actions without subscribing to state changes
+export const usePlayerProgressActions = () => use(PlayerProgressActionsContext);

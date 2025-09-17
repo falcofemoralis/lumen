@@ -50,6 +50,7 @@ export default function ThemedButton({
       { children && (
         <Text
           style={ [
+            styles.text,
             styles.textFilled,
             textStyle,
             isSelected && styles.textFilledSelected,
@@ -94,6 +95,7 @@ export default function ThemedButton({
       { children && (
         <Text
           style={ [
+            styles.text,
             styles.textOutlined,
             textStyle,
             isSelected && styles.textOutlinedSelected,

@@ -1,10 +1,10 @@
+import StorageStore from 'Store/Storage.store';
 import { safeJsonParse } from 'Util/Json';
-import { configStorage } from 'Util/Storage';
 
 export const getConfig = (
   key: string
 ): string | null => {
-  const config = configStorage.getString(key);
+  const config = StorageStore.getConfigStorage().getString(key);
 
   if (!config) {
     return null;
@@ -16,7 +16,7 @@ export const getConfig = (
 export const updateConfig = (
   key: string,
   value: string
-): void => configStorage.set(key, value);
+): void => StorageStore.getConfigStorage().set(key, value);
 
 export const getConfigJson = <T>(key: string): T | null => {
   const configJson = getConfig(key);

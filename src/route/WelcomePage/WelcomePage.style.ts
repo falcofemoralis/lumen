@@ -179,6 +179,7 @@ export const styles = CreateStyles({
   },
   providerValidateButtonDisabled: {
     opacity: 0.5,
+    pointerEvents: 'none',
   },
   cdnWrapper: {
     alignSelf: 'center',

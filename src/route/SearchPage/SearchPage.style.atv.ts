@@ -15,6 +15,7 @@ export const styles = CreateStyles({
   actionBtn: {
     width: 48,
     height: 48,
+    justifyContent: 'center',
   },
   searchBarContainer: {
     flex: 1,
@@ -24,10 +25,11 @@ export const styles = CreateStyles({
     height: 48,
     borderRadius: 50,
     paddingHorizontal: 16,
+    fontSize: 16,
   },
   suggestionsWrapper: {
     marginTop: 16,
-    height: 36,
+    height: 48,
   },
   suggestions: {
     gap: 12,

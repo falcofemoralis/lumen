@@ -1,7 +1,7 @@
+import { useNavigation } from '@react-navigation/native';
 import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import Wrapper from 'Component/Wrapper';
-import { router } from 'expo-router';
 import { ArrowLeft } from 'lucide-react-native';
 import { View } from 'react-native';
 import { Colors } from 'Style/Colors';
@@ -15,6 +15,8 @@ export const HeaderComponent = ({
   additionalAction,
   AdditionalActionIcon,
 }: HeaderComponentProps) => {
+  const navigation = useNavigation();
+
   return (
     <Wrapper>
       <View style={ styles.topActions }>
@@ -22,7 +24,7 @@ export const HeaderComponent = ({
           <ThemedPressable
             style={ styles.topActionsButton }
             contentStyle={ styles.topActionsButtonContent }
-            onPress={ () => router.back() }
+            onPress={ () => navigation.goBack() }
           >
             <ArrowLeft
               size={ scale(24) }

@@ -1,6 +1,8 @@
 import { ApiInterface, ApiServiceType } from 'Api/index';
 import { REZKA_PROXY_PROVIDER } from 'Api/RezkaApi/configApi';
 import { services } from 'Api/services';
+import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
+import t from 'i18n/t';
 import {
   createContext,
   use,
@@ -8,65 +10,65 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { Platform } from 'react-native';
+import { Linking, Platform } from 'react-native';
+import StorageStore from 'Store/Storage.store';
 import { ProfileInterface } from 'Type/Profile.interface';
 import { CookiesManager } from 'Util/Cookies';
 import { safeJsonParse } from 'Util/Json';
-import { requestValidator, setProxyHeaders } from 'Util/Request';
-import { miscStorage } from 'Util/Storage';
+import { addProxyHeaders, requestValidator } from 'Util/Request';
 
 export const CREDENTIALS_STORAGE = 'CREDENTIALS_STORAGE';
 export const PROFILE_STORAGE = 'PROFILE_STORAGE';
 
+export const defaultService = ApiServiceType.REZKA;
+
 interface ServiceContextInterface {
   isSignedIn: boolean;
   profile: ProfileInterface | null;
+  currentService: ApiInterface;
   updateCurrentService: (service: ApiServiceType) => void;
-  getCurrentService: () => ApiInterface;
   setAuthorization: (auth: string, name: string, password: string) => void;
   login: (name: string, password: string) => Promise<void>;
   logout: () => void;
   updateProvider: (value: string, skipValidation?: boolean) => Promise<void>;
   updateCDN: (value: string, skipValidation?: boolean) => Promise<void>;
   updateUserAgent: (value: string) => void;
+  updateOfficialMode: (value: string) => void;
   validateUrl: (url: string) => Promise<void>;
+  getCDNs: () => DropdownItem[];
+  viewProfile: () => void;
 }
 
 const ServiceContext = createContext<ServiceContextInterface>({
   isSignedIn: false,
   profile: null,
+  currentService: services[defaultService],
   updateCurrentService: () => {},
-  getCurrentService: () => services[ApiServiceType.REZKA],
   setAuthorization: () => {},
   login: async () => {},
   logout: () => {},
   updateProvider: async () => {},
   updateCDN: async () => {},
   updateUserAgent: () => {},
+  updateOfficialMode: () => {},
   validateUrl: async () => {},
+  getCDNs: () => [],
+  viewProfile: () => {},
 });
 
 export const ServiceProvider = ({ children }: { children: React.ReactNode }) => {
-  const [currentService, setCurrentService] = useState<ApiServiceType>(ApiServiceType.REZKA);
-  const [isSignedIn, setIsSignedIn] = useState<boolean>(!!miscStorage.getString(CREDENTIALS_STORAGE));
+  const [currentService, setCurrentService] = useState<ApiInterface>(services[defaultService]);
+  const [isSignedIn, setIsSignedIn] = useState<boolean>(!!StorageStore.getMiscStorage().getString(CREDENTIALS_STORAGE));
   const [profile, setProfile] = useState<ProfileInterface | null>(
-    safeJsonParse<ProfileInterface>(miscStorage.getString(PROFILE_STORAGE))
+    safeJsonParse<ProfileInterface>(StorageStore.getMiscStorage().getString(PROFILE_STORAGE))
   );
-
-  /**
-   * Get the current service
-   * @returns {ApiInterface} - The current service
-   */
-  const getCurrentService = useCallback(() => {
-    return services[currentService];
-  }, [currentService]);
 
   /**
    * Update the current service
    * @param {ApiServiceType} service - The service to set as current
    */
   const updateCurrentService = useCallback((service: ApiServiceType) => {
-    setCurrentService(service);
+    setCurrentService(services[service]);
   }, []);
 
   /**
@@ -76,26 +78,25 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
    * @param {string} password - The password
    */
   const setAuthorization = useCallback((auth: string, name: string, password: string) => {
-    const service = getCurrentService();
-    service.setAuthorization(auth);
-    miscStorage.set(CREDENTIALS_STORAGE, JSON.stringify({ name, password }));
-  }, [getCurrentService]);
+    currentService.setAuthorization(auth);
+    StorageStore.getMiscStorage().set(CREDENTIALS_STORAGE, JSON.stringify({ name, password }));
+  }, [currentService]);
 
   /**
    * Load the profile for the current service
    */
   const loadProfile = useCallback(async () => {
-    const value = await getCurrentService().getProfile();
+    const value = await currentService.getProfile();
 
-    miscStorage.set(PROFILE_STORAGE, JSON.stringify(value));
+    StorageStore.getMiscStorage().set(PROFILE_STORAGE, JSON.stringify(value));
     setProfile(value);
-  }, []);
+  }, [currentService]);
 
   /**
    * Remove the profile for the current service
    */
   const removeProfile = useCallback(() => {
-    miscStorage.delete(PROFILE_STORAGE);
+    StorageStore.getMiscStorage().delete(PROFILE_STORAGE);
     setProfile(null);
   }, []);
 
@@ -105,33 +106,33 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
    * @param {string} password - The password
    */
   const login = useCallback(async (name: string, password: string) => {
-    const auth = await getCurrentService().login(name, password);
+    const auth = await currentService.login(name, password);
     setAuthorization(auth, name, password);
 
     await loadProfile();
 
     setIsSignedIn(true);
-  }, [getCurrentService, setAuthorization, loadProfile]);
+  }, [currentService, setAuthorization, loadProfile]);
 
   /**
    * Logout from the current service
    */
   const logout = useCallback(() => {
-    const service = getCurrentService();
-    service.logout();
-    service.setAuthorization('');
+    currentService.logout();
+    currentService.setAuthorization('');
     setIsSignedIn(false);
     removeProfile();
-    miscStorage.set(CREDENTIALS_STORAGE, '');
-  }, [getCurrentService, removeProfile]);
+    StorageStore.getMiscStorage().set(CREDENTIALS_STORAGE, '');
+    (new CookiesManager()).reset();
+  }, [currentService, removeProfile]);
 
   /**
    * Validate the URL for the current service
    * @param {string} url - The URL to validate
    */
   const validateUrl = useCallback(async (url: string, headers?: HeadersInit) => {
-    await requestValidator(url, headers ?? getCurrentService().getHeaders());
-  }, [getCurrentService]);
+    await requestValidator(url, headers ?? currentService.getHeaders());
+  }, [currentService]);
 
   /**
    * Update the provider for the current service
@@ -142,19 +143,21 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
     if (!skipValidation) {
       const isWeb = Platform.OS === 'web';
       const url = isWeb ? REZKA_PROXY_PROVIDER : value;
-      const headers = isWeb ? setProxyHeaders(getCurrentService().getHeaders(), value) : undefined;
+      const headers = isWeb ? addProxyHeaders(currentService.getHeaders(), value) : undefined;
 
       await validateUrl(url, headers);
     }
 
-    getCurrentService().setProvider(value);
+    if (value !== '') {
+      currentService.setProvider(value);
+    }
 
     // Reset cookies
     (new CookiesManager()).reset();
 
     if (isSignedIn) {
       const { name, password } = safeJsonParse<{ name: string; password: string }>(
-        miscStorage.getString(CREDENTIALS_STORAGE)
+        StorageStore.getMiscStorage().getString(CREDENTIALS_STORAGE)
       ) ?? {};
 
       logout();
@@ -163,7 +166,7 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
         await login(name, password);
       }
     }
-  }, [getCurrentService, validateUrl, isSignedIn, logout, login]);
+  }, [currentService, validateUrl, isSignedIn, logout, login]);
 
   /**
    * Update the CDN for the current service
@@ -175,22 +178,49 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
       await validateUrl(value);
     }
 
-    getCurrentService().setCDN(value);
-  }, [getCurrentService, validateUrl]);
+    currentService.setCDN(value);
+  }, [currentService, validateUrl]);
 
   /**
    * Update the user agent for the current service
    * @param {string} value - The user agent string
    */
   const updateUserAgent = useCallback((value: string) => {
-    getCurrentService().setUserAgent(value);
-  }, [getCurrentService]);
+    currentService.setUserAgent(value);
+  }, [currentService]);
+
+  /**
+   * Update the official mode for the current service
+   * @param {string} value - The official mode string
+   */
+  const updateOfficialMode = useCallback((value: string) => {
+    currentService.setOfficialMode(value);
+  }, [currentService]);
+
+  /**
+   * Get the CDNs for the current service
+   */
+  const getCDNs = useCallback(() => {
+    return [
+      {
+        value: 'auto',
+        label: t('Automatic'),
+      },
+    ].concat(currentService.defaultCDNs.map((cdn) => ({
+      value: cdn,
+      label: cdn,
+    }))) ;
+  }, [currentService]);
+
+  const viewProfile = useCallback(() => {
+    Linking.openURL(`${currentService.getProvider()}/user/${profile?.id}/`);
+  }, [currentService, profile]);
 
   const value = useMemo(() => ({
     isSignedIn,
     profile,
+    currentService,
     updateCurrentService,
-    getCurrentService,
     setAuthorization,
     removeProfile,
     login,
@@ -199,11 +229,14 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
     updateCDN,
     updateUserAgent,
     validateUrl,
+    updateOfficialMode,
+    getCDNs,
+    viewProfile,
   }), [
     isSignedIn,
     profile,
+    currentService,
     updateCurrentService,
-    getCurrentService,
     setAuthorization,
     removeProfile,
     login,
@@ -212,6 +245,9 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
     updateCDN,
     updateUserAgent,
     validateUrl,
+    updateOfficialMode,
+    getCDNs,
+    viewProfile,
   ]);
 
   return (

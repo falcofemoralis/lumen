@@ -1,8 +1,5 @@
-import { Colors } from 'Style/Colors';
+import { ITEM_HEIGHT, MAX_ITEMS_TO_DISPLAY } from 'Component/ThemedSimpleList/ThemedSimpleList.style.atv';
 import CreateStyles from 'Util/CreateStyles';
-
-const MAX_ITEMS_TO_DISPLAY = 6;
-const ITEM_HEIGHT = 48;
 
 export const styles = CreateStyles({
   input: {
@@ -19,77 +16,9 @@ export const styles = CreateStyles({
     width: 20,
     alignSelf: 'center',
   },
-  icon: {
-    marginRight: 5,
-    height: 20,
-    width: 20,
-  },
-  iconFocused: {
-  },
   container: {
-  },
-  listContainer: {
-    maxHeight: MAX_ITEMS_TO_DISPLAY * ITEM_HEIGHT - 16,
-    alignSelf: 'flex-end',
-    height: '100%',
   },
   contentContainer: {
     maxHeight: MAX_ITEMS_TO_DISPLAY * ITEM_HEIGHT - 16,
-  },
-  scrollViewContainer: {
-    overflow: 'hidden',
-    flex: 1,
-    flexDirection: 'column',
-  },
-  scrollView: {
-    minWidth: 300,
-  },
-  header: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingBottom: 10,
-    borderBottomColor: Colors.divider,
-    borderBottomWidth: 1,
-  },
-  headerText: {
-    color: Colors.textSecondary,
-    fontSize: 14,
-    lineHeight: 16,
-    fontWeight: '500',
-  },
-  item: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 10,
-    height: ITEM_HEIGHT,
-    width: '100%',
-    borderRadius: 12,
-  },
-  itemFocused: {
-    backgroundColor: Colors.backgroundFocused,
-    borderRadius: 12,
-  },
-  itemSelected: {
-    backgroundColor: Colors.primary,
-    borderRadius: 12,
-  },
-  itemContainer: {
-    flexDirection: 'row',
-    width: '100%',
-  },
-  text: {
-    color: Colors.text,
-    fontSize: 14,
-    lineHeight: 20,
-    fontWeight: '500',
-  },
-  textFocused: {
-    color: Colors.textFocused,
-  },
-  textSelected: {
-    color: Colors.textOnPrimary,
-  },
-  iconSelected: {
   },
 });

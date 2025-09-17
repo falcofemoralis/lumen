@@ -1,37 +1,35 @@
 import { ThemedBottomSheetRef } from 'Component/ThemedBottomSheet/ThemedBottomSheet.type';
+import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useAppUpdaterContext } from 'Context/AppUpdaterContext';
-import { useOverlayContext } from 'Context/OverlayContext';
 import { withTV } from 'Hooks/withTV';
 import { useEffect, useRef, useState } from 'react';
 import { Platform } from 'react-native';
 import { useLockSpatialNavigation } from 'react-tv-space-navigation';
 import ConfigStore from 'Store/Config.store';
+import LoggerStore from 'Store/Logger.store';
 import { Installer } from 'Util/App/installer';
 
 import AppUpdaterComponent from './AppUpdater.component';
 import AppUpdaterComponentTV from './AppUpdater.component.atv';
-import { OVERLAY_APP_UPDATE_ID } from './AppUpdater.config';
 
 export const AppUpdaterContainer = () => {
   const { update, isUpdateRejected, resetUpdate } = useAppUpdaterContext();
-  const { openOverlay, closeOverlay } = useOverlayContext();
   const [isLoading, setIsLoading] = useState(false);
-  const bottomSheetRef = useRef<ThemedBottomSheetRef>(null);
   const { lock, unlock } = useLockSpatialNavigation();
   const [progress, setProgress] = useState(0);
+  const overlayRef = useRef<ThemedOverlayRef>(null);
+  const bottomSheetRef = useRef<ThemedBottomSheetRef>(null);
 
   const openPopup = () => {
     if (ConfigStore.isTV()) {
-      openOverlay(OVERLAY_APP_UPDATE_ID);
+      overlayRef.current?.open();
     } else {
       bottomSheetRef.current?.present();
     }
   };
 
   const closePopup = () => {
-    if (ConfigStore.isTV()) {
-      closeOverlay(OVERLAY_APP_UPDATE_ID);
-    } else {
+    if (!ConfigStore.isTV()) {
       bottomSheetRef.current?.dismiss();
     }
 
@@ -94,6 +92,7 @@ export const AppUpdaterContainer = () => {
   const containerProps = {
     update,
     isLoading,
+    overlayRef,
     bottomSheetRef,
     progress,
     acceptUpdate,

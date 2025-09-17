@@ -1,7 +1,9 @@
+import { useNavigation } from '@react-navigation/native';
 import { useNotificationsContext } from 'Context/NotificationsContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { withTV } from 'Hooks/withTV';
 import { useCallback, useEffect, useState } from 'react';
+import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { NotificationInterface } from 'Type/Notification.interface';
@@ -13,15 +15,18 @@ import NotificationsPageComponentTV from './NotificationsPage.component.atv';
 export function NotificationsPageContainer() {
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState<NotificationInterface[]>([]);
-  const { isSignedIn, getCurrentService } = useServiceContext();
+  const { isSignedIn, currentService } = useServiceContext();
   const { resetNotifications, getNotifications } = useNotificationsContext();
+  const navigation = useNavigation();
 
   const loadFilms = async (items: NotificationInterface[]) => {
     try {
       setData(
-        await getCurrentService().getFilmsFromNotifications(items)
+        await currentService.getFilmsFromNotifications(items)
       );
     } catch (error) {
+      LoggerStore.error('notificationsLoadFilms', { error });
+
       NotificationStore.displayError(error as Error);
     } finally {
       setIsLoading(false);
@@ -30,7 +35,6 @@ export function NotificationsPageContainer() {
 
   const prepareNotifications = async () => {
     if (isSignedIn && !data.length) {
-
       const notifications = await getNotifications();
 
       if (notifications) {
@@ -52,7 +56,7 @@ export function NotificationsPageContainer() {
   }, [isSignedIn]);
 
   const handleSelectFilm = useCallback((film: FilmCardInterface) => {
-    openFilm(film);
+    openFilm(film, navigation);
   }, []);
 
   const getData = () => {

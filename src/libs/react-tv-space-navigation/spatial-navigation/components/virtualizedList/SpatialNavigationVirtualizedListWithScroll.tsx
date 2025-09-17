@@ -19,7 +19,7 @@ import React from 'react';
 import { typedForwardRef } from '../../helpers/TypedForwardRef';
 import { SpatialNavigationVirtualizedListRef } from '../../types/SpatialNavigationVirtualizedListRef';
 
-const ItemWrapperWithScrollContext = typedMemo(
+export const ItemWrapperWithScrollContext = typedMemo(
   <T,>({
     setCurrentlyFocusedItemIndex,
     item,

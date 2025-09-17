@@ -2,6 +2,7 @@ import { FilmPagerInterface } from 'Component/FilmPager/FilmPager.type';
 import { useServiceContext } from 'Context/ServiceContext';
 import { withTV } from 'Hooks/withTV';
 import { useEffect, useState } from 'react';
+import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
 import { BookmarkInterface } from 'Type/Bookmark.interface';
 import { FilmListInterface } from 'Type/FilmList.interface';
@@ -14,13 +15,13 @@ export function BookmarksPageContainer() {
   const [isLoading, setIsLoading] = useState(true);
   const [bookmarks, setBookmarks] = useState<BookmarkInterface[]>([]);
   const [filmPager, setFilmPager] = useState<FilmPagerInterface>({});
-  const { isSignedIn, getCurrentService } = useServiceContext();
+  const { isSignedIn, currentService } = useServiceContext();
 
   const loadBookmarks = async () => {
     setIsLoading(true);
 
     try {
-      const items = await getCurrentService().getBookmarks();
+      const items = await currentService.getBookmarks();
 
       if (items.length > 0 && items[0].filmList) {
         const { id, filmList } = items[0];
@@ -29,8 +30,10 @@ export function BookmarksPageContainer() {
       }
 
       setBookmarks(items);
-    } catch (e) {
-      NotificationStore.displayError(e as Error);
+    } catch (error) {
+      LoggerStore.error('bookmarksPageLoadBookmarks', { error });
+
+      NotificationStore.displayError(error as Error);
     } finally {
       setIsLoading(false);
     }
@@ -46,7 +49,7 @@ export function BookmarksPageContainer() {
     menuItem: MenuItemInterface,
     currentPage: number,
     _isRefresh: boolean
-  ) => getCurrentService().getBookmarkedFilms({
+  ) => currentService.getBookmarkedFilms({
     id: menuItem.id,
     title: menuItem.title,
   }, currentPage);

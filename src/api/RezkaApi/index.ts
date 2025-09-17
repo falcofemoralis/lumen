@@ -10,15 +10,17 @@ import menuApi from './menuApi';
 import playerApi from './playerApi';
 import searchApi from './searchApi';
 
-const RezkaApi: ApiInterface = createApi([
+const RezkaApi: ApiInterface = createApi(
   configApi,
-  filmApi,
-  menuApi,
-  playerApi,
-  authApi,
-  accountApi,
-  searchApi,
-  commentsApi,
-]);
+  [
+    filmApi,
+    menuApi,
+    playerApi,
+    authApi,
+    accountApi,
+    searchApi,
+    commentsApi,
+  ]
+);
 
 export default RezkaApi;

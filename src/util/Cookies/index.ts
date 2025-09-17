@@ -1,5 +1,5 @@
 import setCookieParser from 'set-cookie-parser';
-import { cookiesStorage } from 'Util/Storage';
+import StorageStore from 'Store/Storage.store';
 
 export function parseCookies(cookieString: string) {
   const cookies: { [key: string]: any } = {};
@@ -44,7 +44,7 @@ export class CookiesManager {
 
   public get(hostname: string) {
     if (!this.cookieMap.has(hostname)) {
-      const dbCookies = cookiesStorage.getString(hostname);
+      const dbCookies = StorageStore.getCookiesStorage().getString(hostname);
       this.cookieMap.set(hostname, dbCookies ? JSON.parse(dbCookies) : {});
     }
 
@@ -53,11 +53,12 @@ export class CookiesManager {
 
   public set(hostname: string, cookies: Record<string, setCookieParser.Cookie>) {
     this.cookieMap.set(hostname, cookies);
-    cookiesStorage.set(hostname, JSON.stringify(cookies));
+    StorageStore.getCookiesStorage().set(hostname, JSON.stringify(cookies));
   }
 
   public reset() {
-    cookiesStorage.clearAll();
+    StorageStore.getCookiesStorage().clearAll();
+    this.cookieMap.clear();
   }
 }
 

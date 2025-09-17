@@ -1,10 +1,9 @@
-import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import { NavigationRoute, ParamListBase } from '@react-navigation/native';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
 import { useNavigationContext } from 'Context/NavigationContext';
 import { useNotificationsContext } from 'Context/NotificationsContext';
 import { useServiceContext } from 'Context/ServiceContext';
-import { Tabs } from 'expo-router';
 import t from 'i18n/t';
 import React, { useCallback, useRef } from 'react';
 import {
@@ -19,33 +18,28 @@ import {
   SpatialNavigationRoot,
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
+import { ACCOUNT_ROUTE } from 'Route/AccountPage/AccountPage.config';
+import { HOME_ROUTE } from 'Route/HomePage/HomePage.config';
+import { LOADER_ROUTE } from 'Route/LoaderPage/LoaderPage.config';
+import { SETTINGS_ROUTE } from 'Route/SettingsPage/SettingsPage.config';
 import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 import { setTimeoutSafe } from 'Util/Misc';
 
-import {
-  DEFAULT_ROUTE,
-  LOADER_ROUTE,
-  TABS_TV_CONFIG,
-} from './NavigationBar.config';
 import { styles } from './NavigationBar.style.atv';
 import {
   NavigationBarComponentProps,
-  NavigationType,
-  StateType,
-  Tab,
-  TAB_COMPONENT,
-  TAB_POSITION,
 } from './NavigationBar.type';
 
 export function NavigationBarComponent({
+  state,
+  descriptors,
   profile,
-  navigateTo,
-  isFocused,
+  onPress,
 }: NavigationBarComponentProps) {
   const { isMenuOpen, toggleMenu } = useNavigationContext();
-  const { badgeData } = useNotificationsContext();
   const { isSignedIn } = useServiceContext();
+  const { badgeData } = useNotificationsContext();
   const lastPage = useRef<string | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -58,14 +52,10 @@ export function NavigationBarComponent({
     [toggleMenu]
   );
 
-  const onTabSelect = useCallback((
-    tab: Tab,
-    navigation: NavigationType,
-    state: StateType
-  ) => {
+  const onTabSelect = useCallback((name: string) => {
     if (lastPage.current !== LOADER_ROUTE) {
       setTimeoutSafe(() => {
-        navigateTo({ ...tab, route: LOADER_ROUTE }, navigation, state);
+        onPress(LOADER_ROUTE);
       }, 0);
       lastPage.current = LOADER_ROUTE;
     }
@@ -75,20 +65,21 @@ export function NavigationBarComponent({
     }
 
     timerRef.current = setTimeoutSafe(() => {
-      navigateTo(tab, navigation, state);
-      lastPage.current = tab.route;
+      onPress(name);
+      lastPage.current = name;
     }, 500);
-  }, [navigateTo]);
+  }, [onPress]);
 
-  const renderDefaultTab = useCallback((
-    tab: Tab,
+  const renderDefaultTab = (
+    route: NavigationRoute<ParamListBase, string>,
     focused: boolean,
     isRootActive: boolean,
     isf: boolean
   ) => {
-    const { title, IconComponent } = tab;
-
-    const badge = badgeData[tab.route] ?? 0;
+    const { options } = descriptors[route.key] ?? {};
+    const { tabBarIcon: IconComponent } = options as { tabBarIcon: React.ComponentType<any> };
+    const { tabBarLabel } = options;
+    const badgeCount = badgeData[route.name] || 0;
 
     return (
       <View
@@ -106,32 +97,38 @@ export function NavigationBarComponent({
               color={ isf && isRootActive ? Colors.black : Colors.white }
             />
           ) }
-          { badge > 0 && (
+          { badgeCount > 0 && (
             <ThemedText style={ styles.badge }>
-              { badge }
+              { badgeCount }
             </ThemedText>
           ) }
         </View>
-        <ThemedText.Animated
+        <ThemedText
           style={ [
             styles.tabText,
             isf && isRootActive && styles.tabContentFocused,
-            isMenuOpen && styles.tabTextOpened,
           ] }
         >
-          { title }
-        </ThemedText.Animated>
+          { typeof tabBarLabel === 'function'
+            ? tabBarLabel({
+              focused,
+              color: isf && isRootActive ? Colors.black : Colors.white,
+              position: 'below-icon',
+              children: '',
+            }) : tabBarLabel }
+        </ThemedText>
       </View>
     );
-  }, [isMenuOpen, badgeData]);
+  };
 
-  const renderAccountTab = useCallback((
-    tab: Tab,
+  const renderAccountTab = (
+    route: NavigationRoute<ParamListBase, string>,
     focused: boolean,
     isRootActive: boolean,
     isf: boolean
   ) => {
-    const { title } = tab;
+    const { options } = descriptors[route.key] ?? {};
+    const { tabBarLabel } = options;
     const { avatar, name } = profile ?? {};
 
     return (
@@ -156,55 +153,63 @@ export function NavigationBarComponent({
           ) }
         </View>
         <View style={ styles.profile }>
-          <ThemedText.Animated
+          <ThemedText
             style={ [
               styles.tabText,
               styles.profileNameText,
               isf && isRootActive && styles.tabContentFocused,
-              isMenuOpen && styles.tabTextOpened,
             ] }
           >
-            { title }
-          </ThemedText.Animated>
-          <ThemedText.Animated
+            { typeof tabBarLabel === 'function'
+              ? tabBarLabel({
+                focused,
+                color: isf && isRootActive ? Colors.black : Colors.white,
+                position: 'below-icon',
+                children: '',
+              }) : tabBarLabel }
+          </ThemedText>
+          <ThemedText
             style={ [
               styles.tabText,
               styles.profileSwitchText,
               isf && isRootActive && styles.tabContentFocused,
-              isMenuOpen && styles.tabTextOpened,
             ] }
           >
             { isSignedIn ? name : t('Sign in') }
-          </ThemedText.Animated>
+          </ThemedText>
         </View>
       </View>
     );
-  }, [isMenuOpen, profile, isSignedIn]);
+  };
 
-  const renderTab = useCallback((
-    tab: Tab,
-    navigation: NavigationType,
-    state: StateType
+  const renderTab = (
+    route: NavigationRoute<ParamListBase, string>,
+    index: number
   ) => {
-    const { title, tabComponent } = tab;
-    const focused = isFocused(tab, state);
+    const { name } = route;
+    const isFocused = state.index === index;
 
     const renderComponent = (isRootActive: boolean, isf: boolean) => {
-      switch (tabComponent) {
-        case TAB_COMPONENT.ACCOUNT:
-          return renderAccountTab(tab, focused, isRootActive, isf);
+      switch (name) {
+        case ACCOUNT_ROUTE:
+          return renderAccountTab(route, isFocused, isRootActive, isf);
         default:
-          return renderDefaultTab(tab, focused, isRootActive, isf);
+          return renderDefaultTab(route, isFocused, isRootActive, isf);
       }
     };
 
     return (
       <DefaultFocus
-        key={ title }
-        enable={ tab.route === DEFAULT_ROUTE }
+        key={ name }
+        enable={ name === HOME_ROUTE }
       >
         <SpatialNavigationFocusableView
-          onFocus={ () => isMenuOpen && onTabSelect(tab, navigation, state) }
+          onFocus={ () => {
+            if (isMenuOpen) {
+              onTabSelect(name);
+            }
+          } }
+          onSelect={ () => onTabSelect(name) }
         >
           { ({ isRootActive, isFocused: isf }) => (
             renderComponent(isRootActive, isf)
@@ -212,26 +217,25 @@ export function NavigationBarComponent({
         </SpatialNavigationFocusableView>
       </DefaultFocus>
     );
-  }, [onTabSelect, isFocused, isMenuOpen, renderAccountTab, renderDefaultTab]);
+  };
 
-  const renderTabs = useCallback((navigation: NavigationType, state: StateType) => {
-    const topTabs = [] as Tab[];
-    const middleTabs = [] as Tab[];
-    const bottomTabs = [] as Tab[];
+  const renderTabs = () => {
+    const topTabs = [] as { route: NavigationRoute<ParamListBase, string>, index: number }[];
+    const middleTabs = [] as { route: NavigationRoute<ParamListBase, string>, index: number }[];
+    const bottomTabs = [] as { route: NavigationRoute<ParamListBase, string>, index: number }[];
 
-    TABS_TV_CONFIG.forEach((tab) => {
-      switch (tab.position) {
-        case TAB_POSITION.TOP:
-          topTabs.push(tab);
+    state.routes.forEach((route, index) => {
+      switch (route.name) {
+        case ACCOUNT_ROUTE:
+          topTabs.push({ route, index });
           break;
-        case TAB_POSITION.MIDDLE:
-          middleTabs.push(tab);
+        case SETTINGS_ROUTE:
+          bottomTabs.push({ route, index });
           break;
-        case TAB_POSITION.BOTTOM:
-          bottomTabs.push(tab);
+        case LOADER_ROUTE:
           break;
         default:
-          middleTabs.push(tab);
+          middleTabs.push({ route, index });
           break;
       }
     });
@@ -244,41 +248,29 @@ export function NavigationBarComponent({
         ] }
       >
         <View>
-          { topTabs.map((tab) => renderTab(tab, navigation, state)) }
+          { topTabs.map(({ route, index }) => renderTab(route, index)) }
         </View>
         <View>
-          { middleTabs.map((tab) => renderTab(tab, navigation, state)) }
+          { middleTabs.map(({ route, index }) => renderTab(route, index)) }
         </View>
         <View>
-          { bottomTabs.map((tab) => renderTab(tab, navigation, state)) }
+          { bottomTabs.map(({ route, index }) => renderTab(route, index)) }
         </View>
       </Animated.View>
     );
-  }, [renderTab, isMenuOpen]);
+  };
 
-  const renderTabBar = useCallback(({ navigation, state }: BottomTabBarProps) => (
+  return (
     <SpatialNavigationRoot
       isActive={ isMenuOpen }
       onDirectionHandledWithoutMovement={ onDirectionHandledWithoutMovement }
     >
       <View style={ styles.bar }>
         <SpatialNavigationView direction="vertical">
-          { renderTabs(navigation, state) }
+          { renderTabs() }
         </SpatialNavigationView>
       </View>
     </SpatialNavigationRoot>
-  ), [renderTabs, onDirectionHandledWithoutMovement, isMenuOpen]);
-
-  return (
-    <Tabs
-      screenOptions={ {
-        headerShown: false,
-        tabBarActiveTintColor: Colors.primary,
-        tabBarInactiveTintColor: Colors.white,
-        tabBarPosition: 'left',
-      } }
-      tabBar={ renderTabBar }
-    />
   );
 }
 

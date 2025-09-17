@@ -1,0 +1,1 @@
+export const ACTOR_ROUTE = 'Actor';

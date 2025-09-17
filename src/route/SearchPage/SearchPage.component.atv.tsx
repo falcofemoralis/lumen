@@ -8,6 +8,7 @@ import { Mic, Search } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { View } from 'react-native';
 import { DefaultFocus, SpatialNavigationScrollView, SpatialNavigationView } from 'react-tv-space-navigation';
+import { Colors } from 'Style/Colors';
 
 import { SEARCH_MENU_ITEM } from './SearchPage.config';
 import { styles } from './SearchPage.style.atv';
@@ -56,6 +57,7 @@ export function SearchPageComponent({
           styleFocused={ recognizing && styles.speakActive }
           IconComponent={ Mic }
           onPress={ handleStartRecognition }
+          iconProps={ recognizing ? { color: Colors.white } : undefined }
         />
         { renderSearchBar() }
         <ThemedButton

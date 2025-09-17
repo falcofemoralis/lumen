@@ -10,7 +10,7 @@ export const ThemedImage = forwardRef<ImageRef, ThemedImageProps>(({
   src,
   style,
   blurRadius,
-  transition = 350,
+  transition = 250,
 }, ref) => {
   useImperativeHandle(ref, () => ({
   }));
@@ -19,13 +19,11 @@ export const ThemedImage = forwardRef<ImageRef, ThemedImageProps>(({
     <Image
       style={ style }
       source={ src }
-      // cachePolicy="memory-disk"
       placeholder={ { blurhash: 'L03IYJj[fQj[j[fQfQfQfQfQfQfQ' } }
-      contentFit="cover"
       placeholderContentFit="cover"
+      contentFit="cover"
       transition={ transition }
       recyclingKey={ src }
-      // onError={(e) => console.error(e.error)}
       blurRadius={ blurRadius }
     />
   );

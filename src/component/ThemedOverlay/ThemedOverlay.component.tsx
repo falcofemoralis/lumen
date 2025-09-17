@@ -1,3 +1,4 @@
+import KeyboardAdjuster from 'Component/KeyboardAdjuster/KeyboardAdjuster.component';
 import { Portal } from 'Component/ThemedPortal';
 import { useLandscape } from 'Hooks/useLandscape';
 import {
@@ -11,15 +12,16 @@ import { noopFn } from 'Util/Function';
 import { styles } from './ThemedOverlay.style';
 import { ThemedOverlayComponentProps } from './ThemedOverlay.type';
 
-/**
- * TODO: Replace modal with react-native-modal once it will be stable
- */
 export function ThemedOverlayComponent({
   isOpened,
-  onHide,
   contentContainerStyle,
   style,
   children,
+  transparent,
+  contentVisible,
+  useKeyboardAdjustment,
+  handleModalRequestClose,
+  onShow,
 }: ThemedOverlayComponentProps) {
   const isLandscape = useLandscape();
 
@@ -28,12 +30,14 @@ export function ThemedOverlayComponent({
       <Modal
         animationType='fade'
         visible={ isOpened }
-        onRequestClose={ onHide }
+        onShow={ onShow }
+        onRequestClose={ handleModalRequestClose }
         backdropColor={ Colors.modal }
+        transparent={ transparent }
       >
         <GestureHandlerRootView>
           <Pressable
-            onPress={ onHide }
+            onPress={ handleModalRequestClose }
             style={ [styles.modal, style] }
           >
             <Pressable
@@ -44,8 +48,9 @@ export function ThemedOverlayComponent({
                 contentContainerStyle,
               ] }
             >
-              { children }
+              { contentVisible && children }
             </Pressable>
+            { useKeyboardAdjustment && <KeyboardAdjuster scale={ 2 } /> }
           </Pressable>
         </GestureHandlerRootView>
       </Modal>
@@ -58,7 +63,6 @@ function propsAreEqual(
   props: ThemedOverlayComponentProps
 ) {
   return prevProps.isOpened === props.isOpened
-    && prevProps.isVisible === props.isVisible
     && prevProps.children === props.children;
 }
 

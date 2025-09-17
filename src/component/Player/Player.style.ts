@@ -1,6 +1,8 @@
 import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
+import { DOUBLE_TAP_ANIMATION_DELAY } from './Player.config';
+
 export const styles = CreateStyles({
   container: {
     position: 'relative',
@@ -9,14 +11,14 @@ export const styles = CreateStyles({
     backgroundColor: Colors.black,
   },
   video: {
-    height: '100%',
     width: '100%',
+    height: '100%',
   },
   controlsContainer: {
     position: 'absolute',
     backgroundColor: Colors.transparent,
-    height: '100%',
     width: '100%',
+    height: '100%',
     left: 0,
     top: 0,
     zIndex: 55,
@@ -108,15 +110,18 @@ export const styles = CreateStyles({
     fontWeight: '700',
   },
   subtitle: {},
+  commentsOverlayModal: {
+    backgroundColor: Colors.transparent,
+  },
   commentsOverlay: {
-    width: '50%',
+    width: '100%',
     height: '100%',
   },
   commentsOverlayContent: {
     height: '100%',
-    maxHeight: '90%',
+    maxHeight: '100%',
     maxWidth: '50%',
-    right: '5%',
+    right: 0,
   },
   commentsOverlayList: {
     height: '100%',
@@ -126,21 +131,32 @@ export const styles = CreateStyles({
     top: '50%',
     transform: [{ translateX: '-50%' }, { translateY: '-50%' }],
     alignItems: 'center',
+    opacity: 0,
+    transitionProperty: 'opacity',
+    transitionDuration: `${DOUBLE_TAP_ANIMATION_DELAY}ms`,
+  },
+  doubleTapActionVisible: {
+    opacity: 1,
+  },
+  doubleTapActionLeft: {
+    left: '20%',
+  },
+  doubleTapActionRight: {
+    left: '80%',
   },
   doubleTapContainer: {
-    backgroundColor: Colors.modal,
-    paddingBlock: 4,
-    paddingInline: 12,
-    borderRadius: 50,
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'center',
     gap: 8,
+  },
+  doubleTapIcon: {
+    backgroundColor: Colors.modal,
+    padding: 10,
+    borderRadius: 50,
   },
   doubleTapText: {
     fontSize: 16,
     fontWeight: '700',
-  },
-  doubleTapIcon: {
   },
   longTapAction: {
     position: 'absolute',
@@ -157,6 +173,12 @@ export const styles = CreateStyles({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+    opacity: 0,
+    transitionProperty: 'opacity',
+    transitionDuration: '150ms',
+  },
+  longTapActionVisible: {
+    opacity: 1,
   },
   longTapText: {
     fontSize: 16,

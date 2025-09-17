@@ -164,9 +164,11 @@ const accountApi: RezkaAccountApiInterface = {
         const season = item.querySelector('.season')?.rawText ?? '';
         const episode = item.querySelector('.cell-2')?.rawText ?? '';
         const info = `${season} - ${episode}`;
+        const itemLink = item.querySelector('.b-seriesupdate__block_list_link');
 
         return {
-          link: item.querySelector('.b-seriesupdate__block_list_link')?.attributes.href ?? '',
+          name: itemLink?.rawText ?? '',
+          link: itemLink?.attributes.href ?? '',
           info,
         };
       });

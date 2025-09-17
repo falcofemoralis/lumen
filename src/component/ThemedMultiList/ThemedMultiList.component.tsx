@@ -33,22 +33,29 @@ export const ThemedMultiListComponent = ({
     );
   };
 
-  const renderItem = useCallback((item: ListItem) => (
-    <View style={ styles.item }>
-      <Text style={ styles.itemLabel }>
-        { item.label }
-      </Text>
-      { item.isChecked ? (
-        <SquareCheck
-          color={ Colors.secondary }
-        />
-      ) : (
-        <Square
-          color={ Colors.white }
-        />
-      ) }
-    </View>
-  ), []);
+  const renderItem = useCallback(({ item }: { item: ListItem }) => (
+    <ThemedPressable
+      key={ item.value }
+      onPress={ () => handleOnChange(item.value, !item.isChecked) }
+      style={ styles.listItem }
+      contentStyle={ styles.listItemContent }
+    >
+      <View style={ styles.item }>
+        <Text style={ styles.itemLabel }>
+          { item.label }
+        </Text>
+        { item.isChecked ? (
+          <SquareCheck
+            color={ Colors.secondary }
+          />
+        ) : (
+          <Square
+            color={ Colors.white }
+          />
+        ) }
+      </View>
+    </ThemedPressable>
+  ), [handleOnChange]);
 
   const renderContent = () => (
     <View
@@ -58,18 +65,7 @@ export const ThemedMultiListComponent = ({
       ] }
     >
       <ScrollView>
-        { values.map((item) => (
-          <ThemedPressable
-            key={ item.value }
-            onPress={ () => handleOnChange(item.value, !item.isChecked) }
-            style={ styles.listItem }
-            contentStyle={ styles.listItemContent }
-          >
-            <View style={ styles.listItem }>
-              { renderItem(item) }
-            </View>
-          </ThemedPressable>
-        )) }
+        { values.map((item) => renderItem({ item })) }
       </ScrollView>
     </View>
   );

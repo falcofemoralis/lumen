@@ -2,6 +2,9 @@ import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
+  page: {
+    paddingBottom: 32,
+  },
   setting: {
     paddingVertical: 12,
     paddingHorizontal: 12,
@@ -10,6 +13,9 @@ export const styles = CreateStyles({
   },
   settingFocused: {
     backgroundColor: Colors.backgroundFocused,
+  },
+  settingHidden: {
+    opacity: 0.5,
   },
   settingTitle: {
   },

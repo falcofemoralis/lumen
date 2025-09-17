@@ -1,5 +1,6 @@
 import { MenuItemInterface } from 'Type/MenuItem.interface';
 
+export const SEARCH_ROUTE = 'Search';
 export const SEARCH_MENU_ITEM: MenuItemInterface = {
   id: 'search',
   title: 'Search',

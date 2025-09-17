@@ -2,7 +2,7 @@ import { REZKA_PROXY_PROVIDER } from 'Api/RezkaApi/configApi';
 import webvtt from 'node-webvtt';
 import { Platform } from 'react-native';
 import { customFetch } from 'Util/Fetch';
-import { setProxyHeaders } from 'Util/Request';
+import { addProxyHeaders } from 'Util/Request';
 import { updateUrlHost } from 'Util/Url';
 
 export interface VTTItem {
@@ -26,7 +26,7 @@ export interface ParsedVTTResult {
 export const vttLoader = async (url: string) => {
   const isWeb = Platform.OS === 'web';
   const input = isWeb ? updateUrlHost(url, REZKA_PROXY_PROVIDER) : url;
-  const headers = isWeb ? setProxyHeaders({}, (new URL(url).origin)) : undefined;
+  const headers = isWeb ? addProxyHeaders({}, (new URL(url).origin)) : undefined;
 
   const res = await customFetch(input, headers ? { headers } : undefined);
 

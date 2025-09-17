@@ -3,6 +3,7 @@ import PlayerVideoRating from 'Component/PlayerVideoRating';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedDropdown from 'Component/ThemedDropdown';
 import ThemedOverlay from 'Component/ThemedOverlay';
+import ThemedSimpleList from 'Component/ThemedSimpleList';
 import t from 'i18n/t';
 import React, { memo } from 'react';
 import { View } from 'react-native';
@@ -18,9 +19,8 @@ import { styles } from './PlayerVideoSelector.style.atv';
 import { PlayerVideoSelectorComponentProps } from './PlayerVideoSelector.type';
 
 export function PlayerVideoSelectorComponent({
-  overlayId,
+  overlayRef,
   voices,
-  onHide,
   isLoading,
   selectedVoice,
   selectedSeasonId,
@@ -33,6 +33,9 @@ export function PlayerVideoSelectorComponent({
   film,
   savedTime,
   calculateProgressThreshold,
+  onOverlayOpen,
+  voiceOverlayRef,
+  onClose,
 }: PlayerVideoSelectorComponentProps) {
   const renderVoiceRating = () => {
     const { voiceRating = [] } = film;
@@ -73,14 +76,15 @@ export function PlayerVideoSelectorComponent({
             header={ t('Search voice') }
             inputStyle={ styles.voicesInput }
             style={ styles.voicesContainer }
+            overlayRef={ voiceOverlayRef }
           />
-          { seasons.length ? renderVoiceRating() : null }
+          { renderVoiceRating() }
         </SpatialNavigationView>
       );
     }
 
     return (
-      <ThemedDropdown
+      <ThemedSimpleList
         data={ voices.map((voice) => ({
           label: voice.title,
           value: voice.identifier,
@@ -90,7 +94,6 @@ export function PlayerVideoSelectorComponent({
         value={ selectedVoice.identifier }
         onChange={ (item) => handleSelectVoice(item.value) }
         header={ t('Search voice') }
-        asList
       />
     );
   };
@@ -253,9 +256,10 @@ export function PlayerVideoSelectorComponent({
 
   return (
     <ThemedOverlay
-      id={ overlayId }
-      onHide={ onHide }
+      ref={ overlayRef }
       contentContainerStyle={ seasons.length > 0 ? styles.container : undefined }
+      onOpen={ onOverlayOpen }
+      onClose={ onClose }
     >
       { renderLoader() }
       { renderVoices() }

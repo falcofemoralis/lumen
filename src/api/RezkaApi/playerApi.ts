@@ -1,3 +1,4 @@
+import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
@@ -38,11 +39,15 @@ const formatFilmVideo = (json: StreamsResult): FilmVideoInterface => {
     json.subtitle_lns
   );
 
-  return {
+  const result = {
     streams: configApi.modifyCDN(streams),
     subtitles,
     storyboardUrl: configApi.getProvider() + json.thumbnails,
   };
+
+  LoggerStore.debug('playerApi::formatFilmVideo', result);
+
+  return result;
 };
 
 const playerApi: PlayerApiInterface = {
@@ -77,8 +82,10 @@ const playerApi: PlayerApiInterface = {
 
     try {
       return formatFilmVideo(json);
-    } catch (e) {
-      NotificationStore.displayError(e as Error);
+    } catch (error) {
+      LoggerStore.error('getFilmStreamsByVoice', { error });
+
+      NotificationStore.displayError(error as Error);
 
       return {
         streams: [],
@@ -114,8 +121,10 @@ const playerApi: PlayerApiInterface = {
 
     try {
       return formatFilmVideo(json);
-    } catch (e) {
-      NotificationStore.displayError(e as Error);
+    } catch (error) {
+      LoggerStore.error('getFilmStreamsByEpisodeId', { error });
+
+      NotificationStore.displayError(error as Error);
 
       return {
         streams: [],

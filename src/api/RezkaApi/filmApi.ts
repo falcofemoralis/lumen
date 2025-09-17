@@ -513,6 +513,8 @@ const filmApi: FilmApiInterface = {
       [key: string]: FilmCardInterface;
     };
 
+    const linksUnique = [...new Set(links)];
+
     const getFilm = async (link: string): Promise<FilmCardInterface> => {
       const root = await configApi.fetchPage(link);
 
@@ -578,7 +580,7 @@ const filmApi: FilmApiInterface = {
       };
     };
 
-    const results = await processPromisesBatch<string, FilmCardInterface>(links, 3, getFilm);
+    const results = await processPromisesBatch<string, FilmCardInterface>(linksUnique, 3, getFilm);
 
     results.forEach((result) => {
       films[result.link] = result;
@@ -586,7 +588,7 @@ const filmApi: FilmApiInterface = {
 
     return notifications.map((notification) => {
       const items = notification.items.map((item) => {
-        const film = films[item.link];
+        const film = { ...films[item.link] } as FilmCardInterface;
         film.info = item.info;
 
         return {

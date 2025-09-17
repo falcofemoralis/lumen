@@ -1,5 +1,7 @@
-import { router } from 'expo-router';
 import { Platform, ToastAndroid } from 'react-native';
+import { ERROR_ROUTE } from 'Route/ErrorPage/ErrorPage.config';
+
+import { navigationRef } from '../navigation/container';
 
 class NotificationStore {
   private isErrorOccurred = false;
@@ -25,8 +27,6 @@ class NotificationStore {
 
     const msg = error instanceof Error ? error.message : String(error);
 
-    console.error(msg);
-
     if (Platform.OS === 'web') {
       // For web, we can use the browser's alert or implement a custom toast
       // You might want to use a proper toast library for better UX
@@ -43,14 +43,11 @@ class NotificationStore {
 
     this.isErrorOccurred = true;
 
-    router.replace({
-      pathname: '/error',
-      params: {
-        code,
-        error,
-        info,
-      },
-    });
+    navigationRef.current?.navigate(ERROR_ROUTE, {
+      code,
+      error,
+      info,
+    } as never);
   }
 }
 

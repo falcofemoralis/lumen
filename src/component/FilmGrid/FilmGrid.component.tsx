@@ -2,7 +2,7 @@ import FilmCard from 'Component/FilmCard';
 import { useFilmCardDimensions } from 'Component/FilmCard/FilmCard.style';
 import ThemedGrid from 'Component/ThemedGrid';
 import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
-import React, { memo, useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import {
   Pressable,
   View,
@@ -14,37 +14,9 @@ import { NUMBER_OF_COLUMNS } from './FilmGrid.config';
 import { ROW_GAP, styles } from './FilmGrid.style';
 import { FilmGridThumbnail } from './FilmGrid.thumbnail';
 import {
-  FilmGridComponentProps, FilmGridItemProps, FilmGridRowType,
+  FilmGridComponentProps,
+  FilmGridRowType,
 } from './FilmGrid.type';
-
-function FilmGridItem({
-  row,
-  width,
-  handleOnPress,
-}: FilmGridItemProps) {
-  const { items } = row;
-
-  return (
-    <View style={ styles.gridRow }>
-      { items.map((item, index) => (
-        <Pressable
-          // eslint-disable-next-line react/no-array-index-key
-          key={ index }
-          style={ { width } }
-          onPress={ () => handleOnPress(item) }
-        >
-          <FilmCard filmCard={ item } />
-        </Pressable>
-      )) }
-    </View>
-  );
-}
-
-function rowPropsAreEqual(prevProps: FilmGridItemProps, props: FilmGridItemProps) {
-  return prevProps.row.id === props.row.id && prevProps.width === props.width;
-}
-
-const MemoizedGridItem = memo(FilmGridItem, rowPropsAreEqual);
 
 export function FilmGridComponent({
   films,
@@ -54,14 +26,23 @@ export function FilmGridComponent({
   const { width, height } = useFilmCardDimensions(NUMBER_OF_COLUMNS, scale(ROW_GAP));
 
   const renderItem = useCallback(
-    ({ item: row, index }: ThemedGridRowProps<FilmGridRowType>) => (
-      <MemoizedGridItem
-        index={ index }
-        row={ row }
-        width={ width }
-        handleOnPress={ handleOnPress }
-      />
-    ),
+    ({ item: row }: ThemedGridRowProps<FilmGridRowType>) => {
+      const { items } = row;
+
+      return (
+        <View style={ styles.gridRow }>
+          { items.map((item, index) => (
+            <Pressable
+              key={ item.id }
+              style={ { width } }
+              onPress={ () => handleOnPress(item) }
+            >
+              <FilmCard filmCard={ item } />
+            </Pressable>
+          )) }
+        </View>
+      );
+    },
     [width]
   );
 
@@ -70,7 +51,7 @@ export function FilmGridComponent({
   ).map((items) => ({
     id: items[0].id,
     items,
-  })), [films, width]);
+  })), [films]);
 
   return (
     <ThemedGrid

@@ -11,6 +11,9 @@ export const styles = CreateStyles({
     flexDirection: 'row',
     gap: 4,
   },
+  voicesDropdown: {
+    flex: 1,
+  },
   seasonsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',

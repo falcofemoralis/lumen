@@ -9,10 +9,11 @@ import {
 } from 'react';
 import { Platform } from 'react-native';
 import ConfigStore from 'Store/Config.store';
+import LoggerStore from 'Store/Logger.store';
+import StorageStore from 'Store/Storage.store';
 import { UpdateInterface } from 'Type/Update.interface';
 import { noopFn } from 'Util/Function';
 import { versionStringToNumber } from 'Util/Misc';
-import { miscStorage } from 'Util/Storage';
 
 const UPDATE_STORAGE_KEY = 'app_update';
 
@@ -37,7 +38,7 @@ export const AppUpdaterProvider = ({ children }: { children: React.ReactNode }) 
   const [isUpdateRejected, setIsUpdateRejected] = useState(false);
 
   const getCachedUpdate = useCallback(async () => {
-    const cachedData = miscStorage.getString(UPDATE_STORAGE_KEY);
+    const cachedData = StorageStore.getMiscStorage().getString(UPDATE_STORAGE_KEY);
 
     if (cachedData) {
       const { data, ttl } = JSON.parse(cachedData) as { data: UpdateInterface; ttl: number };
@@ -50,7 +51,7 @@ export const AppUpdaterProvider = ({ children }: { children: React.ReactNode }) 
     const response = await fetch(UPDATE_LINK);
     const data = await response.json() as UpdateInterface;
 
-    miscStorage.set(UPDATE_STORAGE_KEY, JSON.stringify({
+    StorageStore.getMiscStorage().set(UPDATE_STORAGE_KEY, JSON.stringify({
       data,
       ttl: Date.now() + 1000 * 60 * 60, // 1 hour
     }));

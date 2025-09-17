@@ -2,6 +2,9 @@ import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
+  page: {
+    paddingBottom: 16,
+  },
   actions: {
     flex: 1,
     flexDirection: 'row',
@@ -108,7 +111,7 @@ export const styles = CreateStyles({
     marginTop: 8,
   },
   readMoreButtonHidden: {
-    opacity: 0,
+    display: 'none',
   },
   section: {
     marginTop: 16,
@@ -290,7 +293,6 @@ export const styles = CreateStyles({
     width: 100,
   },
   relatedListItemPoster: {
-    height: 160,
   },
   commentsOverlay: {
     width: '50%',
@@ -304,5 +306,12 @@ export const styles = CreateStyles({
   },
   descriptionOverlayText: {
     fontSize: 16,
+    lineHeight: 24,
+  },
+  card: {
+    backgroundColor: Colors.backgroundLight,
+    borderRadius: 16,
+    borderColor: Colors.darkBorder,
+    borderWidth: 1,
   },
 });

@@ -5,6 +5,7 @@ export interface ThemedInputContainerProps extends TextInputProps {
   onChangeText: (t: string) => void;
   style?: StyleProp<TextStyle> | undefined;
   containerStyle?: StyleProp<ViewStyle> | undefined;
+  editable?: boolean;
 }
 
 export interface ThemedInputComponentProps extends ThemedInputContainerProps {

@@ -22,6 +22,7 @@ const ThemedPressable = ({
   return (
     <SpatialNavigationFocusableView
       onSelect={ noopFn }
+      onLongSelect={ noopFn }
     >
       { ({ isFocused }) => (
         <View style={ [style, { overflow: 'hidden' }] }>

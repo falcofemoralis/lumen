@@ -6,6 +6,7 @@ export interface NotificationInterface {
 }
 
 export interface NotificationItemInterface {
+  name: string;
   link: string;
   film?: FilmCardInterface;
   info?: string;

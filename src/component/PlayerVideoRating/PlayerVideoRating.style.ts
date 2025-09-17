@@ -17,7 +17,8 @@ export const styles = CreateStyles({
   },
   voiceRatingItemContainer: {
     flexDirection: 'row',
-    padding: 16,
+    paddingBlock: 8,
+    paddingInline: 16,
   },
   voiceRatingInfo: {
     flexDirection: 'column',
@@ -38,7 +39,7 @@ export const styles = CreateStyles({
     width: '100%',
   },
   voiceRatingBar: {
-    height: 8,
+    height: 6,
     width: '100%',
     backgroundColor: Colors.backgroundLighter,
     borderRadius: 16,

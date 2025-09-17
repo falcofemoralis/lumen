@@ -9,14 +9,15 @@ import CategoryPageComponent from './CategoryPage.component';
 import CategoryPageComponentTV from './CategoryPage.component.atv';
 import { CategoryPageContainerProps } from './CategoryPage.type';
 
-export function CategoryPageContainer({ link }: CategoryPageContainerProps) {
+export function CategoryPageContainer({ route }: CategoryPageContainerProps) {
+  const { link } = route.params as { link: string };
   const [filmPager, setFilmPager] = useState<FilmPagerInterface>({});
-  const { getCurrentService } = useServiceContext();
+  const { currentService } = useServiceContext();
 
   const onLoadFilms = async (
     _menuItem: MenuItemInterface,
     currentPage: number
-  ) => getCurrentService().getFilms(currentPage, link);
+  ) => currentService.getFilms(currentPage, link);
 
   const onUpdateFilms = async (key: string, filmList: FilmListInterface) => {
     setFilmPager((prevFilmPager) => ({

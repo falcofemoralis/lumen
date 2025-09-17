@@ -1,6 +1,8 @@
+import { useNavigation } from '@react-navigation/native';
 import { useServiceContext } from 'Context/ServiceContext';
 import { withTV } from 'Hooks/withTV';
 import { useEffect, useRef, useState } from 'react';
+import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
 import { RecentItemInterface } from 'Type/RecentItem.interface';
 import { openFilm } from 'Util/Router';
@@ -9,13 +11,14 @@ import RecentPageComponent from './RecentPage.component';
 import RecentPageComponentTV from './RecentPage.component.atv';
 
 export function RecentPageContainer() {
-  const { isSignedIn, getCurrentService } = useServiceContext();
+  const { isSignedIn, currentService } = useServiceContext();
   const [items, setItems] = useState<RecentItemInterface[]>([]);
   const paginationRef = useRef({
     page: 1,
     totalPages: 1,
   });
   const updatingStateRef = useRef(false);
+  const navigation = useNavigation();
 
   useEffect(() => {
     if (isSignedIn) {
@@ -23,9 +26,9 @@ export function RecentPageContainer() {
     }
 
     return () => {
-      getCurrentService().unloadRecentPage();
+      currentService.unloadRecentPage();
     };
-  }, [isSignedIn, getCurrentService]);
+  }, [isSignedIn, currentService]);
 
   useEffect(() => {
     updatingStateRef.current = false;
@@ -48,7 +51,7 @@ export function RecentPageContainer() {
         const {
           items: resItems,
           totalPages: resTotalPages,
-        } = await getCurrentService().getRecent(
+        } = await currentService.getRecent(
           page,
           { isRefresh }
         );
@@ -62,6 +65,8 @@ export function RecentPageContainer() {
 
         setItems(newItems);
       } catch (error) {
+        LoggerStore.error('recentPageLoadRecent', { error });
+
         NotificationStore.displayError(error as Error);
         updatingStateRef.current = false;
       }
@@ -77,7 +82,7 @@ export function RecentPageContainer() {
   };
 
   const handleOnPress = (item: RecentItemInterface) => {
-    openFilm({ link: item.link, poster: item.image });
+    openFilm({ link: item.link, poster: item.image }, navigation);
   };
 
   const removeItem = async (item: RecentItemInterface) => {
@@ -85,7 +90,9 @@ export function RecentPageContainer() {
 
     setItems((prev) => prev.filter((i) => i.id !== id));
 
-    getCurrentService().removeRecent(id).catch((error) => {
+    currentService.removeRecent(id).catch((error) => {
+      LoggerStore.error('removeItem', { error });
+
       NotificationStore.displayError(error as Error);
     });
   };

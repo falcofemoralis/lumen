@@ -1,24 +1,24 @@
+import { ParamListBase, RouteProp } from '@react-navigation/native';
+import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 
 export interface FilmPageContainerProps {
-  link: string;
-  thumbnailPoster: string;
+  route: RouteProp<ParamListBase, string>;
 }
 
 export interface FilmPageComponentProps {
   film: FilmInterface | null;
   thumbnailPoster: string;
   visibleScheduleItems: ScheduleItemInterface[];
-  playerVideoSelectorOverlayId: string;
-  scheduleOverlayId: string;
-  commentsOverlayId: string;
-  bookmarksOverlayId: string;
-  descriptionOverlayId: string;
+  playerVideoSelectorOverlayRef: React.RefObject<ThemedOverlayRef | null>;
+  scheduleOverlayRef: React.RefObject<ThemedOverlayRef | null>;
+  commentsOverlayRef: React.RefObject<ThemedOverlayRef | null>;
+  bookmarksOverlayRef: React.RefObject<ThemedOverlayRef | null>;
+  descriptionOverlayRef: React.RefObject<ThemedOverlayRef | null>;
   playFilm: () => void;
-  hideVideoSelector: () => void;
   handleVideoSelect: (video: FilmVideoInterface, voice: FilmVoiceInterface) => void;
   handleSelectFilm: (film: FilmInterface) => void;
   handleSelectActor: (actorLink: string) => void;
@@ -26,4 +26,5 @@ export interface FilmPageComponentProps {
   handleUpdateScheduleWatch: (scheduleItem: ScheduleItemInterface) => Promise<boolean>;
   handleShare: () => void;
   openBookmarks: () => void;
+  handleBookmarkChange: (film: FilmInterface) => void;
 }

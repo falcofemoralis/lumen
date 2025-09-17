@@ -1,13 +1,15 @@
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import InfoBlock from 'Component/InfoBlock';
+import KeyboardAdjuster from 'Component/KeyboardAdjuster/KeyboardAdjuster.component';
 import Loader from 'Component/Loader';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedInput from 'Component/ThemedInput';
-import { router } from 'expo-router';
 import t from 'i18n/t';
 import { useRef } from 'react';
 import { View } from 'react-native';
-import { AvoidSoftInputView } from 'react-native-avoid-softinput';
+import { useKeyboardController } from 'react-native-keyboard-controller';
 import { DefaultFocus } from 'react-tv-space-navigation';
+import { ACCOUNT_ROUTE } from 'Route/AccountPage/AccountPage.config';
 
 import { styles } from './LoginForm.style.atv';
 import { LoginFormComponentProps } from './LoginForm.type';
@@ -17,14 +19,24 @@ export function LoginFormComponent({
   withRedirect,
   handleLogin,
 }: LoginFormComponentProps) {
+  const navigation = useNavigation();
   const loginRef = useRef({ username: '', password: '' });
+  const { setEnabled } = useKeyboardController();
+
+  useFocusEffect(() => {
+    setEnabled(true);
+
+    return () => {
+      setEnabled(false);
+    };
+  });
 
   const renderForm = () => {
     if (withRedirect) {
       return (
         <ThemedButton
           style={ styles.form }
-          onPress={ () => router.navigate('/(tabs)/(account)') }
+          onPress={ () => navigation.navigate(ACCOUNT_ROUTE) }
         >
           { t('Go to login page') }
         </ThemedButton>
@@ -67,17 +79,16 @@ export function LoginFormComponent({
 
   return (
     <DefaultFocus>
-      <AvoidSoftInputView>
-        <View
-          style={ styles.container }
-        >
-          <InfoBlock
-            title={ t('You are not logged in') }
-            subtitle={ t('Sign in to sync content') }
-          />
-          { renderForm() }
-        </View>
-      </AvoidSoftInputView>
+      <View
+        style={ styles.container }
+      >
+        <InfoBlock
+          title={ t('You are not logged in') }
+          subtitle={ t('Sign in to sync content') }
+        />
+        { renderForm() }
+        <KeyboardAdjuster />
+      </View>
     </DefaultFocus>
   );
 }

@@ -1,10 +1,12 @@
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
+import { Pressable } from 'react-native-gesture-handler';
 import { Colors } from 'Style/Colors';
 
 import { ThemedPressableProps } from './ThemedPressable.type';
 
 export const ThemedPressable = ({
   onPress,
+  onLongPress,
   children,
   style,
   contentStyle,
@@ -20,6 +22,7 @@ export const ThemedPressable = ({
       <Pressable
         ref={ ref }
         onPress={ onPress }
+        onLongPress={ onLongPress }
         disabled={ disabled }
         android_ripple={ {
           color: mode === 'light' ? Colors.whiteTransparent : Colors.button,

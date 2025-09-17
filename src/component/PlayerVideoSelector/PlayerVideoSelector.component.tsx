@@ -3,6 +3,7 @@ import PlayerVideoRating from 'Component/PlayerVideoRating';
 import ThemedDropdown from 'Component/ThemedDropdown';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedPressable from 'Component/ThemedPressable';
+import ThemedSimpleList from 'Component/ThemedSimpleList';
 import ThemedText from 'Component/ThemedText';
 import t from 'i18n/t';
 import React, { memo } from 'react';
@@ -16,9 +17,8 @@ import { styles } from './PlayerVideoSelector.style';
 import { PlayerVideoSelectorComponentProps } from './PlayerVideoSelector.type';
 
 export function PlayerVideoSelectorComponent({
-  overlayId,
+  overlayRef,
   voices,
-  onHide,
   isLoading,
   selectedVoice,
   selectedSeasonId,
@@ -31,6 +31,9 @@ export function PlayerVideoSelectorComponent({
   film,
   savedTime,
   calculateProgressThreshold,
+  onOverlayOpen,
+  voiceOverlayRef,
+  onClose,
 }: PlayerVideoSelectorComponentProps) {
   const renderVoiceRating = () => {
     const { voiceRating = [] } = film;
@@ -53,9 +56,31 @@ export function PlayerVideoSelectorComponent({
       return null;
     }
 
+    if (seasons.length) {
+      return (
+        <View style={ styles.voicesContainer }>
+          <ThemedDropdown
+            data={ voices.map((voice) => ({
+              label: voice.title,
+              value: voice.identifier,
+              startIcon: voice.premiumIcon,
+              endIcon: voice.img,
+            })) }
+            value={ selectedVoice.identifier }
+            onChange={ (item) => handleSelectVoice(item.value) }
+            header={ t('Search voice') }
+            inputStyle={ styles.voiceDropdownInput }
+            style={ styles.voicesDropdown }
+            overlayRef={ voiceOverlayRef }
+          />
+          { renderVoiceRating() }
+        </View>
+      );
+    }
+
     return (
       <View style={ styles.voicesContainer }>
-        <ThemedDropdown
+        <ThemedSimpleList
           data={ voices.map((voice) => ({
             label: voice.title,
             value: voice.identifier,
@@ -63,12 +88,9 @@ export function PlayerVideoSelectorComponent({
             endIcon: voice.img,
           })) }
           value={ selectedVoice.identifier }
-          header={ t('Search voice') }
           onChange={ (item) => handleSelectVoice(item.value) }
-          asList={ !seasons.length }
-          style={ styles.voiceDropdownInput }
+          header={ t('Search voice') }
         />
-        { seasons.length ? renderVoiceRating() : null }
       </View>
     );
   };
@@ -199,10 +221,11 @@ export function PlayerVideoSelectorComponent({
 
   return (
     <ThemedOverlay
-      id={ overlayId }
-      onHide={ onHide }
+      ref={ overlayRef }
       contentContainerStyle={ styles.container }
       style={ styles.background }
+      onOpen={ onOverlayOpen }
+      onClose={ onClose }
     >
       { renderLoader() }
       { renderContent() }
