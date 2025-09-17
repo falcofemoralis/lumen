@@ -1,5 +1,5 @@
-import { calculateCardDimensions } from 'Component/FilmCard/FilmCard.style.atv';
-import { FilmCardThumbnail } from 'Component/FilmCard/FilmCard.thumbnail.atv';
+import { calculateCardDimensions } from 'Component/FilmCard/FilmCard.style';
+import { FilmCardThumbnail } from 'Component/FilmCard/FilmCard.thumbnail';
 import { View } from 'react-native';
 import { scale } from 'Util/CreateStyles';
 
