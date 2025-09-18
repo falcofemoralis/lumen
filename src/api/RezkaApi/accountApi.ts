@@ -5,7 +5,7 @@ import { HTMLElementInterface } from 'Util/Parser';
 
 import { AccountApiInterface, ApiParams } from '..';
 import configApi from './configApi';
-import { JSONResult, parseFilmsListRoot } from './utils';
+import { getStaticUrl, JSONResult, parseFilmsListRoot } from './utils';
 
 type RezkaAccountApiInterface = AccountApiInterface & {
   recentItems: HTMLElementInterface[] | null;
@@ -189,11 +189,7 @@ const accountApi: RezkaAccountApiInterface = {
   },
 
   getPhotoUrl(url: string) {
-    if (!url.includes('http')) {
-      return `https://statichdrezka.ac/${url}`;
-    }
-
-    return url;
+    return getStaticUrl(url);
   },
 };
 

@@ -1,9 +1,6 @@
-import { REZKA_PROXY_PROVIDER } from 'Api/RezkaApi/configApi';
+import { services } from 'Api/services';
+import { DEFAULT_SERVICE } from 'Context/ServiceContext';
 import webvtt from 'node-webvtt';
-import { Platform } from 'react-native';
-import { customFetch } from 'Util/Fetch';
-import { addProxyHeaders } from 'Util/Request';
-import { updateUrlHost } from 'Util/Url';
 
 export interface VTTItem {
   start: number
@@ -24,13 +21,7 @@ export interface ParsedVTTResult {
 }
 
 export const vttLoader = async (url: string) => {
-  const isWeb = Platform.OS === 'web';
-  const input = isWeb ? updateUrlHost(url, REZKA_PROXY_PROVIDER) : url;
-  const headers = isWeb ? addProxyHeaders({}, (new URL(url).origin)) : undefined;
-
-  const res = await customFetch(input, headers ? { headers } : undefined);
-
-  return res.text();
+  return await services[DEFAULT_SERVICE].getRequest(url);
 };
 
 export const subtitleParser = async (subtitleUrl: string): Promise<VTTItem[]> => {
