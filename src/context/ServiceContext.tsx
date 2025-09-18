@@ -20,7 +20,7 @@ import { addProxyHeaders, requestValidator } from 'Util/Request';
 export const CREDENTIALS_STORAGE = 'CREDENTIALS_STORAGE';
 export const PROFILE_STORAGE = 'PROFILE_STORAGE';
 
-export const defaultService = ApiServiceType.REZKA;
+export const DEFAULT_SERVICE = ApiServiceType.REZKA;
 
 interface ServiceContextInterface {
   isSignedIn: boolean;
@@ -42,7 +42,7 @@ interface ServiceContextInterface {
 const ServiceContext = createContext<ServiceContextInterface>({
   isSignedIn: false,
   profile: null,
-  currentService: services[defaultService],
+  currentService: services[DEFAULT_SERVICE],
   updateCurrentService: () => {},
   setAuthorization: () => {},
   login: async () => {},
@@ -57,7 +57,7 @@ const ServiceContext = createContext<ServiceContextInterface>({
 });
 
 export const ServiceProvider = ({ children }: { children: React.ReactNode }) => {
-  const [currentService, setCurrentService] = useState<ApiInterface>(services[defaultService]);
+  const [currentService, setCurrentService] = useState<ApiInterface>(services[DEFAULT_SERVICE]);
   const [isSignedIn, setIsSignedIn] = useState<boolean>(!!StorageStore.getMiscStorage().getString(CREDENTIALS_STORAGE));
   const [profile, setProfile] = useState<ProfileInterface | null>(
     safeJsonParse<ProfileInterface>(StorageStore.getMiscStorage().getString(PROFILE_STORAGE))

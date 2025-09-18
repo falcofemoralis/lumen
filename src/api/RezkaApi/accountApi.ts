@@ -187,6 +187,14 @@ const accountApi: RezkaAccountApiInterface = {
       throw new Error(data?.message ?? 'Something went wrong');
     }
   },
+
+  getPhotoUrl(url: string) {
+    if (!url.includes('http')) {
+      return `https://statichdrezka.ac/${url}`;
+    }
+
+    return url;
+  },
 };
 
 export default accountApi;

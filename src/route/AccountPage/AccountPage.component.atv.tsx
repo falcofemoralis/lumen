@@ -1,3 +1,4 @@
+import { services } from 'Api/services';
 import Loader from 'Component/Loader';
 import LoginForm from 'Component/LoginForm';
 import Page from 'Component/Page';
@@ -5,7 +6,7 @@ import ThemedButton from 'Component/ThemedButton';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
 import { useNotificationsContext } from 'Context/NotificationsContext';
-import { useServiceContext } from 'Context/ServiceContext';
+import { DEFAULT_SERVICE, useServiceContext } from 'Context/ServiceContext';
 import t from 'i18n/t';
 import React from 'react';
 import { Image, View } from 'react-native';
@@ -43,7 +44,7 @@ export function AccountPageComponent({
         <View style={ styles.profileInfo }>
           { avatar ? (
             <ThemedImage
-              src={ avatar }
+              src={ services[DEFAULT_SERVICE].getPhotoUrl(avatar) }
               style={ styles.profileAvatar }
             />
           ) : (

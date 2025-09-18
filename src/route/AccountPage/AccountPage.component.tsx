@@ -1,4 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
+import { services } from 'Api/services';
 import Loader from 'Component/Loader';
 import LoginForm from 'Component/LoginForm';
 import Page from 'Component/Page';
@@ -9,7 +10,7 @@ import ThemedSafeArea from 'Component/ThemedSafeArea';
 import ThemedText from 'Component/ThemedText';
 import Wrapper from 'Component/Wrapper';
 import { useNotificationsContext } from 'Context/NotificationsContext';
-import { useServiceContext } from 'Context/ServiceContext';
+import { DEFAULT_SERVICE, useServiceContext } from 'Context/ServiceContext';
 import t from 'i18n/t';
 import { Bell, Settings } from 'lucide-react-native';
 import React from 'react';
@@ -85,7 +86,7 @@ export function AccountPageComponent({
         <View style={ styles.profileInfo }>
           { avatar ? (
             <ThemedImage
-              src={ avatar }
+              src={ services[DEFAULT_SERVICE].getPhotoUrl(avatar) }
               style={ styles.profileAvatar }
             />
           ) : (

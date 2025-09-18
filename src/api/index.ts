@@ -129,6 +129,7 @@ export interface AccountApiInterface {
   unloadRecentPage(): void;
   getNotifications(): Promise<NotificationInterface[]>;
   saveScheduleWatch(watchId: string): Promise<void>;
+  getPhotoUrl(url: string): string;
 }
 
 export interface SearchApiInterface {
