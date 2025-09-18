@@ -10,6 +10,7 @@ import {
   View,
 } from 'react-native';
 import Animated from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ACCOUNT_ROUTE } from 'Route/AccountPage/AccountPage.config';
 import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
@@ -28,6 +29,7 @@ export function NavigationBarComponent({
 }: NavigationBarComponentProps) {
   const { badgeData } = useNotificationsContext();
   const { width } = useWindowDimensions();
+  const { bottom } = useSafeAreaInsets();
 
   const renderDefaultTab = useCallback((
     route: NavigationRoute<ParamListBase, string>,
@@ -118,7 +120,7 @@ export function NavigationBarComponent({
   }, [renderAccountTab, renderDefaultTab, width, onPress, onLongPress, state]);
 
   return (
-    <View style={ styles.tabBar }>
+    <View style={ [styles.tabBar, { paddingBottom: bottom }] }>
       <View style={ styles.tabs }>
         { state.routes.map((route, i) => renderTab(route, i)) }
       </View>

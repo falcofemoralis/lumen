@@ -3,6 +3,7 @@ import InfoBlock from 'Component/InfoBlock';
 import Page from 'Component/Page';
 import ThemedInput from 'Component/ThemedInput';
 import ThemedPressable from 'Component/ThemedPressable';
+import ThemedSafeArea from 'Component/ThemedSafeArea';
 import ThemedText from 'Component/ThemedText';
 import Wrapper from 'Component/Wrapper';
 import t from 'i18n/t';
@@ -150,13 +151,17 @@ export function SearchPageComponent({
 
   return (
     <Page>
-      <View style={ styles.container }>
-        <Wrapper>
-          { renderSearchContainer() }
-        </Wrapper>
-        { renderSuggestions() }
-      </View>
-      { renderFilms() }
+      <ThemedSafeArea>
+        <View style={ styles.content }>
+          <View style={ styles.container }>
+            <Wrapper>
+              { renderSearchContainer() }
+            </Wrapper>
+            { renderSuggestions() }
+          </View>
+          { renderFilms() }
+        </View>
+      </ThemedSafeArea>
     </Page>
   );
 }

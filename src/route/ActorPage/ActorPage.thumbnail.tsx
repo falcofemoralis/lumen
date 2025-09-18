@@ -7,10 +7,10 @@ import { scale } from 'Util/CreateStyles';
 
 import { styles } from './ActorPage.style';
 
-export const ActorPageThumbnail = () => (
+export const ActorPageThumbnail = ({ top }: { top: number }) => (
   <Page>
     <Wrapper>
-      <View style={ styles.mainContent }>
+      <View style={ [styles.mainContent, { paddingTop: top }] }>
         <Thumbnail
           style={ styles.photoWrapper }
         />

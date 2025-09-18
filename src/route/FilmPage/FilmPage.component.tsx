@@ -35,6 +35,7 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COMMENTS_MODAL_ROUTE } from 'Route/modal/CommentsModal/CommentsModal.config';
 import { SCHEDULE_MODAL_ROUTE } from 'Route/modal/ScheduleModal/ScheduleModal.config';
 import NotificationStore from 'Store/Notification.store';
@@ -81,6 +82,7 @@ export function FilmPageComponent({
     scrollOffset.value = event.contentOffset.y;
   });
   const imageHeight = width * (166 / 250);
+  const { top } = useSafeAreaInsets();
 
   const imageAnimatedStyle = useAnimatedStyle(() => {
     return {
@@ -511,6 +513,7 @@ export function FilmPageComponent({
     <Header
       additionalAction={ handleShare }
       AdditionalActionIcon={ Forward }
+      style={ { paddingTop: top } }
     />
   );
 
@@ -579,7 +582,7 @@ export function FilmPageComponent({
   const renderContent = () => {
     if (!film) {
       return (
-        <FilmPageThumbnail />
+        <FilmPageThumbnail top={ top } />
       );
     }
 

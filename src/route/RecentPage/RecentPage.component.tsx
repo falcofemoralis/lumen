@@ -9,6 +9,7 @@ import React, { memo, useCallback } from 'react';
 import {
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from 'Style/Colors';
 import { RecentItemInterface } from 'Type/RecentItem.interface';
 import { scale } from 'Util/CreateStyles';
@@ -88,6 +89,8 @@ export function RecentPageComponent({
   handleOnPress,
   removeItem,
 }: RecentPageComponentProps) {
+  const { top } = useSafeAreaInsets();
+
   const renderItem = useCallback(
     ({ item, index }: ThemedGridRowProps<RecentItemInterface>) => (
       <MemoizedRecentItem
@@ -109,6 +112,7 @@ export function RecentPageComponent({
         renderItem={ renderItem }
         onNextLoad={ onNextLoad }
         ListEmptyComponent={ <RecentPageThumbnail /> }
+        ListHeaderComponent={ <View style={ { height: top } } /> }
       />
     </Page>
   );

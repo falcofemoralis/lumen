@@ -17,6 +17,7 @@ export interface ThemedGridContainerProps<T = any> {
   ListEmptyComponent?: React.ComponentType<any>
   | React.ReactElement<any, string
   | React.JSXElementConstructor<any>>;
+  ListHeaderComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
   renderItem: (args: ThemedGridRowProps<T>) => React.ReactNode;
   onNextLoad?: (isRefresh: boolean) => Promise<void>;
 }
@@ -31,6 +32,7 @@ export interface ThemedGridComponentProps<T = any> {
   header?: React.ReactNode;
   headerSize?: number;
   ListEmptyComponent?: any;
+  ListHeaderComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
   renderItem: (props: { item: T, index: number }) => React.ReactNode;
   handleScrollEnd: () => void;
   handleRefresh?: () => void;

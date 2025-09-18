@@ -1,6 +1,7 @@
 import Header from 'Component/Header';
 import Loader from 'Component/Loader';
 import ThemedAccordion from 'Component/ThemedAccordion';
+import ThemedSafeArea from 'Component/ThemedSafeArea';
 import Wrapper from 'Component/Wrapper';
 import t from 'i18n/t';
 import { useCallback, useEffect, useState } from 'react';
@@ -59,17 +60,19 @@ export const ScheduleModalComponent = ({ film, handleUpdateScheduleWatch }: Sche
   }
 
   return (
-    <View style={ styles.container }>
-      <Header title={ t('Schedule') } />
-      <Wrapper style={ styles.wrapper }>
-        <ScrollView>
-          <ThemedAccordion
-            data={ data }
-            renderItem={ renderItem }
-          />
-        </ScrollView>
-      </Wrapper>
-    </View>
+    <ThemedSafeArea>
+      <View style={ styles.container }>
+        <Header title={ t('Schedule') } />
+        <Wrapper style={ styles.wrapper }>
+          <ScrollView>
+            <ThemedAccordion
+              data={ data }
+              renderItem={ renderItem }
+            />
+          </ScrollView>
+        </Wrapper>
+      </View>
+    </ThemedSafeArea>
   );
 };
 

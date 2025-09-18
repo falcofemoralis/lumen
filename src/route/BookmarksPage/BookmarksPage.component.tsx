@@ -4,6 +4,7 @@ import Page from 'Component/Page';
 import t from 'i18n/t';
 import React from 'react';
 import { View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { styles } from './BookmarksPage.style';
 import { BookmarksPageThumbnail } from './BookmarksPage.thumbnail';
@@ -16,9 +17,11 @@ export function BookmarksPageComponent({
   onLoadFilms,
   onUpdateFilms,
 }: BookmarksPageComponentProps) {
+  const { top } = useSafeAreaInsets();
+
   const renderContent = () => {
     if (isLoading) {
-      return <BookmarksPageThumbnail />;
+      return <BookmarksPageThumbnail top={ top } />;
     }
 
     if (!menuItems.length) {

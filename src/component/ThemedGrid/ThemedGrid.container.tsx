@@ -20,6 +20,7 @@ export function ThemedGridContainer({
   header,
   headerSize,
   ListEmptyComponent,
+  ListHeaderComponent,
   renderItem,
   onNextLoad,
 }: ThemedGridContainerProps) {
@@ -73,6 +74,7 @@ export function ThemedGridContainer({
     header,
     headerSize,
     ListEmptyComponent,
+    ListHeaderComponent,
     renderItem,
   });
 

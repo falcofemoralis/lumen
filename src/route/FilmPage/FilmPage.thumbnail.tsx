@@ -9,11 +9,12 @@ import { scale } from 'Util/CreateStyles';
 
 import { styles } from './FilmPage.style';
 
-export const FilmPageThumbnail = () => (
+export const FilmPageThumbnail = ({ top }: {top: number}) => (
   <View>
     <View style={ styles.upperContent }>
       <Header
         AdditionalActionIcon={ Forward }
+        style={ { paddingTop: top } }
       />
       <Wrapper>
         <Thumbnail
