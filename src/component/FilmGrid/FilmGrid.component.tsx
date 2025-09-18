@@ -53,7 +53,7 @@ export function FilmGridComponent({
   ).map((items) => ({
     id: items[0].id,
     items,
-  })), [films]);
+  })), [films, width]);
 
   return (
     <ThemedGrid
