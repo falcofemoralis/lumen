@@ -1,6 +1,5 @@
 import FilmPager from 'Component/FilmPager';
 import InfoBlock from 'Component/InfoBlock';
-import LoginForm from 'Component/LoginForm';
 import Page from 'Component/Page';
 import t from 'i18n/t';
 import React from 'react';

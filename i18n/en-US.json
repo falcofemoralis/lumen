@@ -143,5 +143,7 @@
   "Contact developer": "Contact developer to get the key to send logs.\n1) Contact via Telegram group\n2) Send me your device id.\n3) I will send you the key.",
   "Enter developer key": "Enter developer key",
   "Maximum": "Maximum",
-  "%s seconds": "%s seconds"
+  "%s seconds": "%s seconds",
+  "No recent items": "No recent items",
+  "You have not watched any films yet": "You have not watched any films yet"
 }

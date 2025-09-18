@@ -1,9 +1,11 @@
+import InfoBlock from 'Component/InfoBlock';
 import Page from 'Component/Page';
 import ThemedGrid from 'Component/ThemedGrid';
 import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
+import t from 'i18n/t';
 import { Trash2 } from 'lucide-react-native';
 import React, { memo, useCallback } from 'react';
 import {
@@ -85,6 +87,7 @@ const MemoizedRecentItem = memo(RecentItem, rowPropsAreEqual);
 
 export function RecentPageComponent({
   items,
+  isLoading,
   onNextLoad,
   handleOnPress,
   removeItem,
@@ -103,17 +106,37 @@ export function RecentPageComponent({
     [handleOnPress]
   );
 
-  return (
-    <Page>
+  const renderContent = () => {
+    if (isLoading) {
+      return <RecentPageThumbnail top={ top } />;
+    }
+
+    if (!items.length) {
+      return (
+        <View style={ styles.empty }>
+          <InfoBlock
+            title={ t('No recent items') }
+            subtitle={ t('You have not watched any films yet') }
+          />
+        </View>
+      );
+    }
+
+    return (
       <ThemedGrid
         data={ items }
         numberOfColumns={ NUMBER_OF_COLUMNS }
         itemSize={ scale(130) }
         renderItem={ renderItem }
         onNextLoad={ onNextLoad }
-        ListEmptyComponent={ <RecentPageThumbnail /> }
         ListHeaderComponent={ <View style={ { height: top } } /> }
       />
+    );
+  };
+
+  return (
+    <Page>
+      { renderContent() }
     </Page>
   );
 }

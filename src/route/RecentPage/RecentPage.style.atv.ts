@@ -61,4 +61,10 @@ export const styles = CreateStyles({
   deleteButton: {
     backgroundColor: Colors.transparent,
   },
+  empty: {
+    height: '100%',
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });

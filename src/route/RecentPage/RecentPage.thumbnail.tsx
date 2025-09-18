@@ -6,8 +6,8 @@ import { scale } from 'Util/CreateStyles';
 import { THUMBNAILS_AMOUNT } from './RecentPage.config';
 import { styles } from './RecentPage.style';
 
-export const RecentPageThumbnail = () => (
-  <Wrapper>
+export const RecentPageThumbnail = ({ top }: { top: number }) => (
+  <Wrapper style={ { paddingTop: top } }>
     { Array(THUMBNAILS_AMOUNT).fill(0).map((_, index) => (
       <View
         // eslint-disable-next-line react/no-array-index-key

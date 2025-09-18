@@ -47,4 +47,10 @@ export const styles = CreateStyles({
     width: 40,
     borderRadius: 50,
   },
+  empty: {
+    height: '100%',
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
