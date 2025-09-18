@@ -134,6 +134,23 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
     await requestValidator(url, headers ?? currentService.getHeaders());
   }, [currentService]);
 
+  const reLogin = useCallback(async () => {
+    // Reset cookies
+    (new CookiesManager()).reset();
+
+    if (isSignedIn) {
+      const { name, password } = safeJsonParse<{ name: string; password: string }>(
+        StorageStore.getMiscStorage().getString(CREDENTIALS_STORAGE)
+      ) ?? {};
+
+      logout();
+
+      if (name && password) {
+        await login(name, password);
+      }
+    }
+  }, [isSignedIn, logout, login]);
+
   /**
    * Update the provider for the current service
    * @param {string} value - The provider URL
@@ -152,21 +169,8 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
       currentService.setProvider(value);
     }
 
-    // Reset cookies
-    (new CookiesManager()).reset();
-
-    if (isSignedIn) {
-      const { name, password } = safeJsonParse<{ name: string; password: string }>(
-        StorageStore.getMiscStorage().getString(CREDENTIALS_STORAGE)
-      ) ?? {};
-
-      logout();
-
-      if (name && password) {
-        await login(name, password);
-      }
-    }
-  }, [currentService, validateUrl, isSignedIn, logout, login]);
+    reLogin();
+  }, [currentService, validateUrl, reLogin]);
 
   /**
    * Update the CDN for the current service
@@ -195,7 +199,9 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
    */
   const updateOfficialMode = useCallback((value: string) => {
     currentService.setOfficialMode(value);
-  }, [currentService]);
+
+    reLogin();
+  }, [currentService, reLogin]);
 
   /**
    * Get the CDNs for the current service
