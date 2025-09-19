@@ -3,6 +3,9 @@ import { CONTENT_WRAPPER_PADDING } from 'Style/Layout';
 import CreateStyles from 'Util/CreateStyles';
 
 export const styles = CreateStyles({
+  content: {
+    flex: 1,
+  },
   container: {
     flexDirection: 'column',
     marginTop: 12,

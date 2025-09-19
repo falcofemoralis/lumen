@@ -17,6 +17,7 @@ export const ThemedGridComponent = ({
   itemSize,
   isRefreshing = false,
   ListEmptyComponent,
+  ListHeaderComponent,
   renderItem,
   handleScrollEnd,
   handleRefresh = noopFn,
@@ -52,6 +53,7 @@ export const ThemedGridComponent = ({
       ListEmptyComponent={ ListEmptyComponent }
       recycleItems
       showsVerticalScrollIndicator={ false }
+      ListHeaderComponent={ ListHeaderComponent }
     />
   );
 };

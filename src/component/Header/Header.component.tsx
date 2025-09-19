@@ -12,6 +12,7 @@ import { HeaderComponentProps } from './Header.type';
 
 export const HeaderComponent = ({
   title,
+  style,
   additionalAction,
   AdditionalActionIcon,
 }: HeaderComponentProps) => {
@@ -19,7 +20,7 @@ export const HeaderComponent = ({
 
   return (
     <Wrapper>
-      <View style={ styles.topActions }>
+      <View style={ [styles.topActions, style] }>
         <View style={ styles.leftActions }>
           <ThemedPressable
             style={ styles.topActionsButton }

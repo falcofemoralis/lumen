@@ -1,9 +1,11 @@
+import InfoBlock from 'Component/InfoBlock';
 import Page from 'Component/Page';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedGrid from 'Component/ThemedGrid';
 import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
+import t from 'i18n/t';
 import { Trash2 } from 'lucide-react-native';
 import React, { useCallback } from 'react';
 import { useWindowDimensions, View } from 'react-native';
@@ -18,6 +20,7 @@ import { RecentGridItem, RecentPageComponentProps } from './RecentPage.type';
 
 export function RecentPageComponent({
   items,
+  isLoading,
   onNextLoad,
   handleOnPress,
   removeItem,
@@ -103,8 +106,23 @@ export function RecentPageComponent({
     );
   }, [handleOnPress]);
 
-  return (
-    <Page contentStyle={ styles.page }>
+  const renderContent = () => {
+    if (isLoading) {
+      return <RecentPageThumbnail />;
+    }
+
+    if (!items.length) {
+      return (
+        <View style={ styles.empty }>
+          <InfoBlock
+            title={ t('No recent items') }
+            subtitle={ t('You have not watched any films yet') }
+          />
+        </View>
+      );
+    }
+
+    return (
       <DefaultFocus>
         <ThemedGrid
           style={ styles.grid }
@@ -114,9 +132,14 @@ export function RecentPageComponent({
           itemSize={ height / 3 }
           renderItem={ renderItem }
           onNextLoad={ onNextLoad }
-          ListEmptyComponent={ <RecentPageThumbnail /> }
         />
       </DefaultFocus>
+    );
+  };
+
+  return (
+    <Page contentStyle={ styles.page }>
+      { renderContent() }
     </Page>
   );
 }

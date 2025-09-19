@@ -4,6 +4,7 @@ import Page from 'Component/Page';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedInput from 'Component/ThemedInput';
 import ThemedList from 'Component/ThemedList';
+import ThemedSafeArea from 'Component/ThemedSafeArea';
 import ThemedText from 'Component/ThemedText';
 import t from 'i18n/t';
 import React, { useState } from 'react';
@@ -159,10 +160,12 @@ export const LoggerPageComponent = ({
 
   return (
     <Page>
-      { renderHeader() }
-      { renderList() }
-      { renderDeviceId() }
-      { renderActions() }
+      <ThemedSafeArea>
+        { renderHeader() }
+        { renderList() }
+        { renderDeviceId() }
+        { renderActions() }
+      </ThemedSafeArea>
     </Page>
   );
 };

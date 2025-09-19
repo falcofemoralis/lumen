@@ -5,6 +5,7 @@ import ThemedText from 'Component/ThemedText';
 import Wrapper from 'Component/Wrapper';
 import React from 'react';
 import { View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { styles } from './ActorPage.style';
 import { ActorPageThumbnail } from './ActorPage.thumbnail';
@@ -15,8 +16,10 @@ export function ActorPageComponent({
   actor,
   handleSelectFilm,
 }: ActorPageComponentProps) {
+  const { top } = useSafeAreaInsets();
+
   if (!actor || isLoading) {
-    return <ActorPageThumbnail />;
+    return <ActorPageThumbnail top={ top } />;
   }
 
   const renderPhoto = () => {
@@ -81,7 +84,7 @@ export function ActorPageComponent({
   );
 
   const renderMainData = () => (
-    <View style={ styles.mainContent }>
+    <View style={ [styles.mainContent, { paddingTop: top }] }>
       { renderPhoto() }
       { renderInfo() }
     </View>

@@ -20,7 +20,7 @@ import { addProxyHeaders, requestValidator } from 'Util/Request';
 export const CREDENTIALS_STORAGE = 'CREDENTIALS_STORAGE';
 export const PROFILE_STORAGE = 'PROFILE_STORAGE';
 
-export const defaultService = ApiServiceType.REZKA;
+export const DEFAULT_SERVICE = ApiServiceType.REZKA;
 
 interface ServiceContextInterface {
   isSignedIn: boolean;
@@ -42,7 +42,7 @@ interface ServiceContextInterface {
 const ServiceContext = createContext<ServiceContextInterface>({
   isSignedIn: false,
   profile: null,
-  currentService: services[defaultService],
+  currentService: services[DEFAULT_SERVICE],
   updateCurrentService: () => {},
   setAuthorization: () => {},
   login: async () => {},
@@ -57,7 +57,7 @@ const ServiceContext = createContext<ServiceContextInterface>({
 });
 
 export const ServiceProvider = ({ children }: { children: React.ReactNode }) => {
-  const [currentService, setCurrentService] = useState<ApiInterface>(services[defaultService]);
+  const [currentService, setCurrentService] = useState<ApiInterface>(services[DEFAULT_SERVICE]);
   const [isSignedIn, setIsSignedIn] = useState<boolean>(!!StorageStore.getMiscStorage().getString(CREDENTIALS_STORAGE));
   const [profile, setProfile] = useState<ProfileInterface | null>(
     safeJsonParse<ProfileInterface>(StorageStore.getMiscStorage().getString(PROFILE_STORAGE))
@@ -134,6 +134,23 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
     await requestValidator(url, headers ?? currentService.getHeaders());
   }, [currentService]);
 
+  const reLogin = useCallback(async () => {
+    // Reset cookies
+    (new CookiesManager()).reset();
+
+    if (isSignedIn) {
+      const { name, password } = safeJsonParse<{ name: string; password: string }>(
+        StorageStore.getMiscStorage().getString(CREDENTIALS_STORAGE)
+      ) ?? {};
+
+      logout();
+
+      if (name && password) {
+        await login(name, password);
+      }
+    }
+  }, [isSignedIn, logout, login]);
+
   /**
    * Update the provider for the current service
    * @param {string} value - The provider URL
@@ -152,21 +169,8 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
       currentService.setProvider(value);
     }
 
-    // Reset cookies
-    (new CookiesManager()).reset();
-
-    if (isSignedIn) {
-      const { name, password } = safeJsonParse<{ name: string; password: string }>(
-        StorageStore.getMiscStorage().getString(CREDENTIALS_STORAGE)
-      ) ?? {};
-
-      logout();
-
-      if (name && password) {
-        await login(name, password);
-      }
-    }
-  }, [currentService, validateUrl, isSignedIn, logout, login]);
+    reLogin();
+  }, [currentService, validateUrl, reLogin]);
 
   /**
    * Update the CDN for the current service
@@ -195,7 +199,9 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
    */
   const updateOfficialMode = useCallback((value: string) => {
     currentService.setOfficialMode(value);
-  }, [currentService]);
+
+    reLogin();
+  }, [currentService, reLogin]);
 
   /**
    * Get the CDNs for the current service

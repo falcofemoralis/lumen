@@ -22,6 +22,7 @@ export const ThemedBottomSheetComponent = ({
           cornerRadius={ 24 }
           backgroundColor={ backgroundColor }
           onMount={ onMount }
+          edgeToEdge
         >
           { children }
         </TrueSheet>

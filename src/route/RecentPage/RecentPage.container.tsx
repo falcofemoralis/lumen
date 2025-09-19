@@ -19,10 +19,15 @@ export function RecentPageContainer() {
   });
   const updatingStateRef = useRef(false);
   const navigation = useNavigation();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (isSignedIn) {
-      loadRecent(1, false);
+      setIsLoading(true);
+
+      loadRecent(1, false).finally(() => {
+        setIsLoading(false);
+      });
     }
 
     return () => {
@@ -106,6 +111,7 @@ export function RecentPageContainer() {
   const containerProps = () => ({
     isSignedIn,
     items,
+    isLoading,
   });
 
   return withTV(RecentPageComponentTV, RecentPageComponent, {

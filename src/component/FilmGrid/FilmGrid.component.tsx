@@ -7,6 +7,7 @@ import {
   Pressable,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { scale } from 'Util/CreateStyles';
 import { calculateRows } from 'Util/List';
 
@@ -24,6 +25,7 @@ export function FilmGridComponent({
   onNextLoad,
 }: FilmGridComponentProps) {
   const { width, height } = useFilmCardDimensions(NUMBER_OF_COLUMNS, scale(ROW_GAP));
+  const { top } = useSafeAreaInsets();
 
   const renderItem = useCallback(
     ({ item: row }: ThemedGridRowProps<FilmGridRowType>) => {
@@ -51,7 +53,7 @@ export function FilmGridComponent({
   ).map((items) => ({
     id: items[0].id,
     items,
-  })), [films]);
+  })), [films, width]);
 
   return (
     <ThemedGrid
@@ -62,6 +64,7 @@ export function FilmGridComponent({
       onNextLoad={ onNextLoad }
       style={ styles.grid }
       ListEmptyComponent={ <FilmGridThumbnail /> }
+      ListHeaderComponent={ <View style={ { height: top } } /> }
     />
   );
 }

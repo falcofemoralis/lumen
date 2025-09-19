@@ -2,6 +2,7 @@ import { RecentItemInterface } from 'Type/RecentItem.interface';
 
 export interface RecentPageComponentProps {
   items: RecentItemInterface[];
+  isLoading: boolean;
   onNextLoad: (isRefresh: boolean) => Promise<void>;
   handleOnPress: (item: RecentItemInterface) => void;
   removeItem: (item: RecentItemInterface) => void;

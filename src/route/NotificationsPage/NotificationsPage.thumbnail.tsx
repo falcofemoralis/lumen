@@ -4,9 +4,9 @@ import Thumbnail from 'Component/Thumbnail';
 import Wrapper from 'Component/Wrapper';
 import { scale } from 'Util/CreateStyles';
 
-export const NotificationsPageThumbnail = () => (
+export const NotificationsPageThumbnail = ({ top }: { top: number }) => (
   <Page>
-    <Wrapper style={ { gap: scale(8) } }>
+    <Wrapper style={ { gap: scale(8), paddingTop: top } }>
       <Thumbnail
         height={ scale(24) }
         width={ scale(200) }

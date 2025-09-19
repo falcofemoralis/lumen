@@ -8,7 +8,7 @@ import { SubtitleInterface } from 'Type/FilmVideo.interface';
 import { EpisodeInterface, SeasonInterface } from 'Type/FilmVoice.interface';
 import { HTMLElementInterface } from 'Util/Parser';
 
-import { decodeUrl } from './decode';
+import { decrypt } from './decode2';
 import { SubtitleLns } from './playerApi';
 
 export interface JSONResult {
@@ -73,7 +73,7 @@ export const parseStreams = (streams: string | null): FilmStreamInterface[] => {
   const parsedStreams = new Map<string, FilmStreamInterface>();
 
   if (streams && streams.length > 0) {
-    const decodedStreams = decodeUrl(streams) as string;
+    const decodedStreams = decrypt(streams) as string;
     const split = decodedStreams.split(',');
 
     split.forEach((str) => {

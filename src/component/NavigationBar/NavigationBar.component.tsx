@@ -1,8 +1,10 @@
 import { NavigationRoute, ParamListBase } from '@react-navigation/native';
+import { services } from 'Api/services';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import { useNotificationsContext } from 'Context/NotificationsContext';
+import { DEFAULT_SERVICE } from 'Context/ServiceContext';
 import React, { useCallback } from 'react';
 import {
   Image,
@@ -10,6 +12,7 @@ import {
   View,
 } from 'react-native';
 import Animated from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ACCOUNT_ROUTE } from 'Route/AccountPage/AccountPage.config';
 import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
@@ -28,6 +31,7 @@ export function NavigationBarComponent({
 }: NavigationBarComponentProps) {
   const { badgeData } = useNotificationsContext();
   const { width } = useWindowDimensions();
+  const { bottom } = useSafeAreaInsets();
 
   const renderDefaultTab = useCallback((
     route: NavigationRoute<ParamListBase, string>,
@@ -66,7 +70,7 @@ export function NavigationBarComponent({
         >
           { avatar ? (
             <ThemedImage
-              src={ avatar }
+              src={ services[DEFAULT_SERVICE].getPhotoUrl(avatar) }
               style={ styles.profileAvatar }
             />
           ) : (
@@ -118,7 +122,7 @@ export function NavigationBarComponent({
   }, [renderAccountTab, renderDefaultTab, width, onPress, onLongPress, state]);
 
   return (
-    <View style={ styles.tabBar }>
+    <View style={ [styles.tabBar, { paddingBottom: bottom }] }>
       <View style={ styles.tabs }>
         { state.routes.map((route, i) => renderTab(route, i)) }
       </View>

@@ -5,6 +5,7 @@ import Wrapper from 'Component/Wrapper';
 import t from 'i18n/t';
 import React from 'react';
 import { View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { styles } from './NotificationsPage.style';
 import { NotificationsPageThumbnail } from './NotificationsPage.thumbnail';
@@ -15,8 +16,10 @@ export function NotificationsPageComponent({
   data,
   handleSelectFilm,
 }: NotificationsPageComponentProps) {
+  const { top } = useSafeAreaInsets();
+
   if (isLoading) {
-    return <NotificationsPageThumbnail />;
+    return <NotificationsPageThumbnail top={ top } />;
   }
 
   if (!data.length) {
@@ -38,7 +41,9 @@ export function NotificationsPageComponent({
         <FilmSections
           data={ data }
           handleOnPress={ handleSelectFilm }
-        />
+        >
+          <View style={ { height: top } } />
+        </FilmSections>
       </Wrapper>
     </Page>
   );

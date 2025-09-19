@@ -1,3 +1,4 @@
+import ThemedSafeArea from 'Component/ThemedSafeArea';
 import Wrapper from 'Component/Wrapper';
 import React, {
   useRef,
@@ -108,19 +109,21 @@ export const WelcomePageComponent = ({
   };
 
   return (
-    <PagerView
-      ref={ pagerViewRef }
-      style={ { flex: 1 } }
-      initialPage={ 0 }
-      onPageSelected={ (e) => setCurrentPage(e.nativeEvent.position) }
-      scrollEnabled={ false }
-    >
-      { slides.map((slide) => (
-        <Wrapper key={ slide.id }>
-          { renderSlide(slide) }
-        </Wrapper>
-      )) }
-    </PagerView>
+    <ThemedSafeArea edges={ ['top', 'bottom', 'left', 'right'] }>
+      <PagerView
+        ref={ pagerViewRef }
+        style={ { flex: 1 } }
+        initialPage={ 0 }
+        onPageSelected={ (e) => setCurrentPage(e.nativeEvent.position) }
+        scrollEnabled={ false }
+      >
+        { slides.map((slide) => (
+          <Wrapper key={ slide.id }>
+            { renderSlide(slide) }
+          </Wrapper>
+        )) }
+      </PagerView>
+    </ThemedSafeArea>
   );
 };
 

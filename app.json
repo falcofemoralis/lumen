@@ -49,7 +49,15 @@
           "imageWidth": 100
         }
       ],
-      "@react-native-firebase/app"
+      "@react-native-firebase/app",
+      [
+        "react-native-edge-to-edge",
+        {
+          "android": {
+            "enforceNavigationBarContrast": false
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
@@ -58,7 +66,7 @@
     "android": {
       "icon": "./assets/images/icon.png",
       "package": "com.falcofemoralis.lumen",
-      "versionCode": 9,
+      "versionCode": 10,
       "googleServicesFile": "./google-services.json",
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
@@ -66,7 +74,7 @@
     "newArchEnabled": true,
     "name": "Lumen App",
     "slug": "lumen",
-    "version": "1.4.0",
+    "version": "1.4.1",
     "extra": {
       "eas": {
         "projectId": "ad7c3459-7949-4f54-9d83-5e8a400a0af4"
