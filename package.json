@@ -60,6 +60,7 @@
     "react-native": "npm:react-native-tvos@~0.81.4-0",
     "react-native-awesome-slider": "^2.9.0",
     "react-native-blob-util": "^0.22.2",
+    "react-native-edge-to-edge": "^1.7.0",
     "react-native-error-boundary": "^2.0.0",
     "react-native-gesture-handler": "~2.28.0",
     "react-native-gradient-shimmer": "^2.2.0",
