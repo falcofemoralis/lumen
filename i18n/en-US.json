@@ -145,5 +145,11 @@
   "Maximum": "Maximum",
   "%s seconds": "%s seconds",
   "No recent items": "No recent items",
-  "You have not watched any films yet": "You have not watched any films yet"
+  "You have not watched any films yet": "You have not watched any films yet",
+  "Columns in list": "Columns in list",
+  "Change number of columns.": "Change number of columns.",
+  "Restart app to apply changes.": "Restart app to apply changes.",
+  "Initial route": "Initial route",
+  "Change initial route.": "Change initial route.",
+  "Account": "Account"
 }

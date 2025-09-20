@@ -1,4 +1,6 @@
+import { HOME_ROUTE } from 'Route/HomePage/HomePage.config';
 import { getConfigJson, updateConfig } from 'Util/Config';
+import { safeJsonParse } from 'Util/Json';
 import { configureRemoteControl } from 'Util/RemoteControl';
 
 export const DEVICE_CONFIG = 'deviceConfig';
@@ -12,6 +14,9 @@ type DeviceConfigType = {
   securedSettings: boolean;
   isTVGridAnimation: boolean;
   isTVAwake: boolean;
+  numberOfColumnsMobile: number;
+  numberOfColumnsTV: number;
+  initialRoute: string;
 }
 
 class ConfigStore {
@@ -24,6 +29,9 @@ class ConfigStore {
     securedSettings: false,
     isTVGridAnimation: true,
     isTVAwake: false,
+    numberOfColumnsMobile: 3,
+    numberOfColumnsTV: 6,
+    initialRoute: HOME_ROUTE,
   };
 
   constructor() {
@@ -104,6 +112,16 @@ class ConfigStore {
 
     return this.config.deviceId;
   }
+
+  parseConfig(configJson: string): DeviceConfigType {
+    const config = safeJsonParse<DeviceConfigType>(configJson);
+
+    return {
+      ...this.config,
+      ...config,
+    };
+  }
+
 }
 
 export default new ConfigStore();

@@ -19,9 +19,9 @@ import {
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
 import { ACCOUNT_ROUTE } from 'Route/AccountPage/AccountPage.config';
-import { HOME_ROUTE } from 'Route/HomePage/HomePage.config';
 import { LOADER_ROUTE } from 'Route/LoaderPage/LoaderPage.config';
 import { SETTINGS_ROUTE } from 'Route/SettingsPage/SettingsPage.config';
+import ConfigStore from 'Store/Config.store';
 import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 import { setTimeoutSafe } from 'Util/Misc';
@@ -201,7 +201,7 @@ export function NavigationBarComponent({
     return (
       <DefaultFocus
         key={ name }
-        enable={ name === HOME_ROUTE }
+        enable={ name === ConfigStore.getConfig().initialRoute }
       >
         <SpatialNavigationFocusableView
           onFocus={ () => {

@@ -12,6 +12,7 @@ export interface FilmGridComponentProps {
   films: FilmCardInterface[];
   header?: React.ReactNode;
   headerSize?: number;
+  numberOfColumns: number;
   handleOnPress: (film: FilmCardInterface) => void;
   handleItemFocus: (index: number) => void;
   onNextLoad?: (isRefresh: boolean) => Promise<void>;
