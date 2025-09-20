@@ -41,7 +41,7 @@ function FilmGridItem({
 }
 
 function rowPropsAreEqual(prevProps: FilmGridItemProps, props: FilmGridItemProps) {
-  return prevProps.row.items[0].id === props.row.items[0].id || prevProps.width === props.width;
+  return prevProps.row.items[0].id === props.row.items[0].id;
 }
 
 const MemoizedGridItem = memo(FilmGridItem, rowPropsAreEqual);
