@@ -86,7 +86,7 @@ export function FilmGridComponent({
       onNextLoad={ onNextLoad }
       header={ header }
       headerSize={ headerSize }
-      ListEmptyComponent={ <FilmGridThumbnail numberOfColumns={ numberOfColumns } /> }
+      ListEmptyComponent={ <FilmGridThumbnail /> }
     />
   );
 }

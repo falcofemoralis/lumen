@@ -53,7 +53,7 @@ export function FilmGridComponent({
   ).map((items) => ({
     id: items[0].id,
     items,
-  })), [films, width, numberOfColumns]); // width is required to recalculate rows after orientation change
+  })), [films, width]); // width is required to recalculate rows after orientation change
 
   return (
     <ThemedGrid
@@ -63,7 +63,7 @@ export function FilmGridComponent({
       renderItem={ renderItem }
       onNextLoad={ onNextLoad }
       style={ styles.grid }
-      ListEmptyComponent={ <FilmGridThumbnail numberOfColumns={ numberOfColumns } /> }
+      ListEmptyComponent={ <FilmGridThumbnail /> }
       ListHeaderComponent={ <View style={ { height: top } } /> }
     />
   );

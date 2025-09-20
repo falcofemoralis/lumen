@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Dimensions } from 'react-native';
 import { Colors } from 'Style/Colors';
 import { calculateItemWidth } from 'Style/Layout';
@@ -37,11 +37,11 @@ export const useFilmCardDimensions = (
   );
   const shouldUpdate = useRef(false);
 
-  const updateDimensions = () => {
+  const updateDimensions = useCallback(() => {
     setDimensions(
       calculateCardDimensions(numberOfColumns, gap, additionalWidth)
     );
-  };
+  }, [numberOfColumns, gap, additionalWidth]);
 
   useEffect(() => {
     if (shouldUpdate.current) {
@@ -57,7 +57,7 @@ export const useFilmCardDimensions = (
     return () => {
       dimensionChangeHandler.remove();
     };
-  }, []);
+  }, [updateDimensions]);
 
   return dimensions;
 };
