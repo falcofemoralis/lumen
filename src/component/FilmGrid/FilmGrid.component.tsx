@@ -11,7 +11,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { scale } from 'Util/CreateStyles';
 import { calculateRows } from 'Util/List';
 
-import { NUMBER_OF_COLUMNS } from './FilmGrid.config';
 import { ROW_GAP, styles } from './FilmGrid.style';
 import { FilmGridThumbnail } from './FilmGrid.thumbnail';
 import {
@@ -21,10 +20,11 @@ import {
 
 export function FilmGridComponent({
   films,
+  numberOfColumns,
   handleOnPress,
   onNextLoad,
 }: FilmGridComponentProps) {
-  const { width, height } = useFilmCardDimensions(NUMBER_OF_COLUMNS, scale(ROW_GAP));
+  const { width, height } = useFilmCardDimensions(numberOfColumns, scale(ROW_GAP));
   const { top } = useSafeAreaInsets();
 
   const renderItem = useCallback(
@@ -33,7 +33,7 @@ export function FilmGridComponent({
 
       return (
         <View style={ styles.gridRow }>
-          { items.map((item, index) => (
+          { items.map((item) => (
             <Pressable
               key={ item.id }
               style={ { width } }
@@ -45,15 +45,15 @@ export function FilmGridComponent({
         </View>
       );
     },
-    [width]
+    [width, handleOnPress]
   );
 
   const data = useMemo(() => calculateRows(
-    films, NUMBER_OF_COLUMNS
+    films, numberOfColumns
   ).map((items) => ({
     id: items[0].id,
     items,
-  })), [films, width]);
+  })), [films, width]); // width is required to recalculate rows after orientation change
 
   return (
     <ThemedGrid

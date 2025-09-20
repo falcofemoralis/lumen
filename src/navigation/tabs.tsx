@@ -125,7 +125,7 @@ export const TabsStack = () => {
   return (
     <Tabs.Navigator
       tabBar={ (props) => <NavigationBar { ...props } /> }
-      initialRouteName={ HOME_ROUTE }
+      initialRouteName={ ConfigStore.getConfig().initialRoute }
       screenOptions={ {
         tabBarPosition: ConfigStore.isTV() ? 'left' : 'bottom',
         popToTopOnBlur: ConfigStore.isTV(),

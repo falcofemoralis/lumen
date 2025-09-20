@@ -2,11 +2,10 @@ import * as Application from 'expo-application';
 import t from 'i18n/t';
 import { CircleCheck, Clapperboard, CloudCog, FolderCog, MonitorCog, UserCog } from 'lucide-react-native';
 import { useEffect, useLayoutEffect, useState } from 'react';
-import { Platform } from 'react-native';
 import { useKeyboardController } from 'react-native-keyboard-controller';
-import RNRestart from 'react-native-restart';
 import ConfigStore from 'Store/Config.store';
 import NotificationStore from 'Store/Notification.store';
+import { restartApp } from 'Util/Device';
 import { configureRemoteControl } from 'Util/RemoteControl';
 
 import WelcomePageComponent from './WelcomePage.component';
@@ -78,11 +77,7 @@ export function WelcomePageContainer() {
 
     ConfigStore.configureDevice(selectedDeviceType === DeviceType.TV);
 
-    if (Platform.OS === 'web') {
-      location.replace('/');
-    } else {
-      RNRestart.restart();
-    }
+    restartApp();
   };
 
   const containerFunctions = {

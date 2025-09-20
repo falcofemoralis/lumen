@@ -10,7 +10,6 @@ import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { scale } from 'Util/CreateStyles';
 import { noopFn } from 'Util/Function';
 
-import { NUMBER_OF_COLUMNS_TV } from './FilmGrid.config';
 import { ROW_GAP, styles } from './FilmGrid.style.atv';
 import { FilmGridThumbnail } from './FilmGrid.thumbnail.atv';
 import { FilmGridComponentProps, FilmGridItemProps } from './FilmGrid.type';
@@ -51,12 +50,13 @@ export function FilmGridComponent({
   films,
   header,
   headerSize,
+  numberOfColumns,
   onNextLoad,
   handleOnPress,
   handleItemFocus,
 }: FilmGridComponentProps) {
   const { width, height } = calculateCardDimensions(
-    NUMBER_OF_COLUMNS_TV,
+    numberOfColumns,
     scale(ROW_GAP),
     scale(ROW_GAP) * 2
   );
@@ -69,16 +69,18 @@ export function FilmGridComponent({
       handleOnPress={ handleOnPress }
       handleItemFocus={ handleItemFocus }
     />
-  ), []);
+  ), [width, handleOnPress, handleItemFocus]);
 
-  const filmsData = useMemo(() => films.map((element, index) => ({ ...element, index })), [films]);
+  const filmsData = useMemo(
+    () => films.map((element, index) => ({ ...element, index })), [films]
+  );
 
   return (
     <ThemedGrid
       style={ styles.grid }
       rowStyle={ styles.rowStyle }
       data={ filmsData }
-      numberOfColumns={ NUMBER_OF_COLUMNS_TV }
+      numberOfColumns={ numberOfColumns }
       itemSize={ height + scale(ROW_GAP) * 2 }
       renderItem={ renderItem }
       onNextLoad={ onNextLoad }

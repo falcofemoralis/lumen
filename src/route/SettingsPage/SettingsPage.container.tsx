@@ -8,13 +8,16 @@ import { Linking } from 'react-native';
 import { useKeyboardController } from 'react-native-keyboard-controller';
 import { LOGGER_ROUTE } from 'Route/LoggerPage/LoggerPage.config';
 import ConfigStore from 'Store/Config.store';
+import NotificationStore from 'Store/Notification.store';
+import { restartApp } from 'Util/Device';
+import { setTimeoutSafe } from 'Util/Misc';
 import { yesNoOptions } from 'Util/Settings';
 import { useTripleTap } from 'Util/Settings/useTripleTap';
 import { convertBooleanToString, convertStringToBoolean } from 'Util/Type';
 
 import SettingsPageComponent from './SettingsPage.component';
 import SettingsPageComponentTV from './SettingsPage.component.atv';
-import { GITHUB_LINK, TELEGRAM_LINK } from './SettingsPage.config';
+import { GITHUB_LINK, MOBILE_ROUTES, TELEGRAM_LINK, TV_ROUTES } from './SettingsPage.config';
 import { SETTING_TYPE, SettingItem } from './SettingsPage.type';
 
 export function SettingsPageContainer() {
@@ -43,6 +46,47 @@ export function SettingsPageContainer() {
   }, []);
 
   const [settings, setSettings] = useState<SettingItem[]>([
+    {
+      id: 'initialRoute',
+      title: t('Initial route'),
+      subtitle: t('Change initial route.'),
+      type: SETTING_TYPE.SELECT,
+      value: ConfigStore.getConfig().initialRoute,
+      options: ConfigStore.isTV() ? TV_ROUTES : MOBILE_ROUTES,
+      onPress,
+    },
+    {
+      id: 'numberOfColumnsMobile',
+      title: t('Columns in list'),
+      subtitle: t('Change number of columns.'),
+      type: SETTING_TYPE.SELECT,
+      value: ConfigStore.getConfig().numberOfColumnsMobile.toString(),
+      options: Array.from({ length: 9 }, (_, index) => ({
+        value: (index + 2).toString(),
+        label: (index + 2).toString(),
+      })),
+      onPress: (value, key) => ConfigStore.updateConfig(key, Number(value)),
+      isHidden: ConfigStore.isTV(),
+    },
+    {
+      id: 'numberOfColumnsTV',
+      title: t('Columns in list'),
+      subtitle: t('Change number of columns.'),
+      type: SETTING_TYPE.SELECT,
+      value: ConfigStore.getConfig().numberOfColumnsTV.toString(),
+      options: Array.from({ length: 11 }, (_, index) => ({
+        value: (index + 2).toString(),
+        label: (index + 2).toString(),
+      })),
+      onPress: (value, key) => {
+        ConfigStore.updateConfig(key, Number(value));
+        NotificationStore.displayMessage(t('Restart app to apply changes.'));
+        setTimeoutSafe(() => {
+          restartApp();
+        }, 2000);
+      },
+      isHidden: !ConfigStore.isTV(),
+    },
     {
       id: 'provider',
       title: t('Provider'),

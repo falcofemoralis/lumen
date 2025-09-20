@@ -1,16 +1,14 @@
 import { useNavigation } from '@react-navigation/native';
 import { withTV } from 'Hooks/withTV';
-import { useCallback } from 'react';
-import ConfigStore from 'Store/Config.store';
+import { useCallback, useMemo } from 'react';
+import { useMMKVString } from 'react-native-mmkv';
+import ConfigStore, { DEVICE_CONFIG } from 'Store/Config.store';
+import StorageStore from 'Store/Storage.store';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { openFilm } from 'Util/Router';
 
 import FilmGridComponent from './FilmGrid.component';
 import GridComponentTV from './FilmGrid.component.atv';
-import {
-  NUMBER_OF_COLUMNS,
-  NUMBER_OF_COLUMNS_TV,
-} from './FilmGrid.config';
 import { FilmGridContainerProps } from './FilmGrid.type';
 
 export function FilmGridContainer({
@@ -21,18 +19,22 @@ export function FilmGridContainer({
   onItemFocus,
 }: FilmGridContainerProps) {
   const navigation = useNavigation();
+  const [configJson] = useMMKVString(DEVICE_CONFIG, StorageStore.getConfigStorage());
+  const numberOfColumns = useMemo(() => {
+    const { numberOfColumnsTV, numberOfColumnsMobile } = ConfigStore.parseConfig(configJson || '');
+
+    return ConfigStore.isTV() ? numberOfColumnsTV : numberOfColumnsMobile;
+  }, [configJson]);
 
   const handleOnPress = useCallback((film: FilmCardInterface) => {
     openFilm(film, navigation);
-  }, []);
+  }, [navigation]);
 
-  const handleItemFocus = (index: number) => {
+  const handleItemFocus = useCallback((index: number) => {
     if (onItemFocus) {
-      const numberOfColumns = ConfigStore.isTV() ? NUMBER_OF_COLUMNS_TV : NUMBER_OF_COLUMNS;
-
       onItemFocus(Math.floor(index / numberOfColumns));
     }
-  };
+  }, [onItemFocus, numberOfColumns]);
 
   const containerFunctions = {
     handleOnPress,
@@ -43,6 +45,7 @@ export function FilmGridContainer({
     films,
     header,
     headerSize,
+    numberOfColumns,
     onNextLoad,
   });
 
