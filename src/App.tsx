@@ -25,18 +25,18 @@ SplashScreen.preventAutoHideAsync();
 export function App() {
   return (
     <SafeAreaProvider>
-      <Navigation
-        theme={ DarkTheme }
-        onReady={ () => {
-          setTimeout(() => {
-            SplashScreen.hideAsync();
-          }, 250);
-        } }
-      >
-        <AppProvider>
-          <SpatialNavigationDeviceTypeProvider>
-            <GestureHandlerRootView>
-              <KeyboardProvider enabled={ false }>
+      <KeyboardProvider enabled={ false }>
+        <Navigation
+          theme={ DarkTheme }
+          onReady={ () => {
+            setTimeout(() => {
+              SplashScreen.hideAsync();
+            }, 250);
+          } }
+        >
+          <AppProvider>
+            <SpatialNavigationDeviceTypeProvider>
+              <GestureHandlerRootView>
                 <Root>
                   <Portal.Host>
                     { !ConfigStore.isTV() && <AppUpdater /> }
@@ -44,11 +44,11 @@ export function App() {
                   </Portal.Host>
                   <StatusBar style="light" />
                 </Root>
-              </KeyboardProvider>
-            </GestureHandlerRootView>
-          </SpatialNavigationDeviceTypeProvider>
-        </AppProvider>
-      </Navigation>
+              </GestureHandlerRootView>
+            </SpatialNavigationDeviceTypeProvider>
+          </AppProvider>
+        </Navigation>
+      </KeyboardProvider>
     </SafeAreaProvider>
   );
 }

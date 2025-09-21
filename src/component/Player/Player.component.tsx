@@ -37,7 +37,7 @@ import {
 import React, {
   useEffect, useRef, useState,
 } from 'react';
-import { Dimensions, View } from 'react-native';
+import { AppState, Dimensions, View } from 'react-native';
 import {
   Gesture,
   GestureDetector,
@@ -164,13 +164,20 @@ export function PlayerComponent({
 
   useEffect(() => {
     ScreenOrientation.lockAsync(OrientationLock.LANDSCAPE);
+
     NavigationBar.setVisibilityAsync('hidden');
     StatusBar.setStatusBarHidden(true, 'slide');
+
+    const focusSubscription = AppState.addEventListener('focus', () => {
+      NavigationBar.setVisibilityAsync('hidden');
+      StatusBar.setStatusBarHidden(true, 'none');
+    });
 
     return () => {
       ScreenOrientation.unlockAsync();
       NavigationBar.setVisibilityAsync('visible');
       StatusBar.setStatusBarHidden(false, 'slide');
+      focusSubscription.remove();
 
       if (controlsTimeout.current) {
         clearTimeout(controlsTimeout.current);
