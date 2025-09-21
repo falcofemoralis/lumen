@@ -28,7 +28,9 @@ const getData = () => {
 };
 
 window.onload = () => {
-  window.postMessage({ action: 'get', data: { ...getData() } });
+  if (typeof CDNPlayer !== 'undefined') {
+    window.postMessage({ action: 'get', data: { ...getData() } });
+  }
 };
 
 const UPDATE_TIMEOUT = 30000;

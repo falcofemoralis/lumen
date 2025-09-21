@@ -64,7 +64,7 @@ const prepareSavedTimeObject = (
     ? { ...previousSavedTime }
     : { filmId: data.titleId, voices: {} };
 
-  const voiceData = newSavedTime.voices[data.voiceId] ?? {};
+  const voiceData = newSavedTime.voices[data.voiceId ?? ''] ?? {};
 
   if (!voiceData.timestamps) {
     voiceData.timestamps = {};
@@ -121,7 +121,7 @@ const getVideoTime = (data, savedTime) => {
     return 0;
   }
 
-  const voiceData = savedTime.voices[data.voiceId];
+  const voiceData = savedTime.voices[data.voiceId ?? ''];
 
   if (!voiceData || !voiceData.timestamps) {
     return 0;
