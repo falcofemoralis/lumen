@@ -1,6 +1,6 @@
 # Lumen app
 
-Modern application to view films on TV and Mobile. This is a continuation of [HDrezka App](https://github.com/falcofemoralis/HDrezka-app), but with reworked functionality on modern tech stack!
+Lumen App is an application to view films on TV and Mobile. This application is unofficial and the administration of the rezka site has nothing to do with it!
 
 ## Features
 
@@ -9,13 +9,8 @@ Modern application to view films on TV and Mobile. This is a continuation of [HD
 - Account authorization
 - Bookmarks
 - Comments
-- Comfortable films list
 
 And more!
-
-## Contact me!
-
-Проблемы с приложением? Есть идеи как его улучшить? Заходите в группу в [Telegram](https://t.me/lumen_app).
 
 ##  Compatibility
 Lumen app requires Android 7.0 or above and it should work on any android device:
