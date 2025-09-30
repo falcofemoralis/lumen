@@ -35,7 +35,7 @@ export const TabsStack = () => {
       [ACCOUNT_ROUTE]: {
         screen: AccountPage,
         options: {
-          tabBarLabel: t('You'),
+          tabBarLabel: t('Account'),
         },
       },
       [NOTIFICATIONS_ROUTE]: {
@@ -117,7 +117,7 @@ export const TabsStack = () => {
       [ACCOUNT_ROUTE]: {
         screen: createAccountStack(ACCOUNT_ROUTE, AccountPage),
         options: {
-          tabBarLabel: t('You'),
+          tabBarLabel: t('Account'),
         },
       },
     };

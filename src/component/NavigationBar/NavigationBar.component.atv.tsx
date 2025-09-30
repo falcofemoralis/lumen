@@ -129,7 +129,7 @@ export function NavigationBarComponent({
   ) => {
     const { options } = descriptors[route.key] ?? {};
     const { tabBarLabel } = options;
-    const { avatar, name } = profile ?? {};
+    const { avatar } = profile ?? {};
 
     return (
       <View
@@ -175,7 +175,7 @@ export function NavigationBarComponent({
               isf && isRootActive && styles.tabContentFocused,
             ] }
           >
-            { isSignedIn ? name : t('Sign in') }
+            { isSignedIn ? t('You') : t('Sign in') }
           </ThemedText>
         </View>
       </View>

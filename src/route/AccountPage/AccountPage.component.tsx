@@ -75,11 +75,7 @@ export function AccountPageComponent({
       );
     }
 
-    const {
-      avatar,
-      name,
-      email,
-    } = profile;
+    const { avatar, name } = profile;
 
     return (
       <View style={ styles.profile }>
@@ -97,13 +93,11 @@ export function AccountPageComponent({
           ) }
           <View>
             <ThemedText style={ styles.profileName }>
+              { t('You') }
+            </ThemedText>
+            <ThemedText>
               { name }
             </ThemedText>
-            <View>
-              <ThemedText>
-                { email }
-              </ThemedText>
-            </View>
           </View>
         </View>
         <View style={ styles.profileActions }>
