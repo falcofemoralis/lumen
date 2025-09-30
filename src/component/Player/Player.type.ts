@@ -1,8 +1,7 @@
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
-import { VideoPlayer, VideoPlayerStatus } from 'expo-video';
+import { VideoPlayer, VideoPlayerStatus, VideoTrack } from 'expo-video';
 import { FilmInterface } from 'Type/Film.interface';
-import { FilmStreamInterface } from 'Type/FilmStream.interface';
 import { FilmVideoInterface, SubtitleInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 
@@ -10,7 +9,6 @@ import { RewindDirection } from './Player.config';
 
 export interface PlayerContainerProps {
   video: FilmVideoInterface;
-  stream: FilmStreamInterface;
   film: FilmInterface
   voice: FilmVoiceInterface;
 }
@@ -22,7 +20,7 @@ export interface PlayerComponentProps {
   video: FilmVideoInterface;
   film: FilmInterface;
   voice: FilmVoiceInterface;
-  stream: FilmStreamInterface;
+  videoTrack: VideoTrack | null;
   selectedQuality: string;
   selectedSubtitle?: SubtitleInterface;
   qualityOverlayRef: React.RefObject<ThemedOverlayRef | null>;

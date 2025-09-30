@@ -66,3 +66,8 @@ export const MAX_QUALITY: DropdownItem = {
   label: t('Maximum'),
   value: 'max',
 };
+
+export const AUTO_QUALITY: DropdownItem = {
+  label: t('Auto'),
+  value: 'auto',
+};

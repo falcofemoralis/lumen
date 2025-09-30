@@ -7,7 +7,6 @@ import RouterStore from 'Store/Router.store';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
-import { getPlayerStream } from 'Util/Player';
 
 import { PLAYER_ROUTE } from './PlayerPage.config';
 import { PlayerPageComponentProps } from './PlayerPage.type';
@@ -49,7 +48,6 @@ export function PlayerPageComponent({ video, film, voice }: PlayerPageComponentP
         video={ video }
         film={ film }
         voice={ voice }
-        stream={ getPlayerStream(video) }
       />
     </Page>
   );

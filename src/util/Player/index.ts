@@ -1,5 +1,6 @@
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { FirestoreDocument, SavedTime, SavedTimestamp, SavedTimeVoice } from 'Component/Player/Player.type';
+import { VideoTrack } from 'expo-video';
 import t from 'i18n/t';
 import ConfigStore from 'Store/Config.store';
 import LoggerStore from 'Store/Logger.store';
@@ -258,4 +259,37 @@ export const prepareShareBody = (film: FilmInterface) => {
   const { title, link } = film;
 
   return t('Watch %s:\n %s', title, link);
+};
+
+export const formatVideoTrackInfo = (videoTrack: VideoTrack|null) => {
+  if (!videoTrack) {
+    return '-';
+  }
+
+  const {
+    // size: { height = 0, width = 0 } = {},
+    mimeType: quality,
+    // frameRate,
+    // bitrate,
+  } = videoTrack;
+
+  const info = [];
+
+  if (quality) {
+    info.push(quality);
+  }
+
+  // if (frameRate) {
+  //   info.push(`${frameRate}`);
+  // }
+
+  // if (mimeType) {
+  //   info.push(getCodecName(mimeType));
+  // }
+
+  // if (bitrate) {
+  //   info.push(`${bitrate / 1000}kbps`);
+  // }
+
+  return info.join('/');
 };
