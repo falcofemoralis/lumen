@@ -31,6 +31,7 @@ import { isBookmarked } from 'Util/Film';
 import { createMasterPlaylist, getQualityFromResolution } from 'Util/Hls';
 import { setIntervalSafe } from 'Util/Misc';
 import {
+  getBufferTime,
   getFirestoreSavedTime,
   getFirestoreVideoTime,
   getPlayerQuality,
@@ -120,7 +121,7 @@ export function PlayerContainer({
     p.preservesPitch = true;
     p.bufferOptions = {
       ...p.bufferOptions,
-      preferredForwardBufferDuration: 180,
+      preferredForwardBufferDuration: getBufferTime(selectedQuality),
     };
     p.play();
 

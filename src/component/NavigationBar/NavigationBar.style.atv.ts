@@ -76,7 +76,7 @@ export const styles = CreateStyles({
     color: Colors.textSecondary,
   },
   profileAvatarContainer: {
-    left: -4,
+    left: -6,
   },
   profileAvatar: {
     width: 32,
