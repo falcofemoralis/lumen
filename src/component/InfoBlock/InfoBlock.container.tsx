@@ -7,6 +7,8 @@ import { InfoBlockContainerProps } from './InfoBlock.type';
 export function InfoBlockContainer({
   title,
   subtitle,
+  hideIcon,
+  style,
 }: InfoBlockContainerProps) {
   const containerFunctions = {
   };
@@ -14,6 +16,8 @@ export function InfoBlockContainer({
   const containerProps = () => ({
     title,
     subtitle,
+    hideIcon,
+    style,
   });
 
   return withTV(InfoBlockComponentTV, InfoBlockComponent, {

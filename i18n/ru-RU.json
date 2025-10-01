@@ -1,10 +1,10 @@
 {
-  "Home": "Новинки",
+  "Home": "Главная",
   "Search": "Поиск",
   "Bookmarks": "Закладки",
   "Recent": "Досмотреть",
   "Notifications": "Обновления",
-  "You": "Аккаунт",
+  "You": "Профиль",
   "Settings": "Настройки",
   "Comments": "Комментарии",
   "Included in": "Включено в",
@@ -152,5 +152,9 @@
   "Restart app to apply changes.": "Применение изменений... Приложение будет перезагружено.",
   "Initial route": "Стартовый экран",
   "Change initial route.": "Выбрать главный экран.",
-  "Account": "Аккаунт"
+  "Account": "Аккаунт",
+  "Auto": "Автоматически",
+  "No bookmarks group": "Разделы отсутствуют",
+  "Go to site and create bookmarks group": "Перейдите на сайт и создайте разделы",
+  "No items": "Список пустой"
 }

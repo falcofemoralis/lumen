@@ -151,5 +151,9 @@
   "Restart app to apply changes.": "Restart app to apply changes.",
   "Initial route": "Initial route",
   "Change initial route.": "Change initial route.",
-  "Account": "Account"
+  "Account": "Account",
+  "Auto": "Auto",
+  "No bookmarks group": "No bookmarks group",
+  "Go to site and create bookmarks group": "Go to site and create bookmarks group",
+  "No items": "No items"
 }

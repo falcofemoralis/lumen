@@ -1,4 +1,6 @@
+/* eslint-disable react-compiler/react-compiler */
 import { getFirestore } from '@react-native-firebase/firestore';
+import { useNavigation } from '@react-navigation/native';
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { usePlayerContext } from 'Context/PlayerContext';
@@ -6,7 +8,7 @@ import { usePlayerProgressActions } from 'Context/PlayerProgressContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useEvent, useEventListener } from 'expo';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
-import { useVideoPlayer, VideoPlayer } from 'expo-video';
+import { useVideoPlayer, VideoPlayer, VideoTrack } from 'expo-video';
 import { withTV } from 'Hooks/withTV';
 import t from 'i18n/t';
 import {
@@ -17,16 +19,19 @@ import {
   useState,
 } from 'react';
 import { BackHandler, Share } from 'react-native';
+import { PLAYER_ROUTE } from 'Route/PlayerPage/PlayerPage.config';
 import ConfigStore from 'Store/Config.store';
 import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
+import RouterStore from 'Store/Router.store';
 import { FilmInterface } from 'Type/Film.interface';
-import { FilmStreamInterface } from 'Type/FilmStream.interface';
 import { FilmVideoInterface, SubtitleInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { isBookmarked } from 'Util/Film';
+import { createMasterPlaylist, getQualityFromResolution } from 'Util/Hls';
 import { setIntervalSafe } from 'Util/Misc';
 import {
+  getBufferTime,
   getFirestoreSavedTime,
   getFirestoreVideoTime,
   getPlayerQuality,
@@ -42,6 +47,7 @@ import {
 import PlayerComponent from './Player.component';
 import PlayerComponentTV from './Player.component.atv';
 import {
+  AUTO_QUALITY,
   AWAKE_TAG,
   DEFAULT_REWIND_SECONDS,
   DEFAULT_SPEED,
@@ -54,19 +60,16 @@ import { FirestoreDocument, PlayerContainerProps, SavedTime } from './Player.typ
 
 export function PlayerContainer({
   video,
-  stream,
   film,
   voice,
 }: PlayerContainerProps) {
+  const navigation = useNavigation();
   const { updateSelectedVoice } = usePlayerContext();
   const { resetProgressStatus, updateProgressStatus } = usePlayerProgressActions();
   const { isSignedIn, profile, currentService } = useServiceContext();
   const [selectedVideo, setSelectedVideo] = useState<FilmVideoInterface>(video);
-  const [selectedStream, setSelectedStream] = useState<FilmStreamInterface>(stream);
   const [selectedVoice, setSelectedVoice] = useState<FilmVoiceInterface>(voice);
-  const [selectedQuality, setSelectedQuality] = useState<string>(
-    getPlayerQuality() === MAX_QUALITY.value ? MAX_QUALITY.value : selectedStream.quality
-  );
+  const [selectedQuality, setSelectedQuality] = useState<string>(getPlayerQuality() || AUTO_QUALITY.value);
   const [selectedSubtitle, setSelectedSubtitle] = useState<SubtitleInterface|undefined>(
     selectedVideo.subtitles?.find(({ isDefault }) => isDefault)
   );
@@ -74,6 +77,7 @@ export function PlayerContainer({
   const [isLocked, setIsLocked] = useState<boolean>(false);
   const [isOverlayOpen, setIsOverlayOpen] = useState<boolean>(false);
   const [isFilmBookmarked, setIsFilmBookmarked] = useState<boolean>(isBookmarked(film));
+  const [selectedVideoTrack, setSelectedVideoTrack] = useState<VideoTrack | null>(null);
 
   const stopEventsRef = useRef<boolean>(false);
   const updateTimeTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -108,7 +112,7 @@ export function PlayerContainer({
     }
   }, [firestoreDb, profile, film, selectedVoice]);
 
-  const player = useVideoPlayer(selectedStream.url, (p) => {
+  const player = useVideoPlayer(selectedQuality !== AUTO_QUALITY.value ? getPlayerStream(video)?.url : null, (p) => {
     const savedTime = getSavedTime(film);
 
     p.loop = false;
@@ -117,7 +121,7 @@ export function PlayerContainer({
     p.preservesPitch = true;
     p.bufferOptions = {
       ...p.bufferOptions,
-      preferredForwardBufferDuration: 180,
+      preferredForwardBufferDuration: getBufferTime(selectedQuality),
     };
     p.play();
 
@@ -173,6 +177,12 @@ export function PlayerContainer({
   }, [player, updateTime]);
 
   useEffect(() => {
+    if (selectedQuality === AUTO_QUALITY.value) {
+      player.replaceAsync(createMasterPlaylist(selectedVideo.streams));
+    }
+  }, []);
+
+  useEffect(() => {
     activateKeepAwakeAsync(AWAKE_TAG);
     createUpdateTimeTimeout();
 
@@ -225,6 +235,29 @@ export function PlayerContainer({
     }
   });
 
+  useEventListener(player, 'videoTrackChange', ({ videoTrack }) => {
+    if (!videoTrack) {
+      setSelectedVideoTrack(null);
+
+      return;
+    }
+
+    // we still can display actual video params, but it will be confusing to the user
+    if (selectedQuality === AUTO_QUALITY.value) {
+      setSelectedVideoTrack({
+        ...videoTrack,
+        mimeType: getQualityFromResolution(videoTrack.size.width, videoTrack.size.height),
+      });
+
+      return;
+    }
+
+    setSelectedVideoTrack({
+      ...videoTrack,
+      mimeType: selectedQuality,
+    });
+  });
+
   const onPlaybackEnd = (currentTime: number, duration: number) => {
     if (currentTime >= duration - 1) {
       handleNewEpisode(RewindDirection.FORWARD);
@@ -243,7 +276,7 @@ export function PlayerContainer({
     resetProgressStatus();
     setSelectedVideo(newVideo);
     setSelectedVoice(newVoice);
-    setSelectedStream(getPlayerStream(newVideo));
+    updatePlayerStream(newVideo);
     resetUpdateTimeTimeout();
     setSelectedSubtitle(newVideo.subtitles?.find(({ isDefault }) => isDefault));
 
@@ -282,7 +315,6 @@ export function PlayerContainer({
 
     updateProgressStatus(newTime, bufferedPosition, duration);
 
-    // eslint-disable-next-line react-compiler/react-compiler
     player.currentTime = newTime;
   };
 
@@ -344,6 +376,46 @@ export function PlayerContainer({
     openOverlay();
   };
 
+  const updatePlayerStream = (filmVideoArg: FilmVideoInterface|null, qualityArg?: string|null) => {
+    const filmVideo = filmVideoArg || selectedVideo;
+    const quality = qualityArg || getPlayerQuality();
+
+    if (quality === AUTO_QUALITY.value) {
+      // temporary solution
+      // unfortunately it doesn't work because player loading becomes stuck
+      // so the only way is to reload the player page entirely
+      //player.replaceAsync(createMasterPlaylist(filmVideo.streams));
+
+      RouterStore.pushData(PLAYER_ROUTE, {
+        video: filmVideo,
+        film,
+        voice,
+      });
+
+      const state = navigation.getState();
+      const filteredRoutes = state?.routes.filter((r) => r.name !== PLAYER_ROUTE) ?? [];
+      filteredRoutes.push({
+        key: `${PLAYER_ROUTE}-${Date.now()}`,
+        name: PLAYER_ROUTE,
+      });
+
+      navigation.reset({
+        index: state?.index ?? 0,
+        routes: filteredRoutes as any,
+      });
+    } else {
+      const newStream = quality !== MAX_QUALITY.value
+        ? filmVideo.streams.find((s) => s.quality === quality)
+        : filmVideo.streams[filmVideo.streams.length - 1];
+
+      if (!newStream) {
+        return;
+      }
+
+      player.replaceAsync(newStream.url);
+    }
+  };
+
   const handleQualityChange = (item: DropdownItem) => {
     const { value: quality } = item;
 
@@ -353,20 +425,11 @@ export function PlayerContainer({
       return;
     }
 
-    const newStream = quality !== MAX_QUALITY.value
-      ? selectedVideo.streams.find((s) => s.quality === quality)
-      : selectedVideo.streams[selectedVideo.streams.length - 1];
-
-    if (!newStream) {
-      return;
-    }
-
     setSelectedQuality(quality);
     updatePlayerQuality(quality);
-    setSelectedStream(newStream);
     updateTime();
+    updatePlayerStream(null, quality);
 
-    player.replaceAsync(newStream.url);
     qualityOverlayRef.current?.close();
   };
 
@@ -540,7 +603,7 @@ export function PlayerContainer({
     video: selectedVideo,
     film,
     voice: selectedVoice,
-    stream: selectedStream,
+    videoTrack: selectedVideoTrack,
     selectedQuality,
     selectedSubtitle,
     qualityOverlayRef,

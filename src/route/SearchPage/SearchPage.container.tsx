@@ -119,6 +119,8 @@ export function SearchPageContainer() {
     updateUserSuggestions(q);
 
     search(q);
+
+    Keyboard.dismiss();
   };
 
   const updateUserSuggestions = (q: string) => {

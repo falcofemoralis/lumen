@@ -1,3 +1,5 @@
+import InfoBlock from 'Component/InfoBlock';
+import t from 'i18n/t';
 import { Square, SquareCheck } from 'lucide-react-native';
 import React from 'react';
 import {
@@ -17,6 +19,8 @@ import { ListItem, ThemedMultiListComponentProps } from './ThemedMultiList.type'
 export const ThemedMultiListComponent = ({
   values,
   header,
+  noItemsTitle,
+  noItemsSubtitle,
   handleOnChange,
 }: ThemedMultiListComponentProps) => {
   const renderHeader = () => {
@@ -66,10 +70,19 @@ export const ThemedMultiListComponent = ({
     </SpatialNavigationFocusableView>
   );
 
-  const renderContent = () => (
-    <View
-      style={ styles.scrollViewContainer }
-    >
+  const renderItems = () => {
+    if (!values.length) {
+      return (
+        <InfoBlock
+          title={ noItemsTitle ?? t('No items') }
+          subtitle={ noItemsSubtitle ?? '' }
+          hideIcon
+          style={ styles.emptyBlock }
+        />
+      );
+    }
+
+    return (
       <DefaultFocus>
         <SpatialNavigationVirtualizedList
           data={ values }
@@ -78,8 +91,18 @@ export const ThemedMultiListComponent = ({
           orientation="vertical"
         />
       </DefaultFocus>
-    </View>
-  );
+    );
+  };
+
+  const renderContent = () => {
+    return (
+      <View
+        style={ styles.scrollViewContainer }
+      >
+        { renderItems() }
+      </View>
+    );
+  };
 
   return (
     <View style={ styles.listContainer }>

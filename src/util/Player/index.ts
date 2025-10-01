@@ -1,5 +1,7 @@
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { FirestoreDocument, SavedTime, SavedTimestamp, SavedTimeVoice } from 'Component/Player/Player.type';
+import * as Device from 'expo-device';
+import { VideoTrack } from 'expo-video';
 import t from 'i18n/t';
 import ConfigStore from 'Store/Config.store';
 import LoggerStore from 'Store/Logger.store';
@@ -258,4 +260,65 @@ export const prepareShareBody = (film: FilmInterface) => {
   const { title, link } = film;
 
   return t('Watch %s:\n %s', title, link);
+};
+
+export const formatVideoTrackInfo = (videoTrack: VideoTrack|null) => {
+  if (!videoTrack) {
+    return '-';
+  }
+
+  const {
+    // size: { height = 0, width = 0 } = {},
+    mimeType: quality,
+    // frameRate,
+    // bitrate,
+  } = videoTrack;
+
+  const info = [];
+
+  if (quality) {
+    info.push(quality);
+  }
+
+  // if (frameRate) {
+  //   info.push(`${frameRate}`);
+  // }
+
+  // if (mimeType) {
+  //   info.push(getCodecName(mimeType));
+  // }
+
+  // if (bitrate) {
+  //   info.push(`${bitrate / 1000}kbps`);
+  // }
+
+  return info.join('/');
+};
+
+export const getBufferTime = (quality: string) => {
+  const { totalMemory } = Device;
+
+  // less then 2GB
+  if (
+    totalMemory && totalMemory <= (2.5 * 1024 * 1024 * 1024)
+    && (quality === '4K' || quality === '2K' || quality === '1080p Ultra')
+  ) {
+    return 30;
+  }
+
+  // less then 4GB
+  if (totalMemory && totalMemory <= (4.5 * 1024 * 1024 * 1024)
+    && (quality === '4K' || quality === '2K')
+  ) {
+    return 30;
+  }
+
+  // less then 6GB
+  if (totalMemory && totalMemory <= (6.5 * 1024 * 1024 * 1024)
+    && (quality === '4K')
+  ) {
+    return 30;
+  }
+
+  return 180;
 };

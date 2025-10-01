@@ -1,5 +1,7 @@
+import InfoBlock from 'Component/InfoBlock';
 import ThemedPressable from 'Component/ThemedPressable';
 import { useLandscape } from 'Hooks/useLandscape';
+import t from 'i18n/t';
 import { Square, SquareCheck } from 'lucide-react-native';
 import React, { useCallback } from 'react';
 import {
@@ -15,6 +17,8 @@ import { ListItem, ThemedMultiListComponentProps } from './ThemedMultiList.type'
 export const ThemedMultiListComponent = ({
   values,
   header,
+  noItemsTitle,
+  noItemsSubtitle,
   handleOnChange,
 }: ThemedMultiListComponentProps) => {
   const isLandscape = useLandscape();
@@ -57,6 +61,25 @@ export const ThemedMultiListComponent = ({
     </ThemedPressable>
   ), [handleOnChange]);
 
+  const renderItems = () => {
+    if (!values.length) {
+      return (
+        <InfoBlock
+          title={ noItemsTitle ?? t('No items') }
+          subtitle={ noItemsSubtitle ?? '' }
+          hideIcon
+          style={ styles.emptyBlock }
+        />
+      );
+    }
+
+    return (
+      <ScrollView>
+        { values.map((item) => renderItem({ item })) }
+      </ScrollView>
+    );
+  };
+
   const renderContent = () => (
     <View
       style={ [
@@ -64,9 +87,7 @@ export const ThemedMultiListComponent = ({
         isLandscape && styles.listItemsLandscape,
       ] }
     >
-      <ScrollView>
-        { values.map((item) => renderItem({ item })) }
-      </ScrollView>
+      { renderItems() }
     </View>
   );
 

@@ -7,6 +7,7 @@ import { View } from 'react-native';
 import ErrorBoundary from 'react-native-error-boundary';
 import Animated from 'react-native-reanimated';
 import { Directions, SpatialNavigationRoot } from 'react-tv-space-navigation';
+import LoggerStore from 'Store/Logger.store';
 import { SpatialNavigationKeyboardLocker } from 'Util/RemoteControl/SpatialNavigationKeyboardLocker';
 
 import { styles } from './Page.style.atv';
@@ -40,7 +41,11 @@ export function PageComponent({
         style,
       ] : styles.wrapper }
     >
-      <ErrorBoundary>
+      <ErrorBoundary
+        onError={ (error, stackTrace) => {
+          LoggerStore.error('PageComponent', { error, stackTrace });
+        } }
+      >
         <SpatialNavigationRoot
           isActive={ isActive }
           onDirectionHandledWithoutMovement={ onDirectionHandledWithoutMovement }

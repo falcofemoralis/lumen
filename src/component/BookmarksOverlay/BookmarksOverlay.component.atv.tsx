@@ -25,6 +25,8 @@ export const BookmarksOverlayComponent = ({
         header={ t('Bookmarks') }
         data={ items }
         onChange={ postBookmark }
+        noItemsTitle={ t('No bookmarks group') }
+        noItemsSubtitle={ t('Go to site and create bookmarks group') }
       />
     </ThemedOverlay>
   );

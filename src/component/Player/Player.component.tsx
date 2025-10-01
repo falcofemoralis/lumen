@@ -51,8 +51,10 @@ import { Colors } from 'Style/Colors';
 import { ClosedCaptionFilled } from 'Style/Icons';
 import { scale } from 'Util/CreateStyles';
 import { setTimeoutSafe } from 'Util/Misc';
+import { formatVideoTrackInfo } from 'Util/Player';
 
 import {
+  AUTO_QUALITY,
   DEFAULT_REWIND_SECONDS,
   DEFAULT_SPEED,
   DEFAULT_SPEEDS,
@@ -75,7 +77,7 @@ export function PlayerComponent({
   video,
   film,
   voice,
-  stream,
+  videoTrack,
   selectedQuality,
   selectedSubtitle,
   qualityOverlayRef,
@@ -440,7 +442,7 @@ export function PlayerComponent({
       <View style={ styles.topActionLine }>
         <PlayerClock />
         <ThemedText>
-          { stream.quality }
+          { formatVideoTrackInfo(videoTrack) }
         </ThemedText>
       </View>
     );
@@ -584,7 +586,7 @@ export function PlayerComponent({
         data={ streams.map((s) => ({
           label: s.quality,
           value: s.quality,
-        })).concat(MAX_QUALITY).reverse() }
+        })).concat([MAX_QUALITY, AUTO_QUALITY]).reverse() }
         onChange={ handleQualityChange }
         onClose={ closeOverlay }
       />

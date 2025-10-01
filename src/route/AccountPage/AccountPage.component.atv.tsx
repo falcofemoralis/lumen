@@ -33,18 +33,14 @@ export function AccountPageComponent({
       );
     }
 
-    const {
-      avatar,
-      name,
-      email,
-    } = profile;
+    const { avatar, name } = profile;
 
     return (
       <View style={ styles.profile }>
         <View style={ styles.profileInfo }>
           { avatar ? (
             <ThemedImage
-              src={ services[DEFAULT_SERVICE].getPhotoUrl(avatar) }
+              src={ avatar }
               style={ styles.profileAvatar }
             />
           ) : (
@@ -55,13 +51,11 @@ export function AccountPageComponent({
           ) }
           <View>
             <ThemedText style={ styles.profileName }>
+              { t('You') }
+            </ThemedText>
+            <ThemedText>
               { name }
             </ThemedText>
-            <View>
-              <ThemedText>
-                { email }
-              </ThemedText>
-            </View>
           </View>
         </View>
         <View style={ styles.profileActionsWrapper }>

@@ -8,6 +8,8 @@ import { ListItem, ThemedMultiListContainerProps } from './ThemedMultiList.type'
 export function ThemedMultiListContainer({
   data,
   header,
+  noItemsTitle,
+  noItemsSubtitle,
   onChange,
 }: ThemedMultiListContainerProps) {
   const [values, setValues] = useState<ListItem[]>(data);
@@ -35,6 +37,8 @@ export function ThemedMultiListContainer({
   return withTV(ThemedMultiListComponentTV, ThemedMultiListComponent, {
     values,
     header,
+    noItemsTitle,
+    noItemsSubtitle,
     handleOnChange,
   });
 }
