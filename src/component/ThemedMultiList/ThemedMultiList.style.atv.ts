@@ -87,4 +87,8 @@ export const styles = CreateStyles({
   },
   iconSelected: {
   },
+  emptyBlock: {
+    justifyContent: 'center',
+    flex: 1,
+  },
 });

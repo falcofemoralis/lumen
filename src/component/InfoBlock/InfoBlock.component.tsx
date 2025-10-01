@@ -10,15 +10,19 @@ import { InfoBlockComponentProps } from './InfoBlock.type';
 export function InfoBlockComponent({
   title,
   subtitle,
+  hideIcon,
+  style,
 }: InfoBlockComponentProps) {
   return (
-    <View style={ styles.container }>
-      <View style={ styles.iconContainer }>
-        <Info
-          size={ scale(24) }
-          color={ Colors.white }
-        />
-      </View>
+    <View style={ [styles.container, style] }>
+      { !hideIcon && (
+        <View style={ styles.iconContainer }>
+          <Info
+            size={ scale(24) }
+            color={ Colors.white }
+          />
+        </View>
+      ) }
       <ThemedText style={ styles.title }>
         { title }
       </ThemedText>

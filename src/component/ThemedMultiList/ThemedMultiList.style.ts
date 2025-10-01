@@ -57,4 +57,9 @@ export const styles = CreateStyles({
   listItemSelected: {
     backgroundColor: Colors.primary,
   },
+  emptyBlock: {
+    minHeight: 120,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });

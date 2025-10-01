@@ -25,8 +25,8 @@ export function BookmarksPageComponent({
       return (
         <View style={ styles.empty }>
           <InfoBlock
-            title={ t('No bookmarks') }
-            subtitle={ t('You have not bookmarked any films yet') }
+            title={ t('No bookmarks group') }
+            subtitle={ t('Go to site and create bookmarks group') }
           />
         </View>
       );
