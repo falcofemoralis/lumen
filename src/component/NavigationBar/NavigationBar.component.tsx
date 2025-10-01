@@ -70,7 +70,7 @@ export function NavigationBarComponent({
         >
           { avatar ? (
             <ThemedImage
-              src={ services[DEFAULT_SERVICE].getPhotoUrl(avatar) }
+              src={ avatar }
               style={ styles.profileAvatar }
             />
           ) : (

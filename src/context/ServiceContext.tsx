@@ -59,9 +59,15 @@ const ServiceContext = createContext<ServiceContextInterface>({
 export const ServiceProvider = ({ children }: { children: React.ReactNode }) => {
   const [currentService, setCurrentService] = useState<ApiInterface>(services[DEFAULT_SERVICE]);
   const [isSignedIn, setIsSignedIn] = useState<boolean>(!!StorageStore.getMiscStorage().getString(CREDENTIALS_STORAGE));
-  const [profile, setProfile] = useState<ProfileInterface | null>(
-    safeJsonParse<ProfileInterface>(StorageStore.getMiscStorage().getString(PROFILE_STORAGE))
-  );
+  const [profile, setProfile] = useState<ProfileInterface | null>(() => {
+    const value = safeJsonParse<ProfileInterface>(StorageStore.getMiscStorage().getString(PROFILE_STORAGE));
+    if (!value) return null;
+
+    return {
+      ...value,
+      avatar: currentService.getPhotoUrl(value.avatar),
+    };
+  });
 
   /**
    * Update the current service
