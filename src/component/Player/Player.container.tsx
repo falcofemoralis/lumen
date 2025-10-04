@@ -69,7 +69,7 @@ export function PlayerContainer({
   const { isSignedIn, profile, currentService } = useServiceContext();
   const [selectedVideo, setSelectedVideo] = useState<FilmVideoInterface>(video);
   const [selectedVoice, setSelectedVoice] = useState<FilmVoiceInterface>(voice);
-  const [selectedQuality, setSelectedQuality] = useState<string>(getPlayerQuality() || AUTO_QUALITY.value);
+  const [selectedQuality, setSelectedQuality] = useState<string>(getPlayerQuality(video));
   const [selectedSubtitle, setSelectedSubtitle] = useState<SubtitleInterface|undefined>(
     selectedVideo.subtitles?.find(({ isDefault }) => isDefault)
   );
@@ -378,7 +378,7 @@ export function PlayerContainer({
 
   const updatePlayerStream = (filmVideoArg: FilmVideoInterface|null, qualityArg?: string|null) => {
     const filmVideo = filmVideoArg || selectedVideo;
-    const quality = qualityArg || getPlayerQuality();
+    const quality = qualityArg || getPlayerQuality(filmVideo);
 
     if (quality === AUTO_QUALITY.value) {
       // temporary solution
