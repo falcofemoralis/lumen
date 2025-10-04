@@ -156,5 +156,7 @@
   "Auto": "Автоматически",
   "No bookmarks group": "Разделы отсутствуют",
   "Go to site and create bookmarks group": "Перейдите на сайт и создайте разделы",
-  "No items": "Список пустой"
+  "No items": "Список пустой",
+  "Player rewind seconds": "Секунды перемотки",
+  "Change player rewind seconds.": "Изменить секунды перемотки."
 }

@@ -88,6 +88,24 @@ export function SettingsPageContainer() {
       isHidden: !ConfigStore.isTV(),
     },
     {
+      id: 'playerRewindSeconds',
+      title: t('Player rewind seconds'),
+      subtitle: t('Change player rewind seconds.'),
+      type: SETTING_TYPE.SELECT,
+      value: ConfigStore.getConfig().playerRewindSeconds.toString(),
+      options: Array.from({ length: 12 }, (_, index) => {
+        const value = (index + 1) * 5;
+
+        return {
+          value: value.toString(),
+          label: value.toString(),
+        };
+      }),
+      onPress: (value, key) => {
+        ConfigStore.updateConfig(key, Number(value));
+      },
+    },
+    {
       id: 'provider',
       title: t('Provider'),
       subtitle: t('Change provider'),

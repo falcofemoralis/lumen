@@ -47,6 +47,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
+import ConfigStore from 'Store/Config.store';
 import { Colors } from 'Style/Colors';
 import { ClosedCaptionFilled } from 'Style/Icons';
 import { scale } from 'Util/CreateStyles';
@@ -54,7 +55,6 @@ import { setTimeoutSafe } from 'Util/Misc';
 import { formatVideoTrackInfo, getPlayerAvailableQualityItems } from 'Util/Player';
 
 import {
-  DEFAULT_REWIND_SECONDS,
   DEFAULT_SPEED,
   DEFAULT_SPEEDS,
   DOUBLE_TAP_ANIMATION,
@@ -207,7 +207,7 @@ export function PlayerComponent({
   };
 
   const handleDoubleTap = (direction: RewindDirection) => {
-    const seconds = DEFAULT_REWIND_SECONDS;
+    const seconds = ConfigStore.getConfig().playerRewindSeconds;
 
     rewindPosition(direction, seconds);
     setDoubleTapAction({

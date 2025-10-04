@@ -49,7 +49,6 @@ import PlayerComponentTV from './Player.component.atv';
 import {
   AUTO_QUALITY,
   AWAKE_TAG,
-  DEFAULT_REWIND_SECONDS,
   DEFAULT_SPEED,
   FIRESTORE_DB,
   MAX_QUALITY,
@@ -318,10 +317,7 @@ export function PlayerContainer({
     player.currentTime = newTime;
   };
 
-  const rewindPosition = async (
-    type: RewindDirection,
-    seconds = DEFAULT_REWIND_SECONDS
-  ) => {
+  const rewindPosition = async (type: RewindDirection,seconds: number) => {
     const { currentTime, bufferedPosition, duration } = player;
 
     const seekTime = type === RewindDirection.BACKWARD ? seconds * -1 : seconds;
