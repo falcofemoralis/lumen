@@ -47,20 +47,18 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
+import ConfigStore from 'Store/Config.store';
 import { Colors } from 'Style/Colors';
 import { ClosedCaptionFilled } from 'Style/Icons';
 import { scale } from 'Util/CreateStyles';
 import { setTimeoutSafe } from 'Util/Misc';
-import { formatVideoTrackInfo } from 'Util/Player';
+import { formatVideoTrackInfo, getPlayerAvailableQualityItems } from 'Util/Player';
 
 import {
-  AUTO_QUALITY,
-  DEFAULT_REWIND_SECONDS,
   DEFAULT_SPEED,
   DEFAULT_SPEEDS,
   DOUBLE_TAP_ANIMATION,
   DOUBLE_TAP_ANIMATION_DELAY,
-  MAX_QUALITY,
   PLAYER_CONTROLS_ANIMATION,
   PLAYER_CONTROLS_TIMEOUT,
   RewindDirection,
@@ -209,7 +207,7 @@ export function PlayerComponent({
   };
 
   const handleDoubleTap = (direction: RewindDirection) => {
-    const seconds = DEFAULT_REWIND_SECONDS;
+    const seconds = ConfigStore.getConfig().playerRewindSeconds;
 
     rewindPosition(direction, seconds);
     setDoubleTapAction({
@@ -575,18 +573,13 @@ export function PlayerComponent({
   );
 
   const renderQualitySelector = () => {
-    const { streams } = video;
-
     return (
       <ThemedDropdown
         asOverlay
         overlayRef={ qualityOverlayRef }
         header={ t('Quality') }
         value={ selectedQuality }
-        data={ streams.map((s) => ({
-          label: s.quality,
-          value: s.quality,
-        })).concat([MAX_QUALITY, AUTO_QUALITY]).reverse() }
+        data={ getPlayerAvailableQualityItems(video) }
         onChange={ handleQualityChange }
         onClose={ closeOverlay }
       />

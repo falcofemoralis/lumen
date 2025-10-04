@@ -1,4 +1,5 @@
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
+import { AUTO_QUALITY, MAX_QUALITY } from 'Component/Player/Player.config';
 import { FirestoreDocument, SavedTime, SavedTimestamp, SavedTimeVoice } from 'Component/Player/Player.type';
 import * as Device from 'expo-device';
 import { VideoTrack } from 'expo-video';
@@ -223,31 +224,37 @@ export const updatePlayerQuality = (quality: string) => {
   );
 };
 
-export const getPlayerQuality = () => StorageStore.getPlayerStorage().getString(PLAYER_QUALITY_STORAGE_KEY);
+export const getPlayerQuality = (video: FilmVideoInterface) => {
+  const quality = StorageStore.getPlayerStorage().getString(PLAYER_QUALITY_STORAGE_KEY);
+
+  // determine default quality
+  // usually it is 720p
+  // but in some cases it can be 480p or 360p
+  if (!quality) {
+    const { streams } = video;
+
+    if (streams.length >= 3) {
+      return '720p';
+    }
+
+    if (streams.length === 2) {
+      return '480p';
+    }
+
+    return '360p';
+  }
+
+  return quality;
+};
 
 export const getPlayerStream = (video: FilmVideoInterface) => {
   const { streams } = video;
 
-  const defaultQuality = getPlayerQuality();
+  const defaultQuality = getPlayerQuality(video);
 
   LoggerStore.debug('getPlayerStream', { defaultQuality, streams });
 
-  if (!defaultQuality) {
-    if (streams.length >= 3) {
-      return streams[2]; // 720p
-    }
-
-    if (streams.length === 2) {
-      return streams[1]; // 480p
-    }
-
-    if (streams.length === 1) {
-      return streams[0]; // 360p
-    }
-  }
-
   const stream = streams.find((s) => s.quality === defaultQuality);
-
   if (!stream) {
     // maximum available quality
     return streams[streams.length - 1];
@@ -321,4 +328,21 @@ export const getBufferTime = (quality: string) => {
   }
 
   return 180;
+};
+
+export const getPlayerAvailableQualityItems = (video: FilmVideoInterface) => {
+  const { streams } = video;
+
+  const qualityItems = streams.map((s) => ({
+    label: s.quality,
+    value: s.quality,
+  })).concat([MAX_QUALITY]);
+
+  const isHlsSupported = streams.some((s) => s.url.endsWith('m3u8'));
+
+  if (isHlsSupported) {
+    qualityItems.push(AUTO_QUALITY);
+  }
+
+  return qualityItems.reverse();
 };

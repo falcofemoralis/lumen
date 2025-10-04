@@ -49,7 +49,6 @@ import PlayerComponentTV from './Player.component.atv';
 import {
   AUTO_QUALITY,
   AWAKE_TAG,
-  DEFAULT_REWIND_SECONDS,
   DEFAULT_SPEED,
   FIRESTORE_DB,
   MAX_QUALITY,
@@ -69,7 +68,7 @@ export function PlayerContainer({
   const { isSignedIn, profile, currentService } = useServiceContext();
   const [selectedVideo, setSelectedVideo] = useState<FilmVideoInterface>(video);
   const [selectedVoice, setSelectedVoice] = useState<FilmVoiceInterface>(voice);
-  const [selectedQuality, setSelectedQuality] = useState<string>(getPlayerQuality() || AUTO_QUALITY.value);
+  const [selectedQuality, setSelectedQuality] = useState<string>(getPlayerQuality(video));
   const [selectedSubtitle, setSelectedSubtitle] = useState<SubtitleInterface|undefined>(
     selectedVideo.subtitles?.find(({ isDefault }) => isDefault)
   );
@@ -318,10 +317,7 @@ export function PlayerContainer({
     player.currentTime = newTime;
   };
 
-  const rewindPosition = async (
-    type: RewindDirection,
-    seconds = DEFAULT_REWIND_SECONDS
-  ) => {
+  const rewindPosition = async (type: RewindDirection, seconds: number) => {
     const { currentTime, bufferedPosition, duration } = player;
 
     const seekTime = type === RewindDirection.BACKWARD ? seconds * -1 : seconds;
@@ -378,7 +374,7 @@ export function PlayerContainer({
 
   const updatePlayerStream = (filmVideoArg: FilmVideoInterface|null, qualityArg?: string|null) => {
     const filmVideo = filmVideoArg || selectedVideo;
-    const quality = qualityArg || getPlayerQuality();
+    const quality = qualityArg || getPlayerQuality(filmVideo);
 
     if (quality === AUTO_QUALITY.value) {
       // temporary solution

@@ -35,9 +35,6 @@ export interface SmartSeekingParams {
 
 export const AWAKE_TAG = 'player';
 
-export const DEFAULT_REWIND_SECONDS = 10;
-export const REWIND_SECONDS_TV = 30;
-
 export const DEFAULT_SMART_SEEKING_PARAMS: SmartSeekingParams = {
   seconds: 15,
   percentage: 0,

@@ -48,16 +48,14 @@ import { Colors } from 'Style/Colors';
 import { ClosedCaptionFilled } from 'Style/Icons';
 import { scale } from 'Util/CreateStyles';
 import { setTimeoutSafe } from 'Util/Misc';
-import { formatVideoTrackInfo } from 'Util/Player';
+import { formatVideoTrackInfo, getPlayerAvailableQualityItems } from 'Util/Player';
 import RemoteControlManager from 'Util/RemoteControl/RemoteControlManager';
 import { SupportedKeys } from 'Util/RemoteControl/SupportedKeys';
 
 import {
-  AUTO_QUALITY,
   DEFAULT_SPEED,
   DEFAULT_SPEEDS,
   FocusedElement,
-  MAX_QUALITY,
   PLAYER_CONTROLS_ANIMATION,
   PLAYER_CONTROLS_TIMEOUT,
   RewindDirection,
@@ -503,18 +501,13 @@ export function PlayerComponent({
   );
 
   const renderQualitySelector = () => {
-    const { streams } = video;
-
     return (
       <ThemedDropdown
         asOverlay
         overlayRef={ qualityOverlayRef }
         header={ t('Quality') }
         value={ selectedQuality }
-        data={ streams.map((s) => ({
-          label: s.quality,
-          value: s.quality,
-        })).concat([MAX_QUALITY, AUTO_QUALITY]).reverse() }
+        data={ getPlayerAvailableQualityItems(video) }
         onChange={ handleQualityChange }
         onClose={ closeOverlay }
       />

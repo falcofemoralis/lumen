@@ -34,7 +34,7 @@ export interface PlayerComponentProps {
   isOverlayOpen: boolean;
   isFilmBookmarked: boolean;
   togglePlayPause: (state?: boolean, stopEvents?: boolean) => void;
-  rewindPosition: (type: RewindDirection, seconds?: number) => void;
+  rewindPosition: (type: RewindDirection, seconds: number) => void;
   seekToPosition: (percent: number) => void;
   calculateCurrentTime: (percent: number) => number;
   openQualitySelector: () => void;

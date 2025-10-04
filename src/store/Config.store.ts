@@ -17,6 +17,7 @@ type DeviceConfigType = {
   numberOfColumnsMobile: number;
   numberOfColumnsTV: number;
   initialRoute: string;
+  playerRewindSeconds: number;
 }
 
 class ConfigStore {
@@ -32,6 +33,7 @@ class ConfigStore {
     numberOfColumnsMobile: 3,
     numberOfColumnsTV: 6,
     initialRoute: HOME_ROUTE,
+    playerRewindSeconds: 10,
   };
 
   constructor() {
