@@ -317,7 +317,7 @@ export function PlayerContainer({
     player.currentTime = newTime;
   };
 
-  const rewindPosition = async (type: RewindDirection,seconds: number) => {
+  const rewindPosition = async (type: RewindDirection, seconds: number) => {
     const { currentTime, bufferedPosition, duration } = player;
 
     const seekTime = type === RewindDirection.BACKWARD ? seconds * -1 : seconds;
