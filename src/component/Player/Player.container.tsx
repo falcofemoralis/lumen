@@ -251,6 +251,15 @@ export function PlayerContainer({
       return;
     }
 
+    if (selectedQuality === MAX_QUALITY.value) {
+      setSelectedVideoTrack({
+        ...videoTrack,
+        mimeType: selectedVideo.streams[selectedVideo.streams.length - 1].quality,
+      });
+
+      return;
+    }
+
     setSelectedVideoTrack({
       ...videoTrack,
       mimeType: selectedQuality,
