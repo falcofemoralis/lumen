@@ -275,11 +275,10 @@ export function PlayerContainer({
     resetProgressStatus();
     setSelectedVideo(newVideo);
     setSelectedVoice(newVoice);
-    updatePlayerStream(newVideo);
     resetUpdateTimeTimeout();
     setSelectedSubtitle(newVideo.subtitles?.find(({ isDefault }) => isDefault));
-
     updateSelectedVoice(film.id, newVoice);
+    updatePlayerStream(newVideo, selectedQuality, newVoice);
   };
 
   const togglePlayPause = (pause?: boolean, stopEvents?: boolean) => {
@@ -372,20 +371,21 @@ export function PlayerContainer({
     openOverlay();
   };
 
-  const updatePlayerStream = (filmVideoArg: FilmVideoInterface|null, qualityArg?: string|null) => {
-    const filmVideo = filmVideoArg || selectedVideo;
-    const quality = qualityArg || getPlayerQuality(filmVideo);
-
-    if (quality === AUTO_QUALITY.value) {
+  const updatePlayerStream = (
+    videoArg: FilmVideoInterface,
+    qualityArg: string,
+    voiceArg: FilmVoiceInterface
+  ) => {
+    if (qualityArg === AUTO_QUALITY.value) {
       // temporary solution
       // unfortunately it doesn't work because player loading becomes stuck
       // so the only way is to reload the player page entirely
       //player.replaceAsync(createMasterPlaylist(filmVideo.streams));
 
       RouterStore.pushData(PLAYER_ROUTE, {
-        video: filmVideo,
+        video: videoArg,
         film,
-        voice,
+        voice: voiceArg || selectedVoice,
       });
 
       const state = navigation.getState();
@@ -400,9 +400,9 @@ export function PlayerContainer({
         routes: filteredRoutes as any,
       });
     } else {
-      const newStream = quality !== MAX_QUALITY.value
-        ? filmVideo.streams.find((s) => s.quality === quality)
-        : filmVideo.streams[filmVideo.streams.length - 1];
+      const newStream = qualityArg !== MAX_QUALITY.value
+        ? videoArg.streams.find((s) => s.quality === qualityArg)
+        : videoArg.streams[videoArg.streams.length - 1];
 
       if (!newStream) {
         return;
@@ -424,7 +424,7 @@ export function PlayerContainer({
     setSelectedQuality(quality);
     updatePlayerQuality(quality);
     updateTime();
-    updatePlayerStream(null, quality);
+    updatePlayerStream(selectedVideo, quality, selectedVoice);
 
     qualityOverlayRef.current?.close();
   };

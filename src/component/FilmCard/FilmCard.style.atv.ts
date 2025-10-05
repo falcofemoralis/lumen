@@ -81,7 +81,7 @@ export const styles = CreateStyles({
     right: 0,
     paddingHorizontal: 4,
     paddingVertical: 1,
-    fontSize: 10,
+    fontSize: 12,
   },
   filmAdditionalText: {
     position: 'absolute',
@@ -89,6 +89,7 @@ export const styles = CreateStyles({
     left: 0,
     paddingHorizontal: 4,
     paddingVertical: 1,
+    fontSize: 12,
   },
   posterPendingRelease: {
     opacity: 0.5,
