@@ -30,6 +30,9 @@ const configApi: ConfigApiInterface = {
     'https://prx5-cogent.ukrtelcdn.net',
     'https://prx6-cogent.ukrtelcdn.net',
     'https://stream.voidboost.cc',
+    'https://stream.voidboost.top',
+    'https://stream.voidboost.link',
+    'https://stream.voidboost.club',
   ],
   defaultUserAgent: `Mozilla/5.0 (Linux; Android ${Device.osVersion}; ${Device.manufacturer} ${Device.modelName}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36`,
   officialMirrors: [
