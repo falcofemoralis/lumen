@@ -29,6 +29,7 @@ export const ThemedInputComponent = ({
   return (
     <SpatialNavigationFocusableView
       onSelect={ onSelect }
+      onFocus={ onSelect }
     >
       { ({ isFocused }) => (
         <TextInput
