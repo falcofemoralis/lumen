@@ -47,12 +47,14 @@ export function FilmCardComponent({
 
   const renderPoster = () => (
     <View style={ styles.posterWrapper }>
-      { renderType() }
       <ThemedImage
         style={ [styles.poster, isPendingRelease && styles.posterPendingRelease] }
         src={ poster }
       />
-      { renderFilmAdditionalText() }
+      <View style={ styles.additionContainer }>
+        { renderType() }
+        { renderFilmAdditionalText() }
+      </View>
     </View>
   );
 

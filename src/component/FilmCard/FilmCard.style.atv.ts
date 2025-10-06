@@ -42,6 +42,7 @@ export const styles = CreateStyles({
     transform: [{ scale: 1.1 }],
   },
   posterWrapper: {
+    position: 'relative',
     width: '100%',
     height: 'auto',
     flexDirection: 'column',
@@ -75,21 +76,26 @@ export const styles = CreateStyles({
   subtitleFocused: {
     color: Colors.textFocused,
   },
-  typeText: {
+  additionContainer: {
     position: 'absolute',
     top: 0,
     right: 0,
+    zIndex: 10,
+    width: '100%',
+    height: '100%',
+    justifyContent: 'space-between',
+  },
+  typeText: {
     paddingHorizontal: 4,
     paddingVertical: 1,
     fontSize: 12,
+    alignSelf: 'flex-end',
   },
   filmAdditionalText: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
     paddingHorizontal: 4,
     paddingVertical: 1,
     fontSize: 12,
+    alignSelf: 'flex-start',
   },
   posterPendingRelease: {
     opacity: 0.5,
