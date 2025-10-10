@@ -142,7 +142,9 @@ export function FilmPageContainer({ route }: FilmPageContainerProps) {
     const { items } = schedule[0];
 
     const initialItems = items.reduce<ScheduleItemInterface[]>((acc, item) => {
-      if (acc.length < MINIMUM_SCHEDULE_ITEMS) {
+      if (!item.isReleased) {
+        acc.push(item);
+      } else if (acc.length < MINIMUM_SCHEDULE_ITEMS) {
         acc.push(item);
       }
 

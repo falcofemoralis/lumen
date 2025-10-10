@@ -2,7 +2,6 @@ import Loader from 'Component/Loader';
 import LoginForm from 'Component/LoginForm';
 import Page from 'Component/Page';
 import ThemedButton from 'Component/ThemedButton';
-import ThemedImage from 'Component/ThemedImage';
 import ThemedPressable from 'Component/ThemedPressable';
 import ThemedSafeArea from 'Component/ThemedSafeArea';
 import ThemedText from 'Component/ThemedText';
@@ -10,15 +9,14 @@ import Wrapper from 'Component/Wrapper';
 import { LinearGradient } from 'expo-linear-gradient';
 import t from 'i18n/t';
 import { Bell, Download, LogOut, MessageSquareText, Settings, Star } from 'lucide-react-native';
+import { ACCOUNT_ROUTE } from 'Navigation/routes';
 import React from 'react';
 import { Image, ScrollView, View } from 'react-native';
-import AnimatedGlow from 'react-native-animated-glow';
 import { Pressable } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 
-import { ACCOUNT_ROUTE, defaultPreset, premiumPreset } from './AccountPage.config';
 import { styles } from './AccountPage.style';
 import { AccountPageComponentProps } from './AccountPage.type';
 
@@ -57,7 +55,7 @@ export function AccountPageComponent({
 
     return (
       <View style={ styles.profileInfo }>
-        <AnimatedGlow preset={ premiumDays > 0 ? premiumPreset : defaultPreset } style={ styles.profileInfoPremium }>
+        { /* <AnimatedGlow preset={ premiumDays > 0 ? premiumPreset : defaultPreset } style={ styles.profileInfoPremium }>
           { avatar ? (
             <ThemedImage
               src={ avatar }
@@ -69,7 +67,7 @@ export function AccountPageComponent({
               style={ styles.profileAvatar }
             />
           ) }
-        </AnimatedGlow>
+        </AnimatedGlow> */ }
         <View>
           <ThemedText style={ styles.profileName }>
             { t('You') }

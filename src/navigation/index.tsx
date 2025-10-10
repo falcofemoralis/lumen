@@ -1,6 +1,5 @@
 import { NavigationProp, NavigationState, StaticParamList } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { withSuspend } from 'Hooks/withSuspend';
 import {
   COMMENTS_MODAL_ROUTE,
   ERROR_ROUTE,
@@ -9,20 +8,17 @@ import {
   SCHEDULE_MODAL_ROUTE,
   WELCOME_ROUTE,
 } from 'Navigation/routes';
-import { lazy } from 'react';
+import ErrorPage from 'Route/ErrorPage';
+import CommentsModal from 'Route/modal/CommentsModal';
+import LoginModal from 'Route/modal/LoginModal';
+import ScheduleModal from 'Route/modal/ScheduleModal';
+import PlayerPage from 'Route/PlayerPage';
+import WelcomePage from 'Route/WelcomePage';
 import ConfigStore from 'Store/Config.store';
 import { DEFAULT_ROUTE_ANIMATION } from 'Style/Animations';
 import { Colors } from 'Style/Colors';
 
 import TabsStack from './tabs';
-
-const WelcomePage = withSuspend(lazy(() => import('Route/WelcomePage')));
-const ErrorPage = withSuspend(lazy(() => import('Route/ErrorPage')));
-const PlayerPage = withSuspend(lazy(() => import('Route/PlayerPage')));
-
-const LoginModal = withSuspend(lazy(() => import('Route/modal/LoginModal')));
-const CommentsModal = withSuspend(lazy(() => import('Route/modal/CommentsModal')));
-const ScheduleModal = withSuspend(lazy(() => import('Route/modal/ScheduleModal')));
 
 const Stack = createNativeStackNavigator();
 
@@ -32,7 +28,7 @@ export function RootStack() {
       <Stack.Navigator>
         <Stack.Screen
           name={ WELCOME_ROUTE }
-          component={ withSuspend(WelcomePage) }
+          component={ WelcomePage }
           options={ {
             headerShown: false,
             animation: DEFAULT_ROUTE_ANIMATION,
@@ -58,11 +54,11 @@ export function RootStack() {
         />
         <Stack.Screen
           name={ ERROR_ROUTE }
-          component={ withSuspend(ErrorPage) }
+          component={ ErrorPage }
         />
         <Stack.Screen
           name={ PLAYER_ROUTE }
-          component={ withSuspend(PlayerPage) }
+          component={ PlayerPage }
         />
       </Stack.Group>
       <Stack.Group
@@ -75,15 +71,15 @@ export function RootStack() {
       >
         <Stack.Screen
           name={ LOGIN_MODAL_ROUTE }
-          component={ withSuspend(LoginModal) }
+          component={ LoginModal }
         />
         <Stack.Screen
           name={ COMMENTS_MODAL_ROUTE }
-          component={ withSuspend(CommentsModal) }
+          component={ CommentsModal }
         />
         <Stack.Screen
           name={ SCHEDULE_MODAL_ROUTE }
-          component={ withSuspend(ScheduleModal) }
+          component={ ScheduleModal }
         />
       </Stack.Group>
     </Stack.Navigator>

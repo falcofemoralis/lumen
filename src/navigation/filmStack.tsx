@@ -1,6 +1,6 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { withSuspend } from 'Hooks/withSuspend';
-import { lazy } from 'react';
+import ActorPage from 'Route/ActorPage';
+import CategoryPage from 'Route/CategoryPage';
 import FilmPage from 'Route/FilmPage';
 import { DEFAULT_ROUTE_ANIMATION } from 'Style/Animations';
 import { Colors } from 'Style/Colors';
@@ -8,9 +8,6 @@ import { Colors } from 'Style/Colors';
 import { ACTOR_ROUTE, CATEGORY_ROUTE, FILM_ROUTE } from './routes';
 
 const Stack = createNativeStackNavigator();
-
-const ActorPage = lazy(() => import('Route/ActorPage'));
-const CategoryPage = lazy(() => import('Route/CategoryPage'));
 
 const FilmStack = ({ name, component }: { name: string, component: any }) => {
   const pageName = `${name}-page`;
@@ -30,11 +27,11 @@ const FilmStack = ({ name, component }: { name: string, component: any }) => {
         />
         <Stack.Screen
           name={ ACTOR_ROUTE }
-          component={ withSuspend(ActorPage) }
+          component={ ActorPage }
         />
         <Stack.Screen
           name={ CATEGORY_ROUTE }
-          component={ withSuspend(CategoryPage) }
+          component={ CategoryPage }
         />
         <Stack.Screen
           name={ FILM_ROUTE }

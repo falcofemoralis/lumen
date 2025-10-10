@@ -1,5 +1,4 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { withSuspend } from 'Hooks/withSuspend';
 import { LOGGER_ROUTE } from 'Navigation/routes';
 import { lazy } from 'react';
 import { DEFAULT_ROUTE_ANIMATION } from 'Style/Animations';
@@ -27,7 +26,7 @@ const SettingsStack = ({ name, component }: { name: string, component: any }) =>
         />
         <Stack.Screen
           name={ LOGGER_ROUTE }
-          component={ withSuspend(LoggerPage) }
+          component={ LoggerPage }
         />
       </Stack.Group>
     </Stack.Navigator>

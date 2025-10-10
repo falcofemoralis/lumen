@@ -1,6 +1,4 @@
-import { PresetConfig } from 'react-native-animated-glow';
-
-export const defaultPreset: PresetConfig = {
+export const defaultPreset = {
   metadata: {
     name: 'Default Preset',
     textColor: '#FFFFFF',
@@ -22,7 +20,7 @@ export const defaultPreset: PresetConfig = {
   ],
 };
 
-export const premiumPreset: PresetConfig = {
+export const premiumPreset = {
   metadata: {
     name: 'Premium Preset',
     textColor: '#FFFFFF',
