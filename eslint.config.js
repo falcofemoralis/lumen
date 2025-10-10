@@ -12,7 +12,7 @@ const reactCompiler = require('eslint-plugin-react-compiler');
 module.exports = defineConfig([
   expoConfig,
   {
-    ignores: ['dist/*'],
+    ignores: ['dist/**', 'src/libs/**'],
     plugins: {
       '@stylistic-plugin': stylistic,
       'eslint-comments': eslintComments,
