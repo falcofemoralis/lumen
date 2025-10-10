@@ -1,3 +1,4 @@
+import FallbackComponent from 'Component/FallbackComponent';
 import { View } from 'react-native';
 import ErrorBoundary from 'react-native-error-boundary';
 import LoggerStore from 'Store/Logger.store';
@@ -18,6 +19,7 @@ export function PageComponent({
       ] }
     >
       <ErrorBoundary
+        FallbackComponent={ FallbackComponent }
         onError={ (error, stackTrace) => {
           LoggerStore.error('PageComponent', { error, stackTrace });
         } }

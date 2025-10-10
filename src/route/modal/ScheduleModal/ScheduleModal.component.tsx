@@ -60,7 +60,7 @@ export const ScheduleModalComponent = ({ film, handleUpdateScheduleWatch }: Sche
   }
 
   return (
-    <ThemedSafeArea>
+    <ThemedSafeArea edges={ ['top', 'bottom', 'left', 'right'] }>
       <View style={ styles.container }>
         <Header title={ t('Schedule') } />
         <Wrapper style={ styles.wrapper }>

@@ -20,7 +20,7 @@ export const CommentsModal = () => {
 
 export const CommentsModalComponent = ({ film }: CommentsModalProps) => {
   return (
-    <ThemedSafeArea>
+    <ThemedSafeArea edges={ ['top', 'bottom', 'left', 'right'] }>
       <View style={ { flex: 1 } }>
         <Header title={ t('Comments') } />
         <Wrapper style={ { flex: 1 } }>

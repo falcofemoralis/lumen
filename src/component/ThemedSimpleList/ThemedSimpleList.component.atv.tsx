@@ -23,11 +23,15 @@ export const ThemedListComponent = ({
 
   const handleLayout = () => {
     setTimeout(() => {
+      console.log('value', value);
+
       const itemIdx = data.findIndex((item) => item.value === value);
 
-      if (scrollViewRef.current) {
-        scrollViewRef.current?.focus(itemIdx);
-      }
+      console.log('handleLayout', itemIdx);
+
+      // if (scrollViewRef.current && itemIdx !== -1) {
+      //   scrollViewRef.current?.focus(itemIdx);
+      // }
     }, 0);
   };
 
@@ -91,23 +95,27 @@ export const ThemedListComponent = ({
     );
   }, [value, onChange]);
 
-  const renderList = () => (
-    <View
-      style={ [
-        styles.listItemsWrapper,
-        { height: data.length >= (MAX_ITEMS_TO_DISPLAY - 1) ? undefined : (data.length * styles.item.height) },
-      ] }
-      onLayout={ handleLayout }
-    >
-      <SpatialNavigationVirtualizedList
-        ref={ scrollViewRef }
-        data={ data }
-        renderItem={ renderItem }
-        itemSize={ styles.item.height }
-        orientation="vertical"
-      />
-    </View>
-  );
+  const renderList = () => {
+    console.log('renderList', data);
+
+    return (
+      <View
+        style={ [
+          styles.listItemsWrapper,
+          { height: data.length >= (MAX_ITEMS_TO_DISPLAY - 1) ? undefined : (data.length * styles.item.height) },
+        ] }
+        onLayout={ handleLayout }
+      >
+        <SpatialNavigationVirtualizedList
+          ref={ scrollViewRef }
+          data={ data }
+          renderItem={ renderItem }
+          itemSize={ styles.item.height }
+          orientation="vertical"
+        />
+      </View>
+    );
+  };
 
   return (
     <View style={ [styles.listContainer, style] }>

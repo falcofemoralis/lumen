@@ -225,14 +225,14 @@ export const updatePlayerQuality = (quality: string) => {
 };
 
 export const getPlayerQuality = (video: FilmVideoInterface) => {
+  const { streams } = video;
+
   const quality = StorageStore.getPlayerStorage().getString(PLAYER_QUALITY_STORAGE_KEY);
 
   // determine default quality
   // usually it is 720p
   // but in some cases it can be 480p or 360p
   if (!quality) {
-    const { streams } = video;
-
     if (streams.length >= 3) {
       return '720p';
     }
@@ -242,6 +242,13 @@ export const getPlayerQuality = (video: FilmVideoInterface) => {
     }
 
     return '360p';
+  }
+
+  // if quality is not found in the list of available qualities, return the last quality
+  const stream = streams.find((s) => s.quality === quality);
+  if (!stream) {
+    // maximum available quality
+    return streams[streams.length - 1].quality;
   }
 
   return quality;
