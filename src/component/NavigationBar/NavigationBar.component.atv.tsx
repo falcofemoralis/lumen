@@ -4,6 +4,7 @@ import ThemedText from 'Component/ThemedText';
 import { useNavigationContext } from 'Context/NavigationContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import t from 'i18n/t';
+import { ACCOUNT_ROUTE , LOADER_ROUTE , SETTINGS_ROUTE } from 'Navigation/routes';
 import React, { useCallback, useRef } from 'react';
 import {
   Image,
@@ -17,9 +18,6 @@ import {
   SpatialNavigationRoot,
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
-import { ACCOUNT_ROUTE } from 'Route/AccountPage/AccountPage.config';
-import { LOADER_ROUTE } from 'Route/LoaderPage/LoaderPage.config';
-import { SETTINGS_ROUTE } from 'Route/SettingsPage/SettingsPage.config';
 import ConfigStore from 'Store/Config.store';
 import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';

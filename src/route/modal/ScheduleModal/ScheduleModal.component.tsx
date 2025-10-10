@@ -4,6 +4,7 @@ import ThemedAccordion from 'Component/ThemedAccordion';
 import ThemedSafeArea from 'Component/ThemedSafeArea';
 import Wrapper from 'Component/Wrapper';
 import t from 'i18n/t';
+import { SCHEDULE_MODAL_ROUTE } from 'Navigation/routes';
 import { useCallback, useEffect, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { ScheduleItem } from 'Route/FilmPage/FilmPageElements';
@@ -11,7 +12,6 @@ import RouterStore from 'Store/Router.store';
 import { FilmInterface } from 'Type/Film.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 
-import { SCHEDULE_MODAL_ROUTE } from './ScheduleModal.config';
 import { styles } from './ScheduleModal.style';
 import { ScheduleModalProps } from './ScheduleModal.type';
 

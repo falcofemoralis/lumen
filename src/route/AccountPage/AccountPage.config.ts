@@ -1,7 +1,5 @@
 import { PresetConfig } from 'react-native-animated-glow';
 
-export const ACCOUNT_ROUTE = 'Account';
-
 export const defaultPreset: PresetConfig = {
   metadata: {
     name: 'Default Preset',

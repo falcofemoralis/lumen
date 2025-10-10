@@ -3,6 +3,7 @@ import { REZKA_PROXY_PROVIDER } from 'Api/RezkaApi/configApi';
 import { services } from 'Api/services';
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import t from 'i18n/t';
+import { ACCOUNT_ROUTE , NOTIFICATIONS_ROUTE } from 'Navigation/routes';
 import {
   createContext,
   use,
@@ -11,8 +12,6 @@ import {
   useState,
 } from 'react';
 import { Linking, Platform } from 'react-native';
-import { ACCOUNT_ROUTE } from 'Route/AccountPage/AccountPage.config';
-import { NOTIFICATIONS_ROUTE } from 'Route/NotificationsPage/NotificationsPage.config';
 import ConfigStore from 'Store/Config.store';
 import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';

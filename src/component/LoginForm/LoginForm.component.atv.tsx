@@ -5,11 +5,11 @@ import Loader from 'Component/Loader';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedInput from 'Component/ThemedInput';
 import t from 'i18n/t';
+import { ACCOUNT_ROUTE } from 'Navigation/routes';
 import { useRef } from 'react';
 import { View } from 'react-native';
 import { useKeyboardController } from 'react-native-keyboard-controller';
 import { DefaultFocus } from 'react-tv-space-navigation';
-import { ACCOUNT_ROUTE } from 'Route/AccountPage/AccountPage.config';
 
 import { styles } from './LoginForm.style.atv';
 import { LoginFormComponentProps } from './LoginForm.type';

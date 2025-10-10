@@ -2,9 +2,8 @@ import { useNavigation } from '@react-navigation/native';
 import { useServiceContext } from 'Context/ServiceContext';
 import { withTV } from 'Hooks/withTV';
 import t from 'i18n/t';
+import { NOTIFICATIONS_ROUTE , SETTINGS_ROUTE } from 'Navigation/routes';
 import { useCallback } from 'react';
-import { NOTIFICATIONS_ROUTE } from 'Route/NotificationsPage/NotificationsPage.config';
-import { SETTINGS_ROUTE } from 'Route/SettingsPage/SettingsPage.config';
 import NotificationStore from 'Store/Notification.store';
 
 import AccountPageComponent from './AccountPage.component';

@@ -11,6 +11,7 @@ import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { useVideoPlayer, VideoPlayer, VideoTrack } from 'expo-video';
 import { withTV } from 'Hooks/withTV';
 import t from 'i18n/t';
+import { PLAYER_ROUTE } from 'Navigation/routes';
 import {
   useCallback,
   useEffect,
@@ -19,7 +20,6 @@ import {
   useState,
 } from 'react';
 import { BackHandler, Share } from 'react-native';
-import { PLAYER_ROUTE } from 'Route/PlayerPage/PlayerPage.config';
 import ConfigStore from 'Store/Config.store';
 import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';

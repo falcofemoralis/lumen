@@ -1,4 +1,4 @@
-import { HOME_ROUTE } from 'Route/HomePage/HomePage.config';
+import { HOME_ROUTE } from 'Navigation/routes';
 import { getConfigJson, updateConfig } from 'Util/Config';
 import { safeJsonParse } from 'Util/Json';
 import { configureRemoteControl } from 'Util/RemoteControl';

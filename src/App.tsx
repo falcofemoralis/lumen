@@ -29,9 +29,7 @@ export function App() {
         <Navigation
           theme={ DarkTheme }
           onReady={ () => {
-            setTimeout(() => {
-              SplashScreen.hideAsync();
-            }, 250);
+            SplashScreen.hideAsync();
           } }
         >
           <AppProvider>

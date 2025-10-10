@@ -3,6 +3,7 @@ import ThemedImage from 'Component/ThemedImage';
 import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import { useServiceContext } from 'Context/ServiceContext';
+import { ACCOUNT_ROUTE } from 'Navigation/routes';
 import React, { useCallback } from 'react';
 import {
   Image,
@@ -11,7 +12,6 @@ import {
 } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ACCOUNT_ROUTE } from 'Route/AccountPage/AccountPage.config';
 import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 
