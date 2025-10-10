@@ -2,7 +2,6 @@ import { NavigationRoute, ParamListBase } from '@react-navigation/native';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
 import { useNavigationContext } from 'Context/NavigationContext';
-import { useNotificationsContext } from 'Context/NotificationsContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import t from 'i18n/t';
 import React, { useCallback, useRef } from 'react';
@@ -38,8 +37,7 @@ export function NavigationBarComponent({
   onPress,
 }: NavigationBarComponentProps) {
   const { isMenuOpen, toggleMenu } = useNavigationContext();
-  const { isSignedIn } = useServiceContext();
-  const { badgeData } = useNotificationsContext();
+  const { isSignedIn, badgeData } = useServiceContext();
   const lastPage = useRef<string | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
