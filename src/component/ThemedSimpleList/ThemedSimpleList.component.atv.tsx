@@ -23,15 +23,11 @@ export const ThemedListComponent = ({
 
   const handleLayout = () => {
     setTimeout(() => {
-      console.log('value', value);
-
       const itemIdx = data.findIndex((item) => item.value === value);
 
-      console.log('handleLayout', itemIdx);
-
-      // if (scrollViewRef.current && itemIdx !== -1) {
-      //   scrollViewRef.current?.focus(itemIdx);
-      // }
+      if (scrollViewRef.current && itemIdx !== -1) {
+        scrollViewRef.current?.focus(itemIdx);
+      }
     }, 0);
   };
 
@@ -96,8 +92,6 @@ export const ThemedListComponent = ({
   }, [value, onChange]);
 
   const renderList = () => {
-    console.log('renderList', data);
-
     return (
       <View
         style={ [
