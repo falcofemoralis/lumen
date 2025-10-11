@@ -18,7 +18,7 @@
             "usesCleartextTraffic": true,
             "enableProguardInReleaseBuilds": true,
             "enableShrinkResourceslnReleaseBuilds": true,
-            "useLegacyPackaging": true
+            "useLegacyPackaging": false
           }
         }
       ],

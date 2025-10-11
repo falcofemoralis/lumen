@@ -224,10 +224,10 @@ export const updatePlayerQuality = (quality: string) => {
   );
 };
 
-export const getPlayerQuality = (video: FilmVideoInterface) => {
+export const getPlayerQuality = (video: FilmVideoInterface, qualityArg?: string) => {
   const { streams } = video;
 
-  const quality = StorageStore.getPlayerStorage().getString(PLAYER_QUALITY_STORAGE_KEY);
+  const quality = qualityArg || StorageStore.getPlayerStorage().getString(PLAYER_QUALITY_STORAGE_KEY);
 
   // determine default quality
   // usually it is 720p
@@ -244,27 +244,29 @@ export const getPlayerQuality = (video: FilmVideoInterface) => {
     return '360p';
   }
 
-  // if quality is not found in the list of available qualities, return the last quality
+  // if quality is auto, return auto and handle it in the player
+  if (quality === AUTO_QUALITY.value) {
+    return quality;
+  }
+
+  // if quality is not found in the list of available qualities or this is MAX quality
+  // return the max available quality (last item in the list)
   const stream = streams.find((s) => s.quality === quality);
-  if (!stream) {
-    // maximum available quality
+  if (!stream || quality === MAX_QUALITY.value) {
     return streams[streams.length - 1].quality;
   }
 
   return quality;
 };
 
-export const getPlayerStream = (video: FilmVideoInterface) => {
+export const getPlayerStream = (video: FilmVideoInterface, quality: string) => {
   const { streams } = video;
 
-  const defaultQuality = getPlayerQuality(video);
+  LoggerStore.debug('getPlayerStream', { quality, streams });
 
-  LoggerStore.debug('getPlayerStream', { defaultQuality, streams });
-
-  const stream = streams.find((s) => s.quality === defaultQuality);
+  const stream = streams.find((s) => s.quality === quality);
   if (!stream) {
-    // maximum available quality
-    return streams[streams.length - 1];
+    return { url: null, quality };
   }
 
   return stream;

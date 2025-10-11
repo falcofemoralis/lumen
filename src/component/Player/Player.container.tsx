@@ -51,7 +51,6 @@ import {
   AWAKE_TAG,
   DEFAULT_SPEED,
   FIRESTORE_DB,
-  MAX_QUALITY,
   RewindDirection,
   SAVE_TIME_EVERY_MS,
 } from './Player.config';
@@ -61,6 +60,7 @@ export function PlayerContainer({
   video,
   film,
   voice,
+  quality: qualityProp,
 }: PlayerContainerProps) {
   const navigation = useNavigation();
   const { updateSelectedVoice } = usePlayerContext();
@@ -68,7 +68,7 @@ export function PlayerContainer({
   const { isSignedIn, profile, currentService } = useServiceContext();
   const [selectedVideo, setSelectedVideo] = useState<FilmVideoInterface>(video);
   const [selectedVoice, setSelectedVoice] = useState<FilmVoiceInterface>(voice);
-  const [selectedQuality, setSelectedQuality] = useState<string>(getPlayerQuality(video));
+  const [selectedQuality, setSelectedQuality] = useState<string>(qualityProp);
   const [selectedSubtitle, setSelectedSubtitle] = useState<SubtitleInterface|undefined>(
     selectedVideo.subtitles?.find(({ isDefault }) => isDefault)
   );
@@ -111,7 +111,7 @@ export function PlayerContainer({
     }
   }, [firestoreDb, profile, film, selectedVoice]);
 
-  const player = useVideoPlayer(selectedQuality !== AUTO_QUALITY.value ? getPlayerStream(video)?.url : null, (p) => {
+  const player = useVideoPlayer(getPlayerStream(video, selectedQuality).url, (p) => {
     const savedTime = getSavedTime(film);
 
     p.loop = false;
@@ -246,15 +246,6 @@ export function PlayerContainer({
       setSelectedVideoTrack({
         ...videoTrack,
         mimeType: getQualityFromResolution(videoTrack.size.width, videoTrack.size.height),
-      });
-
-      return;
-    }
-
-    if (selectedQuality === MAX_QUALITY.value) {
-      setSelectedVideoTrack({
-        ...videoTrack,
-        mimeType: selectedVideo.streams[selectedVideo.streams.length - 1].quality,
       });
 
       return;
@@ -409,9 +400,7 @@ export function PlayerContainer({
         routes: filteredRoutes as any,
       });
     } else {
-      const newStream = qualityArg !== MAX_QUALITY.value
-        ? videoArg.streams.find((s) => s.quality === qualityArg)
-        : videoArg.streams[videoArg.streams.length - 1];
+      const newStream = getPlayerStream(videoArg, getPlayerQuality(videoArg, qualityArg));
 
       if (!newStream) {
         return;
@@ -430,7 +419,7 @@ export function PlayerContainer({
       return;
     }
 
-    setSelectedQuality(quality);
+    setSelectedQuality(getPlayerQuality(selectedVideo, quality));
     updatePlayerQuality(quality);
     updateTime();
     updatePlayerStream(selectedVideo, quality, selectedVoice);
