@@ -1,5 +1,6 @@
 import ThemedImage from 'Component/ThemedImage';
 import { Text, View } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { SpatialNavigationFocusableView } from 'react-tv-space-navigation';
 import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
@@ -108,9 +109,59 @@ export default function ThemedButton({
     </View>
   );
 
+  const renderLong = (isFocused: boolean) => (
+    <Animated.View
+      style={ [
+        styles.container,
+        styles.containerLong,
+        style,
+        isSelected && styles.containerLongSelected,
+        isFocused && styles.containerLongFocused,
+        isFocused && styleFocused,
+      ] }
+    >
+      { additionalElement && additionalElement(isFocused, isSelected ?? false) }
+      { IconComponent && (
+        <IconComponent
+          style={ [
+            styles.iconFilled,
+            isSelected && styles.iconFilledSelected,
+            isFocused && styles.iconFilledFocused,
+          ] }
+          size={ scale(18) }
+          color={ isFocused ? Colors.black : Colors.white }
+          { ...iconProps }
+        />
+      ) }
+      { children && (
+        <Text
+          style={ [
+            styles.text,
+            styles.textFilled,
+            textStyle,
+            isSelected && styles.textFilledSelected,
+            isFocused && styles.textFilledFocused,
+          ] }
+        >
+          { children }
+        </Text>
+      ) }
+      { rightImage && (
+        <ThemedImage
+          style={ [styles.rightIcon, rightImageStyle] }
+          src={ rightImage }
+        />
+      ) }
+    </Animated.View>
+  );
+
   const renderButton = (isFocused: boolean) => {
     if (variant === 'outlined') {
       return renderOutlined(isFocused);
+    }
+
+    if (variant === 'long') {
+      return renderLong(isFocused);
     }
 
     return renderFilled(isFocused);

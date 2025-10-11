@@ -8,9 +8,6 @@ export const INFO_HEIGHT = 65;
 export const INFO_PADDING_HORIZONTAL = 8;
 export const INFO_PADDING_VERTICAL = 4;
 
-export const DEFAULT_SCALE = 1;
-export const FOCUSED_SCALE = 1.1;
-
 export const calculateCardDimensions = (
   numberOfColumns: number,
   gap?: number,

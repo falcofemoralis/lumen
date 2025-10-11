@@ -1,6 +1,8 @@
 import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
+import { GRADIENT_SIZE_MOBILE } from './AccountPageGradients';
+
 export const styles = CreateStyles({
   wrapper: {
     flex: 1,
@@ -55,9 +57,13 @@ export const styles = CreateStyles({
     gap: 8,
     alignItems: 'center',
   },
+  profileInfoAvatarContainer: {
+    position: 'relative',
+  },
   profileInfoPremium: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    position: 'absolute',
+    left: ((GRADIENT_SIZE_MOBILE / 2) - 64 / 2) * -1,
+    top: ((GRADIENT_SIZE_MOBILE / 2) - 64 / 2) * -1,
   },
   profileAvatar: {
     width: 64,
@@ -137,5 +143,8 @@ export const styles = CreateStyles({
     fontSize: 14,
     fontWeight: '500',
     zIndex: 10,
+  },
+  premiumButton: {
+    backgroundColor: '#5B359A',
   },
 });

@@ -2,6 +2,7 @@ import Loader from 'Component/Loader';
 import LoginForm from 'Component/LoginForm';
 import Page from 'Component/Page';
 import ThemedButton from 'Component/ThemedButton';
+import ThemedImage from 'Component/ThemedImage';
 import ThemedPressable from 'Component/ThemedPressable';
 import ThemedSafeArea from 'Component/ThemedSafeArea';
 import ThemedText from 'Component/ThemedText';
@@ -11,7 +12,7 @@ import t from 'i18n/t';
 import { Bell, Download, LogOut, MessageSquareText, Settings, Star } from 'lucide-react-native';
 import { ACCOUNT_ROUTE } from 'Navigation/routes';
 import React from 'react';
-import { Image, ScrollView, View } from 'react-native';
+import { Image, ScrollView, StyleProp, View, ViewStyle } from 'react-native';
 import { Pressable } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from 'Style/Colors';
@@ -19,6 +20,7 @@ import { scale } from 'Util/CreateStyles';
 
 import { styles } from './AccountPage.style';
 import { AccountPageComponentProps } from './AccountPage.type';
+import { DefaultGradient, GRADIENT_SIZE_MOBILE, PremiumGradient } from './AccountPageGradients';
 
 export function AccountPageComponent({
   isSignedIn,
@@ -55,7 +57,12 @@ export function AccountPageComponent({
 
     return (
       <View style={ styles.profileInfo }>
-        { /* <AnimatedGlow preset={ premiumDays > 0 ? premiumPreset : defaultPreset } style={ styles.profileInfoPremium }>
+        <View style={ styles.profileInfoAvatarContainer }>
+          { premiumDays > 0 ? (
+            <PremiumGradient size={ GRADIENT_SIZE_MOBILE } style={ styles.profileInfoPremium } />
+          ) : (
+            <DefaultGradient size={ GRADIENT_SIZE_MOBILE } style={ styles.profileInfoPremium } />
+          ) }
           { avatar ? (
             <ThemedImage
               src={ avatar }
@@ -67,7 +74,7 @@ export function AccountPageComponent({
               style={ styles.profileAvatar }
             />
           ) }
-        </AnimatedGlow> */ }
+        </View>
         <View>
           <ThemedText style={ styles.profileName }>
             { t('You') }
@@ -95,10 +102,7 @@ export function AccountPageComponent({
           start={ { x: 1, y: 1 } }
           end={ { x: 0, y: 0 } }
         />
-        <Pressable
-          style={ styles.premiumBadge }
-          onPress={ handleViewPayments }
-        >
+        <View style={ styles.premiumBadge }>
           <Image
             source={ require('../../../assets/images/prem-content-logo.png') }
             style={ styles.premiumBadgeIcon }
@@ -109,7 +113,7 @@ export function AccountPageComponent({
           <ThemedText style={ styles.premiumBadgeText }>
             { t('You have %s days left.', String(premiumDays)) }
           </ThemedText>
-        </Pressable>
+        </View>
       </View>
     );
   };
@@ -117,11 +121,12 @@ export function AccountPageComponent({
   const renderActionButton = (
     title: string,
     icon: React.ComponentType<any>,
-    action: () => void
+    action: () => void,
+    style?: StyleProp<ViewStyle>
   ) => {
     return (
       <ThemedButton
-        style={ styles.profileAction }
+        style={ [styles.profileAction, style] }
         contentStyle={ styles.profileActionContent }
         textStyle={ styles.profileActionText }
         IconComponent={ icon }
@@ -158,6 +163,7 @@ export function AccountPageComponent({
           { renderPremiumBadge() }
         </View>
         <View style={ [styles.profileActionsGroup] }>
+          { renderActionButton(t('Renew subscription'), Star, handleViewPayments, styles.premiumButton) }
           { renderNotificationButton() }
           { renderActionButton(t('Downloads'), Download, openNotImplemented) }
           { renderActionButton(t('Comments'), MessageSquareText, openNotImplemented) }

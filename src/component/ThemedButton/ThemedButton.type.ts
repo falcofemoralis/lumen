@@ -2,7 +2,7 @@ import {
   ImageStyle, StyleProp, TextStyle, ViewStyle,
 } from 'react-native';
 
-export type Variant = 'filled' | 'outlined';
+export type Variant = 'filled' | 'outlined' | 'long';
 
 export interface ThemedButtonProps {
   children?: React.ReactNode;
