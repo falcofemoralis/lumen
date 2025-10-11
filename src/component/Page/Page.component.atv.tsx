@@ -1,5 +1,6 @@
 import { useIsFocused } from '@react-navigation/native';
 import AppUpdater from 'Component/AppUpdater';
+import FallbackComponent from 'Component/FallbackComponent';
 import { Portal } from 'Component/ThemedPortal';
 import { useNavigationContext } from 'Context/NavigationContext';
 import React, { useCallback } from 'react';
@@ -42,6 +43,7 @@ export function PageComponent({
       ] : styles.wrapper }
     >
       <ErrorBoundary
+        FallbackComponent={ FallbackComponent }
         onError={ (error, stackTrace) => {
           LoggerStore.error('PageComponent', { error, stackTrace });
         } }

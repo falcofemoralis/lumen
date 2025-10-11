@@ -1,12 +1,11 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import ActorPage from 'Route/ActorPage';
-import { ACTOR_ROUTE } from 'Route/ActorPage/ActorPage.config';
 import CategoryPage from 'Route/CategoryPage';
-import { CATEGORY_ROUTE } from 'Route/CategoryPage/CategoryPage.config';
 import FilmPage from 'Route/FilmPage';
-import { FILM_ROUTE } from 'Route/FilmPage/FilmPage.config';
 import { DEFAULT_ROUTE_ANIMATION } from 'Style/Animations';
 import { Colors } from 'Style/Colors';
+
+import { ACTOR_ROUTE, CATEGORY_ROUTE, FILM_ROUTE } from './routes';
 
 const Stack = createNativeStackNavigator();
 
@@ -36,7 +35,7 @@ const FilmStack = ({ name, component }: { name: string, component: any }) => {
         />
         <Stack.Screen
           name={ FILM_ROUTE }
-          component={ FilmPage }
+          component={ FilmPage } // we always should preload film page because it will be 100% opened
         />
       </Stack.Group>
     </Stack.Navigator>

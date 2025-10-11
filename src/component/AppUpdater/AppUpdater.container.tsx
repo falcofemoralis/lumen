@@ -6,7 +6,6 @@ import { useEffect, useRef, useState } from 'react';
 import { Platform } from 'react-native';
 import { useLockSpatialNavigation } from 'react-tv-space-navigation';
 import ConfigStore from 'Store/Config.store';
-import LoggerStore from 'Store/Logger.store';
 import { Installer } from 'Util/App/installer';
 
 import AppUpdaterComponent from './AppUpdater.component';

@@ -54,13 +54,6 @@ export function FilmCardComponent({
     );
   };
 
-  const renderAdditionContainer = () => (
-    <>
-      { renderType() }
-      { renderFilmAdditionalText() }
-    </>
-  );
-
   const renderPoster = () => (
     <View
       style={ styles.posterWrapper }
@@ -75,7 +68,10 @@ export function FilmCardComponent({
         ] }
         src={ poster }
       />
-      { renderAdditionContainer() }
+      <View style={ styles.additionContainer }>
+        { renderType() }
+        { renderFilmAdditionalText() }
+      </View>
     </View>
   );
 

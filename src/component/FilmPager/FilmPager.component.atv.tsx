@@ -119,7 +119,7 @@ export function FilmPagerComponent({
         setTimeoutSafe(() => {
           unlock();
         }, 0);
-      }, 750);
+      }, 300);
     }
   };
 

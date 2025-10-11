@@ -5,11 +5,20 @@ export const styles = CreateStyles({
   wrapper: {
     flex: 1,
   },
+  scrollView: {
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  content: {
+    paddingBottom: 8,
+  },
   topBar: {
     flexDirection: 'row',
     width: '100%',
     justifyContent: 'flex-end',
     gap: 16,
+    zIndex: 10,
   },
   tobBarBtn: {
     backgroundColor: Colors.transparent,
@@ -21,6 +30,9 @@ export const styles = CreateStyles({
     width: 20,
     height: 20,
   },
+  badgeContainer: {
+    position: 'relative',
+  },
   badge: {
     backgroundColor: Colors.secondary,
     width: 16,
@@ -31,15 +43,20 @@ export const styles = CreateStyles({
     alignItems: 'center',
     textAlign: 'center',
     position: 'absolute',
-    right: 0,
-    top: 0,
+    left: 8,
+    top: 8,
+    zIndex: 10,
   },
   profile: {
     width: '100%',
   },
   profileInfo: {
-    flexDirection: 'row',
-    gap: 16,
+    flexDirection: 'column',
+    gap: 8,
+    alignItems: 'center',
+  },
+  profileInfoPremium: {
+    justifyContent: 'center',
     alignItems: 'center',
   },
   profileAvatar: {
@@ -52,13 +69,73 @@ export const styles = CreateStyles({
     fontSize: 20,
     fontWeight: '700',
   },
+  profileSubname: {
+    fontSize: 14,
+    textAlign: 'center',
+  },
   profileActions: {
     marginTop: 16,
-    flexDirection: 'row',
+    flexDirection: 'column',
     gap: 8,
   },
+  profileActionsGroup: {
+    width: '100%',
+    flexDirection: 'column',
+    gap: 8,
+    marginBottom: 12,
+  },
   profileAction: {
-    flex: 1,
+    backgroundColor: Colors.backgroundLight,
+    borderRadius: 20,
+  },
+  profileActionContent: {
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+  },
+  profileActionText: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  premiumBadgeContainer: {
+    position: 'relative',
+    overflow: 'hidden',
     borderRadius: 24,
+  },
+  premiumBadge: {
+    backgroundColor: Colors.transparent,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    flexDirection: 'column',
+    gap: 8,
+  },
+  premiumBadgeGradient: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    right: 0,
+    height: '100%',
+    width: '100%',
+  },
+  premiumBadgeIcon: {
+    position: 'absolute',
+    right: 16,
+    top: 16,
+    width: 80,
+    height: 20,
+  },
+  premiumBadgeHeading: {
+    fontSize: 16,
+    fontWeight: '700',
+    zIndex: 10,
+  },
+  premiumBadgeText: {
+    fontSize: 14,
+    fontWeight: '500',
+    zIndex: 10,
   },
 });

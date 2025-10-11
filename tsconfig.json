@@ -8,6 +8,7 @@
       "Component/*": ["./src/component/*"],
       "Context/*": ["./src/context/*"],
       "Hooks/*": ["./src/hooks/*"],
+      "Navigation/*": ["./src/navigation/*"],
       "Route/*": ["./src/route/*"],
       "Style/*": ["./src/style/*"],
       "Service/*": ["./src/service/*"],

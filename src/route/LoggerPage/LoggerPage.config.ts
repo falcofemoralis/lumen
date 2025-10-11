@@ -1,1 +1,0 @@
-export const LOGGER_ROUTE = 'Logger';

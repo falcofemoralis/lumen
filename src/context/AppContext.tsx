@@ -7,7 +7,6 @@ import {
 
 import { AppUpdaterProvider } from './AppUpdaterContext';
 import { NavigationProvider } from './NavigationContext';
-import { NotificationsProvider } from './NotificationsContext';
 import { PlayerProvider } from './PlayerContext';
 import { PlayerProgressProvider } from './PlayerProgressContext';
 import { ServiceProvider } from './ServiceContext';
@@ -31,7 +30,6 @@ export const composeProviders = (...p: Provider[]) =>
 export const AppProviders = composeProviders(
   NavigationProvider,
   ServiceProvider,
-  NotificationsProvider,
   PlayerProvider,
   PlayerProgressProvider,
   AppUpdaterProvider

@@ -1,12 +1,13 @@
 import t from 'i18n/t';
-import { ACCOUNT_ROUTE } from 'Route/AccountPage/AccountPage.config';
-import { BOOKMARKS_ROUTE } from 'Route/BookmarksPage/BookmarksPage.config';
-import { HOME_ROUTE } from 'Route/HomePage/HomePage.config';
-import { NOTIFICATIONS_ROUTE } from 'Route/NotificationsPage/NotificationsPage.config';
-import { RECENT_ROUTE } from 'Route/RecentPage/RecentPage.config';
-import { SEARCH_ROUTE } from 'Route/SearchPage/SearchPage.config';
+import {
+  ACCOUNT_ROUTE,
+  BOOKMARKS_ROUTE,
+  HOME_ROUTE,
+  NOTIFICATIONS_ROUTE,
+  RECENT_ROUTE,
+  SEARCH_ROUTE,
+} from 'Navigation/routes';
 
-export const SETTINGS_ROUTE = 'Settings';
 export const GITHUB_LINK = 'https://github.com/falcofemoralis/lumen';
 export const TELEGRAM_LINK = 'https://t.me/lumen_app';
 

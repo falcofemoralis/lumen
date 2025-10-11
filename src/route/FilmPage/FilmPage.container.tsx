@@ -3,6 +3,7 @@ import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useServiceContext } from 'Context/ServiceContext';
 import { withTV } from 'Hooks/withTV';
 import t from 'i18n/t';
+import { PLAYER_ROUTE } from 'Navigation/routes';
 import {
   useCallback,
   useEffect,
@@ -10,7 +11,6 @@ import {
   useState,
 } from 'react';
 import { Share } from 'react-native';
-import { PLAYER_ROUTE } from 'Route/PlayerPage/PlayerPage.config';
 import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
 import RouterStore from 'Store/Router.store';

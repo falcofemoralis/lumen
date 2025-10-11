@@ -1,1 +1,0 @@
-export const SCHEDULE_MODAL_ROUTE = 'ScheduleModal';

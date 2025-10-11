@@ -677,7 +677,7 @@ export function PlayerComponent({
     <View
       style={ [
         styles.container,
-        isCommentsOpen && { width: (Dimensions.get('window').width) * 0.55 },
+        isCommentsOpen && { width: (Dimensions.get('window').width) * 0.45 },
       ] }
     >
       <VideoView

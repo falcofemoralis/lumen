@@ -1,5 +1,4 @@
 import { useNavigation } from '@react-navigation/native';
-import { useNotificationsContext } from 'Context/NotificationsContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { withTV } from 'Hooks/withTV';
 import { useCallback, useEffect, useState } from 'react';
@@ -15,8 +14,7 @@ import NotificationsPageComponentTV from './NotificationsPage.component.atv';
 export function NotificationsPageContainer() {
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState<NotificationInterface[]>([]);
-  const { isSignedIn, currentService } = useServiceContext();
-  const { resetNotifications, getNotifications } = useNotificationsContext();
+  const { isSignedIn, currentService, resetNotifications, getNotifications } = useServiceContext();
   const navigation = useNavigation();
 
   const loadFilms = async (items: NotificationInterface[]) => {

@@ -12,6 +12,7 @@ import { ModifiedProvider } from 'Type/ModifiedProvider.interface';
 import { NotificationInterface } from 'Type/Notification.interface';
 import { ProfileInterface } from 'Type/Profile.interface';
 import { RecentListInterface } from 'Type/RecentList.interface';
+import { UserDataInterface } from 'Type/UserData.interface';
 import { HTMLElementInterface } from 'Util/Parser';
 
 import { Variables } from '../util/Request/index';
@@ -127,7 +128,7 @@ export interface AccountApiInterface {
   getRecent(page: number, params?: ApiParams): Promise<RecentListInterface>;
   removeRecent(filmId: string): Promise<boolean>;
   unloadRecentPage(): void;
-  getNotifications(): Promise<NotificationInterface[]>;
+  getUserData(): Promise<UserDataInterface>;
   saveScheduleWatch(watchId: string): Promise<void>;
   getPhotoUrl(url: string): string;
 }
