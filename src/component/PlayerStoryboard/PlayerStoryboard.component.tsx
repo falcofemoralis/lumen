@@ -1,6 +1,6 @@
-import { Image } from 'expo-image';
 import { memo, useEffect, useState } from 'react';
 import { View } from 'react-native';
+import { NitroImage } from 'react-native-nitro-image';
 import { Colors } from 'Style/Colors';
 import { storyboardParser, VTTItem } from 'Util/VttParser';
 
@@ -14,9 +14,9 @@ interface StoryImageProps {
 }
 
 export const CacheImage = ({ uri }: { uri: string }) => (
-  <Image
+  <NitroImage
     style={ styles.image }
-    source={ { uri } }
+    image={ { url: uri } }
   />
 );
 

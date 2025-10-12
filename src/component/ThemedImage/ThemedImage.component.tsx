@@ -1,27 +1,20 @@
-import { Image } from 'expo-image';
-import { memo } from 'react';
+import React, { memo } from 'react';
+import { View } from 'react-native';
+import { NitroImage } from 'react-native-nitro-image';
 
+import { styles } from './ThemedImage.style';
 import { ThemedImageProps } from './ThemedImage.type';
 
-export const ThemedImage = ({
-  src,
-  style,
-  blurRadius,
-  transition = 250,
-}: ThemedImageProps) => {
-  return (
-    <Image
-      style={ style }
-      source={ src }
-      placeholder={ { blurhash: 'L03IYJj[fQj[j[fQfQfQfQfQfQfQ' } }
-      placeholderContentFit="cover"
-      contentFit="cover"
-      transition={ transition }
+export const ThemedImage = ({ src, style }: ThemedImageProps) => (
+  <View style={ [style, styles.container] }>
+    <NitroImage
+      style={ styles.image }
+      image={ { url: src } }
+      resizeMode="cover"
       recyclingKey={ src }
-      blurRadius={ blurRadius }
     />
-  );
-};
+  </View>
+);
 
 function rowPropsAreEqual(prevProps: ThemedImageProps, props: ThemedImageProps) {
   return prevProps.src === props.src;
