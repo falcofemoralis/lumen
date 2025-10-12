@@ -13,7 +13,6 @@ import { Bell, Download, LogOut, MessageSquareText, Settings, Star } from 'lucid
 import { ACCOUNT_ROUTE } from 'Navigation/routes';
 import React from 'react';
 import { Image, ScrollView, StyleProp, View, ViewStyle } from 'react-native';
-import { Pressable } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
@@ -59,9 +58,9 @@ export function AccountPageComponent({
       <View style={ styles.profileInfo }>
         <View style={ styles.profileInfoAvatarContainer }>
           { premiumDays > 0 ? (
-            <PremiumGradient size={ GRADIENT_SIZE_MOBILE } style={ styles.profileInfoPremium } />
+            <PremiumGradient size={ scale(GRADIENT_SIZE_MOBILE) } style={ styles.profileInfoPremium } />
           ) : (
-            <DefaultGradient size={ GRADIENT_SIZE_MOBILE } style={ styles.profileInfoPremium } />
+            <DefaultGradient size={ scale(GRADIENT_SIZE_MOBILE) } style={ styles.profileInfoPremium } />
           ) }
           { avatar ? (
             <ThemedImage

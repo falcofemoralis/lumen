@@ -3,7 +3,7 @@ import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 import { scale } from 'Util/CreateStyles';
 
 export const GRADIENT_SIZE_MOBILE = 300;
-export const GRADIENT_SIZE_TV = 300;
+export const GRADIENT_SIZE_TV = 400;
 
 export const PremiumGradient = ({ style, size: sz }: { style?: StyleProp<ViewStyle>, size: number }) => {
   const size = scale(sz);
@@ -20,8 +20,8 @@ export const PremiumGradient = ({ style, size: sz }: { style?: StyleProp<ViewSty
           fy={ size / 2 }
           gradientUnits="userSpaceOnUse"
         >
-          <Stop offset="0.1" stopColor="#D819E0" stopOpacity="0.4" />
-          <Stop offset="0.5" stopColor="#5B359A" stopOpacity="0.4" />
+          <Stop offset="0.05" stopColor="#D819E0" stopOpacity="0.4" />
+          <Stop offset="0.3" stopColor="#5B359A" stopOpacity="0.4" />
           <Stop offset="1" stopColor="#5B359A" stopOpacity="0" />
         </RadialGradient>
       </Defs>
@@ -44,8 +44,8 @@ export const DefaultGradient = ({ style, size: sz }: { style?: StyleProp<ViewSty
           fy={ size / 2 }
           gradientUnits="userSpaceOnUse"
         >
-          <Stop offset="0.1" stopColor="#EA1B45" stopOpacity="0.7" />
-          <Stop offset="0.5" stopColor="#FC5909" stopOpacity="0.4" />
+          <Stop offset="0.05" stopColor="#EA1B45" stopOpacity="0.7" />
+          <Stop offset="0.3" stopColor="#FC5909" stopOpacity="0.4" />
           <Stop offset="1" stopColor="#FC5909" stopOpacity="0" />
         </RadialGradient>
       </Defs>

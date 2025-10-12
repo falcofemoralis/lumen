@@ -3,6 +3,8 @@ import CreateStyles from 'Util/CreateStyles';
 
 import { GRADIENT_SIZE_MOBILE } from './AccountPageGradients';
 
+const AVATAR_SIZE = 64;
+
 export const styles = CreateStyles({
   wrapper: {
     flex: 1,
@@ -62,12 +64,12 @@ export const styles = CreateStyles({
   },
   profileInfoPremium: {
     position: 'absolute',
-    left: ((GRADIENT_SIZE_MOBILE / 2) - 64 / 2) * -1,
-    top: ((GRADIENT_SIZE_MOBILE / 2) - 64 / 2) * -1,
+    left: ((GRADIENT_SIZE_MOBILE / 2) - AVATAR_SIZE / 2) * -1,
+    top: ((GRADIENT_SIZE_MOBILE / 2) - AVATAR_SIZE / 2) * -1,
   },
   profileAvatar: {
-    width: 64,
-    height: 64,
+    width: AVATAR_SIZE,
+    height: AVATAR_SIZE,
     backgroundColor: Colors.backgroundLight,
     borderRadius: 99,
   },

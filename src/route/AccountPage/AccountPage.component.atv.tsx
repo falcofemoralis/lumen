@@ -65,9 +65,9 @@ export function AccountPageComponent({
       <View style={ styles.profileInfo }>
         <View style={ styles.profileInfoAvatarContainer }>
           { premiumDays > 0 ? (
-            <PremiumGradient size={ GRADIENT_SIZE_TV } style={ styles.profileInfoPremium } />
+            <PremiumGradient size={ scale(GRADIENT_SIZE_TV) } style={ styles.profileInfoPremium } />
           ) : (
-            <DefaultGradient size={ GRADIENT_SIZE_TV } style={ styles.profileInfoPremium } />
+            <DefaultGradient size={ scale(GRADIENT_SIZE_TV) } style={ styles.profileInfoPremium } />
           ) }
           { avatar ? (
             <ThemedImage
