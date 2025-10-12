@@ -2,7 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useServiceContext } from 'Context/ServiceContext';
 import { withTV } from 'Hooks/withTV';
 import t from 'i18n/t';
-import { NOTIFICATIONS_ROUTE , SETTINGS_ROUTE } from 'Navigation/routes';
+import { NOTIFICATIONS_ROUTE, SETTINGS_ROUTE } from 'Navigation/routes';
 import { useCallback } from 'react';
 import NotificationStore from 'Store/Notification.store';
 

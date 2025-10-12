@@ -458,7 +458,7 @@ export function PlayerComponent({
             ...(hideActions ? styles.controlsRowHidden : {}),
           } }
         >
-          { renderBottomAction(Settings2 , openQualitySelector, bottomActionRef) }
+          { renderBottomAction(Settings2, openQualitySelector, bottomActionRef) }
           { isPlaylistSelector && renderBottomAction(ListVideo, openVideoSelector) }
           { subtitles.length > 0 && renderBottomAction(
             selectedSubtitle?.languageCode === '' ? ClosedCaption : ClosedCaptionFilled,

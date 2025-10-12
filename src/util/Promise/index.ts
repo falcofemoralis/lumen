@@ -1,4 +1,4 @@
-export async function processPromisesBatch<S,T>(
+export async function processPromisesBatch<S, T>(
   items: S[],
   limit: number,
   fn: (item: S) => Promise<T>

@@ -4,7 +4,7 @@ import ThemedText from 'Component/ThemedText';
 import { useNavigationContext } from 'Context/NavigationContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import t from 'i18n/t';
-import { ACCOUNT_ROUTE , LOADER_ROUTE , SETTINGS_ROUTE } from 'Navigation/routes';
+import { ACCOUNT_ROUTE, LOADER_ROUTE, SETTINGS_ROUTE } from 'Navigation/routes';
 import React, { useCallback, useRef } from 'react';
 import {
   Image,

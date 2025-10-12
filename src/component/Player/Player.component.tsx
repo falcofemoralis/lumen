@@ -266,11 +266,11 @@ export function PlayerComponent({
       }
 
       scheduleOnRN(setPlayerRate, 1.5);
-      scheduleOnRN(setLongTapAction,true);
+      scheduleOnRN(setLongTapAction, true);
     })
     .onEnd(() => {
-      scheduleOnRN(setPlayerRate,1);
-      scheduleOnRN(setLongTapAction,false);
+      scheduleOnRN(setPlayerRate, 1);
+      scheduleOnRN(setLongTapAction, false);
     });
 
   const enablePIP = () => {
