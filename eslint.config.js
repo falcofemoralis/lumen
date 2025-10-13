@@ -55,7 +55,6 @@ module.exports = defineConfig([
       'no-multiple-empty-lines': ['error', { max: 1, maxBOF: 0, maxEOF: 0 }],
       'key-spacing': ['error', { beforeColon: false, afterColon: true }],
       'func-call-spacing': ['error', 'never'],
-      'comma-spacing': ['error', { before: false, after: true }],
       'no-trailing-spaces': ['error', {
         skipBlankLines: false,
         ignoreComments: false,

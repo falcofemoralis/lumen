@@ -4154,6 +4154,11 @@ expo-font@~14.0.8:
   dependencies:
     fontfaceobserver "^2.1.0"
 
+expo-image@^3.0.8:
+  version "3.0.8"
+  resolved "https://registry.yarnpkg.com/expo-image/-/expo-image-3.0.8.tgz#ec76f7a300712cc659b197e5478362426e411424"
+  integrity sha512-L83fTHVjvE5hACxUXPk3dpABteI/IypeqxKMeOAAcT2eB/jbqT53ddsYKEvKAP86eoByQ7+TCtw9AOUizEtaTQ==
+
 expo-keep-awake@^15.0.7, expo-keep-awake@~15.0.7:
   version "15.0.7"
   resolved "https://registry.yarnpkg.com/expo-keep-awake/-/expo-keep-awake-15.0.7.tgz#4eada556e1cca6c9c2e5aa39478fd01816cd0bc9"
@@ -6496,20 +6501,10 @@ react-native-mmkv@^3.3.1:
   resolved "https://registry.yarnpkg.com/react-native-mmkv/-/react-native-mmkv-3.3.1.tgz#854ec786d3951e4bbbaa6161d812c3345d071d85"
   integrity sha512-LYamDWQirPTUJZ9Re+BkCD+zLRGNr+EVJDeIeblvoJXGatWy9PXnChtajDSLqwjX3EXVeUyjgrembs7wlBw9ug==
 
-react-native-nitro-image@^0.6.1:
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/react-native-nitro-image/-/react-native-nitro-image-0.6.1.tgz#bf4d37ed52d435f751a27017fade4a6d7b7fb9a6"
-  integrity sha512-LKttegj2fZ6NdmqZG531LB2NteW5TbGy/vbyHFtTX39g73it3R5jss+IMYmuHJHjhbFse/wu2yP+zh3MXAa6Jg==
-
-react-native-nitro-modules@^0.30.0:
-  version "0.30.0"
-  resolved "https://registry.yarnpkg.com/react-native-nitro-modules/-/react-native-nitro-modules-0.30.0.tgz#f1d326fddb980fd6f108721204d4d4d9a8f1bf56"
-  integrity sha512-DHFSEbM7cwVHmpbGvmd+b5iqy67My0In9oBc8eSMvjTkLWrDkkiE5jLdt6ZJyDF7Fn3C5Tr6Lq2bUa596VSW2g==
-
-react-native-nitro-web-image@^0.6.1:
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/react-native-nitro-web-image/-/react-native-nitro-web-image-0.6.1.tgz#030d0db7828846d1ba1c425add6aefe0aeed936b"
-  integrity sha512-WblMIuxLWmy8oqPMmMoBJRVrUafEPhARu4vs9rMvtFDIarGNIu9zSSXZuTQP7f9PlM1UezV47RY2gzn0e3Ersg==
+react-native-nitro-modules@^0.29.4:
+  version "0.29.4"
+  resolved "https://registry.yarnpkg.com/react-native-nitro-modules/-/react-native-nitro-modules-0.29.4.tgz#e82a243996f4a85b9194a2e2a89970487638e1c2"
+  integrity sha512-AfUMcwFtj9FuEDwDLN5eIVo0lBYTQqDaV7meiFzuoZyRmc8ywykFTKfyZwRN2t8Z/WtTlfCj9Y9yaET33IImsg==
 
 react-native-pager-view@^7.0.0:
   version "7.0.0"
