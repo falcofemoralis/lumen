@@ -1,6 +1,6 @@
 import ThemedImage from 'Component/ThemedImage';
 import ThemedText from 'Component/ThemedText';
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { View } from 'react-native';
 import {
   DefaultFocus,
@@ -20,6 +20,7 @@ export const ThemedListComponent = ({
   onChange,
 }: ThemedSimpleListComponentProps) => {
   const scrollViewRef = useRef<SpatialNavigationVirtualizedListRef>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const handleLayout = () => {
     setTimeout(() => {
@@ -27,6 +28,10 @@ export const ThemedListComponent = ({
 
       if (scrollViewRef.current && itemIdx !== -1) {
         scrollViewRef.current?.focus(itemIdx);
+
+        if (!isScrolled) {
+          setIsScrolled(true);
+        }
       }
     }, 0);
   };
@@ -106,6 +111,7 @@ export const ThemedListComponent = ({
           renderItem={ renderItem }
           itemSize={ styles.item.height }
           orientation="vertical"
+          scrollDuration={ (data.findIndex((item) => item.value === value) > 0 && !isScrolled) ? 0 : undefined }
         />
       </View>
     );
