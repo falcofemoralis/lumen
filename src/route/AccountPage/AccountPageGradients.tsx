@@ -3,7 +3,7 @@ import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 import { scale } from 'Util/CreateStyles';
 
 export const GRADIENT_SIZE_MOBILE = 300;
-export const GRADIENT_SIZE_TV = 400;
+export const GRADIENT_SIZE_TV = 350;
 
 export const PremiumGradient = ({ style, size: sz }: { style?: StyleProp<ViewStyle>, size: number }) => {
   const size = scale(sz);
