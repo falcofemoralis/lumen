@@ -164,6 +164,8 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
     setIsSignedIn(false);
     removeProfile();
     StorageStore.getMiscStorage().set(CREDENTIALS_STORAGE, '');
+    StorageStore.getMiscStorage().set(NOTIFICATIONS_STORAGE, '');
+    StorageStore.getMiscStorage().set(USER_DATA_STORAGE_CACHE, '');
     (new CookiesManager()).reset();
   }, [currentService, removeProfile]);
 

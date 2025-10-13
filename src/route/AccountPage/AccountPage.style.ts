@@ -1,10 +1,6 @@
 import { Colors } from 'Style/Colors';
 import CreateStyles from 'Util/CreateStyles';
 
-import { GRADIENT_SIZE_MOBILE } from './AccountPageGradients';
-
-const AVATAR_SIZE = 64;
-
 export const styles = CreateStyles({
   wrapper: {
     flex: 1,
@@ -61,15 +57,16 @@ export const styles = CreateStyles({
   },
   profileInfoAvatarContainer: {
     position: 'relative',
+    height: 64,
+    width: 64,
   },
   profileInfoPremium: {
     position: 'absolute',
-    left: ((GRADIENT_SIZE_MOBILE / 2) - AVATAR_SIZE / 2) * -1,
-    top: ((GRADIENT_SIZE_MOBILE / 2) - AVATAR_SIZE / 2) * -1,
+    top: '50%',
+    left: '50%',
+    transform: [{ translateX: '-50%' }, { translateY: '-50%' }],
   },
   profileAvatar: {
-    width: AVATAR_SIZE,
-    height: AVATAR_SIZE,
     backgroundColor: Colors.backgroundLight,
     borderRadius: 99,
   },

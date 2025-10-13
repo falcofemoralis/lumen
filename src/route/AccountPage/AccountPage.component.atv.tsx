@@ -65,9 +65,9 @@ export function AccountPageComponent({
       <View style={ styles.profileInfo }>
         <View style={ styles.profileInfoAvatarContainer }>
           { premiumDays > 0 ? (
-            <PremiumGradient size={ scale(GRADIENT_SIZE_TV) } style={ styles.profileInfoPremium } />
+            <PremiumGradient style={ styles.profileInfoPremium } size={ GRADIENT_SIZE_TV } />
           ) : (
-            <DefaultGradient size={ scale(GRADIENT_SIZE_TV) } style={ styles.profileInfoPremium } />
+            <DefaultGradient style={ [styles.profileInfoPremium] } size={ GRADIENT_SIZE_TV } />
           ) }
           { avatar ? (
             <ThemedImage
@@ -118,10 +118,13 @@ export function AccountPageComponent({
   };
 
   const renderActions = () => {
+    const { premiumDays = 0 } = profile ?? {};
+
     return (
       <SpatialNavigationScrollView>
         <View style={ styles.profileActions }>
-          { renderActionButton(t('Renew subscription'), Star, handleViewPayments, styles.premiumButton) }
+          { /* eslint-disable-next-line max-len */ }
+          { renderActionButton(premiumDays > 0 ? t('Renew subscription') : t('Get subscription'), Star, handleViewPayments, styles.premiumButton) }
           <DefaultFocus>
             { renderActionButton(t('Downloads'), Download, openNotImplemented) }
           </DefaultFocus>
