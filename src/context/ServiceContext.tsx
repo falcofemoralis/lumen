@@ -32,7 +32,7 @@ export const USER_DATA_STORAGE_CACHE_TTL = 1000 * 60 * 60; // 1 hour
 
 export const DEFAULT_SERVICE = ApiServiceType.REZKA;
 
-interface ServiceContextInterface {
+export interface ServiceContextInterface {
   isSignedIn: boolean;
   profile: ProfileInterface | null;
   currentService: ApiInterface;

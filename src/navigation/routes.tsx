@@ -17,3 +17,4 @@ export const WELCOME_ROUTE = 'Welcome';
 export const COMMENTS_MODAL_ROUTE = 'CommentsModal';
 export const LOGIN_MODAL_ROUTE = 'LoginModal';
 export const SCHEDULE_MODAL_ROUTE = 'ScheduleModal';
+export const SETTINGS_MODAL_ROUTE = 'SettingsModal';

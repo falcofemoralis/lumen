@@ -1,0 +1,1 @@
+export { default } from './SettingLink.container';

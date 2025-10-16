@@ -166,5 +166,10 @@
   "Theres an error": "Похоже что-то пошло не так",
   "Try again": "Попробовать снова",
   "Renew subscription": "Продлить подписку",
-  "Get subscription": "Оформить подписку"
+  "Get subscription": "Оформить подписку",
+  "Appearance": "Интерфейс",
+  "Network": "Сетевые настройки",
+  "Player": "Плеер",
+  "Debug": "Отладка",
+  "About": "О приложении"
 }

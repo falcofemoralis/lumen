@@ -6,12 +6,14 @@ import {
   LOGIN_MODAL_ROUTE,
   PLAYER_ROUTE,
   SCHEDULE_MODAL_ROUTE,
+  SETTINGS_MODAL_ROUTE,
   WELCOME_ROUTE,
 } from 'Navigation/routes';
 import ErrorPage from 'Route/ErrorPage';
 import CommentsModal from 'Route/modal/CommentsModal';
 import LoginModal from 'Route/modal/LoginModal';
 import ScheduleModal from 'Route/modal/ScheduleModal';
+import SettingsModal from 'Route/modal/SettingsModal';
 import PlayerPage from 'Route/PlayerPage';
 import WelcomePage from 'Route/WelcomePage';
 import ConfigStore from 'Store/Config.store';
@@ -80,6 +82,10 @@ export function RootStack() {
         <Stack.Screen
           name={ SCHEDULE_MODAL_ROUTE }
           component={ ScheduleModal }
+        />
+        <Stack.Screen
+          name={ SETTINGS_MODAL_ROUTE }
+          component={ SettingsModal }
         />
       </Stack.Group>
     </Stack.Navigator>
