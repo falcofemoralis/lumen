@@ -55,23 +55,21 @@ export function FilmCardComponent({
   };
 
   const renderPoster = () => (
-    <View
-      style={ styles.posterWrapper }
-      renderToHardwareTextureAndroid
-    >
-      <ThemedImage
-        style={ [
-          styles.poster,
-          stylePoster,
-          isFocused && styles.posterFocused,
-          isPendingRelease && styles.posterPendingRelease,
-        ] }
-        src={ poster }
-      />
-      <View style={ styles.additionContainer }>
-        { renderType() }
-        { renderFilmAdditionalText() }
-      </View>
+    <ThemedImage
+      style={ [
+        styles.poster,
+        stylePoster,
+        isFocused && styles.posterFocused,
+        isPendingRelease && styles.posterPendingRelease,
+      ] }
+      src={ poster }
+    />
+  );
+
+  const renderAdditionContainer = () => (
+    <View style={ styles.additionContainer }>
+      { renderType() }
+      { renderFilmAdditionalText() }
     </View>
   );
 
@@ -104,7 +102,15 @@ export function FilmCardComponent({
         style,
       ] }
     >
-      { renderPoster() }
+      <View
+        style={ [
+          styles.posterWrapper,
+          isFocused && styles.posterWrapperFocused,
+        ] }
+      >
+        { renderPoster() }
+        { renderAdditionContainer() }
+      </View>
       <View
         style={ [
           styles.info,

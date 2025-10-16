@@ -31,11 +31,14 @@ export const styles = CreateStyles({
     flex: 1,
     flexDirection: 'column',
     width: '100%',
+    borderRadius: 8,
+    overflow: 'hidden',
     transform: [{ scale: 1 }],
     transitionProperty: 'transform',
     transitionDuration: '250ms',
   },
   cardFocused: {
+    borderRadius: 8,
     transform: [{ scale: 1.1 }],
   },
   posterWrapper: {
@@ -43,6 +46,13 @@ export const styles = CreateStyles({
     width: '100%',
     height: 'auto',
     flexDirection: 'column',
+    borderBottomRightRadius: 8,
+    borderBottomLeftRadius: 8,
+    overflow: 'hidden',
+  },
+  posterWrapperFocused: {
+    borderBottomRightRadius: 0,
+    borderBottomLeftRadius: 0,
   },
   poster: {
     aspectRatio: '166 / 250',

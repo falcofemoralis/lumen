@@ -32,7 +32,8 @@ export const styles = CreateStyles({
     height: 150,
     width: 'auto',
     aspectRatio: '166 / 250',
-    borderRadius: 0,
+    borderRadius: 8,
+    overflow: 'hidden',
   },
   itemContent: {
     height: '100%',
