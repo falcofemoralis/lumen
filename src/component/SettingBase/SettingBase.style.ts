@@ -17,6 +17,7 @@ export const styles = CreateStyles({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
+    flex: 1,
   },
   settingContent: {
     width: 'auto',
