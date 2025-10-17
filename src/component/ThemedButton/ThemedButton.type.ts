@@ -21,4 +21,6 @@ export interface ThemedButtonProps {
   disableRootActive?: boolean;
   disabled?: boolean;
   additionalElement?: (isFocused: boolean, isSelected: boolean) => React.ReactNode;
+  withAnimation?: boolean;
+  zoomScale?: number;
 }

@@ -40,6 +40,8 @@ export const styles = CreateStyles({
     flex: 1,
     flexDirection: 'column',
     minWidth: 300,
+    paddingHorizontal: 12,
+    marginHorizontal: -12,
   },
   scrollView: {
   },

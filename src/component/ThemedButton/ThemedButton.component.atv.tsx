@@ -1,7 +1,6 @@
 import ThemedImage from 'Component/ThemedImage';
+import ThemedPressable from 'Component/ThemedPressable';
 import { Text, View } from 'react-native';
-import Animated from 'react-native-reanimated';
-import { SpatialNavigationFocusableView } from 'react-tv-space-navigation';
 import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 
@@ -23,6 +22,8 @@ export default function ThemedButton({
   rightImageStyle,
   disableRootActive,
   additionalElement,
+  withAnimation = false,
+  zoomScale = 1.1,
 }: ThemedButtonProps) {
   const renderFilled = (isFocused: boolean) => (
     <View
@@ -110,7 +111,7 @@ export default function ThemedButton({
   );
 
   const renderLong = (isFocused: boolean) => (
-    <Animated.View
+    <View
       style={ [
         styles.container,
         styles.containerLong,
@@ -152,7 +153,7 @@ export default function ThemedButton({
           src={ rightImage }
         />
       ) }
-    </Animated.View>
+    </View>
   );
 
   const renderButton = (isFocused: boolean) => {
@@ -176,13 +177,15 @@ export default function ThemedButton({
   };
 
   return (
-    <SpatialNavigationFocusableView
-      onSelect={ onPress }
+    <ThemedPressable
+      onPress={ onPress }
       onFocus={ onFocus }
+      withAnimation={ withAnimation }
+      zoomScale={ zoomScale }
     >
       { ({ isFocused, isRootActive }) => (
         renderButton(isActive(isFocused, isRootActive))
       ) }
-    </SpatialNavigationFocusableView>
+    </ThemedPressable>
   );
 }

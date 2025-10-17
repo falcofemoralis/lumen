@@ -36,7 +36,7 @@ export const ThemedGridComponent = ({
       style={ style }
       additionalRenderedRows={ 2 }
       scrollBehavior='stick-to-center'
-      scrollDuration={ ConfigStore.getConfig().isTVGridAnimation ? 180 : 0 }
+      scrollDuration={ ConfigStore.getConfig().isTVGridAnimation ? 250 : 0 }
       header={ header }
       headerSize={ headerSize }
     />

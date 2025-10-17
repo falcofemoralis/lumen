@@ -1,5 +1,6 @@
 import FilmCard from 'Component/FilmCard';
 import { calculateCardDimensions } from 'Component/FilmCard/FilmCard.style.atv';
+import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import React, {
   memo,
@@ -24,6 +25,7 @@ import {
 } from './FilmSections.type';
 
 const FilmSectionsRow = ({
+  index,
   row,
   itemSize,
   containerWidth,
@@ -59,11 +61,11 @@ const FilmSectionsRow = ({
         alignInGrid
         style={ styles.rowStyle }
       >
-        { films.map((item, index) => (
-          <SpatialNavigationFocusableView
+        { films.map((item, idx) => (
+          <ThemedPressable
             // eslint-disable-next-line react/no-array-index-key
-            key={ index }
-            onSelect={ () => handleOnPress(item) }
+            key={ `${index}-${idx}-${item.id}` }
+            onPress={ () => handleOnPress(item) }
           >
             { ({ isFocused }) => (
               <FilmCard
@@ -72,7 +74,7 @@ const FilmSectionsRow = ({
                 style={ { width: itemSize } }
               />
             ) }
-          </SpatialNavigationFocusableView>
+          </ThemedPressable>
         )) }
       </SpatialNavigationView>
     </View>
@@ -94,8 +96,9 @@ export function FilmSectionsComponent({
 
   const containerWidth = calculateItemWidth(1);
 
-  const renderItem = useCallback(({ item: row }: {item: FilmSectionsItem}) => (
+  const renderItem = useCallback(({ item: row, index }: {item: FilmSectionsItem, index: number}) => (
     <MemoizedFilmSectionsRow
+      index={ index }
       row={ row }
       itemSize={ width }
       numberOfColumns={ NUMBER_OF_COLUMNS_TV }

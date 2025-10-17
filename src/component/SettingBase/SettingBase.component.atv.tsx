@@ -1,6 +1,6 @@
+import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import { View } from 'react-native';
-import { SpatialNavigationFocusableView } from 'react-tv-space-navigation';
 import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 
@@ -19,9 +19,10 @@ const SettingBaseComponent = ({
   }
 
   return (
-    <SpatialNavigationFocusableView
-      onSelect={ () => isEnabled && onPress?.() }
+    <ThemedPressable
+      onPress={ () => isEnabled && onPress?.() }
       onFocus={ onFocus }
+      withAnimation
     >
       { ({ isFocused, isRootActive }) => (
         <View style={ [
@@ -59,7 +60,7 @@ const SettingBaseComponent = ({
           </View>
         </View>
       ) }
-    </SpatialNavigationFocusableView>
+    </ThemedPressable>
   );
 };
 

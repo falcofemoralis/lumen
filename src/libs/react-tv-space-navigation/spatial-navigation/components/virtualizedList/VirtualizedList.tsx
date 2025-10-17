@@ -263,7 +263,7 @@ export const VirtualizedList = typedMemo(
           transform: [vertical ? { translateY: newTranslationValue } : { translateX: newTranslationValue }],
           transitionProperty: 'transform',
           transitionDuration: `${scrollDuration}ms`,
-          transitionTimingFunction: 'ease-out',
+          transitionTimingFunction: 'ease-in-out'
         }, style, directionStyle, dimensionStyle]}
         testID={testID}
       >

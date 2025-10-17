@@ -60,7 +60,7 @@ export const SettingsStructureComponent = ({
             <DefaultFocus>
               <SpatialNavigationScrollView offsetFromStart={ height / 2.1 }>
                 { settings.map((setting) => (
-                  <View key={ setting.id }>
+                  <View key={ setting.id } style={ styles.tabButton }>
                     { renderSetting(setting)[setting.type] }
                   </View>
                 )) }
@@ -72,7 +72,7 @@ export const SettingsStructureComponent = ({
           <View style={ styles.tab }>
             <SpatialNavigationScrollView offsetFromStart={ height / 2.1 }>
               { settings.find((s) => s.id === settingsGroupId)?.settings?.map((setting) => (
-                <View key={ setting.id }>
+                <View key={ setting.id } style={ styles.tabButton }>
                   { renderSetting(setting)[setting.type] }
                 </View>
               )) ?? null }

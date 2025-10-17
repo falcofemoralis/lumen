@@ -39,10 +39,7 @@ export function AccountPageComponent({
           start={ { x: 1, y: 1 } }
           end={ { x: 0, y: 0 } }
         />
-        <Pressable
-          style={ styles.premiumBadge }
-          onPress={ handleViewPayments }
-        >
+        <View style={ styles.premiumBadge }>
           <Image
             source={ require('../../../assets/images/prem-content-logo.png') }
             style={ styles.premiumBadgeIcon }
@@ -53,7 +50,7 @@ export function AccountPageComponent({
           <ThemedText style={ styles.premiumBadgeText }>
             { t('You have %s days left.', String(premiumDays)) }
           </ThemedText>
-        </Pressable>
+        </View>
       </View>
     );
   };
@@ -111,6 +108,7 @@ export function AccountPageComponent({
           size: scale(20),
         } }
         variant="long"
+        withAnimation
       >
         { title }
       </ThemedButton>

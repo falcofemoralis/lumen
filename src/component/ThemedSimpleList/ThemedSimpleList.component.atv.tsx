@@ -1,10 +1,10 @@
 import ThemedImage from 'Component/ThemedImage';
+import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import { useCallback, useRef, useState } from 'react';
 import { View } from 'react-native';
 import {
   DefaultFocus,
-  SpatialNavigationFocusableView,
   SpatialNavigationVirtualizedList,
   SpatialNavigationVirtualizedListRef,
 } from 'react-tv-space-navigation';
@@ -55,8 +55,9 @@ export const ThemedListComponent = ({
 
     return (
       <DefaultFocus enable={ isSelected }>
-        <SpatialNavigationFocusableView
-          onSelect={ () => onChange(item) }
+        <ThemedPressable
+          onPress={ () => onChange(item) }
+          withAnimation
         >
           { ({ isFocused }) => (
             <View
@@ -91,7 +92,7 @@ export const ThemedListComponent = ({
               </View>
             </View>
           ) }
-        </SpatialNavigationFocusableView>
+        </ThemedPressable>
       </DefaultFocus>
     );
   }, [value, onChange]);

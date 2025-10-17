@@ -1,52 +1,54 @@
-import { Pressable, View } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { SpatialNavigationFocusableView } from 'react-tv-space-navigation';
-import { Colors } from 'Style/Colors';
-import { noopFn } from 'Util/Function';
 
-import { ThemedPressableProps } from './ThemedPressable.type';
+import { styles } from './ThemedPressable.style.atv';
+import { ThemedFocusableNodeState, ThemedPressableComponentProps } from './ThemedPressable.type';
 
-/**
- * A themed pressable component for TV OS that can be used to add support for mouse\pointer interaction.
- * Currently not used in the app.
- */
-const ThemedPressable = ({
+export const ThemedPressableComponent = ({
   onPress,
+  onLongPress,
+  onFocus,
+  onBlur,
   children,
   style,
-  contentStyle,
-  ref,
+  spatialRef,
   disabled = false,
   mode = 'light',
   pressDelay = 50,
-}: ThemedPressableProps) => {
+  withAnimation = false,
+  zoomScale = 1.05,
+}: ThemedPressableComponentProps) => {
+  const renderChildren = (state: ThemedFocusableNodeState): React.ReactElement => {
+    if (typeof children === 'function') {
+      return children(state);
+    }
+
+    return children as React.ReactElement;
+  };
+
   return (
     <SpatialNavigationFocusableView
-      onSelect={ noopFn }
-      onLongSelect={ noopFn }
+      ref={ spatialRef }
+      onSelect={ onPress }
+      onLongSelect={ onLongPress }
+      onFocus={ onFocus }
+      onBlur={ onBlur }
     >
-      { ({ isFocused }) => (
-        <View style={ [style, { overflow: 'hidden' }] }>
-          <Pressable
-            ref={ ref }
-            onPress={ onPress }
-            disabled={ disabled }
-            android_ripple={ {
-              color: mode === 'light' ? Colors.whiteTransparent : Colors.button,
-            } }
-            unstable_pressDelay={ pressDelay }
-            style={ [{
-              flex: 1,
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }, contentStyle] }
-            tvFocusable={ false }
-            focusable={ false }
-          >
-            { children }
-          </Pressable>
-        </View>
-      ) }
+      { ({ isFocused, isRootActive }) => withAnimation ? (
+        <Animated.View
+          style={ [
+            styles.item,
+            style,
+            isFocused && {
+              transform: [{ scale: zoomScale }],
+            },
+          ] }
+        >
+          { typeof children === 'function' ? children({ isFocused, isRootActive }) : children }
+        </Animated.View>
+      ) : renderChildren({ isFocused, isRootActive }) }
     </SpatialNavigationFocusableView>
   );
 };
+
+export default ThemedPressableComponent;

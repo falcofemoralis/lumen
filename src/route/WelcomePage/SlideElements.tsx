@@ -156,6 +156,7 @@ export const BaseSlide = ({
                   ] }
                   onPress={ handleBack }
                   pressDelay={ 0 }
+                  resolveAsMobile
                 >
                   <ChevronLeft
                     size={ scale(24) }
@@ -186,6 +187,7 @@ export const BaseSlide = ({
                   onPress={ canComplete ? complete : handleNext }
                   pressDelay={ 0 }
                   mode='dark'
+                  resolveAsMobile
                 >
                   <ThemedText
                     style={ [
@@ -275,6 +277,7 @@ export const ConfigureSlide = ({
                 isFocused && styles.TVfocused,
               ] }
               onPress={ handleSelectTV }
+              resolveAsMobile
             >
               <View style={ styles.configureContainer }>
                 <View style={ styles.configureIcon }>
@@ -317,6 +320,7 @@ export const ConfigureSlide = ({
                 isFocused && styles.TVfocused,
               ] }
               onPress={ handleSelectMobile }
+              resolveAsMobile
             >
               <View style={ styles.configureContainer }>
                 <View style={ styles.configureIcon }>
@@ -441,6 +445,7 @@ export const ProviderSlide = ({
               ] }
               onPress={ validateProvider }
               disabled={ isLoading }
+              resolveAsMobile
             >
               { isProviderValid === false && (
                 <CircleAlert color='red' />
@@ -567,6 +572,7 @@ export const CDNSlide = ({
               ] }
               onPress={ handleValidateCDN }
               disabled={ isLoading }
+              resolveAsMobile
             >
               { isCDNValid === false && (
                 <CircleAlert color='red' />
@@ -648,6 +654,7 @@ export const LoginSlide = ({
                 isLoading && styles.providerValidateButtonDisabled,
               ] }
               onPress={ handleLogin }
+              resolveAsMobile
             >
               <ThemedText
                 style={ [

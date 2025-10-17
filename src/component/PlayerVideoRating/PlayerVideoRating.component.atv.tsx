@@ -2,13 +2,13 @@ import ThemedButton from 'Component/ThemedButton';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
+import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import { CircleHelp } from 'lucide-react-native';
 import { useMemo, useRef } from 'react';
 import { View } from 'react-native';
 import {
   DefaultFocus,
-  SpatialNavigationFocusableView,
   SpatialNavigationScrollView,
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
@@ -27,6 +27,7 @@ export const PlayerVideoRatingComponent = ({
     styles.voiceRatingOverlay.width
     - styles.voiceRatingPercentContainer.width
     - styles.voiceRatingItemContainer.padding * 2
+    - styles.voiceRatingNavigationView.paddingHorizontal * 2
   ), []);
 
   const renderButton = () => {
@@ -44,7 +45,7 @@ export const PlayerVideoRatingComponent = ({
 
   const renderRating = (item: VoiceRatingInterface) => {
     return (
-      <SpatialNavigationFocusableView key={ item.title }>
+      <ThemedPressable key={ item.title } withAnimation>
         { ({ isFocused }) => (
           <View
             style={ [
@@ -94,7 +95,7 @@ export const PlayerVideoRatingComponent = ({
             </View>
           </View>
         ) }
-      </SpatialNavigationFocusableView>
+      </ThemedPressable>
     );
   };
 
@@ -105,6 +106,7 @@ export const PlayerVideoRatingComponent = ({
       <ThemedOverlay
         ref={ ratingOverlayRef }
         contentContainerStyle={ styles.voiceRatingOverlay }
+        containerStyle={ styles.voiceRatingOverlayContainer }
       >
         <View style={ styles.voiceRatingContainer }>
           <SpatialNavigationScrollView
@@ -112,6 +114,7 @@ export const PlayerVideoRatingComponent = ({
           >
             <SpatialNavigationView
               direction="vertical"
+              style={ styles.voiceRatingNavigationView }
             >
               <DefaultFocus>
                 { voiceRating.map((item) => renderRating(item)) }

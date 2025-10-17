@@ -15,4 +15,8 @@ export const styles = CreateStyles({
     height: '100%',
     width: '100%',
   },
+  tabButton: {
+    paddingVertical: 2,
+    paddingHorizontal: 12,
+  },
 });

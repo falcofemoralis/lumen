@@ -10,6 +10,7 @@ export const styles = CreateStyles({
     flexDirection: 'row',
     justifyContent: 'center',
     gap: 10,
+    paddingTop: 4,
   },
   actionButton: {
     paddingVertical: 6,
@@ -286,7 +287,8 @@ export const styles = CreateStyles({
   relatedList: {
     flexDirection: 'row',
     gap: 16,
-    paddingBlock: 16,
+    paddingBlock: 12,
+    paddingHorizontal: 6,
   },
   relatedListItem: {
     flex: 0,
@@ -313,5 +315,11 @@ export const styles = CreateStyles({
     borderRadius: 16,
     borderColor: Colors.darkBorder,
     borderWidth: 1,
+  },
+  actorsCollection: {
+    flexDirection: 'row',
+    gap: 10,
+    paddingBlock: 12,
+    paddingHorizontal: 6,
   },
 });

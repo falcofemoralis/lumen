@@ -75,15 +75,11 @@ export const styles = CreateStyles({
   // long
   containerLong: {
     borderRadius: 44,
-    transform: [{ scale: 1 }],
-    transitionProperty: 'transform',
-    transitionDuration: '250ms',
   },
   containerLongSelected: {
     backgroundColor: Colors.primary,
   },
   containerLongFocused: {
     backgroundColor: Colors.buttonFocused,
-    transform: [{ scale: 1.1 }],
   },
 });

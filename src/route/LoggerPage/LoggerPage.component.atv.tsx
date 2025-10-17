@@ -3,11 +3,12 @@ import Page from 'Component/Page';
 import ThemedButton from 'Component/ThemedButton';
 import ThemedInput from 'Component/ThemedInput';
 import ThemedList from 'Component/ThemedList';
+import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import t from 'i18n/t';
 import { useState } from 'react';
 import { View } from 'react-native';
-import { DefaultFocus, SpatialNavigationFocusableView, SpatialNavigationView } from 'react-tv-space-navigation';
+import { DefaultFocus, SpatialNavigationView } from 'react-tv-space-navigation';
 import ConfigStore from 'Store/Config.store';
 import { LogEntry } from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
@@ -73,7 +74,7 @@ export const LoggerPageComponent = ({
     } = item;
 
     return (
-      <SpatialNavigationFocusableView>
+      <ThemedPressable>
         { ({ isFocused }) => (
           <View
             style={ [
@@ -101,7 +102,7 @@ export const LoggerPageComponent = ({
             </ThemedText>
           </View>
         ) }
-      </SpatialNavigationFocusableView>
+      </ThemedPressable>
     );
   };
 
@@ -155,6 +156,7 @@ export const LoggerPageComponent = ({
             onPress={ sendLogs }
             style={ [styles.action, styles.actionPrimary] }
             disabled={ isSending || !data.length }
+            withAnimation
           >
             { t('Send') }
           </ThemedButton>
@@ -162,6 +164,7 @@ export const LoggerPageComponent = ({
             onPress={ clearLogs }
             style={ styles.action }
             disabled={ isSending || !data.length }
+            withAnimation
           >
             { t('Clear') }
           </ThemedButton>

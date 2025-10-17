@@ -1,5 +1,6 @@
 import { NavigationRoute, ParamListBase } from '@react-navigation/native';
 import ThemedImage from 'Component/ThemedImage';
+import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import { useNavigationContext } from 'Context/NavigationContext';
 import { useServiceContext } from 'Context/ServiceContext';
@@ -199,18 +200,18 @@ export function NavigationBarComponent({
         key={ name }
         enable={ name === ConfigStore.getConfig().initialRoute }
       >
-        <SpatialNavigationFocusableView
+        <ThemedPressable
           onFocus={ () => {
             if (isMenuOpen) {
               onTabSelect(name);
             }
           } }
-          onSelect={ () => onTabSelect(name) }
+          onPress={ () => onTabSelect(name) }
         >
           { ({ isRootActive, isFocused: isf }) => (
             renderComponent(isRootActive, isf)
           ) }
-        </SpatialNavigationFocusableView>
+        </ThemedPressable>
       </DefaultFocus>
     );
   };

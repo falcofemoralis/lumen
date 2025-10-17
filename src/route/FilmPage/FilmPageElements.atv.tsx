@@ -5,12 +5,12 @@ import { AccordionGroupInterface } from 'Component/ThemedAccordion/ThemedAccordi
 import ThemedImage from 'Component/ThemedImage';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
+import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import t from 'i18n/t';
 import { CircleCheck, Star } from 'lucide-react-native';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { View } from 'react-native';
-import { SpatialNavigationFocusableView } from 'react-tv-space-navigation';
 import { Colors } from 'Style/Colors';
 import { ActorCardInterface } from 'Type/ActorCard.interface';
 import { FilmInterface } from 'Type/Film.interface';
@@ -59,8 +59,10 @@ export const ActorView = memo(({
   } = actor;
 
   return (
-    <SpatialNavigationFocusableView
-      onSelect={ () => handleSelectActor(link ?? '') }
+    <ThemedPressable
+      onPress={ () => handleSelectActor(link ?? '') }
+      withAnimation
+      zoomScale={ 1.1 }
     >
       { ({ isFocused }) => (
         <View style={ [styles.actor, isFocused && styles.actorFocused] }>
@@ -101,7 +103,7 @@ export const ActorView = memo(({
           ) }
         </View>
       ) }
-    </SpatialNavigationFocusableView>
+    </ThemedPressable>
   );
 }, (
   prevProps: ActorProps, nextProps: ActorProps
@@ -147,8 +149,8 @@ export const ScheduleItem = memo(({
   }, [handleUpdateScheduleWatch, item]);
 
   return (
-    <SpatialNavigationFocusableView
-      onSelect={ handlePress }
+    <ThemedPressable
+      onPress={ handlePress }
     >
       { ({ isFocused }) => (
         <View
@@ -225,7 +227,7 @@ export const ScheduleItem = memo(({
           </View>
         </View>
       ) }
-    </SpatialNavigationFocusableView>
+    </ThemedPressable>
   );
 }, (
   prevProps: ScheduleItemProps, nextProps: ScheduleItemProps
@@ -305,8 +307,8 @@ export const FranchiseItemComponent = memo(({
   }, [link, handleSelectFilm]);
 
   return (
-    <SpatialNavigationFocusableView
-      onSelect={ onSelect }
+    <ThemedPressable
+      onPress={ onSelect }
     >
       { ({ isFocused }) => (
         <View style={ [styles.franchiseItem, isFocused && styles.franchiseItemFocused] }>
@@ -347,8 +349,7 @@ export const FranchiseItemComponent = memo(({
           </ThemedText>
         </View>
       ) }
-
-    </SpatialNavigationFocusableView>
+    </ThemedPressable>
   );
 }, (
   prevProps: FranchiseItemProps, nextProps: FranchiseItemProps
@@ -366,8 +367,8 @@ export const InfoList = memo(({
   const { name, position, link } = list;
 
   return (
-    <SpatialNavigationFocusableView
-      onSelect={ () => {
+    <ThemedPressable
+      onPress={ () => {
         handleSelectCategory(link);
       } }
     >
@@ -388,7 +389,7 @@ export const InfoList = memo(({
           </ThemedText>
         </View>
       ) }
-    </SpatialNavigationFocusableView>
+    </ThemedPressable>
   );
 }, (
   prevProps: InfoListProps, nextProps: InfoListProps
@@ -412,8 +413,8 @@ export const RelatedItem = memo(({
   }, [link, handleSelectFilm]);
 
   return (
-    <SpatialNavigationFocusableView
-      onSelect={ onSelect }
+    <ThemedPressable
+      onPress={ onSelect }
     >
       { ({ isFocused }) => (
         <FilmCard
@@ -423,7 +424,7 @@ export const RelatedItem = memo(({
           stylePoster={ styles.relatedListItemPoster }
         />
       ) }
-    </SpatialNavigationFocusableView>
+    </ThemedPressable>
   );
 }, (
   prevProps: RelatedItemProps, nextProps: RelatedItemProps

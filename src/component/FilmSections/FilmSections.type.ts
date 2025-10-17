@@ -26,6 +26,7 @@ export type FilmSectionsItem = {
 }
 
 export interface FilmSectionsRowProps {
+  index: number;
   row: FilmSectionsItem;
   itemSize?: number;
   numberOfColumns: number;
