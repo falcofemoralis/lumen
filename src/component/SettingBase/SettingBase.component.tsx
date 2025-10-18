@@ -11,7 +11,7 @@ const SettingBaseComponent = ({
   setting,
   onPress,
 }: SettingBaseComponentProps) => {
-  const { title, subtitle, isHidden, isEnabled, IconComponent } = setting;
+  const { title, subtitle, isHidden, isEnabled, IconComponent, iconProps } = setting;
 
   if (isHidden) {
     return null;
@@ -27,8 +27,9 @@ const SettingBaseComponent = ({
         { IconComponent && (
           <IconComponent
             style={ styles.settingIcon }
-            size={ scale(24) }
+            size={ scale(20) }
             color={ isEnabled ? Colors.text : Colors.textSecondary }
+            { ...iconProps }
           />
         ) }
         <View style={ styles.settingContent }>

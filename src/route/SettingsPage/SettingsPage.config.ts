@@ -6,6 +6,7 @@ import {
   Blend,
   Bug,
   BugPlay,
+  Cloud,
   CloudCog,
   FolderCog,
   Globe,
@@ -31,6 +32,8 @@ import {
 import { Linking } from 'react-native';
 import ConfigStore from 'Store/Config.store';
 import NotificationStore from 'Store/Notification.store';
+import { Colors } from 'Style/Colors';
+import { GithubIcon, TelegramIcon } from 'Style/Icons';
 import { restartApp } from 'Util/Device';
 import { setTimeoutSafe } from 'Util/Misc';
 import { onSettingPress, yesNoOptions } from 'Util/Settings';
@@ -302,6 +305,13 @@ export const getSettingsStructure = (
           type: SETTING_TYPE.LINK,
           value: 'link',
           onSettingPress: () => Linking.openURL(TELEGRAM_LINK),
+          IconComponent: TelegramIcon,
+          iconProps: {
+            color: undefined,
+            strokeWidth: 1,
+            fill: Colors.white,
+            absoluteStrokeWidth: true,
+          },
         },
         {
           id: 'github',
@@ -310,6 +320,7 @@ export const getSettingsStructure = (
           type: SETTING_TYPE.LINK,
           value: 'link',
           onSettingPress: () => Linking.openURL(GITHUB_LINK),
+          IconComponent: GithubIcon,
         },
         {
           id: 'version',
@@ -335,6 +346,7 @@ export const getSettingsStructure = (
               }));
             }
           },
+          IconComponent: Info,
         },
         {
           id: 'isFirestore',
@@ -345,6 +357,7 @@ export const getSettingsStructure = (
           options: yesNoOptions,
           onSettingPress,
           isHidden: !ConfigStore.getConfig().securedSettings,
+          IconComponent: Cloud,
         },
       ],
     },

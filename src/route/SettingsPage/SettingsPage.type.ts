@@ -41,4 +41,5 @@ export type SettingItem = {
   ) => void;
   settings?: SettingItem[];
   IconComponent?: React.ComponentType<any>;
+  iconProps?: Record<string, any>;
 }

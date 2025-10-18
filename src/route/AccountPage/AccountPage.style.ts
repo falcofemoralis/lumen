@@ -43,7 +43,7 @@ export const styles = CreateStyles({
     alignItems: 'center',
     textAlign: 'center',
     position: 'absolute',
-    left: 8,
+    left: 22,
     top: 8,
     zIndex: 10,
   },
