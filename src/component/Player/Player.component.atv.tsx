@@ -7,6 +7,7 @@ import PlayerProgressBar from 'Component/PlayerProgressBar';
 import PlayerSubtitles from 'Component/PlayerSubtitles';
 import PlayerVideoSelector from 'Component/PlayerVideoSelector';
 import ThemedDropdown from 'Component/ThemedDropdown';
+import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import { usePlayerContext } from 'Context/PlayerContext';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -322,9 +323,9 @@ export function PlayerComponent({
     action?: () => void,
     ref?: Ref<SpatialNavigationNodeRef>
   ) => (
-    <SpatialNavigationFocusableView
-      ref={ ref }
-      onSelect={ action }
+    <ThemedPressable
+      spatialRef={ ref }
+      onPress={ action }
       onFocus={ () => updateFocusedElement(el) }
     >
       { ({ isFocused }) => (
@@ -340,7 +341,7 @@ export function PlayerComponent({
           />
         </View>
       ) }
-    </SpatialNavigationFocusableView>
+    </ThemedPressable>
   );
 
   const renderTopAction = (
@@ -458,7 +459,7 @@ export function PlayerComponent({
             ...(hideActions ? styles.controlsRowHidden : {}),
           } }
         >
-          { renderBottomAction(Settings2 , openQualitySelector, bottomActionRef) }
+          { renderBottomAction(Settings2, openQualitySelector, bottomActionRef) }
           { isPlaylistSelector && renderBottomAction(ListVideo, openVideoSelector) }
           { subtitles.length > 0 && renderBottomAction(
             selectedSubtitle?.languageCode === '' ? ClosedCaption : ClosedCaptionFilled,

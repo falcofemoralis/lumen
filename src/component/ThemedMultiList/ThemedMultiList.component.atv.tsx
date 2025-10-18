@@ -1,4 +1,5 @@
 import InfoBlock from 'Component/InfoBlock';
+import ThemedPressable from 'Component/ThemedPressable';
 import t from 'i18n/t';
 import { Square, SquareCheck } from 'lucide-react-native';
 import React from 'react';
@@ -8,10 +9,10 @@ import {
 } from 'react-native';
 import {
   DefaultFocus,
-  SpatialNavigationFocusableView,
   SpatialNavigationVirtualizedList,
 } from 'react-tv-space-navigation';
 import { Colors } from 'Style/Colors';
+import { scale } from 'Util/CreateStyles';
 
 import { styles } from './ThemedMultiList.style.atv';
 import { ListItem, ThemedMultiListComponentProps } from './ThemedMultiList.type';
@@ -38,8 +39,9 @@ export const ThemedMultiListComponent = ({
   };
 
   const renderItem = ({ item }: { item: ListItem }) => (
-    <SpatialNavigationFocusableView
-      onSelect={ () => { handleOnChange(item.value, !item.isChecked); } }
+    <ThemedPressable
+      onPress={ () => { handleOnChange(item.value, !item.isChecked); } }
+      withAnimation
     >
       { ({ isFocused }) => (
         <View style={ [
@@ -59,15 +61,17 @@ export const ThemedMultiListComponent = ({
           { item.isChecked ? (
             <SquareCheck
               color={ Colors.primary }
+              size={ scale(20) }
             />
           ) : (
             <Square
               color={ isFocused ? Colors.black : Colors.white }
+              size={ scale(20) }
             />
           ) }
         </View>
       ) }
-    </SpatialNavigationFocusableView>
+    </ThemedPressable>
   );
 
   const renderItems = () => {

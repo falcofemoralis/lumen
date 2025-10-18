@@ -1,1 +1,0 @@
-export const NOTIFICATIONS_ROUTE = 'Notifications';

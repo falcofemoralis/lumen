@@ -72,4 +72,21 @@ export const styles = CreateStyles({
   },
   rightIcon: {
   },
+  // long
+  containerLong: {
+    borderRadius: 44,
+  },
+  containerLongSelected: {
+    backgroundColor: Colors.primary,
+  },
+  containerLongFocused: {
+    backgroundColor: Colors.buttonFocused,
+  },
+  // transparent
+  textLongSelected: {
+    color: Colors.textOnTertiary,
+  },
+  textLongFocused: {
+    color: Colors.textFocused,
+  },
 });

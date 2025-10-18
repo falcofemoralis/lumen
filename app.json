@@ -17,8 +17,8 @@
           "android": {
             "usesCleartextTraffic": true,
             "enableProguardInReleaseBuilds": true,
-            "enableShrinkResourceslnReleaseBuilds": true,
-            "useLegacyPackaging": true
+            "enableShrinkResourcesInReleaseBuilds": true,
+            "useLegacyPackaging": false
           }
         }
       ],

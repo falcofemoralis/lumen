@@ -72,19 +72,18 @@ export function FilmPageComponent({
     text: string,
     onPress?: () => void
   ) => (
-    <SpatialNavigationFocusableView>
-      <ThemedButton
-        variant="outlined"
-        onPress={ onPress }
-        IconComponent={ IconComponent }
-        iconProps={ { size: scale(18) } }
-        style={ styles.actionButton }
-        textStyle={ styles.actionButtonText }
-        disableRootActive
-      >
-        { text }
-      </ThemedButton>
-    </SpatialNavigationFocusableView>
+    <ThemedButton
+      variant="outlined"
+      onPress={ onPress }
+      IconComponent={ IconComponent }
+      iconProps={ { size: scale(18) } }
+      style={ styles.actionButton }
+      textStyle={ styles.actionButtonText }
+      disableRootActive
+      withAnimation
+    >
+      { text }
+    </ThemedButton>
   );
 
   const renderPlayButton = () => {
@@ -344,7 +343,7 @@ export function FilmPageComponent({
             offsetFromStart={ Dimensions.get('window').width / 2 }
           >
             <SpatialNavigationView
-              style={ styles.collection }
+              style={ styles.actorsCollection }
               direction="horizontal"
             >
               { persons.map((actor, index) => (

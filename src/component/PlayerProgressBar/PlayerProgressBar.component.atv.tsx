@@ -7,6 +7,7 @@ import {
 } from 'Component/Player/Player.config';
 import { LongEvent } from 'Component/Player/Player.type';
 import PlayerStoryboard from 'Component/PlayerStoryboard';
+import ThemedPressable from 'Component/ThemedPressable';
 import { usePlayerContext } from 'Context/PlayerContext';
 import { usePlayerProgressContext } from 'Context/PlayerProgressContext';
 import React, {
@@ -234,8 +235,8 @@ export const PlayerProgressBarComponent = ({
 
   // Memoized thumb render to prevent unnecessary re-renders
   const renderThumb = useCallback(() => (
-    <SpatialNavigationFocusableView
-      ref={ thumbRef }
+    <ThemedPressable
+      spatialRef={ thumbRef }
       onFocus={ onFocus }
     >
       { ({ isFocused }) => (
@@ -246,7 +247,7 @@ export const PlayerProgressBarComponent = ({
           ] }
         />
       ) }
-    </SpatialNavigationFocusableView>
+    </ThemedPressable>
   ), [thumbRef, onFocus]);
 
   const renderStoryboard = () => {

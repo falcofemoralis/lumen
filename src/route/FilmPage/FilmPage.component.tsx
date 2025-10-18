@@ -21,6 +21,7 @@ import {
   Play,
   Star,
 } from 'lucide-react-native';
+import { COMMENTS_MODAL_ROUTE, SCHEDULE_MODAL_ROUTE } from 'Navigation/routes';
 import React from 'react';
 import {
   ScrollView,
@@ -36,8 +37,6 @@ import Animated, {
   useSharedValue,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { COMMENTS_MODAL_ROUTE } from 'Route/modal/CommentsModal/CommentsModal.config';
-import { SCHEDULE_MODAL_ROUTE } from 'Route/modal/ScheduleModal/ScheduleModal.config';
 import NotificationStore from 'Store/Notification.store';
 import RouterStore from 'Store/Router.store';
 import { Colors } from 'Style/Colors';
@@ -263,7 +262,7 @@ export function FilmPageComponent({
 
   const renderMiddleActions = () => (
     <View style={ styles.middleActions }>
-      { renderMiddleAction(Star, 'Rate',openNotImplemented) }
+      { renderMiddleAction(Star, 'Rate', openNotImplemented) }
       { renderMiddleAction(Clapperboard, 'Trailer', openNotImplemented) }
       { renderMiddleAction(MessageSquareText, 'Comments', openComments) }
       { renderMiddleAction(isBookmarked(film) ? BookmarkCheck : Bookmark, 'Bookmark', openBookmarks) }

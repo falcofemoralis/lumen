@@ -157,5 +157,18 @@
   "Go to site and create bookmarks group": "Go to site and create bookmarks group",
   "No items": "No items",
   "Player rewind seconds": "Player rewind seconds",
-  "Change player rewind seconds.": "Change player rewind seconds."
+  "Change player rewind seconds.": "Change player rewind seconds.",
+  "Stars": "Stars",
+  "You have %s days left.": "You have %s days left.",
+  "Downloads": "Downloads",
+  "Oops!": "Oops!",
+  "Theres an error": "Theres an error",
+  "Try again": "Try again",
+  "Renew subscription": "Renew subscription",
+  "Get subscription": "Get subscription",
+  "Appearance": "Appearance",
+  "Network": "Network",
+  "Player": "Player",
+  "Debug": "Debug",
+  "About": "About"
 }

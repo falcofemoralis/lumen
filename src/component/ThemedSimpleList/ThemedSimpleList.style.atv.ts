@@ -27,6 +27,8 @@ export const styles = CreateStyles({
     maxHeight: MAX_ITEMS_TO_DISPLAY * ITEM_HEIGHT - 42,
     width: 300,
     overflow: 'hidden',
+    paddingHorizontal: 12,
+    marginHorizontal: -12,
   },
   item: {
     flexDirection: 'row',

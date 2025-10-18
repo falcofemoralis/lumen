@@ -11,6 +11,7 @@ export interface PlayerContainerProps {
   video: FilmVideoInterface;
   film: FilmInterface
   voice: FilmVoiceInterface;
+  quality: string;
 }
 
 export interface PlayerComponentProps {

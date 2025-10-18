@@ -1,10 +1,10 @@
 import ThemedImage from 'Component/ThemedImage';
+import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { View } from 'react-native';
 import {
   DefaultFocus,
-  SpatialNavigationFocusableView,
   SpatialNavigationVirtualizedList,
   SpatialNavigationVirtualizedListRef,
 } from 'react-tv-space-navigation';
@@ -20,13 +20,18 @@ export const ThemedListComponent = ({
   onChange,
 }: ThemedSimpleListComponentProps) => {
   const scrollViewRef = useRef<SpatialNavigationVirtualizedListRef>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const handleLayout = () => {
     setTimeout(() => {
       const itemIdx = data.findIndex((item) => item.value === value);
 
-      if (scrollViewRef.current) {
+      if (scrollViewRef.current && itemIdx !== -1) {
         scrollViewRef.current?.focus(itemIdx);
+
+        if (!isScrolled) {
+          setIsScrolled(true);
+        }
       }
     }, 0);
   };
@@ -50,8 +55,9 @@ export const ThemedListComponent = ({
 
     return (
       <DefaultFocus enable={ isSelected }>
-        <SpatialNavigationFocusableView
-          onSelect={ () => onChange(item) }
+        <ThemedPressable
+          onPress={ () => onChange(item) }
+          withAnimation
         >
           { ({ isFocused }) => (
             <View
@@ -86,28 +92,31 @@ export const ThemedListComponent = ({
               </View>
             </View>
           ) }
-        </SpatialNavigationFocusableView>
+        </ThemedPressable>
       </DefaultFocus>
     );
   }, [value, onChange]);
 
-  const renderList = () => (
-    <View
-      style={ [
-        styles.listItemsWrapper,
-        { height: data.length >= (MAX_ITEMS_TO_DISPLAY - 1) ? undefined : (data.length * styles.item.height) },
-      ] }
-      onLayout={ handleLayout }
-    >
-      <SpatialNavigationVirtualizedList
-        ref={ scrollViewRef }
-        data={ data }
-        renderItem={ renderItem }
-        itemSize={ styles.item.height }
-        orientation="vertical"
-      />
-    </View>
-  );
+  const renderList = () => {
+    return (
+      <View
+        style={ [
+          styles.listItemsWrapper,
+          { height: data.length >= (MAX_ITEMS_TO_DISPLAY - 1) ? undefined : (data.length * styles.item.height) },
+        ] }
+        onLayout={ handleLayout }
+      >
+        <SpatialNavigationVirtualizedList
+          ref={ scrollViewRef }
+          data={ data }
+          renderItem={ renderItem }
+          itemSize={ styles.item.height }
+          orientation="vertical"
+          scrollDuration={ (data.findIndex((item) => item.value === value) > 0 && !isScrolled) ? 0 : undefined }
+        />
+      </View>
+    );
+  };
 
   return (
     <View style={ [styles.listContainer, style] }>

@@ -266,11 +266,11 @@ export function PlayerComponent({
       }
 
       scheduleOnRN(setPlayerRate, 1.5);
-      scheduleOnRN(setLongTapAction,true);
+      scheduleOnRN(setLongTapAction, true);
     })
     .onEnd(() => {
-      scheduleOnRN(setPlayerRate,1);
-      scheduleOnRN(setLongTapAction,false);
+      scheduleOnRN(setPlayerRate, 1);
+      scheduleOnRN(setLongTapAction, false);
     });
 
   const enablePIP = () => {
@@ -677,7 +677,7 @@ export function PlayerComponent({
     <View
       style={ [
         styles.container,
-        isCommentsOpen && { width: (Dimensions.get('window').width) * 0.55 },
+        isCommentsOpen && { width: (Dimensions.get('window').width) * 0.45 },
       ] }
     >
       <VideoView

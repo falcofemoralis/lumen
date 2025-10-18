@@ -1,5 +1,5 @@
+import { ERROR_ROUTE } from 'Navigation/routes';
 import { Platform, ToastAndroid } from 'react-native';
-import { ERROR_ROUTE } from 'Route/ErrorPage/ErrorPage.config';
 
 import { navigationRef } from '../navigation/container';
 

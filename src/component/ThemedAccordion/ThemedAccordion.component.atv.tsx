@@ -1,5 +1,6 @@
 import ThemedOverlay from 'Component/ThemedOverlay';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
+import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import { useRef, useState } from 'react';
 import { View } from 'react-native';
@@ -37,9 +38,7 @@ export const ThemedAccordionComponent = ({
         key={ `group-${id}` }
         style={ styles.groupContainer }
       >
-        <SpatialNavigationFocusableView
-          onSelect={ () => showOverlay(id) }
-        >
+        <ThemedPressable onPress={ () => showOverlay(id) }>
           { ({ isFocused }) => (
             <ThemedText
               style={ [
@@ -50,7 +49,7 @@ export const ThemedAccordionComponent = ({
               { title }
             </ThemedText>
           ) }
-        </SpatialNavigationFocusableView>
+        </ThemedPressable>
       </View>
     );
   };

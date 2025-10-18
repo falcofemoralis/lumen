@@ -8,6 +8,7 @@ export enum SETTING_TYPE {
   SELECT = 'SELECT',
   TEXT = 'TEXT',
   LINK = 'LINK',
+  GROUP = 'GROUP',
 }
 
 export type SettingType = keyof typeof SETTING_TYPE;
@@ -26,12 +27,18 @@ export type SettingItem = {
   id: string;
   type: SettingType;
   title: string;
-  subtitle: string;
+  subtitle?: string;
   value?: string | null;
   options?: SettingItemOption[];
   dependsOn?: SettingItemDependsOn;
   isEnabled?: boolean;
   isHidden?: boolean;
   disableUpdate?: boolean;
-  onPress?: (value: string | null, key: any) => void;
+  onSettingPress?: (
+    value: string | null,
+    key: any,
+    setSettings: React.Dispatch<React.SetStateAction<SettingItem[]>>
+  ) => void;
+  settings?: SettingItem[];
+  IconComponent?: React.ComponentType<any>;
 }

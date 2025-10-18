@@ -1,6 +1,6 @@
+import ThemedPressable from 'Component/ThemedPressable';
 import { useCallback, useRef } from 'react';
 import { TextInput } from 'react-native';
-import { SpatialNavigationFocusableView } from 'react-tv-space-navigation';
 import { Colors } from 'Style/Colors';
 
 import { styles } from './ThemedInput.style.atv';
@@ -11,6 +11,7 @@ export const ThemedInputComponent = ({
   onChangeText,
   style,
   editable = true,
+  withAnimation = false,
   ...props
 }: ThemedInputComponentProps) => {
   const textInputRef = useRef<TextInput>(null);
@@ -27,8 +28,10 @@ export const ThemedInputComponent = ({
   }, [editable]);
 
   return (
-    <SpatialNavigationFocusableView
-      onSelect={ onSelect }
+    <ThemedPressable
+      onPress={ onSelect }
+      onFocus={ onSelect }
+      withAnimation={ withAnimation }
     >
       { ({ isFocused }) => (
         <TextInput
@@ -52,7 +55,7 @@ export const ThemedInputComponent = ({
           { ...props }
         />
       ) }
-    </SpatialNavigationFocusableView>
+    </ThemedPressable>
   );
 };
 

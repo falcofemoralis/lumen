@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import Svg, { Path } from 'react-native-svg';
 
 export const WelcomePageTV = ({ color }: { color: string }) => (

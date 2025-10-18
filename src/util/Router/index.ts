@@ -1,6 +1,4 @@
-import { ACTOR_ROUTE } from 'Route/ActorPage/ActorPage.config';
-import { CATEGORY_ROUTE } from 'Route/CategoryPage/CategoryPage.config';
-import { FILM_ROUTE } from 'Route/FilmPage/FilmPage.config';
+import { ACTOR_ROUTE, CATEGORY_ROUTE, FILM_ROUTE } from 'Navigation/routes';
 import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
 import { FilmCardInterface } from 'Type/FilmCard.interface';

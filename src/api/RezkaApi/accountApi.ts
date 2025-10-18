@@ -25,11 +25,16 @@ const accountApi: RezkaAccountApiInterface = {
 
     const root = await configApi.fetchPage(`/user/${userId}`);
 
+    const premiumNode = root.querySelector('.b-tophead-premuser');
+
     return {
       id: userId,
       name: root.querySelector('head title')?.rawText ?? '',
       email: root.querySelector('#email')?.attributes.value ?? '',
       avatar: root.querySelector('.b-userprofile__avatar_holder img')?.attributes.src ?? '',
+      premiumDays: premiumNode ? parseInt(
+        premiumNode?.rawText.replace('Осталось', '').replace('днейПродлить', '').trim()
+      ) : undefined,
     };
   },
 
@@ -154,10 +159,10 @@ const accountApi: RezkaAccountApiInterface = {
     this.recentItems = null;
   },
 
-  async getNotifications() {
+  async getUserData() {
     const root = await configApi.fetchPage('/');
 
-    return root.querySelectorAll('.b-seriesupdate__block').map((el) => {
+    const notifications = root.querySelectorAll('.b-seriesupdate__block').map((el) => {
       const date = el.querySelector('.b-seriesupdate__block_date')?.rawText ?? '';
 
       const items = el.querySelectorAll('.tracked').map((item) => {
@@ -178,6 +183,16 @@ const accountApi: RezkaAccountApiInterface = {
         items,
       };
     }) as NotificationInterface[];
+
+    const premiumNode = root.querySelector('.b-tophead-premuser');
+    const premiumDays = premiumNode ? parseInt(
+      premiumNode?.rawText.replace('Осталось', '').replace('днейПродлить', '').trim()
+    ) : undefined;
+
+    return {
+      notifications,
+      premiumDays,
+    };
   },
 
   async saveScheduleWatch(id: string) {

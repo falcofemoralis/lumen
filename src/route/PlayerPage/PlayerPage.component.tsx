@@ -1,14 +1,15 @@
 import Page from 'Component/Page';
 import Player from 'Component/Player';
 import { useNavigationContext } from 'Context/NavigationContext';
+import { PLAYER_ROUTE } from 'Navigation/routes';
 import { useEffect } from 'react';
 import ConfigStore from 'Store/Config.store';
 import RouterStore from 'Store/Router.store';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
+import { getPlayerQuality } from 'Util/Player';
 
-import { PLAYER_ROUTE } from './PlayerPage.config';
 import { PlayerPageComponentProps } from './PlayerPage.type';
 
 export const PlayerPage = () => {
@@ -48,6 +49,7 @@ export function PlayerPageComponent({ video, film, voice }: PlayerPageComponentP
         video={ video }
         film={ film }
         voice={ voice }
+        quality={ getPlayerQuality(video) }
       />
     </Page>
   );

@@ -8,9 +8,6 @@ export const INFO_HEIGHT = 65;
 export const INFO_PADDING_HORIZONTAL = 8;
 export const INFO_PADDING_VERTICAL = 4;
 
-export const DEFAULT_SCALE = 1;
-export const FOCUSED_SCALE = 1.1;
-
 export const calculateCardDimensions = (
   numberOfColumns: number,
   gap?: number,
@@ -34,17 +31,28 @@ export const styles = CreateStyles({
     flex: 1,
     flexDirection: 'column',
     width: '100%',
+    borderRadius: 8,
+    overflow: 'hidden',
     transform: [{ scale: 1 }],
     transitionProperty: 'transform',
     transitionDuration: '250ms',
   },
   cardFocused: {
+    borderRadius: 8,
     transform: [{ scale: 1.1 }],
   },
   posterWrapper: {
+    position: 'relative',
     width: '100%',
     height: 'auto',
     flexDirection: 'column',
+    borderBottomRightRadius: 8,
+    borderBottomLeftRadius: 8,
+    overflow: 'hidden',
+  },
+  posterWrapperFocused: {
+    borderBottomRightRadius: 0,
+    borderBottomLeftRadius: 0,
   },
   poster: {
     aspectRatio: '166 / 250',
@@ -75,20 +83,26 @@ export const styles = CreateStyles({
   subtitleFocused: {
     color: Colors.textFocused,
   },
-  typeText: {
+  additionContainer: {
     position: 'absolute',
     top: 0,
     right: 0,
+    zIndex: 10,
+    width: '100%',
+    height: '100%',
+    justifyContent: 'space-between',
+  },
+  typeText: {
     paddingHorizontal: 4,
     paddingVertical: 1,
-    fontSize: 10,
+    fontSize: 12,
+    alignSelf: 'flex-end',
   },
   filmAdditionalText: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
     paddingHorizontal: 4,
     paddingVertical: 1,
+    fontSize: 12,
+    alignSelf: 'flex-start',
   },
   posterPendingRelease: {
     opacity: 0.5,

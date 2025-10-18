@@ -1,5 +1,4 @@
 import { useAppUpdaterContext } from 'Context/AppUpdaterContext';
-import { useNotificationsContext } from 'Context/NotificationsContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import * as StatusBar from 'expo-status-bar';
 import { useAwake } from 'Hooks/useAwake';
@@ -10,7 +9,7 @@ import StorageStore from 'Store/Storage.store';
 
 export const Root = ({ children }: { children: React.ReactNode }) => {
   const { isSignedIn } = useServiceContext();
-  const { getNotifications } = useNotificationsContext();
+  const { fetchUserData } = useServiceContext();
   const { checkVersion } = useAppUpdaterContext();
   const { startAwake } = useAwake();
   const config = useMMKVString(DEVICE_CONFIG, StorageStore.getConfigStorage());
@@ -21,9 +20,9 @@ export const Root = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if(isSignedIn) {
-      getNotifications();
+      fetchUserData();
     }
-  }, [isSignedIn, getNotifications]);
+  }, [isSignedIn, fetchUserData]);
 
   useEffect(() => {
     return startAwake();

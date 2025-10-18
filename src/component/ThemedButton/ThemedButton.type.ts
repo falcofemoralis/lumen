@@ -2,7 +2,7 @@ import {
   ImageStyle, StyleProp, TextStyle, ViewStyle,
 } from 'react-native';
 
-export type Variant = 'filled' | 'outlined';
+export type Variant = 'filled' | 'outlined' | 'long' | 'transparent';
 
 export interface ThemedButtonProps {
   children?: React.ReactNode;
@@ -21,4 +21,6 @@ export interface ThemedButtonProps {
   disableRootActive?: boolean;
   disabled?: boolean;
   additionalElement?: (isFocused: boolean, isSelected: boolean) => React.ReactNode;
+  withAnimation?: boolean;
+  zoomScale?: number;
 }

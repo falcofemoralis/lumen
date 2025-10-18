@@ -2,12 +2,8 @@ import { CommonActions } from '@react-navigation/native';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useProfile } from 'Hooks/useProfile';
 import { withTV } from 'Hooks/withTV';
+import { ACCOUNT_ROUTE, BOOKMARKS_ROUTE, NOTIFICATIONS_ROUTE, RECENT_ROUTE } from 'Navigation/routes';
 import { useCallback } from 'react';
-import { ACCOUNT_ROUTE } from 'Route/AccountPage/AccountPage.config';
-import { BOOKMARKS_ROUTE } from 'Route/BookmarksPage/BookmarksPage.config';
-import { NOTIFICATIONS_ROUTE } from 'Route/NotificationsPage/NotificationsPage.config';
-import { RECENT_ROUTE } from 'Route/RecentPage/RecentPage.config';
-import ConfigStore from 'Store/Config.store';
 
 import NavigationBarComponent from './NavigationBar.component';
 import NavigationBarComponentTV from './NavigationBar.component.atv';
