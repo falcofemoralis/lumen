@@ -50,6 +50,7 @@ export function LoginFormComponent({
             style={ styles.input }
             placeholder={ t('Login or email') }
             onChangeText={ (text) => { loginRef.current.username = text; } }
+            withAnimation
           />
         </View>
         <View style={ styles.inputContainer }>
@@ -58,6 +59,7 @@ export function LoginFormComponent({
             placeholder={ t('Password') }
             onChangeText={ (text) => { loginRef.current.password = text; } }
             secureTextEntry
+            withAnimation
           />
         </View>
         <ThemedButton
@@ -66,6 +68,7 @@ export function LoginFormComponent({
             loginRef.current.username,
             loginRef.current.password
           ) }
+          withAnimation
         >
           { t('Sign in') }
         </ThemedButton>

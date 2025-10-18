@@ -156,6 +156,43 @@ export default function ThemedButton({
     </View>
   );
 
+  const renderTransparent = (isFocused: boolean) => (
+    <View
+      style={ [
+        styles.container,
+        styles.containerOutlined,
+        style,
+        isFocused && styleFocused,
+      ] }
+    >
+      { IconComponent && (
+        <IconComponent
+          style={ [
+            styles.iconFilled,
+            isSelected && styles.iconFilledSelected,
+            isFocused && styles.iconFilledFocused,
+          ] }
+          size={ scale(18) }
+          color={ isFocused ? Colors.black : Colors.white }
+          { ...iconProps }
+        />
+      ) }
+      { children && (
+        <Text
+          style={ [
+            styles.text,
+            styles.textOutlined,
+            textStyle,
+            isSelected && styles.textLongSelected,
+            isFocused && styles.textLongFocused,
+          ] }
+        >
+          { children }
+        </Text>
+      ) }
+    </View>
+  );
+
   const renderButton = (isFocused: boolean) => {
     if (variant === 'outlined') {
       return renderOutlined(isFocused);
@@ -163,6 +200,10 @@ export default function ThemedButton({
 
     if (variant === 'long') {
       return renderLong(isFocused);
+    }
+
+    if (variant === 'transparent') {
+      return renderTransparent(isFocused);
     }
 
     return renderFilled(isFocused);

@@ -82,4 +82,11 @@ export const styles = CreateStyles({
   containerLongFocused: {
     backgroundColor: Colors.buttonFocused,
   },
+  // transparent
+  textLongSelected: {
+    color: Colors.textOnTertiary,
+  },
+  textLongFocused: {
+    color: Colors.textFocused,
+  },
 });
