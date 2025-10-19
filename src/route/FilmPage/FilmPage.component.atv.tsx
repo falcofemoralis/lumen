@@ -410,12 +410,14 @@ export function FilmPageComponent({
             </DefaultFocus>
           </SpatialNavigationScrollView>
         </View>
-        <ThemedButton
-          onPress={ () => scheduleOverlayRef?.current?.open() }
-          style={ styles.scheduleViewAll }
-        >
-          { t('View full schedule') }
-        </ThemedButton>
+        <View style={ { width: '100%' } }>
+          <ThemedButton
+            onPress={ () => scheduleOverlayRef?.current?.open() }
+            style={ styles.scheduleViewAll }
+          >
+            { t('View full schedule') }
+          </ThemedButton>
+        </View>
       </Section>
     );
   };

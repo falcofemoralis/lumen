@@ -201,7 +201,7 @@ export const styles = CreateStyles({
     justifyContent: 'space-between',
   },
   scheduleItemReleaseWrapper: {
-    width: 48,
+    width: 80,
     justifyContent: 'center',
   },
   scheduleItemText: {
@@ -231,7 +231,7 @@ export const styles = CreateStyles({
   },
   scheduleViewAll: {
     marginTop: 4,
-    width: '25%',
+    width: '35%',
   },
   scheduleOverlay: {
     width: '50%',

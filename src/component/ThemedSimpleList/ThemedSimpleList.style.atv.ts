@@ -9,6 +9,7 @@ export const styles = CreateStyles({
     justifyContent: 'center',
     alignItems: 'center',
     paddingBottom: 10,
+    marginBottom: 10,
     borderBottomColor: Colors.divider,
     borderBottomWidth: 1,
   },

@@ -39,6 +39,7 @@ export const PlayerVideoRatingComponent = ({
         } }
         onPress={ () => ratingOverlayRef.current?.open() }
         style={ styles.voiceRatingInput }
+        withAnimation
       />
     );
   };
