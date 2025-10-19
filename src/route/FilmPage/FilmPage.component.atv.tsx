@@ -14,7 +14,6 @@ import React, { useState } from 'react';
 import { Dimensions, useWindowDimensions, View } from 'react-native';
 import {
   DefaultFocus,
-  SpatialNavigationFocusableView,
   SpatialNavigationScrollView,
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
@@ -30,7 +29,13 @@ import { styles } from './FilmPage.style.atv';
 import { FilmPageThumbnail } from './FilmPage.thumbnail.atv';
 import { FilmPageComponentProps } from './FilmPage.type';
 import {
-  ActorView, FranchiseItemComponent, InfoList, RelatedItem, ScheduleItem, ScheduleOverlay, Section,
+  ActorView,
+  FranchiseItemComponent,
+  InfoList,
+  RelatedItem,
+  ScheduleItem,
+  ScheduleOverlay,
+  Section,
 } from './FilmPageElements.atv';
 
 export function FilmPageComponent({
