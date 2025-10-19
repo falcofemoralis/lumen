@@ -7,6 +7,7 @@ import {
 
 import { AppUpdaterProvider } from './AppUpdaterContext';
 import { NavigationProvider } from './NavigationContext';
+import { OverlayProvider } from './OverlayContext';
 import { PlayerProvider } from './PlayerContext';
 import { PlayerProgressProvider } from './PlayerProgressContext';
 import { ServiceProvider } from './ServiceContext';
@@ -32,7 +33,8 @@ export const AppProviders = composeProviders(
   ServiceProvider,
   PlayerProvider,
   PlayerProgressProvider,
-  AppUpdaterProvider
+  AppUpdaterProvider,
+  OverlayProvider
 );
 
 export const AppProvider = ({ children }: { children: React.ReactNode }) => {

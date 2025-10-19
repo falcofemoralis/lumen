@@ -5,7 +5,8 @@ import SettingLink from 'Component/SettingLink';
 import SettingSelect from 'Component/SettingSelect';
 import SettingText from 'Component/SettingText';
 import { useNavigationContext } from 'Context/NavigationContext';
-import { useEffect, useState } from 'react';
+import { useOverlayContext } from 'Context/OverlayContext';
+import { useEffect, useRef, useState } from 'react';
 import { useWindowDimensions, View } from 'react-native';
 import {
   DefaultFocus,
@@ -35,31 +36,25 @@ const SettingGroupPage = ({
   renderSetting: (setting: SettingItem) => Record<SettingType, React.ReactNode>
 }) => {
   const { height } = useWindowDimensions();
-  const { isLocked, lock, unlock } = useLockSpatialNavigation();
+  const { lock, unlock } = useLockSpatialNavigation();
+  const { isOverlayOpen } = useOverlayContext();
+  const prevIsOverlayOpen = useRef(isOverlayOpen);
 
   useEffect(() => {
-    const keyDownListener = (type: SupportedKeys) => {
-      if (!isActive) {
-        return false;
-      }
+    if (!isActive) {
+      return;
+    }
 
-      if (type === SupportedKeys.ENTER && !isLocked) {
+    if (prevIsOverlayOpen.current !== isOverlayOpen) {
+      if (prevIsOverlayOpen.current) {
+        unlock();
+      } else {
         lock();
       }
 
-      if ((type === SupportedKeys.BACK || type === SupportedKeys.ENTER) && isLocked) {
-        unlock();
-      }
-
-      return false;
-    };
-
-    RemoteControlManager.addKeydownListener(keyDownListener);
-
-    return () => {
-      RemoteControlManager.removeKeydownListener(keyDownListener);
-    };
-  }, [isActive, isLocked, lock, unlock]);
+      prevIsOverlayOpen.current = isOverlayOpen;
+    }
+  }, [isActive, isOverlayOpen, lock, unlock]);
 
   return (
     <SpatialNavigationView
