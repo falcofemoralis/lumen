@@ -45,12 +45,10 @@ const SettingGroupPage = ({
 
       if (type === SupportedKeys.ENTER) {
         lock();
-        console.log('lock tab');
       }
 
       if (type === SupportedKeys.BACK) {
         unlock();
-        console.log('unlock tab');
       }
 
       return false;
@@ -102,14 +100,11 @@ export const SettingsStructureComponent = ({
         if (type === SupportedKeys.RIGHT && !isGroupFocused) {
           setIsGroupFocused(true);
           lock();
-          console.log('lock page');
         }
 
         if (type === SupportedKeys.LEFT && isGroupFocused) {
           setIsGroupFocused(false);
           unlock();
-
-          console.log('unlock page');
         }
       }
 
@@ -174,8 +169,6 @@ export const SettingsStructureComponent = ({
           </SpatialNavigationView>
         </DefaultFocus>
         { settings.map(setting => {
-          console.log('is active', isGroupFocused, setting.id, settingsGroupId);
-
           const isActive = isGroupFocused && setting.id === settingsGroupId;
 
           return (
