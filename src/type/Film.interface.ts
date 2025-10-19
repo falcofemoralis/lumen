@@ -57,4 +57,5 @@ export interface FilmInterface {
 
   // flags
   isPendingRelease?: boolean;
+  isRestricted?: boolean;
 }

@@ -9,7 +9,7 @@ import ThemedImage from 'Component/ThemedImage';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedText from 'Component/ThemedText';
 import t from 'i18n/t';
-import { Bookmark, BookmarkCheck, Clapperboard, Clock, MessageSquareText, Play } from 'lucide-react-native';
+import { Bookmark, BookmarkCheck, Clapperboard, Clock, MessageSquareText, Play, ShieldOff } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { Dimensions, useWindowDimensions, View } from 'react-native';
 import {
@@ -92,7 +92,7 @@ export function FilmPageComponent({
   );
 
   const renderPlayButton = () => {
-    const { isPendingRelease } = film;
+    const { isPendingRelease, isRestricted } = film;
 
     if (isPendingRelease) {
       return renderAction(
@@ -100,6 +100,16 @@ export function FilmPageComponent({
         t('Coming Soon'),
         () => {
           NotificationStore.displayMessage(t('We are waiting for the film in the good quality'));
+        }
+      );
+    }
+
+    if (isRestricted) {
+      return renderAction(
+        ShieldOff,
+        t('Not available'),
+        () => {
+          NotificationStore.displayMessage(t('Unfortunately, this video is not available in your region'));
         }
       );
     }

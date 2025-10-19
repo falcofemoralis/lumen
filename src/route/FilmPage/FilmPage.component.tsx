@@ -19,6 +19,7 @@ import {
   Forward,
   MessageSquareText,
   Play,
+  ShieldOff,
   Star,
 } from 'lucide-react-native';
 import { COMMENTS_MODAL_ROUTE, SCHEDULE_MODAL_ROUTE } from 'Navigation/routes';
@@ -271,7 +272,7 @@ export function FilmPageComponent({
   );
 
   const renderPlay = () => {
-    const { isPendingRelease } = film;
+    const { isPendingRelease, isRestricted } = film;
 
     if (isPendingRelease) {
       return (
@@ -283,6 +284,21 @@ export function FilmPageComponent({
           />
           <ThemedText style={ styles.pendingReleaseText }>
             { t('We are waiting for the film in the good quality') }
+          </ThemedText>
+        </Wrapper>
+      );
+    }
+
+    if (isRestricted) {
+      return (
+        <Wrapper style={ styles.pendingRelease }>
+          <ShieldOff
+            style={ styles.pendingReleaseIcon }
+            size={ scale(24) }
+            color={ Colors.white }
+          />
+          <ThemedText style={ styles.pendingReleaseText }>
+            { t('Unfortunately, this video is not available in your region') }
           </ThemedText>
         </Wrapper>
       );

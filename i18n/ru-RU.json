@@ -171,5 +171,7 @@
   "Network": "Сетевые настройки",
   "Player": "Плеер",
   "Debug": "Отладка",
-  "About": "О приложении"
+  "About": "О приложении",
+  "Not available": "Не доступно",
+  "Unfortunately, this video is not available in your region": "К сожалению, это видео не доступно в вашем регионе"
 }

@@ -170,5 +170,7 @@
   "Network": "Network",
   "Player": "Player",
   "Debug": "Debug",
-  "About": "About"
+  "About": "About",
+  "Not available": "Not available",
+  "Unfortunately, this video is not available in your region": "Unfortunately, this video is not available in your region"
 }
