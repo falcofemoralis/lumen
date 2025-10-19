@@ -19,7 +19,6 @@ import React, {
 import { View } from 'react-native';
 import { Slider } from 'react-native-awesome-slider';
 import { useSharedValue } from 'react-native-reanimated';
-import { SpatialNavigationFocusableView } from 'react-tv-space-navigation';
 import ConfigStore from 'Store/Config.store';
 import { Colors } from 'Style/Colors';
 import { noopFn } from 'Util/Function';

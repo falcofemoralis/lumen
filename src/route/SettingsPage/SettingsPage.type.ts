@@ -42,4 +42,5 @@ export type SettingItem = {
   settings?: SettingItem[];
   IconComponent?: React.ComponentType<any>;
   iconProps?: Record<string, any>;
+  iconPropsFocused?: Record<string, any>;
 }

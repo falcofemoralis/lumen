@@ -10,6 +10,10 @@ export const styles = CreateStyles({
     width: '50%',
     height: '100%',
   },
+  tabContainerHidden: {
+    height: 0,
+    width: 0,
+  },
   tab: {
     flexDirection: 'column',
     height: '100%',

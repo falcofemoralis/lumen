@@ -312,6 +312,9 @@ export const getSettingsStructure = (
             fill: Colors.white,
             absoluteStrokeWidth: true,
           },
+          iconPropsFocused: {
+            fill: Colors.black,
+          },
         },
         {
           id: 'github',

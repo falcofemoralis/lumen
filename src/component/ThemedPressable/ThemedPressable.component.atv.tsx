@@ -39,7 +39,7 @@ export const ThemedPressableComponent = ({
           style={ [
             styles.item,
             style,
-            isFocused && {
+            isFocused && isRootActive && {
               transform: [{ scale: zoomScale }],
             },
           ] }

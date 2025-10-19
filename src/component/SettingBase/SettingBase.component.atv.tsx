@@ -12,7 +12,7 @@ const SettingBaseComponent = ({
   onPress,
   onFocus,
 }: SettingBaseComponentProps) => {
-  const { title, subtitle, isHidden, isEnabled, IconComponent, iconProps } = setting;
+  const { title, subtitle, isHidden, isEnabled, IconComponent, iconProps, iconPropsFocused } = setting;
 
   if (isHidden) {
     return null;
@@ -38,6 +38,7 @@ const SettingBaseComponent = ({
                 size={ scale(24) }
                 color={ isFocused && isRootActive ? Colors.textFocused : Colors.text }
                 { ...iconProps }
+                { ...(isFocused && isRootActive ? iconPropsFocused : undefined) }
               />
             ) }
             <View style={ styles.settingContent }>
