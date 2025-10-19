@@ -41,6 +41,7 @@ export interface ConfigApiInterface {
   defaultCDNs: string[];
   defaultUserAgent: string;
   officialMirrors: DropdownItem[];
+  officialShareLink: string;
   config: ServiceConfigInterface | null;
   loadConfig(): ServiceConfigInterface;
   updateConfig(key: keyof ServiceConfigInterface, value: string): Promise<void>;

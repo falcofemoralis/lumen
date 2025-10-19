@@ -49,6 +49,7 @@ const configApi: ConfigApiInterface = {
       value: 'https://stepnet.video',
     },
   ],
+  officialShareLink: 'https://rzk.link',
   config: null,
 
   loadConfig() {

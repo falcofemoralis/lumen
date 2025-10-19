@@ -1,6 +1,5 @@
 import { CommonActions } from '@react-navigation/native';
 import { useServiceContext } from 'Context/ServiceContext';
-import { useProfile } from 'Hooks/useProfile';
 import { withTV } from 'Hooks/withTV';
 import { ACCOUNT_ROUTE, BOOKMARKS_ROUTE, NOTIFICATIONS_ROUTE, RECENT_ROUTE } from 'Navigation/routes';
 import { useCallback } from 'react';
@@ -10,7 +9,7 @@ import NavigationBarComponentTV from './NavigationBar.component.atv';
 import { NavigationBarContainerProps } from './NavigationBar.type';
 
 export function NavigationBarContainer(props: NavigationBarContainerProps) {
-  const [profile] = useProfile();
+  const { profile } = useServiceContext();
   const { isSignedIn } = useServiceContext();
   const { navigation, state } = props;
 

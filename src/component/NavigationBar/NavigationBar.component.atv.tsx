@@ -15,7 +15,6 @@ import Animated from 'react-native-reanimated';
 import {
   DefaultFocus,
   Directions,
-  SpatialNavigationFocusableView,
   SpatialNavigationRoot,
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
