@@ -27,13 +27,13 @@ export const styles = CreateStyles({
   },
   activeElement: {
     height: '100%',
-    backgroundColor: Colors.white,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
     position: 'absolute',
     left: 0,
     top: 0,
     borderRadius: 99,
     transitionProperty: 'all',
-    transitionDuration: '100ms',
+    transitionDuration: '200ms',
     transitionTimingFunction: 'ease-in-out',
   },
   activeElementUnfocused: {

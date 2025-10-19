@@ -10,7 +10,6 @@ export const styles = CreateStyles({
     flexDirection: 'row',
     justifyContent: 'center',
     gap: 10,
-    paddingTop: 4,
   },
   actionButton: {
     paddingVertical: 6,

@@ -35,7 +35,7 @@ const SettingGroupPage = ({
   renderSetting: (setting: SettingItem) => Record<SettingType, React.ReactNode>
 }) => {
   const { height } = useWindowDimensions();
-  const { lock, unlock } = useLockSpatialNavigation();
+  const { isLocked, lock, unlock } = useLockSpatialNavigation();
 
   useEffect(() => {
     const keyDownListener = (type: SupportedKeys) => {
@@ -43,11 +43,11 @@ const SettingGroupPage = ({
         return false;
       }
 
-      if (type === SupportedKeys.ENTER) {
+      if (type === SupportedKeys.ENTER && !isLocked) {
         lock();
       }
 
-      if (type === SupportedKeys.BACK) {
+      if ((type === SupportedKeys.BACK || type === SupportedKeys.ENTER) && isLocked) {
         unlock();
       }
 
@@ -59,7 +59,7 @@ const SettingGroupPage = ({
     return () => {
       RemoteControlManager.removeKeydownListener(keyDownListener);
     };
-  }, [isActive, lock, unlock]);
+  }, [isActive, isLocked, lock, unlock]);
 
   return (
     <SpatialNavigationView

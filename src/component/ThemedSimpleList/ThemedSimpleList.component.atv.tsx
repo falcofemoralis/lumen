@@ -57,7 +57,6 @@ export const ThemedListComponent = ({
       <DefaultFocus enable={ isSelected }>
         <ThemedPressable
           onPress={ () => onChange(item) }
-          withAnimation
         >
           { ({ isFocused }) => (
             <View
@@ -104,7 +103,7 @@ export const ThemedListComponent = ({
           styles.listItemsWrapper,
           { height: data.length >= (MAX_ITEMS_TO_DISPLAY - 1)
             ? undefined
-            : (data.length * styles.item.height) + styles.listItemsWrapper.paddingBlock,
+            : (data.length * styles.item.height),
           },
         ] }
         onLayout={ handleLayout }

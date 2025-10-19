@@ -228,7 +228,11 @@ export function FilmPagerComponent({
               if (rowRef.current !== row) {
                 canNavigateMenuRef.current = false;
                 rowRef.current = row;
-                setCurrentRow(row);
+
+                if (currentRow > 0) {
+                  setCurrentRow(row);
+                }
+
                 onRowFocus(row);
               }
             } }

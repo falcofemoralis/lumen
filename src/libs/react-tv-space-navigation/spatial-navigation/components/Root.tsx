@@ -59,7 +59,7 @@ export const SpatialNavigationRoot = ({
 
   return (
     <SpatialNavigatorContext.Provider value={spatialNavigator}>
-      <LockSpatialNavigationContext.Provider value={lockActions}>
+      <LockSpatialNavigationContext.Provider value={{ ...lockActions, isLocked }}>
         <IsRootActiveContext.Provider value={isRootActive}>
           <ParentIdContext.Provider value={ROOT_ID}>{children}</ParentIdContext.Provider>
         </IsRootActiveContext.Provider>

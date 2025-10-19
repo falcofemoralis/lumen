@@ -41,7 +41,6 @@ export const ThemedMultiListComponent = ({
   const renderItem = ({ item }: { item: ListItem }) => (
     <ThemedPressable
       onPress={ () => { handleOnChange(item.value, !item.isChecked); } }
-      withAnimation
     >
       { ({ isFocused }) => (
         <View style={ [

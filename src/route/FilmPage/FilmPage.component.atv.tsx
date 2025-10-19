@@ -85,7 +85,6 @@ export function FilmPageComponent({
       style={ styles.actionButton }
       textStyle={ styles.actionButtonText }
       disableRootActive
-      withAnimation
     >
       { text }
     </ThemedButton>
