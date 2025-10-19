@@ -102,7 +102,10 @@ export const ThemedListComponent = ({
       <View
         style={ [
           styles.listItemsWrapper,
-          { height: data.length >= (MAX_ITEMS_TO_DISPLAY - 1) ? undefined : (data.length * styles.item.height) },
+          { height: data.length >= (MAX_ITEMS_TO_DISPLAY - 1)
+            ? undefined
+            : (data.length * styles.item.height) + styles.listItemsWrapper.paddingBlock,
+          },
         ] }
         onLayout={ handleLayout }
       >
@@ -112,6 +115,7 @@ export const ThemedListComponent = ({
           renderItem={ renderItem }
           itemSize={ styles.item.height }
           orientation="vertical"
+          scrollBehavior={ data.length >= (MAX_ITEMS_TO_DISPLAY - 1) ? undefined : 'stick-to-end' }
           scrollDuration={ (data.findIndex((item) => item.value === value) > 0 && !isScrolled) ? 0 : undefined }
         />
       </View>

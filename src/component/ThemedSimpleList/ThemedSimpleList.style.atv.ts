@@ -9,7 +9,6 @@ export const styles = CreateStyles({
     justifyContent: 'center',
     alignItems: 'center',
     paddingBottom: 10,
-    marginBottom: 10,
     borderBottomColor: Colors.divider,
     borderBottomWidth: 1,
   },
@@ -25,11 +24,12 @@ export const styles = CreateStyles({
   },
   listItemsWrapper: {
     flexDirection: 'column',
-    maxHeight: MAX_ITEMS_TO_DISPLAY * ITEM_HEIGHT - 42,
+    maxHeight: MAX_ITEMS_TO_DISPLAY * ITEM_HEIGHT - 42 + 10,
     width: 300,
     overflow: 'hidden',
     paddingHorizontal: 12,
     marginHorizontal: -12,
+    paddingBlock: 10,
   },
   item: {
     flexDirection: 'row',
