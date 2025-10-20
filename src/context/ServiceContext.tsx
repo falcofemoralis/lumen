@@ -116,7 +116,10 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
     const value = await currentService.getProfile();
 
     StorageStore.getMiscStorage().set(PROFILE_STORAGE, JSON.stringify(value));
-    setProfile(value);
+    setProfile({
+      ...value,
+      avatar: currentService.getPhotoUrl(value.avatar),
+    });
   }, [currentService]);
 
   /**

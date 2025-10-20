@@ -33,13 +33,20 @@ const checkEnabled = (setting: SettingItem, allSettings: SettingItem[]) => {
 };
 
 export const updateSettings = (settings: SettingItem[], value?: string, id?: string) => {
-  return settings.map((st) => ({
+  const settingsWithNewValue = settings.map((st) => ({
     ...st,
     value: st.id === id ? value : st.value,
-    isEnabled: checkEnabled(st, settings),
     settings: st.settings?.map((s) => ({
       ...s,
       value: s.id === id ? value : s.value,
+    })),
+  }));
+
+  return settingsWithNewValue.map((st) => ({
+    ...st,
+    isEnabled: checkEnabled(st, settingsWithNewValue),
+    settings: st.settings?.map((s) => ({
+      ...s,
       isEnabled: checkEnabled(s, st.settings ?? []),
     })),
   }));
