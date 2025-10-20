@@ -71,6 +71,7 @@ export function FilmPagerComponent({
   const debounce = useRef<NodeJS.Timeout | null>(null);
   const tabWidthsRef = useRef<number[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [activePage, setActivePage] = useState(0);
 
   useEffect(() => {
     const keyDownListener = (type: SupportedKeys) => {
@@ -124,12 +125,12 @@ export function FilmPagerComponent({
     };
   });
 
-  const getSelectedPagerItem = () => pagerItems[activeIndex] ?? pagerItems[0];
-
   const handleMenuItemChange = (pagerItem: PagerItemInterface) => {
     const { key } = pagerItem;
 
     if (key !== pagerItems[activeIndex].key) {
+      const idx = pagerItems.findIndex((item) => item.key === key);
+
       setActiveIndex(pagerItems.findIndex((item) => item.key === key));
 
       if (debounce.current) {
@@ -137,10 +138,12 @@ export function FilmPagerComponent({
       }
 
       debounce.current = setTimeoutSafe(async () => {
+        setActivePage(idx);
+
         if (!pagerItem.films) {
           await onPreLoad(pagerItem);
         }
-      }, 400);
+      }, 600);
     }
   };
 
@@ -148,15 +151,12 @@ export function FilmPagerComponent({
     const {
       menuItem: { title },
     } = item;
-    const {
-      menuItem: { title: selectedTitle },
-    } = getSelectedPagerItem();
 
     return (
       <TabButton
         key={ title }
         title={ title }
-        isActive={ selectedTitle === title }
+        isActive={ activeIndex === idx }
         onFocus={ () => handleMenuItemChange(item) }
         onLayout={ (width) => tabWidthsRef.current[idx] = width }
       />
@@ -215,7 +215,7 @@ export function FilmPagerComponent({
   };
 
   const renderPage = () => {
-    const pagerItem = getSelectedPagerItem();
+    const pagerItem = pagerItems[activePage];
     const { films } = pagerItem;
 
     return (

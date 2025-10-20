@@ -32,8 +32,8 @@ export const styles = CreateStyles({
     left: 0,
     top: 0,
     borderRadius: 99,
-    transitionProperty: 'all',
-    transitionDuration: '200ms',
+    transitionProperty: ['width', 'transform'],
+    transitionDuration: '250ms',
     transitionTimingFunction: 'ease-in-out',
   },
   activeElementUnfocused: {
