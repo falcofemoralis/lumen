@@ -4,13 +4,14 @@ import ThemedButton from 'Component/ThemedButton';
 import ThemedGrid from 'Component/ThemedGrid';
 import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
 import ThemedImage from 'Component/ThemedImage';
+import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import t from 'i18n/t';
 import { Trash2 } from 'lucide-react-native';
 import React, { useCallback } from 'react';
 import { useWindowDimensions, View } from 'react-native';
 import Animated from 'react-native-reanimated';
-import { DefaultFocus, SpatialNavigationFocusableView } from 'react-tv-space-navigation';
+import { DefaultFocus } from 'react-tv-space-navigation';
 import { calculateLayoutWidth } from 'Style/Layout';
 
 import { NUMBER_OF_COLUMNS_TV } from './RecentPage.config';
@@ -60,12 +61,15 @@ export function RecentPageComponent({
           style={ styles.deleteButton }
           IconComponent={ Trash2 }
           onPress={ () => removeItem(item) }
+          withAnimation
         />
       );
     }
 
     return (
-      <SpatialNavigationFocusableView onSelect={ () => handleOnPress(item) }>
+      <ThemedPressable
+        onPress={ () => handleOnPress(item) }
+      >
         { ({ isFocused }) => {
           return (
             <Animated.View
@@ -102,7 +106,7 @@ export function RecentPageComponent({
             </Animated.View>
           );
         } }
-      </SpatialNavigationFocusableView>
+      </ThemedPressable>
     );
   }, [handleOnPress]);
 

@@ -58,12 +58,14 @@ export function SearchPageComponent({
           IconComponent={ Mic }
           onPress={ handleStartRecognition }
           iconProps={ recognizing ? { color: Colors.white } : undefined }
+          withAnimation
         />
         { renderSearchBar() }
         <ThemedButton
           style={ styles.actionBtn }
           IconComponent={ Search }
           onPress={ handleApplySearch }
+          withAnimation
         />
       </SpatialNavigationView>
     </DefaultFocus>

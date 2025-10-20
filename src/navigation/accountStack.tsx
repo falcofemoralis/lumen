@@ -1,8 +1,7 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { NOTIFICATIONS_ROUTE, SETTINGS_ROUTE } from 'Navigation/routes';
 import NotificationsPage from 'Route/NotificationsPage';
-import { NOTIFICATIONS_ROUTE } from 'Route/NotificationsPage/NotificationsPage.config';
 import SettingsPage from 'Route/SettingsPage';
-import { SETTINGS_ROUTE } from 'Route/SettingsPage/SettingsPage.config';
 import { DEFAULT_ROUTE_ANIMATION } from 'Style/Animations';
 import { Colors } from 'Style/Colors';
 

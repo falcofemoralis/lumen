@@ -1,68 +1,17 @@
 import Page from 'Component/Page';
+import SettingsStructure from 'Component/SettingsStructure';
 import React from 'react';
-import { useWindowDimensions, View } from 'react-native';
-import { DefaultFocus, SpatialNavigationScrollView } from 'react-tv-space-navigation';
 
 import { styles } from './SettingsPage.style.atv';
-import {
-  SettingItem, SettingsPageComponentProps,
-  SettingType,
-} from './SettingsPage.type';
-import {
-  SettingInput,
-  SettingLink,
-  SettingSelect,
-  SettingText,
-} from './SettingsPageElements.atv';
+import { SettingsPageComponentProps } from './SettingsPage.type';
 
 export function SettingsPageComponent({
   settings,
   onSettingUpdate,
 }: SettingsPageComponentProps) {
-  const { height } = useWindowDimensions();
-
-  const renderSetting = (setting: SettingItem): Record<SettingType, React.ReactNode> => ({
-    TEXT: (
-      <SettingText
-        setting={ setting }
-        onUpdate={ onSettingUpdate }
-      />
-    ),
-    INPUT: (
-      <SettingInput
-        setting={ setting }
-        onUpdate={ onSettingUpdate }
-      />
-    ),
-    SELECT: (
-      <SettingSelect
-        setting={ setting }
-        onUpdate={ onSettingUpdate }
-      />
-    ),
-    LINK: (
-      <SettingLink
-        setting={ setting }
-        onUpdate={ onSettingUpdate }
-      />
-    ),
-  });
-
-  const renderSettings = () => (
-    <DefaultFocus>
-      <SpatialNavigationScrollView offsetFromStart={ height / 2.1 }>
-        { settings.map((setting) => (
-          <View key={ setting.id }>
-            { renderSetting(setting)[setting.type] }
-          </View>
-        )) }
-      </SpatialNavigationScrollView>
-    </DefaultFocus>
-  );
-
   return (
     <Page style={ styles.page }>
-      { renderSettings() }
+      <SettingsStructure settings={ settings } onSettingUpdate={ onSettingUpdate } />
     </Page>
   );
 }

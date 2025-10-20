@@ -54,28 +54,22 @@ export function FilmCardComponent({
     );
   };
 
-  const renderAdditionContainer = () => (
-    <>
-      { renderType() }
-      { renderFilmAdditionalText() }
-    </>
+  const renderPoster = () => (
+    <ThemedImage
+      style={ [
+        styles.poster,
+        stylePoster,
+        isFocused && styles.posterFocused,
+        isPendingRelease && styles.posterPendingRelease,
+      ] }
+      src={ poster }
+    />
   );
 
-  const renderPoster = () => (
-    <View
-      style={ styles.posterWrapper }
-      renderToHardwareTextureAndroid
-    >
-      <ThemedImage
-        style={ [
-          styles.poster,
-          stylePoster,
-          isFocused && styles.posterFocused,
-          isPendingRelease && styles.posterPendingRelease,
-        ] }
-        src={ poster }
-      />
-      { renderAdditionContainer() }
+  const renderAdditionContainer = () => (
+    <View style={ styles.additionContainer }>
+      { renderType() }
+      { renderFilmAdditionalText() }
     </View>
   );
 
@@ -108,7 +102,15 @@ export function FilmCardComponent({
         style,
       ] }
     >
-      { renderPoster() }
+      <View
+        style={ [
+          styles.posterWrapper,
+          isFocused && styles.posterWrapperFocused,
+        ] }
+      >
+        { renderPoster() }
+        { renderAdditionContainer() }
+      </View>
       <View
         style={ [
           styles.info,

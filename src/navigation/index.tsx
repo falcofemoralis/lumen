@@ -1,22 +1,26 @@
 import { NavigationProp, NavigationState, StaticParamList } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import {
+  COMMENTS_MODAL_ROUTE,
+  ERROR_ROUTE,
+  LOGIN_MODAL_ROUTE,
+  PLAYER_ROUTE,
+  SCHEDULE_MODAL_ROUTE,
+  SETTINGS_MODAL_ROUTE,
+  WELCOME_ROUTE,
+} from 'Navigation/routes';
 import ErrorPage from 'Route/ErrorPage';
-import { ERROR_ROUTE } from 'Route/ErrorPage/ErrorPage.config';
-import CommentsModal from 'Route/modal/CommentsModal/CommentsModal.component';
-import { COMMENTS_MODAL_ROUTE } from 'Route/modal/CommentsModal/CommentsModal.config';
+import CommentsModal from 'Route/modal/CommentsModal';
 import LoginModal from 'Route/modal/LoginModal';
-import { LOGIN_MODAL_ROUTE } from 'Route/modal/LoginModal/LoginModal.config';
-import ScheduleModal from 'Route/modal/ScheduleModal/ScheduleModal.component';
-import { SCHEDULE_MODAL_ROUTE } from 'Route/modal/ScheduleModal/ScheduleModal.config';
+import ScheduleModal from 'Route/modal/ScheduleModal';
+import SettingsModal from 'Route/modal/SettingsModal';
 import PlayerPage from 'Route/PlayerPage';
-import { PLAYER_ROUTE } from 'Route/PlayerPage/PlayerPage.config';
 import WelcomePage from 'Route/WelcomePage';
-import { WELCOME_ROUTE } from 'Route/WelcomePage/WelcomePage.config';
 import ConfigStore from 'Store/Config.store';
 import { DEFAULT_ROUTE_ANIMATION } from 'Style/Animations';
 import { Colors } from 'Style/Colors';
 
-import { TabsStack } from './tabs';
+import TabsStack from './tabs';
 
 const Stack = createNativeStackNavigator();
 
@@ -78,6 +82,10 @@ export function RootStack() {
         <Stack.Screen
           name={ SCHEDULE_MODAL_ROUTE }
           component={ ScheduleModal }
+        />
+        <Stack.Screen
+          name={ SETTINGS_MODAL_ROUTE }
+          component={ SettingsModal }
         />
       </Stack.Group>
     </Stack.Navigator>

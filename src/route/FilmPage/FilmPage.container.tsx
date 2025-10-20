@@ -3,6 +3,7 @@ import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useServiceContext } from 'Context/ServiceContext';
 import { withTV } from 'Hooks/withTV';
 import t from 'i18n/t';
+import { PLAYER_ROUTE } from 'Navigation/routes';
 import {
   useCallback,
   useEffect,
@@ -10,7 +11,6 @@ import {
   useState,
 } from 'react';
 import { Share } from 'react-native';
-import { PLAYER_ROUTE } from 'Route/PlayerPage/PlayerPage.config';
 import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
 import RouterStore from 'Store/Router.store';
@@ -20,6 +20,7 @@ import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { prepareShareBody } from 'Util/Player';
 import { openActor, openCategory, openFilm } from 'Util/Router';
+import { updateUrlHost } from 'Util/Url';
 
 import FilmPageComponent from './FilmPage.component';
 import FilmPageComponentTV from './FilmPage.component.atv';
@@ -207,9 +208,15 @@ export function FilmPageContainer({ route }: FilmPageContainerProps) {
       return;
     }
 
+    const shareFilm = { ...film };
+
+    if (currentService.isOfficialMode()) {
+      shareFilm.link = updateUrlHost(shareFilm.link, currentService.officialShareLink);
+    }
+
     try {
       await Share.share({
-        message: prepareShareBody(film),
+        message: prepareShareBody(shareFilm),
       });
     } catch (error) {
       LoggerStore.error('handleShare', { error });

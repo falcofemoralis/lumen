@@ -1,0 +1,20 @@
+export const ACCOUNT_ROUTE = 'Account';
+export const ACTOR_ROUTE = 'Actor';
+export const BOOKMARKS_ROUTE = 'Bookmarks';
+export const CATEGORY_ROUTE = 'Category';
+export const ERROR_ROUTE = 'Error';
+export const FILM_ROUTE = 'Film';
+export const HOME_ROUTE = 'Home';
+export const LOADER_ROUTE = 'Loader';
+export const LOGGER_ROUTE = 'Logger';
+export const NOTIFICATIONS_ROUTE = 'Notifications';
+export const PLAYER_ROUTE = 'Player';
+export const RECENT_ROUTE = 'Recent';
+export const SEARCH_ROUTE = 'Search';
+export const SETTINGS_ROUTE = 'Settings';
+export const WELCOME_ROUTE = 'Welcome';
+
+export const COMMENTS_MODAL_ROUTE = 'CommentsModal';
+export const LOGIN_MODAL_ROUTE = 'LoginModal';
+export const SCHEDULE_MODAL_ROUTE = 'ScheduleModal';
+export const SETTINGS_MODAL_ROUTE = 'SettingsModal';

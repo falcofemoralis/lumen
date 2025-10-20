@@ -19,8 +19,10 @@ import {
   Forward,
   MessageSquareText,
   Play,
+  ShieldOff,
   Star,
 } from 'lucide-react-native';
+import { COMMENTS_MODAL_ROUTE, SCHEDULE_MODAL_ROUTE } from 'Navigation/routes';
 import React from 'react';
 import {
   ScrollView,
@@ -36,8 +38,6 @@ import Animated, {
   useSharedValue,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { COMMENTS_MODAL_ROUTE } from 'Route/modal/CommentsModal/CommentsModal.config';
-import { SCHEDULE_MODAL_ROUTE } from 'Route/modal/ScheduleModal/ScheduleModal.config';
 import NotificationStore from 'Store/Notification.store';
 import RouterStore from 'Store/Router.store';
 import { Colors } from 'Style/Colors';
@@ -263,7 +263,7 @@ export function FilmPageComponent({
 
   const renderMiddleActions = () => (
     <View style={ styles.middleActions }>
-      { renderMiddleAction(Star, 'Rate',openNotImplemented) }
+      { renderMiddleAction(Star, 'Rate', openNotImplemented) }
       { renderMiddleAction(Clapperboard, 'Trailer', openNotImplemented) }
       { renderMiddleAction(MessageSquareText, 'Comments', openComments) }
       { renderMiddleAction(isBookmarked(film) ? BookmarkCheck : Bookmark, 'Bookmark', openBookmarks) }
@@ -272,7 +272,7 @@ export function FilmPageComponent({
   );
 
   const renderPlay = () => {
-    const { isPendingRelease } = film;
+    const { isPendingRelease, isRestricted } = film;
 
     if (isPendingRelease) {
       return (
@@ -284,6 +284,21 @@ export function FilmPageComponent({
           />
           <ThemedText style={ styles.pendingReleaseText }>
             { t('We are waiting for the film in the good quality') }
+          </ThemedText>
+        </Wrapper>
+      );
+    }
+
+    if (isRestricted) {
+      return (
+        <Wrapper style={ styles.pendingRelease }>
+          <ShieldOff
+            style={ styles.pendingReleaseIcon }
+            size={ scale(24) }
+            color={ Colors.white }
+          />
+          <ThemedText style={ styles.pendingReleaseText }>
+            { t('Unfortunately, this video is not available in your region') }
           </ThemedText>
         </Wrapper>
       );

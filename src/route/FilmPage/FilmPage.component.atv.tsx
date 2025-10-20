@@ -9,12 +9,11 @@ import ThemedImage from 'Component/ThemedImage';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import ThemedText from 'Component/ThemedText';
 import t from 'i18n/t';
-import { Bookmark, BookmarkCheck, Clapperboard, Clock, MessageSquareText, Play } from 'lucide-react-native';
+import { Bookmark, BookmarkCheck, Clapperboard, Clock, MessageSquareText, Play, ShieldOff } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { Dimensions, useWindowDimensions, View } from 'react-native';
 import {
   DefaultFocus,
-  SpatialNavigationFocusableView,
   SpatialNavigationScrollView,
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
@@ -30,7 +29,13 @@ import { styles } from './FilmPage.style.atv';
 import { FilmPageThumbnail } from './FilmPage.thumbnail.atv';
 import { FilmPageComponentProps } from './FilmPage.type';
 import {
-  ActorView, FranchiseItemComponent, InfoList, RelatedItem, ScheduleItem, ScheduleOverlay, Section,
+  ActorView,
+  FranchiseItemComponent,
+  InfoList,
+  RelatedItem,
+  ScheduleItem,
+  ScheduleOverlay,
+  Section,
 } from './FilmPageElements.atv';
 
 export function FilmPageComponent({
@@ -72,23 +77,21 @@ export function FilmPageComponent({
     text: string,
     onPress?: () => void
   ) => (
-    <SpatialNavigationFocusableView>
-      <ThemedButton
-        variant="outlined"
-        onPress={ onPress }
-        IconComponent={ IconComponent }
-        iconProps={ { size: scale(18) } }
-        style={ styles.actionButton }
-        textStyle={ styles.actionButtonText }
-        disableRootActive
-      >
-        { text }
-      </ThemedButton>
-    </SpatialNavigationFocusableView>
+    <ThemedButton
+      variant="outlined"
+      onPress={ onPress }
+      IconComponent={ IconComponent }
+      iconProps={ { size: scale(18) } }
+      style={ styles.actionButton }
+      textStyle={ styles.actionButtonText }
+      disableRootActive
+    >
+      { text }
+    </ThemedButton>
   );
 
   const renderPlayButton = () => {
-    const { isPendingRelease } = film;
+    const { isPendingRelease, isRestricted } = film;
 
     if (isPendingRelease) {
       return renderAction(
@@ -96,6 +99,16 @@ export function FilmPageComponent({
         t('Coming Soon'),
         () => {
           NotificationStore.displayMessage(t('We are waiting for the film in the good quality'));
+        }
+      );
+    }
+
+    if (isRestricted) {
+      return renderAction(
+        ShieldOff,
+        t('Not available'),
+        () => {
+          NotificationStore.displayMessage(t('Unfortunately, this video is not available in your region'));
         }
       );
     }
@@ -344,7 +357,7 @@ export function FilmPageComponent({
             offsetFromStart={ Dimensions.get('window').width / 2 }
           >
             <SpatialNavigationView
-              style={ styles.collection }
+              style={ styles.actorsCollection }
               direction="horizontal"
             >
               { persons.map((actor, index) => (
@@ -396,12 +409,14 @@ export function FilmPageComponent({
             </DefaultFocus>
           </SpatialNavigationScrollView>
         </View>
-        <ThemedButton
-          onPress={ () => scheduleOverlayRef?.current?.open() }
-          style={ styles.scheduleViewAll }
-        >
-          { t('View full schedule') }
-        </ThemedButton>
+        <View style={ { width: '100%' } }>
+          <ThemedButton
+            onPress={ () => scheduleOverlayRef?.current?.open() }
+            style={ styles.scheduleViewAll }
+          >
+            { t('View full schedule') }
+          </ThemedButton>
+        </View>
       </Section>
     );
   };

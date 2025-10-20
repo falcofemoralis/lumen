@@ -11,6 +11,7 @@ import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { useVideoPlayer, VideoPlayer, VideoTrack } from 'expo-video';
 import { withTV } from 'Hooks/withTV';
 import t from 'i18n/t';
+import { PLAYER_ROUTE } from 'Navigation/routes';
 import {
   useCallback,
   useEffect,
@@ -19,7 +20,6 @@ import {
   useState,
 } from 'react';
 import { BackHandler, Share } from 'react-native';
-import { PLAYER_ROUTE } from 'Route/PlayerPage/PlayerPage.config';
 import ConfigStore from 'Store/Config.store';
 import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
@@ -51,7 +51,6 @@ import {
   AWAKE_TAG,
   DEFAULT_SPEED,
   FIRESTORE_DB,
-  MAX_QUALITY,
   RewindDirection,
   SAVE_TIME_EVERY_MS,
 } from './Player.config';
@@ -61,6 +60,7 @@ export function PlayerContainer({
   video,
   film,
   voice,
+  quality: qualityProp,
 }: PlayerContainerProps) {
   const navigation = useNavigation();
   const { updateSelectedVoice } = usePlayerContext();
@@ -68,7 +68,7 @@ export function PlayerContainer({
   const { isSignedIn, profile, currentService } = useServiceContext();
   const [selectedVideo, setSelectedVideo] = useState<FilmVideoInterface>(video);
   const [selectedVoice, setSelectedVoice] = useState<FilmVoiceInterface>(voice);
-  const [selectedQuality, setSelectedQuality] = useState<string>(getPlayerQuality(video));
+  const [selectedQuality, setSelectedQuality] = useState<string>(qualityProp);
   const [selectedSubtitle, setSelectedSubtitle] = useState<SubtitleInterface|undefined>(
     selectedVideo.subtitles?.find(({ isDefault }) => isDefault)
   );
@@ -111,7 +111,15 @@ export function PlayerContainer({
     }
   }, [firestoreDb, profile, film, selectedVoice]);
 
-  const player = useVideoPlayer(selectedQuality !== AUTO_QUALITY.value ? getPlayerStream(video)?.url : null, (p) => {
+  const videoUrl = useMemo(() => {
+    if (selectedQuality === AUTO_QUALITY.value) {
+      return createMasterPlaylist(video.streams).uri;
+    }
+
+    return getPlayerStream(video, selectedQuality).url;
+  }, [selectedQuality, video]);
+
+  const player = useVideoPlayer(videoUrl, (p) => {
     const savedTime = getSavedTime(film);
 
     p.loop = false;
@@ -174,12 +182,6 @@ export function PlayerContainer({
       }
     }, SAVE_TIME_EVERY_MS);
   }, [player, updateTime]);
-
-  useEffect(() => {
-    if (selectedQuality === AUTO_QUALITY.value) {
-      player.replaceAsync(createMasterPlaylist(selectedVideo.streams));
-    }
-  }, []);
 
   useEffect(() => {
     activateKeepAwakeAsync(AWAKE_TAG);
@@ -275,11 +277,10 @@ export function PlayerContainer({
     resetProgressStatus();
     setSelectedVideo(newVideo);
     setSelectedVoice(newVoice);
-    updatePlayerStream(newVideo);
     resetUpdateTimeTimeout();
     setSelectedSubtitle(newVideo.subtitles?.find(({ isDefault }) => isDefault));
-
     updateSelectedVoice(film.id, newVoice);
+    updatePlayerStream(newVideo, selectedQuality, newVoice);
   };
 
   const togglePlayPause = (pause?: boolean, stopEvents?: boolean) => {
@@ -372,20 +373,21 @@ export function PlayerContainer({
     openOverlay();
   };
 
-  const updatePlayerStream = (filmVideoArg: FilmVideoInterface|null, qualityArg?: string|null) => {
-    const filmVideo = filmVideoArg || selectedVideo;
-    const quality = qualityArg || getPlayerQuality(filmVideo);
-
-    if (quality === AUTO_QUALITY.value) {
+  const updatePlayerStream = (
+    videoArg: FilmVideoInterface,
+    qualityArg: string,
+    voiceArg: FilmVoiceInterface
+  ) => {
+    if (qualityArg === AUTO_QUALITY.value) {
       // temporary solution
       // unfortunately it doesn't work because player loading becomes stuck
       // so the only way is to reload the player page entirely
       //player.replaceAsync(createMasterPlaylist(filmVideo.streams));
 
       RouterStore.pushData(PLAYER_ROUTE, {
-        video: filmVideo,
+        video: videoArg,
         film,
-        voice,
+        voice: voiceArg || selectedVoice,
       });
 
       const state = navigation.getState();
@@ -400,9 +402,7 @@ export function PlayerContainer({
         routes: filteredRoutes as any,
       });
     } else {
-      const newStream = quality !== MAX_QUALITY.value
-        ? filmVideo.streams.find((s) => s.quality === quality)
-        : filmVideo.streams[filmVideo.streams.length - 1];
+      const newStream = getPlayerStream(videoArg, getPlayerQuality(videoArg, qualityArg));
 
       if (!newStream) {
         return;
@@ -421,10 +421,10 @@ export function PlayerContainer({
       return;
     }
 
-    setSelectedQuality(quality);
+    setSelectedQuality(getPlayerQuality(selectedVideo, quality));
     updatePlayerQuality(quality);
     updateTime();
-    updatePlayerStream(null, quality);
+    updatePlayerStream(selectedVideo, quality, selectedVoice);
 
     qualityOverlayRef.current?.close();
   };

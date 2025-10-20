@@ -2,10 +2,8 @@ import FilmCard from 'Component/FilmCard';
 import { calculateCardDimensions } from 'Component/FilmCard/FilmCard.style.atv';
 import ThemedGrid from 'Component/ThemedGrid';
 import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
+import ThemedPressable from 'Component/ThemedPressable';
 import React, { memo, useCallback, useMemo } from 'react';
-import {
-  SpatialNavigationFocusableView,
-} from 'react-tv-space-navigation';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { scale } from 'Util/CreateStyles';
 import { noopFn } from 'Util/Function';
@@ -25,8 +23,8 @@ function FilmGridItem({
   const item = items[0];
 
   return (
-    <SpatialNavigationFocusableView
-      onSelect={ () => handleOnPress(item) }
+    <ThemedPressable
+      onPress={ () => handleOnPress(item) }
       onFocus={ () => handleItemFocus(index) }
     >
       { ({ isFocused, isRootActive }) => (
@@ -36,7 +34,7 @@ function FilmGridItem({
           isFocused={ isFocused && isRootActive }
         />
       ) }
-    </SpatialNavigationFocusableView>
+    </ThemedPressable>
   );
 }
 

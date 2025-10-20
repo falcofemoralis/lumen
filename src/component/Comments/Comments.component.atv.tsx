@@ -2,6 +2,7 @@ import Loader from 'Component/Loader';
 import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedList from 'Component/ThemedList';
+import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
 import t from 'i18n/t';
 import { ThumbsUp } from 'lucide-react-native';
@@ -17,7 +18,6 @@ import React, {
 } from 'react';
 import { LayoutRectangle, useWindowDimensions, View } from 'react-native';
 import {
-  SpatialNavigationFocusableView,
   SpatialNavigationNodeRef,
 } from 'react-tv-space-navigation';
 import { Colors } from 'Style/Colors';
@@ -63,9 +63,9 @@ export const CommentItem = forwardRef<CommentItemRef, CommentItemProps>(({
   }), [commentRef]);
 
   return (
-    <SpatialNavigationFocusableView
-      ref={ commentRef }
-      onSelect={ () => commentTextRef.current?.openSpoilers() }
+    <ThemedPressable
+      spatialRef={ commentRef }
+      onPress={ () => commentTextRef.current?.openSpoilers() }
     >
       { ({ isFocused }) => (
         <View
@@ -131,7 +131,7 @@ export const CommentItem = forwardRef<CommentItemRef, CommentItemProps>(({
           </View>
         </View>
       ) }
-    </SpatialNavigationFocusableView>
+    </ThemedPressable>
   );
 });
 

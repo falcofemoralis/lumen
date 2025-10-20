@@ -1,10 +1,9 @@
 import { NavigationRoute, ParamListBase } from '@react-navigation/native';
-import { services } from 'Api/services';
 import ThemedImage from 'Component/ThemedImage';
 import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
-import { useNotificationsContext } from 'Context/NotificationsContext';
-import { DEFAULT_SERVICE } from 'Context/ServiceContext';
+import { useServiceContext } from 'Context/ServiceContext';
+import { ACCOUNT_ROUTE } from 'Navigation/routes';
 import React, { useCallback } from 'react';
 import {
   Image,
@@ -13,7 +12,6 @@ import {
 } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ACCOUNT_ROUTE } from 'Route/AccountPage/AccountPage.config';
 import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 
@@ -29,7 +27,7 @@ export function NavigationBarComponent({
   onPress,
   onLongPress,
 }: NavigationBarComponentProps) {
-  const { badgeData } = useNotificationsContext();
+  const { badgeData } = useServiceContext();
   const { width } = useWindowDimensions();
   const { bottom } = useSafeAreaInsets();
 

@@ -1,5 +1,9 @@
 import { useCallback, useRef } from 'react';
 
+export interface TripleTapInterface {
+  handleTap: () => boolean;
+}
+
 export const useTripleTap = () => {
   const tapTimesRef = useRef<number>(0);
   const timeoutRef = useRef<number | null>(null);

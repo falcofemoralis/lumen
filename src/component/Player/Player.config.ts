@@ -45,8 +45,7 @@ export const DEFAULT_SMART_SEEKING_PARAMS: SmartSeekingParams = {
 
 export const LONG_PRESS_DURATION = 250;
 
-// 1 minutes * 60 seconds/minute * 1000 milliseconds/second
-export const SAVE_TIME_EVERY_MS = 60000;
+export const SAVE_TIME_EVERY_MS = 30000;
 
 export const PLAYER_CONTROLS_TIMEOUT = 3000;
 export const PLAYER_CONTROLS_ANIMATION = 150;

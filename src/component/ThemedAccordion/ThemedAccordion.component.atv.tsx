@@ -1,13 +1,37 @@
+import { useIsFocused } from '@react-navigation/native';
 import ThemedOverlay from 'Component/ThemedOverlay';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
+import ThemedPressable from 'Component/ThemedPressable';
 import ThemedText from 'Component/ThemedText';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
-import { DefaultFocus, SpatialNavigationFocusableView, SpatialNavigationScrollView } from 'react-tv-space-navigation';
+import { DefaultFocus, SpatialNavigationScrollView, useLockSpatialNavigation } from 'react-tv-space-navigation';
 import { scale } from 'Util/CreateStyles';
 
 import { styles } from './ThemedAccordion.style.atv';
 import { AccordionGroupInterface, ThemedAccordionComponentProps } from './ThemedAccordion.type';
+
+const AccordionLocker = ({ isGroupOpened }: { isGroupOpened: boolean }) => {
+  const { lock, unlock } = useLockSpatialNavigation();
+  const isFocused = useIsFocused();
+  const prevFocus = useRef<boolean>(isFocused);
+
+  useEffect(() => {
+    if (isGroupOpened) {
+      if (prevFocus.current !== isFocused) {
+        prevFocus.current = isFocused;
+
+        if (!isFocused) {
+          lock();
+        } else {
+          unlock();
+        }
+      }
+    }
+  }, [isGroupOpened, isFocused, lock, unlock]);
+
+  return null;
+};
 
 export const ThemedAccordionComponent = ({
   data,
@@ -37,9 +61,7 @@ export const ThemedAccordionComponent = ({
         key={ `group-${id}` }
         style={ styles.groupContainer }
       >
-        <SpatialNavigationFocusableView
-          onSelect={ () => showOverlay(id) }
-        >
+        <ThemedPressable onPress={ () => showOverlay(id) }>
           { ({ isFocused }) => (
             <ThemedText
               style={ [
@@ -50,7 +72,7 @@ export const ThemedAccordionComponent = ({
               { title }
             </ThemedText>
           ) }
-        </SpatialNavigationFocusableView>
+        </ThemedPressable>
       </View>
     );
   };
@@ -64,6 +86,7 @@ export const ThemedAccordionComponent = ({
         containerStyle={ styles.overlay }
         onClose={ handleCloseOverlay }
       >
+        <AccordionLocker isGroupOpened={ !!openAccordionGroup } />
         <SpatialNavigationScrollView
           offsetFromStart={ scale(32) }
           style={ overlayContent }

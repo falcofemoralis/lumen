@@ -1,3 +1,4 @@
+import { useOverlayContext } from 'Context/OverlayContext';
 import { withTV } from 'Hooks/withTV';
 import { forwardRef, useImperativeHandle, useState } from 'react';
 
@@ -8,11 +9,13 @@ import { ThemedOverlayContainerProps, ThemedOverlayRef } from './ThemedOverlay.t
 export const ThemedOverlayContainer = forwardRef<ThemedOverlayRef, ThemedOverlayContainerProps>((props, ref) => {
   const [isOpened, setIsOpened] = useState(false);
   const [contentVisible, setContentVisible] = useState(false);
+  const { setIsOverlayOpen } = useOverlayContext();
 
   useImperativeHandle(ref, () => ({
     open: () => {
       setIsOpened(true);
       setContentVisible(true);
+      setIsOverlayOpen(true);
 
       setTimeout(() => {
         props.onOpen?.();
@@ -20,6 +23,7 @@ export const ThemedOverlayContainer = forwardRef<ThemedOverlayRef, ThemedOverlay
     },
     close: () => {
       setIsOpened(false);
+      setIsOverlayOpen(false);
 
       setTimeout(() => {
         setContentVisible(false);
@@ -30,6 +34,7 @@ export const ThemedOverlayContainer = forwardRef<ThemedOverlayRef, ThemedOverlay
 
   const handleModalRequestClose = () => {
     setIsOpened(false);
+    setIsOverlayOpen(false);
 
     setTimeout(() => {
       setContentVisible(false);

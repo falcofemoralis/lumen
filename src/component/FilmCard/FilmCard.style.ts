@@ -67,6 +67,7 @@ export const styles = CreateStyles({
     overflow: 'hidden',
   },
   posterWrapper: {
+    position: 'relative',
     width: '100%',
     height: 'auto',
     overflow: 'hidden',
@@ -94,23 +95,26 @@ export const styles = CreateStyles({
     paddingTop: 4,
     color: Colors.textSecondary,
   },
-  typeText: {
+  additionContainer: {
     position: 'absolute',
     top: 0,
     right: 0,
     zIndex: 10,
+    width: '100%',
+    height: '100%',
+    justifyContent: 'space-between',
+  },
+  typeText: {
     paddingHorizontal: 4,
     paddingVertical: 1,
     fontSize: 10,
+    alignSelf: 'flex-end',
   },
   filmAdditionalText: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    zIndex: 10,
     paddingHorizontal: 4,
     paddingVertical: 1,
     fontSize: 10,
     borderBottomLeftRadius: 8,
+    alignSelf: 'flex-start',
   },
 });

@@ -18,9 +18,17 @@ export const styles = CreateStyles({
     width: 400,
     height: 350,
   },
+  voiceRatingOverlayContainer: {
+    padding: 4,
+  },
   voiceRatingContainer: {
     flexDirection: 'column',
+    width: '100%',
     height: '100%',
+  },
+  voiceRatingNavigationView: {
+    paddingBlock: 4,
+    paddingHorizontal: 12,
   },
   voiceRatingItemContainer: {
     flexDirection: 'row',
@@ -50,7 +58,7 @@ export const styles = CreateStyles({
   voiceRatingBarContainer: {
   },
   voiceRatingBar: {
-    height: 10,
+    height: 8,
     width: '100%',
     backgroundColor: Colors.backgroundLighter,
     borderRadius: 16,

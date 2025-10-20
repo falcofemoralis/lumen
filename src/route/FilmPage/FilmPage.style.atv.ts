@@ -200,7 +200,7 @@ export const styles = CreateStyles({
     justifyContent: 'space-between',
   },
   scheduleItemReleaseWrapper: {
-    width: 48,
+    width: 80,
     justifyContent: 'center',
   },
   scheduleItemText: {
@@ -230,7 +230,7 @@ export const styles = CreateStyles({
   },
   scheduleViewAll: {
     marginTop: 4,
-    width: '25%',
+    width: '35%',
   },
   scheduleOverlay: {
     width: '50%',
@@ -286,7 +286,8 @@ export const styles = CreateStyles({
   relatedList: {
     flexDirection: 'row',
     gap: 16,
-    paddingBlock: 16,
+    paddingBlock: 12,
+    paddingHorizontal: 6,
   },
   relatedListItem: {
     flex: 0,
@@ -313,5 +314,11 @@ export const styles = CreateStyles({
     borderRadius: 16,
     borderColor: Colors.darkBorder,
     borderWidth: 1,
+  },
+  actorsCollection: {
+    flexDirection: 'row',
+    gap: 10,
+    paddingBlock: 12,
+    paddingHorizontal: 6,
   },
 });

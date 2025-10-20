@@ -37,12 +37,14 @@ export const useIsLocked = () => {
 export const LockSpatialNavigationContext = createContext<{
   lock: () => void;
   unlock: () => void;
+  isLocked: boolean;
 }>({
   lock: () => undefined,
   unlock: () => undefined,
+  isLocked: false,
 });
 
 export const useLockSpatialNavigation = () => {
-  const { lock, unlock } = useContext(LockSpatialNavigationContext);
-  return { lock, unlock };
+  const { lock, unlock, isLocked } = useContext(LockSpatialNavigationContext);
+  return { lock, unlock, isLocked };
 };

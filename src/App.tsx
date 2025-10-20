@@ -1,3 +1,5 @@
+import 'Util/Firestore/deprecated-warning';
+
 import { DarkTheme } from '@react-navigation/native';
 import AppUpdater from 'Component/AppUpdater';
 import Root from 'Component/Root';
@@ -29,9 +31,7 @@ export function App() {
         <Navigation
           theme={ DarkTheme }
           onReady={ () => {
-            setTimeout(() => {
-              SplashScreen.hideAsync();
-            }, 250);
+            SplashScreen.hideAsync();
           } }
         >
           <AppProvider>

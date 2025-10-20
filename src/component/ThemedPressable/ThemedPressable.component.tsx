@@ -2,9 +2,9 @@ import { View } from 'react-native';
 import { Pressable } from 'react-native-gesture-handler';
 import { Colors } from 'Style/Colors';
 
-import { ThemedPressableProps } from './ThemedPressable.type';
+import { ThemedPressableComponentProps } from './ThemedPressable.type';
 
-export const ThemedPressable = ({
+export const ThemedPressableComponent = ({
   onPress,
   onLongPress,
   children,
@@ -15,7 +15,7 @@ export const ThemedPressable = ({
   mode = 'light',
   pressDelay = 50,
   additionalElement,
-}: ThemedPressableProps) => {
+}: ThemedPressableComponentProps) => {
   return (
     <View style={ [style, { overflow: 'hidden' }] }>
       { additionalElement }
@@ -37,10 +37,10 @@ export const ThemedPressable = ({
         tvFocusable={ false }
         focusable={ false }
       >
-        { children }
+        { typeof children === 'function' ? children({ isFocused: false, isRootActive: false }) : children }
       </Pressable>
     </View>
   );
 };
 
-export default ThemedPressable;
+export default ThemedPressableComponent;

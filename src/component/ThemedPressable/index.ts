@@ -1,1 +1,1 @@
-export { default } from './ThemedPressable.component';
+export { default } from './ThemedPressable.container';

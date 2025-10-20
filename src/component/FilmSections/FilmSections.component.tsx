@@ -15,6 +15,7 @@ import {
 } from './FilmSections.type';
 
 const FilmSectionsRow = ({
+  index,
   row,
   itemSize,
   handleOnPress,
@@ -40,10 +41,10 @@ const FilmSectionsRow = ({
       { content && renderContent() }
       { header && renderHeader() }
       <View style={ styles.gridRow }>
-        { films.map((item, index) => (
+        { films.map((item, idx) => (
           <Pressable
             // eslint-disable-next-line react/no-array-index-key
-            key={ index }
+            key={ `${index}-${idx}-${item.id}` }
             style={ { width: itemSize } }
             onPress={ () => handleOnPress(item) }
           >
@@ -69,8 +70,9 @@ export function FilmSectionsComponent({
 }: FilmSectionsComponentProps) {
   const { width, height } = useFilmCardDimensions(NUMBER_OF_COLUMNS, scale(ROW_GAP));
 
-  const renderItem = useCallback(({ item: row }: {item: FilmSectionsItem}) => (
+  const renderItem = useCallback(({ item: row, index }: {item: FilmSectionsItem, index: number}) => (
     <MemoizedFilmSectionsRow
+      index={ index }
       row={ row }
       itemSize={ width }
       numberOfColumns={ NUMBER_OF_COLUMNS }

@@ -64,13 +64,17 @@ export const AppUpdaterProvider = ({ children }: { children: React.ReactNode }) 
       return;
     }
 
-    const data = await getCachedUpdate();
+    try{
+      const data = await getCachedUpdate();
 
-    const currentVersion = versionStringToNumber(Application.nativeApplicationVersion || '0.0.0');
-    const newVersion = versionStringToNumber(data?.versionName || '0.0.0');
+      const currentVersion = versionStringToNumber(Application.nativeApplicationVersion || '0.0.0');
+      const newVersion = versionStringToNumber(data?.versionName || '0.0.0');
 
-    if (newVersion > currentVersion) {
-      setUpdate(data);
+      if (newVersion > currentVersion) {
+        setUpdate(data);
+      }
+    } catch (error) {
+      LoggerStore.error('checkVersion', { error });
     }
   }, [getCachedUpdate]);
 

@@ -1,6 +1,6 @@
 import ThemedImage from 'Component/ThemedImage';
+import ThemedPressable from 'Component/ThemedPressable';
 import { Text, View } from 'react-native';
-import { SpatialNavigationFocusableView } from 'react-tv-space-navigation';
 import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 
@@ -22,6 +22,8 @@ export default function ThemedButton({
   rightImageStyle,
   disableRootActive,
   additionalElement,
+  withAnimation = false,
+  zoomScale = 1.1,
 }: ThemedButtonProps) {
   const renderFilled = (isFocused: boolean) => (
     <View
@@ -108,9 +110,100 @@ export default function ThemedButton({
     </View>
   );
 
+  const renderLong = (isFocused: boolean) => (
+    <View
+      style={ [
+        styles.container,
+        styles.containerLong,
+        style,
+        isSelected && styles.containerLongSelected,
+        isFocused && styles.containerLongFocused,
+        isFocused && styleFocused,
+      ] }
+    >
+      { additionalElement && additionalElement(isFocused, isSelected ?? false) }
+      { IconComponent && (
+        <IconComponent
+          style={ [
+            styles.iconFilled,
+            isSelected && styles.iconFilledSelected,
+            isFocused && styles.iconFilledFocused,
+          ] }
+          size={ scale(18) }
+          color={ isFocused ? Colors.black : Colors.white }
+          { ...iconProps }
+        />
+      ) }
+      { children && (
+        <Text
+          style={ [
+            styles.text,
+            styles.textFilled,
+            textStyle,
+            isSelected && styles.textFilledSelected,
+            isFocused && styles.textFilledFocused,
+          ] }
+        >
+          { children }
+        </Text>
+      ) }
+      { rightImage && (
+        <ThemedImage
+          style={ [styles.rightIcon, rightImageStyle] }
+          src={ rightImage }
+        />
+      ) }
+    </View>
+  );
+
+  const renderTransparent = (isFocused: boolean) => (
+    <View
+      style={ [
+        styles.container,
+        styles.containerOutlined,
+        style,
+        isFocused && styleFocused,
+      ] }
+    >
+      { IconComponent && (
+        <IconComponent
+          style={ [
+            styles.iconFilled,
+            isSelected && styles.iconFilledSelected,
+            isFocused && styles.iconFilledFocused,
+          ] }
+          size={ scale(18) }
+          color={ isFocused ? Colors.black : Colors.white }
+          { ...iconProps }
+        />
+      ) }
+      { children && (
+        <Text
+          style={ [
+            styles.text,
+            styles.textOutlined,
+            textStyle,
+            isSelected && styles.textLongSelected,
+            isFocused && styles.textLongFocused,
+          ] }
+        >
+          { children }
+        </Text>
+      ) }
+    </View>
+  );
+
   const renderButton = (isFocused: boolean) => {
     if (variant === 'outlined') {
       return renderOutlined(isFocused);
+    }
+
+    if (variant === 'long') {
+      return renderLong(isFocused);
+    }
+
+    if (variant === 'transparent') {
+      return renderTransparent(isFocused);
     }
 
     return renderFilled(isFocused);
@@ -125,13 +218,15 @@ export default function ThemedButton({
   };
 
   return (
-    <SpatialNavigationFocusableView
-      onSelect={ onPress }
+    <ThemedPressable
+      onPress={ onPress }
       onFocus={ onFocus }
+      withAnimation={ withAnimation }
+      zoomScale={ zoomScale }
     >
       { ({ isFocused, isRootActive }) => (
         renderButton(isActive(isFocused, isRootActive))
       ) }
-    </SpatialNavigationFocusableView>
+    </ThemedPressable>
   );
 }

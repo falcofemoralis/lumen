@@ -1,33 +1,29 @@
 import { Image } from 'expo-image';
-import { forwardRef, memo, useImperativeHandle } from 'react';
+import { memo } from 'react';
+import { View } from 'react-native';
 
+import { styles } from './ThemedImage.style';
 import { ThemedImageProps } from './ThemedImage.type';
 
-type ImageRef = {
-};
-
-export const ThemedImage = forwardRef<ImageRef, ThemedImageProps>(({
+export const ThemedImage = ({
   src,
   style,
   blurRadius,
   transition = 250,
-}, ref) => {
-  useImperativeHandle(ref, () => ({
-  }));
-
+}: ThemedImageProps) => {
   return (
-    <Image
-      style={ style }
-      source={ src }
-      placeholder={ { blurhash: 'L03IYJj[fQj[j[fQfQfQfQfQfQfQ' } }
-      placeholderContentFit="cover"
-      contentFit="cover"
-      transition={ transition }
-      recyclingKey={ src }
-      blurRadius={ blurRadius }
-    />
+    <View style={ [styles.container, style] }>
+      <Image
+        style={ styles.image }
+        source={ src }
+        contentFit="cover"
+        transition={ transition }
+        recyclingKey={ src }
+        blurRadius={ blurRadius }
+      />
+    </View>
   );
-});
+};
 
 function rowPropsAreEqual(prevProps: ThemedImageProps, props: ThemedImageProps) {
   return prevProps.src === props.src;

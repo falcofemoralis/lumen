@@ -121,7 +121,6 @@ export const styles = CreateStyles({
     height: '100%',
     maxHeight: '100%',
     maxWidth: '50%',
-    right: 0,
   },
   commentsOverlayList: {
     height: '100%',

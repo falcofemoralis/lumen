@@ -1,5 +1,3 @@
-import { useNavigation } from '@react-navigation/native';
-import { services } from 'Api/services';
 import Loader from 'Component/Loader';
 import LoginForm from 'Component/LoginForm';
 import Page from 'Component/Page';
@@ -9,77 +7,61 @@ import ThemedPressable from 'Component/ThemedPressable';
 import ThemedSafeArea from 'Component/ThemedSafeArea';
 import ThemedText from 'Component/ThemedText';
 import Wrapper from 'Component/Wrapper';
-import { useNotificationsContext } from 'Context/NotificationsContext';
-import { DEFAULT_SERVICE, useServiceContext } from 'Context/ServiceContext';
+import { LinearGradient } from 'expo-linear-gradient';
 import t from 'i18n/t';
-import { Bell, Settings } from 'lucide-react-native';
+import { Bell, Download, LogOut, MessageSquareText, Settings, Star } from 'lucide-react-native';
+import { ACCOUNT_ROUTE } from 'Navigation/routes';
 import React from 'react';
-import { Image, View } from 'react-native';
-import { NOTIFICATIONS_ROUTE } from 'Route/NotificationsPage/NotificationsPage.config';
-import { SETTINGS_ROUTE } from 'Route/SettingsPage/SettingsPage.config';
+import { Image, ScrollView, StyleProp, View, ViewStyle } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from 'Style/Colors';
 import { scale } from 'Util/CreateStyles';
 
-import { ACCOUNT_ROUTE } from './AccountPage.config';
 import { styles } from './AccountPage.style';
 import { AccountPageComponentProps } from './AccountPage.type';
+import { DefaultGradient, GRADIENT_SIZE_MOBILE, PremiumGradient } from './AccountPageGradients';
 
 export function AccountPageComponent({
   isSignedIn,
   profile,
+  badgeData,
+  handleViewProfile,
+  handleViewPayments,
+  handleLogout,
+  openSettings,
+  openNotifications,
+  openNotImplemented,
 }: AccountPageComponentProps) {
-  const { logout, viewProfile } = useServiceContext();
-  const { badgeData, resetNotifications } = useNotificationsContext();
-  const navigation = useNavigation();
-
-  const renderTopBarButton = (IconComponent: React.ComponentType<any>, route: string) => {
-    return (
-      <ThemedPressable
-        style={ styles.tobBarBtn }
-        onPress={ () => navigation.navigate(route as never) }
-      >
-        <IconComponent
-          style={ styles.tobBarBtnIcon }
-          size={ scale(24) }
-          color={ Colors.white }
-        />
-      </ThemedPressable>
-    );
-  };
+  const { top } = useSafeAreaInsets();
 
   const renderTopBar = () => {
-    const badge = badgeData[ACCOUNT_ROUTE] ?? 0;
-
     return (
       <View style={ styles.topBar }>
-        <View>
-          { renderTopBarButton(Bell, NOTIFICATIONS_ROUTE) }
-          { badge > 0 && (
-            <ThemedText style={ styles.badge }>
-              { badge }
-            </ThemedText>
-          ) }
-        </View>
-        { renderTopBarButton(Settings, SETTINGS_ROUTE) }
+        <ThemedPressable
+          style={ styles.tobBarBtn }
+          onPress={ openSettings }
+        >
+          <Settings
+            style={ styles.tobBarBtnIcon }
+            size={ scale(24) }
+            color={ Colors.white }
+          />
+        </ThemedPressable>
       </View>
     );
   };
 
-  const renderProfile = () => {
-    if (!profile) {
-      return (
-        <Loader
-          isLoading
-          fullScreen
-        />
-      );
-    }
-
-    const { avatar, name } = profile;
+  const renderAvatarContainer = () => {
+    const { avatar, name, premiumDays = 0 } = profile ?? {};
 
     return (
-      <View style={ styles.profile }>
-        <View style={ styles.profileInfo }>
+      <View style={ styles.profileInfo }>
+        <View style={ styles.profileInfoAvatarContainer }>
+          { premiumDays > 0 ? (
+            <PremiumGradient style={ styles.profileInfoPremium } size={ GRADIENT_SIZE_MOBILE } />
+          ) : (
+            <DefaultGradient style={ styles.profileInfoPremium } size={ GRADIENT_SIZE_MOBILE } />
+          ) }
           { avatar ? (
             <ThemedImage
               src={ avatar }
@@ -91,31 +73,103 @@ export function AccountPageComponent({
               style={ styles.profileAvatar }
             />
           ) }
-          <View>
-            <ThemedText style={ styles.profileName }>
-              { t('You') }
-            </ThemedText>
-            <ThemedText>
-              { name }
-            </ThemedText>
-          </View>
         </View>
-        <View style={ styles.profileActions }>
-          <ThemedButton
-            style={ styles.profileAction }
-            onPress={ () => {
-              logout();
-              resetNotifications();
-            } }
-          >
-            { t('Log out') }
-          </ThemedButton>
-          <ThemedButton
-            style={ styles.profileAction }
-            onPress={ viewProfile }
-          >
-            { t('View Profile') }
-          </ThemedButton>
+        <View>
+          <ThemedText style={ styles.profileName }>
+            { t('You') }
+          </ThemedText>
+          <ThemedText style={ styles.profileSubname }>
+            { name }
+          </ThemedText>
+        </View>
+      </View>
+    );
+  };
+
+  const renderPremiumBadge = () => {
+    const { premiumDays = 0 } = profile ?? {};
+
+    if (!premiumDays) {
+      return null;
+    }
+
+    return (
+      <View style={ styles.premiumBadgeContainer }>
+        <LinearGradient
+          style={ styles.premiumBadgeGradient }
+          colors={ ['#C383E1', '#5B359A'] }
+          start={ { x: 1, y: 1 } }
+          end={ { x: 0, y: 0 } }
+        />
+        <View style={ styles.premiumBadge }>
+          <Image
+            source={ require('../../../assets/images/prem-content-logo.png') }
+            style={ styles.premiumBadgeIcon }
+          />
+          <ThemedText style={ styles.premiumBadgeHeading }>
+            HDrezka Premium
+          </ThemedText>
+          <ThemedText style={ styles.premiumBadgeText }>
+            { t('You have %s days left.', String(premiumDays)) }
+          </ThemedText>
+        </View>
+      </View>
+    );
+  };
+
+  const renderActionButton = (
+    title: string,
+    icon: React.ComponentType<any>,
+    action: () => void,
+    style?: StyleProp<ViewStyle>
+  ) => {
+    return (
+      <ThemedButton
+        style={ [styles.profileAction, style] }
+        contentStyle={ styles.profileActionContent }
+        textStyle={ styles.profileActionText }
+        IconComponent={ icon }
+        onPress={ action }
+        iconProps={ {
+          size: scale(20),
+          color: Colors.white,
+        } }
+      >
+        { title }
+      </ThemedButton>
+    );
+  };
+
+  const renderNotificationButton = () => {
+    const badge = badgeData[ACCOUNT_ROUTE] ?? 0;
+
+    return (
+      <View style={ styles.badgeContainer }>
+        { badge > 0 && (
+          <ThemedText style={ styles.badge }>
+            { badge }
+          </ThemedText>
+        ) }
+        { renderActionButton(t('Notifications'), Bell, openNotifications) }
+      </View>
+    );
+  };
+
+  const renderActions = () => {
+    return (
+      <View style={ styles.profileActions }>
+        <View style={ styles.profileActionsGroup }>
+          { renderPremiumBadge() }
+        </View>
+        <View style={ [styles.profileActionsGroup] }>
+          { renderActionButton(t('Renew subscription'), Star, handleViewPayments, styles.premiumButton) }
+          { renderNotificationButton() }
+          { renderActionButton(t('Downloads'), Download, openNotImplemented) }
+          { renderActionButton(t('Comments'), MessageSquareText, openNotImplemented) }
+          { renderActionButton(t('View Profile'), Star, handleViewProfile) }
+        </View>
+        <View style={ [styles.profileActionsGroup] }>
+          { renderActionButton(t('Log out'), LogOut, handleLogout) }
         </View>
       </View>
     );
@@ -123,19 +177,37 @@ export function AccountPageComponent({
 
   const renderContent = () => {
     if (!isSignedIn) {
-      return <LoginForm withRedirect />;
+      return (
+        <LoginForm withRedirect />
+      );
     }
 
-    return renderProfile();
+    if (!profile) {
+      return (
+        <Loader
+          isLoading
+          fullScreen
+        />
+      );
+    }
+
+    return (
+      <View style={ styles.content }>
+        { renderAvatarContainer() }
+        { renderActions() }
+      </View>
+    );
   };
 
   return (
     <Page>
-      <ThemedSafeArea>
-        <Wrapper style={ styles.wrapper }>
-          { renderTopBar() }
-          { renderContent() }
-        </Wrapper>
+      <ThemedSafeArea edges={ ['left', 'right'] }>
+        <ScrollView style={ { paddingTop: top } } contentContainerStyle={ styles.scrollView }>
+          <Wrapper style={ styles.wrapper }>
+            { renderTopBar() }
+            { renderContent() }
+          </Wrapper>
+        </ScrollView>
       </ThemedSafeArea>
     </Page>
   );

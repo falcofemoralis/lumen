@@ -69,6 +69,14 @@ export const parseFilmCard = (el: HTMLElementInterface): FilmCardInterface => {
   };
 };
 
+const extractTextFromHtml = (htmlString: string): string => {
+  if(!htmlString.includes('</')) {
+    return htmlString;
+  }
+
+  return htmlString.replace(/<[^>]*>/g, '').trim();
+};
+
 export const parseStreams = (streams: string | null): FilmStreamInterface[] => {
   const parsedStreams = new Map<string, FilmStreamInterface>();
 
@@ -98,7 +106,10 @@ export const parseStreams = (streams: string | null): FilmStreamInterface[] => {
     });
   }
 
-  return Array.from(parsedStreams.values());
+  return Array.from(parsedStreams.values()).map((s) => ({
+    ...s,
+    quality: extractTextFromHtml(s.quality),
+  }));
 };
 
 export const parseSeasons = (root: HTMLElementInterface): {

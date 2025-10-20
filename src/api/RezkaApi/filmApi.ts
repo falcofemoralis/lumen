@@ -189,6 +189,7 @@ const filmApi: FilmApiInterface = {
 
     film.description = root.querySelector('.b-post__description_text')?.rawText.trim();
     film.isPendingRelease = !!root.querySelector('.b-post__go_status');
+    film.isRestricted = !!root.querySelector('.b-player__restricted__block_message');
 
     if (!film.isPendingRelease) {
       // player data
