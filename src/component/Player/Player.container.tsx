@@ -111,7 +111,15 @@ export function PlayerContainer({
     }
   }, [firestoreDb, profile, film, selectedVoice]);
 
-  const player = useVideoPlayer(getPlayerStream(video, selectedQuality).url, (p) => {
+  const videoUrl = useMemo(() => {
+    if (selectedQuality === AUTO_QUALITY.value) {
+      return createMasterPlaylist(video.streams).uri;
+    }
+
+    return getPlayerStream(video, selectedQuality).url;
+  }, [selectedQuality, video]);
+
+  const player = useVideoPlayer(videoUrl, (p) => {
     const savedTime = getSavedTime(film);
 
     p.loop = false;
@@ -174,12 +182,6 @@ export function PlayerContainer({
       }
     }, SAVE_TIME_EVERY_MS);
   }, [player, updateTime]);
-
-  useEffect(() => {
-    if (selectedQuality === AUTO_QUALITY.value) {
-      player.replaceAsync(createMasterPlaylist(selectedVideo.streams));
-    }
-  }, []);
 
   useEffect(() => {
     activateKeepAwakeAsync(AWAKE_TAG);

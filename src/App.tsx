@@ -1,3 +1,5 @@
+import 'Util/Firestore/deprecated-warning';
+
 import { DarkTheme } from '@react-navigation/native';
 import AppUpdater from 'Component/AppUpdater';
 import Root from 'Component/Root';
