@@ -1,29 +1,28 @@
-import { Colors } from 'Style/Colors';
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale, colors }: Theme) => ({
   input: {
-    backgroundColor: Colors.backgroundLighter,
+    backgroundColor: colors.backgroundLighter,
   },
   inputContent: {
     justifyContent: 'flex-start',
-    gap: 8,
-    padding: 8,
+    gap: scale(8),
+    padding: scale(8),
   },
   inputIcon: {
   },
   inputText: {
   },
   inputImage: {
-    height: 20,
-    width: 20,
+    height: scale(20),
+    width: scale(20),
     alignSelf: 'center',
   },
   overlay: {
-    padding: 8,
+    padding: scale(8),
   },
   overlayContent: {
     width: '100%',
     flexDirection: 'row',
   },
-});
+} satisfies ThemedStyles);

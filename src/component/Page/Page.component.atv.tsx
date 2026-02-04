@@ -1,29 +1,25 @@
 import { useIsFocused } from '@react-navigation/native';
-import AppUpdater from 'Component/AppUpdater';
-import FallbackComponent from 'Component/FallbackComponent';
+import { AppUpdater } from 'Component/AppUpdater';
 import { Portal } from 'Component/ThemedPortal';
 import { useNavigationContext } from 'Context/NavigationContext';
-import React, { useCallback } from 'react';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
+import { useCallback } from 'react';
 import { View } from 'react-native';
-import ErrorBoundary from 'react-native-error-boundary';
-import Animated from 'react-native-reanimated';
 import { Directions, SpatialNavigationRoot } from 'react-tv-space-navigation';
-import LoggerStore from 'Store/Logger.store';
 import { SpatialNavigationKeyboardLocker } from 'Util/RemoteControl/SpatialNavigationKeyboardLocker';
 
-import { styles } from './Page.style.atv';
+import { componentStyles } from './Page.style.atv';
 import { PageComponentProps } from './Page.type';
 
 export function PageComponent({
   children,
   style,
   contentStyle,
-  disableWrapper,
+  fullscreen,
 }: PageComponentProps) {
   const isFocused = useIsFocused();
   const { isMenuOpen, toggleMenu, isNavigationLocked } = useNavigationContext();
-
-  const isActive = isFocused && !isMenuOpen;
+  const styles = useThemedStyles(componentStyles);
 
   const onDirectionHandledWithoutMovement = useCallback(
     (movement: string) => {
@@ -35,33 +31,22 @@ export function PageComponent({
   );
 
   return (
-    <Animated.View
-      style={ !disableWrapper ? [
-        styles.container,
-        isMenuOpen && styles.containerOpened,
-        style,
-      ] : styles.wrapper }
+    <View
+      style={ [styles.container, style, fullscreen && styles.fullscreen] }
     >
-      <ErrorBoundary
-        FallbackComponent={ FallbackComponent }
-        onError={ (error, stackTrace) => {
-          LoggerStore.error('PageComponent', { error, stackTrace });
-        } }
+      <SpatialNavigationRoot
+        isActive={ isFocused && !isMenuOpen }
+        onDirectionHandledWithoutMovement={ onDirectionHandledWithoutMovement }
       >
-        <SpatialNavigationRoot
-          isActive={ isActive }
-          onDirectionHandledWithoutMovement={ onDirectionHandledWithoutMovement }
-        >
-          <SpatialNavigationKeyboardLocker />
-          <Portal.Host>
-            <View style={ !disableWrapper ? [styles.content, contentStyle] : styles.wrapper }>
-              <AppUpdater />
-              { children }
-            </View>
-          </Portal.Host>
-        </SpatialNavigationRoot>
-      </ErrorBoundary>
-    </Animated.View>
+        <SpatialNavigationKeyboardLocker />
+        <Portal.Host>
+          <View style={ [styles.content, contentStyle, fullscreen && styles.fullscreen] }>
+            <AppUpdater position='page' />
+            { children }
+          </View>
+        </Portal.Host>
+      </SpatialNavigationRoot>
+    </View>
   );
 }
 

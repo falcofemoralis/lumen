@@ -155,7 +155,7 @@ const accountApi: RezkaAccountApiInterface = {
     return true;
   },
 
-  unloadRecentPage() {
+  unloadRecentScreen() {
     this.recentItems = null;
   },
 

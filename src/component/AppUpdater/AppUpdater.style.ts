@@ -1,71 +1,70 @@
-import { Colors } from 'Style/Colors';
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale, colors, text }: Theme) => ({
   loadingContainer: {
     opacity: 0.5,
     pointerEvents: 'none',
   },
   wrapper: {
-    paddingVertical: 16,
+    paddingVertical: scale(16),
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    gap: 8,
+    gap: scale(8),
   },
   headerIcon: {
-    height: 32,
-    width: 32,
+    height: scale(32),
+    width: scale(32),
   },
   headerText: {
-    fontSize: 16,
+    fontSize: scale(text.sm.fontSize),
     fontWeight: '700',
-    color: Colors.textSecondary,
+    color: colors.textSecondary,
   },
   closeIcon: {
-    height: 16,
-    width: 16,
+    height: scale(16),
+    width: scale(16),
   },
   closeBtn: {
     position: 'absolute',
     top: 0,
     right: 0,
-    borderRadius: 50,
+    borderRadius: scale(50),
   },
   closeBtnContent: {
-    padding: 8,
+    padding: scale(8),
   },
   updateText: {
-    fontSize: 16,
+    fontSize: scale(text.sm.fontSize),
     fontWeight: '700',
-    marginTop: 16,
+    marginTop: scale(16),
   },
   versionText: {
-    fontSize: 14,
-    color: Colors.textSecondary,
+    fontSize: scale(text.xs.fontSize),
+    color: colors.textSecondary,
   },
   newText: {
-    fontSize: 16,
+    fontSize: scale(text.sm.fontSize),
     fontWeight: '700',
-    marginTop: 16,
+    marginTop: scale(16),
   },
   descriptionText: {
-    fontSize: 14,
-    color: Colors.textSecondary,
+    fontSize: scale(text.xs.fontSize),
+    color: colors.textSecondary,
   },
   actions: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: 8,
-    marginTop: 16,
+    gap: scale(8),
+    marginTop: scale(16),
   },
   buttonContainer: {
     overflow: 'hidden',
-    height: 48,
+    height: scale(48),
     width: '50%',
-    borderRadius: 8,
+    borderRadius: scale(8),
   },
   button: {
     flex: 1,
@@ -80,10 +79,10 @@ export const styles = CreateStyles({
     alignItems: 'center',
   },
   skipButton: {
-    backgroundColor: Colors.backgroundLight,
+    backgroundColor: colors.backgroundLight,
   },
   updateButton: {
-    backgroundColor: Colors.secondary,
+    backgroundColor: colors.secondary,
   },
   loader: {
     position: 'absolute',
@@ -94,4 +93,4 @@ export const styles = CreateStyles({
     alignItems: 'center',
     justifyContent: 'center',
   },
-});
+} satisfies ThemedStyles);

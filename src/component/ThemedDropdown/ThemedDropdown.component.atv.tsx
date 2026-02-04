@@ -1,12 +1,13 @@
-import ThemedButton from 'Component/ThemedButton';
-import ThemedOverlay from 'Component/ThemedOverlay';
+import { ThemedButton } from 'Component/ThemedButton';
+import { ThemedOverlay } from 'Component/ThemedOverlay';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
-import ThemedSimpleList from 'Component/ThemedSimpleList';
+import { ThemedSimpleList } from 'Component/ThemedSimpleList';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { Plus } from 'lucide-react-native';
-import React, { memo, useRef } from 'react';
+import { memo, useRef } from 'react';
 import { View } from 'react-native';
 
-import { styles } from './ThemedDropdown.style.atv';
+import { componentStyles } from './ThemedDropdown.style.atv';
 import { ThemedDropdownComponentProps } from './ThemedDropdown.type';
 
 export const ThemedDropdownComponent = ({
@@ -20,6 +21,7 @@ export const ThemedDropdownComponent = ({
   overlayRef,
   onClose,
 }: ThemedDropdownComponentProps) => {
+  const styles = useThemedStyles(componentStyles);
   const componentOverlayRef = useRef<ThemedOverlayRef>(null);
 
   const renderModal = () => {

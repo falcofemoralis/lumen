@@ -1,20 +1,16 @@
-import InfoBlock from 'Component/InfoBlock';
-import ThemedPressable from 'Component/ThemedPressable';
-import t from 'i18n/t';
+import { InfoBlock } from 'Component/InfoBlock';
+import { ThemedPressable } from 'Component/ThemedPressable';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
+import { t } from 'i18n/translate';
 import { Square, SquareCheck } from 'lucide-react-native';
-import React from 'react';
-import {
-  Text,
-  View,
-} from 'react-native';
+import { Text, View } from 'react-native';
 import {
   DefaultFocus,
   SpatialNavigationVirtualizedList,
 } from 'react-tv-space-navigation';
-import { Colors } from 'Style/Colors';
-import { scale } from 'Util/CreateStyles';
+import { useAppTheme } from 'Theme/context';
 
-import { styles } from './ThemedMultiList.style.atv';
+import { componentStyles } from './ThemedMultiList.style.atv';
 import { ListItem, ThemedMultiListComponentProps } from './ThemedMultiList.type';
 
 export const ThemedMultiListComponent = ({
@@ -24,6 +20,9 @@ export const ThemedMultiListComponent = ({
   noItemsSubtitle,
   handleOnChange,
 }: ThemedMultiListComponentProps) => {
+  const { scale, theme } = useAppTheme();
+  const styles = useThemedStyles(componentStyles);
+
   const renderHeader = () => {
     if (!header) {
       return null;
@@ -59,12 +58,12 @@ export const ThemedMultiListComponent = ({
           </View>
           { item.isChecked ? (
             <SquareCheck
-              color={ Colors.primary }
+              color={ theme.colors.primary }
               size={ scale(20) }
             />
           ) : (
             <Square
-              color={ isFocused ? Colors.black : Colors.white }
+              color={ isFocused ? theme.colors.iconFocused : theme.colors.icon }
               size={ scale(20) }
             />
           ) }

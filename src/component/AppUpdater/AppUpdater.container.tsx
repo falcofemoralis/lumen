@@ -1,18 +1,19 @@
 import { ThemedBottomSheetRef } from 'Component/ThemedBottomSheet/ThemedBottomSheet.type';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useAppUpdaterContext } from 'Context/AppUpdaterContext';
-import { withTV } from 'Hooks/withTV';
+import { useConfigContext } from 'Context/ConfigContext';
 import { useEffect, useRef, useState } from 'react';
 import { Platform } from 'react-native';
 import { useLockSpatialNavigation } from 'react-tv-space-navigation';
-import ConfigStore from 'Store/Config.store';
 import { Installer } from 'Util/App/installer';
 
 import AppUpdaterComponent from './AppUpdater.component';
 import AppUpdaterComponentTV from './AppUpdater.component.atv';
+import { AppUpdaterContainerProps } from './AppUpdater.type';;
 
-export const AppUpdaterContainer = () => {
+export const AppUpdaterContainer = ({ position }: AppUpdaterContainerProps) => {
   const { update, isUpdateRejected, resetUpdate } = useAppUpdaterContext();
+  const { isTV } = useConfigContext();
   const [isLoading, setIsLoading] = useState(false);
   const { lock, unlock } = useLockSpatialNavigation();
   const [progress, setProgress] = useState(0);
@@ -20,7 +21,7 @@ export const AppUpdaterContainer = () => {
   const bottomSheetRef = useRef<ThemedBottomSheetRef>(null);
 
   const openPopup = () => {
-    if (ConfigStore.isTV()) {
+    if (isTV) {
       overlayRef.current?.open();
     } else {
       bottomSheetRef.current?.present();
@@ -28,7 +29,7 @@ export const AppUpdaterContainer = () => {
   };
 
   const closePopup = () => {
-    if (!ConfigStore.isTV()) {
+    if (!isTV) {
       bottomSheetRef.current?.dismiss();
     }
 
@@ -36,12 +37,22 @@ export const AppUpdaterContainer = () => {
   };
 
   useEffect(() => {
-    if (update && ConfigStore.isTV()) {
+    if (update && isTV) {
       setTimeout(() => {
         openPopup();
       }, 0);
     }
   }, [update]);
+
+  if (isTV) {
+    if (position === 'root') {
+      return null;
+    }
+  } else {
+    if (position === 'page') {
+      return null;
+    }
+  }
 
   if (!update || isUpdateRejected) {
     return null;
@@ -61,7 +72,7 @@ export const AppUpdaterContainer = () => {
       return;
     }
 
-    if (ConfigStore.isTV()) {
+    if (isTV) {
       lock();
     }
 
@@ -76,7 +87,7 @@ export const AppUpdaterContainer = () => {
     if (!result) {
       setIsLoading(false);
 
-      if (ConfigStore.isTV()) {
+      if (isTV) {
         unlock();
       }
 
@@ -99,7 +110,7 @@ export const AppUpdaterContainer = () => {
     onBottomSheetMount,
   };
 
-  return withTV(AppUpdaterComponentTV, AppUpdaterComponent, containerProps);
+  return isTV ? <AppUpdaterComponentTV { ...containerProps } /> : <AppUpdaterComponent { ...containerProps } />;
 };
 
 export default AppUpdaterContainer;

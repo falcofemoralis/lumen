@@ -1,12 +1,11 @@
-import { Colors } from 'Style/Colors';
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale, colors, text }: Theme) => ({
   container: {
     position: 'relative',
     width: '100%',
     height: '100%',
-    backgroundColor: Colors.black,
+    backgroundColor: colors.background,
   },
   containerWithComments: {
     width: '60%',
@@ -22,7 +21,7 @@ export const styles = CreateStyles({
     height: '60%',
     width: '100%',
     zIndex: 1,
-    backgroundColor: Colors.transparent,
+    backgroundColor: colors.transparent,
     opacity: 1,
   },
   backgroundGradient: {
@@ -33,8 +32,8 @@ export const styles = CreateStyles({
     position: 'absolute',
     bottom: 0,
     left: 0,
-    paddingHorizontal: 48,
-    paddingBottom: 32,
+    paddingHorizontal: scale(48),
+    paddingBottom: scale(32),
     backgroundColor: 'transparent',
     width: '100%',
     height: 'auto',
@@ -43,7 +42,7 @@ export const styles = CreateStyles({
   },
   controlsRow: {
     flexDirection: 'row',
-    gap: 14,
+    gap: scale(14),
     opacity: 1,
   },
   controlsRowLine: {
@@ -56,12 +55,12 @@ export const styles = CreateStyles({
   topInfo: {
   },
   title: {
-    fontSize: 36,
-    marginBottom: 4,
+    fontSize: scale(text.xxl.fontSize),
+    marginBottom: scale(4),
   },
   subtitle: {
-    fontSize: 18,
-    marginBottom: 20,
+    fontSize: scale(text.md.fontSize),
+    marginBottom: scale(20),
   },
   bottomActions: {
     width: '100%',
@@ -72,12 +71,12 @@ export const styles = CreateStyles({
   action: {
     justifyContent: 'center',
     alignItems: 'center',
-    height: 46,
-    width: 46,
+    height: scale(46),
+    width: scale(46),
   },
   focusedAction: {
-    borderRadius: 50,
-    backgroundColor: Colors.whiteTransparent,
+    borderRadius: scale(50),
+    backgroundColor: colors.whiteTransparent,
   },
   commentsOverlay: {
     width: '40%',
@@ -85,17 +84,17 @@ export const styles = CreateStyles({
     marginRight: 0,
   },
   commentsOverlayModal: {
-    backgroundColor: Colors.transparent,
+    backgroundColor: colors.transparent,
   },
   commentsOverlayContent: {
     height: '100%',
   },
   topActionLine: {
     flexDirection: 'column',
-    gap: 8,
+    gap: scale(8),
   },
   topActionLineText: {
-    fontSize: 16,
+    fontSize: scale(text.sm.fontSize),
     textAlign: 'right',
   },
-});
+} satisfies ThemedStyles);

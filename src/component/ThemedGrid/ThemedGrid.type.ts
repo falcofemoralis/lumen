@@ -1,8 +1,7 @@
-import React from 'react';
 import { StyleProp, ViewStyle } from 'react-native';
 
 export interface ThemedGridRowProps<T = any> {
-  item: T,
+  item: T & { isPlaceholder?: boolean };
   index: number;
 }
 
@@ -14,9 +13,7 @@ export interface ThemedGridContainerProps<T = any> {
   rowStyle?: StyleProp<ViewStyle>;
   header?: React.ReactNode;
   headerSize?: number;
-  ListEmptyComponent?: React.ComponentType<any>
-  | React.ReactElement<any, string
-  | React.JSXElementConstructor<any>>;
+  scrollBehavior?: 'stick-to-start' | 'stick-to-center';
   ListHeaderComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
   renderItem: (args: ThemedGridRowProps<T>) => React.ReactNode;
   onNextLoad?: (isRefresh: boolean) => Promise<void>;
@@ -31,7 +28,7 @@ export interface ThemedGridComponentProps<T = any> {
   rowStyle?: StyleProp<ViewStyle>;
   header?: React.ReactNode;
   headerSize?: number;
-  ListEmptyComponent?: any;
+  scrollBehavior?: 'stick-to-start' | 'stick-to-center';
   ListHeaderComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
   renderItem: (props: { item: T, index: number }) => React.ReactNode;
   handleScrollEnd: () => void;

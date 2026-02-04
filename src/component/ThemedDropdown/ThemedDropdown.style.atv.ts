@@ -1,9 +1,9 @@
 import { ITEM_HEIGHT, MAX_ITEMS_TO_DISPLAY } from 'Component/ThemedSimpleList/ThemedSimpleList.style.atv';
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale }: Theme) => ({
   input: {
-    borderRadius: 12,
+    borderRadius: scale(12),
   },
   inputFocused: {
   },
@@ -12,13 +12,13 @@ export const styles = CreateStyles({
   inputTextFocused: {
   },
   inputImage: {
-    height: 20,
-    width: 20,
+    height: scale(20),
+    width: scale(20),
     alignSelf: 'center',
   },
   container: {
   },
   contentContainer: {
-    maxHeight: MAX_ITEMS_TO_DISPLAY * ITEM_HEIGHT - 16,
+    maxHeight: MAX_ITEMS_TO_DISPLAY * scale(ITEM_HEIGHT) - scale(16),
   },
-});
+} satisfies ThemedStyles);

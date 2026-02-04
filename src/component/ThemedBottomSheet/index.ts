@@ -1,1 +1,1 @@
-export { default } from './ThemedBottomSheet.component';
+export { default as ThemedBottomSheet } from './ThemedBottomSheet.component';

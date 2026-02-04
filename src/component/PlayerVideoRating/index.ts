@@ -1,1 +1,1 @@
-export { default } from './PlayerVideoRating.container';
+export { default as PlayerVideoRating } from './PlayerVideoRating.container';

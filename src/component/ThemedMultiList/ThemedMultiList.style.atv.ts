@@ -1,12 +1,11 @@
-import { Colors } from 'Style/Colors';
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
 const MAX_ITEMS_TO_DISPLAY = 6;
 const ITEM_HEIGHT = 48;
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale, colors, text }: Theme) => ({
   input: {
-    borderRadius: 12,
+    borderRadius: scale(12),
   },
   inputFocused: {
   },
@@ -15,21 +14,21 @@ export const styles = CreateStyles({
   inputTextFocused: {
   },
   inputImage: {
-    height: 20,
-    width: 20,
+    height: scale(20),
+    width: scale(20),
     alignSelf: 'center',
   },
   icon: {
-    marginRight: 5,
-    height: 20,
-    width: 20,
+    marginRight: scale(5),
+    height: scale(20),
+    width: scale(20),
   },
   iconFocused: {
   },
   container: {
   },
   listContainer: {
-    maxHeight: MAX_ITEMS_TO_DISPLAY * ITEM_HEIGHT - 16,
+    maxHeight: MAX_ITEMS_TO_DISPLAY * scale(ITEM_HEIGHT) - scale(16),
     alignSelf: 'flex-end',
     height: '100%',
   },
@@ -39,53 +38,53 @@ export const styles = CreateStyles({
     overflow: 'hidden',
     flex: 1,
     flexDirection: 'column',
-    minWidth: 300,
-    paddingHorizontal: 12,
-    marginHorizontal: -12,
+    minWidth: scale(300),
+    paddingHorizontal: scale(12),
+    marginHorizontal: scale(-12),
   },
   scrollView: {
   },
   header: {
     justifyContent: 'center',
     alignItems: 'center',
-    paddingBottom: 10,
-    borderBottomColor: Colors.divider,
+    paddingBottom: scale(10),
+    borderBottomColor: colors.divider,
     borderBottomWidth: 1,
   },
   headerText: {
-    color: Colors.textSecondary,
-    fontSize: 14,
-    lineHeight: 16,
+    color: colors.textSecondary,
+    fontSize: scale(text.xs.fontSize),
+    lineHeight: scale(16),
     fontWeight: '500',
   },
   item: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 10,
-    height: ITEM_HEIGHT,
+    paddingHorizontal: scale(10),
+    height: scale(ITEM_HEIGHT),
     width: '100%',
-    borderRadius: 12,
+    borderRadius: scale(12),
   },
   itemFocused: {
-    backgroundColor: Colors.backgroundFocused,
-    borderRadius: 12,
+    backgroundColor: colors.backgroundFocused,
+    borderRadius: scale(12),
   },
   itemContainer: {
     flexDirection: 'row',
     flex: 1,
   },
   text: {
-    color: Colors.text,
-    fontSize: 14,
-    lineHeight: 20,
+    color: colors.text,
+    fontSize: scale(text.xs.fontSize),
+    lineHeight: scale(20),
     fontWeight: '500',
   },
   textFocused: {
-    color: Colors.textFocused,
+    color: colors.textFocused,
   },
   textSelected: {
-    color: Colors.textOnPrimary,
+    color: colors.textOnTertiary,
   },
   iconSelected: {
   },
@@ -93,4 +92,4 @@ export const styles = CreateStyles({
     justifyContent: 'center',
     flex: 1,
   },
-});
+} satisfies ThemedStyles);

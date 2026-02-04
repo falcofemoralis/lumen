@@ -1,6 +1,6 @@
+import { useConfigContext } from 'Context/ConfigContext';
 import { useMemo } from 'react';
 import { SpatialNavigationVirtualizedGrid } from 'react-tv-space-navigation';
-import ConfigStore from 'Store/Config.store';
 
 import { SCROLL_EVENT_UPDATES_MS_TV } from './ThemedGrid.config';
 import { ThemedGridComponentProps } from './ThemedGrid.type';
@@ -13,15 +13,12 @@ export const ThemedGridComponent = ({
   rowStyle,
   header,
   headerSize,
-  ListEmptyComponent,
+  scrollBehavior = 'stick-to-start',
   renderItem,
   handleScrollEnd,
 }: ThemedGridComponentProps) => {
+  const { isTVGridAnimation } = useConfigContext();
   const memoData = useMemo(() => data.map((element, index) => ({ ...element, index })), [data]);
-
-  if (!memoData.length) {
-    return ListEmptyComponent;
-  }
 
   return (
     <SpatialNavigationVirtualizedGrid
@@ -35,8 +32,8 @@ export const ThemedGridComponent = ({
       onEndReachedThresholdRowsNumber={ 2 }
       style={ style }
       additionalRenderedRows={ 2 }
-      scrollBehavior='stick-to-center'
-      scrollDuration={ ConfigStore.getConfig().isTVGridAnimation ? 250 : 0 }
+      scrollBehavior={ scrollBehavior }
+      scrollDuration={ isTVGridAnimation ? 250 : 0 }
       header={ header }
       headerSize={ headerSize }
     />

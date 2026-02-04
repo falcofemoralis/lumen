@@ -1,26 +1,22 @@
 /* eslint-disable max-len */
 import { ApiServiceType, ConfigApiInterface, ServiceConfigInterface } from 'Api/index';
 import * as Device from 'expo-device';
-import t from 'i18n/t';
-import { Platform } from 'react-native';
-import LoggerStore from 'Store/Logger.store';
+import { t } from 'i18n/translate';
 import NotificationStore from 'Store/Notification.store';
 import { FilmStreamInterface } from 'Type/FilmStream.interface';
 import { ModifiedProvider } from 'Type/ModifiedProvider.interface';
-import { getConfigJson, updateConfig } from 'Util/Config';
 import { safeJsonParse } from 'Util/Json';
 import { HTMLElementInterface, parseHtml } from 'Util/Parser';
-import { addProxyHeaders, executeGet, executePost, Variables } from 'Util/Request';
+import { executeGet, executePost, Variables } from 'Util/Request';
+import { storage } from 'Util/Storage';
 import { updateUrlHost } from 'Util/Url';
 
 const REZKA_CONFIG = 'rezkaConfig';
 
-const REZKA_PROXY_PROVIDER = process.env.EXPO_PUBLIC_APP_URL ?? 'http://localhost:3000';
-
 const configApi: ConfigApiInterface = {
   serviceType: ApiServiceType.REZKA,
   defaultProviders: [
-    'https://rezka-ua.org',
+    'https://rezka-ua.pub',
   ],
   defaultCDNs: [
     'https://prx-cogent.ukrtelcdn.net',
@@ -29,6 +25,7 @@ const configApi: ConfigApiInterface = {
     'https://prx4-cogent.ukrtelcdn.net',
     'https://prx5-cogent.ukrtelcdn.net',
     'https://prx6-cogent.ukrtelcdn.net',
+    'https://prx-ams.ukrtelcdn.net',
     'https://stream.voidboost.cc',
     'https://stream.voidboost.top',
     'https://stream.voidboost.link',
@@ -62,7 +59,7 @@ const configApi: ConfigApiInterface = {
         officialMode: '',
       };
 
-      const config = getConfigJson<ServiceConfigInterface>(REZKA_CONFIG);
+      const config = storage.getConfigStorage().load<ServiceConfigInterface>(REZKA_CONFIG);
 
       if (config) {
         this.config = {
@@ -76,10 +73,10 @@ const configApi: ConfigApiInterface = {
   },
 
   async updateConfig(key: keyof ServiceConfigInterface, value: unknown) {
-    updateConfig(REZKA_CONFIG, JSON.stringify({
+    storage.getConfigStorage().save(REZKA_CONFIG, {
       ...this.config,
       [key]: value,
-    }));
+    });
   },
 
   setProvider(provider: string): void {
@@ -139,14 +136,9 @@ const configApi: ConfigApiInterface = {
     return headers;
   },
 
-  getProxyHeaders(): HeadersInit {
-    const headers = this.getHeaders();
-
-    return addProxyHeaders(headers, this.getProvider());
-  },
-
   parseContent(content: string): HTMLElementInterface {
     const page = parseHtml(content);
+
     const error = page.querySelector('.error-code');
 
     if (error) {
@@ -195,9 +187,7 @@ const configApi: ConfigApiInterface = {
     variables: Variables = {}
   ) {
     const { query, provider } = this.modifyProvider(queryInput);
-    const headers = Platform.OS === 'web' ? this.getProxyHeaders() : this.getHeaders();
-
-    LoggerStore.debug('configApi::getRequest', { query, provider, variables });
+    const headers = this.getHeaders();
 
     return executeGet(
       query,
@@ -218,12 +208,7 @@ const configApi: ConfigApiInterface = {
     variables: Record<string, string> = {}
   ) {
     const { query, provider } = this.modifyProvider(queryInput);
-    const headers = Platform.OS === 'web' ? this.getProxyHeaders() : this.getHeaders();
-
-    if (!query.includes('/login')) {
-      // do not include login request
-      LoggerStore.debug('configApi::postRequest', { query, provider, variables });
-    }
+    const headers = this.getHeaders();
 
     return executePost(
       `${query}/?t=${Date.now()}`,
@@ -261,11 +246,9 @@ const configApi: ConfigApiInterface = {
    * @returns ModifiedUrl
    */
   modifyProvider(query: string): ModifiedProvider {
-    const isWeb = Platform.OS === 'web';
-
     return {
-      query: isWeb ? updateUrlHost(query, REZKA_PROXY_PROVIDER) : query,
-      provider: isWeb ? REZKA_PROXY_PROVIDER : this.getProvider(),
+      query: query,
+      provider: this.getProvider(),
     };
   },
 
@@ -294,7 +277,5 @@ const configApi: ConfigApiInterface = {
     return !!this.getOfficialMode();
   },
 };
-
-export { REZKA_PROXY_PROVIDER };
 
 export default configApi;

@@ -1,11 +1,11 @@
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale, text }: Theme) => ({
   duration: {
     width: 'auto',
   },
   durationText: {
-    fontSize: 16,
+    fontSize: scale(text.sm.fontSize),
     textAlign: 'right',
   },
-});
+} satisfies ThemedStyles);

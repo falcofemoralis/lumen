@@ -1,11 +1,12 @@
-import Loader from 'Component/Loader';
-import PlayerVideoRating from 'Component/PlayerVideoRating';
-import ThemedButton from 'Component/ThemedButton';
-import ThemedDropdown from 'Component/ThemedDropdown';
-import ThemedOverlay from 'Component/ThemedOverlay';
-import ThemedSimpleList from 'Component/ThemedSimpleList';
-import t from 'i18n/t';
-import React, { memo } from 'react';
+import { Loader } from 'Component/Loader';
+import { PlayerVideoRating } from 'Component/PlayerVideoRating';
+import { ThemedButton } from 'Component/ThemedButton';
+import { ThemedDropdown } from 'Component/ThemedDropdown';
+import { ThemedOverlay } from 'Component/ThemedOverlay';
+import { ThemedSimpleList } from 'Component/ThemedSimpleList';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
+import { t } from 'i18n/translate';
+import { memo } from 'react';
 import { View } from 'react-native';
 import {
   DefaultFocus,
@@ -15,7 +16,7 @@ import {
 import { EpisodeInterface, SeasonInterface } from 'Type/FilmVoice.interface';
 import { getVideoProgress } from 'Util/Player';
 
-import { styles } from './PlayerVideoSelector.style.atv';
+import { componentStyles } from './PlayerVideoSelector.style.atv';
 import { PlayerVideoSelectorComponentProps } from './PlayerVideoSelector.type';
 
 export function PlayerVideoSelectorComponent({
@@ -37,6 +38,8 @@ export function PlayerVideoSelectorComponent({
   voiceOverlayRef,
   onClose,
 }: PlayerVideoSelectorComponentProps) {
+  const styles = useThemedStyles(componentStyles);
+
   const renderVoiceRating = () => {
     const { voiceRating = [] } = film;
 

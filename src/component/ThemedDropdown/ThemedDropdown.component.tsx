@@ -1,13 +1,14 @@
-import ThemedButton from 'Component/ThemedButton';
-import ThemedOverlay from 'Component/ThemedOverlay';
+import { ThemedButton } from 'Component/ThemedButton';
+import { ThemedOverlay } from 'Component/ThemedOverlay';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
-import ThemedSimpleList from 'Component/ThemedSimpleList';
+import { ThemedSimpleList } from 'Component/ThemedSimpleList';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { Plus } from 'lucide-react-native';
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import { View } from 'react-native';
-import { Colors } from 'Style/Colors';
+import { useAppTheme } from 'Theme/context';
 
-import { styles } from './ThemedDropdown.style';
+import { componentStyles } from './ThemedDropdown.style';
 import { ThemedDropdownComponentProps } from './ThemedDropdown.type';
 
 export const ThemedDropdownComponent = ({
@@ -22,6 +23,8 @@ export const ThemedDropdownComponent = ({
   style,
   onClose,
 }: ThemedDropdownComponentProps) => {
+  const { theme } = useAppTheme();
+  const styles = useThemedStyles(componentStyles);
   const componentOverlayRef = useRef<ThemedOverlayRef>(null);
 
   const renderModal = () => {
@@ -58,7 +61,7 @@ export const ThemedDropdownComponent = ({
         onPress={ () => (overlayRef || componentOverlayRef).current?.open() }
         IconComponent={ Plus }
         iconProps={ {
-          color: Colors.text,
+          color: theme.colors.text,
           size: 18,
         } }
         rightImage={ endIcon }

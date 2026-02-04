@@ -1,18 +1,18 @@
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-export const ROW_GAP = 8;
+const ROW_GAP = 8;
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale, text }: Theme) => ({
   gridRow: {
     flexDirection: 'row',
     width: '100%',
-    gap: ROW_GAP,
-    paddingBottom: ROW_GAP,
+    gap: scale(ROW_GAP),
+    paddingBottom: scale(ROW_GAP),
   },
   headerText: {
-    fontSize: 24,
+    fontSize: scale(text.xl.fontSize),
     fontWeight: '700',
-    paddingBottom: 4,
-    marginBottom: 4,
+    paddingBottom: scale(4),
+    marginBottom: scale(4),
   },
-});
+} satisfies ThemedStyles);

@@ -1,4 +1,4 @@
-import SettingBase from 'Component/SettingBase';
+import { SettingBase } from 'Component/SettingBase';
 
 import { SettingTextComponentProps } from './SettingText.type';
 

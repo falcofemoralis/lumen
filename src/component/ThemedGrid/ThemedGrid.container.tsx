@@ -1,10 +1,9 @@
-import { withTV } from 'Hooks/withTV';
+import { useConfigContext } from 'Context/ConfigContext';
 import {
   useEffect,
   useRef,
   useState,
 } from 'react';
-import LoggerStore from 'Store/Logger.store';
 import { noopFn } from 'Util/Function';
 
 import ThemedGridComponent from './ThemedGrid.component';
@@ -19,11 +18,12 @@ export function ThemedGridContainer({
   rowStyle,
   header,
   headerSize,
-  ListEmptyComponent,
   ListHeaderComponent,
+  scrollBehavior,
   renderItem,
   onNextLoad,
 }: ThemedGridContainerProps) {
+  const { isTV } = useConfigContext();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const updatingStateRef = useRef(false);
 
@@ -42,8 +42,6 @@ export function ThemedGridContainer({
           await onNextLoad(isRefresh);
         }
       } catch (error) {
-        LoggerStore.error('loadNextPage', { error });
-
         updatingStateRef.current = false;
       } finally {
         onLoading(false);
@@ -59,12 +57,7 @@ export function ThemedGridContainer({
     loadNextPage((state) => setIsRefreshing(state), true);
   };
 
-  const containerFunctions = {
-    handleScrollEnd,
-    handleRefresh,
-  };
-
-  const containerProps = () => ({
+  const containerProps = {
     data,
     numberOfColumns,
     isRefreshing,
@@ -73,15 +66,15 @@ export function ThemedGridContainer({
     rowStyle,
     header,
     headerSize,
-    ListEmptyComponent,
+    scrollBehavior,
     ListHeaderComponent,
     renderItem,
-  });
+    handleScrollEnd,
+    handleRefresh,
+  };
 
-  return withTV(ThemedGridComponentTV, ThemedGridComponent, {
-    ...containerFunctions,
-    ...containerProps(),
-  });
+  return isTV ? <ThemedGridComponentTV { ...containerProps } /> : <ThemedGridComponent { ...containerProps } />;
+
 }
 
 export default ThemedGridContainer;

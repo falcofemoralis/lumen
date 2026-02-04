@@ -1,5 +1,5 @@
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
-import t from 'i18n/t';
+import { t } from 'i18n/translate';
 
 import { ProgressStatus } from './Player.type';
 
@@ -9,6 +9,8 @@ export const DEFAULT_PROGRESS_STATUS: ProgressStatus = {
   currentTime: '-',
   durationTime: '-',
   remainingTime: '-',
+  bufferedTime: '0',
+  endDate: undefined,
 };
 
 export enum RewindDirection {

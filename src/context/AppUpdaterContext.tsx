@@ -7,13 +7,12 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { Platform } from 'react-native';
-import ConfigStore from 'Store/Config.store';
-import LoggerStore from 'Store/Logger.store';
-import StorageStore from 'Store/Storage.store';
 import { UpdateInterface } from 'Type/Update.interface';
 import { noopFn } from 'Util/Function';
 import { versionStringToNumber } from 'Util/Misc';
+import { storage } from 'Util/Storage';
+
+import { useConfigContext } from './ConfigContext';
 
 const UPDATE_STORAGE_KEY = 'app_update';
 
@@ -34,11 +33,12 @@ const AppUpdaterContext = createContext<AppUpdaterContextInterface>({
 });
 
 export const AppUpdaterProvider = ({ children }: { children: React.ReactNode }) => {
+  const { isConfigured } = useConfigContext();
   const [update, setUpdate] = useState<UpdateInterface | null>(null);
   const [isUpdateRejected, setIsUpdateRejected] = useState(false);
 
   const getCachedUpdate = useCallback(async () => {
-    const cachedData = StorageStore.getMiscStorage().getString(UPDATE_STORAGE_KEY);
+    const cachedData = storage.getMiscStorage().loadString(UPDATE_STORAGE_KEY);
 
     if (cachedData) {
       const { data, ttl } = JSON.parse(cachedData) as { data: UpdateInterface; ttl: number };
@@ -51,7 +51,7 @@ export const AppUpdaterProvider = ({ children }: { children: React.ReactNode }) 
     const response = await fetch(UPDATE_LINK);
     const data = await response.json() as UpdateInterface;
 
-    StorageStore.getMiscStorage().set(UPDATE_STORAGE_KEY, JSON.stringify({
+    storage.getMiscStorage().saveString(UPDATE_STORAGE_KEY, JSON.stringify({
       data,
       ttl: Date.now() + 1000 * 60 * 60, // 1 hour
     }));
@@ -60,7 +60,7 @@ export const AppUpdaterProvider = ({ children }: { children: React.ReactNode }) 
   }, []);
 
   const checkVersion = useCallback(async () => {
-    if (!ConfigStore.isConfigured() || Platform.OS === 'web') {
+    if (!isConfigured) {
       return;
     }
 
@@ -74,9 +74,8 @@ export const AppUpdaterProvider = ({ children }: { children: React.ReactNode }) 
         setUpdate(data);
       }
     } catch (error) {
-      LoggerStore.error('checkVersion', { error });
     }
-  }, [getCachedUpdate]);
+  }, [isConfigured, getCachedUpdate]);
 
   const resetUpdate = useCallback(() => {
     setUpdate(null);

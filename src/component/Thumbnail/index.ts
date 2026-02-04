@@ -1,1 +1,1 @@
-export { default } from './Thumbnail.component';
+export { default as Thumbnail } from './Thumbnail.component';

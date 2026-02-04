@@ -1,6 +1,6 @@
 import { View } from 'react-native';
 import { Pressable } from 'react-native-gesture-handler';
-import { Colors } from 'Style/Colors';
+import { useAppTheme } from 'Theme/context';
 
 import { ThemedPressableComponentProps } from './ThemedPressable.type';
 
@@ -16,6 +16,8 @@ export const ThemedPressableComponent = ({
   pressDelay = 50,
   additionalElement,
 }: ThemedPressableComponentProps) => {
+  const { theme } = useAppTheme();
+
   return (
     <View style={ [style, { overflow: 'hidden' }] }>
       { additionalElement }
@@ -25,7 +27,7 @@ export const ThemedPressableComponent = ({
         onLongPress={ onLongPress }
         disabled={ disabled }
         android_ripple={ {
-          color: mode === 'light' ? Colors.whiteTransparent : Colors.button,
+          color: mode === 'light' ? theme.colors.whiteTransparent : theme.colors.button,
         } }
         unstable_pressDelay={ pressDelay }
         style={ [{

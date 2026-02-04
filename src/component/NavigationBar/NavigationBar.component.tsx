@@ -1,24 +1,18 @@
 import { NavigationRoute, ParamListBase } from '@react-navigation/native';
-import ThemedImage from 'Component/ThemedImage';
-import ThemedPressable from 'Component/ThemedPressable';
-import ThemedText from 'Component/ThemedText';
+import { ThemedImage } from 'Component/ThemedImage';
+import { ThemedPressable } from 'Component/ThemedPressable';
+import { ThemedText } from 'Component/ThemedText';
 import { useServiceContext } from 'Context/ServiceContext';
-import { ACCOUNT_ROUTE } from 'Navigation/routes';
-import React, { useCallback } from 'react';
-import {
-  Image,
-  useWindowDimensions,
-  View,
-} from 'react-native';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
+import { ACCOUNT_TAB } from 'Navigation/navigationRoutes';
+import { useCallback } from 'react';
+import { Image, useWindowDimensions, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Colors } from 'Style/Colors';
-import { scale } from 'Util/CreateStyles';
+import { useAppTheme } from 'Theme/context';
 
-import { styles, TAB_ADDITIONAL_SIZE } from './NavigationBar.style';
-import {
-  NavigationBarComponentProps,
-} from './NavigationBar.type';
+import { componentStyles, TAB_ADDITIONAL_SIZE } from './NavigationBar.style';
+import { NavigationBarComponentProps } from './NavigationBar.type';
 
 export function NavigationBarComponent({
   state,
@@ -27,6 +21,8 @@ export function NavigationBarComponent({
   onPress,
   onLongPress,
 }: NavigationBarComponentProps) {
+  const { scale, theme } = useAppTheme();
+  const styles = useThemedStyles(componentStyles);
   const { badgeData } = useServiceContext();
   const { width } = useWindowDimensions();
   const { bottom } = useSafeAreaInsets();
@@ -44,12 +40,12 @@ export function NavigationBarComponent({
           <IconComponent
             style={ styles.tabIcon }
             size={ scale(24) }
-            color={ Colors.white }
+            color={ theme.colors.icon }
           />
         ) }
       </Animated.View>
     );
-  }, [descriptors]);
+  }, [descriptors, scale, styles, theme]);
 
   const renderAccountTab = useCallback((
     route: NavigationRoute<ParamListBase, string>,
@@ -85,7 +81,7 @@ export function NavigationBarComponent({
         </Animated.View>
       </Animated.View>
     );
-  }, [profile, badgeData]);
+  }, [profile, badgeData, styles]);
 
   const renderTab = useCallback((
     route: NavigationRoute<ParamListBase, string>,
@@ -96,7 +92,7 @@ export function NavigationBarComponent({
 
     const renderComponent = () => {
       switch (name) {
-        case ACCOUNT_ROUTE:
+        case ACCOUNT_TAB:
           return renderAccountTab(route, isFocused);
         default:
           return renderDefaultTab(route, isFocused);
@@ -117,7 +113,7 @@ export function NavigationBarComponent({
         { renderComponent() }
       </ThemedPressable>
     );
-  }, [renderAccountTab, renderDefaultTab, width, onPress, onLongPress, state]);
+  }, [renderAccountTab, renderDefaultTab, width, onPress, onLongPress, state, scale, styles]);
 
   return (
     <View style={ [styles.tabBar, { paddingBottom: bottom }] }>

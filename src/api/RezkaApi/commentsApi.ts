@@ -1,5 +1,5 @@
 import { CommentTextInterface, CommentTextType } from 'Type/Comment.interface';
-import { decodeHtml } from 'Util/Htlm';
+import { decodeHtml } from 'Util/Html';
 import { safeJsonParse } from 'Util/Json';
 
 import { CommentsApiInterface } from '..';

@@ -4,12 +4,13 @@ import {
   use,
   useCallback,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 
 interface PlayerContextInterface {
-  focusedElement: FocusedElement;
+  focusedElementRef: React.MutableRefObject<FocusedElement>;
   selectedVoice: {
     filmId: string;
     voice: FilmVoiceInterface;
@@ -19,21 +20,21 @@ interface PlayerContextInterface {
 }
 
 const PlayerContext = createContext<PlayerContextInterface>({
-  focusedElement: FocusedElement.PROGRESS_THUMB,
+  focusedElementRef: { current: FocusedElement.PROGRESS_THUMB },
   selectedVoice: null,
   updateFocusedElement: () => {},
   updateSelectedVoice: () => {},
 });
 
 export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
-  const [focusedElement, setFocusedElement] = useState(FocusedElement.PROGRESS_THUMB);
+  const focusedElementRef = useRef(FocusedElement.PROGRESS_THUMB);
   const [selectedVoice, setSelectedVoice] = useState<{
     filmId: string;
     voice: FilmVoiceInterface;
   } | null>(null);
 
   const updateFocusedElement = useCallback((element: FocusedElement) => {
-    setFocusedElement(element);
+    focusedElementRef.current = element;
   }, []);
 
   const updateSelectedVoice = useCallback((filmId: string, voice: FilmVoiceInterface) => {
@@ -44,12 +45,11 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const value = useMemo(() => ({
-    focusedElement,
+    focusedElementRef,
     selectedVoice,
     updateFocusedElement,
     updateSelectedVoice,
   }), [
-    focusedElement,
     selectedVoice,
     updateFocusedElement,
     updateSelectedVoice,

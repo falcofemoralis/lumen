@@ -1,1 +1,1 @@
-export { default } from './ThemedList.container';
+export { default as ThemedList } from './ThemedList.container';

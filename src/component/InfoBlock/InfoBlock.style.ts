@@ -1,28 +1,27 @@
-import { Colors } from 'Style/Colors';
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale, colors, text }: Theme) => ({
   container: {
     flexDirection: 'column',
-    gap: 4,
+    gap: scale(4),
   },
   iconContainer: {
     justifyContent: 'center',
     alignItems: 'center',
     alignSelf: 'center',
-    backgroundColor: Colors.backgroundLight,
-    borderRadius: 99,
-    width: 36,
-    height: 36,
+    backgroundColor: colors.backgroundLight,
+    borderRadius: scale(99),
+    width: scale(36),
+    height: scale(36),
   },
   title: {
-    fontSize: 20,
+    fontSize: scale(text.lg.fontSize),
     fontWeight: '700',
     textAlign: 'center',
   },
   subtitle: {
-    fontSize: 14,
-    color: Colors.textSecondary,
+    fontSize: scale(text.xs.fontSize),
+    color: colors.textSecondary,
     textAlign: 'center',
   },
-});
+} satisfies ThemedStyles);

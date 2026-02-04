@@ -1,1 +1,1 @@
-export { default } from './PlayerDuration.container';
+export { default as PlayerDuration } from './PlayerDuration.container';

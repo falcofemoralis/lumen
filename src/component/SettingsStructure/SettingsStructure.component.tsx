@@ -1,10 +1,10 @@
-import SettingGroup from 'Component/SettingGroup';
-import SettingInput from 'Component/SettingInput';
-import SettingLink from 'Component/SettingLink';
-import SettingSelect from 'Component/SettingSelect';
-import SettingText from 'Component/SettingText';
+import { SettingGroup } from 'Component/SettingGroup';
+import { SettingInput } from 'Component/SettingInput';
+import { SettingLink } from 'Component/SettingLink';
+import { SettingSelect } from 'Component/SettingSelect';
+import { SettingText } from 'Component/SettingText';
 import { ScrollView, View } from 'react-native';
-import { SettingItem, SettingType } from 'Route/SettingsPage/SettingsPage.type';
+import { SettingItem, SettingType } from 'Screen/SettingsScreen/SettingsScreen.type';
 
 import { SettingsStructureComponentProps } from './SettingsStructure.type';
 

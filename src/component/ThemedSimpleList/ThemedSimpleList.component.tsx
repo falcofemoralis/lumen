@@ -1,11 +1,12 @@
-import ThemedImage from 'Component/ThemedImage';
-import ThemedPressable from 'Component/ThemedPressable';
-import ThemedText from 'Component/ThemedText';
+import { ThemedImage } from 'Component/ThemedImage';
+import { ThemedPressable } from 'Component/ThemedPressable';
+import { ThemedText } from 'Component/ThemedText';
 import { useLandscape } from 'Hooks/useLandscape';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { useCallback, useRef } from 'react';
 import { ScrollView, View } from 'react-native';
 
-import { styles } from './ThemedSimpleList.style';
+import { componentStyles } from './ThemedSimpleList.style';
 import { ListItem, ThemedSimpleListComponentProps } from './ThemedSimpleList.type';
 
 export const ThemedListComponent = ({
@@ -15,6 +16,7 @@ export const ThemedListComponent = ({
   style,
   onChange,
 }: ThemedSimpleListComponentProps) => {
+  const styles = useThemedStyles(componentStyles);
   const scrollViewRef = useRef<ScrollView>(null);
   const isLandscape = useLandscape();
 
@@ -71,7 +73,7 @@ export const ThemedListComponent = ({
         ) }
       </View>
     </ThemedPressable>
-  ), [onChange, value]);
+  ), [onChange, value, styles]);
 
   const renderList = () => (
     <View

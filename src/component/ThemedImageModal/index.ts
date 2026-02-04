@@ -1,1 +1,1 @@
-export { default } from './ThemedImageModal.component';
+export { default as ThemedImageModal } from './ThemedImageModal.component';

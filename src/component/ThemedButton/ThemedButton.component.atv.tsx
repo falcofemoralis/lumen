@@ -1,10 +1,10 @@
-import ThemedImage from 'Component/ThemedImage';
-import ThemedPressable from 'Component/ThemedPressable';
+import { ThemedImage } from 'Component/ThemedImage';
+import { ThemedPressable } from 'Component/ThemedPressable';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { Text, View } from 'react-native';
-import { Colors } from 'Style/Colors';
-import { scale } from 'Util/CreateStyles';
+import { useAppTheme } from 'Theme/context';
 
-import { styles } from './ThemedButton.style.atv';
+import { componentStyles } from './ThemedButton.style.atv';
 import { ThemedButtonProps } from './ThemedButton.type';
 
 export default function ThemedButton({
@@ -25,6 +25,9 @@ export default function ThemedButton({
   withAnimation = false,
   zoomScale = 1.1,
 }: ThemedButtonProps) {
+  const { scale, theme } = useAppTheme();
+  const styles = useThemedStyles(componentStyles);
+
   const renderFilled = (isFocused: boolean) => (
     <View
       style={ [
@@ -45,7 +48,7 @@ export default function ThemedButton({
             isFocused && styles.iconFilledFocused,
           ] }
           size={ scale(18) }
-          color={ isFocused ? Colors.black : Colors.white }
+          color={ isFocused ? theme.colors.iconFocused : theme.colors.icon }
           { ...iconProps }
         />
       ) }
@@ -90,7 +93,7 @@ export default function ThemedButton({
             isFocused && styles.iconFilledFocused,
           ] }
           size={ scale(18) }
-          color={ isFocused ? Colors.black : Colors.white }
+          color={ isFocused ? theme.colors.iconFocused : theme.colors.icon }
           { ...iconProps }
         />
       ) }
@@ -130,7 +133,7 @@ export default function ThemedButton({
             isFocused && styles.iconFilledFocused,
           ] }
           size={ scale(18) }
-          color={ isFocused ? Colors.black : Colors.white }
+          color={ isFocused ? theme.colors.iconFocused : theme.colors.icon }
           { ...iconProps }
         />
       ) }
@@ -173,7 +176,7 @@ export default function ThemedButton({
             isFocused && styles.iconFilledFocused,
           ] }
           size={ scale(18) }
-          color={ isFocused ? Colors.black : Colors.white }
+          color={ isFocused ? theme.colors.iconFocused : theme.colors.icon }
           { ...iconProps }
         />
       ) }

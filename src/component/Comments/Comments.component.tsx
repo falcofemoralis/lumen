@@ -1,23 +1,24 @@
-import Loader from 'Component/Loader';
+import { Loader } from 'Component/Loader';
 import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
-import ThemedImage from 'Component/ThemedImage';
-import ThemedList from 'Component/ThemedList';
-import ThemedText from 'Component/ThemedText';
-import t from 'i18n/t';
+import { ThemedImage } from 'Component/ThemedImage';
+import { ThemedList } from 'Component/ThemedList';
+import { ThemedText } from 'Component/ThemedText';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
+import { t } from 'i18n/translate';
 import { ThumbsUp } from 'lucide-react-native';
 import { memo, useCallback } from 'react';
 import { View } from 'react-native';
-import { Colors } from 'Style/Colors';
+import { useAppTheme } from 'Theme/context';
 import { CommentInterface } from 'Type/Comment.interface';
-import { scale } from 'Util/CreateStyles';
 
-import { INDENT_SIZE, styles } from './Comments.style';
+import { componentStyles } from './Comments.style';
 import { CommentItemProps, CommentsComponentProps } from './Comments.type';
 import { CommentText } from './CommentText';
 
 export function CommentItem({
   comment,
   idx,
+  styles,
 }: CommentItemProps) {
   const {
     id,
@@ -26,8 +27,8 @@ export function CommentItem({
     date,
     likes,
   } = comment;
-
-  const leftIndent = INDENT_SIZE * comment.indent;
+  const { scale, theme } = useAppTheme();
+  const leftIndent = styles.indentSize.width * comment.indent;
 
   return (
     <View
@@ -52,6 +53,7 @@ export function CommentItem({
           style={ styles.commentTextWrapper }
           textStyle={ styles.commentText }
           comment={ comment }
+          styles={ styles }
         />
         <View style={ styles.commentDateRow }>
           <ThemedText style={ styles.commentTextSmall }>
@@ -64,7 +66,7 @@ export function CommentItem({
               </ThemedText>
               <ThumbsUp
                 size={ scale(16) }
-                color={ Colors.white }
+                color={ theme.colors.icon }
               />
             </View>
           ) }
@@ -86,14 +88,18 @@ export const CommentsComponent = ({
   style,
   onNextLoad,
 }: CommentsComponentProps) => {
+  const { scale } = useAppTheme();
+  const styles = useThemedStyles(componentStyles);
+
   const renderItem = useCallback(
     ({ item, index }: ThemedGridRowProps<CommentInterface>) => (
       <MemoCommentItem
         comment={ item }
         idx={ index }
+        styles={ styles }
       />
     ),
-    []
+    [styles]
   );
 
   if (!comments || (isLoading && !comments.length)) {
@@ -116,7 +122,6 @@ export const CommentsComponent = ({
 
   return (
     <ThemedList
-      // style={ [styles.commentsList, style] }
       data={ comments }
       estimatedItemSize={ scale(100) }
       renderItem={ renderItem }

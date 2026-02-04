@@ -1,15 +1,15 @@
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale, text }: Theme) => ({
   overlay: {
-    gap: 16,
+    gap: scale(16),
   },
   overlayTitle: {
-    fontSize: 20,
+    fontSize: scale(text.lg.fontSize),
     fontWeight: '600',
   },
   overlayInput: {
   },
   overlayButton: {
   },
-});
+} satisfies ThemedStyles);

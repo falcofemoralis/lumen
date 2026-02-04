@@ -2,12 +2,10 @@ import { getFirestore } from '@react-native-firebase/firestore';
 import { FIRESTORE_DB } from 'Component/Player/Player.config';
 import { FirestoreDocument, SavedTime } from 'Component/Player/Player.type';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
+import { useConfigContext } from 'Context/ConfigContext';
 import { usePlayerContext } from 'Context/PlayerContext';
 import { useServiceContext } from 'Context/ServiceContext';
-import { withTV } from 'Hooks/withTV';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import ConfigStore from 'Store/Config.store';
-import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { EpisodeInterface, FilmVoiceInterface, SeasonInterface } from 'Type/FilmVoice.interface';
@@ -27,6 +25,7 @@ export function PlayerVideoSelectorContainer({
   onClose,
 }: PlayerVideoSelectorContainerProps) {
   const { voices = [] } = film;
+  const { isTV, isFirestore } = useConfigContext();
   const { selectedVoice: contextVoice, updateSelectedVoice } = usePlayerContext();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedVoice, setSelectedVoice] = useState<FilmVoiceInterface>(
@@ -41,10 +40,10 @@ export function PlayerVideoSelectorContainer({
   );
   const [savedTime, setSavedTime] = useState<SavedTime | null>(null);
   const firestoreDb = useMemo(() => (
-    ConfigStore.getConfig().isFirestore && isSignedIn
+    isFirestore && isSignedIn
       ? getFirestore().collection<FirestoreDocument>(FIRESTORE_DB)
       : null
-  ), [isSignedIn]);
+  ), [isSignedIn, isFirestore]);
   const firestoreSavedTimeRef = useRef(false);
   const voiceOverlayRef = useRef<ThemedOverlayRef>(null);
 
@@ -109,8 +108,6 @@ export function PlayerVideoSelectorContainer({
     if (isSignedIn) {
       currentService.saveWatch(film, voice)
         .catch((error) => {
-          LoggerStore.error('handleSelectVideoSaveWatch', { error });
-
           NotificationStore.displayError(error as Error);
         });
     }
@@ -142,8 +139,6 @@ export function PlayerVideoSelectorContainer({
 
         handleSelectVideo(video, voice);
       } catch (error) {
-        LoggerStore.error('handleSelectVoiceNoSeasons', { error });
-
         NotificationStore.displayError(error as Error);
       } finally {
         setIsLoading(false);
@@ -171,8 +166,6 @@ export function PlayerVideoSelectorContainer({
           setSelectedEpisodeId(episodeId);
         }
       } catch (error) {
-        LoggerStore.error('handleSelectVoice', { error });
-
         NotificationStore.displayError(error as Error);
       } finally {
         setIsLoading(false);
@@ -206,8 +199,6 @@ export function PlayerVideoSelectorContainer({
 
       handleSelectVideo(video, voice);
     } catch (error) {
-      LoggerStore.error('handleSelectEpisode', { error });
-
       NotificationStore.displayError(error as Error);
     } finally {
       setIsLoading(false);
@@ -231,7 +222,7 @@ export function PlayerVideoSelectorContainer({
     initFirestoreSavedTime();
   };
 
-  const containerProps = () => ({
+  const containerProps = {
     overlayRef,
     film,
     voices,
@@ -243,9 +234,6 @@ export function PlayerVideoSelectorContainer({
     episodes: getEpisodes(),
     savedTime,
     voiceOverlayRef,
-  });
-
-  const containerFunctions = {
     handleSelectVoice,
     setSelectedSeasonId,
     handleSelectEpisode,
@@ -254,10 +242,8 @@ export function PlayerVideoSelectorContainer({
     onClose,
   };
 
-  return withTV(FilmVideoSelectorComponentTV, PlayerVideoSelectorComponent, {
-    ...containerProps(),
-    ...containerFunctions,
-  });
+  // eslint-disable-next-line max-len
+  return isTV ? <FilmVideoSelectorComponentTV { ...containerProps } /> : <PlayerVideoSelectorComponent { ...containerProps } />;
 }
 
 export default PlayerVideoSelectorContainer;

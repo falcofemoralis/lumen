@@ -12,7 +12,7 @@ import { MenuItemInterface } from 'Type/MenuItem.interface';
 import { RatingInterface } from 'Type/Rating.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { VoiceRatingInterface } from 'Type/VoiceRating.interface';
-import { decodeHtml } from 'Util/Htlm';
+import { decodeHtml } from 'Util/Html';
 import { HTMLElementInterface } from 'Util/Parser';
 import { processPromisesBatch } from 'Util/Promise';
 import { Variables } from 'Util/Request';
@@ -65,7 +65,7 @@ const filmApi: FilmApiInterface = {
    * @returns Film
    */
   async getFilm(link: string): Promise<FilmInterface | null> {
-    const root = await configApi.fetchPage(link);
+    const root = await configApi.fetchPage(link, {});
 
     // base data
     const id = root.querySelector('#user-favorites-holder')?.attributes['data-post_id'] ?? '';
@@ -402,7 +402,9 @@ const filmApi: FilmApiInterface = {
       const films: FilmCardInterface[] = [];
 
       const res = await configApi.postRequest(path, variables);
+
       const root = configApi.parseContent(`<div>${res}</div>`);
+
       const filmElements = root.querySelectorAll('.b-content__inline_item');
 
       filmElements.forEach((el) => {

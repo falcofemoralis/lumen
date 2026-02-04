@@ -1,4 +1,3 @@
-import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
@@ -45,8 +44,6 @@ const formatFilmVideo = (json: StreamsResult): FilmVideoInterface => {
     storyboardUrl: configApi.getProvider() + json.thumbnails,
   };
 
-  LoggerStore.debug('playerApi::formatFilmVideo', result);
-
   return result;
 };
 
@@ -83,8 +80,6 @@ const playerApi: PlayerApiInterface = {
     try {
       return formatFilmVideo(json);
     } catch (error) {
-      LoggerStore.error('getFilmStreamsByVoice', { error });
-
       NotificationStore.displayError(error as Error);
 
       return {
@@ -122,8 +117,6 @@ const playerApi: PlayerApiInterface = {
     try {
       return formatFilmVideo(json);
     } catch (error) {
-      LoggerStore.error('getFilmStreamsByEpisodeId', { error });
-
       NotificationStore.displayError(error as Error);
 
       return {

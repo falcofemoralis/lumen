@@ -1,16 +1,15 @@
-import { Colors } from 'Style/Colors';
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale, colors, text }: Theme) => ({
   input: {
-    backgroundColor: Colors.input,
-    borderRadius: 16,
-    paddingHorizontal: 8,
-    color: Colors.text,
-    fontSize: 14,
+    backgroundColor: colors.input,
+    borderRadius: scale(16),
+    paddingHorizontal: scale(8),
+    color: colors.text,
+    fontSize: scale(text.xs.fontSize),
   },
   inputFocus: {
-    backgroundColor: Colors.inputFocused,
-    color: Colors.textFocused,
+    backgroundColor: colors.inputFocused,
+    color: colors.textFocused,
   },
-});
+} satisfies ThemedStyles);

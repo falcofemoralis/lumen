@@ -55,7 +55,6 @@ export interface ConfigApiInterface {
   setAuthorization(auth: string): void;
   getAuthorization(): string;
   getHeaders(): HeadersInit;
-  getProxyHeaders(): HeadersInit;
   parseContent(content: string): HTMLElementInterface;
   fetchPage(query: string, variables?: Variables): Promise<HTMLElementInterface>;
   fetchJson<T>(query: string, variables: Variables): Promise<T | null>;
@@ -128,7 +127,7 @@ export interface AccountApiInterface {
   removeBookmark(filmId: string, bookmarkId: string): Promise<void>;
   getRecent(page: number, params?: ApiParams): Promise<RecentListInterface>;
   removeRecent(filmId: string): Promise<boolean>;
-  unloadRecentPage(): void;
+  unloadRecentScreen(): void;
   getUserData(): Promise<UserDataInterface>;
   saveScheduleWatch(watchId: string): Promise<void>;
   getPhotoUrl(url: string): string;

@@ -5,17 +5,8 @@ export interface PageContainerProps {
   children: Exclude<NonNullable<ReactNode>, string | number | boolean>
   style?: ViewStyle;
   contentStyle?: ViewStyle;
-  disableWrapper?: boolean;
-  testID?: string;
+  fullscreen?: boolean;
 }
 
-export interface PageComponentProps {
-  children: Exclude<NonNullable<ReactNode>, string | number | boolean>
-  style?: ViewStyle;
-  contentStyle?: ViewStyle;
-  disableWrapper?: boolean;
+export interface PageComponentProps extends PageContainerProps {
 }
-
-export type HistoryItem = {
-  key: string;
-};

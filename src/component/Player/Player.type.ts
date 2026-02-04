@@ -63,6 +63,8 @@ export type ProgressStatus = {
   currentTime: string;
   durationTime: string;
   remainingTime: string;
+  bufferedTime: string;
+  endDate?: number;
 };
 
 export interface LongEvent {

@@ -1,7 +1,6 @@
-import { ERROR_ROUTE } from 'Navigation/routes';
-import { Platform, ToastAndroid } from 'react-native';
-
-import { navigationRef } from '../navigation/container';
+import { ERROR_SCREEN } from 'Navigation/navigationRoutes';
+import { ToastAndroid } from 'react-native';
+import { navigate } from 'Util/Navigation';
 
 class NotificationStore {
   private isErrorOccurred = false;
@@ -11,13 +10,7 @@ class NotificationStore {
       return;
     }
 
-    if (Platform.OS === 'web') {
-      // For web, we can use the browser's alert or implement a custom toast
-      // You might want to use a proper toast library for better UX
-      alert(msg);
-    } else {
-      ToastAndroid.show(msg, ToastAndroid.SHORT);
-    }
+    ToastAndroid.show(msg, ToastAndroid.SHORT);
   }
 
   displayError(error: string | Error) {
@@ -27,13 +20,12 @@ class NotificationStore {
 
     const msg = error instanceof Error ? error.message : String(error);
 
-    if (Platform.OS === 'web') {
-      // For web, we can use the browser's alert or implement a custom toast
-      // You might want to use a proper toast library for better UX
-      alert(msg);
-    } else {
-      ToastAndroid.show(msg, ToastAndroid.LONG);
+    if (__DEV__) {
+      console.error(msg);
+      console.trace();
     }
+
+    ToastAndroid.show(msg, ToastAndroid.LONG);
   }
 
   displayErrorScreen(code?: string, error?: string, info?: string) {
@@ -43,7 +35,7 @@ class NotificationStore {
 
     this.isErrorOccurred = true;
 
-    navigationRef.current?.navigate(ERROR_ROUTE, {
+    navigate(ERROR_SCREEN, {
       code,
       error,
       info,

@@ -1,12 +1,10 @@
 import { useEventListener } from 'expo';
-import React, { useEffect, useState } from 'react';
-import {
-  Text,
-  View,
-} from 'react-native';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
+import { useEffect, useState } from 'react';
+import { Text, View } from 'react-native';
 import { subtitleParser, VTTItem } from 'Util/VttParser';
 
-import { styles } from './PlayerSubtitles.style';
+import { componentStyles } from './PlayerSubtitles.style';
 import { PlayerSubtitlesComponentProps } from './PlayerSubtitles.type';
 
 export const PlayerSubtitlesComponent = ({
@@ -14,6 +12,7 @@ export const PlayerSubtitlesComponent = ({
   player,
   style,
 }: PlayerSubtitlesComponentProps) => {
+  const styles = useThemedStyles(componentStyles);
   const [subtitles, setSubtitles] = useState<VTTItem[] | null>([]);
   const [text, setText] = useState('');
 

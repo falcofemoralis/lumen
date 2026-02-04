@@ -1,18 +1,17 @@
-import { Colors } from 'Style/Colors';
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale, colors }: Theme) => ({
   modal: {
-    paddingHorizontal: 8,
+    paddingHorizontal: scale(8),
     justifyContent: 'center',
     height: '100%',
     width: '100%',
   },
   contentContainerStyle: {
-    backgroundColor: Colors.backgroundLight,
-    padding: 8,
-    borderRadius: 16,
-    borderColor: Colors.darkBorder,
+    backgroundColor: colors.backgroundLight,
+    padding: scale(8),
+    borderRadius: scale(16),
+    borderColor: colors.darkBorder,
     borderWidth: 1,
     maxHeight: '50%',
     overflow: 'hidden',
@@ -21,7 +20,7 @@ export const styles = CreateStyles({
     position: 'absolute',
     right: '10%',
     width: '100%',
-    maxHeight: 300,
-    maxWidth: 300,
+    maxHeight: scale(300),
+    maxWidth: scale(300),
   },
-});
+} satisfies ThemedStyles);

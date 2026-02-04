@@ -18,9 +18,13 @@ export interface FilmGridComponentProps {
   onNextLoad?: (isRefresh: boolean) => Promise<void>;
 }
 
+export type FilmGridRowItem = FilmCardInterface & {
+  isPlaceholder?: boolean;
+};
+
 export type FilmGridRowType = {
   id: string;
-  items: FilmCardInterface[];
+  items: FilmGridRowItem[];
 }
 
 export interface FilmGridItemProps {

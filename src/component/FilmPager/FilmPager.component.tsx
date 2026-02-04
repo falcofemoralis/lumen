@@ -1,5 +1,6 @@
-import FilmGrid from 'Component/FilmGrid';
-import Wrapper from 'Component/Wrapper';
+import { FilmGrid } from 'Component/FilmGrid';
+import { Wrapper } from 'Component/Wrapper';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { NativeSyntheticEvent, ScrollView, View } from 'react-native';
 import { Pressable } from 'react-native-gesture-handler';
@@ -10,10 +11,10 @@ import {
   OnPageSelectedEventData,
 } from 'react-native-pager-view/lib/typescript/PagerViewNativeComponent';
 import Animated from 'react-native-reanimated';
-import { Colors } from 'Style/Colors';
-import { scale } from 'Util/CreateStyles';
+import { useAppTheme } from 'Theme/context';
+import { ThemedStyles } from 'Theme/types';
 
-import { styles } from './FilmPager.style';
+import { componentStyles } from './FilmPager.style';
 import { FilmPagerComponentProps, PagerItemInterface } from './FilmPager.type';
 
 const TabButton = memo(({
@@ -21,11 +22,13 @@ const TabButton = memo(({
   isActive,
   onPress,
   onLayout,
+  styles,
 }: {
   title: string;
   isActive: boolean;
   onPress: () => void;
   onLayout: (width: number) => void;
+  styles: ThemedStyles
 }) => (
   <Pressable
     onPress={ onPress }
@@ -50,11 +53,12 @@ export const FilmPagerComponent = ({
   onPreLoad,
   onNextLoad,
 }: FilmPagerComponentProps) => {
+  const { scale, theme } = useAppTheme();
+  const styles = useThemedStyles(componentStyles);
   const { AnimatedPagerView, ref: pagerViewRef } = usePagerView({ pagesAmount: 10 });
   const [activeIndex, setActiveIndex] = useState(0);
   const [activeTab, setActiveTab] = useState(0);
   const [renderedTabs, setRenderedTabs] = useState<boolean[]>([]);
-  const [isPagerViewReady, setIsPagerViewReady] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
   const tabWidthsRef = useRef<number[]>([]);
   const loadedTabsRef = useRef<boolean[]>([]);
@@ -66,14 +70,6 @@ export const FilmPagerComponent = ({
     setRenderedTabs(Array(length).fill(false));
     loadedTabsRef.current = Array(length).fill(false);
   }, [pagerItems.length]);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsPagerViewReady(true);
-    }, 50); // Small delay to ensure PagerView is mounted
-
-    return () => clearTimeout(timer);
-  }, []);
 
   const updateActiveTab = useCallback((index: number) => {
     if (index !== activeTab) {
@@ -152,11 +148,12 @@ export const FilmPagerComponent = ({
             isActive={ activeTab === i }
             onPress={ () => handleTabPress(i) }
             onLayout={ (width) => tabWidthsRef.current[i] = width }
+            styles={ styles }
           />
         )) }
       </ScrollView>
     </Wrapper>
-  ), [pagerItems, activeTab, handleTabPress]);
+  ), [pagerItems, activeTab, handleTabPress, styles]);
 
   const renderPage = useCallback((pagerItem: PagerItemInterface, idx: number) => {
     if (!renderedTabs[idx] && idx !== 0) {
@@ -173,7 +170,7 @@ export const FilmPagerComponent = ({
     );
   }, [renderedTabs, onNextLoad]);
 
-  const pages = useMemo(() => pagerItems.map((item, idx) => (
+  const pages = useMemo(() => (pagerItems).map((item, idx) => (
     <Wrapper key={ item.key }>
       { renderPage(item, idx) }
     </Wrapper>
@@ -182,14 +179,14 @@ export const FilmPagerComponent = ({
   const renderPagerView = useMemo(() => (
     <AnimatedPagerView
       ref={ pagerViewRef }
-      style={ { flex: 1, backgroundColor: Colors.background } }
+      style={ { flex: 1, backgroundColor: theme.colors.background } }
       initialPage={ 0 }
       onPageScroll={ handlePageScroll }
       onPageSelected={ handlePageSelect }
       onPageScrollStateChanged={ handlePageScrollStateChanged }
       pageMargin={ scale(24) }
     >
-      { isPagerViewReady ? pages : null }
+      { pages }
     </AnimatedPagerView>
   ), [
     AnimatedPagerView,
@@ -198,13 +195,14 @@ export const FilmPagerComponent = ({
     handlePageSelect,
     handlePageScrollStateChanged,
     pages,
-    isPagerViewReady,
+    scale,
+    theme,
   ]);
 
   return (
     <View style={ { flex: 1 } }>
       { renderPagerView }
-      { (pagerItems.length > 1 && isPagerViewReady) && renderScrollableTabBar }
+      { pagerItems.length > 1 && renderScrollableTabBar }
     </View>
   );
 };

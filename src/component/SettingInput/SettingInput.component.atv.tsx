@@ -1,17 +1,18 @@
-import Loader from 'Component/Loader';
-import SettingBase from 'Component/SettingBase';
+import { Loader } from 'Component/Loader';
+import { SettingBase } from 'Component/SettingBase';
 import { propsAreEqual } from 'Component/SettingBase/SettingBase.component.atv';
-import ThemedButton from 'Component/ThemedButton';
-import ThemedInput from 'Component/ThemedInput';
-import ThemedOverlay from 'Component/ThemedOverlay';
+import { ThemedButton } from 'Component/ThemedButton';
+import { ThemedInput } from 'Component/ThemedInput';
+import { ThemedOverlay } from 'Component/ThemedOverlay';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
-import ThemedText from 'Component/ThemedText';
-import t from 'i18n/t';
+import { ThemedText } from 'Component/ThemedText';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
+import { t } from 'i18n/translate';
 import { memo, useCallback, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { DefaultFocus } from 'react-tv-space-navigation';
 
-import { styles } from './SettingInput.style.atv';
+import { componentStyles } from './SettingInput.style.atv';
 import { SettingInputComponentProps } from './SettingInput.type';
 
 export const SettingInputComponent = memo(({
@@ -22,6 +23,7 @@ export const SettingInputComponent = memo(({
     title,
     value,
   } = setting;
+  const styles = useThemedStyles(componentStyles);
   const overlayRef = useRef<ThemedOverlayRef>(null);
   const [inputValue, setInputValue] = useState(value);
   const [isLoading, setIsLoading] = useState(false);

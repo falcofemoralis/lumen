@@ -1,23 +1,23 @@
-import FilmCard from 'Component/FilmCard';
-import { calculateCardDimensions } from 'Component/FilmCard/FilmCard.style.atv';
-import ThemedPressable from 'Component/ThemedPressable';
-import ThemedText from 'Component/ThemedText';
-import React, {
+import { FilmCard } from 'Component/FilmCard';
+import { FilmCardThumbnail } from 'Component/FilmCard/FilmCard.thumbnail.atv';
+import { useFilmCardDimensions } from 'Component/FilmCard/useFilmCardDimensions';
+import { useGridLayout } from 'Component/ThemedGrid/useGridLayout';
+import { ThemedPressable } from 'Component/ThemedPressable';
+import { ThemedText } from 'Component/ThemedText';
+import { useConfigContext } from 'Context/ConfigContext';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
+import {
   memo,
   useCallback,
   useMemo,
 } from 'react';
 import { View } from 'react-native';
 import {
-  SpatialNavigationFocusableView,
   SpatialNavigationView,
   SpatialNavigationVirtualizedList,
 } from 'react-tv-space-navigation';
-import { calculateItemWidth } from 'Style/Layout';
-import { scale } from 'Util/CreateStyles';
 
-import { NUMBER_OF_COLUMNS_TV } from './FilmSections.config';
-import { HEADER_HEIGHT, ROW_GAP, styles } from './FilmSections.style.atv';
+import { componentStyles } from './FilmSections.style.atv';
 import {
   FilmSectionsComponentProps,
   FilmSectionsItem,
@@ -29,9 +29,10 @@ const FilmSectionsRow = ({
   row,
   itemSize,
   containerWidth,
+  styles,
   handleOnPress,
 }: FilmSectionsRowProps) => {
-  const { header, content, films = [] } = row;
+  const { header, content, films = [], isPlaceholder = false } = row;
 
   const renderContent = () => (
     <View>
@@ -46,6 +47,28 @@ const FilmSectionsRow = ({
       </ThemedText>
     </View>
   );
+
+  if (isPlaceholder) {
+    return (
+      <View
+        style={ [
+          styles.container,
+          { width: containerWidth },
+        ] }
+      >
+        { content && renderContent() }
+        <View style={ styles.rowStyle }>
+          { films.map((item, idx) => (
+            <FilmCardThumbnail
+              // eslint-disable-next-line react/no-array-index-key
+              key={ `${index}-${idx}-${item.id}` }
+              width={ itemSize || 0 }
+            />
+          )) }
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View
@@ -88,32 +111,35 @@ export function FilmSectionsComponent({
   contentHeight = 0,
   handleOnPress,
 }: FilmSectionsComponentProps) {
-  const { width, height } = calculateCardDimensions(
-    NUMBER_OF_COLUMNS_TV,
-    scale(ROW_GAP),
-    scale(ROW_GAP) * 2
+  const styles = useThemedStyles(componentStyles);
+  const { numberOfColumnsTV, isTVGridAnimation } = useConfigContext();
+  const { width, height } = useFilmCardDimensions(
+    numberOfColumnsTV,
+    styles.rowStyle.gap,
+    styles.rowStyle.gap * 2
   );
 
-  const containerWidth = calculateItemWidth(1);
+  const { gridWidth } = useGridLayout(1);
 
   const renderItem = useCallback(({ item: row, index }: {item: FilmSectionsItem, index: number}) => (
     <MemoizedFilmSectionsRow
       index={ index }
       row={ row }
       itemSize={ width }
-      numberOfColumns={ NUMBER_OF_COLUMNS_TV }
+      numberOfColumns={ numberOfColumnsTV }
       handleOnPress={ handleOnPress }
-      containerWidth={ containerWidth }
+      containerWidth={ gridWidth }
+      styles={ styles }
     />
-  ), []);
+  ), [styles]);
 
   const calculatedHeights = useMemo(() => data.reduce((acc, item) => {
-    acc[item.index] = (height + scale(ROW_GAP) * 2)
-      + (item.header ? scale(HEADER_HEIGHT) : 0)
+    acc[item.index] = (height + styles.rowStyle.gap * 2)
+      + (item.header ? styles.headerText.fontSize : 0)
       + (item.content ? contentHeight : 0);
 
     return acc;
-  }, {} as Record<string, number>), [data]);
+  }, {} as Record<string, number>), [data, styles]);
 
   const getCalculatedItemSize = useCallback((
     item: FilmSectionsItem
@@ -125,7 +151,7 @@ export function FilmSectionsComponent({
       renderItem={ renderItem }
       itemSize={ getCalculatedItemSize }
       additionalItemsRendered={ 1 }
-      scrollDuration={ 0 }
+      scrollDuration={ isTVGridAnimation ? 250 : 0 }
       style={ styles.grid }
       orientation="vertical"
       isGrid

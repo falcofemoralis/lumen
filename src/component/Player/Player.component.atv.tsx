@@ -1,18 +1,19 @@
-import BookmarksOverlay from 'Component/BookmarksOverlay';
-import CommentsOverlay from 'Component/CommentsOverlay';
-import Loader from 'Component/Loader';
-import PlayerClock from 'Component/PlayerClock';
-import PlayerDuration from 'Component/PlayerDuration';
-import PlayerProgressBar from 'Component/PlayerProgressBar';
-import PlayerSubtitles from 'Component/PlayerSubtitles';
-import PlayerVideoSelector from 'Component/PlayerVideoSelector';
-import ThemedDropdown from 'Component/ThemedDropdown';
-import ThemedPressable from 'Component/ThemedPressable';
-import ThemedText from 'Component/ThemedText';
+import { BookmarksOverlay } from 'Component/BookmarksOverlay';
+import { CommentsOverlay } from 'Component/CommentsOverlay';
+import { Loader } from 'Component/Loader';
+import { PlayerClock } from 'Component/PlayerClock';
+import { PlayerDuration } from 'Component/PlayerDuration';
+import { PlayerProgressBar } from 'Component/PlayerProgressBar';
+import { PlayerSubtitles } from 'Component/PlayerSubtitles';
+import { PlayerVideoSelector } from 'Component/PlayerVideoSelector';
+import { ThemedDropdown } from 'Component/ThemedDropdown';
+import { ThemedPressable } from 'Component/ThemedPressable';
+import { ThemedText } from 'Component/ThemedText';
 import { usePlayerContext } from 'Context/PlayerContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { VideoView } from 'expo-video';
-import t from 'i18n/t';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
+import { t } from 'i18n/translate';
 import {
   Bookmark,
   BookmarkCheck,
@@ -27,7 +28,7 @@ import {
   SkipForward,
   Undo2,
 } from 'lucide-react-native';
-import React, {
+import {
   Ref,
   useEffect,
   useRef,
@@ -41,13 +42,11 @@ import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated'
 import { scheduleOnRN } from 'react-native-worklets';
 import {
   DefaultFocus,
-  SpatialNavigationFocusableView,
   SpatialNavigationNodeRef,
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
-import { Colors } from 'Style/Colors';
-import { ClosedCaptionFilled } from 'Style/Icons';
-import { scale } from 'Util/CreateStyles';
+import { useAppTheme } from 'Theme/context';
+import { ClosedCaptionFilled } from 'Theme/icons';
 import { setTimeoutSafe } from 'Util/Misc';
 import { formatVideoTrackInfo, getPlayerAvailableQualityItems } from 'Util/Player';
 import RemoteControlManager from 'Util/RemoteControl/RemoteControlManager';
@@ -61,7 +60,7 @@ import {
   PLAYER_CONTROLS_TIMEOUT,
   RewindDirection,
 } from './Player.config';
-import { styles } from './Player.style.atv';
+import { componentStyles } from './Player.style.atv';
 import { PlayerComponentProps } from './Player.type';
 
 export function PlayerComponent({
@@ -102,7 +101,9 @@ export function PlayerComponent({
   onBookmarkChange,
   backwardToStart,
 }: PlayerComponentProps) {
-  const { focusedElement, updateFocusedElement } = usePlayerContext();
+  const { scale, theme } = useAppTheme();
+  const styles = useThemedStyles(componentStyles);
+  const { focusedElementRef, updateFocusedElement } = usePlayerContext();
   const [showControls, setShowControls] = useState(false);
   const [hideActions, setHideActions] = useState(false);
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
@@ -114,7 +115,6 @@ export function PlayerComponent({
   const showControlsRef = useRef(showControls);
   const isOverlayOpenRef = useRef(isOverlayOpen);
   const isComponentMounted = useRef(true);
-  const focusedElementRef = useRef(focusedElement);
   const hideActionsRef = useRef(hideActions);
 
   const controlsAnimation = useAnimatedStyle(() => ({
@@ -155,10 +155,9 @@ export function PlayerComponent({
   useEffect(() => {
     isOverlayOpenRef.current = isOverlayOpen;
     showControlsRef.current = showControls;
-    focusedElementRef.current = focusedElement;
     hideActionsRef.current = hideActions;
     isPlayingRef.current = isPlaying;
-  }, [showControls, isOverlayOpen, focusedElement, hideActions, isPlaying]);
+  }, [showControls, isOverlayOpen, hideActions, isPlaying]);
 
   useEffect(() => {
     return () => {
@@ -220,13 +219,16 @@ export function PlayerComponent({
           togglePlayPause();
         }
 
-        if ((type === SupportedKeys.UP || type === SupportedKeys.DOWN) && hideActionsRef.current) {
-          setHideActions(false);
-        }
-
         if (type === SupportedKeys.LEFT || type === SupportedKeys.RIGHT) {
           setHideActions(true);
           setShowControls(true);
+        }
+      }
+
+      if (focusedElementRef.current === FocusedElement.TOP_ACTION
+        || focusedElementRef.current === FocusedElement.BOTTOM_ACTION) {
+        if ((type === SupportedKeys.UP || type === SupportedKeys.DOWN) && hideActionsRef.current) {
+          setHideActions(false);
         }
       }
 
@@ -286,7 +288,8 @@ export function PlayerComponent({
     return (
       <ThemedText style={ styles.title }>
         {
-          `${title}${hasSeasons ? ` ${t('Season %s - Episode %s', voice.lastSeasonId, voice.lastEpisodeId)}` : ''}`
+          // eslint-disable-next-line max-len
+          `${title}${hasSeasons ? ` ${t('Season {{season}} - Episode {{episode}}', { season: voice.lastSeasonId, episode: voice.lastEpisodeId })}` : ''}`
         }
       </ThemedText>
     );
@@ -337,7 +340,7 @@ export function PlayerComponent({
         >
           <IconComponent
             size={ scale(26) }
-            color={ Colors.white }
+            color={ theme.colors.icon }
           />
         </View>
       ) }
@@ -411,9 +414,7 @@ export function PlayerComponent({
         calculateCurrentTime={ calculateCurrentTime }
         seekToPosition={ seekToPosition }
         thumbRef={ middleActionRef }
-        onFocus={ () => {
-          updateFocusedElement(FocusedElement.PROGRESS_THUMB);
-        } }
+        onFocus={ () => updateFocusedElement(FocusedElement.PROGRESS_THUMB) }
         rewindPosition={ rewindPosition }
         togglePlayPause={ togglePlayPause }
         hideActions={ hideActions }
@@ -462,7 +463,7 @@ export function PlayerComponent({
           { renderBottomAction(Settings2, openQualitySelector, bottomActionRef) }
           { isPlaylistSelector && renderBottomAction(ListVideo, openVideoSelector) }
           { subtitles.length > 0 && renderBottomAction(
-            selectedSubtitle?.languageCode === '' ? ClosedCaption : ClosedCaptionFilled,
+            selectedSubtitle?.languageCode === '' ? ClosedCaption : ClosedCaptionFilled({ color: theme.colors.icon }),
             openSubtitleSelector
           ) }
           { renderBottomAction(isFilmBookmarked ? BookmarkCheck : Bookmark, openBookmarksOverlay) }

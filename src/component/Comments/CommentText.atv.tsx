@@ -1,11 +1,8 @@
-import ThemedText from 'Component/ThemedText';
+import { ThemedText } from 'Component/ThemedText';
 import { forwardRef, useImperativeHandle, useState } from 'react';
-import {
-  StyleProp, TextStyle, View, ViewStyle,
-} from 'react-native';
+import { StyleProp, TextStyle, View, ViewStyle } from 'react-native';
 import { CommentInterface, CommentTextType } from 'Type/Comment.interface';
 
-import { styles } from './Comments.style.atv';
 import { CalculatedLine } from './Comments.type';
 
 interface CommentTextProps {
@@ -13,6 +10,7 @@ interface CommentTextProps {
   style?: StyleProp<ViewStyle> | undefined;
   textStyle?: StyleProp<TextStyle>;
   lines: CalculatedLine[];
+  styles: any;
 }
 
 export type CommentTextRef = {
@@ -26,6 +24,7 @@ export const CommentText = forwardRef<CommentTextRef, CommentTextProps>(
       style,
       textStyle,
       lines,
+      styles,
     },
     ref
   ) => {

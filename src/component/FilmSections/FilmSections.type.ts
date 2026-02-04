@@ -1,8 +1,10 @@
+import { ThemedStyles } from 'Theme/types';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 
 export type FilmSectionsData = {
   header: string;
   films: FilmCardInterface[];
+  isPlaceholder?: boolean;
 }
 
 export interface FilmSectionsContainerProps {
@@ -23,6 +25,7 @@ export type FilmSectionsItem = {
   films?: FilmCardInterface[];
   header?: string;
   content?: React.ReactNode;
+  isPlaceholder?: boolean;
 }
 
 export interface FilmSectionsRowProps {
@@ -32,4 +35,5 @@ export interface FilmSectionsRowProps {
   numberOfColumns: number;
   handleOnPress: (film: FilmCardInterface) => void;
   containerWidth?: number;
+  styles: ThemedStyles;
 }

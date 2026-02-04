@@ -1,9 +1,6 @@
+import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
-import { withTV } from 'Hooks/withTV';
-import {
-  forwardRef, useEffect, useImperativeHandle, useRef, useState,
-} from 'react';
-import LoggerStore from 'Store/Logger.store';
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
 import { CommentInterface } from 'Type/Comment.interface';
 
@@ -17,6 +14,7 @@ export type CommentsRef = {
 
 export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>(
   ({ film, loaderFullScreen, style, initialLoad }, ref) => {
+    const { isTV } = useConfigContext();
     const { id } = film;
     const [comments, setComments] = useState<CommentInterface[] | null>(null);
     const paginationRef = useRef({
@@ -70,7 +68,6 @@ export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>
 
           setComments([...(comments ?? []), ...newItems]);
         } catch (error) {
-          LoggerStore.error('loadComments', { error });
           NotificationStore.displayError(error as Error);
           updatingStateRef.current = false;
         } finally {
@@ -87,21 +84,15 @@ export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>
       }
     };
 
-    const containerFunctions = {
-      onNextLoad,
-    };
-
-    const containerProps = () => ({
+    const containerProps = {
       comments,
       style,
       isLoading,
       loaderFullScreen,
-    });
+      onNextLoad,
+    };
 
-    return withTV(CommentsComponentTV, CommentsComponent, {
-      ...containerFunctions,
-      ...containerProps(),
-    });
+    return isTV ? <CommentsComponentTV { ...containerProps } /> : <CommentsComponent { ...containerProps } />;
   }
 );
 

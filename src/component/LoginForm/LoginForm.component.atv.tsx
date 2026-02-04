@@ -1,17 +1,17 @@
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import InfoBlock from 'Component/InfoBlock';
-import KeyboardAdjuster from 'Component/KeyboardAdjuster/KeyboardAdjuster.component';
-import Loader from 'Component/Loader';
-import ThemedButton from 'Component/ThemedButton';
-import ThemedInput from 'Component/ThemedInput';
-import t from 'i18n/t';
-import { ACCOUNT_ROUTE } from 'Navigation/routes';
+import { InfoBlock } from 'Component/InfoBlock';
+import { KeyboardAdjuster } from 'Component/KeyboardAdjuster';
+import { Loader } from 'Component/Loader';
+import { ThemedButton } from 'Component/ThemedButton';
+import { ThemedInput } from 'Component/ThemedInput';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
+import { t } from 'i18n/translate';
+import { ACCOUNT_SCREEN } from 'Navigation/navigationRoutes';
 import { useRef } from 'react';
 import { View } from 'react-native';
-import { useKeyboardController } from 'react-native-keyboard-controller';
 import { DefaultFocus } from 'react-tv-space-navigation';
+import { navigate } from 'Util/Navigation';
 
-import { styles } from './LoginForm.style.atv';
+import { componentStyles } from './LoginForm.style.atv';
 import { LoginFormComponentProps } from './LoginForm.type';
 
 export function LoginFormComponent({
@@ -19,24 +19,15 @@ export function LoginFormComponent({
   withRedirect,
   handleLogin,
 }: LoginFormComponentProps) {
-  const navigation = useNavigation();
   const loginRef = useRef({ username: '', password: '' });
-  const { setEnabled } = useKeyboardController();
-
-  useFocusEffect(() => {
-    setEnabled(true);
-
-    return () => {
-      setEnabled(false);
-    };
-  });
+  const styles = useThemedStyles(componentStyles);
 
   const renderForm = () => {
     if (withRedirect) {
       return (
         <ThemedButton
           style={ styles.form }
-          onPress={ () => navigation.navigate(ACCOUNT_ROUTE) }
+          onPress={ () => navigate(ACCOUNT_SCREEN) }
         >
           { t('Go to login page') }
         </ThemedButton>

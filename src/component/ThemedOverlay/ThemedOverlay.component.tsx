@@ -1,15 +1,14 @@
 import KeyboardAdjuster from 'Component/KeyboardAdjuster/KeyboardAdjuster.component';
 import { Portal } from 'Component/ThemedPortal';
 import { useLandscape } from 'Hooks/useLandscape';
-import {
-  memo,
-} from 'react';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
+import { memo } from 'react';
 import { Modal } from 'react-native';
 import { GestureHandlerRootView, Pressable } from 'react-native-gesture-handler';
-import { Colors } from 'Style/Colors';
+import { useAppTheme } from 'Theme/context';
 import { noopFn } from 'Util/Function';
 
-import { styles } from './ThemedOverlay.style';
+import { componentStyles } from './ThemedOverlay.style';
 import { ThemedOverlayComponentProps } from './ThemedOverlay.type';
 
 export function ThemedOverlayComponent({
@@ -23,6 +22,8 @@ export function ThemedOverlayComponent({
   handleModalRequestClose,
   onShow,
 }: ThemedOverlayComponentProps) {
+  const { theme } = useAppTheme();
+  const styles = useThemedStyles(componentStyles);
   const isLandscape = useLandscape();
 
   return (
@@ -32,7 +33,7 @@ export function ThemedOverlayComponent({
         visible={ isOpened }
         onShow={ onShow }
         onRequestClose={ handleModalRequestClose }
-        backdropColor={ Colors.modal }
+        backdropColor={ theme.colors.modal }
         transparent={ transparent }
       >
         <GestureHandlerRootView>

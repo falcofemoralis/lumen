@@ -1,9 +1,10 @@
-import ThemedText from 'Component/ThemedText';
+import { ThemedText } from 'Component/ThemedText';
 import { usePlayerProgressContext } from 'Context/PlayerProgressContext';
-import t from 'i18n/t';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
+import { t } from 'i18n/translate';
 import { View } from 'react-native';
 
-import { styles } from './PlayerDuration.style.atv';
+import { componentStyles } from './PlayerDuration.style.atv';
 
 export const PlayerDurationComponent = () => {
   const {
@@ -13,11 +14,12 @@ export const PlayerDurationComponent = () => {
       remainingTime,
     } = {},
   } = usePlayerProgressContext();
+  const styles = useThemedStyles(componentStyles);
 
   return (
     <View style={ styles.duration }>
       <ThemedText style={ styles.durationText }>
-        { t('Remaining: %s', remainingTime) }
+        { t('Remaining: {{remaining}}', { remaining: remainingTime } ) }
       </ThemedText>
       <ThemedText style={ styles.durationText }>
         { `${currentTime} / ${durationTime}` }

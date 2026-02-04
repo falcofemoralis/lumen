@@ -1,6 +1,6 @@
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale }: Theme) => ({
   container: {
     height: '100%',
     flexDirection: 'column',
@@ -9,18 +9,18 @@ export const styles = CreateStyles({
     maxWidth: '50%',
   },
   form: {
-    marginTop: 16,
+    marginTop: scale(16),
     justifyContent: 'center',
     alignItems: 'center',
   },
   inputContainer: {
     flexDirection: 'row',
-    margin: 8,
+    margin: scale(8),
   },
   input: {
-    width: 250,
+    width: scale(250),
   },
   button: {
-    margin: 8,
+    margin: scale(8),
   },
-});
+} satisfies ThemedStyles);

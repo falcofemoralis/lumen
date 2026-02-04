@@ -1,42 +1,27 @@
-import { Colors } from 'Style/Colors';
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale, colors }: Theme) => ({
   container: {
+    width: '100%',
+    height: '100%',
   },
   menuListWrapper: {
-    height: 40,
+    position: 'relative',
+    height: scale(40),
     zIndex: 10,
     transitionProperty: 'all',
     transitionDuration: '250ms',
+    backgroundColor: colors.background,
   },
   menuListScroll: {},
   menuList: {
-    gap: 8,
+    gap: scale(8),
   },
   grid: {
     zIndex: 2,
-    paddingTop: 8,
-    height: '80%',
-  },
-  hidden: {
-    opacity: 0,
+    marginTop: scale(8),
   },
   tabButton: {
     height: '100%',
   },
-  activeElement: {
-    height: '100%',
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    borderRadius: 99,
-    transitionProperty: ['width', 'transform'],
-    transitionDuration: '250ms',
-    transitionTimingFunction: 'ease-in-out',
-  },
-  activeElementUnfocused: {
-    backgroundColor: Colors.tertiary,
-  },
-});
+} satisfies ThemedStyles);

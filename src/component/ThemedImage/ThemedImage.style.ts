@@ -1,13 +1,12 @@
-import { Colors } from 'Style/Colors';
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-export const styles = CreateStyles({
+export const componentStyles = ({ colors }: Theme) => ({
   container: {
-    backgroundColor: Colors.thumbnail,
+    backgroundColor: colors.thumbnail,
     overflow: 'hidden',
   },
   image: {
     width: '100%',
     height: '100%',
   },
-});
+} satisfies ThemedStyles);

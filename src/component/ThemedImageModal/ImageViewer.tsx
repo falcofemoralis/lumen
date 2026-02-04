@@ -1,15 +1,15 @@
-import Loader from 'Component/Loader';
-import React, { useMemo, useState } from 'react';
+import { Loader } from 'Component/Loader';
+import { useMemo, useState } from 'react';
 import { useWindowDimensions } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
-  runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withDecay,
   withTiming,
 } from 'react-native-reanimated';
-import { Colors } from 'Style/Colors';
+import { scheduleOnRN } from 'react-native-worklets';
+import { useAppTheme } from 'Theme/context';
 
 export type ImageViewerProps = {
   imageUrl: string;
@@ -26,6 +26,7 @@ export default function ImageViewer({
   onSingleTap,
   onRequestClose,
 }: ImageViewerProps) {
+  const { theme } = useAppTheme();
   const [isLoading, setIsLoading] = useState(true);
   const dimensions = useWindowDimensions();
 
@@ -146,7 +147,7 @@ export default function ImageViewer({
       if (scale.value === 1) {
         if (event.translationY < -50) {
           if (event.velocityY < -2000 || event.translationY < -200) {
-            runOnJS(onRequestClose)();
+            scheduleOnRN(onRequestClose);
 
             return;
           }
@@ -193,7 +194,7 @@ export default function ImageViewer({
 
   const singleTap = Gesture.Tap().onEnd(() => {
 
-    onSingleTap && runOnJS(onSingleTap)();
+    onSingleTap && scheduleOnRN(onSingleTap);
   });
 
   const doubleTap = Gesture.Tap()
@@ -278,7 +279,7 @@ export default function ImageViewer({
           flex: 1,
           alignItems: 'center',
           justifyContent: 'center',
-          backgroundColor: Colors.transparent,
+          backgroundColor: theme.colors.transparent,
         } }
       >
         <Loader

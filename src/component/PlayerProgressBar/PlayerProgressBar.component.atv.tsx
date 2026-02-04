@@ -6,11 +6,13 @@ import {
   SmartSeekingParams,
 } from 'Component/Player/Player.config';
 import { LongEvent } from 'Component/Player/Player.type';
-import PlayerStoryboard from 'Component/PlayerStoryboard';
-import ThemedPressable from 'Component/ThemedPressable';
+import { PlayerStoryboard } from 'Component/PlayerStoryboard';
+import { ThemedPressable } from 'Component/ThemedPressable';
+import { useConfigContext } from 'Context/ConfigContext';
 import { usePlayerContext } from 'Context/PlayerContext';
 import { usePlayerProgressContext } from 'Context/PlayerProgressContext';
-import React, {
+import { useThemedStyles } from 'Hooks/useThemedStyles';
+import {
   useCallback,
   useEffect,
   useMemo,
@@ -19,14 +21,13 @@ import React, {
 import { View } from 'react-native';
 import { Slider } from 'react-native-awesome-slider';
 import { useSharedValue } from 'react-native-reanimated';
-import ConfigStore from 'Store/Config.store';
-import { Colors } from 'Style/Colors';
+import { useAppTheme } from 'Theme/context';
 import { noopFn } from 'Util/Function';
 import { setTimeoutSafe } from 'Util/Misc';
 import RemoteControlManager from 'Util/RemoteControl/RemoteControlManager';
 import { SupportedKeys } from 'Util/RemoteControl/SupportedKeys';
 
-import { styles } from './PlayerProgressBar.style.atv';
+import { componentStyles } from './PlayerProgressBar.style.atv';
 import { PlayerProgressBarComponentProps } from './PlayerProgressBar.type';
 
 export const PlayerProgressBarComponent = ({
@@ -40,9 +41,12 @@ export const PlayerProgressBarComponent = ({
   rewindPosition = noopFn,
   togglePlayPause = noopFn,
 }: PlayerProgressBarComponentProps) => {
-  const { focusedElement } = usePlayerContext();
+  const { theme } = useAppTheme();
+  const styles = useThemedStyles(componentStyles);
+  const { focusedElementRef } = usePlayerContext();
   const { progressStatus, updateProgressStatus } = usePlayerProgressContext();
   const rewindTimer = useRef<number | null>(null);
+  const { playerRewindSeconds } = useConfigContext();
 
   // Refs for performance-critical values to avoid re-renders
   const smartSeekingRef = useRef<SmartSeekingParams>({ ...DEFAULT_SMART_SEEKING_PARAMS });
@@ -182,14 +186,14 @@ export const PlayerProgressBarComponent = ({
     if (e.longTimeout) {
       // Button press
       clearTimeout(e.longTimeout);
-      rewindPosition(direction, ConfigStore.getConfig().playerRewindSeconds);
+      rewindPosition(direction, playerRewindSeconds);
     }
-  }, [toggleSmartSeeking, rewindPosition]);
+  }, [toggleSmartSeeking, rewindPosition, playerRewindSeconds]);
 
   // Memoized remote control event listeners
   const remoteControlListeners = useMemo(() => {
     const keyDownListener = (type: SupportedKeys) => {
-      if (focusedElement === FocusedElement.PROGRESS_THUMB) {
+      if (focusedElementRef.current === FocusedElement.PROGRESS_THUMB) {
         if (type === SupportedKeys.LEFT) {
           handleProgressThumbKeyDown(type, RewindDirection.BACKWARD);
         }
@@ -203,7 +207,7 @@ export const PlayerProgressBarComponent = ({
     };
 
     const keyUpListener = (type: SupportedKeys) => {
-      if (focusedElement === FocusedElement.PROGRESS_THUMB) {
+      if (focusedElementRef.current === FocusedElement.PROGRESS_THUMB) {
         if (type === SupportedKeys.LEFT) {
           handleProgressThumbKeyUp(type, RewindDirection.BACKWARD);
         }
@@ -217,7 +221,7 @@ export const PlayerProgressBarComponent = ({
     };
 
     return { keyDownListener, keyUpListener };
-  }, [focusedElement, handleProgressThumbKeyDown, handleProgressThumbKeyUp]);
+  }, [handleProgressThumbKeyDown, handleProgressThumbKeyUp]);
 
   // Remote control event listeners setup
   useEffect(() => {
@@ -247,7 +251,7 @@ export const PlayerProgressBarComponent = ({
         />
       ) }
     </ThemedPressable>
-  ), [thumbRef, onFocus]);
+  ), [thumbRef, onFocus, styles]);
 
   const renderStoryboard = () => {
     if (!storyboardUrl) {
@@ -278,10 +282,10 @@ export const PlayerProgressBarComponent = ({
         maximumValue={ maximumValue }
         style={ styles.progressBar }
         theme={ {
-          minimumTrackTintColor: Colors.secondary,
+          minimumTrackTintColor: theme.colors.secondary,
           cacheTrackTintColor: '#F97F87',
           maximumTrackTintColor: '#8B8B8B',
-          bubbleBackgroundColor: Colors.secondary,
+          bubbleBackgroundColor: theme.colors.secondary,
         } }
         renderThumb={ renderThumb }
       />

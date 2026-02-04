@@ -1,39 +1,20 @@
 import { Text } from 'react-native';
-import Animated from 'react-native-reanimated';
-import { Colors } from 'Style/Colors';
+import { useAppTheme } from 'Theme/context';
 
 import { ThemedTextProps } from './ThemedText.type';
 
-function ThemedText({
+const ThemedText = ({
   style,
-  lightColor,
-  darkColor,
-  type = 'default',
-  ...rest
-}: ThemedTextProps) {
+  ...props
+}: ThemedTextProps) => {
+  const { theme, scale } = useAppTheme();
+
   return (
     <Text
-      style={ [{ color: Colors.text }, style] }
-      { ...rest }
+      style={ [{ color: theme.colors.text, fontSize: scale(theme.text.xs.fontSize) }, style] }
+      { ...props }
     />
   );
-}
-
-function ThemedTextAnimated({
-  style,
-  lightColor,
-  darkColor,
-  type = 'default',
-  ...rest
-}: ThemedTextProps) {
-  return (
-    <Animated.Text
-      style={ [{ color: Colors.text }, style] }
-      { ...rest }
-    />
-  );
-}
-
-ThemedText.Animated = ThemedTextAnimated;
+};
 
 export default ThemedText;

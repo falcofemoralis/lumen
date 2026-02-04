@@ -1,1 +1,1 @@
-export { default } from './SettingLink.container';
+export { default as SettingLink } from './SettingLink.container';

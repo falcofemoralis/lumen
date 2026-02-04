@@ -1,4 +1,4 @@
-import { SettingItem } from 'Route/SettingsPage/SettingsPage.type';
+import { SettingItem } from 'Screen/SettingsScreen/SettingsScreen.type';
 
 export type SettingGroupComponentProps = {
   setting: SettingItem;

@@ -1,1 +1,1 @@
-export { default } from './ThemedMultiList.container';
+export { default as ThemedMultiList } from './ThemedMultiList.container';

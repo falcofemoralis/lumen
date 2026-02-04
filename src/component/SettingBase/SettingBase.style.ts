@@ -1,8 +1,6 @@
-import { Colors } from 'Style/Colors';
-import { CONTENT_WRAPPER_PADDING } from 'Style/Layout';
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale, colors, text, spacing }: Theme) => ({
   setting: {
   },
   settingHidden: {
@@ -10,13 +8,13 @@ export const styles = CreateStyles({
   },
   settingContainer: {
     justifyContent: 'flex-start',
-    paddingHorizontal: CONTENT_WRAPPER_PADDING,
-    paddingVertical: 12,
+    paddingHorizontal: scale(spacing.wrapperPadding),
+    paddingVertical: scale(12),
   },
   settingWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: scale(12),
     flex: 1,
   },
   settingContent: {
@@ -28,11 +26,11 @@ export const styles = CreateStyles({
   settingIcon: {
   },
   settingTitle: {
-    fontSize: 14,
+    fontSize: scale(text.xs.fontSize),
   },
   settingSubtitle: {
-    fontSize: 14,
-    color: Colors.textSecondary,
+    fontSize: scale(text.xs.fontSize),
+    color: colors.textSecondary,
     opacity: 0.8,
   },
-});
+} satisfies ThemedStyles);

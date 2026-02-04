@@ -1,22 +1,60 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
+    "allowJs": false,
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "jsx": "react-native",
+    "customConditions": [
+      "react-native"
+    ],
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "strict": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "sourceMap": true,
+    "target": "esnext",
+    "lib": [
+      "esnext",
+      "dom"
+    ],
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "baseUrl": ".",
     "paths": {
-      "i18n/*": ["./src/util/Translation/*"],
+      "@assets/*": ["./assets/*"],
+      "i18n/*": ["./src/i18n/*"],
       "Api/*": ["./src/api/*"],
       "Component/*": ["./src/component/*"],
       "Context/*": ["./src/context/*"],
       "Hooks/*": ["./src/hooks/*"],
       "Navigation/*": ["./src/navigation/*"],
-      "Route/*": ["./src/route/*"],
-      "Style/*": ["./src/style/*"],
+      "Screen/*": ["./src/screen/*"],
       "Service/*": ["./src/service/*"],
       "Store/*": ["./src/store/*"],
+      "Theme/*": ["./src/theme/*"],
       "Type/*": ["./src/type/*"],
       "Util/*": ["./src/util/*"],
-      "react-tv-space-navigation": ["./src/libs/react-tv-space-navigation"]
+      "react-tv-space-navigation": ["./src/libs/react-tv-space-navigation"],
+    },
+    "typeRoots": [
+      "./node_modules/@types",
+      "./types"
+    ]
+  },
+  "ts-node": {
+    "compilerOptions": {
+      "module": "commonjs"
     }
   },
-  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"]
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules",
+    "test/**/*"
+  ]
 }

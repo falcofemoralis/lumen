@@ -3,15 +3,15 @@ import { getFirestore } from '@react-native-firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
+import { useConfigContext } from 'Context/ConfigContext';
 import { usePlayerContext } from 'Context/PlayerContext';
 import { usePlayerProgressActions } from 'Context/PlayerProgressContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useEvent, useEventListener } from 'expo';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { useVideoPlayer, VideoPlayer, VideoTrack } from 'expo-video';
-import { withTV } from 'Hooks/withTV';
-import t from 'i18n/t';
-import { PLAYER_ROUTE } from 'Navigation/routes';
+import { t } from 'i18n/translate';
+import { PLAYER_SCREEN } from 'Navigation/navigationRoutes';
 import {
   useCallback,
   useEffect,
@@ -20,8 +20,6 @@ import {
   useState,
 } from 'react';
 import { BackHandler, Share } from 'react-native';
-import ConfigStore from 'Store/Config.store';
-import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
 import RouterStore from 'Store/Router.store';
 import { FilmInterface } from 'Type/Film.interface';
@@ -62,6 +60,7 @@ export function PlayerContainer({
   voice,
   quality: qualityProp,
 }: PlayerContainerProps) {
+  const { isTV, isFirestore } = useConfigContext();
   const navigation = useNavigation();
   const { updateSelectedVoice } = usePlayerContext();
   const { resetProgressStatus, updateProgressStatus } = usePlayerProgressActions();
@@ -89,10 +88,10 @@ export function PlayerContainer({
 
   const firestoreSavedTimeRef = useRef(false);
   const firestoreDb = useMemo(() => (
-    ConfigStore.getConfig().isFirestore && isSignedIn
+    isFirestore && isSignedIn
       ? getFirestore().collection<FirestoreDocument>(FIRESTORE_DB)
       : null
-  ), [isSignedIn]);
+  ), [isSignedIn, isFirestore]);
 
   const initFirestoreSavedTime = useCallback(async (p: VideoPlayer, savedTime: SavedTime | null) => {
     if (firestoreSavedTimeRef.current || !firestoreDb || !profile) {
@@ -175,8 +174,6 @@ export function PlayerContainer({
           updateTime();
         }
       } catch (error) {
-        LoggerStore.error('createUpdateTimeTimeout', { error });
-
         // If we get an error accessing the player, reset the timeout
         createUpdateTimeTimeout();
       }
@@ -230,8 +227,6 @@ export function PlayerContainer({
 
   useEventListener(player, 'statusChange', ({ status: playerStatus, error }) => {
     if (playerStatus === 'error') {
-      LoggerStore.error('Player', { error: error?.message });
-
       NotificationStore.displayError(`An error occurred : ${error?.message}`);
     }
   });
@@ -384,17 +379,17 @@ export function PlayerContainer({
       // so the only way is to reload the player page entirely
       //player.replaceAsync(createMasterPlaylist(filmVideo.streams));
 
-      RouterStore.pushData(PLAYER_ROUTE, {
+      RouterStore.pushData(PLAYER_SCREEN, {
         video: videoArg,
         film,
         voice: voiceArg || selectedVoice,
       });
 
       const state = navigation.getState();
-      const filteredRoutes = state?.routes.filter((r) => r.name !== PLAYER_ROUTE) ?? [];
+      const filteredRoutes = state?.routes.filter((r) => r.name !== PLAYER_SCREEN) ?? [];
       filteredRoutes.push({
-        key: `${PLAYER_ROUTE}-${Date.now()}`,
-        name: PLAYER_ROUTE,
+        key: `${PLAYER_SCREEN}-${Date.now()}`,
+        name: PLAYER_SCREEN,
       });
 
       navigation.reset({
@@ -576,8 +571,6 @@ export function PlayerContainer({
         message: prepareShareBody(film),
       });
     } catch (error) {
-      LoggerStore.error('handleShare', { error });
-
       NotificationStore.displayError(error as Error);
     }
   };
@@ -592,7 +585,7 @@ export function PlayerContainer({
     togglePlayPause(false);
   };
 
-  const containerProps = () => ({
+  const containerProps = {
     player,
     status,
     isPlaying,
@@ -612,9 +605,6 @@ export function PlayerContainer({
     isLocked,
     isOverlayOpen,
     isFilmBookmarked,
-  });
-
-  const containerFunctions = {
     togglePlayPause,
     rewindPosition,
     seekToPosition,
@@ -638,10 +628,7 @@ export function PlayerContainer({
     backwardToStart,
   };
 
-  return withTV(PlayerComponentTV, PlayerComponent, {
-    ...containerProps(),
-    ...containerFunctions,
-  });
+  return isTV ? <PlayerComponentTV { ...containerProps } /> : <PlayerComponent { ...containerProps } />;
 }
 
 export default PlayerContainer;

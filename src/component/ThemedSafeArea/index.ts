@@ -1,1 +1,1 @@
-export { default } from './ThemedSafeArea.component';
+export { default as ThemedSafeArea } from './ThemedSafeArea.component';

@@ -1,7 +1,7 @@
-import Loader from 'Component/Loader';
-import ThemedMultiList from 'Component/ThemedMultiList';
-import ThemedOverlay from 'Component/ThemedOverlay';
-import t from 'i18n/t';
+import { Loader } from 'Component/Loader';
+import { ThemedMultiList } from 'Component/ThemedMultiList';
+import { ThemedOverlay } from 'Component/ThemedOverlay';
+import { t } from 'i18n/translate';
 
 import { BookmarksOverlayComponentProps } from './BookmarksOverlay.type';
 

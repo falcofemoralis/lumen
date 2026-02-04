@@ -1,8 +1,8 @@
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
 export const ROW_GAP = 8;
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale }: Theme) => ({
   grid: {
     width: '100%',
     height: '100%',
@@ -10,7 +10,7 @@ export const styles = CreateStyles({
   gridRow: {
     flexDirection: 'row',
     width: '100%',
-    gap: ROW_GAP,
-    paddingBottom: ROW_GAP,
+    gap: scale(ROW_GAP),
+    paddingBottom: scale(ROW_GAP),
   },
-});
+} satisfies ThemedStyles);

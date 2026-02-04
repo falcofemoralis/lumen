@@ -1,1 +1,1 @@
-export { default } from './NavigationBar.container';
+export { default as NavigationBar } from './NavigationBar.container';

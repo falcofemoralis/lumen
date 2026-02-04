@@ -1,6 +1,5 @@
-import { withTV } from 'Hooks/withTV';
+import { useConfigContext } from 'Context/ConfigContext';
 import { useEffect, useState } from 'react';
-import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
 import { PaginationInterface } from 'Type/Pagination.interface';
 
@@ -17,18 +16,20 @@ export function FilmPagerContainer({
   onUpdateFilms,
   onRowFocus,
 }: FilmPagerContainerProps) {
-  const [pagerItems, setPagerItems] = useState<PagerItemInterface[]>(
-    menuItems.map((item, idx) => ({
-      key: String(idx + 1),
-      title: item.title,
-      menuItem: item,
-      films: null,
-      pagination: {
-        currentPage: 1,
-        totalPages: 1,
-      },
-    }))
-  );
+  const { isTV } = useConfigContext();
+
+  const mapItems = (items: typeof menuItems) => items.map((item, idx) => ({
+    key: String(idx + 1),
+    title: item.title,
+    menuItem: item,
+    films: null,
+    pagination: {
+      currentPage: 1,
+      totalPages: 1,
+    },
+  }));
+
+  const [pagerItems, setPagerItems] = useState<PagerItemInterface[]>(mapItems(menuItems));
 
   useEffect(() => {
     if (loadOnInit) {
@@ -99,8 +100,6 @@ export function FilmPagerContainer({
         totalPages,
       });
     } catch (error) {
-      LoggerStore.error('loadFilms', { error });
-
       NotificationStore.displayError(error as Error);
     }
   };
@@ -120,22 +119,16 @@ export function FilmPagerContainer({
     await loadFilms(item, newPage, isRefresh, isRefresh);
   };
 
-  const containerFunctions = {
+  const containerProps = {
+    pagerItems,
+    gridStyle,
+    onRowFocus,
     loadFilms,
     onNextLoad,
     onPreLoad,
   };
 
-  const containerProps = () => ({
-    pagerItems,
-    gridStyle,
-    onRowFocus,
-  });
-
-  return withTV(FilmPagerComponentTV, FilmPagerComponent, {
-    ...containerFunctions,
-    ...containerProps(),
-  });
+  return isTV ? <FilmPagerComponentTV { ...containerProps } /> : <FilmPagerComponent { ...containerProps } />;
 }
 
 export default FilmPagerContainer;

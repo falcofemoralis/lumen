@@ -1,14 +1,13 @@
-import { Colors } from 'Style/Colors';
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale, colors }: Theme) => ({
   button: {
     justifyContent: 'flex-start',
-    marginVertical: 4,
-    borderRadius: 12,
-    backgroundColor: Colors.backgroundLight,
+    marginVertical: scale(4),
+    borderRadius: scale(12),
+    backgroundColor: colors.backgroundLight,
   },
   buttonContent: {
-    padding: 12,
+    padding: scale(12),
   },
-});
+} satisfies ThemedStyles);

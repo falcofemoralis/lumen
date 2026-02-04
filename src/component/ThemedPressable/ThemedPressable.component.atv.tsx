@@ -1,7 +1,7 @@
+import { TouchableHighlight } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 import { SpatialNavigationFocusableView } from 'react-tv-space-navigation';
 
-import { styles } from './ThemedPressable.style.atv';
 import { ThemedFocusableNodeState, ThemedPressableComponentProps } from './ThemedPressable.type';
 
 export const ThemedPressableComponent = ({
@@ -13,8 +13,6 @@ export const ThemedPressableComponent = ({
   style,
   spatialRef,
   disabled = false,
-  mode = 'light',
-  pressDelay = 50,
   withAnimation = false,
   zoomScale = 1.05,
 }: ThemedPressableComponentProps) => {
@@ -37,14 +35,18 @@ export const ThemedPressableComponent = ({
       { ({ isFocused, isRootActive }) => withAnimation ? (
         <Animated.View
           style={ [
-            styles.item,
+            {
+              transform: [{ scale: 1 }],
+              transitionProperty: 'transform',
+              transitionDuration: '250ms',
+            },
             style,
             isFocused && isRootActive && {
               transform: [{ scale: zoomScale }],
             },
           ] }
         >
-          { typeof children === 'function' ? children({ isFocused, isRootActive }) : children }
+          { renderChildren({ isFocused, isRootActive }) }
         </Animated.View>
       ) : renderChildren({ isFocused, isRootActive }) }
     </SpatialNavigationFocusableView>

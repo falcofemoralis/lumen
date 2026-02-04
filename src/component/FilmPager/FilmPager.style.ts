@@ -1,20 +1,19 @@
-import { Colors } from 'Style/Colors';
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale, colors, text }: Theme) => ({
   tabBarContainer: {
     position: 'relative',
     alignItems: 'center',
-    height: 42,
+    height: scale(42),
   },
   tabButton: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 6,
+    paddingHorizontal: scale(6),
   },
   tabText: {
-    color: Colors.text,
-    fontSize: 12,
+    color: colors.text,
+    fontSize: scale(text.xxs.fontSize),
     opacity: 0.7,
     transitionProperty: 'opacity',
     transitionDuration: '250ms',
@@ -23,4 +22,4 @@ export const styles = CreateStyles({
     fontWeight: 'bold',
     opacity: 1,
   },
-});
+} satisfies ThemedStyles);

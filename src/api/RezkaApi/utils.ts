@@ -8,7 +8,7 @@ import { SubtitleInterface } from 'Type/FilmVideo.interface';
 import { EpisodeInterface, SeasonInterface } from 'Type/FilmVoice.interface';
 import { HTMLElementInterface } from 'Util/Parser';
 
-import { decrypt } from './decode2';
+import { decrypt } from './decode';
 import { SubtitleLns } from './playerApi';
 
 export interface JSONResult {

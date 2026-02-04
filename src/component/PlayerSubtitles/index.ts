@@ -1,1 +1,1 @@
-export { default } from './PlayerSubtitles.component';
+export { default as PlayerSubtitles } from './PlayerSubtitles.component';

@@ -1,12 +1,12 @@
-import { withTV } from 'Hooks/withTV';
+import { useConfigContext } from 'Context/ConfigContext';
 import { useState } from 'react';
 
-import ThemedAccordionComponent from './ThemedAccordion.component';
-import ThemedAccordionComponentTV from './ThemedAccordion.component.atv';
+import ThemedAccordionComponentTV, { ThemedAccordionComponent } from './ThemedAccordion.component.atv';
 import { ExpandedItem, ThemedAccordionContainerProps } from './ThemedAccordion.type';
 
 export const ThemedAccordionContainer = (props: ThemedAccordionContainerProps<any>) => {
   const [expanded, setExpanded] = useState<ExpandedItem>({});
+  const { isTV } = useConfigContext();
 
   const openAccordionGroup = (id: string) => {
     setExpanded({
@@ -15,19 +15,15 @@ export const ThemedAccordionContainer = (props: ThemedAccordionContainerProps<an
     });
   };
 
-  const containerFunctions = {
-    openAccordionGroup,
-  };
-
   const containerProps = {
     ...props,
     expanded,
+    openAccordionGroup,
   };
 
-  return withTV(ThemedAccordionComponentTV, ThemedAccordionComponent, {
-    ...containerProps,
-    ...containerFunctions,
-  });
+  // eslint-disable-next-line max-len
+  return isTV ? <ThemedAccordionComponentTV { ...containerProps } /> : <ThemedAccordionComponent { ...containerProps } />;
+
 };
 
 export default ThemedAccordionContainer;

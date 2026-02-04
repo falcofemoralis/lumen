@@ -1,5 +1,5 @@
 import { LegendList } from '@legendapp/list';
-import React, { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import {
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -16,13 +16,12 @@ export const ThemedGridComponent = ({
   numberOfColumns,
   itemSize,
   isRefreshing = false,
-  ListEmptyComponent,
   ListHeaderComponent,
   renderItem,
   handleScrollEnd,
   handleRefresh = noopFn,
 }: ThemedGridComponentProps) => {
-  const scrollFuncRef = React.useRef<() => void>(handleScrollEnd);
+  const scrollFuncRef = useRef<() => void>(handleScrollEnd);
 
   useEffect(() => {
     scrollFuncRef.current = handleScrollEnd;
@@ -50,7 +49,6 @@ export const ThemedGridComponent = ({
       onScroll={ onScroll }
       refreshControl={ renderRefreshControl() }
       keyExtractor={ (item, idx) => `${item.id}-row-${idx}` }
-      ListEmptyComponent={ ListEmptyComponent }
       recycleItems
       showsVerticalScrollIndicator={ false }
       ListHeaderComponent={ ListHeaderComponent }

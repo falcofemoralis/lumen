@@ -1,0 +1,1 @@
+export { default as Awake } from './Awake.component';

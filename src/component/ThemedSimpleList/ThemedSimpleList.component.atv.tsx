@@ -1,6 +1,7 @@
-import ThemedImage from 'Component/ThemedImage';
-import ThemedPressable from 'Component/ThemedPressable';
-import ThemedText from 'Component/ThemedText';
+import { ThemedImage } from 'Component/ThemedImage';
+import { ThemedPressable } from 'Component/ThemedPressable';
+import { ThemedText } from 'Component/ThemedText';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { useCallback, useRef, useState } from 'react';
 import { View } from 'react-native';
 import {
@@ -9,7 +10,7 @@ import {
   SpatialNavigationVirtualizedListRef,
 } from 'react-tv-space-navigation';
 
-import { MAX_ITEMS_TO_DISPLAY, styles } from './ThemedSimpleList.style.atv';
+import { componentStyles, MAX_ITEMS_TO_DISPLAY } from './ThemedSimpleList.style.atv';
 import { ListItem, ThemedSimpleListComponentProps } from './ThemedSimpleList.type';
 
 export const ThemedListComponent = ({
@@ -19,6 +20,7 @@ export const ThemedListComponent = ({
   style,
   onChange,
 }: ThemedSimpleListComponentProps) => {
+  const styles = useThemedStyles(componentStyles);
   const scrollViewRef = useRef<SpatialNavigationVirtualizedListRef>(null);
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -94,7 +96,7 @@ export const ThemedListComponent = ({
         </ThemedPressable>
       </DefaultFocus>
     );
-  }, [value, onChange]);
+  }, [value, onChange, styles]);
 
   const renderList = () => {
     return (

@@ -1,20 +1,22 @@
-import BookmarksOverlay from 'Component/BookmarksOverlay';
-import CommentsOverlay from 'Component/CommentsOverlay';
-import Loader from 'Component/Loader';
-import PlayerClock from 'Component/PlayerClock';
-import PlayerDuration from 'Component/PlayerDuration';
-import PlayerProgressBar from 'Component/PlayerProgressBar';
-import PlayerSubtitles from 'Component/PlayerSubtitles';
-import PlayerVideoSelector from 'Component/PlayerVideoSelector';
-import ThemedDropdown from 'Component/ThemedDropdown';
-import ThemedPressable from 'Component/ThemedPressable';
-import ThemedText from 'Component/ThemedText';
+import { BookmarksOverlay } from 'Component/BookmarksOverlay';
+import { CommentsOverlay } from 'Component/CommentsOverlay';
+import { Loader } from 'Component/Loader';
+import { PlayerClock } from 'Component/PlayerClock';
+import { PlayerDuration } from 'Component/PlayerDuration';
+import { PlayerProgressBar } from 'Component/PlayerProgressBar';
+import { PlayerSubtitles } from 'Component/PlayerSubtitles';
+import { PlayerVideoSelector } from 'Component/PlayerVideoSelector';
+import { ThemedDropdown } from 'Component/ThemedDropdown';
+import { ThemedPressable } from 'Component/ThemedPressable';
+import { ThemedText } from 'Component/ThemedText';
+import { useConfigContext } from 'Context/ConfigContext';
 import * as NavigationBar from 'expo-navigation-bar';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { OrientationLock } from 'expo-screen-orientation';
 import * as StatusBar from 'expo-status-bar';
 import { isPictureInPictureSupported, VideoView } from 'expo-video';
-import t from 'i18n/t';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
+import { t } from 'i18n/translate';
 import {
   Bookmark,
   BookmarkCheck,
@@ -34,9 +36,7 @@ import {
   SkipBack,
   SkipForward,
 } from 'lucide-react-native';
-import React, {
-  useEffect, useRef, useState,
-} from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { AppState, Dimensions, View } from 'react-native';
 import {
   Gesture,
@@ -47,10 +47,8 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
-import ConfigStore from 'Store/Config.store';
-import { Colors } from 'Style/Colors';
-import { ClosedCaptionFilled } from 'Style/Icons';
-import { scale } from 'Util/CreateStyles';
+import { useAppTheme } from 'Theme/context';
+import { ClosedCaptionFilled } from 'Theme/icons';
 import { setTimeoutSafe } from 'Util/Misc';
 import { formatVideoTrackInfo, getPlayerAvailableQualityItems } from 'Util/Player';
 
@@ -63,7 +61,7 @@ import {
   PLAYER_CONTROLS_TIMEOUT,
   RewindDirection,
 } from './Player.config';
-import { MiddleActionVariant, styles } from './Player.style';
+import { componentStyles, MiddleActionVariant } from './Player.style';
 import { DoubleTapAction, PlayerComponentProps } from './Player.type';
 
 const { width: screenWidth } = Dimensions.get('window');
@@ -109,6 +107,9 @@ export function PlayerComponent({
   onBookmarkChange,
   setPlayerRate,
 }: PlayerComponentProps) {
+  const { scale, theme } = useAppTheme();
+  const styles = useThemedStyles(componentStyles);
+  const { playerRewindSeconds } = useConfigContext();
   const [showControls, setShowControls] = useState(false);
   const [isScrolling, setIsScrolling] = useState(false);
   const [doubleTapAction, setDoubleTapAction] = useState<DoubleTapAction | null>(null);
@@ -207,7 +208,7 @@ export function PlayerComponent({
   };
 
   const handleDoubleTap = (direction: RewindDirection) => {
-    const seconds = ConfigStore.getConfig().playerRewindSeconds;
+    const seconds = playerRewindSeconds;
 
     rewindPosition(direction, seconds);
     setDoubleTapAction({
@@ -288,7 +289,7 @@ export function PlayerComponent({
       >
         <IconComponent
           size={ scale(28) }
-          color={ Colors.white }
+          color={ theme.colors.icon }
         />
       </ThemedPressable>
     </GestureDetector>
@@ -300,7 +301,8 @@ export function PlayerComponent({
     return (
       <ThemedText style={ styles.title }>
         {
-          `${title}${hasSeasons ? ` ${t('Season %s - Episode %s', voice.lastSeasonId, voice.lastEpisodeId)}` : ''}`
+          // eslint-disable-next-line max-len
+          `${title}${hasSeasons ? ` ${t('Season {{season}} - Episode {{episode}}', { season: voice.lastSeasonId, episode: voice.lastEpisodeId })}` : ''}`
         }
       </ThemedText>
     );
@@ -333,7 +335,7 @@ export function PlayerComponent({
     }
 
     return renderAction(
-      selectedSubtitle?.languageCode === '' ? ClosedCaption : ClosedCaptionFilled,
+      selectedSubtitle?.languageCode === '' ? ClosedCaption : ClosedCaptionFilled({ color: theme.colors.icon }),
       openSubtitleSelector
     );
   };
@@ -367,7 +369,7 @@ export function PlayerComponent({
       >
         <IconComponent
           size={ scale(size === 'big' ? 28 : 20) }
-          color={ Colors.white }
+          color={ theme.colors.icon }
         />
       </ThemedPressable>
     </GestureDetector>
@@ -482,7 +484,7 @@ export function PlayerComponent({
     const { seconds = 10, direction, isVisible } = doubleTapAction ?? {};
 
     return (
-      <React.Fragment>
+      <Fragment>
         <Animated.View
           style={ [
             styles.doubleTapAction,
@@ -492,10 +494,10 @@ export function PlayerComponent({
         >
           <View style={ styles.doubleTapContainer }>
             <View style={ styles.doubleTapIcon }>
-              <Rewind color={ Colors.white } />
+              <Rewind color={ theme.colors.icon } />
             </View>
             <ThemedText style={ styles.longTapText }>
-              { t('%s seconds', `-${seconds}`) }
+              { t('{{seconds}} seconds', { seconds: `-${seconds}` }) }
             </ThemedText>
           </View>
         </Animated.View>
@@ -508,14 +510,14 @@ export function PlayerComponent({
         >
           <View style={ styles.doubleTapContainer }>
             <View style={ styles.doubleTapIcon }>
-              <FastForward color={ Colors.white } />
+              <FastForward color={ theme.colors.icon } />
             </View>
             <ThemedText style={ styles.longTapText }>
-              { t('%s seconds', `${seconds}`) }
+              { t('{{seconds}} seconds', { seconds: `${seconds}` }) }
             </ThemedText>
           </View>
         </Animated.View>
-      </React.Fragment>
+      </Fragment>
     );
   };
 
@@ -533,7 +535,7 @@ export function PlayerComponent({
           </ThemedText>
           <FastForward
             size={ scale(18) }
-            color={ Colors.white }
+            color={ theme.colors.icon }
           />
         </View>
       </View>

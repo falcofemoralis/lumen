@@ -14,7 +14,7 @@
 // import * as TaskManager from 'expo-task-manager';
 // import t from 'i18n/t';
 // import { useCallback } from 'react';
-// import { FILM_ROUTE } from 'Route/FilmPage/FilmPage.config';
+// import { FILM_ROUTE } from 'Route/FilmScreen/FilmScreen.config';
 // import ConfigStore from 'Store/Config.store';
 // import LoggerStore from 'Store/Logger.store';
 // import StorageStore from 'Store/Storage.store';

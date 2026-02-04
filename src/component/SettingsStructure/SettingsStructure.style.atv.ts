@@ -1,6 +1,6 @@
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale }: Theme) => ({
   container: {
     flexDirection: 'row',
     width: '100%',
@@ -20,7 +20,7 @@ export const styles = CreateStyles({
     width: '100%',
   },
   tabButton: {
-    paddingVertical: 2,
-    paddingHorizontal: 12,
+    paddingVertical: scale(2),
+    paddingHorizontal: scale(12),
   },
-});
+} satisfies ThemedStyles);

@@ -1,22 +1,23 @@
-import { calculateCardDimensions } from 'Component/FilmCard/FilmCard.style';
 import { FilmCardThumbnail } from 'Component/FilmCard/FilmCard.thumbnail';
 import { View } from 'react-native';
-import { scale } from 'Util/CreateStyles';
 
-import { NUMBER_OF_COLUMNS } from './FilmSections.config';
-import { ROW_GAP } from './FilmSections.style';
-
-export const FilmSectionsThumbnail = () => {
-  const { width } = calculateCardDimensions(NUMBER_OF_COLUMNS, scale(ROW_GAP));
-
+export const FilmSectionsThumbnail = ({
+  width,
+  numberOfColumns,
+  styles,
+}: {
+  width: number;
+  numberOfColumns: number;
+  styles: any;
+}) => {
   return (
     <View
       style={ {
         flexDirection: 'row',
-        gap: scale(ROW_GAP),
+        gap: styles.gridRow.gap,
       } }
     >
-      { Array(NUMBER_OF_COLUMNS).fill(0).map((__, index) => (
+      { Array(numberOfColumns).fill(0).map((__, index) => (
         <FilmCardThumbnail
           // eslint-disable-next-line react/no-array-index-key
           key={ `film-list-thumb-col-${index}` }

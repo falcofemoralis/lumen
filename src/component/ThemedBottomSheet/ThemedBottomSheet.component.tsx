@@ -1,8 +1,7 @@
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import { Portal } from 'Component/ThemedPortal';
-import React from 'react';
 import { View } from 'react-native';
-import { Colors } from 'Style/Colors';
+import { useAppTheme } from 'Theme/context';
 
 import { ThemedBottomSheetComponentProps } from './ThemedBottomSheet.type';
 
@@ -10,9 +9,11 @@ export const ThemedBottomSheetComponent = ({
   ref,
   children,
   sizes = ['40%', 'large'],
-  backgroundColor = Colors.backgroundLight,
+  backgroundColor,
   onMount,
 }: ThemedBottomSheetComponentProps) => {
+  const { theme } = useAppTheme();
+
   return (
     <View>
       <Portal>
@@ -20,7 +21,7 @@ export const ThemedBottomSheetComponent = ({
           ref={ ref }
           sizes={ sizes }
           cornerRadius={ 24 }
-          backgroundColor={ backgroundColor }
+          backgroundColor={ backgroundColor ?? theme.colors.backgroundLight }
           onMount={ onMount }
           edgeToEdge
         >

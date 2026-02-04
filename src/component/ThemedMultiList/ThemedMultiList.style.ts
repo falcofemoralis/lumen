@@ -1,13 +1,12 @@
-import { Colors } from 'Style/Colors';
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
 const MAX_ITEMS_TO_DISPLAY = 6;
 const MAX_ITEMS_TO_DISPLAY_LANDSCAPE = 5;
 const ITEM_HEIGHT = 48;
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale, colors, text }: Theme) => ({
   item: {
-    paddingHorizontal: 12,
+    paddingHorizontal: scale(16),
     height: ITEM_HEIGHT,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -16,13 +15,13 @@ export const styles = CreateStyles({
   },
   itemLabel: {
     flex: 1,
-    fontSize: 16,
-    color: Colors.white,
+    fontSize: scale(text.sm.fontSize),
+    color: colors.text,
   },
   icon: {
-    marginRight: 5,
-    height: 20,
-    width: 20,
+    marginRight: scale(5),
+    height: scale(20),
+    width: scale(20),
   },
   listContainer: {
     flexDirection: 'column',
@@ -30,36 +29,36 @@ export const styles = CreateStyles({
   listHeader: {
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 8,
-    marginBottom: 8,
-    borderBottomColor: Colors.divider,
+    padding: scale(8),
+    marginBottom: scale(8),
+    borderBottomColor: colors.divider,
     borderBottomWidth: 1,
   },
   listHeaderText: {
-    color: Colors.text,
-    fontSize: 16,
-    lineHeight: 16,
+    color: colors.text,
+    fontSize: scale(text.sm.fontSize),
+    lineHeight: scale(16),
     fontWeight: '500',
   },
   listItems: {
     flexDirection: 'column',
-    maxHeight: MAX_ITEMS_TO_DISPLAY * ITEM_HEIGHT - 8,
+    maxHeight: MAX_ITEMS_TO_DISPLAY * scale(ITEM_HEIGHT) - scale(8),
   },
   listItemsLandscape: {
-    maxHeight: MAX_ITEMS_TO_DISPLAY_LANDSCAPE * ITEM_HEIGHT - 8,
+    maxHeight: MAX_ITEMS_TO_DISPLAY_LANDSCAPE * scale(ITEM_HEIGHT) - scale(8),
   },
   listItem: {
-    borderRadius: 16,
+    borderRadius: scale(16),
     flex: 1,
   },
   listItemContent: {
   },
   listItemSelected: {
-    backgroundColor: Colors.primary,
+    backgroundColor: colors.primary,
   },
   emptyBlock: {
-    minHeight: 120,
+    minHeight: scale(120),
     justifyContent: 'center',
     alignItems: 'center',
   },
-});
+} satisfies ThemedStyles);

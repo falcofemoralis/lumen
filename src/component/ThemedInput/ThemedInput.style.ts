@@ -1,13 +1,12 @@
-import { Colors } from 'Style/Colors';
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale, colors }: Theme) => ({
   container: {
-    backgroundColor: Colors.input,
-    borderRadius: 16,
-    paddingHorizontal: 8,
+    backgroundColor: colors.input,
+    borderRadius: scale(16),
+    paddingHorizontal: scale(8),
   },
   input: {
-    color: Colors.text,
+    color: colors.text,
   },
-});
+} satisfies ThemedStyles);

@@ -1,1 +1,1 @@
-export { default } from './PlayerClock.container';
+export { default as PlayerClock } from './PlayerClock.container';

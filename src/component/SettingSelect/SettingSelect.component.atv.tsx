@@ -1,7 +1,7 @@
-import Loader from 'Component/Loader';
-import SettingBase from 'Component/SettingBase';
+import { Loader } from 'Component/Loader';
+import { SettingBase } from 'Component/SettingBase';
 import { propsAreEqual } from 'Component/SettingBase/SettingBase.component.atv';
-import ThemedDropdown from 'Component/ThemedDropdown';
+import { ThemedDropdown } from 'Component/ThemedDropdown';
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { memo, useCallback, useRef, useState } from 'react';

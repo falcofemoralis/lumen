@@ -1,14 +1,14 @@
-import { Colors } from 'Style/Colors';
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
 const MAX_ITEMS_TO_DISPLAY = 6;
 const MAX_ITEMS_TO_DISPLAY_LANDSCAPE = 5;
+
 export const ITEM_HEIGHT = 48;
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale, colors, text }: Theme) => ({
   item: {
-    paddingHorizontal: 12,
-    height: ITEM_HEIGHT,
+    paddingHorizontal: scale(12),
+    height: scale(ITEM_HEIGHT),
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -16,27 +16,27 @@ export const styles = CreateStyles({
   },
   itemLabel: {
     flex: 1,
-    fontSize: 16,
-    color: Colors.text,
+    fontSize: scale(text.sm.fontSize),
+    color: colors.text,
   },
   icon: {
-    marginRight: 5,
-    height: 20,
-    width: 20,
+    marginRight: scale(5),
+    height: scale(20),
+    width: scale(20),
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 8,
-    marginBottom: 8,
-    borderBottomColor: Colors.divider,
+    padding: scale(8),
+    marginBottom: scale(8),
+    borderBottomColor: colors.divider,
     borderBottomWidth: 1,
   },
   headerText: {
-    color: Colors.text,
-    fontSize: 16,
-    lineHeight: 16,
+    color: colors.text,
+    fontSize: scale(text.sm.fontSize),
+    lineHeight: scale(16),
     fontWeight: '500',
   },
   listContainer: {
@@ -45,19 +45,18 @@ export const styles = CreateStyles({
   },
   listItems: {
     flexDirection: 'column',
-    maxHeight: MAX_ITEMS_TO_DISPLAY * ITEM_HEIGHT - 8,
-    // minWidth: 300,
+    maxHeight: MAX_ITEMS_TO_DISPLAY * scale(ITEM_HEIGHT) - scale(8),
   },
   listItemsLandscape: {
-    maxHeight: MAX_ITEMS_TO_DISPLAY_LANDSCAPE * ITEM_HEIGHT - 8,
+    maxHeight: MAX_ITEMS_TO_DISPLAY_LANDSCAPE * scale(ITEM_HEIGHT) - scale(8),
   },
   listItem: {
-    borderRadius: 16,
+    borderRadius: scale(16),
   },
   listItemContent: {
     flex: 1,
   },
   listItemSelected: {
-    backgroundColor: Colors.primary,
+    backgroundColor: colors.primary,
   },
-});
+} satisfies ThemedStyles);

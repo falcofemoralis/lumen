@@ -1,24 +1,23 @@
-import { Colors } from 'Style/Colors';
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale, colors, text }: Theme) => ({
   view: {
     alignItems: 'center',
   },
   bubbleStyle: {
-    padding: 2,
-    paddingHorizontal: 5,
-    borderRadius: 5,
-    backgroundColor: Colors.secondary,
+    padding: scale(2),
+    paddingHorizontal: scale(5),
+    borderRadius: scale(5),
+    backgroundColor: colors.secondary,
   },
   textStyle: {
-    color: Colors.text,
-    fontSize: 12,
+    color: colors.text,
+    fontSize: scale(text.xxs.fontSize),
     paddingVertical: 0,
   },
   storyBoard: {
     position: 'absolute',
-    bottom: 25,
+    bottom: scale(25),
     alignSelf: 'center',
   },
-});
+} satisfies ThemedStyles);

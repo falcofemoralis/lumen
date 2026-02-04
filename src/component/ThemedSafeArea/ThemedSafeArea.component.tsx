@@ -1,7 +1,6 @@
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { styles } from './ThemedSafeArea.style';
 import { ThemedSafeAreaComponentProps } from './ThemedSafeArea.type';
 
 export const ThemedSafeAreaComponent = ({
@@ -14,7 +13,7 @@ export const ThemedSafeAreaComponent = ({
   return (
     <View
       style={ [
-        styles.container,
+        { flex: 1 },
         style,
         {
           paddingTop: edges.includes('top') ? top : 0,

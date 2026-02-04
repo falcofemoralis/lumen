@@ -1,1 +1,1 @@
-export { default } from './ThemedSimpleList.container';
+export { default as ThemedSimpleList } from './ThemedSimpleList.container';

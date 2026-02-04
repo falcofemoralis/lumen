@@ -1,1 +1,1 @@
-export { default } from './SettingText.container';
+export { default as SettingText } from './SettingText.container';

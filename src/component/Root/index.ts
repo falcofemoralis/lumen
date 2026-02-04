@@ -1,1 +1,1 @@
-export { default } from './Root.component';
+export { default as Root } from './Root.component';

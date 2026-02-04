@@ -1,8 +1,6 @@
-import { Colors } from 'Style/Colors';
-import CreateStyles from 'Util/CreateStyles';
+import { ThemedStyles } from 'Theme/types';
 
-export const styles = CreateStyles({
-  loader: {},
+export const styles = {
   fullscreenLoader: {
     position: 'absolute',
     top: '50%',
@@ -12,6 +10,6 @@ export const styles = CreateStyles({
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 50,
-    backgroundColor: Colors.transparent,
+    backgroundColor: 'transparent',
   },
-});
+} satisfies ThemedStyles;

@@ -1,19 +1,17 @@
-import Loader from 'Component/Loader';
-import PlayerVideoRating from 'Component/PlayerVideoRating';
-import ThemedDropdown from 'Component/ThemedDropdown';
-import ThemedOverlay from 'Component/ThemedOverlay';
-import ThemedPressable from 'Component/ThemedPressable';
-import ThemedSimpleList from 'Component/ThemedSimpleList';
-import ThemedText from 'Component/ThemedText';
-import t from 'i18n/t';
-import React, { memo } from 'react';
-import {
-  ScrollView,
-  View,
-} from 'react-native';
+import { Loader } from 'Component/Loader';
+import { PlayerVideoRating } from 'Component/PlayerVideoRating';
+import { ThemedDropdown } from 'Component/ThemedDropdown';
+import { ThemedOverlay } from 'Component/ThemedOverlay';
+import { ThemedPressable } from 'Component/ThemedPressable';
+import { ThemedSimpleList } from 'Component/ThemedSimpleList';
+import { ThemedText } from 'Component/ThemedText';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
+import { t } from 'i18n/translate';
+import { memo } from 'react';
+import { ScrollView, View } from 'react-native';
 import { getVideoProgress } from 'Util/Player';
 
-import { styles } from './PlayerVideoSelector.style';
+import { componentStyles } from './PlayerVideoSelector.style';
 import { PlayerVideoSelectorComponentProps } from './PlayerVideoSelector.type';
 
 export function PlayerVideoSelectorComponent({
@@ -35,6 +33,8 @@ export function PlayerVideoSelectorComponent({
   voiceOverlayRef,
   onClose,
 }: PlayerVideoSelectorComponentProps) {
+  const styles = useThemedStyles(componentStyles);
+
   const renderVoiceRating = () => {
     const { voiceRating = [] } = film;
 

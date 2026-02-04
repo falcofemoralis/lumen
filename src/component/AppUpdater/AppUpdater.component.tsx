@@ -1,17 +1,17 @@
-import Loader from 'Component/Loader';
-import ThemedBottomSheet from 'Component/ThemedBottomSheet';
-import ThemedPressable from 'Component/ThemedPressable';
-import ThemedText from 'Component/ThemedText';
-import Wrapper from 'Component/Wrapper';
+import { Loader } from 'Component/Loader';
+import { ThemedBottomSheet } from 'Component/ThemedBottomSheet';
+import { ThemedPressable } from 'Component/ThemedPressable';
+import { ThemedText } from 'Component/ThemedText';
+import { Wrapper } from 'Component/Wrapper';
 import * as Application from 'expo-application';
-import t from 'i18n/t';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
+import { t } from 'i18n/translate';
 import { X } from 'lucide-react-native';
 import { Image, Pressable, ScrollView, View } from 'react-native';
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
-import { Colors } from 'Style/Colors';
-import { scale } from 'Util/CreateStyles';
+import { useAppTheme } from 'Theme/context';
 
-import { styles } from './AppUpdater.style';
+import { componentStyles } from './AppUpdater.style';
 import { AppUpdaterComponentProps } from './AppUpdater.type';
 
 export const AppUpdaterComponent = ({
@@ -24,11 +24,13 @@ export const AppUpdaterComponent = ({
   onBottomSheetMount,
 }: AppUpdaterComponentProps) => {
   const { versionName, description } = update;
+  const { scale, theme } = useAppTheme();
+  const styles = useThemedStyles(componentStyles);
 
   const renderHeader = () => (
     <View style={ styles.header }>
       <Image
-        source={ require('../../../assets/images/icon.png') }
+        source={ require('../../../assets/images/app-icon-all.png') }
         style={ styles.headerIcon }
       />
       <ThemedText style={ styles.headerText }>
@@ -42,7 +44,7 @@ export const AppUpdaterComponent = ({
         <X
           style={ styles.closeIcon }
           size={ scale(20) }
-          color={ Colors.white }
+          color={ theme.colors.icon }
         />
       </ThemedPressable>
     </View>
@@ -54,7 +56,10 @@ export const AppUpdaterComponent = ({
         { t('Update Available') }
       </ThemedText>
       <ThemedText style={ styles.versionText }>
-        { t('%s to %s', Application.nativeApplicationVersion ?? '0.0.0', versionName) }
+        { t('{{versionFrom}} to {{versionTo}}', {
+          versionFrom: Application.nativeApplicationVersion ?? '0.0.0',
+          versionTo: versionName,
+        }) }
       </ThemedText>
       <ScrollView>
         <ThemedText style={ styles.newText }>
@@ -92,7 +97,7 @@ export const AppUpdaterComponent = ({
             styles.skipButton,
           ] }
           android_ripple={ {
-            color: Colors.whiteTransparent,
+            color: theme.colors.whiteTransparent,
           } }
         >
           <GestureDetector gesture={ cancelGesture }>
@@ -111,7 +116,7 @@ export const AppUpdaterComponent = ({
             styles.updateButton,
           ] }
           android_ripple={ {
-            color: Colors.whiteTransparent,
+            color: theme.colors.whiteTransparent,
           } }
         >
           <GestureDetector gesture={ acceptGesture }>
@@ -145,7 +150,7 @@ export const AppUpdaterComponent = ({
     <ThemedBottomSheet
       ref={ bottomSheetRef }
       sizes={ ['auto'] }
-      backgroundColor={ Colors.background }
+      backgroundColor={ theme.colors.background }
       onMount={ onBottomSheetMount }
     >
       <GestureHandlerRootView style={ { flexGrow: 1 } }>

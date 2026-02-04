@@ -1,11 +1,14 @@
-import { withTV } from 'Hooks/withTV';
+import { useConfigContext } from 'Context/ConfigContext';
 
 import SettingInputComponent from './SettingInput.component';
 import SettingInputComponentTV from './SettingInput.component.atv';
 import { SettingInputComponentProps } from './SettingInput.type';
 
 export function SettingInputContainer(props: SettingInputComponentProps) {
-  return withTV(SettingInputComponentTV, SettingInputComponent, props);
+  const { isTV } = useConfigContext();
+
+  return isTV ? <SettingInputComponentTV { ...props } /> : <SettingInputComponent { ...props } />;
+
 }
 
 export default SettingInputContainer;

@@ -1,6 +1,6 @@
+import { useConfigContext } from 'Context/ConfigContext';
 import { View } from 'react-native';
-import ConfigStore from 'Store/Config.store';
-import { CONTENT_WRAPPER_PADDING, CONTENT_WRAPPER_PADDING_TV } from 'Style/Layout';
+import { useAppTheme } from 'Theme/context';
 
 import { WrapperProps } from './Wrapper.type';
 
@@ -8,12 +8,13 @@ export const WrapperComponent = ({
   children,
   style,
 }: WrapperProps) => {
+  const { scale, theme } = useAppTheme();
+  const { isTV } = useConfigContext();
+
   return (
     <View
       style={ [{
-        marginHorizontal: ConfigStore.isTV()
-          ? CONTENT_WRAPPER_PADDING_TV
-          : CONTENT_WRAPPER_PADDING,
+        marginHorizontal: isTV ? scale(theme.spacing.wrapperPaddingTV) : scale(theme.spacing.wrapperPadding),
       }, style] }
     >
       { children }

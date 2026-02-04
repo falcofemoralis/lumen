@@ -1,7 +1,8 @@
+import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { TextInput, View } from 'react-native';
-import { Colors } from 'Style/Colors';
+import { useAppTheme } from 'Theme/context';
 
-import { styles } from './ThemedInput.style';
+import { componentStyles } from './ThemedInput.style';
 import { ThemedInputComponentProps } from './ThemedInput.type';
 
 export const ThemedInputComponent = ({
@@ -12,17 +13,20 @@ export const ThemedInputComponent = ({
   editable = true,
   ...props
 }: ThemedInputComponentProps) => {
+  const { theme } = useAppTheme();
+  const styles = useThemedStyles(componentStyles);
+
   return (
     <View style={ [styles.container, containerStyle] }>
       <TextInput
         placeholder={ placeholder }
         onChangeText={ onChangeText }
         style={ [ styles.input, style ] }
-        placeholderTextColor={ Colors.text }
-        selectionColor={ Colors.secondary }
-        cursorColor={ Colors.secondary }
-        underlineColorAndroid={ Colors.transparent }
-        selectionHandleColor={ Colors.secondary }
+        placeholderTextColor={ theme.colors.text }
+        selectionColor={ theme.colors.secondary }
+        cursorColor={ theme.colors.secondary }
+        underlineColorAndroid={ theme.colors.transparent }
+        selectionHandleColor={ theme.colors.secondary }
         tvFocusable={ false }
         editable={ editable }
         { ...props }

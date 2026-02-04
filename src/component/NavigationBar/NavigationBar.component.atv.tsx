@@ -1,32 +1,25 @@
 import { NavigationRoute, ParamListBase } from '@react-navigation/native';
-import ThemedImage from 'Component/ThemedImage';
-import ThemedPressable from 'Component/ThemedPressable';
-import ThemedText from 'Component/ThemedText';
+import { ThemedImage } from 'Component/ThemedImage';
+import { ThemedPressable } from 'Component/ThemedPressable';
+import { ThemedText } from 'Component/ThemedText';
 import { useNavigationContext } from 'Context/NavigationContext';
 import { useServiceContext } from 'Context/ServiceContext';
-import t from 'i18n/t';
-import { ACCOUNT_ROUTE, LOADER_ROUTE, SETTINGS_ROUTE } from 'Navigation/routes';
-import React, { useCallback, useRef } from 'react';
-import {
-  Image,
-  View,
-} from 'react-native';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
+import { t } from 'i18n/translate';
+import { ACCOUNT_TAB, LOADER_SCREEN, SETTINGS_SCREEN } from 'Navigation/navigationRoutes';
+import { createRef, memo, useCallback, useMemo, useRef } from 'react';
+import { Image, View } from 'react-native';
 import Animated from 'react-native-reanimated';
-import {
-  DefaultFocus,
-  Directions,
-  SpatialNavigationRoot,
-  SpatialNavigationView,
-} from 'react-tv-space-navigation';
-import ConfigStore from 'Store/Config.store';
-import { Colors } from 'Style/Colors';
-import { scale } from 'Util/CreateStyles';
+import { DefaultFocus, Directions, SpatialNavigationRoot, SpatialNavigationView } from 'react-tv-space-navigation';
+import { useAppTheme } from 'Theme/context';
+import { BadgeData } from 'Type/BadgeData.interface';
+import { ProfileInterface } from 'Type/Profile.interface';
 import { setTimeoutSafe } from 'Util/Misc';
 
-import { styles } from './NavigationBar.style.atv';
-import {
-  NavigationBarComponentProps,
-} from './NavigationBar.type';
+import { componentStyles } from './NavigationBar.style.atv';
+import { NavigationBarComponentProps } from './NavigationBar.type';
+
+export const navigationBarRef = createRef<View>();
 
 export function NavigationBarComponent({
   state,
@@ -35,8 +28,9 @@ export function NavigationBarComponent({
   onPress,
 }: NavigationBarComponentProps) {
   const { isMenuOpen, toggleMenu } = useNavigationContext();
-  const { isSignedIn, badgeData } = useServiceContext();
-  const lastPage = useRef<string | null>(null);
+  const { badgeData } = useServiceContext();
+  const styles = useThemedStyles(componentStyles);
+  const lastPage = useRef<string | null>(state.routes[state.index]?.name || null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const onDirectionHandledWithoutMovement = useCallback(
@@ -49,11 +43,11 @@ export function NavigationBarComponent({
   );
 
   const onTabSelect = useCallback((name: string) => {
-    if (lastPage.current !== LOADER_ROUTE) {
+    if (lastPage.current !== LOADER_SCREEN) {
       setTimeoutSafe(() => {
-        onPress(LOADER_ROUTE);
+        onPress(LOADER_SCREEN);
       }, 0);
-      lastPage.current = LOADER_ROUTE;
+      lastPage.current = LOADER_SCREEN;
     }
 
     if (timerRef.current) {
@@ -66,22 +60,111 @@ export function NavigationBarComponent({
     }, 500);
   }, [onPress]);
 
-  const renderDefaultTab = (
+  const renderTab = (
     route: NavigationRoute<ParamListBase, string>,
-    focused: boolean,
+    index: number
+  ) => {
+    return (
+      <MemoizedNavigationTab
+        key={ route.name }
+        styles={ styles }
+        onTabSelect={ onTabSelect }
+        badgeData={ badgeData }
+        descriptors={ descriptors }
+        profile={ profile }
+        isActiveTab={ state.index === index }
+        name={ route.name }
+        routeKey={ route.key }
+      />
+    );
+  };
+
+  const { topTabs, middleTabs, bottomTabs } = useMemo(() => {
+    const tt = [] as { route: NavigationRoute<ParamListBase, string>, index: number }[];
+    const mt = [] as { route: NavigationRoute<ParamListBase, string>, index: number }[];
+    const bt = [] as { route: NavigationRoute<ParamListBase, string>, index: number }[];
+
+    state.routes.forEach((route, index) => {
+      switch (route.name) {
+        case ACCOUNT_TAB:
+          tt.push({ route, index });
+          break;
+        case SETTINGS_SCREEN:
+          bt.push({ route, index });
+          break;
+        case LOADER_SCREEN:
+          break;
+        default:
+          mt.push({ route, index });
+          break;
+      }
+    });
+
+    return { topTabs: tt, middleTabs: mt, bottomTabs: bt };
+  }, [state.routes]);
+
+  return (
+    <SpatialNavigationRoot
+      isActive={ isMenuOpen }
+      onDirectionHandledWithoutMovement={ onDirectionHandledWithoutMovement }
+    >
+      <Animated.View style={ [styles.bar, isMenuOpen && styles.barOpened] }>
+        <SpatialNavigationView direction="vertical" style={ { width: '100%' } }>
+          <View style={ styles.tabs }>
+            <View>
+              { topTabs.map(({ route, index }) => renderTab(route, index)) }
+            </View>
+            <View>
+              { middleTabs.map(({ route, index }) => renderTab(route, index)) }
+            </View>
+            <View>
+              { bottomTabs.map(({ route, index }) => renderTab(route, index)) }
+            </View>
+          </View>
+        </SpatialNavigationView>
+      </Animated.View>
+    </SpatialNavigationRoot>
+  );
+}
+
+type NavigationTabProps = {
+  styles: any,
+  badgeData: BadgeData,
+  onTabSelect: (name: string) => void,
+  descriptors: Record<string, any>,
+  profile?: ProfileInterface | null,
+  isActiveTab: boolean,
+  name: string,
+  routeKey: string,
+};
+
+const NavigationTab = ({
+  styles,
+  onTabSelect,
+  badgeData,
+  descriptors,
+  profile,
+  isActiveTab,
+  name,
+  routeKey,
+}: NavigationTabProps) => {
+  const { theme } = useAppTheme();
+  const { isSignedIn } = useServiceContext();
+
+  const renderDefaultTab = (
     isRootActive: boolean,
     isf: boolean
   ) => {
-    const { options } = descriptors[route.key] ?? {};
+    const { options } = descriptors[routeKey] ?? {};
     const { tabBarIcon: IconComponent } = options as { tabBarIcon: React.ComponentType<any> };
     const { tabBarLabel } = options;
-    const badgeCount = badgeData[route.name] || 0;
+    const badgeCount = badgeData[name] || 0;
 
     return (
       <View
         style={ [
           styles.tab,
-          focused && !isRootActive && styles.tabSelected,
+          isActiveTab && !isRootActive && styles.tabSelected,
           isf && isRootActive && styles.tabFocused,
         ] }
       >
@@ -89,8 +172,8 @@ export function NavigationBarComponent({
           { IconComponent && (
             <IconComponent
               style={ styles.tabIcon }
-              size={ scale(20) }
-              color={ isf && isRootActive ? Colors.black : Colors.white }
+              size={ styles.tabIcon.width }
+              color={ isf && isRootActive ? theme.colors.iconFocused : theme.colors.icon }
             />
           ) }
           { badgeCount > 0 && (
@@ -107,8 +190,8 @@ export function NavigationBarComponent({
         >
           { typeof tabBarLabel === 'function'
             ? tabBarLabel({
-              focused,
-              color: isf && isRootActive ? Colors.black : Colors.white,
+              focused: isActiveTab,
+              color: isf && isRootActive ? theme.colors.iconFocused : theme.colors.icon,
               position: 'below-icon',
               children: '',
             }) : tabBarLabel }
@@ -118,12 +201,10 @@ export function NavigationBarComponent({
   };
 
   const renderAccountTab = (
-    route: NavigationRoute<ParamListBase, string>,
-    focused: boolean,
     isRootActive: boolean,
     isf: boolean
   ) => {
-    const { options } = descriptors[route.key] ?? {};
+    const { options } = descriptors[routeKey] ?? {};
     const { tabBarLabel } = options;
     const { avatar } = profile ?? {};
 
@@ -131,7 +212,7 @@ export function NavigationBarComponent({
       <View
         style={ [
           styles.tab,
-          focused && !isRootActive && styles.tabSelected,
+          isActiveTab && !isRootActive && styles.tabSelected,
           isf && isRootActive && styles.tabFocused,
         ] }
       >
@@ -158,8 +239,8 @@ export function NavigationBarComponent({
           >
             { typeof tabBarLabel === 'function'
               ? tabBarLabel({
-                focused,
-                color: isf && isRootActive ? Colors.black : Colors.white,
+                focused: isActiveTab,
+                color: isf && isRootActive ? theme.colors.iconFocused : theme.colors.icon,
                 position: 'below-icon',
                 children: '',
               }) : tabBarLabel }
@@ -178,96 +259,34 @@ export function NavigationBarComponent({
     );
   };
 
-  const renderTab = (
-    route: NavigationRoute<ParamListBase, string>,
-    index: number
-  ) => {
-    const { name } = route;
-    const isFocused = state.index === index;
-
-    const renderComponent = (isRootActive: boolean, isf: boolean) => {
-      switch (name) {
-        case ACCOUNT_ROUTE:
-          return renderAccountTab(route, isFocused, isRootActive, isf);
-        default:
-          return renderDefaultTab(route, isFocused, isRootActive, isf);
-      }
-    };
-
-    return (
-      <DefaultFocus
-        key={ name }
-        enable={ name === ConfigStore.getConfig().initialRoute }
-      >
-        <ThemedPressable
-          onFocus={ () => {
-            if (isMenuOpen) {
-              onTabSelect(name);
-            }
-          } }
-          onPress={ () => onTabSelect(name) }
-        >
-          { ({ isRootActive, isFocused: isf }) => (
-            renderComponent(isRootActive, isf)
-          ) }
-        </ThemedPressable>
-      </DefaultFocus>
-    );
-  };
-
-  const renderTabs = () => {
-    const topTabs = [] as { route: NavigationRoute<ParamListBase, string>, index: number }[];
-    const middleTabs = [] as { route: NavigationRoute<ParamListBase, string>, index: number }[];
-    const bottomTabs = [] as { route: NavigationRoute<ParamListBase, string>, index: number }[];
-
-    state.routes.forEach((route, index) => {
-      switch (route.name) {
-        case ACCOUNT_ROUTE:
-          topTabs.push({ route, index });
-          break;
-        case SETTINGS_ROUTE:
-          bottomTabs.push({ route, index });
-          break;
-        case LOADER_ROUTE:
-          break;
-        default:
-          middleTabs.push({ route, index });
-          break;
-      }
-    });
-
-    return (
-      <Animated.View
-        style={ [
-          styles.tabs,
-          isMenuOpen && styles.tabsOpened,
-        ] }
-      >
-        <View>
-          { topTabs.map(({ route, index }) => renderTab(route, index)) }
-        </View>
-        <View>
-          { middleTabs.map(({ route, index }) => renderTab(route, index)) }
-        </View>
-        <View>
-          { bottomTabs.map(({ route, index }) => renderTab(route, index)) }
-        </View>
-      </Animated.View>
-    );
-  };
-
   return (
-    <SpatialNavigationRoot
-      isActive={ isMenuOpen }
-      onDirectionHandledWithoutMovement={ onDirectionHandledWithoutMovement }
+    <DefaultFocus
+      key={ name }
+      enable={ isActiveTab }
     >
-      <View style={ styles.bar }>
-        <SpatialNavigationView direction="vertical">
-          { renderTabs() }
-        </SpatialNavigationView>
-      </View>
-    </SpatialNavigationRoot>
+      <ThemedPressable
+        onFocus={ () => {
+          onTabSelect(name);
+        } }
+        onPress={ () => onTabSelect(name) }
+      >
+        { ({ isRootActive, isFocused: isf }) => {
+          switch (name) {
+            case ACCOUNT_TAB:
+              return renderAccountTab(isRootActive, isf);
+            default:
+              return renderDefaultTab(isRootActive, isf);
+          }
+        } }
+      </ThemedPressable>
+    </DefaultFocus>
   );
+};
+
+function rowPropsAreEqual(prevProps: NavigationTabProps, props: NavigationTabProps) {
+  return prevProps.isActiveTab === props.isActiveTab && prevProps.badgeData[props.name] === props.badgeData[props.name];
 }
+
+const MemoizedNavigationTab = memo(NavigationTab, rowPropsAreEqual);
 
 export default NavigationBarComponent;

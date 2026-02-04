@@ -1,34 +1,33 @@
-import { Colors } from 'Style/Colors';
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
 export const TAB_ADDITIONAL_SIZE = 20;
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale, colors, text }: Theme) => ({
   tabBar: {
     width: '100%',
     borderTopWidth: 1,
-    borderColor: Colors.border,
+    borderColor: colors.border,
   },
   tabs: {
     width: '100%',
     flexDirection: 'row',
-    height: 50,
+    height: scale(50),
     overflow: 'hidden',
   },
   tabContainer: {
     flexDirection: 'column',
-    height: 50 + TAB_ADDITIONAL_SIZE,
-    top: -TAB_ADDITIONAL_SIZE / 2,
+    height: scale(50) + scale(TAB_ADDITIONAL_SIZE),
+    top: -scale(TAB_ADDITIONAL_SIZE) / 2,
     borderRadius: 99,
     position: 'absolute',
   },
   tab: {
     flexDirection: 'column',
-    gap: 2,
+    gap: scale(2),
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 8,
-    borderRadius: 99,
+    paddingVertical: scale(8),
+    borderRadius: scale(99),
     opacity: 0.7,
     transitionProperty: 'opacity',
     transitionDuration: '150ms',
@@ -39,7 +38,7 @@ export const styles = CreateStyles({
   tabIcon: {
   },
   tabText: {
-    fontSize: 12,
+    fontSize: scale(text.xxs.fontSize),
   },
   tabTextFocused: {
     fontWeight: 700,
@@ -48,32 +47,32 @@ export const styles = CreateStyles({
     opacity: 1,
   },
   profileAvatar: {
-    width: 22,
-    height: 22,
-    backgroundColor: Colors.background,
-    borderRadius: 99,
+    width: scale(22),
+    height: scale(22),
+    backgroundColor: colors.background,
+    borderRadius: scale(99),
   },
   profileAvatarContainer: {
-    borderRadius: 99,
-    borderWidth: 2,
-    borderColor: Colors.transparent,
+    borderRadius: scale(99),
+    borderWidth: scale(2),
+    borderColor: colors.transparent,
     transitionProperty: 'borderColor',
     transitionDuration: '150ms',
   },
   profileAvatarFocused: {
-    borderColor: Colors.white,
+    borderColor: colors.backgroundFocused,
   },
   badge: {
-    backgroundColor: Colors.secondary,
-    width: 16,
-    height: 16,
-    borderRadius: 50,
-    fontSize: 12,
+    backgroundColor: colors.secondary,
+    width: scale(16),
+    height: scale(16),
+    borderRadius: scale(50),
+    fontSize: scale(text.xxs.fontSize),
     justifyContent: 'center',
     alignItems: 'center',
     textAlign: 'center',
     position: 'absolute',
-    right: -8,
-    top: -8,
+    right: -scale(8),
+    top: -scale(8),
   },
-});
+} satisfies ThemedStyles);

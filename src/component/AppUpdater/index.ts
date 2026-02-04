@@ -1,1 +1,1 @@
-export { default } from './AppUpdater.container';
+export { default as AppUpdater } from './AppUpdater.container';

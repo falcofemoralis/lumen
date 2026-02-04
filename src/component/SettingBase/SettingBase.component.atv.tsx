@@ -1,10 +1,10 @@
-import ThemedPressable from 'Component/ThemedPressable';
-import ThemedText from 'Component/ThemedText';
+import { ThemedPressable } from 'Component/ThemedPressable';
+import { ThemedText } from 'Component/ThemedText';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { View } from 'react-native';
-import { Colors } from 'Style/Colors';
-import { scale } from 'Util/CreateStyles';
+import { useAppTheme } from 'Theme/context';
 
-import { styles } from './SettingBase.style.atv';
+import { componentStyles } from './SettingBase.style.atv';
 import { SettingBaseComponentProps } from './SettingBase.type';
 
 const SettingBaseComponent = ({
@@ -12,6 +12,8 @@ const SettingBaseComponent = ({
   onPress,
   onFocus,
 }: SettingBaseComponentProps) => {
+  const { scale, theme } = useAppTheme();
+  const styles = useThemedStyles(componentStyles);
   const { title, subtitle, isHidden, isEnabled, IconComponent, iconProps, iconPropsFocused } = setting;
 
   if (isHidden) {
@@ -36,7 +38,7 @@ const SettingBaseComponent = ({
               <IconComponent
                 style={ styles.settingIcon }
                 size={ scale(24) }
-                color={ isFocused && isRootActive ? Colors.textFocused : Colors.text }
+                color={ isFocused && isRootActive ? theme.colors.textFocused : theme.colors.text }
                 { ...iconProps }
                 { ...(isFocused && isRootActive ? iconPropsFocused : undefined) }
               />

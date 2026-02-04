@@ -1,13 +1,13 @@
 import { useNavigation } from '@react-navigation/native';
-import ThemedPressable from 'Component/ThemedPressable';
-import ThemedText from 'Component/ThemedText';
-import Wrapper from 'Component/Wrapper';
+import { ThemedPressable } from 'Component/ThemedPressable';
+import { ThemedText } from 'Component/ThemedText';
+import { Wrapper } from 'Component/Wrapper';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { ArrowLeft } from 'lucide-react-native';
 import { View } from 'react-native';
-import { Colors } from 'Style/Colors';
-import { scale } from 'Util/CreateStyles';
+import { useAppTheme } from 'Theme/context';
 
-import { styles } from './Header.style';
+import { componentStyles } from './Header.style';
 import { HeaderComponentProps } from './Header.type';
 
 export const HeaderComponent = ({
@@ -17,6 +17,8 @@ export const HeaderComponent = ({
   AdditionalActionIcon,
 }: HeaderComponentProps) => {
   const navigation = useNavigation();
+  const { scale, theme } = useAppTheme();
+  const styles = useThemedStyles(componentStyles);
 
   return (
     <Wrapper>
@@ -29,7 +31,7 @@ export const HeaderComponent = ({
           >
             <ArrowLeft
               size={ scale(24) }
-              color={ Colors.white }
+              color={ theme.colors.icon }
             />
           </ThemedPressable>
           { title && (
@@ -46,7 +48,7 @@ export const HeaderComponent = ({
           >
             <AdditionalActionIcon
               size={ scale(24) }
-              color={ Colors.white }
+              color={ theme.colors.icon }
             />
           </ThemedPressable>
         ) }

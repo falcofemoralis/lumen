@@ -1,7 +1,6 @@
-import { Colors } from 'Style/Colors';
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale, colors, text }: Theme) => ({
   container: {
     width: '100%',
   },
@@ -9,13 +8,13 @@ export const styles = CreateStyles({
     width: '100%',
   },
   group: {
-    padding: 12,
-    borderRadius: 8,
-    fontSize: 14,
+    padding: scale(12),
+    borderRadius: scale(8),
+    fontSize: scale(text.xs.fontSize),
   },
   groupFocused: {
-    backgroundColor: Colors.backgroundFocused,
-    color: Colors.textFocused,
+    backgroundColor: colors.backgroundFocused,
+    color: colors.textFocused,
   },
   content: {
     flexDirection: 'column',
@@ -24,4 +23,4 @@ export const styles = CreateStyles({
     maxHeight: '70%',
     maxWidth: '50%',
   },
-});
+} satisfies ThemedStyles);
