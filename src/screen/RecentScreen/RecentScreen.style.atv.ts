@@ -27,12 +27,20 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     opacity: 1,
     transform: [{ scale: 1.1 }],
   },
+  posterContainer: {
+    borderRadius: 8,
+    borderWidth: scale(2),
+    borderColor: colors.transparent,
+    overflow: 'hidden',
+  },
+  posterContainerFocused: {
+    borderWidth: scale(2),
+    borderColor: colors.icon,
+  },
   poster: {
     height: scale(150),
     width: 'auto',
     aspectRatio: '166 / 250',
-    borderRadius: 8,
-    overflow: 'hidden',
   },
   itemContent: {
     height: '100%',

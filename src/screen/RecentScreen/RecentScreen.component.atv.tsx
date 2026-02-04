@@ -82,10 +82,12 @@ export function RecentScreenComponent({
                 isFocused && styles.itemFocused,
               ] }
             >
-              <ThemedImage
-                style={ styles.poster }
-                src={ image }
-              />
+              <View style={ [styles.posterContainer, isFocused && styles.posterContainerFocused] }>
+                <ThemedImage
+                  style={ styles.poster }
+                  src={ image }
+                />
+              </View>
               <View style={ styles.itemContent }>
                 <ThemedText style={ [styles.name, isFocused && styles.nameFocused] }>
                   { name }
@@ -111,7 +113,7 @@ export function RecentScreenComponent({
         } }
       </ThemedPressable>
     );
-  }, [handleOnPress]);
+  }, [handleOnPress, styles]);
 
   const renderContent = () => {
     if (isLoading) {
