@@ -283,10 +283,6 @@ const NavigationTab = ({
   );
 };
 
-function rowPropsAreEqual(prevProps: NavigationTabProps, props: NavigationTabProps) {
-  return prevProps.isActiveTab === props.isActiveTab && prevProps.badgeData[props.name] === props.badgeData[props.name];
-}
-
-const MemoizedNavigationTab = memo(NavigationTab, rowPropsAreEqual);
+const MemoizedNavigationTab = memo(NavigationTab);
 
 export default NavigationBarComponent;
