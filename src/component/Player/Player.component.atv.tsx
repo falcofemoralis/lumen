@@ -103,7 +103,7 @@ export function PlayerComponent({
 }: PlayerComponentProps) {
   const { scale, theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
-  const { focusedElementRef, updateFocusedElement } = usePlayerContext();
+  const { focusedElement, updateFocusedElement } = usePlayerContext();
   const [showControls, setShowControls] = useState(false);
   const [hideActions, setHideActions] = useState(false);
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
@@ -115,6 +115,7 @@ export function PlayerComponent({
   const showControlsRef = useRef(showControls);
   const isOverlayOpenRef = useRef(isOverlayOpen);
   const isComponentMounted = useRef(true);
+  const focusedElementRef = useRef(focusedElement);
   const hideActionsRef = useRef(hideActions);
 
   const controlsAnimation = useAnimatedStyle(() => ({
@@ -155,9 +156,10 @@ export function PlayerComponent({
   useEffect(() => {
     isOverlayOpenRef.current = isOverlayOpen;
     showControlsRef.current = showControls;
+    focusedElementRef.current = focusedElement;
     hideActionsRef.current = hideActions;
     isPlayingRef.current = isPlaying;
-  }, [showControls, isOverlayOpen, hideActions, isPlaying]);
+  }, [showControls, isOverlayOpen, focusedElement, hideActions, isPlaying]);
 
   useEffect(() => {
     return () => {
@@ -219,16 +221,13 @@ export function PlayerComponent({
           togglePlayPause();
         }
 
+        if ((type === SupportedKeys.UP || type === SupportedKeys.DOWN) && hideActionsRef.current) {
+          setHideActions(false);
+        }
+
         if (type === SupportedKeys.LEFT || type === SupportedKeys.RIGHT) {
           setHideActions(true);
           setShowControls(true);
-        }
-      }
-
-      if (focusedElementRef.current === FocusedElement.TOP_ACTION
-        || focusedElementRef.current === FocusedElement.BOTTOM_ACTION) {
-        if ((type === SupportedKeys.UP || type === SupportedKeys.DOWN) && hideActionsRef.current) {
-          setHideActions(false);
         }
       }
 

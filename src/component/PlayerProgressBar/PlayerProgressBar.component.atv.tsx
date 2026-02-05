@@ -43,7 +43,7 @@ export const PlayerProgressBarComponent = ({
 }: PlayerProgressBarComponentProps) => {
   const { theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
-  const { focusedElementRef } = usePlayerContext();
+  const { focusedElement } = usePlayerContext();
   const { progressStatus, updateProgressStatus } = usePlayerProgressContext();
   const rewindTimer = useRef<number | null>(null);
   const { playerRewindSeconds } = useConfigContext();
@@ -193,7 +193,7 @@ export const PlayerProgressBarComponent = ({
   // Memoized remote control event listeners
   const remoteControlListeners = useMemo(() => {
     const keyDownListener = (type: SupportedKeys) => {
-      if (focusedElementRef.current === FocusedElement.PROGRESS_THUMB) {
+      if (focusedElement === FocusedElement.PROGRESS_THUMB) {
         if (type === SupportedKeys.LEFT) {
           handleProgressThumbKeyDown(type, RewindDirection.BACKWARD);
         }
@@ -207,7 +207,7 @@ export const PlayerProgressBarComponent = ({
     };
 
     const keyUpListener = (type: SupportedKeys) => {
-      if (focusedElementRef.current === FocusedElement.PROGRESS_THUMB) {
+      if (focusedElement === FocusedElement.PROGRESS_THUMB) {
         if (type === SupportedKeys.LEFT) {
           handleProgressThumbKeyUp(type, RewindDirection.BACKWARD);
         }
@@ -221,7 +221,7 @@ export const PlayerProgressBarComponent = ({
     };
 
     return { keyDownListener, keyUpListener };
-  }, [handleProgressThumbKeyDown, handleProgressThumbKeyUp]);
+  }, [focusedElement, handleProgressThumbKeyDown, handleProgressThumbKeyUp]);
 
   // Remote control event listeners setup
   useEffect(() => {
