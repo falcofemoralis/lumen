@@ -1,5 +1,5 @@
 import range from 'lodash/range';
-import React, { ReactNode, useCallback, useEffect, useMemo } from 'react';
+import React, { ForwardedRef, ReactNode, useCallback, useEffect, useMemo } from 'react';
 import { StyleProp, StyleSheet,View, ViewStyle } from 'react-native';
 
 import { ParentIdContext, useParentId } from '../../context/ParentIdContext';
@@ -11,6 +11,7 @@ import {
   SpatialNavigationVirtualizedListWithScrollProps,
 } from '../virtualizedList/SpatialNavigationVirtualizedListWithScroll';
 import { convertToGrid } from './helpers/convertToGrid';
+import { SpatialNavigationVirtualizedListRef } from '../../types/SpatialNavigationVirtualizedListRef';
 
 type SpatialNavigationVirtualizedGridProps<T> = Pick<
   SpatialNavigationVirtualizedListWithScrollProps<T>,
@@ -35,6 +36,7 @@ type SpatialNavigationVirtualizedGridProps<T> = Pick<
     numberOfColumns: number;
     /** Used to modify every row style */
     rowContainerStyle?: StyleProp<ViewStyle>;
+    ref: ForwardedRef<SpatialNavigationVirtualizedListRef>
   };
 
 export type GridRowType<T> = {

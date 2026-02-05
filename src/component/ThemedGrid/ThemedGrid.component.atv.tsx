@@ -1,6 +1,8 @@
 import { useConfigContext } from 'Context/ConfigContext';
-import { useMemo } from 'react';
-import { SpatialNavigationVirtualizedGrid } from 'react-tv-space-navigation';
+import { useEffect, useMemo, useRef } from 'react';
+import { SpatialNavigationVirtualizedGrid, SpatialNavigationVirtualizedListRef } from 'react-tv-space-navigation';
+import RemoteControlManager from 'Util/RemoteControl/RemoteControlManager';
+import { SupportedKeys } from 'Util/RemoteControl/SupportedKeys';
 
 import { SCROLL_EVENT_UPDATES_MS_TV } from './ThemedGrid.config';
 import { ThemedGridComponentProps } from './ThemedGrid.type';
@@ -18,10 +20,31 @@ export const ThemedGridComponent = ({
   handleScrollEnd,
 }: ThemedGridComponentProps) => {
   const { isTVGridAnimation } = useConfigContext();
+  const listRef = useRef<SpatialNavigationVirtualizedListRef>(null);
+
   const memoData = useMemo(() => data.map((element, index) => ({ ...element, index })), [data]);
+
+  useEffect(() => {
+    const keyDownListener = (type: SupportedKeys) => {
+      if (type === SupportedKeys.BACKWARD) {
+        listRef.current?.focus(0);
+
+        return true;
+      }
+
+      return false;
+    };
+
+    const remoteControlDownListener = RemoteControlManager.addKeydownListener(keyDownListener);
+
+    return () => {
+      RemoteControlManager.removeKeydownListener(remoteControlDownListener);
+    };
+  }, []);
 
   return (
     <SpatialNavigationVirtualizedGrid
+      ref={ listRef }
       data={ memoData }
       renderItem={ renderItem }
       itemHeight={ itemSize }
