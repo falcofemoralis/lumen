@@ -1,16 +1,25 @@
-import { useGradualAnimation } from 'Hooks/useGradualAnimation';
-import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import { useKeyboardHandler } from 'react-native-keyboard-controller';
+import Animated, { useSharedValue, withSpring } from 'react-native-reanimated';
 
 export const KeyboardAdjuster = ({ scale = 1 }: {scale?: number}) => {
-  const { height } = useGradualAnimation();
+  const height = useSharedValue(0);
 
-  const keyboardPadding = useAnimatedStyle(() => {
-    return {
-      height: height.value > 0 ? (height.value / scale) : 0,
-    };
-  }, []);
+  useKeyboardHandler(
+    {
+      onStart: (e) => {
+        'worklet';
 
-  return <Animated.View style={ keyboardPadding } />;
+        if (e.progress === 1 && e.height > 0) {
+          height.value = withSpring(e.height);
+        } else if (e.progress === 0 && e.height === 0) {
+          height.value = withSpring(e.height);
+        }
+      },
+    },
+    []
+  );
+
+  return <Animated.View style={ { height } } />;
 };
 
 export default KeyboardAdjuster;
