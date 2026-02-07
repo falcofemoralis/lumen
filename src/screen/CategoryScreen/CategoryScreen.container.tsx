@@ -1,18 +1,26 @@
-import { FilmPagerInterface } from 'Component/FilmPager/FilmPager.type';
+import { pagerItemsUpdater } from 'Component/FilmPager/FilmPager.config';
+import { PagerItemInterface } from 'Component/FilmPager/FilmPager.type';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useState } from 'react';
-import { FilmListInterface } from 'Type/FilmList.interface';
 import { MenuItemInterface } from 'Type/MenuItem.interface';
 
 import CategoryScreenComponent from './CategoryScreen.component';
 import CategoryScreenComponentTV from './CategoryScreen.component.atv';
+import { CATEGORY_MENU_ITEM } from './CategoryScreen.config';
 import { CategoryScreenContainerProps } from './CategoryScreen.type';
 
 export function CategoryScreenContainer({ route }: CategoryScreenContainerProps) {
   const { link } = route.params as { link: string };
   const { isTV } = useConfigContext();
-  const [filmPager, setFilmPager] = useState<FilmPagerInterface>({});
+  const [pagerItems, setPagerItems] = useState<PagerItemInterface[]>([{
+    menuItem: CATEGORY_MENU_ITEM,
+    films: null,
+    pagination: {
+      currentPage: 1,
+      totalPages: 1,
+    },
+  }]);
   const { currentService } = useServiceContext();
 
   const onLoadFilms = async (
@@ -20,17 +28,12 @@ export function CategoryScreenContainer({ route }: CategoryScreenContainerProps)
     currentPage: number
   ) => currentService.getFilms(currentPage, link);
 
-  const onUpdateFilms = async (key: string, filmList: FilmListInterface) => {
-    setFilmPager((prevFilmPager) => ({
-      ...prevFilmPager,
-      [key]: {
-        filmList,
-      },
-    }));
+  const onUpdateFilms = (key: string, item: PagerItemInterface) => {
+    setPagerItems(pagerItemsUpdater(key, item));
   };
 
   const containerProps = {
-    filmPager,
+    pagerItems,
     onLoadFilms,
     onUpdateFilms,
   };

@@ -40,7 +40,7 @@ const TabButton = memo(({
 ));
 
 export function FilmPagerComponent({
-  pagerItems,
+  items,
   gridStyle,
   onPreLoad,
   onNextLoad,
@@ -53,12 +53,13 @@ export function FilmPagerComponent({
   const [activePage, setActivePage] = useState(0);
 
   const handleMenuItemChange = (pagerItem: PagerItemInterface) => {
-    const { key } = pagerItem;
+    const { menuItem: { id: key } = {} } = pagerItem;
+    const { menuItem: { id: activeKey } = {} } = items[activeIndex] || {};
 
-    if (key !== pagerItems[activeIndex].key) {
-      const idx = pagerItems.findIndex((item) => item.key === key);
+    if (key !== activeKey) {
+      const idx = items.findIndex((item) => item.menuItem?.id === key);
 
-      setActiveIndex(pagerItems.findIndex((item) => item.key === key));
+      setActiveIndex(items.findIndex((item) => item.menuItem?.id === key));
 
       if (debounce.current) {
         clearTimeout(debounce.current);
@@ -68,9 +69,9 @@ export function FilmPagerComponent({
         setActivePage(idx);
 
         if (!pagerItem.films) {
-          await onPreLoad(pagerItem);
+          onPreLoad(pagerItem);
         }
-      }, 600);
+      }, 650);
     }
   };
 
@@ -91,7 +92,7 @@ export function FilmPagerComponent({
   };
 
   const renderTopMenu = () => {
-    if (pagerItems.length <= 1) {
+    if (items.length <= 1) {
       return null;
     }
 
@@ -106,7 +107,7 @@ export function FilmPagerComponent({
             direction="horizontal"
             style={ styles.menuList }
           >
-            { pagerItems.map((item, idx) => renderMenuItem(item, idx)) }
+            { items.map((item, idx) => renderMenuItem(item, idx)) }
           </SpatialNavigationView>
         </SpatialNavigationScrollView>
       </Animated.View>
@@ -114,7 +115,7 @@ export function FilmPagerComponent({
   };
 
   const renderPage = () => {
-    const pagerItem = pagerItems[activePage];
+    const pagerItem = items[activePage];
     const { films } = pagerItem;
 
     return (

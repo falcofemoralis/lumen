@@ -1,5 +1,5 @@
 import { useConfigContext } from 'Context/ConfigContext';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import NotificationStore from 'Store/Notification.store';
 import { PaginationInterface } from 'Type/Pagination.interface';
 
@@ -8,8 +8,7 @@ import FilmPagerComponentTV from './FilmPager.component.atv';
 import { FilmPagerContainerProps, PagerItemInterface } from './FilmPager.type';
 
 export function FilmPagerContainer({
-  menuItems,
-  filmPager,
+  items,
   loadOnInit = false,
   gridStyle,
   onLoadFilms,
@@ -18,67 +17,30 @@ export function FilmPagerContainer({
 }: FilmPagerContainerProps) {
   const { isTV } = useConfigContext();
 
-  const mapItems = (items: typeof menuItems) => items.map((item, idx) => ({
-    key: String(idx + 1),
-    title: item.title,
-    menuItem: item,
-    films: null,
-    pagination: {
-      currentPage: 1,
-      totalPages: 1,
-    },
-  }));
-
-  const [pagerItems, setPagerItems] = useState<PagerItemInterface[]>(mapItems(menuItems));
-
   useEffect(() => {
     if (loadOnInit) {
-      loadFilms(pagerItems[0], { currentPage: 1, totalPages: 1 });
+      const firstItem = Object.values(items)[0];
+      loadFilms(firstItem, firstItem.pagination);
     }
   }, []);
 
-  useEffect(() => {
-    const newItems = pagerItems.map((item) => {
-      const { menuItem: { id } } = item;
-      const pagerItem = filmPager[id];
-
-      if (!pagerItem) {
-        return item;
-      }
-
-      const {
-        filmList: {
-          films = [],
-          totalPages = 1,
-        } = {},
-      } = pagerItem;
-
-      return {
-        ...item,
-        films,
-        pagination: {
-          ...item.pagination,
-          totalPages,
-        },
-      };
-    });
-
-    setPagerItems(newItems);
-  }, [filmPager]);
-
   const loadFilms = async (
     pagerItem: PagerItemInterface,
-    pagination: PaginationInterface,
+    newPagination: PaginationInterface,
     isUpdate = false, // replace current films with new ones
     isRefresh = false // fetch new films
   ) => {
     const {
-      key,
       menuItem,
       films,
-      pagination: { totalPages: currentTotalPages },
+      pagination,
     } = pagerItem;
-    const { currentPage } = pagination;
+    const {
+      totalPages: currentTotalPages,
+    } = pagination;
+    const {
+      currentPage,
+    } = newPagination;
     const { id: menuItemId } = menuItem;
 
     if (currentPage > currentTotalPages) {
@@ -90,14 +52,14 @@ export function FilmPagerContainer({
 
       const updatedFilms = isUpdate ? newFilms : Array.from(films ?? []).concat(newFilms);
 
-      const currentPagerItem = pagerItems.find(({ key: crKey }) => crKey === key);
-      if (currentPagerItem) {
-        currentPagerItem.pagination.currentPage = currentPage;
-      }
-
       onUpdateFilms(menuItemId, {
+        ...pagerItem,
         films: updatedFilms,
-        totalPages,
+        pagination: {
+          ...pagination,
+          totalPages,
+          currentPage,
+        },
       });
     } catch (error) {
       NotificationStore.displayError(error as Error);
@@ -120,7 +82,7 @@ export function FilmPagerContainer({
   };
 
   const containerProps = {
-    pagerItems,
+    items,
     gridStyle,
     onRowFocus,
     loadFilms,

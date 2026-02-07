@@ -1,4 +1,5 @@
-import { FilmPagerInterface } from 'Component/FilmPager/FilmPager.type';
+import { pagerItemsUpdater } from 'Component/FilmPager/FilmPager.config';
+import { PagerItemInterface } from 'Component/FilmPager/FilmPager.type';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import {
@@ -8,7 +9,6 @@ import {
 import { useRef, useState } from 'react';
 import { Keyboard } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
-import { FilmListInterface } from 'Type/FilmList.interface';
 import { MenuItemInterface } from 'Type/MenuItem.interface';
 import { safeJsonParse } from 'Util/Json';
 import { setTimeoutSafe } from 'Util/Misc';
@@ -16,7 +16,7 @@ import { storage } from 'Util/Storage';
 
 import SearchScreenComponent from './SearchScreen.component';
 import SearchScreenComponentTV from './SearchScreen.component.atv';
-import { MAX_USER_SUGGESTIONS, SEARCH_DEBOUNCE_TIME, USER_SUGGESTIONS } from './SearchScreen.config';
+import { MAX_USER_SUGGESTIONS, SEARCH_DEBOUNCE_TIME, SEARCH_MENU_ITEM, USER_SUGGESTIONS } from './SearchScreen.config';
 
 export function SearchScreenContainer() {
   const { isTV } = useConfigContext();
@@ -24,7 +24,14 @@ export function SearchScreenContainer() {
   const [suggestions, setSuggestions] = useState<string[]>(
     safeJsonParse(storage.getMiscStorage().loadString(USER_SUGGESTIONS), []) || []
   );
-  const [filmPager, setFilmPager] = useState<FilmPagerInterface>({});
+  const [pagerItems, setPagerItems] = useState<PagerItemInterface[]>([{
+    menuItem: SEARCH_MENU_ITEM,
+    films: null,
+    pagination: {
+      currentPage: 1,
+      totalPages: 1,
+    },
+  }]);
   const [enteredText, setEnteredText] = useState('');
   const [recognizing, setRecognizing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -55,9 +62,18 @@ export function SearchScreenContainer() {
     setIsLoading(true);
 
     try {
-      const films = await currentService.search(q, 1);
+      const page = 1;
 
-      onUpdateFilms('search', films);
+      const filmsList = await currentService.search(q, page);
+
+      onUpdateFilms('search', {
+        ...pagerItems[0],
+        films: filmsList.films,
+        pagination: {
+          currentPage: page,
+          totalPages: filmsList.totalPages,
+        },
+      });
     } catch (error) {
       NotificationStore.displayError(error as Error);
     } finally {
@@ -133,8 +149,15 @@ export function SearchScreenContainer() {
   };
 
   const resetSearch = () => {
-    if (filmPager.search?.filmList.films.length) {
-      onUpdateFilms('search', { films: [], totalPages: 1 });
+    if (pagerItems[0]?.films?.length) {
+      onUpdateFilms('search', {
+        ...pagerItems[0],
+        films: null,
+        pagination: {
+          currentPage: 1,
+          totalPages: 1,
+        },
+      });
     }
 
     if (query) {
@@ -178,18 +201,13 @@ export function SearchScreenContainer() {
     currentPage: number
   ) => currentService.search(query, currentPage);
 
-  const onUpdateFilms = async (key: string, filmList: FilmListInterface) => {
-    setFilmPager((prevFilmPager) => ({
-      ...prevFilmPager,
-      [key]: {
-        filmList,
-      },
-    }));
+  const onUpdateFilms = async (key: string, item: PagerItemInterface) => {
+    setPagerItems(pagerItemsUpdater(key, item));
   };
 
   const containerProps = {
     suggestions,
-    filmPager,
+    pagerItems,
     query,
     recognizing,
     enteredText,

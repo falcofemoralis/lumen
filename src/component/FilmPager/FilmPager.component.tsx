@@ -49,7 +49,7 @@ const TabButton = memo(({
 ));
 
 export const FilmPagerComponent = ({
-  pagerItems,
+  items,
   onPreLoad,
   onNextLoad,
 }: FilmPagerComponentProps) => {
@@ -63,6 +63,7 @@ export const FilmPagerComponent = ({
   const tabWidthsRef = useRef<number[]>([]);
   const loadedTabsRef = useRef<boolean[]>([]);
   const scrollState = useRef<'idle' | 'dragging' | 'settling'>('idle');
+  const pagerItems = useMemo(() => Object.values(items), [items]);
 
   // Initialize arrays when pagerItems changes
   useEffect(() => {
@@ -141,10 +142,10 @@ export const FilmPagerComponent = ({
         contentContainerStyle={ styles.tabBarContainer }
         accessibilityRole="tablist"
       >
-        { pagerItems.map(({ key, title }, i) => (
+        { pagerItems.map(({ menuItem }, i) => (
           <TabButton
-            key={ key }
-            title={ title }
+            key={ menuItem.id }
+            title={ menuItem.title }
             isActive={ activeTab === i }
             onPress={ () => handleTabPress(i) }
             onLayout={ (width) => tabWidthsRef.current[i] = width }
@@ -171,7 +172,7 @@ export const FilmPagerComponent = ({
   }, [renderedTabs, onNextLoad]);
 
   const pages = useMemo(() => (pagerItems).map((item, idx) => (
-    <Wrapper key={ item.key }>
+    <Wrapper key={ item.menuItem.id }>
       { renderPage(item, idx) }
     </Wrapper>
   )), [pagerItems, renderPage]);

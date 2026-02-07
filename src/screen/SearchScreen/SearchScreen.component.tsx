@@ -12,13 +12,12 @@ import { ArrowUpLeft, History, Mic, Search, X } from 'lucide-react-native';
 import { View } from 'react-native';
 import { useAppTheme } from 'Theme/context';
 
-import { SEARCH_MENU_ITEM } from './SearchScreen.config';
 import { componentStyles } from './SearchScreen.style';
 import { SearchScreenComponentProps } from './SearchScreen.type';
 
 export function SearchScreenComponent({
   suggestions,
-  filmPager,
+  pagerItems,
   query,
   recognizing,
   enteredText,
@@ -128,7 +127,7 @@ export function SearchScreenComponent({
       return null;
     }
 
-    if (!isLoading && !filmPager.search?.filmList.films.length) {
+    if (!isLoading && !pagerItems[0]?.films?.length) {
       return (
         <View style={ styles.noResults }>
           <InfoBlock
@@ -142,8 +141,7 @@ export function SearchScreenComponent({
     return (
       <View style={ styles.grid }>
         <FilmPager
-          menuItems={ [SEARCH_MENU_ITEM] }
-          filmPager={ filmPager }
+          items={ pagerItems }
           onLoadFilms={ onLoadFilms }
           onUpdateFilms={ onUpdateFilms }
         />

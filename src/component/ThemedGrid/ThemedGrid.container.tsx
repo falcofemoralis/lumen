@@ -1,6 +1,5 @@
 import { useConfigContext } from 'Context/ConfigContext';
 import {
-  useEffect,
   useRef,
   useState,
 } from 'react';
@@ -27,10 +26,6 @@ export function ThemedGridContainer({
   const [isRefreshing, setIsRefreshing] = useState(false);
   const updatingStateRef = useRef(false);
 
-  useEffect(() => {
-    updatingStateRef.current = false;
-  }, [data]);
-
   const loadNextPage = async (onLoading: (state: boolean) => void, isRefresh = false) => {
     if (!updatingStateRef.current) {
       updatingStateRef.current = true;
@@ -41,10 +36,13 @@ export function ThemedGridContainer({
         if (onNextLoad) {
           await onNextLoad(isRefresh);
         }
-      } catch (error) {
-        updatingStateRef.current = false;
       } finally {
         onLoading(false);
+        requestAnimationFrame(() => {
+          setTimeout(() => {
+            updatingStateRef.current = false;
+          }, 50);
+        });
       }
     }
   };

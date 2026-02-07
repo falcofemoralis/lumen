@@ -1,14 +1,16 @@
-import { FilmPagerInterface } from 'Component/FilmPager/FilmPager.type';
+import { PagerItemInterface } from 'Component/FilmPager/FilmPager.type';
 import { FilmListInterface } from 'Type/FilmList.interface';
 import { MenuItemInterface } from 'Type/MenuItem.interface';
 
 export interface HomeScreenComponentProps {
-  menuItems: MenuItemInterface[];
-  filmPager: FilmPagerInterface;
+  pagerItems: PagerItemInterface[];
   onLoadFilms: (
     menuItem: MenuItemInterface,
     currentPage: number,
     isRefresh: boolean
   ) => Promise<FilmListInterface>;
-  onUpdateFilms: (key: string, filmList: FilmListInterface) => void;
+  onUpdateFilms: (
+    key: string,
+    item: PagerItemInterface
+  ) => void;
 }

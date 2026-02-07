@@ -1,10 +1,9 @@
-import { FilmPagerInterface } from 'Component/FilmPager/FilmPager.type';
+import { pagerItemsUpdater } from 'Component/FilmPager/FilmPager.config';
+import { PagerItemInterface } from 'Component/FilmPager/FilmPager.type';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useEffect, useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
-import { BookmarkInterface } from 'Type/Bookmark.interface';
-import { FilmListInterface } from 'Type/FilmList.interface';
 import { MenuItemInterface } from 'Type/MenuItem.interface';
 
 import BookmarksScreenComponent from './BookmarksScreen.component';
@@ -13,8 +12,8 @@ import BookmarksScreenComponentTV from './BookmarksScreen.component.atv';
 export function BookmarksScreenContainer() {
   const { isTV } = useConfigContext();
   const [isLoading, setIsLoading] = useState(true);
-  const [bookmarks, setBookmarks] = useState<BookmarkInterface[]>([]);
-  const [filmPager, setFilmPager] = useState<FilmPagerInterface>({});
+  const [pagerItems, setPagerItems] = useState<PagerItemInterface[]>([]);
+
   const { isSignedIn, currentService } = useServiceContext();
 
   const loadBookmarks = async () => {
@@ -23,13 +22,21 @@ export function BookmarksScreenContainer() {
     try {
       const items = await currentService.getBookmarks();
 
-      if (items.length > 0 && items[0].filmList) {
-        const { id, filmList } = items[0];
+      setPagerItems(items.reduce((acc, menuItem) => {
+        acc.push({
+          menuItem: {
+            ...menuItem,
+            path: '',
+          },
+          films: menuItem.filmList ? menuItem.filmList.films : null,
+          pagination: {
+            currentPage: 1,
+            totalPages: menuItem.filmList ? menuItem.filmList.totalPages : 1,
+          },
+        });
 
-        onUpdateFilms(id, filmList);
-      }
-
-      setBookmarks(items);
+        return acc;
+      }, [] as PagerItemInterface[]));
     } catch (error) {
       NotificationStore.displayError(error as Error);
     } finally {
@@ -52,26 +59,11 @@ export function BookmarksScreenContainer() {
     title: menuItem.title,
   }, currentPage);
 
-  const onUpdateFilms = async (key: string, filmList: FilmListInterface) => {
-    setFilmPager((prevFilmPager) => ({
-      ...prevFilmPager,
-      [key]: {
-        filmList,
-      },
-    }));
-  };
-
-  const getMenuItems = (): MenuItemInterface[] => bookmarks.map((item) => ({
-    id: item.id,
-    title: item.title,
-    path: '',
-  }));
+  const onUpdateFilms = (key: string, item: PagerItemInterface) => setPagerItems(pagerItemsUpdater(key, item));
 
   const containerProps = {
     isLoading,
-    bookmarks,
-    filmPager,
-    menuItems: getMenuItems(),
+    pagerItems,
     onLoadFilms,
     onUpdateFilms,
   };

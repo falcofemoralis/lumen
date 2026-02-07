@@ -4,20 +4,19 @@ import { Page } from 'Component/Page';
 import { ThemedButton } from 'Component/ThemedButton';
 import { ThemedInput } from 'Component/ThemedInput';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
+import { t } from 'i18n/translate';
 import { Mic, Search } from 'lucide-react-native';
 import { useState } from 'react';
 import { View } from 'react-native';
 import { DefaultFocus, SpatialNavigationScrollView, SpatialNavigationView } from 'react-tv-space-navigation';
 import { useAppTheme } from 'Theme/context';
 
-import { SEARCH_MENU_ITEM } from './SearchScreen.config';
 import { componentStyles } from './SearchScreen.style.atv';
 import { SearchScreenComponentProps } from './SearchScreen.type';
-import { t } from 'i18n/translate';
 
 export function SearchScreenComponent({
   suggestions,
-  filmPager,
+  pagerItems,
   query,
   recognizing,
   enteredText,
@@ -113,7 +112,7 @@ export function SearchScreenComponent({
       return null;
     }
 
-    if (!isLoading && !filmPager.search?.filmList.films.length) {
+    if (!isLoading && !pagerItems[0].films?.length) {
       return (
         <View style={ styles.noResults }>
           <InfoBlock
@@ -127,8 +126,7 @@ export function SearchScreenComponent({
     return (
       <FilmPager
         gridStyle={ styles.grid }
-        menuItems={ [SEARCH_MENU_ITEM] }
-        filmPager={ filmPager }
+        items={ pagerItems }
         onLoadFilms={ onLoadFilms }
         onUpdateFilms={ onUpdateFilms }
         onRowFocus={ setCurrentRow }

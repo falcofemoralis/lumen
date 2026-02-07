@@ -10,8 +10,7 @@ import { BookmarksScreenComponentProps } from './BookmarksScreen.type';
 
 export function BookmarksScreenComponent({
   isLoading,
-  menuItems,
-  filmPager,
+  pagerItems,
   onLoadFilms,
   onUpdateFilms,
 }: BookmarksScreenComponentProps) {
@@ -20,7 +19,7 @@ export function BookmarksScreenComponent({
       return <BookmarksScreenThumbnail />;
     }
 
-    if (!menuItems.length) {
+    if (!pagerItems.length) {
       return (
         <View style={ styles.empty }>
           <InfoBlock
@@ -33,8 +32,7 @@ export function BookmarksScreenComponent({
 
     return (
       <FilmPager
-        menuItems={ menuItems }
-        filmPager={ filmPager }
+        items={ pagerItems }
         onLoadFilms={ onLoadFilms }
         onUpdateFilms={ onUpdateFilms }
       />

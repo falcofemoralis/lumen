@@ -1,14 +1,8 @@
 import { LegendList } from '@legendapp/list';
-import { useCallback, useEffect, useRef } from 'react';
-import {
-  NativeScrollEvent,
-  NativeSyntheticEvent,
-  RefreshControl,
-} from 'react-native';
+import { useCallback } from 'react';
+import { RefreshControl } from 'react-native';
 import { noopFn } from 'Util/Function';
-import { isCloseToBottom } from 'Util/Scroll';
 
-import { SCROLL_EVENT_END_PADDING } from './ThemedGrid.config';
 import { ThemedGridComponentProps } from './ThemedGrid.type';
 
 export const ThemedGridComponent = ({
@@ -21,18 +15,6 @@ export const ThemedGridComponent = ({
   handleScrollEnd,
   handleRefresh = noopFn,
 }: ThemedGridComponentProps) => {
-  const scrollFuncRef = useRef<() => void>(handleScrollEnd);
-
-  useEffect(() => {
-    scrollFuncRef.current = handleScrollEnd;
-  }, [handleScrollEnd]);
-
-  const onScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    if (isCloseToBottom(event, SCROLL_EVENT_END_PADDING)) {
-      scrollFuncRef.current();
-    }
-  }, []);
-
   const renderRefreshControl = useCallback(() => (
     <RefreshControl
       refreshing={ isRefreshing }
@@ -46,12 +28,13 @@ export const ThemedGridComponent = ({
       numColumns={ numberOfColumns }
       estimatedItemSize={ itemSize }
       renderItem={ renderItem }
-      onScroll={ onScroll }
       refreshControl={ renderRefreshControl() }
       keyExtractor={ (item, idx) => `${item.id}-row-${idx}` }
       recycleItems
       showsVerticalScrollIndicator={ false }
       ListHeaderComponent={ ListHeaderComponent }
+      onEndReached={ handleScrollEnd }
+      onEndReachedThreshold={ 0.25 }
     />
   );
 };

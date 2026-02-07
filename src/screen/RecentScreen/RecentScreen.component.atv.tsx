@@ -82,7 +82,7 @@ export function RecentScreenComponent({
                 isFocused && styles.itemFocused,
               ] }
             >
-              <View style={ [styles.posterContainer, isFocused && styles.posterContainerFocused] }>
+              <View style={ [styles.poster, styles.posterContainer, isFocused && styles.posterContainerFocused] }>
                 <ThemedImage
                   style={ styles.poster }
                   src={ image }

@@ -3,7 +3,6 @@ import { InfoBlock } from 'Component/InfoBlock';
 import { Page } from 'Component/Page';
 import { t } from 'i18n/translate';
 import { View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { styles } from './BookmarksScreen.style';
 import { BookmarksScreenThumbnail } from './BookmarksScreen.thumbnail';
@@ -11,8 +10,7 @@ import { BookmarksScreenComponentProps } from './BookmarksScreen.type';
 
 export function BookmarksScreenComponent({
   isLoading,
-  menuItems,
-  filmPager,
+  pagerItems,
   onLoadFilms,
   onUpdateFilms,
 }: BookmarksScreenComponentProps) {
@@ -21,7 +19,7 @@ export function BookmarksScreenComponent({
       return <BookmarksScreenThumbnail />;
     }
 
-    if (!menuItems.length) {
+    if (!pagerItems.length) {
       return (
         <View style={ styles.empty }>
           <InfoBlock
@@ -34,8 +32,7 @@ export function BookmarksScreenComponent({
 
     return (
       <FilmPager
-        menuItems={ menuItems }
-        filmPager={ filmPager }
+        items={ pagerItems }
         onLoadFilms={ onLoadFilms }
         onUpdateFilms={ onUpdateFilms }
       />

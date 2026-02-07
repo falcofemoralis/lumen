@@ -5,8 +5,7 @@ import { MenuItemInterface } from 'Type/MenuItem.interface';
 import { PaginationInterface } from 'Type/Pagination.interface';
 
 export interface FilmPagerContainerProps {
-  menuItems: MenuItemInterface[];
-  filmPager: FilmPagerInterface;
+  items: PagerItemInterface[];
   loadOnInit?: boolean;
   gridStyle?: StyleProp<ViewStyle>;
   onLoadFilms: (
@@ -14,12 +13,15 @@ export interface FilmPagerContainerProps {
     currentPage: number,
     isRefresh: boolean
   ) => Promise<FilmListInterface>;
-  onUpdateFilms: (key: string, filmList: FilmListInterface) => void;
+  onUpdateFilms: (
+    key: string,
+    item: PagerItemInterface
+  ) => void;
   onRowFocus?: (row: number) => void;
 }
 
 export interface FilmPagerComponentProps {
-  pagerItems: PagerItemInterface[];
+  items: PagerItemInterface[];
   gridStyle?: StyleProp<ViewStyle>;
   onNextLoad: (isRefresh: boolean, item: PagerItemInterface) => Promise<void>;
   onPreLoad: (item: PagerItemInterface) => void;
@@ -27,15 +29,7 @@ export interface FilmPagerComponentProps {
 }
 
 export interface PagerItemInterface {
-  key: string;
-  title: string;
   menuItem: MenuItemInterface;
   films: FilmCardInterface[] | null;
   pagination: PaginationInterface;
-}
-
-export interface FilmPagerInterface {
-  [key: string]: {
-    filmList: FilmListInterface;
-  } | undefined;
 }
