@@ -19,6 +19,7 @@ export function ThemedGridContainer({
   headerSize,
   ListHeaderComponent,
   scrollBehavior,
+  tvOptimized,
   renderItem,
   onNextLoad,
 }: ThemedGridContainerProps) {
@@ -65,6 +66,7 @@ export function ThemedGridContainer({
     header,
     headerSize,
     scrollBehavior,
+    tvOptimized,
     ListHeaderComponent,
     renderItem,
     handleScrollEnd,

@@ -9,8 +9,6 @@ export const componentStyles = ({ scale, colors }: Theme) => ({
     position: 'relative',
     height: scale(40),
     zIndex: 10,
-    transitionProperty: 'all',
-    transitionDuration: '250ms',
     backgroundColor: colors.background,
   },
   menuListScroll: {},

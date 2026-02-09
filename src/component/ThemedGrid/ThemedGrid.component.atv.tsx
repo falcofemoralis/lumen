@@ -16,6 +16,7 @@ export const ThemedGridComponent = ({
   header,
   headerSize,
   scrollBehavior = 'stick-to-start',
+  tvOptimized = false,
   renderItem,
   handleScrollEnd,
 }: ThemedGridComponentProps) => {
@@ -59,6 +60,8 @@ export const ThemedGridComponent = ({
       scrollDuration={ isTVGridAnimation ? 250 : 0 }
       header={ header }
       headerSize={ headerSize }
+      isFlatlist={ tvOptimized }
+      paddingBottom={ itemSize }
     />
   );
 };

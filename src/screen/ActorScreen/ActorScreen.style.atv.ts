@@ -1,7 +1,5 @@
 import { Theme, ThemedStyles } from 'Theme/types';
 
-export const MAIN_CONTENT_HEIGHT_TV = 300;
-
 export const componentStyles = ({ scale, colors, text }: Theme) => ({
   mainContent: {
     flexDirection: 'row',

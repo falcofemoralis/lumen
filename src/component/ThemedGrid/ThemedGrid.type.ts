@@ -14,6 +14,7 @@ export interface ThemedGridContainerProps<T = any> {
   header?: React.ReactNode;
   headerSize?: number;
   scrollBehavior?: 'stick-to-start' | 'stick-to-center';
+  tvOptimized?: boolean;
   ListHeaderComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
   renderItem: (args: ThemedGridRowProps<T>) => React.ReactNode;
   onNextLoad?: (isRefresh: boolean) => Promise<void>;
@@ -29,6 +30,7 @@ export interface ThemedGridComponentProps<T = any> {
   header?: React.ReactNode;
   headerSize?: number;
   scrollBehavior?: 'stick-to-start' | 'stick-to-center';
+  tvOptimized?: boolean;
   ListHeaderComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
   renderItem: (props: { item: T, index: number }) => React.ReactNode;
   handleScrollEnd: () => void;

@@ -6,6 +6,7 @@ import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
 import { ThemedPressable } from 'Component/ThemedPressable';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { memo, useCallback, useMemo } from 'react';
+import { View } from 'react-native';
 import { useAppTheme } from 'Theme/context';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { noopFn } from 'Util/Function';
@@ -68,15 +69,19 @@ export function FilmGridComponent({
     scale(ROW_GAP) // paddingHorizontal
   );
 
+  const actualHeight = useMemo(() => height + scale(ROW_GAP), [height, scale]);
+
   const renderItem = useCallback(({ item, index }: ThemedGridRowProps<FilmCardInterface>) => (
-    <MemoizedGridItem
-      index={ index }
-      row={ { id: String(index), items: [item] } }
-      width={ width }
-      handleOnPress={ handleOnPress }
-      handleItemFocus={ handleItemFocus }
-    />
-  ), [width, handleOnPress, handleItemFocus]);
+    <View style={ { height: actualHeight } }>
+      <MemoizedGridItem
+        index={ index }
+        row={ { id: String(index), items: [item] } }
+        width={ width }
+        handleOnPress={ handleOnPress }
+        handleItemFocus={ handleItemFocus }
+      />
+    </View>
+  ), [width, actualHeight, handleOnPress, handleItemFocus]);
 
   const filmsData = useMemo(
     () => {
@@ -99,11 +104,12 @@ export function FilmGridComponent({
       rowStyle={ styles.rowStyle }
       data={ filmsData }
       numberOfColumns={ numberOfColumns }
-      itemSize={ height + scale(ROW_GAP) * 2 }
+      itemSize={ actualHeight }
       renderItem={ renderItem }
       onNextLoad={ onNextLoad }
       header={ header }
       headerSize={ headerSize }
+      tvOptimized
     />
   );
 }

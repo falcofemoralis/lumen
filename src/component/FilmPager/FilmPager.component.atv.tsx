@@ -3,7 +3,6 @@ import { ThemedButton } from 'Component/ThemedButton';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { memo, useRef, useState } from 'react';
 import { View } from 'react-native';
-import Animated from 'react-native-reanimated';
 import {
   DefaultFocus,
   SpatialNavigationScrollView,
@@ -97,7 +96,7 @@ export function FilmPagerComponent({
     }
 
     return (
-      <Animated.View style={ styles.menuListWrapper }>
+      <View style={ styles.menuListWrapper }>
         <SpatialNavigationScrollView
           horizontal
           offsetFromStart={ scale(64) }
@@ -110,7 +109,7 @@ export function FilmPagerComponent({
             { items.map((item, idx) => renderMenuItem(item, idx)) }
           </SpatialNavigationView>
         </SpatialNavigationScrollView>
-      </Animated.View>
+      </View>
     );
   };
 

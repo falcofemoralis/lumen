@@ -32,13 +32,7 @@ const FilmSectionsRow = ({
   styles,
   handleOnPress,
 }: FilmSectionsRowProps) => {
-  const { header, content, films = [], isPlaceholder = false } = row;
-
-  const renderContent = () => (
-    <View>
-      { content }
-    </View>
-  );
+  const { header, films = [], isPlaceholder = false } = row;
 
   const renderHeader = () => (
     <View style={ styles.container }>
@@ -56,7 +50,6 @@ const FilmSectionsRow = ({
           { width: containerWidth },
         ] }
       >
-        { content && renderContent() }
         <View style={ styles.rowStyle }>
           { films.map((item, idx) => (
             <FilmCardThumbnail
@@ -77,7 +70,6 @@ const FilmSectionsRow = ({
         { width: containerWidth },
       ] }
     >
-      { content && renderContent() }
       { header && renderHeader() }
       <SpatialNavigationView
         direction="horizontal"
@@ -108,7 +100,7 @@ const MemoizedFilmSectionsRow = memo(FilmSectionsRow);
 
 export function FilmSectionsComponent({
   data,
-  contentHeight = 0,
+  children,
   handleOnPress,
 }: FilmSectionsComponentProps) {
   const styles = useThemedStyles(componentStyles);
@@ -121,29 +113,32 @@ export function FilmSectionsComponent({
 
   const { gridWidth } = useGridLayout(1);
 
-  const renderItem = useCallback(({ item: row, index }: {item: FilmSectionsItem, index: number}) => (
-    <MemoizedFilmSectionsRow
-      index={ index }
-      row={ row }
-      itemSize={ width }
-      numberOfColumns={ numberOfColumnsTV }
-      handleOnPress={ handleOnPress }
-      containerWidth={ gridWidth }
-      styles={ styles }
-    />
-  ), [styles]);
-
   const calculatedHeights = useMemo(() => data.reduce((acc, item) => {
     acc[item.index] = (height + styles.rowStyle.gap * 2)
-      + (item.header ? styles.headerText.fontSize : 0)
-      + (item.content ? contentHeight : 0);
+      + (item.header ? styles.headerText.fontSize : 0);
 
     return acc;
   }, {} as Record<string, number>), [data, styles]);
 
+  const renderItem = useCallback(({ item: row, index }: {item: FilmSectionsItem, index: number}) => (
+    <View style={ { height: calculatedHeights[index] } }>
+      <MemoizedFilmSectionsRow
+        index={ index }
+        row={ row }
+        itemSize={ width }
+        numberOfColumns={ numberOfColumnsTV }
+        handleOnPress={ handleOnPress }
+        containerWidth={ gridWidth }
+        styles={ styles }
+      />
+    </View>
+  ), [styles, calculatedHeights]);
+
   const getCalculatedItemSize = useCallback((
     item: FilmSectionsItem
-  ) => calculatedHeights[item.index], [calculatedHeights]);
+  ) => {
+    return calculatedHeights[item.index];
+  }, [calculatedHeights]);
 
   return (
     <SpatialNavigationVirtualizedList
@@ -155,6 +150,9 @@ export function FilmSectionsComponent({
       style={ styles.grid }
       orientation="vertical"
       isGrid
+      isFlatlist
+      paddingBottom={ height }
+      HeaderComponent={ children }
     />
   );
 }

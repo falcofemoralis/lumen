@@ -32,24 +32,35 @@ export const ThemedPressableComponent = ({
       onFocus={ onFocus }
       onBlur={ onBlur }
     >
-      { ({ isFocused, isRootActive }) => withAnimation ? (
-        <Animated.View
-          style={ [
-            {
-              transform: [{ scale: 1 }],
-              transitionProperty: 'transform',
-              transitionDuration: '250ms',
-            },
-            style,
-            isFocused && isRootActive && {
-              transform: [{ scale: zoomScale }],
-            },
-          ] }
-        >
-          { renderChildren({ isFocused, isRootActive }) }
-        </Animated.View>
-      ) : renderChildren({ isFocused, isRootActive }) }
+      { ({ isFocused, isRootActive }) => {
+        return (
+          <TouchableHighlight
+            onPress={ onPress }
+            onLongPress={ onLongPress }
+            focusable={ false }
+          >
+            { withAnimation ? (
+              <Animated.View
+                style={ [
+                  {
+                    transform: [{ scale: 1 }],
+                    transitionProperty: 'transform',
+                    transitionDuration: '250ms',
+                  },
+                  style,
+                  isFocused && isRootActive && {
+                    transform: [{ scale: zoomScale }],
+                  },
+                ] }
+              >
+                { renderChildren({ isFocused, isRootActive }) }
+              </Animated.View>
+            ) : renderChildren({ isFocused, isRootActive }) }
+          </TouchableHighlight>
+        );
+      } }
     </SpatialNavigationFocusableView>
+
   );
 };
 

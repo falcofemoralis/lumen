@@ -10,13 +10,12 @@ export type FilmSectionsData = {
 export interface FilmSectionsContainerProps {
   data: FilmSectionsData[];
   children?: React.ReactNode;
-  contentHeight?: number;
   handleOnPress: (film: FilmCardInterface) => void;
 }
 
 export interface FilmSectionsComponentProps {
   data: FilmSectionsItem[];
-  contentHeight?: number;
+  children?: React.ReactNode;
   handleOnPress: (film: FilmCardInterface) => void;
 }
 
@@ -24,7 +23,6 @@ export type FilmSectionsItem = {
   index: number;
   films?: FilmCardInterface[];
   header?: string;
-  content?: React.ReactNode;
   isPlaceholder?: boolean;
 }
 

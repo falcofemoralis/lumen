@@ -9,7 +9,7 @@ import { DefaultFocus } from 'react-tv-space-navigation';
 import { useAppTheme } from 'Theme/context';
 import { ActorInterface } from 'Type/Actor.interface';
 
-import { componentStyles, MAIN_CONTENT_HEIGHT_TV } from './ActorScreen.style.atv';
+import { componentStyles } from './ActorScreen.style.atv';
 import { ActorScreenComponentProps } from './ActorScreen.type';
 
 export function ActorScreenComponent({
@@ -125,7 +125,6 @@ export function ActorScreenComponent({
         <FilmSections
           data={ data }
           handleOnPress={ handleSelectFilm }
-          contentHeight={ scale(MAIN_CONTENT_HEIGHT_TV) }
         >
           { renderMainData() }
         </FilmSections>

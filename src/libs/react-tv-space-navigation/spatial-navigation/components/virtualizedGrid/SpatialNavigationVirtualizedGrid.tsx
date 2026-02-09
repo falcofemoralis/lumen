@@ -37,6 +37,8 @@ type SpatialNavigationVirtualizedGridProps<T> = Pick<
     /** Used to modify every row style */
     rowContainerStyle?: StyleProp<ViewStyle>;
     ref: ForwardedRef<SpatialNavigationVirtualizedListRef>
+    isFlatlist?: boolean;
+    paddingBottom?: number;
   };
 
 export type GridRowType<T> = {

@@ -9,6 +9,7 @@ import { NodeOrientation } from '../../types/orientation';
 import { invertOrientation } from '../virtualizedGrid/helpers/convertToGrid';
 import { VirtualizedListWithSize } from './VirtualizedListWithSize';
 import { uniqueId } from 'Util/Math';
+import { VirtualizedFlatList } from './VirtualizedFlatList';
 
 const useCreateVirtualParentsIds = (parentId: string) =>
   useCachedValues(() => uniqueId(`${parentId}_virtual_`));
@@ -25,7 +26,7 @@ const useRegisterInitialAndUnregisterFinalVirtualNodes = <T,>({
   registerNthVirtualNode,
   unregisterNthVirtualNode,
 }: {
-  allItems: Array<T>;
+  allItems: T[];
   parentId: string;
   registerNthVirtualNode: (index: number) => void;
   unregisterNthVirtualNode: (index: number) => void;
@@ -34,7 +35,7 @@ const useRegisterInitialAndUnregisterFinalVirtualNodes = <T,>({
    * We register each item in allItems at 1st render, and unregister all the registered nodes on unmount.
    * If data was added to allItems in the meantime (ex: onEndReached), the cleanup function needs to have "access" to this additional data in order to unregister the additional nodes.
    * This means the cleanup function needs to have access to up-to-date data, so we use a reference to the list of data. */
-  const currentAllItems = useRef<Array<T>>(allItems);
+  const currentAllItems = useRef<T[]>(allItems);
   currentAllItems.current = allItems;
 
   useEffect(() => {
@@ -49,11 +50,11 @@ const useUpdateRegistration = <T,>({
   registerNthVirtualNode,
   unregisterNthVirtualNode,
 }: {
-  allItems: Array<T>;
+  allItems: T[];
   registerNthVirtualNode: (index: number) => void;
   unregisterNthVirtualNode: (index: number) => void;
 }) => {
-  const previousAllItems = useRef<Array<T>>(allItems);
+  const previousAllItems = useRef<T[]>(allItems);
 
   // useBeforeMountEffect done every time allItems is changing to change the way the allItems is register in the spatialNavigator
   useEffect(() => {
@@ -77,7 +78,7 @@ export const useRegisterVirtualNodes = <T,>({
   orientation,
   isGrid,
 }: {
-  allItems: Array<T>;
+  allItems: T[];
   orientation: NodeOrientation;
   isGrid: boolean;
 }) => {
@@ -140,6 +141,9 @@ export type SpatialNavigationVirtualizedListWithVirtualNodesProps<T> = Omit<
   'listSizeInPx'
 > & {
   isGrid?: boolean;
+  isFlatlist?: boolean;
+  paddingBottom?: number;
+  HeaderComponent?: React.ReactNode;
 };
 
 export type SpatialNavigationVirtualizedListWithVirtualNodesRef = {
@@ -202,6 +206,11 @@ export const SpatialNavigationVirtualizedListWithVirtualNodes = typedMemo(
       ),
       [getNthVirtualNodeID, renderItem],
     );
+
+
+    if (props.isFlatlist) {
+      return <VirtualizedFlatList {...props} renderItem={renderWrappedItem} />;
+    }
 
     return <VirtualizedListWithSize {...props} renderItem={renderWrappedItem} />;
   },

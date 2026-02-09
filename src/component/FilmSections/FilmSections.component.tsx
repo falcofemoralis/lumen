@@ -22,13 +22,7 @@ const FilmSectionsRow = ({
   handleOnPress,
   styles,
 }: FilmSectionsRowProps) => {
-  const { content, header, films = [], isPlaceholder } = row;
-
-  const renderContent = () => (
-    <View>
-      { content }
-    </View>
-  );
+  const { header, films = [], isPlaceholder } = row;
 
   const renderHeader = () => (
     <View>
@@ -41,7 +35,6 @@ const FilmSectionsRow = ({
   if (isPlaceholder) {
     return (
       <View>
-        { content && renderContent() }
         <View style={ styles.gridRow }>
           { films.map((item, idx) => (
             <FilmCardThumbnail
@@ -57,7 +50,6 @@ const FilmSectionsRow = ({
 
   return (
     <View>
-      { content && renderContent() }
       { header && renderHeader() }
       <View style={ styles.gridRow }>
         { films.map((item, idx) => (
@@ -81,6 +73,7 @@ const MemoizedFilmSectionsRow = memo(FilmSectionsRow);
 
 export function FilmSectionsComponent({
   data: films,
+  children,
   handleOnPress,
 }: FilmSectionsComponentProps) {
   const styles = useThemedStyles(componentStyles);
@@ -113,6 +106,7 @@ export function FilmSectionsComponent({
       keyExtractor={ (item) => `${item.index}-film-list-row` }
       recycleItems
       showsVerticalScrollIndicator={ false }
+      ListHeaderComponent={ children }
     />
   );
 }

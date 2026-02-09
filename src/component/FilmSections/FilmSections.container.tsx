@@ -13,7 +13,6 @@ import { FilmSectionsContainerProps, FilmSectionsData, FilmSectionsItem } from '
 export function FilmSectionsContainer({
   data: initialData = [],
   children,
-  contentHeight,
 }: FilmSectionsContainerProps) {
   const navigation = useNavigation();
   const { isTV, numberOfColumnsTV, numberOfColumnsMobile } = useConfigContext();
@@ -54,19 +53,15 @@ export function FilmSectionsContainer({
       return acc;
     }, [] as FilmSectionsItem[]);
 
-    if (items.length > 0) {
-      items[0].content = children;
-    }
-
     return items.map((item, index) => ({
       ...item,
       index,
     }));
-  }, [initialData, children, isTV, numberOfColumnsTV, numberOfColumnsMobile]);
+  }, [initialData, isTV, numberOfColumnsTV, numberOfColumnsMobile]);
 
   const containerProps = {
     data,
-    contentHeight,
+    children,
     handleOnPress,
   };
 
