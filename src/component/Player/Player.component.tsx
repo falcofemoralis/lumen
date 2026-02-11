@@ -10,6 +10,7 @@ import { ThemedDropdown } from 'Component/ThemedDropdown';
 import { ThemedPressable } from 'Component/ThemedPressable';
 import { ThemedText } from 'Component/ThemedText';
 import { useConfigContext } from 'Context/ConfigContext';
+import * as Haptics from 'expo-haptics';
 import * as NavigationBar from 'expo-navigation-bar';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { OrientationLock } from 'expo-screen-orientation';
@@ -266,6 +267,7 @@ export function PlayerComponent({
         return;
       }
 
+      scheduleOnRN(Haptics.performAndroidHapticsAsync, Haptics.AndroidHaptics.Gesture_Start);
       scheduleOnRN(setPlayerRate, 1.5);
       scheduleOnRN(setLongTapAction, true);
     })

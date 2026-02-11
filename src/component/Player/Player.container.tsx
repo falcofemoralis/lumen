@@ -58,16 +58,18 @@ export function PlayerContainer({
   video,
   film,
   voice,
-  quality: qualityProp,
 }: PlayerContainerProps) {
   const { isTV, isFirestore } = useConfigContext();
   const navigation = useNavigation();
   const { updateSelectedVoice } = usePlayerContext();
   const { resetProgressStatus, updateProgressStatus } = usePlayerProgressActions();
   const { isSignedIn, profile, currentService } = useServiceContext();
+
+  const defaultQuality = useMemo(() => getPlayerQuality(video), [video]);
+
   const [selectedVideo, setSelectedVideo] = useState<FilmVideoInterface>(video);
   const [selectedVoice, setSelectedVoice] = useState<FilmVoiceInterface>(voice);
-  const [selectedQuality, setSelectedQuality] = useState<string>(qualityProp);
+  const [selectedQuality, setSelectedQuality] = useState<string>(defaultQuality);
   const [selectedSubtitle, setSelectedSubtitle] = useState<SubtitleInterface|undefined>(
     selectedVideo.subtitles?.find(({ isDefault }) => isDefault)
   );

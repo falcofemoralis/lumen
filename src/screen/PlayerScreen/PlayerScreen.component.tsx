@@ -8,7 +8,6 @@ import RouterStore from 'Store/Router.store';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
-import { getPlayerQuality } from 'Util/Player';
 
 import { PlayerScreenComponentProps } from './PlayerScreen.type';
 
@@ -50,7 +49,6 @@ export function PlayerScreenComponent({ video, film, voice }: PlayerScreenCompon
         video={ video }
         film={ film }
         voice={ voice }
-        quality={ getPlayerQuality(video) }
       />
     </Page>
   );

@@ -52,6 +52,7 @@
     "expo-application": "^7.0.7",
     "expo-build-properties": "~1.0.9",
     "expo-device": "^8.0.7",
+    "expo-haptics": "~15.0.8",
     "expo-image": "^3.0.8",
     "expo-keep-awake": "^15.0.7",
     "expo-linear-gradient": "^15.0.7",
