@@ -13,10 +13,10 @@ export const ThemedGridComponent = ({
   numberOfColumns,
   style,
   rowStyle,
-  header,
-  headerSize,
   scrollBehavior = 'stick-to-start',
   tvOptimized = false,
+  ListHeaderComponent,
+  ListEmptyComponent,
   renderItem,
   handleScrollEnd,
 }: ThemedGridComponentProps) => {
@@ -50,6 +50,8 @@ export const ThemedGridComponent = ({
       renderItem={ renderItem }
       itemHeight={ itemSize }
       numberOfColumns={ numberOfColumns }
+      ListHeaderComponent={ ListHeaderComponent }
+      ListEmptyComponent={ ListEmptyComponent }
       scrollInterval={ SCROLL_EVENT_UPDATES_MS_TV }
       rowContainerStyle={ rowStyle }
       onEndReached={ handleScrollEnd }
@@ -58,8 +60,6 @@ export const ThemedGridComponent = ({
       additionalRenderedRows={ 2 }
       scrollBehavior={ scrollBehavior }
       scrollDuration={ isTVGridAnimation ? 250 : 0 }
-      header={ header }
-      headerSize={ headerSize }
       isFlatlist={ tvOptimized }
       paddingBottom={ itemSize }
     />

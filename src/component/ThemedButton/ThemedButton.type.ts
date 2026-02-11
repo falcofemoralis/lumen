@@ -1,10 +1,13 @@
+import { Ref } from 'react';
 import {
   ImageStyle, StyleProp, TextStyle, ViewStyle,
 } from 'react-native';
+import { SpatialNavigationNodeRef } from 'react-tv-space-navigation';
 
 export type Variant = 'filled' | 'outlined' | 'long' | 'transparent';
 
 export interface ThemedButtonProps {
+  spatialRef?: Ref<SpatialNavigationNodeRef>;
   children?: React.ReactNode;
   style?: StyleProp<ViewStyle>;
   styleFocused?: StyleProp<ViewStyle>;
@@ -23,4 +26,5 @@ export interface ThemedButtonProps {
   additionalElement?: (isFocused: boolean, isSelected: boolean) => React.ReactNode;
   withAnimation?: boolean;
   zoomScale?: number;
+  isFocusVisible?: boolean;
 }

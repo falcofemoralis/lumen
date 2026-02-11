@@ -1,7 +1,8 @@
 import { useConfigContext } from 'Context/ConfigContext';
 import { useState } from 'react';
 
-import ThemedAccordionComponentTV, { ThemedAccordionComponent } from './ThemedAccordion.component.atv';
+import ThemedAccordionComponent from './ThemedAccordion.component';
+import ThemedAccordionComponentTV from './ThemedAccordion.component.atv';
 import { ExpandedItem, ThemedAccordionContainerProps } from './ThemedAccordion.type';
 
 export const ThemedAccordionContainer = (props: ThemedAccordionContainerProps<any>) => {

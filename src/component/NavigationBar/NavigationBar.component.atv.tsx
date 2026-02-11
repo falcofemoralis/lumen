@@ -43,6 +43,10 @@ export function NavigationBarComponent({
   );
 
   const onTabSelect = useCallback((name: string) => {
+    if (!isMenuOpen) {
+      return;
+    }
+
     if (lastPage.current !== LOADER_SCREEN) {
       setTimeoutSafe(() => {
         onPress(LOADER_SCREEN);
@@ -58,7 +62,7 @@ export function NavigationBarComponent({
       onPress(name);
       lastPage.current = name;
     }, 500);
-  }, [onPress]);
+  }, [onPress, isMenuOpen]);
 
   const renderTab = (
     route: NavigationRoute<ParamListBase, string>,

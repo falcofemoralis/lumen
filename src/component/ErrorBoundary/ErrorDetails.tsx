@@ -37,6 +37,8 @@ export function ErrorDetails({
           <ScrollView
             style={ styles.scroll }
             contentContainerStyle={ styles.scrollContent }
+            tvFocusable={ false }
+            focusable={ false }
           >
             { errorInfo && (
               <ThemedText
@@ -48,7 +50,10 @@ export function ErrorDetails({
             ) }
           </ScrollView>
           <DefaultFocus>
-            <ThemedButton style={ styles.button } onPress={ onReset }>
+            <ThemedButton
+              style={ styles.button }
+              onPress={ onReset }
+            >
               { t('Try again') }
             </ThemedButton>
           </DefaultFocus>

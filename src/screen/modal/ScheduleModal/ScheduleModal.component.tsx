@@ -1,4 +1,3 @@
-import { componentStyles } from 'Component/FilmSections/FilmSections.style';
 import { Header } from 'Component/Header';
 import { Loader } from 'Component/Loader';
 import { ThemedAccordion } from 'Component/ThemedAccordion';
@@ -9,6 +8,7 @@ import { t } from 'i18n/translate';
 import { SCHEDULE_MODAL_SCREEN } from 'Navigation/navigationRoutes';
 import { useCallback, useEffect, useState } from 'react';
 import { ScrollView, View } from 'react-native';
+import { componentStyles } from 'Screen/FilmScreen/FilmScreen.style';
 import { ScheduleItem } from 'Screen/FilmScreen/FilmScreenElements';
 import RouterStore from 'Store/Router.store';
 import { FilmInterface } from 'Type/Film.interface';
@@ -42,7 +42,7 @@ export const ScheduleModalComponent = ({ film, handleUpdateScheduleWatch }: Sche
     }, 50);
   }, []);
 
-  const renderItem = useCallback((item: ScheduleItemInterface, idx: number) => (
+  const renderItem = useCallback((item: ScheduleItemInterface) => (
     <ScheduleItem
       key={ `modal-schedule-${item.name}` }
       item={ item }

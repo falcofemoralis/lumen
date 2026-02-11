@@ -152,7 +152,7 @@ export function FilmSectionsComponent({
       isGrid
       isFlatlist
       paddingBottom={ height }
-      HeaderComponent={ children }
+      ListHeaderComponent={ children }
     />
   );
 }

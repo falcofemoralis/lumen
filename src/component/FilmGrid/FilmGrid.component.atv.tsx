@@ -7,6 +7,7 @@ import { ThemedPressable } from 'Component/ThemedPressable';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { memo, useCallback, useMemo } from 'react';
 import { View } from 'react-native';
+import { DefaultFocus } from 'react-tv-space-navigation';
 import { useAppTheme } from 'Theme/context';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { noopFn } from 'Util/Function';
@@ -53,9 +54,11 @@ const MemoizedGridItem = memo(FilmGridItem, rowPropsAreEqual);
 
 export function FilmGridComponent({
   films,
-  header,
-  headerSize,
   numberOfColumns,
+  isGridVisible,
+  isEmpty,
+  ListHeaderComponent,
+  ListEmptyComponent,
   onNextLoad,
   handleOnPress,
   handleItemFocus,
@@ -72,19 +75,25 @@ export function FilmGridComponent({
   const actualHeight = useMemo(() => height + scale(ROW_GAP), [height, scale]);
 
   const renderItem = useCallback(({ item, index }: ThemedGridRowProps<FilmCardInterface>) => (
-    <View style={ { height: actualHeight } }>
-      <MemoizedGridItem
-        index={ index }
-        row={ { id: String(index), items: [item] } }
-        width={ width }
-        handleOnPress={ handleOnPress }
-        handleItemFocus={ handleItemFocus }
-      />
-    </View>
+    <DefaultFocus enable={ index === 0 }>
+      <View style={ { height: actualHeight } }>
+        <MemoizedGridItem
+          index={ index }
+          row={ { id: String(index), items: [item] } }
+          width={ width }
+          handleOnPress={ handleOnPress }
+          handleItemFocus={ handleItemFocus }
+        />
+      </View>
+    </DefaultFocus>
   ), [width, actualHeight, handleOnPress, handleItemFocus]);
 
   const filmsData = useMemo(
     () => {
+      if (isEmpty) {
+        return [];
+      }
+
       if (!films.length) {
         return new Array(numberOfColumns * THUMBNAILS_ROWS_TV).fill(null).map((_, index) => ({
           id: `film-placeholder-${index}`,
@@ -95,7 +104,7 @@ export function FilmGridComponent({
 
       return films.map((element, index) => ({ ...element, index }));
     },
-    [films, numberOfColumns]
+    [films, numberOfColumns, isEmpty]
   );
 
   return (
@@ -107,8 +116,8 @@ export function FilmGridComponent({
       itemSize={ actualHeight }
       renderItem={ renderItem }
       onNextLoad={ onNextLoad }
-      header={ header }
-      headerSize={ headerSize }
+      ListHeaderComponent={ ListHeaderComponent }
+      ListEmptyComponent={ isGridVisible ? ListEmptyComponent : null }
       tvOptimized
     />
   );

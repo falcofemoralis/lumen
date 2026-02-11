@@ -9,7 +9,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ErrorBoundary } from 'Component/ErrorBoundary';
 import { useConfigContext } from 'Context/ConfigContext';
 import { StatusBar } from 'expo-status-bar';
-import { View } from 'react-native';
 import { ErrorScreen } from 'Screen/ErrorScreen';
 import { CommentsModal } from 'Screen/modal/CommentsModal/CommentsModal.component';
 import { LoginModal } from 'Screen/modal/LoginModal';

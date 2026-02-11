@@ -10,8 +10,10 @@ import { FilmGridContainerProps } from './FilmGrid.type';
 
 export function FilmGridContainer({
   films,
-  header,
-  headerSize,
+  isGridVisible,
+  isEmpty,
+  ListHeaderComponent,
+  ListEmptyComponent,
   onNextLoad,
   onItemFocus,
 }: FilmGridContainerProps) {
@@ -32,9 +34,11 @@ export function FilmGridContainer({
 
   const containerProps = {
     films,
-    header,
-    headerSize,
     numberOfColumns,
+    isGridVisible,
+    isEmpty,
+    ListHeaderComponent,
+    ListEmptyComponent,
     onNextLoad,
     handleOnPress,
     handleItemFocus,

@@ -10,6 +10,7 @@ export const componentStyles = ({ scale, colors }: Theme) => ({
     height: scale(40),
     zIndex: 10,
     backgroundColor: colors.background,
+    marginBottom: scale(16),
   },
   menuListScroll: {},
   menuList: {
@@ -17,7 +18,6 @@ export const componentStyles = ({ scale, colors }: Theme) => ({
   },
   grid: {
     zIndex: 2,
-    marginTop: scale(8),
   },
   tabButton: {
     height: '100%',

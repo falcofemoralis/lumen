@@ -14,7 +14,8 @@ export interface VirtualizedListProps<T> {
   /** If vertical the height of an item, otherwise the width */
   itemSize: number | ((item: T) => number);
   currentlyFocusedItemIndex: number;
-  HeaderComponent?: React.ReactNode;
+  ListHeaderComponent?: React.ReactNode;
+  ListEmptyComponent?: React.ReactNode;
   /**
    * How many items are RENDERED ADDITIONALLY to the minimum amount possible. It impacts virtualization size.
    * Defaults to 2.
@@ -73,8 +74,9 @@ export const VirtualizedFlatList = typedMemo(
     listSizeInPx,
     scrollBehavior = "stick-to-start",
     testID,
-    HeaderComponent,
-    paddingBottom = 0
+    ListHeaderComponent,
+    ListEmptyComponent,
+    paddingBottom = 0,
   }: VirtualizedListProps<T>) => {
     const listRef = useRef<FlatList<any>>(null);
 
@@ -82,17 +84,17 @@ export const VirtualizedFlatList = typedMemo(
       if (currentlyFocusedItemIndex === 0) {
         listRef.current?.scrollToOffset({
           offset: 0,
-          animated: true,
+          animated: scrollDuration > 0,
         });
         return;
       }
 
       listRef.current?.scrollToIndex({
         index: currentlyFocusedItemIndex,
-        animated: true,
+        animated: scrollDuration > 0,
         viewPosition: 0,
       });
-    }, [currentlyFocusedItemIndex]);
+    }, [currentlyFocusedItemIndex, scrollDuration]);
 
     return (
       <FlatList
@@ -100,18 +102,16 @@ export const VirtualizedFlatList = typedMemo(
         data={data}
         renderItem={renderItem}
         keyExtractor={(_, index) => `row-${index}`}
-        initialNumToRender={2}
-        maxToRenderPerBatch={2}
-        windowSize={2}
         onEndReached={onEndReached}
-        onEndReachedThreshold={0.25}
+        onEndReachedThreshold={0.75}
         style={[{ height: "100%" }, style]}
         contentContainerStyle={{
           paddingBottom
         }}
         removeClippedSubviews
         scrollEnabled={false}
-        ListHeaderComponent={ HeaderComponent }
+        ListHeaderComponent={ ListHeaderComponent }
+        ListEmptyComponent={ ListEmptyComponent }
       />
     );
   },

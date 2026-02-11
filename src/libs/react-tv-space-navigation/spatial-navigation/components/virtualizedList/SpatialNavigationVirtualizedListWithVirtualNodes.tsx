@@ -143,7 +143,8 @@ export type SpatialNavigationVirtualizedListWithVirtualNodesProps<T> = Omit<
   isGrid?: boolean;
   isFlatlist?: boolean;
   paddingBottom?: number;
-  HeaderComponent?: React.ReactNode;
+  ListHeaderComponent?: React.ReactNode;
+  ListEmptyComponent?: React.ReactNode;
 };
 
 export type SpatialNavigationVirtualizedListWithVirtualNodesRef = {
@@ -207,9 +208,11 @@ export const SpatialNavigationVirtualizedListWithVirtualNodes = typedMemo(
       [getNthVirtualNodeID, renderItem],
     );
 
-
     if (props.isFlatlist) {
-      return <VirtualizedFlatList {...props} renderItem={renderWrappedItem} />;
+      return <VirtualizedFlatList
+        {...props} 
+        renderItem={renderWrappedItem}
+      />;
     }
 
     return <VirtualizedListWithSize {...props} renderItem={renderWrappedItem} />;

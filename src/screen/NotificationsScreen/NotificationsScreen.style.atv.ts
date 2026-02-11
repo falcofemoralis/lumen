@@ -2,7 +2,6 @@ import { Theme, ThemedStyles } from 'Theme/types';
 
 export const componentStyles = ({ scale }: Theme) => ({
   container: {
-    marginTop: scale(40),
   },
   empty: {
     height: '100%',

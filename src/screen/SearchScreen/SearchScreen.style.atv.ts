@@ -4,7 +4,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   container: {
     flexDirection: 'column',
     zIndex: 10,
-    marginTop: scale(16),
+    marginBottom: scale(16),
   },
   searchContainer: {
     flexDirection: 'row',
@@ -32,9 +32,6 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   },
   suggestions: {
     gap: scale(12),
-  },
-  grid: {
-    paddingTop: scale(24),
   },
   speakActive: {
     backgroundColor: colors.secondary,

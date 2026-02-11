@@ -8,6 +8,7 @@ import { componentStyles } from './ThemedButton.style.atv';
 import { ThemedButtonProps } from './ThemedButton.type';
 
 export default function ThemedButton({
+  spatialRef,
   onPress,
   onFocus,
   children,
@@ -24,6 +25,7 @@ export default function ThemedButton({
   additionalElement,
   withAnimation = false,
   zoomScale = 1.1,
+  isFocusVisible = true,
 }: ThemedButtonProps) {
   const { scale, theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
@@ -214,14 +216,15 @@ export default function ThemedButton({
 
   const isActive = (isFocused: boolean, isRootActive: boolean) => {
     if (disableRootActive) {
-      return isFocused;
+      return isFocused && isFocusVisible;
     }
 
-    return isFocused && isRootActive;
+    return isFocused && isRootActive && isFocusVisible;
   };
 
   return (
     <ThemedPressable
+      spatialRef={ spatialRef }
       onPress={ onPress }
       onFocus={ onFocus }
       withAnimation={ withAnimation }

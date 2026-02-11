@@ -8,6 +8,10 @@ export interface FilmPagerContainerProps {
   items: PagerItemInterface[];
   loadOnInit?: boolean;
   gridStyle?: StyleProp<ViewStyle>;
+  isGridVisible?: boolean;
+  isEmpty?: boolean;
+  ListHeaderComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
+  ListEmptyComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
   onLoadFilms: (
     menuItem: MenuItemInterface,
     currentPage: number,
@@ -23,6 +27,10 @@ export interface FilmPagerContainerProps {
 export interface FilmPagerComponentProps {
   items: PagerItemInterface[];
   gridStyle?: StyleProp<ViewStyle>;
+  isGridVisible?: boolean;
+  isEmpty?: boolean;
+  ListHeaderComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
+  ListEmptyComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
   onNextLoad: (isRefresh: boolean, item: PagerItemInterface) => Promise<void>;
   onPreLoad: (item: PagerItemInterface) => void;
   onRowFocus?: (row: number) => void;

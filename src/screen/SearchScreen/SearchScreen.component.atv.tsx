@@ -6,32 +6,29 @@ import { ThemedInput } from 'Component/ThemedInput';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import { Mic, Search } from 'lucide-react-native';
-import { useState } from 'react';
+import { memo } from 'react';
 import { View } from 'react-native';
 import { DefaultFocus, SpatialNavigationScrollView, SpatialNavigationView } from 'react-tv-space-navigation';
 import { useAppTheme } from 'Theme/context';
+import { ThemedStyles } from 'Theme/types';
 
 import { componentStyles } from './SearchScreen.style.atv';
 import { SearchScreenComponentProps } from './SearchScreen.type';
 
-export function SearchScreenComponent({
+const SearchHeader = memo(({
   suggestions,
-  pagerItems,
-  query,
   recognizing,
   enteredText,
-  isLoading,
+  styles,
   onChangeText,
   onApplySearch,
   onApplySuggestion,
-  onLoadFilms,
-  onUpdateFilms,
   handleStartRecognition,
   handleApplySearch,
-}: SearchScreenComponentProps) {
+}: SearchScreenComponentProps & {
+  styles: ThemedStyles
+}) => {
   const { theme } = useAppTheme();
-  const styles = useThemedStyles(componentStyles);
-  const [currentRow, setCurrentRow] = useState(0);
 
   const renderSearchBar = () => (
     <View style={ styles.searchBarContainer }>
@@ -48,10 +45,7 @@ export function SearchScreenComponent({
   const renderSearchContainer = () => (
     <DefaultFocus>
       <SpatialNavigationView
-        style={ {
-          ...styles.searchContainer,
-          ...(currentRow > 0 && styles.hidden),
-        } }
+        style={ styles.searchContainer }
         direction="horizontal"
       >
         <ThemedButton
@@ -80,10 +74,7 @@ export function SearchScreenComponent({
 
     return (
       <View
-        style={ {
-          ...styles.suggestionsWrapper,
-          ...(currentRow > 0 && styles.hidden),
-        } }
+        style={ styles.suggestionsWrapper }
       >
         <SpatialNavigationScrollView
           horizontal
@@ -107,40 +98,51 @@ export function SearchScreenComponent({
     );
   };
 
-  const renderFilms = () => {
-    if (!query) {
-      return null;
-    }
+  return (
+    <View style={ styles.container }>
+      { renderSearchContainer() }
+      { renderSuggestions() }
+    </View>
+  );
+});
 
-    if (!isLoading && !pagerItems[0].films?.length) {
-      return (
-        <View style={ styles.noResults }>
-          <InfoBlock
-            title={ t('No results found') }
-            subtitle={ t('Try searching for something else') }
-          />
-        </View>
-      );
-    }
+export function SearchScreenComponent(props: SearchScreenComponentProps) {
+  const styles = useThemedStyles(componentStyles);
+  const {
+    pagerItems,
+    query,
+    isLoading,
+    onLoadFilms,
+    onUpdateFilms,
+  } = props;
 
-    return (
-      <FilmPager
-        gridStyle={ styles.grid }
-        items={ pagerItems }
-        onLoadFilms={ onLoadFilms }
-        onUpdateFilms={ onUpdateFilms }
-        onRowFocus={ setCurrentRow }
+  const renderEmptyBlock = () => (
+    <View style={ styles.noResults }>
+      <InfoBlock
+        title={ t('No results found') }
+        subtitle={ t('Try searching for something else') }
       />
-    );
-  };
+    </View>
+  );
+
+  const renderSearchHeader = () => (
+    <SearchHeader
+      { ...props }
+      styles={ styles }
+    />
+  );
 
   return (
     <Page>
-      <View style={ styles.container }>
-        { renderSearchContainer() }
-        { renderSuggestions() }
-      </View>
-      { renderFilms() }
+      <FilmPager
+        items={ pagerItems }
+        onLoadFilms={ onLoadFilms }
+        onUpdateFilms={ onUpdateFilms }
+        isGridVisible={ !!query }
+        isEmpty={ !isLoading && !pagerItems[0].films?.length }
+        ListHeaderComponent={ renderSearchHeader() }
+        ListEmptyComponent={ renderEmptyBlock() }
+      />
     </Page>
   );
 }
