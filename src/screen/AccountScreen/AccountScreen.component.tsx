@@ -157,13 +157,16 @@ export function AccountScreenComponent({
   };
 
   const renderActions = () => {
+    const { premiumDays = 0 } = profile ?? {};
+
     return (
       <View style={ styles.profileActions }>
         <View style={ styles.profileActionsGroup }>
           { renderPremiumBadge() }
         </View>
         <View style={ [styles.profileActionsGroup] }>
-          { renderActionButton(t('Renew subscription'), Star, handleViewPayments, styles.premiumButton) }
+          { /* eslint-disable-next-line max-len */ }
+          { renderActionButton(premiumDays > 0 ? t('Renew subscription') : t('Get subscription'), Star, handleViewPayments, styles.premiumButton) }
           { renderNotificationButton() }
           { renderActionButton(t('Downloads'), Download, openNotImplemented) }
           { renderActionButton(t('Comments'), MessageSquareText, openNotImplemented) }
