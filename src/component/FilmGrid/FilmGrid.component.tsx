@@ -21,6 +21,7 @@ import {
 export function FilmGridComponent({
   films,
   numberOfColumns,
+  isAddSafeArea = true,
   handleOnPress,
   onNextLoad,
 }: FilmGridComponentProps) {
@@ -86,7 +87,7 @@ export function FilmGridComponent({
       renderItem={ renderItem }
       onNextLoad={ onNextLoad }
       style={ styles.grid }
-      ListHeaderComponent={ <View style={ { height: top } } /> }
+      ListHeaderComponent={ isAddSafeArea ? <View style={ { height: top } } /> : null }
     />
   );
 }

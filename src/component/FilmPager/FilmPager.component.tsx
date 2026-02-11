@@ -50,6 +50,7 @@ const TabButton = memo(({
 
 export const FilmPagerComponent = ({
   items,
+  isAddSafeArea,
   onPreLoad,
   onNextLoad,
 }: FilmPagerComponentProps) => {
@@ -166,6 +167,7 @@ export const FilmPagerComponent = ({
     return (
       <FilmGrid
         films={ films ?? [] }
+        isAddSafeArea={ isAddSafeArea }
         onNextLoad={ (isRefresh) => onNextLoad(isRefresh, pagerItem) }
       />
     );

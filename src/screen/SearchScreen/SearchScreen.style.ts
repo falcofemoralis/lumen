@@ -67,7 +67,7 @@ export const componentStyles = ({ scale, colors, text, spacing }: Theme) => ({
   grid: {
     marginTop: scale(12),
     width: '100%',
-    height: '100%',
+    flex: 1,
   },
   speakActive: {
     backgroundColor: colors.secondary,

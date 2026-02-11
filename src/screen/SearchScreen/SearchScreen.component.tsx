@@ -144,6 +144,7 @@ export function SearchScreenComponent({
           items={ pagerItems }
           onLoadFilms={ onLoadFilms }
           onUpdateFilms={ onUpdateFilms }
+          isAddSafeArea={ false }
         />
       </View>
     );

@@ -14,6 +14,7 @@ export function FilmGridContainer({
   isEmpty,
   ListHeaderComponent,
   ListEmptyComponent,
+  isAddSafeArea,
   onNextLoad,
   onItemFocus,
 }: FilmGridContainerProps) {
@@ -37,6 +38,7 @@ export function FilmGridContainer({
     numberOfColumns,
     isGridVisible,
     isEmpty,
+    isAddSafeArea,
     ListHeaderComponent,
     ListEmptyComponent,
     onNextLoad,

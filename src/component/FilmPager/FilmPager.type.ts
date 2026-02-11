@@ -10,6 +10,7 @@ export interface FilmPagerContainerProps {
   gridStyle?: StyleProp<ViewStyle>;
   isGridVisible?: boolean;
   isEmpty?: boolean;
+  isAddSafeArea?: boolean;
   ListHeaderComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
   ListEmptyComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
   onLoadFilms: (
@@ -29,6 +30,7 @@ export interface FilmPagerComponentProps {
   gridStyle?: StyleProp<ViewStyle>;
   isGridVisible?: boolean;
   isEmpty?: boolean;
+  isAddSafeArea?: boolean;
   ListHeaderComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
   ListEmptyComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
   onNextLoad: (isRefresh: boolean, item: PagerItemInterface) => Promise<void>;
