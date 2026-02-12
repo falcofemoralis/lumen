@@ -8,7 +8,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   card: {
     flexDirection: 'column',
     width: '100%',
-    borderRadius: scale(8),
+    borderRadius: scale(12),
     overflow: 'hidden',
     transform: [{ scale: 1 }],
     transitionProperty: 'transform',

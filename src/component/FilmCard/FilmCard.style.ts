@@ -12,7 +12,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     width: '100%',
     height: 'auto',
     overflow: 'hidden',
-    borderRadius: scale(8),
+    borderRadius: scale(12),
   },
   poster: {
     aspectRatio: '166 / 250',

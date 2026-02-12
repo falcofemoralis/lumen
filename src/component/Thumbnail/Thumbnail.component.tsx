@@ -54,7 +54,7 @@ export const ThumbnailComponent = ({ style, height, width }: ThumbnailComponentP
       width={ transformValue('width', width, style, layoutWidth, theme.dimensions.height) }
       style={ [
         {
-          borderRadius: scale(16),
+          borderRadius: scale(12),
         },
         style ? style : {},
       ] }
