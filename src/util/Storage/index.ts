@@ -1,4 +1,4 @@
-import { MMKV } from 'react-native-mmkv';
+import { createMMKV, MMKV } from 'react-native-mmkv';
 
 class StorageWrapper {
   private mmkvStorage: MMKV;
@@ -80,7 +80,7 @@ class StorageWrapper {
    */
   remove(key: string): void {
     try {
-      this.mmkvStorage.delete(key);
+      this.mmkvStorage.remove(key);
     } catch {}
   }
 
@@ -102,7 +102,7 @@ class Storage {
 
   getConfigStorage() {
     if (!this.configStorage) {
-      this.configStorage = new StorageWrapper(new MMKV({ id: 'config' }));
+      this.configStorage = new StorageWrapper(createMMKV({ id: 'config' }));
     }
 
     return this.configStorage;
@@ -110,7 +110,7 @@ class Storage {
 
   getCookiesStorage() {
     if (!this.cookiesStorage) {
-      this.cookiesStorage = new StorageWrapper(new MMKV({ id: 'cookies' }));
+      this.cookiesStorage = new StorageWrapper(createMMKV({ id: 'cookies' }));
     }
 
     return this.cookiesStorage;
@@ -118,7 +118,7 @@ class Storage {
 
   getPlayerStorage() {
     if (!this.playerStorage) {
-      this.playerStorage = new StorageWrapper(new MMKV({ id: 'player' }));
+      this.playerStorage = new StorageWrapper(createMMKV({ id: 'player' }));
     }
 
     return this.playerStorage;
@@ -126,7 +126,7 @@ class Storage {
 
   getMiscStorage() {
     if (!this.miscStorage) {
-      this.miscStorage = new StorageWrapper(new MMKV({ id: 'misc' }));
+      this.miscStorage = new StorageWrapper(createMMKV({ id: 'misc' }));
     }
 
     return this.miscStorage;

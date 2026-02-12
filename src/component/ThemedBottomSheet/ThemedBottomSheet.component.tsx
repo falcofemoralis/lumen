@@ -8,7 +8,7 @@ import { ThemedBottomSheetComponentProps } from './ThemedBottomSheet.type';
 export const ThemedBottomSheetComponent = ({
   ref,
   children,
-  sizes = ['40%', 'large'],
+  detents = [0.4, 'auto'],
   backgroundColor,
   onMount,
 }: ThemedBottomSheetComponentProps) => {
@@ -19,11 +19,10 @@ export const ThemedBottomSheetComponent = ({
       <Portal>
         <TrueSheet
           ref={ ref }
-          sizes={ sizes }
+          detents={ detents }
           cornerRadius={ 24 }
           backgroundColor={ backgroundColor ?? theme.colors.backgroundLight }
           onMount={ onMount }
-          edgeToEdge
         >
           { children }
         </TrueSheet>

@@ -36,23 +36,28 @@ export function ThemedOverlayComponent({
         backdropColor={ theme.colors.modal }
         transparent={ transparent }
       >
+
         <GestureHandlerRootView>
-          <Pressable
-            onPress={ handleModalRequestClose }
-            style={ [styles.modal, style] }
-          >
+          <Portal.Host>
             <Pressable
-              onPress={ noopFn }
-              style={ [
-                styles.contentContainerStyle,
-                isLandscape && styles.contentContainerStyleLandscape,
-                contentContainerStyle,
-              ] }
+              onPress={ handleModalRequestClose }
+              style={ [styles.modal, style] }
             >
-              { contentVisible && children }
+              <Pressable
+                onPress={ noopFn }
+                style={ [
+                  styles.contentContainerStyle,
+                  isLandscape && styles.contentContainerStyleLandscape,
+                  contentContainerStyle,
+                ] }
+              >
+
+                { contentVisible && children }
+
+              </Pressable>
+              { useKeyboardAdjustment && <KeyboardAdjuster scale={ 2 } /> }
             </Pressable>
-            { useKeyboardAdjustment && <KeyboardAdjuster scale={ 2 } /> }
-          </Pressable>
+          </Portal.Host>
         </GestureHandlerRootView>
       </Modal>
     </Portal>

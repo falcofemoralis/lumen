@@ -1,11 +1,11 @@
-import { SheetSize, TrueSheet } from '@lodev09/react-native-true-sheet';
+import { SheetDetent, TrueSheet } from '@lodev09/react-native-true-sheet';
 
 export type ThemedBottomSheetRef = TrueSheet;
 
 export interface ThemedBottomSheetComponentProps {
   ref: React.Ref<ThemedBottomSheetRef>
   children: React.ReactNode;
-  sizes?: SheetSize[];
+  detents?: SheetDetent[];
   backgroundColor?: string;
   onMount?: () => void;
 }

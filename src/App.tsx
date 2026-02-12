@@ -16,7 +16,6 @@ if (__DEV__) {
   // If you turn it off in metro.config.js, you'll have to manually import it.
   require('./devtools/ReactotronConfig.ts');
 }
-import 'Util/GestureHandler/gestureHandler';
 
 import { AppUpdater } from 'Component/AppUpdater';
 import { Awake } from 'Component/Awake';
@@ -31,7 +30,6 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { initialWindowMetrics, SafeAreaProvider } from 'react-native-safe-area-context';
 import { ThemeProvider } from 'Theme/context';
-import { loadDateFnsLocale } from 'Util/Date';
 import { useNavigationPersistence } from 'Util/Navigation';
 import { configureRemoteControl } from 'Util/RemoteControl';
 
@@ -76,9 +74,7 @@ export function App() {
   useEffect(() => {
     configureRemoteControl();
 
-    initI18n()
-      .then(() => setIsI18nInitialized(true))
-      .then(() => loadDateFnsLocale());
+    initI18n().then(() => setIsI18nInitialized(true));
   }, []);
 
   if (!isNavigationStateRestored || !isI18nInitialized) {

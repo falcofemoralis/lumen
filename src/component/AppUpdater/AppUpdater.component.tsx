@@ -149,7 +149,7 @@ export const AppUpdaterComponent = ({
   return (
     <ThemedBottomSheet
       ref={ bottomSheetRef }
-      sizes={ ['auto'] }
+      detents={ ['auto'] }
       backgroundColor={ theme.colors.background }
       onMount={ onBottomSheetMount }
     >
