@@ -17,7 +17,7 @@
     "adb:disconnect": "adb disconnect 192.168.1.104",
     "adb:install:dev": "adb install android/app/build/outputs/apk/release/app-release.apk",
     "adb:install:prod": "adb install release-signed.apk",
-    "postinstall": "patch-package",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@bam.tech/lrud": "^8.0.2",
