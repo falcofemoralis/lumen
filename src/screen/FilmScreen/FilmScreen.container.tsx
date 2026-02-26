@@ -258,7 +258,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
       posterTask.start();
     }
 
-    for (const linkItem of links) {
+    links.forEach((linkItem) => {
       const { url, quality, subtitles = [], seasonId, episodeId, voice } = linkItem;
       const taskName = [];
 
@@ -301,7 +301,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
 
         allSubtitles.push(...subtitleLinks);
 
-        for (const subtitle of subtitleLinks) {
+        subtitleLinks.forEach((subtitle) => {
           const { url: subtitleDestination, originalUrl: subtitleUrl } = subtitle;
 
           // ignore "off" subtitle
@@ -327,7 +327,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
             });
 
           subtitleTask.start();
-        }
+        });
       }
 
       const task = createDownloadTask({
@@ -373,7 +373,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
         });
 
       task.start();
-    }
+    });
   };
 
   const containerProps = {
