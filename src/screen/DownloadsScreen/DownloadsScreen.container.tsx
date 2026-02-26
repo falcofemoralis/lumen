@@ -213,9 +213,9 @@ export const DownloadsScreenContainer = () => {
           }
         }
 
-        voice.seasons?.sort((a, b) => a.seasonId.localeCompare(b.seasonId));
+        voice.seasons?.sort((a, b) => Number(a.seasonId) - Number(b.seasonId));
         voice.seasons?.forEach(season => {
-          season.episodes.sort((a, b) => a.episodeId.localeCompare(b.episodeId));
+          season.episodes.sort((a, b) => Number(a.episodeId) - Number(b.episodeId));
         });
       } else {
         voice.video?.streams.push(...video.streams);
