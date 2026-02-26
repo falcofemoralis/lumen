@@ -7,16 +7,14 @@ import { ThemedStyles } from 'Theme/types';
 import { THUMBNAILS_AMOUNT } from './RecentScreen.config';
 
 export const RecentScreenThumbnail = ({
-  top,
   styles,
 }: {
-  top: number,
   styles: ThemedStyles
 }) => {
   const { scale } = useAppTheme();
 
   return (
-    <Wrapper style={ { paddingTop: top } }>
+    <Wrapper>
       { Array(THUMBNAILS_AMOUNT).fill(0).map((_, index) => (
         <View
         // eslint-disable-next-line react/no-array-index-key

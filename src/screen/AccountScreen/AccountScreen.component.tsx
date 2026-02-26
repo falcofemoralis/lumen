@@ -30,6 +30,7 @@ export function AccountScreenComponent({
   openSettings,
   openNotifications,
   openNotImplemented,
+  openDownloads,
 }: AccountScreenComponentProps) {
   const { scale, theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
@@ -168,7 +169,7 @@ export function AccountScreenComponent({
           { /* eslint-disable-next-line max-len */ }
           { renderActionButton(premiumDays > 0 ? t('Renew subscription') : t('Get subscription'), Star, handleViewPayments, styles.premiumButton) }
           { renderNotificationButton() }
-          { renderActionButton(t('Downloads'), Download, openNotImplemented) }
+          { renderActionButton(t('Downloads'), Download, openDownloads) }
           { renderActionButton(t('Comments'), MessageSquareText, openNotImplemented) }
           { renderActionButton(t('View Profile'), Star, handleViewProfile) }
         </View>

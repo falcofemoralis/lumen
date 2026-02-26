@@ -1,5 +1,7 @@
+import { InfoBlock } from 'Component/InfoBlock';
 import { Loader } from 'Component/Loader';
 import { PlayerVideoRating } from 'Component/PlayerVideoRating';
+import { ThemedButton } from 'Component/ThemedButton';
 import { ThemedDropdown } from 'Component/ThemedDropdown';
 import { ThemedOverlay } from 'Component/ThemedOverlay';
 import { ThemedPressable } from 'Component/ThemedPressable';
@@ -7,10 +9,10 @@ import { ThemedSimpleList } from 'Component/ThemedSimpleList';
 import { ThemedText } from 'Component/ThemedText';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
-import { memo } from 'react';
 import { ScrollView, View } from 'react-native';
 import { getVideoProgress } from 'Util/Player';
 
+import { formatDownloadKey } from './PlayerVideoSelector.config';
 import { componentStyles } from './PlayerVideoSelector.style';
 import { PlayerVideoSelectorComponentProps } from './PlayerVideoSelector.type';
 
@@ -32,6 +34,13 @@ export function PlayerVideoSelectorComponent({
   onOverlayOpen,
   voiceOverlayRef,
   onClose,
+  isDownloader,
+  episodesToDownload,
+  handleEpisodesDownload,
+  qualityOverlayRef,
+  downloadQualities,
+  handleDownload,
+  isOffline,
 }: PlayerVideoSelectorComponentProps) {
   const styles = useThemedStyles(componentStyles);
 
@@ -155,36 +164,46 @@ export function PlayerVideoSelectorComponent({
     );
   };
 
-  const renderEpisodes = () => (
-    <View
-      style={ [
-        styles.episodesContainer,
-        seasons.length === 1 && seasons[0].isOnlyEpisodes && styles.episodesContainerNoBorder,
-      ] }
-    >
-      { episodes.map(({ episodeId, name }) => (
-        <ThemedPressable
-          key={ episodeId }
-          style={ [
-            styles.episode,
-            selectedEpisodeId === episodeId && styles.episodeSelected,
-          ] }
-          onPress={ () => handleSelectEpisode(episodeId) }
-          contentStyle={ styles.episodeContent }
-          additionalElement={ renderEpisodeTimeline(episodeId) }
-        >
-          <ThemedText
-            style={ [
-              styles.episodeText,
-              selectedEpisodeId === episodeId && styles.episodeTextSelected,
-            ] }
-          >
-            { name }
-          </ThemedText>
-        </ThemedPressable>
-      )) }
-    </View>
-  );
+  const renderEpisodes = () => {
+    return (
+      <View
+        style={ [
+          styles.episodesContainer,
+          seasons.length === 1 && seasons[0].isOnlyEpisodes && styles.episodesContainerNoBorder,
+        ] }
+      >
+        { episodes.map(({ episodeId, name }) => {
+          const isSelectedForDownload = isDownloader
+            && episodesToDownload[formatDownloadKey(selectedSeasonId, episodeId)];
+
+          return (
+            <ThemedPressable
+              key={ episodeId }
+              style={ [
+                styles.episode,
+                selectedEpisodeId === episodeId && styles.episodeSelected,
+              ] }
+              onPress={ () => handleSelectEpisode(episodeId) }
+              contentStyle={ [
+                styles.episodeContent,
+                isSelectedForDownload ? styles.episodeDownloadSelected : undefined,
+              ] }
+              additionalElement={ renderEpisodeTimeline(episodeId) }
+            >
+              <ThemedText
+                style={ [
+                  styles.episodeText,
+                  selectedEpisodeId === episodeId && styles.episodeTextSelected,
+                ] }
+              >
+                { name }
+              </ThemedText>
+            </ThemedPressable>
+          );
+        }) }
+      </View>
+    );
+  };
 
   const renderSeriesSelection = () => {
     if (!seasons.length) {
@@ -206,7 +225,20 @@ export function PlayerVideoSelectorComponent({
     />
   );
 
+  const renderEmpty = () => (
+    <View style={ styles.empty }>
+      <InfoBlock
+        title={ t('No data') }
+        subtitle={ t('You have not downloaded anything') }
+      />
+    </View>
+  );
+
   const renderContent = () => {
+    if (isOffline && !seasons.length && (voices.length > 0 && !voices[0].video?.streams?.length)) {
+      return renderEmpty();
+    }
+
     if (!seasons.length) {
       return renderVoices();
     }
@@ -219,29 +251,59 @@ export function PlayerVideoSelectorComponent({
     );
   };
 
+  const renderDownloadButton = () => {
+    if (!isDownloader || !episodes.length) {
+      return null;
+    }
+
+    return (
+      <ThemedButton
+        onPress={ handleEpisodesDownload }
+        disabled={ !Object.values(episodesToDownload).filter((selected) => selected).length }
+        style={ styles.downloadBtn }
+      >
+        { t('Download') }
+      </ThemedButton>
+    );
+  };
+
+  const renderQualitySelector = () => {
+    if (!isDownloader) {
+      return null;
+    }
+
+    return (
+      <ThemedDropdown
+        data={ (downloadQualities ?? []).map((quality) => ({
+          label: quality,
+          value: quality,
+        })) }
+        onChange={ (item) => handleDownload(item.value) }
+        header={ t('Quality') }
+        inputStyle={ styles.voiceDropdownInput }
+        style={ styles.voicesDropdown }
+        overlayRef={ qualityOverlayRef }
+        asOverlay
+      />
+    );
+  };
+
   return (
-    <ThemedOverlay
-      ref={ overlayRef }
-      contentContainerStyle={ styles.container }
-      style={ styles.background }
-      onOpen={ onOverlayOpen }
-      onClose={ onClose }
-    >
-      { renderLoader() }
-      { renderContent() }
-    </ThemedOverlay>
+    <>
+      <ThemedOverlay
+        ref={ overlayRef }
+        contentContainerStyle={ styles.container }
+        style={ styles.background }
+        onOpen={ onOverlayOpen }
+        onClose={ onClose }
+      >
+        { renderLoader() }
+        { renderContent() }
+        { renderDownloadButton() }
+      </ThemedOverlay>
+      { renderQualitySelector() }
+    </>
   );
 }
 
-function propsAreEqual(
-  prevProps: PlayerVideoSelectorComponentProps,
-  props: PlayerVideoSelectorComponentProps
-) {
-  return prevProps.isLoading === props.isLoading
-    && prevProps.selectedVoice.id === props.selectedVoice.id
-    && prevProps.selectedSeasonId === props.selectedSeasonId
-    && prevProps.selectedEpisodeId === props.selectedEpisodeId
-    && prevProps.savedTime === props.savedTime;
-}
-
-export default memo(PlayerVideoSelectorComponent, propsAreEqual);
+export default PlayerVideoSelectorComponent;

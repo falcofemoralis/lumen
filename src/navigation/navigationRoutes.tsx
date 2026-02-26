@@ -13,6 +13,7 @@ export const RECENT_SCREEN = 'Recent';
 export const SEARCH_SCREEN = 'Search';
 export const SETTINGS_SCREEN = 'Settings';
 export const WELCOME_SCREEN = 'Welcome';
+export const DOWNLOADS_SCREEN = 'Downloads';
 
 export const COMMENTS_MODAL_SCREEN = 'CommentsModal';
 export const LOGIN_MODAL_SCREEN = 'LoginModal';

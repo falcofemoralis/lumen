@@ -1,3 +1,4 @@
+import { PlayerVideoSelectorRef } from 'Component/PlayerVideoSelector/PlayerVideoSelector.container';
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { VideoPlayer, VideoPlayerStatus, VideoTrack } from 'expo-video';
@@ -11,6 +12,7 @@ export interface PlayerContainerProps {
   video: FilmVideoInterface;
   film: FilmInterface
   voice: FilmVoiceInterface;
+  isOffline?: boolean;
 }
 
 export interface PlayerComponentProps {
@@ -25,7 +27,7 @@ export interface PlayerComponentProps {
   selectedSubtitle?: SubtitleInterface;
   qualityOverlayRef: React.RefObject<ThemedOverlayRef | null>;
   subtitleOverlayRef: React.RefObject<ThemedOverlayRef | null>;
-  playerVideoSelectorOverlayRef: React.RefObject<ThemedOverlayRef | null>;
+  playerVideoSelectorOverlayRef: React.RefObject<PlayerVideoSelectorRef | null>;
   commentsOverlayRef: React.RefObject<ThemedOverlayRef | null>;
   bookmarksOverlayRef: React.RefObject<ThemedOverlayRef | null>;
   speedOverlayRef: React.RefObject<ThemedOverlayRef | null>;
@@ -33,6 +35,7 @@ export interface PlayerComponentProps {
   isLocked: boolean;
   isOverlayOpen: boolean;
   isFilmBookmarked: boolean;
+  isOffline?: boolean;
   togglePlayPause: (state?: boolean, stopEvents?: boolean) => void;
   rewindPosition: (type: RewindDirection, seconds: number) => void;
   seekToPosition: (percent: number) => void;

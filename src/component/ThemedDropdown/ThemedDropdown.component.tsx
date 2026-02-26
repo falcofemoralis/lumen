@@ -61,7 +61,7 @@ export const ThemedDropdownComponent = ({
         onPress={ () => (overlayRef || componentOverlayRef).current?.open() }
         IconComponent={ Plus }
         iconProps={ {
-          color: theme.colors.text,
+          color: theme.colors.icon,
           size: 18,
         } }
         rightImage={ endIcon }

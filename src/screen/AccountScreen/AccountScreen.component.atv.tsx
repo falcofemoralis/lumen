@@ -23,6 +23,7 @@ export function AccountScreenComponent({
   handleViewPayments,
   handleLogout,
   openNotImplemented,
+  openDownloads,
 }: AccountScreenComponentProps) {
   const { scale } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
@@ -127,7 +128,7 @@ export function AccountScreenComponent({
           { /* eslint-disable-next-line max-len */ }
           { renderActionButton(premiumDays > 0 ? t('Renew subscription') : t('Get subscription'), Star, handleViewPayments, styles.premiumButton) }
           <DefaultFocus>
-            { renderActionButton(t('Downloads'), Download, openNotImplemented) }
+            { renderActionButton(t('Downloads'), Download, openDownloads) }
           </DefaultFocus>
           { renderActionButton(t('Comments'), MessageSquareText, openNotImplemented) }
           { renderActionButton(t('View Profile'), Star, handleViewProfile) }

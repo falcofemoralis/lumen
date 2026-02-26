@@ -99,6 +99,7 @@ class Storage {
   private cookiesStorage: StorageWrapper|null = null;
   private playerStorage: StorageWrapper|null = null;
   private miscStorage: StorageWrapper|null = null;
+  private downloadsStorage: StorageWrapper|null = null;
 
   getConfigStorage() {
     if (!this.configStorage) {
@@ -130,6 +131,14 @@ class Storage {
     }
 
     return this.miscStorage;
+  }
+
+  getDownloadsStorage() {
+    if (!this.downloadsStorage) {
+      this.downloadsStorage = new StorageWrapper(createMMKV({ id: 'downloads' }));
+    }
+
+    return this.downloadsStorage;
   }
 }
 

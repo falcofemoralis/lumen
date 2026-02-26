@@ -87,6 +87,7 @@ export function PlayerComponent({
   isLocked,
   isOverlayOpen,
   isFilmBookmarked,
+  isOffline,
   togglePlayPause,
   seekToPosition,
   calculateCurrentTime,
@@ -435,6 +436,7 @@ export function PlayerComponent({
       <PlayerSubtitles
         player={ player }
         subtitleUrl={ url }
+        isOffline={ isOffline }
       />
     );
   };
@@ -473,9 +475,9 @@ export function PlayerComponent({
             ] }
           >
             { isPlaylistSelector && renderAction(ListVideo, openVideoSelector) }
-            { renderAction(MessageSquareText, handleOpenComments) }
-            { renderAction(isFilmBookmarked ? BookmarkCheck : Bookmark, openBookmarksOverlay) }
-            { renderAction(Forward, handleShare) }
+            { !isOffline && renderAction(MessageSquareText, handleOpenComments) }
+            { !isOffline && renderAction(isFilmBookmarked ? BookmarkCheck : Bookmark, openBookmarksOverlay) }
+            { !isOffline && renderAction(Forward, handleShare) }
           </View>
         </View>
       </View>
@@ -599,11 +601,12 @@ export function PlayerComponent({
 
     return (
       <PlayerVideoSelector
-        overlayRef={ playerVideoSelectorOverlayRef }
+        ref={ playerVideoSelectorOverlayRef }
         film={ film }
         onSelect={ handleVideoSelect }
         voice={ voice }
         onClose={ closeOverlay }
+        isOffline={ isOffline }
       />
     );
   };

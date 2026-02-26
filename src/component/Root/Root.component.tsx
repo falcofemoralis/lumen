@@ -1,8 +1,13 @@
+import {
+  completeHandler,
+  getExistingDownloadTasks,
+} from '@kesha-antonov/react-native-background-downloader';
 import { useAppUpdaterContext } from 'Context/AppUpdaterContext';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import * as StatusBar from 'expo-status-bar';
 import { useEffect } from 'react';
+import NotificationStore from 'Store/Notification.store';
 
 export const Root = ({ children }: { children: React.ReactNode }) => {
   const { isSignedIn } = useServiceContext();
@@ -25,6 +30,21 @@ export const Root = ({ children }: { children: React.ReactNode }) => {
       StatusBar.setStatusBarHidden(true);
     }
   }, [isTV]);
+
+  useEffect( () => {
+    getExistingDownloadTasks().then(tasks => {
+      tasks.forEach(task => {
+        task
+          .done(() => {
+            completeHandler(task.id);
+          })
+          .error(({ error }) => {
+            NotificationStore.displayError(error);
+            completeHandler(task.id);
+          });
+      });
+    });
+  }, []);
 
   return children;
 };

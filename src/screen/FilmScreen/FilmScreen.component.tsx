@@ -44,6 +44,7 @@ import { CollectionItemInterface } from 'Type/CollectionItem';
 import { FilmInterface } from 'Type/Film.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { isBookmarked } from 'Util/Film';
+import { noopFn } from 'Util/Function';
 import { navigate } from 'Util/Navigation';
 
 import { componentStyles } from './FilmScreen.style';
@@ -63,6 +64,7 @@ export function FilmScreenComponent({
   visibleScheduleItems,
   playerVideoSelectorOverlayRef,
   bookmarksOverlayRef,
+  playerVideoDownloaderOverlayRef,
   playFilm,
   handleVideoSelect,
   handleSelectFilm,
@@ -72,6 +74,8 @@ export function FilmScreenComponent({
   handleShare,
   openBookmarks,
   handleBookmarkChange,
+  openVideoDownloader,
+  handleDownloadSelect,
 }: FilmScreenComponentProps) {
   const { scale, theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
@@ -267,7 +271,7 @@ export function FilmScreenComponent({
       { renderMiddleAction(Clapperboard, 'Trailer', openNotImplemented) }
       { renderMiddleAction(MessageSquareText, 'Comments', openComments) }
       { renderMiddleAction(isBookmarked(film) ? BookmarkCheck : Bookmark, 'Bookmark', openBookmarks) }
-      { renderMiddleAction(Download, 'Download', openNotImplemented) }
+      { renderMiddleAction(Download, 'Download', openVideoDownloader) }
     </View>
   );
 
@@ -494,17 +498,23 @@ export function FilmScreenComponent({
   };
 
   const renderPlayerVideoSelector = () => {
-    const { voices = [], hasVoices, hasSeasons } = film;
-
-    if (!voices.length || (!hasVoices && !hasSeasons)) {
-      return null;
-    }
-
     return (
       <PlayerVideoSelector
-        overlayRef={ playerVideoSelectorOverlayRef }
+        ref={ playerVideoSelectorOverlayRef }
         film={ film }
         onSelect={ handleVideoSelect }
+      />
+    );
+  };
+
+  const renderPlayerVideoDownloader = () => {
+    return (
+      <PlayerVideoSelector
+        ref={ playerVideoDownloaderOverlayRef }
+        film={ film }
+        onSelect={ noopFn }
+        onDownloadSelect={ handleDownloadSelect }
+        isDownloader
       />
     );
   };
@@ -526,6 +536,7 @@ export function FilmScreenComponent({
       <>
         { renderPlayerVideoSelector() }
         { renderBookmarksOverlay() }
+        { renderPlayerVideoDownloader() }
       </>
     );
   };

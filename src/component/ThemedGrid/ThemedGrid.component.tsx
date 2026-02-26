@@ -11,6 +11,7 @@ export const ThemedGridComponent = ({
   itemSize,
   isRefreshing = false,
   ListHeaderComponent,
+  ListEmptyComponent,
   renderItem,
   handleScrollEnd,
   handleRefresh = noopFn,
@@ -33,8 +34,10 @@ export const ThemedGridComponent = ({
       recycleItems
       showsVerticalScrollIndicator={ false }
       ListHeaderComponent={ ListHeaderComponent }
+      ListEmptyComponent={ ListEmptyComponent }
       onEndReached={ handleScrollEnd }
       onEndReachedThreshold={ 0.25 }
+      contentContainerStyle={ { flexGrow: 1 } }
     />
   );
 };

@@ -2,7 +2,7 @@ const mainColors = {
   primary: '#004A77',
   secondary: '#E50000',
   tertiary: '#001E30',
-  error: '#8C1D18',
+  error: '#E50000',
 };
 
 const utilsColors = {

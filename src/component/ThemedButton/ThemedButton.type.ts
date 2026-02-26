@@ -10,7 +10,9 @@ export interface ThemedButtonProps {
   spatialRef?: Ref<SpatialNavigationNodeRef>;
   children?: React.ReactNode;
   style?: StyleProp<ViewStyle>;
+  styleSelected?: StyleProp<ViewStyle>;
   styleFocused?: StyleProp<ViewStyle>;
+  styleAdditional?: StyleProp<ViewStyle>;
   contentStyle?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
   rightImageStyle?: StyleProp<ImageStyle>

@@ -20,12 +20,18 @@ export interface ParsedVTTResult {
   valid: boolean
 }
 
-export const vttLoader = async (url: string) => {
+export const vttLoader = async (url: string, isOffline?: boolean) => {
+  if (isOffline) {
+    const response = await fetch(`file://${url}`);
+
+    return await response.text();
+  }
+
   return await services[DEFAULT_SERVICE].getRequest(url);
 };
 
-export const subtitleParser = async (subtitleUrl: string): Promise<VTTItem[]> => {
-  const subtitleData = await vttLoader(subtitleUrl);
+export const subtitleParser = async (subtitleUrl: string, isOffline?: boolean): Promise<VTTItem[]> => {
+  const subtitleData = await vttLoader(subtitleUrl, isOffline);
   const subtitleType = subtitleUrl.split('.')[subtitleUrl.split('.').length - 1];
 
   const result: VTTItem[] = [];

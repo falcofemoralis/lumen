@@ -1,6 +1,7 @@
 /* eslint-disable react-compiler/react-compiler */
 import { getFirestore } from '@react-native-firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
+import { PlayerVideoSelectorRef } from 'Component/PlayerVideoSelector/PlayerVideoSelector.container';
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useConfigContext } from 'Context/ConfigContext';
@@ -58,6 +59,7 @@ export function PlayerContainer({
   video,
   film,
   voice,
+  isOffline,
 }: PlayerContainerProps) {
   const { isTV, isFirestore } = useConfigContext();
   const navigation = useNavigation();
@@ -83,17 +85,17 @@ export function PlayerContainer({
   const updateTimeTimeout = useRef<NodeJS.Timeout | null>(null);
   const qualityOverlayRef = useRef<ThemedOverlayRef>(null);
   const subtitleOverlayRef = useRef<ThemedOverlayRef>(null);
-  const playerVideoSelectorOverlayRef = useRef<ThemedOverlayRef>(null);
+  const playerVideoSelectorOverlayRef = useRef<PlayerVideoSelectorRef>(null);
   const commentsOverlayRef = useRef<ThemedOverlayRef>(null);
   const bookmarksOverlayRef = useRef<ThemedOverlayRef>(null);
   const speedOverlayRef = useRef<ThemedOverlayRef>(null);
 
   const firestoreSavedTimeRef = useRef(false);
   const firestoreDb = useMemo(() => (
-    isFirestore && isSignedIn
+    isFirestore && isSignedIn && !isOffline
       ? getFirestore().collection<FirestoreDocument>(FIRESTORE_DB)
       : null
-  ), [isSignedIn, isFirestore]);
+  ), [isSignedIn, isFirestore, isOffline]);
 
   const initFirestoreSavedTime = useCallback(async (p: VideoPlayer, savedTime: SavedTime | null) => {
     if (firestoreSavedTimeRef.current || !firestoreDb || !profile) {
@@ -113,12 +115,16 @@ export function PlayerContainer({
   }, [firestoreDb, profile, film, selectedVoice]);
 
   const videoUrl = useMemo(() => {
+    if (isOffline) {
+      return `file://${getPlayerStream(video, selectedQuality).url}`;
+    }
+
     if (selectedQuality === AUTO_QUALITY.value) {
       return createMasterPlaylist(video.streams).uri;
     }
 
     return getPlayerStream(video, selectedQuality).url;
-  }, [selectedQuality, video]);
+  }, [selectedQuality, video, isOffline]);
 
   const player = useVideoPlayer(videoUrl, (p) => {
     const savedTime = getSavedTime(film);
@@ -217,7 +223,7 @@ export function PlayerContainer({
         return;
       }
 
-      updateProgressStatus(currentTime, bufferedPosition, duration);
+      updateProgressStatus(currentTime, !isOffline ? bufferedPosition : 0, duration);
 
       if (!playing) {
         return;
@@ -607,6 +613,7 @@ export function PlayerContainer({
     isLocked,
     isOverlayOpen,
     isFilmBookmarked,
+    isOffline,
     togglePlayPause,
     rewindPosition,
     seekToPosition,

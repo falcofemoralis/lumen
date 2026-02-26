@@ -109,37 +109,36 @@ export function RecentScreenComponent({
     [handleOnPress, styles]
   );
 
-  const renderContent = () => {
-    if (isLoading) {
-      return <RecentScreenThumbnail top={ top } styles={ styles } />;
-    }
+  const renderHeader = useCallback(() => {
+    return <View style={ { height: top } } />;
+  }, [top]);
 
-    if (!items.length) {
-      return (
-        <View style={ styles.empty }>
-          <InfoBlock
-            title={ t('No recent items') }
-            subtitle={ t('You have not watched any films yet') }
-          />
-        </View>
-      );
+  const renderEmpty = () => {
+    if (isLoading) {
+      return <RecentScreenThumbnail styles={ styles } />;
     }
 
     return (
+      <View style={ styles.empty }>
+        <InfoBlock
+          title={ t('No recent items') }
+          subtitle={ t('You have not watched any films yet') }
+        />
+      </View>
+    );
+  };
+
+  return (
+    <Page>
       <ThemedGrid
         data={ items }
         numberOfColumns={ NUMBER_OF_COLUMNS }
         itemSize={ scale(130) }
         renderItem={ renderItem }
         onNextLoad={ onNextLoad }
-        ListHeaderComponent={ <View style={ { height: top } } /> }
+        ListHeaderComponent={ renderHeader }
+        ListEmptyComponent={ renderEmpty }
       />
-    );
-  };
-
-  return (
-    <Page>
-      { renderContent() }
     </Page>
   );
 }

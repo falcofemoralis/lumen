@@ -10,7 +10,16 @@ import { ThemedOverlay } from 'Component/ThemedOverlay';
 import { ThemedText } from 'Component/ThemedText';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
-import { Bookmark, BookmarkCheck, Clapperboard, Clock, MessageSquareText, Play, ShieldOff } from 'lucide-react-native';
+import {
+  Bookmark,
+  BookmarkCheck,
+  Clapperboard,
+  Clock,
+  Download,
+  MessageSquareText,
+  Play,
+  ShieldOff,
+} from 'lucide-react-native';
 import { useState } from 'react';
 import { Dimensions, useWindowDimensions, View } from 'react-native';
 import {
@@ -24,6 +33,7 @@ import { CollectionItemInterface } from 'Type/CollectionItem';
 import { FilmInterface } from 'Type/Film.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { isBookmarked } from 'Util/Film';
+import { noopFn } from 'Util/Function';
 
 import { componentStyles } from './FilmScreen.style.atv';
 import { FilmScreenThumbnail } from './FilmScreen.thumbnail.atv';
@@ -46,6 +56,7 @@ export function FilmScreenComponent({
   commentsOverlayRef,
   bookmarksOverlayRef,
   descriptionOverlayRef,
+  playerVideoDownloaderOverlayRef,
   playFilm,
   handleVideoSelect,
   handleSelectFilm,
@@ -54,6 +65,8 @@ export function FilmScreenComponent({
   openBookmarks,
   handleUpdateScheduleWatch,
   handleBookmarkChange,
+  openVideoDownloader,
+  handleDownloadSelect,
 }: FilmScreenComponentProps) {
   const { scale, theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
@@ -126,7 +139,7 @@ export function FilmScreenComponent({
           { renderAction(MessageSquareText, t('Comments'), () => commentsOverlayRef?.current?.open()) }
           { renderAction(isBookmarked(film) ? BookmarkCheck : Bookmark, t('Bookmark'), openBookmarks) }
           { renderAction(Clapperboard, t('Trailer'), openNotImplemented) }
-          { /* { renderAction(Download, t('Download'), openNotImplemented) } */ }
+          { renderAction(Download, t('Download'), openVideoDownloader) }
         </View>
       </DefaultFocus>
     </SpatialNavigationView>
@@ -326,17 +339,23 @@ export function FilmScreenComponent({
   );
 
   const renderPlayerVideoSelector = () => {
-    const { voices = [] } = film;
-
-    if (!voices.length) {
-      return null;
-    }
-
     return (
       <PlayerVideoSelector
-        overlayRef={ playerVideoSelectorOverlayRef }
+        ref={ playerVideoSelectorOverlayRef }
         film={ film }
         onSelect={ handleVideoSelect }
+      />
+    );
+  };
+
+  const renderPlayerVideoDownloader = () => {
+    return (
+      <PlayerVideoSelector
+        ref={ playerVideoDownloaderOverlayRef }
+        film={ film }
+        onSelect={ noopFn }
+        onDownloadSelect={ handleDownloadSelect }
+        isDownloader
       />
     );
   };
@@ -558,6 +577,7 @@ export function FilmScreenComponent({
       { renderBookmarksOverlay() }
       { renderCommentsOverlay() }
       { renderDescriptionOverlay() }
+      { renderPlayerVideoDownloader() }
     </>
   );
 

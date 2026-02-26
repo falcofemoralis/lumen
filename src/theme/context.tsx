@@ -13,7 +13,7 @@ import {
   useEffect,
   useMemo,
 } from 'react';
-import { Dimensions, StyleProp, useColorScheme } from 'react-native';
+import { Dimensions, StyleProp, useColorScheme, useWindowDimensions } from 'react-native';
 import { moderateScale } from 'react-native-size-matters';
 
 import { setImperativeTheming } from './context.utils';
@@ -59,6 +59,7 @@ export const ThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = ({
   const systemColorScheme = useColorScheme();
   // Our saved theme context: can be "light", "dark", or undefined (system theme)
   const { themeScheme, isConfigured, isTV, setConfig } = useConfigContext();
+  const dimensions = useWindowDimensions();
 
   /**
    * This function is used to set the theme context and is exported from the useAppTheme() hook.
@@ -112,7 +113,7 @@ export const ThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = ({
     return {
       ...selected,
       scale,
-      dimensions: Dimensions.get('window'),
+      dimensions,
     };
   }, [themeContext, scale]);
 

@@ -110,15 +110,17 @@ export const ThemedListComponent = ({
         ] }
         onLayout={ handleLayout }
       >
-        <SpatialNavigationVirtualizedList
-          ref={ scrollViewRef }
-          data={ data }
-          renderItem={ renderItem }
-          itemSize={ styles.item.height }
-          orientation="vertical"
-          scrollBehavior={ data.length >= (MAX_ITEMS_TO_DISPLAY - 1) ? undefined : 'stick-to-end' }
-          scrollDuration={ (data.findIndex((item) => item.value === value) > 0 && !isScrolled) ? 0 : undefined }
-        />
+        { data.length > 0 && (
+          <SpatialNavigationVirtualizedList
+            ref={ scrollViewRef }
+            data={ data }
+            renderItem={ renderItem }
+            itemSize={ styles.item.height }
+            orientation="vertical"
+            scrollBehavior={ data.length >= (MAX_ITEMS_TO_DISPLAY - 1) ? undefined : 'stick-to-end' }
+            scrollDuration={ (data.findIndex((item) => item.value === value) > 0 && !isScrolled) ? 0 : undefined }
+          />
+        ) }
       </View>
     );
   };

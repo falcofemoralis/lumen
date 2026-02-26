@@ -1,7 +1,7 @@
 import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { t } from 'i18n/translate';
-import { NOTIFICATIONS_SCREEN, SETTINGS_SCREEN } from 'Navigation/navigationRoutes';
+import { DOWNLOADS_SCREEN, NOTIFICATIONS_SCREEN, SETTINGS_SCREEN } from 'Navigation/navigationRoutes';
 import { useCallback } from 'react';
 import NotificationStore from 'Store/Notification.store';
 import { navigate } from 'Util/Navigation';
@@ -42,6 +42,10 @@ export function AccountScreenContainer() {
     navigate(NOTIFICATIONS_SCREEN);
   }, []);
 
+  const openDownloads = useCallback(() => {
+    navigate(DOWNLOADS_SCREEN);
+  }, []);
+
   const openNotImplemented = useCallback(() => {
     NotificationStore.displayMessage(t('Not implemented'));
   }, []);
@@ -56,6 +60,7 @@ export function AccountScreenContainer() {
     openSettings,
     openNotifications,
     openNotImplemented,
+    openDownloads,
   };
 
   return isTV ? <AccountScreenComponentTV { ...containerProps } /> : <AccountScreenComponent { ...containerProps } />;

@@ -33,7 +33,7 @@ export const ThemedDropdownComponent = ({
         onClose={ onClose }
       >
         <ThemedSimpleList
-          data={ data }
+          data={ data ?? [] }
           value={ value }
           header={ header }
           onChange={ onChange }

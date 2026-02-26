@@ -13,7 +13,9 @@ export default function ThemedButton({
   onFocus,
   children,
   style,
+  styleSelected,
   styleFocused,
+  styleAdditional,
   IconComponent,
   iconProps,
   textStyle,
@@ -37,6 +39,8 @@ export default function ThemedButton({
         styles.containerFilled,
         style,
         isSelected && styles.containerFilledSelected,
+        isSelected && styleSelected,
+        styleAdditional,
         isFocused && styles.containerFilledFocused,
         isFocused && styleFocused,
       ] }
@@ -83,6 +87,7 @@ export default function ThemedButton({
         styles.containerOutlined,
         style,
         isSelected && styles.containerOutlinedSelected,
+        isSelected && styleSelected,
         isFocused && styles.containerOutlinedFocused,
         isFocused && styleFocused,
       ] }
@@ -122,6 +127,7 @@ export default function ThemedButton({
         styles.containerLong,
         style,
         isSelected && styles.containerLongSelected,
+        isSelected && styleSelected,
         isFocused && styles.containerLongFocused,
         isFocused && styleFocused,
       ] }
@@ -167,6 +173,7 @@ export default function ThemedButton({
         styles.container,
         styles.containerOutlined,
         style,
+        isSelected && styleSelected,
         isFocused && styleFocused,
       ] }
     >

@@ -11,4 +11,5 @@ export interface AccountScreenComponentProps {
   openSettings: () => void;
   openNotifications: () => void;
   openNotImplemented: () => void;
+  openDownloads: () => void;
 }

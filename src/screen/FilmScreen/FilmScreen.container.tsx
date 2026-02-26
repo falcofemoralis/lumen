@@ -1,4 +1,9 @@
+import {
+  completeHandler,
+  createDownloadTask,
+} from '@kesha-antonov/react-native-background-downloader';
 import { useNavigation } from '@react-navigation/native';
+import { PlayerVideoSelectorRef } from 'Component/PlayerVideoSelector/PlayerVideoSelector.container';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
@@ -13,10 +18,12 @@ import {
 import { Share } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
 import RouterStore from 'Store/Router.store';
+import { DownloadLinkInterface } from 'Type/DownloadLink.interface';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
+import { getDownloadsDir, normalizeName, TaskIdStorage, uuid } from 'Util/Download';
 import { navigate } from 'Util/Navigation';
 import { prepareShareBody } from 'Util/Player';
 import { openActor, openCategory, openFilm } from 'Util/Router';
@@ -29,15 +36,16 @@ import { FilmScreenContainerProps } from './FilmScreen.type';
 
 export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
   const { link, thumbnailPoster } = route.params as { link: string, thumbnailPoster: string };
-  const { isTV } = useConfigContext();
+  const { isTV, downloadsPath, downloadsSaveSubtitles, downloadsSavePoster } = useConfigContext();
   const navigation = useNavigation();
   const { isSignedIn, currentService } = useServiceContext();
   const [film, setFilm] = useState<FilmInterface | null>(null);
-  const playerVideoSelectorOverlayRef = useRef<ThemedOverlayRef>(null);
+  const playerVideoSelectorOverlayRef = useRef<PlayerVideoSelectorRef>(null);
   const scheduleOverlayRef = useRef<ThemedOverlayRef>(null);
   const commentsOverlayRef = useRef<ThemedOverlayRef>(null);
   const bookmarksOverlayRef = useRef<ThemedOverlayRef>(null);
   const descriptionOverlayRef = useRef<ThemedOverlayRef>(null);
+  const playerVideoDownloaderOverlayRef = useRef<PlayerVideoSelectorRef>(null);
 
   useEffect(() => {
     const loadFilm = async () => {
@@ -53,58 +61,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     loadFilm();
   }, []);
 
-  const openVideoSelector = useCallback(async () => {
-    if (!film) {
-      return;
-    }
-
-    playerVideoSelectorOverlayRef.current?.open();
-  }, [film]);
-
   const handleVideoSelect = (video: FilmVideoInterface, voice: FilmVoiceInterface) => {
-    playerVideoSelectorOverlayRef.current?.close();
-    openPlayer(video, voice);
-  };
-
-  const playFilm = () => {
-    if (!film) {
-      return;
-    }
-
-    const { voices, hasVoices, hasSeasons } = film;
-
-    if (voices.length <= 0) {
-      NotificationStore.displayMessage(t('No video available'));
-
-      return;
-    }
-
-    if (hasVoices || hasSeasons) {
-      openVideoSelector();
-
-      return;
-    }
-
-    const voice = voices[0];
-    const { video } = voice;
-
-    if (!video) {
-      NotificationStore.displayMessage(t('No video streams available'));
-
-      return;
-    }
-
-    if (isSignedIn) {
-      currentService.saveWatch(film, voice)
-        .catch((error) => {
-          NotificationStore.displayError(error as Error);
-        });
-    }
-
-    openPlayer(video, voice);
-  };
-
-  const openPlayer = (video: FilmVideoInterface, voice: FilmVoiceInterface) => {
     RouterStore.pushData(PLAYER_SCREEN, {
       video,
       film,
@@ -112,6 +69,32 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     });
 
     navigate(PLAYER_SCREEN);
+
+    playerVideoSelectorOverlayRef.current?.close();
+  };
+
+  const openVideoDownloader = useCallback(async () => {
+    if (!film) {
+      return;
+    }
+
+    playerVideoDownloaderOverlayRef.current?.open();
+  }, [film]);
+
+  const playFilm = () => {
+    if (!film) {
+      return;
+    }
+
+    const { voices } = film;
+
+    if (voices.length <= 0) {
+      NotificationStore.displayMessage(t('No video available'));
+
+      return;
+    }
+
+    playerVideoSelectorOverlayRef.current?.open();
   };
 
   const handleSelectFilm = useCallback((f: FilmInterface) => {
@@ -241,6 +224,158 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     });
   };
 
+  const handleDownloadSelect = async (links: DownloadLinkInterface[]) => {
+    if (!film) {
+      return;
+    }
+
+    const { id, title, poster } = film;
+    const filmName = [normalizeName(title), id];
+    const folderName = filmName.join('-');
+    const folderPath = `${getDownloadsDir(downloadsPath)}/${folderName}`;
+
+    const posterExtension = poster.split('.').pop()?.split('?')[0] || 'jpg';
+    const posterDestination = `${folderPath}/poster.${posterExtension}`;
+
+    if (downloadsSavePoster) {
+      const posterTask = createDownloadTask({
+        id: uuid(),
+        url: poster,
+        destination: posterDestination,
+        metadata: {
+          groupId: id,
+          groupName: title,
+        },
+      })
+        .done(() => {
+          completeHandler(posterTask.id);
+        })
+        .error(({ error }) => {
+          NotificationStore.displayError(error);
+          completeHandler(posterTask.id);
+        });
+
+      posterTask.start();
+    }
+
+    for (const linkItem of links) {
+      const { url, quality, subtitles = [], seasonId, episodeId, voice } = linkItem;
+      const taskName = [];
+
+      taskName.push(quality);
+
+      if (seasonId) {
+        taskName.push(`S${seasonId}`);
+      }
+
+      if (episodeId) {
+        taskName.push(`E${episodeId}`);
+      }
+
+      const name = [...filmName, ...taskName].join('-');
+      const taskUrl = url.replace(':hls:manifest.m3u8', '');
+      const extension = taskUrl.split('.').pop();
+      const destination = `${folderPath}/${name}.${extension}`;
+
+      const allSubtitles = [];
+      if (downloadsSaveSubtitles) {
+        const subtitleLinks = subtitles.map((subtitle) => {
+          const { url: subtitleUrl, languageCode } = subtitle;
+
+          if (!languageCode) {
+            return {
+              ...subtitle,
+              originalUrl: null,
+            };
+          }
+
+          const subtitleExtension = subtitleUrl.split('.').pop()?.split('?')[0] || 'vtt';
+          const subtitleDestination = `${folderPath}/${name}-${languageCode}.${subtitleExtension}`;
+
+          return {
+            ...subtitle,
+            url: subtitleDestination,
+            originalUrl: subtitleUrl,
+          };
+        });
+
+        allSubtitles.push(...subtitleLinks);
+
+        for (const subtitle of subtitleLinks) {
+          const { url: subtitleDestination, originalUrl: subtitleUrl } = subtitle;
+
+          // ignore "off" subtitle
+          if (!subtitleUrl) {
+            return;
+          }
+
+          const subtitleTask = createDownloadTask({
+            id: uuid(),
+            url: subtitleUrl,
+            destination: subtitleDestination,
+            metadata: {
+              groupId: id,
+              groupName: title,
+            },
+          })
+            .done(() => {
+              completeHandler(subtitleTask.id);
+            })
+            .error(({ error }) => {
+              NotificationStore.displayError(error);
+              completeHandler(subtitleTask.id);
+            });
+
+          subtitleTask.start();
+        }
+      }
+
+      const task = createDownloadTask({
+        id: TaskIdStorage.getOrCreate(destination, {
+          url: taskUrl,
+          destination,
+          folder: folderPath,
+          film: {
+            id,
+            link: film.link,
+            type: film.type,
+            poster: posterDestination,
+            title: film.title,
+            originalTitle: film.originalTitle,
+            releaseDate: film.releaseDate,
+            countries: film.countries,
+            genres: film.genres,
+            voices: film.voices,
+            hasVoices: film.hasVoices,
+            hasSeasons: film.hasSeasons,
+          },
+          quality,
+          subtitles: allSubtitles,
+          seasonId,
+          episodeId,
+          voiceId: voice?.id,
+        }),
+        url: taskUrl,
+        destination,
+        metadata: {
+          taskFileName: taskName.join(' '),
+          destination,
+          groupId: id,
+          groupName: title,
+        },
+      })
+        .done(() => {
+          completeHandler(task.id);
+        })
+        .error(({ error }) => {
+          NotificationStore.displayError(error);
+          completeHandler(task.id);
+        });
+
+      task.start();
+    }
+  };
+
   const containerProps = {
     film,
     thumbnailPoster,
@@ -250,6 +385,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     commentsOverlayRef,
     bookmarksOverlayRef,
     descriptionOverlayRef,
+    playerVideoDownloaderOverlayRef,
     playFilm,
     handleVideoSelect,
     handleSelectFilm,
@@ -259,6 +395,8 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     handleShare,
     openBookmarks,
     handleBookmarkChange,
+    openVideoDownloader,
+    handleDownloadSelect,
   };
 
   return isTV ? <FilmScreenComponentTV { ...containerProps } /> : <FilmScreenComponent { ...containerProps } />;

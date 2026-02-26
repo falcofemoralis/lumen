@@ -99,3 +99,6 @@ uat.xlsx
 key.txt
 .env
 .env.local
+
+!modules/react-native-downloads/android/
+modules/react-native-downloads/android/build

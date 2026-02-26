@@ -11,6 +11,7 @@ export const ThemedImage = ({
   style,
   blurRadius,
   transition = 250,
+  cachePolicy,
 }: ThemedImageProps) => {
   const styles = useThemedStyles(componentStyles);
 
@@ -23,6 +24,7 @@ export const ThemedImage = ({
         transition={ transition }
         recyclingKey={ src }
         blurRadius={ blurRadius }
+        cachePolicy={ cachePolicy }
       />
     </View>
   );

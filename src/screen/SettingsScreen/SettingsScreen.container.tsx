@@ -4,9 +4,12 @@ import * as Application from 'expo-application';
 import { t } from 'i18n/translate';
 import {
   Blend,
+  BookImage,
   Cloud,
   CloudCog,
+  Download,
   FolderCog,
+  FolderDown,
   Globe,
   Grid3x2,
   Info,
@@ -15,9 +18,11 @@ import {
   Rewind,
   Route,
   ShieldCheck,
+  Subtitles,
   TvMinimalPlay,
   UserCog,
 } from 'lucide-react-native';
+import { reactNativeDownloads } from 'Modules/react-native-downloads';
 import { useState } from 'react';
 import { Linking } from 'react-native';
 import { useTripleTap } from 'Screen/SettingsScreen/useTripleTap';
@@ -52,6 +57,9 @@ export function SettingsScreenContainer() {
     playerRewindSeconds,
     isFirestore,
     securedSettings,
+    downloadsPath,
+    downloadsSaveSubtitles,
+    downloadsSavePoster,
   } = useConfigContext();
   const {
     currentService,
@@ -190,6 +198,47 @@ export function SettingsScreenContainer() {
           value: currentService.getUserAgent(),
           IconComponent: UserCog,
           onSettingPress: (value) => updateUserAgent(value as string),
+        },
+      ],
+    },
+    {
+      id: 'downloads-group',
+      type: SETTING_TYPE.GROUP,
+      title: t('Downloads'),
+      IconComponent: Download,
+      settings: [
+        {
+          id: 'downloadsPath',
+          title: t('Downloads path'),
+          subtitle: t('Change downloads path'),
+          type: SETTING_TYPE.SELECT,
+          value: downloadsPath ?? reactNativeDownloads.getDefaultDownloadDirectory(),
+          options: reactNativeDownloads.getDownloadsDirectories().map((dir) => ({
+            value: dir.downloadsPath,
+            label: dir.isPrimary ? 'Internal storage' : (dir.isRemovable ? 'SD Card' : 'External storage'),
+          })),
+          IconComponent: FolderDown,
+          onSettingPress,
+        },
+        {
+          id: 'downloadsSaveSubtitles',
+          title: t('Download subtitles'),
+          subtitle: t('Toggle download subtitles.'),
+          type: SETTING_TYPE.SELECT,
+          value: convertBooleanToString(downloadsSaveSubtitles),
+          options: yesNoOptions,
+          IconComponent: Subtitles,
+          onSettingPress,
+        },
+        {
+          id: 'downloadsSavePoster',
+          title: t('Download poster'),
+          subtitle: t('Toggle download poster.'),
+          type: SETTING_TYPE.SELECT,
+          value: convertBooleanToString(downloadsSavePoster),
+          options: yesNoOptions,
+          IconComponent: BookImage,
+          onSettingPress,
         },
       ],
     },

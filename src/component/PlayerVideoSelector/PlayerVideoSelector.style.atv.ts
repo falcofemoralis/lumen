@@ -60,4 +60,16 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   buttonProgressMaskFocused: {
     backgroundColor: colors.buttonFocused,
   },
+  episodeDownloadSelected: {
+    backgroundColor: colors.secondary,
+  },
+  downloadBtn: {
+    marginBottom: scale(12),
+    backgroundColor: colors.backgroundLighter,
+  },
+  empty: {
+    height: scale(150),
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 } satisfies ThemedStyles);

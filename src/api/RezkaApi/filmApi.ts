@@ -23,7 +23,11 @@ import {
   formatDurationWithMoment,
   getStaticUrl,
   parseActorCard,
-  parseFilmCard, parseFilmsListRoot, parseFilmType, parseSeasons, parseStreams,
+  parseFilmCard,
+  parseFilmsListRoot,
+  parseFilmType,
+  parseSeasons,
+  parseStreams,
   parseSubtitles,
 } from './utils';
 

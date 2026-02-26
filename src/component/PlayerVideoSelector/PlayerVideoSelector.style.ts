@@ -57,7 +57,11 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   episodeSelected: {
     backgroundColor: colors.primary,
   },
-  episodeText: {},
+  episodeDownloadSelected: {
+    backgroundColor: colors.secondary,
+  },
+  episodeText: {
+  },
   episodeTextSelected: {
     color: colors.textOnTertiary,
   },
@@ -95,5 +99,14 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     right: 0,
     bottom: 0,
     backgroundColor: colors.chip,
+  },
+  downloadBtn: {
+    marginTop: scale(12),
+    backgroundColor: colors.backgroundLighter,
+  },
+  empty: {
+    height: scale(150),
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 } satisfies ThemedStyles);

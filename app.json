@@ -22,7 +22,11 @@
     "allowBackup": false,
     "edgeToEdgeEnabled": true,
     "versionCode": 15,
-    "googleServicesFile": "./google-services.json"
+    "googleServicesFile": "./google-services.json",
+    "permissions": [
+      "android.permission.MANAGE_EXTERNAL_STORAGE",
+      "android.permission.WRITE_EXTERNAL_STORAGE"
+    ]
   },
   "plugins": [
     "./plugins/withReactNativeKeyevent.js",
@@ -73,7 +77,8 @@
       }
     ],
     "expo-speech-recognition",
-    "@react-native-firebase/app"
+    "@react-native-firebase/app",
+    "@kesha-antonov/react-native-background-downloader"
   ],
   "experiments": {
     "tsconfigPaths": true,

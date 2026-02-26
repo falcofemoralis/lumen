@@ -82,6 +82,7 @@ export function PlayerComponent({
   selectedSpeed,
   isOverlayOpen,
   isFilmBookmarked,
+  isOffline,
   togglePlayPause,
   rewindPosition,
   openQualitySelector,
@@ -396,7 +397,7 @@ export function PlayerComponent({
           </>
         ) }
         { renderTopAction(Gauge, openSpeedSelector) }
-        { renderTopAction(MessageSquareText, handleOpenComments) }
+        { !isOffline && renderTopAction(MessageSquareText, handleOpenComments) }
         { renderTopAction(Undo2, backwardToStart) }
       </View>
       { renderTopActionLine() }
@@ -436,6 +437,7 @@ export function PlayerComponent({
       <PlayerSubtitles
         player={ player }
         subtitleUrl={ url }
+        isOffline={ isOffline }
       />
     );
   };
@@ -465,7 +467,7 @@ export function PlayerComponent({
             selectedSubtitle?.languageCode === '' ? ClosedCaption : ClosedCaptionFilled({ color: theme.colors.icon }),
             openSubtitleSelector
           ) }
-          { renderBottomAction(isFilmBookmarked ? BookmarkCheck : Bookmark, openBookmarksOverlay) }
+          { !isOffline && renderBottomAction(isFilmBookmarked ? BookmarkCheck : Bookmark, openBookmarksOverlay) }
         </SpatialNavigationView>
         { renderDuration() }
       </View>
@@ -524,11 +526,12 @@ export function PlayerComponent({
 
     return (
       <PlayerVideoSelector
-        overlayRef={ playerVideoSelectorOverlayRef }
+        ref={ playerVideoSelectorOverlayRef }
         film={ film }
         onSelect={ handleVideoSelect }
         voice={ voice }
         onClose={ closeOverlay }
+        isOffline={ isOffline }
       />
     );
   };

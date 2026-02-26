@@ -5,8 +5,10 @@ import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useConfigContext } from 'Context/ConfigContext';
 import { usePlayerContext } from 'Context/PlayerContext';
 import { useServiceContext } from 'Context/ServiceContext';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { t } from 'i18n/translate';
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
+import { DownloadLinkInterface } from 'Type/DownloadLink.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { EpisodeInterface, FilmVoiceInterface, SeasonInterface } from 'Type/FilmVoice.interface';
 import { getFirestoreSavedTime, getSavedTime, setSavedTime as setSavedTimeStorage } from 'Util/Player';
@@ -14,236 +16,440 @@ import { combineSavedTime } from 'Util/Player/savedTimeUtil';
 
 import PlayerVideoSelectorComponent from './PlayerVideoSelector.component';
 import FilmVideoSelectorComponentTV from './PlayerVideoSelector.component.atv';
-import { PROGRESS_THRESHOLD_MAX, PROGRESS_THRESHOLD_MIN } from './PlayerVideoSelector.config';
+import { formatDownloadKey, PROGRESS_THRESHOLD_MAX, PROGRESS_THRESHOLD_MIN } from './PlayerVideoSelector.config';
 import { PlayerVideoSelectorContainerProps } from './PlayerVideoSelector.type';
 
-export function PlayerVideoSelectorContainer({
-  overlayRef,
-  film,
-  voice: voiceInput,
-  onSelect,
-  onClose,
-}: PlayerVideoSelectorContainerProps) {
-  const { voices = [] } = film;
-  const { isTV, isFirestore } = useConfigContext();
-  const { selectedVoice: contextVoice, updateSelectedVoice } = usePlayerContext();
-  const [isLoading, setIsLoading] = useState(false);
-  const [selectedVoice, setSelectedVoice] = useState<FilmVoiceInterface>(
-    voiceInput ?? voices.find(({ isActive }) => isActive) ?? voices[0]
-  );
-  const { isSignedIn, profile, currentService } = useServiceContext();
-  const [selectedSeasonId, setSelectedSeasonId] = useState<string | undefined>(
-    selectedVoice.lastSeasonId
-  );
-  const [selectedEpisodeId, setSelectedEpisodeId] = useState<string | undefined>(
-    selectedVoice.lastEpisodeId
-  );
-  const [savedTime, setSavedTime] = useState<SavedTime | null>(null);
-  const firestoreDb = useMemo(() => (
-    isFirestore && isSignedIn
-      ? getFirestore().collection<FirestoreDocument>(FIRESTORE_DB)
-      : null
-  ), [isSignedIn, isFirestore]);
-  const firestoreSavedTimeRef = useRef(false);
-  const voiceOverlayRef = useRef<ThemedOverlayRef>(null);
+export type PlayerVideoSelectorRef = {
+  open: () => void;
+  close: () => void;
+};
 
-  const getContextVoice = () => {
-    const { id } = film;
+export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, PlayerVideoSelectorContainerProps>(
+  (
+    {
+      film,
+      voice: voiceInput,
+      isDownloader,
+      isOffline,
+      onSelect,
+      onClose,
+      onDownloadSelect,
+    },
+    ref
+  ) => {
+    const { voices = [] } = film;
+    const { isTV, isFirestore } = useConfigContext();
+    const { selectedVoice: contextVoice, updateSelectedVoice } = usePlayerContext();
+    const [isLoading, setIsLoading] = useState(false);
+    const [selectedVoice, setSelectedVoice] = useState<FilmVoiceInterface>(
+      voiceInput ?? voices.find(({ isActive }) => isActive) ?? voices[0]
+    );
+    const { isSignedIn, profile, currentService } = useServiceContext();
 
-    const { filmId, voice } = contextVoice || {};
+    const [selectedSeasonId, setSelectedSeasonId] = useState<string | undefined>(
+      !isOffline ? selectedVoice.lastSeasonId : '1'
+    );
+    const [selectedEpisodeId, setSelectedEpisodeId] = useState<string | undefined>(
+      !isOffline ? selectedVoice.lastEpisodeId : '1'
+    );
+    const [savedTime, setSavedTime] = useState<SavedTime | null>(null);
+    const firestoreDb = useMemo(() => (
+      isFirestore && isSignedIn && !isOffline
+        ? getFirestore().collection<FirestoreDocument>(FIRESTORE_DB)
+        : null
+    ), [isSignedIn, isFirestore, isOffline]);
 
-    if (filmId === id && voice) {
-      return voice;
-    }
+    const firestoreSavedTimeRef = useRef(false);
+    const overlayRef = useRef<ThemedOverlayRef>(null);
+    const voiceOverlayRef = useRef<ThemedOverlayRef>(null);
+    const qualityOverlayRef = useRef<ThemedOverlayRef>(null);
 
-    return null;
-  };
+    const [episodesToDownload, setEpisodesToDownload] = useState<Record<string, boolean>>({});
 
-  const initFirestoreSavedTime = async () => {
-    if (firestoreSavedTimeRef.current || !firestoreDb || !profile) {
-      return;
-    }
+    const [downloadQualities, setDownloadQualities] = useState<string[] | null>(null);
+    const downloadVideosRef = useRef<Record<string, FilmVideoInterface> | null>(null);
+    const downloadVoicesRef = useRef<Record<string, FilmVoiceInterface | null>>(null);
 
-    firestoreSavedTimeRef.current = true;
-    const fireStoreSavedTime = await getFirestoreSavedTime(film, profile, firestoreDb);
+    const isMountedRef = useRef(false);
 
-    if (fireStoreSavedTime) {
-      const combinedSavedTime = combineSavedTime(savedTime, fireStoreSavedTime);
+    useImperativeHandle(ref, () => ({
+      open: () => {
+        const { hasVoices, hasSeasons } = film;
 
-      if (combinedSavedTime) {
-        setSavedTime(combinedSavedTime);
-        setSavedTimeStorage(combinedSavedTime, film);
-      }
-    }
-  };
+        if (hasVoices || hasSeasons) {
+          overlayRef.current?.open();
 
-  /**
-   * if user selected another voice\season\episode directly in the player
-   */
-  useEffect(() => {
-    const voice = getContextVoice();
+          return;
+        }
 
-    if (voice) {
-      setSelectedVoice(voice);
-      setSelectedSeasonId(voice.lastSeasonId);
-      setSelectedEpisodeId(voice.lastEpisodeId);
-    }
-  }, [contextVoice]);
+        const voice = voices[0];
+        const { video } = voice;
 
-  const getSeasons = (): SeasonInterface[] => {
-    const { seasons = [] } = selectedVoice;
+        if (!video) {
+          NotificationStore.displayMessage(t('No video streams available'));
 
-    return seasons;
-  };
-
-  const getEpisodes = (): EpisodeInterface[] => {
-    const { seasons = [] } = selectedVoice;
-
-    const { episodes = [] } = seasons.find(({ seasonId }) => seasonId === selectedSeasonId) ?? {};
-
-    return episodes;
-  };
-
-  const handleSelectVideo = (video: FilmVideoInterface, voice: FilmVoiceInterface) => {
-    if (isSignedIn) {
-      currentService.saveWatch(film, voice)
-        .catch((error) => {
-          NotificationStore.displayError(error as Error);
-        });
-    }
-
-    onSelect(video, voice);
-
-    if (getContextVoice()) {
-      // if store voice was updated, re update it
-      updateSelectedVoice(film.id, voice);
-    }
-  };
-
-  const handleSelectVoice = async (voiceId: string) => {
-    const { hasSeasons } = film;
-    const voice = voices.find(({ identifier }) => identifier === voiceId);
-
-    if (!voice) {
-      return;
-    }
-
-    if (!hasSeasons) {
-      setSelectedVoice(voice);
-
-      setIsLoading(true);
-
-      try {
-        const video = await currentService
-          .getFilmStreamsByVoice(film, voice);
+          return;
+        }
 
         handleSelectVideo(video, voice);
-      } catch (error) {
-        NotificationStore.displayError(error as Error);
-      } finally {
-        setIsLoading(false);
+      },
+      close: () => {
+        overlayRef.current?.close();
+      },
+    }));
+
+    const getContextVoice = () => {
+      const { id } = film;
+
+      const { filmId, voice } = contextVoice || {};
+
+      if (filmId === id && voice) {
+        return voice;
       }
 
-      return;
-    }
+      return null;
+    };
 
-    voiceOverlayRef?.current?.close();
+    const initFirestoreSavedTime = async () => {
+      if (firestoreSavedTimeRef.current || !firestoreDb || !profile) {
+        return;
+      }
 
-    setTimeout(async () => {
+      firestoreSavedTimeRef.current = true;
+      const fireStoreSavedTime = await getFirestoreSavedTime(film, profile, firestoreDb);
+
+      if (fireStoreSavedTime) {
+        const combinedSavedTime = combineSavedTime(savedTime, fireStoreSavedTime);
+
+        if (combinedSavedTime) {
+          setSavedTime(combinedSavedTime);
+          setSavedTimeStorage(combinedSavedTime, film);
+        }
+      }
+    };
+
+    /**
+     * if user selected another voice\season\episode directly in the player
+     */
+    useEffect(() => {
+      const voice = getContextVoice();
+
+      if (voice) {
+        setSelectedVoice(voice);
+        setSelectedSeasonId(voice.lastSeasonId);
+        setSelectedEpisodeId(voice.lastEpisodeId);
+      }
+    }, [contextVoice]);
+
+    /**
+     * Sync selectedVoice when film.voices is updated
+     */
+    useEffect(() => {
+      if (voices.length === 0 || !isMountedRef.current) {
+        isMountedRef.current = true;
+
+        return;
+      }
+
+      const updatedVoice = voices.find(({ identifier }) => identifier === selectedVoice.identifier);
+
+      if (updatedVoice && updatedVoice !== selectedVoice) {
+        setSelectedVoice(updatedVoice);
+      }
+    }, [film]);
+
+    const getSeasons = (): SeasonInterface[] => {
+      const { seasons = [] } = selectedVoice ?? {};
+
+      return seasons;
+    };
+
+    const getEpisodes = (): EpisodeInterface[] => {
+      const { seasons = [] } = selectedVoice ?? {};
+
+      const { episodes = [] } = seasons.find(({ seasonId }) => seasonId === selectedSeasonId) ?? {};
+
+      return episodes;
+    };
+
+    const handleSelectVideo = (video: FilmVideoInterface, voice: FilmVoiceInterface) => {
+      if (isDownloader) {
+        if (!downloadVideosRef.current || !downloadVoicesRef.current) {
+          downloadVideosRef.current = {};
+          downloadVoicesRef.current = {};
+        }
+
+        downloadVideosRef.current['0'] = video;
+        downloadVoicesRef.current['0'] = voice;
+
+        setDownloadQualities(video.streams.map(({ quality }) => quality));
+        qualityOverlayRef.current?.open();
+
+        return;
+      }
+
+      if (isSignedIn && !isOffline) {
+        currentService.saveWatch(film, voice)
+          .catch((error) => {
+            NotificationStore.displayError(error as Error);
+          });
+      }
+
+      onSelect(video, voice);
+
+      if (getContextVoice()) {
+        // if store voice was updated, re update it
+        updateSelectedVoice(film.id, voice);
+      }
+    };
+
+    const handleSelectVoice = async (voiceId: string) => {
+      const { hasSeasons } = film;
+      const voice = voices.find(({ identifier }) => identifier === voiceId);
+
+      if (!voice) {
+        return;
+      }
+
+      if (!hasSeasons) {
+        setSelectedVoice(voice);
+
+        setIsLoading(true);
+
+        try {
+          const video = isOffline ? voice.video : await currentService
+            .getFilmStreamsByVoice(film, voice);
+
+          if (video) {
+            handleSelectVideo(video, voice);
+          }
+        } catch (error) {
+          NotificationStore.displayError(error as Error);
+        } finally {
+          setIsLoading(false);
+        }
+
+        return;
+      }
+
+      voiceOverlayRef?.current?.close();
+
+      setTimeout(async () => {
+        setIsLoading(true);
+
+        try {
+          const updatedVoice = isOffline ? voice : await currentService.getFilmSeasons(film, voice);
+
+          setSelectedVoice(updatedVoice);
+
+          if (isDownloader) {
+            setEpisodesToDownload({});
+          }
+
+          const { seasons = [] } = updatedVoice;
+
+          if (seasons.length > 0) {
+            const season = seasons[0];
+            const { seasonId, episodes: [{ episodeId }] = [] } = season;
+            setSelectedSeasonId(seasonId);
+            setSelectedEpisodeId(episodeId);
+          }
+        } catch (error) {
+          NotificationStore.displayError(error as Error);
+        } finally {
+          setIsLoading(false);
+        }
+      }, 0);
+    };
+
+    const handleSelectEpisode = async (episodeId: string) => {
+      const { hasSeasons } = film;
+
+      if (isDownloader) {
+        const key = formatDownloadKey(selectedSeasonId, episodeId);
+
+        setEpisodesToDownload((prev) => ({
+          ...prev,
+          [key]: !prev[key],
+        }));
+
+        return;
+      }
+
+      setSelectedEpisodeId(episodeId);
       setIsLoading(true);
 
       try {
-        const updatedVoice = await currentService.getFilmSeasons(film, voice);
+        const video = isOffline
+          ? selectedVoice.seasons?.find(({ seasonId }) => seasonId === selectedSeasonId)?.episodes?.find(
+            ({ episodeId: eId }) => eId === episodeId
+          )?.video
+          : await currentService
+            .getFilmStreamsByEpisodeId(
+              film,
+              selectedVoice,
+              selectedSeasonId ?? '1',
+              episodeId
+            );
 
-        setSelectedVoice(updatedVoice);
+        const voice = {
+          ...selectedVoice,
+        };
 
-        const { seasons = [] } = updatedVoice;
+        if (hasSeasons) {
+          voice.lastSeasonId = selectedSeasonId;
+          voice.lastEpisodeId = episodeId;
+        }
 
-        if (seasons.length > 0) {
-          const season = seasons[0];
-          const { seasonId, episodes: [{ episodeId }] = [] } = season;
-          setSelectedSeasonId(seasonId);
-          setSelectedEpisodeId(episodeId);
+        if (video) {
+          handleSelectVideo(video, voice);
         }
       } catch (error) {
         NotificationStore.displayError(error as Error);
       } finally {
         setIsLoading(false);
       }
-    }, 0);
-  };
+    };
 
-  const handleSelectEpisode = async (episodeId: string) => {
-    const { hasSeasons } = film;
-
-    setSelectedEpisodeId(episodeId);
-    setIsLoading(true);
-
-    try {
-      const video = await currentService
-        .getFilmStreamsByEpisodeId(
-          film,
-          selectedVoice,
-          selectedSeasonId ?? '1',
-          episodeId
-        );
-
-      const voice = {
-        ...selectedVoice,
-      };
-
-      if (hasSeasons) {
-        voice.lastSeasonId = selectedSeasonId;
-        voice.lastEpisodeId = episodeId;
+    const calculateProgressThreshold = (progress: number): number => {
+      if (progress < PROGRESS_THRESHOLD_MIN) {
+        return 0;
       }
 
-      handleSelectVideo(video, voice);
-    } catch (error) {
-      NotificationStore.displayError(error as Error);
-    } finally {
+      if ((100 - progress) < PROGRESS_THRESHOLD_MAX) {
+        return 100;
+      }
+
+      return progress;
+    };
+
+    const onOverlayOpen = () => {
+      if (!isOffline) {
+        setSavedTime(getSavedTime(film));
+        initFirestoreSavedTime();
+      }
+    };
+
+    const handleEpisodesDownload = async () => {
+      downloadVideosRef.current = {};
+      downloadVoicesRef.current = {};
+
+      setIsLoading(true);
+
+      for (const [key, value] of Object.entries(episodesToDownload)) {
+        if (!value) {
+          continue;
+        }
+
+        const [seasonId, episodeId] = key.split(',');
+
+        const video = await currentService
+          .getFilmStreamsByEpisodeId(
+            film,
+            selectedVoice,
+            seasonId,
+            episodeId
+          );
+
+        downloadVideosRef.current[key] = video;
+        downloadVoicesRef.current[key] = {
+          ...selectedVoice,
+          lastSeasonId: seasonId,
+          lastEpisodeId: episodeId,
+        };
+      }
+
+      const allQualities = Object.values(downloadVideosRef.current).map(
+        (video) => video.streams.map(({ quality }) => quality)
+      );
+      const commonQualities = allQualities.reduce(
+        (a, b) => a.filter((c) => b.includes(c))
+      );
+
+      setDownloadQualities(commonQualities);
       setIsLoading(false);
-    }
-  };
 
-  const calculateProgressThreshold = (progress: number): number => {
-    if (progress < PROGRESS_THRESHOLD_MIN) {
-      return 0;
-    }
+      qualityOverlayRef.current?.open();
+    };
 
-    if ((100 - progress) < PROGRESS_THRESHOLD_MAX) {
-      return 100;
-    }
+    const handleDownload = async (quality: string) => {
+      const downloadVideos = downloadVideosRef.current;
+      const downloadVoices = downloadVoicesRef.current;
 
-    return progress;
-  };
+      if (!downloadVideos || !downloadVoices) {
+        NotificationStore.displayMessage(t('No video available'));
 
-  const onOverlayOpen = () => {
-    setSavedTime(getSavedTime(film));
-    initFirestoreSavedTime();
-  };
+        return;
+      }
 
-  const containerProps = {
-    overlayRef,
-    film,
-    voices,
-    isLoading,
-    selectedVoice,
-    selectedSeasonId,
-    selectedEpisodeId,
-    seasons: getSeasons(),
-    episodes: getEpisodes(),
-    savedTime,
-    voiceOverlayRef,
-    handleSelectVoice,
-    setSelectedSeasonId,
-    handleSelectEpisode,
-    calculateProgressThreshold,
-    onOverlayOpen,
-    onClose,
-  };
+      const videos = Object.entries(downloadVideos);
+      const links: DownloadLinkInterface[] = [];
 
-  // eslint-disable-next-line max-len
-  return isTV ? <FilmVideoSelectorComponentTV { ...containerProps } /> : <PlayerVideoSelectorComponent { ...containerProps } />;
-}
+      for (const [key, video] of Object.entries(downloadVideos)) {
+        const voice = downloadVoices[key];
+
+        const stream = video.streams.find(({ quality: q }) => q === quality);
+        if (!stream) {
+          NotificationStore.displayMessage(t('No video streams available for {{key}}', { key }));
+
+          return;
+        }
+
+        links.push({
+          url: stream.url,
+          quality: stream.quality,
+          subtitles: video.subtitles,
+          seasonId: voice?.lastSeasonId,
+          episodeId: voice?.lastEpisodeId,
+          voice: voice,
+        });
+      }
+
+      if (links.length !== videos.length) {
+        return;
+      }
+
+      if (onDownloadSelect) {
+        onDownloadSelect(links);
+      }
+
+      setDownloadQualities(null);
+      setEpisodesToDownload({});
+
+      qualityOverlayRef.current?.close();
+      overlayRef.current?.close();
+    };
+
+    const containerProps = {
+      overlayRef,
+      film,
+      voices,
+      isLoading,
+      selectedVoice,
+      selectedSeasonId,
+      selectedEpisodeId,
+      seasons: getSeasons(),
+      episodes: getEpisodes(),
+      savedTime,
+      voiceOverlayRef,
+      isDownloader,
+      isOffline,
+      episodesToDownload,
+      qualityOverlayRef,
+      downloadQualities,
+      handleSelectVoice,
+      setSelectedSeasonId,
+      handleSelectEpisode,
+      calculateProgressThreshold,
+      onOverlayOpen,
+      onClose,
+      handleEpisodesDownload,
+      handleDownload,
+    };
+
+    // eslint-disable-next-line max-len
+    return isTV ? <FilmVideoSelectorComponentTV { ...containerProps } /> : <PlayerVideoSelectorComponent { ...containerProps } />;
+  }
+);
 
 export default PlayerVideoSelectorContainer;

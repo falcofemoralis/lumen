@@ -11,13 +11,14 @@ export const PlayerSubtitlesComponent = ({
   subtitleUrl,
   player,
   style,
+  isOffline,
 }: PlayerSubtitlesComponentProps) => {
   const styles = useThemedStyles(componentStyles);
   const [subtitles, setSubtitles] = useState<VTTItem[] | null>([]);
   const [text, setText] = useState('');
 
   useEffect(() => {
-    subtitleParser(subtitleUrl).then((parsedSubtitles) => {
+    subtitleParser(subtitleUrl, isOffline).then((parsedSubtitles) => {
       setSubtitles(parsedSubtitles);
     });
   }, [subtitleUrl]);
