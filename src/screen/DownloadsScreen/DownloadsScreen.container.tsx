@@ -1,6 +1,7 @@
 /* eslint-disable max-len */
 import {
   completeHandler,
+  createDownloadTask,
   DownloadTask,
   getExistingDownloadTasks,
 } from '@kesha-antonov/react-native-background-downloader';
@@ -9,7 +10,7 @@ import { Directory, File } from 'expo-file-system';
 import * as IntentLauncher from 'expo-intent-launcher';
 import { t } from 'i18n/translate';
 import { PLAYER_SCREEN } from 'Navigation/navigationRoutes';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
 import RouterStore from 'Store/Router.store';
 import { DownloadFileInterface, DownloadFilmInterface } from 'Type/DownloadFile.interface';
@@ -26,6 +27,7 @@ export const DownloadsScreenContainer = () => {
   const { isTV, downloadsPath } = useConfigContext();
   const [downloadedFilms, setDownloadedFilms] = useState<DownloadFilmInterface[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const completeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const readStorage = useCallback((): DownloadFileInterface[] => {
     try {
@@ -66,6 +68,10 @@ export const DownloadsScreenContainer = () => {
     }
   }, [downloadsPath]);
 
+  const getFileDestination = useCallback((task: any): string => {
+    return (task.destination ?? task.metadata?.destination ?? task.downloadParams?.destination ?? '') as string;
+  }, []);
+
   const readExistingTasks = useCallback(async (): Promise<DownloadFileInterface[]> => {
     try {
       const tasks = await getExistingDownloadTasks();
@@ -73,7 +79,7 @@ export const DownloadsScreenContainer = () => {
       const files: DownloadFileInterface[] = [];
       const mapping = TaskIdStorage.load();
       tasks.forEach(task => {
-        const destination = task.metadata?.destination as string;
+        const destination = getFileDestination(task);
         if (!destination) {
           return;
         }
@@ -107,7 +113,7 @@ export const DownloadsScreenContainer = () => {
 
       return [];
     }
-  }, []);
+  }, [getFileDestination]);
 
   const groupDownloadedFiles = useCallback((files: DownloadFileInterface[]): DownloadFilmInterface[] => {
     const newDownloadedFiles: Record<string, DownloadFilmInterface> = {};
@@ -273,7 +279,7 @@ export const DownloadsScreenContainer = () => {
   }, []);
 
   const deleteFile = useCallback((task: DownloadTask) => {
-    const destination = (task.metadata?.destination ?? task.downloadParams?.destination ?? '') as string;
+    const destination = getFileDestination(task);
     if (!destination) {
       NotificationStore.displayError('Destination not found');
 
@@ -289,18 +295,81 @@ export const DownloadsScreenContainer = () => {
     } catch (e) {
       NotificationStore.displayError(e as Error);
     }
-  }, []);
+  }, [getFileDestination]);
+
+  const completeTask = useCallback((task: DownloadTask) => {
+    if (completeTimeoutRef.current) {
+      clearTimeout(completeTimeoutRef.current);
+    }
+
+    completeTimeoutRef.current = setTimeout(() => {
+      scanFiles();
+    }, 100);
+  }, [scanFiles]);
+
+  const toggleTask = useCallback(async (taskId: string, isActive: boolean) => {
+    const task = downloadedFilms.flatMap(film => film.tasks).find((tsk) => tsk.id === taskId);
+    if (!task) {
+      return;
+    }
+
+    if (isActive) {
+      await task.resume();
+    } else {
+      await task.pause();
+    }
+
+    setDownloadedFilms(prev => prev.map(film => ({
+      ...film,
+      tasks: film.tasks.map(ft => ft.id === taskId ? task : ft),
+    })));
+  }, [downloadedFilms]);
 
   const restartTask = useCallback((task: DownloadTask) => {
+    const destination = getFileDestination(task);
+    if (!destination) {
+      NotificationStore.displayError('Destination not found');
+
+      return;
+    }
+
     try {
-      task.start();
+      const mapping = TaskIdStorage.load();
+      const taskInfo = mapping[destination];
+
+      if (!taskInfo) {
+        NotificationStore.displayError('Task info not found');
+
+        return;
+      }
+
+      const newTask = createDownloadTask({
+        id: task.id,
+        url: taskInfo.url,
+        destination: taskInfo.destination,
+        metadata: task.metadata,
+      })
+        .done(() => {
+          completeHandler(task.id);
+        })
+        .error(({ error }) => {
+          NotificationStore.displayError(error);
+          completeHandler(task.id);
+        });
+
+      newTask.start();
+
+      setDownloadedFilms(prev => prev.map(film => ({
+        ...film,
+        tasks: film.tasks.map(ft => ft.id === task.id ? newTask : ft),
+      })));
     } catch (e) {
       console.warn('Failed to start task', e);
     }
-  }, []);
+  }, [getFileDestination]);
 
-  const deleteTask = useCallback(async (task: DownloadTask) => {
-    const destination = (task.metadata?.destination ?? task.downloadParams?.destination ?? '') as string;
+  const deleteTask = useCallback(async (task: DownloadTask, isRefresh: boolean = true) => {
+    const destination = getFileDestination(task);
     if (!destination) {
       NotificationStore.displayError('Destination not found');
 
@@ -311,13 +380,21 @@ export const DownloadsScreenContainer = () => {
     await completeHandler(task.id);
     TaskIdStorage.clear(destination);
     deleteFile(task);
+
+    if (isRefresh) {
+      completeTask(task);
+    }
+  }, [deleteFile, completeTask, getFileDestination]);
+
+  const handleTaskError = useCallback((task: DownloadTask) => {
+    deleteFile(task);
   }, [deleteFile]);
 
   const deleteFilm = useCallback(async (item: DownloadFilmInterface) => {
     const { tasks, folder: destination } = item;
 
     for (const task of tasks) {
-      await deleteTask(task);
+      await deleteTask(task, false);
     }
 
     try {
@@ -357,6 +434,9 @@ export const DownloadsScreenContainer = () => {
     deleteFilm,
     openFolder,
     handleRefresh,
+    completeTask,
+    toggleTask,
+    handleTaskError,
   };
 
   return isTV ? <DownloadsScreenComponentTV { ...containerProps } /> : <DownloadsScreenComponent { ...containerProps } />;

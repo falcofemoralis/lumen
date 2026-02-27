@@ -23,36 +23,24 @@ import Animated, { FadeOut, LinearTransition, useSharedValue } from 'react-nativ
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from 'Theme/context';
 import { DownloadFilmInterface } from 'Type/DownloadFile.interface';
-import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { formatBytes } from 'Util/Download';
 
 import { NUMBER_OF_COLUMNS } from './DownloadsScreen.config';
 import { componentStyles } from './DownloadsScreen.style';
-import { DownloadsScreenComponentProps } from './DownloadsScreen.type';
+import { DownloadItemProps, DownloadItemTaskProps, DownloadsScreenComponentProps } from './DownloadsScreen.type';
 
 const DownloadItemTask = ({
   task,
   styles,
-  completeTask,
-  pauseTask,
-  resumeTask,
   deleteTask,
   deleteFile,
   restartTask,
-}: {
-  task: DownloadTask
-  styles: ReturnType<typeof componentStyles>
-  completeTask: (taskId: string) => void
-  pauseTask: (taskId: string) => void
-  resumeTask: (taskId: string) => void
-  deleteTask: (task: DownloadTask) => void
-  deleteFile: (task: DownloadTask) => void;
-  restartTask: (task: DownloadTask) => void;
-}) => {
+  toggleTask,
+  completeTask,
+}: DownloadItemTaskProps) => {
   const { scale, theme } = useAppTheme();
-  const isAttachedRef = useRef(false);
   const [downloaded, setDownloaded] = useState(0);
   const [total, setTotal] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -67,30 +55,27 @@ const DownloadItemTask = ({
   } = task as DownloadTask & { metadata?: { taskFileName?: string } };
 
   useEffect(() => {
-    if (!task) {
-      return;
-    }
-
-    if (!isAttachedRef.current) {
-      task
-        .progress(({ bytesDownloaded, bytesTotal }) => {
-          const percentage = (bytesDownloaded / bytesTotal) * 100;
-          progress.value = percentage;
-          setProgressPercentage(Math.floor(percentage));
-          setDownloaded(bytesDownloaded);
-          setTotal(bytesTotal);
-        })
-        .done(() => {
-          completeTask(task.id);
-        })
-        .error(({ error: err }) => {
-          deleteFile(task);
-          setError(err);
-        });
-
-      isAttachedRef.current = true;
-    }
-  }, [task]);
+    task
+      .progress(({ bytesDownloaded, bytesTotal }) => {
+        const percentage = (bytesDownloaded / bytesTotal) * 100;
+        progress.value = percentage;
+        setProgressPercentage(Math.floor(percentage));
+        setDownloaded(bytesDownloaded);
+        setTotal(bytesTotal);
+      })
+      .done(() => {
+        completeTask(task);
+      })
+      .error(({ error: err }) => {
+        deleteFile(task);
+        setError(err);
+        setDownloaded(0);
+        setTotal(0);
+        setError(null);
+        setProgressPercentage(0);
+        progress.value = 0;
+      });
+  }, []);
 
   const renderContent = () => {
     return (
@@ -131,10 +116,7 @@ const DownloadItemTask = ({
         ) }
         <ThemedPressable
           style={ styles.actionsBtn }
-          onPress={ () => {
-            deleteTask(task);
-            completeTask(task.id);
-          } }
+          onPress={ () => deleteTask(task) }
         >
           <Trash2
             size={ scale(24) }
@@ -144,7 +126,7 @@ const DownloadItemTask = ({
         { task.state === 'PAUSED' ? (
           <ThemedPressable
             style={ styles.actionsBtn }
-            onPress={ () => resumeTask(task.id) }
+            onPress={ () => toggleTask(task.id, true) }
           >
             <Play
               size={ scale(24) }
@@ -154,7 +136,7 @@ const DownloadItemTask = ({
         ) : (
           <ThemedPressable
             style={ styles.actionsBtn }
-            onPress={ () => pauseTask(task.id) }
+            onPress={ () => toggleTask(task.id, false) }
           >
             <Pause
               size={ scale(24) }
@@ -204,29 +186,15 @@ const DownloadItemTask = ({
   );
 };
 
-const DownloadItem = ({
-  index,
-  item,
-  styles,
-  onSelect,
-  deleteTask,
-  deleteFilm,
-  openFolder,
-  handleRefresh,
-  deleteFile,
-  restartTask,
-}: {
-  index: number
-  item: DownloadFilmInterface
-  styles: ReturnType<typeof componentStyles>
-  onSelect: (film: FilmInterface, video: FilmVideoInterface, voice: FilmVoiceInterface) => void;
-  deleteFile: (task: DownloadTask) => void;
-  restartTask: (task: DownloadTask) => void;
-  deleteTask: (task: DownloadTask) => void;
-  deleteFilm: (item: DownloadFilmInterface) => void;
-  openFolder: (destination: string) => void;
-  handleRefresh: (isRefresh: boolean) => Promise<void>;
-}) => {
+const DownloadItem = (props: DownloadItemProps) => {
+  const {
+    index,
+    item,
+    styles,
+    openFolder,
+    deleteFilm,
+    handleVideoSelect,
+  } = props;
   const playerVideoSelectorOverlayRef = useRef<PlayerVideoSelectorRef>(null);
   const actionsOverlayRef = useRef<ThemedOverlayRef>(null);
 
@@ -241,7 +209,6 @@ const DownloadItem = ({
     tasks,
   } = item;
   const { scale, theme } = useAppTheme();
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleActions = useCallback((action: ListItem) => {
     if (action.value === 'open') {
@@ -251,44 +218,12 @@ const DownloadItem = ({
     }
 
     actionsOverlayRef.current?.close();
-  }, [item, openFolder, deleteFilm]);
+  }, [item, folder, openFolder, deleteFilm]);
 
   const handleSelect = useCallback((video: FilmVideoInterface, voice: FilmVoiceInterface) => {
-    onSelect(item.film, video, voice);
+    handleVideoSelect(item.film, video, voice);
     playerVideoSelectorOverlayRef.current?.close();
-  }, [item, onSelect]);
-
-  const completeTask = useCallback((taskId: string) => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-
-    timeoutRef.current = setTimeout(() => {
-      handleRefresh(true);
-    }, 50);
-  }, [handleRefresh]);
-
-  const pauseTask = useCallback(async (taskId: string) => {
-    const task = tasks.find((tsk) => tsk.id === taskId);
-    if (task) {
-      await task.pause();
-    }
-
-    setTimeout(() => {
-      handleRefresh(true);
-    }, 50);
-  }, [handleRefresh, tasks]);
-
-  const resumeTask = useCallback(async (taskId: string) => {
-    const task = tasks.find((tsk) => tsk.id === taskId);
-    if (task) {
-      await task.resume();
-    }
-
-    setTimeout(() => {
-      handleRefresh(true);
-    }, 50);
-  }, [handleRefresh, tasks]);
+  }, [item, handleVideoSelect]);
 
   const renderPlayerVideoSelector = () => {
     const { film } = item;
@@ -384,15 +319,10 @@ const DownloadItem = ({
       <View style={ styles.tasks }>
         { tasks.map((task) => (
           <DownloadItemTask
+            { ...props }
             key={ task.id }
             task={ task }
             styles={ styles }
-            completeTask={ completeTask }
-            pauseTask={ pauseTask }
-            resumeTask={ resumeTask }
-            deleteTask={ deleteTask }
-            deleteFile={ deleteFile }
-            restartTask={ restartTask }
           />
         )) }
       </View>
@@ -402,17 +332,12 @@ const DownloadItem = ({
 
 export const MemoizedDownloadItem = memo(DownloadItem);
 
-export const DownloadsScreenComponent = ({
-  downloadedFilms,
-  isLoading,
-  handleVideoSelect,
-  deleteFile,
-  deleteTask,
-  restartTask,
-  deleteFilm,
-  openFolder,
-  handleRefresh,
-}: DownloadsScreenComponentProps) => {
+export const DownloadsScreenComponent = (props: DownloadsScreenComponentProps) => {
+  const {
+    downloadedFilms,
+    isLoading,
+    handleRefresh,
+  } = props;
   const { scale } = useAppTheme();
   const { top } = useSafeAreaInsets();
   const styles = useThemedStyles(componentStyles);
@@ -424,19 +349,13 @@ export const DownloadsScreenComponent = ({
   const renderItem = useCallback(({ item, index }: ThemedGridRowProps<DownloadFilmInterface>) => {
     return (
       <MemoizedDownloadItem
-        item={ item }
-        onSelect={ handleVideoSelect }
-        styles={ styles }
+        { ...props }
         index={ index }
-        openFolder={ openFolder }
-        deleteFile={ deleteFile }
-        restartTask={ restartTask }
-        deleteTask={ deleteTask }
-        deleteFilm={ deleteFilm }
-        handleRefresh={ handleRefresh }
+        item={ item }
+        styles={ styles }
       />
     );
-  }, [styles, handleVideoSelect, openFolder, deleteFilm, deleteTask]);
+  }, [styles, props]);
 
   const renderEmpty = () => {
     if (isLoading) {
