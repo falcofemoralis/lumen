@@ -199,6 +199,7 @@ const ru: Translations = {
   'Toggle download subtitles.': 'Включить загрузку субтитров.',
   'Download poster': 'Загружать постер',
   'Toggle download poster.': 'Включить загрузку постера.',
+  'Download failed': 'Ошибка загрузки',
 };
 
 export default ru;

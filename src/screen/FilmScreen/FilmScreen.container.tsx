@@ -262,8 +262,6 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
       const { url, quality, subtitles = [], seasonId, episodeId, voice } = linkItem;
       const taskName = [];
 
-      taskName.push(quality);
-
       if (seasonId) {
         taskName.push(`S${seasonId}`);
       }
@@ -272,7 +270,9 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
         taskName.push(`E${episodeId}`);
       }
 
-      const name = [...filmName, ...taskName].join('-');
+      taskName.push(quality);
+
+      const name = [...taskName, ...filmName].join('-');
       const taskUrl = url.replace(':hls:manifest.m3u8', '');
       const extension = taskUrl.split('.').pop();
       const destination = `${folderPath}/${name}.${extension}`;
@@ -368,7 +368,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
           completeHandler(task.id);
         })
         .error(({ error }) => {
-          NotificationStore.displayError(error);
+          NotificationStore.displayError(error ?? t('Download failed'));
           completeHandler(task.id);
         });
 

@@ -197,6 +197,7 @@ const en = {
   'Toggle download subtitles.': 'Toggle download subtitles.',
   'Download poster': 'Download poster',
   'Toggle download poster.': 'Toggle download poster.',
+  'Download failed': 'Download failed',
 };
 
 export default en;

@@ -10,7 +10,7 @@ export interface DownloadsScreenComponentProps {
   isLoading: boolean;
   handleVideoSelect: (film: FilmInterface, video: FilmVideoInterface, voice: FilmVoiceInterface) => void;
   deleteFile: (task: DownloadTask) => void;
-  restartTask: (task: DownloadTask) => void;
+  restartTask: (task: DownloadTask) => DownloadTask|null;
   deleteTask: (task: DownloadTask) => void;
   deleteFilm: (item: DownloadFilmInterface) => void;
   openFolder: (destination: string) => void;

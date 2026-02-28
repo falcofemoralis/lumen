@@ -330,7 +330,7 @@ export const DownloadsScreenContainer = () => {
     if (!destination) {
       NotificationStore.displayError('Destination not found');
 
-      return;
+      return null;
     }
 
     try {
@@ -340,7 +340,7 @@ export const DownloadsScreenContainer = () => {
       if (!taskInfo) {
         NotificationStore.displayError('Task info not found');
 
-        return;
+        return null;
       }
 
       const newTask = createDownloadTask({
@@ -363,8 +363,12 @@ export const DownloadsScreenContainer = () => {
         ...film,
         tasks: film.tasks.map(ft => ft.id === task.id ? newTask : ft),
       })));
+
+      return newTask;
     } catch (e) {
       console.warn('Failed to start task', e);
+
+      return null;
     }
   }, [getFileDestination]);
 

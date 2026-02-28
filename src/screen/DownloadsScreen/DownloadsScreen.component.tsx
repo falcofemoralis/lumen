@@ -54,10 +54,11 @@ const DownloadItemTask = ({
     metadata: { taskFileName } = {},
   } = task as DownloadTask & { metadata?: { taskFileName?: string } };
 
-  useEffect(() => {
-    task
+  const processTask = (taskArg: DownloadTask) => {
+    taskArg
       .progress(({ bytesDownloaded, bytesTotal }) => {
         const percentage = (bytesDownloaded / bytesTotal) * 100;
+        // eslint-disable-next-line react-compiler/react-compiler
         progress.value = percentage;
         setProgressPercentage(Math.floor(percentage));
         setDownloaded(bytesDownloaded);
@@ -68,14 +69,25 @@ const DownloadItemTask = ({
       })
       .error(({ error: err }) => {
         deleteFile(task);
-        setError(err);
+        setError(err ?? t('Download failed'));
         setDownloaded(0);
         setTotal(0);
-        setError(null);
         setProgressPercentage(0);
         progress.value = 0;
       });
+  };
+
+  useEffect(() => {
+    processTask(task);
   }, []);
+
+  const handleTaskRestart = () => {
+    setError(null);
+    const newTask = restartTask(task);
+    if (newTask) {
+      processTask(newTask);
+    }
+  };
 
   const renderContent = () => {
     return (
@@ -100,13 +112,41 @@ const DownloadItemTask = ({
     );
   };
 
+  const renderToggleActions = () => {
+    if (task.state === 'FAILED') {
+      return null;
+    }
+
+    return task.state === 'PAUSED' ? (
+      <ThemedPressable
+        style={ styles.actionsBtn }
+        onPress={ () => toggleTask(task.id, true) }
+      >
+        <Play
+          size={ scale(24) }
+          color={ theme.colors.icon }
+        />
+      </ThemedPressable>
+    ) : (
+      <ThemedPressable
+        style={ styles.actionsBtn }
+        onPress={ () => toggleTask(task.id, false) }
+      >
+        <Pause
+          size={ scale(24) }
+          color={ theme.colors.icon }
+        />
+      </ThemedPressable>
+    );
+  };
+
   const renderActions = () => {
     return (
       <View style={ styles.taskActions }>
-        { error && (
+        { task.state === 'FAILED' && (
           <ThemedPressable
             style={ styles.actionsBtn }
-            onPress={ () => restartTask(task) }
+            onPress={ handleTaskRestart }
           >
             <RotateCcw
               size={ scale(24) }
@@ -123,27 +163,7 @@ const DownloadItemTask = ({
             color={ theme.colors.icon }
           />
         </ThemedPressable>
-        { task.state === 'PAUSED' ? (
-          <ThemedPressable
-            style={ styles.actionsBtn }
-            onPress={ () => toggleTask(task.id, true) }
-          >
-            <Play
-              size={ scale(24) }
-              color={ theme.colors.icon }
-            />
-          </ThemedPressable>
-        ) : (
-          <ThemedPressable
-            style={ styles.actionsBtn }
-            onPress={ () => toggleTask(task.id, false) }
-          >
-            <Pause
-              size={ scale(24) }
-              color={ theme.colors.icon }
-            />
-          </ThemedPressable>
-        ) }
+        { renderToggleActions() }
       </View>
     );
   };
