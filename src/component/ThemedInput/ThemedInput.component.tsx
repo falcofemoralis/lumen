@@ -1,4 +1,7 @@
+import { ThemedPressable } from 'Component/ThemedPressable';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
+import { Eye, EyeOff } from 'lucide-react-native';
+import { useState } from 'react';
 import { TextInput, View } from 'react-native';
 import { useAppTheme } from 'Theme/context';
 
@@ -11,10 +14,35 @@ export const ThemedInputComponent = ({
   style,
   containerStyle,
   editable = true,
+  secureTextEntry = false,
   ...props
 }: ThemedInputComponentProps) => {
   const { theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
+  const renderSecureIcon = () => {
+    if (!secureTextEntry) {
+      return null;
+    }
+
+    return (
+      <ThemedPressable
+        style={ styles.secureIcon }
+        onPress={ () => setIsPasswordVisible(!isPasswordVisible) }
+      >
+        { isPasswordVisible ? (
+          <EyeOff
+            color={ theme.colors.icon }
+          />
+        ) : (
+          <Eye
+            color={ theme.colors.icon }
+          />
+        ) }
+      </ThemedPressable>
+    );
+  };
 
   return (
     <View style={ [styles.container, containerStyle] }>
@@ -29,8 +57,10 @@ export const ThemedInputComponent = ({
         selectionHandleColor={ theme.colors.secondary }
         tvFocusable={ false }
         editable={ editable }
+        secureTextEntry={ secureTextEntry ? !isPasswordVisible : false }
         { ...props }
       />
+      { renderSecureIcon() }
     </View>
   );
 };

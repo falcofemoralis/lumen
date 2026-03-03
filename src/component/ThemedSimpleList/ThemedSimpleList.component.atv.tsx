@@ -2,7 +2,7 @@ import { ThemedImage } from 'Component/ThemedImage';
 import { ThemedPressable } from 'Component/ThemedPressable';
 import { ThemedText } from 'Component/ThemedText';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { View } from 'react-native';
 import {
   DefaultFocus,
@@ -23,6 +23,8 @@ export const ThemedListComponent = ({
   const styles = useThemedStyles(componentStyles);
   const scrollViewRef = useRef<SpatialNavigationVirtualizedListRef>(null);
   const [isScrolled, setIsScrolled] = useState(false);
+
+  const selectedIndex = useMemo(() => data.findIndex((item) => item.value === value), [data, value]);
 
   const handleLayout = () => {
     setTimeout(() => {
@@ -52,11 +54,11 @@ export const ThemedListComponent = ({
     );
   };
 
-  const renderItem = useCallback(({ item }: { item: ListItem }) => {
-    const isSelected = value === item.value;
+  const renderItem = useCallback(({ item, index }: { item: ListItem; index: number }) => {
+    const isSelected = selectedIndex !== -1 ? index === selectedIndex : false;
 
     return (
-      <DefaultFocus enable={ isSelected }>
+      <DefaultFocus enable={ selectedIndex !== -1 ? index === selectedIndex : index === 0 }>
         <ThemedPressable
           onPress={ () => onChange(item) }
         >
@@ -96,7 +98,7 @@ export const ThemedListComponent = ({
         </ThemedPressable>
       </DefaultFocus>
     );
-  }, [value, onChange, styles]);
+  }, [onChange, selectedIndex, styles]);
 
   const renderList = () => {
     return (

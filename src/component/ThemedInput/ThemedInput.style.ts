@@ -9,4 +9,13 @@ export const componentStyles = ({ scale, colors }: Theme) => ({
   input: {
     color: colors.text,
   },
+  secureIcon: {
+    width: scale(32),
+    height: scale(32),
+    position: 'absolute',
+    right: scale(4),
+    top: '50%',
+    transform: [{ translateY: -scale(16) }],
+    borderRadius: scale(50),
+  },
 } satisfies ThemedStyles);

@@ -3,10 +3,12 @@ import { View } from 'react-native';
 import { useAppTheme } from 'Theme/context';
 import { ThemedStyles } from 'Theme/types';
 
+import { componentStyles } from './FilmScreen.style.atv';
+
 export const FilmScreenThumbnail = ({
   styles,
 }: {
-  styles: ThemedStyles
+  styles: ThemedStyles<typeof componentStyles>;
 }) => {
   const { scale } = useAppTheme();
 

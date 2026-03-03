@@ -189,7 +189,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     const shareFilm = { ...film };
 
     if (currentService.isOfficialMode()) {
-      shareFilm.link = updateUrlHost(shareFilm.link, currentService.officialShareLink);
+      // shareFilm.link = updateUrlHost(shareFilm.link, currentService.officialShareLink);
     }
 
     try {

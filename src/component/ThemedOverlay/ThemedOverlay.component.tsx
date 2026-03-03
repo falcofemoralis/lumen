@@ -36,7 +36,6 @@ export function ThemedOverlayComponent({
         backdropColor={ theme.colors.modal }
         transparent={ transparent }
       >
-
         <GestureHandlerRootView>
           <Portal.Host>
             <Pressable
@@ -55,7 +54,7 @@ export function ThemedOverlayComponent({
                 { contentVisible && children }
 
               </Pressable>
-              { useKeyboardAdjustment && <KeyboardAdjuster scale={ 2 } /> }
+              { useKeyboardAdjustment && <KeyboardAdjuster scale={ 0.5 } /> }
             </Pressable>
           </Portal.Host>
         </GestureHandlerRootView>

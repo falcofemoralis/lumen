@@ -67,4 +67,6 @@ export type ExtendedViewStyle = ViewStyle & {
   transitionTimingFunction?: string;
 }
 export type StyleValue = ExtendedViewStyle | TextStyle | ImageStyle;
-export type ThemedStyles = Record<string, StyleValue>
+export type ThemedStylesObject = Record<string, StyleValue>;
+export type ThemedStylesFunction<T = any> = (theme: Theme) => T;
+export type ThemedStyles<T = ThemedStylesObject> = T extends (...args: any[]) => any ? ReturnType<T> : T;

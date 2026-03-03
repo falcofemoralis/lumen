@@ -1,16 +1,21 @@
 import { KeyboardAdjuster } from 'Component/KeyboardAdjuster';
-import { ThemedDropdown } from 'Component/ThemedDropdown';
-import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
+import { ThemedButton } from 'Component/ThemedButton';
+import { ThemedCustomSelect } from 'Component/ThemedCustomSelect';
 import { ThemedImage } from 'Component/ThemedImage';
 import { ThemedInput } from 'Component/ThemedInput';
+import { ThemedOverlay } from 'Component/ThemedOverlay';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { Portal } from 'Component/ThemedPortal';
 import { ThemedPressable } from 'Component/ThemedPressable';
+import { ThemedFocusableNodeState } from 'Component/ThemedPressable/ThemedPressable.type';
 import { ThemedText } from 'Component/ThemedText';
+import { ThemedToggle } from 'Component/ThemedToggle';
+import { useConfigContext } from 'Context/ConfigContext';
+import { useOverlayContext } from 'Context/OverlayContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useLandscape } from 'Hooks/useLandscape';
 import { t } from 'i18n/translate';
-import { Check, ChevronLeft, CircleAlert } from 'lucide-react-native';
+import { Check, ChevronLeft, CircleAlert, Info, LogIn, RefreshCw } from 'lucide-react-native';
 import {
   useCallback,
   useRef,
@@ -19,6 +24,8 @@ import {
 import {
   Image,
   ImageSourcePropType,
+  Linking,
+  Pressable,
   ScrollView,
   StyleProp,
   View,
@@ -33,10 +40,12 @@ import {
 } from 'react-tv-space-navigation';
 import NotificationStore from 'Store/Notification.store';
 import { useAppTheme } from 'Theme/context';
+import { ThemedStyles } from 'Theme/types';
 import { FilmInterface } from 'Type/Film.interface';
 import { SpatialNavigationKeyboardLocker } from 'Util/RemoteControl/SpatialNavigationKeyboardLocker';
 
 import { TEST_URL } from './WelcomeScreen.config';
+import { componentStyles } from './WelcomeScreen.style';
 import { DeviceType, SlideInterface } from './WelcomeScreen.type';
 import { WelcomeScreenMobile, WelcomeScreenTV } from './WelcomeScreenIcons';
 
@@ -44,7 +53,7 @@ export type SlideProps = {
   slide: SlideInterface;
   goBack: (slide: SlideInterface) => void;
   goNext: (slide: SlideInterface) => void;
-  styles: any;
+  styles: ThemedStyles<typeof componentStyles>;
 }
 
 export type BaseSlideProps = {
@@ -62,7 +71,7 @@ export type BaseSlideProps = {
   goBack?: (slide: SlideInterface) => void;
   goNext?: (slide: SlideInterface) => void;
   onNext?: () => void;
-  styles: any
+  styles: ThemedStyles<typeof componentStyles>
 }
 
 export const BaseSlide = ({
@@ -85,6 +94,7 @@ export const BaseSlide = ({
   const isLandscape = useLandscape();
   const nextButtonRef = useRef<SpatialNavigationNodeRef>(null);
   const { theme, scale } = useAppTheme();
+  const { isOverlayOpen } = useOverlayContext();
 
   const renderBaseSlide = () => {
     const {
@@ -145,62 +155,45 @@ export const BaseSlide = ({
       <SpatialNavigationView direction='horizontal' style={ styles.navigation }>
         { canBack && (
           <View style={ styles.prevButtonContainer }>
-            <SpatialNavigationFocusableView
-              onSelect={ handleBack }
+            <SlidePressable
+              style={ styles.prevButton }
+              contentStyle={ styles.prevButtonContent }
+              onPress={ handleBack }
+              styles={ styles }
             >
               { ({ isFocused }) => (
-                <ThemedPressable
-                  style={ styles.prevButton }
-                  contentStyle={ [
-                    styles.prevButtonContent,
-                    isFocused && styles.TVfocused,
-                  ] }
-                  onPress={ handleBack }
-                  pressDelay={ 0 }
-                  resolveAsMobile
-                >
-                  <ChevronLeft
-                    size={ scale(24) }
-                    color={ isFocused ? theme.colors.iconFocused : theme.colors.icon }
-                  />
-                </ThemedPressable>
+                <ChevronLeft
+                  size={ scale(24) }
+                  color={ isFocused ? theme.colors.iconFocused : theme.colors.icon }
+                />
               ) }
-            </SpatialNavigationFocusableView>
+            </SlidePressable>
           </View>
         ) }
         <DefaultFocus>
           { (canNext || canComplete) && (
-            <SpatialNavigationFocusableView
-              ref={ nextButtonRef }
-              onSelect={ canComplete ? complete : handleNext }
-              style={ [
+            <SlidePressable
+              spatialRef={ nextButtonRef }
+              style={ styles.nextButtonPressable }
+              contentStyle={ styles.nextButtonContent }
+              spatialStyle={ [
                 styles.nextButton,
                 isLandscape && styles.nextButtonLandscape,
               ] }
+              onPress={ canComplete ? complete : handleNext }
+              styles={ styles }
             >
               { ({ isFocused }) => (
-                <ThemedPressable
-                  style={ styles.nextButtonPressable }
-                  contentStyle={ [
-                    styles.nextButtonContent,
-                    isFocused && styles.TVfocused,
+                <ThemedText
+                  style={ [
+                    styles.buttonText,
+                    isFocused && styles.TVfocusedText,
                   ] }
-                  onPress={ canComplete ? complete : handleNext }
-                  pressDelay={ 0 }
-                  mode='dark'
-                  resolveAsMobile
                 >
-                  <ThemedText
-                    style={ [
-                      styles.buttonText,
-                      isFocused && styles.TVfocusedText,
-                    ] }
-                  >
-                    { canComplete ? t('Complete') : t('Next') }
-                  </ThemedText>
-                </ThemedPressable>
+                  { canComplete ? t('Complete') : t('Next') }
+                </ThemedText>
               ) }
-            </SpatialNavigationFocusableView>
+            </SlidePressable>
           ) }
         </DefaultFocus>
       </SpatialNavigationView>
@@ -220,7 +213,7 @@ export const BaseSlide = ({
         >
           { renderBaseSlide() }
           { children }
-          <KeyboardAdjuster />
+          <KeyboardAdjuster isActive={ !isOverlayOpen } />
           { renderBaseNavigation() }
         </ScrollView>
       </Portal.Host>
@@ -251,7 +244,7 @@ export const ConfigureSlide = ({
     }
 
     goNext(s);
-  }, [selectedDeviceType]);
+  }, [selectedDeviceType, goNext]);
 
   const handleSelectTV = useCallback(() => {
     configureDeviceType(DeviceType.TV);
@@ -269,92 +262,82 @@ export const ConfigureSlide = ({
       styles={ styles }
     >
       <View style={ styles.configureWrapper }>
-        <SpatialNavigationFocusableView
-          onSelect={ handleSelectTV }
-          style={ styles.configureButton }
+        <SlidePressable
+          style={ styles.configureButtonPressable }
+          contentStyle={ [
+            styles.configureButtonContent,
+            selectedDeviceType === DeviceType.TV && styles.configureButtonSelected,
+          ] }
+          spatialStyle={ styles.configureButton }
+          onPress={ handleSelectTV }
+          styles={ styles }
         >
           { ({ isFocused }) => (
-            <ThemedPressable
-              style={ styles.configureButtonPressable }
-              contentStyle={ [
-                styles.configureButtonContent,
-                selectedDeviceType === DeviceType.TV && styles.configureButtonSelected,
-                isFocused && styles.TVfocused,
-              ] }
-              onPress={ handleSelectTV }
-              resolveAsMobile
-            >
-              <View style={ styles.configureContainer }>
-                <View style={ styles.configureIcon }>
-                  <WelcomeScreenTV
-                    color={ isFocused ? theme.colors.iconFocused : theme.colors.icon }
-                  />
-                </View>
-                <View style={ styles.configureInfo }>
-                  <ThemedText
-                    style={ [
-                      styles.configureTitle,
-                      isFocused && styles.TVfocusedText,
-                    ] }
-                  >
-                    { t('TV Version') }
-                  </ThemedText>
-                  <ThemedText
-                    style={ [
-                      styles.configureSubtitle,
-                      isFocused && styles.TVfocusedText,
-                    ] }
-                  >
-                    { t('Suits for TV') }
-                  </ThemedText>
-                </View>
+            <View style={ styles.configureContainer }>
+              <View style={ styles.configureIcon }>
+                <WelcomeScreenTV
+                  color={ isFocused ? theme.colors.iconFocused : theme.colors.icon }
+                />
               </View>
-            </ThemedPressable>
+              <View style={ styles.configureInfo }>
+                <ThemedText
+                  style={ [
+                    styles.configureTitle,
+                    isFocused && styles.TVfocusedText,
+                  ] }
+                >
+                  { t('TV Version') }
+                </ThemedText>
+                <ThemedText
+                  style={ [
+                    styles.configureSubtitle,
+                    isFocused && styles.TVfocusedText,
+                  ] }
+                >
+                  { t('Suits for TV') }
+                </ThemedText>
+              </View>
+            </View>
           ) }
-        </SpatialNavigationFocusableView>
-        <SpatialNavigationFocusableView
-          onSelect={ handleSelectMobile }
-          style={ styles.configureButton }
+        </SlidePressable>
+        <SlidePressable
+          style={ styles.configureButtonPressable }
+          contentStyle={ [
+            styles.configureButtonContent,
+            selectedDeviceType === DeviceType.MOBILE && styles.configureButtonSelected,
+          ] }
+          spatialStyle={ styles.configureButton }
+          onPress={ handleSelectMobile }
+          styles={ styles }
         >
           { ({ isFocused }) => (
-            <ThemedPressable
-              style={ styles.configureButtonPressable }
-              contentStyle={ [
-                styles.configureButtonContent,
-                selectedDeviceType === DeviceType.MOBILE && styles.configureButtonSelected,
-                isFocused && styles.TVfocused,
-              ] }
-              onPress={ handleSelectMobile }
-              resolveAsMobile
-            >
-              <View style={ styles.configureContainer }>
-                <View style={ styles.configureIcon }>
-                  <WelcomeScreenMobile
-                    color={ isFocused ? theme.colors.iconFocused : theme.colors.icon }
-                  />
-                </View>
-                <View style={ styles.configureInfo }>
-                  <ThemedText
-                    style={ [
-                      styles.configureTitle,
-                      isFocused && styles.TVfocusedText,
-                    ] }
-                  >
-                    { t('Mobile Version') }
-                  </ThemedText>
-                  <ThemedText
-                    style={ [
-                      styles.configureSubtitle,
-                      isFocused && styles.TVfocusedText,
-                    ] }
-                  >
-                    { t('Suits for mobile') }
-                  </ThemedText>
-                </View>
+            <View style={ styles.configureContainer }>
+              <View style={ styles.configureIcon }>
+                <WelcomeScreenMobile
+                  color={ isFocused ? theme.colors.iconFocused : theme.colors.icon }
+                />
               </View>
-            </ThemedPressable>
+              <View style={ styles.configureInfo }>
+                <ThemedText
+                  style={ [
+                    styles.configureTitle,
+                    isFocused && styles.TVfocusedText,
+                  ] }
+                >
+                  { t('Mobile Version') }
+                </ThemedText>
+                <ThemedText
+                  style={ [
+                    styles.configureSubtitle,
+                    isFocused && styles.TVfocusedText,
+                  ] }
+                >
+                  { t('Suits for mobile') }
+                </ThemedText>
+              </View>
+            </View>
           ) }
-        </SpatialNavigationFocusableView>
+        </SlidePressable>
       </View>
     </BaseSlide>
   );
@@ -369,91 +352,97 @@ export const ProviderSlide = ({
   goNext,
   styles,
 }: ProviderSlideProps) => {
-  const { currentService, updateProvider, updateOfficialMode } = useServiceContext();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { theme } = useAppTheme();
+  const { currentService, updateProvider, updateOfficialMode, logout, validateUrl } = useServiceContext();
   const [selectedProvider, setSelectedProvider] = useState<string | null>(currentService.getDefaultProvider());
+  const [isOfficialMode, setIsOfficialMode] = useState<boolean>(currentService.isOfficialMode());
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isProviderValid, setIsProviderValid] = useState<boolean | null>(null);
-  const [selectedMode, setSelectedMode] = useState<string>(currentService.getOfficialMode()); // actually it is a provider link
-  const overlayRef = useRef<ThemedOverlayRef>(null);
+
+  const handleUpdateProvide = useCallback((value: string) => {
+    if (!value) {
+      NotificationStore.displayError(t('Please select a provider'));
+
+      return;
+    }
+
+    updateProvider(value);
+    setSelectedProvider(value);
+    setIsProviderValid(null);
+  }, [updateProvider]);
+
+  const handleOfficialMode = useCallback((value: boolean) => {
+    updateOfficialMode(value);
+    setIsOfficialMode(value);
+    setIsProviderValid(null);
+  }, [updateOfficialMode]);
 
   const validateProvider = useCallback(async () => {
     setIsLoading(true);
 
-    try {
-      updateOfficialMode(selectedMode);
+    try {;
+      logout();
 
-      // with official mode, we don't need to set provider, because official mode will use separate provider
-      await updateProvider(selectedMode ? '' : (selectedProvider ?? ''), true);
-      await currentService.getFilm(TEST_URL);
+      await validateUrl(currentService.getProvider());
 
       setIsProviderValid(true);
     } catch (error) {
       console.error(error);
-
       NotificationStore.displayError(t('Invalid provider'));
 
       setIsProviderValid(false);
     } finally {
       setIsLoading(false);
     }
-  }, [selectedProvider, selectedMode, currentService, updateProvider, updateOfficialMode]);
+  }, [currentService, logout, validateUrl]);
 
-  const handleUpdateProvider = useCallback(() => {
-    updateOfficialMode(selectedMode);
-    updateProvider(selectedMode ? '' : (selectedProvider ?? ''), true);
-  }, [selectedProvider, selectedMode, updateProvider, updateOfficialMode]);
-
-  const handleSelectMode = useCallback(({ value }: DropdownItem) => {
-    setSelectedMode(value);
-    overlayRef.current?.close();
-  }, []);
+  const handleNext = useCallback(() => {
+    logout();
+  }, [logout]);
 
   return (
     <BaseSlide
       slide={ slide }
       goBack={ goBack }
       goNext={ goNext }
-      onNext={ handleUpdateProvider }
+      onNext={ handleNext }
       styles={ styles }
     >
       <View style={ styles.providerWrapper }>
-        <ThemedInput
-          style={ [
-            styles.providerSelectorInput,
-            isLoading && styles.providerValidateButtonDisabled,
-            selectedMode && styles.providerValidateButtonDisabled,
-          ] }
-          placeholder={ t('Provider') }
-          onChangeText={ setSelectedProvider }
+        <ThemedCustomSelect
+          options={ currentService.defaultProviders }
           value={ selectedProvider ?? '' }
-          editable={ !selectedMode }
+          onSelect={ handleUpdateProvide }
+          disabled={ isOfficialMode }
         />
-        <ThemedText>
-          { t('Official mode') }
-        </ThemedText>
-        <ThemedDropdown
-          overlayRef={ overlayRef }
-          data={ currentService.officialMirrors }
-          onChange={ handleSelectMode }
-          header={ t('Official mode') }
-          value={ selectedMode ?? '' }
-        />
-        <SpatialNavigationFocusableView
-          onSelect={ validateProvider }
-          style={ styles.providerButtonContainer }
+        <View style={ styles.providerOffModeRow }>
+          <ThemedText>
+            { t('Official mode') }
+          </ThemedText>
+          <ThemedToggle
+            value={ isOfficialMode }
+            onValueChange={ handleOfficialMode }
+          />
+        </View>
+        <ThemedPressable
+          style={ styles.providerValidateButton }
+          contentStyle={ [
+            styles.providerValidateButtonContent,
+            isLoading && styles.providerValidateButtonDisabled,
+          ] }
+          onPress={ validateProvider }
+          disabled={ isLoading }
+          withAnimation
         >
           { ({ isFocused }) => (
-            <ThemedPressable
-              style={ styles.providerValidateButton }
-              contentStyle={ [
-                styles.providerValidateButtonContent,
-                isFocused && styles.TVfocused,
-                isLoading && styles.providerValidateButtonDisabled,
-              ] }
-              onPress={ validateProvider }
-              disabled={ isLoading }
-              resolveAsMobile
+            <View style={ [
+              styles.providerValidateButtonInner,
+              isFocused && styles.TVfocused,
+            ] }
             >
+              { isProviderValid === null && (
+                <RefreshCw color={ isFocused ? theme.colors.iconFocused : theme.colors.icon } />
+              ) }
               { isProviderValid === false && (
                 <CircleAlert color='red' />
               ) }
@@ -468,10 +457,243 @@ export const ProviderSlide = ({
               >
                 { t('Validate') }
               </ThemedText>
-            </ThemedPressable>
+            </View>
           ) }
-        </SpatialNavigationFocusableView>
+        </ThemedPressable>
       </View>
+    </BaseSlide>
+  );
+};
+
+type LoginSlideProps = SlideProps & {
+};
+
+export const LoginSlide = ({
+  slide,
+  goBack,
+  goNext,
+  styles,
+}: LoginSlideProps) => {
+  const { theme, scale } = useAppTheme();
+  const { isTV } = useConfigContext();
+  const { profile, isSignedIn, currentService, login } = useServiceContext();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const usernameRef = useRef<string | null>(null);
+  const passwordRef = useRef<string | null>(null);
+  const registrationOverlayRef = useRef<ThemedOverlayRef>(null);
+
+  const handleNext = useCallback((s: SlideInterface) => {
+    if (!isSignedIn) {
+      NotificationStore.displayMessage(t('Please sign in to continue'));
+
+      return;
+    }
+
+    goNext(s);
+  }, [isSignedIn, goNext]);
+
+  const handleLogin = useCallback(async () => {
+    setIsLoading(true);
+
+    if (!usernameRef.current || !passwordRef.current) {
+      NotificationStore.displayMessage(t('Please enter username and password'));
+      setIsLoading(false);
+
+      return;
+    }
+
+    try {
+      await login(
+        usernameRef.current ?? '',
+        passwordRef.current ?? ''
+      );
+    } catch (error) {
+      NotificationStore.displayError(error as Error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [login]);
+
+  const handleRegistration = useCallback(() => {
+    registrationOverlayRef.current?.open();
+  }, []);
+
+  const handleOpenEmail = useCallback(() => {
+    Linking.openURL(`mailto:${currentService.supportEmail}`);
+  }, [currentService]);
+
+  const renderLoginForm = () => (
+    <View style={ styles.loginWrapper }>
+      <View style={ styles.loginInputs }>
+        <ThemedInput
+          style={ isLoading && styles.providerValidateButtonDisabled }
+          placeholder={ t('Login or email') }
+          onChangeText={ username => usernameRef.current = username }
+        />
+        <ThemedInput
+          style={ isLoading && styles.providerValidateButtonDisabled }
+          placeholder={ t('Password') }
+          onChangeText={ password => passwordRef.current = password }
+          secureTextEntry
+        />
+      </View>
+      <ThemedPressable
+        style={ styles.loginButton }
+        contentStyle={ [
+          styles.loginButtonContent,
+          isLoading && styles.loginButtonDisabled,
+        ] }
+        onPress={ handleLogin }
+        disabled={ isLoading }
+        withAnimation
+      >
+        { ({ isFocused }) => (
+          <View style={ [
+            styles.loginButtonInner,
+            isFocused && styles.TVfocused,
+          ] }
+          >
+            <LogIn
+              color={ isFocused ? theme.colors.iconFocused : theme.colors.icon }
+            />
+            <ThemedText
+              style={ [
+                styles.loginButtonText,
+                isFocused && styles.TVfocusedText,
+              ] }
+            >
+              { t('Sign in') }
+            </ThemedText>
+          </View>
+        ) }
+      </ThemedPressable>
+      <View style={ styles.registrationContainer }>
+        <ThemedText
+          style={ [
+            styles.providerButtonText,
+          ] }
+        >
+          { t('No Account?') }
+        </ThemedText>
+        <ThemedPressable onPress={ handleRegistration } withAnimation>
+          { ({ isFocused }) => (
+            <ThemedText style={ [
+              styles.signUpText,
+              isFocused && styles.signUpTextFocused,
+            ] }
+            >
+              { t('Sign Up') }
+            </ThemedText>
+          ) }
+        </ThemedPressable>
+      </View>
+      <ThemedOverlay ref={ registrationOverlayRef } contentContainerStyle={ isTV && styles.registrationOverlayTV }>
+        <View style={ styles.registrationOverlay }>
+          <View style={ styles.registrationRow }>
+            <View style={ styles.registrationRowWrapper }>
+              <ThemedText style={ styles.registrationRowNumber }>
+                1
+              </ThemedText>
+              <ThemedText style={ styles.registrationRowTitle }>
+                { t('Send any text to the email.') }
+              </ThemedText>
+            </View>
+            <View style={ styles.registrationRowContent }>
+              <ThemedPressable
+                style={ styles.supportEmailButton }
+                onPress={ handleOpenEmail }
+                withAnimation
+              >
+                { ({ isFocused }) => (
+                  <ThemedText
+                    style={ [
+                      styles.supportEmailButtonText,
+                      isFocused && styles.supportEmailButtonTextFocused,
+                    ] }
+                  >
+                    { currentService.supportEmail }
+                  </ThemedText>
+                ) }
+              </ThemedPressable>
+            </View>
+          </View>
+          <View style={ styles.registrationRow }>
+            <View style={ styles.registrationRowWrapper }>
+              <ThemedText style={ styles.registrationRowNumber }>
+                2
+              </ThemedText>
+              <ThemedText style={ styles.registrationRowTitle }>
+                { t('Check your email for the response email.') }
+              </ThemedText>
+            </View>
+            <View style={ styles.registrationRowContent }>
+              <View style={ styles.registrationHintContainer }>
+                <Info
+                  color={ theme.colors.icon }
+                  size={ scale(18) }
+                />
+                <ThemedText style={ styles.registrationHint }>
+                  { t('If email not received, check your spam folder.') }
+                </ThemedText>
+              </View>
+              <View style={ styles.registrationHintContainer }>
+                <Info
+                  color={ theme.colors.icon }
+                  size={ scale(18) }
+                />
+                <ThemedText style={ styles.registrationHint }>
+                  { t('Do not need to change provider in the app, just use official mode.') }
+                </ThemedText>
+              </View>
+            </View>
+          </View>
+          <View style={ styles.registrationRow }>
+            <View style={ styles.registrationRowWrapper }>
+              <ThemedText style={ styles.registrationRowNumber }>
+                3
+              </ThemedText>
+              <ThemedText style={ styles.registrationRowTitle }>
+                { t('Use data from the email to sign in.') }
+              </ThemedText>
+            </View>
+          </View>
+          <View style={ styles.registrationRowContent }>
+            <View style={ styles.registrationConfirmButtonWrapper }>
+              <DefaultFocus>
+                <ThemedButton
+                  style={ styles.registrationConfirmButton }
+                  onPress={ () => registrationOverlayRef.current?.close() }
+                >
+                  { t('Authorize') }
+                </ThemedButton>
+              </DefaultFocus>
+            </View>
+          </View>
+        </View>
+      </ThemedOverlay>
+    </View>
+  );
+
+  const renderContent = () => {
+    if (profile) {
+      return null;
+    }
+
+    return renderLoginForm();
+  };
+
+  return (
+    <BaseSlide
+      slide={ slide }
+      goBack={ goBack }
+      goNext={ handleNext }
+      style={ styles.loginSlide }
+      customImage={ profile?.avatar }
+      customTitle={ profile ? t('Welcome back, {{user}}!', { user: profile.name }) : undefined }
+      customSubtitle={ profile?.email }
+      styles={ styles }
+    >
+      { renderContent() }
     </BaseSlide>
   );
 };
@@ -485,11 +707,30 @@ export const CDNSlide = ({
   goNext,
   styles,
 }: CDNSlideProps) => {
-  const { currentService, validateUrl, updateCDN, getCDNs } = useServiceContext();
+  const { theme } = useAppTheme();
+  const { currentService, validateUrl, updateAutomaticCDN, updateCDN } = useServiceContext();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [selectedCDN, setSelectedCDN] = useState<string | null>(currentService.getCDN());
+  const [isAutomatic, setIsAutomatic] = useState<boolean>(currentService.isAutomaticCDN());
   const [isCDNValid, setIsCDNValid] = useState<boolean | null>(null);
-  const overlayRef = useRef<ThemedOverlayRef>(null);
+
+  const handleUpdateCDN = useCallback(() => {
+    if (!selectedCDN) {
+      NotificationStore.displayError(t('Please select a CDN'));
+
+      return;
+    }
+
+    setSelectedCDN(selectedCDN);
+    updateCDN(selectedCDN ?? '');
+    setIsCDNValid(null);
+  }, [selectedCDN, updateCDN]);
+
+  const handleAutomaticMode = useCallback((value: boolean) => {
+    setIsAutomatic(value);
+    updateAutomaticCDN(value);
+    setIsCDNValid(null);
+  }, [updateAutomaticCDN]);
 
   const handleValidateCDN = useCallback(async () => {
     let film: FilmInterface | null = null;
@@ -497,10 +738,10 @@ export const CDNSlide = ({
     setIsLoading(true);
 
     try {
-      updateCDN(selectedCDN ?? '', true);
       film = await currentService.getFilm(TEST_URL);
     } catch (error) {
-      NotificationStore.displayError(t('Invalid Provider'));
+      console.error(error);
+      NotificationStore.displayError(t('Invalid CDN'));
 
       return;
     }
@@ -534,17 +775,7 @@ export const CDNSlide = ({
     } finally {
       setIsLoading(false);
     }
-  }, [selectedCDN]);
-
-  const handleUpdateCDN = useCallback(() => {
-    updateCDN(selectedCDN ?? '', true);
-  }, [selectedCDN, updateCDN]);
-
-  const handleSelect = useCallback(({ value }: DropdownItem) => {
-    updateCDN(value);
-    setSelectedCDN(value);
-    overlayRef.current?.close();
-  }, [updateCDN]);
+  }, [currentService, validateUrl]);
 
   return (
     <BaseSlide
@@ -556,29 +787,41 @@ export const CDNSlide = ({
       styles={ styles }
     >
       <View style={ styles.cdnWrapper }>
-        <ThemedDropdown
-          overlayRef={ overlayRef }
-          data={ getCDNs() }
-          onChange={ handleSelect }
-          header={ t('CDN') }
+        <ThemedCustomSelect
+          options={ currentService.defaultCDNs }
           value={ selectedCDN ?? '' }
+          onSelect={ handleUpdateCDN }
+          disabled={ isAutomatic }
         />
-        <SpatialNavigationFocusableView
-          onSelect={ handleValidateCDN }
-          style={ styles.providerButtonContainer }
+        <View style={ styles.providerOffModeRow }>
+          <ThemedText>
+            { t('Automatic') }
+          </ThemedText>
+          <ThemedToggle
+            value={ isAutomatic }
+            onValueChange={ handleAutomaticMode }
+          />
+        </View>
+
+        <ThemedPressable
+          style={ styles.providerValidateButton }
+          contentStyle={ [
+            styles.providerValidateButtonContent,
+            isLoading && styles.providerValidateButtonDisabled,
+          ] }
+          onPress={ handleValidateCDN }
+          disabled={ isLoading }
+          withAnimation
         >
           { ({ isFocused }) => (
-            <ThemedPressable
-              style={ styles.providerValidateButton }
-              contentStyle={ [
-                styles.providerValidateButtonContent,
-                isFocused && styles.TVfocused,
-                isLoading && styles.providerValidateButtonDisabled,
-              ] }
-              onPress={ handleValidateCDN }
-              disabled={ isLoading }
-              resolveAsMobile
+            <View style={ [
+              styles.providerValidateButtonInner,
+              isFocused && styles.TVfocused,
+            ] }
             >
+              { isCDNValid === null && (
+                <RefreshCw color={ isFocused ? theme.colors.iconFocused : theme.colors.icon } />
+              ) }
               { isCDNValid === false && (
                 <CircleAlert color='red' />
               ) }
@@ -593,108 +836,60 @@ export const CDNSlide = ({
               >
                 { t('Validate') }
               </ThemedText>
-            </ThemedPressable>
+            </View>
           ) }
-        </SpatialNavigationFocusableView>
+        </ThemedPressable>
       </View>
     </BaseSlide>
   );
 };
 
-type LoginSlideProps = SlideProps & {
-};
-
-export const LoginSlide = ({
-  slide,
-  goBack,
-  goNext,
+export const SlidePressable = ({
+  style,
+  contentStyle,
+  children,
   styles,
-}: LoginSlideProps) => {
-  const { profile, login } = useServiceContext();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-
-  const handleLogin = useCallback(async () => {
-    setIsLoading(true);
-
-    try {
-      await login(username, password);
-    } catch (error) {
-      NotificationStore.displayError(error as Error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [login, username, password]);
-
-  const renderLoginForm = () => (
-    <View>
-      <View style={ styles.loginForm }>
-        <ThemedInput
-          style={ isLoading && styles.providerValidateButtonDisabled }
-          placeholder={ t('Login or email') }
-          onChangeText={ setUsername }
-          defaultValue={ username ?? '' }
-        />
-        <ThemedInput
-          style={ isLoading && styles.providerValidateButtonDisabled }
-          placeholder={ t('Password') }
-          onChangeText={ setPassword }
-          defaultValue={ password ?? '' }
-          secureTextEntry
-        />
-      </View>
-      <View style={ styles.providerButtonContainer }>
-        <SpatialNavigationFocusableView
-          onSelect={ handleLogin }
-          style={ styles.providerButtonContainer }
-        >
-          { ({ isFocused }) => (
-            <ThemedPressable
-              style={ styles.providerValidateButton }
-              contentStyle={ [
-                styles.providerValidateButtonContent,
-                isFocused && styles.TVfocused,
-                isLoading && styles.providerValidateButtonDisabled,
-              ] }
-              onPress={ handleLogin }
-              resolveAsMobile
-            >
-              <ThemedText
-                style={ [
-                  styles.providerButtonText,
-                  isFocused && styles.TVfocusedText,
-                ] }
-              >
-                { t('Sign in') }
-              </ThemedText>
-            </ThemedPressable>
-          ) }
-        </SpatialNavigationFocusableView>
-      </View>
-    </View>
-  );
-
-  const renderContent = () => {
-    if (profile) {
-      return null;
-    }
-
-    return renderLoginForm();
-  };
+  spatialRef,
+  spatialStyle,
+  onPress,
+}: {
+  style?: StyleProp<ViewStyle>;
+  contentStyle?: StyleProp<ViewStyle>;
+  children?: React.ReactNode | ((props: ThemedFocusableNodeState) => React.ReactElement);
+  styles: ThemedStyles<typeof componentStyles>;
+  spatialRef?: React.Ref<SpatialNavigationNodeRef>;
+  spatialStyle?: StyleProp<ViewStyle>;
+  onPress?: () => void;
+}) => {
+  const { theme } = useAppTheme();
 
   return (
-    <BaseSlide
-      slide={ slide }
-      goBack={ goBack }
-      goNext={ goNext }
-      style={ styles.loginSlide }
-      customImage={ profile?.avatar }
-      customTitle={ profile ? t('Welcome back, {{user}}!', { user: profile.name }) : undefined }
-      customSubtitle={ profile?.email }
-      styles={ styles }
+    <SpatialNavigationFocusableView
+      ref={ spatialRef }
+      onSelect={ onPress }
+      style={ [spatialStyle] }
     >
-      { renderContent() }
-    </BaseSlide>
+      { ({ isFocused, isRootActive }) => (
+        <View style={ [style,, { overflow: 'hidden' }] }>
+          <Pressable
+            onPress={ onPress }
+            android_ripple={ {
+              color: theme.colors.whiteTransparent,
+            } }
+            unstable_pressDelay={ 0 }
+            style={ [{
+              flex: 1,
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }, contentStyle, isFocused && styles.TVfocused] }
+            tvFocusable={ false }
+            focusable={ false }
+          >
+            { typeof children === 'function' ? children({ isFocused, isRootActive }) : children }
+          </Pressable>
+        </View>
+      ) }
+    </SpatialNavigationFocusableView>
   );
 };

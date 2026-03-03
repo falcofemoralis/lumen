@@ -9,12 +9,7 @@ import { EpisodeInterface, SeasonInterface } from 'Type/FilmVoice.interface';
 import { HTMLElementInterface } from 'Util/Parser';
 
 import { decrypt } from './decode';
-import { SubtitleLns } from './playerApi';
-
-export interface JSONResult {
-  success: boolean;
-  message: string;
-}
+import { SubtitleLns } from './type';
 
 export const getStaticUrl = (path: string): string => {
   if (path.startsWith('http')) {

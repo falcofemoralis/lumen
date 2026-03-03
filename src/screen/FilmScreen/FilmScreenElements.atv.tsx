@@ -20,10 +20,12 @@ import { FranchiseItem } from 'Type/FranchiseItem.interface';
 import { InfoListInterface } from 'Type/InfoList.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 
+import { componentStyles } from './FilmScreen.style.atv';
+
 interface SectionProps {
   title: string;
   children: React.ReactNode;
-  styles: ThemedStyles;
+  styles: ThemedStyles<typeof componentStyles>;
 }
 
 export const Section = ({
@@ -44,7 +46,7 @@ export const Section = ({
 interface ActorProps {
   actor: ActorCardInterface
   handleSelectActor: (link: string) => void
-  styles: any;
+  styles: ThemedStyles<typeof componentStyles>;
 }
 
 export const ActorView = memo(({
@@ -115,7 +117,7 @@ export const ActorView = memo(({
 interface ScheduleItemProps {
   item: ScheduleItemInterface
   handleUpdateScheduleWatch: (scheduleItem: ScheduleItemInterface) => Promise<boolean>
-  styles: ThemedStyles
+  styles: ThemedStyles<typeof componentStyles>;
 }
 
 export const ScheduleItem = memo(({
@@ -243,7 +245,7 @@ interface ScheduleOverlayProps {
   scheduleOverlayRef: React.RefObject<ThemedOverlayRef | null>;
   film: FilmInterface;
   handleUpdateScheduleWatch: (scheduleItem: ScheduleItemInterface) => Promise<boolean>;
-  styles: ThemedStyles;
+  styles: ThemedStyles<typeof componentStyles>;
 }
 
 export const ScheduleOverlay = ({
@@ -292,7 +294,7 @@ interface FranchiseItemProps {
   item: FranchiseItem,
   idx: number,
   handleSelectFilm: (film: FilmInterface) => void,
-  styles: ThemedStyles;
+  styles: ThemedStyles<typeof componentStyles>;
 }
 
 export const FranchiseItemComponent = memo(({
@@ -369,7 +371,7 @@ export const FranchiseItemComponent = memo(({
 interface InfoListProps {
   list: InfoListInterface,
   handleSelectCategory: (link: string) => void
-  styles: ThemedStyles;
+  styles: ThemedStyles<typeof componentStyles>;
 }
 
 export const InfoList = memo(({
@@ -411,7 +413,7 @@ export const InfoList = memo(({
 interface RelatedItemProps {
   item: FilmCardInterface,
   handleSelectFilm: (film: FilmInterface) => void,
-  styles: ThemedStyles
+  styles: ThemedStyles<typeof componentStyles>;
 }
 
 export const RelatedItem = memo(({

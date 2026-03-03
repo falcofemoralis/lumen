@@ -22,7 +22,6 @@ export interface CommentItemProps {
   idx: number;
   containerWidth?: number;
   lines?: CalculatedLine[];
-  styles: any;
 }
 
 export type CalculatedLine = {

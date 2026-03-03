@@ -5,11 +5,12 @@ import { useAppTheme } from 'Theme/context';
 import { ThemedStyles } from 'Theme/types';
 
 import { THUMBNAILS_AMOUNT } from './RecentScreen.config';
+import { componentStyles } from './RecentScreen.style';
 
 export const RecentScreenThumbnail = ({
   styles,
 }: {
-  styles: ThemedStyles
+  styles: ThemedStyles<typeof componentStyles>;
 }) => {
   const { scale } = useAppTheme();
 

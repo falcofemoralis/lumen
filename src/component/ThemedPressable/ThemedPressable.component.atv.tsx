@@ -10,6 +10,7 @@ export const ThemedPressableComponent = ({
   onBlur,
   children,
   style,
+  contentStyle,
   spatialRef,
   disabled = false,
   withAnimation = false,
@@ -26,10 +27,11 @@ export const ThemedPressableComponent = ({
   return (
     <SpatialNavigationFocusableView
       ref={ spatialRef }
-      onSelect={ onPress }
-      onLongSelect={ onLongPress }
+      onSelect={ disabled ? undefined : onPress }
+      onLongSelect={ disabled ? undefined : onLongPress }
       onFocus={ onFocus }
       onBlur={ onBlur }
+      style={ style }
     >
       { ({ isFocused, isRootActive }) => withAnimation ? (
         <Animated.View
@@ -39,10 +41,11 @@ export const ThemedPressableComponent = ({
               transitionProperty: 'transform',
               transitionDuration: '250ms',
             },
-            style,
+            contentStyle,
             isFocused && isRootActive && {
               transform: [{ scale: zoomScale }],
             },
+            disabled && { opacity: 0.5 },
           ] }
         >
           { renderChildren({ isFocused, isRootActive }) }

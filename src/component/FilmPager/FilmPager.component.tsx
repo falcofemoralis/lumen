@@ -28,7 +28,7 @@ const TabButton = memo(({
   isActive: boolean;
   onPress: () => void;
   onLayout: (width: number) => void;
-  styles: ThemedStyles
+  styles: ThemedStyles<typeof componentStyles>;
 }) => (
   <Pressable
     onPress={ onPress }

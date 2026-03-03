@@ -28,6 +28,7 @@ export default function ThemedButton({
   withAnimation = false,
   zoomScale = 1.1,
   isFocusVisible = true,
+  disabled = false,
 }: ThemedButtonProps) {
   const { scale, theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
@@ -43,6 +44,7 @@ export default function ThemedButton({
         styleAdditional,
         isFocused && styles.containerFilledFocused,
         isFocused && styleFocused,
+        disabled && styles.containerFilledDisabled,
       ] }
     >
       { additionalElement && additionalElement(isFocused, isSelected ?? false) }

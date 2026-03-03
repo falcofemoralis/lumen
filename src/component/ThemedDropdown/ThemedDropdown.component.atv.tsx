@@ -17,6 +17,7 @@ export const ThemedDropdownComponent = ({
   header,
   asOverlay,
   style,
+  inputLabel,
   onChange,
   overlayRef,
   onClose,
@@ -57,7 +58,7 @@ export const ThemedDropdownComponent = ({
         onPress={ () => (overlayRef || componentOverlayRef).current?.open() }
         rightImage={ endIcon }
       >
-        { label }
+        { inputLabel ?? label }
       </ThemedButton>
     );
   };

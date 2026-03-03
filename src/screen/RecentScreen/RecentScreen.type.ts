@@ -18,5 +18,4 @@ export interface RecentGridRowProps {
   index: number;
   handleOnPress: (item: RecentItemInterface) => void;
   removeItem: (item: RecentItemInterface) => void;
-  styles: any;
 }

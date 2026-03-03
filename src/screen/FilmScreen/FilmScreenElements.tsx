@@ -16,11 +16,13 @@ import { FranchiseItem } from 'Type/FranchiseItem.interface';
 import { InfoListInterface } from 'Type/InfoList.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 
+import { componentStyles } from './FilmScreen.style';
+
 interface SectionProps {
-  title: string;
-  children: React.ReactNode;
-  useHeadingWrapper?: boolean;
-  styles: ThemedStyles;
+  title: string
+  children: React.ReactNode
+  useHeadingWrapper?: boolean
+  styles: ThemedStyles<typeof componentStyles>
 }
 
 export const Section = ({
@@ -42,7 +44,7 @@ export const Section = ({
 interface ActorProps {
   actor: ActorCardInterface,
   handleSelectActor: (link: string) => void
-  styles: any;
+  styles: ThemedStyles<typeof componentStyles>;
 }
 
 export const ActorView = memo(({
@@ -103,10 +105,10 @@ export const ActorView = memo(({
 ) => prevProps.actor.name === nextProps.actor.name);
 
 interface ScheduleItemProps {
-  item: ScheduleItemInterface,
-  useInternalState?: boolean,
+  item: ScheduleItemInterface
+  useInternalState?: boolean
   handleUpdateScheduleWatch: (scheduleItem: ScheduleItemInterface) => Promise<boolean>
-  styles: ThemedStyles;
+  styles: ThemedStyles<typeof componentStyles>
 }
 
 export const ScheduleItem = memo(({
@@ -218,7 +220,7 @@ interface FranchiseItemProps {
   item: FranchiseItem,
   idx: number,
   handleSelectFilm: (film: FilmInterface) => void,
-  styles: ThemedStyles
+  styles: ThemedStyles<typeof componentStyles>
 }
 
 export const FranchiseItemComponent = memo(({
@@ -277,9 +279,9 @@ export const FranchiseItemComponent = memo(({
 ) => prevProps.item.link === nextProps.item.link);
 
 interface InfoListProps {
-  list: InfoListInterface,
-  handleSelectCategory: (link: string) => void,
-  styles: ThemedStyles
+  list: InfoListInterface
+  handleSelectCategory: (link: string) => void
+  styles: ThemedStyles<typeof componentStyles>
 }
 
 export const InfoList = memo(({

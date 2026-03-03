@@ -67,7 +67,6 @@ export function SettingsScreenContainer() {
     updateCDN,
     updateUserAgent,
     updateOfficialMode,
-    getCDNs,
   } = useServiceContext();
   const { theme } = useAppTheme();
   const { handleTap } = useTripleTap();
@@ -157,39 +156,42 @@ export function SettingsScreenContainer() {
       title: t('Network'),
       IconComponent: Globe,
       settings: [
-        {
-          id: 'officialMode',
-          title: t('Official mode'),
-          subtitle: t('Links will be used as in the official application.'),
-          type: SETTING_TYPE.SELECT,
-          value: currentService.getOfficialMode(),
-          options: currentService.officialMirrors,
-          IconComponent: ShieldCheck,
-          onSettingPress: (value) => updateOfficialMode(value as string),
-        },
-        {
-          id: 'provider',
-          title: t('Provider'),
-          subtitle: t('Change provider'),
-          type: SETTING_TYPE.INPUT,
-          value: currentService.getDefaultProvider(),
-          onSettingPress: (value) => updateProvider(value as string),
-          IconComponent: CloudCog,
-          dependsOn: {
-            field: 'officialMode',
-            value: '',
-          },
-        },
-        {
-          id: 'cdn',
-          title: t('CDN'),
-          subtitle: t('Change CDN'),
-          type: SETTING_TYPE.SELECT,
-          value: currentService.getCDN(),
-          options: getCDNs(),
-          IconComponent: FolderCog,
-          onSettingPress: (value) => updateCDN(value as string, true),
-        },
+        // {
+        //   id: 'officialMode',
+        //   title: t('Official mode'),
+        //   subtitle: t('Links will be used as in the official application.'),
+        //   type: SETTING_TYPE.SWITCH,
+        //   value: convertBooleanToString(currentService.isOfficialMode()),
+        //   IconComponent: ShieldCheck,
+        //   onSettingPress: (value) => updateOfficialMode(value as string),
+        // },
+        // {
+        //   id: 'provider',
+        //   title: t('Provider'),
+        //   subtitle: t('Change provider'),
+        //   type: SETTING_TYPE.CUSTOM_SELECT,
+        //   value: currentService.getDefaultProvider(),
+        //   options: currentService.defaultProviders.map((provider) => ({
+        //     value: provider,
+        //     label: provider,
+        //   })),
+        //   onSettingPress: (value) => updateProvider(value as string),
+        //   IconComponent: CloudCog,
+        //   dependsOn: {
+        //     field: 'officialMode',
+        //     value: 'false',
+        //   },
+        // },
+        // {
+        //   id: 'cdn',
+        //   title: t('CDN'),
+        //   subtitle: t('Change CDN'),
+        //   type: SETTING_TYPE.SELECT,
+        //   value: currentService.getCDN(),
+        //   options: getCDNs(),
+        //   IconComponent: FolderCog,
+        //   onSettingPress: (value) => updateCDN(value as string, true),
+        // },
         {
           id: 'userAgent',
           title: t('Useragent'),
@@ -348,11 +350,14 @@ export function SettingsScreenContainer() {
       return true;
     }
 
+    const result = await onPress?.(value, id, setSettings);
+    if (result === false) {
+      return false;
+    }
+
     if (!disableUpdate) {
       setSettings((prevSettings) => updateSettings(prevSettings, value, id));
     }
-
-    onPress?.(value, id, setSettings);
 
     return true;
   };

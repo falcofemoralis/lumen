@@ -1,9 +1,8 @@
 import { ThemedSafeArea } from 'Component/ThemedSafeArea';
 import { Wrapper } from 'Component/Wrapper';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
-import { useRef, useState } from 'react';
-import PagerView from 'react-native-pager-view';
-import { noopFn } from 'Util/Function';
+import { useMemo, useState } from 'react';
+import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated';
 
 import { BaseSlide, CDNSlide, ConfigureSlide, LoginSlide, ProviderSlide } from './SlideElements';
 import { componentStyles } from './WelcomeScreen.style';
@@ -16,22 +15,19 @@ export const WelcomeScreenComponent = ({
   complete,
 }: WelcomeScreenComponentProps) => {
   const styles = useThemedStyles(componentStyles);
-  const pagerViewRef = useRef<PagerView>(null);
   const [currentPage, setCurrentPage] = useState(0);
 
   const goBack = (_slide: SlideInterface) => {
     if (currentPage > 0) {
-      pagerViewRef.current?.setPageWithoutAnimation(currentPage - 1);
+      setCurrentPage(currentPage - 1);
     }
   };
 
   const goNext = (_slide: SlideInterface) => {
     if (currentPage < slides.length - 1) {
-      pagerViewRef.current?.setPageWithoutAnimation(currentPage + 1);
+      setCurrentPage(currentPage + 1);
     }
   };
-
-  const isSlideActive = (slide: SlideInterface) => slides.findIndex((s) => s.id === slide.id) === currentPage;
 
   const renderWelcomeSlide = (slide: SlideInterface) => (
     <BaseSlide
@@ -64,8 +60,8 @@ export const WelcomeScreenComponent = ({
     />
   );
 
-  const renderCDNSlide = (slide: SlideInterface) => (
-    <CDNSlide
+  const renderLoginSlide = (slide: SlideInterface) => (
+    <LoginSlide
       slide={ slide }
       goBack={ goBack }
       goNext={ goNext }
@@ -73,8 +69,8 @@ export const WelcomeScreenComponent = ({
     />
   );
 
-  const renderLoginSlide = (slide: SlideInterface) => (
-    <LoginSlide
+  const renderCDNSlide = (slide: SlideInterface) => (
+    <CDNSlide
       slide={ slide }
       goBack={ goBack }
       goNext={ goNext }
@@ -104,27 +100,21 @@ export const WelcomeScreenComponent = ({
     COMPLETE: renderCompleteSlide,
   };
 
-  const renderSlide = (slide: SlideInterface) => {
-    const render = RENDER_MAP[slide.id] ?? noopFn;
-
-    return isSlideActive(slide) ? render(slide) : null;
-  };
+  const activeSlide = useMemo(() => slides[currentPage], [currentPage, slides]);
 
   return (
     <ThemedSafeArea edges={ ['top', 'bottom', 'left', 'right'] }>
-      <PagerView
-        ref={ pagerViewRef }
-        style={ { flex: 1 } }
-        initialPage={ 0 }
-        onPageSelected={ (e) => setCurrentPage(e.nativeEvent.position) }
-        scrollEnabled={ false }
+      <Animated.View
+        key={ activeSlide.id }
+        entering={ FadeIn }
+        exiting={ FadeOut }
+        layout={ LinearTransition }
+        style={ styles.page }
       >
-        { slides.map((slide) => (
-          <Wrapper key={ slide.id }>
-            { renderSlide(slide) }
-          </Wrapper>
-        )) }
-      </PagerView>
+        <Wrapper style={ styles.wrapper }>
+          { RENDER_MAP[activeSlide.id](activeSlide) }
+        </Wrapper>
+      </Animated.View>
     </ThemedSafeArea>
   );
 };

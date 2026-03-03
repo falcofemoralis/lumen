@@ -200,6 +200,23 @@ const ru: Translations = {
   'Download poster': 'Загружать постер',
   'Toggle download poster.': 'Включить загрузку постера.',
   'Download failed': 'Ошибка загрузки',
+  'Please select or type a value': 'Пожалуйста, выберите или введите значение',
+  'Type or select value': 'Введите или выберите значение',
+  'Select from presets': 'Выбрать из списка',
+  'Confirm': 'Подтвердить',
+  'Please sign in to continue': 'Пожалуйста, войдите в аккаунт, чтобы продолжить',
+  'No Account?': 'Нет аккаунта?',
+  'Sign Up': 'Зарегистрируйтесь',
+  'Send any text to the email.': 'Отправьте любое письмо на почту',
+  'Check your email for the response email.': 'Проверьте вашу почту на наличие ответного письма',
+  'If email not received, check your spam folder.': 'Если письмо не пришло, проверьте папку Спам',
+  'Do not need to change provider in the app, just use official mode.': 'Зеркало не нужно менять в приложении, просто используйте официальный режим',
+  'Use data from the email to sign in.': 'Используйте данные из письма для авторизации в аккаунт',
+  'Please enter username and password': 'Пожалуйста, введите имя пользователя и пароль',
+  'Authorize': 'Авторизоваться',
+  'Please select a provider': 'Пожалуйста, выберите зеркало',
+  'Please select a CDN': 'Пожалуйста, выберите CDN',
+  'Invalid CDN': 'Недействительный CDN',
 };
 
 export default ru;

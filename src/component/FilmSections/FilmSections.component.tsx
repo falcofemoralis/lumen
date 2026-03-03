@@ -7,6 +7,7 @@ import { useConfigContext } from 'Context/ConfigContext';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { memo, useCallback, useMemo } from 'react';
 import { Pressable, View } from 'react-native';
+import { ThemedStyles } from 'Theme/types';
 
 import { componentStyles } from './FilmSections.style';
 import {
@@ -21,7 +22,7 @@ const FilmSectionsRow = ({
   itemSize,
   handleOnPress,
   styles,
-}: FilmSectionsRowProps) => {
+}: FilmSectionsRowProps & { styles: ThemedStyles<typeof componentStyles> }) => {
   const { header, films = [], isPlaceholder } = row;
 
   const renderHeader = () => (

@@ -12,6 +12,7 @@ import { Image, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { DefaultFocus, Directions, SpatialNavigationRoot, SpatialNavigationView } from 'react-tv-space-navigation';
 import { useAppTheme } from 'Theme/context';
+import { ThemedStyles } from 'Theme/types';
 import { BadgeData } from 'Type/BadgeData.interface';
 import { ProfileInterface } from 'Type/Profile.interface';
 import { setTimeoutSafe } from 'Util/Misc';
@@ -132,7 +133,7 @@ export function NavigationBarComponent({
 }
 
 type NavigationTabProps = {
-  styles: any,
+  styles: ThemedStyles<typeof componentStyles>,
   badgeData: BadgeData,
   onTabSelect: (name: string) => void,
   descriptors: Record<string, any>,

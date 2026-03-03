@@ -1,19 +1,22 @@
 import { ThemedText } from 'Component/ThemedText';
 import { useState } from 'react';
 import { StyleProp, TextStyle, View, ViewStyle } from 'react-native';
+import { ThemedStyles } from 'Theme/types';
 import { CommentInterface, CommentTextInterface, CommentTextType } from 'Type/Comment.interface';
+
+import { componentStyles } from './Comments.style';
 
 interface CommentTextProps {
   comment: CommentInterface
-  style?: StyleProp<ViewStyle> | undefined;
-  textStyle?: StyleProp<TextStyle>;
-  styles: any;
+  style?: StyleProp<ViewStyle> | undefined
+  textStyle?: StyleProp<TextStyle>
+  styles: ThemedStyles<typeof componentStyles>
 }
 
 interface SpoilerItemProps {
-  textItem: CommentTextInterface,
-  textStyle?: StyleProp<TextStyle>,
-  styles: any,
+  textItem: CommentTextInterface
+  textStyle?: StyleProp<TextStyle>
+  styles: ThemedStyles<typeof componentStyles>
 }
 
 const SpoilerItem = ({

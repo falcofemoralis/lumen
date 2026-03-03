@@ -198,6 +198,23 @@ const en = {
   'Download poster': 'Download poster',
   'Toggle download poster.': 'Toggle download poster.',
   'Download failed': 'Download failed',
+  'Please select or type a value': 'Please select or type a value',
+  'Type or select value': 'Type or select value',
+  'Select from presets': 'Select from presets',
+  'Confirm': 'Confirm',
+  'Please sign in to continue': 'Please sign in to continue',
+  'No Account?': 'No Account?',
+  'Sign Up': 'Sign Up',
+  'Send any text to the email.': 'Send any text to the email.',
+  'Check your email for the response email.': 'Check your email for the response email.',
+  'If email not received, check your spam folder.': 'If email not received, check your spam folder.',
+  'Do not need to change provider in the app, just use official mode.': 'Do not need to change provider in the app, just use official mode.',
+  'Use data from the email to sign in.': 'Use data from the email to sign in.',
+  'Please enter username and password': 'Please enter username and password',
+  'Authorize': 'Authorize',
+  'Please select a provider': 'Please select a provider',
+  'Please select a CDN': 'Please select a CDN',
+  'Invalid CDN': 'Invalid CDN',
 };
 
 export default en;

@@ -22,6 +22,7 @@ import { Slider } from 'react-native-awesome-slider';
 import Animated, { FadeOut, LinearTransition, useSharedValue } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from 'Theme/context';
+import { ThemedStyles } from 'Theme/types';
 import { DownloadFilmInterface } from 'Type/DownloadFile.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
@@ -39,7 +40,7 @@ const DownloadItemTask = ({
   restartTask,
   toggleTask,
   completeTask,
-}: DownloadItemTaskProps) => {
+}: DownloadItemTaskProps & { styles: ThemedStyles<typeof componentStyles> }) => {
   const { scale, theme } = useAppTheme();
   const [downloaded, setDownloaded] = useState(0);
   const [total, setTotal] = useState(0);
@@ -206,7 +207,7 @@ const DownloadItemTask = ({
   );
 };
 
-const DownloadItem = (props: DownloadItemProps) => {
+const DownloadItem = (props: DownloadItemProps & { styles: ThemedStyles<typeof componentStyles> }) => {
   const {
     index,
     item,

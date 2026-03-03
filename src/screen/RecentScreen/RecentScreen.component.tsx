@@ -12,6 +12,7 @@ import { memo, useCallback } from 'react';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from 'Theme/context';
+import { ThemedStyles } from 'Theme/types';
 import { RecentItemInterface } from 'Type/RecentItem.interface';
 
 import { NUMBER_OF_COLUMNS } from './RecentScreen.config';
@@ -25,7 +26,7 @@ function RecentItem({
   handleOnPress,
   removeItem,
   styles,
-}: RecentGridRowProps) {
+}: RecentGridRowProps & { styles: ThemedStyles<typeof componentStyles> }) {
   const {
     image,
     name,

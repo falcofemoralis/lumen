@@ -23,7 +23,6 @@ export type ThemedPressableContainerProps ={
   additionalElement?: React.ReactNode;
   withAnimation?: boolean;
   zoomScale?: number;
-  resolveAsMobile?: boolean;
 }
 
 export type ThemedPressableComponentProps = ThemedPressableContainerProps;

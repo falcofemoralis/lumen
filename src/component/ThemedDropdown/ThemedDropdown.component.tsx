@@ -23,7 +23,7 @@ export const ThemedDropdownComponent = ({
   style,
   onClose,
 }: ThemedDropdownComponentProps) => {
-  const { theme } = useAppTheme();
+  const { theme, scale } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
   const componentOverlayRef = useRef<ThemedOverlayRef>(null);
 
@@ -62,7 +62,7 @@ export const ThemedDropdownComponent = ({
         IconComponent={ Plus }
         iconProps={ {
           color: theme.colors.icon,
-          size: 18,
+          size: scale(18),
         } }
         rightImage={ endIcon }
       >

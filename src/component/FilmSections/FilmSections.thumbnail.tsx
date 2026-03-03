@@ -1,5 +1,8 @@
 import { FilmCardThumbnail } from 'Component/FilmCard/FilmCard.thumbnail';
 import { View } from 'react-native';
+import { ThemedStyles } from 'Theme/types';
+
+import { componentStyles } from './FilmSections.style';
 
 export const FilmSectionsThumbnail = ({
   width,
@@ -8,7 +11,7 @@ export const FilmSectionsThumbnail = ({
 }: {
   width: number;
   numberOfColumns: number;
-  styles: any;
+  styles: ThemedStyles<typeof componentStyles>;
 }) => {
   return (
     <View

@@ -9,6 +9,7 @@ import { ThumbsUp } from 'lucide-react-native';
 import { memo, useCallback } from 'react';
 import { View } from 'react-native';
 import { useAppTheme } from 'Theme/context';
+import { ThemedStyles } from 'Theme/types';
 import { CommentInterface } from 'Type/Comment.interface';
 
 import { componentStyles } from './Comments.style';
@@ -19,7 +20,7 @@ export function CommentItem({
   comment,
   idx,
   styles,
-}: CommentItemProps) {
+}: CommentItemProps & { styles: ThemedStyles<typeof componentStyles> }) {
   const {
     id,
     avatar,

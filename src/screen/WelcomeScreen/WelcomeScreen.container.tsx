@@ -26,7 +26,6 @@ export function WelcomeScreenContainer() {
       title: t('Personalize Your Experience'),
       subtitle: t('Choose your device type for a tailored movie-watching journey.'),
       IconComponent: MonitorCog,
-
     },
     {
       id: SLIDE_TYPE.PROVIDER,
@@ -35,16 +34,16 @@ export function WelcomeScreenContainer() {
       IconComponent: CloudCog,
     },
     {
-      id: SLIDE_TYPE.CDN,
-      title: t('Optimize Streaming Performance'),
-      subtitle: t('Choose a content delivery network (CDN) for faster streaming.'),
-      IconComponent: FolderCog,
-    },
-    {
       id: SLIDE_TYPE.LOGIN,
       title: t('Sign In to an Account'),
       subtitle: t('Log in to sync your content and enjoy a seamless experience.'),
       IconComponent: UserCog,
+    },
+    {
+      id: SLIDE_TYPE.CDN,
+      title: t('Optimize Streaming Performance'),
+      subtitle: t('Choose a content delivery network (CDN) for faster streaming.'),
+      IconComponent: FolderCog,
     },
     {
       id: SLIDE_TYPE.COMPLETE,

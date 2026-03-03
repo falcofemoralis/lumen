@@ -26,7 +26,7 @@ const SearchHeader = memo(({
   handleStartRecognition,
   handleApplySearch,
 }: SearchScreenComponentProps & {
-  styles: ThemedStyles
+  styles: ThemedStyles<typeof componentStyles>;
 }) => {
   const { theme } = useAppTheme();
 

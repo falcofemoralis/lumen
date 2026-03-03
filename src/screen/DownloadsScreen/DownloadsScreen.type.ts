@@ -23,10 +23,8 @@ export interface DownloadsScreenComponentProps {
 export interface DownloadItemProps extends Omit<DownloadsScreenComponentProps, 'handleRefresh' | 'isLoading'> {
   index: number;
   item: DownloadFilmInterface;
-  styles: ThemedStyles;
 }
 
 export interface DownloadItemTaskProps extends Omit<DownloadsScreenComponentProps, 'handleRefresh' | 'isLoading'> {
   task: DownloadTask;
-  styles: ThemedStyles;
 }

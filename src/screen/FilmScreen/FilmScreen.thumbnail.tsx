@@ -7,12 +7,14 @@ import { View } from 'react-native';
 import { useAppTheme } from 'Theme/context';
 import { ThemedStyles } from 'Theme/types';
 
+import { componentStyles } from './FilmScreen.style';
+
 export const FilmScreenThumbnail = ({
   top,
   styles,
 }: {
   top: number,
-  styles: ThemedStyles
+  styles: ThemedStyles<typeof componentStyles>;
 }) => {
   const { scale, theme } = useAppTheme();
 

@@ -24,6 +24,9 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   containerFilledFocused: {
     backgroundColor: colors.buttonFocused,
   },
+  containerFilledDisabled: {
+    opacity: 0.5,
+  },
   textFilled: {
     color: colors.text,
   },

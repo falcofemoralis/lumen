@@ -8,6 +8,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ErrorBoundary } from 'Component/ErrorBoundary';
 import { useConfigContext } from 'Context/ConfigContext';
+import { useServiceContext } from 'Context/ServiceContext';
 import { StatusBar } from 'expo-status-bar';
 import { ErrorScreen } from 'Screen/ErrorScreen';
 import { CommentsModal } from 'Screen/modal/CommentsModal/CommentsModal.component';
@@ -36,9 +37,10 @@ const Stack = createNativeStackNavigator<AppStackParamList>();
 
 const AppStack = () => {
   const { isConfigured } = useConfigContext();
+  const { isSignedIn } = useServiceContext();
   const { theme } = useAppTheme();
 
-  if (!isConfigured) {
+  if (!isConfigured || !isSignedIn) {
     return (
       <Stack.Navigator>
         <Stack.Screen

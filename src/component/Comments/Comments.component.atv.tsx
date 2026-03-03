@@ -20,6 +20,7 @@ import {
 import { LayoutRectangle, useWindowDimensions, View } from 'react-native';
 import { SpatialNavigationNodeRef } from 'react-tv-space-navigation';
 import { useAppTheme } from 'Theme/context';
+import { ThemedStyles } from 'Theme/types';
 import { CommentInterface, CommentTextType } from 'Type/Comment.interface';
 
 import { MEASURE_TEXT_STRING } from './Comments.config';
@@ -33,7 +34,8 @@ type CommentItemRef = {
   focus: () => void;
 };
 
-export const CommentItem = forwardRef<CommentItemRef, CommentItemProps>(({
+// eslint-disable-next-line max-len
+export const CommentItem = forwardRef<CommentItemRef, CommentItemProps & { styles: ThemedStyles<typeof componentStyles> }>(({
   comment,
   containerWidth = 0,
   lines = [],
@@ -145,7 +147,7 @@ const CommentsList = ({
 }: CommentsComponentProps & {
   containerWidth: number;
   charLayout: LayoutRectangle | null;
-  styles: any;
+  styles: ThemedStyles<typeof componentStyles>;
 }) => {
   const { height } = useWindowDimensions();
   const defaultItemRef = useRef<CommentItemRef>(null);

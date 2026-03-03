@@ -1,7 +1,5 @@
 import { ApiInterface, ApiServiceType } from 'Api/index';
 import { services } from 'Api/services';
-import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
-import { t } from 'i18n/translate';
 import { ACCOUNT_SCREEN, ACCOUNT_TAB, NOTIFICATIONS_SCREEN, NOTIFICATIONS_TAB } from 'Navigation/navigationRoutes';
 import {
   createContext,
@@ -16,7 +14,6 @@ import { BadgeData } from 'Type/BadgeData.interface';
 import { NotificationInterface, NotificationItemInterface } from 'Type/Notification.interface';
 import { ProfileInterface } from 'Type/Profile.interface';
 import { UserDataInterface } from 'Type/UserData.interface';
-import { CookiesManager } from 'Util/Cookies';
 import { requestValidator } from 'Util/Request';
 import { storage } from 'Util/Storage';
 
@@ -42,14 +39,15 @@ export interface ServiceContextInterface {
   updateProvider: (value: string, skipValidation?: boolean) => Promise<void>;
   updateCDN: (value: string, skipValidation?: boolean) => Promise<void>;
   updateUserAgent: (value: string) => void;
-  updateOfficialMode: (value: string) => void;
+  updateOfficialMode: (isActive: boolean) => void;
   validateUrl: (url: string) => Promise<void>;
-  getCDNs: () => DropdownItem[];
   viewProfile: () => void;
   resetNotifications: () => Promise<void>;
   fetchUserData: () => Promise<UserDataInterface | null>;
   getNotifications: () => Promise<NotificationInterface[]>;
   viewPayments: () => void;
+  reLogin: () => Promise<void>;
+  updateAutomaticCDN: (isActive: boolean) => void;
 }
 
 const ServiceContext = createContext<ServiceContextInterface>({
@@ -66,17 +64,18 @@ const ServiceContext = createContext<ServiceContextInterface>({
   updateUserAgent: () => {},
   updateOfficialMode: () => {},
   validateUrl: async () => {},
-  getCDNs: () => [],
   viewProfile: () => {},
   resetNotifications: async () => {},
   fetchUserData: async () => null,
   getNotifications: async () => [],
   viewPayments: () => {},
+  reLogin: async () => {},
+  updateAutomaticCDN: () => {},
 });
 
 export const ServiceProvider = ({ children }: { children: React.ReactNode }) => {
   const [currentService, setCurrentService] = useState<ApiInterface>(services[DEFAULT_SERVICE]);
-  const [isSignedIn, setIsSignedIn] = useState<boolean>(!!storage.getMiscStorage().loadString(CREDENTIALS_STORAGE));
+  const [isSignedIn, setIsSignedIn] = useState<boolean>(currentService.isSignedIn());
   const [profile, setProfile] = useState<ProfileInterface | null>(() => {
     const value = storage.getMiscStorage().load<ProfileInterface>(PROFILE_STORAGE);
 
@@ -168,7 +167,6 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
     storage.getMiscStorage().remove(CREDENTIALS_STORAGE);
     storage.getMiscStorage().remove(NOTIFICATIONS_STORAGE);
     storage.getMiscStorage().remove(USER_DATA_STORAGE_CACHE);
-    (new CookiesManager()).reset();
   }, [currentService, removeProfile]);
 
   /**
@@ -179,10 +177,10 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
     await requestValidator(url, headers ?? currentService.getHeaders());
   }, [currentService]);
 
+  /**
+   * Re-login to the current service using the stored credentials. This is useful when the provider is changed, so we can re-login to get the new profile and other data.
+   */
   const reLogin = useCallback(async () => {
-    // Reset cookies
-    (new CookiesManager()).reset();
-
     if (isSignedIn) {
       const data = storage.getMiscStorage().load<{ name: string; password: string }>(CREDENTIALS_STORAGE);
 
@@ -197,34 +195,20 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
   /**
    * Update the provider for the current service
    * @param {string} value - The provider URL
-   * @param {boolean} skipValidation - Whether to skip validation
    */
-  const updateProvider = useCallback(async (value: string, skipValidation = false) => {
-    if (!skipValidation) {
-      const url = value;
-
-      await validateUrl(url);
-    }
-
-    if (value !== '') {
-      currentService.setProvider(value);
-    }
-
-    reLogin();
-  }, [currentService, validateUrl, reLogin]);
+  const updateProvider = useCallback(async (value: string) => {
+    const cleanedValue = value.replace(/\/+$/, '');
+    currentService.setProvider(cleanedValue);
+  }, [currentService]);
 
   /**
    * Update the CDN for the current service
    * @param {string} value - The CDN URL
-   * @param {boolean} skipValidation - Whether to skip validation
    */
-  const updateCDN = useCallback(async (value: string, skipValidation = false) => {
-    if (value !== 'auto' && !skipValidation) {
-      await validateUrl(value);
-    }
-
-    currentService.setCDN(value);
-  }, [currentService, validateUrl]);
+  const updateCDN = useCallback(async (value: string) => {
+    const cleanedValue = value.replace(/\/+$/, '');
+    currentService.setCDN(cleanedValue);
+  }, [currentService]);
 
   /**
    * Update the user agent for the current service
@@ -236,27 +220,18 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
 
   /**
    * Update the official mode for the current service
-   * @param {string} value - The official mode string
+   * @param {boolean} isActive - Whether the official mode is active
    */
-  const updateOfficialMode = useCallback((value: string) => {
-    currentService.setOfficialMode(value);
-
-    reLogin();
-  }, [currentService, reLogin]);
+  const updateOfficialMode = useCallback((isActive: boolean) => {
+    currentService.setOfficialMode(isActive ? '1' : '');
+  }, [currentService]);
 
   /**
-   * Get the CDNs for the current service
+   * Update the automatic CDN mode for the current service
+   * @param {boolean} isActive - Whether the automatic CDN mode is active
    */
-  const getCDNs = useCallback(() => {
-    return [
-      {
-        value: 'auto',
-        label: t('Automatic'),
-      },
-    ].concat(currentService.defaultCDNs.map((cdn) => ({
-      value: cdn,
-      label: cdn,
-    }))) ;
+  const updateAutomaticCDN = useCallback((isActive: boolean) => {
+    currentService.setAutomaticCDN(isActive);
   }, [currentService]);
 
   const viewProfile = useCallback(() => {
@@ -378,12 +353,13 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
     updateUserAgent,
     validateUrl,
     updateOfficialMode,
-    getCDNs,
     viewProfile,
     resetNotifications,
     fetchUserData,
     getNotifications,
     viewPayments,
+    reLogin,
+    updateAutomaticCDN,
   }), [
     isSignedIn,
     profile,
@@ -399,12 +375,13 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
     updateUserAgent,
     validateUrl,
     updateOfficialMode,
-    getCDNs,
     viewProfile,
     resetNotifications,
     fetchUserData,
     getNotifications,
     viewPayments,
+    reLogin,
+    updateAutomaticCDN,
   ]);
 
   return (

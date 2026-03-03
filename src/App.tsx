@@ -56,6 +56,7 @@ import { useNavigationPersistence } from 'Util/Navigation';
 import { configureRemoteControl } from 'Util/RemoteControl';
 
 import { initI18n } from './i18n';
+import { applyPatches } from './patch';
 
 export const NAVIGATION_PERSISTENCE_KEY = 'NAVIGATION_STATE';
 
@@ -95,6 +96,7 @@ export function App() {
 
   useEffect(() => {
     configureRemoteControl();
+    applyPatches();
 
     initI18n().then(() => setIsI18nInitialized(true));
   }, []);

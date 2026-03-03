@@ -16,6 +16,7 @@ import {
   SpatialNavigationView,
   SpatialNavigationVirtualizedList,
 } from 'react-tv-space-navigation';
+import { ThemedStyles } from 'Theme/types';
 
 import { componentStyles } from './FilmSections.style.atv';
 import {
@@ -31,7 +32,7 @@ const FilmSectionsRow = ({
   containerWidth,
   styles,
   handleOnPress,
-}: FilmSectionsRowProps) => {
+}: FilmSectionsRowProps & { styles: ThemedStyles<typeof componentStyles> }) => {
   const { header, films = [], isPlaceholder = false } = row;
 
   const renderHeader = () => (

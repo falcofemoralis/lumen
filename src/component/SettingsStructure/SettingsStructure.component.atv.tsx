@@ -37,7 +37,7 @@ const SettingGroupPage = ({
   selectedGroupId: string;
   isActive: boolean;
   renderSetting: (setting: SettingItem) => Record<SettingType, React.ReactNode>
-  styles: ThemedStyles
+  styles: ThemedStyles<typeof componentStyles>;
 }) => {
   const { height } = useWindowDimensions();
   const { lock, unlock } = useLockSpatialNavigation();

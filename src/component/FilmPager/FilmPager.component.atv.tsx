@@ -29,7 +29,7 @@ const TabButton = memo(({
   title: string;
   isActive: boolean;
   onFocus: () => void;
-  styles: ThemedStyles;
+  styles: ThemedStyles<typeof componentStyles>;
   isFocusVisible: boolean;
 }) => (
   <ThemedButton
@@ -51,7 +51,7 @@ const TopMenu = memo(({
   styles,
 }: FilmPagerComponentProps & {
   handlePageChange: (page: number, pagerItem: PagerItemInterface) => void;
-  styles: ThemedStyles
+  styles: ThemedStyles<typeof componentStyles>;
 }) => {
   const { scale } = useAppTheme();
   const debounce = useRef<NodeJS.Timeout | null>(null);

@@ -4,13 +4,14 @@ import { useAppTheme } from 'Theme/context';
 import { ThemedStyles } from 'Theme/types';
 
 import { THUMBNAILS_AMOUNT_TV } from './RecentScreen.config';
+import { componentStyles } from './RecentScreen.style.atv';
 
 export const RecentScreenThumbnail = ({
   width: containerWidth,
   styles,
 }: {
   width: number;
-  styles: ThemedStyles
+  styles: ThemedStyles<typeof componentStyles>;
 }) => {
   const { scale, theme } = useAppTheme();
 

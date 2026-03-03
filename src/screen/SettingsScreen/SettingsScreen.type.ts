@@ -9,6 +9,8 @@ export enum SETTING_TYPE {
   TEXT = 'TEXT',
   LINK = 'LINK',
   GROUP = 'GROUP',
+  CUSTOM_SELECT = 'CUSTOM_SELECT',
+  SWITCH = 'SWITCH',
 }
 
 export type SettingType = keyof typeof SETTING_TYPE;
@@ -38,7 +40,7 @@ export type SettingItem = {
     value: string | null,
     key: any,
     setSettings: React.Dispatch<React.SetStateAction<SettingItem[]>>
-  ) => void;
+  ) => Promise<boolean | void> | boolean | void;
   settings?: SettingItem[];
   IconComponent?: React.ComponentType<any>;
   iconProps?: Record<string, any>;
