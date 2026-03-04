@@ -8,7 +8,6 @@
   "updates": {
     "fallbackToCacheTimeout": 0
   },
-  "newArchEnabled": true,
   "assetBundlePatterns": [
     "**/*"
   ],
