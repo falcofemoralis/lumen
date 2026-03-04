@@ -1,5 +1,5 @@
-import RNApkInstaller from '@dominicvonk/react-native-apk-installer';
 import { t } from 'i18n/translate';
+import { ApkInstaller } from 'Modules/react-native-apk-installer';
 import { Alert, PermissionsAndroid, Platform } from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import { wait } from 'Util/Misc';
@@ -26,9 +26,9 @@ export class Installer {
         return false;
       }
 
-      const grantedInstall = await RNApkInstaller.haveUnknownAppSourcesPermission();
+      const grantedInstall = await ApkInstaller.haveUnknownAppSourcesPermission();
       if (!grantedInstall) {
-        RNApkInstaller.showUnknownAppSourcesPermission();
+        ApkInstaller.showUnknownAppSourcesPermission();
 
         return false;
       }
@@ -90,6 +90,8 @@ export class Installer {
     } catch (error) {
       // if permission request fails, we can still try to proceed
       // as Downloads folder might still be accessible
+      console.error('Error checking/requesting storage permission:', error);
+
       return true;
     }
   }
@@ -108,6 +110,7 @@ export class Installer {
         await fs.mkdir(fs.dirs.DownloadDir);
       }
     } catch (error) {
+      console.error(error);
     }
 
     const previousFileExists = await fs.exists(filePath);
@@ -149,6 +152,7 @@ export class Installer {
 
       return downloadedPath;
     } catch (error) {
+      console.error(error);
       // Fallback to download manager which should handle Downloads folder correctly
       const fallbackResponse = await ReactNativeBlobUtil.config({
         addAndroidDownloads: {
@@ -180,10 +184,12 @@ export class Installer {
         throw new Error('APK file not found');
       }
 
-      await RNApkInstaller.install(apkPath);
+      await ApkInstaller.install(apkPath);
 
       return false;
     } catch (error) {
+      console.error(error);
+
       return false;
     }
   }

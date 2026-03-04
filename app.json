@@ -20,7 +20,6 @@
       "backgroundImage": "./assets/images/app-icon-android-adaptive-background.png"
     },
     "allowBackup": false,
-    "edgeToEdgeEnabled": true,
     "versionCode": 15,
     "googleServicesFile": "./google-services.json",
     "permissions": [
@@ -78,7 +77,8 @@
     ],
     "expo-speech-recognition",
     "@react-native-firebase/app",
-    "@kesha-antonov/react-native-background-downloader"
+    "@kesha-antonov/react-native-background-downloader",
+    "expo-image"
   ],
   "experiments": {
     "tsconfigPaths": true,

@@ -870,11 +870,12 @@ export const SlidePressable = ({
       style={ [spatialStyle] }
     >
       { ({ isFocused, isRootActive }) => (
-        <View style={ [style,, { overflow: 'hidden' }] }>
+        <View style={ [style, { overflow: 'hidden' }] }>
           <Pressable
             onPress={ onPress }
             android_ripple={ {
               color: theme.colors.whiteTransparent,
+              foreground: true,
             } }
             unstable_pressDelay={ 0 }
             style={ [{

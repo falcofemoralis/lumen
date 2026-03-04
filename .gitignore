@@ -102,3 +102,5 @@ key.txt
 
 !modules/react-native-downloads/android/
 modules/react-native-downloads/android/build
+!modules/react-native-apk-installer/android/
+modules/react-native-apk-installer/android/build
