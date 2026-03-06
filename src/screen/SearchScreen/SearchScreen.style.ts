@@ -14,8 +14,7 @@ export const componentStyles = ({ scale, colors, text, spacing }: Theme) => ({
     gap: scale(12),
   },
   actionBtn: {
-    width: scale(36),
-    height: scale(36),
+    aspectRatio: 1,
     backgroundColor: colors.button,
     borderRadius: scale(99),
     padding: 0,
@@ -33,12 +32,14 @@ export const componentStyles = ({ scale, colors, text, spacing }: Theme) => ({
     zIndex: 15,
     backgroundColor: colors.button,
     borderRadius: scale(50),
+    transform: [{ translateY: '-50%' }],
+    top: '50%',
   },
   closeIcon: {
   },
   searchBar: {
     width: '100%',
-    height: scale(36),
+    justifyContent: 'center',
   },
   searchBarOutline: {
     borderRadius: scale(24),
