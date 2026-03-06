@@ -19,4 +19,5 @@ export interface ServiceConfigInterface {
   auth: string;
   userAgentNew: string;
   officialMode: string;
+  officialModeShareLink: string;
 }

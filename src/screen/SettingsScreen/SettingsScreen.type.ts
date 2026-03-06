@@ -45,4 +45,9 @@ export type SettingItem = {
   IconComponent?: React.ComponentType<any>;
   iconProps?: Record<string, any>;
   iconPropsFocused?: Record<string, any>;
+  confirmation?: {
+    title: string;
+    message?: string;
+  };
+  withLoader?: boolean;
 }

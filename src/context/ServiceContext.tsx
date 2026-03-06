@@ -1,5 +1,6 @@
 import { ApiInterface, ApiServiceType } from 'Api/index';
 import { services } from 'Api/services';
+import { t } from 'i18n/translate';
 import { ACCOUNT_SCREEN, ACCOUNT_TAB, NOTIFICATIONS_SCREEN, NOTIFICATIONS_TAB } from 'Navigation/navigationRoutes';
 import {
   createContext,
@@ -11,11 +12,13 @@ import {
 import { Linking } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
 import { BadgeData } from 'Type/BadgeData.interface';
+import { FilmInterface } from 'Type/Film.interface';
 import { NotificationInterface, NotificationItemInterface } from 'Type/Notification.interface';
 import { ProfileInterface } from 'Type/Profile.interface';
 import { UserDataInterface } from 'Type/UserData.interface';
 import { requestValidator } from 'Util/Request';
 import { storage } from 'Util/Storage';
+import { updateUrlHost } from 'Util/Url';
 
 import { getGlobalConfig } from './ConfigContext';
 
@@ -35,9 +38,9 @@ export interface ServiceContextInterface {
   updateCurrentService: (service: ApiServiceType) => void;
   setAuthorization: (auth: string, name: string, password: string) => void;
   login: (name: string, password: string) => Promise<void>;
-  logout: () => void;
-  updateProvider: (value: string, skipValidation?: boolean) => Promise<void>;
-  updateCDN: (value: string, skipValidation?: boolean) => Promise<void>;
+  logout: (forceLogout?: boolean) => void;
+  updateProvider: (value: string) => Promise<void>;
+  updateCDN: (value: string) => Promise<void>;
   updateUserAgent: (value: string) => void;
   updateOfficialMode: (isActive: boolean) => void;
   validateUrl: (url: string) => Promise<void>;
@@ -48,6 +51,7 @@ export interface ServiceContextInterface {
   viewPayments: () => void;
   reLogin: () => Promise<void>;
   updateAutomaticCDN: (isActive: boolean) => void;
+  prepareShareBody: (film: FilmInterface) => string;
 }
 
 const ServiceContext = createContext<ServiceContextInterface>({
@@ -71,6 +75,7 @@ const ServiceContext = createContext<ServiceContextInterface>({
   viewPayments: () => {},
   reLogin: async () => {},
   updateAutomaticCDN: () => {},
+  prepareShareBody: () => '',
 });
 
 export const ServiceProvider = ({ children }: { children: React.ReactNode }) => {
@@ -159,10 +164,14 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
   /**
    * Logout from the current service
    */
-  const logout = useCallback(() => {
+  const logout = useCallback((forceLogout: boolean = false) => {
     currentService.logout();
     currentService.setAuthorization('');
-    setIsSignedIn(false);
+
+    if (forceLogout) {
+      setIsSignedIn(false);
+    }
+
     removeProfile();
     storage.getMiscStorage().remove(CREDENTIALS_STORAGE);
     storage.getMiscStorage().remove(NOTIFICATIONS_STORAGE);
@@ -181,16 +190,15 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
    * Re-login to the current service using the stored credentials. This is useful when the provider is changed, so we can re-login to get the new profile and other data.
    */
   const reLogin = useCallback(async () => {
-    if (isSignedIn) {
-      const data = storage.getMiscStorage().load<{ name: string; password: string }>(CREDENTIALS_STORAGE);
+    const data = storage.getMiscStorage().load<{ name: string; password: string }>(CREDENTIALS_STORAGE);
 
-      logout();
+    currentService.logout();
+    currentService.setAuthorization('');
 
-      if (data && data.name && data.password) {
-        await login(data.name, data.password);
-      }
+    if (data && data.name && data.password) {
+      await login(data.name, data.password);
     }
-  }, [isSignedIn, logout, login]);
+  }, [currentService, login]);
 
   /**
    * Update the provider for the current service
@@ -338,6 +346,17 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
     return userData?.notifications ?? [];
   }, [fetchUserData]);
 
+  const prepareShareBody = useCallback((film: FilmInterface) => {
+    const { title, link } = film;
+    let shareLink = link;
+
+    if (currentService.isOfficialMode()) {
+      shareLink = updateUrlHost(shareLink, currentService.getOfficialShareLink());
+    }
+
+    return t('Watch {{title}}:\n {{link}}', { title, link: shareLink });
+  }, [currentService]);
+
   const value = useMemo(() => ({
     isSignedIn,
     profile,
@@ -360,6 +379,7 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
     viewPayments,
     reLogin,
     updateAutomaticCDN,
+    prepareShareBody,
   }), [
     isSignedIn,
     profile,
@@ -382,6 +402,7 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
     viewPayments,
     reLogin,
     updateAutomaticCDN,
+    prepareShareBody,
   ]);
 
   return (

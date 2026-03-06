@@ -217,6 +217,13 @@ const ru: Translations = {
   'Please select a provider': 'Пожалуйста, выберите зеркало',
   'Please select a CDN': 'Пожалуйста, выберите CDN',
   'Invalid CDN': 'Недействительный CDN',
+  'Accept': 'Принять',
+  'Are you sure?': 'Вы уверены?',
+  'Please wait a bit after enabling.': 'Пожалуйста, подождите немного после изменения настройки.',
+  'Automatic CDN': 'Автоматический CDN',
+  'Toggle automatic CDN usage.': 'Включить автоматическое использование CDN.',
+  'Official mode share link': 'Зеркало официального режима',
+  'Change official mode share link.': 'Изменить публичное зеркало для официального режима.',
 };
 
 export default ru;

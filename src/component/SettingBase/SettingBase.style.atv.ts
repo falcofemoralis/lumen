@@ -8,6 +8,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     minHeight: scale(64),
     justifyContent: 'center',
     borderRadius: scale(16),
+    width: '100%',
   },
   settingFocused: {
     backgroundColor: colors.backgroundFocused,
@@ -17,13 +18,16 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     opacity: 0.5,
   },
   settingWrapper: {
+    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     gap: scale(16),
   },
   settingContent: {
-    width: 'auto',
-    maxWidth: '90%',
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    minWidth: 0,
   },
   settingTitle: {
     fontSize: scale(text.sm.fontSize),
@@ -41,5 +45,11 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     color: colors.textFocused,
   },
   settingIcon: {
+    flexShrink: 0,
+  },
+  settingAdditionalElement: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
   },
 } satisfies ThemedStyles);

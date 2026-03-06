@@ -260,12 +260,6 @@ export const getPlayerStream = (video: FilmVideoInterface, quality: string) => {
   return stream;
 };
 
-export const prepareShareBody = (film: FilmInterface) => {
-  const { title, link } = film;
-
-  return t('Watch {{title}}:\n {{link}}', { title, link });
-};
-
 export const formatVideoTrackInfo = (videoTrack: VideoTrack|null) => {
   if (!videoTrack) {
     return '-';

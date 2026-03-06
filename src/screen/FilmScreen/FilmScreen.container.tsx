@@ -25,9 +25,7 @@ import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { getDownloadsDir, normalizeName, TaskIdStorage, uuid } from 'Util/Download';
 import { navigate } from 'Util/Navigation';
-import { prepareShareBody } from 'Util/Player';
 import { openActor, openCategory, openFilm } from 'Util/Router';
-import { updateUrlHost } from 'Util/Url';
 
 import FilmScreenComponent from './FilmScreen.component';
 import FilmScreenComponentTV from './FilmScreen.component.atv';
@@ -38,7 +36,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
   const { link, thumbnailPoster } = route.params as { link: string, thumbnailPoster: string };
   const { isTV, downloadsPath, downloadsSaveSubtitles, downloadsSavePoster } = useConfigContext();
   const navigation = useNavigation();
-  const { isSignedIn, currentService } = useServiceContext();
+  const { isSignedIn, currentService, prepareShareBody } = useServiceContext();
   const [film, setFilm] = useState<FilmInterface | null>(null);
   const playerVideoSelectorOverlayRef = useRef<PlayerVideoSelectorRef>(null);
   const scheduleOverlayRef = useRef<ThemedOverlayRef>(null);
@@ -186,15 +184,9 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
       return;
     }
 
-    const shareFilm = { ...film };
-
-    if (currentService.isOfficialMode()) {
-      // shareFilm.link = updateUrlHost(shareFilm.link, currentService.officialShareLink);
-    }
-
     try {
       await Share.share({
-        message: prepareShareBody(shareFilm),
+        message: prepareShareBody(film),
       });
     } catch (error) {
       NotificationStore.displayError(error as Error);

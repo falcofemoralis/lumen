@@ -2,28 +2,27 @@ import { Theme, ThemedStyles } from 'Theme/types';
 
 export const componentStyles = ({ scale, colors, text, spacing }: Theme) => ({
   setting: {
+    width: '100%',
   },
   settingHidden: {
     opacity: 0.5,
   },
   settingContainer: {
-    justifyContent: 'flex-start',
-    paddingHorizontal: scale(spacing.wrapperPadding),
-    paddingVertical: scale(12),
-  },
-  settingWrapper: {
+    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     gap: scale(12),
-    flex: 1,
-  },
-  settingContent: {
-    width: 'auto',
-    maxWidth: '90%',
-    flexDirection: 'column',
-    justifyContent: 'center',
+    paddingHorizontal: scale(spacing.wrapperPadding),
+    paddingVertical: scale(12),
   },
   settingIcon: {
+    flexShrink: 0,
+  },
+  settingContent: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    minWidth: 0,
   },
   settingTitle: {
     fontSize: scale(text.xs.fontSize),
@@ -32,5 +31,10 @@ export const componentStyles = ({ scale, colors, text, spacing }: Theme) => ({
     fontSize: scale(text.xs.fontSize),
     color: colors.textSecondary,
     opacity: 0.8,
+  },
+  settingAdditionalElement: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
   },
 } satisfies ThemedStyles);

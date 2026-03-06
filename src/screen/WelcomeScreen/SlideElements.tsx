@@ -381,7 +381,7 @@ export const ProviderSlide = ({
     setIsLoading(true);
 
     try {;
-      logout();
+      logout(true);
 
       await validateUrl(currentService.getProvider());
 
@@ -397,7 +397,7 @@ export const ProviderSlide = ({
   }, [currentService, logout, validateUrl]);
 
   const handleNext = useCallback(() => {
-    logout();
+    logout(true);
   }, [logout]);
 
   return (

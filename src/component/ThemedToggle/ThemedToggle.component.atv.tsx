@@ -28,7 +28,6 @@ function SwitchInput(props: SwitchInputProps) {
   const {
     on,
     status,
-    disabled,
     outerStyle: $outerStyleOverride,
     innerStyle: $innerStyleOverride,
     detailStyle: $detailStyleOverride,
@@ -68,13 +67,11 @@ function SwitchInput(props: SwitchInputProps) {
   );
 
   const offBackgroundColor = [
-    disabled && colors.secondary,
     status === 'error' && colors.error,
     colors.backgroundLighter,
   ].filter(Boolean)[0];
 
   const onBackgroundColor = [
-    disabled && colors.transparent,
     status === 'error' && colors.error,
     colors.primary,
   ].filter(Boolean)[0];
@@ -84,14 +81,12 @@ function SwitchInput(props: SwitchInputProps) {
       return [
         $detailStyleOverride?.backgroundColor,
         status === 'error' && colors.error,
-        disabled && colors.secondary,
         colors.icon,
       ].filter(Boolean)[0];
     }
 
     return [
       $innerStyleOverride?.backgroundColor,
-      disabled && colors.secondary,
       status === 'error' && colors.error,
       colors.icon,
     ].filter(Boolean)[0];
@@ -181,6 +176,21 @@ function Toggle<T>(props: ToggleProps<T>) {
     if (disabled) return;
     onValueChange?.(!value);
     onPress?.(e);
+  }
+
+  if (disabled) {
+    return (
+      <View style={ $inputWrapperStyles }>
+        <ToggleInput
+          on={ !!value }
+          disabled={ !!disabled }
+          status={ status }
+          outerStyle={ props.inputOuterStyle ?? {} }
+          innerStyle={ props.inputInnerStyle ?? {} }
+          detailStyle={ props.inputDetailStyle ?? {} }
+        />
+      </View>
+    );
   }
 
   return (

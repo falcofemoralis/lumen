@@ -215,6 +215,13 @@ const en = {
   'Please select a provider': 'Please select a provider',
   'Please select a CDN': 'Please select a CDN',
   'Invalid CDN': 'Invalid CDN',
+  'Accept': 'Accept',
+  'Are you sure?': 'Are you sure?',
+  'Please wait a bit after enabling.': 'Please wait a bit after enabling.',
+  'Automatic CDN': 'Automatic CDN',
+  'Toggle automatic CDN usage.': 'Toggle automatic CDN usage.',
+  'Official mode share link': 'Official mode share link',
+  'Change official mode share link.': 'Change official mode share link.',
 };
 
 export default en;

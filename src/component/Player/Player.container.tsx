@@ -37,7 +37,6 @@ import {
   getPlayerStream,
   getSavedTime,
   getVideoTime,
-  prepareShareBody,
   updateFirestoreSavedTime,
   updatePlayerQuality,
   updateSavedTime,
@@ -65,7 +64,7 @@ export function PlayerContainer({
   const navigation = useNavigation();
   const { updateSelectedVoice } = usePlayerContext();
   const { resetProgressStatus, updateProgressStatus } = usePlayerProgressActions();
-  const { isSignedIn, profile, currentService } = useServiceContext();
+  const { isSignedIn, profile, currentService, prepareShareBody } = useServiceContext();
 
   const defaultQuality = useMemo(() => getPlayerQuality(video), [video]);
 

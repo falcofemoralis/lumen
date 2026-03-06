@@ -30,7 +30,7 @@ export function AccountScreenContainer() {
   }, [viewPayments]);
 
   const handleLogout = useCallback(() => {
-    logout();
+    logout(true);
     resetNotifications();
   }, [logout, resetNotifications]);
 

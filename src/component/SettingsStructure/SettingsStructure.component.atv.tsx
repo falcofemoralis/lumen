@@ -1,8 +1,10 @@
 import { useIsFocused } from '@react-navigation/native';
+import { SettingCustomSelect } from 'Component/SettingCustomSelect';
 import { SettingGroup } from 'Component/SettingGroup';
 import { SettingInput } from 'Component/SettingInput';
 import { SettingLink } from 'Component/SettingLink';
 import { SettingSelect } from 'Component/SettingSelect';
+import { SettingSwitch } from 'Component/SettingSwitch';
 import { SettingText } from 'Component/SettingText';
 import { useNavigationContext } from 'Context/NavigationContext';
 import { useOverlayContext } from 'Context/OverlayContext';
@@ -148,6 +150,18 @@ export const SettingsStructureComponent = ({
         setting={ setting }
         onUpdate={ onSettingUpdate }
         onSelect={ (s) => setSettingsGroupId(s.id) }
+      />
+    ),
+    SWITCH: (
+      <SettingSwitch
+        setting={ setting }
+        onUpdate={ onSettingUpdate }
+      />
+    ),
+    CUSTOM_SELECT: (
+      <SettingCustomSelect
+        setting={ setting }
+        onUpdate={ onSettingUpdate }
       />
     ),
   });

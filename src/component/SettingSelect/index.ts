@@ -1,1 +1,1 @@
-export { default as SettingSelect } from './SettingSelect.container';
+export { default as SettingSelect } from './SettingSelect.component';

@@ -1,7 +1,9 @@
+import { SettingCustomSelect } from 'Component/SettingCustomSelect';
 import { SettingGroup } from 'Component/SettingGroup';
 import { SettingInput } from 'Component/SettingInput';
 import { SettingLink } from 'Component/SettingLink';
 import { SettingSelect } from 'Component/SettingSelect';
+import { SettingSwitch } from 'Component/SettingSwitch';
 import { SettingText } from 'Component/SettingText';
 import { ScrollView, View } from 'react-native';
 import { SettingItem, SettingType } from 'Screen/SettingsScreen/SettingsScreen.type';
@@ -39,6 +41,18 @@ export const SettingsStructureComponent = ({
     ),
     GROUP: (
       <SettingGroup
+        setting={ setting }
+        onUpdate={ onSettingUpdate }
+      />
+    ),
+    SWITCH: (
+      <SettingSwitch
+        setting={ setting }
+        onUpdate={ onSettingUpdate }
+      />
+    ),
+    CUSTOM_SELECT: (
+      <SettingCustomSelect
         setting={ setting }
         onUpdate={ onSettingUpdate }
       />

@@ -26,7 +26,6 @@ export const SettingInputComponent = memo(({
   const styles = useThemedStyles(componentStyles);
   const overlayRef = useRef<ThemedOverlayRef>(null);
   const [inputValue, setInputValue] = useState(value);
-  const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
 
   const onChangeText = useCallback((text: string) => {
@@ -48,8 +47,6 @@ export const SettingInputComponent = memo(({
       return;
     }
 
-    setIsLoading(true);
-
     const success = await onUpdate(setting, inputValue);
 
     if (success) {
@@ -57,9 +54,7 @@ export const SettingInputComponent = memo(({
     } else {
       setHasError(true);
     }
-
-    setIsLoading(false);
-  }, [onUpdate, setting.id, inputValue]);
+  }, [inputValue, value, onUpdate, setting]);
 
   return (
     <View>
@@ -87,14 +82,10 @@ export const SettingInputComponent = memo(({
           <ThemedButton
             style={ styles.overlayButton }
             onPress={ onSave }
-            disabled={ !inputValue || isLoading || hasError }
+            disabled={ !inputValue || hasError }
           >
             { t('Save') }
           </ThemedButton>
-          <Loader
-            isLoading={ isLoading }
-            fullScreen
-          />
         </DefaultFocus>
       </ThemedOverlay>
     </View>

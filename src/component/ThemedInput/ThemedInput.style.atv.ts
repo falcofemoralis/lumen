@@ -16,7 +16,6 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   },
   inputPressable: {
     width: '100%',
-    backgroundColor: 'green',
   },
   inputFocus: {
     backgroundColor: colors.inputFocused,

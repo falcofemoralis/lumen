@@ -8,8 +8,10 @@ import {
   Cloud,
   CloudCog,
   Download,
+  ExternalLink,
   FolderCog,
   FolderDown,
+  FolderLock,
   Globe,
   Grid3x2,
   Info,
@@ -26,6 +28,7 @@ import { reactNativeDownloads } from 'Modules/react-native-downloads';
 import { useState } from 'react';
 import { Linking } from 'react-native';
 import { useTripleTap } from 'Screen/SettingsScreen/useTripleTap';
+import { TEST_URL } from 'Screen/WelcomeScreen/WelcomeScreen.config';
 import NotificationStore from 'Store/Notification.store';
 import { useAppTheme } from 'Theme/context';
 import { GithubIcon, TelegramIcon } from 'Theme/icons';
@@ -63,10 +66,13 @@ export function SettingsScreenContainer() {
   } = useConfigContext();
   const {
     currentService,
+    updateOfficialMode,
     updateProvider,
+    updateAutomaticCDN,
     updateCDN,
     updateUserAgent,
-    updateOfficialMode,
+    reLogin,
+    validateUrl,
   } = useServiceContext();
   const { theme } = useAppTheme();
   const { handleTap } = useTripleTap();
@@ -156,42 +162,148 @@ export function SettingsScreenContainer() {
       title: t('Network'),
       IconComponent: Globe,
       settings: [
-        // {
-        //   id: 'officialMode',
-        //   title: t('Official mode'),
-        //   subtitle: t('Links will be used as in the official application.'),
-        //   type: SETTING_TYPE.SWITCH,
-        //   value: convertBooleanToString(currentService.isOfficialMode()),
-        //   IconComponent: ShieldCheck,
-        //   onSettingPress: (value) => updateOfficialMode(value as string),
-        // },
-        // {
-        //   id: 'provider',
-        //   title: t('Provider'),
-        //   subtitle: t('Change provider'),
-        //   type: SETTING_TYPE.CUSTOM_SELECT,
-        //   value: currentService.getDefaultProvider(),
-        //   options: currentService.defaultProviders.map((provider) => ({
-        //     value: provider,
-        //     label: provider,
-        //   })),
-        //   onSettingPress: (value) => updateProvider(value as string),
-        //   IconComponent: CloudCog,
-        //   dependsOn: {
-        //     field: 'officialMode',
-        //     value: 'false',
-        //   },
-        // },
-        // {
-        //   id: 'cdn',
-        //   title: t('CDN'),
-        //   subtitle: t('Change CDN'),
-        //   type: SETTING_TYPE.SELECT,
-        //   value: currentService.getCDN(),
-        //   options: getCDNs(),
-        //   IconComponent: FolderCog,
-        //   onSettingPress: (value) => updateCDN(value as string, true),
-        // },
+        {
+          id: 'officialMode',
+          title: t('Official mode'),
+          subtitle: t('Links will be used as in the official application.'),
+          type: SETTING_TYPE.SWITCH,
+          value: convertBooleanToString(currentService.isOfficialMode()),
+          IconComponent: ShieldCheck,
+          onSettingPress: async (value) => {
+            try {
+              updateOfficialMode(convertStringToBoolean(value));
+
+              await reLogin();
+            } catch (error) {
+              NotificationStore.displayError(error as Error);
+
+              return false;
+            }
+
+            return true;
+          },
+          confirmation: {
+            title: t('Are you sure?'),
+            message: t('Please wait a bit after enabling.'),
+          },
+          withLoader: true,
+        },
+        {
+          id: 'provider',
+          title: t('Provider'),
+          subtitle: t('Change provider'),
+          type: SETTING_TYPE.CUSTOM_SELECT,
+          value: currentService.getDefaultProvider(),
+          options: currentService.defaultProviders.map((provider) => ({
+            value: provider,
+            label: provider,
+          })),
+          onSettingPress: async (value) => {
+            try {
+              await validateUrl(value as string);
+
+              updateProvider(value as string);
+
+              await reLogin();
+            } catch (error) {
+              NotificationStore.displayError(error as Error);
+
+              return false;
+            }
+
+            return true;
+          },
+          IconComponent: CloudCog,
+          confirmation: {
+            title: t('Are you sure?'),
+            message: t('Please wait a bit after enabling.'),
+          },
+          withLoader: true,
+        },
+        {
+          id: 'officialModeShareLink',
+          title: t('Official mode share link'),
+          subtitle: t('Change official mode share link.'),
+          type: SETTING_TYPE.CUSTOM_SELECT,
+          value: currentService.getOfficialShareLink(),
+          options: currentService.defaultProviders.map((provider) => ({
+            value: provider,
+            label: provider,
+          })),
+          onSettingPress: async (value) => {
+            currentService.setOfficialShareLink(value as string);
+          },
+          IconComponent: ExternalLink,
+          dependsOn: {
+            field: 'officialMode',
+            value: 'true',
+          },
+        },
+        {
+          id: 'automaticCDN',
+          title: t('Automatic CDN'),
+          subtitle: t('Toggle automatic CDN usage.'),
+          type: SETTING_TYPE.SWITCH,
+          value: convertBooleanToString(currentService.isAutomaticCDN()),
+          IconComponent: FolderLock,
+          onSettingPress: async (value) => {
+            updateAutomaticCDN(convertStringToBoolean(value));
+          },
+          confirmation: {
+            title: t('Are you sure?'),
+          },
+          withLoader: true,
+        },
+        {
+          id: 'cdn',
+          title: t('CDN'),
+          subtitle: t('Change CDN'),
+          type: SETTING_TYPE.CUSTOM_SELECT,
+          value: currentService.getCDN(),
+          options: currentService.defaultCDNs.map((cdn) => ({
+            value: cdn,
+            label: cdn,
+          })),
+          onSettingPress: async (value) => {
+            try {
+              updateCDN(value as string);
+
+              const film = await currentService.getFilm(TEST_URL);
+              if (!film) {
+                throw new Error('Film is not available with the selected CDN');
+              }
+
+              const { voices } = film;
+
+              if (!voices.length
+                    || !voices[0].video
+                    || !voices[0].video.streams.length
+              ) {
+                throw new Error('Something went wrong');
+              }
+
+              const { url } = currentService.modifyCDN(voices[0].video.streams)[0];
+
+              await validateUrl((new URL(url)).origin);
+            } catch (error) {
+              NotificationStore.displayError(error as Error);
+
+              return false;
+            }
+
+            return true;
+          },
+          IconComponent: FolderCog,
+          dependsOn: {
+            field: 'automaticCDN',
+            value: 'false',
+          },
+          confirmation: {
+            title: t('Are you sure?'),
+            message: t('Please wait a bit after enabling.'),
+          },
+          withLoader: true,
+        },
         {
           id: 'userAgent',
           title: t('Useragent'),
@@ -344,19 +456,26 @@ export function SettingsScreenContainer() {
   ]);
 
   const onSettingUpdate = async (setting: SettingItem, value: string) => {
-    const { id, onSettingPress: onPress, disableUpdate } = setting;
+    const { id, onSettingPress: onPress, disableUpdate, value: prevValue = '' } = setting;
 
     if (!onPress) {
       return true;
     }
 
-    const result = await onPress?.(value, id, setSettings);
-    if (result === false) {
-      return false;
-    }
-
     if (!disableUpdate) {
       setSettings((prevSettings) => updateSettings(prevSettings, value, id));
+    }
+
+    const result = await onPress?.(value, id, setSettings);
+
+    if (result === false) {
+      await onPress?.(prevValue, id, setSettings);
+
+      if (!disableUpdate) {
+        setSettings((prevSettings) => updateSettings(prevSettings, prevValue ?? '', id));
+      }
+
+      return false;
     }
 
     return true;

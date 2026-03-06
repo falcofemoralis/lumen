@@ -68,7 +68,7 @@ const RezkaApi = {
   config: null as ServiceConfigInterface | null,
   supportEmail: 'mirror@hdrezka.org',
 
-  getConfigFromStorage(): ServiceConfigInterface|null {
+  getConfigFromStorage(): ServiceConfigInterface | null {
     return storage.getConfigStorage().load<ServiceConfigInterface>(REZKA_CONFIG);
   },
 
@@ -81,6 +81,7 @@ const RezkaApi = {
         auth: '',
         userAgentNew: this.defaultUserAgent,
         officialMode: '1', // back compatibility with old version where this value was a provider, but right now it is boolean and can be any value
+        officialModeShareLink: this.defaultProviders[0],
       };
 
       const config = this.getConfigFromStorage();
@@ -272,10 +273,10 @@ const RezkaApi = {
   },
 
   /**
-     * Modify CDN for streams
-     * @param streams
-     * @returns streams with modified URLs
-     */
+  * Modify CDN for streams
+  * @param streams
+  * @returns streams with modified URLs
+  */
   modifyCDN(streams: FilmStreamInterface[]) {
     const cdn = this.getCDN();
 
@@ -294,10 +295,10 @@ const RezkaApi = {
   },
 
   /**
-     * Modify provider URL
-     * @param query
-     * @returns ModifiedUrl
-     */
+  * Modify provider URL
+  * @param query
+  * @returns ModifiedUrl
+  */
   modifyProvider(query: string): ModifiedProvider {
     return {
       query: query,
@@ -306,26 +307,42 @@ const RezkaApi = {
   },
 
   /**
-     * Set official mode
-     * @param mode
-     */
+  * Set official mode
+  * @param mode
+  */
   setOfficialMode(mode: string): void {
     this.updateConfig('officialMode', mode);
     this.loadConfig().officialMode = mode;
   },
 
   /**
-     * Get official mode
-     * @returns string
-     */
+  * Get official mode
+  * @returns string
+  */
   getOfficialMode(): string {
     return this.loadConfig().officialMode;
   },
 
   /**
-     * Check if official mode is enabled
-     * @returns boolean
-     */
+   * Set official share link
+   * @param link
+   */
+  setOfficialShareLink(link: string): void {
+    this.updateConfig('officialModeShareLink', link);
+    this.loadConfig().officialModeShareLink = link;
+  },
+
+  /**
+   * Get official share link
+   */
+  getOfficialShareLink(): string {
+    return this.loadConfig().officialModeShareLink;
+  },
+
+  /**
+  * Check if official mode is enabled
+  * @returns boolean
+  */
   isOfficialMode() {
     return !!this.getOfficialMode();
   },
@@ -543,7 +560,7 @@ const RezkaApi = {
     cookiesManager.reset();
   },
 
-  async getComments  (filmId: string, page: number) {
+  async getComments(filmId: string, page: number) {
     const json = await this.getRequest('/ajax/get_comments', {
       t: String(Date.now()),
       news_id: filmId,
@@ -704,7 +721,7 @@ const RezkaApi = {
     infoTable.forEach((el) => {
       el.childNodes = el.childNodes.filter((node) => node.rawTagName === 'td');
       const key = el.firstChild?.rawText.replace(':', '');
-      const value = el.lastChild as HTMLElementInterface|undefined;
+      const value = el.lastChild as HTMLElementInterface | undefined;
 
       if (key && value) {
         switch (key) {
@@ -1087,7 +1104,7 @@ const RezkaApi = {
     infoTable.forEach((el) => {
       el.childNodes = el.childNodes.filter((node) => node.rawTagName === 'td');
       const key = el.firstChild?.rawText.replace(':', '');
-      const value = el.lastChild as HTMLElementInterface|undefined;
+      const value = el.lastChild as HTMLElementInterface | undefined;
 
       if (key && value) {
         switch (key) {
@@ -1142,7 +1159,7 @@ const RezkaApi = {
       const subtitle = infoTable.reduce<string[]>((acc, el) => {
         el.childNodes = el.childNodes.filter((node) => node.rawTagName === 'td');
         const key = el.firstChild?.rawText.replace(':', '');
-        const value = el.lastChild as HTMLElementInterface|undefined;
+        const value = el.lastChild as HTMLElementInterface | undefined;
 
         if (key && value) {
           switch (key) {
