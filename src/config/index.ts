@@ -12,7 +12,6 @@ export type DeviceConfigType = {
   initialRoute: string;
   playerRewindSeconds: number;
   themeScheme?: string;
-  isScrollEnabledTV: boolean; // new
   downloadsPath?: string;
   downloadsSaveSubtitles: boolean;
   downloadsSavePoster: boolean;
@@ -30,7 +29,6 @@ export const defaultConfig: DeviceConfigType = {
   initialRoute: HOME_SCREEN,
   playerRewindSeconds: 10,
   themeScheme: undefined,
-  isScrollEnabledTV: false,
   downloadsPath: undefined,
   downloadsSaveSubtitles: true,
   downloadsSavePoster: true,
