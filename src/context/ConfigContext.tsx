@@ -28,7 +28,7 @@ export const ConfigProvider = ({ children }: { children: React.ReactNode }) => {
       return defaultConfig;
     }
 
-    const parsedConfig = safeJsonParse<DeviceConfigType>(deviceConfig);
+    const parsedConfig = safeJsonParse<DeviceConfigType>(deviceConfig) ?? {};
 
     return {
       ...defaultConfig,
@@ -37,11 +37,15 @@ export const ConfigProvider = ({ children }: { children: React.ReactNode }) => {
   }, [deviceConfig]);
 
   const setConfig = useCallback((key: keyof DeviceConfigType, value: unknown) => {
-    setDeviceConfig(JSON.stringify({
-      ...config,
-      [key]: value,
-    }));
-  }, [config, setDeviceConfig]);
+    setDeviceConfig((prevConfig) => {
+      const parsedConfig = safeJsonParse<DeviceConfigType>(prevConfig) ?? {};
+
+      return JSON.stringify({
+        ...parsedConfig,
+        [key]: value,
+      });
+    });
+  }, [setDeviceConfig]);
 
   const value = useMemo(() => ({
     ...config,

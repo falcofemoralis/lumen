@@ -63,7 +63,7 @@ const RezkaApi = {
     'https://stream.voidboost.link',
     'https://stream.voidboost.club',
   ],
-  defaultUserAgent: `Mozilla/5.0 (Linux; Android ${Device.osVersion}; ${Device.manufacturer} ${Device.modelName}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36`,
+  defaultUserAgent: `Mozilla/5.0 (Linux; Android ${Device.osVersion}; ${Device.manufacturer} ${Device.modelName}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36`,
   officialMirror: 'https://hdrzk.org',
   config: null as ServiceConfigInterface | null,
   supportEmail: 'mirror@hdrezka.org',
@@ -73,44 +73,57 @@ const RezkaApi = {
   },
 
   loadConfig() {
-    if (!this.config) {
+    this.config = {
+      provider: this.defaultProviders[0],
+      cdn: '',
+      autoCdn: true,
+      auth: '',
+      userAgentNew: this.defaultUserAgent,
+      officialMode: '1', // back compatibility with old version where this value was a provider, but right now it is boolean and can be any value
+      officialModeShareLink: this.defaultProviders[0],
+    };
+
+    const config = this.getConfigFromStorage();
+
+    if (config) {
       this.config = {
-        provider: this.defaultProviders[0],
-        cdn: '',
-        autoCdn: true,
-        auth: '',
-        userAgentNew: this.defaultUserAgent,
-        officialMode: '1', // back compatibility with old version where this value was a provider, but right now it is boolean and can be any value
-        officialModeShareLink: this.defaultProviders[0],
+        ...this.config,
+        ...config,
       };
-
-      const config = this.getConfigFromStorage();
-
-      if (config) {
-        this.config = {
-          ...this.config,
-          ...config,
-        };
-      }
     }
 
     return this.config;
   },
 
-  async updateConfig(key: keyof ServiceConfigInterface, value: unknown) {
-    storage.getConfigStorage().save(REZKA_CONFIG, {
+  getConfig() {
+    if (!this.config) {
+      this.loadConfig();
+    }
+
+    return this.config as ServiceConfigInterface;
+  },
+
+  updateConfig(key: keyof ServiceConfigInterface, value: unknown) {
+    const result = storage.getConfigStorage().save(REZKA_CONFIG, {
       ...this.config,
       [key]: value,
     });
+
+    if (!result) {
+      NotificationStore.displayError('Failed to save config');
+
+      return;
+    }
+
+    this.loadConfig();
   },
 
   setProvider(provider: string): void {
     this.updateConfig('provider', provider);
-    this.loadConfig().provider = provider;
   },
 
   getDefaultProvider(): string {
-    return this.loadConfig().provider;
+    return this.getConfig().provider;
   },
 
   getProvider(): string {
@@ -123,38 +136,34 @@ const RezkaApi = {
 
   setCDN(cdn: string): void {
     this.updateConfig('cdn', cdn);
-    this.loadConfig().cdn = cdn;
   },
 
   getCDN(): string {
-    return this.loadConfig().cdn || this.defaultCDNs[0];
+    return this.getConfig().cdn || this.defaultCDNs[0];
   },
 
   setAutomaticCDN(isActive: boolean): void {
     this.updateConfig('autoCdn', isActive);
-    this.loadConfig().autoCdn = isActive;
   },
 
   isAutomaticCDN(): boolean {
-    return this.loadConfig().autoCdn;
+    return this.getConfig().autoCdn;
   },
 
   setUserAgent(agent: string): void {
     this.updateConfig('userAgentNew', agent);
-    this.loadConfig().userAgentNew = agent;
   },
 
   getUserAgent(): string {
-    return this.loadConfig().userAgentNew;
+    return this.getConfig().userAgentNew;
   },
 
   setAuthorization(auth: string): void {
     this.updateConfig('auth', auth);
-    this.loadConfig().auth = auth;
   },
 
   getAuthorization(): string {
-    return this.loadConfig().auth;
+    return this.getConfig().auth;
   },
 
   getHeaders(): HeadersInit {
@@ -312,7 +321,6 @@ const RezkaApi = {
   */
   setOfficialMode(mode: string): void {
     this.updateConfig('officialMode', mode);
-    this.loadConfig().officialMode = mode;
   },
 
   /**
@@ -320,7 +328,7 @@ const RezkaApi = {
   * @returns string
   */
   getOfficialMode(): string {
-    return this.loadConfig().officialMode;
+    return this.getConfig().officialMode;
   },
 
   /**
@@ -329,14 +337,13 @@ const RezkaApi = {
    */
   setOfficialShareLink(link: string): void {
     this.updateConfig('officialModeShareLink', link);
-    this.loadConfig().officialModeShareLink = link;
   },
 
   /**
    * Get official share link
    */
   getOfficialShareLink(): string {
-    return this.loadConfig().officialModeShareLink;
+    return this.getConfig().officialModeShareLink;
   },
 
   /**

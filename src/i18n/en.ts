@@ -227,6 +227,10 @@ const en = {
   'Dark': 'Dark',
   'Theme scheme': 'Theme scheme',
   'Change the theme scheme.': 'Change the theme scheme.',
+  'Show buffer time': 'Show buffer time',
+  'Toggle buffer time display.': 'Toggle buffer time display.',
+  'Show end time': 'Show end time',
+  'Toggle end time display.': 'Toggle end time display.',
 };
 
 export default en;

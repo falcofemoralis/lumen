@@ -11,6 +11,8 @@ export type DeviceConfigType = {
   numberOfColumnsTV: number;
   initialRoute: string;
   playerRewindSeconds: number;
+  playerShowBufferTime: boolean;
+  playerShowEndTime: boolean;
   themeScheme?: string;
   downloadsPath?: string;
   downloadsSaveSubtitles: boolean;
@@ -28,6 +30,8 @@ export const defaultConfig: DeviceConfigType = {
   numberOfColumnsTV: 6,
   initialRoute: HOME_SCREEN,
   playerRewindSeconds: 10,
+  playerShowBufferTime: false,
+  playerShowEndTime: false,
   themeScheme: undefined,
   downloadsPath: undefined,
   downloadsSaveSubtitles: true,

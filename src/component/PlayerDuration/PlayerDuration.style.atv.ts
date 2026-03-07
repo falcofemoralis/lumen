@@ -9,4 +9,7 @@ export const componentStyles = ({ scale, text, colors }: Theme) => ({
     textAlign: 'right',
     color: colors.textOnContrast,
   },
+  remainingWrapper: {
+    flexDirection: 'row',
+  },
 } satisfies ThemedStyles);

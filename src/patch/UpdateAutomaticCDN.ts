@@ -7,7 +7,7 @@ export const UpdateAutomaticCDN: PatchInterface = {
 
   apply: () => {
     const service = services[ApiServiceType.REZKA];
-    const config = service.loadConfig();
+    const config = service.getConfig();
 
     if (config.cdn === 'auto') {
       service.setAutomaticCDN(true);
