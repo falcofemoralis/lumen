@@ -1,3 +1,4 @@
+import { Pressable } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 import { SpatialNavigationFocusableView } from 'react-tv-space-navigation';
 
@@ -16,12 +17,25 @@ export const ThemedPressableComponent = ({
   withAnimation = false,
   zoomScale = 1.05,
 }: ThemedPressableComponentProps) => {
-  const renderChildren = (state: ThemedFocusableNodeState): React.ReactElement => {
+  const renderChildren = (state: ThemedFocusableNodeState) => {
     if (typeof children === 'function') {
       return children(state);
     }
 
     return children as React.ReactElement;
+  };
+
+  const renderPressableWrapper = (state: ThemedFocusableNodeState) => {
+    return (
+      <Pressable
+        onPress={ onPress }
+        onLongPress={ onLongPress }
+        disabled={ disabled }
+        focusable={ false }
+      >
+        { renderChildren(state) }
+      </Pressable>
+    );
   };
 
   return (
@@ -48,9 +62,9 @@ export const ThemedPressableComponent = ({
             disabled && { opacity: 0.5 },
           ] }
         >
-          { renderChildren({ isFocused, isRootActive }) }
+          { renderPressableWrapper({ isFocused, isRootActive }) }
         </Animated.View>
-      ) : renderChildren({ isFocused, isRootActive }) }
+      ) : renderPressableWrapper({ isFocused, isRootActive }) }
     </SpatialNavigationFocusableView>
   );
 };
