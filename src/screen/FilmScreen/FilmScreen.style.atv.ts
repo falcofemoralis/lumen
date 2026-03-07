@@ -12,7 +12,7 @@ export const componentStyles = ({ scale, text, colors }: Theme) => ({
     marginTop: scale(8),
   },
   actionButton: {
-    paddingVertical: scale(10),
+    paddingVertical: scale(8),
   },
   actionButtonText: {
     fontSize: scale(text.xs.fontSize),

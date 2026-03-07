@@ -20,7 +20,7 @@ export const FilmScreenThumbnail = ({
             <Thumbnail
               // eslint-disable-next-line react/no-array-index-key
               key={ `film-action-thumb-${index}` }
-              height={ scale(32) }
+              height={ scale(34) }
               width={ scale(110) }
             />
           )) }
