@@ -8,7 +8,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import { Download, LogOut, MessageSquareText, Star } from 'lucide-react-native';
-import { Image, StyleProp, View, ViewStyle } from 'react-native';
+import { Image, StyleProp, TextStyle, View, ViewStyle } from 'react-native';
 import { DefaultFocus, SpatialNavigationScrollView } from 'react-tv-space-navigation';
 import { useAppTheme } from 'Theme/context';
 
@@ -25,7 +25,7 @@ export function AccountScreenComponent({
   openNotImplemented,
   openDownloads,
 }: AccountScreenComponentProps) {
-  const { scale } = useAppTheme();
+  const { theme, scale } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
 
   const renderPremiumBadge = () => {
@@ -99,17 +99,20 @@ export function AccountScreenComponent({
     title: string,
     icon: React.ComponentType<any>,
     action: () => void,
-    style?: StyleProp<ViewStyle>
+    style?: StyleProp<ViewStyle>,
+    textStyle?: StyleProp<TextStyle>,
+    iconStyle?: StyleProp<any>
   ) => {
     return (
       <ThemedButton
         style={ [styles.profileAction, style] }
         contentStyle={ styles.profileActionContent }
-        textStyle={ styles.profileActionText }
+        textStyle={ [styles.profileActionText, textStyle] }
         IconComponent={ icon }
         onPress={ action }
         iconProps={ {
           size: scale(20),
+          color: iconStyle ? iconStyle.color : undefined,
         } }
         variant="long"
         withAnimation
@@ -126,7 +129,7 @@ export function AccountScreenComponent({
       <SpatialNavigationScrollView>
         <View style={ styles.profileActions }>
           { /* eslint-disable-next-line max-len */ }
-          { renderActionButton(premiumDays > 0 ? t('Renew subscription') : t('Get subscription'), Star, handleViewPayments, styles.premiumButton) }
+          { renderActionButton(premiumDays > 0 ? t('Renew subscription') : t('Get subscription'), Star, handleViewPayments, styles.premiumButton, styles.premiumButtonText, styles.premiumButtonIcon) }
           <DefaultFocus>
             { renderActionButton(t('Downloads'), Download, openDownloads) }
           </DefaultFocus>

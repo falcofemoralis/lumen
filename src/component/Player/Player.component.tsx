@@ -292,7 +292,7 @@ export function PlayerComponent({
       >
         <IconComponent
           size={ scale(28) }
-          color={ theme.colors.icon }
+          color={ theme.colors.iconOnContrast }
         />
       </ThemedPressable>
     </GestureDetector>
@@ -338,7 +338,8 @@ export function PlayerComponent({
     }
 
     return renderAction(
-      selectedSubtitle?.languageCode === '' ? ClosedCaption : ClosedCaptionFilled({ color: theme.colors.icon }),
+      // eslint-disable-next-line max-len
+      selectedSubtitle?.languageCode === '' ? ClosedCaption : ClosedCaptionFilled({ color: theme.colors.iconOnContrast }),
       openSubtitleSelector
     );
   };
@@ -372,7 +373,7 @@ export function PlayerComponent({
       >
         <IconComponent
           size={ scale(size === 'big' ? 28 : 20) }
-          color={ theme.colors.icon }
+          color={ theme.colors.iconOnContrast }
         />
       </ThemedPressable>
     </GestureDetector>
@@ -445,7 +446,7 @@ export function PlayerComponent({
     return (
       <View style={ styles.topActionLine }>
         <PlayerClock />
-        <ThemedText>
+        <ThemedText style={ styles.topActionLineText }>
           { formatVideoTrackInfo(videoTrack) }
         </ThemedText>
       </View>

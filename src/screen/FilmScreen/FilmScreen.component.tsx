@@ -316,7 +316,7 @@ export function FilmScreenComponent({
           IconComponent={ Play }
           iconProps={ {
             size: scale(18),
-            color: theme.colors.icon,
+            color: theme.colors.iconOnContrast,
           } }
           textStyle={ styles.playBtnText }
         >

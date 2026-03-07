@@ -16,7 +16,7 @@ export const PlayerClockComponent = () => {
     >
       <ReactLiveClock
         style={ {
-          color: theme.colors.text,
+          color: theme.colors.textOnContrast,
           fontSize: scale(16),
           alignSelf: 'flex-end',
         } }

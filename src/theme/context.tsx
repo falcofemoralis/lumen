@@ -28,9 +28,10 @@ import type {
 
 export type ThemeContextType = {
   navigationTheme: NavTheme
-  setThemeContextOverride: (newTheme: ThemeContextModeT) => void
+  setThemeContextOverride: (newTheme?: ThemeContextModeT) => void
   theme: Theme
   themeContext: ImmutableThemeContextModeT
+  themeScheme?: string
   themed: <T>(styleOrStyleFn: AllowedStylesT<T>) => T
   themedStyles: <T>(styleOrStyleFn: ThemedStyle<T>) => T
   scale: (number: number) => number
@@ -68,7 +69,7 @@ export const ThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = ({
    *  - setThemeContextOverride(undefined) the app will follow the operating system theme.
    */
   const setThemeContextOverride = useCallback(
-    (newTheme: ThemeContextModeT) => {
+    (newTheme?: ThemeContextModeT) => {
       setConfig('themeScheme', newTheme);
     },
     [setConfig]
@@ -94,8 +95,7 @@ export const ThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = ({
   const themeContext: ImmutableThemeContextModeT = useMemo(() => {
     const t = initialContext || themeScheme || (!!systemColorScheme ? systemColorScheme : 'light');
 
-    return 'dark';
-    //return t === 'dark' ? 'dark' : 'light';
+    return t === 'dark' ? 'dark' : 'light';
   }, [initialContext, themeScheme, systemColorScheme]);
 
   const navigationTheme: NavTheme = useMemo(() => {
@@ -115,7 +115,7 @@ export const ThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = ({
       scale,
       dimensions,
     };
-  }, [themeContext, scale]);
+  }, [themeContext, scale, dimensions]);
 
   useEffect(() => {
     setImperativeTheming(theme);
@@ -150,6 +150,7 @@ export const ThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = ({
     navigationTheme,
     theme,
     themeContext,
+    themeScheme,
     setThemeContextOverride,
     themed,
     themedStyles,

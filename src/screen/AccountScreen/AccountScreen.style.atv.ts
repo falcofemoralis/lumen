@@ -102,4 +102,10 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   premiumButton: {
     backgroundColor: '#5B359A',
   },
+  premiumButtonText: {
+    color: colors.textOnContrast,
+  },
+  premiumButtonIcon: {
+    color: colors.iconOnContrast,
+  },
 } satisfies ThemedStyles);

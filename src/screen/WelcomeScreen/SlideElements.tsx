@@ -874,7 +874,7 @@ export const SlidePressable = ({
           <Pressable
             onPress={ onPress }
             android_ripple={ {
-              color: theme.colors.whiteTransparent,
+              color: theme.colors.pressableHighlight,
               foreground: true,
             } }
             unstable_pressDelay={ 0 }

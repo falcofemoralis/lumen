@@ -97,7 +97,7 @@ export const AppUpdaterComponent = ({
             styles.skipButton,
           ] }
           android_ripple={ {
-            color: theme.colors.whiteTransparent,
+            color: theme.colors.pressableHighlight,
           } }
         >
           <GestureDetector gesture={ cancelGesture }>
@@ -116,7 +116,7 @@ export const AppUpdaterComponent = ({
             styles.updateButton,
           ] }
           android_ripple={ {
-            color: theme.colors.whiteTransparent,
+            color: theme.colors.pressableHighlight,
           } }
         >
           <GestureDetector gesture={ acceptGesture }>

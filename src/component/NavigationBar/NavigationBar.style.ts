@@ -74,5 +74,6 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     position: 'absolute',
     right: -scale(8),
     top: -scale(8),
+    color: colors.textOnContrast,
   },
 } satisfies ThemedStyles);

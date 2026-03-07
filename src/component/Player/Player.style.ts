@@ -7,7 +7,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     position: 'relative',
     width: '100%',
     height: '100%',
-    backgroundColor: colors.background,
+    backgroundColor: '#000000',
   },
   video: {
     width: '100%',
@@ -107,8 +107,11 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   title: {
     fontSize: scale(text.lg.fontSize),
     fontWeight: '700',
+    color: colors.textOnContrast,
   },
-  subtitle: {},
+  subtitle: {
+    color: colors.textOnContrast,
+  },
   commentsOverlayModal: {
     backgroundColor: colors.transparent,
   },
@@ -187,6 +190,9 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   topActionLine: {
     flexDirection: 'column',
     gap: scale(8),
+  },
+  topActionLineText: {
+    color: colors.textOnContrast,
   },
 } satisfies ThemedStyles);
 

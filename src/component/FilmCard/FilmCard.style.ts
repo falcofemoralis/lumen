@@ -49,6 +49,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     paddingVertical: scale(1),
     fontSize: scale(10),
     alignSelf: 'flex-end',
+    color: colors.textOnContrast,
   },
   filmAdditionalText: {
     paddingHorizontal: scale(4),
@@ -56,5 +57,6 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     fontSize: scale(text.xxxs.fontSize),
     borderBottomLeftRadius: scale(8),
     alignSelf: 'flex-start',
+    color: colors.textOnContrast,
   },
 } satisfies ThemedStyles);

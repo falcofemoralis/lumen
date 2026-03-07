@@ -83,7 +83,7 @@ export function SearchScreenComponent({
         <Mic
           style={ styles.actionBtnIcon }
           size={ scale(16) }
-          color={ theme.colors.icon }
+          color={ recognizing ? theme.colors.iconOnContrast : theme.colors.icon }
         />
       </ThemedPressable>
     </View>

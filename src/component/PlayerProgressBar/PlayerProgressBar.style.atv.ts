@@ -11,7 +11,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     width: scale(7),
     height: scale(7),
     borderRadius: scale(99),
-    backgroundColor: colors.icon,
+    backgroundColor: colors.iconOnContrast,
   },
   focusedThumb: {
     width: scale(12),

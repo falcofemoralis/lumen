@@ -72,12 +72,14 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     paddingVertical: scale(1),
     fontSize: scale(text.xxs.fontSize),
     alignSelf: 'flex-end',
+    color: colors.textOnContrast,
   },
   filmAdditionalText: {
     paddingHorizontal: scale(4),
     paddingVertical: scale(1),
     fontSize: scale(text.xxs.fontSize),
     alignSelf: 'flex-start',
+    color: colors.textOnContrast,
   },
   posterPendingRelease: {
     opacity: 0.5,

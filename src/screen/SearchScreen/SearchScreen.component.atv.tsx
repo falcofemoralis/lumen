@@ -53,7 +53,7 @@ const SearchHeader = memo(({
           styleFocused={ recognizing && styles.speakActive }
           IconComponent={ Mic }
           onPress={ handleStartRecognition }
-          iconProps={ recognizing ? { color: theme.colors.icon } : undefined }
+          iconProps={ recognizing ? { color: theme.colors.iconOnContrast } : undefined }
           withAnimation
         />
         { renderSearchBar() }

@@ -27,7 +27,7 @@ export const ThemedPressableComponent = ({
         onLongPress={ onLongPress }
         disabled={ disabled }
         android_ripple={ {
-          color: mode === 'light' ? theme.colors.whiteTransparent : theme.colors.button,
+          color: mode === 'light' ? theme.colors.pressableHighlight : theme.colors.pressableHighlightOpposite,
         } }
         unstable_pressDelay={ pressDelay }
         style={ [{

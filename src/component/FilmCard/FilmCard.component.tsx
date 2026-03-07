@@ -24,7 +24,10 @@ export function FilmCardComponent({
 
   const renderType = () => (
     <ThemedText
-      style={ [styles.typeText, { backgroundColor: FILM_TYPE_COLORS[type] }] }
+      style={ [
+        styles.typeText,
+        { backgroundColor: FILM_TYPE_COLORS[type] },
+      ] }
     >
       { t( TYPE_LABELS[type]) }
     </ThemedText>

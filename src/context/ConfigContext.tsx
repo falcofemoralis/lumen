@@ -2,7 +2,6 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
 } from 'react';
 import { useMMKVString } from 'react-native-mmkv';

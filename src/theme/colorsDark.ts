@@ -9,7 +9,8 @@ const utilsColors = {
   transparent: 'transparent',
   modal: 'rgba(0, 0, 0, 0.6)',
   fade: 'rgba(0, 0, 0, 0.8)',
-  whiteTransparent: 'rgba(191, 191, 191, 0.5)',
+  pressableHighlight: 'rgba(191, 191, 191, 0.5)',
+  pressableHighlightOpposite: '#383838',
 };
 
 const textColors = {
@@ -17,9 +18,10 @@ const textColors = {
   textFocused: '#303030',
   textSecondary: '#C4C7C5',
   textOnPrimary: '#0a1b38',
-  textOnSecondary: '#E50000',
+  textOnSecondary: '#E3E3E3',
   textOnTertiary: '#C2E7FF',
   textOnError: '#F9DEDC',
+  textOnContrast: '#E3E3E3',
 };
 
 const backgroundColors = {
@@ -44,6 +46,7 @@ const buttonColors = {
   chipFocused: backgroundColors.backgroundFocused,
   icon: '#E3E3E3',
   iconFocused: '#000000',
+  iconOnContrast: '#E3E3E3',
 };
 
 const inputColors = {

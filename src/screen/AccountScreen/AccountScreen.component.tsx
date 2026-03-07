@@ -12,7 +12,7 @@ import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import { Bell, Download, LogOut, MessageSquareText, Settings, Star } from 'lucide-react-native';
 import { ACCOUNT_TAB } from 'Navigation/navigationRoutes';
-import { Image, ScrollView, StyleProp, View, ViewStyle } from 'react-native';
+import { Image, ScrollView, StyleProp, TextStyle, View, ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from 'Theme/context';
 
@@ -123,18 +123,20 @@ export function AccountScreenComponent({
     title: string,
     icon: React.ComponentType<any>,
     action: () => void,
-    style?: StyleProp<ViewStyle>
+    style?: StyleProp<ViewStyle>,
+    textStyle?: StyleProp<TextStyle>,
+    iconStyle?: StyleProp<any>
   ) => {
     return (
       <ThemedButton
         style={ [styles.profileAction, style] }
         contentStyle={ styles.profileActionContent }
-        textStyle={ styles.profileActionText }
+        textStyle={ [styles.profileActionText, textStyle] }
         IconComponent={ icon }
         onPress={ action }
         iconProps={ {
           size: scale(20),
-          color: theme.colors.icon,
+          color: iconStyle ? iconStyle.color : theme.colors.icon,
         } }
       >
         { title }
@@ -167,7 +169,7 @@ export function AccountScreenComponent({
         </View>
         <View style={ [styles.profileActionsGroup] }>
           { /* eslint-disable-next-line max-len */ }
-          { renderActionButton(premiumDays > 0 ? t('Renew subscription') : t('Get subscription'), Star, handleViewPayments, styles.premiumButton) }
+          { renderActionButton(premiumDays > 0 ? t('Renew subscription') : t('Get subscription'), Star, handleViewPayments, styles.premiumButton, styles.premiumButtonText, styles.premiumButtonIcon) }
           { renderNotificationButton() }
           { renderActionButton(t('Downloads'), Download, openDownloads) }
           { renderActionButton(t('Comments'), MessageSquareText, openNotImplemented) }

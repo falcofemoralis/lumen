@@ -40,7 +40,7 @@ export const DefaultGradient = ({ style, size }: { style?: StyleProp<ViewStyle>,
           gradientUnits="userSpaceOnUse"
         >
           <Stop offset="0.05" stopColor="#EA1B45" stopOpacity="0.7" />
-          <Stop offset="0.3" stopColor="#FC5909" stopOpacity="0.4" />
+          <Stop offset="0.3" stopColor="#FC5909" stopOpacity="0.65" />
           <Stop offset="1" stopColor="#FC5909" stopOpacity="0" />
         </RadialGradient>
       </Defs>

@@ -222,6 +222,11 @@ const en = {
   'Toggle automatic CDN usage.': 'Toggle automatic CDN usage.',
   'Official mode share link': 'Official mode share link',
   'Change official mode share link.': 'Change official mode share link.',
+  'System default': 'System default',
+  'Light': 'Light',
+  'Dark': 'Dark',
+  'Theme scheme': 'Theme scheme',
+  'Change the theme scheme.': 'Change the theme scheme.',
 };
 
 export default en;

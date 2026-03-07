@@ -5,7 +5,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     position: 'relative',
     width: '100%',
     height: '100%',
-    backgroundColor: colors.background,
+    backgroundColor: '#000000',
   },
   containerWithComments: {
     width: '60%',
@@ -57,10 +57,12 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   title: {
     fontSize: scale(text.xxl.fontSize),
     marginBottom: scale(4),
+    color: colors.textOnContrast,
   },
   subtitle: {
     fontSize: scale(text.md.fontSize),
     marginBottom: scale(20),
+    color: colors.textOnContrast,
   },
   bottomActions: {
     width: '100%',
@@ -76,7 +78,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   },
   focusedAction: {
     borderRadius: scale(50),
-    backgroundColor: colors.whiteTransparent,
+    backgroundColor: colors.pressableHighlight,
   },
   commentsOverlay: {
     width: '40%',
@@ -96,5 +98,6 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   topActionLineText: {
     fontSize: scale(text.sm.fontSize),
     textAlign: 'right',
+    color: colors.textOnContrast,
   },
 } satisfies ThemedStyles);

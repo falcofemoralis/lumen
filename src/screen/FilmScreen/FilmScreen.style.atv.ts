@@ -9,9 +9,10 @@ export const componentStyles = ({ scale, text, colors }: Theme) => ({
     flexDirection: 'row',
     justifyContent: 'center',
     gap: scale(10),
+    marginTop: scale(8),
   },
   actionButton: {
-    paddingVertical: scale(6),
+    paddingVertical: scale(10),
   },
   actionButtonText: {
     fontSize: scale(text.xs.fontSize),

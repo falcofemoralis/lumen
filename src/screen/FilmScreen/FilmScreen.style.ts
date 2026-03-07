@@ -116,6 +116,7 @@ export const componentStyles = ({ scale, colors, text, spacing }: Theme) => ({
   playBtnText: {
     fontSize: scale(text.xs.fontSize),
     fontWeight: '700',
+    color: colors.textOnContrast,
   },
   downloadBtn: {
     backgroundColor: colors.backgroundLight,
@@ -143,7 +144,7 @@ export const componentStyles = ({ scale, colors, text, spacing }: Theme) => ({
     gap: scale(4),
   },
   middleActionButton: {
-    backgroundColor: colors.whiteTransparent,
+    backgroundColor: colors.backgroundLighter,
     width: scale(44),
     height: scale(44),
     borderRadius: scale(100),
@@ -227,6 +228,7 @@ export const componentStyles = ({ scale, colors, text, spacing }: Theme) => ({
   },
   directorText: {
     fontSize: scale(text.xxs.fontSize),
+    color: colors.textOnContrast,
   },
   visibleScheduleItems: {
   },

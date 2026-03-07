@@ -340,7 +340,7 @@ export function PlayerComponent({
         >
           <IconComponent
             size={ scale(26) }
-            color={ theme.colors.icon }
+            color={ theme.colors.iconOnContrast }
           />
         </View>
       ) }
@@ -464,7 +464,8 @@ export function PlayerComponent({
           { renderBottomAction(Settings2, openQualitySelector, bottomActionRef) }
           { isPlaylistSelector && renderBottomAction(ListVideo, openVideoSelector) }
           { subtitles.length > 0 && renderBottomAction(
-            selectedSubtitle?.languageCode === '' ? ClosedCaption : ClosedCaptionFilled({ color: theme.colors.icon }),
+            // eslint-disable-next-line max-len
+            selectedSubtitle?.languageCode === '' ? ClosedCaption : ClosedCaptionFilled({ color: theme.colors.iconOnContrast }),
             openSubtitleSelector
           ) }
           { !isOffline && renderBottomAction(isFilmBookmarked ? BookmarkCheck : Bookmark, openBookmarksOverlay) }

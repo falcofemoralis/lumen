@@ -16,7 +16,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     width: scale(36),
     height: scale(36),
     borderRadius: scale(100),
-    backgroundColor: colors.whiteTransparent,
+    backgroundColor: colors.backgroundLighter,
   },
   topActionsButtonContent: {
     padding: scale(12),

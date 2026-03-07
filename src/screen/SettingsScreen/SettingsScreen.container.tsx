@@ -5,6 +5,7 @@ import { t } from 'i18n/translate';
 import {
   Blend,
   BookImage,
+  Brush,
   Cloud,
   CloudCog,
   Download,
@@ -32,6 +33,7 @@ import { TEST_URL } from 'Screen/WelcomeScreen/WelcomeScreen.config';
 import NotificationStore from 'Store/Notification.store';
 import { useAppTheme } from 'Theme/context';
 import { GithubIcon, TelegramIcon } from 'Theme/icons';
+import { ThemeContextModeT } from 'Theme/types';
 import { restartApp } from 'Util/Device';
 import { setTimeoutSafe } from 'Util/Misc';
 import { convertBooleanToString, convertStringToBoolean, convertStringToNumber } from 'Util/Type';
@@ -74,7 +76,7 @@ export function SettingsScreenContainer() {
     reLogin,
     validateUrl,
   } = useServiceContext();
-  const { theme } = useAppTheme();
+  const { theme, themeScheme, setThemeContextOverride } = useAppTheme();
   const { handleTap } = useTripleTap();
 
   const onSettingPress = (value: string | null, key: any) => {
@@ -88,6 +90,24 @@ export function SettingsScreenContainer() {
       title: t('Appearance'),
       IconComponent: Palette,
       settings: [
+        {
+          id: 'themeScheme',
+          title: t('Theme scheme'),
+          subtitle: t('Change the theme scheme.'),
+          type: SETTING_TYPE.SELECT,
+          value: !themeScheme ? 'system' : themeScheme,
+          options: [
+            { value: 'system', label: t('System default') },
+            { value: 'dark', label: t('Dark') },
+            { value: 'light', label: t('Light') },
+          ],
+          IconComponent: Brush,
+          onSettingPress: (value) => {
+            setTimeoutSafe(() => {
+              setThemeContextOverride((value as string) === 'system' ? undefined : (value as ThemeContextModeT));
+            }, 50);
+          },
+        },
         {
           id: 'initialRoute',
           title: t('Initial route'),

@@ -224,6 +224,11 @@ const ru: Translations = {
   'Toggle automatic CDN usage.': 'Включить автоматическое использование CDN.',
   'Official mode share link': 'Зеркало официального режима',
   'Change official mode share link.': 'Изменить публичное зеркало для официального режима.',
+  'System default': 'Как в системе',
+  'Light': 'Светлая',
+  'Dark': 'Темная',
+  'Theme scheme': 'Тема приложения',
+  'Change the theme scheme.': 'Изменить тему приложения.',
 };
 
 export default ru;
