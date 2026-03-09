@@ -280,7 +280,10 @@ export function PlayerComponent({
     });
 
   const enablePIP = () => {
-    playerRef.current?.startPictureInPicture();
+    setShowControls(false);
+    setTimeout(() => {
+      playerRef.current?.startPictureInPicture();
+    }, 0);
   };
 
   const renderAction = (
