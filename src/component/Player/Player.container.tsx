@@ -35,6 +35,7 @@ import {
   getFirestoreVideoTime,
   getPlayerQuality,
   getPlayerStream,
+  getQualityFromStreams,
   getSavedTime,
   getVideoTime,
   updateFirestoreSavedTime,
@@ -49,6 +50,7 @@ import {
   AWAKE_TAG,
   DEFAULT_SPEED,
   FIRESTORE_DB,
+  MAX_QUALITY,
   RewindDirection,
   SAVE_TIME_EVERY_MS,
 } from './Player.config';
@@ -73,11 +75,15 @@ export function PlayerContainer({
   const { resetProgressStatus, updateProgressStatus } = usePlayerProgressActions();
   const { isSignedIn, profile, currentService, prepareShareBody } = useServiceContext();
 
-  const defaultQuality = useMemo(() => getPlayerQuality(video, qualityProp), [video, qualityProp]);
+  const storedQuality = useMemo(() => qualityProp ?? getPlayerQuality(), [qualityProp]);
+  const defaultQuality = useMemo(() => getQualityFromStreams(video, storedQuality), [video, storedQuality]);
 
   const [selectedVideo, setSelectedVideo] = useState<FilmVideoInterface>(video);
   const [selectedVoice, setSelectedVoice] = useState<FilmVoiceInterface>(voice);
   const [selectedQuality, setSelectedQuality] = useState<string>(defaultQuality);
+  const [overlayQuality, setOverlayQuality] = useState<string>(
+    storedQuality !== MAX_QUALITY.value ? defaultQuality : MAX_QUALITY.value
+  );
   const [selectedSubtitle, setSelectedSubtitle] = useState<SubtitleInterface|undefined>(
     selectedVideo.subtitles?.find(({ isDefault }) => isDefault)
   );
@@ -188,6 +194,7 @@ export function PlayerContainer({
           updateTime();
         }
       } catch (error) {
+        console.error('Error updating time:', error);
         // If we get an error accessing the player, reset the timeout
         createUpdateTimeTimeout();
       }
@@ -415,7 +422,7 @@ export function PlayerContainer({
         routes: filteredRoutes as any,
       });
     } else {
-      const newStream = getPlayerStream(videoArg, getPlayerQuality(videoArg, qualityArg));
+      const newStream = getPlayerStream(videoArg, getQualityFromStreams(videoArg, qualityArg));
 
       if (!newStream) {
         return;
@@ -434,7 +441,8 @@ export function PlayerContainer({
       return;
     }
 
-    setSelectedQuality(getPlayerQuality(selectedVideo, quality));
+    setOverlayQuality(quality);
+    setSelectedQuality(getQualityFromStreams(selectedVideo, quality));
 
     if (playerSaveQuality) {
       updatePlayerQuality(quality);
@@ -628,6 +636,7 @@ export function PlayerContainer({
     isOverlayOpen,
     isFilmBookmarked,
     isOffline,
+    overlayQuality,
     togglePlayPause,
     rewindPosition,
     seekToPosition,

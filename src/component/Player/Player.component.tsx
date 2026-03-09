@@ -88,6 +88,7 @@ export function PlayerComponent({
   isOverlayOpen,
   isFilmBookmarked,
   isOffline,
+  overlayQuality,
   togglePlayPause,
   seekToPosition,
   calculateCurrentTime,
@@ -590,7 +591,7 @@ export function PlayerComponent({
         asOverlay
         overlayRef={ qualityOverlayRef }
         header={ t('Quality') }
-        value={ selectedQuality }
+        value={ overlayQuality }
         data={ getPlayerAvailableQualityItems(video) }
         onChange={ handleQualityChange }
         onClose={ closeOverlay }

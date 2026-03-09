@@ -84,6 +84,7 @@ export function PlayerComponent({
   isOverlayOpen,
   isFilmBookmarked,
   isOffline,
+  overlayQuality,
   togglePlayPause,
   rewindPosition,
   openQualitySelector,
@@ -518,7 +519,7 @@ export function PlayerComponent({
         asOverlay
         overlayRef={ qualityOverlayRef }
         header={ t('Quality') }
-        value={ selectedQuality }
+        value={ overlayQuality }
         data={ getPlayerAvailableQualityItems(video) }
         onChange={ handleQualityChange }
         onClose={ closeOverlay }

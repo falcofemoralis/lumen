@@ -48,7 +48,7 @@ import { GithubIcon, TelegramIcon } from 'Theme/icons';
 import { ThemeContextModeT } from 'Theme/types';
 import { restartApp } from 'Util/Device';
 import { setTimeoutSafe } from 'Util/Misc';
-import { loadPlayerQuality, updatePlayerQuality } from 'Util/Player';
+import { getPlayerQuality, updatePlayerQuality } from 'Util/Player';
 import { convertBooleanToString, convertStringToBoolean, convertStringToNumber } from 'Util/Type';
 
 import SettingsScreenComponent from './SettingsScreen.component';
@@ -410,7 +410,7 @@ export function SettingsScreenContainer() {
           id: 'playerQuality',
           title: t('Player video quality'),
           type: SETTING_TYPE.SELECT,
-          value: loadPlayerQuality(),
+          value: getPlayerQuality(),
           options: [
             MAX_QUALITY,
             {

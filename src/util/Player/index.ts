@@ -213,14 +213,12 @@ export const updatePlayerQuality = (quality: string) => {
   );
 };
 
-export const loadPlayerQuality = () => {
+export const getPlayerQuality = () => {
   return storage.getPlayerStorage().loadString(PLAYER_QUALITY_STORAGE_KEY) || '720p';
 };
 
-export const getPlayerQuality = (video: FilmVideoInterface, qualityArg?: string) => {
+export const getQualityFromStreams = (video: FilmVideoInterface, quality: string) => {
   const { streams } = video;
-
-  const quality = qualityArg || loadPlayerQuality();
 
   // if quality is auto, return auto and handle it in the player
   if (quality === AUTO_QUALITY.value) {
