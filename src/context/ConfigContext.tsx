@@ -20,6 +20,21 @@ const ConfigContext = createContext<ConfigContextInterface>({
   setConfig: () => {},
 });
 
+// External access to global config. Avoid using it!
+let globalConfig: any = null;
+export const getGlobalConfig = (): DeviceConfigType => {
+  if (!globalConfig) {
+    const storedConfig = storage.getConfigStorage().load<DeviceConfigType>(DEVICE_CONFIG);
+
+    globalConfig = {
+      ...(globalConfig || {}),
+      ...(storedConfig || {}),
+    };
+  }
+
+  return globalConfig;
+};
+
 export const ConfigProvider = ({ children }: { children: React.ReactNode }) => {
   const [deviceConfig, setDeviceConfig] = useMMKVString(DEVICE_CONFIG, storage.getConfigStorage().getMMKVInstance());
 
@@ -37,6 +52,11 @@ export const ConfigProvider = ({ children }: { children: React.ReactNode }) => {
   }, [deviceConfig]);
 
   const setConfig = useCallback((key: keyof DeviceConfigType, value: unknown) => {
+    if (globalConfig) {
+      // eslint-disable-next-line react-compiler/react-compiler
+      globalConfig[key] = value;
+    }
+
     setDeviceConfig((prevConfig) => {
       const parsedConfig = safeJsonParse<DeviceConfigType>(prevConfig) ?? {};
 
@@ -60,21 +80,6 @@ export const ConfigProvider = ({ children }: { children: React.ReactNode }) => {
       { children }
     </ConfigContext.Provider>
   );
-};
-
-// External access to global config. Avoid using it!
-let globalConfig: any = null;
-export const getGlobalConfig = (): DeviceConfigType => {
-  if (!globalConfig) {
-    const storedConfig = storage.getConfigStorage().load<DeviceConfigType>(DEVICE_CONFIG);
-
-    globalConfig = {
-      ...(globalConfig || {}),
-      ...(storedConfig || {}),
-    };
-  }
-
-  return globalConfig;
 };
 
 export const useConfigContext = () => {

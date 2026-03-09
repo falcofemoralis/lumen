@@ -10,7 +10,7 @@ export type PlayerVideoSelectorContainerProps = {
   voice?: FilmVoiceInterface;
   isDownloader?: boolean;
   isOffline?: boolean;
-  onSelect: (video: FilmVideoInterface, voice: FilmVoiceInterface) => void;
+  onSelect: (video: FilmVideoInterface, voice: FilmVoiceInterface, quality?: string) => void;
   onClose?: () => void;
   onDownloadSelect?: (links: DownloadLinkInterface[]) => void;
 };
@@ -31,7 +31,8 @@ export type PlayerVideoSelectorComponentProps = {
   isOffline?: boolean;
   qualityOverlayRef: React.RefObject<ThemedOverlayRef | null>;
   episodesToDownload: Record<string, boolean>;
-  downloadQualities: string[] | null;
+  streamQualities: string[] | null;
+  playerAskQuality: boolean;
   handleSelectVoice: (voiceId: string) => void;
   setSelectedSeasonId: (id: string) => void;
   handleSelectEpisode: (episodeId: string) => void;
@@ -40,4 +41,5 @@ export type PlayerVideoSelectorComponentProps = {
   onClose?: () => void;
   handleEpisodesDownload: () => void;
   handleDownload: (quality: string) => void;
+  handleQualitySelect: (quality: string) => void;
 };

@@ -38,7 +38,7 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
     ref
   ) => {
     const { voices = [] } = film;
-    const { isTV, isFirestore } = useConfigContext();
+    const { isTV, isFirestore, playerAskQuality, sortVoicesByRating } = useConfigContext();
     const { selectedVoice: contextVoice, updateSelectedVoice } = usePlayerContext();
     const [isLoading, setIsLoading] = useState(false);
     const [selectedVoice, setSelectedVoice] = useState<FilmVoiceInterface>(
@@ -66,9 +66,12 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
 
     const [episodesToDownload, setEpisodesToDownload] = useState<Record<string, boolean>>({});
 
-    const [downloadQualities, setDownloadQualities] = useState<string[] | null>(null);
+    const [streamQualities, setStreamQualities] = useState<string[] | null>(null);
     const downloadVideosRef = useRef<Record<string, FilmVideoInterface> | null>(null);
     const downloadVoicesRef = useRef<Record<string, FilmVoiceInterface | null>>(null);
+
+    const selectedVideosRef = useRef<FilmVideoInterface | null>(null);
+    const selectedVoicesRef = useRef<FilmVoiceInterface | null>(null);
 
     const isMountedRef = useRef(false);
 
@@ -182,7 +185,7 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
         downloadVideosRef.current['0'] = video;
         downloadVoicesRef.current['0'] = voice;
 
-        setDownloadQualities(video.streams.map(({ quality }) => quality));
+        setStreamQualities(video.streams.map(({ quality }) => quality));
         qualityOverlayRef.current?.open();
 
         return;
@@ -195,7 +198,14 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
           });
       }
 
-      onSelect(video, voice);
+      if (playerAskQuality) {
+        selectedVideosRef.current = video;
+        selectedVoicesRef.current = voice;
+        setStreamQualities(video.streams.map(({ quality }) => quality));
+        qualityOverlayRef.current?.open();
+      } else {
+        onSelect(video, voice);
+      }
 
       if (getContextVoice()) {
         // if store voice was updated, re update it
@@ -366,7 +376,7 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
         (a, b) => a.filter((c) => b.includes(c))
       );
 
-      setDownloadQualities(commonQualities);
+      setStreamQualities(commonQualities);
       setIsLoading(false);
 
       qualityOverlayRef.current?.open();
@@ -413,17 +423,51 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
         onDownloadSelect(links);
       }
 
-      setDownloadQualities(null);
+      setStreamQualities(null);
       setEpisodesToDownload({});
 
       qualityOverlayRef.current?.close();
       overlayRef.current?.close();
     };
 
+    const handleQualitySelect = (quality: string) => {
+      if (!selectedVideosRef.current || !selectedVoicesRef.current) {
+        NotificationStore.displayMessage(t('No video available'));
+
+        return;
+      }
+
+      onSelect(selectedVideosRef.current, selectedVoicesRef.current, quality);
+
+      qualityOverlayRef.current?.close();
+      selectedVideosRef.current = null;
+      selectedVoicesRef.current = null;
+    };
+
+    const sortedVoices = useMemo(() => {
+      if (!sortVoicesByRating) {
+        return voices;
+      }
+
+      const { voiceRating = [] } = film;
+      if (!voiceRating.length) {
+        return voices;
+      }
+
+      const sorted = [...voices].sort((a, b) => {
+        const aRating = voiceRating.find(({ title }) => title === a.title)?.rating ?? 0;
+        const bRating = voiceRating.find(({ title }) => title === b.title)?.rating ?? 0;
+
+        return bRating - aRating;
+      });
+
+      return sorted;
+    }, [voices, sortVoicesByRating, film]);
+
     const containerProps = {
       overlayRef,
       film,
-      voices,
+      voices: sortedVoices,
       isLoading,
       selectedVoice,
       selectedSeasonId,
@@ -436,7 +480,8 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
       isOffline,
       episodesToDownload,
       qualityOverlayRef,
-      downloadQualities,
+      streamQualities,
+      playerAskQuality,
       handleSelectVoice,
       setSelectedSeasonId,
       handleSelectEpisode,
@@ -445,6 +490,7 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
       onClose,
       handleEpisodesDownload,
       handleDownload,
+      handleQualitySelect,
     };
 
     // eslint-disable-next-line max-len

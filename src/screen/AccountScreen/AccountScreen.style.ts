@@ -58,6 +58,9 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     position: 'relative',
     height: scale(64),
     width: scale(64),
+    borderColor: colors.icon,
+    borderWidth: scale(2),
+    borderRadius: scale(99),
   },
   profileInfoPremium: {
     position: 'absolute',

@@ -3,18 +3,22 @@ import {
   getExistingDownloadTasks,
 } from '@kesha-antonov/react-native-background-downloader';
 import { useAppUpdaterContext } from 'Context/AppUpdaterContext';
+import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useEffect } from 'react';
 import NotificationStore from 'Store/Notification.store';
 
 export const Root = ({ children }: { children: React.ReactNode }) => {
+  const { checkForUpdates } = useConfigContext();
   const { isSignedIn } = useServiceContext();
   const { fetchUserData } = useServiceContext();
   const { checkVersion } = useAppUpdaterContext();
 
   useEffect(() => {
-    checkVersion();
-  }, [checkVersion]);
+    if (checkForUpdates) {
+      checkVersion();
+    }
+  }, [checkForUpdates, checkVersion]);
 
   useEffect(() => {
     if (isSignedIn) {

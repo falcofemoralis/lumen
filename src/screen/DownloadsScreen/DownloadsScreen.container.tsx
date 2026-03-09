@@ -267,12 +267,13 @@ export const DownloadsScreenContainer = () => {
     scanFiles();
   }, [scanFiles]);
 
-  const handleVideoSelect = useCallback((film: FilmInterface, video: FilmVideoInterface, voice: FilmVoiceInterface) => {
+  const handleVideoSelect = useCallback((film: FilmInterface, video: FilmVideoInterface, voice: FilmVoiceInterface, quality?: string) => {
     RouterStore.pushData(PLAYER_SCREEN, {
       video,
       film,
       voice,
       isOffline: true,
+      quality,
     });
 
     navigate(PLAYER_SCREEN);

@@ -109,6 +109,7 @@ export function PlayerComponent({
   onBookmarkChange,
   setPlayerRate,
 }: PlayerComponentProps) {
+  const { playerLongPressSpeed } = useConfigContext();
   const { scale, theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
   const { playerRewindSeconds } = useConfigContext();
@@ -269,7 +270,7 @@ export function PlayerComponent({
       }
 
       scheduleOnRN(Haptics.performAndroidHapticsAsync, Haptics.AndroidHaptics.Gesture_Start);
-      scheduleOnRN(setPlayerRate, 1.5);
+      scheduleOnRN(setPlayerRate, playerLongPressSpeed);
       scheduleOnRN(setLongTapAction, true);
     })
     .onEnd(() => {
@@ -536,11 +537,11 @@ export function PlayerComponent({
           ] }
         >
           <ThemedText style={ styles.longTapText }>
-            1.5x
+            { `${playerLongPressSpeed}x` }
           </ThemedText>
           <FastForward
             size={ scale(18) }
-            color={ theme.colors.icon }
+            color={ theme.colors.iconOnContrast }
           />
         </View>
       </View>

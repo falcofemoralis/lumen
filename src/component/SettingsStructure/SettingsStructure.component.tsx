@@ -6,6 +6,7 @@ import { SettingSelect } from 'Component/SettingSelect';
 import { SettingSwitch } from 'Component/SettingSwitch';
 import { SettingText } from 'Component/SettingText';
 import { ScrollView, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SettingItem, SettingType } from 'Screen/SettingsScreen/SettingsScreen.type';
 
 import { SettingsStructureComponentProps } from './SettingsStructure.type';
@@ -14,6 +15,8 @@ export const SettingsStructureComponent = ({
   settings,
   onSettingUpdate,
 }: SettingsStructureComponentProps) => {
+  const { bottom } = useSafeAreaInsets();
+
   const renderSetting = (setting: SettingItem): Record<SettingType, React.ReactNode> => ({
     TEXT: (
       <SettingText
@@ -66,6 +69,7 @@ export const SettingsStructureComponent = ({
           { renderSetting(setting)[setting.type] }
         </View>
       )) }
+      <View style={ { height: bottom } } />
     </ScrollView>
   );
 };

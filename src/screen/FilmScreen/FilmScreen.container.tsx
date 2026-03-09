@@ -59,11 +59,12 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     loadFilm();
   }, []);
 
-  const handleVideoSelect = (video: FilmVideoInterface, voice: FilmVoiceInterface) => {
+  const handleVideoSelect = (video: FilmVideoInterface, voice: FilmVoiceInterface, quality?: string) => {
     RouterStore.pushData(PLAYER_SCREEN, {
       video,
       film,
       voice,
+      quality,
     });
 
     navigate(PLAYER_SCREEN);

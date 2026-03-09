@@ -184,6 +184,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   longTapText: {
     fontSize: scale(text.sm.fontSize),
     fontWeight: '700',
+    color: colors.textOnContrast,
   },
   longTapIcon: {
   },

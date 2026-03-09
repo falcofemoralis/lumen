@@ -13,6 +13,7 @@ export interface PlayerContainerProps {
   film: FilmInterface
   voice: FilmVoiceInterface;
   isOffline?: boolean;
+  quality?: string;
 }
 
 export interface PlayerComponentProps {

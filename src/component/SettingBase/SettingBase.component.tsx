@@ -4,8 +4,9 @@ import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { ThemedPressable } from 'Component/ThemedPressable';
 import { ThemedText } from 'Component/ThemedText';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { View } from 'react-native';
+import { SETTING_TYPE } from 'Screen/SettingsScreen/SettingsScreen.type';
 import { useAppTheme } from 'Theme/context';
 
 import { componentStyles } from './SettingBase.style';
@@ -27,6 +28,9 @@ const SettingBaseComponent = ({
     iconProps,
     confirmation,
     withLoader,
+    value,
+    type,
+    options,
   } = setting;
 
   const confirmOverlayRef = useRef<ThemedOverlayRef>(null);
@@ -62,6 +66,20 @@ const SettingBaseComponent = ({
     }
   }, [confirmation, isEnabled, isLoading, onPress, withLoader]);
 
+  const secondText = useMemo(() => {
+    if (type === SETTING_TYPE.INPUT || type === SETTING_TYPE.CUSTOM_SELECT) {
+      return value;
+    }
+
+    if (type === SETTING_TYPE.SELECT && options) {
+      const selectedOption = options.find(option => option.value === value);
+
+      return selectedOption ? selectedOption.label : subtitle;
+    }
+
+    return subtitle ? subtitle : null;
+  }, [options, subtitle, type, value]);
+
   if (isHidden) {
     return null;
   }
@@ -86,9 +104,9 @@ const SettingBaseComponent = ({
           <ThemedText style={ styles.settingTitle }>
             { title }
           </ThemedText>
-          { subtitle && (
+          { secondText && (
             <ThemedText style={ styles.settingSubtitle }>
-              { subtitle }
+              { secondText }
             </ThemedText>
           ) }
         </View>

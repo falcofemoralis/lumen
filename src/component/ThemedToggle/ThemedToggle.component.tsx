@@ -30,7 +30,6 @@ function SwitchInput(props: SwitchInputProps) {
   const {
     on,
     status,
-    disabled,
     outerStyle: $outerStyleOverride,
     innerStyle: $innerStyleOverride,
     detailStyle: $detailStyleOverride,
@@ -83,14 +82,14 @@ function SwitchInput(props: SwitchInputProps) {
       return [
         $detailStyleOverride?.backgroundColor,
         status === 'error' && colors.error,
-        colors.icon,
+        colors.iconOnContrast,
       ].filter(Boolean)[0];
     }
 
     return [
       $innerStyleOverride?.backgroundColor,
       status === 'error' && colors.error,
-      colors.icon,
+      colors.iconOnContrast,
     ].filter(Boolean)[0];
 
   })();

@@ -7,4 +7,5 @@ export interface PlayerScreenComponentProps {
   film: FilmInterface;
   voice: FilmVoiceInterface;
   isOffline: boolean;
+  quality?: string;
 }

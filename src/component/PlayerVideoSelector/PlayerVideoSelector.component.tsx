@@ -38,9 +38,11 @@ export function PlayerVideoSelectorComponent({
   episodesToDownload,
   handleEpisodesDownload,
   qualityOverlayRef,
-  downloadQualities,
+  streamQualities,
   handleDownload,
   isOffline,
+  playerAskQuality,
+  handleQualitySelect,
 }: PlayerVideoSelectorComponentProps) {
   const styles = useThemedStyles(componentStyles);
 
@@ -268,17 +270,17 @@ export function PlayerVideoSelectorComponent({
   };
 
   const renderQualitySelector = () => {
-    if (!isDownloader) {
+    if (!isDownloader && !playerAskQuality) {
       return null;
     }
 
     return (
       <ThemedDropdown
-        data={ (downloadQualities ?? []).map((quality) => ({
+        data={ (streamQualities ?? []).map((quality) => ({
           label: quality,
           value: quality,
         })) }
-        onChange={ (item) => handleDownload(item.value) }
+        onChange={ (item) => isDownloader ? handleDownload(item.value) : handleQualitySelect(item.value) }
         header={ t('Quality') }
         inputStyle={ styles.voiceDropdownInput }
         style={ styles.voicesDropdown }

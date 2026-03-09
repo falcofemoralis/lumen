@@ -1,11 +1,15 @@
+import { MAX_QUALITY } from 'Component/Player/Player.config';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import * as Application from 'expo-application';
 import { t } from 'i18n/translate';
 import {
+  ArrowDown10,
   Blend,
   BookImage,
   Brush,
+  CircleArrowRight,
+  CircleQuestionMark,
   Cloud,
   CloudCog,
   Download,
@@ -13,16 +17,22 @@ import {
   FolderCog,
   FolderDown,
   FolderLock,
+  Gauge,
   Globe,
   Grid3x2,
   Info,
+  Loader,
   LoaderCircle,
   MonitorPlay,
   MoveRight,
   Palette,
+  Pin,
+  RefreshCw,
   Rewind,
   Route,
+  Settings2,
   ShieldCheck,
+  StepForward,
   Subtitles,
   TvMinimalPlay,
   UserCog,
@@ -38,6 +48,7 @@ import { GithubIcon, TelegramIcon } from 'Theme/icons';
 import { ThemeContextModeT } from 'Theme/types';
 import { restartApp } from 'Util/Device';
 import { setTimeoutSafe } from 'Util/Misc';
+import { loadPlayerQuality, updatePlayerQuality } from 'Util/Player';
 import { convertBooleanToString, convertStringToBoolean, convertStringToNumber } from 'Util/Type';
 
 import SettingsScreenComponent from './SettingsScreen.component';
@@ -69,6 +80,14 @@ export function SettingsScreenContainer() {
     downloadsPath,
     downloadsSaveSubtitles,
     downloadsSavePoster,
+    playerAutoNextEpisode,
+    playerLongPressSpeed,
+    sortVoicesByRating,
+    playerStopPlayOnButtonTV,
+    playerBufferTimeSetting,
+    checkForUpdates,
+    playerSaveQuality,
+    playerAskQuality,
   } = useConfigContext();
   const {
     currentService,
@@ -97,7 +116,6 @@ export function SettingsScreenContainer() {
         {
           id: 'themeScheme',
           title: t('Theme scheme'),
-          subtitle: t('Change the theme scheme.'),
           type: SETTING_TYPE.SELECT,
           value: !themeScheme ? 'system' : themeScheme,
           options: [
@@ -115,7 +133,6 @@ export function SettingsScreenContainer() {
         {
           id: 'initialRoute',
           title: t('Initial route'),
-          subtitle: t('Change initial route.'),
           type: SETTING_TYPE.SELECT,
           value: initialRoute,
           options: isTV ? TV_SCREENS : MOBILE_SCREENS,
@@ -125,7 +142,6 @@ export function SettingsScreenContainer() {
         {
           id: 'numberOfColumnsMobile',
           title: t('Columns in list'),
-          subtitle: t('Change number of columns.'),
           type: SETTING_TYPE.SELECT,
           value: numberOfColumnsMobile.toString(),
           options: Array.from({ length: 9 }, (_, index) => ({
@@ -139,7 +155,6 @@ export function SettingsScreenContainer() {
         {
           id: 'numberOfColumnsTV',
           title: t('Columns in list'),
-          subtitle: t('Change number of columns.'),
           type: SETTING_TYPE.SELECT,
           value: numberOfColumnsTV.toString(),
           options: Array.from({ length: 11 }, (_, index) => ({
@@ -178,6 +193,16 @@ export function SettingsScreenContainer() {
           onSettingPress,
           isHidden: !isTV,
         },
+        {
+          id: 'sortVoicesByRating',
+          title: t('Sort voices by rating'),
+          subtitle: t('Toggle sorting voices by rating.'),
+          type: SETTING_TYPE.SWITCH,
+          value: convertBooleanToString(sortVoicesByRating),
+          options: yesNoOptions,
+          onSettingPress,
+          IconComponent: ArrowDown10,
+        },
       ],
     },
     {
@@ -215,7 +240,6 @@ export function SettingsScreenContainer() {
         {
           id: 'provider',
           title: t('Provider'),
-          subtitle: t('Change provider'),
           type: SETTING_TYPE.CUSTOM_SELECT,
           value: currentService.getDefaultProvider(),
           options: currentService.defaultProviders.map((provider) => ({
@@ -247,7 +271,6 @@ export function SettingsScreenContainer() {
         {
           id: 'officialModeShareLink',
           title: t('Official mode share link'),
-          subtitle: t('Change official mode share link.'),
           type: SETTING_TYPE.CUSTOM_SELECT,
           value: currentService.getOfficialShareLink(),
           options: currentService.defaultProviders.map((provider) => ({
@@ -281,7 +304,6 @@ export function SettingsScreenContainer() {
         {
           id: 'cdn',
           title: t('CDN'),
-          subtitle: t('Change CDN'),
           type: SETTING_TYPE.CUSTOM_SELECT,
           value: currentService.getCDN(),
           options: currentService.defaultCDNs.map((cdn) => ({
@@ -331,7 +353,6 @@ export function SettingsScreenContainer() {
         {
           id: 'userAgent',
           title: t('Useragent'),
-          subtitle: t('Change useragent'),
           type: SETTING_TYPE.INPUT,
           value: currentService.getUserAgent(),
           IconComponent: UserCog,
@@ -348,7 +369,6 @@ export function SettingsScreenContainer() {
         {
           id: 'downloadsPath',
           title: t('Downloads path'),
-          subtitle: t('Change downloads path'),
           type: SETTING_TYPE.SELECT,
           value: downloadsPath ?? reactNativeDownloads.getDefaultDownloadDirectory(),
           options: reactNativeDownloads.getDownloadsDirectories().map((dir) => ({
@@ -387,9 +407,69 @@ export function SettingsScreenContainer() {
       IconComponent: TvMinimalPlay,
       settings: [
         {
+          id: 'playerQuality',
+          title: t('Player video quality'),
+          type: SETTING_TYPE.SELECT,
+          value: loadPlayerQuality(),
+          options: [
+            MAX_QUALITY,
+            {
+              label: '4K',
+              value: '4K',
+            },
+            {
+              label: '2K',
+              value: '2K',
+            },
+            {
+              label: '1080p Ultra',
+              value: '1080p Ultra',
+            },
+            {
+              label: '1080p',
+              value: '1080p',
+            },
+            {
+              label: '720p',
+              value: '720p',
+            },
+            {
+              label: '480p',
+              value: '480p',
+            },
+            {
+              label: '360p',
+              value: '360p',
+            },
+          ],
+          onSettingPress: (value) => {
+            updatePlayerQuality(value as string);
+          },
+          IconComponent: Settings2,
+        },
+        {
+          id: 'playerSaveQuality',
+          title: t('Save player video quality'),
+          subtitle: t('Toggle save quality.'),
+          type: SETTING_TYPE.SWITCH,
+          value: convertBooleanToString(playerSaveQuality),
+          options: yesNoOptions,
+          onSettingPress,
+          IconComponent: Pin,
+        },
+        {
+          id: 'playerAskQuality',
+          title: t('Ask quality'),
+          subtitle: t('Toggle ask quality.'),
+          type: SETTING_TYPE.SWITCH,
+          value: convertBooleanToString(playerAskQuality),
+          options: yesNoOptions,
+          onSettingPress,
+          IconComponent: CircleQuestionMark,
+        },
+        {
           id: 'playerRewindSeconds',
           title: t('Player rewind seconds'),
-          subtitle: t('Change player rewind seconds.'),
           type: SETTING_TYPE.SELECT,
           value: playerRewindSeconds.toString(),
           options: Array.from({ length: 12 }, (_, index) => {
@@ -402,6 +482,33 @@ export function SettingsScreenContainer() {
           }),
           IconComponent: Rewind,
           onSettingPress,
+        },
+        {
+          id: 'playerAutoNextEpisode',
+          title: t('Auto next episode'),
+          subtitle: t('Toggle auto next episode.'),
+          type: SETTING_TYPE.SWITCH,
+          value: convertBooleanToString(playerAutoNextEpisode),
+          options: yesNoOptions,
+          onSettingPress,
+          IconComponent: StepForward,
+        },
+        {
+          id: 'playerLongPressSpeed',
+          title: t('Player long press speed'),
+          type: SETTING_TYPE.SELECT,
+          value: playerLongPressSpeed.toString(),
+          options: Array.from({ length: 12 }, (_, index) => {
+            const value = (index + 1) * 0.25;
+
+            return {
+              value: value.toString(),
+              label: value.toString(),
+            };
+          }),
+          onSettingPress,
+          IconComponent: Gauge,
+          isHidden: isTV,
         },
         {
           id: 'playerShowBufferTime',
@@ -422,6 +529,40 @@ export function SettingsScreenContainer() {
           options: yesNoOptions,
           onSettingPress,
           IconComponent: MoveRight,
+        },
+        {
+          id: 'playerStopPlayOnButtonTV',
+          title: t('Stop play on button TV'),
+          subtitle: t('Toggle stop play on button TV.'),
+          type: SETTING_TYPE.SWITCH,
+          value: convertBooleanToString(playerStopPlayOnButtonTV),
+          options: yesNoOptions,
+          onSettingPress,
+          IconComponent: CircleArrowRight,
+          isHidden: !isTV,
+        },
+        {
+          id: 'playerBufferTimeSetting',
+          title: t('Player buffer time settings'),
+          type: SETTING_TYPE.SELECT,
+          value: playerBufferTimeSetting ? playerBufferTimeSetting.toString() : 'auto',
+          options: [{
+            value: 'auto',
+            label: t('Auto'),
+          }, ...Array.from({ length: 12 }, (_, index) => {
+            const value = (index + 1) * 15;
+
+            return {
+              value: value.toString(),
+              label: value.toString(),
+            };
+          })],
+          onSettingPress: (value, key) => {
+            const newValue = value === 'auto' ? undefined : convertStringToNumber(value);
+
+            setConfig(key, newValue);
+          },
+          IconComponent: Loader,
         },
       ],
     },
@@ -483,6 +624,16 @@ export function SettingsScreenContainer() {
             }
           },
           IconComponent: Info,
+        },
+        {
+          id: 'checkForUpdates',
+          title: t('Check for updates'),
+          subtitle: t('Toggle check for updates.'),
+          type: SETTING_TYPE.SWITCH,
+          value: convertBooleanToString(checkForUpdates),
+          options: yesNoOptions,
+          onSettingPress,
+          IconComponent: RefreshCw,
         },
         {
           id: 'isFirestore',

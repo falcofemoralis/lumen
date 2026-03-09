@@ -11,7 +11,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     backgroundColor: colors.secondary,
   },
   textStyle: {
-    color: colors.text,
+    color: colors.textOnContrast,
     fontSize: scale(text.xxs.fontSize),
     paddingVertical: 0,
   },

@@ -12,11 +12,12 @@ import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { PlayerScreenComponentProps } from './PlayerScreen.type';
 
 export const PlayerScreen = () => {
-  const { video, film, voice, isOffline } = RouterStore.popData(PLAYER_SCREEN) as {
+  const { video, film, voice, isOffline, quality } = RouterStore.popData(PLAYER_SCREEN) as {
     video: FilmVideoInterface;
     film: FilmInterface;
     voice: FilmVoiceInterface;
     isOffline: boolean;
+    quality?: string;
   };
 
   return (
@@ -25,11 +26,12 @@ export const PlayerScreen = () => {
       film={ film }
       voice={ voice }
       isOffline={ isOffline }
+      quality={ quality }
     />
   );
 };
 
-export function PlayerScreenComponent({ video, film, voice, isOffline }: PlayerScreenComponentProps) {
+export function PlayerScreenComponent({ video, film, voice, isOffline, quality }: PlayerScreenComponentProps) {
   const { isTV } = useConfigContext();
   const { lockNavigation, unlockNavigation } = useNavigationContext();
 
@@ -52,6 +54,7 @@ export function PlayerScreenComponent({ video, film, voice, isOffline }: PlayerS
         film={ film }
         voice={ voice }
         isOffline={ isOffline }
+        quality={ quality }
       />
     </Page>
   );

@@ -59,14 +59,21 @@ export function PlayerContainer({
   film,
   voice,
   isOffline,
+  quality: qualityProp,
 }: PlayerContainerProps) {
-  const { isTV, isFirestore } = useConfigContext();
+  const {
+    isTV,
+    isFirestore,
+    playerSaveQuality,
+    playerAutoNextEpisode,
+    playerBufferTimeSetting,
+  } = useConfigContext();
   const navigation = useNavigation();
   const { updateSelectedVoice } = usePlayerContext();
   const { resetProgressStatus, updateProgressStatus } = usePlayerProgressActions();
   const { isSignedIn, profile, currentService, prepareShareBody } = useServiceContext();
 
-  const defaultQuality = useMemo(() => getPlayerQuality(video), [video]);
+  const defaultQuality = useMemo(() => getPlayerQuality(video, qualityProp), [video, qualityProp]);
 
   const [selectedVideo, setSelectedVideo] = useState<FilmVideoInterface>(video);
   const [selectedVoice, setSelectedVoice] = useState<FilmVoiceInterface>(voice);
@@ -134,7 +141,7 @@ export function PlayerContainer({
     p.preservesPitch = true;
     p.bufferOptions = {
       ...p.bufferOptions,
-      preferredForwardBufferDuration: getBufferTime(selectedQuality),
+      preferredForwardBufferDuration: playerBufferTimeSetting ?? getBufferTime(selectedQuality),
     };
     p.play();
 
@@ -262,6 +269,10 @@ export function PlayerContainer({
   });
 
   const onPlaybackEnd = (currentTime: number, duration: number) => {
+    if (!playerAutoNextEpisode) {
+      return;
+    }
+
     if (currentTime >= duration - 1) {
       handleNewEpisode(RewindDirection.FORWARD);
     }
@@ -424,7 +435,11 @@ export function PlayerContainer({
     }
 
     setSelectedQuality(getPlayerQuality(selectedVideo, quality));
-    updatePlayerQuality(quality);
+
+    if (playerSaveQuality) {
+      updatePlayerQuality(quality);
+    }
+
     updateTime();
     updatePlayerStream(selectedVideo, quality, selectedVoice);
 

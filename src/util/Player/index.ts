@@ -3,7 +3,6 @@ import { AUTO_QUALITY, MAX_QUALITY } from 'Component/Player/Player.config';
 import { FirestoreDocument, SavedTime, SavedTimestamp, SavedTimeVoice } from 'Component/Player/Player.type';
 import * as Device from 'expo-device';
 import { VideoTrack } from 'expo-video';
-import { t } from 'i18n/translate';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
@@ -214,25 +213,14 @@ export const updatePlayerQuality = (quality: string) => {
   );
 };
 
+export const loadPlayerQuality = () => {
+  return storage.getPlayerStorage().loadString(PLAYER_QUALITY_STORAGE_KEY) || '720p';
+};
+
 export const getPlayerQuality = (video: FilmVideoInterface, qualityArg?: string) => {
   const { streams } = video;
 
-  const quality = qualityArg || storage.getPlayerStorage().loadString(PLAYER_QUALITY_STORAGE_KEY);
-
-  // determine default quality
-  // usually it is 720p
-  // but in some cases it can be 480p or 360p
-  if (!quality) {
-    if (streams.length >= 3) {
-      return '720p';
-    }
-
-    if (streams.length === 2) {
-      return '480p';
-    }
-
-    return '360p';
-  }
+  const quality = qualityArg || loadPlayerQuality();
 
   // if quality is auto, return auto and handle it in the player
   if (quality === AUTO_QUALITY.value) {

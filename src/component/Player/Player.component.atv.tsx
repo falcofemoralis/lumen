@@ -9,6 +9,7 @@ import { PlayerVideoSelector } from 'Component/PlayerVideoSelector';
 import { ThemedDropdown } from 'Component/ThemedDropdown';
 import { ThemedPressable } from 'Component/ThemedPressable';
 import { ThemedText } from 'Component/ThemedText';
+import { useConfigContext } from 'Context/ConfigContext';
 import { usePlayerContext } from 'Context/PlayerContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { VideoView } from 'expo-video';
@@ -102,6 +103,7 @@ export function PlayerComponent({
   onBookmarkChange,
   backwardToStart,
 }: PlayerComponentProps) {
+  const { playerStopPlayOnButtonTV } = useConfigContext();
   const { scale, theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
   const { focusedElement, updateFocusedElement } = usePlayerContext();
@@ -210,6 +212,12 @@ export function PlayerComponent({
         if (type === SupportedKeys.DOWN) {
           updateFocusedElement(FocusedElement.BOTTOM_ACTION);
           bottomActionRef.current?.focus();
+        }
+
+        if (playerStopPlayOnButtonTV && type === SupportedKeys.ENTER) {
+          togglePlayPause();
+
+          return false;
         }
 
         setShowControls(true);
