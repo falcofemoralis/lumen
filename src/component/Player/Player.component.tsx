@@ -264,6 +264,7 @@ export function PlayerComponent({
     });
 
   const longPressGesture = Gesture.LongPress()
+    .maxDistance(Number.POSITIVE_INFINITY)
     .onStart(() => {
       if (showControls || isLocked || !isPlaying) {
         return;
