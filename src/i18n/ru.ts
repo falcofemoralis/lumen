@@ -248,6 +248,8 @@ const ru: Translations = {
   'Year': 'Год',
   'Choose year': 'Выберите год',
   'Lets search!': 'Поехали!',
+  'Do you want to remove this suggestion from history?': 'Вы точно хотите удалить это из истории?',
+  'Remove': 'Удалить',
 };
 
 export default ru;

@@ -10,6 +10,7 @@ import { ThemedButtonProps } from './ThemedButton.type';
 export default function ThemedButton({
   spatialRef,
   onPress,
+  onLongPress,
   onFocus,
   children,
   style,
@@ -237,6 +238,7 @@ export default function ThemedButton({
     <ThemedPressable
       spatialRef={ spatialRef }
       onPress={ onPress }
+      onLongPress={ onLongPress }
       onFocus={ onFocus }
       withAnimation={ withAnimation }
       zoomScale={ zoomScale }

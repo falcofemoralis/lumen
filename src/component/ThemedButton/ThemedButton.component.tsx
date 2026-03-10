@@ -8,6 +8,7 @@ import { ThemedButtonProps } from './ThemedButton.type';
 
 export default function ThemedButton({
   onPress,
+  onLongPress,
   children,
   style,
   contentStyle,
@@ -25,6 +26,7 @@ export default function ThemedButton({
       style={ [styles.container, style, disabled && styles.disabled] }
       contentStyle={ [styles.content, contentStyle] }
       onPress={ onPress }
+      onLongPress={ onLongPress }
       disabled={ disabled }
     >
       { IconComponent && (

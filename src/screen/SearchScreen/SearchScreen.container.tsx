@@ -44,6 +44,7 @@ export function SearchScreenContainer() {
   const [isLoading, setIsLoading] = useState(false);
   const debounce = useRef<NodeJS.Timeout | null>(null);
   const { currentService } = useServiceContext();
+  const confirmationOverlayRef = useRef<ThemedOverlayRef>(null);
 
   const additionalContentOverlayRef = useRef<ThemedOverlayRef>(null);
   const [categories, setCategories] = useState<SearchableCategoryInterface[] | null>(null);
@@ -278,6 +279,29 @@ export function SearchScreenContainer() {
     navigate(COLLECTION_SCREEN);
   };
 
+  const suggestionToRemove = useRef<string | null>(null);
+
+  const handleRemoveSuggestion = (suggestion: string) => {
+    suggestionToRemove.current = suggestion;
+    confirmationOverlayRef.current?.open();
+  };
+
+  const removeSuggestion = () => {
+    if (!suggestionToRemove.current) {
+      return;
+    }
+
+    const userSuggestions = safeJsonParse(storage.getMiscStorage().loadString(USER_SUGGESTIONS), []) || [];
+    const newSuggestions = userSuggestions.filter((s: string) => s !== suggestionToRemove.current);
+    storage.getMiscStorage().save(
+      USER_SUGGESTIONS,
+      newSuggestions
+    );
+    setSuggestions(newSuggestions);
+    suggestionToRemove.current = null;
+    confirmationOverlayRef.current?.close();
+  };
+
   const containerProps = {
     suggestions,
     pagerItems,
@@ -291,6 +315,7 @@ export function SearchScreenContainer() {
     selectedGenre,
     selectedYear,
     isCategoriesLoading,
+    confirmationOverlayRef,
     handleApplyAdditionalContent,
     handleOpenCollections,
     setSelectedCategory: handleSelectCategory,
@@ -306,6 +331,8 @@ export function SearchScreenContainer() {
     resetSearch,
     clearSearch,
     openAdditionalContentOverlay,
+    handleRemoveSuggestion,
+    removeSuggestion,
   };
 
   return isTV ? <SearchScreenComponentTV { ...containerProps } /> : <SearchScreenComponent { ...containerProps } />;

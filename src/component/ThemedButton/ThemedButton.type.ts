@@ -24,6 +24,7 @@ export interface ThemedButtonProps {
   variant?: Variant;
   rightImage?: string;
   onPress?: () => void;
+  onLongPress?: () => void;
   onFocus?: () => void;
   disableRootActive?: boolean;
   disabled?: boolean;

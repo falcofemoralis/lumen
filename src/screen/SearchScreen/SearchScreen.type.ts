@@ -16,6 +16,7 @@ export interface SearchScreenComponentProps {
   selectedGenre: string | null;
   selectedYear: string | null;
   isCategoriesLoading: boolean;
+  confirmationOverlayRef: React.RefObject<any>;
   handleApplyAdditionalContent: () => void;
   handleOpenCollections: () => void;
   setSelectedCategory: (category: SearchableCategoryInterface) => void;
@@ -38,4 +39,6 @@ export interface SearchScreenComponentProps {
   resetSearch: () => void;
   clearSearch: () => void;
   openAdditionalContentOverlay: () => void;
+  handleRemoveSuggestion: (suggestion: string) => void;
+  removeSuggestion: () => void;
 }

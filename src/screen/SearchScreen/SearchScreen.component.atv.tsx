@@ -1,3 +1,4 @@
+import { ConfirmOverlay } from 'Component/ConfirmOverlay';
 import { FilmPager } from 'Component/FilmPager';
 import { InfoBlock } from 'Component/InfoBlock';
 import { Loader } from 'Component/Loader';
@@ -31,6 +32,7 @@ const SearchHeader = memo(({
   handleApplySearch,
   openAdditionalContentOverlay,
   handleOpenCollections,
+  handleRemoveSuggestion,
 }: SearchScreenComponentProps & {
   styles: ThemedStyles<typeof componentStyles>;
 }) => {
@@ -106,6 +108,7 @@ const SearchHeader = memo(({
               <ThemedButton
                 key={ item }
                 onPress={ () => onApplySuggestion(item) }
+                onLongPress={ () => handleRemoveSuggestion(item) }
               >
                 { item }
               </ThemedButton>
@@ -136,12 +139,14 @@ export function SearchScreenComponent(props: SearchScreenComponentProps) {
     selectedGenre,
     selectedYear,
     isCategoriesLoading,
+    confirmationOverlayRef,
     onLoadFilms,
     onUpdateFilms,
     handleApplyAdditionalContent,
     setSelectedCategory,
     setSelectedGenre,
     setSelectedYear,
+    removeSuggestion,
   } = props;
 
   const renderEmptyBlock = () => (
@@ -245,9 +250,22 @@ export function SearchScreenComponent(props: SearchScreenComponentProps) {
     );
   };
 
+  const renderConfirmationModal = () => {
+    return (
+      <ConfirmOverlay
+        overlayRef={ confirmationOverlayRef }
+        onConfirm={ removeSuggestion }
+        title={ t('Are you sure?') }
+        message={ t('Do you want to remove this suggestion from history?') }
+        confirmButtonText={ t('Remove') }
+      />
+    );
+  };
+
   return (
     <Page>
       { renderCategoriesModal() }
+      { renderConfirmationModal() }
       <FilmPager
         items={ pagerItems }
         onLoadFilms={ onLoadFilms }

@@ -12,6 +12,8 @@ export const ConfirmOverlayComponent = ({
   overlayRef,
   title,
   message,
+  confirmButtonText,
+  cancelButtonText,
   onConfirm,
 }: ConfirmOverlayProps) => {
   const styles = useThemedStyles(componentStyles);
@@ -29,10 +31,10 @@ export const ConfirmOverlayComponent = ({
         ) }
         <View style={ styles.actions }>
           <ThemedButton onPress={ onCancel } contentStyle={ styles.button }>
-            { t('Cancel') }
+            { cancelButtonText ?? t('Cancel') }
           </ThemedButton>
           <ThemedButton onPress={ onConfirm } contentStyle={ [styles.button, styles.buttonPrimary] }>
-            { t('Accept') }
+            { confirmButtonText ?? t('Accept') }
           </ThemedButton>
         </View>
       </View>

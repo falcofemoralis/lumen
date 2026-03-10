@@ -246,6 +246,8 @@ const en = {
   'Year': 'Year',
   'Choose year': 'Choose year',
   'Lets search!': 'Lets search!',
+  'Do you want to remove this suggestion from history?': 'Do you want to remove this suggestion from history?',
+  'Remove': 'Remove',
 };
 
 export default en;

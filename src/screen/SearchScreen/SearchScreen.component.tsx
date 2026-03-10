@@ -1,3 +1,4 @@
+import { ConfirmOverlay } from 'Component/ConfirmOverlay';
 import { FilmPager } from 'Component/FilmPager';
 import { InfoBlock } from 'Component/InfoBlock';
 import { Loader } from 'Component/Loader';
@@ -32,6 +33,7 @@ export function SearchScreenComponent({
   selectedGenre,
   selectedYear,
   isCategoriesLoading,
+  confirmationOverlayRef,
   onChangeText,
   onApplySearch,
   onApplySuggestion,
@@ -47,6 +49,8 @@ export function SearchScreenComponent({
   setSelectedCategory,
   setSelectedGenre,
   setSelectedYear,
+  handleRemoveSuggestion,
+  removeSuggestion,
 }: SearchScreenComponentProps) {
   const { scale, theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
@@ -137,6 +141,7 @@ export function SearchScreenComponent({
           <ThemedPressable
             key={ suggestion }
             onPress={ () => onApplySuggestion(suggestion) }
+            onLongPress={ () => handleRemoveSuggestion(suggestion) }
             style={ styles.suggestion }
             contentStyle={ styles.suggestionContent }
           >
@@ -267,9 +272,22 @@ export function SearchScreenComponent({
     );
   };
 
+  const renderConfirmationModal = () => {
+    return (
+      <ConfirmOverlay
+        overlayRef={ confirmationOverlayRef }
+        onConfirm={ removeSuggestion }
+        title={ t('Are you sure?') }
+        message={ t('Do you want to remove this suggestion from history?') }
+        confirmButtonText={ t('Remove') }
+      />
+    );
+  };
+
   return (
     <Page>
       { renderCategoriesModal() }
+      { renderConfirmationModal() }
       <ThemedSafeArea>
         <View style={ styles.content }>
           <View style={ styles.container }>
