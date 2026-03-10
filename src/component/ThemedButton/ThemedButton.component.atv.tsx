@@ -29,6 +29,8 @@ export default function ThemedButton({
   zoomScale = 1.1,
   isFocusVisible = true,
   disabled = false,
+  iconColor,
+  iconColorFocused,
 }: ThemedButtonProps) {
   const { scale, theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
@@ -56,7 +58,7 @@ export default function ThemedButton({
             isFocused && styles.iconFilledFocused,
           ] }
           size={ scale(18) }
-          color={ isFocused ? theme.colors.iconFocused : theme.colors.icon }
+          color={ isFocused ? (iconColorFocused || theme.colors.iconFocused) : (iconColor || theme.colors.icon) }
           { ...iconProps }
         />
       ) }

@@ -54,16 +54,16 @@ export function AccountScreenComponent({
   };
 
   const renderAvatarContainer = () => {
-    const { avatar, name, premiumDays = 0 } = profile ?? {};
+    const { avatar, name } = profile ?? {};
 
     return (
       <View style={ styles.profileInfo }>
         <View style={ styles.profileInfoAvatarContainer }>
-          { premiumDays > 0 ? (
+          { /* { premiumDays > 0 ? (
             <PremiumGradient style={ styles.profileInfoPremium } size={ scale(GRADIENT_SIZE_MOBILE) } />
           ) : (
             <DefaultGradient style={ styles.profileInfoPremium } size={ scale(GRADIENT_SIZE_MOBILE) } />
-          ) }
+          ) } */ }
           { avatar ? (
             <ThemedImage
               src={ avatar }

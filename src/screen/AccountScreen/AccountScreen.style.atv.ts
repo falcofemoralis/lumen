@@ -19,10 +19,10 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   },
   profileInfoAvatarContainer: {
     position: 'relative',
-    height: scale(64),
-    width: scale(64),
+    height: scale(96),
+    width: scale(96),
     borderColor: colors.icon,
-    borderWidth: scale(2),
+    borderWidth: scale(3),
     borderRadius: scale(99),
   },
   profileInfoPremium: {
@@ -36,15 +36,15 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     borderRadius: scale(99),
   },
   profileName: {
-    fontSize: scale(text.lg.fontSize),
+    fontSize: scale(text.xl.fontSize),
     fontWeight: '700',
   },
   profileSubname: {
-    fontSize: scale(text.xs.fontSize),
+    fontSize: scale(text.lg.fontSize),
     textAlign: 'center',
   },
   profileActions: {
-    width: '60%',
+    width: '70%',
     gap: scale(12),
     paddingBlock: scale(6),
     paddingInline: scale(16),

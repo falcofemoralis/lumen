@@ -25,7 +25,7 @@ export function AccountScreenComponent({
   openNotImplemented,
   openDownloads,
 }: AccountScreenComponentProps) {
-  const { theme, scale } = useAppTheme();
+  const { scale } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
 
   const renderPremiumBadge = () => {
@@ -60,16 +60,16 @@ export function AccountScreenComponent({
   };
 
   const renderAvatarContainer = () => {
-    const { avatar, name, premiumDays = 0 } = profile ?? {};
+    const { avatar, name } = profile ?? {};
 
     return (
       <View style={ styles.profileInfo }>
         <View style={ styles.profileInfoAvatarContainer }>
-          { premiumDays > 0 ? (
+          { /* { premiumDays > 0 ? (
             <PremiumGradient style={ styles.profileInfoPremium } size={ scale(GRADIENT_SIZE_TV) } />
           ) : (
             <DefaultGradient style={ [styles.profileInfoPremium] } size={ scale(GRADIENT_SIZE_TV) } />
-          ) }
+          ) } */ }
           { avatar ? (
             <ThemedImage
               src={ avatar }
@@ -108,11 +108,11 @@ export function AccountScreenComponent({
         style={ [styles.profileAction, style] }
         contentStyle={ styles.profileActionContent }
         textStyle={ [styles.profileActionText, textStyle] }
+        iconColor={ iconStyle?.color }
         IconComponent={ icon }
         onPress={ action }
         iconProps={ {
           size: scale(20),
-          color: iconStyle ? iconStyle.color : undefined,
         } }
         variant="long"
         withAnimation

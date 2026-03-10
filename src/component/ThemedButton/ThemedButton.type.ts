@@ -19,6 +19,8 @@ export interface ThemedButtonProps {
   isSelected?: boolean;
   IconComponent?: React.ComponentType<any>;
   iconProps?: Record<string, any>;
+  iconColor?: string;
+  iconColorFocused?: string;
   variant?: Variant;
   rightImage?: string;
   onPress?: () => void;

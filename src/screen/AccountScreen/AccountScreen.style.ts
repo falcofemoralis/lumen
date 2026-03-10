@@ -59,7 +59,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     height: scale(64),
     width: scale(64),
     borderColor: colors.icon,
-    borderWidth: scale(2),
+    borderWidth: scale(3),
     borderRadius: scale(99),
   },
   profileInfoPremium: {
