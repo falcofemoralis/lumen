@@ -478,7 +478,7 @@ export function SettingsScreenContainer() {
 
             return {
               value: value.toString(),
-              label: value.toString(),
+              label: t('{{seconds}} seconds', { seconds: value }),
             };
           }),
           IconComponent: Rewind,
@@ -504,7 +504,7 @@ export function SettingsScreenContainer() {
 
             return {
               value: value.toString(),
-              label: value.toString(),
+              label: `${value.toString()}x`,
             };
           }),
           onSettingPress,
@@ -555,7 +555,7 @@ export function SettingsScreenContainer() {
 
             return {
               value: value.toString(),
-              label: value.toString(),
+              label: t('{{seconds}} seconds', { seconds: value }),
             };
           })],
           onSettingPress: (value, key) => {
