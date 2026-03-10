@@ -47,6 +47,7 @@ import { useAppTheme } from 'Theme/context';
 import { GithubIcon, TelegramIcon } from 'Theme/icons';
 import { ThemeContextModeT } from 'Theme/types';
 import { restartApp } from 'Util/Device';
+import { openLinkInBrowser } from 'Util/Link';
 import { setTimeoutSafe } from 'Util/Misc';
 import { getPlayerQuality, updatePlayerQuality } from 'Util/Player';
 import { convertBooleanToString, convertStringToBoolean, convertStringToNumber } from 'Util/Type';
@@ -578,7 +579,7 @@ export function SettingsScreenContainer() {
           subtitle: t('Go to Telegram'),
           type: SETTING_TYPE.LINK,
           value: 'link',
-          onSettingPress: () => Linking.openURL(TELEGRAM_LINK),
+          onSettingPress: () => openLinkInBrowser(TELEGRAM_LINK),
           IconComponent: TelegramIcon,
           iconProps: {
             color: undefined,
@@ -596,7 +597,7 @@ export function SettingsScreenContainer() {
           subtitle: t('Go to GitHub'),
           type: SETTING_TYPE.LINK,
           value: 'link',
-          onSettingPress: () => Linking.openURL(GITHUB_LINK),
+          onSettingPress: () => openLinkInBrowser(GITHUB_LINK),
           IconComponent: GithubIcon,
         },
         {

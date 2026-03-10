@@ -75,7 +75,6 @@ export function PlayerComponent({
   film,
   voice,
   videoTrack,
-  selectedQuality,
   selectedSubtitle,
   qualityOverlayRef,
   subtitleOverlayRef,

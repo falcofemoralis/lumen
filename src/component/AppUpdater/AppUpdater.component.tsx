@@ -1,5 +1,6 @@
 import { Loader } from 'Component/Loader';
 import { ThemedBottomSheet } from 'Component/ThemedBottomSheet';
+import { Portal } from 'Component/ThemedPortal';
 import { ThemedPressable } from 'Component/ThemedPressable';
 import { ThemedText } from 'Component/ThemedText';
 import { Wrapper } from 'Component/Wrapper';
@@ -21,7 +22,6 @@ export const AppUpdaterComponent = ({
   progress,
   acceptUpdate,
   rejectUpdate,
-  onBottomSheetMount,
 }: AppUpdaterComponentProps) => {
   const { versionName, description } = update;
   const { scale, theme } = useAppTheme();
@@ -147,23 +147,26 @@ export const AppUpdaterComponent = ({
   };
 
   return (
-    <ThemedBottomSheet
-      ref={ bottomSheetRef }
-      detents={ ['auto'] }
-      backgroundColor={ theme.colors.background }
-      onMount={ onBottomSheetMount }
-    >
-      <GestureHandlerRootView style={ { flexGrow: 1 } }>
-        { renderLoader() }
-        <View style={ isLoading && styles.loadingContainer }>
-          <Wrapper style={ styles.wrapper }>
-            { renderHeader() }
-            { renderContent() }
-            { renderActions() }
-          </Wrapper>
-        </View>
-      </GestureHandlerRootView>
-    </ThemedBottomSheet>
+    <View>
+      <Portal.Host>
+        <ThemedBottomSheet
+          ref={ bottomSheetRef }
+          detents={ ['auto'] }
+          backgroundColor={ theme.colors.background }
+        >
+          <GestureHandlerRootView style={ { flexGrow: 1 } }>
+            { renderLoader() }
+            <View style={ isLoading && styles.loadingContainer }>
+              <Wrapper style={ styles.wrapper }>
+                { renderHeader() }
+                { renderContent() }
+                { renderActions() }
+              </Wrapper>
+            </View>
+          </GestureHandlerRootView>
+        </ThemedBottomSheet>
+      </Portal.Host>
+    </View>
   );
 };
 

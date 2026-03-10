@@ -19,6 +19,7 @@ export type ThemedDropdownContainerProps = {
   inputLabel?: string;
   style?: StyleProp<ViewStyle>;
   onClose?: () => void;
+  closeOnChange?: boolean;
 };
 
 export type ThemedDropdownComponentProps = ThemedDropdownContainerProps;

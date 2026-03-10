@@ -1,3 +1,4 @@
+import { Portal } from 'Component/ThemedPortal';
 import { View } from 'react-native';
 
 import { PageComponentProps } from './Page.type';
@@ -7,17 +8,19 @@ export function PageComponent({
   style,
 }: PageComponentProps) {
   return (
-    <View
-      style={ [
-        {
-          height: '100%',
-          width: '100%',
-        },
-        style,
-      ] }
-    >
-      { children }
-    </View>
+    <Portal.Host>
+      <View
+        style={ [
+          {
+            height: '100%',
+            width: '100%',
+          },
+          style,
+        ] }
+      >
+        { children }
+      </View>
+    </Portal.Host>
   );
 }
 

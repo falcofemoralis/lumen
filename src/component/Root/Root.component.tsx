@@ -2,6 +2,7 @@ import {
   completeHandler,
   getExistingDownloadTasks,
 } from '@kesha-antonov/react-native-background-downloader';
+import { AppUpdater } from 'Component/AppUpdater';
 import { useAppUpdaterContext } from 'Context/AppUpdaterContext';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
@@ -41,7 +42,12 @@ export const Root = ({ children }: { children: React.ReactNode }) => {
     });
   }, []);
 
-  return children;
+  return (
+    <>
+      <AppUpdater position='root' />
+      { children }
+    </>
+  );
 };
 
 export default Root;

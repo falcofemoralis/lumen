@@ -10,7 +10,6 @@ export const ThemedBottomSheetComponent = ({
   children,
   detents = [0.4, 'auto'],
   backgroundColor,
-  onMount,
 }: ThemedBottomSheetComponentProps) => {
   const { theme } = useAppTheme();
 
@@ -22,7 +21,6 @@ export const ThemedBottomSheetComponent = ({
           detents={ detents }
           cornerRadius={ 24 }
           backgroundColor={ backgroundColor ?? theme.colors.backgroundLight }
-          onMount={ onMount }
         >
           { children }
         </TrueSheet>

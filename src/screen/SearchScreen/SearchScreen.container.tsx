@@ -1,17 +1,23 @@
+import { useNavigation } from '@react-navigation/native';
 import { pagerItemsUpdater } from 'Component/FilmPager/FilmPager.config';
 import { PagerItemInterface } from 'Component/FilmPager/FilmPager.type';
+import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import {
   ExpoSpeechRecognitionModule,
   useSpeechRecognitionEvent,
 } from 'expo-speech-recognition';
+import { COLLECTION_SCREEN } from 'Navigation/navigationRoutes';
 import { useRef, useState } from 'react';
 import { Keyboard } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
 import { MenuItemInterface } from 'Type/MenuItem.interface';
+import { SearchableCategoryInterface } from 'Type/SearchableCategoryInterface.interface';
 import { safeJsonParse } from 'Util/Json';
 import { setTimeoutSafe } from 'Util/Misc';
+import { navigate } from 'Util/Navigation';
+import { openCategory } from 'Util/Router';
 import { storage } from 'Util/Storage';
 
 import SearchScreenComponent from './SearchScreen.component';
@@ -21,6 +27,7 @@ import { MAX_USER_SUGGESTIONS, SEARCH_DEBOUNCE_TIME, SEARCH_MENU_ITEM, USER_SUGG
 export function SearchScreenContainer() {
   const { isTV } = useConfigContext();
   const [query, setQuery] = useState('');
+  const navigation = useNavigation();
   const [suggestions, setSuggestions] = useState<string[]>(
     safeJsonParse(storage.getMiscStorage().loadString(USER_SUGGESTIONS), []) || []
   );
@@ -37,6 +44,15 @@ export function SearchScreenContainer() {
   const [isLoading, setIsLoading] = useState(false);
   const debounce = useRef<NodeJS.Timeout | null>(null);
   const { currentService } = useServiceContext();
+
+  const additionalContentOverlayRef = useRef<ThemedOverlayRef>(null);
+  const [categories, setCategories] = useState<SearchableCategoryInterface[] | null>(null);
+  const [isCategoriesLoading, setIsCategoriesLoading] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<SearchableCategoryInterface | null>(null);
+  const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
+  const [selectedYear, setSelectedYear] = useState<string | null>(null);
+  const isLoadingAdditionalContentRef = useRef(false);
+  const isLoadedAdditionalContentRef = useRef(false);
 
   useSpeechRecognitionEvent('start', () => setRecognizing(true));
   useSpeechRecognitionEvent('end', () => setRecognizing(false));
@@ -205,6 +221,63 @@ export function SearchScreenContainer() {
     setPagerItems(pagerItemsUpdater(key, item));
   };
 
+  const openAdditionalContentOverlay = () => {
+    additionalContentOverlayRef.current?.open();
+
+    if (isLoadedAdditionalContentRef.current || isLoadingAdditionalContentRef.current) {
+      return;
+    }
+
+    isLoadingAdditionalContentRef.current = true;
+    setIsCategoriesLoading(true);
+
+    currentService.loadAdditionalContent()
+      .then((cats) => {
+        if (cats.length > 0) {
+          const firstCat = cats[0];
+          setCategories(cats);
+          setSelectedCategory(firstCat);
+
+          if (firstCat.genres.length > 0) {
+            setSelectedGenre(firstCat.genres[0].value);
+          }
+
+          if (firstCat.years.length > 0) {
+            setSelectedYear(firstCat.years[0].value);
+          }
+        }
+      })
+      .finally(() => {
+        setIsCategoriesLoading(false);
+        isLoadingAdditionalContentRef.current = false;
+        isLoadedAdditionalContentRef.current = true;
+      });
+  };
+
+  const handleSelectCategory = (cat: SearchableCategoryInterface) => {
+    setSelectedCategory(cat);
+
+    if (cat.genres.length > 0) {
+      setSelectedGenre(cat.genres[0].value);
+    }
+
+    if (cat.years.length > 0) {
+      setSelectedYear(cat.years[0].value);
+    }
+  };
+
+  const handleApplyAdditionalContent = () => {
+    additionalContentOverlayRef.current?.close();
+
+    const url = selectedYear !== '0' ? `${selectedGenre}${selectedYear}` : selectedGenre ?? '';
+
+    openCategory(url, navigation);
+  };
+
+  const handleOpenCollections = () => {
+    navigate(COLLECTION_SCREEN);
+  };
+
   const containerProps = {
     suggestions,
     pagerItems,
@@ -212,6 +285,17 @@ export function SearchScreenContainer() {
     recognizing,
     enteredText,
     isLoading,
+    additionalContentOverlayRef,
+    categories,
+    selectedCategory,
+    selectedGenre,
+    selectedYear,
+    isCategoriesLoading,
+    handleApplyAdditionalContent,
+    handleOpenCollections,
+    setSelectedCategory: handleSelectCategory,
+    setSelectedGenre,
+    setSelectedYear,
     onChangeText,
     onApplySearch,
     onApplySuggestion,
@@ -221,6 +305,7 @@ export function SearchScreenContainer() {
     handleApplySearch,
     resetSearch,
     clearSearch,
+    openAdditionalContentOverlay,
   };
 
   return isTV ? <SearchScreenComponentTV { ...containerProps } /> : <SearchScreenComponent { ...containerProps } />;

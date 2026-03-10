@@ -1,15 +1,19 @@
 import { FilmPager } from 'Component/FilmPager';
 import { InfoBlock } from 'Component/InfoBlock';
+import { Loader } from 'Component/Loader';
 import { Page } from 'Component/Page';
+import { ThemedButton } from 'Component/ThemedButton';
+import { ThemedDropdown } from 'Component/ThemedDropdown';
 import { ThemedInput } from 'Component/ThemedInput';
+import { ThemedOverlay } from 'Component/ThemedOverlay';
 import { ThemedPressable } from 'Component/ThemedPressable';
 import { ThemedSafeArea } from 'Component/ThemedSafeArea';
 import { ThemedText } from 'Component/ThemedText';
 import { Wrapper } from 'Component/Wrapper';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
-import { ArrowUpLeft, History, Mic, Search, X } from 'lucide-react-native';
-import { View } from 'react-native';
+import { ArrowUpLeft, History, LayoutGrid, Mic, Search, Settings2, X } from 'lucide-react-native';
+import { ScrollView, View } from 'react-native';
 import { useAppTheme } from 'Theme/context';
 
 import { componentStyles } from './SearchScreen.style';
@@ -22,6 +26,12 @@ export function SearchScreenComponent({
   recognizing,
   enteredText,
   isLoading,
+  additionalContentOverlayRef,
+  categories,
+  selectedCategory,
+  selectedGenre,
+  selectedYear,
+  isCategoriesLoading,
   onChangeText,
   onApplySearch,
   onApplySuggestion,
@@ -31,13 +41,30 @@ export function SearchScreenComponent({
   handleApplySearch,
   resetSearch,
   clearSearch,
+  openAdditionalContentOverlay,
+  handleApplyAdditionalContent,
+  handleOpenCollections,
+  setSelectedCategory,
+  setSelectedGenre,
+  setSelectedYear,
 }: SearchScreenComponentProps) {
   const { scale, theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
 
   const renderSearchBar = () => (
     <View style={ styles.searchBarContainer }>
+      <ThemedPressable
+        style={ styles.actionBtnSearch }
+        onPress={ handleApplySearch }
+      >
+        <Search
+          style={ styles.actionBtnIcon }
+          size={ scale(16) }
+          color={ theme.colors.icon }
+        />
+      </ThemedPressable>
       <ThemedInput
+        style={ styles.searchBarInput }
         containerStyle={ styles.searchBar }
         placeholder={ t('Search') }
         onChangeText={ (text) => onChangeText(text) }
@@ -66,17 +93,6 @@ export function SearchScreenComponent({
   const renderSearchContainer = () => (
     <View style={ styles.searchContainer }>
       <ThemedPressable
-        style={ styles.actionBtn }
-        onPress={ handleApplySearch }
-      >
-        <Search
-          style={ styles.actionBtnIcon }
-          size={ scale(16) }
-          color={ theme.colors.icon }
-        />
-      </ThemedPressable>
-      { renderSearchBar() }
-      <ThemedPressable
         style={ [styles.actionBtn, recognizing && styles.speakActive] }
         onPress={ handleStartRecognition }
       >
@@ -84,6 +100,27 @@ export function SearchScreenComponent({
           style={ styles.actionBtnIcon }
           size={ scale(16) }
           color={ recognizing ? theme.colors.iconOnContrast : theme.colors.icon }
+        />
+      </ThemedPressable>
+      { renderSearchBar() }
+      <ThemedPressable
+        style={ styles.actionBtn }
+        onPress={ openAdditionalContentOverlay }
+      >
+        <Settings2
+          style={ styles.actionBtnIcon }
+          size={ scale(16) }
+          color={ theme.colors.icon }
+        />
+      </ThemedPressable>
+      <ThemedPressable
+        style={ styles.actionBtn }
+        onPress={ handleOpenCollections }
+      >
+        <LayoutGrid
+          style={ styles.actionBtnIcon }
+          size={ scale(16) }
+          color={ theme.colors.icon }
         />
       </ThemedPressable>
     </View>
@@ -150,8 +187,89 @@ export function SearchScreenComponent({
     );
   };
 
+  const renderCategories = () => {
+    if (isCategoriesLoading) {
+      return (
+        <View style={ styles.categoriesLoader }>
+          <Loader fullScreen isLoading />
+        </View>
+      );
+    }
+
+    if (!categories?.length) {
+      return null;
+    }
+
+    return (
+      <ScrollView>
+        <View style={ styles.categories }>
+          <ThemedText>
+            { t('Choose format') }
+          </ThemedText>
+          <ThemedDropdown
+            header={ t('Format') }
+            value={ selectedCategory?.name || '' }
+            data={ categories?.map((cat) => ({
+              label: cat.name,
+              value: cat.name,
+            })) || [] }
+            onChange={ (item) => {
+              const cat = categories?.find((c) => c.name === item.value);
+
+              if (cat) {
+                setSelectedCategory(cat);
+              }
+            } }
+            closeOnChange
+          />
+          <ThemedText>
+            { t('Choose genre') }
+          </ThemedText>
+          <ThemedDropdown
+            header={ t('Genre') }
+            value={ selectedGenre || '' }
+            data={ selectedCategory?.genres.map((genre) => ({
+              label: genre.name,
+              value: genre.value,
+            })) || [] }
+            onChange={ (item) => setSelectedGenre(item.value) }
+            closeOnChange
+          />
+          <ThemedText>
+            { t('Choose year') }
+          </ThemedText>
+          <ThemedDropdown
+            header={ t('Year') }
+            value={ selectedYear || '' }
+            data={ selectedCategory?.years.map((year) => ({
+              label: year.name,
+              value: year.value,
+            })) || [] }
+            onChange={ (item) => setSelectedYear(item.value) }
+            closeOnChange
+          />
+          <ThemedButton
+            style={ styles.categoriesSelectBtn }
+            onPress={ handleApplyAdditionalContent }
+          >
+            { t('Lets search!') }
+          </ThemedButton>
+        </View>
+      </ScrollView>
+    );
+  };
+
+  const renderCategoriesModal = () => {
+    return (
+      <ThemedOverlay ref={ additionalContentOverlayRef }>
+        { renderCategories() }
+      </ThemedOverlay>
+    );
+  };
+
   return (
     <Page>
+      { renderCategoriesModal() }
       <ThemedSafeArea>
         <View style={ styles.content }>
           <View style={ styles.container }>

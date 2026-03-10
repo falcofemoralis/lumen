@@ -16,6 +16,7 @@ import { FilmInterface } from 'Type/Film.interface';
 import { NotificationInterface, NotificationItemInterface } from 'Type/Notification.interface';
 import { ProfileInterface } from 'Type/Profile.interface';
 import { UserDataInterface } from 'Type/UserData.interface';
+import { openLinkInBrowser } from 'Util/Link';
 import { requestValidator } from 'Util/Request';
 import { storage } from 'Util/Storage';
 import { updateUrlHost } from 'Util/Url';
@@ -243,11 +244,11 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
   }, [currentService]);
 
   const viewProfile = useCallback(() => {
-    Linking.openURL(`${currentService.getProvider()}/user/${profile?.id}/`);
+    openLinkInBrowser(`${currentService.getProvider()}/user/${profile?.id}/`);
   }, [currentService, profile]);
 
   const viewPayments = useCallback(() => {
-    Linking.openURL(`${currentService.getProvider()}/payments/`);
+    openLinkInBrowser(`${currentService.getProvider()}/payments/`);
   }, [currentService]);
 
   /**

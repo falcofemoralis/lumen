@@ -37,7 +37,7 @@ export const AppUpdaterContainer = ({ position }: AppUpdaterContainerProps) => {
   };
 
   useEffect(() => {
-    if (update && isTV) {
+    if (update) {
       setTimeout(() => {
         openPopup();
       }, 0);
@@ -57,10 +57,6 @@ export const AppUpdaterContainer = ({ position }: AppUpdaterContainerProps) => {
   if (!update || isUpdateRejected) {
     return null;
   }
-
-  const onBottomSheetMount = () => {
-    openPopup();
-  };
 
   const acceptUpdate = async () => {
     const {
@@ -107,7 +103,6 @@ export const AppUpdaterContainer = ({ position }: AppUpdaterContainerProps) => {
     progress,
     acceptUpdate,
     rejectUpdate,
-    onBottomSheetMount,
   };
 
   return isTV ? <AppUpdaterComponentTV { ...containerProps } /> : <AppUpdaterComponent { ...containerProps } />;

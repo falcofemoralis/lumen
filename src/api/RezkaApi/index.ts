@@ -6,6 +6,7 @@ import NotificationStore from 'Store/Notification.store';
 import { ActorInterface, ActorRole } from 'Type/Actor.interface';
 import { BookmarkInterface } from 'Type/Bookmark.interface';
 import { CommentTextInterface, CommentTextType } from 'Type/Comment.interface';
+import { ContentCollectionInterface } from 'Type/ContentCollection.interface';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { FilmListInterface } from 'Type/FilmList.interface';
@@ -1455,6 +1456,68 @@ const RezkaApi = {
     }
 
     return !!cookies['dle_password'].value;
+  },
+
+  async loadAdditionalContent() {
+    const root = await this.fetchPage('/collections');
+
+    const categories = root.querySelectorAll('li.b-topnav__item').map((cat) => {
+      if (cat.classList.contains('single')) {
+        return null;
+      }
+
+      const categoryName = cat.querySelector('.b-topnav__item-link')?.rawText ?? '';
+
+      const genres = cat.querySelectorAll('select.select-category option').map((item) => {
+        const name = item.rawText;
+        const value = item.attributes.value;
+
+        return { name, value };
+      }).filter((genre, index, self) =>
+        index === self.findIndex((g) => g.value === genre.value));
+
+      const years = cat.querySelectorAll('select.select-year option').map((item) => {
+        const name = item.rawText;
+        const value = item.attributes.value;
+
+        return { name, value };
+      }).filter((genre, index, self) =>
+        index === self.findIndex((g) => g.value === genre.value));
+
+      return {
+        name: categoryName.trim(),
+        genres,
+        years,
+      };
+    }).filter((cat) => cat !== null);
+
+    return categories;
+  },
+
+  async getCollections(page: number) {
+    const root = await this.fetchPage(`/collections/page/${page}/`);
+
+    const collections = root.querySelectorAll('.b-content__collections_item').map((item) => {
+      const title = item.querySelector('.title')?.rawText ?? '';
+      const image = item.querySelector('.cover')?.attributes.src ?? '';
+      const url = item.attributes['data-url'] ?? '';
+      const amount = item.querySelector('.num')?.rawText ?? 0;
+
+      return {
+        id: title,
+        title,
+        image,
+        url,
+        amount: Number(amount),
+      } as ContentCollectionInterface;
+    });
+
+    const navs = root.querySelectorAll('.b-navigation a');
+
+    return {
+      items: collections,
+      totalPages: navs.length > 0 ? Number(navs[navs.length - 2].rawText) : 1,
+    };
   },
 };
 

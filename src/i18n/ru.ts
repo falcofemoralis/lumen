@@ -118,7 +118,7 @@ const ru: Translations = {
   'No video streams available': 'Нет доступных потоков. Проверьте работоспособность на сайте.',
   'Invalid provider': 'Зеркало не работает. Попробуйте выбрать другое.',
   'You are blocked': 'Нами была обнаружена подозрительная активность с вашего IP-адреса. Если вы используете VPN смените его.',
-  'Not found': 'Страница не найдена',
+  'Not found': 'Ничего не найдено',
   'Official mode': 'Официальный режим',
   'Links will be used as in the official application.': 'Будет использовано зеркало как в официальном приложении.',
   'Off': 'Отключен',
@@ -241,6 +241,13 @@ const ru: Translations = {
   'Toggle ask quality.': 'Если включено, при каждом запуске фильма будет спрашиваться, какое качество вы хотите выбрать.',
   'Toggle download subtitles.': 'Переключить скачивания файла субтитров.',
   'Toggle download poster.': 'Переключить скачивания постера.',
+  'Format': 'Формат',
+  'Choose format': 'Выберите формат',
+  'Genre': 'Жанр',
+  'Choose genre': 'Выберите жанр',
+  'Year': 'Год',
+  'Choose year': 'Выберите год',
+  'Lets search!': 'Поехали!',
 };
 
 export default ru;

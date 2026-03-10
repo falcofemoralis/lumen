@@ -25,7 +25,6 @@ export type AppStackParamList = {
   LoginModal: undefined
   ScheduleModal: undefined
   SettingsModal: undefined
-
 }
 
 export type AppStackScreenProps<T extends keyof AppStackParamList> = NativeStackScreenProps<

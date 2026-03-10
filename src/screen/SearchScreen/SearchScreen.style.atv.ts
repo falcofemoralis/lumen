@@ -49,4 +49,19 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     alignContent: 'center',
     alignItems: 'center',
   },
+  categoriesOverlay: {
+    width: '40%',
+    padding: scale(16),
+  },
+  categories: {
+    flexDirection: 'column',
+    gap: scale(8),
+  },
+  categoriesLoader: {
+    minHeight: scale(200),
+  },
+  categoriesSelectBtn: {
+    backgroundColor: colors.primary,
+    marginTop: scale(12),
+  },
 } satisfies ThemedStyles);

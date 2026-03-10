@@ -14,7 +14,6 @@ export interface AppUpdaterComponentProps {
   progress: number;
   acceptUpdate: () => void;
   rejectUpdate: () => void;
-  onBottomSheetMount: () => void;
 }
 
 export interface MetaData {

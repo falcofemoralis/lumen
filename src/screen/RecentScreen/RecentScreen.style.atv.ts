@@ -28,7 +28,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     transform: [{ scale: 1.1 }],
   },
   posterContainer: {
-    borderRadius: 8,
+    borderRadius: scale(8),
     borderWidth: scale(2),
     borderColor: colors.transparent,
     overflow: 'hidden',

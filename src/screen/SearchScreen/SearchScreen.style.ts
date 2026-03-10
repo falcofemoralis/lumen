@@ -11,7 +11,7 @@ export const componentStyles = ({ scale, colors, text, spacing }: Theme) => ({
   searchContainer: {
     flexDirection: 'row',
     width: '100%',
-    gap: scale(12),
+    gap: scale(8),
   },
   actionBtn: {
     aspectRatio: 1,
@@ -21,8 +21,23 @@ export const componentStyles = ({ scale, colors, text, spacing }: Theme) => ({
   },
   actionBtnIcon: {
   },
+  actionBtnSearch: {
+    position: 'absolute',
+    left: 0,
+    width: scale(36),
+    height: scale(36),
+    zIndex: 15,
+    backgroundColor: colors.button,
+    borderRadius: scale(50),
+    transform: [{ translateY: '-50%' }],
+    top: '50%',
+  },
   searchBarContainer: {
     flex: 1,
+  },
+  searchBarInput: {
+    marginLeft: scale(26),
+    marginRight: scale(26),
   },
   closeBtn: {
     position: 'absolute',
@@ -81,5 +96,16 @@ export const componentStyles = ({ scale, colors, text, spacing }: Theme) => ({
     justifyContent: 'center',
     alignContent: 'center',
     alignItems: 'center',
+  },
+  categories: {
+    flexDirection: 'column',
+    gap: scale(8),
+  },
+  categoriesLoader: {
+    minHeight: scale(200),
+  },
+  categoriesSelectBtn: {
+    backgroundColor: colors.primary,
+    marginTop: scale(12),
   },
 } satisfies ThemedStyles);

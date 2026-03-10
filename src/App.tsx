@@ -39,10 +39,8 @@ if (__DEV__) {
   console.error = withoutIgnored(console.error);
 }
 
-import { AppUpdater } from 'Component/AppUpdater';
 import { Awake } from 'Component/Awake';
 import { Root } from 'Component/Root';
-import Portal from 'Component/ThemedPortal/Portal';
 import { AppProvider } from 'Context/AppContext';
 import * as Linking from 'expo-linking';
 import * as SplashScreen from 'expo-splash-screen';
@@ -118,17 +116,14 @@ export function App() {
             <GestureHandlerRootView>
               <Root>
                 <Awake>
-                  <Portal.Host>
-                    <AppUpdater position='root' />
-                    <AppNavigator
-                      linking={ linking }
-                      initialState={ initialNavigationState }
-                      onStateChange={ onNavigationStateChange }
-                      onReady={ () => {
-                        SplashScreen.hideAsync();
-                      } }
-                    />
-                  </Portal.Host>
+                  <AppNavigator
+                    linking={ linking }
+                    initialState={ initialNavigationState }
+                    onStateChange={ onNavigationStateChange }
+                    onReady={ () => {
+                      SplashScreen.hideAsync();
+                    } }
+                  />
                 </Awake>
               </Root>
             </GestureHandlerRootView>

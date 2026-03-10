@@ -239,6 +239,13 @@ const en = {
   'Toggle ask quality.': 'Toggle ask quality.',
   'Toggle download subtitles.': 'Toggle download subtitles.',
   'Toggle download poster.': 'Toggle download poster.',
+  'Format': 'Format',
+  'Choose format': 'Choose format',
+  'Genre': 'Genre',
+  'Choose genre': 'Choose genre',
+  'Year': 'Year',
+  'Choose year': 'Choose year',
+  'Lets search!': 'Lets search!',
 };
 
 export default en;

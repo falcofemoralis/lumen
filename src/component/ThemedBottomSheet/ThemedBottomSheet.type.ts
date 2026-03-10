@@ -7,5 +7,4 @@ export interface ThemedBottomSheetComponentProps {
   children: React.ReactNode;
   detents?: SheetDetent[];
   backgroundColor?: string;
-  onMount?: () => void;
 }

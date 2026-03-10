@@ -1,10 +1,11 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ActorScreen } from 'Screen/ActorScreen';
 import { CategoryScreen } from 'Screen/CategoryScreen';
+import { CollectionScreen } from 'Screen/CollectionScreen';
 import { FilmScreen } from 'Screen/FilmScreen';
 import { useAppTheme } from 'Theme/context';
 
-import { ACTOR_SCREEN, CATEGORY_SCREEN, FILM_SCREEN } from './navigationRoutes';
+import { ACTOR_SCREEN, CATEGORY_SCREEN, COLLECTION_SCREEN, FILM_SCREEN } from './navigationRoutes';
 
 const Stack = createNativeStackNavigator();
 
@@ -35,6 +36,10 @@ export const FilmNavigator = ({ name, component }: { name: string, component: an
         <Stack.Screen
           name={ FILM_SCREEN }
           component={ FilmScreen }
+        />
+        <Stack.Screen
+          name={ COLLECTION_SCREEN }
+          component={ CollectionScreen }
         />
       </Stack.Group>
     </Stack.Navigator>

@@ -1,11 +1,15 @@
 import { FilmPager } from 'Component/FilmPager';
 import { InfoBlock } from 'Component/InfoBlock';
+import { Loader } from 'Component/Loader';
 import { Page } from 'Component/Page';
 import { ThemedButton } from 'Component/ThemedButton';
+import { ThemedDropdown } from 'Component/ThemedDropdown';
 import { ThemedInput } from 'Component/ThemedInput';
+import { ThemedOverlay } from 'Component/ThemedOverlay';
+import { ThemedText } from 'Component/ThemedText';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
-import { Mic, Search } from 'lucide-react-native';
+import { LayoutGrid, Mic, Search, Settings2 } from 'lucide-react-native';
 import { memo } from 'react';
 import { View } from 'react-native';
 import { DefaultFocus, SpatialNavigationScrollView, SpatialNavigationView } from 'react-tv-space-navigation';
@@ -25,6 +29,8 @@ const SearchHeader = memo(({
   onApplySuggestion,
   handleStartRecognition,
   handleApplySearch,
+  openAdditionalContentOverlay,
+  handleOpenCollections,
 }: SearchScreenComponentProps & {
   styles: ThemedStyles<typeof componentStyles>;
 }) => {
@@ -56,11 +62,23 @@ const SearchHeader = memo(({
           iconProps={ recognizing ? { color: theme.colors.iconOnContrast } : undefined }
           withAnimation
         />
+        <ThemedButton
+          style={ styles.actionBtn }
+          IconComponent={ Settings2 }
+          onPress={ openAdditionalContentOverlay }
+          withAnimation
+        />
         { renderSearchBar() }
         <ThemedButton
           style={ styles.actionBtn }
           IconComponent={ Search }
           onPress={ handleApplySearch }
+          withAnimation
+        />
+        <ThemedButton
+          style={ styles.actionBtn }
+          IconComponent={ LayoutGrid }
+          onPress={ handleOpenCollections }
           withAnimation
         />
       </SpatialNavigationView>
@@ -112,8 +130,18 @@ export function SearchScreenComponent(props: SearchScreenComponentProps) {
     pagerItems,
     query,
     isLoading,
+    additionalContentOverlayRef,
+    categories,
+    selectedCategory,
+    selectedGenre,
+    selectedYear,
+    isCategoriesLoading,
     onLoadFilms,
     onUpdateFilms,
+    handleApplyAdditionalContent,
+    setSelectedCategory,
+    setSelectedGenre,
+    setSelectedYear,
   } = props;
 
   const renderEmptyBlock = () => (
@@ -132,8 +160,94 @@ export function SearchScreenComponent(props: SearchScreenComponentProps) {
     />
   );
 
+  const renderCategories = () => {
+    if (isCategoriesLoading) {
+      return (
+        <View style={ styles.categoriesLoader }>
+          <Loader fullScreen isLoading />
+        </View>
+      );
+    }
+
+    if (!categories?.length) {
+      return null;
+    }
+
+    return (
+      <SpatialNavigationView direction='vertical'>
+        <View style={ styles.categories }>
+          <ThemedText>
+            { t('Choose format') }
+          </ThemedText>
+          <ThemedDropdown
+            header={ t('Format') }
+            value={ selectedCategory?.name || '' }
+            data={ categories?.map((cat) => ({
+              label: cat.name,
+              value: cat.name,
+            })) || [] }
+            onChange={ (item) => {
+              const cat = categories?.find((c) => c.name === item.value);
+
+              if (cat) {
+                setSelectedCategory(cat);
+              }
+            } }
+            closeOnChange
+          />
+          <ThemedText>
+            { t('Choose genre') }
+          </ThemedText>
+          <ThemedDropdown
+            header={ t('Genre') }
+            value={ selectedGenre || '' }
+            data={ selectedCategory?.genres.map((genre) => ({
+              label: genre.name,
+              value: genre.value,
+            })) || [] }
+            onChange={ (item) => setSelectedGenre(item.value) }
+            closeOnChange
+          />
+          <ThemedText>
+            { t('Choose year') }
+          </ThemedText>
+          <ThemedDropdown
+            header={ t('Year') }
+            value={ selectedYear || '' }
+            data={ selectedCategory?.years.map((year) => ({
+              label: year.name,
+              value: year.value,
+            })) || [] }
+            onChange={ (item) => setSelectedYear(item.value) }
+            closeOnChange
+          />
+          <DefaultFocus>
+            <ThemedButton
+              style={ styles.categoriesSelectBtn }
+              onPress={ handleApplyAdditionalContent }
+            >
+              { t('Lets search!') }
+            </ThemedButton>
+          </DefaultFocus>
+        </View>
+      </SpatialNavigationView>
+    );
+  };
+
+  const renderCategoriesModal = () => {
+    return (
+      <ThemedOverlay
+        ref={ additionalContentOverlayRef }
+        containerStyle={ styles.categoriesOverlay }
+      >
+        { renderCategories() }
+      </ThemedOverlay>
+    );
+  };
+
   return (
     <Page>
+      { renderCategoriesModal() }
       <FilmPager
         items={ pagerItems }
         onLoadFilms={ onLoadFilms }
