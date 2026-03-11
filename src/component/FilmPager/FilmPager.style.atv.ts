@@ -1,13 +1,13 @@
 import { Theme, ThemedStyles } from 'Theme/types';
 
-export const componentStyles = ({ scale, colors }: Theme) => ({
+export const componentStyles = ({ scale, colors, text }: Theme) => ({
   container: {
     width: '100%',
     height: '100%',
   },
   menuListWrapper: {
     position: 'relative',
-    height: scale(40),
+    height: scale(42),
     zIndex: 10,
     backgroundColor: colors.background,
     marginBottom: scale(16),
@@ -21,5 +21,20 @@ export const componentStyles = ({ scale, colors }: Theme) => ({
   },
   tabButton: {
     height: '100%',
+    gap: scale(0),
+    paddingVertical: scale(8),
+  },
+  tabBarSorting: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sortingText: {
+    color: colors.text,
+    fontSize: scale(text.xxs.fontSize),
+    overflow: 'hidden',
+  },
+  sortingTextFocused: {
+    color: colors.textFocused,
   },
 } satisfies ThemedStyles);

@@ -25,3 +25,11 @@ export type SeasonsResult = JSONResult & {
   seasons: string;
   episodes: string
 };
+
+export enum FILM_SORTING {
+  ALL = 'all',
+  FILMS = 'films',
+  SERIES = 'series',
+  MULFILMS = 'mulfilms',
+  ANIME = 'anime',
+}

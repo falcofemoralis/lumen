@@ -122,6 +122,7 @@ export default function ThemedButton({
           { children }
         </Text>
       ) }
+      { additionalElement && additionalElement(isFocused, isSelected ?? false) }
     </View>
   );
 

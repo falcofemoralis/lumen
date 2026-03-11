@@ -30,8 +30,9 @@ import { executeGet, executePost, Variables } from 'Util/Request';
 import { storage } from 'Util/Storage';
 import { updateUrlHost } from 'Util/Url';
 
-import { CommentsResult, JSONResult, SeasonsResult, StreamsResult } from './type';
+import { CommentsResult, FILM_SORTING, JSONResult, SeasonsResult, StreamsResult } from './type';
 import {
+  applyFilmSorting,
   formatDurationWithMoment,
   getStaticUrl,
   parseActorCard,
@@ -676,9 +677,14 @@ const RezkaApi = {
     page: number,
     path = '',
     variables?: Variables,
-    params?: ApiParams
+    params?: ApiParams,
+    sort?: string
   ): Promise<FilmListInterface> {
     const { key } = params || {};
+
+    if (sort && variables) {
+      applyFilmSorting(sort, variables);
+    }
 
     const root = await this.fetchPage(
       `${path === '/' ? '' : path}/page/${page}/`,
@@ -1026,15 +1032,47 @@ const RezkaApi = {
     return film;
   },
 
+  getFilmSortingOptions() {
+    return [
+      {
+        label: t('All'),
+        value: FILM_SORTING.ALL as string,
+      },
+      {
+        label: t('Films'),
+        value: FILM_SORTING.FILMS as string,
+      },
+      {
+        label: t('Series'),
+        value: FILM_SORTING.SERIES as string,
+      },
+      {
+        label: t('Multfilms'),
+        value: FILM_SORTING.MULFILMS as string,
+      },
+      {
+        label: t('Anime'),
+        value: FILM_SORTING.ANIME as string,
+      },
+    ];
+  },
+
   /**
    * Get films from home menu
    * @param menuItem
    * @param page
+   * @param sort
    * @param params
    * @returns FilmList
    */
-  async getHomeMenuFilms(menuItem: MenuItemInterface, page: number, params?: ApiParams) {
-    const { path, key, variables } = menuItem;
+  async getHomeMenuFilms(menuItem: MenuItemInterface, page: number, sort?: string, params?: ApiParams) {
+    const { path, key, variables = {} } = menuItem;
+
+    const sortVariable = key === '.b-newest_slider__wrapper' ? 'id' : undefined;
+
+    if (sort) {
+      applyFilmSorting(sort, variables, sortVariable);
+    }
 
     if (key === '.b-newest_slider__wrapper') {
       const films: FilmCardInterface[] = [];

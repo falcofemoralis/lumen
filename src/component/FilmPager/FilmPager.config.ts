@@ -7,3 +7,11 @@ export const pagerItemsUpdater = (key: string, item: PagerItemInterface) => {
         ? { ...pagerItem, ...item }
         : pagerItem);
 };
+
+export const pagerItemsReset = (key: string) => {
+  return (prevPagerItems: PagerItemInterface[]) =>
+    prevPagerItems.map(pagerItem =>
+      pagerItem.menuItem.id === key
+        ? { ...pagerItem, films: null, pagination: { currentPage: 1, totalPages: 1 } }
+        : pagerItem);
+};

@@ -5,6 +5,7 @@ import { HomeScreenComponentProps } from './HomeScreen.type';
 
 export function HomeScreenComponent({
   pagerItems,
+  sorting,
   onLoadFilms,
   onUpdateFilms,
 }: HomeScreenComponentProps) {
@@ -15,6 +16,7 @@ export function HomeScreenComponent({
         onLoadFilms={ onLoadFilms }
         onUpdateFilms={ onUpdateFilms }
         loadOnInit
+        sorting={ sorting }
       />
     </Page>
   );

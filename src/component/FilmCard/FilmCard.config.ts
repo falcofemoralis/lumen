@@ -3,7 +3,7 @@ import { FilmType } from 'Type/FilmType.type';
 
 export const TYPE_LABELS: Record<FilmType, TxKeyPath> = {
   [FilmType.FILM]: 'Movie',
-  [FilmType.SERIES]: 'Series',
+  [FilmType.SERIES]: 'Serial',
   [FilmType.CARTOON]: 'Cartoon',
   [FilmType.ANIME]: 'Anime',
   [FilmType.TV_SHOW]: 'TV Show',

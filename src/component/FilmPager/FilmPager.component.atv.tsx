@@ -1,8 +1,12 @@
 import { FilmGrid } from 'Component/FilmGrid';
 import { ThemedButton } from 'Component/ThemedButton';
+import { ThemedDropdown } from 'Component/ThemedDropdown';
+import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
+import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
-import { createRef, memo, Ref, useCallback, useRef, useState } from 'react';
+import { createRef, memo, Ref, useCallback, useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import {
   SpatialNavigationNode,
   SpatialNavigationNodeRef,
@@ -19,36 +23,99 @@ import { FilmPagerComponentProps, PagerItemInterface } from './FilmPager.type';
 
 const TabButton = memo(({
   ref,
-  title,
+  menuItem,
   isActive,
   onFocus,
   styles,
   isFocusVisible,
+  sorting,
+  selectedSorting,
+  handleSelectSorting,
 }: {
   ref: Ref<SpatialNavigationNodeRef>,
-  title: string;
+  menuItem: PagerItemInterface['menuItem'];
   isActive: boolean;
   onFocus: () => void;
   styles: ThemedStyles<typeof componentStyles>;
   isFocusVisible: boolean;
-}) => (
-  <ThemedButton
-    spatialRef={ ref }
-    key={ title }
-    variant='outlined'
-    isSelected={ isActive }
-    onFocus={ onFocus }
-    style={ styles.tabButton }
-    isFocusVisible={ isFocusVisible }
-  >
-    { title }
-  </ThemedButton>
-));
+  sorting?: FilmPagerComponentProps['sorting'];
+  selectedSorting?: FilmPagerComponentProps['selectedSorting'];
+  handleSelectSorting?: FilmPagerComponentProps['handleSelectSorting'];
+}) => {
+  const { scale } = useAppTheme();
+  const sortingOverlayRef = useRef<ThemedOverlayRef>(null);
+  const { id, title } = menuItem;
+  const sortingHeightAnim = useSharedValue(0);
+
+  useEffect(() => {
+    sortingHeightAnim.value = withTiming(isActive && sorting ? scale(14) : 0, {
+      duration: 250,
+    });
+  }, [isActive, sorting, scale, sortingHeightAnim]);
+
+  const sortingAnimatedStyle = useAnimatedStyle(() => ({
+    height: sortingHeightAnim.value,
+  }));
+
+  const handlePress = () => {
+    if (isActive && sorting) {
+      sortingOverlayRef.current?.open();
+    }
+  };
+
+  const handleSelect = (item: DropdownItem) => {
+    handleSelectSorting?.(menuItem, item);
+    sortingOverlayRef.current?.close();
+  };
+
+  return (
+    <>
+      <ThemedButton
+        spatialRef={ ref }
+        key={ id }
+        variant='outlined'
+        isSelected={ isActive }
+        onFocus={ onFocus }
+        onPress={ handlePress }
+        style={ [
+          styles.tabButton,
+          sorting && styles.tabBarSorting,
+        ] }
+        isFocusVisible={ isFocusVisible }
+        additionalElement={ !sorting ? undefined : (isFocused) => (
+          <Animated.Text
+            style={ [
+              styles.sortingText,
+              isFocused && styles.sortingTextFocused,
+              sortingAnimatedStyle,
+            ] }
+          >
+            { selectedSorting?.[id]?.label ?? sorting[0].label }
+          </Animated.Text>
+        ) }
+      >
+        { title }
+      </ThemedButton>
+      { sorting && (
+        <ThemedDropdown
+          overlayRef={ sortingOverlayRef }
+          data={ sorting }
+          value={ selectedSorting?.[id]?.value ?? sorting[0].value ?? '' }
+          onChange={ handleSelect }
+          asOverlay
+        />
+      ) }
+    </>
+  );
+});
 
 const TopMenu = memo(({
   items,
-  handlePageChange,
   styles,
+  sorting,
+  selectedSorting,
+  handlePageChange,
+  handleSelectSorting,
 }: FilmPagerComponentProps & {
   handlePageChange: (page: number, pagerItem: PagerItemInterface) => void;
   styles: ThemedStyles<typeof componentStyles>;
@@ -88,17 +155,20 @@ const TopMenu = memo(({
   };
 
   const renderMenuItem = (item: PagerItemInterface, idx: number, focusVisible: boolean) => {
-    const { menuItem: { title } } = item;
+    const { menuItem } = item;
 
     return (
       <TabButton
         ref={ refs.current[idx] }
-        key={ title }
-        title={ title }
+        key={ menuItem.id }
+        menuItem={ menuItem }
         isActive={ activeIndex === idx }
         onFocus={ () => handleMenuItemChange(item) }
         styles={ styles }
         isFocusVisible={ focusVisible }
+        sorting={ sorting }
+        selectedSorting={ selectedSorting }
+        handleSelectSorting={ handleSelectSorting }
       />
     );
   };

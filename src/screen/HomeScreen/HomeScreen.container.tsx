@@ -1,8 +1,8 @@
-import { pagerItemsUpdater } from 'Component/FilmPager/FilmPager.config';
+import { pagerItemsReset, pagerItemsUpdater } from 'Component/FilmPager/FilmPager.config';
 import { PagerItemInterface } from 'Component/FilmPager/FilmPager.type';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { MenuItemInterface } from 'Type/MenuItem.interface';
 
 import HomeScreenComponent from './HomeScreen.component';
@@ -11,6 +11,7 @@ import HomeScreenComponentTV from './HomeScreen.component.atv';
 export function HomeScreenContainer() {
   const { currentService } = useServiceContext();
   const { isTV } = useConfigContext();
+  const sorting = useMemo(() => currentService.getFilmSortingOptions(), [currentService]);
 
   const [pagerItems, setPagerItems] = useState<PagerItemInterface[]>(currentService
     .getHomeMenu()
@@ -30,10 +31,17 @@ export function HomeScreenContainer() {
   const onLoadFilms = async (
     menuItem: MenuItemInterface,
     currentPage: number,
-    isRefresh: boolean
-  ) => currentService.getHomeMenuFilms(menuItem, currentPage, {
-    isRefresh,
-  });
+    isRefresh: boolean,
+    sort?: string
+  ) => {
+    if (isRefresh) {
+      setPagerItems(pagerItemsReset(menuItem.id));
+    }
+
+    return currentService.getHomeMenuFilms(menuItem, currentPage, sort, {
+      isRefresh,
+    });
+  };
 
   const onUpdateFilms = (key: string, item: PagerItemInterface) => {
     setPagerItems(pagerItemsUpdater(key, item));
@@ -41,6 +49,7 @@ export function HomeScreenContainer() {
 
   const containerProps = {
     pagerItems,
+    sorting,
     onLoadFilms,
     onUpdateFilms,
   };

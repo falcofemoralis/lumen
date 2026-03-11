@@ -22,4 +22,9 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     fontWeight: 'bold',
     opacity: 1,
   },
+  sortingText: {
+    color: colors.text,
+    fontSize: scale(text.xxs.fontSize),
+    overflow: 'hidden',
+  },
 } satisfies ThemedStyles);

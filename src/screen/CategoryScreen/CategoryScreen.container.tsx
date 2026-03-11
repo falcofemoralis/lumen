@@ -1,4 +1,4 @@
-import { pagerItemsUpdater } from 'Component/FilmPager/FilmPager.config';
+import { pagerItemsReset, pagerItemsUpdater } from 'Component/FilmPager/FilmPager.config';
 import { PagerItemInterface } from 'Component/FilmPager/FilmPager.type';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
@@ -24,9 +24,16 @@ export function CategoryScreenContainer({ route }: CategoryScreenContainerProps)
   const { currentService } = useServiceContext();
 
   const onLoadFilms = async (
-    _menuItem: MenuItemInterface,
-    currentPage: number
-  ) => currentService.getFilms(currentPage, link);
+    menuItem: MenuItemInterface,
+    currentPage: number,
+    isRefresh: boolean
+  ) => {
+    if (isRefresh) {
+      setPagerItems(pagerItemsReset(menuItem.id));
+    }
+
+    return currentService.getFilms(currentPage, link);
+  };
 
   const onUpdateFilms = (key: string, item: PagerItemInterface) => {
     setPagerItems(pagerItemsUpdater(key, item));

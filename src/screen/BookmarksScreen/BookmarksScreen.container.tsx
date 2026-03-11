@@ -1,4 +1,4 @@
-import { pagerItemsUpdater } from 'Component/FilmPager/FilmPager.config';
+import { pagerItemsReset, pagerItemsUpdater } from 'Component/FilmPager/FilmPager.config';
 import { PagerItemInterface } from 'Component/FilmPager/FilmPager.type';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
@@ -53,11 +53,17 @@ export function BookmarksScreenContainer() {
   const onLoadFilms = async (
     menuItem: MenuItemInterface,
     currentPage: number,
-    _isRefresh: boolean
-  ) => currentService.getBookmarkedFilms({
-    id: menuItem.id,
-    title: menuItem.title,
-  }, currentPage);
+    isRefresh: boolean
+  ) => {
+    if (isRefresh) {
+      setPagerItems(pagerItemsReset(menuItem.id));
+    }
+
+    return currentService.getBookmarkedFilms({
+      id: menuItem.id,
+      title: menuItem.title,
+    }, currentPage);
+  };
 
   const onUpdateFilms = (key: string, item: PagerItemInterface) => setPagerItems(pagerItemsUpdater(key, item));
 

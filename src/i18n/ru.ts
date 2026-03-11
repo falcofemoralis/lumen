@@ -95,7 +95,7 @@ const ru: Translations = {
   'Press back again to exit': 'Нажмите назад еще раз, чтобы выйти',
   'Login': 'Авторизация',
   'Movie': 'Фильм',
-  'Series': 'Сериал',
+  'Serial': 'Сериал',
   'Cartoon': 'Мультфильм',
   'Anime': 'Аниме',
   'TV Show': 'Телешоу',
@@ -250,6 +250,10 @@ const ru: Translations = {
   'Lets search!': 'Поехали!',
   'Do you want to remove this suggestion from history?': 'Вы точно хотите удалить это из истории?',
   'Remove': 'Удалить',
+  'All': 'Все',
+  'Films': 'Фильмы',
+  'Multfilms': 'Мультфильмы',
+  'Series': 'Сериалы',
 };
 
 export default ru;

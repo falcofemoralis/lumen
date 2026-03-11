@@ -7,9 +7,10 @@ import { FilmType } from 'Type/FilmType.type';
 import { SubtitleInterface } from 'Type/FilmVideo.interface';
 import { EpisodeInterface, SeasonInterface } from 'Type/FilmVoice.interface';
 import { HTMLElementInterface } from 'Util/Parser';
+import { Variables } from 'Util/Request';
 
 import { decrypt } from './decode';
-import { SubtitleLns } from './type';
+import { FILM_SORTING, SubtitleLns } from './type';
 
 export const getStaticUrl = (path: string): string => {
   if (path.startsWith('http')) {
@@ -284,4 +285,25 @@ export const formatDurationWithMoment = (minutes: number): string => {
   }
 
   return `${hours} ч ${remainingMinutes} мин.`;
+};
+
+export const applyFilmSorting = (sort: string, variables: Variables, nameArg?: string) => {
+  const name = nameArg ?? 'genre';
+
+  switch (sort) {
+    case FILM_SORTING.FILMS:
+      variables[name] = '1';
+      break;
+    case FILM_SORTING.SERIES:
+      variables[name] = '2';
+      break;
+    case FILM_SORTING.MULFILMS:
+      variables[name] = '3';
+      break;
+    case FILM_SORTING.ANIME:
+      variables[name] = '82';
+      break;
+    default:
+      break;
+  }
 };

@@ -93,7 +93,7 @@ const en = {
   'Press back again to exit': 'Press back again to exit',
   'Login': 'Login',
   'Movie': 'Movie',
-  'Series': 'Series',
+  'Serial': 'Serial',
   'Cartoon': 'Cartoon',
   'Anime': 'Anime',
   'TV Show': 'TV Show',
@@ -248,6 +248,10 @@ const en = {
   'Lets search!': 'Lets search!',
   'Do you want to remove this suggestion from history?': 'Do you want to remove this suggestion from history?',
   'Remove': 'Remove',
+  'All': 'All',
+  'Films': 'Films',
+  'Multfilms': 'Multfilms',
+  'Series': 'Series',
 };
 
 export default en;

@@ -1,5 +1,6 @@
+import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import { useConfigContext } from 'Context/ConfigContext';
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
 import { PaginationInterface } from 'Type/Pagination.interface';
 
@@ -16,11 +17,15 @@ export function FilmPagerContainer({
   ListHeaderComponent,
   ListEmptyComponent,
   isAddSafeArea,
+  sorting,
   onLoadFilms,
   onUpdateFilms,
   onRowFocus,
 }: FilmPagerContainerProps) {
   const { isTV } = useConfigContext();
+  const [selectedSorting, setSelectedSorting] = useState<Record<string, DropdownItem> | null>(
+    sorting && sorting.length > 0 ? {} : null
+  );
 
   useEffect(() => {
     if (loadOnInit) {
@@ -33,7 +38,8 @@ export function FilmPagerContainer({
     pagerItem: PagerItemInterface,
     newPagination: PaginationInterface,
     isUpdate = false, // replace current films with new ones
-    isRefresh = false // fetch new films
+    isRefresh = false, // fetch new films
+    sort?: string
   ) => {
     const {
       menuItem,
@@ -53,7 +59,7 @@ export function FilmPagerContainer({
     }
 
     try {
-      const { films: newFilms, totalPages } = await onLoadFilms(menuItem, currentPage, isRefresh);
+      const { films: newFilms, totalPages } = await onLoadFilms(menuItem, currentPage, isRefresh, sort);
 
       const updatedFilms = isUpdate ? newFilms : Array.from(films ?? []).concat(newFilms);
 
@@ -86,18 +92,33 @@ export function FilmPagerContainer({
     await loadFilms(item, newPage, isRefresh, isRefresh);
   };
 
+  const handleSelectSorting = useCallback((menuItem: PagerItemInterface['menuItem'], item: DropdownItem) => {
+    const { id } = menuItem;
+
+    setSelectedSorting((prev) => ({ ...prev, [id]: item }));
+
+    loadFilms({
+      menuItem,
+      films: null,
+      pagination: { currentPage: 1, totalPages: 1 },
+    }, { currentPage: 1, totalPages: 1 }, true, true, item.value);
+  }, []);
+
   const containerProps = {
     items,
     gridStyle,
     isGridVisible,
     isEmpty,
     isAddSafeArea,
+    sorting,
+    selectedSorting,
     ListHeaderComponent,
     ListEmptyComponent,
     onRowFocus,
     loadFilms,
     onNextLoad,
     onPreLoad,
+    handleSelectSorting,
   };
 
   return isTV ? <FilmPagerComponentTV { ...containerProps } /> : <FilmPagerComponent { ...containerProps } />;

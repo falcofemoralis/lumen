@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
-import { pagerItemsUpdater } from 'Component/FilmPager/FilmPager.config';
+import { pagerItemsReset, pagerItemsUpdater } from 'Component/FilmPager/FilmPager.config';
 import { PagerItemInterface } from 'Component/FilmPager/FilmPager.type';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useConfigContext } from 'Context/ConfigContext';
@@ -214,9 +214,16 @@ export function SearchScreenContainer() {
   };
 
   const onLoadFilms = async (
-    _menuItem: MenuItemInterface,
-    currentPage: number
-  ) => currentService.search(query, currentPage);
+    menuItem: MenuItemInterface,
+    currentPage: number,
+    isRefresh: boolean
+  ) => {
+    if (isRefresh) {
+      setPagerItems(pagerItemsReset(menuItem.id));
+    }
+
+    return currentService.search(query, currentPage);
+  };
 
   const onUpdateFilms = async (key: string, item: PagerItemInterface) => {
     setPagerItems(pagerItemsUpdater(key, item));
