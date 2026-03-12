@@ -7,10 +7,10 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   },
   menuListWrapper: {
     position: 'relative',
-    height: scale(42),
     zIndex: 10,
     backgroundColor: colors.background,
     marginBottom: scale(16),
+    height: scale(46),
   },
   menuListScroll: {},
   menuList: {
@@ -21,8 +21,8 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   },
   tabButton: {
     height: '100%',
-    gap: scale(0),
-    paddingVertical: scale(8),
+    gap: 0,
+    paddingVertical: scale(6),
   },
   tabBarSorting: {
     flexDirection: 'column',
