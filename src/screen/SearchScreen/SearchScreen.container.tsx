@@ -277,7 +277,15 @@ export function SearchScreenContainer() {
   const handleApplyAdditionalContent = () => {
     additionalContentOverlayRef.current?.close();
 
-    const url = selectedYear !== '0' ? `${selectedGenre}${selectedYear}` : selectedGenre ?? '';
+    let url = '';
+
+    if (selectedYear === '-1') {
+      url = (selectedGenre ?? '').replace('/best', '');
+    } else if (selectedYear === '0') {
+      url = selectedGenre ?? '';
+    } else {
+      url = `${selectedGenre}${selectedYear}`;
+    }
 
     openCategory(url, navigation);
   };

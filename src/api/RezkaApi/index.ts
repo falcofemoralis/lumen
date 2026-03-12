@@ -1525,7 +1525,10 @@ const RezkaApi = {
       return {
         name: categoryName.trim(),
         genres,
-        years,
+        years: [
+          { name: 'за последнее время', value: '-1' },
+          ...years,
+        ],
       };
     }).filter((cat) => cat !== null);
 
