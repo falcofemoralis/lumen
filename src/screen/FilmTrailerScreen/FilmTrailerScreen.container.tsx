@@ -2,8 +2,11 @@ import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useNavigationContext } from 'Context/NavigationContext';
 import { useServiceContext } from 'Context/ServiceContext';
+import * as NavigationBar from 'expo-navigation-bar';
+import * as StatusBar from 'expo-status-bar';
 import { FILM_TRAILER_SCREEN } from 'Navigation/navigationRoutes';
 import { useEffect, useRef, useState } from 'react';
+import { AppState } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
 import RouterStore from 'Store/Router.store';
 import { FilmInterface } from 'Type/Film.interface';
@@ -45,6 +48,22 @@ export const FilmTrailerScreenContainer = ({
       if (isTV) {
         unlockNavigation();
       }
+    };
+  }, []);
+
+  useEffect(() => {
+    NavigationBar.setVisibilityAsync('hidden');
+    StatusBar.setStatusBarHidden(true, 'slide');
+
+    const focusSubscription = AppState.addEventListener('focus', () => {
+      NavigationBar.setVisibilityAsync('hidden');
+      StatusBar.setStatusBarHidden(true, 'none');
+    });
+
+    return () => {
+      NavigationBar.setVisibilityAsync('visible');
+      StatusBar.setStatusBarHidden(false, 'slide');
+      focusSubscription.remove();
     };
   }, []);
 
