@@ -222,6 +222,7 @@ const DownloadItem = (props: DownloadItemProps & { styles: ThemedStyles<typeof c
     openFolder,
     deleteFilm,
     handleVideoSelect,
+    deleteTask,
   } = props;
   const { width: containerWidth } = useLayout();
   const playerVideoSelectorOverlayRef = useRef<PlayerVideoSelectorRef>(null);
@@ -238,13 +239,14 @@ const DownloadItem = (props: DownloadItemProps & { styles: ThemedStyles<typeof c
     bytesTotal,
     tasks,
   } = item;
+
   const handleActions = useCallback((action: ListItem) => {
     if (action.value === 'open') {
+      actionsOverlayRef.current?.close();
       openFolder(folder);
-      actionsOverlayRef.current?.close();
     } else if (action.value === 'delete') {
-      deleteFilm(item);
       actionsOverlayRef.current?.close();
+      deleteFilm(item);
     } else if (action.value === 'tasks') {
       tasksOverlayRef.current?.open();
     }
@@ -320,6 +322,9 @@ const DownloadItem = (props: DownloadItemProps & { styles: ThemedStyles<typeof c
         <ThemedText>
           { formatBytes(bytesTotal || 0) }
         </ThemedText>
+        { tasks && tasks.length > 0 && (
+          <Loader isLoading />
+        ) }
       </View>
     );
   };
@@ -334,6 +339,12 @@ const DownloadItem = (props: DownloadItemProps & { styles: ThemedStyles<typeof c
       />
     );
   };
+
+  const handleDeleteTask = useCallback((task: DownloadTask) => {
+    deleteTask(task);
+    tasksOverlayRef.current?.close();
+    actionsOverlayRef.current?.close();
+  }, [deleteTask]);
 
   const renderTasksOverlayContent = () => {
     if (!tasks.length) {
@@ -354,6 +365,7 @@ const DownloadItem = (props: DownloadItemProps & { styles: ThemedStyles<typeof c
               key={ task.id }
               task={ task }
               styles={ styles }
+              deleteTask={ handleDeleteTask }
             />
           )) }
         </View>
@@ -363,7 +375,7 @@ const DownloadItem = (props: DownloadItemProps & { styles: ThemedStyles<typeof c
 
   const renderTasksOverlay = () => {
     return (
-      <ThemedOverlay ref={ tasksOverlayRef }>
+      <ThemedOverlay ref={ tasksOverlayRef } containerStyle={ styles.tasksOverlay }>
         { renderTasksOverlayContent() }
       </ThemedOverlay>
     );
@@ -448,6 +460,14 @@ export const DownloadsScreenComponent = (props: DownloadsScreenComponentProps) =
             title={ t('No downloads') }
             subtitle={ t('You have not downloaded any films yet') }
           />
+          <DefaultFocus>
+            <ThemedButton
+              style={ styles.refreshBtn }
+              onPress={ () => handleRefresh(true) }
+            >
+              { t('Refresh downloads') }
+            </ThemedButton>
+          </DefaultFocus>
         </View>
       );
     }

@@ -253,6 +253,7 @@ const en = {
   'Multfilms': 'Multfilms',
   'Series': 'Series',
   'Tailer not found': 'Tailer not found',
+  'Refresh downloads': 'Refresh downloads',
 };
 
 export default en;

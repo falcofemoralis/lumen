@@ -72,6 +72,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     marginTop: scale(4),
   },
   taskContent: {
+    width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
@@ -98,7 +99,6 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     flexDirection: 'row',
   },
   taskRowContent: {
-    width: '100%',
     flexDirection: 'row',
     gap: scale(8),
     padding: scale(10),
@@ -112,5 +112,11 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   },
   taskRowTextFocused: {
     color: colors.textFocused,
+  },
+  tasksOverlay: {
+    width: '60%',
+  },
+  refreshBtn: {
+    marginTop: scale(16),
   },
 } as ThemedStyles);
