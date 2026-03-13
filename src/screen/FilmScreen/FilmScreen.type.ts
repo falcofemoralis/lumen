@@ -32,4 +32,5 @@ export interface FilmScreenComponentProps {
   handleBookmarkChange: (film: FilmInterface) => void;
   openVideoDownloader: () => void;
   handleDownloadSelect: (links: DownloadLinkInterface[]) => void;
+  openTrailerOverlay: () => void;
 }

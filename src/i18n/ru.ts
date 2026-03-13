@@ -254,6 +254,7 @@ const ru: Translations = {
   'Films': 'Фильмы',
   'Multfilms': 'Мультфильмы',
   'Series': 'Сериалы',
+  'Tailer not found': 'Трейлер не найден',
 };
 
 export default ru;

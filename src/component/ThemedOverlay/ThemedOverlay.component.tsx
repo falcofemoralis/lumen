@@ -50,9 +50,7 @@ export function ThemedOverlayComponent({
                   contentContainerStyle,
                 ] }
               >
-
                 { contentVisible && children }
-
               </Pressable>
               { useKeyboardAdjustment && <KeyboardAdjuster scale={ 0.5 } /> }
             </Pressable>

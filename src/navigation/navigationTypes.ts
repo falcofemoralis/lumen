@@ -21,6 +21,7 @@ export type AppStackParamList = {
   Tabs: NavigatorScreenParams<TabsParamList>
   Error: undefined
   Player: undefined
+  FilmTrailer: undefined
   CommentsModal: undefined
   LoginModal: undefined
   ScheduleModal: undefined

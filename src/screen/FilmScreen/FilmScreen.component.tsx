@@ -76,6 +76,7 @@ export function FilmScreenComponent({
   handleBookmarkChange,
   openVideoDownloader,
   handleDownloadSelect,
+  openTrailerOverlay,
 }: FilmScreenComponentProps) {
   const { scale, theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
@@ -268,7 +269,7 @@ export function FilmScreenComponent({
   const renderMiddleActions = () => (
     <View style={ styles.middleActions }>
       { renderMiddleAction(Star, 'Rate', openNotImplemented) }
-      { renderMiddleAction(Clapperboard, 'Trailer', openNotImplemented) }
+      { renderMiddleAction(Clapperboard, 'Trailer', openTrailerOverlay) }
       { renderMiddleAction(MessageSquareText, 'Comments', openComments) }
       { renderMiddleAction(isBookmarked(film) ? BookmarkCheck : Bookmark, 'Bookmark', openBookmarks) }
       { renderMiddleAction(Download, 'Download', openVideoDownloader) }

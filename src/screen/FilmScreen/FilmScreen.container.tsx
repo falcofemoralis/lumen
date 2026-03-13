@@ -8,7 +8,7 @@ import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { t } from 'i18n/translate';
-import { PLAYER_SCREEN } from 'Navigation/navigationRoutes';
+import { FILM_TRAILER_SCREEN, PLAYER_SCREEN } from 'Navigation/navigationRoutes';
 import {
   useCallback,
   useEffect,
@@ -369,6 +369,14 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     });
   };
 
+  const openTrailerOverlay = () => {
+    RouterStore.pushData(FILM_TRAILER_SCREEN, {
+      film,
+    });
+
+    navigate(FILM_TRAILER_SCREEN);
+  };
+
   const containerProps = {
     film,
     thumbnailPoster,
@@ -390,6 +398,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     handleBookmarkChange,
     openVideoDownloader,
     handleDownloadSelect,
+    openTrailerOverlay,
   };
 
   return isTV ? <FilmScreenComponentTV { ...containerProps } /> : <FilmScreenComponent { ...containerProps } />;

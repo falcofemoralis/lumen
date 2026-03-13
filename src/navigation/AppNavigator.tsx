@@ -11,6 +11,7 @@ import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { StatusBar } from 'expo-status-bar';
 import { ErrorScreen } from 'Screen/ErrorScreen';
+import { FilmTrailerScreen } from 'Screen/FilmTrailerScreen';
 import { CommentsModal } from 'Screen/modal/CommentsModal/CommentsModal.component';
 import { LoginModal } from 'Screen/modal/LoginModal';
 import { ScheduleModal } from 'Screen/modal/ScheduleModal';
@@ -25,6 +26,7 @@ import {
   ERROR_SCREEN,
   exitRoutes,
   exitRoutesTV,
+  FILM_TRAILER_SCREEN,
   LOGIN_MODAL_SCREEN,
   PLAYER_SCREEN,
   SCHEDULE_MODAL_SCREEN,
@@ -76,6 +78,10 @@ const AppStack = () => {
       <Stack.Screen
         name={ PLAYER_SCREEN }
         component={ PlayerScreen }
+      />
+      <Stack.Screen
+        name={ FILM_TRAILER_SCREEN }
+        component={ FilmTrailerScreen }
       />
       <Stack.Group
         screenOptions={ {

@@ -67,6 +67,7 @@ export function FilmScreenComponent({
   handleBookmarkChange,
   openVideoDownloader,
   handleDownloadSelect,
+  openTrailerOverlay,
 }: FilmScreenComponentProps) {
   const { scale, theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
@@ -138,7 +139,7 @@ export function FilmScreenComponent({
           { renderPlayButton() }
           { renderAction(MessageSquareText, t('Comments'), () => commentsOverlayRef?.current?.open()) }
           { renderAction(isBookmarked(film) ? BookmarkCheck : Bookmark, t('Bookmark'), openBookmarks) }
-          { renderAction(Clapperboard, t('Trailer'), openNotImplemented) }
+          { renderAction(Clapperboard, t('Trailer'), openTrailerOverlay) }
           { renderAction(Download, t('Download'), openVideoDownloader) }
         </View>
       </DefaultFocus>

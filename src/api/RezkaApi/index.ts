@@ -30,7 +30,7 @@ import { executeGet, executePost, Variables } from 'Util/Request';
 import { storage } from 'Util/Storage';
 import { updateUrlHost } from 'Util/Url';
 
-import { CommentsResult, FILM_SORTING, JSONResult, SeasonsResult, StreamsResult } from './type';
+import { CommentsResult, FILM_SORTING, JSONResult, SeasonsResult, StreamsResult, TrailerResult } from './type';
 import {
   applyFilmSorting,
   formatDurationWithMoment,
@@ -1559,6 +1559,23 @@ const RezkaApi = {
       items: collections,
       totalPages: navs.length > 0 ? Number(navs[navs.length - 2].rawText) : 1,
     };
+  },
+
+  async getFilmTrailer(filmId: string) {
+    const result = await this.fetchJson<TrailerResult>('/engine/ajax/gettrailervideo.php', {
+      id: filmId,
+    });
+
+    if (!result || !result.success) {
+      return null;
+    }
+
+    const code = result.code;
+
+    const startIndex = code.indexOf('https://');
+    const endIndex = code.indexOf('lay=1') + 5;
+
+    return code.substring(startIndex, endIndex);
   },
 };
 

@@ -2638,6 +2638,18 @@
     invariant "^2.2.4"
     nullthrows "^1.1.1"
 
+"@react-native-youtube-bridge/core@2.1.4":
+  version "2.1.4"
+  resolved "https://registry.yarnpkg.com/@react-native-youtube-bridge/core/-/core-2.1.4.tgz#a6a0e4f97cd28a5bf047d1a8617ddb95be61ee5a"
+  integrity sha512-iL2/+z2bhlq1rXSTdUfuWCeXxGsbkMbQYG24kiK2zl8Vaz8PCyFwK1OSJMMGFBv2gL2IIXMOdlF+BM5/4a+OFg==
+
+"@react-native-youtube-bridge/react@2.1.4":
+  version "2.1.4"
+  resolved "https://registry.yarnpkg.com/@react-native-youtube-bridge/react/-/react-2.1.4.tgz#0a0903cf6791eb3dc8bdc910326de334e9d831a6"
+  integrity sha512-Qz9gOPZKGwlCYA2jel9UwiTReNLpPlQ4WHi1RvWBdNAnfYEXdX/OWWEg3cD7UW340draMLasO1/Q4WTPSPDohA==
+  dependencies:
+    "@react-native-youtube-bridge/core" "2.1.4"
+
 "@react-native/assets-registry@0.83.2":
   version "0.83.2"
   resolved "https://registry.yarnpkg.com/@react-native/assets-registry/-/assets-registry-0.83.2.tgz#485d4b085f360c3b4254cca382413b9ca609edb1"
@@ -5902,7 +5914,7 @@ intl-pluralrules@^2.0.1:
   resolved "https://registry.yarnpkg.com/intl-pluralrules/-/intl-pluralrules-2.0.1.tgz#de16c3df1e09437635829725e88ea70c9ad79569"
   integrity sha512-astxTLzIdXPeN0K9Rumi6LfMpm3rvNO0iJE+h/k8Kr/is+wPbRe4ikyDjlLr6VTh/mEfNv8RjN+gu3KwDiuhqg==
 
-invariant@^2.2.4:
+invariant@2.2.4, invariant@^2.2.4:
   version "2.2.4"
   resolved "https://registry.yarnpkg.com/invariant/-/invariant-2.2.4.tgz#610f3c92c9359ce1db616e538008d23ff35158e6"
   integrity sha512-phJfQVBuaJM5raOpJjSfkiD6BpbCE4Ns//LaXl6wGYtUBY83nWS6Rf9tXm2e8VaK60JEjYldbPif/A2B1C2gNA==
@@ -8340,6 +8352,14 @@ react-native-web@^0.21.2:
     postcss-value-parser "^4.2.0"
     styleq "^0.1.3"
 
+react-native-webview@^13.16.1:
+  version "13.16.1"
+  resolved "https://registry.yarnpkg.com/react-native-webview/-/react-native-webview-13.16.1.tgz#d5a6483fcb823eac704bd2a3d82c263771c6ede3"
+  integrity sha512-If0eHhoEdOYDcHsX+xBFwHMbWBGK1BvGDQDQdVkwtSIXiq1uiqjkpWVP2uQ1as94J0CzvFE9PUNDuhiX0Z6ubw==
+  dependencies:
+    escape-string-regexp "^4.0.0"
+    invariant "2.2.4"
+
 react-native-worklets@^0.7.4:
   version "0.7.4"
   resolved "https://registry.yarnpkg.com/react-native-worklets/-/react-native-worklets-0.7.4.tgz#6cc1eed31417ced2b007d82bfbd506ac27797de5"
@@ -8356,6 +8376,14 @@ react-native-worklets@^0.7.4:
     "@babel/preset-typescript" "7.27.1"
     convert-source-map "2.0.0"
     semver "7.7.3"
+
+react-native-youtube-bridge@^2.1.4:
+  version "2.1.4"
+  resolved "https://registry.yarnpkg.com/react-native-youtube-bridge/-/react-native-youtube-bridge-2.1.4.tgz#0e0484df6808bbd9618da5fdbae2680c31c78e8b"
+  integrity sha512-T172W0q4y1xt7+gyYha2gbHLUdVX5qGrtZmgq/yuV8dYWPdR/JarygCWxpS1RVcnqGIK6RXcR2dL3efhm0RJiw==
+  dependencies:
+    "@react-native-youtube-bridge/core" "2.1.4"
+    "@react-native-youtube-bridge/react" "2.1.4"
 
 "react-native@npm:react-native-tvos@0.83.2-0", "react-native@npm:react-native-tvos@~0.83.2-0":
   version "0.83.2-0"

@@ -252,6 +252,7 @@ const en = {
   'Films': 'Films',
   'Multfilms': 'Multfilms',
   'Series': 'Series',
+  'Tailer not found': 'Tailer not found',
 };
 
 export default en;
