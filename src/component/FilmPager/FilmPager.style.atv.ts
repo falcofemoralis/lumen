@@ -10,6 +10,9 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     zIndex: 10,
     backgroundColor: colors.background,
     marginBottom: scale(16),
+    height: scale(40),
+  },
+  menuListWrapperWithSorting: {
     height: scale(46),
   },
   menuListScroll: {},

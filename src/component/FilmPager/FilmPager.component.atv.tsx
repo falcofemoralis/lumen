@@ -192,7 +192,12 @@ const TopMenu = memo(({
         }
 
         return (
-          <View style={ styles.menuListWrapper }>
+          <View
+            style={ [
+              styles.menuListWrapper,
+              sorting && styles.menuListWrapperWithSorting,
+            ] }
+          >
             <SpatialNavigationScrollView
               horizontal
               offsetFromStart={ scale(64) }
