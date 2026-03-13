@@ -11,6 +11,7 @@ import { ThemedPressable } from 'Component/ThemedPressable';
 import { ThemedSafeArea } from 'Component/ThemedSafeArea';
 import { ThemedText } from 'Component/ThemedText';
 import { Wrapper } from 'Component/Wrapper';
+import * as Haptics from 'expo-haptics';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import { ArrowUpLeft, History, LayoutGrid, Mic, Search, Settings2, X } from 'lucide-react-native';
@@ -141,7 +142,10 @@ export function SearchScreenComponent({
           <ThemedPressable
             key={ suggestion }
             onPress={ () => onApplySuggestion(suggestion) }
-            onLongPress={ () => handleRemoveSuggestion(suggestion) }
+            onLongPress={ () => {
+              Haptics.performAndroidHapticsAsync(Haptics.AndroidHaptics.Gesture_Start);
+              handleRemoveSuggestion(suggestion);
+            } }
             style={ styles.suggestion }
             contentStyle={ styles.suggestionContent }
           >
