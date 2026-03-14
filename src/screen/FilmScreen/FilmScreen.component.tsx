@@ -65,6 +65,7 @@ export function FilmScreenComponent({
   playerVideoSelectorOverlayRef,
   bookmarksOverlayRef,
   playerVideoDownloaderOverlayRef,
+  isDeepLink,
   playFilm,
   handleVideoSelect,
   handleSelectFilm,
@@ -547,6 +548,7 @@ export function FilmScreenComponent({
       additionalAction={ handleShare }
       AdditionalActionIcon={ Forward }
       style={ { paddingTop: top } }
+      isDeepLink={ isDeepLink }
     />
   );
 

@@ -10,7 +10,11 @@ import { ComponentProps } from 'react';
 export type TabsParamList = {
   Account: undefined
   Notifications: undefined
-  Home: undefined
+  ['Home-tab']: {
+    Film: {
+      link: string
+    }
+  }
   Recent: undefined
   Search: undefined
   Bookmarks: undefined

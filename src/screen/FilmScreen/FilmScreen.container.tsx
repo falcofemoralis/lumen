@@ -2,20 +2,22 @@ import {
   completeHandler,
   createDownloadTask,
 } from '@kesha-antonov/react-native-background-downloader';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { PlayerVideoSelectorRef } from 'Component/PlayerVideoSelector/PlayerVideoSelector.container';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { t } from 'i18n/translate';
 import { FILM_TRAILER_SCREEN, PLAYER_SCREEN } from 'Navigation/navigationRoutes';
+import { AppStackParamList } from 'Navigation/navigationTypes';
 import {
   useCallback,
   useEffect,
   useRef,
   useState,
 } from 'react';
-import { Share } from 'react-native';
+import { BackHandler, Share } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
 import RouterStore from 'Store/Router.store';
 import { DownloadLinkInterface } from 'Type/DownloadLink.interface';
@@ -33,9 +35,10 @@ import { MINIMUM_SCHEDULE_ITEMS } from './FilmScreen.config';
 import { FilmScreenContainerProps } from './FilmScreen.type';
 
 export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
-  const { link, thumbnailPoster } = route.params as { link: string, thumbnailPoster: string };
+  const { link: linkArg, thumbnailPoster } = (route.params ?? {}) as { link: string, thumbnailPoster?: string };
+
   const { isTV, downloadsPath, downloadsSaveSubtitles, downloadsSavePoster } = useConfigContext();
-  const navigation = useNavigation();
+  const navigation = useNavigation<NativeStackNavigationProp<AppStackParamList>>();
   const { isSignedIn, currentService, prepareShareBody } = useServiceContext();
   const [film, setFilm] = useState<FilmInterface | null>(null);
   const playerVideoSelectorOverlayRef = useRef<PlayerVideoSelectorRef>(null);
@@ -44,6 +47,35 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
   const bookmarksOverlayRef = useRef<ThemedOverlayRef>(null);
   const descriptionOverlayRef = useRef<ThemedOverlayRef>(null);
   const playerVideoDownloaderOverlayRef = useRef<PlayerVideoSelectorRef>(null);
+
+  // fallback to deep link url
+  let link = linkArg;
+  let isDeepLink = false;
+  if (!link && route?.path) {
+    link = route.path;
+    isDeepLink = true;
+  }
+
+  useFocusEffect(() => {
+    const onBackPress = () => {
+      if (isDeepLink) {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Tabs', params: { screen: 'Home-tab' } }],
+        });
+
+        return true;
+      }
+
+      return false;
+    };
+
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+    return () => {
+      backHandler.remove();
+    };
+  });
 
   useEffect(() => {
     const loadFilm = async () => {
@@ -387,6 +419,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     bookmarksOverlayRef,
     descriptionOverlayRef,
     playerVideoDownloaderOverlayRef,
+    isDeepLink,
     playFilm,
     handleVideoSelect,
     handleSelectFilm,

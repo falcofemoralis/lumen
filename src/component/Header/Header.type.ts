@@ -5,4 +5,5 @@ export type HeaderComponentProps = {
   style?: StyleProp<ViewStyle>;
   additionalAction?: () => void;
   AdditionalActionIcon?: React.ComponentType<any>;
+  isDeepLink?: boolean;
 };

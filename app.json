@@ -24,6 +24,19 @@
     "permissions": [
       "android.permission.MANAGE_EXTERNAL_STORAGE",
       "android.permission.WRITE_EXTERNAL_STORAGE"
+    ],
+    "intentFilters": [
+      {
+        "action": "VIEW",
+        "autoVerify": true,
+        "data": [
+          { "scheme": "https", "host": "rezka.ag" },
+          { "scheme": "https", "host": "rezka-ua.pub" },
+          { "scheme": "http", "host": "hdrezka.tv" },
+          { "scheme": "https", "host": "hdrzk.org" }
+        ],
+        "category": ["BROWSABLE", "DEFAULT"]
+      }
     ]
   },
   "plugins": [

@@ -1,9 +1,11 @@
 import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ThemedPressable } from 'Component/ThemedPressable';
 import { ThemedText } from 'Component/ThemedText';
 import { Wrapper } from 'Component/Wrapper';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { ArrowLeft } from 'lucide-react-native';
+import { AppStackParamList } from 'Navigation/navigationTypes';
 import { View } from 'react-native';
 import { useAppTheme } from 'Theme/context';
 
@@ -15,8 +17,9 @@ export const HeaderComponent = ({
   style,
   additionalAction,
   AdditionalActionIcon,
+  isDeepLink = false,
 }: HeaderComponentProps) => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NativeStackNavigationProp<AppStackParamList>>();
   const { scale, theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
 
@@ -27,7 +30,16 @@ export const HeaderComponent = ({
           <ThemedPressable
             style={ styles.topActionsButton }
             contentStyle={ styles.topActionsButtonContent }
-            onPress={ () => navigation.goBack() }
+            onPress={ () => {
+              if (isDeepLink) {
+                navigation.reset({
+                  index: 0,
+                  routes: [{ name: 'Tabs', params: { screen: 'Home-tab' } }],
+                });
+              } else {
+                navigation.goBack();
+              }
+            } }
           >
             <ArrowLeft
               size={ scale(24) }

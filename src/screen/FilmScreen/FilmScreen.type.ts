@@ -13,7 +13,7 @@ export interface FilmScreenContainerProps {
 
 export interface FilmScreenComponentProps {
   film: FilmInterface | null;
-  thumbnailPoster: string;
+  thumbnailPoster?: string;
   visibleScheduleItems: ScheduleItemInterface[];
   playerVideoSelectorOverlayRef: React.RefObject<PlayerVideoSelectorRef | null>;
   scheduleOverlayRef: React.RefObject<ThemedOverlayRef | null>;
@@ -21,6 +21,7 @@ export interface FilmScreenComponentProps {
   bookmarksOverlayRef: React.RefObject<ThemedOverlayRef | null>;
   descriptionOverlayRef: React.RefObject<ThemedOverlayRef | null>;
   playerVideoDownloaderOverlayRef: React.RefObject<PlayerVideoSelectorRef | null>;
+  isDeepLink: boolean;
   playFilm: () => void;
   handleVideoSelect: (video: FilmVideoInterface, voice: FilmVoiceInterface) => void;
   handleSelectFilm: (film: FilmInterface) => void;

@@ -39,12 +39,16 @@ if (__DEV__) {
   console.error = withoutIgnored(console.error);
 }
 
+import { LinkingOptions } from '@react-navigation/native';
+import { services } from 'Api/services';
 import { Awake } from 'Component/Awake';
 import { Root } from 'Component/Root';
 import { AppProvider } from 'Context/AppContext';
+import { DEFAULT_SERVICE } from 'Context/ServiceContext';
 import * as Linking from 'expo-linking';
 import * as SplashScreen from 'expo-splash-screen';
 import { AppNavigator } from 'Navigation/AppNavigator';
+import { AppStackParamList } from 'Navigation/navigationTypes';
 import { useEffect, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
@@ -58,24 +62,6 @@ import { applyPatches } from './patch';
 
 export const NAVIGATION_PERSISTENCE_KEY = 'NAVIGATION_STATE';
 
-// Web linking configuration
-const prefix = Linking.createURL('/');
-const config = {
-  screens: {
-    // Welcome: 'welcome',
-    // Demo: {
-    //   screens: {
-    //     DemoShowroom: {
-    //       path: 'showroom/:queryIndex?/:itemIndex?',
-    //     },
-    //     DemoDebug: 'debug',
-    //     DemoPodcastList: 'podcast',
-    //     DemoCommunity: 'community',
-    //   },
-    // },
-  },
-};
-
 SplashScreen.setOptions({
   duration: 750,
   fade: true,
@@ -88,7 +74,7 @@ export function App() {
     initialNavigationState,
     onNavigationStateChange,
     isRestored: isNavigationStateRestored,
-  } = useNavigationPersistence( NAVIGATION_PERSISTENCE_KEY);
+  } = useNavigationPersistence(NAVIGATION_PERSISTENCE_KEY);
 
   const [isI18nInitialized, setIsI18nInitialized] = useState(false);
 
@@ -103,9 +89,31 @@ export function App() {
     return null;
   }
 
-  const linking = {
-    prefixes: [prefix],
-    config,
+  const linking: LinkingOptions<AppStackParamList> = {
+    prefixes: [
+      Linking.createURL('/'),
+      services[DEFAULT_SERVICE].officialMirror,
+      ...services[DEFAULT_SERVICE].defaultProviders,
+    ],
+    config: {
+      screens: {
+        Tabs: {
+          screens: {
+            'Home-tab': {
+              screens: {
+                Film: {
+                  path: '*',
+                  parse: {
+                    link: (_: string, url: string) => url,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    filter: (url: string) => url.includes('.html'),
   };
 
   return (
