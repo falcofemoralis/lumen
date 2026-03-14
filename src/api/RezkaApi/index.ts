@@ -51,6 +51,7 @@ const RezkaApi = {
     'https://rezka.ag',
     'https://rezka-ua.pub',
     'http://hdrezka.tv',
+    'https://hdrezka.ag',
   ],
   defaultCDNs: [
     'https://prx-cogent.ukrtelcdn.net',

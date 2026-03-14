@@ -33,7 +33,8 @@
           { "scheme": "https", "host": "rezka.ag" },
           { "scheme": "https", "host": "rezka-ua.pub" },
           { "scheme": "http", "host": "hdrezka.tv" },
-          { "scheme": "https", "host": "hdrzk.org" }
+          { "scheme": "https", "host": "hdrzk.org" },
+          { "scheme": "https", "host": "hdrezka.ag" }
         ],
         "category": ["BROWSABLE", "DEFAULT"]
       }
