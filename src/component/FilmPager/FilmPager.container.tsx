@@ -1,5 +1,6 @@
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import { useConfigContext } from 'Context/ConfigContext';
+import { useNetworkContext } from 'Context/NetworkContext';
 import { useCallback, useEffect, useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
 import { PaginationInterface } from 'Type/Pagination.interface';
@@ -26,6 +27,7 @@ export function FilmPagerContainer({
   const [selectedSorting, setSelectedSorting] = useState<Record<string, DropdownItem> | null>(
     sorting && sorting.length > 0 ? {} : null
   );
+  const { handleConnectionError } = useNetworkContext();
 
   useEffect(() => {
     if (loadOnInit) {
@@ -73,7 +75,11 @@ export function FilmPagerContainer({
         },
       });
     } catch (error) {
-      NotificationStore.displayError(error as Error);
+      const handled = handleConnectionError(error as Error);
+
+      if (!handled) {
+        NotificationStore.displayError(error as Error);
+      }
     }
   };
 

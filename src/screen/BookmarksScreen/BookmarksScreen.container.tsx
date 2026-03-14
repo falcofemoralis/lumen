@@ -1,6 +1,7 @@
 import { pagerItemsReset, pagerItemsUpdater } from 'Component/FilmPager/FilmPager.config';
 import { PagerItemInterface } from 'Component/FilmPager/FilmPager.type';
 import { useConfigContext } from 'Context/ConfigContext';
+import { useNetworkContext } from 'Context/NetworkContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useEffect, useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
@@ -13,6 +14,7 @@ export function BookmarksScreenContainer() {
   const { isTV } = useConfigContext();
   const [isLoading, setIsLoading] = useState(true);
   const [pagerItems, setPagerItems] = useState<PagerItemInterface[]>([]);
+  const { handleConnectionError } = useNetworkContext();
 
   const { isSignedIn, currentService } = useServiceContext();
 
@@ -38,7 +40,11 @@ export function BookmarksScreenContainer() {
         return acc;
       }, [] as PagerItemInterface[]));
     } catch (error) {
-      NotificationStore.displayError(error as Error);
+      const handled = handleConnectionError(error as Error);
+
+      if (!handled) {
+        NotificationStore.displayError(error as Error);
+      }
     } finally {
       setIsLoading(false);
     }

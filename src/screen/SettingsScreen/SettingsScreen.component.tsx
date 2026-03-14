@@ -11,7 +11,7 @@ export function SettingsScreenComponent({
   onSettingUpdate,
 }: SettingsScreenComponentProps) {
   return (
-    <Page>
+    <Page checkConnection={ false }>
       <ThemedSafeArea>
         <Header title={ t('Settings') } />
         <SettingsStructure

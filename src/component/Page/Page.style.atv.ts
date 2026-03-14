@@ -17,4 +17,11 @@ export const componentStyles = ({ scale, dimensions, spacing, colors }: Theme) =
     marginInline: 0,
     marginTop: 0,
   },
+  noConnectionContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  btn: {
+    marginTop: scale(16),
+  },
 } satisfies ThemedStyles);

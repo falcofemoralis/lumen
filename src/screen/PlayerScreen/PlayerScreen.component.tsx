@@ -48,7 +48,10 @@ export function PlayerScreenComponent({ video, film, voice, isOffline, quality }
   }, []);
 
   return (
-    <Page fullscreen>
+    <Page
+      fullscreen
+      checkConnection={ false }
+    >
       <Player
         video={ video }
         film={ film }

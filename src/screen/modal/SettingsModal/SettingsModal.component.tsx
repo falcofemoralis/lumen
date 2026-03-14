@@ -29,7 +29,9 @@ export const SettingsModal = () => {
   };
 
   return (
-    <Page>
+    <Page
+      checkConnection={ false }
+    >
       <ThemedSafeArea>
         <Header title={ title } />
         <SettingsStructure settings={ settings ?? [] } onSettingUpdate={ onUpdate } />

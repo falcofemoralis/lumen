@@ -207,7 +207,9 @@ export function AccountScreenComponent({
   };
 
   return (
-    <Page>
+    <Page
+      checkConnection={ false }
+    >
       <ThemedSafeArea edges={ ['left', 'right'] }>
         <ScrollView style={ { paddingTop: top } } contentContainerStyle={ styles.scrollView }>
           <Wrapper style={ styles.wrapper }>

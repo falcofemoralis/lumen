@@ -1,3 +1,4 @@
+import { t } from 'i18n/translate';
 import { ERROR_SCREEN } from 'Navigation/navigationRoutes';
 import { ToastAndroid } from 'react-native';
 import { navigate } from 'Util/Navigation';
@@ -25,7 +26,16 @@ class NotificationStore {
       console.trace();
     }
 
-    ToastAndroid.show(msg, ToastAndroid.LONG);
+    let formattedMsg = msg;
+    switch (msg) {
+      case 'TypeError: Network request failed':
+        formattedMsg = t('Network request failed. Please check your internet connection and try again.');
+        break;
+      default:
+        break;
+    }
+
+    ToastAndroid.show(formattedMsg, ToastAndroid.LONG);
   }
 
   displayErrorScreen(code?: string, error?: string, info?: string) {

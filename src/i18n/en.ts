@@ -254,6 +254,11 @@ const en = {
   'Series': 'Series',
   'Tailer not found': 'Tailer not found',
   'Refresh downloads': 'Refresh downloads',
+  'Network error': 'Network error',
+  'Network request failed. Please check your internet connection and try again.': 'Network request failed. Please check your internet connection and try again.',
+  'Retry': 'Retry',
+  'Strict connection check': 'Strict connection check',
+  'Toggle strict connection check.': 'Toggle strict connection check.',
 };
 
 export default en;

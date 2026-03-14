@@ -9,6 +9,7 @@ export function InfoBlockContainer({
   subtitle,
   hideIcon,
   style,
+  Icon,
 }: InfoBlockContainerProps) {
   const { isTV } = useConfigContext();
 
@@ -17,6 +18,7 @@ export function InfoBlockContainer({
     subtitle,
     hideIcon,
     style,
+    Icon,
   };
 
   return isTV ? <InfoBlockComponentTV { ...containerProps } /> : <InfoBlockComponent { ...containerProps } />;

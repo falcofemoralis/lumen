@@ -6,7 +6,9 @@ export interface PageContainerProps {
   style?: ViewStyle;
   contentStyle?: ViewStyle;
   fullscreen?: boolean;
+  checkConnection?: boolean;
 }
 
 export interface PageComponentProps extends PageContainerProps {
+  isConnected?: boolean;
 }

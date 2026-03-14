@@ -11,7 +11,10 @@ export function SettingsScreenComponent({
   const { scale } = useAppTheme();
 
   return (
-    <Page style={ { paddingBottom: scale(32) } }>
+    <Page
+      checkConnection={ false }
+      style={ { paddingBottom: scale(32) } }
+    >
       <SettingsStructure settings={ settings } onSettingUpdate={ onSettingUpdate } />
     </Page>
   );

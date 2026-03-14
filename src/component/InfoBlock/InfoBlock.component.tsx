@@ -12,6 +12,7 @@ export function InfoBlockComponent({
   subtitle,
   hideIcon,
   style,
+  Icon,
 }: InfoBlockComponentProps) {
   const { scale, theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
@@ -20,10 +21,17 @@ export function InfoBlockComponent({
     <View style={ [styles.container, style] }>
       { !hideIcon && (
         <View style={ styles.iconContainer }>
-          <Info
-            size={ scale(24) }
-            color={ theme.colors.icon }
-          />
+          { Icon ? (
+            <Icon
+              size={ scale(30) }
+              color={ theme.colors.icon }
+            />
+          ) : (
+            <Info
+              size={ scale(30) }
+              color={ theme.colors.icon }
+            />
+          ) }
         </View>
       ) }
       <ThemedText style={ styles.title }>

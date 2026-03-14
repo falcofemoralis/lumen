@@ -25,6 +25,7 @@ export type DeviceConfigType = {
   checkForUpdates: boolean;
   playerSaveQuality: boolean;
   playerAskQuality: boolean;
+  strictConnectionCheck: boolean;
 }
 
 export const defaultConfig: DeviceConfigType = {
@@ -52,4 +53,5 @@ export const defaultConfig: DeviceConfigType = {
   playerBufferTimeSetting: undefined,
   sortVoicesByRating: false,
   checkForUpdates: true,
+  strictConnectionCheck: true,
 };

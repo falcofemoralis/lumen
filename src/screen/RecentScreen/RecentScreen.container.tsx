@@ -1,5 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import { useConfigContext } from 'Context/ConfigContext';
+import { useNetworkContext } from 'Context/NetworkContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useEffect, useRef, useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
@@ -20,6 +21,7 @@ export function RecentScreenContainer() {
   const updatingStateRef = useRef(false);
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(true);
+  const { handleConnectionError } = useNetworkContext();
 
   useEffect(() => {
     if (isSignedIn) {
@@ -70,7 +72,12 @@ export function RecentScreenContainer() {
 
         setItems(newItems);
       } catch (error) {
-        NotificationStore.displayError(error as Error);
+        const handled = handleConnectionError(error as Error);
+
+        if (!handled) {
+          NotificationStore.displayError(error as Error);
+        }
+
         updatingStateRef.current = false;
       }
     }

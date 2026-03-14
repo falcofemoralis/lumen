@@ -489,7 +489,9 @@ export const DownloadsScreenComponent = (props: DownloadsScreenComponentProps) =
   };
 
   return (
-    <Page>
+    <Page
+      checkConnection={ false }
+    >
       { renderContent() }
     </Page>
   );

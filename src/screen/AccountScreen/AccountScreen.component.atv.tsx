@@ -164,7 +164,9 @@ export function AccountScreenComponent({
   };
 
   return (
-    <Page>
+    <Page
+      checkConnection={ false }
+    >
       { renderContent() }
     </Page>
   );

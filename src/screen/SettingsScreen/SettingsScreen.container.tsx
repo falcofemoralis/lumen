@@ -19,6 +19,7 @@ import {
   FolderLock,
   Gauge,
   Globe,
+  GlobeLock,
   Grid3x2,
   Info,
   Loader,
@@ -89,6 +90,7 @@ export function SettingsScreenContainer() {
     checkForUpdates,
     playerSaveQuality,
     playerAskQuality,
+    strictConnectionCheck,
   } = useConfigContext();
   const {
     currentService,
@@ -350,6 +352,16 @@ export function SettingsScreenContainer() {
             message: t('Please wait a bit after enabling.'),
           },
           withLoader: true,
+        },
+        {
+          id: 'strictConnectionCheck',
+          title: t('Strict connection check'),
+          subtitle: t('Toggle strict connection check.'),
+          type: SETTING_TYPE.SWITCH,
+          value: convertBooleanToString(strictConnectionCheck),
+          options: yesNoOptions,
+          onSettingPress,
+          IconComponent: GlobeLock,
         },
         {
           id: 'userAgent',

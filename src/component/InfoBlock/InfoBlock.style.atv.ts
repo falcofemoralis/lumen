@@ -10,8 +10,8 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     alignSelf: 'center',
     backgroundColor: colors.backgroundLight,
     borderRadius: scale(99),
-    width: scale(36),
-    height: scale(36),
+    width: scale(42),
+    height: scale(42),
   },
   title: {
     fontSize: scale(text.xl.fontSize),

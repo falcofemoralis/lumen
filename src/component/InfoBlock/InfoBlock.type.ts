@@ -5,6 +5,7 @@ export interface InfoBlockContainerProps {
   subtitle: string;
   hideIcon?: boolean;
   style?: StyleProp<ViewStyle>;
+  Icon?: React.ComponentType<any>;
 }
 
 export interface InfoBlockComponentProps {
@@ -12,4 +13,5 @@ export interface InfoBlockComponentProps {
   subtitle: string;
   hideIcon?: boolean;
   style?: StyleProp<ViewStyle>;
+  Icon?: React.ComponentType<any>;
 }

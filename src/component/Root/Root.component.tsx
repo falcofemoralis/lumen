@@ -5,6 +5,7 @@ import {
 import { AppUpdater } from 'Component/AppUpdater';
 import { useAppUpdaterContext } from 'Context/AppUpdaterContext';
 import { useConfigContext } from 'Context/ConfigContext';
+import { useNetworkContext } from 'Context/NetworkContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useEffect } from 'react';
 import NotificationStore from 'Store/Notification.store';
@@ -14,18 +15,19 @@ export const Root = ({ children }: { children: React.ReactNode }) => {
   const { isSignedIn } = useServiceContext();
   const { fetchUserData } = useServiceContext();
   const { checkVersion } = useAppUpdaterContext();
+  const { isInternetAvailable } = useNetworkContext();
 
   useEffect(() => {
-    if (checkForUpdates) {
+    if (checkForUpdates && isInternetAvailable) {
       checkVersion();
     }
-  }, [checkForUpdates, checkVersion]);
+  }, [checkForUpdates, checkVersion, isInternetAvailable]);
 
   useEffect(() => {
-    if (isSignedIn) {
+    if (isSignedIn && isInternetAvailable) {
       fetchUserData();
     }
-  }, [isSignedIn, fetchUserData]);
+  }, [isSignedIn, fetchUserData, isInternetAvailable]);
 
   useEffect( () => {
     getExistingDownloadTasks().then(tasks => {

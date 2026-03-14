@@ -256,6 +256,11 @@ const ru: Translations = {
   'Series': 'Сериалы',
   'Tailer not found': 'Трейлер не найден',
   'Refresh downloads': 'Обновить загрузки',
+  'Network error': 'Ошибка сети',
+  'Network request failed. Please check your internet connection and try again.': 'Сетевая ошибка. Отсутствует соединение с интернетом, либо сайт недоступен.',
+  'Retry': 'Попробовать снова',
+  'Strict connection check': 'Строгая проверка соединения',
+  'Toggle strict connection check.': 'Переключить проверку наличия интернет соединения.',
 };
 
 export default ru;
