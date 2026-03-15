@@ -1,4 +1,4 @@
-import { MAX_QUALITY } from 'Component/Player/Player.config';
+import { ASPECT_RATIO_OPTIONS, getAspectRatioLabel, MAX_QUALITY } from 'Component/Player/Player.config';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import * as Application from 'expo-application';
@@ -24,6 +24,7 @@ import {
   Info,
   Loader,
   LoaderCircle,
+  Maximize2,
   MonitorPlay,
   MoveRight,
   Palette,
@@ -40,7 +41,6 @@ import {
 } from 'lucide-react-native';
 import { reactNativeDownloads } from 'Modules/react-native-downloads';
 import { useState } from 'react';
-import { Linking } from 'react-native';
 import { useTripleTap } from 'Screen/SettingsScreen/useTripleTap';
 import { TEST_URL } from 'Screen/WelcomeScreen/WelcomeScreen.config';
 import NotificationStore from 'Store/Notification.store';
@@ -91,6 +91,7 @@ export function SettingsScreenContainer() {
     playerSaveQuality,
     playerAskQuality,
     strictConnectionCheck,
+    playerDefaultAspectRatio,
   } = useConfigContext();
   const {
     currentService,
@@ -494,6 +495,18 @@ export function SettingsScreenContainer() {
             };
           }),
           IconComponent: Rewind,
+          onSettingPress,
+        },
+        {
+          id: 'playerDefaultAspectRatio',
+          title: t('Player default aspect ratio'),
+          type: SETTING_TYPE.SELECT,
+          value: playerDefaultAspectRatio,
+          options: ASPECT_RATIO_OPTIONS.map((option) => ({
+            value: option,
+            label: getAspectRatioLabel(option),
+          })),
+          IconComponent: Maximize2,
           onSettingPress,
         },
         {

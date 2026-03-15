@@ -28,6 +28,7 @@ import {
   ListVideo,
   LockKeyhole,
   LockKeyholeOpen,
+  Maximize2,
   MessageSquareText,
   Pause,
   PictureInPicture2,
@@ -83,6 +84,7 @@ export function PlayerComponent({
   bookmarksOverlayRef,
   speedOverlayRef,
   selectedSpeed,
+  selectedAspectRatio,
   isLocked,
   isOverlayOpen,
   isFilmBookmarked,
@@ -101,6 +103,7 @@ export function PlayerComponent({
   handleSubtitleChange,
   handleSpeedChange,
   openSpeedSelector,
+  handleAspectRatioChange,
   openBookmarksOverlay,
   openCommentsOverlay,
   handleLockControls,
@@ -484,6 +487,7 @@ export function PlayerComponent({
             { !isOffline && renderAction(MessageSquareText, handleOpenComments) }
             { !isOffline && renderAction(isFilmBookmarked ? BookmarkCheck : Bookmark, openBookmarksOverlay) }
             { !isOffline && renderAction(Forward, handleShare) }
+            { renderAction(Maximize2, handleAspectRatioChange) }
           </View>
         </View>
       </View>
@@ -697,7 +701,7 @@ export function PlayerComponent({
         ref={ playerRef }
         style={ styles.video }
         player={ player }
-        contentFit="contain"
+        contentFit={ selectedAspectRatio }
         nativeControls={ false }
         allowsPictureInPicture={ isPictureInPictureSupported() }
       />

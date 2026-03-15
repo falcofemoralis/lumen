@@ -21,6 +21,7 @@ import {
   ClosedCaption,
   Gauge,
   ListVideo,
+  Maximize2,
   MessageSquareText,
   Pause,
   Play,
@@ -84,6 +85,7 @@ export function PlayerComponent({
   isFilmBookmarked,
   isOffline,
   overlayQuality,
+  selectedAspectRatio,
   togglePlayPause,
   rewindPosition,
   openQualitySelector,
@@ -102,6 +104,7 @@ export function PlayerComponent({
   closeOverlay,
   onBookmarkChange,
   backwardToStart,
+  handleAspectRatioChange,
 }: PlayerComponentProps) {
   const { playerStopPlayOnButtonTV } = useConfigContext();
   const { scale, theme } = useAppTheme();
@@ -477,6 +480,7 @@ export function PlayerComponent({
             openSubtitleSelector
           ) }
           { !isOffline && renderBottomAction(isFilmBookmarked ? BookmarkCheck : Bookmark, openBookmarksOverlay) }
+          { renderBottomAction(Maximize2, handleAspectRatioChange) }
         </SpatialNavigationView>
         { renderDuration() }
       </View>
@@ -623,7 +627,7 @@ export function PlayerComponent({
       <VideoView
         style={ styles.video }
         player={ player }
-        contentFit="contain"
+        contentFit={ selectedAspectRatio }
         nativeControls={ false }
         allowsPictureInPicture={ false }
       />

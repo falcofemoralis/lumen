@@ -261,6 +261,10 @@ const ru: Translations = {
   'Retry': 'Попробовать снова',
   'Strict connection check': 'Строгая проверка соединения',
   'Toggle strict connection check.': 'Переключить проверку наличия интернет соединения.',
+  'Player default aspect ratio': 'Соотношение сторон по умолчанию',
+  'Contain': 'Вписать',
+  'Cover': 'Обрезать',
+  'Fill': 'Заполнить',
 };
 
 export default ru;

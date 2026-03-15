@@ -10,7 +10,7 @@ import { usePlayerProgressActions } from 'Context/PlayerProgressContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useEvent, useEventListener } from 'expo';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
-import { useVideoPlayer, VideoPlayer, VideoTrack } from 'expo-video';
+import { useVideoPlayer, VideoContentFit, VideoPlayer, VideoTrack } from 'expo-video';
 import { t } from 'i18n/translate';
 import { PLAYER_SCREEN } from 'Navigation/navigationRoutes';
 import {
@@ -46,6 +46,7 @@ import {
 import PlayerComponent from './Player.component';
 import PlayerComponentTV from './Player.component.atv';
 import {
+  ASPECT_RATIO_OPTIONS,
   AUTO_QUALITY,
   AWAKE_TAG,
   DEFAULT_SPEED,
@@ -69,6 +70,7 @@ export function PlayerContainer({
     playerSaveQuality,
     playerAutoNextEpisode,
     playerBufferTimeSetting,
+    playerDefaultAspectRatio,
   } = useConfigContext();
   const navigation = useNavigation();
   const { updateSelectedVoice } = usePlayerContext();
@@ -88,6 +90,9 @@ export function PlayerContainer({
     selectedVideo.subtitles?.find(({ isDefault }) => isDefault)
   );
   const [selectedSpeed, setSelectedSpeed] = useState<number>(DEFAULT_SPEED);
+  const [selectedAspectRatio, setSelectedAspectRatio] = useState<VideoContentFit>(
+    playerDefaultAspectRatio as VideoContentFit
+  );
   const [isLocked, setIsLocked] = useState<boolean>(false);
   const [isOverlayOpen, setIsOverlayOpen] = useState<boolean>(false);
   const [isFilmBookmarked, setIsFilmBookmarked] = useState<boolean>(isBookmarked(film));
@@ -591,6 +596,15 @@ export function PlayerContainer({
     speedOverlayRef.current?.close();
   };
 
+  const handleAspectRatioChange = () => {
+    setSelectedAspectRatio((prev) => {
+      const currentIndex = ASPECT_RATIO_OPTIONS.findIndex((option) => option === prev);
+      const nextIndex = (currentIndex + 1) % ASPECT_RATIO_OPTIONS.length;
+
+      return ASPECT_RATIO_OPTIONS[nextIndex];
+    });
+  };
+
   const handleLockControls = () => {
     setIsLocked(!isLocked);
   };
@@ -632,6 +646,7 @@ export function PlayerContainer({
     bookmarksOverlayRef,
     speedOverlayRef,
     selectedSpeed,
+    selectedAspectRatio,
     isLocked,
     isOverlayOpen,
     isFilmBookmarked,
@@ -651,6 +666,7 @@ export function PlayerContainer({
     handleSubtitleChange,
     handleSpeedChange,
     openSpeedSelector,
+    handleAspectRatioChange,
     openCommentsOverlay,
     openBookmarksOverlay,
     handleLockControls,

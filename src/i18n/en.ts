@@ -259,6 +259,10 @@ const en = {
   'Retry': 'Retry',
   'Strict connection check': 'Strict connection check',
   'Toggle strict connection check.': 'Toggle strict connection check.',
+  'Player default aspect ratio': 'Player default aspect ratio',
+  'Contain': 'Contain',
+  'Cover': 'Cover',
+  'Fill': 'Fill',
 };
 
 export default en;

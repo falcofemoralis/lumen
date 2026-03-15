@@ -1,7 +1,7 @@
 import { PlayerVideoSelectorRef } from 'Component/PlayerVideoSelector/PlayerVideoSelector.container';
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
-import { VideoPlayer, VideoPlayerStatus, VideoTrack } from 'expo-video';
+import { VideoContentFit, VideoPlayer, VideoPlayerStatus, VideoTrack } from 'expo-video';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface, SubtitleInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
@@ -33,6 +33,7 @@ export interface PlayerComponentProps {
   bookmarksOverlayRef: React.RefObject<ThemedOverlayRef | null>;
   speedOverlayRef: React.RefObject<ThemedOverlayRef | null>;
   selectedSpeed: number;
+  selectedAspectRatio: VideoContentFit;
   isLocked: boolean;
   isOverlayOpen: boolean;
   isFilmBookmarked: boolean;
@@ -52,6 +53,7 @@ export interface PlayerComponentProps {
   handleSubtitleChange: (item: DropdownItem) => void;
   handleSpeedChange: (item: DropdownItem) => void;
   openSpeedSelector: () => void;
+  handleAspectRatioChange: () => void;
   openCommentsOverlay: () => void;
   openBookmarksOverlay: () => void;
   handleLockControls: () => void;
