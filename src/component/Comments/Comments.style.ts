@@ -40,6 +40,9 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     fontSize: scale(13),
     color: colors.textSecondary,
   },
+  commentTextSmallLiked: {
+    color: colors.secondary,
+  },
   commentTextFocused: {
     color: colors.textFocused,
   },
@@ -48,6 +51,10 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     justifyContent: 'space-between',
     alignSelf: 'baseline',
     width: '100%',
+  },
+  commentLikesBtn: {
+    padding: scale(4),
+    borderRadius: scale(99),
   },
   commentLikes: {
     flexDirection: 'row',

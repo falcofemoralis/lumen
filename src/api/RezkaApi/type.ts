@@ -42,3 +42,8 @@ export type RatingResult = JSONResult & {
   num: number;
   votes: number;
 };
+
+export type LikeResult = JSONResult & {
+  count: number;
+  type: 'minus' | 'plus';
+};

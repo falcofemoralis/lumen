@@ -2,6 +2,7 @@ import { Loader } from 'Component/Loader';
 import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
 import { ThemedImage } from 'Component/ThemedImage';
 import { ThemedList } from 'Component/ThemedList';
+import { ThemedPressable } from 'Component/ThemedPressable';
 import { ThemedText } from 'Component/ThemedText';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
@@ -20,6 +21,7 @@ export function CommentItem({
   comment,
   idx,
   styles,
+  handlePostLike,
 }: CommentItemProps & { styles: ThemedStyles<typeof componentStyles> }) {
   const {
     id,
@@ -27,6 +29,7 @@ export function CommentItem({
     username,
     date,
     likes,
+    isDisabled,
   } = comment;
   const { scale, theme } = useAppTheme();
   const leftIndent = styles.indentSize.width * comment.indent;
@@ -60,17 +63,27 @@ export function CommentItem({
           <ThemedText style={ styles.commentTextSmall }>
             { date }
           </ThemedText>
-          { likes > 0 && (
-            <View style={ styles.commentLikes }>
-              <ThemedText style={ styles.commentTextSmall }>
-                { likes }
+          <View style={ styles.commentLikes }>
+            { likes > 0 && (
+              <ThemedText
+                style={ [
+                  styles.commentTextSmall,
+                  isDisabled && styles.commentTextSmallLiked,
+                ] }
+              >
+                { likes ?? 0 }
               </ThemedText>
+            ) }
+            <ThemedPressable
+              contentStyle={ styles.commentLikesBtn }
+              onPress={ () => handlePostLike(comment.id) }
+            >
               <ThumbsUp
                 size={ scale(16) }
-                color={ theme.colors.icon }
+                color={ isDisabled ? theme.colors.secondary : theme.colors.icon }
               />
-            </View>
-          ) }
+            </ThemedPressable>
+          </View>
         </View>
       </View>
     </View>
@@ -78,7 +91,7 @@ export function CommentItem({
 }
 
 function rowPropsAreEqual(prevProps: CommentItemProps, props: CommentItemProps) {
-  return prevProps.comment.id === props.comment.id;
+  return prevProps.comment.id === props.comment.id && prevProps.comment.likes === props.comment.likes;
 }
 
 const MemoCommentItem = memo(CommentItem, rowPropsAreEqual);
@@ -86,8 +99,8 @@ const MemoCommentItem = memo(CommentItem, rowPropsAreEqual);
 export const CommentsComponent = ({
   comments,
   isLoading,
-  style,
   onNextLoad,
+  handlePostLike,
 }: CommentsComponentProps) => {
   const { scale } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
@@ -98,9 +111,10 @@ export const CommentsComponent = ({
         comment={ item }
         idx={ index }
         styles={ styles }
+        handlePostLike={ handlePostLike }
       />
     ),
-    [styles]
+    [styles, handlePostLike]
   );
 
   if (!comments || (isLoading && !comments.length)) {

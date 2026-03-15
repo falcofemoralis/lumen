@@ -30,7 +30,7 @@ import { executeGet, executePost, Variables } from 'Util/Request';
 import { storage } from 'Util/Storage';
 import { updateUrlHost } from 'Util/Url';
 
-import { CommentsResult, FILM_SORTING, JSONResult, RatingResult, SeasonsResult, StreamsResult, TrailerResult } from './type';
+import { CommentsResult, FILM_SORTING, JSONResult, LikeResult, RatingResult, SeasonsResult, StreamsResult, TrailerResult } from './type';
 import {
   applyFilmSorting,
   formatDurationWithMoment,
@@ -1597,6 +1597,18 @@ const RezkaApi = {
 
     if (!data?.success) {
       throw new Error('Failed to update rating');
+    }
+
+    return data;
+  },
+
+  async postLike(commentId: string) {
+    const data = await this.fetchJson<LikeResult>('/engine/ajax/comments_like.php', {
+      id: commentId,
+    });
+
+    if (!data?.success) {
+      throw new Error('Failed to like a comment');
     }
 
     return data;

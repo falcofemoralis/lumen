@@ -40,6 +40,7 @@ export const CommentItem = forwardRef<CommentItemRef, CommentItemProps & { style
   containerWidth = 0,
   lines = [],
   styles,
+  handlePostLike,
 }, ref) => {
   const {
     id,
@@ -47,6 +48,7 @@ export const CommentItem = forwardRef<CommentItemRef, CommentItemProps & { style
     username,
     date,
     likes,
+    isDisabled,
   } = comment;
   const { scale, theme } = useAppTheme();
   const commentRef = useRef<SpatialNavigationNodeRef>(null);
@@ -62,6 +64,7 @@ export const CommentItem = forwardRef<CommentItemRef, CommentItemProps & { style
     <ThemedPressable
       spatialRef={ commentRef }
       onPress={ () => commentTextRef.current?.openSpoilers() }
+      onLongPress={ () => handlePostLike(comment.id) }
     >
       { ({ isFocused }) => (
         <View
@@ -113,6 +116,7 @@ export const CommentItem = forwardRef<CommentItemRef, CommentItemProps & { style
                 <View style={ styles.commentLikes }>
                   <ThemedText style={ [
                     styles.commentTextSmall,
+                    isDisabled && styles.commentTextSmallLiked,
                     isFocused && styles.textFocused,
                   ] }
                   >
@@ -120,7 +124,7 @@ export const CommentItem = forwardRef<CommentItemRef, CommentItemProps & { style
                   </ThemedText>
                   <ThumbsUp
                     size={ scale(16) }
-                    color={ theme.colors.icon }
+                    color={ isDisabled ? theme.colors.secondary : theme.colors.icon }
                   />
                 </View>
               ) }
@@ -133,7 +137,9 @@ export const CommentItem = forwardRef<CommentItemRef, CommentItemProps & { style
 });
 
 function rowPropsAreEqual(prevProps: CommentItemProps, props: CommentItemProps) {
-  return prevProps.comment.id === props.comment.id || prevProps.lines === props.lines;
+  return prevProps.comment.id === props.comment.id
+  && prevProps.lines === props.lines
+  && prevProps.comment.likes === props.comment.likes;
 }
 
 const MemoCommentItem = memo(CommentItem, rowPropsAreEqual);
@@ -144,6 +150,7 @@ const CommentsList = ({
   containerWidth,
   charLayout,
   styles,
+  handlePostLike,
 }: CommentsComponentProps & {
   containerWidth: number;
   charLayout: LayoutRectangle | null;
@@ -348,6 +355,7 @@ const CommentsList = ({
       idx={ index }
       containerWidth={ containerWidth }
       lines={ getCalculatedItemLines(item) }
+      handlePostLike={ handlePostLike }
       styles={ styles }
     />
   ), [getCalculatedItemLines, containerWidth, styles]);
@@ -367,6 +375,7 @@ export const CommentsComponent = ({
   style,
   isLoading,
   onNextLoad,
+  handlePostLike,
 }: CommentsComponentProps) => {
   const styles = useThemedStyles(componentStyles);
   const [containerWidth, setContainerWidth] = useState(0);
@@ -403,6 +412,7 @@ export const CommentsComponent = ({
         containerWidth={ containerWidth }
         charLayout={ charLayout }
         styles={ styles }
+        handlePostLike={ handlePostLike }
       />
     );
   };

@@ -55,6 +55,9 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     fontSize: scale(13),
     color: colors.textSecondary,
   },
+  commentTextSmallLiked: {
+    color: colors.secondary,
+  },
   commentTextFocused: {
   },
   commentDateRow: {

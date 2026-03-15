@@ -267,6 +267,7 @@ const ru: Translations = {
   'Fill': 'Заполнить',
   'Rate': 'Оценить',
   'Are you sure you want to hide this item?': 'Отметить как просмотренный и не отображать уведомления о выходе новых серий?',
+  'Liked': 'Оценено',
 };
 
 export default ru;

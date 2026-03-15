@@ -53,7 +53,7 @@ export const ThemedMultiListComponent = ({
         </Text>
         { item.isChecked ? (
           <SquareCheck
-            color={ theme.colors.primary }
+            color={ theme.colors.secondary }
           />
         ) : (
           <Square
