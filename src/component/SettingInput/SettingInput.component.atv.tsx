@@ -1,4 +1,3 @@
-import { Loader } from 'Component/Loader';
 import { SettingBase } from 'Component/SettingBase';
 import { propsAreEqual } from 'Component/SettingBase/SettingBase.component.atv';
 import { ThemedButton } from 'Component/ThemedButton';

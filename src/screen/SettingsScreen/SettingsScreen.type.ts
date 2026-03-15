@@ -50,4 +50,5 @@ export type SettingItem = {
     message?: string;
   };
   withLoader?: boolean;
+  imageLink?: string;
 }

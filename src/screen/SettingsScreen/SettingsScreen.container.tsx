@@ -605,6 +605,7 @@ export function SettingsScreenContainer() {
           type: SETTING_TYPE.LINK,
           value: 'link',
           onSettingPress: () => openLinkInBrowser(TELEGRAM_LINK),
+          imageLink: require('../../../assets/images/telegram-qr.png'),
           IconComponent: TelegramIcon,
           iconProps: {
             color: undefined,
@@ -622,6 +623,7 @@ export function SettingsScreenContainer() {
           subtitle: t('Go to GitHub'),
           type: SETTING_TYPE.LINK,
           value: 'link',
+          imageLink: require('../../../assets/images/github-qr.png'),
           onSettingPress: () => openLinkInBrowser(GITHUB_LINK),
           IconComponent: GithubIcon,
         },
