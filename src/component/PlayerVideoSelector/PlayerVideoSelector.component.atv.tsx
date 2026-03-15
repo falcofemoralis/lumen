@@ -136,6 +136,46 @@ export function PlayerVideoSelectorComponent({
     return rows;
   };
 
+  const renderSeasonTimeline = (season: SeasonInterface, isFocused: boolean, isSelected: boolean) => {
+    if (!savedTime || !season.episodes.length) {
+      return null;
+    }
+
+    let totalProgress = 0;
+
+    season.episodes.forEach(({ episodeId }: { episodeId: string }) => {
+      const progress = getVideoProgress({
+        ...selectedVoice,
+        lastSeasonId: season.seasonId,
+        lastEpisodeId: episodeId,
+      }, savedTime);
+
+      if (progress) {
+        totalProgress += calculateProgressThreshold(progress);
+      }
+    });
+
+    if (totalProgress === 0) {
+      return null;
+    }
+
+    const averageProgress = totalProgress / season.episodes.length;
+
+    return (
+      <View style={ styles.buttonProgressContainer }>
+        <View style={ styles.buttonProgressOutline } />
+        <View
+          style={ [
+            styles.buttonProgressMask,
+            isSelected && styles.buttonProgressMaskSelected,
+            isFocused && styles.buttonProgressMaskFocused,
+            { width: `${100 - averageProgress}%` },
+          ] }
+        />
+      </View>
+    );
+  };
+
   const renderSeasons = () => {
     if (seasons.length === 1 && seasons[0].isOnlyEpisodes) {
       return null;
@@ -162,6 +202,9 @@ export function PlayerVideoSelectorComponent({
                   isSelected={ selectedSeasonId === seasonId }
                   onPress={ () => setSelectedSeasonId(seasonId) }
                   style={ styles.button }
+                  additionalElement={
+                    (isFocused, isSelected) => renderSeasonTimeline(season, isFocused, isSelected)
+                  }
                 >
                   { name }
                 </ThemedButton>

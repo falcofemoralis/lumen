@@ -29,11 +29,17 @@ export const AppUpdaterContainer = ({ position }: AppUpdaterContainerProps) => {
   };
 
   const closePopup = () => {
-    if (!isTV) {
+    if (isTV) {
+      overlayRef.current?.close();
+    } else {
       bottomSheetRef.current?.dismiss();
     }
 
-    resetUpdate();
+    setTimeout(() => {
+      requestAnimationFrame(() => {
+        resetUpdate();
+      });
+    }, 0);
   };
 
   useEffect(() => {

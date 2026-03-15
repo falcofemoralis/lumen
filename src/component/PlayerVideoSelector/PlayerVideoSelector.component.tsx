@@ -10,6 +10,7 @@ import { ThemedText } from 'Component/ThemedText';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import { ScrollView, View } from 'react-native';
+import { SeasonInterface } from 'Type/FilmVoice.interface';
 import { getVideoProgress } from 'Util/Player';
 
 import { formatDownloadKey } from './PlayerVideoSelector.config';
@@ -106,6 +107,45 @@ export function PlayerVideoSelectorComponent({
     );
   };
 
+  const renderSeasonTimeline = (season: SeasonInterface) => {
+    if (!savedTime || !season.episodes.length) {
+      return null;
+    }
+
+    let totalProgress = 0;
+
+    season.episodes.forEach(({ episodeId }: { episodeId: string }) => {
+      const progress = getVideoProgress({
+        ...selectedVoice,
+        lastSeasonId: season.seasonId,
+        lastEpisodeId: episodeId,
+      }, savedTime);
+
+      if (progress) {
+        totalProgress += calculateProgressThreshold(progress);
+      }
+    });
+
+    if (totalProgress === 0) {
+      return null;
+    }
+
+    const averageProgress = totalProgress / season.episodes.length;
+
+    return (
+      <View style={ styles.buttonProgressContainer }>
+        <View style={ styles.buttonProgressOutline } />
+        <View
+          style={ [
+            styles.buttonProgressMask,
+            selectedSeasonId === season.seasonId && styles.seasonSelected,
+            { width: `${100 - averageProgress}%` },
+          ] }
+        />
+      </View>
+    );
+  };
+
   const renderSeasons = () => {
     if (seasons.length === 1 && seasons[0].isOnlyEpisodes) {
       return null;
@@ -122,6 +162,7 @@ export function PlayerVideoSelectorComponent({
             ] }
             contentStyle={ styles.seasonContent }
             onPress={ () => setSelectedSeasonId(season.seasonId) }
+            additionalElement={ renderSeasonTimeline(season) }
           >
             <ThemedText
               style={ [
