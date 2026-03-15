@@ -320,7 +320,7 @@ export function PlayerComponent({
       >
         <ArrowLeft
           size={ scale(24) }
-          color={ theme.colors.icon }
+          color={ theme.colors.iconOnContrast }
         />
       </ThemedPressable>
     </View>

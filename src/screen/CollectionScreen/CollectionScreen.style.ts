@@ -19,6 +19,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     padding: scale(4),
     zIndex: 10,
     fontSize: scale(text.xxs.fontSize),
+    color: colors.textOnContrast,
   },
   amount: {
     position: 'absolute',
@@ -30,6 +31,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     justifyContent: 'flex-end',
     textAlign: 'right',
     fontSize: scale(text.xxs.fontSize),
+    color: colors.textOnContrast,
   },
   image: {
     width: '100%',

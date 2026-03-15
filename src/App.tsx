@@ -19,7 +19,7 @@ if (__DEV__) {
   require('./devtools/ReactotronConfig.ts');
 
   const IGNORED_LOGS = [
-    'i18next is maintained with support from Locize',
+    'i18next is made possible by our own product',
     '`new NativeEventEmitter()`',
   ];
 

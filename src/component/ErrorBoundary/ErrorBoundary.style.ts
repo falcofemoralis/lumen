@@ -38,7 +38,6 @@ export const componentStyles = ({ scale, colors }: Theme) => ({
   button: {
     backgroundColor: colors.primary,
     borderRadius: scale(50),
-    padding: scale(4),
     width: scale(200),
   },
 } satisfies ThemedStyles);
