@@ -79,6 +79,12 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   progressBarRowLocked: {
     pointerEvents: 'none',
   },
+  topInfoWrapper: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: scale(8),
+  },
   topInfo: {
     flex: 1,
     flexDirection: 'column',
@@ -194,6 +200,21 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   },
   topActionLineText: {
     color: colors.textOnContrast,
+  },
+  backButtonContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backButton: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: scale(36),
+    height: scale(36),
+    borderRadius: scale(100),
+  },
+  backButtonContent: {
+    padding: scale(12),
   },
 } satisfies ThemedStyles);
 

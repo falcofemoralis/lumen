@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import { BookmarksOverlay } from 'Component/BookmarksOverlay';
 import { CommentsOverlay } from 'Component/CommentsOverlay';
 import { Loader } from 'Component/Loader';
@@ -19,6 +20,7 @@ import { isPictureInPictureSupported, VideoView } from 'expo-video';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import {
+  ArrowLeft,
   Bookmark,
   BookmarkCheck,
   ClosedCaption,
@@ -129,6 +131,7 @@ export function PlayerComponent({
   const isOverlayOpenRef = useRef(isOverlayOpen);
   const isScrollingRef = useRef(isScrolling);
   const isComponentMounted = useRef(true);
+  const navigation = useNavigation();
 
   const controlsAnimation = useAnimatedStyle(() => ({
     opacity: withTiming(showControls ? 1 : 0, { duration: PLAYER_CONTROLS_ANIMATION }),
@@ -306,6 +309,23 @@ export function PlayerComponent({
     </GestureDetector>
   );
 
+  const renderBackButton = () => (
+    <View style={ styles.backButtonContainer }>
+      <ThemedPressable
+        style={ styles.backButton }
+        contentStyle={ styles.backButtonContent }
+        onPress={ () => {
+          navigation.goBack();
+        } }
+      >
+        <ArrowLeft
+          size={ scale(24) }
+          color={ theme.colors.icon }
+        />
+      </ThemedPressable>
+    </View>
+  );
+
   const renderTitle = () => {
     const { title, hasSeasons } = film;
 
@@ -332,9 +352,12 @@ export function PlayerComponent({
   };
 
   const renderTopInfo = () => (
-    <View style={ styles.topInfo }>
-      { renderTitle() }
-      { renderSubtitle() }
+    <View style={ styles.topInfoWrapper }>
+      { renderBackButton() }
+      <View style={ styles.topInfo }>
+        { renderTitle() }
+        { renderSubtitle() }
+      </View>
     </View>
   );
 
