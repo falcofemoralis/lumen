@@ -264,6 +264,7 @@ const en = {
   'Cover': 'Cover',
   'Fill': 'Fill',
   'Rate': 'Rate',
+  'Are you sure you want to hide this item?': 'Are you sure you want to hide this item?',
 };
 
 export default en;

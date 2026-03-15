@@ -6,6 +6,9 @@ export const componentStyles = ({ scale, colors, spacing }: Theme) => ({
     paddingVertical: scale(12),
     gap: scale(10),
   },
+  itemHidden: {
+    opacity: 0.5,
+  },
   itemContentWrapper: {
     paddingHorizontal: scale(spacing.wrapperPadding),
   },
@@ -50,5 +53,9 @@ export const componentStyles = ({ scale, colors, spacing }: Theme) => ({
     width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  actionsColumn: {
+    flexDirection: 'column',
+    gap: scale(4),
   },
 } satisfies ThemedStyles);

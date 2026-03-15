@@ -459,7 +459,6 @@ const RezkaApi = {
 
     const items = (this.recentItems && !isRefresh) ? this.recentItems : await loadItems();
 
-    // const items = root.querySelectorAll(`.b-videosaves__list_item:nth-child(n+${start + 1}):nth-child(-n+${end})`);
     const slicedItems = items.slice((page - 1) * itemsPerPage, (page * itemsPerPage) - 1);
 
     const recentItems = slicedItems.map((el) => {
@@ -467,6 +466,7 @@ const RezkaApi = {
       const link = el.querySelector('.title a');
       const info = el.querySelector('.info')?.childNodes[0]?.rawText;
       const additionalInfo = el.querySelector('.new-episode')?.rawText;
+      const isWatched = el.classList.contains('watched-row');
 
       return {
         id: el.querySelector('.delete')?.attributes['data-id'] ?? '',
@@ -476,7 +476,7 @@ const RezkaApi = {
         name: (el.querySelector('.title')?.rawText ?? '').trim(),
         info: info ? info.trim() : '',
         additionalInfo: additionalInfo ? additionalInfo.trim() : '',
-        isWatched: false,
+        isWatched,
       };
     });
 
@@ -486,10 +486,6 @@ const RezkaApi = {
     };
   },
 
-  /**
-  * Remove watch later item
-  * @param filmId string
-  */
   async removeRecent(filmId: string) {
     const data = await this.fetchJson<JSONResult>('/engine/ajax/cdn_saves_remove.php', { id: filmId });
 
@@ -498,6 +494,18 @@ const RezkaApi = {
     }
 
     return true;
+  },
+
+  async hideRecent(filmId: string) {
+    const data = await this.fetchJson<JSONResult>('/engine/ajax/cdn_saves_view.php', {
+      id: filmId,
+    });
+
+    if (!data?.success) {
+      throw new Error(this.stripHtmlFromMessage(data?.message));
+    }
+
+    return data;
   },
 
   unloadRecentScreen() {

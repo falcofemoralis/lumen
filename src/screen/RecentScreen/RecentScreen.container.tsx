@@ -1,4 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
+import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useNetworkContext } from 'Context/NetworkContext';
 import { useServiceContext } from 'Context/ServiceContext';
@@ -22,6 +23,7 @@ export function RecentScreenContainer() {
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(true);
   const { handleConnectionError } = useNetworkContext();
+  const hideConfirmOverlayRef = useRef<ThemedOverlayRef | null>(null);
 
   useEffect(() => {
     if (isSignedIn) {
@@ -105,13 +107,49 @@ export function RecentScreenContainer() {
     });
   };
 
+  const hideItemRef = useRef<RecentItemInterface | null>(null);
+
+  const openHideConfirmOverlay = (item: RecentItemInterface) => {
+    if (item.isWatched) {
+      hideItemRef.current = item;
+      hideItem();
+
+      return;
+    }
+
+    hideItemRef.current = item;
+    hideConfirmOverlayRef.current?.open();
+  };
+
+  const hideItem = async () => {
+    if (!hideItemRef.current) {
+      return;
+    }
+
+    const { id } = hideItemRef.current;
+    hideItemRef.current = null;
+
+    hideConfirmOverlayRef.current?.close();
+
+    setItems((prev) => {
+      return prev.map((i) => i.id === id ? { ...i, isWatched: !i.isWatched } : i);
+    });
+
+    currentService.hideRecent(id).catch((error) => {
+      NotificationStore.displayError(error as Error);
+    });
+  };
+
   const containerProps = {
     isSignedIn,
     items,
     isLoading,
+    hideConfirmOverlayRef,
     onNextLoad,
     handleOnPress,
     removeItem,
+    openHideConfirmOverlay,
+    hideItem,
   };
 
   return isTV ? <RecentScreenComponentTV { ...containerProps } /> : <RecentScreenComponent { ...containerProps } />;

@@ -1,3 +1,4 @@
+import { ConfirmOverlay } from 'Component/ConfirmOverlay';
 import { InfoBlock } from 'Component/InfoBlock';
 import { Page } from 'Component/Page';
 import { ThemedButton } from 'Component/ThemedButton';
@@ -9,7 +10,7 @@ import { ThemedText } from 'Component/ThemedText';
 import { useLayout } from 'Hooks/useLayout';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
-import { Trash2 } from 'lucide-react-native';
+import { Eye, EyeOff, Trash2 } from 'lucide-react-native';
 import { useCallback } from 'react';
 import { View } from 'react-native';
 import Animated from 'react-native-reanimated';
@@ -24,9 +25,12 @@ import { RecentGridItem, RecentScreenComponentProps } from './RecentScreen.type'
 export function RecentScreenComponent({
   items,
   isLoading,
+  hideConfirmOverlayRef,
   onNextLoad,
   handleOnPress,
   removeItem,
+  openHideConfirmOverlay,
+  hideItem,
 }: RecentScreenComponentProps & { items: RecentGridItem[] }) {
   const { width: containerWidth } = useLayout();
   const { theme } = useAppTheme();
@@ -41,6 +45,10 @@ export function RecentScreenComponent({
         ...item,
         isDeleteButton: true,
       });
+      rowsItems.push({
+        ...item,
+        isHideButton: true,
+      });
     });
 
     return rowsItems;
@@ -54,16 +62,28 @@ export function RecentScreenComponent({
       info,
       additionalInfo,
       isDeleteButton,
+      isHideButton,
     } = item;
 
-    const width = containerWidth / 2;
+    const width = containerWidth / 1.6;
 
     if (isDeleteButton) {
       return (
         <ThemedButton
-          style={ styles.deleteButton }
+          style={ styles.actionButton }
           IconComponent={ Trash2 }
           onPress={ () => removeItem(item) }
+          withAnimation
+        />
+      );
+    }
+
+    if (isHideButton) {
+      return (
+        <ThemedButton
+          style={ styles.actionButton }
+          IconComponent={ item.isWatched ? EyeOff : Eye }
+          onPress={ () => openHideConfirmOverlay(item) }
           withAnimation
         />
       );
@@ -80,6 +100,7 @@ export function RecentScreenComponent({
                 styles.item,
                 { width },
                 isFocused && styles.itemFocused,
+                item.isWatched && styles.itemHidden,
               ] }
             >
               <View style={ [styles.poster, styles.posterContainer, isFocused && styles.posterContainerFocused] }>
@@ -142,7 +163,7 @@ export function RecentScreenComponent({
           style={ styles.grid }
           rowStyle={ styles.rowStyle }
           data={ prepareItems() }
-          numberOfColumns={ NUMBER_OF_COLUMNS_TV + 1 }
+          numberOfColumns={ NUMBER_OF_COLUMNS_TV + 2 }
           itemSize={ theme.dimensions.height / 3 }
           renderItem={ renderItem }
           onNextLoad={ onNextLoad }
@@ -152,8 +173,20 @@ export function RecentScreenComponent({
     );
   };
 
+  const renderConfirmOverlay = () => {
+    return (
+      <ConfirmOverlay
+        overlayRef={ hideConfirmOverlayRef }
+        title={ t('Are you sure?') }
+        message={ t('Are you sure you want to hide this item?') }
+        onConfirm={ hideItem }
+      />
+    );
+  };
+
   return (
     <Page contentStyle={ styles.page }>
+      { renderConfirmOverlay() }
       { renderContent() }
     </Page>
   );

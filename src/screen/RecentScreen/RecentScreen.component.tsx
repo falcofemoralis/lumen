@@ -1,3 +1,4 @@
+import { ConfirmOverlay } from 'Component/ConfirmOverlay';
 import { InfoBlock } from 'Component/InfoBlock';
 import { Page } from 'Component/Page';
 import { ThemedGrid } from 'Component/ThemedGrid';
@@ -7,7 +8,7 @@ import { ThemedPressable } from 'Component/ThemedPressable';
 import { ThemedText } from 'Component/ThemedText';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
-import { Trash2 } from 'lucide-react-native';
+import { Eye, EyeOff, Trash2 } from 'lucide-react-native';
 import { memo, useCallback } from 'react';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -26,6 +27,7 @@ function RecentItem({
   handleOnPress,
   removeItem,
   styles,
+  openHideConfirmOverlay,
 }: RecentGridRowProps & { styles: ThemedStyles<typeof componentStyles> }) {
   const {
     image,
@@ -41,7 +43,12 @@ function RecentItem({
       onPress={ () => handleOnPress(item) }
       contentStyle={ styles.itemContentWrapper }
     >
-      <View style={ [styles.item, index !== 0 && styles.itemBorder] }>
+      <View style={ [
+        styles.item,
+        index !== 0 && styles.itemBorder,
+        item.isWatched && styles.itemHidden,
+      ] }
+      >
         <View style={ styles.itemContainer }>
           <ThemedImage
             style={ styles.poster }
@@ -65,15 +72,33 @@ function RecentItem({
               </ThemedText>
             ) }
           </View>
-          <ThemedPressable
-            onPress={ () => removeItem(item) }
-            style={ styles.deleteButton }
-          >
-            <Trash2
-              size={ scale(24) }
-              color={ theme.colors.icon }
-            />
-          </ThemedPressable>
+          <View style={ styles.actionsColumn }>
+            <ThemedPressable
+              onPress={ () => removeItem(item) }
+              style={ styles.deleteButton }
+            >
+              <Trash2
+                size={ scale(24) }
+                color={ theme.colors.icon }
+              />
+            </ThemedPressable>
+            <ThemedPressable
+              onPress={ () => openHideConfirmOverlay(item) }
+              style={ styles.deleteButton }
+            >
+              { item.isWatched ? (
+                <EyeOff
+                  size={ scale(24) }
+                  color={ theme.colors.icon }
+                />
+              ) : (
+                <Eye
+                  size={ scale(24) }
+                  color={ theme.colors.icon }
+                />
+              ) }
+            </ThemedPressable>
+          </View>
         </View>
       </View>
     </ThemedPressable>
@@ -81,7 +106,7 @@ function RecentItem({
 }
 
 function rowPropsAreEqual(prevProps: RecentGridRowProps, props: RecentGridRowProps) {
-  return prevProps.item.id === props.item.id;
+  return prevProps.item.id === props.item.id && prevProps.item.isWatched === props.item.isWatched;
 }
 
 const MemoizedRecentItem = memo(RecentItem, rowPropsAreEqual);
@@ -89,9 +114,12 @@ const MemoizedRecentItem = memo(RecentItem, rowPropsAreEqual);
 export function RecentScreenComponent({
   items,
   isLoading,
+  hideConfirmOverlayRef,
   onNextLoad,
   handleOnPress,
   removeItem,
+  openHideConfirmOverlay,
+  hideItem,
 }: RecentScreenComponentProps) {
   const { scale } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
@@ -105,6 +133,7 @@ export function RecentScreenComponent({
         index={ index }
         removeItem={ removeItem }
         styles={ styles }
+        openHideConfirmOverlay={ openHideConfirmOverlay }
       />
     ),
     [handleOnPress, styles]
@@ -129,8 +158,20 @@ export function RecentScreenComponent({
     );
   };
 
+  const renderConfirmOverlay = () => {
+    return (
+      <ConfirmOverlay
+        overlayRef={ hideConfirmOverlayRef }
+        title={ t('Are you sure?') }
+        message={ t('Are you sure you want to hide this item?') }
+        onConfirm={ hideItem }
+      />
+    );
+  };
+
   return (
     <Page>
+      { renderConfirmOverlay() }
       <ThemedGrid
         data={ items }
         numberOfColumns={ NUMBER_OF_COLUMNS }

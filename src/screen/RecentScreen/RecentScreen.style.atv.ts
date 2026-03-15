@@ -12,7 +12,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     marginRight: scale(ROW_GAP),
   },
   rowStyle: {
-    gap: scale(ROW_GAP),
+    gap: scale(8),
   },
   item: {
     height: 'auto',
@@ -22,6 +22,9 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     transform: [{ scale: 1 }],
     transitionProperty: 'all',
     transitionDuration: '250ms',
+  },
+  itemHidden: {
+    opacity: 0.5,
   },
   itemFocused: {
     opacity: 1,
@@ -67,7 +70,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   },
   additionalInfoFocused: {
   },
-  deleteButton: {
+  actionButton: {
     backgroundColor: colors.transparent,
   },
   empty: {
