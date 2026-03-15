@@ -265,6 +265,7 @@ const ru: Translations = {
   'Contain': 'Вписать',
   'Cover': 'Обрезать',
   'Fill': 'Заполнить',
+  'Rate': 'Оценить',
 };
 
 export default ru;

@@ -5,6 +5,7 @@ import { PlayerVideoSelector } from 'Component/PlayerVideoSelector';
 import { Rating } from 'Component/Rating';
 import { ThemedAccordion } from 'Component/ThemedAccordion';
 import { ThemedButton } from 'Component/ThemedButton';
+import { ThemedDropdown } from 'Component/ThemedDropdown';
 import { ThemedImage } from 'Component/ThemedImage';
 import { ThemedOverlay } from 'Component/ThemedOverlay';
 import { ThemedText } from 'Component/ThemedText';
@@ -19,6 +20,7 @@ import {
   MessageSquareText,
   Play,
   ShieldOff,
+  Star,
 } from 'lucide-react-native';
 import { useState } from 'react';
 import { Dimensions, useWindowDimensions, View } from 'react-native';
@@ -57,6 +59,7 @@ export function FilmScreenComponent({
   bookmarksOverlayRef,
   descriptionOverlayRef,
   playerVideoDownloaderOverlayRef,
+  ratingOverlayRef,
   playFilm,
   handleVideoSelect,
   handleSelectFilm,
@@ -68,6 +71,8 @@ export function FilmScreenComponent({
   openVideoDownloader,
   handleDownloadSelect,
   openTrailerOverlay,
+  openRatingOverlay,
+  handleRatingSelect,
 }: FilmScreenComponentProps) {
   const { scale, theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
@@ -84,23 +89,21 @@ export function FilmScreenComponent({
     setShowReadMore(percent > 44);
   };
 
-  const openNotImplemented = () => {
-    NotificationStore.displayMessage(t('Not implemented'));
-  };
-
   const renderAction = (
     IconComponent: React.ComponentType<any>,
     text: string,
-    onPress?: () => void
+    onPress?: () => void,
+    isDisabled?: boolean
   ) => (
     <ThemedButton
       variant="outlined"
-      onPress={ onPress }
+      onPress={ isDisabled ? noopFn : onPress }
       IconComponent={ IconComponent }
       iconProps={ { size: scale(18) } }
-      style={ styles.actionButton }
+      style={ [styles.actionButton, isDisabled && styles.actionButtonDisabled] }
       textStyle={ styles.actionButtonText }
       disableRootActive
+      disabled={ isDisabled }
     >
       { text }
     </ThemedButton>
@@ -138,9 +141,10 @@ export function FilmScreenComponent({
         <View style={ styles.actions }>
           { renderPlayButton() }
           { renderAction(MessageSquareText, t('Comments'), () => commentsOverlayRef?.current?.open()) }
-          { renderAction(isBookmarked(film) ? BookmarkCheck : Bookmark, t('Bookmark'), openBookmarks) }
           { renderAction(Clapperboard, t('Trailer'), openTrailerOverlay) }
+          { renderAction(isBookmarked(film) ? BookmarkCheck : Bookmark, t('Bookmark'), openBookmarks) }
           { renderAction(Download, t('Download'), openVideoDownloader) }
+          { renderAction(Star, t('Rate'), openRatingOverlay, film.isRatingPosted) }
         </View>
       </DefaultFocus>
     </SpatialNavigationView>
@@ -208,11 +212,21 @@ export function FilmScreenComponent({
   };
 
   const renderRatings = () => {
-    const { ratings = [] } = film;
+    const { ratings = [], mainRating } = film;
+
+    const allRatings = [...ratings];
+
+    if (mainRating) {
+      allRatings.push(mainRating);
+    }
+
+    if (!allRatings.length) {
+      return null;
+    }
 
     return (
       <View style={ styles.ratingsRow }>
-        { ratings.map(({ name, rating, votes }) => renderInfoText(`${rating} (${votes})`, name)) }
+        { allRatings.map(({ name, rating, votes }) => renderInfoText(`${rating} (${votes})`, name)) }
       </View>
     );
   };
@@ -571,6 +585,21 @@ export function FilmScreenComponent({
     </ThemedOverlay>
   );
 
+  const renderRatingOverlay = () => {
+    return (
+      <ThemedDropdown
+        overlayRef={ ratingOverlayRef }
+        data={ Array.from({ length: 10 }, (_, i) => ({
+          label: (i + 1).toString(),
+          value: String(i + 1),
+        })).reverse() }
+        onChange={ (item) => handleRatingSelect(Number(item.value)) }
+        closeOnChange
+        asOverlay
+      />
+    );
+  };
+
   const renderModals = () => (
     <>
       { renderPlayerVideoSelector() }
@@ -579,6 +608,7 @@ export function FilmScreenComponent({
       { renderCommentsOverlay() }
       { renderDescriptionOverlay() }
       { renderPlayerVideoDownloader() }
+      { renderRatingOverlay() }
     </>
   );
 

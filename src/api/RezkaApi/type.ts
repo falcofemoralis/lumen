@@ -33,6 +33,12 @@ export enum FILM_SORTING {
   MULFILMS = 'mulfilms',
   ANIME = 'anime',
 }
+
 export type TrailerResult = JSONResult & {
   code: string;
 }
+
+export type RatingResult = JSONResult & {
+  num: number;
+  votes: number;
+};

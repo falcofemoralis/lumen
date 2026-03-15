@@ -149,6 +149,9 @@ export const componentStyles = ({ scale, colors, text, spacing }: Theme) => ({
     height: scale(44),
     borderRadius: scale(100),
   },
+  middleActionButtonDisabled: {
+    opacity: 0.5,
+  },
   middleActionIcon: {
     margin: scale(8),
   },

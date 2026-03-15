@@ -14,6 +14,9 @@ export const componentStyles = ({ scale, text, colors }: Theme) => ({
   actionButton: {
     paddingVertical: scale(8),
   },
+  actionButtonDisabled: {
+    opacity: 0.5,
+  },
   actionButtonText: {
     fontSize: scale(text.xs.fontSize),
   },

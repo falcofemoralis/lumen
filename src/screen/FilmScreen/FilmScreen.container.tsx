@@ -47,6 +47,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
   const bookmarksOverlayRef = useRef<ThemedOverlayRef>(null);
   const descriptionOverlayRef = useRef<ThemedOverlayRef>(null);
   const playerVideoDownloaderOverlayRef = useRef<PlayerVideoSelectorRef>(null);
+  const ratingOverlayRef = useRef<ThemedOverlayRef>(null);
 
   // fallback to deep link url
   let link = linkArg;
@@ -409,6 +410,41 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     navigate(FILM_TRAILER_SCREEN);
   };
 
+  const openRatingOverlay = () => {
+    ratingOverlayRef.current?.open();
+  };
+
+  const handleRatingSelect = async (rating: number) => {
+    if (!film) {
+      return;
+    }
+
+    const { id } = film ;
+
+    try {
+      const result = await currentService.postRating(id, rating);
+
+      setFilm((prevFilm) => {
+        if (!prevFilm) {
+          return prevFilm;
+        }
+
+        return {
+          ...prevFilm,
+          isRatingPosted: true,
+          mainRating: {
+            text: `${result.num} (${result.votes})`,
+            name: 'Rezka',
+            rating: Number(result.num),
+            votes: Number(result.votes),
+          },
+        };
+      });
+    } catch (error) {
+      NotificationStore.displayError(error as Error);
+    }
+  };
+
   const containerProps = {
     film,
     thumbnailPoster,
@@ -420,6 +456,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     descriptionOverlayRef,
     playerVideoDownloaderOverlayRef,
     isDeepLink,
+    ratingOverlayRef,
     playFilm,
     handleVideoSelect,
     handleSelectFilm,
@@ -432,6 +469,8 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     openVideoDownloader,
     handleDownloadSelect,
     openTrailerOverlay,
+    handleRatingSelect,
+    openRatingOverlay,
   };
 
   return isTV ? <FilmScreenComponentTV { ...containerProps } /> : <FilmScreenComponent { ...containerProps } />;

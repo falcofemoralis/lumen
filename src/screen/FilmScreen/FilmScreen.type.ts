@@ -22,6 +22,7 @@ export interface FilmScreenComponentProps {
   descriptionOverlayRef: React.RefObject<ThemedOverlayRef | null>;
   playerVideoDownloaderOverlayRef: React.RefObject<PlayerVideoSelectorRef | null>;
   isDeepLink: boolean;
+  ratingOverlayRef: React.RefObject<ThemedOverlayRef | null>;
   playFilm: () => void;
   handleVideoSelect: (video: FilmVideoInterface, voice: FilmVoiceInterface) => void;
   handleSelectFilm: (film: FilmInterface) => void;
@@ -34,4 +35,6 @@ export interface FilmScreenComponentProps {
   openVideoDownloader: () => void;
   handleDownloadSelect: (links: DownloadLinkInterface[]) => void;
   openTrailerOverlay: () => void;
+  handleRatingSelect: (rating: number) => Promise<void>;
+  openRatingOverlay: () => void;
 }

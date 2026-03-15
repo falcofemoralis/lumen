@@ -30,7 +30,7 @@ import { executeGet, executePost, Variables } from 'Util/Request';
 import { storage } from 'Util/Storage';
 import { updateUrlHost } from 'Util/Url';
 
-import { CommentsResult, FILM_SORTING, JSONResult, SeasonsResult, StreamsResult, TrailerResult } from './type';
+import { CommentsResult, FILM_SORTING, JSONResult, RatingResult, SeasonsResult, StreamsResult, TrailerResult } from './type';
 import {
   applyFilmSorting,
   formatDurationWithMoment,
@@ -835,6 +835,7 @@ const RezkaApi = {
     film.description = root.querySelector('.b-post__description_text')?.rawText.trim();
     film.isPendingRelease = !!root.querySelector('.b-post__go_status');
     film.isRestricted = !!root.querySelector('.b-player__restricted__block_message');
+    film.isRatingPosted = !!root.querySelector('.b-rating .current');
 
     if (!film.isPendingRelease) {
       // player data
@@ -1577,6 +1578,20 @@ const RezkaApi = {
     const endIndex = code.indexOf('lay=1') + 5;
 
     return code.substring(startIndex, endIndex);
+  },
+
+  async postRating(filmId: string, rating: number) {
+    const data = await this.fetchJson<RatingResult>('/engine/ajax/rating.php', {
+      news_id: filmId,
+      go_rate: String(rating),
+      skin: 'hdrezka',
+    });
+
+    if (!data?.success) {
+      throw new Error('Failed to update rating');
+    }
+
+    return data;
   },
 };
 

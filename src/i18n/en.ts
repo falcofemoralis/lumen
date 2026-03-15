@@ -263,6 +263,7 @@ const en = {
   'Contain': 'Contain',
   'Cover': 'Cover',
   'Fill': 'Fill',
+  'Rate': 'Rate',
 };
 
 export default en;

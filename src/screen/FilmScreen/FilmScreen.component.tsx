@@ -3,6 +3,7 @@ import { Header } from 'Component/Header';
 import { Page } from 'Component/Page';
 import { PlayerVideoSelector } from 'Component/PlayerVideoSelector';
 import { ThemedButton } from 'Component/ThemedButton';
+import { ThemedDropdown } from 'Component/ThemedDropdown';
 import { ThemedImageModal } from 'Component/ThemedImageModal';
 import { ThemedPressable } from 'Component/ThemedPressable';
 import { ThemedText } from 'Component/ThemedText';
@@ -37,7 +38,6 @@ import Animated, {
   useSharedValue,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import NotificationStore from 'Store/Notification.store';
 import RouterStore from 'Store/Router.store';
 import { useAppTheme } from 'Theme/context';
 import { CollectionItemInterface } from 'Type/CollectionItem';
@@ -66,6 +66,7 @@ export function FilmScreenComponent({
   bookmarksOverlayRef,
   playerVideoDownloaderOverlayRef,
   isDeepLink,
+  ratingOverlayRef,
   playFilm,
   handleVideoSelect,
   handleSelectFilm,
@@ -78,6 +79,8 @@ export function FilmScreenComponent({
   openVideoDownloader,
   handleDownloadSelect,
   openTrailerOverlay,
+  openRatingOverlay,
+  handleRatingSelect,
 }: FilmScreenComponentProps) {
   const { scale, theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
@@ -122,10 +125,6 @@ export function FilmScreenComponent({
       handleUpdateScheduleWatch,
     });
     navigate(SCHEDULE_MODAL_SCREEN);
-  };
-
-  const openNotImplemented = () => {
-    NotificationStore.displayMessage(t('Not implemented'));
   };
 
   const renderTitle = () => {
@@ -248,12 +247,17 @@ export function FilmScreenComponent({
   const renderMiddleAction = (
     IconComponent: React.ComponentType<any>,
     text: string,
-    action?: () => void
+    action?: () => void,
+    disabled?: boolean
   ) => (
     <View style={ styles.middleAction }>
       <ThemedPressable
-        style={ styles.middleActionButton }
+        style={ [
+          styles.middleActionButton,
+          disabled && styles.middleActionButtonDisabled,
+        ] }
         onPress={ action }
+        disabled={ disabled }
       >
         <IconComponent
           style={ styles.middleActionIcon }
@@ -269,7 +273,7 @@ export function FilmScreenComponent({
 
   const renderMiddleActions = () => (
     <View style={ styles.middleActions }>
-      { renderMiddleAction(Star, 'Rate', openNotImplemented) }
+      { renderMiddleAction(Star, 'Rate', openRatingOverlay, film.isRatingPosted) }
       { renderMiddleAction(Clapperboard, 'Trailer', openTrailerOverlay) }
       { renderMiddleAction(MessageSquareText, 'Comments', openComments) }
       { renderMiddleAction(isBookmarked(film) ? BookmarkCheck : Bookmark, 'Bookmark', openBookmarks) }
@@ -529,6 +533,21 @@ export function FilmScreenComponent({
     />
   );
 
+  const renderRatingOverlay = () => {
+    return (
+      <ThemedDropdown
+        overlayRef={ ratingOverlayRef }
+        data={ Array.from({ length: 10 }, (_, i) => ({
+          label: (i + 1).toString(),
+          value: String(i + 1),
+        })).reverse() }
+        onChange={ (item) => handleRatingSelect(Number(item.value)) }
+        closeOnChange
+        asOverlay
+      />
+    );
+  };
+
   const renderModals = () => {
     if (!film) {
       return null;
@@ -539,6 +558,7 @@ export function FilmScreenComponent({
         { renderPlayerVideoSelector() }
         { renderBookmarksOverlay() }
         { renderPlayerVideoDownloader() }
+        { renderRatingOverlay() }
       </>
     );
   };
@@ -612,13 +632,19 @@ export function FilmScreenComponent({
   };
 
   const renderRatings = () => {
-    const { ratings = [] } = film;
+    const { ratings = [], mainRating } = film;
 
-    if (!ratings.length) {
+    const allRatings = [...ratings];
+
+    if (mainRating) {
+      allRatings.push(mainRating);
+    }
+
+    if (!allRatings.length) {
       return null;
     }
 
-    return ratings.map(({ name, rating, votes }, i) => renderInfoText(`${rating} (${votes})`, name, i === 0));
+    return allRatings.map(({ name, rating, votes }, i) => renderInfoText(`${rating} (${votes})`, name, i === 0));
   };
 
   const renderContent = () => {
