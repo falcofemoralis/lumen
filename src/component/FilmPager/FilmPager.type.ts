@@ -13,6 +13,7 @@ export interface FilmPagerContainerProps {
   isEmpty?: boolean;
   isAddSafeArea?: boolean;
   sorting?: DropdownItem[];
+  menuDefaultFocus?: boolean;
   ListHeaderComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
   ListEmptyComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
   onLoadFilms: (
@@ -36,6 +37,7 @@ export interface FilmPagerComponentProps {
   isAddSafeArea?: boolean;
   sorting?: DropdownItem[];
   selectedSorting?: Record<string, DropdownItem> | null;
+  menuDefaultFocus?: boolean;
   ListHeaderComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
   ListEmptyComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
   onNextLoad: (isRefresh: boolean, item: PagerItemInterface) => Promise<void>;

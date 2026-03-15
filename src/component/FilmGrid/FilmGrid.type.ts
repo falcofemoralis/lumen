@@ -5,6 +5,7 @@ export interface FilmGridContainerProps {
   isGridVisible?: boolean;
   isEmpty?: boolean;
   isAddSafeArea?: boolean;
+  menuDefaultFocus?: boolean;
   ListHeaderComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
   ListEmptyComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
   onNextLoad?: (isRefresh: boolean) => Promise<void>;
@@ -17,6 +18,7 @@ export interface FilmGridComponentProps {
   isGridVisible?: boolean;
   isEmpty?: boolean;
   isAddSafeArea?: boolean;
+  menuDefaultFocus?: boolean;
   ListHeaderComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
   ListEmptyComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
   handleOnPress: (film: FilmCardInterface) => void;

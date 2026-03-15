@@ -59,6 +59,7 @@ export function FilmGridComponent({
   isEmpty,
   ListHeaderComponent,
   ListEmptyComponent,
+  menuDefaultFocus,
   onNextLoad,
   handleOnPress,
   handleItemFocus,
@@ -75,7 +76,7 @@ export function FilmGridComponent({
   const actualHeight = useMemo(() => height + scale(ROW_GAP), [height, scale]);
 
   const renderItem = useCallback(({ item, index }: ThemedGridRowProps<FilmCardInterface>) => (
-    <DefaultFocus enable={ index === 0 }>
+    <DefaultFocus enable={ menuDefaultFocus ? false : index === 0 }>
       <View style={ { height: actualHeight } }>
         <MemoizedGridItem
           index={ index }

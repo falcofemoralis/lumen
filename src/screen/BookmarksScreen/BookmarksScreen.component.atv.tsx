@@ -35,6 +35,7 @@ export function BookmarksScreenComponent({
         items={ pagerItems }
         onLoadFilms={ onLoadFilms }
         onUpdateFilms={ onUpdateFilms }
+        menuDefaultFocus
       />
     );
   };

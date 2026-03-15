@@ -15,6 +15,7 @@ export function FilmGridContainer({
   ListHeaderComponent,
   ListEmptyComponent,
   isAddSafeArea,
+  menuDefaultFocus,
   onNextLoad,
   onItemFocus,
 }: FilmGridContainerProps) {
@@ -39,6 +40,7 @@ export function FilmGridContainer({
     isGridVisible,
     isEmpty,
     isAddSafeArea,
+    menuDefaultFocus,
     ListHeaderComponent,
     ListEmptyComponent,
     onNextLoad,

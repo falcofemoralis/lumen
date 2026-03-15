@@ -8,6 +8,7 @@ import { createRef, memo, Ref, useCallback, useEffect, useRef, useState } from '
 import { View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import {
+  DefaultFocus,
   SpatialNavigationNode,
   SpatialNavigationNodeRef,
   SpatialNavigationScrollView,
@@ -114,6 +115,7 @@ const TopMenu = memo(({
   styles,
   sorting,
   selectedSorting,
+  menuDefaultFocus,
   handlePageChange,
   handleSelectSorting,
 }: FilmPagerComponentProps & {
@@ -173,6 +175,16 @@ const TopMenu = memo(({
     );
   };
 
+  const renderItems = () => (
+    <SpatialNavigationView
+      direction="horizontal"
+      style={ styles.menuList }
+      alignInGrid={ false }
+    >
+      { items.map((item, idx) => renderMenuItem(item, idx, isFocusVisible)) }
+    </SpatialNavigationView>
+  );
+
   return (
     <SpatialNavigationNode>
       { ({ isActive }) => {
@@ -203,13 +215,11 @@ const TopMenu = memo(({
               offsetFromStart={ scale(64) }
               style={ styles.menuListScroll }
             >
-              <SpatialNavigationView
-                direction="horizontal"
-                style={ styles.menuList }
-                alignInGrid={ false }
-              >
-                { items.map((item, idx) => renderMenuItem(item, idx, isFocusVisible)) }
-              </SpatialNavigationView>
+              { menuDefaultFocus ? (
+                <DefaultFocus>
+                  { renderItems() }
+                </DefaultFocus>
+              ) : renderItems() }
             </SpatialNavigationScrollView>
           </View>
         );
@@ -224,6 +234,7 @@ export function FilmPagerComponent(props: FilmPagerComponentProps) {
     gridStyle,
     isGridVisible,
     isEmpty,
+    menuDefaultFocus,
     ListHeaderComponent,
     ListEmptyComponent,
     onPreLoad,
@@ -259,6 +270,7 @@ export function FilmPagerComponent(props: FilmPagerComponentProps) {
         isEmpty={ isEmpty }
         ListHeaderComponent={ items.length > 1 ? renderMenu() : ListHeaderComponent }
         ListEmptyComponent={ ListEmptyComponent }
+        menuDefaultFocus={ menuDefaultFocus }
       />
     </View>
   );
