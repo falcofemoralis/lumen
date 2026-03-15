@@ -353,7 +353,7 @@ export function PlayerComponent({
 
   const renderTopInfo = () => (
     <View style={ styles.topInfoWrapper }>
-      { renderBackButton() }
+      { !isLocked && renderBackButton() }
       <View style={ styles.topInfo }>
         { renderTitle() }
         { renderSubtitle() }
