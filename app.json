@@ -12,7 +12,7 @@
     "**/*"
   ],
   "android": {
-    "icon": "./assets/images/app-icon-android-legacy.png",
+    "icon": "./assets/images/app-icon-all.png",
     "package": "com.falcofemoralis.lumen",
     "adaptiveIcon": {
       "foregroundImage": "./assets/images/app-icon-android-adaptive-foreground.png",
@@ -53,8 +53,8 @@
     [
       "expo-splash-screen",
       {
-        "image": "./assets/images/app-icon-android-adaptive-foreground.png",
-        "imageWidth": 150,
+        "image": "./assets/images/app-icon-all.png",
+        "imageWidth": 100,
         "backgroundColor": "#000000"
       }
     ],
