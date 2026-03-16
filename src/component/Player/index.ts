@@ -1,1 +1,1 @@
-export { default } from './Player.container';
+export { default as Player } from './Player.container';

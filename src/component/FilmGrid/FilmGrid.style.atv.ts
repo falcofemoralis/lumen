@@ -1,15 +1,15 @@
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-export const ROW_GAP = 16;
+export const ROW_GAP = 18;
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale }: Theme) => ({
   grid: {
-    paddingTop: ROW_GAP,
-    paddingHorizontal: ROW_GAP,
+    paddingTop: scale(13),
+    paddingHorizontal: scale(6),
   },
   rowStyle: {
     flexDirection: 'row',
     width: '100%',
-    gap: ROW_GAP,
+    gap: scale(ROW_GAP),
   },
-});
+} satisfies ThemedStyles);

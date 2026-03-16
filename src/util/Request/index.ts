@@ -1,4 +1,4 @@
-import t from 'i18n/t';
+import { t } from 'i18n/translate';
 import { Platform } from 'react-native';
 import { customFetch } from 'Util/Fetch';
 
@@ -134,7 +134,7 @@ export const requestValidator = async (
   headers: HeadersInit
 ) => {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 5000);
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
 
   try {
     await executeGet(
@@ -149,11 +149,4 @@ export const requestValidator = async (
   } finally {
     clearTimeout(timeoutId);
   }
-};
-
-export const addProxyHeaders = (headers: HeadersInit, originalHost: string): HeadersInit => {
-  return {
-    ...headers,
-    'X-Forwarded-Host': originalHost,
-  };
 };

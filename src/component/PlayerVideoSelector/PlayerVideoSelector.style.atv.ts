@@ -1,31 +1,30 @@
-import { Colors } from 'Style/Colors';
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale, colors, text }: Theme) => ({
   container: {
-    maxHeight: 300,
+    maxHeight: scale(300),
   },
   voicesInput: {
-    marginBottom: 10,
+    marginBottom: scale(10),
   },
   episodesContainer: {
-    borderTopWidth: 2,
-    borderTopColor: Colors.border,
-    paddingTop: 8,
+    borderTopWidth: scale(2),
+    borderTopColor: colors.border,
+    paddingTop: scale(8),
   },
   episodesContainerNoBorder: {
     borderTopWidth: 0,
   },
   button: {
-    marginEnd: 10,
-    marginBottom: 10,
+    marginEnd: scale(10),
+    marginBottom: scale(10),
   },
   voicesWrapper: {
     width: '100%',
-    minWidth: 288,
-    maxHeight: 288,
+    minWidth: scale(288),
+    maxHeight: scale(288),
     flexDirection: 'column',
-    gap: 4,
+    gap: scale(4),
   },
   voicesContainer: {
     flex: 1,
@@ -43,22 +42,34 @@ export const styles = CreateStyles({
     left: 0,
     right: 0,
     bottom: 0,
-    borderRadius: 18,
-    borderWidth: 2,
+    borderRadius: scale(18),
+    borderWidth: scale(2),
     borderColor: '#0283d1',
-    backgroundColor: Colors.transparent,
+    backgroundColor: colors.transparent,
   },
   buttonProgressMask: {
     position: 'absolute',
     top: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: Colors.button,
+    backgroundColor: colors.button,
   },
   buttonProgressMaskSelected: {
-    backgroundColor: Colors.primary,
+    backgroundColor: colors.primary,
   },
   buttonProgressMaskFocused: {
-    backgroundColor: Colors.buttonFocused,
+    backgroundColor: colors.buttonFocused,
   },
-});
+  episodeDownloadSelected: {
+    backgroundColor: colors.secondary,
+  },
+  downloadBtn: {
+    marginBottom: scale(12),
+    backgroundColor: colors.backgroundLighter,
+  },
+  empty: {
+    height: scale(150),
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+} satisfies ThemedStyles);

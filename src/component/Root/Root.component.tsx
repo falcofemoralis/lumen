@@ -1,40 +1,55 @@
+import {
+  completeHandler,
+  getExistingDownloadTasks,
+} from '@kesha-antonov/react-native-background-downloader';
+import { AppUpdater } from 'Component/AppUpdater';
 import { useAppUpdaterContext } from 'Context/AppUpdaterContext';
+import { useConfigContext } from 'Context/ConfigContext';
+import { useNetworkContext } from 'Context/NetworkContext';
 import { useServiceContext } from 'Context/ServiceContext';
-import * as StatusBar from 'expo-status-bar';
-import { useAwake } from 'Hooks/useAwake';
 import { useEffect } from 'react';
-import { useMMKVString } from 'react-native-mmkv';
-import ConfigStore, { DEVICE_CONFIG } from 'Store/Config.store';
-import StorageStore from 'Store/Storage.store';
+import NotificationStore from 'Store/Notification.store';
 
 export const Root = ({ children }: { children: React.ReactNode }) => {
+  const { checkForUpdates } = useConfigContext();
   const { isSignedIn } = useServiceContext();
   const { fetchUserData } = useServiceContext();
   const { checkVersion } = useAppUpdaterContext();
-  const { startAwake } = useAwake();
-  const config = useMMKVString(DEVICE_CONFIG, StorageStore.getConfigStorage());
+  const { isInternetAvailable } = useNetworkContext();
 
   useEffect(() => {
-    checkVersion();
-  }, [checkVersion]);
+    if (checkForUpdates && isInternetAvailable) {
+      checkVersion();
+    }
+  }, [checkForUpdates, checkVersion, isInternetAvailable]);
 
   useEffect(() => {
-    if(isSignedIn) {
+    if (isSignedIn && isInternetAvailable) {
       fetchUserData();
     }
-  }, [isSignedIn, fetchUserData]);
+  }, [isSignedIn, fetchUserData, isInternetAvailable]);
 
-  useEffect(() => {
-    return startAwake();
-  }, [startAwake, config]);
-
-  useEffect(() => {
-    if (ConfigStore.isTV()) {
-      StatusBar.setStatusBarHidden(true);
-    }
+  useEffect( () => {
+    getExistingDownloadTasks().then(tasks => {
+      tasks.forEach(task => {
+        task
+          .done(() => {
+            completeHandler(task.id);
+          })
+          .error(({ error }) => {
+            NotificationStore.displayError(error);
+            completeHandler(task.id);
+          });
+      });
+    });
   }, []);
 
-  return children;
+  return (
+    <>
+      <AppUpdater position='root' />
+      { children }
+    </>
+  );
 };
 
 export default Root;

@@ -1,26 +1,28 @@
-import ThemedText from 'Component/ThemedText';
+import { ThemedText } from 'Component/ThemedText';
 import { useState } from 'react';
-import {
-  StyleProp, TextStyle, View, ViewStyle,
-} from 'react-native';
+import { StyleProp, TextStyle, View, ViewStyle } from 'react-native';
+import { ThemedStyles } from 'Theme/types';
 import { CommentInterface, CommentTextInterface, CommentTextType } from 'Type/Comment.interface';
 
-import { styles } from './Comments.style';
+import { componentStyles } from './Comments.style';
 
 interface CommentTextProps {
   comment: CommentInterface
-  style?: StyleProp<ViewStyle> | undefined;
-  textStyle?: StyleProp<TextStyle>;
+  style?: StyleProp<ViewStyle> | undefined
+  textStyle?: StyleProp<TextStyle>
+  styles: ThemedStyles<typeof componentStyles>
 }
 
 interface SpoilerItemProps {
-  textItem: CommentTextInterface,
-  textStyle?: StyleProp<TextStyle>,
+  textItem: CommentTextInterface
+  textStyle?: StyleProp<TextStyle>
+  styles: ThemedStyles<typeof componentStyles>
 }
 
 const SpoilerItem = ({
   textItem,
   textStyle,
+  styles,
 }: SpoilerItemProps) => {
   const [visible, setVisible] = useState(false);
 
@@ -39,7 +41,7 @@ const SpoilerItem = ({
   );
 };
 
-export const CommentText = ({ comment, style, textStyle }: CommentTextProps) => {
+export const CommentText = ({ comment, style, textStyle, styles }: CommentTextProps) => {
   const { text: commentText } = comment;
 
   const renderLines = (text: string, nStyle?: StyleProp<TextStyle>) => (
@@ -54,6 +56,7 @@ export const CommentText = ({ comment, style, textStyle }: CommentTextProps) => 
     <SpoilerItem
       textItem={ textItem }
       textStyle={ textStyle }
+      styles={ styles }
     />
   );
 

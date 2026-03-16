@@ -1,25 +1,25 @@
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale }: Theme) => ({
   container: {
   },
   redirectContainer: {
-    padding: 20,
+    padding: scale(20),
     flex: 1,
     justifyContent: 'center',
-    gap: 16,
+    gap: scale(16),
   },
   modalButton: {
   },
   modalButtonContent: {
   },
   form: {
-    marginTop: 16,
-    gap: 8,
+    marginTop: scale(16),
+    gap: scale(8),
   },
   input: {
-    margin: 4,
+    margin: scale(4),
   },
   button: {
   },
-});
+} satisfies ThemedStyles);

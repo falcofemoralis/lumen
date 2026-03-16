@@ -1,11 +1,13 @@
-import { withTV } from 'Hooks/withTV';
+import { useConfigContext } from 'Context/ConfigContext';
 
 import SettingBaseComponent from './SettingBase.component';
 import SettingBaseComponentTV from './SettingBase.component.atv';
 import { SettingBaseComponentProps } from './SettingBase.type';
 
 export function SettingBaseContainer(props: SettingBaseComponentProps) {
-  return withTV(SettingBaseComponentTV, SettingBaseComponent, props);
+  const { isTV } = useConfigContext();
+
+  return isTV ? <SettingBaseComponentTV { ...props } /> : <SettingBaseComponent { ...props } />;
 }
 
 export default SettingBaseContainer;

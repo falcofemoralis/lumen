@@ -1,4 +1,4 @@
-import SettingBase from 'Component/SettingBase';
+import { SettingBase } from 'Component/SettingBase';
 import { View } from 'react-native';
 
 import { SettingGroupComponentProps } from './SettingGroup.type';

@@ -1,18 +1,22 @@
-import ThemedImage from 'Component/ThemedImage';
-import ThemedPressable from 'Component/ThemedPressable';
+import { ThemedImage } from 'Component/ThemedImage';
+import { ThemedPressable } from 'Component/ThemedPressable';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { Text, View } from 'react-native';
-import { Colors } from 'Style/Colors';
-import { scale } from 'Util/CreateStyles';
+import { useAppTheme } from 'Theme/context';
 
-import { styles } from './ThemedButton.style.atv';
+import { componentStyles } from './ThemedButton.style.atv';
 import { ThemedButtonProps } from './ThemedButton.type';
 
 export default function ThemedButton({
+  spatialRef,
   onPress,
+  onLongPress,
   onFocus,
   children,
   style,
+  styleSelected,
   styleFocused,
+  styleAdditional,
   IconComponent,
   iconProps,
   textStyle,
@@ -24,7 +28,14 @@ export default function ThemedButton({
   additionalElement,
   withAnimation = false,
   zoomScale = 1.1,
+  isFocusVisible = true,
+  disabled = false,
+  iconColor,
+  iconColorFocused,
 }: ThemedButtonProps) {
+  const { scale, theme } = useAppTheme();
+  const styles = useThemedStyles(componentStyles);
+
   const renderFilled = (isFocused: boolean) => (
     <View
       style={ [
@@ -32,8 +43,11 @@ export default function ThemedButton({
         styles.containerFilled,
         style,
         isSelected && styles.containerFilledSelected,
+        isSelected && styleSelected,
+        styleAdditional,
         isFocused && styles.containerFilledFocused,
         isFocused && styleFocused,
+        disabled && styles.containerFilledDisabled,
       ] }
     >
       { additionalElement && additionalElement(isFocused, isSelected ?? false) }
@@ -45,7 +59,7 @@ export default function ThemedButton({
             isFocused && styles.iconFilledFocused,
           ] }
           size={ scale(18) }
-          color={ isFocused ? Colors.black : Colors.white }
+          color={ isFocused ? (iconColorFocused || theme.colors.iconFocused) : (iconColor || theme.colors.icon) }
           { ...iconProps }
         />
       ) }
@@ -78,6 +92,7 @@ export default function ThemedButton({
         styles.containerOutlined,
         style,
         isSelected && styles.containerOutlinedSelected,
+        isSelected && styleSelected,
         isFocused && styles.containerOutlinedFocused,
         isFocused && styleFocused,
       ] }
@@ -90,7 +105,7 @@ export default function ThemedButton({
             isFocused && styles.iconFilledFocused,
           ] }
           size={ scale(18) }
-          color={ isFocused ? Colors.black : Colors.white }
+          color={ isFocused ? theme.colors.iconFocused : theme.colors.icon }
           { ...iconProps }
         />
       ) }
@@ -107,6 +122,7 @@ export default function ThemedButton({
           { children }
         </Text>
       ) }
+      { additionalElement && additionalElement(isFocused, isSelected ?? false) }
     </View>
   );
 
@@ -117,6 +133,7 @@ export default function ThemedButton({
         styles.containerLong,
         style,
         isSelected && styles.containerLongSelected,
+        isSelected && styleSelected,
         isFocused && styles.containerLongFocused,
         isFocused && styleFocused,
       ] }
@@ -130,7 +147,7 @@ export default function ThemedButton({
             isFocused && styles.iconFilledFocused,
           ] }
           size={ scale(18) }
-          color={ isFocused ? Colors.black : Colors.white }
+          color={ isFocused ? theme.colors.iconFocused : theme.colors.icon }
           { ...iconProps }
         />
       ) }
@@ -162,6 +179,7 @@ export default function ThemedButton({
         styles.container,
         styles.containerOutlined,
         style,
+        isSelected && styleSelected,
         isFocused && styleFocused,
       ] }
     >
@@ -173,7 +191,7 @@ export default function ThemedButton({
             isFocused && styles.iconFilledFocused,
           ] }
           size={ scale(18) }
-          color={ isFocused ? Colors.black : Colors.white }
+          color={ isFocused ? theme.colors.iconFocused : theme.colors.icon }
           { ...iconProps }
         />
       ) }
@@ -211,15 +229,17 @@ export default function ThemedButton({
 
   const isActive = (isFocused: boolean, isRootActive: boolean) => {
     if (disableRootActive) {
-      return isFocused;
+      return isFocused && isFocusVisible;
     }
 
-    return isFocused && isRootActive;
+    return isFocused && isRootActive && isFocusVisible;
   };
 
   return (
     <ThemedPressable
+      spatialRef={ spatialRef }
       onPress={ onPress }
+      onLongPress={ onLongPress }
       onFocus={ onFocus }
       withAnimation={ withAnimation }
       zoomScale={ zoomScale }

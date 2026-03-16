@@ -1,8 +1,7 @@
-import RNApkInstaller from '@dominicvonk/react-native-apk-installer';
-import t from 'i18n/t';
+import { t } from 'i18n/translate';
+import { ApkInstaller } from 'Modules/react-native-apk-installer';
 import { Alert, PermissionsAndroid, Platform } from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
-import LoggerStore from 'Store/Logger.store';
 import { wait } from 'Util/Misc';
 
 export class Installer {
@@ -27,9 +26,9 @@ export class Installer {
         return false;
       }
 
-      const grantedInstall = await RNApkInstaller.haveUnknownAppSourcesPermission();
+      const grantedInstall = await ApkInstaller.haveUnknownAppSourcesPermission();
       if (!grantedInstall) {
-        RNApkInstaller.showUnknownAppSourcesPermission();
+        ApkInstaller.showUnknownAppSourcesPermission();
 
         return false;
       }
@@ -49,8 +48,6 @@ export class Installer {
       return this.installApk(apkPath);
     } catch (error) {
       const errorMessage = (error as Error).message;
-
-      LoggerStore.error('downloadAndInstallApk', { error: errorMessage });
 
       if (errorMessage.includes('timeout')) {
         Alert.alert('Error', 'Download timed out. Please check your internet connection and try again.');
@@ -91,13 +88,10 @@ export class Installer {
         return true;
       }
     } catch (error) {
-      LoggerStore.error('requestStoragePermission', {
-        msg: 'Permission request failed:',
-        error,
-      });
-
       // if permission request fails, we can still try to proceed
       // as Downloads folder might still be accessible
+      console.error('Error checking/requesting storage permission:', error);
+
       return true;
     }
   }
@@ -116,10 +110,7 @@ export class Installer {
         await fs.mkdir(fs.dirs.DownloadDir);
       }
     } catch (error) {
-      LoggerStore.error('downloadApk', {
-        msg: 'Could not create Downloads directory, but continuing anyway:',
-        error,
-      });
+      console.error(error);
     }
 
     const previousFileExists = await fs.exists(filePath);
@@ -161,8 +152,7 @@ export class Installer {
 
       return downloadedPath;
     } catch (error) {
-      LoggerStore.error('downloadApk', { error });
-
+      console.error(error);
       // Fallback to download manager which should handle Downloads folder correctly
       const fallbackResponse = await ReactNativeBlobUtil.config({
         addAndroidDownloads: {
@@ -194,11 +184,11 @@ export class Installer {
         throw new Error('APK file not found');
       }
 
-      await RNApkInstaller.install(apkPath);
+      await ApkInstaller.install(apkPath);
 
       return false;
     } catch (error) {
-      LoggerStore.error('installApk', { error });
+      console.error(error);
 
       return false;
     }

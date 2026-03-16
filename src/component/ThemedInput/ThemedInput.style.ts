@@ -1,13 +1,21 @@
-import { Colors } from 'Style/Colors';
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale, colors }: Theme) => ({
   container: {
-    backgroundColor: Colors.input,
-    borderRadius: 16,
-    paddingHorizontal: 8,
+    backgroundColor: colors.input,
+    borderRadius: scale(16),
+    paddingHorizontal: scale(8),
   },
   input: {
-    color: Colors.text,
+    color: colors.text,
   },
-});
+  secureIcon: {
+    width: scale(32),
+    height: scale(32),
+    position: 'absolute',
+    right: scale(4),
+    top: '50%',
+    transform: [{ translateY: -scale(16) }],
+    borderRadius: scale(50),
+  },
+} satisfies ThemedStyles);

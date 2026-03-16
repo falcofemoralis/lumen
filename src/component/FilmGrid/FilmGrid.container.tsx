@@ -1,30 +1,28 @@
 import { useNavigation } from '@react-navigation/native';
-import { withTV } from 'Hooks/withTV';
-import { useCallback, useMemo } from 'react';
-import { useMMKVString } from 'react-native-mmkv';
-import ConfigStore, { DEVICE_CONFIG } from 'Store/Config.store';
-import StorageStore from 'Store/Storage.store';
+import { useConfigContext } from 'Context/ConfigContext';
+import { useCallback } from 'react';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { openFilm } from 'Util/Router';
 
 import FilmGridComponent from './FilmGrid.component';
-import GridComponentTV from './FilmGrid.component.atv';
+import FilmGridComponentTV from './FilmGrid.component.atv';
 import { FilmGridContainerProps } from './FilmGrid.type';
 
 export function FilmGridContainer({
   films,
-  header,
-  headerSize,
+  isGridVisible,
+  isEmpty,
+  ListHeaderComponent,
+  ListEmptyComponent,
+  isAddSafeArea,
+  menuDefaultFocus,
   onNextLoad,
   onItemFocus,
 }: FilmGridContainerProps) {
   const navigation = useNavigation();
-  const [configJson] = useMMKVString(DEVICE_CONFIG, StorageStore.getConfigStorage());
-  const numberOfColumns = useMemo(() => {
-    const { numberOfColumnsTV, numberOfColumnsMobile } = ConfigStore.parseConfig(configJson || '');
+  const { isTV, numberOfColumnsMobile, numberOfColumnsTV } = useConfigContext();
 
-    return ConfigStore.isTV() ? numberOfColumnsTV : numberOfColumnsMobile;
-  }, [configJson]);
+  const numberOfColumns = isTV ? numberOfColumnsTV : numberOfColumnsMobile;
 
   const handleOnPress = useCallback((film: FilmCardInterface) => {
     openFilm(film, navigation);
@@ -36,23 +34,22 @@ export function FilmGridContainer({
     }
   }, [onItemFocus, numberOfColumns]);
 
-  const containerFunctions = {
+  const containerProps = {
+    films,
+    numberOfColumns,
+    isGridVisible,
+    isEmpty,
+    isAddSafeArea,
+    menuDefaultFocus,
+    ListHeaderComponent,
+    ListEmptyComponent,
+    onNextLoad,
     handleOnPress,
     handleItemFocus,
   };
 
-  const containerProps = () => ({
-    films,
-    header,
-    headerSize,
-    numberOfColumns,
-    onNextLoad,
-  });
+  return isTV ? <FilmGridComponentTV { ...containerProps } /> : <FilmGridComponent { ...containerProps } />;
 
-  return withTV(GridComponentTV, FilmGridComponent, {
-    ...containerFunctions,
-    ...containerProps(),
-  });
 }
 
 export default FilmGridContainer;

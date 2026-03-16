@@ -1,31 +1,30 @@
-import { Colors } from 'Style/Colors';
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale, colors, text }: Theme) => ({
   progressBarContainer: {
     position: 'relative',
   },
   progressBar: {
-    marginBlock: 12,
+    marginBlock: scale(12),
   },
   thumb: {
-    width: 7,
-    height: 7,
-    borderRadius: 99,
-    backgroundColor: Colors.white,
+    width: scale(7),
+    height: scale(7),
+    borderRadius: scale(99),
+    backgroundColor: colors.iconOnContrast,
   },
   focusedThumb: {
-    width: 12,
-    height: 12,
+    width: scale(12),
+    height: scale(12),
   },
   storyBoard: {
     position: 'absolute',
-    bottom: 40,
+    bottom: scale(40),
     alignSelf: 'center',
-    backgroundColor: Colors.background,
+    backgroundColor: colors.background,
     opacity: 0,
   },
   storyBoardVisible: {
     opacity: 1,
   },
-});
+} satisfies ThemedStyles);

@@ -1,7 +1,6 @@
-import { Colors } from 'Style/Colors';
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale, colors, text }: Theme) => ({
   background: {
   },
   container: {
@@ -9,7 +8,7 @@ export const styles = CreateStyles({
   voicesContainer: {
     width: '100%',
     flexDirection: 'row',
-    gap: 4,
+    gap: scale(4),
   },
   voicesDropdown: {
     flex: 1,
@@ -17,57 +16,61 @@ export const styles = CreateStyles({
   seasonsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 4,
-    marginTop: 8,
+    gap: scale(4),
+    marginTop: scale(8),
   },
   season: {
-    backgroundColor: Colors.chip,
-    borderRadius: 16,
+    backgroundColor: colors.chip,
+    borderRadius: scale(16),
   },
   seasonContent: {
-    padding: 8,
+    padding: scale(8),
   },
   seasonSelected: {
-    backgroundColor: Colors.primary,
+    backgroundColor: colors.primary,
   },
   seasonText: {
-    color: Colors.chipText,
+    color: colors.chipText,
   },
   seasonTextSelected: {
-    color: Colors.textOnPrimary,
+    color: colors.textOnTertiary,
   },
   episodesContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 4,
-    marginTop: 8,
-    paddingTop: 8,
-    borderTopWidth: 2,
-    borderTopColor: Colors.divider,
+    gap: scale(4),
+    marginTop: scale(8),
+    paddingTop: scale(8),
+    borderTopWidth: scale(2),
+    borderTopColor: colors.divider,
   },
   episodesContainerNoBorder: {
     borderTopWidth: 0,
   },
   episode: {
-    backgroundColor: Colors.chip,
-    borderRadius: 16,
+    backgroundColor: colors.chip,
+    borderRadius: scale(16),
   },
   episodeContent: {
-    padding: 8,
+    padding: scale(8),
   },
   episodeSelected: {
-    backgroundColor: Colors.primary,
+    backgroundColor: colors.primary,
   },
-  episodeText: {},
+  episodeDownloadSelected: {
+    backgroundColor: colors.secondary,
+  },
+  episodeText: {
+  },
   episodeTextSelected: {
-    color: Colors.textOnPrimary,
+    color: colors.textOnTertiary,
   },
   playContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
   playBtn: {
-    margin: 8,
+    margin: scale(8),
   },
   voiceDropdownInput: {
     flex: 1,
@@ -85,16 +88,25 @@ export const styles = CreateStyles({
     left: 0,
     right: 0,
     bottom: 0,
-    borderRadius: 18,
-    borderWidth: 2,
+    borderRadius: scale(18),
+    borderWidth: scale(2),
     borderColor: '#0283d1',
-    backgroundColor: Colors.transparent,
+    backgroundColor: colors.transparent,
   },
   buttonProgressMask: {
     position: 'absolute',
     top: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: Colors.chip,
+    backgroundColor: colors.chip,
   },
-});
+  downloadBtn: {
+    marginTop: scale(12),
+    backgroundColor: colors.backgroundLighter,
+  },
+  empty: {
+    height: scale(150),
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+} satisfies ThemedStyles);

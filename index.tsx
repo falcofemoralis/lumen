@@ -1,4 +1,4 @@
-import '@expo/metro-runtime'; // Necessary for Fast Refresh on Web
+import '@expo/metro-runtime'; // this is for fast refresh on web w/o expo-router
 
 import { registerRootComponent } from 'expo';
 

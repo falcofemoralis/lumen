@@ -1,1 +1,1 @@
-export { default } from './CommentsOverlay.container';
+export { default as CommentsOverlay } from './CommentsOverlay.container';

@@ -1,16 +1,16 @@
-import ThemedBottomSheet from 'Component/ThemedBottomSheet';
+import { ThemedBottomSheet } from 'Component/ThemedBottomSheet';
 import { ThemedBottomSheetRef } from 'Component/ThemedBottomSheet/ThemedBottomSheet.type';
-import ThemedImage from 'Component/ThemedImage';
-import ThemedPressable from 'Component/ThemedPressable';
-import ThemedText from 'Component/ThemedText';
+import { ThemedImage } from 'Component/ThemedImage';
+import { ThemedPressable } from 'Component/ThemedPressable';
+import { ThemedText } from 'Component/ThemedText';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { CircleHelp } from 'lucide-react-native';
 import { useRef } from 'react';
 import { ScrollView, View } from 'react-native';
-import { Colors } from 'Style/Colors';
+import { useAppTheme } from 'Theme/context';
 import { VoiceRatingInterface } from 'Type/VoiceRating.interface';
-import { scale } from 'Util/CreateStyles';
 
-import { styles } from './PlayerVideoRating.style';
+import { componentStyles } from './PlayerVideoRating.style';
 import { PlayerVideoRatingComponentProps } from './PlayerVideoRating.type';
 
 export const PlayerVideoRatingComponent = ({
@@ -18,6 +18,8 @@ export const PlayerVideoRatingComponent = ({
   seasons,
 }: PlayerVideoRatingComponentProps) => {
   const bottomSheetRef = useRef<ThemedBottomSheetRef>(null);
+  const { scale, theme } = useAppTheme();
+  const styles = useThemedStyles(componentStyles);
 
   const renderButton = () => {
     return (
@@ -31,7 +33,7 @@ export const PlayerVideoRatingComponent = ({
             seasons.length ? styles.voiceDropdownInputIconSeason : undefined,
           ] }
           size={ scale(24) }
-          color={ Colors.white }
+          color={ theme.colors.icon }
         />
       </ThemedPressable>
     );
@@ -81,7 +83,7 @@ export const PlayerVideoRatingComponent = ({
     const { voiceRating = [] } = film;
 
     return (
-      <ThemedBottomSheet ref={ bottomSheetRef } sizes={ ['40%', 'auto'] }>
+      <ThemedBottomSheet ref={ bottomSheetRef } detents={ [0.4, 'auto'] }>
         <ScrollView style={ styles.voiceRatingContainer }>
           { voiceRating.map((item) => renderRating(item)) }
         </ScrollView>

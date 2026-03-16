@@ -11,10 +11,11 @@ export interface CommentsContainerProps {
 
 export interface CommentsComponentProps {
   comments: CommentInterface[] | null;
-  onNextLoad: () => Promise<void>;
   style?: StyleProp<ViewStyle> | undefined;
   isLoading: boolean;
   loaderFullScreen?: boolean;
+  onNextLoad: () => Promise<void>;
+  handlePostLike: (commentId: string) => void;
 }
 
 export interface CommentItemProps {
@@ -22,6 +23,7 @@ export interface CommentItemProps {
   idx: number;
   containerWidth?: number;
   lines?: CalculatedLine[];
+  handlePostLike: (commentId: string) => void;
 }
 
 export type CalculatedLine = {

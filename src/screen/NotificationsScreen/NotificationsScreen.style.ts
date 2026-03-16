@@ -1,0 +1,14 @@
+import { ThemedStyles } from 'Theme/types';
+
+export const styles = {
+  container: {
+    height: '100%',
+    width: '100%',
+  },
+  empty: {
+    height: '100%',
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+} satisfies ThemedStyles;

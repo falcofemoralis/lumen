@@ -1,14 +1,15 @@
-import { useNavigation } from '@react-navigation/native';
-import InfoBlock from 'Component/InfoBlock';
-import Loader from 'Component/Loader';
-import ThemedButton from 'Component/ThemedButton';
-import ThemedInput from 'Component/ThemedInput';
-import t from 'i18n/t';
-import { LOGIN_MODAL_ROUTE } from 'Navigation/routes';
+import { InfoBlock } from 'Component/InfoBlock';
+import { Loader } from 'Component/Loader';
+import { ThemedButton } from 'Component/ThemedButton';
+import { ThemedInput } from 'Component/ThemedInput';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
+import { t } from 'i18n/translate';
+import { LOGIN_MODAL_SCREEN } from 'Navigation/navigationRoutes';
 import { useRef } from 'react';
 import { View } from 'react-native';
+import { goBack, navigate } from 'Util/Navigation';
 
-import { styles } from './LoginForm.style';
+import { componentStyles } from './LoginForm.style';
 import { LoginFormComponentProps } from './LoginForm.type';
 
 export function LoginFormComponent({
@@ -17,19 +18,19 @@ export function LoginFormComponent({
   style,
   handleLogin,
 }: LoginFormComponentProps) {
-  const navigation = useNavigation();
   const loginRef = useRef({ username: '', password: '' });
+  const styles = useThemedStyles(componentStyles);
 
   const onLogin = async () => {
     const success = await handleLogin(loginRef.current.username, loginRef.current.password);
 
     if (success) {
-      navigation.goBack();
+      goBack();
     }
   };
 
   const openForm = () => {
-    navigation.navigate(LOGIN_MODAL_ROUTE);
+    navigate(LOGIN_MODAL_SCREEN);
   };
 
   const renderForm = () => {

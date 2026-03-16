@@ -1,13 +1,15 @@
 import { LegendList } from '@legendapp/list';
-import FilmCard from 'Component/FilmCard';
-import { useFilmCardDimensions } from 'Component/FilmCard/FilmCard.style';
-import ThemedText from 'Component/ThemedText';
-import React, { memo, useCallback, useMemo } from 'react';
+import { FilmCard } from 'Component/FilmCard';
+import { FilmCardThumbnail } from 'Component/FilmCard/FilmCard.thumbnail';
+import { useFilmCardDimensions } from 'Component/FilmCard/useFilmCardDimensions';
+import { ThemedText } from 'Component/ThemedText';
+import { useConfigContext } from 'Context/ConfigContext';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
+import { memo, useCallback, useMemo } from 'react';
 import { Pressable, View } from 'react-native';
-import { scale } from 'Util/CreateStyles';
+import { ThemedStyles } from 'Theme/types';
 
-import { NUMBER_OF_COLUMNS } from './FilmSections.config';
-import { ROW_GAP, styles } from './FilmSections.style';
+import { componentStyles } from './FilmSections.style';
 import {
   FilmSectionsComponentProps,
   FilmSectionsItem,
@@ -19,14 +21,9 @@ const FilmSectionsRow = ({
   row,
   itemSize,
   handleOnPress,
-}: FilmSectionsRowProps) => {
-  const { content, header, films = [] } = row;
-
-  const renderContent = () => (
-    <View>
-      { content }
-    </View>
-  );
+  styles,
+}: FilmSectionsRowProps & { styles: ThemedStyles<typeof componentStyles> }) => {
+  const { header, films = [], isPlaceholder } = row;
 
   const renderHeader = () => (
     <View>
@@ -36,9 +33,24 @@ const FilmSectionsRow = ({
     </View>
   );
 
+  if (isPlaceholder) {
+    return (
+      <View>
+        <View style={ styles.gridRow }>
+          { films.map((item, idx) => (
+            <FilmCardThumbnail
+              // eslint-disable-next-line react/no-array-index-key
+              key={ `${index}-${idx}-${item.id}` }
+              width={ itemSize || 0 }
+            />
+          )) }
+        </View>
+      </View>
+    );
+  }
+
   return (
     <View>
-      { content && renderContent() }
       { header && renderHeader() }
       <View style={ styles.gridRow }>
         { films.map((item, idx) => (
@@ -58,27 +70,27 @@ const FilmSectionsRow = ({
   );
 };
 
-function rowPropsAreEqual(prevProps: FilmSectionsRowProps, props: FilmSectionsRowProps) {
-  return prevProps.row.index === props.row.index && prevProps.itemSize === props.itemSize;
-}
-
-const MemoizedFilmSectionsRow = memo(FilmSectionsRow, rowPropsAreEqual);
+const MemoizedFilmSectionsRow = memo(FilmSectionsRow);
 
 export function FilmSectionsComponent({
   data: films,
+  children,
   handleOnPress,
 }: FilmSectionsComponentProps) {
-  const { width, height } = useFilmCardDimensions(NUMBER_OF_COLUMNS, scale(ROW_GAP));
+  const styles = useThemedStyles(componentStyles);
+  const { numberOfColumnsMobile } = useConfigContext();
+  const { width, height } = useFilmCardDimensions(numberOfColumnsMobile, styles.gridRow.gap);
 
   const renderItem = useCallback(({ item: row, index }: {item: FilmSectionsItem, index: number}) => (
     <MemoizedFilmSectionsRow
       index={ index }
       row={ row }
       itemSize={ width }
-      numberOfColumns={ NUMBER_OF_COLUMNS }
+      numberOfColumns={ numberOfColumnsMobile }
       handleOnPress={ handleOnPress }
+      styles={ styles }
     />
-  ), [width]);
+  ), [width, styles]);
 
   const data = useMemo(() => films.map(
     (row) => ({
@@ -95,6 +107,7 @@ export function FilmSectionsComponent({
       keyExtractor={ (item) => `${item.index}-film-list-row` }
       recycleItems
       showsVerticalScrollIndicator={ false }
+      ListHeaderComponent={ children }
     />
   );
 }

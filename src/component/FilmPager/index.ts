@@ -1,1 +1,1 @@
-export { default } from './FilmPager.container';
+export { default as FilmPager } from './FilmPager.container';

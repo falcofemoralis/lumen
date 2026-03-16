@@ -1,7 +1,7 @@
 import {
   createContext,
-  use,
   useCallback,
+  useContext,
   useMemo,
   useState,
 } from 'react';
@@ -55,4 +55,9 @@ export const NavigationProvider = ({ children }: { children: React.ReactNode }) 
   );
 };
 
-export const useNavigationContext = () => use(NavigationContext);
+export const useNavigationContext = () => {
+  const context = useContext(NavigationContext);
+  if (!context) throw new Error('useNavigationContext must be used within a NavigationProvider');
+
+  return context;
+};

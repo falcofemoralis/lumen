@@ -1,44 +1,20 @@
-import { Colors } from 'Style/Colors';
-import { calculateItemWidth } from 'Style/Layout';
-import CreateStyles, { scale } from 'Util/CreateStyles';
-
-import { FilmCardDimensions } from './FilmCard.type';
+import { Theme, ThemedStyles } from 'Theme/types';
 
 export const INFO_HEIGHT = 65;
 export const INFO_PADDING_HORIZONTAL = 8;
 export const INFO_PADDING_VERTICAL = 4;
 
-export const calculateCardDimensions = (
-  numberOfColumns: number,
-  gap?: number,
-  additionalWidth?: number
-): FilmCardDimensions => {
-  const width = calculateItemWidth(numberOfColumns, gap, additionalWidth);
-
-  const posterHeight = width * (250 / 166);
-  const infoHeight = scale(INFO_HEIGHT) + scale(INFO_PADDING_VERTICAL);
-
-  const height = posterHeight + infoHeight;
-
-  return {
-    width,
-    height,
-  };
-};
-
-export const styles = CreateStyles({
+export const componentStyles = ({ scale, colors, text }: Theme) => ({
   card: {
-    flex: 1,
     flexDirection: 'column',
     width: '100%',
-    borderRadius: 8,
+    borderRadius: scale(12),
     overflow: 'hidden',
     transform: [{ scale: 1 }],
     transitionProperty: 'transform',
     transitionDuration: '250ms',
   },
   cardFocused: {
-    borderRadius: 8,
     transform: [{ scale: 1.1 }],
   },
   posterWrapper: {
@@ -46,8 +22,8 @@ export const styles = CreateStyles({
     width: '100%',
     height: 'auto',
     flexDirection: 'column',
-    borderBottomRightRadius: 8,
-    borderBottomLeftRadius: 8,
+    borderBottomRightRadius: scale(8),
+    borderBottomLeftRadius: scale(8),
     overflow: 'hidden',
   },
   posterWrapperFocused: {
@@ -60,28 +36,27 @@ export const styles = CreateStyles({
   posterFocused: {},
   info: {
     width: '100%',
-    height: INFO_HEIGHT,
-    backgroundColor: Colors.transparent,
-    paddingHorizontal: INFO_PADDING_HORIZONTAL,
-    paddingVertical: INFO_PADDING_VERTICAL,
+    height: scale(INFO_HEIGHT),
+    paddingHorizontal: scale(INFO_PADDING_HORIZONTAL),
+    paddingVertical: scale(INFO_PADDING_VERTICAL),
   },
   infoFocused: {
-    backgroundColor: Colors.buttonFocused,
+    backgroundColor: colors.buttonFocused,
   },
   title: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: Colors.text,
+    fontSize: scale(text.xxs.fontSize),
+    fontWeight: 'bold',
+    color: colors.text,
   },
   titleFocused: {
-    color: Colors.textFocused,
+    color: colors.textFocused,
   },
   subtitle: {
-    fontSize: 10,
-    color: Colors.textSecondary,
+    fontSize: scale(text.xxxs.fontSize),
+    color: colors.textSecondary,
   },
   subtitleFocused: {
-    color: Colors.textFocused,
+    color: colors.textFocused,
   },
   additionContainer: {
     position: 'absolute',
@@ -93,18 +68,20 @@ export const styles = CreateStyles({
     justifyContent: 'space-between',
   },
   typeText: {
-    paddingHorizontal: 4,
-    paddingVertical: 1,
-    fontSize: 12,
+    paddingHorizontal: scale(4),
+    paddingVertical: scale(1),
+    fontSize: scale(text.xxs.fontSize),
     alignSelf: 'flex-end',
+    color: colors.textOnContrast,
   },
   filmAdditionalText: {
-    paddingHorizontal: 4,
-    paddingVertical: 1,
-    fontSize: 12,
+    paddingHorizontal: scale(4),
+    paddingVertical: scale(1),
+    fontSize: scale(text.xxs.fontSize),
     alignSelf: 'flex-start',
+    color: colors.textOnContrast,
   },
   posterPendingRelease: {
     opacity: 0.5,
   },
-});
+} satisfies ThemedStyles);

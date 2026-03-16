@@ -1,28 +1,27 @@
 import { ApiInterface, ApiServiceType } from 'Api/index';
-import { REZKA_PROXY_PROVIDER } from 'Api/RezkaApi/configApi';
 import { services } from 'Api/services';
-import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
-import t from 'i18n/t';
-import { ACCOUNT_ROUTE, NOTIFICATIONS_ROUTE } from 'Navigation/routes';
+import { t } from 'i18n/translate';
+import { ACCOUNT_SCREEN, ACCOUNT_TAB, NOTIFICATIONS_SCREEN, NOTIFICATIONS_TAB } from 'Navigation/navigationRoutes';
 import {
   createContext,
-  use,
   useCallback,
+  useContext,
   useMemo,
   useState,
 } from 'react';
-import { Linking, Platform } from 'react-native';
-import ConfigStore from 'Store/Config.store';
-import LoggerStore from 'Store/Logger.store';
+import { Linking } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
-import StorageStore from 'Store/Storage.store';
 import { BadgeData } from 'Type/BadgeData.interface';
+import { FilmInterface } from 'Type/Film.interface';
 import { NotificationInterface, NotificationItemInterface } from 'Type/Notification.interface';
 import { ProfileInterface } from 'Type/Profile.interface';
 import { UserDataInterface } from 'Type/UserData.interface';
-import { CookiesManager } from 'Util/Cookies';
-import { safeJsonParse } from 'Util/Json';
-import { addProxyHeaders, requestValidator } from 'Util/Request';
+import { openLinkInBrowser } from 'Util/Link';
+import { requestValidator } from 'Util/Request';
+import { storage } from 'Util/Storage';
+import { updateUrlHost } from 'Util/Url';
+
+import { getGlobalConfig } from './ConfigContext';
 
 export const CREDENTIALS_STORAGE = 'CREDENTIALS_STORAGE';
 export const PROFILE_STORAGE = 'PROFILE_STORAGE';
@@ -40,18 +39,20 @@ export interface ServiceContextInterface {
   updateCurrentService: (service: ApiServiceType) => void;
   setAuthorization: (auth: string, name: string, password: string) => void;
   login: (name: string, password: string) => Promise<void>;
-  logout: () => void;
-  updateProvider: (value: string, skipValidation?: boolean) => Promise<void>;
-  updateCDN: (value: string, skipValidation?: boolean) => Promise<void>;
+  logout: (forceLogout?: boolean) => void;
+  updateProvider: (value: string) => Promise<void>;
+  updateCDN: (value: string) => Promise<void>;
   updateUserAgent: (value: string) => void;
-  updateOfficialMode: (value: string) => void;
+  updateOfficialMode: (isActive: boolean) => void;
   validateUrl: (url: string) => Promise<void>;
-  getCDNs: () => DropdownItem[];
   viewProfile: () => void;
   resetNotifications: () => Promise<void>;
   fetchUserData: () => Promise<UserDataInterface | null>;
   getNotifications: () => Promise<NotificationInterface[]>;
   viewPayments: () => void;
+  reLogin: () => Promise<void>;
+  updateAutomaticCDN: (isActive: boolean) => void;
+  prepareShareBody: (film: FilmInterface) => string;
 }
 
 const ServiceContext = createContext<ServiceContextInterface>({
@@ -68,19 +69,22 @@ const ServiceContext = createContext<ServiceContextInterface>({
   updateUserAgent: () => {},
   updateOfficialMode: () => {},
   validateUrl: async () => {},
-  getCDNs: () => [],
   viewProfile: () => {},
   resetNotifications: async () => {},
   fetchUserData: async () => null,
   getNotifications: async () => [],
   viewPayments: () => {},
+  reLogin: async () => {},
+  updateAutomaticCDN: () => {},
+  prepareShareBody: () => '',
 });
 
 export const ServiceProvider = ({ children }: { children: React.ReactNode }) => {
   const [currentService, setCurrentService] = useState<ApiInterface>(services[DEFAULT_SERVICE]);
-  const [isSignedIn, setIsSignedIn] = useState<boolean>(!!StorageStore.getMiscStorage().getString(CREDENTIALS_STORAGE));
+  const [isSignedIn, setIsSignedIn] = useState<boolean>(currentService.isSignedIn());
   const [profile, setProfile] = useState<ProfileInterface | null>(() => {
-    const value = safeJsonParse<ProfileInterface>(StorageStore.getMiscStorage().getString(PROFILE_STORAGE));
+    const value = storage.getMiscStorage().load<ProfileInterface>(PROFILE_STORAGE);
+
     if (!value) return null;
 
     return {
@@ -106,7 +110,7 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
    */
   const setAuthorization = useCallback((auth: string, name: string, password: string) => {
     currentService.setAuthorization(auth);
-    StorageStore.getMiscStorage().set(CREDENTIALS_STORAGE, JSON.stringify({ name, password }));
+    storage.getMiscStorage().save(CREDENTIALS_STORAGE, { name, password });
   }, [currentService]);
 
   /**
@@ -115,7 +119,7 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
   const loadProfile = useCallback(async () => {
     const value = await currentService.getProfile();
 
-    StorageStore.getMiscStorage().set(PROFILE_STORAGE, JSON.stringify(value));
+    storage.getMiscStorage().save(PROFILE_STORAGE, value);
     setProfile({
       ...value,
       avatar: currentService.getPhotoUrl(value.avatar),
@@ -126,21 +130,21 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
    * Update the profile for the current service
    */
   const updateProfile = useCallback(async (p: Partial<ProfileInterface>) => {
-    const value = safeJsonParse<ProfileInterface>(StorageStore.getMiscStorage().getString(PROFILE_STORAGE));
+    const value = storage.getMiscStorage().load<ProfileInterface>(PROFILE_STORAGE);
 
     if (!value) return;
 
-    StorageStore.getMiscStorage().set(PROFILE_STORAGE, JSON.stringify({
+    storage.getMiscStorage().save(PROFILE_STORAGE, {
       ...value,
       ...p,
-    }));
+    });
   }, []);
 
   /**
    * Remove the profile for the current service
    */
   const removeProfile = useCallback(() => {
-    StorageStore.getMiscStorage().delete(PROFILE_STORAGE);
+    storage.getMiscStorage().remove(PROFILE_STORAGE);
     setProfile(null);
   }, []);
 
@@ -161,15 +165,18 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
   /**
    * Logout from the current service
    */
-  const logout = useCallback(() => {
+  const logout = useCallback((forceLogout: boolean = false) => {
     currentService.logout();
     currentService.setAuthorization('');
-    setIsSignedIn(false);
+
+    if (forceLogout) {
+      setIsSignedIn(false);
+    }
+
     removeProfile();
-    StorageStore.getMiscStorage().set(CREDENTIALS_STORAGE, '');
-    StorageStore.getMiscStorage().set(NOTIFICATIONS_STORAGE, '');
-    StorageStore.getMiscStorage().set(USER_DATA_STORAGE_CACHE, '');
-    (new CookiesManager()).reset();
+    storage.getMiscStorage().remove(CREDENTIALS_STORAGE);
+    storage.getMiscStorage().remove(NOTIFICATIONS_STORAGE);
+    storage.getMiscStorage().remove(USER_DATA_STORAGE_CACHE);
   }, [currentService, removeProfile]);
 
   /**
@@ -180,56 +187,37 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
     await requestValidator(url, headers ?? currentService.getHeaders());
   }, [currentService]);
 
+  /**
+   * Re-login to the current service using the stored credentials. This is useful when the provider is changed, so we can re-login to get the new profile and other data.
+   */
   const reLogin = useCallback(async () => {
-    // Reset cookies
-    (new CookiesManager()).reset();
+    const data = storage.getMiscStorage().load<{ name: string; password: string }>(CREDENTIALS_STORAGE);
 
-    if (isSignedIn) {
-      const { name, password } = safeJsonParse<{ name: string; password: string }>(
-        StorageStore.getMiscStorage().getString(CREDENTIALS_STORAGE)
-      ) ?? {};
+    currentService.logout();
+    currentService.setAuthorization('');
 
-      logout();
-
-      if (name && password) {
-        await login(name, password);
-      }
+    if (data && data.name && data.password) {
+      await login(data.name, data.password);
     }
-  }, [isSignedIn, logout, login]);
+  }, [currentService, login]);
 
   /**
    * Update the provider for the current service
    * @param {string} value - The provider URL
-   * @param {boolean} skipValidation - Whether to skip validation
    */
-  const updateProvider = useCallback(async (value: string, skipValidation = false) => {
-    if (!skipValidation) {
-      const isWeb = Platform.OS === 'web';
-      const url = isWeb ? REZKA_PROXY_PROVIDER : value;
-      const headers = isWeb ? addProxyHeaders(currentService.getHeaders(), value) : undefined;
-
-      await validateUrl(url, headers);
-    }
-
-    if (value !== '') {
-      currentService.setProvider(value);
-    }
-
-    reLogin();
-  }, [currentService, validateUrl, reLogin]);
+  const updateProvider = useCallback(async (value: string) => {
+    const cleanedValue = value.replace(/\/+$/, '');
+    currentService.setProvider(cleanedValue);
+  }, [currentService]);
 
   /**
    * Update the CDN for the current service
    * @param {string} value - The CDN URL
-   * @param {boolean} skipValidation - Whether to skip validation
    */
-  const updateCDN = useCallback(async (value: string, skipValidation = false) => {
-    if (value !== 'auto' && !skipValidation) {
-      await validateUrl(value);
-    }
-
-    currentService.setCDN(value);
-  }, [currentService, validateUrl]);
+  const updateCDN = useCallback(async (value: string) => {
+    const cleanedValue = value.replace(/\/+$/, '');
+    currentService.setCDN(cleanedValue);
+  }, [currentService]);
 
   /**
    * Update the user agent for the current service
@@ -241,35 +229,26 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
 
   /**
    * Update the official mode for the current service
-   * @param {string} value - The official mode string
+   * @param {boolean} isActive - Whether the official mode is active
    */
-  const updateOfficialMode = useCallback((value: string) => {
-    currentService.setOfficialMode(value);
-
-    reLogin();
-  }, [currentService, reLogin]);
+  const updateOfficialMode = useCallback((isActive: boolean) => {
+    currentService.setOfficialMode(isActive ? '1' : '');
+  }, [currentService]);
 
   /**
-   * Get the CDNs for the current service
+   * Update the automatic CDN mode for the current service
+   * @param {boolean} isActive - Whether the automatic CDN mode is active
    */
-  const getCDNs = useCallback(() => {
-    return [
-      {
-        value: 'auto',
-        label: t('Automatic'),
-      },
-    ].concat(currentService.defaultCDNs.map((cdn) => ({
-      value: cdn,
-      label: cdn,
-    }))) ;
+  const updateAutomaticCDN = useCallback((isActive: boolean) => {
+    currentService.setAutomaticCDN(isActive);
   }, [currentService]);
 
   const viewProfile = useCallback(() => {
-    Linking.openURL(`${currentService.getProvider()}/user/${profile?.id}/`);
+    openLinkInBrowser(`${currentService.getProvider()}/user/${profile?.id}/`);
   }, [currentService, profile]);
 
   const viewPayments = useCallback(() => {
-    Linking.openURL(`${currentService.getProvider()}/payments/`);
+    openLinkInBrowser(`${currentService.getProvider()}/payments/`);
   }, [currentService]);
 
   /**
@@ -282,9 +261,7 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
       return acc;
     }, []);
 
-    const previousItems = safeJsonParse<NotificationItemInterface[]>(
-      StorageStore.getMiscStorage().getString(NOTIFICATIONS_STORAGE)
-    ) ?? [];
+    const previousItems = storage.getMiscStorage().load<NotificationItemInterface[]>(NOTIFICATIONS_STORAGE) ?? [];
 
     const badgeCount = newItems.reduce((acc, item) => {
       if (!previousItems.find((prevItem) => prevItem.link === item.link)) {
@@ -295,7 +272,7 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
     }, 0);
 
     setBadgeData({
-      [ConfigStore.isTV() ? NOTIFICATIONS_ROUTE : ACCOUNT_ROUTE]: badgeCount,
+      [getGlobalConfig().isTV ? NOTIFICATIONS_TAB : ACCOUNT_TAB]: badgeCount,
     });
   }, []);
 
@@ -303,8 +280,9 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
    * Reset notifications for the current service
    */
   const resetNotifications = useCallback(async () => {
-    const cachedData = StorageStore.getMiscStorage().getString(USER_DATA_STORAGE_CACHE);
-    const { data: userData } = safeJsonParse<{ data: UserDataInterface }>(cachedData) || { data: null };
+    const { data: userData } = storage.getMiscStorage().load<
+      { data: UserDataInterface }
+    >(USER_DATA_STORAGE_CACHE) || { data: null };
 
     if (userData?.notifications) {
       const { notifications } = userData;
@@ -315,11 +293,11 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
         return acc;
       }, []);
 
-      StorageStore.getMiscStorage().set(NOTIFICATIONS_STORAGE, JSON.stringify(newItems));
+      storage.getMiscStorage().save(NOTIFICATIONS_STORAGE, newItems);
     }
 
     setBadgeData({
-      [ConfigStore.isTV() ? NOTIFICATIONS_ROUTE : ACCOUNT_ROUTE]: 0,
+      [getGlobalConfig().isTV ? NOTIFICATIONS_SCREEN : ACCOUNT_SCREEN]: 0,
     });
   }, []);
 
@@ -328,7 +306,7 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
    */
   const fetchUserData = useCallback(async () => {
     try {
-      const cachedData = StorageStore.getMiscStorage().getString(USER_DATA_STORAGE_CACHE);
+      const cachedData = storage.getMiscStorage().loadString(USER_DATA_STORAGE_CACHE);
 
       if (cachedData) {
         const { data, ttl } = JSON.parse(cachedData) as { data: UserDataInterface; ttl: number };
@@ -345,10 +323,10 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
 
       const userData = await currentService.getUserData();
 
-      StorageStore.getMiscStorage().set(USER_DATA_STORAGE_CACHE, JSON.stringify({
+      storage.getMiscStorage().save(USER_DATA_STORAGE_CACHE, {
         data: userData,
         ttl: Date.now() + USER_DATA_STORAGE_CACHE_TTL,
-      }));
+      });
 
       const { notifications, premiumDays } = userData;
 
@@ -357,8 +335,6 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
 
       return userData;
     } catch (error) {
-      LoggerStore.error('fetchUserData', { error });
-
       NotificationStore.displayError(error as Error);
 
       return null;
@@ -370,6 +346,17 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
 
     return userData?.notifications ?? [];
   }, [fetchUserData]);
+
+  const prepareShareBody = useCallback((film: FilmInterface) => {
+    const { title, link } = film;
+    let shareLink = link;
+
+    if (currentService.isOfficialMode()) {
+      shareLink = updateUrlHost(shareLink, currentService.getOfficialShareLink());
+    }
+
+    return t('Watch {{title}}:\n {{link}}', { title, link: shareLink });
+  }, [currentService]);
 
   const value = useMemo(() => ({
     isSignedIn,
@@ -386,12 +373,14 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
     updateUserAgent,
     validateUrl,
     updateOfficialMode,
-    getCDNs,
     viewProfile,
     resetNotifications,
     fetchUserData,
     getNotifications,
     viewPayments,
+    reLogin,
+    updateAutomaticCDN,
+    prepareShareBody,
   }), [
     isSignedIn,
     profile,
@@ -407,12 +396,14 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
     updateUserAgent,
     validateUrl,
     updateOfficialMode,
-    getCDNs,
     viewProfile,
     resetNotifications,
     fetchUserData,
     getNotifications,
     viewPayments,
+    reLogin,
+    updateAutomaticCDN,
+    prepareShareBody,
   ]);
 
   return (
@@ -422,4 +413,9 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
   );
 };
 
-export const useServiceContext = () => use(ServiceContext);
+export const useServiceContext = () => {
+  const context = useContext(ServiceContext);
+  if (!context) throw new Error('useServiceContext must be used within a ServiceProvider');
+
+  return context;
+};

@@ -1,46 +1,55 @@
-import { Colors } from 'Style/Colors';
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale, colors, text }: Theme) => ({
   setting: {
-    paddingVertical: 12,
-    paddingHorizontal: 12,
-    backgroundColor: Colors.transparent,
-    minHeight: 64,
+    paddingVertical: scale(12),
+    paddingHorizontal: scale(12),
+    backgroundColor: colors.transparent,
+    minHeight: scale(64),
     justifyContent: 'center',
-    borderRadius: 16,
+    borderRadius: scale(16),
+    width: '100%',
   },
   settingFocused: {
-    backgroundColor: Colors.backgroundFocused,
-    borderRadius: 16,
+    backgroundColor: colors.backgroundFocused,
+    borderRadius: scale(16),
   },
   settingHidden: {
     opacity: 0.5,
   },
   settingWrapper: {
+    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
+    gap: scale(16),
   },
   settingContent: {
-    width: 'auto',
-    maxWidth: '90%',
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    minWidth: 0,
   },
   settingTitle: {
-    fontSize: 16,
+    fontSize: scale(text.sm.fontSize),
     fontWeight: '700',
   },
   settingTitleFocused: {
-    color: Colors.textFocused,
+    color: colors.textFocused,
   },
   settingSubtitle: {
-    fontSize: 14,
-    color: Colors.textSecondary,
+    fontSize: scale(text.sm.fontSize),
+    color: colors.textSecondary,
     opacity: 0.8,
   },
   settingSubtitleFocused: {
-    color: Colors.textFocused,
+    color: colors.textFocused,
   },
   settingIcon: {
+    flexShrink: 0,
   },
-});
+  settingAdditionalElement: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+} satisfies ThemedStyles);

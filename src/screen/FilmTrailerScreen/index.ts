@@ -1,0 +1,1 @@
+export { default as FilmTrailerScreen } from './FilmTrailerScreen.container';

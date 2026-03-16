@@ -1,18 +1,18 @@
-import FilmCard from 'Component/FilmCard';
-import { useFilmCardDimensions } from 'Component/FilmCard/FilmCard.style';
-import ThemedGrid from 'Component/ThemedGrid';
+/* eslint-disable max-len */
+import { FilmCard } from 'Component/FilmCard';
+import { FilmCardThumbnail } from 'Component/FilmCard/FilmCard.thumbnail';
+import { useFilmCardDimensions } from 'Component/FilmCard/useFilmCardDimensions';
+import { ThemedGrid } from 'Component/ThemedGrid';
 import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
-import React, { useCallback, useMemo } from 'react';
-import {
-  Pressable,
-  View,
-} from 'react-native';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
+import { useCallback, useMemo } from 'react';
+import { Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { scale } from 'Util/CreateStyles';
+import { useAppTheme } from 'Theme/context';
 import { calculateRows } from 'Util/List';
 
-import { ROW_GAP, styles } from './FilmGrid.style';
-import { FilmGridThumbnail } from './FilmGrid.thumbnail';
+import { THUMBNAILS_ROWS } from './FilmGrid.config';
+import { componentStyles, ROW_GAP } from './FilmGrid.style';
 import {
   FilmGridComponentProps,
   FilmGridRowType,
@@ -21,15 +21,28 @@ import {
 export function FilmGridComponent({
   films,
   numberOfColumns,
+  isAddSafeArea = true,
   handleOnPress,
   onNextLoad,
 }: FilmGridComponentProps) {
+  const { scale } = useAppTheme();
+  const styles = useThemedStyles(componentStyles);
   const { width, height } = useFilmCardDimensions(numberOfColumns, scale(ROW_GAP));
   const { top } = useSafeAreaInsets();
 
   const renderItem = useCallback(
     ({ item: row }: ThemedGridRowProps<FilmGridRowType>) => {
       const { items } = row;
+
+      if (row.isPlaceholder) {
+        return (
+          <View style={ styles.gridRow }>
+            { items.map((item) => (
+              <FilmCardThumbnail key={ item.id } width={ width } />
+            )) }
+          </View>
+        );
+      }
 
       return (
         <View style={ styles.gridRow }>
@@ -45,15 +58,26 @@ export function FilmGridComponent({
         </View>
       );
     },
-    [width, handleOnPress]
+    [width, handleOnPress, styles]
   );
 
-  const data = useMemo(() => calculateRows(
-    films, numberOfColumns
-  ).map((items) => ({
-    id: items[0].id,
-    items,
-  })), [films, width]); // width is required to recalculate rows after orientation change
+  const data = useMemo(() => {
+    if (!films.length) {
+      return calculateRows(
+        new Array(numberOfColumns * THUMBNAILS_ROWS).fill(null).map((_, index) => ({ id: `film-placeholder-${index}` })),
+        numberOfColumns
+      ).map((items) => ({
+        id: items[0].id,
+        items,
+        isPlaceholder: true,
+      }));
+    }
+
+    return calculateRows(
+      films,
+      numberOfColumns
+    ).map((items) => ({ id: items[0].id, items, width })); // width is required to make array unique with different width value
+  }, [films, width, numberOfColumns]); // width is required to recalculate rows after orientation change
 
   return (
     <ThemedGrid
@@ -63,8 +87,7 @@ export function FilmGridComponent({
       renderItem={ renderItem }
       onNextLoad={ onNextLoad }
       style={ styles.grid }
-      ListEmptyComponent={ <FilmGridThumbnail /> }
-      ListHeaderComponent={ <View style={ { height: top } } /> }
+      ListHeaderComponent={ isAddSafeArea ? <View style={ { height: top } } /> : null }
     />
   );
 }

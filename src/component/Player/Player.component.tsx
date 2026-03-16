@@ -1,21 +1,26 @@
-import BookmarksOverlay from 'Component/BookmarksOverlay';
-import CommentsOverlay from 'Component/CommentsOverlay';
-import Loader from 'Component/Loader';
-import PlayerClock from 'Component/PlayerClock';
-import PlayerDuration from 'Component/PlayerDuration';
-import PlayerProgressBar from 'Component/PlayerProgressBar';
-import PlayerSubtitles from 'Component/PlayerSubtitles';
-import PlayerVideoSelector from 'Component/PlayerVideoSelector';
-import ThemedDropdown from 'Component/ThemedDropdown';
-import ThemedPressable from 'Component/ThemedPressable';
-import ThemedText from 'Component/ThemedText';
+import { useNavigation } from '@react-navigation/native';
+import { BookmarksOverlay } from 'Component/BookmarksOverlay';
+import { CommentsOverlay } from 'Component/CommentsOverlay';
+import { Loader } from 'Component/Loader';
+import { PlayerClock } from 'Component/PlayerClock';
+import { PlayerDuration } from 'Component/PlayerDuration';
+import { PlayerProgressBar } from 'Component/PlayerProgressBar';
+import { PlayerSubtitles } from 'Component/PlayerSubtitles';
+import { PlayerVideoSelector } from 'Component/PlayerVideoSelector';
+import { ThemedDropdown } from 'Component/ThemedDropdown';
+import { ThemedPressable } from 'Component/ThemedPressable';
+import { ThemedText } from 'Component/ThemedText';
+import { useConfigContext } from 'Context/ConfigContext';
+import * as Haptics from 'expo-haptics';
 import * as NavigationBar from 'expo-navigation-bar';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { OrientationLock } from 'expo-screen-orientation';
 import * as StatusBar from 'expo-status-bar';
 import { isPictureInPictureSupported, VideoView } from 'expo-video';
-import t from 'i18n/t';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
+import { t } from 'i18n/translate';
 import {
+  ArrowLeft,
   Bookmark,
   BookmarkCheck,
   ClosedCaption,
@@ -25,6 +30,7 @@ import {
   ListVideo,
   LockKeyhole,
   LockKeyholeOpen,
+  Maximize2,
   MessageSquareText,
   Pause,
   PictureInPicture2,
@@ -34,9 +40,7 @@ import {
   SkipBack,
   SkipForward,
 } from 'lucide-react-native';
-import React, {
-  useEffect, useRef, useState,
-} from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { AppState, Dimensions, View } from 'react-native';
 import {
   Gesture,
@@ -47,10 +51,8 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
-import ConfigStore from 'Store/Config.store';
-import { Colors } from 'Style/Colors';
-import { ClosedCaptionFilled } from 'Style/Icons';
-import { scale } from 'Util/CreateStyles';
+import { useAppTheme } from 'Theme/context';
+import { ClosedCaptionFilled } from 'Theme/icons';
 import { setTimeoutSafe } from 'Util/Misc';
 import { formatVideoTrackInfo, getPlayerAvailableQualityItems } from 'Util/Player';
 
@@ -63,7 +65,7 @@ import {
   PLAYER_CONTROLS_TIMEOUT,
   RewindDirection,
 } from './Player.config';
-import { MiddleActionVariant, styles } from './Player.style';
+import { componentStyles, MiddleActionVariant } from './Player.style';
 import { DoubleTapAction, PlayerComponentProps } from './Player.type';
 
 const { width: screenWidth } = Dimensions.get('window');
@@ -76,7 +78,6 @@ export function PlayerComponent({
   film,
   voice,
   videoTrack,
-  selectedQuality,
   selectedSubtitle,
   qualityOverlayRef,
   subtitleOverlayRef,
@@ -85,9 +86,12 @@ export function PlayerComponent({
   bookmarksOverlayRef,
   speedOverlayRef,
   selectedSpeed,
+  selectedAspectRatio,
   isLocked,
   isOverlayOpen,
   isFilmBookmarked,
+  isOffline,
+  overlayQuality,
   togglePlayPause,
   seekToPosition,
   calculateCurrentTime,
@@ -101,6 +105,7 @@ export function PlayerComponent({
   handleSubtitleChange,
   handleSpeedChange,
   openSpeedSelector,
+  handleAspectRatioChange,
   openBookmarksOverlay,
   openCommentsOverlay,
   handleLockControls,
@@ -108,7 +113,12 @@ export function PlayerComponent({
   closeOverlay,
   onBookmarkChange,
   setPlayerRate,
+  handleBackButtonPress,
 }: PlayerComponentProps) {
+  const { playerLongPressSpeed } = useConfigContext();
+  const { scale, theme } = useAppTheme();
+  const styles = useThemedStyles(componentStyles);
+  const { playerRewindSeconds } = useConfigContext();
   const [showControls, setShowControls] = useState(false);
   const [isScrolling, setIsScrolling] = useState(false);
   const [doubleTapAction, setDoubleTapAction] = useState<DoubleTapAction | null>(null);
@@ -207,7 +217,7 @@ export function PlayerComponent({
   };
 
   const handleDoubleTap = (direction: RewindDirection) => {
-    const seconds = ConfigStore.getConfig().playerRewindSeconds;
+    const seconds = playerRewindSeconds;
 
     rewindPosition(direction, seconds);
     setDoubleTapAction({
@@ -260,12 +270,14 @@ export function PlayerComponent({
     });
 
   const longPressGesture = Gesture.LongPress()
+    .maxDistance(Number.POSITIVE_INFINITY)
     .onStart(() => {
       if (showControls || isLocked || !isPlaying) {
         return;
       }
 
-      scheduleOnRN(setPlayerRate, 1.5);
+      scheduleOnRN(Haptics.performAndroidHapticsAsync, Haptics.AndroidHaptics.Gesture_Start);
+      scheduleOnRN(setPlayerRate, playerLongPressSpeed);
       scheduleOnRN(setLongTapAction, true);
     })
     .onEnd(() => {
@@ -274,7 +286,10 @@ export function PlayerComponent({
     });
 
   const enablePIP = () => {
-    playerRef.current?.startPictureInPicture();
+    setShowControls(false);
+    setTimeout(() => {
+      playerRef.current?.startPictureInPicture();
+    }, 0);
   };
 
   const renderAction = (
@@ -288,10 +303,25 @@ export function PlayerComponent({
       >
         <IconComponent
           size={ scale(28) }
-          color={ Colors.white }
+          color={ theme.colors.iconOnContrast }
         />
       </ThemedPressable>
     </GestureDetector>
+  );
+
+  const renderBackButton = () => (
+    <View style={ styles.backButtonContainer }>
+      <ThemedPressable
+        style={ styles.backButton }
+        contentStyle={ styles.backButtonContent }
+        onPress={ handleBackButtonPress }
+      >
+        <ArrowLeft
+          size={ scale(24) }
+          color={ theme.colors.iconOnContrast }
+        />
+      </ThemedPressable>
+    </View>
   );
 
   const renderTitle = () => {
@@ -300,7 +330,8 @@ export function PlayerComponent({
     return (
       <ThemedText style={ styles.title }>
         {
-          `${title}${hasSeasons ? ` ${t('Season %s - Episode %s', voice.lastSeasonId, voice.lastEpisodeId)}` : ''}`
+          // eslint-disable-next-line max-len
+          `${title}${hasSeasons ? ` ${t('Season {{season}} - Episode {{episode}}', { season: voice.lastSeasonId, episode: voice.lastEpisodeId })}` : ''}`
         }
       </ThemedText>
     );
@@ -319,9 +350,12 @@ export function PlayerComponent({
   };
 
   const renderTopInfo = () => (
-    <View style={ styles.topInfo }>
-      { renderTitle() }
-      { renderSubtitle() }
+    <View style={ styles.topInfoWrapper }>
+      { !isLocked && renderBackButton() }
+      <View style={ styles.topInfo }>
+        { renderTitle() }
+        { renderSubtitle() }
+      </View>
     </View>
   );
 
@@ -333,7 +367,8 @@ export function PlayerComponent({
     }
 
     return renderAction(
-      selectedSubtitle?.languageCode === '' ? ClosedCaption : ClosedCaptionFilled,
+      // eslint-disable-next-line max-len
+      selectedSubtitle?.languageCode === '' ? ClosedCaption : ClosedCaptionFilled({ color: theme.colors.iconOnContrast }),
       openSubtitleSelector
     );
   };
@@ -367,7 +402,7 @@ export function PlayerComponent({
       >
         <IconComponent
           size={ scale(size === 'big' ? 28 : 20) }
-          color={ Colors.white }
+          color={ theme.colors.iconOnContrast }
         />
       </ThemedPressable>
     </GestureDetector>
@@ -431,6 +466,7 @@ export function PlayerComponent({
       <PlayerSubtitles
         player={ player }
         subtitleUrl={ url }
+        isOffline={ isOffline }
       />
     );
   };
@@ -439,7 +475,7 @@ export function PlayerComponent({
     return (
       <View style={ styles.topActionLine }>
         <PlayerClock />
-        <ThemedText>
+        <ThemedText style={ styles.topActionLineText }>
           { formatVideoTrackInfo(videoTrack) }
         </ThemedText>
       </View>
@@ -469,9 +505,10 @@ export function PlayerComponent({
             ] }
           >
             { isPlaylistSelector && renderAction(ListVideo, openVideoSelector) }
-            { renderAction(MessageSquareText, handleOpenComments) }
-            { renderAction(isFilmBookmarked ? BookmarkCheck : Bookmark, openBookmarksOverlay) }
-            { renderAction(Forward, handleShare) }
+            { !isOffline && renderAction(MessageSquareText, handleOpenComments) }
+            { !isOffline && renderAction(isFilmBookmarked ? BookmarkCheck : Bookmark, openBookmarksOverlay) }
+            { !isOffline && renderAction(Forward, handleShare) }
+            { renderAction(Maximize2, handleAspectRatioChange) }
           </View>
         </View>
       </View>
@@ -482,7 +519,7 @@ export function PlayerComponent({
     const { seconds = 10, direction, isVisible } = doubleTapAction ?? {};
 
     return (
-      <React.Fragment>
+      <Fragment>
         <Animated.View
           style={ [
             styles.doubleTapAction,
@@ -492,10 +529,10 @@ export function PlayerComponent({
         >
           <View style={ styles.doubleTapContainer }>
             <View style={ styles.doubleTapIcon }>
-              <Rewind color={ Colors.white } />
+              <Rewind color={ theme.colors.icon } />
             </View>
             <ThemedText style={ styles.longTapText }>
-              { t('%s seconds', `-${seconds}`) }
+              { t('{{seconds}} seconds', { seconds: `-${seconds}` }) }
             </ThemedText>
           </View>
         </Animated.View>
@@ -508,14 +545,14 @@ export function PlayerComponent({
         >
           <View style={ styles.doubleTapContainer }>
             <View style={ styles.doubleTapIcon }>
-              <FastForward color={ Colors.white } />
+              <FastForward color={ theme.colors.icon } />
             </View>
             <ThemedText style={ styles.longTapText }>
-              { t('%s seconds', `${seconds}`) }
+              { t('{{seconds}} seconds', { seconds: `${seconds}` }) }
             </ThemedText>
           </View>
         </Animated.View>
-      </React.Fragment>
+      </Fragment>
     );
   };
 
@@ -529,11 +566,11 @@ export function PlayerComponent({
           ] }
         >
           <ThemedText style={ styles.longTapText }>
-            1.5x
+            { `${playerLongPressSpeed}x` }
           </ThemedText>
           <FastForward
             size={ scale(18) }
-            color={ Colors.white }
+            color={ theme.colors.iconOnContrast }
           />
         </View>
       </View>
@@ -578,7 +615,7 @@ export function PlayerComponent({
         asOverlay
         overlayRef={ qualityOverlayRef }
         header={ t('Quality') }
-        value={ selectedQuality }
+        value={ overlayQuality }
         data={ getPlayerAvailableQualityItems(video) }
         onChange={ handleQualityChange }
         onClose={ closeOverlay }
@@ -595,11 +632,12 @@ export function PlayerComponent({
 
     return (
       <PlayerVideoSelector
-        overlayRef={ playerVideoSelectorOverlayRef }
+        ref={ playerVideoSelectorOverlayRef }
         film={ film }
         onSelect={ handleVideoSelect }
         voice={ voice }
         onClose={ closeOverlay }
+        isOffline={ isOffline }
       />
     );
   };
@@ -684,7 +722,7 @@ export function PlayerComponent({
         ref={ playerRef }
         style={ styles.video }
         player={ player }
-        contentFit="contain"
+        contentFit={ selectedAspectRatio }
         nativeControls={ false }
         allowsPictureInPicture={ isPictureInPictureSupported() }
       />

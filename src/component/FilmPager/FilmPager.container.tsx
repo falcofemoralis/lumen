@@ -1,6 +1,7 @@
-import { withTV } from 'Hooks/withTV';
-import { useEffect, useState } from 'react';
-import LoggerStore from 'Store/Logger.store';
+import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
+import { useConfigContext } from 'Context/ConfigContext';
+import { useNetworkContext } from 'Context/NetworkContext';
+import { useCallback, useEffect, useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
 import { PaginationInterface } from 'Type/Pagination.interface';
 
@@ -9,75 +10,51 @@ import FilmPagerComponentTV from './FilmPager.component.atv';
 import { FilmPagerContainerProps, PagerItemInterface } from './FilmPager.type';
 
 export function FilmPagerContainer({
-  menuItems,
-  filmPager,
+  items,
   loadOnInit = false,
   gridStyle,
+  isGridVisible = true,
+  isEmpty = false,
+  ListHeaderComponent,
+  ListEmptyComponent,
+  isAddSafeArea,
+  sorting,
+  menuDefaultFocus,
   onLoadFilms,
   onUpdateFilms,
   onRowFocus,
 }: FilmPagerContainerProps) {
-  const [pagerItems, setPagerItems] = useState<PagerItemInterface[]>(
-    menuItems.map((item, idx) => ({
-      key: String(idx + 1),
-      title: item.title,
-      menuItem: item,
-      films: null,
-      pagination: {
-        currentPage: 1,
-        totalPages: 1,
-      },
-    }))
+  const { isTV } = useConfigContext();
+  const [selectedSorting, setSelectedSorting] = useState<Record<string, DropdownItem> | null>(
+    sorting && sorting.length > 0 ? {} : null
   );
+  const { handleConnectionError } = useNetworkContext();
 
   useEffect(() => {
     if (loadOnInit) {
-      loadFilms(pagerItems[0], { currentPage: 1, totalPages: 1 });
+      const firstItem = Object.values(items)[0];
+      loadFilms(firstItem, firstItem.pagination);
     }
   }, []);
 
-  useEffect(() => {
-    const newItems = pagerItems.map((item) => {
-      const { menuItem: { id } } = item;
-      const pagerItem = filmPager[id];
-
-      if (!pagerItem) {
-        return item;
-      }
-
-      const {
-        filmList: {
-          films = [],
-          totalPages = 1,
-        } = {},
-      } = pagerItem;
-
-      return {
-        ...item,
-        films,
-        pagination: {
-          ...item.pagination,
-          totalPages,
-        },
-      };
-    });
-
-    setPagerItems(newItems);
-  }, [filmPager]);
-
   const loadFilms = async (
     pagerItem: PagerItemInterface,
-    pagination: PaginationInterface,
+    newPagination: PaginationInterface,
     isUpdate = false, // replace current films with new ones
-    isRefresh = false // fetch new films
+    isRefresh = false, // fetch new films
+    sort?: string
   ) => {
     const {
-      key,
       menuItem,
       films,
-      pagination: { totalPages: currentTotalPages },
+      pagination,
     } = pagerItem;
-    const { currentPage } = pagination;
+    const {
+      totalPages: currentTotalPages,
+    } = pagination;
+    const {
+      currentPage,
+    } = newPagination;
     const { id: menuItemId } = menuItem;
 
     if (currentPage > currentTotalPages) {
@@ -85,23 +62,25 @@ export function FilmPagerContainer({
     }
 
     try {
-      const { films: newFilms, totalPages } = await onLoadFilms(menuItem, currentPage, isRefresh);
+      const { films: newFilms, totalPages } = await onLoadFilms(menuItem, currentPage, isRefresh, sort);
 
       const updatedFilms = isUpdate ? newFilms : Array.from(films ?? []).concat(newFilms);
 
-      const currentPagerItem = pagerItems.find(({ key: crKey }) => crKey === key);
-      if (currentPagerItem) {
-        currentPagerItem.pagination.currentPage = currentPage;
-      }
-
       onUpdateFilms(menuItemId, {
+        ...pagerItem,
         films: updatedFilms,
-        totalPages,
+        pagination: {
+          ...pagination,
+          totalPages,
+          currentPage,
+        },
       });
     } catch (error) {
-      LoggerStore.error('loadFilms', { error });
+      const handled = handleConnectionError(error as Error);
 
-      NotificationStore.displayError(error as Error);
+      if (!handled) {
+        NotificationStore.displayError(error as Error);
+      }
     }
   };
 
@@ -120,22 +99,37 @@ export function FilmPagerContainer({
     await loadFilms(item, newPage, isRefresh, isRefresh);
   };
 
-  const containerFunctions = {
+  const handleSelectSorting = useCallback((menuItem: PagerItemInterface['menuItem'], item: DropdownItem) => {
+    const { id } = menuItem;
+
+    setSelectedSorting((prev) => ({ ...prev, [id]: item }));
+
+    loadFilms({
+      menuItem,
+      films: null,
+      pagination: { currentPage: 1, totalPages: 1 },
+    }, { currentPage: 1, totalPages: 1 }, true, true, item.value);
+  }, []);
+
+  const containerProps = {
+    items,
+    gridStyle,
+    isGridVisible,
+    isEmpty,
+    isAddSafeArea,
+    sorting,
+    selectedSorting,
+    menuDefaultFocus,
+    ListHeaderComponent,
+    ListEmptyComponent,
+    onRowFocus,
     loadFilms,
     onNextLoad,
     onPreLoad,
+    handleSelectSorting,
   };
 
-  const containerProps = () => ({
-    pagerItems,
-    gridStyle,
-    onRowFocus,
-  });
-
-  return withTV(FilmPagerComponentTV, FilmPagerComponent, {
-    ...containerFunctions,
-    ...containerProps(),
-  });
+  return isTV ? <FilmPagerComponentTV { ...containerProps } /> : <FilmPagerComponent { ...containerProps } />;
 }
 
 export default FilmPagerContainer;

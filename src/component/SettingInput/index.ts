@@ -1,1 +1,1 @@
-export { default } from './SettingInput.container';
+export { default as SettingInput } from './SettingInput.container';

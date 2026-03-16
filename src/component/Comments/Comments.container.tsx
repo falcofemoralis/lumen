@@ -1,9 +1,8 @@
+import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
-import { withTV } from 'Hooks/withTV';
-import {
-  forwardRef, useEffect, useImperativeHandle, useRef, useState,
-} from 'react';
-import LoggerStore from 'Store/Logger.store';
+import * as Haptics from 'expo-haptics';
+import { t } from 'i18n/translate';
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
 import { CommentInterface } from 'Type/Comment.interface';
 
@@ -17,6 +16,7 @@ export type CommentsRef = {
 
 export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>(
   ({ film, loaderFullScreen, style, initialLoad }, ref) => {
+    const { isTV } = useConfigContext();
     const { id } = film;
     const [comments, setComments] = useState<CommentInterface[] | null>(null);
     const paginationRef = useRef({
@@ -70,7 +70,6 @@ export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>
 
           setComments([...(comments ?? []), ...newItems]);
         } catch (error) {
-          LoggerStore.error('loadComments', { error });
           NotificationStore.displayError(error as Error);
           updatingStateRef.current = false;
         } finally {
@@ -87,21 +86,44 @@ export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>
       }
     };
 
-    const containerFunctions = {
-      onNextLoad,
-    };
+    const handlePostLike = useCallback((commentId: string) => {
+      if (isTV) {
+        NotificationStore.displayMessage(t('Liked'));
+      } else {
+        Haptics.performAndroidHapticsAsync(Haptics.AndroidHaptics.Gesture_Start);
+      }
 
-    const containerProps = () => ({
+      currentService.postLike(commentId).then(({ type }) => {
+        setComments((prevComments) => {
+          if (!prevComments) {
+            return prevComments;
+          }
+
+          return prevComments.map((comment) => {
+            if (comment.id === commentId) {
+              const likes = type === 'plus' ? comment.likes + 1 : comment.likes - 1;
+
+              return { ...comment, likes, isDisabled: type === 'plus' };
+            }
+
+            return comment;
+          });
+        });
+      }).catch((error) => {
+        NotificationStore.displayError(error as Error);
+      });
+    }, [currentService, isTV]);
+
+    const containerProps = {
       comments,
       style,
       isLoading,
       loaderFullScreen,
-    });
+      onNextLoad,
+      handlePostLike,
+    };
 
-    return withTV(CommentsComponentTV, CommentsComponent, {
-      ...containerFunctions,
-      ...containerProps(),
-    });
+    return isTV ? <CommentsComponentTV { ...containerProps } /> : <CommentsComponent { ...containerProps } />;
   }
 );
 

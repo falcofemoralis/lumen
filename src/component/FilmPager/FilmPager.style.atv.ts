@@ -1,42 +1,43 @@
-import { Colors } from 'Style/Colors';
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale, colors, text }: Theme) => ({
   container: {
+    width: '100%',
+    height: '100%',
   },
   menuListWrapper: {
-    height: 40,
+    position: 'relative',
     zIndex: 10,
-    transitionProperty: 'all',
-    transitionDuration: '250ms',
+    backgroundColor: colors.background,
+    marginBottom: scale(16),
+    height: scale(40),
+  },
+  menuListWrapperWithSorting: {
+    height: scale(46),
   },
   menuListScroll: {},
   menuList: {
-    gap: 8,
+    gap: scale(8),
   },
   grid: {
     zIndex: 2,
-    paddingTop: 8,
-    height: '80%',
-  },
-  hidden: {
-    opacity: 0,
   },
   tabButton: {
     height: '100%',
+    gap: 0,
+    paddingVertical: scale(6),
   },
-  activeElement: {
-    height: '100%',
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    borderRadius: 99,
-    transitionProperty: ['width', 'transform'],
-    transitionDuration: '250ms',
-    transitionTimingFunction: 'ease-in-out',
+  tabBarSorting: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  activeElementUnfocused: {
-    backgroundColor: Colors.tertiary,
+  sortingText: {
+    color: colors.text,
+    fontSize: scale(text.xxs.fontSize),
+    overflow: 'hidden',
   },
-});
+  sortingTextFocused: {
+    color: colors.textFocused,
+  },
+} satisfies ThemedStyles);

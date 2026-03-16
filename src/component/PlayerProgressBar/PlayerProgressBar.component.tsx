@@ -1,10 +1,8 @@
 import { usePlayerProgressContext } from 'Context/PlayerProgressContext';
-import {
-  useCallback, useEffect, useRef,
-} from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { Slider } from 'react-native-awesome-slider';
 import { useSharedValue } from 'react-native-reanimated';
-import { Colors } from 'Style/Colors';
+import { useAppTheme } from 'Theme/context';
 import { noopFn } from 'Util/Function';
 
 import { Bubble, BubbleRef } from './Bubble';
@@ -17,6 +15,7 @@ export const PlayerProgressBarComponent = ({
   handleUserInteraction,
   handleIsScrolling = noopFn,
 }: PlayerProgressBarComponentProps) => {
+  const { theme } = useAppTheme();
   const { progressStatus } = usePlayerProgressContext();
   const bubbleRef = useRef<BubbleRef>(null);
   const progress = useSharedValue(0);
@@ -84,10 +83,10 @@ export const PlayerProgressBarComponent = ({
       onSlidingStart={ onSlidingStart }
       onSlidingComplete={ onSlidingComplete }
       theme={ {
-        minimumTrackTintColor: Colors.secondary,
+        minimumTrackTintColor: theme.colors.secondary,
         cacheTrackTintColor: '#888888aa',
         maximumTrackTintColor: '#555555aa',
-        bubbleBackgroundColor: Colors.secondary,
+        bubbleBackgroundColor: theme.colors.secondary,
       } }
     />
   );

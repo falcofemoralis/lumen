@@ -1,16 +1,16 @@
-import Loader from 'Component/Loader';
-import SettingBase from 'Component/SettingBase';
+import { SettingBase } from 'Component/SettingBase';
 import { propsAreEqual } from 'Component/SettingBase/SettingBase.component';
-import ThemedButton from 'Component/ThemedButton';
-import ThemedInput from 'Component/ThemedInput';
-import ThemedOverlay from 'Component/ThemedOverlay';
+import { ThemedButton } from 'Component/ThemedButton';
+import { ThemedInput } from 'Component/ThemedInput';
+import { ThemedOverlay } from 'Component/ThemedOverlay';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
-import ThemedText from 'Component/ThemedText';
-import t from 'i18n/t';
+import { ThemedText } from 'Component/ThemedText';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
+import { t } from 'i18n/translate';
 import { memo, useCallback, useRef, useState } from 'react';
 import { View } from 'react-native';
 
-import { styles } from './SettingInput.style';
+import { componentStyles } from './SettingInput.style';
 import { SettingInputComponentProps } from './SettingInput.type';
 
 export const SettingInputComponent = memo(({
@@ -21,9 +21,9 @@ export const SettingInputComponent = memo(({
     title,
     value,
   } = setting;
+  const styles = useThemedStyles(componentStyles);
   const overlayRef = useRef<ThemedOverlayRef>(null);
   const [inputValue, setInputValue] = useState(value);
-  const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
 
   const onChangeText = useCallback((text: string) => {
@@ -45,8 +45,6 @@ export const SettingInputComponent = memo(({
       return;
     }
 
-    setIsLoading(true);
-
     const success = await onUpdate(setting, inputValue);
 
     if (success) {
@@ -54,9 +52,7 @@ export const SettingInputComponent = memo(({
     } else {
       setHasError(true);
     }
-
-    setIsLoading(false);
-  }, [onUpdate, setting.id, inputValue]);
+  }, [inputValue, value, onUpdate, setting]);
 
   return (
     <View>
@@ -83,14 +79,10 @@ export const SettingInputComponent = memo(({
         <ThemedButton
           style={ styles.overlayButton }
           onPress={ onSave }
-          disabled={ !inputValue || isLoading || hasError }
+          disabled={ !inputValue || hasError }
         >
           { t('Save') }
         </ThemedButton>
-        <Loader
-          isLoading={ isLoading }
-          fullScreen
-        />
       </ThemedOverlay>
     </View>
   );

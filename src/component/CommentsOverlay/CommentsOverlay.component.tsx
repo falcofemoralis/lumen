@@ -1,7 +1,7 @@
-import Comments from 'Component/Comments';
+import { Comments } from 'Component/Comments';
 import { CommentsRef } from 'Component/Comments/Comments.container';
-import ThemedOverlay from 'Component/ThemedOverlay';
-import ThemedSafeArea from 'Component/ThemedSafeArea';
+import { ThemedOverlay } from 'Component/ThemedOverlay';
+import { ThemedSafeArea } from 'Component/ThemedSafeArea';
 import { useCallback, useRef } from 'react';
 
 import { CommentsOverlayComponentProps } from './CommentsOverlay.type';

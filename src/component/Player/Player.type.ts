@@ -1,6 +1,7 @@
+import { PlayerVideoSelectorRef } from 'Component/PlayerVideoSelector/PlayerVideoSelector.container';
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
-import { VideoPlayer, VideoPlayerStatus, VideoTrack } from 'expo-video';
+import { VideoContentFit, VideoPlayer, VideoPlayerStatus, VideoTrack } from 'expo-video';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface, SubtitleInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
@@ -11,7 +12,8 @@ export interface PlayerContainerProps {
   video: FilmVideoInterface;
   film: FilmInterface
   voice: FilmVoiceInterface;
-  quality: string;
+  isOffline?: boolean;
+  quality?: string;
 }
 
 export interface PlayerComponentProps {
@@ -26,14 +28,17 @@ export interface PlayerComponentProps {
   selectedSubtitle?: SubtitleInterface;
   qualityOverlayRef: React.RefObject<ThemedOverlayRef | null>;
   subtitleOverlayRef: React.RefObject<ThemedOverlayRef | null>;
-  playerVideoSelectorOverlayRef: React.RefObject<ThemedOverlayRef | null>;
+  playerVideoSelectorOverlayRef: React.RefObject<PlayerVideoSelectorRef | null>;
   commentsOverlayRef: React.RefObject<ThemedOverlayRef | null>;
   bookmarksOverlayRef: React.RefObject<ThemedOverlayRef | null>;
   speedOverlayRef: React.RefObject<ThemedOverlayRef | null>;
   selectedSpeed: number;
+  selectedAspectRatio: VideoContentFit;
   isLocked: boolean;
   isOverlayOpen: boolean;
   isFilmBookmarked: boolean;
+  isOffline?: boolean;
+  overlayQuality: string;
   togglePlayPause: (state?: boolean, stopEvents?: boolean) => void;
   rewindPosition: (type: RewindDirection, seconds: number) => void;
   seekToPosition: (percent: number) => void;
@@ -48,6 +53,7 @@ export interface PlayerComponentProps {
   handleSubtitleChange: (item: DropdownItem) => void;
   handleSpeedChange: (item: DropdownItem) => void;
   openSpeedSelector: () => void;
+  handleAspectRatioChange: () => void;
   openCommentsOverlay: () => void;
   openBookmarksOverlay: () => void;
   handleLockControls: () => void;
@@ -55,6 +61,7 @@ export interface PlayerComponentProps {
   closeOverlay: () => void;
   onBookmarkChange: (film: FilmInterface) => void;
   backwardToStart: () => void;
+  handleBackButtonPress: () => void;
 }
 
 export type ProgressStatus = {
@@ -63,6 +70,8 @@ export type ProgressStatus = {
   currentTime: string;
   durationTime: string;
   remainingTime: string;
+  bufferedTime: string;
+  endDate?: number;
 };
 
 export interface LongEvent {

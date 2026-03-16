@@ -1,17 +1,18 @@
-import InfoBlock from 'Component/InfoBlock';
-import ThemedPressable from 'Component/ThemedPressable';
+import { InfoBlock } from 'Component/InfoBlock';
+import { ThemedPressable } from 'Component/ThemedPressable';
 import { useLandscape } from 'Hooks/useLandscape';
-import t from 'i18n/t';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
+import { t } from 'i18n/translate';
 import { Square, SquareCheck } from 'lucide-react-native';
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import {
   ScrollView,
   Text,
   View,
 } from 'react-native';
-import { Colors } from 'Style/Colors';
+import { useAppTheme } from 'Theme/context';
 
-import { styles } from './ThemedMultiList.style';
+import { componentStyles } from './ThemedMultiList.style';
 import { ListItem, ThemedMultiListComponentProps } from './ThemedMultiList.type';
 
 export const ThemedMultiListComponent = ({
@@ -21,6 +22,8 @@ export const ThemedMultiListComponent = ({
   noItemsSubtitle,
   handleOnChange,
 }: ThemedMultiListComponentProps) => {
+  const { theme } = useAppTheme();
+  const styles = useThemedStyles(componentStyles);
   const isLandscape = useLandscape();
 
   const renderHeader = () => {
@@ -50,11 +53,11 @@ export const ThemedMultiListComponent = ({
         </Text>
         { item.isChecked ? (
           <SquareCheck
-            color={ Colors.secondary }
+            color={ theme.colors.secondary }
           />
         ) : (
           <Square
-            color={ Colors.white }
+            color={ theme.colors.icon }
           />
         ) }
       </View>

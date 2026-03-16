@@ -1,10 +1,10 @@
-import ThemedText from 'Component/ThemedText';
+import { ThemedText } from 'Component/ThemedText';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { Info } from 'lucide-react-native';
 import { View } from 'react-native';
-import { Colors } from 'Style/Colors';
-import { scale } from 'Util/CreateStyles';
+import { useAppTheme } from 'Theme/context';
 
-import { styles } from './InfoBlock.style.atv';
+import { componentStyles } from './InfoBlock.style.atv';
 import { InfoBlockComponentProps } from './InfoBlock.type';
 
 export function InfoBlockComponent({
@@ -12,15 +12,26 @@ export function InfoBlockComponent({
   subtitle,
   hideIcon,
   style,
+  Icon,
 }: InfoBlockComponentProps) {
+  const { scale, theme } = useAppTheme();
+  const styles = useThemedStyles(componentStyles);
+
   return (
     <View style={ [styles.container, style] }>
       { !hideIcon && (
         <View style={ styles.iconContainer }>
-          <Info
-            size={ scale(24) }
-            color={ Colors.white }
-          />
+          { Icon ? (
+            <Icon
+              size={ scale(30) }
+              color={ theme.colors.icon }
+            />
+          ) : (
+            <Info
+              size={ scale(30) }
+              color={ theme.colors.icon }
+            />
+          ) }
         </View>
       ) }
       <ThemedText style={ styles.title }>

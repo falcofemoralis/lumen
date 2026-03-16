@@ -1,9 +1,10 @@
-import ThemedPressable from 'Component/ThemedPressable';
-import ThemedText from 'Component/ThemedText';
+import { ThemedPressable } from 'Component/ThemedPressable';
+import { ThemedText } from 'Component/ThemedText';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { View } from 'react-native';
 import Expandable from 'react-native-reanimated-animated-accordion';
 
-import { styles } from './ThemedAccordion.style';
+import { componentStyles } from './ThemedAccordion.style';
 import { AccordionGroupInterface, ThemedAccordionComponentProps } from './ThemedAccordion.type';
 
 export const ThemedAccordionComponent = ({
@@ -12,6 +13,8 @@ export const ThemedAccordionComponent = ({
   openAccordionGroup,
   renderItem,
 }: ThemedAccordionComponentProps<any>) => {
+  const styles = useThemedStyles(componentStyles);
+
   const renderAccordionGroup = (group: AccordionGroupInterface<any>) => {
     const { id, title, items } = group;
 

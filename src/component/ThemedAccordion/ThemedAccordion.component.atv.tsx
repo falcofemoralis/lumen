@@ -1,14 +1,15 @@
 import { useIsFocused } from '@react-navigation/native';
-import ThemedOverlay from 'Component/ThemedOverlay';
+import { ThemedOverlay } from 'Component/ThemedOverlay';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
-import ThemedPressable from 'Component/ThemedPressable';
-import ThemedText from 'Component/ThemedText';
+import { ThemedPressable } from 'Component/ThemedPressable';
+import { ThemedText } from 'Component/ThemedText';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { DefaultFocus, SpatialNavigationScrollView, useLockSpatialNavigation } from 'react-tv-space-navigation';
-import { scale } from 'Util/CreateStyles';
+import { useAppTheme } from 'Theme/context';
 
-import { styles } from './ThemedAccordion.style.atv';
+import { componentStyles } from './ThemedAccordion.style.atv';
 import { AccordionGroupInterface, ThemedAccordionComponentProps } from './ThemedAccordion.type';
 
 const AccordionLocker = ({ isGroupOpened }: { isGroupOpened: boolean }) => {
@@ -38,6 +39,8 @@ export const ThemedAccordionComponent = ({
   overlayContent,
   renderItem,
 }: ThemedAccordionComponentProps<any>) => {
+  const { scale } = useAppTheme();
+  const styles = useThemedStyles(componentStyles);
   const overlayRef = useRef<ThemedOverlayRef>(null);
   const [openAccordionGroup, setOpenAccordionGroup] = useState<string | null>(null);
 

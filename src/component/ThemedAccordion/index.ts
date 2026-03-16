@@ -1,1 +1,1 @@
-export { default } from './ThemedAccordion.container';
+export { default as ThemedAccordion } from './ThemedAccordion.container';

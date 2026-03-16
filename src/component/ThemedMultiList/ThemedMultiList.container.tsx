@@ -1,4 +1,4 @@
-import { withTV } from 'Hooks/withTV';
+import { useConfigContext } from 'Context/ConfigContext';
 import { memo, useCallback, useState } from 'react';
 
 import ThemedMultiListComponent from './ThemedMultiList.component';
@@ -12,6 +12,7 @@ export function ThemedMultiListContainer({
   noItemsSubtitle,
   onChange,
 }: ThemedMultiListContainerProps) {
+  const { isTV } = useConfigContext();
   const [values, setValues] = useState<ListItem[]>(data);
 
   const handleOnChange = useCallback((value: string, isChecked: boolean) => {
@@ -34,13 +35,16 @@ export function ThemedMultiListContainer({
     }));
   }, [onChange, values]);
 
-  return withTV(ThemedMultiListComponentTV, ThemedMultiListComponent, {
+  const containerProps = {
     values,
     header,
     noItemsTitle,
     noItemsSubtitle,
     handleOnChange,
-  });
+  };
+
+  // eslint-disable-next-line max-len
+  return isTV ? <ThemedMultiListComponentTV { ...containerProps } /> : <ThemedMultiListComponent { ...containerProps } />;
 }
 
 function propsAreEqual(

@@ -1,24 +1,27 @@
-import BookmarksOverlay from 'Component/BookmarksOverlay';
-import CommentsOverlay from 'Component/CommentsOverlay';
-import Loader from 'Component/Loader';
-import PlayerClock from 'Component/PlayerClock';
-import PlayerDuration from 'Component/PlayerDuration';
-import PlayerProgressBar from 'Component/PlayerProgressBar';
-import PlayerSubtitles from 'Component/PlayerSubtitles';
-import PlayerVideoSelector from 'Component/PlayerVideoSelector';
-import ThemedDropdown from 'Component/ThemedDropdown';
-import ThemedPressable from 'Component/ThemedPressable';
-import ThemedText from 'Component/ThemedText';
+import { BookmarksOverlay } from 'Component/BookmarksOverlay';
+import { CommentsOverlay } from 'Component/CommentsOverlay';
+import { Loader } from 'Component/Loader';
+import { PlayerClock } from 'Component/PlayerClock';
+import { PlayerDuration } from 'Component/PlayerDuration';
+import { PlayerProgressBar } from 'Component/PlayerProgressBar';
+import { PlayerSubtitles } from 'Component/PlayerSubtitles';
+import { PlayerVideoSelector } from 'Component/PlayerVideoSelector';
+import { ThemedDropdown } from 'Component/ThemedDropdown';
+import { ThemedPressable } from 'Component/ThemedPressable';
+import { ThemedText } from 'Component/ThemedText';
+import { useConfigContext } from 'Context/ConfigContext';
 import { usePlayerContext } from 'Context/PlayerContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { VideoView } from 'expo-video';
-import t from 'i18n/t';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
+import { t } from 'i18n/translate';
 import {
   Bookmark,
   BookmarkCheck,
   ClosedCaption,
   Gauge,
   ListVideo,
+  Maximize2,
   MessageSquareText,
   Pause,
   Play,
@@ -27,7 +30,7 @@ import {
   SkipForward,
   Undo2,
 } from 'lucide-react-native';
-import React, {
+import {
   Ref,
   useEffect,
   useRef,
@@ -41,13 +44,11 @@ import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated'
 import { scheduleOnRN } from 'react-native-worklets';
 import {
   DefaultFocus,
-  SpatialNavigationFocusableView,
   SpatialNavigationNodeRef,
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
-import { Colors } from 'Style/Colors';
-import { ClosedCaptionFilled } from 'Style/Icons';
-import { scale } from 'Util/CreateStyles';
+import { useAppTheme } from 'Theme/context';
+import { ClosedCaptionFilled } from 'Theme/icons';
 import { setTimeoutSafe } from 'Util/Misc';
 import { formatVideoTrackInfo, getPlayerAvailableQualityItems } from 'Util/Player';
 import RemoteControlManager from 'Util/RemoteControl/RemoteControlManager';
@@ -61,7 +62,7 @@ import {
   PLAYER_CONTROLS_TIMEOUT,
   RewindDirection,
 } from './Player.config';
-import { styles } from './Player.style.atv';
+import { componentStyles } from './Player.style.atv';
 import { PlayerComponentProps } from './Player.type';
 
 export function PlayerComponent({
@@ -72,7 +73,6 @@ export function PlayerComponent({
   film,
   voice,
   videoTrack,
-  selectedQuality,
   selectedSubtitle,
   qualityOverlayRef,
   subtitleOverlayRef,
@@ -83,6 +83,9 @@ export function PlayerComponent({
   selectedSpeed,
   isOverlayOpen,
   isFilmBookmarked,
+  isOffline,
+  overlayQuality,
+  selectedAspectRatio,
   togglePlayPause,
   rewindPosition,
   openQualitySelector,
@@ -101,7 +104,11 @@ export function PlayerComponent({
   closeOverlay,
   onBookmarkChange,
   backwardToStart,
+  handleAspectRatioChange,
 }: PlayerComponentProps) {
+  const { playerStopPlayOnButtonTV } = useConfigContext();
+  const { scale, theme } = useAppTheme();
+  const styles = useThemedStyles(componentStyles);
   const { focusedElement, updateFocusedElement } = usePlayerContext();
   const [showControls, setShowControls] = useState(false);
   const [hideActions, setHideActions] = useState(false);
@@ -210,6 +217,12 @@ export function PlayerComponent({
           bottomActionRef.current?.focus();
         }
 
+        if (playerStopPlayOnButtonTV && type === SupportedKeys.ENTER) {
+          togglePlayPause();
+
+          return false;
+        }
+
         setShowControls(true);
 
         return false;
@@ -286,7 +299,8 @@ export function PlayerComponent({
     return (
       <ThemedText style={ styles.title }>
         {
-          `${title}${hasSeasons ? ` ${t('Season %s - Episode %s', voice.lastSeasonId, voice.lastEpisodeId)}` : ''}`
+          // eslint-disable-next-line max-len
+          `${title}${hasSeasons ? ` ${t('Season {{season}} - Episode {{episode}}', { season: voice.lastSeasonId, episode: voice.lastEpisodeId })}` : ''}`
         }
       </ThemedText>
     );
@@ -337,7 +351,7 @@ export function PlayerComponent({
         >
           <IconComponent
             size={ scale(26) }
-            color={ Colors.white }
+            color={ theme.colors.iconOnContrast }
           />
         </View>
       ) }
@@ -394,7 +408,7 @@ export function PlayerComponent({
           </>
         ) }
         { renderTopAction(Gauge, openSpeedSelector) }
-        { renderTopAction(MessageSquareText, handleOpenComments) }
+        { !isOffline && renderTopAction(MessageSquareText, handleOpenComments) }
         { renderTopAction(Undo2, backwardToStart) }
       </View>
       { renderTopActionLine() }
@@ -411,9 +425,7 @@ export function PlayerComponent({
         calculateCurrentTime={ calculateCurrentTime }
         seekToPosition={ seekToPosition }
         thumbRef={ middleActionRef }
-        onFocus={ () => {
-          updateFocusedElement(FocusedElement.PROGRESS_THUMB);
-        } }
+        onFocus={ () => updateFocusedElement(FocusedElement.PROGRESS_THUMB) }
         rewindPosition={ rewindPosition }
         togglePlayPause={ togglePlayPause }
         hideActions={ hideActions }
@@ -436,6 +448,7 @@ export function PlayerComponent({
       <PlayerSubtitles
         player={ player }
         subtitleUrl={ url }
+        isOffline={ isOffline }
       />
     );
   };
@@ -462,10 +475,12 @@ export function PlayerComponent({
           { renderBottomAction(Settings2, openQualitySelector, bottomActionRef) }
           { isPlaylistSelector && renderBottomAction(ListVideo, openVideoSelector) }
           { subtitles.length > 0 && renderBottomAction(
-            selectedSubtitle?.languageCode === '' ? ClosedCaption : ClosedCaptionFilled,
+            // eslint-disable-next-line max-len
+            selectedSubtitle?.languageCode === '' ? ClosedCaption : ClosedCaptionFilled({ color: theme.colors.iconOnContrast }),
             openSubtitleSelector
           ) }
-          { renderBottomAction(isFilmBookmarked ? BookmarkCheck : Bookmark, openBookmarksOverlay) }
+          { !isOffline && renderBottomAction(isFilmBookmarked ? BookmarkCheck : Bookmark, openBookmarksOverlay) }
+          { renderBottomAction(Maximize2, handleAspectRatioChange) }
         </SpatialNavigationView>
         { renderDuration() }
       </View>
@@ -507,7 +522,7 @@ export function PlayerComponent({
         asOverlay
         overlayRef={ qualityOverlayRef }
         header={ t('Quality') }
-        value={ selectedQuality }
+        value={ overlayQuality }
         data={ getPlayerAvailableQualityItems(video) }
         onChange={ handleQualityChange }
         onClose={ closeOverlay }
@@ -524,11 +539,12 @@ export function PlayerComponent({
 
     return (
       <PlayerVideoSelector
-        overlayRef={ playerVideoSelectorOverlayRef }
+        ref={ playerVideoSelectorOverlayRef }
         film={ film }
         onSelect={ handleVideoSelect }
         voice={ voice }
         onClose={ closeOverlay }
+        isOffline={ isOffline }
       />
     );
   };
@@ -611,7 +627,7 @@ export function PlayerComponent({
       <VideoView
         style={ styles.video }
         player={ player }
-        contentFit="contain"
+        contentFit={ selectedAspectRatio }
         nativeControls={ false }
         allowsPictureInPicture={ false }
       />

@@ -1,45 +1,50 @@
-import { Colors } from 'Style/Colors';
-import CreateStyles, { scale } from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-export const INDENT_SIZE = scale(16);
+const INDENT_SIZE = 16;
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale, colors, text }: Theme) => ({
+  indentSize: {
+    width: scale(INDENT_SIZE),
+  },
   commentsList: {
   },
   item: {
     flexDirection: 'row',
-    gap: 8,
-    paddingBottom: 8,
+    gap: scale(8),
+    paddingBottom: scale(8),
   },
   itemEven: {
   },
   avatar: {
-    height: 32,
-    width: 32,
-    borderRadius: 64,
+    height: scale(32),
+    width: scale(32),
+    borderRadius: scale(64),
   },
   comment: {
     flexDirection: 'column',
     flex: 1,
-    backgroundColor: Colors.backgroundLight,
-    borderRadius: 12,
-    padding: 8,
+    backgroundColor: colors.backgroundLight,
+    borderRadius: scale(12),
+    padding: scale(8),
   },
   commentTextWrapper: {
     width: '100%',
     flexDirection: 'column',
-    marginBlock: 4,
+    marginBlock: scale(4),
   },
   commentText: {
-    fontSize: 16,
-    lineHeight: 16,
+    fontSize: scale(text.sm.fontSize),
+    lineHeight: scale(16),
   },
   commentTextSmall: {
-    fontSize: 13,
-    color: Colors.textSecondary,
+    fontSize: scale(13),
+    color: colors.textSecondary,
+  },
+  commentTextSmallLiked: {
+    color: colors.secondary,
   },
   commentTextFocused: {
-    color: Colors.textFocused,
+    color: colors.textFocused,
   },
   commentDateRow: {
     flexDirection: 'row',
@@ -47,14 +52,18 @@ export const styles = CreateStyles({
     alignSelf: 'baseline',
     width: '100%',
   },
+  commentLikesBtn: {
+    padding: scale(4),
+    borderRadius: scale(99),
+  },
   commentLikes: {
     flexDirection: 'row',
-    gap: 4,
+    gap: scale(4),
     alignItems: 'center',
   },
   spoiler: {
-    backgroundColor: Colors.button,
-    color: Colors.button,
+    backgroundColor: colors.button,
+    color: colors.button,
   },
   loader: {
     height: '100%',
@@ -71,11 +80,11 @@ export const styles = CreateStyles({
     justifyContent: 'center',
     alignContent: 'center',
     alignItems: 'center',
-    paddingBottom: 24,
+    paddingBottom: scale(24),
   },
   noCommentsText: {
-    color: Colors.text,
-    fontSize: 16,
+    color: colors.text,
+    fontSize: scale(text.sm.fontSize),
     textAlign: 'center',
   },
-});
+} satisfies ThemedStyles);

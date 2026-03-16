@@ -1,1 +1,1 @@
-export { default } from './PlayerVideoSelector.container';
+export { default as PlayerVideoSelector } from './PlayerVideoSelector.container';

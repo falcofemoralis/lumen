@@ -53,16 +53,16 @@ export const SpatialNavigationDeviceTypeProvider = ({ children }: DeviceProvider
 
   const getScrollingIntervalId = useCallback(() => scrollingId.current, []);
 
-  useEffect(() => {
-    if (deviceType === 'remotePointer' || Platform.OS !== 'web') return;
+  // useEffect(() => {
+  //   if (deviceType === 'remotePointer' || Platform.OS !== 'web') return;
 
-    const callback = () => {
-      setDeviceType('remotePointer');
-    };
+  //   const callback = () => {
+  //     setDeviceType('remotePointer');
+  //   };
 
-    window.addEventListener('mousemove', callback);
-    return () => window.removeEventListener('mousemove', callback);
-  }, [deviceType, setDeviceType]);
+  //   window.addEventListener('mousemove', callback);
+  //   return () => window.removeEventListener('mousemove', callback);
+  // }, [deviceType, setDeviceType]);
 
   const value = useMemo(
     () => ({

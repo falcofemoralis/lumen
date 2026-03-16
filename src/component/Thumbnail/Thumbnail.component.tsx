@@ -1,16 +1,19 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import React from 'react';
+import { useLayout } from 'Hooks/useLayout';
 import { DimensionValue } from 'react-native';
 import GradientShimmer from 'react-native-gradient-shimmer';
-import { Colors } from 'Style/Colors';
-import { calculateLayoutWidth } from 'Style/Layout';
+import { useAppTheme } from 'Theme/context';
 
-import { styles } from './Thumbnail.style';
 import { ThumbnailComponentProps } from './Thumbnail.type';
 
-const convertPercentageToNumber = (value: DimensionValue) => {
+const convertPercentageToNumber = (
+  type: 'width' | 'height',
+  value: DimensionValue,
+  layoutWidth: number,
+  layoutHeight: number
+) => {
   if (typeof value === 'string' && value.endsWith('%')) {
-    return (parseFloat(value) / 100) * calculateLayoutWidth();
+    return (parseFloat(value) / 100) * (type === 'width' ? layoutWidth : layoutHeight);
   }
 
   if (typeof value === 'string' && value === 'auto') {
@@ -20,27 +23,41 @@ const convertPercentageToNumber = (value: DimensionValue) => {
   return typeof value === 'number' ? value : parseFloat(value as string);
 };
 
-const transformValue = (type: 'width' | 'height', value: DimensionValue | undefined, style: any) => {
+const transformValue = (
+  type: 'width' | 'height',
+  value: DimensionValue | undefined,
+  style: any,
+  layoutWidth: number,
+  layoutHeight: number
+) => {
   if (style && style[type] !== undefined) {
-    return convertPercentageToNumber(style[type]);
+    return convertPercentageToNumber(type, style[type], layoutWidth, layoutHeight);
   }
 
   if (value) {
-    return convertPercentageToNumber(value);
+    return convertPercentageToNumber(type, value, layoutWidth, layoutHeight);
   }
 
   return 10;
 };
 
 export const ThumbnailComponent = ({ style, height, width }: ThumbnailComponentProps) => {
+  const { theme, scale } = useAppTheme();
+  const { width: layoutWidth } = useLayout();
+
   return (
     <GradientShimmer
       LinearGradientComponent={ LinearGradient }
-      backgroundColor={ Colors.thumbnail }
-      highlightColor={ Colors.thumbnailHighlight }
-      height={ transformValue('height', height, style) }
-      width={ transformValue('width', width, style) }
-      style={ [styles.thumbnail, style] }
+      backgroundColor={ theme.colors.thumbnail }
+      highlightColor={ theme.colors.thumbnailHighlight }
+      height={ transformValue('height', height, style, layoutWidth, theme.dimensions.height) }
+      width={ transformValue('width', width, style, layoutWidth, theme.dimensions.height) }
+      style={ [
+        {
+          borderRadius: scale(12),
+        },
+        style ? style : {},
+      ] }
     />
   );
 };

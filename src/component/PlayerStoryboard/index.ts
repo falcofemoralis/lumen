@@ -1,1 +1,1 @@
-export { default } from './PlayerStoryboard.component';
+export { default as PlayerStoryboard } from './PlayerStoryboard.component';

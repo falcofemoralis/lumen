@@ -1,19 +1,22 @@
-import { Colors } from 'Style/Colors';
-import CreateStyles, { scale } from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-export const ITEM_ELEMENTS_HEIGHT = scale(20);
-export const OVERLAY_PADDING = scale(16) * 2;
-export const INDENT_SIZE = scale(16);
+const ITEM_ELEMENTS_HEIGHT = 20;
+const OVERLAY_PADDING = 16 * 2;
+const INDENT_SIZE = 16;
 
-export const ITEM_PADDING = scale(8);
-export const BOTTOM_PADDING = scale(8);
+const ITEM_PADDING = 8;
+const BOTTOM_PADDING = 8;
 
-export const ITEM_ADDITIONAL_HEIGHT =
-  + ITEM_ELEMENTS_HEIGHT * 2
-  + ITEM_PADDING * 2
-  + BOTTOM_PADDING;
-
-export const styles = CreateStyles({
+export const componentStyles = ({ scale, colors, text }: Theme) => ({
+  indentSize: {
+    width: scale(INDENT_SIZE),
+  },
+  itemAdditionalHeight: {
+    height: scale(ITEM_ELEMENTS_HEIGHT) * 2 + scale(ITEM_PADDING) * 2 + scale(BOTTOM_PADDING),
+  },
+  overlayPadding: {
+    padding: scale(OVERLAY_PADDING),
+  },
   wrapper: {
     flexDirection: 'column',
     width: '100%',
@@ -22,35 +25,38 @@ export const styles = CreateStyles({
   },
   item: {
     flexDirection: 'row',
-    gap: 8,
+    gap: scale(8),
     paddingBottom: BOTTOM_PADDING,
   },
   itemFocused: {
-    backgroundColor: Colors.backgroundLighter,
+    backgroundColor: colors.backgroundLighter,
   },
   avatar: {
-    height: 32,
-    width: 32,
-    borderRadius: 64,
+    height: scale(32),
+    width: scale(32),
+    borderRadius: scale(64),
   },
   comment: {
     flexDirection: 'column',
-    backgroundColor: Colors.button,
-    borderRadius: 12,
+    backgroundColor: colors.button,
+    borderRadius: scale(12),
     padding: ITEM_PADDING,
   },
   commentTextWrapper: {
     width: '100%',
     flexDirection: 'column',
-    marginBlock: 4,
+    marginBlock: scale(4),
   },
   commentText: {
-    fontSize: 16,
-    lineHeight: 16,
+    fontSize: scale(16),
+    lineHeight: scale(16),
   },
   commentTextSmall: {
-    fontSize: 13,
-    color: Colors.textSecondary,
+    fontSize: scale(13),
+    color: colors.textSecondary,
+  },
+  commentTextSmallLiked: {
+    color: colors.secondary,
   },
   commentTextFocused: {
   },
@@ -62,12 +68,12 @@ export const styles = CreateStyles({
   },
   commentLikes: {
     flexDirection: 'row',
-    gap: 4,
+    gap: scale(4),
     alignItems: 'center',
   },
   spoiler: {
-    backgroundColor: Colors.backgroundLight,
-    color: Colors.backgroundLight,
+    backgroundColor: colors.backgroundLight,
+    color: colors.backgroundLight,
   },
   textFocused: {
   },
@@ -89,8 +95,8 @@ export const styles = CreateStyles({
     alignItems: 'center',
   },
   noCommentsText: {
-    color: Colors.text,
-    fontSize: 16,
+    color: colors.text,
+    fontSize: scale(text.sm.fontSize),
     textAlign: 'center',
   },
-});
+} satisfies ThemedStyles);

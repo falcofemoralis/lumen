@@ -19,7 +19,7 @@ export default class SpatialNavigator {
     this.onDirectionHandledWithoutMovementRef = onDirectionHandledWithoutMovementRef;
   }
 
-  private registerMap: { [key: string]: Array<Parameters<Lrud['registerNode']>> } = {};
+  private registerMap: { [key: string]: Parameters<Lrud['registerNode']>[] } = {};
 
   public registerNode(...params: Parameters<Lrud['registerNode']>) {
     try {

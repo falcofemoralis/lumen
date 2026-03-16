@@ -1,3 +1,1 @@
-import FilmCardContainer from './FilmCard.container';
-
-export default FilmCardContainer;
+export { default as FilmCard } from './FilmCard.container';

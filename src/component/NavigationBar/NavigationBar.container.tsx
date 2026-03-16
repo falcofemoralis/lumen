@@ -1,7 +1,7 @@
 import { CommonActions } from '@react-navigation/native';
+import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
-import { withTV } from 'Hooks/withTV';
-import { ACCOUNT_ROUTE, BOOKMARKS_ROUTE, NOTIFICATIONS_ROUTE, RECENT_ROUTE } from 'Navigation/routes';
+import { ACCOUNT_TAB, BOOKMARKS_TAB, NOTIFICATIONS_TAB, RECENT_TAB } from 'Navigation/navigationRoutes';
 import { useCallback } from 'react';
 
 import NavigationBarComponent from './NavigationBar.component';
@@ -11,15 +11,16 @@ import { NavigationBarContainerProps } from './NavigationBar.type';
 export function NavigationBarContainer(props: NavigationBarContainerProps) {
   const { profile } = useServiceContext();
   const { isSignedIn } = useServiceContext();
+  const { isTV } = useConfigContext();
   const { navigation, state } = props;
 
   const getRedirectRoute = useCallback((name: string) => {
     // if not signed in, we should redirect to account page
-    if (!isSignedIn && (name === BOOKMARKS_ROUTE
-      || name === RECENT_ROUTE
-      || name === NOTIFICATIONS_ROUTE
+    if (!isSignedIn && (name === BOOKMARKS_TAB
+      || name === RECENT_TAB
+      || name === NOTIFICATIONS_TAB
     )) {
-      return ACCOUNT_ROUTE;
+      return ACCOUNT_TAB;
     }
 
     return name;
@@ -72,7 +73,7 @@ export function NavigationBarContainer(props: NavigationBarContainerProps) {
     onLongPress,
   };
 
-  return withTV(NavigationBarComponentTV, NavigationBarComponent, containerProps);
+  return isTV ? <NavigationBarComponentTV { ...containerProps } /> : <NavigationBarComponent { ...containerProps } />;
 }
 
 export default NavigationBarContainer;

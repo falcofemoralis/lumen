@@ -1,17 +1,18 @@
-import Loader from 'Component/Loader';
-import ThemedBottomSheet from 'Component/ThemedBottomSheet';
-import ThemedPressable from 'Component/ThemedPressable';
-import ThemedText from 'Component/ThemedText';
-import Wrapper from 'Component/Wrapper';
+import { Loader } from 'Component/Loader';
+import { ThemedBottomSheet } from 'Component/ThemedBottomSheet';
+import { Portal } from 'Component/ThemedPortal';
+import { ThemedPressable } from 'Component/ThemedPressable';
+import { ThemedText } from 'Component/ThemedText';
+import { Wrapper } from 'Component/Wrapper';
 import * as Application from 'expo-application';
-import t from 'i18n/t';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
+import { t } from 'i18n/translate';
 import { X } from 'lucide-react-native';
 import { Image, Pressable, ScrollView, View } from 'react-native';
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
-import { Colors } from 'Style/Colors';
-import { scale } from 'Util/CreateStyles';
+import { useAppTheme } from 'Theme/context';
 
-import { styles } from './AppUpdater.style';
+import { componentStyles } from './AppUpdater.style';
 import { AppUpdaterComponentProps } from './AppUpdater.type';
 
 export const AppUpdaterComponent = ({
@@ -21,14 +22,15 @@ export const AppUpdaterComponent = ({
   progress,
   acceptUpdate,
   rejectUpdate,
-  onBottomSheetMount,
 }: AppUpdaterComponentProps) => {
   const { versionName, description } = update;
+  const { scale, theme } = useAppTheme();
+  const styles = useThemedStyles(componentStyles);
 
   const renderHeader = () => (
     <View style={ styles.header }>
       <Image
-        source={ require('../../../assets/images/icon.png') }
+        source={ require('../../../assets/images/app-icon-all.png') }
         style={ styles.headerIcon }
       />
       <ThemedText style={ styles.headerText }>
@@ -42,7 +44,7 @@ export const AppUpdaterComponent = ({
         <X
           style={ styles.closeIcon }
           size={ scale(20) }
-          color={ Colors.white }
+          color={ theme.colors.icon }
         />
       </ThemedPressable>
     </View>
@@ -54,7 +56,10 @@ export const AppUpdaterComponent = ({
         { t('Update Available') }
       </ThemedText>
       <ThemedText style={ styles.versionText }>
-        { t('%s to %s', Application.nativeApplicationVersion ?? '0.0.0', versionName) }
+        { t('{{versionFrom}} to {{versionTo}}', {
+          versionFrom: Application.nativeApplicationVersion ?? '0.0.0',
+          versionTo: versionName,
+        }) }
       </ThemedText>
       <ScrollView>
         <ThemedText style={ styles.newText }>
@@ -92,7 +97,7 @@ export const AppUpdaterComponent = ({
             styles.skipButton,
           ] }
           android_ripple={ {
-            color: Colors.whiteTransparent,
+            color: theme.colors.pressableHighlight,
           } }
         >
           <GestureDetector gesture={ cancelGesture }>
@@ -111,7 +116,7 @@ export const AppUpdaterComponent = ({
             styles.updateButton,
           ] }
           android_ripple={ {
-            color: Colors.whiteTransparent,
+            color: theme.colors.pressableHighlight,
           } }
         >
           <GestureDetector gesture={ acceptGesture }>
@@ -142,23 +147,26 @@ export const AppUpdaterComponent = ({
   };
 
   return (
-    <ThemedBottomSheet
-      ref={ bottomSheetRef }
-      sizes={ ['auto'] }
-      backgroundColor={ Colors.background }
-      onMount={ onBottomSheetMount }
-    >
-      <GestureHandlerRootView style={ { flexGrow: 1 } }>
-        { renderLoader() }
-        <View style={ isLoading && styles.loadingContainer }>
-          <Wrapper style={ styles.wrapper }>
-            { renderHeader() }
-            { renderContent() }
-            { renderActions() }
-          </Wrapper>
-        </View>
-      </GestureHandlerRootView>
-    </ThemedBottomSheet>
+    <View>
+      <Portal.Host>
+        <ThemedBottomSheet
+          ref={ bottomSheetRef }
+          detents={ ['auto'] }
+          backgroundColor={ theme.colors.background }
+        >
+          <GestureHandlerRootView style={ { flexGrow: 1 } }>
+            { renderLoader() }
+            <View style={ isLoading && styles.loadingContainer }>
+              <Wrapper style={ styles.wrapper }>
+                { renderHeader() }
+                { renderContent() }
+                { renderActions() }
+              </Wrapper>
+            </View>
+          </GestureHandlerRootView>
+        </ThemedBottomSheet>
+      </Portal.Host>
+    </View>
   );
 };
 

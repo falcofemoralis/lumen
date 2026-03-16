@@ -1,11 +1,13 @@
-import { withTV } from 'Hooks/withTV';
+import { useConfigContext } from 'Context/ConfigContext';
 
 import SettingGroupComponent from './SettingGroup.component';
 import SettingGroupComponentTV from './SettingGroup.component.atv';
 import { SettingGroupComponentProps } from './SettingGroup.type';
 
 export function SettingGroupContainer(props: SettingGroupComponentProps) {
-  return withTV(SettingGroupComponentTV, SettingGroupComponent, props);
+  const { isTV } = useConfigContext();
+
+  return isTV ? <SettingGroupComponentTV { ...props } /> : <SettingGroupComponent { ...props } />;
 }
 
 export default SettingGroupContainer;

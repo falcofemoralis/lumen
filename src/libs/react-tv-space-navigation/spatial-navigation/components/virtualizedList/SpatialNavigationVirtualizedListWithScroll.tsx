@@ -1,4 +1,4 @@
-import { ForwardedRef, useCallback, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import React, { ForwardedRef, useCallback, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { VirtualizedListProps } from './VirtualizedList';
 
 import {
@@ -15,7 +15,7 @@ import { typedMemo } from '../../helpers/TypedMemo';
 import { useSpatialNavigationDeviceType } from '../../context/DeviceContext';
 import { View, Platform, ViewStyle } from 'react-native';
 import { useSpatialNavigator } from '../../context/SpatialNavigatorContext';
-import React from 'react';
+
 import { typedForwardRef } from '../../helpers/TypedForwardRef';
 import { SpatialNavigationVirtualizedListRef } from '../../types/SpatialNavigationVirtualizedListRef';
 

@@ -1,7 +1,8 @@
-import ThemedImage from 'Component/ThemedImage';
-import ThemedPressable from 'Component/ThemedPressable';
-import ThemedText from 'Component/ThemedText';
-import { useCallback, useRef, useState } from 'react';
+import { ThemedImage } from 'Component/ThemedImage';
+import { ThemedPressable } from 'Component/ThemedPressable';
+import { ThemedText } from 'Component/ThemedText';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { View } from 'react-native';
 import {
   DefaultFocus,
@@ -9,7 +10,7 @@ import {
   SpatialNavigationVirtualizedListRef,
 } from 'react-tv-space-navigation';
 
-import { MAX_ITEMS_TO_DISPLAY, styles } from './ThemedSimpleList.style.atv';
+import { componentStyles, MAX_ITEMS_TO_DISPLAY } from './ThemedSimpleList.style.atv';
 import { ListItem, ThemedSimpleListComponentProps } from './ThemedSimpleList.type';
 
 export const ThemedListComponent = ({
@@ -19,8 +20,11 @@ export const ThemedListComponent = ({
   style,
   onChange,
 }: ThemedSimpleListComponentProps) => {
+  const styles = useThemedStyles(componentStyles);
   const scrollViewRef = useRef<SpatialNavigationVirtualizedListRef>(null);
   const [isScrolled, setIsScrolled] = useState(false);
+
+  const selectedIndex = useMemo(() => data.findIndex((item) => item.value === value), [data, value]);
 
   const handleLayout = () => {
     setTimeout(() => {
@@ -50,11 +54,11 @@ export const ThemedListComponent = ({
     );
   };
 
-  const renderItem = useCallback(({ item }: { item: ListItem }) => {
-    const isSelected = value === item.value;
+  const renderItem = useCallback(({ item, index }: { item: ListItem; index: number }) => {
+    const isSelected = selectedIndex !== -1 ? index === selectedIndex : false;
 
     return (
-      <DefaultFocus enable={ isSelected }>
+      <DefaultFocus enable={ selectedIndex !== -1 ? index === selectedIndex : index === 0 }>
         <ThemedPressable
           onPress={ () => onChange(item) }
         >
@@ -94,7 +98,7 @@ export const ThemedListComponent = ({
         </ThemedPressable>
       </DefaultFocus>
     );
-  }, [value, onChange]);
+  }, [onChange, selectedIndex, styles]);
 
   const renderList = () => {
     return (
@@ -108,15 +112,17 @@ export const ThemedListComponent = ({
         ] }
         onLayout={ handleLayout }
       >
-        <SpatialNavigationVirtualizedList
-          ref={ scrollViewRef }
-          data={ data }
-          renderItem={ renderItem }
-          itemSize={ styles.item.height }
-          orientation="vertical"
-          scrollBehavior={ data.length >= (MAX_ITEMS_TO_DISPLAY - 1) ? undefined : 'stick-to-end' }
-          scrollDuration={ (data.findIndex((item) => item.value === value) > 0 && !isScrolled) ? 0 : undefined }
-        />
+        { data.length > 0 && (
+          <SpatialNavigationVirtualizedList
+            ref={ scrollViewRef }
+            data={ data }
+            renderItem={ renderItem }
+            itemSize={ styles.item.height }
+            orientation="vertical"
+            scrollBehavior={ data.length >= (MAX_ITEMS_TO_DISPLAY - 1) ? undefined : 'stick-to-end' }
+            scrollDuration={ (data.findIndex((item) => item.value === value) > 0 && !isScrolled) ? 0 : undefined }
+          />
+        ) }
       </View>
     );
   };

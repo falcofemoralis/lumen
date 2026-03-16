@@ -1,1 +1,1 @@
-export { default } from './KeyboardAdjuster.component';
+export { default as KeyboardAdjuster } from './KeyboardAdjuster.component';

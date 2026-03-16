@@ -1,84 +1,107 @@
 {
-  "expo": {
-    "scheme": "lumen",
-    "plugins": [
-      "./plugins/withReactNativeKeyevent.js",
-      [
-        "@react-native-tvos/config-tv",
-        {
-          "isTV": true,
-          "removeFlipperOnAndroid": true,
-          "androidTVBanner": "./assets/tv_icons/ic_banner.png"
-        }
-      ],
-      [
-        "expo-build-properties",
-        {
-          "android": {
-            "usesCleartextTraffic": true,
-            "enableProguardInReleaseBuilds": true,
-            "enableShrinkResourcesInReleaseBuilds": true,
-            "useLegacyPackaging": true
-          }
-        }
-      ],
-      "expo-font",
-      [
-        "expo-video",
-        {
-          "supportsBackgroundPlayback": true,
-          "supportsPictureInPicture": true
-        }
-      ],
-      [
-        "expo-screen-orientation",
-        {
-          "initialOrientation": "DEFAULT"
-        }
-      ],
-      "expo-speech-recognition",
-      [
-        "expo-splash-screen",
-        {
-          "backgroundColor": "#000000",
-          "image": "./assets/images/icon.png",
-          "dark": {
-            "image": "./assets/images/icon.png",
-            "backgroundColor": "#000000"
-          },
-          "imageWidth": 100
-        }
-      ],
-      "@react-native-firebase/app",
-      [
-        "react-native-edge-to-edge",
-        {
-          "android": {
-            "enforceNavigationBarContrast": false
-          }
-        }
-      ]
+  "name": "Lumen App",
+  "slug": "lumen",
+  "scheme": "lumen",
+  "version": "1.5.0",
+  "userInterfaceStyle": "automatic",
+  "icon": "./assets/images/app-icon-all.png",
+  "updates": {
+    "fallbackToCacheTimeout": 0
+  },
+  "assetBundlePatterns": [
+    "**/*"
+  ],
+  "android": {
+    "icon": "./assets/images/app-icon-all.png",
+    "package": "com.falcofemoralis.lumen",
+    "adaptiveIcon": {
+      "foregroundImage": "./assets/images/app-icon-android-adaptive-foreground.png",
+      "backgroundImage": "./assets/images/app-icon-android-adaptive-background.png"
+    },
+    "allowBackup": false,
+    "versionCode": 16,
+    "googleServicesFile": "./google-services.json",
+    "permissions": [
+      "android.permission.MANAGE_EXTERNAL_STORAGE",
+      "android.permission.WRITE_EXTERNAL_STORAGE"
     ],
-    "experiments": {
-      "typedRoutes": true,
-      "reactCompiler": true
-    },
-    "android": {
-      "icon": "./assets/images/icon.png",
-      "package": "com.falcofemoralis.lumen",
-      "versionCode": 15,
-      "googleServicesFile": "./google-services.json",
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
-    },
-    "newArchEnabled": true,
-    "name": "Lumen App",
-    "slug": "lumen",
-    "version": "1.4.6",
-    "extra": {
-      "eas": {
-        "projectId": "ad7c3459-7949-4f54-9d83-5e8a400a0af4"
+    "intentFilters": [
+      {
+        "action": "VIEW",
+        "autoVerify": true,
+        "data": [
+          { "scheme": "https", "host": "rezka.ag" },
+          { "scheme": "https", "host": "rezka-ua.pub" },
+          { "scheme": "http", "host": "hdrezka.tv" },
+          { "scheme": "https", "host": "hdrzk.org" },
+          { "scheme": "https", "host": "hdrezka.ag" }
+        ],
+        "category": ["BROWSABLE", "DEFAULT"]
       }
+    ]
+  },
+  "plugins": [
+    "./plugins/withReactNativeKeyevent.js",
+    [
+      "@react-native-tvos/config-tv",
+      {
+        "isTV": true,
+        "androidTVBanner": "./assets/tv_icons/ic_banner.png"
+      }
+    ],
+    "expo-localization",
+    [
+      "expo-splash-screen",
+      {
+        "image": "./assets/images/app-icon-all.png",
+        "imageWidth": 100,
+        "backgroundColor": "#000000"
+      }
+    ],
+    [
+      "react-native-edge-to-edge",
+      {
+        "android": {
+          "parentTheme": "Light",
+          "enforceNavigationBarContrast": false
+        }
+      }
+    ],
+    [
+      "expo-build-properties",
+      {
+        "android": {
+          "usesCleartextTraffic": true,
+          "enableMinifyInReleaseBuilds": true,
+          "enableShrinkResourcesInReleaseBuilds": true
+        }
+      }
+    ],
+    [
+      "expo-video",
+      {
+        "supportsBackgroundPlayback": true,
+        "supportsPictureInPicture": true
+      }
+    ],
+    [
+      "expo-screen-orientation",
+      {
+        "initialOrientation": "DEFAULT"
+      }
+    ],
+    "expo-speech-recognition",
+    "@react-native-firebase/app",
+    "@kesha-antonov/react-native-background-downloader",
+    "expo-image"
+  ],
+  "experiments": {
+    "tsconfigPaths": true,
+    "reactCompiler": true
+  },
+  "extra": {
+    "ignite": {
+      "version": "11.4.0"
     }
   }
 }

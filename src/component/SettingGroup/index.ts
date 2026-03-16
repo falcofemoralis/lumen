@@ -1,1 +1,1 @@
-export { default } from './SettingGroup.container';
+export { default as SettingGroup } from './SettingGroup.container';

@@ -1,11 +1,10 @@
-import { Colors } from 'Style/Colors';
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale, colors, text }: Theme) => ({
   voiceRatingInput: {
-    backgroundColor: Colors.transparent,
-    width: 40,
-    height: 40,
+    backgroundColor: colors.transparent,
+    width: scale(40),
+    height: scale(40),
     paddingHorizontal: 0,
     paddingVertical: 0,
     justifyContent: 'center',
@@ -15,11 +14,11 @@ export const styles = CreateStyles({
     margin: 0,
   },
   voiceRatingOverlay: {
-    width: 400,
-    height: 350,
+    width: scale(400),
+    height: scale(350),
   },
   voiceRatingOverlayContainer: {
-    padding: 4,
+    padding: scale(4),
   },
   voiceRatingContainer: {
     flexDirection: 'column',
@@ -27,61 +26,61 @@ export const styles = CreateStyles({
     height: '100%',
   },
   voiceRatingNavigationView: {
-    paddingBlock: 4,
-    paddingHorizontal: 12,
+    paddingBlock: scale(4),
+    paddingHorizontal: scale(12),
   },
   voiceRatingItemContainer: {
     flexDirection: 'row',
-    padding: 16,
+    padding: scale(16),
   },
   voiceRatingItemContainerFocused: {
-    backgroundColor: Colors.backgroundFocused,
-    borderRadius: 16,
+    backgroundColor: colors.backgroundFocused,
+    borderRadius: scale(16),
   },
   voiceRatingInfo: {
     flexDirection: 'column',
   },
   voiceRatingTextContainer: {
     flexDirection: 'row',
-    gap: 4,
+    gap: scale(4),
   },
   voiceRatingTextFocused: {
-    color: Colors.textFocused,
+    color: colors.textFocused,
   },
   voiceRatingText: {
-    fontSize: 16,
+    fontSize: scale(text.sm.fontSize),
   },
   voiceRatingImage: {
-    height: 20,
-    width: 20,
+    height: scale(20),
+    width: scale(20),
   },
   voiceRatingBarContainer: {
   },
   voiceRatingBar: {
-    height: 8,
+    height: scale(8),
     width: '100%',
-    backgroundColor: Colors.backgroundLighter,
-    borderRadius: 16,
-    marginTop: 8,
+    backgroundColor: colors.backgroundLighter,
+    borderRadius: scale(16),
+    marginTop: scale(8),
   },
   voiceRatingBarActive: {
     position: 'absolute',
     top: 0,
     left: 0,
-    backgroundColor: Colors.secondary,
+    backgroundColor: colors.secondary,
     borderTopRightRadius: 0,
     borderBottomRightRadius: 0,
   },
   voiceRatingPercentContainer: {
-    width: 60,
+    width: scale(60),
     justifyContent: 'flex-end',
     textAlign: 'center',
   },
   voiceRatingPercent: {
-    fontSize: 16,
+    fontSize: scale(text.sm.fontSize),
     textAlign: 'right',
   },
   voiceRatingPercentFocused: {
-    color: Colors.textFocused,
+    color: colors.textFocused,
   },
-});
+} satisfies ThemedStyles);

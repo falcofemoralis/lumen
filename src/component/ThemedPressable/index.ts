@@ -1,1 +1,1 @@
-export { default } from './ThemedPressable.container';
+export { default as ThemedPressable } from './ThemedPressable.container';

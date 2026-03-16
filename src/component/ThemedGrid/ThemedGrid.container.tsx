@@ -1,10 +1,8 @@
-import { withTV } from 'Hooks/withTV';
+import { useConfigContext } from 'Context/ConfigContext';
 import {
-  useEffect,
   useRef,
   useState,
 } from 'react';
-import LoggerStore from 'Store/Logger.store';
 import { noopFn } from 'Util/Function';
 
 import ThemedGridComponent from './ThemedGrid.component';
@@ -17,19 +15,16 @@ export function ThemedGridContainer({
   itemSize,
   style,
   rowStyle,
-  header,
-  headerSize,
   ListEmptyComponent,
   ListHeaderComponent,
+  scrollBehavior,
+  tvOptimized,
   renderItem,
   onNextLoad,
 }: ThemedGridContainerProps) {
+  const { isTV } = useConfigContext();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const updatingStateRef = useRef(false);
-
-  useEffect(() => {
-    updatingStateRef.current = false;
-  }, [data]);
 
   const loadNextPage = async (onLoading: (state: boolean) => void, isRefresh = false) => {
     if (!updatingStateRef.current) {
@@ -41,12 +36,13 @@ export function ThemedGridContainer({
         if (onNextLoad) {
           await onNextLoad(isRefresh);
         }
-      } catch (error) {
-        LoggerStore.error('loadNextPage', { error });
-
-        updatingStateRef.current = false;
       } finally {
         onLoading(false);
+        requestAnimationFrame(() => {
+          setTimeout(() => {
+            updatingStateRef.current = false;
+          }, 50);
+        });
       }
     }
   };
@@ -59,29 +55,24 @@ export function ThemedGridContainer({
     loadNextPage((state) => setIsRefreshing(state), true);
   };
 
-  const containerFunctions = {
-    handleScrollEnd,
-    handleRefresh,
-  };
-
-  const containerProps = () => ({
+  const containerProps = {
     data,
     numberOfColumns,
     isRefreshing,
     itemSize,
     style,
     rowStyle,
-    header,
-    headerSize,
-    ListEmptyComponent,
+    scrollBehavior,
+    tvOptimized,
     ListHeaderComponent,
+    ListEmptyComponent,
     renderItem,
-  });
+    handleScrollEnd,
+    handleRefresh,
+  };
 
-  return withTV(ThemedGridComponentTV, ThemedGridComponent, {
-    ...containerFunctions,
-    ...containerProps(),
-  });
+  return isTV ? <ThemedGridComponentTV { ...containerProps } /> : <ThemedGridComponent { ...containerProps } />;
+
 }
 
 export default ThemedGridContainer;

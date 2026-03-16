@@ -1,0 +1,54 @@
+export interface SettingsScreenComponentProps {
+  settings: SettingItem[];
+  onSettingUpdate: (setting: SettingItem, value: string) => Promise<boolean>;
+}
+
+export enum SETTING_TYPE {
+  INPUT = 'INPUT',
+  SELECT = 'SELECT',
+  TEXT = 'TEXT',
+  LINK = 'LINK',
+  GROUP = 'GROUP',
+  CUSTOM_SELECT = 'CUSTOM_SELECT',
+  SWITCH = 'SWITCH',
+}
+
+export type SettingType = keyof typeof SETTING_TYPE;
+
+export type SettingItemOption = {
+  label: string;
+  value: string;
+}
+
+export type SettingItemDependsOn = {
+  field: string;
+  value: string | null;
+}
+
+export type SettingItem = {
+  id: string;
+  type: SettingType;
+  title: string;
+  subtitle?: string;
+  value?: string | null;
+  options?: SettingItemOption[];
+  dependsOn?: SettingItemDependsOn;
+  isEnabled?: boolean;
+  isHidden?: boolean;
+  disableUpdate?: boolean;
+  onSettingPress?: (
+    value: string | null,
+    key: any,
+    setSettings: React.Dispatch<React.SetStateAction<SettingItem[]>>
+  ) => Promise<boolean | void> | boolean | void;
+  settings?: SettingItem[];
+  IconComponent?: React.ComponentType<any>;
+  iconProps?: Record<string, any>;
+  iconPropsFocused?: Record<string, any>;
+  confirmation?: {
+    title: string;
+    message?: string;
+  };
+  withLoader?: boolean;
+  imageLink?: string;
+}

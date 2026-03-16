@@ -1,1 +1,1 @@
-export { default } from './SettingsStructure.container';
+export { default as SettingsStructure } from './SettingsStructure.container';

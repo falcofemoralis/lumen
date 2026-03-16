@@ -1,17 +1,18 @@
 /* eslint-disable react-compiler/react-compiler */
 import { getFirestore } from '@react-native-firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
+import { PlayerVideoSelectorRef } from 'Component/PlayerVideoSelector/PlayerVideoSelector.container';
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
+import { useConfigContext } from 'Context/ConfigContext';
 import { usePlayerContext } from 'Context/PlayerContext';
 import { usePlayerProgressActions } from 'Context/PlayerProgressContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useEvent, useEventListener } from 'expo';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
-import { useVideoPlayer, VideoPlayer, VideoTrack } from 'expo-video';
-import { withTV } from 'Hooks/withTV';
-import t from 'i18n/t';
-import { PLAYER_ROUTE } from 'Navigation/routes';
+import { useVideoPlayer, VideoContentFit, VideoPlayer, VideoTrack } from 'expo-video';
+import { t } from 'i18n/translate';
+import { PLAYER_SCREEN } from 'Navigation/navigationRoutes';
 import {
   useCallback,
   useEffect,
@@ -20,8 +21,6 @@ import {
   useState,
 } from 'react';
 import { BackHandler, Share } from 'react-native';
-import ConfigStore from 'Store/Config.store';
-import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
 import RouterStore from 'Store/Router.store';
 import { FilmInterface } from 'Type/Film.interface';
@@ -36,9 +35,9 @@ import {
   getFirestoreVideoTime,
   getPlayerQuality,
   getPlayerStream,
+  getQualityFromStreams,
   getSavedTime,
   getVideoTime,
-  prepareShareBody,
   updateFirestoreSavedTime,
   updatePlayerQuality,
   updateSavedTime,
@@ -47,10 +46,12 @@ import {
 import PlayerComponent from './Player.component';
 import PlayerComponentTV from './Player.component.atv';
 import {
+  ASPECT_RATIO_OPTIONS,
   AUTO_QUALITY,
   AWAKE_TAG,
   DEFAULT_SPEED,
   FIRESTORE_DB,
+  MAX_QUALITY,
   RewindDirection,
   SAVE_TIME_EVERY_MS,
 } from './Player.config';
@@ -60,19 +61,38 @@ export function PlayerContainer({
   video,
   film,
   voice,
+  isOffline,
   quality: qualityProp,
 }: PlayerContainerProps) {
+  const {
+    isTV,
+    isFirestore,
+    playerSaveQuality,
+    playerAutoNextEpisode,
+    playerBufferTimeSetting,
+    playerDefaultAspectRatio,
+  } = useConfigContext();
   const navigation = useNavigation();
   const { updateSelectedVoice } = usePlayerContext();
   const { resetProgressStatus, updateProgressStatus } = usePlayerProgressActions();
-  const { isSignedIn, profile, currentService } = useServiceContext();
+  const { isSignedIn, profile, currentService, prepareShareBody } = useServiceContext();
+
+  const storedQuality = useMemo(() => qualityProp ?? getPlayerQuality(), [qualityProp]);
+  const defaultQuality = useMemo(() => getQualityFromStreams(video, storedQuality), [video, storedQuality]);
+
   const [selectedVideo, setSelectedVideo] = useState<FilmVideoInterface>(video);
   const [selectedVoice, setSelectedVoice] = useState<FilmVoiceInterface>(voice);
-  const [selectedQuality, setSelectedQuality] = useState<string>(qualityProp);
+  const [selectedQuality, setSelectedQuality] = useState<string>(defaultQuality);
+  const [overlayQuality, setOverlayQuality] = useState<string>(
+    storedQuality !== MAX_QUALITY.value ? defaultQuality : MAX_QUALITY.value
+  );
   const [selectedSubtitle, setSelectedSubtitle] = useState<SubtitleInterface|undefined>(
     selectedVideo.subtitles?.find(({ isDefault }) => isDefault)
   );
   const [selectedSpeed, setSelectedSpeed] = useState<number>(DEFAULT_SPEED);
+  const [selectedAspectRatio, setSelectedAspectRatio] = useState<VideoContentFit>(
+    playerDefaultAspectRatio as VideoContentFit
+  );
   const [isLocked, setIsLocked] = useState<boolean>(false);
   const [isOverlayOpen, setIsOverlayOpen] = useState<boolean>(false);
   const [isFilmBookmarked, setIsFilmBookmarked] = useState<boolean>(isBookmarked(film));
@@ -82,17 +102,17 @@ export function PlayerContainer({
   const updateTimeTimeout = useRef<NodeJS.Timeout | null>(null);
   const qualityOverlayRef = useRef<ThemedOverlayRef>(null);
   const subtitleOverlayRef = useRef<ThemedOverlayRef>(null);
-  const playerVideoSelectorOverlayRef = useRef<ThemedOverlayRef>(null);
+  const playerVideoSelectorOverlayRef = useRef<PlayerVideoSelectorRef>(null);
   const commentsOverlayRef = useRef<ThemedOverlayRef>(null);
   const bookmarksOverlayRef = useRef<ThemedOverlayRef>(null);
   const speedOverlayRef = useRef<ThemedOverlayRef>(null);
 
   const firestoreSavedTimeRef = useRef(false);
   const firestoreDb = useMemo(() => (
-    ConfigStore.getConfig().isFirestore && isSignedIn
+    isFirestore && isSignedIn && !isOffline
       ? getFirestore().collection<FirestoreDocument>(FIRESTORE_DB)
       : null
-  ), [isSignedIn]);
+  ), [isSignedIn, isFirestore, isOffline]);
 
   const initFirestoreSavedTime = useCallback(async (p: VideoPlayer, savedTime: SavedTime | null) => {
     if (firestoreSavedTimeRef.current || !firestoreDb || !profile) {
@@ -112,12 +132,16 @@ export function PlayerContainer({
   }, [firestoreDb, profile, film, selectedVoice]);
 
   const videoUrl = useMemo(() => {
+    if (isOffline) {
+      return `file://${getPlayerStream(video, selectedQuality).url}`;
+    }
+
     if (selectedQuality === AUTO_QUALITY.value) {
       return createMasterPlaylist(video.streams).uri;
     }
 
     return getPlayerStream(video, selectedQuality).url;
-  }, [selectedQuality, video]);
+  }, [selectedQuality, video, isOffline]);
 
   const player = useVideoPlayer(videoUrl, (p) => {
     const savedTime = getSavedTime(film);
@@ -128,7 +152,7 @@ export function PlayerContainer({
     p.preservesPitch = true;
     p.bufferOptions = {
       ...p.bufferOptions,
-      preferredForwardBufferDuration: getBufferTime(selectedQuality),
+      preferredForwardBufferDuration: playerBufferTimeSetting ?? getBufferTime(selectedQuality),
     };
     p.play();
 
@@ -175,13 +199,16 @@ export function PlayerContainer({
           updateTime();
         }
       } catch (error) {
-        LoggerStore.error('createUpdateTimeTimeout', { error });
-
+        console.error('Error updating time:', error);
         // If we get an error accessing the player, reset the timeout
         createUpdateTimeTimeout();
       }
     }, SAVE_TIME_EVERY_MS);
   }, [player, updateTime]);
+
+  const handleBack = useCallback(() => {
+    updateTime();
+  }, [updateTime]);
 
   useEffect(() => {
     activateKeepAwakeAsync(AWAKE_TAG);
@@ -190,7 +217,7 @@ export function PlayerContainer({
     const backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
       () => {
-        updateTime();
+        handleBack();
 
         return false;
       }
@@ -202,7 +229,7 @@ export function PlayerContainer({
       backHandler.remove();
       resetProgressStatus();
     };
-  }, [updateTime, createUpdateTimeTimeout, initFirestoreSavedTime, resetProgressStatus]);
+  }, [handleBack, createUpdateTimeTimeout, initFirestoreSavedTime, resetProgressStatus]);
 
   useEventListener(
     player,
@@ -218,7 +245,7 @@ export function PlayerContainer({
         return;
       }
 
-      updateProgressStatus(currentTime, bufferedPosition, duration);
+      updateProgressStatus(currentTime, !isOffline ? bufferedPosition : 0, duration);
 
       if (!playing) {
         return;
@@ -230,8 +257,6 @@ export function PlayerContainer({
 
   useEventListener(player, 'statusChange', ({ status: playerStatus, error }) => {
     if (playerStatus === 'error') {
-      LoggerStore.error('Player', { error: error?.message });
-
       NotificationStore.displayError(`An error occurred : ${error?.message}`);
     }
   });
@@ -260,6 +285,10 @@ export function PlayerContainer({
   });
 
   const onPlaybackEnd = (currentTime: number, duration: number) => {
+    if (!playerAutoNextEpisode) {
+      return;
+    }
+
     if (currentTime >= duration - 1) {
       handleNewEpisode(RewindDirection.FORWARD);
     }
@@ -384,17 +413,17 @@ export function PlayerContainer({
       // so the only way is to reload the player page entirely
       //player.replaceAsync(createMasterPlaylist(filmVideo.streams));
 
-      RouterStore.pushData(PLAYER_ROUTE, {
+      RouterStore.pushData(PLAYER_SCREEN, {
         video: videoArg,
         film,
         voice: voiceArg || selectedVoice,
       });
 
       const state = navigation.getState();
-      const filteredRoutes = state?.routes.filter((r) => r.name !== PLAYER_ROUTE) ?? [];
+      const filteredRoutes = state?.routes.filter((r) => r.name !== PLAYER_SCREEN) ?? [];
       filteredRoutes.push({
-        key: `${PLAYER_ROUTE}-${Date.now()}`,
-        name: PLAYER_ROUTE,
+        key: `${PLAYER_SCREEN}-${Date.now()}`,
+        name: PLAYER_SCREEN,
       });
 
       navigation.reset({
@@ -402,7 +431,7 @@ export function PlayerContainer({
         routes: filteredRoutes as any,
       });
     } else {
-      const newStream = getPlayerStream(videoArg, getPlayerQuality(videoArg, qualityArg));
+      const newStream = getPlayerStream(videoArg, getQualityFromStreams(videoArg, qualityArg));
 
       if (!newStream) {
         return;
@@ -421,8 +450,13 @@ export function PlayerContainer({
       return;
     }
 
-    setSelectedQuality(getPlayerQuality(selectedVideo, quality));
-    updatePlayerQuality(quality);
+    setOverlayQuality(quality);
+    setSelectedQuality(getQualityFromStreams(selectedVideo, quality));
+
+    if (playerSaveQuality) {
+      updatePlayerQuality(quality);
+    }
+
     updateTime();
     updatePlayerStream(selectedVideo, quality, selectedVoice);
 
@@ -566,6 +600,15 @@ export function PlayerContainer({
     speedOverlayRef.current?.close();
   };
 
+  const handleAspectRatioChange = () => {
+    setSelectedAspectRatio((prev) => {
+      const currentIndex = ASPECT_RATIO_OPTIONS.findIndex((option) => option === prev);
+      const nextIndex = (currentIndex + 1) % ASPECT_RATIO_OPTIONS.length;
+
+      return ASPECT_RATIO_OPTIONS[nextIndex];
+    });
+  };
+
   const handleLockControls = () => {
     setIsLocked(!isLocked);
   };
@@ -576,8 +619,6 @@ export function PlayerContainer({
         message: prepareShareBody(film),
       });
     } catch (error) {
-      LoggerStore.error('handleShare', { error });
-
       NotificationStore.displayError(error as Error);
     }
   };
@@ -592,7 +633,12 @@ export function PlayerContainer({
     togglePlayPause(false);
   };
 
-  const containerProps = () => ({
+  const handleBackButtonPress = () => {
+    handleBack();
+    navigation.goBack();
+  };
+
+  const containerProps = {
     player,
     status,
     isPlaying,
@@ -609,12 +655,12 @@ export function PlayerContainer({
     bookmarksOverlayRef,
     speedOverlayRef,
     selectedSpeed,
+    selectedAspectRatio,
     isLocked,
     isOverlayOpen,
     isFilmBookmarked,
-  });
-
-  const containerFunctions = {
+    isOffline,
+    overlayQuality,
     togglePlayPause,
     rewindPosition,
     seekToPosition,
@@ -629,6 +675,7 @@ export function PlayerContainer({
     handleSubtitleChange,
     handleSpeedChange,
     openSpeedSelector,
+    handleAspectRatioChange,
     openCommentsOverlay,
     openBookmarksOverlay,
     handleLockControls,
@@ -636,12 +683,10 @@ export function PlayerContainer({
     closeOverlay,
     onBookmarkChange,
     backwardToStart,
+    handleBackButtonPress,
   };
 
-  return withTV(PlayerComponentTV, PlayerComponent, {
-    ...containerProps(),
-    ...containerFunctions,
-  });
+  return isTV ? <PlayerComponentTV { ...containerProps } /> : <PlayerComponent { ...containerProps } />;
 }
 
 export default PlayerContainer;

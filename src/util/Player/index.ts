@@ -3,16 +3,14 @@ import { AUTO_QUALITY, MAX_QUALITY } from 'Component/Player/Player.config';
 import { FirestoreDocument, SavedTime, SavedTimestamp, SavedTimeVoice } from 'Component/Player/Player.type';
 import * as Device from 'expo-device';
 import { VideoTrack } from 'expo-video';
-import t from 'i18n/t';
-import ConfigStore from 'Store/Config.store';
-import LoggerStore from 'Store/Logger.store';
-import StorageStore from 'Store/Storage.store';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { ProfileInterface } from 'Type/Profile.interface';
 import { getFormattedDate } from 'Util/Date';
+import { getDeviceId } from 'Util/DeviceId';
 import { safeJsonParse } from 'Util/Json';
+import { storage } from 'Util/Storage';
 
 export const PLAYER_SAVED_TIME_STORAGE_KEY = 'playerTime';
 export const PLAYER_QUALITY_STORAGE_KEY = 'playerQuality';
@@ -62,7 +60,7 @@ const prepareSavedTimeObject = (
   voiceData.timestamps[formatTimestampKey(voice)] = {
     time,
     progress,
-    deviceId: ConfigStore.getDeviceId(),
+    deviceId: getDeviceId(),
   };
 
   newSavedTime.voices[voice.id] = voiceData;
@@ -73,34 +71,27 @@ const prepareSavedTimeObject = (
 export const updateSavedTime = (film: FilmInterface, voice: FilmVoiceInterface, time: number, progress: number) => {
   const key = formatPlayerKeyTime(film);
 
-  const prevSavedTimeJson = StorageStore.getPlayerStorage().getString(key);
-  const prevSavedTime = safeJsonParse<SavedTime | null>(prevSavedTimeJson, null);
+  const prevSavedTime = storage.getPlayerStorage().load<SavedTime | null>(key);
   const newSavedTime = prepareSavedTimeObject(film, voice, time, progress, prevSavedTime);
 
-  StorageStore.getPlayerStorage().set(
+  storage.getPlayerStorage().save(
     key,
-    JSON.stringify(newSavedTime)
+    newSavedTime
   );
 };
 
 export const setSavedTime = (savedTime: SavedTime, film: FilmInterface) => {
   const key = formatPlayerKeyTime(film);
 
-  StorageStore.getPlayerStorage().set(
+  storage.getPlayerStorage().save(
     key,
-    JSON.stringify(savedTime)
+    savedTime
   );
 };
 
 export const getSavedTime = (film: FilmInterface): SavedTime | null => {
   const key = formatPlayerKeyTime(film);
-  const savedTimeJson = StorageStore.getPlayerStorage().getString(key);
-
-  if (!savedTimeJson) {
-    return null;
-  }
-
-  const savedTime = safeJsonParse<SavedTime | null>(savedTimeJson, null);
+  const savedTime = storage.getPlayerStorage().load<SavedTime | null>(key);
 
   return savedTime;
 };
@@ -216,33 +207,18 @@ export const getFirestoreVideoTime = (
 };
 
 export const updatePlayerQuality = (quality: string) => {
-  LoggerStore.debug('updatePlayerQuality', { quality });
-
-  StorageStore.getPlayerStorage().set(
+  storage.getPlayerStorage().saveString(
     PLAYER_QUALITY_STORAGE_KEY,
     quality
   );
 };
 
-export const getPlayerQuality = (video: FilmVideoInterface, qualityArg?: string) => {
+export const getPlayerQuality = () => {
+  return storage.getPlayerStorage().loadString(PLAYER_QUALITY_STORAGE_KEY) || '720p';
+};
+
+export const getQualityFromStreams = (video: FilmVideoInterface, quality: string) => {
   const { streams } = video;
-
-  const quality = qualityArg || StorageStore.getPlayerStorage().getString(PLAYER_QUALITY_STORAGE_KEY);
-
-  // determine default quality
-  // usually it is 720p
-  // but in some cases it can be 480p or 360p
-  if (!quality) {
-    if (streams.length >= 3) {
-      return '720p';
-    }
-
-    if (streams.length === 2) {
-      return '480p';
-    }
-
-    return '360p';
-  }
 
   // if quality is auto, return auto and handle it in the player
   if (quality === AUTO_QUALITY.value) {
@@ -262,20 +238,12 @@ export const getPlayerQuality = (video: FilmVideoInterface, qualityArg?: string)
 export const getPlayerStream = (video: FilmVideoInterface, quality: string) => {
   const { streams } = video;
 
-  LoggerStore.debug('getPlayerStream', { quality, streams });
-
   const stream = streams.find((s) => s.quality === quality);
   if (!stream) {
     return { url: null, quality };
   }
 
   return stream;
-};
-
-export const prepareShareBody = (film: FilmInterface) => {
-  const { title, link } = film;
-
-  return t('Watch %s:\n %s', title, link);
 };
 
 export const formatVideoTrackInfo = (videoTrack: VideoTrack|null) => {

@@ -1,10 +1,11 @@
-import ThemedImage from 'Component/ThemedImage';
-import ThemedText from 'Component/ThemedText';
-import React from 'react';
+import { ThemedImage } from 'Component/ThemedImage';
+import { ThemedText } from 'Component/ThemedText';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
+import { t } from 'i18n/translate';
 import { View } from 'react-native';
 
 import { FILM_TYPE_COLORS, TYPE_LABELS } from './FilmCard.config';
-import { styles } from './FilmCard.style';
+import { componentStyles } from './FilmCard.style';
 import { FilmCardComponentProps } from './FilmCard.type';
 
 export function FilmCardComponent({
@@ -19,12 +20,16 @@ export function FilmCardComponent({
     info,
     isPendingRelease,
   } = filmCard;
+  const styles = useThemedStyles(componentStyles);
 
   const renderType = () => (
     <ThemedText
-      style={ [styles.typeText, { backgroundColor: FILM_TYPE_COLORS[type] }] }
+      style={ [
+        styles.typeText,
+        { backgroundColor: FILM_TYPE_COLORS[type] },
+      ] }
     >
-      { TYPE_LABELS[type] }
+      { t( TYPE_LABELS[type]) }
     </ThemedText>
   );
 

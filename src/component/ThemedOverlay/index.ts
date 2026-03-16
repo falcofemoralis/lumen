@@ -1,1 +1,1 @@
-export { default } from './ThemedOverlay.container';
+export { default as ThemedOverlay } from './ThemedOverlay.container';

@@ -1,21 +1,20 @@
-import { Colors } from 'Style/Colors';
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
 export const MAX_ITEMS_TO_DISPLAY = 6;
 export const ITEM_HEIGHT = 48;
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale, colors, text }: Theme) => ({
   header: {
     justifyContent: 'center',
     alignItems: 'center',
-    paddingBottom: 10,
-    borderBottomColor: Colors.divider,
+    paddingBottom: scale(10),
+    borderBottomColor: colors.divider,
     borderBottomWidth: 1,
   },
   headerText: {
-    color: Colors.textSecondary,
-    fontSize: 14,
-    lineHeight: 16,
+    color: colors.textSecondary,
+    fontSize: scale(text.xs.fontSize),
+    lineHeight: scale(16),
     fontWeight: '500',
   },
   listContainer: {
@@ -24,53 +23,53 @@ export const styles = CreateStyles({
   },
   listItemsWrapper: {
     flexDirection: 'column',
-    maxHeight: MAX_ITEMS_TO_DISPLAY * ITEM_HEIGHT - 42,
-    width: 300,
+    maxHeight: MAX_ITEMS_TO_DISPLAY * scale(ITEM_HEIGHT) - scale(42),
+    width: scale(300),
     overflow: 'hidden',
-    paddingHorizontal: 12,
-    marginHorizontal: -12,
+    paddingHorizontal: scale(12),
+    marginHorizontal: scale(-12),
   },
   item: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 10,
-    height: ITEM_HEIGHT,
-    borderRadius: 12,
+    paddingHorizontal: scale(10),
+    height: scale(ITEM_HEIGHT),
+    borderRadius: scale(12),
   },
   itemFocused: {
-    backgroundColor: Colors.backgroundFocused,
-    borderRadius: 12,
+    backgroundColor: colors.backgroundFocused,
+    borderRadius: scale(12),
   },
   itemSelected: {
-    backgroundColor: Colors.primary,
-    borderRadius: 12,
+    backgroundColor: colors.primary,
+    borderRadius: scale(12),
   },
   itemContainer: {
     flexDirection: 'row',
     width: '100%',
   },
   text: {
-    color: Colors.text,
-    fontSize: 14,
-    lineHeight: 20,
+    color: colors.text,
+    fontSize: scale(text.xs.fontSize),
+    lineHeight: scale(20),
     fontWeight: '500',
     maxWidth: '90%',
   },
   textFocused: {
-    color: Colors.textFocused,
+    color: colors.textFocused,
   },
   textSelected: {
-    color: Colors.textOnPrimary,
+    color: colors.textOnTertiary,
   },
   icon: {
-    marginRight: 5,
-    height: 20,
-    width: 20,
-    minWidth: 20,
+    marginRight: scale(5),
+    height: scale(20),
+    width: scale(20),
+    minWidth: scale(20),
   },
   iconFocused: {
   },
   iconSelected: {
   },
-});
+} satisfies ThemedStyles);

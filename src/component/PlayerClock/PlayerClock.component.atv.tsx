@@ -1,25 +1,28 @@
 import { View } from 'react-native';
-import { Colors } from 'Style/Colors';
-import { scale } from 'Util/CreateStyles';
+import { useAppTheme } from 'Theme/context';
 
 import ReactLiveClock from './ReactLiveClock';
 
-export const PlayerClockComponent = () => (
-  <View
-    style={ {
-      flex: 1,
-      flexDirection: 'row',
-      justifyContent: 'flex-end',
-    } }
-  >
-    <ReactLiveClock
+export const PlayerClockComponent = () => {
+  const { scale, theme } = useAppTheme();
+
+  return (
+    <View
       style={ {
-        color: Colors.text,
-        fontSize: scale(16),
-        alignSelf: 'flex-end',
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
       } }
-    />
-  </View>
-);
+    >
+      <ReactLiveClock
+        style={ {
+          color: theme.colors.textOnContrast,
+          fontSize: scale(16),
+          alignSelf: 'flex-end',
+        } }
+      />
+    </View>
+  );
+};
 
 export default PlayerClockComponent;

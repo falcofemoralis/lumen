@@ -1,3 +1,4 @@
+import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import { StyleProp, ViewStyle } from 'react-native';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { FilmListInterface } from 'Type/FilmList.interface';
@@ -5,37 +6,48 @@ import { MenuItemInterface } from 'Type/MenuItem.interface';
 import { PaginationInterface } from 'Type/Pagination.interface';
 
 export interface FilmPagerContainerProps {
-  menuItems: MenuItemInterface[];
-  filmPager: FilmPagerInterface;
+  items: PagerItemInterface[];
   loadOnInit?: boolean;
   gridStyle?: StyleProp<ViewStyle>;
+  isGridVisible?: boolean;
+  isEmpty?: boolean;
+  isAddSafeArea?: boolean;
+  sorting?: DropdownItem[];
+  menuDefaultFocus?: boolean;
+  ListHeaderComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
+  ListEmptyComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
   onLoadFilms: (
     menuItem: MenuItemInterface,
     currentPage: number,
-    isRefresh: boolean
+    isRefresh: boolean,
+    sort?: string
   ) => Promise<FilmListInterface>;
-  onUpdateFilms: (key: string, filmList: FilmListInterface) => void;
+  onUpdateFilms: (
+    key: string,
+    item: PagerItemInterface
+  ) => void;
   onRowFocus?: (row: number) => void;
 }
 
 export interface FilmPagerComponentProps {
-  pagerItems: PagerItemInterface[];
+  items: PagerItemInterface[];
   gridStyle?: StyleProp<ViewStyle>;
+  isGridVisible?: boolean;
+  isEmpty?: boolean;
+  isAddSafeArea?: boolean;
+  sorting?: DropdownItem[];
+  selectedSorting?: Record<string, DropdownItem> | null;
+  menuDefaultFocus?: boolean;
+  ListHeaderComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
+  ListEmptyComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
   onNextLoad: (isRefresh: boolean, item: PagerItemInterface) => Promise<void>;
   onPreLoad: (item: PagerItemInterface) => void;
   onRowFocus?: (row: number) => void;
+  handleSelectSorting: (menuItem: PagerItemInterface['menuItem'], item: DropdownItem) => void;
 }
 
 export interface PagerItemInterface {
-  key: string;
-  title: string;
   menuItem: MenuItemInterface;
   films: FilmCardInterface[] | null;
   pagination: PaginationInterface;
-}
-
-export interface FilmPagerInterface {
-  [key: string]: {
-    filmList: FilmListInterface;
-  } | undefined;
 }

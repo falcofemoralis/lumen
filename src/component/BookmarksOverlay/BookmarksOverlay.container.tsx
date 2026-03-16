@@ -1,7 +1,6 @@
+import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
-import { withTV } from 'Hooks/withTV';
 import { useState } from 'react';
-import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
 
 import BookmarksOverlayComponent from './BookmarksOverlay.component';
@@ -16,6 +15,7 @@ export const BookmarksOverlayContainer = ({
 }: BookmarksOverlayContainerProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { currentService } = useServiceContext();
+  const { isTV } = useConfigContext();
 
   const postBookmark = async (bookmarkId: string, isChecked: boolean) => {
     const { id } = film;
@@ -35,8 +35,6 @@ export const BookmarksOverlayContainer = ({
         onBookmarkChange?.(film);
       }
     } catch (error) {
-      LoggerStore.error('postBookmark', { error });
-
       NotificationStore.displayError(error as Error);
     } finally {
       setIsLoading(false);
@@ -54,6 +52,7 @@ export const BookmarksOverlayContainer = ({
   };
 
   const containerProps = {
+    postBookmark,
     overlayRef,
     film,
     isLoading,
@@ -61,14 +60,8 @@ export const BookmarksOverlayContainer = ({
     onClose,
   };
 
-  const containerFunctions = {
-    postBookmark,
-  };
-
-  return withTV(BookmarksOverlayComponentTV, BookmarksOverlayComponent, {
-    ...containerProps,
-    ...containerFunctions,
-  });
+  // eslint-disable-next-line max-len
+  return isTV ? <BookmarksOverlayComponentTV { ...containerProps } /> : <BookmarksOverlayComponent { ...containerProps } />;
 };
 
 export default BookmarksOverlayContainer;

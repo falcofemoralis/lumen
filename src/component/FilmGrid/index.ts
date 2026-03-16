@@ -1,1 +1,1 @@
-export { default } from './FilmGrid.container';
+export { default as FilmGrid } from './FilmGrid.container';

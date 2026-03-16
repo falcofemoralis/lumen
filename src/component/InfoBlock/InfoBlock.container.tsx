@@ -1,4 +1,4 @@
-import { withTV } from 'Hooks/withTV';
+import { useConfigContext } from 'Context/ConfigContext';
 
 import InfoBlockComponent from './InfoBlock.component';
 import InfoBlockComponentTV from './InfoBlock.component.atv';
@@ -9,21 +9,20 @@ export function InfoBlockContainer({
   subtitle,
   hideIcon,
   style,
+  Icon,
 }: InfoBlockContainerProps) {
-  const containerFunctions = {
-  };
+  const { isTV } = useConfigContext();
 
-  const containerProps = () => ({
+  const containerProps = {
     title,
     subtitle,
     hideIcon,
     style,
-  });
+    Icon,
+  };
 
-  return withTV(InfoBlockComponentTV, InfoBlockComponent, {
-    ...containerFunctions,
-    ...containerProps(),
-  });
+  return isTV ? <InfoBlockComponentTV { ...containerProps } /> : <InfoBlockComponent { ...containerProps } />;
+
 }
 
 export default InfoBlockContainer;

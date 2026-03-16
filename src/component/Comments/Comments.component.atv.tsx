@@ -1,12 +1,13 @@
-import Loader from 'Component/Loader';
+import { Loader } from 'Component/Loader';
 import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
-import ThemedImage from 'Component/ThemedImage';
-import ThemedList from 'Component/ThemedList';
-import ThemedPressable from 'Component/ThemedPressable';
-import ThemedText from 'Component/ThemedText';
-import t from 'i18n/t';
+import { ThemedImage } from 'Component/ThemedImage';
+import { ThemedList } from 'Component/ThemedList';
+import { ThemedPressable } from 'Component/ThemedPressable';
+import { ThemedText } from 'Component/ThemedText';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
+import { t } from 'i18n/translate';
 import { ThumbsUp } from 'lucide-react-native';
-import React, {
+import {
   forwardRef,
   memo,
   useCallback,
@@ -17,20 +18,13 @@ import React, {
   useState,
 } from 'react';
 import { LayoutRectangle, useWindowDimensions, View } from 'react-native';
-import {
-  SpatialNavigationNodeRef,
-} from 'react-tv-space-navigation';
-import { Colors } from 'Style/Colors';
+import { SpatialNavigationNodeRef } from 'react-tv-space-navigation';
+import { useAppTheme } from 'Theme/context';
+import { ThemedStyles } from 'Theme/types';
 import { CommentInterface, CommentTextType } from 'Type/Comment.interface';
-import { scale } from 'Util/CreateStyles';
 
 import { MEASURE_TEXT_STRING } from './Comments.config';
-import {
-  INDENT_SIZE,
-  ITEM_ADDITIONAL_HEIGHT,
-  OVERLAY_PADDING,
-  styles,
-} from './Comments.style.atv';
+import { componentStyles } from './Comments.style.atv';
 import {
   CalculatedLine, CalculatedText, CommentItemProps, CommentsComponentProps,
 } from './Comments.type';
@@ -40,10 +34,13 @@ type CommentItemRef = {
   focus: () => void;
 };
 
-export const CommentItem = forwardRef<CommentItemRef, CommentItemProps>(({
+// eslint-disable-next-line max-len
+export const CommentItem = forwardRef<CommentItemRef, CommentItemProps & { styles: ThemedStyles<typeof componentStyles> }>(({
   comment,
   containerWidth = 0,
   lines = [],
+  styles,
+  handlePostLike,
 }, ref) => {
   const {
     id,
@@ -51,12 +48,13 @@ export const CommentItem = forwardRef<CommentItemRef, CommentItemProps>(({
     username,
     date,
     likes,
+    isDisabled,
   } = comment;
-
+  const { scale, theme } = useAppTheme();
   const commentRef = useRef<SpatialNavigationNodeRef>(null);
   const commentTextRef = useRef<CommentTextRef>(null);
 
-  const leftIndent = INDENT_SIZE * comment.indent;
+  const leftIndent = styles.indentSize.width * comment.indent;
 
   useImperativeHandle(ref, () => ({
     focus: () => commentRef.current?.focus(),
@@ -66,6 +64,7 @@ export const CommentItem = forwardRef<CommentItemRef, CommentItemProps>(({
     <ThemedPressable
       spatialRef={ commentRef }
       onPress={ () => commentTextRef.current?.openSpoilers() }
+      onLongPress={ () => handlePostLike(comment.id) }
     >
       { ({ isFocused }) => (
         <View
@@ -103,6 +102,7 @@ export const CommentItem = forwardRef<CommentItemRef, CommentItemProps>(({
               ] }
               comment={ comment }
               lines={ lines }
+              styles={ styles }
             />
             <View style={ styles.commentDateRow }>
               <ThemedText style={ [
@@ -116,6 +116,7 @@ export const CommentItem = forwardRef<CommentItemRef, CommentItemProps>(({
                 <View style={ styles.commentLikes }>
                   <ThemedText style={ [
                     styles.commentTextSmall,
+                    isDisabled && styles.commentTextSmallLiked,
                     isFocused && styles.textFocused,
                   ] }
                   >
@@ -123,7 +124,7 @@ export const CommentItem = forwardRef<CommentItemRef, CommentItemProps>(({
                   </ThemedText>
                   <ThumbsUp
                     size={ scale(16) }
-                    color={ Colors.white }
+                    color={ isDisabled ? theme.colors.secondary : theme.colors.icon }
                   />
                 </View>
               ) }
@@ -136,7 +137,9 @@ export const CommentItem = forwardRef<CommentItemRef, CommentItemProps>(({
 });
 
 function rowPropsAreEqual(prevProps: CommentItemProps, props: CommentItemProps) {
-  return prevProps.comment.id === props.comment.id || prevProps.lines === props.lines;
+  return prevProps.comment.id === props.comment.id
+  && prevProps.lines === props.lines
+  && prevProps.comment.likes === props.comment.likes;
 }
 
 const MemoCommentItem = memo(CommentItem, rowPropsAreEqual);
@@ -146,9 +149,12 @@ const CommentsList = ({
   onNextLoad,
   containerWidth,
   charLayout,
+  styles,
+  handlePostLike,
 }: CommentsComponentProps & {
   containerWidth: number;
   charLayout: LayoutRectangle | null;
+  styles: ThemedStyles<typeof componentStyles>;
 }) => {
   const { height } = useWindowDimensions();
   const defaultItemRef = useRef<CommentItemRef>(null);
@@ -162,7 +168,7 @@ const CommentsList = ({
   }, []);
 
   const splitText = useCallback((str: string, indent: number) => {
-    const width = containerWidth - (indent * INDENT_SIZE);
+    const width = containerWidth - (indent * styles.indentSize.width);
 
     const charWidth = Math.ceil((charLayout?.width || 1) / MEASURE_TEXT_STRING.length);
 
@@ -203,7 +209,7 @@ const CommentsList = ({
     }
 
     return lines;
-  }, [charLayout, containerWidth]);
+  }, [charLayout, containerWidth, styles]);
 
   const calculateItemSize = useCallback((item: CommentInterface): CalculatedText => {
     const commentText = item.text;
@@ -227,11 +233,11 @@ const CommentsList = ({
     const textHeight = calculatedLines.reduce((acc, textObj) => acc + textObj.totalHeight, 0);
 
     return {
-      height: textHeight + ITEM_ADDITIONAL_HEIGHT,
+      height: textHeight + styles.itemAdditionalHeight.height,
       lineHeight: charLayout?.height || 0,
       lines: calculatedLines,
     };
-  }, [charLayout, splitText]);
+  }, [charLayout, splitText, styles]);
 
   const commentCalculatedHeights = useMemo(() => (comments ?? []).reduce((acc, comment) => {
     acc[comment.id] = calculateItemSize(comment);
@@ -241,7 +247,7 @@ const CommentsList = ({
 
   const stringifiedComments = useMemo(() => (comments ?? []).reduce((acc, comment) => {
     const commentHeight = commentCalculatedHeights[comment.id].height;
-    const containerHeight = height - ITEM_ADDITIONAL_HEIGHT - OVERLAY_PADDING;
+    const containerHeight = height - styles.itemAdditionalHeight.height - styles.overlayPadding.padding;
 
     // if comment height is more than possible to show on the screen, we need to split it into multiple comments
     if (commentHeight > containerHeight) {
@@ -332,7 +338,7 @@ const CommentsList = ({
     }
 
     return acc;
-  }, [] as CommentInterface[]), [commentCalculatedHeights, comments, height]);
+  }, [] as CommentInterface[]), [commentCalculatedHeights, comments, height, styles]);
 
   const getCalculatedItemSize = useCallback((
     item: CommentInterface
@@ -349,8 +355,10 @@ const CommentsList = ({
       idx={ index }
       containerWidth={ containerWidth }
       lines={ getCalculatedItemLines(item) }
+      handlePostLike={ handlePostLike }
+      styles={ styles }
     />
-  ), [getCalculatedItemLines, containerWidth]);
+  ), [getCalculatedItemLines, containerWidth, styles]);
 
   return (
     <ThemedList
@@ -367,7 +375,9 @@ export const CommentsComponent = ({
   style,
   isLoading,
   onNextLoad,
+  handlePostLike,
 }: CommentsComponentProps) => {
+  const styles = useThemedStyles(componentStyles);
   const [containerWidth, setContainerWidth] = useState(0);
   const [charLayout, setCharLayout] = useState<LayoutRectangle|null>(null);
 
@@ -394,7 +404,6 @@ export const CommentsComponent = ({
     }
 
     return (
-      // <DefaultFocus>
       <CommentsList
         comments={ comments }
         style={ style }
@@ -402,8 +411,9 @@ export const CommentsComponent = ({
         onNextLoad={ onNextLoad }
         containerWidth={ containerWidth }
         charLayout={ charLayout }
+        styles={ styles }
+        handlePostLike={ handlePostLike }
       />
-      // </DefaultFocus>
     );
   };
 

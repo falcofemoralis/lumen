@@ -1,30 +1,27 @@
 import { NAVIGATION_BAR_TV_WIDTH } from 'Component/NavigationBar/NavigationBar.style.atv';
-import { Dimensions, StyleSheet } from 'react-native';
-import { CONTENT_WRAPPER_PADDING_TV } from 'Style/Layout';
-import { scale } from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-const containerWidth = Dimensions.get('window').width;
-
-export const styles = StyleSheet.create({
-  wrapper: {
-    height: '100%',
-    width: '100%',
-  },
+export const componentStyles = ({ scale, dimensions, spacing, colors }: Theme) => ({
   container: {
     height: '100%',
-    width: containerWidth - scale(NAVIGATION_BAR_TV_WIDTH) - CONTENT_WRAPPER_PADDING_TV * 2,
-    marginInline: CONTENT_WRAPPER_PADDING_TV,
-    transform: [{ translateX: 0 }],
-    transitionProperty: 'transform',
-    transitionDuration: '250ms',
-    transitionTimingFunction: 'ease-in-out',
-  },
-  containerOpened: {
-    transform: [{ translateX: scale(NAVIGATION_BAR_TV_WIDTH + CONTENT_WRAPPER_PADDING_TV) }],
+    width: dimensions.width - scale(NAVIGATION_BAR_TV_WIDTH) - scale(spacing.wrapperPaddingTV) * 2,
+    marginInline: scale(spacing.wrapperPaddingTV),
   },
   content: {
     height: '100%',
     width: '100%',
-    marginTop: 16,
   },
-});
+  fullscreen: {
+    height: '100%',
+    width: '100%',
+    marginInline: 0,
+    marginTop: 0,
+  },
+  noConnectionContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  btn: {
+    marginTop: scale(16),
+  },
+} satisfies ThemedStyles);

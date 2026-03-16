@@ -1,13 +1,15 @@
 import { useNavigation } from '@react-navigation/native';
-import ThemedPressable from 'Component/ThemedPressable';
-import ThemedText from 'Component/ThemedText';
-import Wrapper from 'Component/Wrapper';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { ThemedPressable } from 'Component/ThemedPressable';
+import { ThemedText } from 'Component/ThemedText';
+import { Wrapper } from 'Component/Wrapper';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { ArrowLeft } from 'lucide-react-native';
+import { AppStackParamList } from 'Navigation/navigationTypes';
 import { View } from 'react-native';
-import { Colors } from 'Style/Colors';
-import { scale } from 'Util/CreateStyles';
+import { useAppTheme } from 'Theme/context';
 
-import { styles } from './Header.style';
+import { componentStyles } from './Header.style';
 import { HeaderComponentProps } from './Header.type';
 
 export const HeaderComponent = ({
@@ -15,8 +17,11 @@ export const HeaderComponent = ({
   style,
   additionalAction,
   AdditionalActionIcon,
+  isDeepLink = false,
 }: HeaderComponentProps) => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NativeStackNavigationProp<AppStackParamList>>();
+  const { scale, theme } = useAppTheme();
+  const styles = useThemedStyles(componentStyles);
 
   return (
     <Wrapper>
@@ -25,11 +30,20 @@ export const HeaderComponent = ({
           <ThemedPressable
             style={ styles.topActionsButton }
             contentStyle={ styles.topActionsButtonContent }
-            onPress={ () => navigation.goBack() }
+            onPress={ () => {
+              if (isDeepLink) {
+                navigation.reset({
+                  index: 0,
+                  routes: [{ name: 'Tabs', params: { screen: 'Home-tab' } }],
+                });
+              } else {
+                navigation.goBack();
+              }
+            } }
           >
             <ArrowLeft
               size={ scale(24) }
-              color={ Colors.white }
+              color={ theme.colors.icon }
             />
           </ThemedPressable>
           { title && (
@@ -46,7 +60,7 @@ export const HeaderComponent = ({
           >
             <AdditionalActionIcon
               size={ scale(24) }
-              color={ Colors.white }
+              color={ theme.colors.icon }
             />
           </ThemedPressable>
         ) }

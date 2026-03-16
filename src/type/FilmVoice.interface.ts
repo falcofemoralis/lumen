@@ -2,12 +2,13 @@ import { FilmVideoInterface } from './FilmVideo.interface';
 
 export interface EpisodeInterface {
   name: string;
-  episodeId: string;
+  episodeId: string; // 1 - 10
+  video?: FilmVideoInterface; // offline video
 }
 
 export interface SeasonInterface {
   name: string;
-  seasonId: string;
+  seasonId: string; // 1 - 10
   episodes: EpisodeInterface[];
   isOnlyEpisodes?: boolean;
 }

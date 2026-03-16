@@ -1,14 +1,13 @@
-import { Colors } from 'Style/Colors';
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
 import { DOUBLE_TAP_ANIMATION_DELAY } from './Player.config';
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale, colors, text }: Theme) => ({
   container: {
     position: 'relative',
     width: '100%',
     height: '100%',
-    backgroundColor: Colors.black,
+    backgroundColor: '#000000',
   },
   video: {
     width: '100%',
@@ -16,7 +15,7 @@ export const styles = CreateStyles({
   },
   controlsContainer: {
     position: 'absolute',
-    backgroundColor: Colors.transparent,
+    backgroundColor: colors.transparent,
     width: '100%',
     height: '100%',
     left: 0,
@@ -28,7 +27,7 @@ export const styles = CreateStyles({
     position: 'absolute',
     height: '100%',
     width: '100%',
-    backgroundColor: Colors.modal,
+    backgroundColor: colors.modal,
   },
   controlsDisabled: {
     pointerEvents: 'none',
@@ -40,7 +39,7 @@ export const styles = CreateStyles({
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    padding: 16,
+    padding: scale(16),
     zIndex: 100,
   },
   middleActions: {
@@ -49,7 +48,7 @@ export const styles = CreateStyles({
     left: '50%',
     transform: [{ translateX: '-50%' }, { translateY: '-50%' }],
     flexDirection: 'row',
-    gap: 80,
+    gap: scale(80),
     alignItems: 'center',
   },
   bottomActions: {
@@ -57,42 +56,48 @@ export const styles = CreateStyles({
     bottom: 0,
     left: 0,
     width: '100%',
-    padding: 16,
-    marginBottom: 16,
+    padding: scale(16),
+    marginBottom: scale(16),
   },
   control: {
     alignSelf: 'center',
-    width: 40,
-    height: 40,
-    backgroundColor: Colors.modal,
-    borderRadius: 50,
+    width: scale(40),
+    height: scale(40),
+    backgroundColor: colors.modal,
+    borderRadius: scale(50),
   },
   controlBig: {
-    width: 48,
-    height: 48,
+    width: scale(48),
+    height: scale(48),
   },
   durationRow: {
-    marginBottom: 16,
+    marginBottom: scale(16),
   },
   progressBarRow: {
-    marginBottom: 16,
+    marginBottom: scale(16),
   },
   progressBarRowLocked: {
     pointerEvents: 'none',
   },
+  topInfoWrapper: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: scale(8),
+  },
   topInfo: {
     flex: 1,
     flexDirection: 'column',
-    gap: 4,
+    gap: scale(4),
   },
   action: {
-    borderRadius: 50,
-    width: 42,
-    height: 42,
+    borderRadius: scale(50),
+    width: scale(42),
+    height: scale(42),
   },
   actionsRow: {
     flexDirection: 'row',
-    gap: 24,
+    gap: scale(24),
   },
   bottomActionsRowLine: {
     flexDirection: 'row',
@@ -106,12 +111,15 @@ export const styles = CreateStyles({
     pointerEvents: 'none',
   },
   title: {
-    fontSize: 20,
+    fontSize: scale(text.lg.fontSize),
     fontWeight: '700',
+    color: colors.textOnContrast,
   },
-  subtitle: {},
+  subtitle: {
+    color: colors.textOnContrast,
+  },
   commentsOverlayModal: {
-    backgroundColor: Colors.transparent,
+    backgroundColor: colors.transparent,
   },
   commentsOverlay: {
     width: '100%',
@@ -149,12 +157,12 @@ export const styles = CreateStyles({
     gap: 8,
   },
   doubleTapIcon: {
-    backgroundColor: Colors.modal,
-    padding: 10,
-    borderRadius: 50,
+    backgroundColor: colors.modal,
+    padding: scale(10),
+    borderRadius: scale(50),
   },
   doubleTapText: {
-    fontSize: 16,
+    fontSize: scale(text.sm.fontSize),
     fontWeight: '700',
   },
   longTapAction: {
@@ -165,13 +173,13 @@ export const styles = CreateStyles({
     alignItems: 'center',
   },
   longTapContainer: {
-    backgroundColor: Colors.modal,
-    paddingBlock: 4,
-    paddingInline: 12,
-    borderRadius: 50,
+    backgroundColor: colors.modal,
+    paddingBlock: scale(4),
+    paddingInline: scale(12),
+    borderRadius: scale(50),
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: scale(8),
     opacity: 0,
     transitionProperty: 'opacity',
     transitionDuration: '150ms',
@@ -180,15 +188,34 @@ export const styles = CreateStyles({
     opacity: 1,
   },
   longTapText: {
-    fontSize: 16,
+    fontSize: scale(text.sm.fontSize),
     fontWeight: '700',
+    color: colors.textOnContrast,
   },
   longTapIcon: {
   },
   topActionLine: {
     flexDirection: 'column',
-    gap: 8,
+    gap: scale(8),
   },
-});
+  topActionLineText: {
+    color: colors.textOnContrast,
+  },
+  backButtonContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backButton: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: scale(36),
+    height: scale(36),
+    borderRadius: scale(100),
+  },
+  backButtonContent: {
+    padding: scale(12),
+  },
+} satisfies ThemedStyles);
 
 export type MiddleActionVariant = 'big' | 'small';

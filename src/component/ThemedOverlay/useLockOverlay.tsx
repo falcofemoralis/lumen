@@ -1,9 +1,10 @@
 import { useIsFocused } from '@react-navigation/native';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { BackHandler } from 'react-native';
 import { useLockSpatialNavigation } from 'react-tv-space-navigation';
-import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
+
+import { ANIMATION_DURATION } from './ThemedOverlay.style.atv';
 
 interface UseLockProps {
   isModalOpened: boolean;
@@ -20,14 +21,30 @@ export const useLockOverlay = ({ isModalOpened, isModalVisible, hideModal }: Use
 
 const useLockParentSpatialNavigator = (isModalOpened: boolean) => {
   const { lock, unlock } = useLockSpatialNavigation();
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isOpenedRef = useRef(isModalOpened);
 
   useEffect(() => {
-    if (isModalOpened) {
-      lock();
+    clearTimeout(timeoutRef.current!);
 
-      return () => {
-        unlock();
-      };
+    if (isModalOpened) {
+      isOpenedRef.current = true;
+      timeoutRef.current = setTimeout(() => {
+        requestAnimationFrame(() => {
+          lock();
+        });
+      }, ANIMATION_DURATION);
+
+      return () => {};
+    }
+
+    if (isOpenedRef.current) {
+      isOpenedRef.current = false;
+      timeoutRef.current = setTimeout(() => {
+        requestAnimationFrame(() => {
+          unlock();
+        });
+      }, ANIMATION_DURATION);
     }
 
     return () => {};
@@ -50,8 +67,6 @@ const usePreventNavigationGoBack = (isModalVisible: boolean, hideModal: () => vo
           return true;
         }
       } catch (error) {
-        LoggerStore.error('usePreventNavigationGoBack', { error });
-
         NotificationStore.displayError(error as Error);
 
         return true;

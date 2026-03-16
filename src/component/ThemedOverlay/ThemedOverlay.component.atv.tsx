@@ -1,11 +1,12 @@
 import KeyboardAdjuster from 'Component/KeyboardAdjuster/KeyboardAdjuster.component';
 import { Portal } from 'Component/ThemedPortal';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { memo } from 'react';
 import { View } from 'react-native';
 import Animated from 'react-native-reanimated';
 
 import { SpatialNavigationOverlay } from './SpatialNavigationOverlay';
-import { styles } from './ThemedOverlay.style.atv';
+import { componentStyles } from './ThemedOverlay.style.atv';
 import { ThemedOverlayComponentProps } from './ThemedOverlay.type';
 
 export function ThemedOverlayComponent({
@@ -18,6 +19,8 @@ export function ThemedOverlayComponent({
   useKeyboardAdjustment,
   handleModalRequestClose,
 }: ThemedOverlayComponentProps) {
+  const styles = useThemedStyles(componentStyles);
+
   return (
     <Portal>
       <SpatialNavigationOverlay

@@ -1,12 +1,13 @@
-import ThemedButton from 'Component/ThemedButton';
-import ThemedOverlay from 'Component/ThemedOverlay';
+import { ThemedButton } from 'Component/ThemedButton';
+import { ThemedOverlay } from 'Component/ThemedOverlay';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
-import ThemedSimpleList from 'Component/ThemedSimpleList';
+import { ThemedSimpleList } from 'Component/ThemedSimpleList';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { Plus } from 'lucide-react-native';
-import React, { memo, useRef } from 'react';
+import { memo, useRef } from 'react';
 import { View } from 'react-native';
 
-import { styles } from './ThemedDropdown.style.atv';
+import { componentStyles } from './ThemedDropdown.style.atv';
 import { ThemedDropdownComponentProps } from './ThemedDropdown.type';
 
 export const ThemedDropdownComponent = ({
@@ -16,10 +17,13 @@ export const ThemedDropdownComponent = ({
   header,
   asOverlay,
   style,
+  inputLabel,
   onChange,
   overlayRef,
   onClose,
+  closeOnChange,
 }: ThemedDropdownComponentProps) => {
+  const styles = useThemedStyles(componentStyles);
   const componentOverlayRef = useRef<ThemedOverlayRef>(null);
 
   const renderModal = () => {
@@ -31,10 +35,16 @@ export const ThemedDropdownComponent = ({
         onClose={ onClose }
       >
         <ThemedSimpleList
-          data={ data }
+          data={ data ?? [] }
           value={ value }
           header={ header }
-          onChange={ onChange }
+          onChange={ (item) => {
+            if (closeOnChange) {
+              (overlayRef || componentOverlayRef).current?.close();
+            }
+
+            onChange(item);
+          } }
         />
       </ThemedOverlay>
     );
@@ -55,7 +65,7 @@ export const ThemedDropdownComponent = ({
         onPress={ () => (overlayRef || componentOverlayRef).current?.open() }
         rightImage={ endIcon }
       >
-        { label }
+        { inputLabel ?? label }
       </ThemedButton>
     );
   };

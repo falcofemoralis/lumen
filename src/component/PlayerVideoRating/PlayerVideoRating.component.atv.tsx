@@ -1,9 +1,10 @@
-import ThemedButton from 'Component/ThemedButton';
-import ThemedImage from 'Component/ThemedImage';
-import ThemedOverlay from 'Component/ThemedOverlay';
+import { ThemedButton } from 'Component/ThemedButton';
+import { ThemedImage } from 'Component/ThemedImage';
+import { ThemedOverlay } from 'Component/ThemedOverlay';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
-import ThemedPressable from 'Component/ThemedPressable';
-import ThemedText from 'Component/ThemedText';
+import { ThemedPressable } from 'Component/ThemedPressable';
+import { ThemedText } from 'Component/ThemedText';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { CircleHelp } from 'lucide-react-native';
 import { useMemo, useRef } from 'react';
 import { View } from 'react-native';
@@ -12,23 +13,25 @@ import {
   SpatialNavigationScrollView,
   SpatialNavigationView,
 } from 'react-tv-space-navigation';
+import { useAppTheme } from 'Theme/context';
 import { VoiceRatingInterface } from 'Type/VoiceRating.interface';
-import { scale } from 'Util/CreateStyles';
 
-import { styles } from './PlayerVideoRating.style.atv';
+import { componentStyles } from './PlayerVideoRating.style.atv';
 import { PlayerVideoRatingComponentProps } from './PlayerVideoRating.type';
 
 export const PlayerVideoRatingComponent = ({
   film,
 }: PlayerVideoRatingComponentProps) => {
   const ratingOverlayRef = useRef<ThemedOverlayRef>(null);
+  const { scale } = useAppTheme();
+  const styles = useThemedStyles(componentStyles);
 
   const barWidth = useMemo(() => (
     styles.voiceRatingOverlay.width
     - styles.voiceRatingPercentContainer.width
     - styles.voiceRatingItemContainer.padding * 2
     - styles.voiceRatingNavigationView.paddingHorizontal * 2
-  ), []);
+  ), [styles]);
 
   const renderButton = () => {
     return (

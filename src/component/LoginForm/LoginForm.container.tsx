@@ -1,8 +1,7 @@
+import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
-import { withTV } from 'Hooks/withTV';
-import t from 'i18n/t';
+import { t } from 'i18n/translate';
 import { useState } from 'react';
-import LoggerStore from 'Store/Logger.store';
 import NotificationStore from 'Store/Notification.store';
 
 import LoginFormComponent from './LoginForm.component';
@@ -14,6 +13,7 @@ export function LoginFormContainer({
 }: LoginFormContainerProps) {
   const [isLoading, setIsLoading] = useState(false);
   const { login, isSignedIn } = useServiceContext();
+  const { isTV } = useConfigContext();
 
   const handleLogin = async (username: string, password: string) => {
     setIsLoading(true);
@@ -26,7 +26,6 @@ export function LoginFormContainer({
 
       return true;
     } catch (error) {
-      LoggerStore.error('handleLogin', { error });
       NotificationStore.displayError(error as Error);
       setIsLoading(false);
 
@@ -38,19 +37,14 @@ export function LoginFormContainer({
     return null;
   }
 
-  const containerFunctions = {
+  const containerProps = {
+    isLoading,
+    withRedirect,
     handleLogin,
   };
 
-  const containerProps = () => ({
-    isLoading,
-    withRedirect,
-  });
+  return isTV ? <LoginFormComponentTV { ...containerProps } /> : <LoginFormComponent { ...containerProps } />;
 
-  return withTV(LoginFormComponentTV, LoginFormComponent, {
-    ...containerFunctions,
-    ...containerProps(),
-  });
 }
 
 export default LoginFormContainer;

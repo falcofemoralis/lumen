@@ -1,38 +1,40 @@
-import { Colors } from 'Style/Colors';
-import { CONTENT_WRAPPER_PADDING } from 'Style/Layout';
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale, colors, text, spacing }: Theme) => ({
   setting: {
+    width: '100%',
   },
   settingHidden: {
     opacity: 0.5,
   },
   settingContainer: {
-    justifyContent: 'flex-start',
-    paddingHorizontal: CONTENT_WRAPPER_PADDING,
-    paddingVertical: 12,
-  },
-  settingWrapper: {
+    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    flex: 1,
-  },
-  settingContent: {
-    width: 'auto',
-    maxWidth: '90%',
-    flexDirection: 'column',
-    justifyContent: 'center',
+    gap: scale(12),
+    paddingHorizontal: scale(spacing.wrapperPadding),
+    paddingVertical: scale(12),
   },
   settingIcon: {
+    flexShrink: 0,
+  },
+  settingContent: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    minWidth: 0,
   },
   settingTitle: {
-    fontSize: 14,
+    fontSize: scale(text.xs.fontSize),
   },
   settingSubtitle: {
-    fontSize: 14,
-    color: Colors.textSecondary,
+    fontSize: scale(text.xs.fontSize),
+    color: colors.textSecondary,
     opacity: 0.8,
   },
-});
+  settingAdditionalElement: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+} satisfies ThemedStyles);

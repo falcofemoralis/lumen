@@ -1,7 +1,8 @@
-import { SettingItem } from 'Route/SettingsPage/SettingsPage.type';
+import { SettingItem } from 'Screen/SettingsScreen/SettingsScreen.type';
 
 export type SettingBaseComponentProps = {
   setting: SettingItem;
-  onPress?: () => void;
+  children?: React.ReactNode;
+  onPress?: () => Promise<void> | void;
   onFocus?: () => void;
 };

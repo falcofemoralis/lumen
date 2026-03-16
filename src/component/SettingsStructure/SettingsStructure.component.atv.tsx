@@ -1,11 +1,14 @@
 import { useIsFocused } from '@react-navigation/native';
-import SettingGroup from 'Component/SettingGroup';
-import SettingInput from 'Component/SettingInput';
-import SettingLink from 'Component/SettingLink';
-import SettingSelect from 'Component/SettingSelect';
-import SettingText from 'Component/SettingText';
+import { SettingCustomSelect } from 'Component/SettingCustomSelect';
+import { SettingGroup } from 'Component/SettingGroup';
+import { SettingInput } from 'Component/SettingInput';
+import { SettingLink } from 'Component/SettingLink';
+import { SettingSelect } from 'Component/SettingSelect';
+import { SettingSwitch } from 'Component/SettingSwitch';
+import { SettingText } from 'Component/SettingText';
 import { useNavigationContext } from 'Context/NavigationContext';
 import { useOverlayContext } from 'Context/OverlayContext';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { useEffect, useRef, useState } from 'react';
 import { useWindowDimensions, View } from 'react-native';
 import {
@@ -15,11 +18,12 @@ import {
   SpatialNavigationView,
   useLockSpatialNavigation,
 } from 'react-tv-space-navigation';
-import { SettingItem, SettingType } from 'Route/SettingsPage/SettingsPage.type';
+import { SettingItem, SettingType } from 'Screen/SettingsScreen/SettingsScreen.type';
+import { ThemedStyles } from 'Theme/types';
 import RemoteControlManager from 'Util/RemoteControl/RemoteControlManager';
 import { SupportedKeys } from 'Util/RemoteControl/SupportedKeys';
 
-import { styles } from './SettingsStructure.style.atv';
+import { componentStyles } from './SettingsStructure.style.atv';
 import { SettingsStructureComponentProps } from './SettingsStructure.type';
 
 const SettingGroupPage = ({
@@ -28,12 +32,14 @@ const SettingGroupPage = ({
   selectedGroupId,
   isActive,
   renderSetting,
+  styles,
 }: {
   settings: SettingItem[];
   groupId: string;
   selectedGroupId: string;
   isActive: boolean;
   renderSetting: (setting: SettingItem) => Record<SettingType, React.ReactNode>
+  styles: ThemedStyles<typeof componentStyles>;
 }) => {
   const { height } = useWindowDimensions();
   const { lock, unlock } = useLockSpatialNavigation();
@@ -64,7 +70,7 @@ const SettingGroupPage = ({
       <View style={ styles.tab }>
         <SpatialNavigationScrollView offsetFromStart={ height / 2.1 }>
           { settings?.map((setting) => (
-            <View key={ setting.id } style={ styles.tabButton }>
+            <View key={ `inner-${setting.id}` } style={ styles.tabButton }>
               { renderSetting(setting)[setting.type] }
             </View>
           )) ?? null }
@@ -78,6 +84,7 @@ export const SettingsStructureComponent = ({
   settings,
   onSettingUpdate,
 }: SettingsStructureComponentProps) => {
+  const styles = useThemedStyles(componentStyles);
   const { height } = useWindowDimensions();
   const [settingsGroupId, setSettingsGroupId] = useState<string>(settings[0].id);
   const [isGroupFocused, setIsGroupFocused] = useState<boolean>(false);
@@ -145,6 +152,18 @@ export const SettingsStructureComponent = ({
         onSelect={ (s) => setSettingsGroupId(s.id) }
       />
     ),
+    SWITCH: (
+      <SettingSwitch
+        setting={ setting }
+        onUpdate={ onSettingUpdate }
+      />
+    ),
+    CUSTOM_SELECT: (
+      <SettingCustomSelect
+        setting={ setting }
+        onUpdate={ onSettingUpdate }
+      />
+    ),
   });
 
   return (
@@ -155,7 +174,7 @@ export const SettingsStructureComponent = ({
             <View style={ styles.tab }>
               <SpatialNavigationScrollView offsetFromStart={ height / 2.1 }>
                 { settings.map((setting) => (
-                  <View key={ setting.id } style={ styles.tabButton }>
+                  <View key={ `tab-${setting.id}` } style={ styles.tabButton }>
                     { renderSetting(setting)[setting.type] }
                   </View>
                 )) }
@@ -167,7 +186,7 @@ export const SettingsStructureComponent = ({
           const isActive = isGroupFocused && setting.id === settingsGroupId;
 
           return (
-            <SpatialNavigationRoot key={ setting.id } isActive={ isActive }>
+            <SpatialNavigationRoot key={ `group-${setting.id}` } isActive={ isActive }>
               <DefaultFocus>
                 <SettingGroupPage
                   settings={ setting.settings ?? [] }
@@ -175,6 +194,7 @@ export const SettingsStructureComponent = ({
                   selectedGroupId={ settingsGroupId }
                   renderSetting={ renderSetting }
                   isActive={ isActive }
+                  styles={ styles }
                 />
               </DefaultFocus>
             </SpatialNavigationRoot>

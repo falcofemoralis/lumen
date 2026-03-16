@@ -5,4 +5,5 @@ export interface PlayerSubtitlesComponentProps {
   subtitleUrl: string;
   player: VideoPlayer;
   style?: StyleProp<ViewStyle>
+  isOffline?: boolean;
 }

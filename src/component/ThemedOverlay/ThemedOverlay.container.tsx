@@ -1,6 +1,6 @@
+import { useConfigContext } from 'Context/ConfigContext';
 import { useOverlayContext } from 'Context/OverlayContext';
-import { withTV } from 'Hooks/withTV';
-import { forwardRef, useImperativeHandle, useState } from 'react';
+import { forwardRef, useId, useImperativeHandle, useState } from 'react';
 
 import ThemedOverlayComponent from './ThemedOverlay.component';
 import ThemedOverlayComponentTV from './ThemedOverlay.component.atv';
@@ -10,12 +10,14 @@ export const ThemedOverlayContainer = forwardRef<ThemedOverlayRef, ThemedOverlay
   const [isOpened, setIsOpened] = useState(false);
   const [contentVisible, setContentVisible] = useState(false);
   const { setIsOverlayOpen } = useOverlayContext();
+  const { isTV } = useConfigContext();
+  const overlayId = useId();
 
   useImperativeHandle(ref, () => ({
     open: () => {
       setIsOpened(true);
       setContentVisible(true);
-      setIsOverlayOpen(true);
+      setIsOverlayOpen(overlayId, true);
 
       setTimeout(() => {
         props.onOpen?.();
@@ -23,7 +25,7 @@ export const ThemedOverlayContainer = forwardRef<ThemedOverlayRef, ThemedOverlay
     },
     close: () => {
       setIsOpened(false);
-      setIsOverlayOpen(false);
+      setIsOverlayOpen(overlayId, false);
 
       setTimeout(() => {
         setContentVisible(false);
@@ -34,7 +36,7 @@ export const ThemedOverlayContainer = forwardRef<ThemedOverlayRef, ThemedOverlay
 
   const handleModalRequestClose = () => {
     setIsOpened(false);
-    setIsOverlayOpen(false);
+    setIsOverlayOpen(overlayId, false);
 
     setTimeout(() => {
       setContentVisible(false);
@@ -42,16 +44,14 @@ export const ThemedOverlayContainer = forwardRef<ThemedOverlayRef, ThemedOverlay
     }, 250);
   };
 
-  const containerProps = () => ({
+  const containerProps = {
     ...props,
     isOpened,
     contentVisible,
     handleModalRequestClose,
-  });
+  };
 
-  return withTV(ThemedOverlayComponentTV, ThemedOverlayComponent, {
-    ...containerProps(),
-  });
+  return isTV ? <ThemedOverlayComponentTV { ...containerProps } /> : <ThemedOverlayComponent { ...containerProps } />;
 });
 
 export default ThemedOverlayContainer;

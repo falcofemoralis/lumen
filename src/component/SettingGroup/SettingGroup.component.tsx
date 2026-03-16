@@ -1,21 +1,19 @@
-import { useNavigation } from '@react-navigation/native';
-import SettingBase from 'Component/SettingBase';
-import { SETTINGS_MODAL_ROUTE } from 'Navigation/routes';
+import { SettingBase } from 'Component/SettingBase';
+import { SETTINGS_MODAL_SCREEN } from 'Navigation/navigationRoutes';
 import { View } from 'react-native';
 import RouterStore from 'Store/Router.store';
+import { navigate } from 'Util/Navigation';
 
 import { SettingGroupComponentProps } from './SettingGroup.type';
 
 const SettingGroupComponent = ({ setting, onUpdate }: SettingGroupComponentProps) => {
-  const navigation = useNavigation();
-
   const onPress = () => {
-    RouterStore.pushData(SETTINGS_MODAL_ROUTE, {
+    RouterStore.pushData(SETTINGS_MODAL_SCREEN, {
       setting: setting,
       onSettingUpdate: onUpdate,
     });
 
-    navigation.navigate(SETTINGS_MODAL_ROUTE);
+    navigate(SETTINGS_MODAL_SCREEN);
   };
 
   return (

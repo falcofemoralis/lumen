@@ -1,13 +1,14 @@
 import {
   createContext,
   use,
+  useCallback,
   useMemo,
   useState,
 } from 'react';
 
 interface OverlayContextInterface {
   isOverlayOpen: boolean;
-  setIsOverlayOpen: (isOpen: boolean) => void;
+  setIsOverlayOpen: (overlayId: string, isOpen: boolean) => void;
 }
 
 const OverlayContext = createContext<OverlayContextInterface>({
@@ -16,7 +17,18 @@ const OverlayContext = createContext<OverlayContextInterface>({
 });
 
 export const OverlayProvider = ({ children }: { children: React.ReactNode }) => {
-  const [isOverlayOpen, setIsOverlayOpen] = useState<boolean>(false);
+  const [openedOverlays, setOpenedOverlays] = useState<Record<string, boolean>>({});
+
+  const setIsOverlayOpen = useCallback((overlayId: string, isOpen: boolean) => {
+    setOpenedOverlays(prev => ({
+      ...prev,
+      [overlayId]: isOpen,
+    }));
+  }, []);
+
+  const isOverlayOpen = useMemo(() => {
+    return Object.values(openedOverlays).some(isOpen => isOpen);
+  }, [openedOverlays]);
 
   const value = useMemo(() => ({
     isOverlayOpen, setIsOverlayOpen,

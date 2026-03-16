@@ -43,6 +43,8 @@ export const PlayerProgressProvider = ({ children }: { children: React.ReactNode
         currentTime: convertSecondsToTime(currentTime),
         durationTime: convertSecondsToTime(duration),
         remainingTime: convertSecondsToTime(duration - currentTime),
+        bufferedTime: bufferedPosition > currentTime ? convertSecondsToTime(bufferedPosition - currentTime) : '0',
+        endDate: Date.now() + (duration - currentTime) * 1000,
       });
     },
     []

@@ -73,6 +73,7 @@ module.exports = defineConfig([
       '@typescript-eslint/no-unnecessary-condition': 'off',
       '@typescript-eslint/no-shadow': 'error',
       '@typescript-eslint/no-use-before-define': 'off',
+      '@typescript-eslint/no-require-imports': 'off',
       // eslint-plugin-eslint-comments
       'eslint-comments/require-description': ['off', {
         ignore: [],

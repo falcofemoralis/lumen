@@ -1,5 +1,6 @@
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
-import t from 'i18n/t';
+import { VideoContentFit } from 'expo-video';
+import { t } from 'i18n/translate';
 
 import { ProgressStatus } from './Player.type';
 
@@ -9,6 +10,8 @@ export const DEFAULT_PROGRESS_STATUS: ProgressStatus = {
   currentTime: '-',
   durationTime: '-',
   remainingTime: '-',
+  bufferedTime: '0',
+  endDate: undefined,
 };
 
 export enum RewindDirection {
@@ -66,4 +69,15 @@ export const MAX_QUALITY: DropdownItem = {
 export const AUTO_QUALITY: DropdownItem = {
   label: t('Auto'),
   value: 'auto',
+};
+
+export const ASPECT_RATIO_OPTIONS: VideoContentFit[] = ['contain', 'cover', 'fill'];
+
+export const getAspectRatioLabel = (aspectRatio: VideoContentFit): string => {
+  switch (aspectRatio) {
+    case 'contain': return t('Contain');
+    case 'cover': return t('Cover');
+    case 'fill': return t('Fill');
+    default: return aspectRatio;
+  }
 };

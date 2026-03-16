@@ -1,34 +1,33 @@
-import { Colors } from 'Style/Colors';
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale, colors, text }: Theme) => ({
   topActions: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignContent: 'center',
     width: '100%',
-    marginVertical: 8,
+    marginVertical: scale(8),
     zIndex: 10,
   },
   topActionsButton: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    width: 36,
-    height: 36,
-    borderRadius: 100,
-    backgroundColor: Colors.whiteTransparent,
+    width: scale(36),
+    height: scale(36),
+    borderRadius: scale(100),
+    backgroundColor: colors.backgroundLighter,
   },
   topActionsButtonContent: {
-    padding: 12,
+    padding: scale(12),
   },
   leftActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
+    gap: scale(16),
   },
   title: {
-    fontSize: 18,
+    fontSize: scale(text.md.fontSize),
     fontWeight: 'bold',
   },
-});
+} satisfies ThemedStyles);

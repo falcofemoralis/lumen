@@ -1,68 +1,9 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { Dimensions } from 'react-native';
-import { Colors } from 'Style/Colors';
-import { calculateItemWidth } from 'Style/Layout';
-import CreateStyles, { scale } from 'Util/CreateStyles';
-
-import { FilmCardDimensions } from './FilmCard.type';
+import { Theme, ThemedStyles } from 'Theme/types';
 
 export const INFO_HEIGHT = 40;
 export const INFO_PADDING_TOP = 8;
 
-export const calculateCardDimensions = (
-  numberOfColumns: number,
-  gap?: number,
-  additionalWidth?: number
-): FilmCardDimensions => {
-  const width = calculateItemWidth(numberOfColumns, gap, additionalWidth);
-
-  const posterHeight = width * (250 / 166);
-  const infoHeight = scale(INFO_HEIGHT) + scale(INFO_PADDING_TOP);
-
-  const height = posterHeight + infoHeight;
-
-  return {
-    width,
-    height,
-  };
-};
-
-export const useFilmCardDimensions = (
-  numberOfColumns: number,
-  gap?: number,
-  additionalWidth?: number
-): FilmCardDimensions => {
-  const [dimensions, setDimensions] = useState(
-    calculateCardDimensions(numberOfColumns, gap, additionalWidth)
-  );
-  const shouldUpdate = useRef(false);
-
-  const updateDimensions = useCallback(() => {
-    setDimensions(
-      calculateCardDimensions(numberOfColumns, gap, additionalWidth)
-    );
-  }, [numberOfColumns, gap, additionalWidth]);
-
-  useEffect(() => {
-    if (shouldUpdate.current) {
-      updateDimensions();
-    }
-
-    shouldUpdate.current = true;
-  }, [numberOfColumns]);
-
-  useEffect(() => {
-    const dimensionChangeHandler = Dimensions.addEventListener('change', updateDimensions);
-
-    return () => {
-      dimensionChangeHandler.remove();
-    };
-  }, [updateDimensions]);
-
-  return dimensions;
-};
-
-export const styles = CreateStyles({
+export const componentStyles = ({ scale, colors, text }: Theme) => ({
   card: {
     overflow: 'hidden',
   },
@@ -71,7 +12,7 @@ export const styles = CreateStyles({
     width: '100%',
     height: 'auto',
     overflow: 'hidden',
-    borderRadius: 8,
+    borderRadius: scale(12),
   },
   poster: {
     aspectRatio: '166 / 250',
@@ -81,19 +22,18 @@ export const styles = CreateStyles({
   },
   info: {
     width: '100%',
-    backgroundColor: Colors.transparent,
-    paddingTop: INFO_PADDING_TOP,
+    paddingTop: scale(INFO_PADDING_TOP),
   },
   title: {
-    fontSize: 12,
+    fontSize: scale(text.xxs.fontSize),
     fontWeight: '700',
-    color: Colors.text,
-    paddingRight: 4,
+    color: colors.text,
+    paddingRight: scale(4),
   },
   subtitle: {
-    fontSize: 10,
-    paddingTop: 4,
-    color: Colors.textSecondary,
+    fontSize: scale(text.xxxs.fontSize),
+    paddingTop: scale(4),
+    color: colors.textSecondary,
   },
   additionContainer: {
     position: 'absolute',
@@ -105,16 +45,18 @@ export const styles = CreateStyles({
     justifyContent: 'space-between',
   },
   typeText: {
-    paddingHorizontal: 4,
-    paddingVertical: 1,
-    fontSize: 10,
+    paddingHorizontal: scale(4),
+    paddingVertical: scale(1),
+    fontSize: scale(10),
     alignSelf: 'flex-end',
+    color: colors.textOnContrast,
   },
   filmAdditionalText: {
-    paddingHorizontal: 4,
-    paddingVertical: 1,
-    fontSize: 10,
-    borderBottomLeftRadius: 8,
+    paddingHorizontal: scale(4),
+    paddingVertical: scale(1),
+    fontSize: scale(text.xxxs.fontSize),
+    borderBottomLeftRadius: scale(8),
     alignSelf: 'flex-start',
+    color: colors.textOnContrast,
   },
-});
+} satisfies ThemedStyles);

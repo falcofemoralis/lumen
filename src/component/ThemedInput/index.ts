@@ -1,1 +1,1 @@
-export { default } from './ThemedInput.container';
+export { default as ThemedInput } from './ThemedInput.container';

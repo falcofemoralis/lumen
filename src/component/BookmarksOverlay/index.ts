@@ -1,1 +1,1 @@
-export { default } from './BookmarksOverlay.container';
+export { default as BookmarksOverlay } from './BookmarksOverlay.container';

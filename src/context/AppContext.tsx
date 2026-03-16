@@ -1,12 +1,14 @@
 import {
   createContext,
   JSX,
-  use,
+  useContext,
   useMemo,
 } from 'react';
 
 import { AppUpdaterProvider } from './AppUpdaterContext';
+import { ConfigProvider } from './ConfigContext';
 import { NavigationProvider } from './NavigationContext';
+import { NetworkProvider } from './NetworkContext';
 import { OverlayProvider } from './OverlayContext';
 import { PlayerProvider } from './PlayerContext';
 import { PlayerProgressProvider } from './PlayerProgressContext';
@@ -29,12 +31,14 @@ export const composeProviders = (...p: Provider[]) =>
   );
 
 export const AppProviders = composeProviders(
+  ConfigProvider,
   NavigationProvider,
   ServiceProvider,
   PlayerProvider,
   PlayerProgressProvider,
   AppUpdaterProvider,
-  OverlayProvider
+  OverlayProvider,
+  NetworkProvider
 );
 
 export const AppProvider = ({ children }: { children: React.ReactNode }) => {
@@ -49,4 +53,4 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export const useAppContext = () => use(AppContext);
+export const useAppContext = () => useContext(AppContext);

@@ -1,7 +1,6 @@
 import Animated from 'react-native-reanimated';
 import { SpatialNavigationFocusableView } from 'react-tv-space-navigation';
 
-import { styles } from './ThemedPressable.style.atv';
 import { ThemedFocusableNodeState, ThemedPressableComponentProps } from './ThemedPressable.type';
 
 export const ThemedPressableComponent = ({
@@ -11,10 +10,9 @@ export const ThemedPressableComponent = ({
   onBlur,
   children,
   style,
+  contentStyle,
   spatialRef,
   disabled = false,
-  mode = 'light',
-  pressDelay = 50,
   withAnimation = false,
   zoomScale = 1.05,
 }: ThemedPressableComponentProps) => {
@@ -29,22 +27,28 @@ export const ThemedPressableComponent = ({
   return (
     <SpatialNavigationFocusableView
       ref={ spatialRef }
-      onSelect={ onPress }
-      onLongSelect={ onLongPress }
+      onSelect={ disabled ? undefined : onPress }
+      onLongSelect={ disabled ? undefined : onLongPress }
       onFocus={ onFocus }
       onBlur={ onBlur }
+      style={ style }
     >
       { ({ isFocused, isRootActive }) => withAnimation ? (
         <Animated.View
           style={ [
-            styles.item,
-            style,
+            {
+              transform: [{ scale: 1 }],
+              transitionProperty: 'transform',
+              transitionDuration: '250ms',
+            },
+            contentStyle,
             isFocused && isRootActive && {
               transform: [{ scale: zoomScale }],
             },
+            disabled && { opacity: 0.5 },
           ] }
         >
-          { typeof children === 'function' ? children({ isFocused, isRootActive }) : children }
+          { renderChildren({ isFocused, isRootActive }) }
         </Animated.View>
       ) : renderChildren({ isFocused, isRootActive }) }
     </SpatialNavigationFocusableView>

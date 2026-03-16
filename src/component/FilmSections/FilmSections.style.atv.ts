@@ -1,10 +1,9 @@
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-export const ROW_GAP = 16;
+const ROW_GAP = 16;
+const HEADER_HEIGHT = 32;
 
-export const HEADER_HEIGHT = 32;
-
-export const styles = CreateStyles({
+export const componentStyles = ({ scale }: Theme) => ({
   container: {
     width: '100%',
   },
@@ -14,13 +13,13 @@ export const styles = CreateStyles({
   rowStyle: {
     flexDirection: 'row',
     width: '100%',
-    gap: ROW_GAP,
-    paddingBlock: ROW_GAP,
-    paddingHorizontal: ROW_GAP,
+    gap: scale(ROW_GAP),
+    paddingBlock: scale(ROW_GAP),
+    paddingHorizontal: scale(ROW_GAP),
   },
   headerText: {
-    fontSize: HEADER_HEIGHT,
-    lineHeight: HEADER_HEIGHT,
+    fontSize: scale(HEADER_HEIGHT),
+    lineHeight: scale(HEADER_HEIGHT),
     fontWeight: '700',
   },
-});
+} satisfies ThemedStyles);

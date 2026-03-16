@@ -1,11 +1,10 @@
 import { Image } from 'expo-image';
 import { memo, useEffect, useState } from 'react';
 import { View } from 'react-native';
-import { Colors } from 'Style/Colors';
+import { useAppTheme } from 'Theme/context';
 import { storyboardParser, VTTItem } from 'Util/VttParser';
 
 import { STORYBOARD_TILE_HEIGHT, STORYBOARD_TILE_WIDTH, STORYBOARD_TILES_COUNT } from './PlayerStoryboard.config';
-import { styles } from './PlayerStoryboard.style';
 import { PlayerStoryboardComponentProps } from './PlayerStoryboard.type';
 
 interface StoryImageProps {
@@ -15,7 +14,10 @@ interface StoryImageProps {
 
 export const CacheImage = ({ uri }: { uri: string }) => (
   <Image
-    style={ styles.image }
+    style={ {
+      width: '100%',
+      height: '100%',
+    } }
     source={ { uri } }
   />
 );
@@ -27,6 +29,8 @@ function imagePropsAreEqual(prevProps: StoryImageProps, props: StoryImageProps) 
 const MemoizedCacheImage = memo(CacheImage, imagePropsAreEqual);
 
 const StoryImage = ({ uri, scale = 1 }: StoryImageProps) => {
+  const { theme } = useAppTheme();
+
   if (!uri) {
     return null;
   }
@@ -55,7 +59,7 @@ const StoryImage = ({ uri, scale = 1 }: StoryImageProps) => {
       style={ {
         width,
         height,
-        backgroundColor: Colors.background,
+        backgroundColor: theme.colors.background,
         overflow: 'hidden',
       } }
     >
@@ -111,7 +115,7 @@ const PlayerStoryboardComponent = ({
   }, [currentTime]);
 
   return (
-    <View style={ [styles.container, style] }>
+    <View style={ style }>
       <StoryImage
         uri={ img }
         scale={ scale }

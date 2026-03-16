@@ -1,13 +1,14 @@
-import Loader from 'Component/Loader';
-import ThemedButton from 'Component/ThemedButton';
-import ThemedOverlay from 'Component/ThemedOverlay';
-import ThemedText from 'Component/ThemedText';
+import { Loader } from 'Component/Loader';
+import { ThemedButton } from 'Component/ThemedButton';
+import { ThemedOverlay } from 'Component/ThemedOverlay';
+import { ThemedText } from 'Component/ThemedText';
 import * as Application from 'expo-application';
-import t from 'i18n/t';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
+import { t } from 'i18n/translate';
 import { Image, ScrollView, View } from 'react-native';
 import { DefaultFocus, SpatialNavigationView } from 'react-tv-space-navigation';
 
-import { styles } from './AppUpdater.style.atv';
+import { componentStyles } from './AppUpdater.style.atv';
 import { AppUpdaterComponentProps } from './AppUpdater.type';
 
 export const AppUpdaterComponent = ({
@@ -19,11 +20,12 @@ export const AppUpdaterComponent = ({
   rejectUpdate,
 }: AppUpdaterComponentProps) => {
   const { versionName, description } = update;
+  const styles = useThemedStyles(componentStyles);
 
   const renderHeader = () => (
     <View style={ styles.header }>
       <Image
-        source={ require('../../../assets/images/icon.png') }
+        source={ require('../../../assets/images/app-icon-all.png') }
         style={ styles.headerIcon }
       />
       <ThemedText style={ styles.headerText }>
@@ -38,7 +40,10 @@ export const AppUpdaterComponent = ({
         { t('Update Available') }
       </ThemedText>
       <ThemedText style={ styles.versionText }>
-        { t('%s to %s', Application.nativeApplicationVersion ?? '0.0.0', versionName) }
+        { t('{{versionFrom}} to {{versionTo}}', {
+          versionFrom: Application.nativeApplicationVersion ?? '0.0.0',
+          versionTo: versionName,
+        }) }
       </ThemedText>
       <ScrollView>
         <ThemedText style={ styles.newText }>

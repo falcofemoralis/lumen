@@ -1,1 +1,1 @@
-export { default } from './PlayerProgressBar.container';
+export { default as PlayerProgressBar } from './PlayerProgressBar.container';

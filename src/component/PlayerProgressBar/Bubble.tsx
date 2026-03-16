@@ -1,4 +1,5 @@
-import PlayerStoryboard from 'Component/PlayerStoryboard';
+import { PlayerStoryboard } from 'Component/PlayerStoryboard';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
 import {
   forwardRef,
   memo,
@@ -11,7 +12,7 @@ import {
 import Animated from 'react-native-reanimated';
 import { convertSecondsToTime } from 'Util/Date';
 
-import { styles } from './PlayerProgressBar.style';
+import { componentStyles } from './PlayerProgressBar.style';
 
 export type BubbleProps = {
   storyboardUrl?: string;
@@ -29,6 +30,7 @@ export const BubbleComponent = forwardRef<BubbleRef, BubbleProps>(
     ref
   ) => {
     const [time, setTime] = useState(0);
+    const styles = useThemedStyles(componentStyles);
 
     useImperativeHandle(ref, () => ({
       setText: (text: string) => {

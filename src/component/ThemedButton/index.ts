@@ -1,1 +1,1 @@
-export { default } from './ThemedButton.container';
+export { default as ThemedButton } from './ThemedButton.container';

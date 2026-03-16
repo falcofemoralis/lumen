@@ -1,1 +1,1 @@
-export { default } from './ThemedGrid.container';
+export { default as ThemedGrid } from './ThemedGrid.container';

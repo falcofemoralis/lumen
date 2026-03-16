@@ -1,2 +1,2 @@
-export const NUMBER_OF_COLUMNS = 3;
-export const NUMBER_OF_COLUMNS_TV = 6;
+export const THUMBNAILS_ROWS = 3;
+export const THUMBNAILS_ROWS_TV = 1;

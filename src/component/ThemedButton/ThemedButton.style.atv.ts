@@ -1,92 +1,98 @@
-import { Colors } from 'Style/Colors';
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale, colors, text }: Theme) => ({
   container: {
-    backgroundColor: Colors.button,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    backgroundColor: colors.button,
+    paddingHorizontal: scale(16),
+    paddingVertical: scale(10),
     borderWidth: 0,
     flexDirection: 'row',
-    gap: 6,
+    gap: scale(6),
     alignItems: 'center',
     overflow: 'hidden',
   },
   text: {
-    fontSize: 14,
+    fontSize: scale(text.xs.fontSize),
   },
   // filled
   containerFilled: {
-    borderRadius: 44,
+    borderRadius: scale(44),
   },
   containerFilledSelected: {
-    backgroundColor: Colors.primary,
+    backgroundColor: colors.primary,
   },
   containerFilledFocused: {
-    backgroundColor: Colors.buttonFocused,
+    backgroundColor: colors.buttonFocused,
+  },
+  containerFilledDisabled: {
+    opacity: 0.5,
   },
   textFilled: {
-    color: Colors.text,
+    color: colors.text,
   },
   textFilledSelected: {
-    color: Colors.textOnPrimary,
+    color: colors.textOnTertiary,
   },
   textFilledFocused: {
-    color: Colors.textFocused,
+    color: colors.textFocused,
+  },
+  icon: {
+    width: scale(18),
+    height: scale(18),
   },
   iconFilled: {
-    color: Colors.text,
+    color: colors.text,
   },
   iconFilledSelected: {},
   iconFilledFocused: {
-    color: Colors.textFocused,
+    color: colors.textFocused,
   },
   // outlined
   containerOutlined: {
-    borderRadius: 44,
-    backgroundColor: Colors.transparent,
+    borderRadius: scale(44),
+    backgroundColor: colors.transparent,
   },
   containerOutlinedSelected: {
-    backgroundColor: Colors.tertiary,
+    backgroundColor: colors.tertiary,
   },
   containerOutlinedFocused: {
-    backgroundColor: Colors.backgroundFocused,
+    backgroundColor: colors.backgroundFocused,
   },
   textOutlined: {
-    color: Colors.text,
+    color: colors.text,
   },
   textOutlinedSelected: {
-    color: Colors.textOnTertiary,
+    color: colors.textOnTertiary,
   },
   textOutlinedFocused: {
-    color: Colors.textFocused,
+    color: colors.textFocused,
   },
   iconOutlined: {
-    color: Colors.text,
+    color: colors.text,
   },
   iconOutlinedSelected: {
-    color: Colors.textOnTertiary,
+    color: colors.textOnTertiary,
   },
   iconOutlinedFocused: {
-    color: Colors.textFocused,
+    color: colors.textFocused,
   },
   rightIcon: {
   },
   // long
   containerLong: {
-    borderRadius: 44,
+    borderRadius: scale(44),
   },
   containerLongSelected: {
-    backgroundColor: Colors.primary,
+    backgroundColor: colors.primary,
   },
   containerLongFocused: {
-    backgroundColor: Colors.buttonFocused,
+    backgroundColor: colors.buttonFocused,
   },
   // transparent
   textLongSelected: {
-    color: Colors.textOnTertiary,
+    color: colors.textOnTertiary,
   },
   textLongFocused: {
-    color: Colors.textFocused,
+    color: colors.textFocused,
   },
-});
+} satisfies ThemedStyles);

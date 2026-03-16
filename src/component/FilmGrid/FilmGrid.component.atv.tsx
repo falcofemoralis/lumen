@@ -1,15 +1,19 @@
-import FilmCard from 'Component/FilmCard';
-import { calculateCardDimensions } from 'Component/FilmCard/FilmCard.style.atv';
-import ThemedGrid from 'Component/ThemedGrid';
+import { FilmCard } from 'Component/FilmCard';
+import { FilmCardThumbnail } from 'Component/FilmCard/FilmCard.thumbnail.atv';
+import { useFilmCardDimensions } from 'Component/FilmCard/useFilmCardDimensions';
+import { ThemedGrid } from 'Component/ThemedGrid';
 import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
-import ThemedPressable from 'Component/ThemedPressable';
-import React, { memo, useCallback, useMemo } from 'react';
+import { ThemedPressable } from 'Component/ThemedPressable';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
+import { memo, useCallback, useMemo } from 'react';
+import { View } from 'react-native';
+import { DefaultFocus } from 'react-tv-space-navigation';
+import { useAppTheme } from 'Theme/context';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
-import { scale } from 'Util/CreateStyles';
 import { noopFn } from 'Util/Function';
 
-import { ROW_GAP, styles } from './FilmGrid.style.atv';
-import { FilmGridThumbnail } from './FilmGrid.thumbnail.atv';
+import { THUMBNAILS_ROWS_TV } from './FilmGrid.config';
+import { componentStyles, ROW_GAP } from './FilmGrid.style.atv';
 import { FilmGridComponentProps, FilmGridItemProps } from './FilmGrid.type';
 
 function FilmGridItem({
@@ -21,6 +25,10 @@ function FilmGridItem({
 }: FilmGridItemProps) {
   const { items } = row;
   const item = items[0];
+
+  if (item.isPlaceholder) {
+    return <FilmCardThumbnail width={ width } />;
+  }
 
   return (
     <ThemedPressable
@@ -46,31 +54,58 @@ const MemoizedGridItem = memo(FilmGridItem, rowPropsAreEqual);
 
 export function FilmGridComponent({
   films,
-  header,
-  headerSize,
   numberOfColumns,
+  isGridVisible,
+  isEmpty,
+  ListHeaderComponent,
+  ListEmptyComponent,
+  menuDefaultFocus,
   onNextLoad,
   handleOnPress,
   handleItemFocus,
 }: FilmGridComponentProps) {
-  const { width, height } = calculateCardDimensions(
+  const { scale } = useAppTheme();
+
+  const styles = useThemedStyles(componentStyles);
+  const { width, height } = useFilmCardDimensions(
     numberOfColumns,
     scale(ROW_GAP),
-    scale(ROW_GAP) * 2
+    scale(ROW_GAP) // paddingHorizontal
   );
 
+  const actualHeight = useMemo(() => height + scale(ROW_GAP), [height, scale]);
+
   const renderItem = useCallback(({ item, index }: ThemedGridRowProps<FilmCardInterface>) => (
-    <MemoizedGridItem
-      index={ index }
-      row={ { id: String(index), items: [item] } }
-      width={ width }
-      handleOnPress={ handleOnPress }
-      handleItemFocus={ handleItemFocus }
-    />
-  ), [width, handleOnPress, handleItemFocus]);
+    <DefaultFocus enable={ menuDefaultFocus ? false : index === 0 }>
+      <View style={ { height: actualHeight } }>
+        <MemoizedGridItem
+          index={ index }
+          row={ { id: String(index), items: [item] } }
+          width={ width }
+          handleOnPress={ handleOnPress }
+          handleItemFocus={ handleItemFocus }
+        />
+      </View>
+    </DefaultFocus>
+  ), [width, actualHeight, handleOnPress, handleItemFocus]);
 
   const filmsData = useMemo(
-    () => films.map((element, index) => ({ ...element, index })), [films]
+    () => {
+      if (isEmpty) {
+        return [];
+      }
+
+      if (!films.length) {
+        return new Array(numberOfColumns * THUMBNAILS_ROWS_TV).fill(null).map((_, index) => ({
+          id: `film-placeholder-${index}`,
+          isPlaceholder: true,
+          index,
+        }));
+      }
+
+      return films.map((element, index) => ({ ...element, index }));
+    },
+    [films, numberOfColumns, isEmpty]
   );
 
   return (
@@ -79,12 +114,12 @@ export function FilmGridComponent({
       rowStyle={ styles.rowStyle }
       data={ filmsData }
       numberOfColumns={ numberOfColumns }
-      itemSize={ height + scale(ROW_GAP) * 2 }
+      itemSize={ actualHeight }
       renderItem={ renderItem }
       onNextLoad={ onNextLoad }
-      header={ header }
-      headerSize={ headerSize }
-      ListEmptyComponent={ <FilmGridThumbnail /> }
+      ListHeaderComponent={ ListHeaderComponent }
+      ListEmptyComponent={ isGridVisible ? ListEmptyComponent : null }
+      tvOptimized
     />
   );
 }

@@ -1,23 +1,22 @@
-import { Colors } from 'Style/Colors';
-import CreateStyles from 'Util/CreateStyles';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-export const styles = CreateStyles({
+export const componentStyles = ({ scale, colors, text }: Theme) => ({
   container: {
     flexDirection: 'row',
     justifyContent: 'center',
-    backgroundColor: Colors.button,
-    borderRadius: 8,
-    color: Colors.text,
-    fontSize: 16,
+    backgroundColor: colors.button,
+    borderRadius: scale(8),
+    color: colors.text,
+    fontSize: scale(text.sm.fontSize),
   },
   content: {
-    padding: 12,
+    padding: scale(12),
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 8,
+    gap: scale(8),
   },
   icon: {
-    width: 16,
+    width: scale(16),
     alignSelf: 'center',
     flexDirection: 'row',
   },
@@ -29,4 +28,4 @@ export const styles = CreateStyles({
   disabled: {
     opacity: 0.5,
   },
-});
+} satisfies ThemedStyles);

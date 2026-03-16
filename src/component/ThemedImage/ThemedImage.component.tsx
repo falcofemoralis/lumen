@@ -1,8 +1,9 @@
 import { Image } from 'expo-image';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { memo } from 'react';
 import { View } from 'react-native';
 
-import { styles } from './ThemedImage.style';
+import { componentStyles } from './ThemedImage.style';
 import { ThemedImageProps } from './ThemedImage.type';
 
 export const ThemedImage = ({
@@ -10,7 +11,10 @@ export const ThemedImage = ({
   style,
   blurRadius,
   transition = 250,
+  cachePolicy,
 }: ThemedImageProps) => {
+  const styles = useThemedStyles(componentStyles);
+
   return (
     <View style={ [styles.container, style] }>
       <Image
@@ -20,6 +24,7 @@ export const ThemedImage = ({
         transition={ transition }
         recyclingKey={ src }
         blurRadius={ blurRadius }
+        cachePolicy={ cachePolicy }
       />
     </View>
   );
