@@ -52,7 +52,7 @@
     "expo-splash-screen": "^55.0.10",
     "expo-status-bar": "^55.0.4",
     "expo-system-ui": "^55.0.9",
-    "expo-video": "^55.0.10",
+    "expo-video": "55.0.10",
     "html-entities": "^2.6.0",
     "i18next": "^25.8.13",
     "intl-pluralrules": "^2.0.1",

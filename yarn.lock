@@ -5153,7 +5153,7 @@ expo-system-ui@^55.0.9:
     "@react-native/normalize-colors" "0.83.2"
     debug "^4.3.2"
 
-expo-video@^55.0.10:
+expo-video@55.0.10:
   version "55.0.10"
   resolved "https://registry.yarnpkg.com/expo-video/-/expo-video-55.0.10.tgz#bcfbbefee82753d814afbd64c6c387afc8f53050"
   integrity sha512-L3UXgvGjrJv4ym3PnIGPPQi4LlVHQSh89eYm2Q7Pn9iUy5ce98sAdqPIKV88bfdLAIWfmPecYUoOzozXBPmenw==

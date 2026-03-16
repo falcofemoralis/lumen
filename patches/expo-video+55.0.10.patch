@@ -1,0 +1,123 @@
+diff --git a/node_modules/expo-video/android/src/main/java/expo/modules/video/managers/PictureInPictureManager.kt b/node_modules/expo-video/android/src/main/java/expo/modules/video/managers/PictureInPictureManager.kt
+index f42a670..c675250 100644
+--- a/node_modules/expo-video/android/src/main/java/expo/modules/video/managers/PictureInPictureManager.kt
++++ b/node_modules/expo-video/android/src/main/java/expo/modules/video/managers/PictureInPictureManager.kt
+@@ -44,6 +44,10 @@ class PictureInPictureManager(appContext: AppContext) : PictureInPictureFragment
+   private val strongVideoViews
+     get() = videoViews.mapNotNull { it.get() }
+   private val rootViewChildrenOriginalVisibility = mutableMapOf<Int, Int>()
++  private var originalPlayerViewLayoutParams: ViewGroup.LayoutParams? = null
++  private var originalPlayerViewParent: WeakReference<ViewGroup>? = null
++  private var originalPlayerViewIndex: Int = -1
++  private var activePiPView: VideoView? = null  // Strong reference to prevent GC during PiP
+   private var isReleased = false
+ 
+   init {
+@@ -53,10 +57,11 @@ class PictureInPictureManager(appContext: AppContext) : PictureInPictureFragment
+   fun release() {
+     if (isInPiP) {
+       // VideoView most likely doesn't exist atp
+-      layoutForPiPExit(null)
++      layoutForPiPExit(activePiPView)
+     }
+ 
+     videoViews.clear()
++    activePiPView = null
+     removePiPHelperFragment()
+     isReleased = true
+   }
+@@ -122,6 +127,9 @@ class PictureInPictureManager(appContext: AppContext) : PictureInPictureFragment
+     maybeWarnAboutAutoEnterViews()
+ 
+     val candidate = currentPiPViewCandidate.get()
++    // Store strong reference to prevent garbage collection
++    activePiPView = candidate
++    
+     candidate?.let {
+       layoutForPiPEnter(it)
+     }
+@@ -138,14 +146,19 @@ class PictureInPictureManager(appContext: AppContext) : PictureInPictureFragment
+       return
+     }
+ 
+-    currentPiPViewCandidate.get()?.let {
+-      layoutForPiPExit(it)
++    // Use the strong reference instead of weak reference
++    val candidate = activePiPView
++    
++    if (candidate != null) {
++      layoutForPiPExit(candidate)
+     }
++    
+     strongVideoViews.forEach {
+-      it.onStopPictureInPicture(currentPiPViewCandidate.get())
++      it.onStopPictureInPicture(candidate)
+     }
+ 
+     isInPiP = false
++    activePiPView = null  // Clear strong reference
+   }
+ 
+   override fun onVideoViewRegistered(videoView: VideoView, allVideoViews: Collection<VideoView>) {
+@@ -268,7 +281,13 @@ class PictureInPictureManager(appContext: AppContext) : PictureInPictureFragment
+     val decorView = mainActivity.window.decorView
+     val rootView = decorView.findViewById<ViewGroup>(android.R.id.content)
+ 
+-    (playerView.parent as? ViewGroup)?.removeView(playerView)
++    // Store original layout params and parent before removing
++    val originalParent = playerView.parent as? ViewGroup
++    originalPlayerViewLayoutParams = playerView.layoutParams
++    originalPlayerViewParent = WeakReference(originalParent)
++    originalPlayerViewIndex = originalParent?.indexOfChild(playerView) ?: -1
++    
++    originalParent?.removeView(playerView)
+     for (i in 0 until rootView.childCount) {
+       val child = rootView.getChildAt(i)
+       if (child != playerView) {
+@@ -286,7 +305,27 @@ class PictureInPictureManager(appContext: AppContext) : PictureInPictureFragment
+     val rootView = decorView.findViewById<ViewGroup>(android.R.id.content)
+ 
+     rootView.removeView(playerView)
+-    videoView?.addView(playerView)
++    
++    // Restore to original parent at original position with original layout params
++    val originalParent = originalPlayerViewParent?.get()
++    
++    if (playerView != null && originalParent != null) {
++      val layoutParams = originalPlayerViewLayoutParams
++      if (originalPlayerViewIndex >= 0 && originalPlayerViewIndex <= originalParent.childCount) {
++        originalParent.addView(playerView, originalPlayerViewIndex, layoutParams)
++      } else {
++        originalParent.addView(playerView, layoutParams)
++      }
++      
++      // Request layout to ensure proper sizing
++      playerView.requestLayout()
++      originalParent.requestLayout()
++      
++      // Clean up stored references
++      originalPlayerViewLayoutParams = null
++      originalPlayerViewParent = null
++      originalPlayerViewIndex = -1
++    }
+ 
+     for (i in 0 until rootView.childCount) {
+       val child = rootView.getChildAt(i)
+diff --git a/node_modules/expo-video/expo-module.config.json b/node_modules/expo-video/expo-module.config.json
+index 14af4a1..6d6ecae 100644
+--- a/node_modules/expo-video/expo-module.config.json
++++ b/node_modules/expo-video/expo-module.config.json
+@@ -4,12 +4,6 @@
+     "modules": ["VideoModule"]
+   },
+   "android": {
+-    "modules": ["expo.modules.video.VideoModule"],
+-    "publication": {
+-      "groupId": "host.exp.exponent",
+-      "artifactId": "expo.modules.video",
+-      "version": "55.0.10",
+-      "repository": "local-maven-repo"
+-    }
++    "modules": ["expo.modules.video.VideoModule"]
+   }
+ }
