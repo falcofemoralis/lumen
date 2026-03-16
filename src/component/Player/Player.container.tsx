@@ -206,6 +206,10 @@ export function PlayerContainer({
     }, SAVE_TIME_EVERY_MS);
   }, [player, updateTime]);
 
+  const handleBack = useCallback(() => {
+    updateTime();
+  }, [updateTime]);
+
   useEffect(() => {
     activateKeepAwakeAsync(AWAKE_TAG);
     createUpdateTimeTimeout();
@@ -213,7 +217,7 @@ export function PlayerContainer({
     const backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
       () => {
-        updateTime();
+        handleBack();
 
         return false;
       }
@@ -225,7 +229,7 @@ export function PlayerContainer({
       backHandler.remove();
       resetProgressStatus();
     };
-  }, [updateTime, createUpdateTimeTimeout, initFirestoreSavedTime, resetProgressStatus]);
+  }, [handleBack, createUpdateTimeTimeout, initFirestoreSavedTime, resetProgressStatus]);
 
   useEventListener(
     player,
@@ -629,6 +633,11 @@ export function PlayerContainer({
     togglePlayPause(false);
   };
 
+  const handleBackButtonPress = () => {
+    handleBack();
+    navigation.goBack();
+  };
+
   const containerProps = {
     player,
     status,
@@ -674,6 +683,7 @@ export function PlayerContainer({
     closeOverlay,
     onBookmarkChange,
     backwardToStart,
+    handleBackButtonPress,
   };
 
   return isTV ? <PlayerComponentTV { ...containerProps } /> : <PlayerComponent { ...containerProps } />;

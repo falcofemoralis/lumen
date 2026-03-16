@@ -113,6 +113,7 @@ export function PlayerComponent({
   closeOverlay,
   onBookmarkChange,
   setPlayerRate,
+  handleBackButtonPress,
 }: PlayerComponentProps) {
   const { playerLongPressSpeed } = useConfigContext();
   const { scale, theme } = useAppTheme();
@@ -131,7 +132,6 @@ export function PlayerComponent({
   const isOverlayOpenRef = useRef(isOverlayOpen);
   const isScrollingRef = useRef(isScrolling);
   const isComponentMounted = useRef(true);
-  const navigation = useNavigation();
 
   const controlsAnimation = useAnimatedStyle(() => ({
     opacity: withTiming(showControls ? 1 : 0, { duration: PLAYER_CONTROLS_ANIMATION }),
@@ -314,9 +314,7 @@ export function PlayerComponent({
       <ThemedPressable
         style={ styles.backButton }
         contentStyle={ styles.backButtonContent }
-        onPress={ () => {
-          navigation.goBack();
-        } }
+        onPress={ handleBackButtonPress }
       >
         <ArrowLeft
           size={ scale(24) }

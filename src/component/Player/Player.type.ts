@@ -61,6 +61,7 @@ export interface PlayerComponentProps {
   closeOverlay: () => void;
   onBookmarkChange: (film: FilmInterface) => void;
   backwardToStart: () => void;
+  handleBackButtonPress: () => void;
 }
 
 export type ProgressStatus = {
