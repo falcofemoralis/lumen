@@ -714,15 +714,17 @@ export const CDNSlide = ({
   const [isAutomatic, setIsAutomatic] = useState<boolean>(currentService.isAutomaticCDN());
   const [isCDNValid, setIsCDNValid] = useState<boolean | null>(null);
 
-  const handleUpdateCDN = useCallback(() => {
-    if (!selectedCDN) {
+  const handleUpdateCDN = useCallback((valueArg: string) => {
+    const value = valueArg || selectedCDN;
+
+    if (!value) {
       NotificationStore.displayError(t('Please select a CDN'));
 
       return;
     }
 
-    setSelectedCDN(selectedCDN);
-    updateCDN(selectedCDN ?? '');
+    setSelectedCDN(value);
+    updateCDN(value ?? '');
     setIsCDNValid(null);
   }, [selectedCDN, updateCDN]);
 
@@ -783,7 +785,7 @@ export const CDNSlide = ({
       goBack={ goBack }
       goNext={ goNext }
       style={ styles.cdnSlide }
-      onNext={ handleUpdateCDN }
+      onNext={ () => handleUpdateCDN }
       styles={ styles }
     >
       <View style={ styles.cdnWrapper }>
