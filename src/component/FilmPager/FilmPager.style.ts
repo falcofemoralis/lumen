@@ -4,7 +4,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   tabBarContainer: {
     position: 'relative',
     alignItems: 'center',
-    height: scale(42),
+    paddingBlock: scale(6),
   },
   tabButton: {
     alignItems: 'center',

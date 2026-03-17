@@ -42,7 +42,7 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
     const { selectedVoice: contextVoice, updateSelectedVoice } = usePlayerContext();
     const [isLoading, setIsLoading] = useState(false);
     const [selectedVoice, setSelectedVoice] = useState<FilmVoiceInterface>(
-      voiceInput ?? voices.find(({ isActive }) => isActive) ?? voices[0]
+      voiceInput ?? voices.length > 0 ? voices.find(({ isActive }) => isActive) ?? voices[0] : {} as FilmVoiceInterface
     );
     const { isSignedIn, profile, currentService } = useServiceContext();
 
