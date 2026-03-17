@@ -25,7 +25,7 @@ export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>
     });
     const updatingStateRef = useRef(false);
     const [isLoading, setIsLoading] = useState(false);
-    const { currentService } = useServiceContext();
+    const { isSignedIn, currentService } = useServiceContext();
 
     useEffect(() => {
       if (initialLoad) {
@@ -87,6 +87,10 @@ export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>
     };
 
     const handlePostLike = useCallback((commentId: string) => {
+      if (!isSignedIn) {
+        return;
+      }
+
       if (isTV) {
         NotificationStore.displayMessage(t('Liked'));
       } else {

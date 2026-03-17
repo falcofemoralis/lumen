@@ -8,6 +8,7 @@ import { ThemedImageModal } from 'Component/ThemedImageModal';
 import { ThemedPressable } from 'Component/ThemedPressable';
 import { ThemedText } from 'Component/ThemedText';
 import { Wrapper } from 'Component/Wrapper';
+import { useServiceContext } from 'Context/ServiceContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
@@ -83,6 +84,7 @@ export function FilmScreenComponent({
   handleRatingSelect,
 }: FilmScreenComponentProps) {
   const { scale, theme } = useAppTheme();
+  const { isSignedIn } = useServiceContext();
   const styles = useThemedStyles(componentStyles);
   const { width } = useWindowDimensions();
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
@@ -273,11 +275,11 @@ export function FilmScreenComponent({
 
   const renderMiddleActions = () => (
     <View style={ styles.middleActions }>
-      { renderMiddleAction(Star, 'Rate', openRatingOverlay, film.isRatingPosted) }
+      { isSignedIn && renderMiddleAction(Star, 'Rate', openRatingOverlay, film.isRatingPosted) }
       { renderMiddleAction(Clapperboard, 'Trailer', openTrailerOverlay) }
       { renderMiddleAction(MessageSquareText, 'Comments', openComments) }
       { renderMiddleAction(isBookmarked(film) ? BookmarkCheck : Bookmark, 'Bookmark', openBookmarks) }
-      { renderMiddleAction(Download, 'Download', openVideoDownloader) }
+      { isSignedIn && renderMiddleAction(Download, 'Download', openVideoDownloader) }
     </View>
   );
 

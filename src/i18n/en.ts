@@ -266,6 +266,7 @@ const en = {
   'Rate': 'Rate',
   'Are you sure you want to hide this item?': 'Are you sure you want to hide this item?',
   'Liked': 'Liked',
+  'Skip sign in': 'Skip sign in',
 };
 
 export default en;

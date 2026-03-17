@@ -268,6 +268,7 @@ const ru: Translations = {
   'Rate': 'Оценить',
   'Are you sure you want to hide this item?': 'Отметить как просмотренный и не отображать уведомления о выходе новых серий?',
   'Liked': 'Оценено',
+  'Skip sign in': 'Пропустить авторизацию',
 };
 
 export default ru;
