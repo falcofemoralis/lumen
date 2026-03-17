@@ -8,6 +8,7 @@ import { SubtitleInterface } from 'Type/FilmVideo.interface';
 import { EpisodeInterface, SeasonInterface } from 'Type/FilmVoice.interface';
 import { HTMLElementInterface } from 'Util/Parser';
 import { Variables } from 'Util/Request';
+import { removeUrlHost } from 'Util/Url';
 
 import { decrypt } from './decode';
 import { FILM_SORTING, SubtitleLns } from './type';
@@ -42,7 +43,8 @@ export const parseFilmType = (type = '') => {
 
 export const parseFilmCard = (el: HTMLElementInterface): FilmCardInterface => {
   const id = el.attributes['data-id'];
-  const link = el.querySelector('.b-content__inline_item-link a')?.attributes.href ?? '';
+  const linkFull = el.querySelector('.b-content__inline_item-link a')?.attributes.href ?? '';
+  const link = removeUrlHost(linkFull);
   const type = parseFilmType(el.querySelector('.cat')?.attributes.class);
   const poster = el.querySelector('.b-content__inline_item-cover img')?.attributes.src ?? '';
   const title = el.querySelector('.b-content__inline_item-link a')?.rawText ?? '';

@@ -15,3 +15,13 @@ export const removeParamFromUrl = (url: string, param: string): string => {
 
   return urlObj.toString();
 };
+
+export const removeUrlHost = (url: string): string => {
+  if (!url.includes('http')) {
+    return url;
+  }
+
+  const urlObj = new URL(url);
+
+  return urlObj.pathname;
+};
