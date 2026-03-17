@@ -2,7 +2,6 @@ import { Theme, ThemedStyles } from 'Theme/types';
 
 export const componentStyles = ({ scale, text, colors }: Theme) => ({
   page: {
-    paddingBottom: scale(16),
   },
   actions: {
     flex: 1,

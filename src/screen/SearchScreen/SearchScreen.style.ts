@@ -24,8 +24,8 @@ export const componentStyles = ({ scale, colors, text, spacing }: Theme) => ({
   actionBtnSearch: {
     position: 'absolute',
     left: 0,
-    width: scale(36),
-    height: scale(36),
+    width: scale(34),
+    height: scale(34),
     zIndex: 15,
     backgroundColor: colors.button,
     borderRadius: scale(50),
@@ -42,8 +42,8 @@ export const componentStyles = ({ scale, colors, text, spacing }: Theme) => ({
   closeBtn: {
     position: 'absolute',
     right: 0,
-    width: scale(36),
-    height: scale(36),
+    width: scale(34),
+    height: scale(34),
     zIndex: 15,
     backgroundColor: colors.button,
     borderRadius: scale(50),

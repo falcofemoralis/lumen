@@ -43,20 +43,8 @@ const TabButton = memo(({
   selectedSorting?: FilmPagerComponentProps['selectedSorting'];
   handleSelectSorting?: FilmPagerComponentProps['handleSelectSorting'];
 }) => {
-  const { scale } = useAppTheme();
   const sortingOverlayRef = useRef<ThemedOverlayRef>(null);
   const { id, title } = menuItem;
-  const sortingHeightAnim = useSharedValue(0);
-
-  useEffect(() => {
-    sortingHeightAnim.value = withTiming(isActive && sorting ? scale(14) : 0, {
-      duration: 250,
-    });
-  }, [isActive, sorting, scale, sortingHeightAnim]);
-
-  const sortingAnimatedStyle = useAnimatedStyle(() => ({
-    height: sortingHeightAnim.value,
-  }));
 
   const handlePress = () => {
     onPress();
@@ -88,11 +76,10 @@ const TabButton = memo(({
         >
           { title }
         </Animated.Text>
-        { sorting && (
+        { sorting && isActive && (
           <Animated.Text
             style={ [
               styles.sortingText,
-              sortingAnimatedStyle,
             ] }
           >
             { selectedSorting?.[id]?.label ?? sorting[0].label }
