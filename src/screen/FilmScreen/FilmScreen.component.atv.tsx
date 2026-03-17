@@ -9,6 +9,7 @@ import { ThemedDropdown } from 'Component/ThemedDropdown';
 import { ThemedImage } from 'Component/ThemedImage';
 import { ThemedOverlay } from 'Component/ThemedOverlay';
 import { ThemedText } from 'Component/ThemedText';
+import { useServiceContext } from 'Context/ServiceContext';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import {
@@ -75,6 +76,7 @@ export function FilmScreenComponent({
   handleRatingSelect,
 }: FilmScreenComponentProps) {
   const { scale, theme } = useAppTheme();
+  const { isSignedIn } = useServiceContext();
   const styles = useThemedStyles(componentStyles);
   const { height } = useWindowDimensions();
   const [showReadMore, setShowReadMore] = useState<boolean | null>(null);
@@ -143,8 +145,8 @@ export function FilmScreenComponent({
           { renderAction(MessageSquareText, t('Comments'), () => commentsOverlayRef?.current?.open()) }
           { renderAction(Clapperboard, t('Trailer'), openTrailerOverlay) }
           { renderAction(isBookmarked(film) ? BookmarkCheck : Bookmark, t('Bookmark'), openBookmarks) }
-          { renderAction(Download, t('Download'), openVideoDownloader) }
-          { renderAction(Star, t('Rate'), openRatingOverlay, film.isRatingPosted) }
+          { isSignedIn && renderAction(Download, t('Download'), openVideoDownloader) }
+          { isSignedIn && renderAction(Star, t('Rate'), openRatingOverlay, film.isRatingPosted) }
         </View>
       </DefaultFocus>
     </SpatialNavigationView>

@@ -476,21 +476,21 @@ export const LoginSlide = ({
 }: LoginSlideProps) => {
   const { theme, scale } = useAppTheme();
   const { isTV } = useConfigContext();
-  const { profile, isSignedIn, currentService, login } = useServiceContext();
+  const { profile, currentService, login } = useServiceContext();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const usernameRef = useRef<string | null>(null);
   const passwordRef = useRef<string | null>(null);
   const registrationOverlayRef = useRef<ThemedOverlayRef>(null);
 
   const handleNext = useCallback((s: SlideInterface) => {
-    if (!isSignedIn) {
-      NotificationStore.displayMessage(t('Please sign in to continue'));
+    // if (!isSignedIn) {
+    //   NotificationStore.displayMessage(t('Please sign in to continue'));
 
-      return;
-    }
+    //   return;
+    // }
 
     goNext(s);
-  }, [isSignedIn, goNext]);
+  }, [goNext]);
 
   const handleLogin = useCallback(async () => {
     setIsLoading(true);

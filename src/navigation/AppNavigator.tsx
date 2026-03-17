@@ -39,10 +39,9 @@ const Stack = createNativeStackNavigator<AppStackParamList>();
 
 const AppStack = () => {
   const { isConfigured } = useConfigContext();
-  const { isSignedIn } = useServiceContext();
   const { theme } = useAppTheme();
 
-  if (!isConfigured || !isSignedIn) {
+  if (!isConfigured) {
     return (
       <Stack.Navigator>
         <Stack.Screen
