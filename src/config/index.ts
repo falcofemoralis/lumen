@@ -28,7 +28,6 @@ export type DeviceConfigType = {
   playerAskQuality: boolean;
   strictConnectionCheck: boolean;
   playerDefaultAspectRatio: string;
-  skipSignIn: boolean;
 }
 
 export const defaultConfig: DeviceConfigType = {
@@ -58,5 +57,4 @@ export const defaultConfig: DeviceConfigType = {
   checkForUpdates: true,
   strictConnectionCheck: true,
   playerDefaultAspectRatio: ASPECT_RATIO_OPTIONS[0],
-  skipSignIn: false,
 };

@@ -475,22 +475,22 @@ export const LoginSlide = ({
   styles,
 }: LoginSlideProps) => {
   const { theme, scale } = useAppTheme();
-  const { isTV, skipSignIn, setConfig } = useConfigContext();
-  const { profile, isSignedIn, currentService, login } = useServiceContext();
+  const { isTV } = useConfigContext();
+  const { profile, currentService, login } = useServiceContext();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const usernameRef = useRef<string | null>(null);
   const passwordRef = useRef<string | null>(null);
   const registrationOverlayRef = useRef<ThemedOverlayRef>(null);
 
   const handleNext = useCallback((s: SlideInterface) => {
-    if (!isSignedIn && !skipSignIn) {
-      NotificationStore.displayMessage(t('Please sign in to continue'));
+    // if (!isSignedIn) {
+    //   NotificationStore.displayMessage(t('Please sign in to continue'));
 
-      return;
-    }
+    //   return;
+    // }
 
     goNext(s);
-  }, [isSignedIn, skipSignIn, goNext]);
+  }, [goNext]);
 
   const handleLogin = useCallback(async () => {
     setIsLoading(true);
@@ -586,15 +586,6 @@ export const LoginSlide = ({
             </ThemedText>
           ) }
         </ThemedPressable>
-      </View>
-      <View style={ styles.providerOffModeRow }>
-        <ThemedText style={ styles.providerButtonText }>
-          { t('Skip sign in') }
-        </ThemedText>
-        <ThemedToggle
-          value={ skipSignIn }
-          onValueChange={ (value) => setConfig('skipSignIn', value) }
-        />
       </View>
       <ThemedOverlay ref={ registrationOverlayRef } contentContainerStyle={ isTV && styles.registrationOverlayTV }>
         <View style={ styles.registrationOverlay }>

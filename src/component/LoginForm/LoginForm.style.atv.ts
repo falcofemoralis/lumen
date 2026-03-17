@@ -18,7 +18,6 @@ export const componentStyles = ({ scale }: Theme) => ({
     margin: scale(8),
   },
   input: {
-    width: scale(250),
   },
   button: {
     margin: scale(8),

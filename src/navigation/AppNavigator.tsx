@@ -38,11 +38,10 @@ import { TabsNavigator } from './TabsNavigator';
 const Stack = createNativeStackNavigator<AppStackParamList>();
 
 const AppStack = () => {
-  const { isConfigured, skipSignIn } = useConfigContext();
-  const { isSignedIn } = useServiceContext();
+  const { isConfigured } = useConfigContext();
   const { theme } = useAppTheme();
 
-  if (!isConfigured || (!isSignedIn && !skipSignIn)) {
+  if (!isConfigured) {
     return (
       <Stack.Navigator>
         <Stack.Screen
