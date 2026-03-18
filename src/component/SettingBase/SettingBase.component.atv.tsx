@@ -15,6 +15,7 @@ import { SettingBaseComponentProps } from './SettingBase.type';
 const SettingBaseComponent = ({
   setting,
   children,
+  isLoading: isLoadingProp = false,
   onPress,
   onFocus,
 }: SettingBaseComponentProps) => {
@@ -89,7 +90,7 @@ const SettingBaseComponent = ({
   return (
     <>
       <ThemedPressable
-        onPress={ () => handleOnPress() }
+        onPress={ (!isEnabled || isLoading || isLoadingProp) ? undefined : () => handleOnPress() }
         onFocus={ onFocus }
         withAnimation
       >
@@ -97,7 +98,7 @@ const SettingBaseComponent = ({
           <View style={ [
             styles.setting,
             isFocused && isRootActive && styles.settingFocused,
-            (!isEnabled || isLoading) && styles.settingHidden,
+            (!isEnabled || isLoading || isLoadingProp) && styles.settingHidden,
           ] }
           >
             <View style={ styles.settingWrapper }>
@@ -134,7 +135,7 @@ const SettingBaseComponent = ({
                 </View>
               ) }
               { withLoader && (
-                <Loader isLoading={ isLoading } fullScreen />
+                <Loader isLoading={ isLoading || isLoadingProp } fullScreen />
               ) }
             </View>
           </View>
