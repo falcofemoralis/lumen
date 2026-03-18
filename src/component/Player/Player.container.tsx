@@ -71,6 +71,7 @@ export function PlayerContainer({
     playerAutoNextEpisode,
     playerBufferTimeSetting,
     playerDefaultAspectRatio,
+    playerDefaultSpeed,
   } = useConfigContext();
   const navigation = useNavigation();
   const { updateSelectedVoice } = usePlayerContext();
@@ -89,7 +90,7 @@ export function PlayerContainer({
   const [selectedSubtitle, setSelectedSubtitle] = useState<SubtitleInterface|undefined>(
     selectedVideo.subtitles?.find(({ isDefault }) => isDefault)
   );
-  const [selectedSpeed, setSelectedSpeed] = useState<number>(DEFAULT_SPEED);
+  const [selectedSpeed, setSelectedSpeed] = useState<number>(playerDefaultSpeed);
   const [selectedAspectRatio, setSelectedAspectRatio] = useState<VideoContentFit>(
     playerDefaultAspectRatio as VideoContentFit
   );
@@ -150,6 +151,7 @@ export function PlayerContainer({
     p.timeUpdateEventInterval = 1;
     p.currentTime = getVideoTime(selectedVoice, savedTime);
     p.preservesPitch = true;
+    p.playbackRate = playerDefaultSpeed;
     p.bufferOptions = {
       ...p.bufferOptions,
       preferredForwardBufferDuration: playerBufferTimeSetting ?? getBufferTime(selectedQuality),

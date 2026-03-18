@@ -1,4 +1,4 @@
-import { ASPECT_RATIO_OPTIONS, getAspectRatioLabel, MAX_QUALITY } from 'Component/Player/Player.config';
+import { ASPECT_RATIO_OPTIONS, DEFAULT_SPEEDS, getAspectRatioLabel, MAX_QUALITY } from 'Component/Player/Player.config';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import * as Application from 'expo-application';
@@ -9,6 +9,7 @@ import {
   BookImage,
   Brush,
   CircleArrowRight,
+  CircleGauge,
   CircleQuestionMark,
   Cloud,
   CloudCog,
@@ -92,6 +93,7 @@ export function SettingsScreenContainer() {
     playerAskQuality,
     strictConnectionCheck,
     playerDefaultAspectRatio,
+    playerDefaultSpeed,
   } = useConfigContext();
   const {
     currentService,
@@ -533,8 +535,22 @@ export function SettingsScreenContainer() {
             };
           }),
           onSettingPress,
-          IconComponent: Gauge,
+          IconComponent: CircleGauge,
           isHidden: isTV,
+        },
+        {
+          id: 'playerDefaultSpeed',
+          title: t('Player default speed'),
+          type: SETTING_TYPE.SELECT,
+          value: playerDefaultSpeed.toString(),
+          options: DEFAULT_SPEEDS.map((value) => {
+            return {
+              value: value.toString(),
+              label: `${value.toString()}x`,
+            };
+          }),
+          onSettingPress,
+          IconComponent: Gauge,
         },
         {
           id: 'playerShowBufferTime',

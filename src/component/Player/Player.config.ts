@@ -54,7 +54,7 @@ export const PLAYER_CONTROLS_TIMEOUT = 3000;
 export const PLAYER_CONTROLS_ANIMATION = 150;
 
 export const DEFAULT_SPEED = 1;
-export const DEFAULT_SPEEDS = [0.25, 0.5, 1, 1.5, 2];
+export const DEFAULT_SPEEDS = [0.25, 0.5, 0.75, 1, 1.10, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3];
 
 export const DOUBLE_TAP_ANIMATION = 2000;
 export const DOUBLE_TAP_ANIMATION_DELAY = 150;

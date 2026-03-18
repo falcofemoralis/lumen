@@ -1,4 +1,4 @@
-import { ASPECT_RATIO_OPTIONS } from 'Component/Player/Player.config';
+import { ASPECT_RATIO_OPTIONS, DEFAULT_SPEED } from 'Component/Player/Player.config';
 import { HOME_SCREEN } from 'Navigation/navigationRoutes';
 
 export type DeviceConfigType = {
@@ -28,6 +28,7 @@ export type DeviceConfigType = {
   playerAskQuality: boolean;
   strictConnectionCheck: boolean;
   playerDefaultAspectRatio: string;
+  playerDefaultSpeed: number;
 }
 
 export const defaultConfig: DeviceConfigType = {
@@ -57,4 +58,5 @@ export const defaultConfig: DeviceConfigType = {
   checkForUpdates: true,
   strictConnectionCheck: true,
   playerDefaultAspectRatio: ASPECT_RATIO_OPTIONS[0],
+  playerDefaultSpeed: DEFAULT_SPEED,
 };
