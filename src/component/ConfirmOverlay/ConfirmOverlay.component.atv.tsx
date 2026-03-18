@@ -15,6 +15,7 @@ export const ConfirmOverlayComponent = ({
   message,
   confirmButtonText,
   cancelButtonText,
+  disableCancelButton,
   onConfirm,
 }: ConfirmOverlayProps) => {
   const styles = useThemedStyles(componentStyles);
@@ -32,9 +33,11 @@ export const ConfirmOverlayComponent = ({
         ) }
         <SpatialNavigationView direction='horizontal'>
           <View style={ styles.actions }>
-            <ThemedButton onPress={ onCancel } contentStyle={ styles.button }>
-              { cancelButtonText ?? t('Cancel') }
-            </ThemedButton>
+            { !disableCancelButton && (
+              <ThemedButton onPress={ onCancel } contentStyle={ styles.button }>
+                { cancelButtonText ?? t('Cancel') }
+              </ThemedButton>
+            ) }
             <DefaultFocus>
               <ThemedButton onPress={ onConfirm } contentStyle={ [styles.button, styles.buttonPrimary] }>
                 { confirmButtonText ?? t('Accept') }

@@ -16,6 +16,9 @@ import { FilmTrailerScreenComponentProps } from './FilmTrailerScreen.type';
 const TrailerPlayer = ({ trailerUrl }: { trailerUrl: string }) => {
   const player = useYouTubePlayer({ url: trailerUrl }, {
     autoplay: true,
+    controls: true,
+    playsinline: true,
+    rel: false,
   });
 
   return (

@@ -10,6 +10,7 @@ import { LoginFormContainerProps } from './LoginForm.type';
 
 export function LoginFormContainer({
   withRedirect,
+  children,
 }: LoginFormContainerProps) {
   const [isLoading, setIsLoading] = useState(false);
   const { login, isSignedIn } = useServiceContext();
@@ -40,6 +41,7 @@ export function LoginFormContainer({
   const containerProps = {
     isLoading,
     withRedirect,
+    children,
     handleLogin,
   };
 

@@ -1,4 +1,4 @@
-import { ASPECT_RATIO_OPTIONS, getAspectRatioLabel, MAX_QUALITY } from 'Component/Player/Player.config';
+import { ASPECT_RATIO_OPTIONS, DEFAULT_SPEEDS, getAspectRatioLabel, MAX_QUALITY } from 'Component/Player/Player.config';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import * as Application from 'expo-application';
@@ -9,9 +9,11 @@ import {
   BookImage,
   Brush,
   CircleArrowRight,
+  CircleGauge,
   CircleQuestionMark,
   Cloud,
   CloudCog,
+  Dock,
   Download,
   ExternalLink,
   FolderCog,
@@ -86,12 +88,14 @@ export function SettingsScreenContainer() {
     playerLongPressSpeed,
     sortVoicesByRating,
     playerStopPlayOnButtonTV,
+    playerStopPlayShowInterfaceTV,
     playerBufferTimeSetting,
     checkForUpdates,
     playerSaveQuality,
     playerAskQuality,
     strictConnectionCheck,
     playerDefaultAspectRatio,
+    playerDefaultSpeed,
   } = useConfigContext();
   const {
     currentService,
@@ -533,8 +537,22 @@ export function SettingsScreenContainer() {
             };
           }),
           onSettingPress,
-          IconComponent: Gauge,
+          IconComponent: CircleGauge,
           isHidden: isTV,
+        },
+        {
+          id: 'playerDefaultSpeed',
+          title: t('Player default speed'),
+          type: SETTING_TYPE.SELECT,
+          value: playerDefaultSpeed.toString(),
+          options: DEFAULT_SPEEDS.map((value) => {
+            return {
+              value: value.toString(),
+              label: `${value.toString()}x`,
+            };
+          }),
+          onSettingPress,
+          IconComponent: Gauge,
         },
         {
           id: 'playerShowBufferTime',
@@ -566,6 +584,21 @@ export function SettingsScreenContainer() {
           onSettingPress,
           IconComponent: CircleArrowRight,
           isHidden: !isTV,
+        },
+        {
+          id: 'playerStopPlayShowInterfaceTV',
+          title: t('Stop play show interface on button TV'),
+          subtitle: t('Toggle stop play show interface on button TV.'),
+          type: SETTING_TYPE.SWITCH,
+          value: convertBooleanToString(playerStopPlayShowInterfaceTV),
+          options: yesNoOptions,
+          onSettingPress,
+          IconComponent: Dock,
+          isHidden: !isTV,
+          dependsOn: {
+            field: 'playerStopPlayOnButtonTV',
+            value: 'true',
+          },
         },
         {
           id: 'playerBufferTimeSetting',

@@ -19,11 +19,15 @@ export const SettingsModal = () => {
   const [settings, setSettings] = useState<SettingItem[]>(initialSettings ?? []);
 
   const onUpdate = async (settingProp: SettingItem, value: string) => {
-    const { id } = settingProp;
+    const { id, value: prevValue = '' } = settingProp;
 
     setSettings((prevSettings) => updateSettings(prevSettings, value, id));
 
-    await onSettingUpdate(settingProp, value);
+    const result = await onSettingUpdate(settingProp, value);
+
+    if (!result) {
+      setSettings((prevSettings) => updateSettings(prevSettings, prevValue ?? '', id));
+    }
 
     return true;
   };

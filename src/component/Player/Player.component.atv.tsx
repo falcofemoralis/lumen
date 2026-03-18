@@ -106,7 +106,7 @@ export function PlayerComponent({
   backwardToStart,
   handleAspectRatioChange,
 }: PlayerComponentProps) {
-  const { playerStopPlayOnButtonTV } = useConfigContext();
+  const { playerStopPlayOnButtonTV, playerStopPlayShowInterfaceTV } = useConfigContext();
   const { scale, theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
   const { focusedElement, updateFocusedElement } = usePlayerContext();
@@ -219,6 +219,10 @@ export function PlayerComponent({
 
         if (playerStopPlayOnButtonTV && type === SupportedKeys.ENTER) {
           togglePlayPause();
+
+          if (playerStopPlayShowInterfaceTV) {
+            setShowControls(true);
+          }
 
           return false;
         }

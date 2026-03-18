@@ -17,6 +17,7 @@ import { LoginFormComponentProps } from './LoginForm.type';
 export function LoginFormComponent({
   isLoading,
   withRedirect,
+  children,
   handleLogin,
 }: LoginFormComponentProps) {
   const loginRef = useRef({ username: '', password: '' });
@@ -72,18 +73,17 @@ export function LoginFormComponent({
   };
 
   return (
-    <DefaultFocus>
-      <View
-        style={ styles.container }
-      >
-        <InfoBlock
-          title={ t('You are not logged in') }
-          subtitle={ t('Sign in to sync content') }
-        />
-        { renderForm() }
-        <KeyboardAdjuster />
-      </View>
-    </DefaultFocus>
+    <View
+      style={ styles.container }
+    >
+      <InfoBlock
+        title={ t('You are not logged in') }
+        subtitle={ t('Sign in to sync content') }
+      />
+      { renderForm() }
+      { children }
+      <KeyboardAdjuster />
+    </View>
   );
 }
 

@@ -15,6 +15,7 @@ import { SettingBaseComponentProps } from './SettingBase.type';
 const SettingBaseComponent = ({
   setting,
   children,
+  isLoading: isLoadingProp = false,
   onPress,
 }: SettingBaseComponentProps) => {
   const { scale, theme } = useAppTheme();
@@ -87,9 +88,9 @@ const SettingBaseComponent = ({
   return (
     <>
       <ThemedPressable
-        style={ [styles.setting, (!isEnabled || isLoading) && styles.settingHidden] }
+        style={ [styles.setting, (!isEnabled || isLoading || isLoadingProp) && styles.settingHidden] }
         contentStyle={ styles.settingContainer }
-        onPress={ () => handleOnPress() }
+        onPress={ (!isEnabled || isLoading || isLoadingProp) ? undefined : () => handleOnPress() }
       >
         { IconComponent && (
           <View style={ styles.settingIcon }>
@@ -116,7 +117,11 @@ const SettingBaseComponent = ({
           </View>
         ) }
         { withLoader && (
-          <Loader isLoading={ isLoading } fullScreen />
+          <Loader
+            isLoading={ isLoading || isLoadingProp }
+            fullScreen
+            style={ styles.loaderContainer }
+          />
         ) }
       </ThemedPressable>
       { confirmation && (
