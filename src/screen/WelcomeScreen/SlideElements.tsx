@@ -1,3 +1,4 @@
+import { ConfirmOverlay } from 'Component/ConfirmOverlay';
 import { KeyboardAdjuster } from 'Component/KeyboardAdjuster';
 import { ThemedButton } from 'Component/ThemedButton';
 import { ThemedCustomSelect } from 'Component/ThemedCustomSelect';
@@ -476,21 +477,22 @@ export const LoginSlide = ({
 }: LoginSlideProps) => {
   const { theme, scale } = useAppTheme();
   const { isTV } = useConfigContext();
-  const { profile, currentService, login } = useServiceContext();
+  const { profile, currentService, isSignedIn, login } = useServiceContext();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const usernameRef = useRef<string | null>(null);
   const passwordRef = useRef<string | null>(null);
   const registrationOverlayRef = useRef<ThemedOverlayRef>(null);
+  const confirmOverlayRef = useRef<ThemedOverlayRef>(null);
 
   const handleNext = useCallback((s: SlideInterface) => {
-    // if (!isSignedIn) {
-    //   NotificationStore.displayMessage(t('Please sign in to continue'));
+    if (currentService.isOfficialMode() && !isSignedIn) {
+      confirmOverlayRef.current?.open();
 
-    //   return;
-    // }
+      return;
+    }
 
     goNext(s);
-  }, [goNext]);
+  }, [currentService, goNext, isSignedIn]);
 
   const handleLogin = useCallback(async () => {
     setIsLoading(true);
@@ -587,6 +589,14 @@ export const LoginSlide = ({
           ) }
         </ThemedPressable>
       </View>
+      <ConfirmOverlay
+        overlayRef={ confirmOverlayRef }
+        onConfirm={ () => confirmOverlayRef.current?.close() }
+        title={ t('Official mode requires sign-in') }
+        message={ t('You are currently in official mode but not signed in. Please sign in to continue.') }
+        confirmButtonText={ t('OK') }
+        disableCancelButton
+      />
       <ThemedOverlay ref={ registrationOverlayRef } contentContainerStyle={ isTV && styles.registrationOverlayTV }>
         <View style={ styles.registrationOverlay }>
           <View style={ styles.registrationRow }>
@@ -714,9 +724,7 @@ export const CDNSlide = ({
   const [isAutomatic, setIsAutomatic] = useState<boolean>(currentService.isAutomaticCDN());
   const [isCDNValid, setIsCDNValid] = useState<boolean | null>(null);
 
-  const handleUpdateCDN = useCallback((valueArg: string) => {
-    const value = valueArg || selectedCDN;
-
+  const handleUpdateCDN = useCallback((value?: string | null) => {
     if (!value) {
       NotificationStore.displayError(t('Please select a CDN'));
 
@@ -726,7 +734,7 @@ export const CDNSlide = ({
     setSelectedCDN(value);
     updateCDN(value ?? '');
     setIsCDNValid(null);
-  }, [selectedCDN, updateCDN]);
+  }, [updateCDN]);
 
   const handleAutomaticMode = useCallback((value: boolean) => {
     setIsAutomatic(value);
@@ -744,6 +752,7 @@ export const CDNSlide = ({
     } catch (error) {
       console.error(error);
       NotificationStore.displayError(t('Invalid CDN'));
+      setIsLoading(false);
 
       return;
     }
@@ -785,7 +794,6 @@ export const CDNSlide = ({
       goBack={ goBack }
       goNext={ goNext }
       style={ styles.cdnSlide }
-      onNext={ () => handleUpdateCDN }
       styles={ styles }
     >
       <View style={ styles.cdnWrapper }>

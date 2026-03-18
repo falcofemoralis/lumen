@@ -207,7 +207,7 @@ const ru: Translations = {
   'Authorize': 'Авторизоваться',
   'Please select a provider': 'Пожалуйста, выберите зеркало',
   'Please select a CDN': 'Пожалуйста, выберите CDN',
-  'Invalid CDN': 'Недействительный CDN',
+  'Invalid CDN': 'Недействительный CDN или нету доступа к фильму.',
   'Accept': 'Принять',
   'Are you sure?': 'Вы уверены?',
   'Please wait a bit after enabling.': 'Пожалуйста, подождите немного после изменения настройки.',
@@ -269,6 +269,8 @@ const ru: Translations = {
   'Are you sure you want to hide this item?': 'Отметить как просмотренный и не отображать уведомления о выходе новых серий?',
   'Liked': 'Оценено',
   'Player default speed': 'Скорость воспроизведения',
+  'Official mode requires sign-in': 'Официальный режим требует авторизации',
+  'You are currently in official mode but not signed in. Please sign in to continue.': 'Вы сейчас в официальном режиме, но не авторизованы. Без авторизации официальный режим недоступен. Пожалуйста, войдите в аккаунт, чтобы продолжить.',
 };
 
 export default ru;

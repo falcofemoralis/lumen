@@ -267,6 +267,8 @@ const en = {
   'Are you sure you want to hide this item?': 'Are you sure you want to hide this item?',
   'Liked': 'Liked',
   'Player default speed': 'Player default speed',
+  'Official mode requires sign-in': 'Official mode requires sign-in',
+  'You are currently in official mode but not signed in. Please sign in to continue.': 'You are currently in official mode but not signed in. Please sign in to continue.',
 };
 
 export default en;

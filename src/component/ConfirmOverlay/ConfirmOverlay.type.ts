@@ -6,5 +6,6 @@ export interface ConfirmOverlayProps {
   message?: string;
   confirmButtonText?: string;
   cancelButtonText?: string;
+  disableCancelButton?: boolean;
   onConfirm: () => void;
 }
