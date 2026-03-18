@@ -269,6 +269,8 @@ const en = {
   'Player default speed': 'Player default speed',
   'Official mode requires sign-in': 'Official mode requires sign-in',
   'You are currently in official mode but not signed in. Please sign in to continue.': 'You are currently in official mode but not signed in. Please sign in to continue.',
+  'Stop play show interface on button TV': 'Stop play show interface on button TV',
+  'Toggle stop play show interface on button TV.': 'Toggle stop play show interface on button TV.',
 };
 
 export default en;

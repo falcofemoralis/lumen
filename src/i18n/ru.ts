@@ -271,6 +271,8 @@ const ru: Translations = {
   'Player default speed': 'Скорость воспроизведения',
   'Official mode requires sign-in': 'Официальный режим требует авторизации',
   'You are currently in official mode but not signed in. Please sign in to continue.': 'Вы сейчас в официальном режиме, но не авторизованы. Без авторизации официальный режим недоступен. Пожалуйста, войдите в аккаунт, чтобы продолжить.',
+  'Stop play show interface on button TV': 'Показывать интерфейс при остановке видео на ТВ',
+  'Toggle stop play show interface on button TV.': 'Если включено, при остановке видео на ТВ будет показываться интерфейс плеера.',
 };
 
 export default ru;

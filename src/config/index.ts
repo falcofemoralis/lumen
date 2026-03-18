@@ -22,6 +22,7 @@ export type DeviceConfigType = {
   playerLongPressSpeed: number;
   sortVoicesByRating: boolean;
   playerStopPlayOnButtonTV: boolean;
+  playerStopPlayShowInterfaceTV: boolean;
   playerBufferTimeSetting?: number;
   checkForUpdates: boolean;
   playerSaveQuality: boolean;
@@ -53,6 +54,7 @@ export const defaultConfig: DeviceConfigType = {
   playerAutoNextEpisode: true,
   playerLongPressSpeed: 1.5,
   playerStopPlayOnButtonTV: false,
+  playerStopPlayShowInterfaceTV: true,
   playerBufferTimeSetting: undefined,
   sortVoicesByRating: false,
   checkForUpdates: true,
