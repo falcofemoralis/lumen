@@ -8,6 +8,7 @@ import { LoaderComponentProps } from './Loader.type';
 export const LoaderComponent = ({
   isLoading,
   fullScreen,
+  style,
 }: LoaderComponentProps) => {
   const { theme } = useAppTheme();
 
@@ -15,6 +16,7 @@ export const LoaderComponent = ({
     <ActivityIndicator
       style={ [
         fullScreen && styles.fullscreenLoader,
+        style,
       ] }
       animating={ isLoading }
       size="large"

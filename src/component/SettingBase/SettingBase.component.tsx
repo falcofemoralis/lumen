@@ -117,7 +117,11 @@ const SettingBaseComponent = ({
           </View>
         ) }
         { withLoader && (
-          <Loader isLoading={ isLoading || isLoadingProp } fullScreen />
+          <Loader
+            isLoading={ isLoading || isLoadingProp }
+            fullScreen
+            style={ styles.loaderContainer }
+          />
         ) }
       </ThemedPressable>
       { confirmation && (

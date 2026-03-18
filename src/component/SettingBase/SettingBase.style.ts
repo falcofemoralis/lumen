@@ -37,4 +37,7 @@ export const componentStyles = ({ scale, colors, text, spacing }: Theme) => ({
     justifyContent: 'center',
     flexShrink: 0,
   },
+  loaderContainer: {
+    transform: [{ translateX: '-50%' }],
+  },
 } satisfies ThemedStyles);
