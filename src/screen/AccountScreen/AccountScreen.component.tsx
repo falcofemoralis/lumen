@@ -18,7 +18,6 @@ import { useAppTheme } from 'Theme/context';
 
 import { componentStyles } from './AccountScreen.style';
 import { AccountScreenComponentProps } from './AccountScreen.type';
-import { DefaultGradient, GRADIENT_SIZE_MOBILE, PremiumGradient } from './AccountScreenGradients';
 
 export function AccountScreenComponent({
   isSignedIn,
@@ -185,7 +184,18 @@ export function AccountScreenComponent({
   const renderContent = () => {
     if (!isSignedIn) {
       return (
-        <LoginForm withRedirect />
+        <LoginForm withRedirect>
+          <ThemedButton
+            IconComponent={ Download }
+            onPress={ openDownloads }
+            iconProps={ {
+              size: scale(20),
+              color: theme.colors.icon,
+            } }
+          >
+            { t('Downloads') }
+          </ThemedButton>
+        </LoginForm>
       );
     }
 

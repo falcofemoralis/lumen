@@ -145,7 +145,7 @@ export function FilmScreenComponent({
           { renderAction(MessageSquareText, t('Comments'), () => commentsOverlayRef?.current?.open()) }
           { renderAction(Clapperboard, t('Trailer'), openTrailerOverlay) }
           { renderAction(isBookmarked(film) ? BookmarkCheck : Bookmark, t('Bookmark'), openBookmarks) }
-          { isSignedIn && renderAction(Download, t('Download'), openVideoDownloader) }
+          { renderAction(Download, t('Download'), openVideoDownloader) }
           { isSignedIn && renderAction(Star, t('Rate'), openRatingOverlay, film.isRatingPosted) }
         </View>
       </DefaultFocus>

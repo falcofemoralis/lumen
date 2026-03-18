@@ -279,7 +279,7 @@ export function FilmScreenComponent({
       { renderMiddleAction(Clapperboard, 'Trailer', openTrailerOverlay) }
       { renderMiddleAction(MessageSquareText, 'Comments', openComments) }
       { renderMiddleAction(isBookmarked(film) ? BookmarkCheck : Bookmark, 'Bookmark', openBookmarks) }
-      { isSignedIn && renderMiddleAction(Download, 'Download', openVideoDownloader) }
+      { renderMiddleAction(Download, 'Download', openVideoDownloader) }
     </View>
   );
 

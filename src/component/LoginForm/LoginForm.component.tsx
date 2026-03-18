@@ -16,6 +16,7 @@ export function LoginFormComponent({
   isLoading,
   withRedirect,
   style,
+  children,
   handleLogin,
 }: LoginFormComponentProps) {
   const loginRef = useRef({ username: '', password: '' });
@@ -86,6 +87,7 @@ export function LoginFormComponent({
     <View style={ [styles.container, withRedirect && styles.redirectContainer, style] }>
       { renderInfoBlock() }
       { renderForm() }
+      { children }
     </View>
   );
 }

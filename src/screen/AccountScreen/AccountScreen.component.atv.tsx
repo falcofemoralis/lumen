@@ -143,7 +143,23 @@ export function AccountScreenComponent({
 
   const renderContent = () => {
     if (!isSignedIn) {
-      return <LoginForm />;
+      return (
+        <LoginForm>
+          <DefaultFocus>
+            <ThemedButton
+              IconComponent={ Download }
+              onPress={ openDownloads }
+              iconProps={ {
+                size: scale(20),
+              } }
+              variant="long"
+              withAnimation
+            >
+              { t('Downloads') }
+            </ThemedButton>
+          </DefaultFocus>
+        </LoginForm>
+      );
     }
 
     if (!profile) {
