@@ -244,11 +244,23 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
   }, [currentService]);
 
   const viewProfile = useCallback(() => {
-    openLinkInBrowser(`${currentService.getProvider()}/user/${profile?.id}/`);
+    let link = `${currentService.getProvider()}/user/${profile?.id}/`;
+
+    if (currentService.isOfficialMode()) {
+      link = updateUrlHost(link, currentService.getOfficialShareLink());
+    }
+
+    openLinkInBrowser(link);
   }, [currentService, profile]);
 
   const viewPayments = useCallback(() => {
-    openLinkInBrowser(`${currentService.getProvider()}/payments/`);
+    let link = `${currentService.getProvider()}/payments/`;
+
+    if (currentService.isOfficialMode()) {
+      link = updateUrlHost(link, currentService.getOfficialShareLink());
+    }
+
+    openLinkInBrowser(link);
   }, [currentService]);
 
   /**
