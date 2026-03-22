@@ -96,7 +96,13 @@ export function FilmPagerContainer({
       currentPage: !isRefresh ? pagination.currentPage + 1 : 1,
     };
 
-    await loadFilms(item, newPage, isRefresh, isRefresh);
+    await loadFilms(
+      item,
+      newPage,
+      isRefresh,
+      isRefresh,
+      selectedSorting ? selectedSorting[item.menuItem.id]?.value : undefined
+    );
   };
 
   const handleSelectSorting = useCallback((menuItem: PagerItemInterface['menuItem'], item: DropdownItem) => {
@@ -122,10 +128,9 @@ export function FilmPagerContainer({
     menuDefaultFocus,
     ListHeaderComponent,
     ListEmptyComponent,
-    onRowFocus,
-    loadFilms,
     onNextLoad,
     onPreLoad,
+    onRowFocus,
     handleSelectSorting,
   };
 
