@@ -8,7 +8,7 @@ export interface ThemedGridRowProps<T = any> {
 export interface ThemedGridContainerProps<T = any> {
   data: T[];
   numberOfColumns: number;
-  itemSize: number;
+  itemSize?: number;
   style?: StyleProp<ViewStyle>;
   rowStyle?: StyleProp<ViewStyle>;
   scrollBehavior?: 'stick-to-start' | 'stick-to-center';

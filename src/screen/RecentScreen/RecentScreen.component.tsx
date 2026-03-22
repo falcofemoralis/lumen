@@ -175,7 +175,6 @@ export function RecentScreenComponent({
       <ThemedGrid
         data={ items }
         numberOfColumns={ NUMBER_OF_COLUMNS }
-        itemSize={ scale(130) }
         renderItem={ renderItem }
         onNextLoad={ onNextLoad }
         ListHeaderComponent={ renderHeader }
