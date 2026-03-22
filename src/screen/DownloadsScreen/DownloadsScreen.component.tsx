@@ -405,7 +405,6 @@ export const DownloadsScreenComponent = (props: DownloadsScreenComponentProps) =
       <ThemedGrid
         data={ downloadedFilms }
         numberOfColumns={ NUMBER_OF_COLUMNS }
-        itemSize={ scale(130) }
         renderItem={ renderItem }
         ListHeaderComponent={ renderHeader }
         ListEmptyComponent={ renderEmpty }
