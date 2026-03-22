@@ -17,7 +17,7 @@ import { NotificationInterface, NotificationItemInterface } from 'Type/Notificat
 import { ProfileInterface } from 'Type/Profile.interface';
 import { UserDataInterface } from 'Type/UserData.interface';
 import { openLinkInBrowser } from 'Util/Link';
-import { requestValidator } from 'Util/Request';
+import { formatURI, requestValidator } from 'Util/Request';
 import { storage } from 'Util/Storage';
 import { updateUrlHost } from 'Util/Url';
 
@@ -361,7 +361,8 @@ export const ServiceProvider = ({ children }: { children: React.ReactNode }) => 
 
   const prepareShareBody = useCallback((film: FilmInterface) => {
     const { title, link } = film;
-    let shareLink = link;
+
+    let shareLink = formatURI(link, {}, currentService.getProvider());;
 
     if (currentService.isOfficialMode()) {
       shareLink = updateUrlHost(shareLink, currentService.getOfficialShareLink());
