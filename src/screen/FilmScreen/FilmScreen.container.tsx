@@ -14,6 +14,7 @@ import { AppStackParamList } from 'Navigation/navigationTypes';
 import {
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -27,6 +28,7 @@ import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { getDownloadsDir, normalizeName, TaskIdStorage, uuid } from 'Util/Download';
 import { navigate } from 'Util/Navigation';
+import { getPlayerQuality, getSavedTime } from 'Util/Player';
 import { openActor, openCategory, openFilm } from 'Util/Router';
 
 import FilmScreenComponent from './FilmScreen.component';
@@ -48,6 +50,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
   const descriptionOverlayRef = useRef<ThemedOverlayRef>(null);
   const playerVideoDownloaderOverlayRef = useRef<PlayerVideoSelectorRef>(null);
   const ratingOverlayRef = useRef<ThemedOverlayRef>(null);
+  const [isContinueWatchingLoading, setIsContinueWatchingLoading] = useState(false);
 
   // fallback to deep link url
   let link = linkArg;
@@ -445,6 +448,120 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     }
   };
 
+  const shouldDisplayContinueWatching = useMemo(() => {
+    if (!film) {
+      return false;
+    }
+
+    const savedTime = getSavedTime(film);
+
+    if (!savedTime || !savedTime.voices || Object.keys(savedTime.voices).length === 0) {
+      return false;
+    }
+
+    // Check if there's at least one voice with saved timestamps
+    for (const voiceId of Object.keys(savedTime.voices)) {
+      const voiceData = savedTime.voices[voiceId];
+
+      if (voiceData && voiceData.timestamps && Object.keys(voiceData.timestamps).length > 0) {
+        // Check if any timestamp has meaningful progress (more than 5 seconds)
+        const hasProgress = Object.values(voiceData.timestamps).some(
+          (timestamp) => timestamp && timestamp.time > 5
+        );
+
+        if (hasProgress) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }, [film]);
+
+  const continueWatching = async () => {
+    if (!film) {
+      return;
+    }
+
+    const savedTime = getSavedTime(film);
+
+    // If no saved time, just play from the beginning
+    if (!savedTime || !savedTime.voices || Object.keys(savedTime.voices).length === 0) {
+      playFilm();
+
+      return;
+    }
+
+    // Find the last watched voice with saved timestamps
+    let lastVoiceId: string | null = null;
+    let lastVoiceData = null;
+
+    for (const voiceId of Object.keys(savedTime.voices)) {
+      const voiceData = savedTime.voices[voiceId];
+
+      if (voiceData && voiceData.timestamps && Object.keys(voiceData.timestamps).length > 0) {
+        lastVoiceId = voiceId;
+        lastVoiceData = voiceData;
+        break;
+      }
+    }
+
+    if (!lastVoiceId || !lastVoiceData) {
+      playFilm();
+
+      return;
+    }
+
+    // Find the voice object in the film
+    const voice = film.voices.find((v) => v.id === lastVoiceId);
+
+    if (!voice) {
+      playFilm();
+
+      return;
+    }
+
+    try {
+      setIsContinueWatchingLoading(true);
+
+      let video: FilmVideoInterface | undefined;
+      const updatedVoice = { ...voice };
+
+      if (film.hasSeasons && voice.lastSeasonId && voice.lastEpisodeId) {
+        // For series, fetch the video for the specific episode
+        video = await currentService.getFilmStreamsByEpisodeId(
+          film,
+          voice,
+          voice.lastSeasonId,
+          voice.lastEpisodeId
+        );
+
+        updatedVoice.lastSeasonId = voice.lastSeasonId;
+        updatedVoice.lastEpisodeId = voice.lastEpisodeId;
+      } else {
+        // For movies, fetch the video for the voice
+        video = await currentService.getFilmStreamsByVoice(film, voice);
+      }
+
+      if (!video) {
+        NotificationStore.displayMessage(t('No video available'));
+        setIsContinueWatchingLoading(false);
+
+        return;
+      }
+
+      // Get the quality preference
+      const quality = getPlayerQuality();
+
+      // Navigate to player with the video and voice
+      handleVideoSelect(video, updatedVoice, quality);
+
+      setIsContinueWatchingLoading(false);
+    } catch (error) {
+      NotificationStore.displayError(error as Error);
+    }
+  };
+
   const containerProps = {
     film,
     thumbnailPoster,
@@ -457,6 +574,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     playerVideoDownloaderOverlayRef,
     isDeepLink,
     ratingOverlayRef,
+    isContinueWatchingLoading,
     playFilm,
     handleVideoSelect,
     handleSelectFilm,
@@ -471,6 +589,8 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     openTrailerOverlay,
     handleRatingSelect,
     openRatingOverlay,
+    shouldDisplayContinueWatching,
+    continueWatching,
   };
 
   return isTV ? <FilmScreenComponentTV { ...containerProps } /> : <FilmScreenComponent { ...containerProps } />;

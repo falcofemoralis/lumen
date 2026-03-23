@@ -86,6 +86,7 @@ export function PlayerComponent({
   isOffline,
   overlayQuality,
   selectedAspectRatio,
+  isLoading,
   togglePlayPause,
   rewindPosition,
   openQualitySelector,
@@ -515,7 +516,7 @@ export function PlayerComponent({
 
   const renderLoader = () => (
     <Loader
-      isLoading={ status === 'loading' }
+      isLoading={ isLoading || status === 'loading' }
       fullScreen
     />
   );

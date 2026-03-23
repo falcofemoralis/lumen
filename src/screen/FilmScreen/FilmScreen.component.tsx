@@ -1,5 +1,6 @@
 import { BookmarksOverlay } from 'Component/BookmarksOverlay';
 import { Header } from 'Component/Header';
+import { Loader } from 'Component/Loader';
 import { Page } from 'Component/Page';
 import { PlayerVideoSelector } from 'Component/PlayerVideoSelector';
 import { ThemedButton } from 'Component/ThemedButton';
@@ -13,8 +14,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import {
+  ArrowRight,
   Bookmark,
   BookmarkCheck,
+  CircleArrowRight,
   Clapperboard,
   Clock,
   Download,
@@ -68,6 +71,8 @@ export function FilmScreenComponent({
   playerVideoDownloaderOverlayRef,
   isDeepLink,
   ratingOverlayRef,
+  shouldDisplayContinueWatching,
+  isContinueWatchingLoading,
   playFilm,
   handleVideoSelect,
   handleSelectFilm,
@@ -82,6 +87,7 @@ export function FilmScreenComponent({
   openTrailerOverlay,
   openRatingOverlay,
   handleRatingSelect,
+  continueWatching,
 }: FilmScreenComponentProps) {
   const { scale, theme } = useAppTheme();
   const { isSignedIn } = useServiceContext();
@@ -317,7 +323,7 @@ export function FilmScreenComponent({
     }
 
     return (
-      <Wrapper>
+      <Wrapper style={ styles.playWrapper }>
         <ThemedButton
           style={ styles.playBtn }
           onPress={ playFilm }
@@ -330,6 +336,24 @@ export function FilmScreenComponent({
         >
           { t('Watch Now') }
         </ThemedButton>
+        { shouldDisplayContinueWatching && (
+          <View>
+            <ThemedButton
+              style={ styles.continueBtn }
+              onPress={ continueWatching }
+              IconComponent={ ArrowRight }
+              iconProps={ {
+                size: scale(18),
+                color: theme.colors.secondary,
+              } }
+              textStyle={ styles.continueBtnText }
+              disabled={ isContinueWatchingLoading }
+            >
+              { t('Continue Watching') }
+            </ThemedButton>
+            <Loader fullScreen isLoading={ isContinueWatchingLoading } />
+          </View>
+        ) }
       </Wrapper>
     );
   };
