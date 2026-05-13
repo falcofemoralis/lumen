@@ -121,7 +121,6 @@ export function RecentScreenComponent({
   openHideConfirmOverlay,
   hideItem,
 }: RecentScreenComponentProps) {
-  const { scale } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
   const { top } = useSafeAreaInsets();
 

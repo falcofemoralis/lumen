@@ -271,6 +271,9 @@ const en = {
   'You are currently in official mode but not signed in. Please sign in to continue.': 'You are currently in official mode but not signed in. Please sign in to continue.',
   'Stop play show interface on button TV': 'Stop play show interface on button TV',
   'Toggle stop play show interface on button TV.': 'Toggle stop play show interface on button TV.',
+  'Continue Watching': 'Continue Watching',
+  'Continue button enabled': 'Continue button enabled',
+  'Toggle continue button.': 'Toggle continue button.',
 };
 
 export default en;

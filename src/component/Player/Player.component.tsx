@@ -92,6 +92,7 @@ export function PlayerComponent({
   isFilmBookmarked,
   isOffline,
   overlayQuality,
+  isLoading,
   togglePlayPause,
   seekToPosition,
   calculateCurrentTime,
@@ -604,7 +605,7 @@ export function PlayerComponent({
 
   const renderLoader = () => (
     <Loader
-      isLoading={ status === 'loading' }
+      isLoading={ isLoading || status === 'loading' }
       fullScreen
     />
   );

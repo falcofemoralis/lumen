@@ -7,8 +7,8 @@ export const componentStyles = ({ scale, text, colors }: Theme) => ({
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: scale(10),
-    marginTop: scale(8),
+    gap: scale(8),
+    marginTop: scale(4),
   },
   actionButton: {
     paddingVertical: scale(8),
@@ -25,7 +25,7 @@ export const componentStyles = ({ scale, text, colors }: Theme) => ({
     flexDirection: 'row',
     gap: scale(24),
     width: '100%',
-    paddingBlockStart: scale(32),
+    paddingBlockStart: scale(16),
   },
   poster: {
     width: '30%',

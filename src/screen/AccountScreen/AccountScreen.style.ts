@@ -37,6 +37,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     width: scale(16),
     height: scale(16),
     borderRadius: scale(50),
+    color: colors.textOnContrast,
     fontSize: scale(text.xxs.fontSize),
     justifyContent: 'center',
     alignItems: 'center',

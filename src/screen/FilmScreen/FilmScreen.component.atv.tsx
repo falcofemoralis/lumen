@@ -10,9 +10,11 @@ import { ThemedImage } from 'Component/ThemedImage';
 import { ThemedOverlay } from 'Component/ThemedOverlay';
 import { ThemedText } from 'Component/ThemedText';
 import { useServiceContext } from 'Context/ServiceContext';
+import { useLayout } from 'Hooks/useLayout';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import {
+  ArrowRight,
   Bookmark,
   BookmarkCheck,
   Clapperboard,
@@ -61,6 +63,7 @@ export function FilmScreenComponent({
   descriptionOverlayRef,
   playerVideoDownloaderOverlayRef,
   ratingOverlayRef,
+  shouldDisplayContinueWatching,
   playFilm,
   handleVideoSelect,
   handleSelectFilm,
@@ -74,6 +77,7 @@ export function FilmScreenComponent({
   openTrailerOverlay,
   openRatingOverlay,
   handleRatingSelect,
+  continueWatching,
 }: FilmScreenComponentProps) {
   const { scale, theme } = useAppTheme();
   const { isSignedIn } = useServiceContext();
@@ -93,7 +97,7 @@ export function FilmScreenComponent({
 
   const renderAction = (
     IconComponent: React.ComponentType<any>,
-    text: string,
+    text?: string,
     onPress?: () => void,
     isDisabled?: boolean
   ) => (
@@ -141,12 +145,13 @@ export function FilmScreenComponent({
     <SpatialNavigationView direction="horizontal">
       <DefaultFocus>
         <View style={ styles.actions }>
+          { shouldDisplayContinueWatching && renderAction(ArrowRight, t('Continue Watching'), continueWatching) }
           { renderPlayButton() }
           { renderAction(MessageSquareText, t('Comments'), () => commentsOverlayRef?.current?.open()) }
-          { renderAction(Clapperboard, t('Trailer'), openTrailerOverlay) }
-          { renderAction(isBookmarked(film) ? BookmarkCheck : Bookmark, t('Bookmark'), openBookmarks) }
-          { renderAction(Download, t('Download'), openVideoDownloader) }
-          { isSignedIn && renderAction(Star, t('Rate'), openRatingOverlay, film.isRatingPosted) }
+          { renderAction(Clapperboard, undefined, openTrailerOverlay) }
+          { renderAction(isBookmarked(film) ? BookmarkCheck : Bookmark, undefined, openBookmarks) }
+          { renderAction(Download, undefined, openVideoDownloader) }
+          { isSignedIn && renderAction(Star, undefined, openRatingOverlay, film.isRatingPosted) }
         </View>
       </DefaultFocus>
     </SpatialNavigationView>

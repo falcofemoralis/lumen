@@ -23,6 +23,8 @@ export interface FilmScreenComponentProps {
   playerVideoDownloaderOverlayRef: React.RefObject<PlayerVideoSelectorRef | null>;
   isDeepLink: boolean;
   ratingOverlayRef: React.RefObject<ThemedOverlayRef | null>;
+  shouldDisplayContinueWatching: boolean;
+  isContinueWatchingLoading: boolean;
   playFilm: () => void;
   handleVideoSelect: (video: FilmVideoInterface, voice: FilmVoiceInterface) => void;
   handleSelectFilm: (film: FilmInterface) => void;
@@ -37,4 +39,5 @@ export interface FilmScreenComponentProps {
   openTrailerOverlay: () => void;
   handleRatingSelect: (rating: number) => Promise<void>;
   openRatingOverlay: () => void;
+  continueWatching: () => void;
 }

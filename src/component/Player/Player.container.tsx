@@ -1,4 +1,3 @@
-/* eslint-disable react-compiler/react-compiler */
 import { getFirestore } from '@react-native-firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import { PlayerVideoSelectorRef } from 'Component/PlayerVideoSelector/PlayerVideoSelector.container';
@@ -49,7 +48,6 @@ import {
   ASPECT_RATIO_OPTIONS,
   AUTO_QUALITY,
   AWAKE_TAG,
-  DEFAULT_SPEED,
   FIRESTORE_DB,
   MAX_QUALITY,
   RewindDirection,
@@ -98,6 +96,7 @@ export function PlayerContainer({
   const [isOverlayOpen, setIsOverlayOpen] = useState<boolean>(false);
   const [isFilmBookmarked, setIsFilmBookmarked] = useState<boolean>(isBookmarked(film));
   const [selectedVideoTrack, setSelectedVideoTrack] = useState<VideoTrack | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const stopEventsRef = useRef<boolean>(false);
   const updateTimeTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -549,20 +548,28 @@ export function PlayerContainer({
     const { seasonId } = seasons[newSeasonIndex];
     const { episodeId } = episodes[newEpisodeIndex];
 
-    const newVideo = await currentService.getFilmStreamsByEpisodeId(
-      film,
-      selectedVoice,
-      seasonId,
-      episodeId
-    );
+    try {
+      setIsLoading(true);
 
-    const newVoice = {
-      ...selectedVoice,
-      lastSeasonId: seasonId,
-      lastEpisodeId: episodeId,
-    };
+      const newVideo = await currentService.getFilmStreamsByEpisodeId(
+        film,
+        selectedVoice,
+        seasonId,
+        episodeId
+      );
 
-    changePlayerVideo(newVideo, newVoice);
+      const newVoice = {
+        ...selectedVoice,
+        lastSeasonId: seasonId,
+        lastEpisodeId: episodeId,
+      };
+
+      changePlayerVideo(newVideo, newVoice);
+    } catch (error) {
+      NotificationStore.displayError(error as Error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const removeUpdateTimeTimeout = () => {
@@ -663,6 +670,7 @@ export function PlayerContainer({
     isFilmBookmarked,
     isOffline,
     overlayQuality,
+    isLoading,
     togglePlayPause,
     rewindPosition,
     seekToPosition,
