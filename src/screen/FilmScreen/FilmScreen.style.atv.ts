@@ -3,10 +3,16 @@ import { Theme, ThemedStyles } from 'Theme/types';
 export const componentStyles = ({ scale, text, colors }: Theme) => ({
   page: {
   },
+  actionsWrapper: {
+    height: scale(44),
+    zIndex: 10,
+  },
+  actionsWrapperCentered: {
+    alignItems: 'center',
+  },
   actions: {
     flex: 1,
     flexDirection: 'row',
-    justifyContent: 'center',
     gap: scale(8),
     marginTop: scale(4),
   },

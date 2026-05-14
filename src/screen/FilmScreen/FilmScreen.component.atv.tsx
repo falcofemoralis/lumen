@@ -84,6 +84,8 @@ export function FilmScreenComponent({
   const styles = useThemedStyles(componentStyles);
   const { height } = useWindowDimensions();
   const [showReadMore, setShowReadMore] = useState<boolean | null>(null);
+  const { width } = useLayout();
+  const [actionsWidth, setActionsWidth] = useState(0);
 
   if (!film) {
     film = null as unknown as FilmInterface; // dirty hack to avoid null checks
@@ -141,20 +143,37 @@ export function FilmScreenComponent({
     return renderAction(Play, t('Watch Now'), playFilm);
   };
 
+  console.log('actionsWidth', actionsWidth, '<', 'width', width, '?', actionsWidth < width);
+
   const renderActions = () => (
-    <SpatialNavigationView direction="horizontal">
-      <DefaultFocus>
-        <View style={ styles.actions }>
-          { shouldDisplayContinueWatching && renderAction(ArrowRight, t('Continue Watching'), continueWatching) }
-          { renderPlayButton() }
-          { renderAction(MessageSquareText, t('Comments'), () => commentsOverlayRef?.current?.open()) }
-          { renderAction(Clapperboard, undefined, openTrailerOverlay) }
-          { renderAction(isBookmarked(film) ? BookmarkCheck : Bookmark, undefined, openBookmarks) }
-          { renderAction(Download, undefined, openVideoDownloader) }
-          { isSignedIn && renderAction(Star, undefined, openRatingOverlay, film.isRatingPosted) }
-        </View>
-      </DefaultFocus>
-    </SpatialNavigationView>
+    <View
+      style={ [
+        styles.actionsWrapper,
+        actionsWidth < width && styles.actionsWrapperCentered,
+      ] }
+    >
+      <SpatialNavigationScrollView
+        horizontal
+        offsetFromStart={ width / 2 }
+      >
+        <DefaultFocus>
+          <SpatialNavigationView
+            direction="horizontal"
+            style={ styles.actions }
+            alignInGrid={ false }
+            onLayout={ (e) => setActionsWidth(e.nativeEvent.layout.width) }
+          >
+            { shouldDisplayContinueWatching && renderAction(ArrowRight, t('Continue Watching'), continueWatching) }
+            { renderPlayButton() }
+            { renderAction(MessageSquareText, t('Comments'), () => commentsOverlayRef?.current?.open()) }
+            { renderAction(Clapperboard, t('Trailer'), openTrailerOverlay) }
+            { renderAction(isBookmarked(film) ? BookmarkCheck : Bookmark, t('Bookmark'), openBookmarks) }
+            { renderAction(Download, t('Download'), openVideoDownloader) }
+            { isSignedIn && renderAction(Star, t('Rate'), openRatingOverlay, film.isRatingPosted) }
+          </SpatialNavigationView>
+        </DefaultFocus>
+      </SpatialNavigationScrollView>
+    </View>
   );
 
   const renderPoster = () => {
