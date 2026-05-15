@@ -23,6 +23,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     marginRight: scale(5),
     height: scale(20),
     width: scale(20),
+    backgroundColor: colors.transparent,
   },
   header: {
     flexDirection: 'row',
