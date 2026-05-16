@@ -48,6 +48,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   controlsRowLine: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'flex-end',
   },
   controlsRowHidden: {
     opacity: 0,
@@ -93,7 +94,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   },
   topActionLine: {
     flexDirection: 'column',
-    gap: scale(8),
+    gap: scale(2),
   },
   topActionLineText: {
     fontSize: scale(text.sm.fontSize),

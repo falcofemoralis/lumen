@@ -15,7 +15,7 @@ export const FilmScreenThumbnail = ({
   return (
     <View>
       <View style={ { flexDirection: 'row' } }>
-        <View style={ styles.actions }>
+        <View style={ [styles.actions, { justifyContent: 'center' }] }>
           { Array(5).fill(0).map((_, index) => (
             <Thumbnail
               // eslint-disable-next-line react/no-array-index-key

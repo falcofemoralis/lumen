@@ -28,14 +28,20 @@ class RemoteControlManager implements RemoteControlManagerInterface {
 
   private handleKeyDown = (keyEvent: { keyCode: number }) => {
     const mappedKey = {
-      21: SupportedKeys.LEFT,
-      22: SupportedKeys.RIGHT,
-      20: SupportedKeys.DOWN,
-      19: SupportedKeys.UP,
-      66: SupportedKeys.ENTER,
-      23: SupportedKeys.ENTER,
-      67: SupportedKeys.BACKWARD,
-      4: SupportedKeys.BACK,
+      21: SupportedKeys.LEFT, // KEYCODE_DPAD_LEFT
+      22: SupportedKeys.RIGHT, // KEYCODE_DPAD_RIGHT
+      20: SupportedKeys.DOWN, // KEYCODE_DPAD_DOWN
+      19: SupportedKeys.UP, // KEYCODE_DPAD_UP
+
+      66: SupportedKeys.ENTER, // KEYCODE_ENTER
+      23: SupportedKeys.ENTER, // KEYCODE_DPAD_CENTER
+
+      67: SupportedKeys.BACKWARD, // KEYCODE_DEL (backspace/delete)
+      4: SupportedKeys.BACK, // KEYCODE_BACK
+
+      // 85: SupportedKeys.ENTER, // KEYCODE_MEDIA_PLAY_PAUSE - already implemented in the built-in player
+      88: SupportedKeys.LEFT, // KEYCODE_MEDIA_PREVIOUS
+      87: SupportedKeys.RIGHT, // KEYCODE_MEDIA_NEXT
     }[keyEvent.keyCode];
 
     if (!mappedKey) {
@@ -63,6 +69,9 @@ class RemoteControlManager implements RemoteControlManagerInterface {
       66: SupportedKeys.ENTER,
       23: SupportedKeys.ENTER,
       67: SupportedKeys.BACKWARD,
+      // 85: SupportedKeys.ENTER,
+      88: SupportedKeys.LEFT,
+      87: SupportedKeys.RIGHT,
     }[keyEvent.keyCode];
 
     if (!mappedKey) {

@@ -30,6 +30,7 @@ export type DeviceConfigType = {
   strictConnectionCheck: boolean;
   playerDefaultAspectRatio: string;
   playerDefaultSpeed: number;
+  isContinueBtnEnabled: boolean;
 }
 
 export const defaultConfig: DeviceConfigType = {
@@ -61,4 +62,5 @@ export const defaultConfig: DeviceConfigType = {
   strictConnectionCheck: true,
   playerDefaultAspectRatio: ASPECT_RATIO_OPTIONS[0],
   playerDefaultSpeed: DEFAULT_SPEED,
+  isContinueBtnEnabled: false,
 };

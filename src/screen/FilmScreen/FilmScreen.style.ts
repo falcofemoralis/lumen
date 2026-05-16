@@ -111,7 +111,6 @@ export const componentStyles = ({ scale, colors, text, spacing }: Theme) => ({
   playBtn: {
     flex: 1,
     backgroundColor: colors.secondary,
-    marginBlockStart: scale(16),
   },
   playBtnText: {
     fontSize: scale(text.xs.fontSize),
@@ -337,5 +336,21 @@ export const componentStyles = ({ scale, colors, text, spacing }: Theme) => ({
     alignItems: 'center',
     gap: scale(16),
     marginBottom: scale(8),
+  },
+  playWrapper: {
+    flexDirection: 'column',
+    gap: scale(8),
+    marginBlockStart: scale(16),
+  },
+  continueBtn: {
+    flex: 1,
+    backgroundColor: colors.background,
+    borderColor: colors.secondary,
+    borderWidth: scale(2),
+  },
+  continueBtnText: {
+    fontSize: scale(text.xs.fontSize),
+    color: colors.secondary,
+    fontWeight: '700',
   },
 } satisfies ThemedStyles);

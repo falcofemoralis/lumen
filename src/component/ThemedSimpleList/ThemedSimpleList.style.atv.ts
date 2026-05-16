@@ -67,6 +67,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     height: scale(20),
     width: scale(20),
     minWidth: scale(20),
+    backgroundColor: colors.transparent,
   },
   iconFocused: {
   },

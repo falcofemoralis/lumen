@@ -5,6 +5,7 @@ import * as Application from 'expo-application';
 import { t } from 'i18n/translate';
 import {
   ArrowDown10,
+  ArrowRight,
   Blend,
   BookImage,
   Brush,
@@ -96,6 +97,7 @@ export function SettingsScreenContainer() {
     strictConnectionCheck,
     playerDefaultAspectRatio,
     playerDefaultSpeed,
+    isContinueBtnEnabled,
   } = useConfigContext();
   const {
     currentService,
@@ -210,6 +212,16 @@ export function SettingsScreenContainer() {
           options: yesNoOptions,
           onSettingPress,
           IconComponent: ArrowDown10,
+        },
+        {
+          id: 'isContinueBtnEnabled',
+          title: t('Continue button enabled'),
+          subtitle: t('Toggle continue button.'),
+          type: SETTING_TYPE.SWITCH,
+          value: convertBooleanToString(isContinueBtnEnabled),
+          options: yesNoOptions,
+          onSettingPress,
+          IconComponent: ArrowRight,
         },
       ],
     },

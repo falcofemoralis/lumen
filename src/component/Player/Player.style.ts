@@ -194,11 +194,11 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   },
   longTapIcon: {
   },
-  topActionLine: {
+  actionLine: {
     flexDirection: 'column',
-    gap: scale(8),
+    gap: scale(4),
   },
-  topActionLineText: {
+  actionLineText: {
     color: colors.textOnContrast,
   },
   backButtonContainer: {

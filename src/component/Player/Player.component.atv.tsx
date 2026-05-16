@@ -3,6 +3,7 @@ import { CommentsOverlay } from 'Component/CommentsOverlay';
 import { Loader } from 'Component/Loader';
 import { PlayerClock } from 'Component/PlayerClock';
 import { PlayerDuration } from 'Component/PlayerDuration';
+import { PlayerDurationEnd } from 'Component/PlayerDurationEnd';
 import { PlayerProgressBar } from 'Component/PlayerProgressBar';
 import { PlayerSubtitles } from 'Component/PlayerSubtitles';
 import { PlayerVideoSelector } from 'Component/PlayerVideoSelector';
@@ -86,6 +87,7 @@ export function PlayerComponent({
   isOffline,
   overlayQuality,
   selectedAspectRatio,
+  isLoading,
   togglePlayPause,
   rewindPosition,
   openQualitySelector,
@@ -380,6 +382,7 @@ export function PlayerComponent({
           { formatVideoTrackInfo(videoTrack) }
         </ThemedText>
         <PlayerClock />
+        <PlayerDurationEnd />
       </View>
     );
   };
@@ -515,7 +518,7 @@ export function PlayerComponent({
 
   const renderLoader = () => (
     <Loader
-      isLoading={ status === 'loading' }
+      isLoading={ isLoading || status === 'loading' }
       fullScreen
     />
   );

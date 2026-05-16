@@ -10,9 +10,11 @@ import { ThemedImage } from 'Component/ThemedImage';
 import { ThemedOverlay } from 'Component/ThemedOverlay';
 import { ThemedText } from 'Component/ThemedText';
 import { useServiceContext } from 'Context/ServiceContext';
+import { useLayout } from 'Hooks/useLayout';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import {
+  ArrowRight,
   Bookmark,
   BookmarkCheck,
   Clapperboard,
@@ -61,6 +63,7 @@ export function FilmScreenComponent({
   descriptionOverlayRef,
   playerVideoDownloaderOverlayRef,
   ratingOverlayRef,
+  shouldDisplayContinueWatching,
   playFilm,
   handleVideoSelect,
   handleSelectFilm,
@@ -74,12 +77,15 @@ export function FilmScreenComponent({
   openTrailerOverlay,
   openRatingOverlay,
   handleRatingSelect,
+  continueWatching,
 }: FilmScreenComponentProps) {
   const { scale, theme } = useAppTheme();
   const { isSignedIn } = useServiceContext();
   const styles = useThemedStyles(componentStyles);
   const { height } = useWindowDimensions();
   const [showReadMore, setShowReadMore] = useState<boolean | null>(null);
+  const { width } = useLayout();
+  const [actionsWidth, setActionsWidth] = useState(0);
 
   if (!film) {
     film = null as unknown as FilmInterface; // dirty hack to avoid null checks
@@ -93,7 +99,7 @@ export function FilmScreenComponent({
 
   const renderAction = (
     IconComponent: React.ComponentType<any>,
-    text: string,
+    text?: string,
     onPress?: () => void,
     isDisabled?: boolean
   ) => (
@@ -138,18 +144,34 @@ export function FilmScreenComponent({
   };
 
   const renderActions = () => (
-    <SpatialNavigationView direction="horizontal">
-      <DefaultFocus>
-        <View style={ styles.actions }>
-          { renderPlayButton() }
-          { renderAction(MessageSquareText, t('Comments'), () => commentsOverlayRef?.current?.open()) }
-          { renderAction(Clapperboard, t('Trailer'), openTrailerOverlay) }
-          { renderAction(isBookmarked(film) ? BookmarkCheck : Bookmark, t('Bookmark'), openBookmarks) }
-          { renderAction(Download, t('Download'), openVideoDownloader) }
-          { isSignedIn && renderAction(Star, t('Rate'), openRatingOverlay, film.isRatingPosted) }
-        </View>
-      </DefaultFocus>
-    </SpatialNavigationView>
+    <View
+      style={ [
+        styles.actionsWrapper,
+        actionsWidth < width && styles.actionsWrapperCentered,
+      ] }
+    >
+      <SpatialNavigationScrollView
+        horizontal
+        offsetFromStart={ width / 2 }
+      >
+        <DefaultFocus>
+          <SpatialNavigationView
+            direction="horizontal"
+            style={ styles.actions }
+            alignInGrid={ false }
+            onLayout={ (e) => setActionsWidth(e.nativeEvent.layout.width) }
+          >
+            { shouldDisplayContinueWatching && renderAction(ArrowRight, t('Continue Watching'), continueWatching) }
+            { renderPlayButton() }
+            { renderAction(MessageSquareText, t('Comments'), () => commentsOverlayRef?.current?.open()) }
+            { renderAction(Clapperboard, t('Trailer'), openTrailerOverlay) }
+            { renderAction(isBookmarked(film) ? BookmarkCheck : Bookmark, t('Bookmark'), openBookmarks) }
+            { renderAction(Download, t('Download'), openVideoDownloader) }
+            { isSignedIn && renderAction(Star, t('Rate'), openRatingOverlay, film.isRatingPosted) }
+          </SpatialNavigationView>
+        </DefaultFocus>
+      </SpatialNavigationScrollView>
+    </View>
   );
 
   const renderPoster = () => {
