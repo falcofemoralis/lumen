@@ -221,7 +221,7 @@ const ru: Translations = {
   'Show buffer time': 'Показывать загруженное время',
   'Toggle buffer time display.': 'Загруженное время (на сколько видео загрузилось) будет показано напротив общего времени после знака +.',
   'Show end time': 'Показывать время когда видео закончится',
-  'Toggle end time display.': 'Время окончания (минуты:секунды) будет показано напротив оставшегося времени после знака >.',
+  'Toggle end time display.': 'Переключить отображение времени окончания фильма.',
   'Auto next episode': 'Автоматически включать следующую серию',
   'Toggle auto next episode.': 'После окончания серии автоматически будет включаться следующая.',
   'Player long press speed': 'Скорость перемотки при долгом нажатии',
@@ -276,6 +276,7 @@ const ru: Translations = {
   'Continue Watching': 'Продолжить',
   'Continue button enabled': 'Кнопка продолжить просмотр',
   'Toggle continue button.': 'Переключить отображение кнопки продолжить просмотр.',
+  'Duration end in ': 'Конец в ',
 };
 
 export default ru;

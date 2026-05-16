@@ -143,8 +143,6 @@ export function FilmScreenComponent({
     return renderAction(Play, t('Watch Now'), playFilm);
   };
 
-  console.log('actionsWidth', actionsWidth, '<', 'width', width, '?', actionsWidth < width);
-
   const renderActions = () => (
     <View
       style={ [

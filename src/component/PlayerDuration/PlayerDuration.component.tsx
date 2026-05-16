@@ -1,8 +1,9 @@
 import { ThemedText } from 'Component/ThemedText';
 import { useConfigContext } from 'Context/ConfigContext';
 import { usePlayerProgressContext } from 'Context/PlayerProgressContext';
-import Moment from 'react-moment';
-import { useAppTheme } from 'Theme/context';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
+
+import { componentStyles } from './PlayerDuration.style';
 
 export const PlayerDurationComponent = () => {
   const {
@@ -11,11 +12,10 @@ export const PlayerDurationComponent = () => {
       durationTime,
       remainingTime,
       bufferedTime,
-      endDate,
     } = {},
   } = usePlayerProgressContext();
-  const { theme } = useAppTheme();
-  const { playerShowBufferTime, playerShowEndTime } = useConfigContext();
+  const styles = useThemedStyles(componentStyles);
+  const { playerShowBufferTime } = useConfigContext();
 
   const getRenderedTime = () => {
     let base = `${currentTime} / ${durationTime}`;
@@ -26,26 +26,12 @@ export const PlayerDurationComponent = () => {
 
     base = base.concat(` (${remainingTime})`);
 
-    if (playerShowEndTime && endDate) {
-      base = base.concat(' > ');
-    }
-
     return base;
   };
 
   return (
-    <ThemedText style={ { color: theme.colors.textOnContrast } }>
+    <ThemedText style={ styles.durationText }>
       { getRenderedTime() }
-      { playerShowEndTime && endDate && (
-        <Moment
-          element={ ThemedText }
-          format="HH:mm"
-          locale="ru"
-          style={ { color: theme.colors.textOnContrast } }
-        >
-          { endDate }
-        </Moment>
-      ) }
     </ThemedText>
   );
 };

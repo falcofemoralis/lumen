@@ -24,7 +24,7 @@ export const SettingCustomSelectComponent = memo(({
     try {
       await onUpdate(setting, val);
     } catch (error) {
-      console.log('error updating SettingCustomSelectComponent', error);
+      console.error('error updating SettingCustomSelectComponent', error);
     } finally {
       setIsLoading(false);
     }

@@ -274,6 +274,7 @@ const en = {
   'Continue Watching': 'Continue Watching',
   'Continue button enabled': 'Continue button enabled',
   'Toggle continue button.': 'Toggle continue button.',
+  'Duration end in ': 'Duration end in ',
 };
 
 export default en;

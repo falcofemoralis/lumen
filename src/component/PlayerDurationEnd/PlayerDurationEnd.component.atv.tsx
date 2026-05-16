@@ -3,42 +3,39 @@ import { useConfigContext } from 'Context/ConfigContext';
 import { usePlayerProgressContext } from 'Context/PlayerProgressContext';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
+import Moment from 'react-moment';
 import { View } from 'react-native';
 
-import { componentStyles } from './PlayerDuration.style.atv';
+import { componentStyles } from './PlayerDurationEnd.style.atv';
 
 export const PlayerDurationComponent = () => {
   const {
-    progressStatus: {
-      currentTime,
-      durationTime,
-      remainingTime,
-      bufferedTime,
-    } = {},
+    progressStatus: { endDate } = {},
   } = usePlayerProgressContext();
   const styles = useThemedStyles(componentStyles);
-  const { playerShowBufferTime } = useConfigContext();
+  const { playerShowEndTime } = useConfigContext();
 
-  const getRenderedTime = () => {
-    let base = `${currentTime} / ${durationTime}`;
-
-    if (playerShowBufferTime && bufferedTime && bufferedTime !== '0') {
-      base = base.concat(`+${bufferedTime}`);
-    }
-
-    return base;
-  };
+  if (!playerShowEndTime) {
+    return null;
+  }
 
   return (
     <View style={ styles.duration }>
       <View style={ styles.remainingWrapper }>
         <ThemedText style={ styles.durationText }>
-          { t('Remaining: {{remaining}}', { remaining: remainingTime ?? '' } ) }
+          { t('Duration end in ') }
         </ThemedText>
+        { endDate && (
+          <Moment
+            element={ ThemedText }
+            format="HH:mm"
+            locale="ru"
+            style={ styles.clockText }
+          >
+            { endDate }
+          </Moment>
+        ) }
       </View>
-      <ThemedText style={ styles.durationText }>
-        { getRenderedTime() }
-      </ThemedText>
     </View>
   );
 };

@@ -1,9 +1,9 @@
-import { useNavigation } from '@react-navigation/native';
 import { BookmarksOverlay } from 'Component/BookmarksOverlay';
 import { CommentsOverlay } from 'Component/CommentsOverlay';
 import { Loader } from 'Component/Loader';
 import { PlayerClock } from 'Component/PlayerClock';
 import { PlayerDuration } from 'Component/PlayerDuration';
+import { PlayerDurationEnd } from 'Component/PlayerDurationEnd';
 import { PlayerProgressBar } from 'Component/PlayerProgressBar';
 import { PlayerSubtitles } from 'Component/PlayerSubtitles';
 import { PlayerVideoSelector } from 'Component/PlayerVideoSelector';
@@ -433,8 +433,11 @@ export function PlayerComponent({
     );
   };
 
-  const renderDuration = () => (
-    <PlayerDuration />
+  const renderTopActionLine = () => (
+    <View style={ styles.actionLine }>
+      <PlayerDurationEnd />
+      <PlayerDuration />
+    </View>
   );
 
   const renderProgressBar = () => {
@@ -472,11 +475,11 @@ export function PlayerComponent({
     );
   };
 
-  const renderTopActionLine = () => {
+  const renderBottomActionLine = () => {
     return (
-      <View style={ styles.topActionLine }>
+      <View style={ styles.actionLine }>
         <PlayerClock />
-        <ThemedText style={ styles.topActionLineText }>
+        <ThemedText style={ styles.actionLineText }>
           { formatVideoTrackInfo(videoTrack) }
         </ThemedText>
       </View>
@@ -491,13 +494,13 @@ export function PlayerComponent({
     return (
       <View style={ styles.bottomActions }>
         <View style={ styles.durationRow }>
-          { renderDuration() }
+          { renderTopActionLine() }
         </View>
         <View style={ [styles.progressBarRow, isLocked && styles.progressBarRowLocked] }>
           { renderProgressBar() }
         </View>
         <View style={ styles.bottomActionsRowLine }>
-          { renderTopActionLine() }
+          { renderBottomActionLine() }
           <View
             style={ [
               styles.actionsRow,
