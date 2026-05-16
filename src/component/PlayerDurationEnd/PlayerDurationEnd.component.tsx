@@ -23,7 +23,7 @@ export const PlayerDurationComponent = () => {
       <ThemedText style={ styles.durationText }>
         { t('Duration end in ') }
       </ThemedText>
-      { endDate && (
+      { endDate ? (
         <Moment
           element={ ThemedText }
           format="HH:mm"
@@ -32,7 +32,7 @@ export const PlayerDurationComponent = () => {
         >
           { endDate }
         </Moment>
-      ) }
+      ) : <ThemedText style={ styles.durationText }>-</ThemedText> }
     </ThemedText>
   );
 };

@@ -24,6 +24,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     textAlign: 'center',
   },
   rightIcon: {
+    backgroundColor: colors.transparent,
   },
   disabled: {
     opacity: 0.5,

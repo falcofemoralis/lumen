@@ -77,6 +77,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     color: colors.textFocused,
   },
   rightIcon: {
+    backgroundColor: colors.transparent,
   },
   // long
   containerLong: {
