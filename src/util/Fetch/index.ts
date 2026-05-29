@@ -6,8 +6,10 @@ import {
   parseCookies,
 } from 'Util/Cookies';
 
+import { wrapFetchWithReactotron } from '../../devtools/FetchInterceptor';
+
 // A wrapper around fetch since RN messes up handling of cookies
-export function customFetch(input: RequestInfo | URL, init?: RequestInit | undefined) {
+async function _customFetch(input: RequestInfo | URL, init?: RequestInit | undefined) {
   const { hostname } = new URL(input instanceof Request ? input.url : input);
 
   return fetch(input, {
@@ -20,6 +22,7 @@ export function customFetch(input: RequestInfo | URL, init?: RequestInit | undef
     keepalive: true,
   }).then((res) => {
     const existingCookies = cookiesManager.get(hostname) || {};
+
     const newCookies = parseCookies(res.headers.get('Set-Cookie') || '');
 
     // Update the existing cookies with new ones
@@ -42,3 +45,7 @@ export function customFetch(input: RequestInfo | URL, init?: RequestInit | undef
     return res;
   });
 }
+
+export const customFetch = __DEV__
+  ? wrapFetchWithReactotron(_customFetch, { ignoreUrls: /symbolicate/ })
+  : _customFetch;
