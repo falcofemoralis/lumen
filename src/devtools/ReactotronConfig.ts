@@ -11,11 +11,7 @@ const reactotron = Reactotron.configure({
 
 reactotron.use(mmkvPlugin<ReactotronReactNative>({ storage: storage.getMiscStorage().getMMKVInstance() }));
 
-reactotron.useReactNative({
-  networking: {
-    ignoreUrls: /symbolicate/,
-  },
-});
+reactotron.useReactNative();
 
 /**
  * We're going to add `console.tron` to the Reactotron object.

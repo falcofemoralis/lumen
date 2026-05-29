@@ -47,5 +47,5 @@ async function _customFetch(input: RequestInfo | URL, init?: RequestInit | undef
 }
 
 export const customFetch = __DEV__
-  ? wrapFetchWithReactotron(_customFetch, { ignoreUrls: /symbolicate/ })
+  ? wrapFetchWithReactotron(_customFetch)
   : _customFetch;
