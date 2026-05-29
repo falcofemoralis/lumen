@@ -23,4 +23,9 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     maxHeight: '70%',
     maxWidth: '50%',
   },
+  items: {
+    flexDirection: 'column',
+    width: '100%',
+    height: '100%',
+  },
 } satisfies ThemedStyles);
