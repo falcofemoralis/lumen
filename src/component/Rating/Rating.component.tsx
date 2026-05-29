@@ -127,7 +127,7 @@ const TapRating: FunctionComponent<TapRatingProps> = ({
 }) => {
   const [position, setPosition] = useState<number>(defaultRating);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (defaultRating === null || defaultRating === undefined) {
       setPosition(3);
     } else {

@@ -66,11 +66,29 @@ export function NavigationBarContainer(props: NavigationBarContainerProps) {
     });
   }, [getRedirectRoute, navigation, state]);
 
+  const onReload = useCallback(() => {
+    const currentRoute = state.routes[state.index];
+
+    navigation.dispatch(
+      CommonActions.reset({
+        ...state,
+        routes: state.routes.map((r) => {
+          if (r.key === currentRoute.key) {
+            return { name: r.name, key: `${r.name}-${Date.now()}` };
+          }
+
+          return r;
+        }),
+      })
+    );
+  }, [navigation, state]);
+
   const containerProps = {
     ...props,
     profile,
     onPress,
     onLongPress,
+    onReload,
   };
 
   return isTV ? <NavigationBarComponentTV { ...containerProps } /> : <NavigationBarComponent { ...containerProps } />;

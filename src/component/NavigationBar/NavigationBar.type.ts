@@ -7,4 +7,5 @@ export type NavigationBarComponentProps = {
   profile: ProfileInterface | null;
   onPress: (name: string) => void;
   onLongPress: (name: string) => void;
+  onReload: () => void;
 } & NavigationBarContainerProps

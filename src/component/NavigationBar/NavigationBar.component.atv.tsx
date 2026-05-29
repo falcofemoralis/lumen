@@ -27,6 +27,7 @@ export function NavigationBarComponent({
   descriptors,
   profile,
   onPress,
+  onReload,
 }: NavigationBarComponentProps) {
   const { isMenuOpen, toggleMenu } = useNavigationContext();
   const { badgeData } = useServiceContext();
@@ -80,6 +81,7 @@ export function NavigationBarComponent({
         isActiveTab={ state.index === index }
         name={ route.name }
         routeKey={ route.key }
+        onReload={ onReload }
       />
     );
   };
@@ -141,6 +143,7 @@ type NavigationTabProps = {
   isActiveTab: boolean,
   name: string,
   routeKey: string,
+  onReload: () => void;
 };
 
 const NavigationTab = ({
@@ -152,6 +155,7 @@ const NavigationTab = ({
   isActiveTab,
   name,
   routeKey,
+  onReload,
 }: NavigationTabProps) => {
   const { theme } = useAppTheme();
   const { isSignedIn } = useServiceContext();
@@ -273,7 +277,7 @@ const NavigationTab = ({
         onFocus={ () => {
           onTabSelect(name);
         } }
-        onPress={ () => onTabSelect(name) }
+        onPress={ () => onReload() }
       >
         { ({ isRootActive, isFocused: isf }) => {
           switch (name) {
