@@ -125,9 +125,9 @@ export function PlayerComponent({
   const [doubleTapAction, setDoubleTapAction] = useState<DoubleTapAction | null>(null);
   const [longTapAction, setLongTapAction] = useState(false);
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
-  const controlsTimeout = useRef<NodeJS.Timeout | null>(null);
+  const controlsTimeout = useRef<number | null>(null);
   const playerRef = useRef<VideoView>(null);
-  const doubleTapTimeout = useRef<NodeJS.Timeout | null>(null);
+  const doubleTapTimeout = useRef<number | null>(null);
   const isPlayingRef = useRef(isPlaying);
   const showControlsRef = useRef(showControls);
   const isOverlayOpenRef = useRef(isOverlayOpen);

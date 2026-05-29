@@ -78,7 +78,7 @@ export type ProgressStatus = {
 
 export interface LongEvent {
   isKeyDownPressed: boolean;
-  longTimeout: NodeJS.Timeout | null;
+  longTimeout: number | null;
   isLongFired: boolean;
 }
 

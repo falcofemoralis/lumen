@@ -1,4 +1,4 @@
-export const setTimeoutSafe = (callback: () => void, ms?: number): NodeJS.Timeout | null => {
+export const setTimeoutSafe = (callback: () => void, ms?: number): number | null => {
   try {
     return setTimeout(() => {
       try {
@@ -6,7 +6,7 @@ export const setTimeoutSafe = (callback: () => void, ms?: number): NodeJS.Timeou
       } catch (e) {
         console.error('error', e);
       }
-    }, ms) as unknown as NodeJS.Timeout;
+    }, ms) as unknown as number;
   } catch (e) {
     // sometimes it can throw an error
     // Error: The 1st argument cannot be cast to type expo.modules.video.player.VideoPlayer
@@ -18,7 +18,7 @@ export const setTimeoutSafe = (callback: () => void, ms?: number): NodeJS.Timeou
   }
 };
 
-export const setIntervalSafe = (callback: () => void, ms?: number): NodeJS.Timeout | null => {
+export const setIntervalSafe = (callback: () => void, ms?: number): number | null => {
   try {
     return setInterval(() => {
       try {
@@ -26,7 +26,7 @@ export const setIntervalSafe = (callback: () => void, ms?: number): NodeJS.Timeo
       } catch (e) {
         console.error('error', e);
       }
-    }, ms) as unknown as NodeJS.Timeout;
+    }, ms) as unknown as number;
   } catch (e) {
     // sometimes it can throw an error
     // Error: The 1st argument cannot be cast to type expo.modules.video.player.VideoPlayer

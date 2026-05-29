@@ -32,7 +32,7 @@ export function NavigationBarComponent({
   const { badgeData } = useServiceContext();
   const styles = useThemedStyles(componentStyles);
   const lastPage = useRef<string | null>(state.routes[state.index]?.name || null);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<number | null>(null);
 
   const onDirectionHandledWithoutMovement = useCallback(
     (movement: string) => {

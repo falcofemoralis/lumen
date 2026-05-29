@@ -42,7 +42,7 @@ export function SearchScreenContainer() {
   const [enteredText, setEnteredText] = useState('');
   const [recognizing, setRecognizing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const debounce = useRef<NodeJS.Timeout | null>(null);
+  const debounce = useRef<number | null>(null);
   const { currentService } = useServiceContext();
   const confirmationOverlayRef = useRef<ThemedOverlayRef>(null);
 

@@ -116,7 +116,7 @@ export function PlayerComponent({
   const [showControls, setShowControls] = useState(false);
   const [hideActions, setHideActions] = useState(false);
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
-  const controlsTimeout = useRef<NodeJS.Timeout | null>(null);
+  const controlsTimeout = useRef<number | null>(null);
   const topActionRef = useRef<SpatialNavigationNodeRef | null>(null);
   const middleActionRef = useRef<SpatialNavigationNodeRef | null>(null);
   const bottomActionRef = useRef<SpatialNavigationNodeRef | null>(null);
