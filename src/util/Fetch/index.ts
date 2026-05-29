@@ -10,9 +10,6 @@ import {
 export function customFetch(input: RequestInfo | URL, init?: RequestInit | undefined) {
   const { hostname } = new URL(input instanceof Request ? input.url : input);
 
-  console.log('fetch', input);
-  console.trace();
-
   return fetch(input, {
     ...init,
     headers: {

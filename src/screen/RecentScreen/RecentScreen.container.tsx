@@ -29,8 +29,6 @@ export function RecentScreenContainer() {
     if (isSignedIn) {
       setIsLoading(true);
 
-      console.log('loadRecent');
-
       loadRecent(1, false).finally(() => {
         setIsLoading(false);
       });
