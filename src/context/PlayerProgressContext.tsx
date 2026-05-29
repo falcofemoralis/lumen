@@ -2,6 +2,7 @@ import { DEFAULT_PROGRESS_STATUS } from 'Component/Player/Player.config';
 import { ProgressStatus } from 'Component/Player/Player.type';
 import {
   createContext,
+  ReactNode,
   use,
   useCallback,
   useMemo,
@@ -32,7 +33,7 @@ const PlayerProgressActionsContext = createContext<PlayerProgressActionsInterfac
   resetProgressStatus: () => {},
 });
 
-export const PlayerProgressProvider = ({ children }: { children: React.ReactNode }) => {
+export const PlayerProgressProvider = ({ children }: { children: ReactNode }) => {
   const [progressStatus, setProgressStatus] = useState(DEFAULT_PROGRESS_STATUS);
 
   const updateProgressStatus = useCallback(

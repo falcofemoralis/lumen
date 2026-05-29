@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { FunctionComponent, ReactElement, useEffect, useState } from 'react';
 import {
   type ImageStyle,
   type StyleProp,
@@ -112,7 +112,7 @@ export type TapRatingProps = {
   starStyle?: ImageStyle;
 };
 
-const TapRating: React.FunctionComponent<TapRatingProps> = ({
+const TapRating: FunctionComponent<TapRatingProps> = ({
   count = 5,
   size: reviewImageSize = 40,
   defaultRating = 3,
@@ -127,7 +127,7 @@ const TapRating: React.FunctionComponent<TapRatingProps> = ({
 }) => {
   const [position, setPosition] = useState<number>(defaultRating);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (defaultRating === null || defaultRating === undefined) {
       setPosition(3);
     } else {
@@ -135,7 +135,7 @@ const TapRating: React.FunctionComponent<TapRatingProps> = ({
     }
   }, [defaultRating]);
 
-  const renderStars = (rating_array: React.ReactElement[]) => {
+  const renderStars = (rating_array: ReactElement[]) => {
     return rating_array.map((star) => star);
   };
 

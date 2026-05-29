@@ -7,7 +7,7 @@ import { useServiceContext } from 'Context/ServiceContext';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import { ACCOUNT_TAB, LOADER_SCREEN, SETTINGS_SCREEN } from 'Navigation/navigationRoutes';
-import { createRef, memo, useCallback, useMemo, useRef } from 'react';
+import { ComponentType, createRef, memo, useCallback, useMemo, useRef } from 'react';
 import { Image, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { DefaultFocus, Directions, SpatialNavigationRoot, SpatialNavigationView } from 'react-tv-space-navigation';
@@ -161,7 +161,7 @@ const NavigationTab = ({
     isf: boolean
   ) => {
     const { options } = descriptors[routeKey] ?? {};
-    const { tabBarIcon: IconComponent } = options as { tabBarIcon: React.ComponentType<any> };
+    const { tabBarIcon: IconComponent } = options as { tabBarIcon: ComponentType<any> };
     const { tabBarLabel } = options;
     const badgeCount = badgeData[name] || 0;
 

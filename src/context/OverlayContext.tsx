@@ -1,5 +1,6 @@
 import {
   createContext,
+  ReactNode,
   use,
   useCallback,
   useMemo,
@@ -16,7 +17,7 @@ const OverlayContext = createContext<OverlayContextInterface>({
   setIsOverlayOpen: () => {},
 });
 
-export const OverlayProvider = ({ children }: { children: React.ReactNode }) => {
+export const OverlayProvider = ({ children }: { children: ReactNode }) => {
   const [openedOverlays, setOpenedOverlays] = useState<Record<string, boolean>>({});
 
   const setIsOverlayOpen = useCallback((overlayId: string, isOpen: boolean) => {

@@ -1,3 +1,4 @@
+import { ComponentType, ReactElement, ReactNode } from 'react';
 import { StyleProp, ViewStyle } from 'react-native';
 
 export interface ThemedGridRowProps<T = any> {
@@ -13,9 +14,9 @@ export interface ThemedGridContainerProps<T = any> {
   rowStyle?: StyleProp<ViewStyle>;
   scrollBehavior?: 'stick-to-start' | 'stick-to-center';
   tvOptimized?: boolean;
-  ListHeaderComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
-  ListEmptyComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
-  renderItem: (args: ThemedGridRowProps<T>) => React.ReactNode;
+  ListHeaderComponent?: ComponentType<any> | ReactElement | null | undefined;
+  ListEmptyComponent?: ComponentType<any> | ReactElement | null | undefined;
+  renderItem: (args: ThemedGridRowProps<T>) => ReactNode;
   onNextLoad?: (isRefresh: boolean) => Promise<void>;
 }
 
@@ -28,9 +29,9 @@ export interface ThemedGridComponentProps<T = any> {
   rowStyle?: StyleProp<ViewStyle>;
   scrollBehavior?: 'stick-to-start' | 'stick-to-center';
   tvOptimized?: boolean;
-  ListHeaderComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
-  ListEmptyComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
-  renderItem: (props: { item: T, index: number }) => React.ReactNode;
+  ListHeaderComponent?: ComponentType<any> | ReactElement | null | undefined;
+  ListEmptyComponent?: ComponentType<any> | ReactElement | null | undefined;
+  renderItem: (props: { item: T, index: number }) => ReactNode;
   handleScrollEnd: () => void;
   handleRefresh?: () => void;
 }

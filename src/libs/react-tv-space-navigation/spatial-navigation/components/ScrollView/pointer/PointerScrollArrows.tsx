@@ -1,7 +1,7 @@
-import React, { ReactElement, ReactNode } from 'react';
+import { memo, ReactElement, ReactNode } from 'react';
 import { View, ViewStyle, StyleSheet } from 'react-native';
 
-export const PointerScrollArrows = React.memo(
+export const PointerScrollArrows = memo(
   ({
     ascendingArrow,
     descendingArrowProps,

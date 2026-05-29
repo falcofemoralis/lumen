@@ -8,13 +8,13 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import { Download, LogOut, MessageSquareText, Star } from 'lucide-react-native';
+import { ComponentType } from 'react';
 import { Image, StyleProp, TextStyle, View, ViewStyle } from 'react-native';
 import { DefaultFocus, SpatialNavigationScrollView } from 'react-tv-space-navigation';
 import { useAppTheme } from 'Theme/context';
 
 import { componentStyles } from './AccountScreen.style.atv';
 import { AccountScreenComponentProps } from './AccountScreen.type';
-import { DefaultGradient, GRADIENT_SIZE_TV, PremiumGradient } from './AccountScreenGradients';
 
 export function AccountScreenComponent({
   isSignedIn,
@@ -97,7 +97,7 @@ export function AccountScreenComponent({
 
   const renderActionButton = (
     title: string,
-    icon: React.ComponentType<any>,
+    icon: ComponentType<any>,
     action: () => void,
     style?: StyleProp<ViewStyle>,
     textStyle?: StyleProp<TextStyle>,

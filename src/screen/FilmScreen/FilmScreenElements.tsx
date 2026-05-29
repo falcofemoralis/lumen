@@ -5,7 +5,7 @@ import { ThemedPressable } from 'Component/ThemedPressable';
 import { ThemedText } from 'Component/ThemedText';
 import { t } from 'i18n/translate';
 import { CircleCheck, Star } from 'lucide-react-native';
-import { memo, useCallback, useEffect, useState } from 'react';
+import { memo, ReactNode, useCallback, useEffect, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { useAppTheme } from 'Theme/context';
 import { ThemedStyles } from 'Theme/types';
@@ -20,7 +20,7 @@ import { componentStyles } from './FilmScreen.style';
 
 interface SectionProps {
   title: string
-  children: React.ReactNode
+  children: ReactNode
   useHeadingWrapper?: boolean
   styles: ThemedStyles<typeof componentStyles>
 }

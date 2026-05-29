@@ -32,6 +32,7 @@ import {
   Undo2,
 } from 'lucide-react-native';
 import {
+  ComponentType,
   Ref,
   useEffect,
   useRef,
@@ -338,7 +339,7 @@ export function PlayerComponent({
   };
 
   const renderAction = (
-    IconComponent: React.ComponentType<any>,
+    IconComponent: ComponentType<any>,
     el: FocusedElement,
     action?: () => void,
     ref?: Ref<SpatialNavigationNodeRef>
@@ -365,7 +366,7 @@ export function PlayerComponent({
   );
 
   const renderTopAction = (
-    icon: React.ComponentType<any>,
+    icon: ComponentType<any>,
     action?: () => void,
     ref?: Ref<SpatialNavigationNodeRef>
   ) => renderAction(
@@ -388,7 +389,7 @@ export function PlayerComponent({
   };
 
   const renderBottomAction = (
-    icon: React.ComponentType<any>,
+    icon: ComponentType<any>,
     action?: () => void,
     ref?: Ref<SpatialNavigationNodeRef>
   ) => renderAction(

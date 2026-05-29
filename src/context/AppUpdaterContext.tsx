@@ -2,6 +2,7 @@ import { UPDATE_LINK } from 'Component/AppUpdater/AppUpdater.config';
 import * as Application from 'expo-application';
 import {
   createContext,
+  ReactNode,
   use,
   useCallback,
   useMemo,
@@ -32,7 +33,7 @@ const AppUpdaterContext = createContext<AppUpdaterContextInterface>({
   resetUpdate: noopFn,
 });
 
-export const AppUpdaterProvider = ({ children }: { children: React.ReactNode }) => {
+export const AppUpdaterProvider = ({ children }: { children: ReactNode }) => {
   const { isConfigured } = useConfigContext();
   const [update, setUpdate] = useState<UpdateInterface | null>(null);
   const [isUpdateRejected, setIsUpdateRejected] = useState(false);

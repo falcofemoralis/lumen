@@ -1,3 +1,4 @@
+import { ComponentType, ReactElement } from 'react';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 
 export interface FilmGridContainerProps {
@@ -6,8 +7,8 @@ export interface FilmGridContainerProps {
   isEmpty?: boolean;
   isAddSafeArea?: boolean;
   menuDefaultFocus?: boolean;
-  ListHeaderComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
-  ListEmptyComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
+  ListHeaderComponent?: ComponentType<any> | ReactElement | null | undefined;
+  ListEmptyComponent?: ComponentType<any> | ReactElement | null | undefined;
   onNextLoad?: (isRefresh: boolean) => Promise<void>;
   onItemFocus?: (row: number) => void;
 }
@@ -19,8 +20,8 @@ export interface FilmGridComponentProps {
   isEmpty?: boolean;
   isAddSafeArea?: boolean;
   menuDefaultFocus?: boolean;
-  ListHeaderComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
-  ListEmptyComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
+  ListHeaderComponent?: ComponentType<any> | ReactElement | null | undefined;
+  ListEmptyComponent?: ComponentType<any> | ReactElement | null | undefined;
   handleOnPress: (film: FilmCardInterface) => void;
   handleItemFocus: (index: number) => void;
   onNextLoad?: (isRefresh: boolean) => Promise<void>;

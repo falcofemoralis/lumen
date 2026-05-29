@@ -30,13 +30,31 @@
         "action": "VIEW",
         "autoVerify": true,
         "data": [
-          { "scheme": "https", "host": "rezka.ag" },
-          { "scheme": "https", "host": "rezka-ua.pub" },
-          { "scheme": "http", "host": "hdrezka.tv" },
-          { "scheme": "https", "host": "hdrzk.org" },
-          { "scheme": "https", "host": "hdrezka.ag" }
+          {
+            "scheme": "https",
+            "host": "rezka.ag"
+          },
+          {
+            "scheme": "https",
+            "host": "rezka-ua.pub"
+          },
+          {
+            "scheme": "http",
+            "host": "hdrezka.tv"
+          },
+          {
+            "scheme": "https",
+            "host": "hdrzk.org"
+          },
+          {
+            "scheme": "https",
+            "host": "hdrezka.ag"
+          }
         ],
-        "category": ["BROWSABLE", "DEFAULT"]
+        "category": [
+          "BROWSABLE",
+          "DEFAULT"
+        ]
       }
     ]
   },
@@ -73,7 +91,8 @@
         "android": {
           "usesCleartextTraffic": true,
           "enableMinifyInReleaseBuilds": true,
-          "enableShrinkResourcesInReleaseBuilds": true
+          "enableShrinkResourcesInReleaseBuilds": true,
+          "usePrecompiledHeaders": true
         }
       }
     ],
@@ -93,15 +112,11 @@
     "expo-speech-recognition",
     "@react-native-firebase/app",
     "@kesha-antonov/react-native-background-downloader",
-    "expo-image"
+    "expo-image",
+    "expo-status-bar"
   ],
   "experiments": {
     "tsconfigPaths": true,
     "reactCompiler": true
-  },
-  "extra": {
-    "ignite": {
-      "version": "11.4.0"
-    }
   }
 }

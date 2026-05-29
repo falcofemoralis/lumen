@@ -1,4 +1,4 @@
-import React, { createContext, useContext } from 'react';
+import { createContext, ReactNode, useContext } from 'react';
 
 const SpatialNavigatorDefaultFocusContext = createContext<boolean>(false);
 
@@ -8,7 +8,7 @@ export const useSpatialNavigatorDefaultFocus = () => {
 };
 
 type Props = {
-  children: React.ReactNode;
+  children: ReactNode;
   enable?: boolean;
 };
 

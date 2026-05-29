@@ -1,3 +1,4 @@
+import { ReactElement } from 'react';
 import Animated from 'react-native-reanimated';
 import { SpatialNavigationFocusableView } from 'react-tv-space-navigation';
 
@@ -16,12 +17,12 @@ export const ThemedPressableComponent = ({
   withAnimation = false,
   zoomScale = 1.05,
 }: ThemedPressableComponentProps) => {
-  const renderChildren = (state: ThemedFocusableNodeState): React.ReactElement => {
+  const renderChildren = (state: ThemedFocusableNodeState): ReactElement => {
     if (typeof children === 'function') {
       return children(state);
     }
 
-    return children as React.ReactElement;
+    return children as ReactElement;
   };
 
   return (

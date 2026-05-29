@@ -1,6 +1,7 @@
 import { FocusedElement } from 'Component/Player/Player.config';
 import {
   createContext,
+  ReactNode,
   use,
   useCallback,
   useMemo,
@@ -25,7 +26,7 @@ const PlayerContext = createContext<PlayerContextInterface>({
   updateSelectedVoice: () => {},
 });
 
-export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
+export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   const [focusedElement, setFocusedElement] = useState(FocusedElement.PROGRESS_THUMB);
   const [selectedVoice, setSelectedVoice] = useState<{
     filmId: string;

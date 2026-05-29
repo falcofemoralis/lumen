@@ -18,6 +18,9 @@ import { useLandscape } from 'Hooks/useLandscape';
 import { t } from 'i18n/translate';
 import { Check, ChevronLeft, CircleAlert, Info, LogIn, RefreshCw } from 'lucide-react-native';
 import {
+  ReactElement,
+  ReactNode,
+  Ref,
   useCallback,
   useRef,
   useState,
@@ -59,7 +62,7 @@ export type SlideProps = {
 
 export type BaseSlideProps = {
   slide: SlideInterface;
-  children?: React.ReactNode;
+  children?: ReactNode;
   style?: StyleProp<ViewStyle>;
   canNext?: boolean;
   canBack?: boolean;
@@ -865,9 +868,9 @@ export const SlidePressable = ({
 }: {
   style?: StyleProp<ViewStyle>;
   contentStyle?: StyleProp<ViewStyle>;
-  children?: React.ReactNode | ((props: ThemedFocusableNodeState) => React.ReactElement);
+  children?: ReactNode | ((props: ThemedFocusableNodeState) => ReactElement);
   styles: ThemedStyles<typeof componentStyles>;
-  spatialRef?: React.Ref<SpatialNavigationNodeRef>;
+  spatialRef?: Ref<SpatialNavigationNodeRef>;
   spatialStyle?: StyleProp<ViewStyle>;
   onPress?: () => void;
 }) => {

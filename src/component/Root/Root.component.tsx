@@ -7,10 +7,10 @@ import { useAppUpdaterContext } from 'Context/AppUpdaterContext';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useNetworkContext } from 'Context/NetworkContext';
 import { useServiceContext } from 'Context/ServiceContext';
-import { useEffect } from 'react';
+import { ReactNode, useEffect } from 'react';
 import NotificationStore from 'Store/Notification.store';
 
-export const Root = ({ children }: { children: React.ReactNode }) => {
+export const Root = ({ children }: { children: ReactNode }) => {
   const { checkForUpdates } = useConfigContext();
   const { isSignedIn } = useServiceContext();
   const { fetchUserData } = useServiceContext();

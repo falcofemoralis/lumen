@@ -2,10 +2,10 @@ import 'moment/locale/ru';
 
 import { ThemedText } from 'Component/ThemedText';
 import moment from 'moment';
-import { useEffect, useState } from 'react';
+import { CSSProperties, useEffect, useState } from 'react';
 import Moment from 'react-moment';
 
-const ReactLiveClock = ({ style }: { style?: React.CSSProperties }) => {
+const ReactLiveClock = ({ style }: { style?: CSSProperties }) => {
   const [currentTime, setCurrentTime] = useState(Date.now());
 
   useEffect(() => {

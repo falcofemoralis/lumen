@@ -1,6 +1,7 @@
+import { ReactNode } from 'react';
 import { StyleProp, ViewStyle } from 'react-native';
 
 export type WrapperProps = {
-  children: React.ReactNode;
+  children: ReactNode;
   style?: StyleProp<ViewStyle>;
 };

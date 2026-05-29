@@ -1,4 +1,4 @@
-import { ThemedStyles } from 'Theme/types';
+import { ReactNode } from 'react';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 
 export type FilmSectionsData = {
@@ -9,13 +9,13 @@ export type FilmSectionsData = {
 
 export interface FilmSectionsContainerProps {
   data: FilmSectionsData[];
-  children?: React.ReactNode;
+  children?: ReactNode;
   handleOnPress: (film: FilmCardInterface) => void;
 }
 
 export interface FilmSectionsComponentProps {
   data: FilmSectionsItem[];
-  children?: React.ReactNode;
+  children?: ReactNode;
   handleOnPress: (film: FilmCardInterface) => void;
 }
 

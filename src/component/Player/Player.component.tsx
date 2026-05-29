@@ -40,7 +40,7 @@ import {
   SkipBack,
   SkipForward,
 } from 'lucide-react-native';
-import { Fragment, useEffect, useRef, useState } from 'react';
+import { ComponentType, Fragment, useEffect, useRef, useState } from 'react';
 import { AppState, Dimensions, View } from 'react-native';
 import {
   Gesture,
@@ -294,7 +294,7 @@ export function PlayerComponent({
   };
 
   const renderAction = (
-    IconComponent: React.ComponentType<any>,
+    IconComponent: ComponentType<any>,
     action?: () => void
   ) => (
     <GestureDetector gesture={ Gesture.Tap() }>
@@ -392,7 +392,7 @@ export function PlayerComponent({
   );
 
   const renderMiddleControl = (
-    IconComponent: React.ComponentType<any>,
+    IconComponent: ComponentType<any>,
     action: () => void,
     size: MiddleActionVariant = 'small'
   ) => (

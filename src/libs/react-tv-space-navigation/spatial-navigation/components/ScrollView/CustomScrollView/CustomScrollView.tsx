@@ -1,11 +1,11 @@
 import { Animated, LayoutChangeEvent, View, ViewStyle } from 'react-native';
-import { forwardRef, useCallback, useRef, useState } from 'react';
+import { forwardRef, ReactNode, useCallback, useRef, useState } from 'react';
 import { CustomScrollViewRef } from '../types';
 import { useStyle } from './CustomScrollView.hooks';
 
 type Props = {
   horizontal?: boolean;
-  children: React.ReactNode;
+  children: ReactNode;
   style?: ViewStyle;
   contentContainerStyle?: ViewStyle;
   scrollDuration?: number;
@@ -49,7 +49,7 @@ export const CustomScrollView = forwardRef<CustomScrollViewRef, Props>(
     const updateRef = (currentRef: View | null) => {
       if (!currentRef) return;
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- couldn't find another way than a mutation... copying the ref makes it not work with measureLayout anymore
+       
       const newRef = currentRef as any as CustomScrollViewRef;
       newRef.getInnerViewNode = () => currentRef;
       newRef.scrollTo = ({ x, y }) => {

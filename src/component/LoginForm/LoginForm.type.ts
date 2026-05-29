@@ -1,14 +1,15 @@
+import { ReactNode } from 'react';
 import { StyleProp, ViewStyle } from 'react-native';
 
 export interface LoginFormContainerProps {
   withRedirect?: boolean;
-  children?: React.ReactNode;
+  children?: ReactNode;
 }
 
 export interface LoginFormComponentProps {
   isLoading: boolean;
   withRedirect?: boolean;
   style?: StyleProp<ViewStyle>;
-  children?: React.ReactNode;
+  children?: ReactNode;
   handleLogin: (username: string, password: string) => Promise<boolean>;
 }

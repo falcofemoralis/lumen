@@ -1,4 +1,4 @@
-import React from 'react';
+import { forwardRef, ReactNode, RefObject } from 'react';
 import { ViewStyle, ScrollView } from 'react-native';
 import { CustomScrollView } from './CustomScrollView/CustomScrollView';
 import { CustomScrollViewRef } from './types';
@@ -7,7 +7,7 @@ type Props = {
   useNativeScroll: boolean;
 
   horizontal?: boolean;
-  children: React.ReactNode;
+  children: ReactNode;
   style?: ViewStyle;
   contentContainerStyle?: ViewStyle;
   scrollDuration?: number;
@@ -15,12 +15,12 @@ type Props = {
   testID?: string;
 };
 
-export const AnyScrollView = React.forwardRef<CustomScrollViewRef, Props>(
+export const AnyScrollView = forwardRef<CustomScrollViewRef, Props>(
   ({ useNativeScroll, ...props }: Props, ref) => {
     if (useNativeScroll) {
       return (
         <ScrollView
-          ref={ref as React.RefObject<ScrollView>}
+          ref={ref as RefObject<ScrollView>}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
           scrollEnabled={false}

@@ -10,12 +10,14 @@ import {
 export function customFetch(input: RequestInfo | URL, init?: RequestInit | undefined) {
   const { hostname } = new URL(input instanceof Request ? input.url : input);
 
+  console.log('fetch', input);
+  console.trace();
+
   return fetch(input, {
     ...init,
     headers: {
       ...(init?.headers || {}),
       Cookie: buildCookieString(cookiesManager.get(hostname) || {}),
-      'Accept-Encoding': 'gzip',
     },
     credentials: 'omit', // Omit cookies and handle ourselves
     keepalive: true,

@@ -1,6 +1,6 @@
 /* eslint-disable react/destructuring-assignment */
 import { useThemedStyles } from 'Hooks/useThemedStyles';
-import React, { ComponentType, useCallback, useEffect, useMemo, useRef } from 'react';
+import { ComponentType, useCallback, useEffect, useMemo, useRef } from 'react';
 import {
   Animated,
   GestureResponderEvent,

@@ -1,6 +1,7 @@
 import {
   createContext,
   JSX,
+  ReactNode,
   useContext,
   useMemo,
 } from 'react';
@@ -20,7 +21,7 @@ interface AppContextInterface {
 const AppContext = createContext<AppContextInterface>({
 });
 
-type Props = { children: React.ReactNode };
+type Props = { children: ReactNode };
 type Provider = (p: Props) => JSX.Element;
 
 export const composeProviders = (...p: Provider[]) =>
@@ -41,7 +42,7 @@ export const AppProviders = composeProviders(
   NetworkProvider
 );
 
-export const AppProvider = ({ children }: { children: React.ReactNode }) => {
+export const AppProvider = ({ children }: { children: ReactNode }) => {
   const value = useMemo(() => ({}), []);
 
   return (

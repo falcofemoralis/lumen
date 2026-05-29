@@ -1,26 +1,26 @@
-import { createContext, useCallback, useRef } from 'react';
+import { createContext, FC, ReactNode, useCallback, useRef } from 'react';
 import { View } from 'react-native';
 
 import PortalManager, { PortalManagerHandle } from './PortalManager';
 
 export type Props = {
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
 type Operation =
-  | { type: 'mount'; key: number; children: React.ReactNode }
-  | { type: 'update'; key: number; children: React.ReactNode }
+  | { type: 'mount'; key: number; children: ReactNode }
+  | { type: 'update'; key: number; children: ReactNode }
   | { type: 'unmount'; key: number };
 
 export type PortalMethods = {
-  mount: (children: React.ReactNode) => number;
-  update: (key: number, children: React.ReactNode) => void;
+  mount: (children: ReactNode) => number;
+  update: (key: number, children: ReactNode) => void;
   unmount: (key: number) => void;
 };
 
 export const PortalContext = createContext<PortalMethods>(null as any);
 
-const PortalHost: React.FC<Props> = ({ children }) => {
+const PortalHost: FC<Props> = ({ children }) => {
   const managerRef = useRef<PortalManagerHandle | null>(null);
   const queueRef = useRef<Operation[]>([]);
   const nextKeyRef = useRef(0);
@@ -46,7 +46,7 @@ const PortalHost: React.FC<Props> = ({ children }) => {
     }
   }, []);
 
-  const mount = useCallback((el: React.ReactNode) => {
+  const mount = useCallback((el: ReactNode) => {
     const key = nextKeyRef.current++;
     if (managerRef.current) {
       managerRef.current.mount(key, el);
@@ -57,7 +57,7 @@ const PortalHost: React.FC<Props> = ({ children }) => {
     return key;
   }, []);
 
-  const update = useCallback((key: number, el: React.ReactNode) => {
+  const update = useCallback((key: number, el: ReactNode) => {
     if (managerRef.current) {
       managerRef.current.update(key, el);
     } else {

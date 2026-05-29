@@ -25,7 +25,7 @@ import {
   ShieldOff,
   Star,
 } from 'lucide-react-native';
-import { useState } from 'react';
+import { ComponentType, useState } from 'react';
 import { Dimensions, useWindowDimensions, View } from 'react-native';
 import {
   DefaultFocus,
@@ -98,7 +98,7 @@ export function FilmScreenComponent({
   };
 
   const renderAction = (
-    IconComponent: React.ComponentType<any>,
+    IconComponent: ComponentType<any>,
     text?: string,
     onPress?: () => void,
     isDisabled?: boolean

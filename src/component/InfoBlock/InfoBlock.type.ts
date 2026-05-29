@@ -1,3 +1,4 @@
+import { ComponentType } from 'react';
 import { StyleProp, ViewStyle } from 'react-native';
 
 export interface InfoBlockContainerProps {
@@ -5,7 +6,7 @@ export interface InfoBlockContainerProps {
   subtitle: string;
   hideIcon?: boolean;
   style?: StyleProp<ViewStyle>;
-  Icon?: React.ComponentType<any>;
+  Icon?: ComponentType<any>;
 }
 
 export interface InfoBlockComponentProps {
@@ -13,5 +14,5 @@ export interface InfoBlockComponentProps {
   subtitle: string;
   hideIcon?: boolean;
   style?: StyleProp<ViewStyle>;
-  Icon?: React.ComponentType<any>;
+  Icon?: ComponentType<any>;
 }

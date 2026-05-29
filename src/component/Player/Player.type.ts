@@ -2,6 +2,7 @@ import { PlayerVideoSelectorRef } from 'Component/PlayerVideoSelector/PlayerVide
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { VideoContentFit, VideoPlayer, VideoPlayerStatus, VideoTrack } from 'expo-video';
+import { RefObject } from 'react';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface, SubtitleInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
@@ -26,12 +27,12 @@ export interface PlayerComponentProps {
   videoTrack: VideoTrack | null;
   selectedQuality: string;
   selectedSubtitle?: SubtitleInterface;
-  qualityOverlayRef: React.RefObject<ThemedOverlayRef | null>;
-  subtitleOverlayRef: React.RefObject<ThemedOverlayRef | null>;
-  playerVideoSelectorOverlayRef: React.RefObject<PlayerVideoSelectorRef | null>;
-  commentsOverlayRef: React.RefObject<ThemedOverlayRef | null>;
-  bookmarksOverlayRef: React.RefObject<ThemedOverlayRef | null>;
-  speedOverlayRef: React.RefObject<ThemedOverlayRef | null>;
+  qualityOverlayRef: RefObject<ThemedOverlayRef | null>;
+  subtitleOverlayRef: RefObject<ThemedOverlayRef | null>;
+  playerVideoSelectorOverlayRef: RefObject<PlayerVideoSelectorRef | null>;
+  commentsOverlayRef: RefObject<ThemedOverlayRef | null>;
+  bookmarksOverlayRef: RefObject<ThemedOverlayRef | null>;
+  speedOverlayRef: RefObject<ThemedOverlayRef | null>;
   selectedSpeed: number;
   selectedAspectRatio: VideoContentFit;
   isLocked: boolean;

@@ -1,4 +1,5 @@
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
+import { RefObject } from 'react';
 import { StyleProp, ViewStyle } from 'react-native';
 
 export interface DropdownItem {
@@ -14,7 +15,7 @@ export type ThemedDropdownContainerProps = {
   header?: string;
   inputStyle?: StyleProp<ViewStyle>;
   asOverlay?: boolean;
-  overlayRef?: React.RefObject<ThemedOverlayRef | null>;
+  overlayRef?: RefObject<ThemedOverlayRef | null>;
   onChange: (item: DropdownItem) => void;
   inputLabel?: string;
   style?: StyleProp<ViewStyle>;

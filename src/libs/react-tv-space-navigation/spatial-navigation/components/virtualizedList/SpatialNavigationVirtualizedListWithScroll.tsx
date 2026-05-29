@@ -1,4 +1,4 @@
-import React, { ForwardedRef, useCallback, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import { Dispatch, ForwardedRef, memo, ReactElement, SetStateAction, useCallback, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { VirtualizedListProps } from './VirtualizedList';
 
 import {
@@ -58,9 +58,9 @@ export type SpatialNavigationVirtualizedListWithScrollProps<T> = Omit<
 >;
 
 export type PointerScrollProps = {
-  descendingArrow?: React.ReactElement;
+  descendingArrow?: ReactElement;
   descendingArrowContainerStyle?: ViewStyle;
-  ascendingArrow?: React.ReactElement;
+  ascendingArrow?: ReactElement;
   ascendingArrowContainerStyle?: ViewStyle;
   scrollInterval?: number;
 };
@@ -70,7 +70,7 @@ const useRemotePointerVirtualizedListScrollProps = <T,>({
   scrollInterval,
   data,
 }: {
-  setCurrentlyFocusedItemIndex: React.Dispatch<React.SetStateAction<number>>;
+  setCurrentlyFocusedItemIndex: Dispatch<SetStateAction<number>>;
   scrollInterval: number;
   data: T[];
 }) => {
@@ -255,7 +255,7 @@ export const SpatialNavigationVirtualizedListWithScroll = typedMemo(
 SpatialNavigationVirtualizedListWithScroll.displayName =
   'SpatialNavigationVirtualizedListWithScroll';
 
-const PointerScrollArrows = React.memo(
+const PointerScrollArrows = memo(
   ({
     ascendingArrow,
     ascendingArrowProps,

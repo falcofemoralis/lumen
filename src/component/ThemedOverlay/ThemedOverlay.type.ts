@@ -1,7 +1,8 @@
+import { ReactNode } from 'react';
 import { StyleProp, ViewStyle } from 'react-native';
 
 export interface ThemedOverlayContainerProps {
-  children: React.ReactNode;
+  children: ReactNode;
   style?: StyleProp<ViewStyle>;
   containerStyle?: StyleProp<ViewStyle>;
   contentContainerStyle?: StyleProp<ViewStyle>;
@@ -14,7 +15,7 @@ export interface ThemedOverlayContainerProps {
 
 export interface ThemedOverlayComponentProps {
   isOpened: boolean;
-  children: React.ReactNode;
+  children: ReactNode;
   style?: StyleProp<ViewStyle>;
   containerStyle?: StyleProp<ViewStyle>;
   contentContainerStyle?: StyleProp<ViewStyle>;

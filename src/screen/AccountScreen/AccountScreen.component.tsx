@@ -12,6 +12,7 @@ import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import { Bell, Download, LogOut, MessageSquareText, Settings, Star } from 'lucide-react-native';
 import { ACCOUNT_TAB } from 'Navigation/navigationRoutes';
+import { ComponentType } from 'react';
 import { Image, ScrollView, StyleProp, TextStyle, View, ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from 'Theme/context';
@@ -120,7 +121,7 @@ export function AccountScreenComponent({
 
   const renderActionButton = (
     title: string,
-    icon: React.ComponentType<any>,
+    icon: ComponentType<any>,
     action: () => void,
     style?: StyleProp<ViewStyle>,
     textStyle?: StyleProp<TextStyle>,

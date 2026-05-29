@@ -4,14 +4,14 @@ import {
   SpatialNavigationNodeDefaultProps,
 } from './Node';
 import { Platform, View, ViewStyle, ViewProps, StyleProp } from 'react-native';
-import { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
+import { forwardRef, ReactElement, useImperativeHandle, useMemo, useRef } from 'react';
 import { SpatialNavigationNodeRef } from '../types/SpatialNavigationNodeRef';
 import { useSpatialNavigationDeviceType } from '../context/DeviceContext';
 import { useSpatialNavigatorFocusableAccessibilityProps } from '../hooks/useSpatialNavigatorFocusableAccessibilityProps';
 
 type FocusableViewProps = {
   style?: StyleProp<ViewStyle> ;
-  children: React.ReactElement | ((props: FocusableNodeState) => React.ReactElement);
+  children: ReactElement | ((props: FocusableNodeState) => ReactElement);
   viewProps?: ViewProps & {
     onMouseEnter?: () => void;
   };

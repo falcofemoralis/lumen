@@ -1,5 +1,6 @@
 import { RewindDirection } from 'Component/Player/Player.config';
 import { VideoPlayer } from 'expo-video';
+import { RefObject } from 'react';
 import { SpatialNavigationNodeRef } from 'react-tv-space-navigation';
 
 export interface PlayerProgressBarContainerProps {
@@ -12,7 +13,7 @@ export interface PlayerProgressBarContainerProps {
   handleIsScrolling?: (value: boolean) => void;
 
   // Mobile Only
-  thumbRef?: React.MutableRefObject<SpatialNavigationNodeRef | null>;
+  thumbRef?: RefObject<SpatialNavigationNodeRef | null>;
   hideActions?: boolean;
   onFocus?: () => void
   // toggleSeekMode?: () => void;

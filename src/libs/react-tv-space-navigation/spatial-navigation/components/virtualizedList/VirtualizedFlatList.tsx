@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
-import { FlatList, StyleProp, StyleSheet, ViewStyle } from "react-native";
+import { JSX, ReactNode, useEffect, useRef } from "react";
+import { FlatList, StyleProp, ViewStyle } from "react-native";
 import { typedMemo } from "../../helpers/TypedMemo";
 import { NodeOrientation } from "../../types/orientation";
 
@@ -14,8 +14,8 @@ export interface VirtualizedListProps<T> {
   /** If vertical the height of an item, otherwise the width */
   itemSize: number | ((item: T) => number);
   currentlyFocusedItemIndex: number;
-  ListHeaderComponent?: React.ReactNode;
-  ListEmptyComponent?: React.ReactNode;
+  ListHeaderComponent?: ReactNode;
+  ListEmptyComponent?: ReactNode;
   /**
    * How many items are RENDERED ADDITIONALLY to the minimum amount possible. It impacts virtualization size.
    * Defaults to 2.
