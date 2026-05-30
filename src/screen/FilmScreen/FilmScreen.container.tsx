@@ -496,13 +496,25 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     let lastVoiceId: string | null = null;
     let lastVoiceData = null;
 
-    for (const voiceId of Object.keys(savedTime.voices)) {
-      const voiceData = savedTime.voices[voiceId];
+    if (savedTime.lastVoiceId) {
+      lastVoiceId = savedTime.lastVoiceId;
 
+      const voiceData = savedTime.voices[lastVoiceId];
       if (voiceData && voiceData.timestamps && Object.keys(voiceData.timestamps).length > 0) {
-        lastVoiceId = voiceId;
         lastVoiceData = voiceData;
-        break;
+      }
+    }
+
+    // fallback for backward compatibility
+    if (!lastVoiceId || !lastVoiceData) {
+      for (const voiceId of Object.keys(savedTime.voices)) {
+        const voiceData = savedTime.voices[voiceId];
+
+        if (voiceData && voiceData.timestamps && Object.keys(voiceData.timestamps).length > 0) {
+          lastVoiceId = voiceId;
+          lastVoiceData = voiceData;
+          break;
+        }
       }
     }
 

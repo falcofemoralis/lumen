@@ -10,7 +10,6 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { Linking } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
 import { BadgeData } from 'Type/BadgeData.interface';
 import { FilmInterface } from 'Type/Film.interface';

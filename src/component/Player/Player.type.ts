@@ -103,6 +103,7 @@ export interface SavedTimeVoice {
 export interface SavedTime {
   filmId: string;
   voices: Record<string, SavedTimeVoice | null>; // voiceId - data
+  lastVoiceId: string | null;
 }
 
 export interface FirestoreDocument {

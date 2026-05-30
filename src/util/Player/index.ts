@@ -49,7 +49,7 @@ const prepareSavedTimeObject = (
 ): SavedTime => {
   const newSavedTime: SavedTime = previousSavedTime
     ? { ...previousSavedTime }
-    : { filmId: film.id, voices: {} };
+    : { filmId: film.id, voices: {}, lastVoiceId: null };
 
   const voiceData = newSavedTime.voices[voice.id] ?? {} as SavedTimeVoice;
 
@@ -67,6 +67,7 @@ const prepareSavedTimeObject = (
   };
 
   newSavedTime.voices[voice.id] = voiceData;
+  newSavedTime.lastVoiceId = voice.id;
 
   return newSavedTime;
 };
