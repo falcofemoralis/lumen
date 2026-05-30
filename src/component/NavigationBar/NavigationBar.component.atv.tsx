@@ -7,7 +7,7 @@ import { useServiceContext } from 'Context/ServiceContext';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import { ACCOUNT_TAB, LOADER_SCREEN, SETTINGS_SCREEN } from 'Navigation/navigationRoutes';
-import { createRef, memo, useCallback, useMemo, useRef } from 'react';
+import { ComponentType, createRef, memo, useCallback, useMemo, useRef } from 'react';
 import { Image, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { DefaultFocus, Directions, SpatialNavigationRoot, SpatialNavigationView } from 'react-tv-space-navigation';
@@ -27,12 +27,13 @@ export function NavigationBarComponent({
   descriptors,
   profile,
   onPress,
+  onReload,
 }: NavigationBarComponentProps) {
   const { isMenuOpen, toggleMenu } = useNavigationContext();
   const { badgeData } = useServiceContext();
   const styles = useThemedStyles(componentStyles);
   const lastPage = useRef<string | null>(state.routes[state.index]?.name || null);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<number | null>(null);
 
   const onDirectionHandledWithoutMovement = useCallback(
     (movement: string) => {
@@ -80,6 +81,7 @@ export function NavigationBarComponent({
         isActiveTab={ state.index === index }
         name={ route.name }
         routeKey={ route.key }
+        onReload={ onReload }
       />
     );
   };
@@ -141,6 +143,7 @@ type NavigationTabProps = {
   isActiveTab: boolean,
   name: string,
   routeKey: string,
+  onReload: () => void;
 };
 
 const NavigationTab = ({
@@ -152,6 +155,7 @@ const NavigationTab = ({
   isActiveTab,
   name,
   routeKey,
+  onReload,
 }: NavigationTabProps) => {
   const { theme } = useAppTheme();
   const { isSignedIn } = useServiceContext();
@@ -161,7 +165,7 @@ const NavigationTab = ({
     isf: boolean
   ) => {
     const { options } = descriptors[routeKey] ?? {};
-    const { tabBarIcon: IconComponent } = options as { tabBarIcon: React.ComponentType<any> };
+    const { tabBarIcon: IconComponent } = options as { tabBarIcon: ComponentType<any> };
     const { tabBarLabel } = options;
     const badgeCount = badgeData[name] || 0;
 
@@ -273,7 +277,7 @@ const NavigationTab = ({
         onFocus={ () => {
           onTabSelect(name);
         } }
-        onPress={ () => onTabSelect(name) }
+        onPress={ () => onReload() }
       >
         { ({ isRootActive, isFocused: isf }) => {
           switch (name) {

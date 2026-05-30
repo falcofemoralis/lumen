@@ -11,7 +11,7 @@ export const ThemedBottomSheetComponent = ({
   detents = [0.4, 'auto'],
   backgroundColor,
 }: ThemedBottomSheetComponentProps) => {
-  const { theme } = useAppTheme();
+  const { theme, scale } = useAppTheme();
 
   return (
     <View>
@@ -22,7 +22,9 @@ export const ThemedBottomSheetComponent = ({
           cornerRadius={ 24 }
           backgroundColor={ backgroundColor ?? theme.colors.backgroundLight }
         >
-          { children }
+          <View style={ { paddingTop: scale(32), paddingBottom: scale(8) } }>
+            { children }
+          </View>
         </TrueSheet>
       </Portal>
     </View>

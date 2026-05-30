@@ -27,6 +27,7 @@ import {
   Star,
 } from 'lucide-react-native';
 import { COMMENTS_MODAL_SCREEN, SCHEDULE_MODAL_SCREEN } from 'Navigation/navigationRoutes';
+import { ComponentType } from 'react';
 import {
   ScrollView,
   Text,
@@ -252,7 +253,7 @@ export function FilmScreenComponent({
   };
 
   const renderMiddleAction = (
-    IconComponent: React.ComponentType<any>,
+    IconComponent: ComponentType<any>,
     text: string,
     action?: () => void,
     disabled?: boolean

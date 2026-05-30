@@ -1,10 +1,10 @@
 import { LayoutChangeEvent, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import { SpatialNavigationNode } from './Node';
-import { forwardRef } from 'react';
+import { forwardRef, ReactNode } from 'react';
 import { SpatialNavigationNodeRef } from '../types/SpatialNavigationNodeRef';
 
 type Props = {
-  children: React.ReactNode;
+  children: ReactNode;
   style?: StyleProp<ViewStyle>;
   direction: 'horizontal' | 'vertical';
   alignInGrid?: boolean;

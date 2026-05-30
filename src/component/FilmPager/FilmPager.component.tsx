@@ -13,11 +13,7 @@ import {
   OnPageScrollStateChangedEventData,
   OnPageSelectedEventData,
 } from 'react-native-pager-view/lib/typescript/PagerViewNativeComponent';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { useAppTheme } from 'Theme/context';
 import { ThemedStyles } from 'Theme/types';
 

@@ -57,13 +57,14 @@ export const ThemedDropdownComponent = ({
       return null;
     }
 
-    const { label, endIcon } = data.find((item) => item.value === value) ?? {};
+    const { label, startIcon, endIcon } = data.find((item) => item.value === value) ?? {};
 
     return (
       <ThemedButton
         style={ [styles.input, inputStyle] }
         contentStyle={ styles.inputContent }
         textStyle={ styles.inputText }
+        leftImageStyle={ styles.inputImage }
         rightImageStyle={ styles.inputImage }
         onPress={ () => (overlayRef || componentOverlayRef).current?.open() }
         IconComponent={ Plus }
@@ -71,6 +72,7 @@ export const ThemedDropdownComponent = ({
           color: theme.colors.icon,
           size: scale(18),
         } }
+        leftImage={ startIcon }
         rightImage={ endIcon }
       >
         { inputLabel ?? label }

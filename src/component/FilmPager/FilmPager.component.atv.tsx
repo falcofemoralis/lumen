@@ -123,7 +123,7 @@ const TopMenu = memo(({
   styles: ThemedStyles<typeof componentStyles>;
 }) => {
   const { scale } = useAppTheme();
-  const debounce = useRef<NodeJS.Timeout | null>(null);
+  const debounce = useRef<number | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const refs = useRef<any[]>(
     items.map(() => createRef<any>())

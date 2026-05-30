@@ -1,3 +1,5 @@
+import { ComponentType, Dispatch, SetStateAction } from 'react';
+
 export interface SettingsScreenComponentProps {
   settings: SettingItem[];
   onSettingUpdate: (setting: SettingItem, value: string) => Promise<boolean>;
@@ -39,10 +41,10 @@ export type SettingItem = {
   onSettingPress?: (
     value: string | null,
     key: any,
-    setSettings: React.Dispatch<React.SetStateAction<SettingItem[]>>
+    setSettings: Dispatch<SetStateAction<SettingItem[]>>
   ) => Promise<boolean | void> | boolean | void;
   settings?: SettingItem[];
-  IconComponent?: React.ComponentType<any>;
+  IconComponent?: ComponentType<any>;
   iconProps?: Record<string, any>;
   iconPropsFocused?: Record<string, any>;
   confirmation?: {

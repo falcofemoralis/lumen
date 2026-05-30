@@ -886,7 +886,7 @@ const RezkaApi = {
 
           const video: FilmVideoInterface = {
             streams: parseStreams(jsonObject.streams),
-            storyboardUrl: this.getProvider() + jsonObject.thumbnails,
+            storyboardUrl: jsonObject.thumbnails ? this.getProvider() + jsonObject.thumbnails : undefined,
             subtitles: parseSubtitles(
               jsonObject.subtitle,
               jsonObject.subtitle_def,
@@ -1335,7 +1335,7 @@ const RezkaApi = {
     const result = {
       streams: this.modifyCDN(streams),
       subtitles,
-      storyboardUrl: this.getProvider() + json.thumbnails,
+      storyboardUrl: json.thumbnails ? this.getProvider() + json.thumbnails : undefined,
     };
 
     return result;

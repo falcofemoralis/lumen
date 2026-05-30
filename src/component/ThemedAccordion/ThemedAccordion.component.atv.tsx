@@ -5,8 +5,13 @@ import { ThemedPressable } from 'Component/ThemedPressable';
 import { ThemedText } from 'Component/ThemedText';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { useEffect, useRef, useState } from 'react';
-import { View } from 'react-native';
-import { DefaultFocus, SpatialNavigationScrollView, useLockSpatialNavigation } from 'react-tv-space-navigation';
+import { useWindowDimensions, View } from 'react-native';
+import {
+  DefaultFocus,
+  SpatialNavigationScrollView,
+  SpatialNavigationView,
+  useLockSpatialNavigation,
+} from 'react-tv-space-navigation';
 import { useAppTheme } from 'Theme/context';
 
 import { componentStyles } from './ThemedAccordion.style.atv';
@@ -43,6 +48,7 @@ export const ThemedAccordionComponent = ({
   const styles = useThemedStyles(componentStyles);
   const overlayRef = useRef<ThemedOverlayRef>(null);
   const [openAccordionGroup, setOpenAccordionGroup] = useState<string | null>(null);
+  const { height } = useWindowDimensions();
 
   const showOverlay = (groupId: string) => {
     setOpenAccordionGroup(groupId);
@@ -112,9 +118,19 @@ export const ThemedAccordionComponent = ({
   return (
     <View style={ styles.container }>
       { renderOverlay() }
-      <DefaultFocus>
-        { data.map((group) => renderAccordionGroup(group)) }
-      </DefaultFocus>
+      <View style={ styles.items }>
+        <SpatialNavigationScrollView
+          offsetFromStart={ height / 2 }
+        >
+          <SpatialNavigationView
+            direction="vertical"
+          >
+            <DefaultFocus>
+              { data.map((group) => renderAccordionGroup(group)) }
+            </DefaultFocus>
+          </SpatialNavigationView>
+        </SpatialNavigationScrollView>
+      </View>
     </View>
   );
 };

@@ -60,6 +60,55 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     isDeepLink = true;
   }
 
+  const updateFilmVoiceData = async (data: FilmInterface | null) => {
+    // logged in users already use service built-in system
+    if (!data) {
+      return;
+    }
+
+    const savedTime = getSavedTime(data);
+
+    if (!savedTime || !savedTime.voices || Object.keys(savedTime.voices).length === 0) {
+      return;
+    }
+
+    // Find the last watched voice with saved timestamps
+    let lastVoiceId: string | null = null;
+    let lastVoiceData = null;
+
+    if (savedTime.lastVoiceId) {
+      lastVoiceId = savedTime.lastVoiceId;
+
+      const voiceData = savedTime.voices[lastVoiceId];
+      if (voiceData && voiceData.timestamps && Object.keys(voiceData.timestamps).length > 0) {
+        lastVoiceData = voiceData;
+      }
+    }
+
+    if (!lastVoiceId || !lastVoiceData) {
+      return;
+    }
+
+    data.voices = data.voices.map((voice) => {
+      const isActive = voice.id === lastVoiceId;
+
+      return {
+        ...voice,
+        lastEpisodeId: isActive ? lastVoiceData.lastEpisodeId : voice.lastEpisodeId, // if we have saved voice data, then use its last saved episode is, otherwise fallback to default one
+        lastSeasonId: isActive ? lastVoiceData.lastSeasonId : voice.lastSeasonId,
+        isActive,
+      };
+    });
+
+    // load seasons if they're missing
+    const activeVoice = data.voices.find((voice) => voice.isActive);
+    if (data?.hasSeasons && activeVoice && !activeVoice.seasons) {
+      const result = await currentService.getFilmSeasons(data, activeVoice);
+
+      activeVoice.seasons = result.seasons;
+    }
+  };
+
   useFocusEffect(() => {
     const onBackPress = () => {
       if (isDeepLink) {
@@ -85,6 +134,10 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     const loadFilm = async () => {
       try {
         const loadedFilm = await currentService.getFilm(link);
+
+        if (!isSignedIn) {
+          await updateFilmVoiceData(loadedFilm);
+        }
 
         setFilm(loadedFilm);
       } catch (error) {
@@ -496,13 +549,25 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     let lastVoiceId: string | null = null;
     let lastVoiceData = null;
 
-    for (const voiceId of Object.keys(savedTime.voices)) {
-      const voiceData = savedTime.voices[voiceId];
+    if (savedTime.lastVoiceId) {
+      lastVoiceId = savedTime.lastVoiceId;
 
+      const voiceData = savedTime.voices[lastVoiceId];
       if (voiceData && voiceData.timestamps && Object.keys(voiceData.timestamps).length > 0) {
-        lastVoiceId = voiceId;
         lastVoiceData = voiceData;
-        break;
+      }
+    }
+
+    // fallback for backward compatibility
+    if (!lastVoiceId || !lastVoiceData) {
+      for (const voiceId of Object.keys(savedTime.voices)) {
+        const voiceData = savedTime.voices[voiceId];
+
+        if (voiceData && voiceData.timestamps && Object.keys(voiceData.timestamps).length > 0) {
+          lastVoiceId = voiceId;
+          lastVoiceData = voiceData;
+          break;
+        }
       }
     }
 
@@ -527,17 +592,35 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
       let video: FilmVideoInterface | undefined;
       const updatedVoice = { ...voice };
 
-      if (film.hasSeasons && voice.lastSeasonId && voice.lastEpisodeId) {
+      let lastEpisodeId = null;
+      let lastSeasonId = null;
+
+      if (isSignedIn) {
+        lastEpisodeId = voice.lastEpisodeId;
+        lastSeasonId = voice.lastSeasonId;
+      } else {
+        lastEpisodeId = lastVoiceData.lastEpisodeId;
+        lastSeasonId = lastVoiceData.lastSeasonId;
+      }
+
+      if (film.hasSeasons) {
+        if (!lastSeasonId || !lastEpisodeId) {
+          NotificationStore.displayMessage(t('Current season or episode not saved.'));
+          setIsContinueWatchingLoading(false);
+
+          return;
+        }
+
         // For series, fetch the video for the specific episode
         video = await currentService.getFilmStreamsByEpisodeId(
           film,
           voice,
-          voice.lastSeasonId,
-          voice.lastEpisodeId
+          lastSeasonId,
+          lastEpisodeId
         );
 
-        updatedVoice.lastSeasonId = voice.lastSeasonId;
-        updatedVoice.lastEpisodeId = voice.lastEpisodeId;
+        updatedVoice.lastSeasonId = lastSeasonId;
+        updatedVoice.lastEpisodeId = lastEpisodeId;
       } else {
         // For movies, fetch the video for the voice
         video = await currentService.getFilmStreamsByVoice(film, voice);

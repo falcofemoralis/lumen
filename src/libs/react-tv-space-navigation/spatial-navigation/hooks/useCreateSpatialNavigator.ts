@@ -1,8 +1,8 @@
 import SpatialNavigator, { OnDirectionHandledWithoutMovement } from '../SpatialNavigator';
-import { useMemo } from 'react';
+import { MutableRefObject, useMemo } from 'react';
 
 type SpatialNavigatorHookParams = {
-  onDirectionHandledWithoutMovementRef: React.MutableRefObject<OnDirectionHandledWithoutMovement>;
+  onDirectionHandledWithoutMovementRef: MutableRefObject<OnDirectionHandledWithoutMovement>;
 };
 
 export const useCreateSpatialNavigator = ({

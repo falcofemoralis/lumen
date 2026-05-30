@@ -1,4 +1,4 @@
-import { Ref } from 'react';
+import { ReactElement, ReactNode, Ref } from 'react';
 import { StyleProp, View, ViewStyle } from 'react-native';
 import { SpatialNavigationNodeRef } from 'react-tv-space-navigation';
 
@@ -12,7 +12,7 @@ export type ThemedPressableContainerProps ={
   onLongPress?: () => void;
   onFocus?: () => void;
   onBlur?: () => void;
-  children?: React.ReactNode | ((props: ThemedFocusableNodeState) => React.ReactElement);
+  children?: ReactNode | ((props: ThemedFocusableNodeState) => ReactElement);
   style?: StyleProp<ViewStyle>;
   contentStyle?: StyleProp<ViewStyle>;
   disabled?: boolean;
@@ -20,7 +20,7 @@ export type ThemedPressableContainerProps ={
   pressDelay?: number;
   ref?: Ref<View>;
   spatialRef?: Ref<SpatialNavigationNodeRef>;
-  additionalElement?: React.ReactNode;
+  additionalElement?: ReactNode;
   withAnimation?: boolean;
   zoomScale?: number;
 }

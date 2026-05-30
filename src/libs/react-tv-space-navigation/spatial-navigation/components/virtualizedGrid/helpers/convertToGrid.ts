@@ -1,4 +1,4 @@
-import chunk from 'lodash/chunk';
+import chunk from 'lodash.chunk';
 import { GridRowType } from '../SpatialNavigationVirtualizedGrid';
 
 import { NodeOrientation } from '../../../types/orientation';

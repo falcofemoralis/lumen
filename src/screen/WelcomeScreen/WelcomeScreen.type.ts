@@ -1,3 +1,5 @@
+import { ComponentType } from 'react';
+
 export interface WelcomeScreenComponentProps {
   slides: SlideInterface[];
   selectedDeviceType: DeviceType | null;
@@ -20,7 +22,7 @@ export interface SlideInterface {
   id: SLIDE_TYPE;
   title: string;
   subtitle: string;
-  IconComponent: React.ComponentType<any>,
+  IconComponent: ComponentType<any>,
 }
 
 export enum DeviceType {

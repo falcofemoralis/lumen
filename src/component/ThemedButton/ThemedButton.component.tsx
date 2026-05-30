@@ -14,8 +14,10 @@ export default function ThemedButton({
   contentStyle,
   IconComponent,
   iconProps,
+  leftImage,
   rightImage,
   textStyle,
+  leftImageStyle,
   rightImageStyle,
   disabled,
 }: ThemedButtonProps) {
@@ -35,6 +37,12 @@ export default function ThemedButton({
           { ...iconProps }
         />
       ) }
+      { leftImage && (
+        <ThemedImage
+          style={ [styles.image, leftImageStyle] }
+          src={ leftImage }
+        />
+      ) }
       { children && (
         <ThemedText style={ [styles.text, textStyle] }>
           { children }
@@ -42,7 +50,7 @@ export default function ThemedButton({
       ) }
       { rightImage && (
         <ThemedImage
-          style={ [styles.rightIcon, rightImageStyle] }
+          style={ [styles.image, rightImageStyle] }
           src={ rightImage }
         />
       ) }

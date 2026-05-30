@@ -1,5 +1,6 @@
 import {
   createContext,
+  ReactNode,
   useCallback,
   useContext,
   useMemo,
@@ -35,7 +36,7 @@ export const getGlobalConfig = (): DeviceConfigType => {
   return globalConfig;
 };
 
-export const ConfigProvider = ({ children }: { children: React.ReactNode }) => {
+export const ConfigProvider = ({ children }: { children: ReactNode }) => {
   const [deviceConfig, setDeviceConfig] = useMMKVString(DEVICE_CONFIG, storage.getConfigStorage().getMMKVInstance());
 
   const config = useMemo(() => {

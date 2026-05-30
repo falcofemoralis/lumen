@@ -76,7 +76,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   iconOutlinedFocused: {
     color: colors.textFocused,
   },
-  rightIcon: {
+  image: {
     backgroundColor: colors.transparent,
   },
   // long

@@ -23,7 +23,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   text: {
     textAlign: 'center',
   },
-  rightIcon: {
+  image: {
     backgroundColor: colors.transparent,
   },
   disabled: {

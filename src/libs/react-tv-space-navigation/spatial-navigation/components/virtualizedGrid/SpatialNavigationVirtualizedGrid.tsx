@@ -1,5 +1,5 @@
-import range from 'lodash/range';
-import React, { ForwardedRef, ReactNode, useCallback, useEffect, useMemo } from 'react';
+import range from 'lodash.range';
+import { ForwardedRef, isValidElement, JSX, ReactNode, useCallback, useEffect, useMemo } from 'react';
 import { StyleProp, StyleSheet,View, ViewStyle } from 'react-native';
 
 import { ParentIdContext, useParentId } from '../../context/ParentIdContext';
@@ -216,7 +216,7 @@ export const SpatialNavigationVirtualizedGrid = typedMemo(
 
     const itemSizeAsAFunction = useCallback(
       (item: GridRowType<T> | JSX.Element) => {
-        if (hasHeader && React.isValidElement(item)) {
+        if (hasHeader && isValidElement(item)) {
           return headerSize;
         }
 
@@ -241,7 +241,7 @@ export const SpatialNavigationVirtualizedGrid = typedMemo(
     );
     const renderHeaderThenRows = useCallback(
       ({ item, index }: { item: GridRowType<T> | JSX.Element; index: number }) => {
-        if (React.isValidElement(item)) {
+        if (isValidElement(item)) {
           return item;
         }
         //We do this to have index taking into account the header

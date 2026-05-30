@@ -4,12 +4,12 @@ import { t } from 'i18n/translate';
 import { ACCOUNT_SCREEN, ACCOUNT_TAB, NOTIFICATIONS_SCREEN, NOTIFICATIONS_TAB } from 'Navigation/navigationRoutes';
 import {
   createContext,
+  ReactNode,
   useCallback,
   useContext,
   useMemo,
   useState,
 } from 'react';
-import { Linking } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
 import { BadgeData } from 'Type/BadgeData.interface';
 import { FilmInterface } from 'Type/Film.interface';
@@ -79,7 +79,7 @@ const ServiceContext = createContext<ServiceContextInterface>({
   prepareShareBody: () => '',
 });
 
-export const ServiceProvider = ({ children }: { children: React.ReactNode }) => {
+export const ServiceProvider = ({ children }: { children: ReactNode }) => {
   const [currentService, setCurrentService] = useState<ApiInterface>(services[DEFAULT_SERVICE]);
   const [isSignedIn, setIsSignedIn] = useState<boolean>(currentService.isSignedIn());
   const [profile, setProfile] = useState<ProfileInterface | null>(() => {

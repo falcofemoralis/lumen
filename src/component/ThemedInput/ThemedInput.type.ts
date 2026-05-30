@@ -1,3 +1,4 @@
+import { RefObject } from 'react';
 import { StyleProp, TextInput, TextInputProps, TextStyle, ViewStyle } from 'react-native';
 
 export interface ThemedInputContainerProps extends TextInputProps {
@@ -7,7 +8,7 @@ export interface ThemedInputContainerProps extends TextInputProps {
   containerStyle?: StyleProp<ViewStyle> | undefined;
   editable?: boolean;
   withAnimation?: boolean;
-  ref?: React.RefObject<TextInput | null>;
+  ref?: RefObject<TextInput | null>;
 }
 
 export interface ThemedInputComponentProps extends ThemedInputContainerProps {

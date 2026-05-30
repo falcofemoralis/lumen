@@ -27,7 +27,7 @@ export const DownloadsScreenContainer = () => {
   const { isTV, downloadsPath } = useConfigContext();
   const [downloadedFilms, setDownloadedFilms] = useState<DownloadFilmInterface[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const completeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const completeTimeoutRef = useRef<number | null>(null);
 
   const readStorage = useCallback((): DownloadFileInterface[] => {
     try {

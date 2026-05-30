@@ -1,13 +1,13 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { FC, ReactNode, useCallback, useEffect, useRef } from 'react';
 
 import type { PortalMethods } from './PortalHost';
 
 type Props = {
   manager: PortalMethods;
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
-const PortalConsumer: React.FC<Props> = ({ manager, children }) => {
+const PortalConsumer: FC<Props> = ({ manager, children }) => {
   const keyRef = useRef<number | null>(null);
 
   const checkManager = useCallback(() => {

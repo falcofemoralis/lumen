@@ -5,7 +5,7 @@ import { ThemedText } from 'Component/ThemedText';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { ACCOUNT_TAB } from 'Navigation/navigationRoutes';
-import { useCallback } from 'react';
+import { ComponentType, useCallback } from 'react';
 import { Image, useWindowDimensions, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -32,7 +32,7 @@ export function NavigationBarComponent({
     focused: boolean
   ) => {
     const { options } = descriptors[route.key] ?? {};
-    const { tabBarIcon: IconComponent } = options as { tabBarIcon: React.ComponentType<any> };
+    const { tabBarIcon: IconComponent } = options as { tabBarIcon: ComponentType<any> };
 
     return (
       <Animated.View style={ [styles.tab, focused && styles.tabFocused] }>

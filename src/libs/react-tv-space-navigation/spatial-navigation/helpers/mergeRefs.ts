@@ -1,15 +1,16 @@
 // copy-paste from react-merge-refs lib
-import type * as React from 'react';
+
+import { LegacyRef, MutableRefObject, RefCallback } from "react";
 
 export function mergeRefs<T>(
-  refs: Array<React.MutableRefObject<T> | React.LegacyRef<T> | undefined | null>,
-): React.RefCallback<T> {
+  refs: (MutableRefObject<T> | LegacyRef<T> | undefined | null)[],
+): RefCallback<T> {
   return (value) => {
     refs.forEach((ref) => {
       if (typeof ref === 'function') {
         ref(value);
       } else if (ref != null) {
-        (ref as React.MutableRefObject<T | null>).current = value;
+        (ref as MutableRefObject<T | null>).current = value;
       }
     });
   };

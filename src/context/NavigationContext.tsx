@@ -1,5 +1,6 @@
 import {
   createContext,
+  ReactNode,
   useCallback,
   useContext,
   useMemo,
@@ -22,7 +23,7 @@ const NavigationContext = createContext<NavigationContextInterface>({
   unlockNavigation: () => {},
 });
 
-export const NavigationProvider = ({ children }: { children: React.ReactNode }) => {
+export const NavigationProvider = ({ children }: { children: ReactNode }) => {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const [isNavigationLocked, setIsNavigationLocked] = useState<boolean>(false);
 

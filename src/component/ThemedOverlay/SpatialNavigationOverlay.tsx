@@ -1,3 +1,4 @@
+import { ReactNode } from 'react';
 import { SpatialNavigationRoot } from 'react-tv-space-navigation';
 
 import { useLockOverlay } from './useLockOverlay';
@@ -6,7 +7,7 @@ type SpatialNavigationOverlayProps = {
   isModalOpened: boolean;
   isModalVisible: boolean;
   hideModal: () => void;
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
 export const SpatialNavigationOverlay = ({

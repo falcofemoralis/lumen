@@ -9,7 +9,7 @@ import { ThemedPressable } from 'Component/ThemedPressable';
 import { ThemedText } from 'Component/ThemedText';
 import { t } from 'i18n/translate';
 import { CircleCheck, Star } from 'lucide-react-native';
-import { memo, useCallback, useEffect, useState } from 'react';
+import { memo, ReactNode, useCallback, useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { useAppTheme } from 'Theme/context';
 import { ThemedStyles } from 'Theme/types';
@@ -24,7 +24,7 @@ import { componentStyles } from './FilmScreen.style.atv';
 
 interface SectionProps {
   title: string;
-  children: React.ReactNode;
+  children: ReactNode;
   styles: ThemedStyles<typeof componentStyles>;
 }
 
@@ -242,7 +242,7 @@ export const ScheduleItem = memo(({
 ) => prevProps.item.name === nextProps.item.name);
 
 interface ScheduleOverlayProps {
-  scheduleOverlayRef: React.RefObject<ThemedOverlayRef | null>;
+  scheduleOverlayRef: RefObject<ThemedOverlayRef | null>;
   film: FilmInterface;
   handleUpdateScheduleWatch: (scheduleItem: ScheduleItemInterface) => Promise<boolean>;
   styles: ThemedStyles<typeof componentStyles>;

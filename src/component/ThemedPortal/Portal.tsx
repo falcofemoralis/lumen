@@ -1,11 +1,13 @@
+import { FC, ReactNode } from 'react';
+
 import PortalConsumer from './PortalConsumer';
 import PortalHost, { PortalContext, PortalMethods } from './PortalHost';
 
 export type Props = {
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
-const Portal: React.FC<Props> & { Host: typeof PortalHost } = ({ children }) => (
+const Portal: FC<Props> & { Host: typeof PortalHost } = ({ children }) => (
   <PortalContext.Consumer>
     { (manager) => (
       <PortalConsumer manager={ manager as PortalMethods }>

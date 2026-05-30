@@ -1,4 +1,4 @@
-import React, { useCallback, RefObject, useRef, ReactElement, forwardRef } from 'react';
+import { useCallback, RefObject, useRef, ReactElement, forwardRef, ReactNode } from 'react';
 import { ScrollView, View, ViewStyle, Platform } from 'react-native';
 import {
   SpatialNavigatorParentScrollContext,
@@ -18,7 +18,7 @@ type Props = {
    * This is a margin in pixels.
    */
   offsetFromStart?: number;
-  children: React.ReactNode;
+  children: ReactNode;
   style?: ViewStyle;
   contentContainerStyle?: ViewStyle;
   /** Arrow that will show up inside the arrowContainer */

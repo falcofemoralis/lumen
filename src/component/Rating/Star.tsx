@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { FunctionComponent, useState } from 'react';
 import {
   Animated,
   type ImageStyle,
@@ -21,7 +21,7 @@ export type StarProps = {
   starSelectedInPosition?: (value: number) => void;
 };
 
-const Star: React.FunctionComponent<StarProps> = ({
+const Star: FunctionComponent<StarProps> = ({
   starImage = STAR_IMAGE,
   fill,
   size,

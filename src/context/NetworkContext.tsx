@@ -1,6 +1,7 @@
 import { NetworkStateType, useNetworkState } from 'expo-network';
 import {
   createContext,
+  ReactNode,
   useCallback,
   useContext,
   useMemo,
@@ -19,7 +20,7 @@ const NetworkContext = createContext<NetworkContextInterface>({
   handleConnectionError: () => false,
 });
 
-export const NetworkProvider = ({ children }: { children: React.ReactNode }) => {
+export const NetworkProvider = ({ children }: { children: ReactNode }) => {
   const { strictConnectionCheck } = useConfigContext();
   const { isConnected, isInternetReachable, type } = useNetworkState();
   const [errorOccurred, setErrorOccurred] = useState<boolean>(false);

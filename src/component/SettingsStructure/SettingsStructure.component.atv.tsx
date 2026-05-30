@@ -9,7 +9,7 @@ import { SettingText } from 'Component/SettingText';
 import { useNavigationContext } from 'Context/NavigationContext';
 import { useOverlayContext } from 'Context/OverlayContext';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
-import { useEffect, useRef, useState } from 'react';
+import { ReactNode, useEffect, useRef, useState } from 'react';
 import { useWindowDimensions, View } from 'react-native';
 import {
   DefaultFocus,
@@ -38,7 +38,7 @@ const SettingGroupPage = ({
   groupId: string;
   selectedGroupId: string;
   isActive: boolean;
-  renderSetting: (setting: SettingItem) => Record<SettingType, React.ReactNode>
+  renderSetting: (setting: SettingItem) => Record<SettingType, ReactNode>
   styles: ThemedStyles<typeof componentStyles>;
 }) => {
   const { height } = useWindowDimensions();
@@ -120,7 +120,7 @@ export const SettingsStructureComponent = ({
     };
   }, [isMenuOpen, isFocused, isGroupFocused, lock, unlock]);
 
-  const renderSetting = (setting: SettingItem): Record<SettingType, React.ReactNode> => ({
+  const renderSetting = (setting: SettingItem): Record<SettingType, ReactNode> => ({
     TEXT: (
       <SettingText
         setting={ setting }

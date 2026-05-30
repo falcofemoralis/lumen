@@ -1,10 +1,10 @@
 import { useAwake } from 'Component/Awake/useAwake';
-import { useEffect } from 'react';
+import { ReactNode, useEffect } from 'react';
 
 export const AwakeComponent = ({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) => {
   const { startAwake } = useAwake();
 

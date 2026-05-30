@@ -40,7 +40,7 @@ import {
   SkipBack,
   SkipForward,
 } from 'lucide-react-native';
-import { Fragment, useEffect, useRef, useState } from 'react';
+import { ComponentType, Fragment, useEffect, useRef, useState } from 'react';
 import { AppState, Dimensions, View } from 'react-native';
 import {
   Gesture,
@@ -125,9 +125,9 @@ export function PlayerComponent({
   const [doubleTapAction, setDoubleTapAction] = useState<DoubleTapAction | null>(null);
   const [longTapAction, setLongTapAction] = useState(false);
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
-  const controlsTimeout = useRef<NodeJS.Timeout | null>(null);
+  const controlsTimeout = useRef<number | null>(null);
   const playerRef = useRef<VideoView>(null);
-  const doubleTapTimeout = useRef<NodeJS.Timeout | null>(null);
+  const doubleTapTimeout = useRef<number | null>(null);
   const isPlayingRef = useRef(isPlaying);
   const showControlsRef = useRef(showControls);
   const isOverlayOpenRef = useRef(isOverlayOpen);
@@ -294,7 +294,7 @@ export function PlayerComponent({
   };
 
   const renderAction = (
-    IconComponent: React.ComponentType<any>,
+    IconComponent: ComponentType<any>,
     action?: () => void
   ) => (
     <GestureDetector gesture={ Gesture.Tap() }>
@@ -392,7 +392,7 @@ export function PlayerComponent({
   );
 
   const renderMiddleControl = (
-    IconComponent: React.ComponentType<any>,
+    IconComponent: ComponentType<any>,
     action: () => void,
     size: MiddleActionVariant = 'small'
   ) => (

@@ -21,7 +21,7 @@ export const useLockOverlay = ({ isModalOpened, isModalVisible, hideModal }: Use
 
 const useLockParentSpatialNavigator = (isModalOpened: boolean) => {
   const { lock, unlock } = useLockSpatialNavigation();
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<number | null>(null);
   const isOpenedRef = useRef(isModalOpened);
 
   useEffect(() => {

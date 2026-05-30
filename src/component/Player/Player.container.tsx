@@ -99,7 +99,7 @@ export function PlayerContainer({
   const [isLoading, setIsLoading] = useState(false);
 
   const stopEventsRef = useRef<boolean>(false);
-  const updateTimeTimeout = useRef<NodeJS.Timeout | null>(null);
+  const updateTimeTimeout = useRef<number | null>(null);
   const qualityOverlayRef = useRef<ThemedOverlayRef>(null);
   const subtitleOverlayRef = useRef<ThemedOverlayRef>(null);
   const playerVideoSelectorOverlayRef = useRef<PlayerVideoSelectorRef>(null);

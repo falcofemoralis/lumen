@@ -10,6 +10,7 @@
  * The app navigation resides in ./app/navigators, so head over there
  * if you're interested in adding screens and navigators.
  */
+
 import { LogBox } from 'react-native';
 
 if (__DEV__) {
@@ -54,7 +55,6 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { initialWindowMetrics, SafeAreaProvider } from 'react-native-safe-area-context';
 import { ThemeProvider } from 'Theme/context';
-import { useNavigationPersistence } from 'Util/Navigation';
 import { configureRemoteControl } from 'Util/RemoteControl';
 
 import { initI18n } from './i18n';
@@ -70,12 +70,6 @@ SplashScreen.setOptions({
 SplashScreen.preventAutoHideAsync();
 
 export function App() {
-  const {
-    initialNavigationState,
-    onNavigationStateChange,
-    isRestored: isNavigationStateRestored,
-  } = useNavigationPersistence(NAVIGATION_PERSISTENCE_KEY);
-
   const [isI18nInitialized, setIsI18nInitialized] = useState(false);
 
   useEffect(() => {
@@ -85,7 +79,7 @@ export function App() {
     initI18n().then(() => setIsI18nInitialized(true));
   }, []);
 
-  if (!isNavigationStateRestored || !isI18nInitialized) {
+  if (!isI18nInitialized) {
     return null;
   }
 
@@ -126,8 +120,6 @@ export function App() {
                 <Awake>
                   <AppNavigator
                     linking={ linking }
-                    initialState={ initialNavigationState }
-                    onStateChange={ onNavigationStateChange }
                     onReady={ () => {
                       SplashScreen.hideAsync();
                     } }

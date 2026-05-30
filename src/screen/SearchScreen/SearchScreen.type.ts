@@ -1,4 +1,5 @@
 import { PagerItemInterface } from 'Component/FilmPager/FilmPager.type';
+import { RefObject } from 'react';
 import { FilmListInterface } from 'Type/FilmList.interface';
 import { MenuItemInterface } from 'Type/MenuItem.interface';
 import { SearchableCategoryInterface } from 'Type/SearchableCategoryInterface.interface';
@@ -10,13 +11,13 @@ export interface SearchScreenComponentProps {
   recognizing: boolean;
   enteredText: string;
   isLoading: boolean;
-  additionalContentOverlayRef: React.RefObject<any>;
+  additionalContentOverlayRef: RefObject<any>;
   categories: SearchableCategoryInterface[] | null;
   selectedCategory: SearchableCategoryInterface | null;
   selectedGenre: string | null;
   selectedYear: string | null;
   isCategoriesLoading: boolean;
-  confirmationOverlayRef: React.RefObject<any>;
+  confirmationOverlayRef: RefObject<any>;
   handleApplyAdditionalContent: () => void;
   handleOpenCollections: () => void;
   setSelectedCategory: (category: SearchableCategoryInterface) => void;

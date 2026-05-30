@@ -1,4 +1,5 @@
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
+import { ComponentType, ReactElement } from 'react';
 import { StyleProp, ViewStyle } from 'react-native';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { FilmListInterface } from 'Type/FilmList.interface';
@@ -14,8 +15,8 @@ export interface FilmPagerContainerProps {
   isAddSafeArea?: boolean;
   sorting?: DropdownItem[];
   menuDefaultFocus?: boolean;
-  ListHeaderComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
-  ListEmptyComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
+  ListHeaderComponent?: ComponentType<any> | ReactElement | null | undefined;
+  ListEmptyComponent?: ComponentType<any> | ReactElement | null | undefined;
   onLoadFilms: (
     menuItem: MenuItemInterface,
     currentPage: number,
@@ -38,8 +39,8 @@ export interface FilmPagerComponentProps {
   sorting?: DropdownItem[];
   selectedSorting?: Record<string, DropdownItem> | null;
   menuDefaultFocus?: boolean;
-  ListHeaderComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
-  ListEmptyComponent?: React.ComponentType<any> | React.ReactElement | null | undefined;
+  ListHeaderComponent?: ComponentType<any> | ReactElement | null | undefined;
+  ListEmptyComponent?: ComponentType<any> | ReactElement | null | undefined;
   onNextLoad: (isRefresh: boolean, item: PagerItemInterface) => Promise<void>;
   onPreLoad: (item: PagerItemInterface) => void;
   onRowFocus?: (row: number) => void;

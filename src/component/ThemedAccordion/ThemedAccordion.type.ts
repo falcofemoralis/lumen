@@ -1,3 +1,4 @@
+import { ReactNode } from 'react';
 import { ViewStyle } from 'react-native';
 
 export interface AccordionGroupInterface<T> {
@@ -9,7 +10,7 @@ export interface AccordionGroupInterface<T> {
 export interface ThemedAccordionContainerProps<T> {
   data: AccordionGroupInterface<T>[];
   overlayContent?: ViewStyle;
-  renderItem: (item: T, idx: number) => React.ReactNode;
+  renderItem: (item: T, idx: number) => ReactNode;
 }
 
 export interface ThemedAccordionComponentProps<T> extends ThemedAccordionContainerProps<T> {

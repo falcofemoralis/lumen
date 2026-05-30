@@ -12,7 +12,7 @@ class RemoteControlManager implements RemoteControlManagerInterface {
 
   private isEnterKeyDownPressed = false;
 
-  private longEnterTimeout: NodeJS.Timeout | null = null;
+  private longEnterTimeout: number | null = null;
 
   private handleLongEnter = () => {
     this.longEnterTimeout = setTimeoutSafe(() => {

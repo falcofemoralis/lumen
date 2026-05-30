@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useImperativeHandle, useRef } from 'react';
+import { ReactNode, Ref, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 import { VirtualizedListProps } from './VirtualizedList';
 import { useSpatialNavigator } from '../../context/SpatialNavigatorContext';
 import { ParentIdContext, useParentId } from '../../context/ParentIdContext';
@@ -143,8 +143,8 @@ export type SpatialNavigationVirtualizedListWithVirtualNodesProps<T> = Omit<
   isGrid?: boolean;
   isFlatlist?: boolean;
   paddingBottom?: number;
-  ListHeaderComponent?: React.ReactNode;
-  ListEmptyComponent?: React.ReactNode;
+  ListHeaderComponent?: ReactNode;
+  ListEmptyComponent?: ReactNode;
 };
 
 export type SpatialNavigationVirtualizedListWithVirtualNodesRef = {
@@ -178,7 +178,7 @@ export type SpatialNavigationVirtualizedListWithVirtualNodesRef = {
 export const SpatialNavigationVirtualizedListWithVirtualNodes = typedMemo(
   <T,>(
     props: SpatialNavigationVirtualizedListWithVirtualNodesProps<T> & {
-      getNodeIdRef: React.Ref<SpatialNavigationVirtualizedListWithVirtualNodesRef>;
+      getNodeIdRef: Ref<SpatialNavigationVirtualizedListWithVirtualNodesRef>;
     },
   ) => {
     const { getNthVirtualNodeID } = useRegisterVirtualNodes({

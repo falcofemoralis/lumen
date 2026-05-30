@@ -1,5 +1,6 @@
 import { SavedTime } from 'Component/Player/Player.type';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
+import { RefObject } from 'react';
 import { DownloadLinkInterface } from 'Type/DownloadLink.interface';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
@@ -16,7 +17,7 @@ export type PlayerVideoSelectorContainerProps = {
 };
 
 export type PlayerVideoSelectorComponentProps = {
-  overlayRef: React.RefObject<ThemedOverlayRef | null>;
+  overlayRef: RefObject<ThemedOverlayRef | null>;
   film: FilmInterface;
   voices: FilmVoiceInterface[];
   isLoading: boolean;
@@ -26,10 +27,10 @@ export type PlayerVideoSelectorComponentProps = {
   seasons: SeasonInterface[];
   episodes: EpisodeInterface[];
   savedTime: SavedTime | null;
-  voiceOverlayRef: React.RefObject<ThemedOverlayRef | null>;
+  voiceOverlayRef: RefObject<ThemedOverlayRef | null>;
   isDownloader?: boolean;
   isOffline?: boolean;
-  qualityOverlayRef: React.RefObject<ThemedOverlayRef | null>;
+  qualityOverlayRef: RefObject<ThemedOverlayRef | null>;
   episodesToDownload: Record<string, boolean>;
   streamQualities: string[] | null;
   playerAskQuality: boolean;

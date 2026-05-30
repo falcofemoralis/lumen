@@ -6,14 +6,12 @@ import {
 } from '@react-navigation/native';
 import { BACK_HANDLER_DELAY } from 'Component/Page/Page.config';
 import { useConfigContext } from 'Context/ConfigContext';
-import { useIsMounted } from 'Hooks/useIsMounted';
 import { t } from 'i18n/translate';
-import { AppStackParamList, NavigationProps } from 'Navigation/navigationTypes';
-import { useEffect, useRef, useState } from 'react';
-import { BackHandler, Linking, Platform } from 'react-native';
+import { AppStackParamList } from 'Navigation/navigationTypes';
+import { useEffect, useRef } from 'react';
+import { BackHandler, Platform } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
 import { setTimeoutSafe } from 'Util/Misc';
-import { storage } from 'Util/Storage';
 
 /**
  * Reference to the root App Navigator.
@@ -115,70 +113,6 @@ export function useBackButtonHandler(canExit: (routeName: string) => boolean) {
 }
 
 /**
- * This helper function will determine whether we should enable navigation persistence
- * based on a config setting and the __DEV__ environment (dev or prod).
- * @param persistNavigation - The config setting for navigation persistence.
- * @returns {boolean} - Whether to restore navigation state by default.
- */
-function navigationRestoredDefaultState(persistNavigation: 'always' | 'dev' | 'prod' | 'never') {
-  if (persistNavigation === 'always') return false;
-  if (persistNavigation === 'dev' && __DEV__) return false;
-  if (persistNavigation === 'prod' && !__DEV__) return false;
-
-  // all other cases, disable restoration by returning true
-  return true;
-}
-
-/**
- * Custom hook for persisting navigation state.
- * @param {string} persistenceKey - The key to use for storing the navigation state.
- * @returns {object} - The navigation state and persistence functions.
- */
-export function useNavigationPersistence(persistenceKey: string) {
-  const [initialNavigationState, setInitialNavigationState] =
-    useState<NavigationProps['initialState']>();
-  const isMounted = useIsMounted();
-
-  const initNavState = navigationRestoredDefaultState('never');
-  const [isRestored, setIsRestored] = useState(initNavState);
-
-  const routeNameRef = useRef<keyof AppStackParamList | undefined>(undefined);
-
-  const onNavigationStateChange = (state: NavigationState | undefined) => {
-    if (state !== undefined) {
-      const currentRouteName = getActiveRouteName(state);
-
-      // Save the current route name for later comparison
-      routeNameRef.current = currentRouteName as keyof AppStackParamList;
-
-      // Persist state to storage
-      storage.getMiscStorage().save(persistenceKey, state);
-    }
-  };
-
-  const restoreState = async () => {
-    try {
-      const initialUrl = await Linking.getInitialURL();
-
-      // Only restore the state if app has not started from a deep link
-      if (!initialUrl) {
-        const state = (await storage.getMiscStorage().load(persistenceKey)) as NavigationProps['initialState'] | null;
-        if (state) setInitialNavigationState(state);
-      }
-    } finally {
-      if (isMounted()) setIsRestored(true);
-    }
-  };
-
-  useEffect(() => {
-    if (!isRestored) restoreState();
-    // runs once on mount
-  }, []);
-
-  return { onNavigationStateChange, restoreState, isRestored, initialNavigationState };
-}
-
-/**
  * use this to navigate without the navigation
  * prop. If you have access to the navigation prop, do not use this.
  * @see {@link https://reactnavigation.org/docs/navigating-without-navigation-prop/}
@@ -201,18 +135,5 @@ export function navigate(name: unknown, params?: unknown) {
 export function goBack() {
   if (navigationRef.isReady() && navigationRef.canGoBack()) {
     navigationRef.goBack();
-  }
-}
-
-/**
- * resetRoot will reset the root navigation state to the given params.
- * @param {Parameters<typeof navigationRef.resetRoot>[0]} state - The state to reset the root to.
- * @returns {void}
- */
-export function resetRoot(
-  state: Parameters<typeof navigationRef.resetRoot>[0] = { index: 0, routes: [] }
-) {
-  if (navigationRef.isReady()) {
-    navigationRef.resetRoot(state);
   }
 }

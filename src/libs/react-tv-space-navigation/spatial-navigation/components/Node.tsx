@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { cloneElement, forwardRef, MutableRefObject, ReactElement, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { useSpatialNavigatorDefaultFocus } from '../context/DefaultFocusContext';
 import { ParentIdContext, useParentId } from '../context/ParentIdContext';
@@ -26,11 +26,11 @@ export type FocusableNodeState = NonFocusableNodeState & {
 
 type FocusableProps = {
   isFocusable: true;
-  children: (props: FocusableNodeState) => React.ReactElement;
+  children: (props: FocusableNodeState) => ReactElement;
 };
 type NonFocusableProps = {
   isFocusable?: false;
-  children: React.ReactElement | ((props: NonFocusableNodeState) => React.ReactElement);
+  children: ReactElement | ((props: NonFocusableNodeState) => ReactElement);
 };
 type DefaultProps = {
   onFocus?: () => void;
@@ -57,7 +57,7 @@ const useScrollToNodeIfNeeded = ({
   childRef,
   additionalOffset,
 }: {
-  childRef: React.MutableRefObject<View | null>;
+  childRef: MutableRefObject<View | null>;
   additionalOffset?: number;
 }) => {
   const { scrollToNodeIfNeeded } = useSpatialNavigatorParentScroll();
@@ -68,8 +68,8 @@ const useScrollToNodeIfNeeded = ({
 const useBindRefToChild = () => {
   const childRef = useRef<View | null>(null);
 
-  const bindRefToChild = (child: React.ReactElement) => {
-    return React.cloneElement(child, {
+  const bindRefToChild = (child: ReactElement) => {
+    return cloneElement(child, {
       // @ts-ignore
       ...child.props,
       ref: (node: View) => {
