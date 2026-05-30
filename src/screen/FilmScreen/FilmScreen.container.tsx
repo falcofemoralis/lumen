@@ -527,17 +527,35 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
       let video: FilmVideoInterface | undefined;
       const updatedVoice = { ...voice };
 
-      if (film.hasSeasons && voice.lastSeasonId && voice.lastEpisodeId) {
+      let lastEpisodeId = null;
+      let lastSeasonId = null;
+
+      if (isSignedIn) {
+        lastEpisodeId = voice.lastEpisodeId;
+        lastSeasonId = voice.lastSeasonId;
+      } else {
+        lastEpisodeId = lastVoiceData.lastEpisodeId;
+        lastSeasonId = lastVoiceData.lastSeasonId;
+      }
+
+      if (film.hasSeasons) {
+        if (!lastSeasonId || !lastEpisodeId) {
+          NotificationStore.displayMessage(t('Current season or episode not saved.'));
+          setIsContinueWatchingLoading(false);
+
+          return;
+        }
+
         // For series, fetch the video for the specific episode
         video = await currentService.getFilmStreamsByEpisodeId(
           film,
           voice,
-          voice.lastSeasonId,
-          voice.lastEpisodeId
+          lastSeasonId,
+          lastEpisodeId
         );
 
-        updatedVoice.lastSeasonId = voice.lastSeasonId;
-        updatedVoice.lastEpisodeId = voice.lastEpisodeId;
+        updatedVoice.lastSeasonId = lastSeasonId;
+        updatedVoice.lastEpisodeId = lastEpisodeId;
       } else {
         // For movies, fetch the video for the voice
         video = await currentService.getFilmStreamsByVoice(film, voice);

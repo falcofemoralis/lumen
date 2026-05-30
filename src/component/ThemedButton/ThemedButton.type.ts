@@ -15,6 +15,7 @@ export interface ThemedButtonProps {
   styleAdditional?: StyleProp<ViewStyle>;
   contentStyle?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
+  leftImageStyle?: StyleProp<ImageStyle>
   rightImageStyle?: StyleProp<ImageStyle>
   isSelected?: boolean;
   IconComponent?: ComponentType<any>;
@@ -22,6 +23,7 @@ export interface ThemedButtonProps {
   iconColor?: string;
   iconColorFocused?: string;
   variant?: Variant;
+  leftImage?: string;
   rightImage?: string;
   onPress?: () => void;
   onLongPress?: () => void;

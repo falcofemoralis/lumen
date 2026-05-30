@@ -9,7 +9,12 @@ const reactotron = Reactotron.configure({
   },
 });
 
+reactotron.use(mmkvPlugin<ReactotronReactNative>({ storage: storage.getConfigStorage().getMMKVInstance() }));
+// reactotron.use(mmkvPlugin<ReactotronReactNative>({ storage: storage.getCookiesStorage().getMMKVInstance() }));
+reactotron.use(mmkvPlugin<ReactotronReactNative>({ storage: storage.getPlayerStorage().getMMKVInstance() }));
 reactotron.use(mmkvPlugin<ReactotronReactNative>({ storage: storage.getMiscStorage().getMMKVInstance() }));
+reactotron.use(mmkvPlugin<ReactotronReactNative>({ storage: storage.getDownloadsStorage().getMMKVInstance() }));
+// reactotron.use(mmkvPlugin<ReactotronReactNative>({ storage: storage.getPatchStorage().getMMKVInstance() }));
 
 reactotron.useReactNative();
 

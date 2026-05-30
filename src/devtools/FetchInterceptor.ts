@@ -35,6 +35,32 @@ function parseQueryParams(url: string): Record<string, string> | null {
   return params;
 }
 
+function parseRequestBody(body: BodyInit): unknown {
+  if (typeof body === 'string') {
+    try {
+      return JSON.parse(body);
+    } catch {
+      return body;
+    }
+  }
+
+  if (body instanceof URLSearchParams) {
+    const out: Record<string, string> = {};
+    body.forEach((value, key) => { out[key] = value; });
+
+    return out;
+  }
+
+  if (body instanceof FormData) {
+    const out: Record<string, unknown> = {};
+    body.forEach((value, key) => { out[key] = value; });
+
+    return out;
+  }
+
+  return '[binary body]';
+}
+
 export function wrapFetchWithReactotron(fetchFn: FetchFn, options: FetchInterceptorOptions = {}): FetchFn {
   const ignoreContentTypes = options.ignoreContentTypes ?? DEFAULT_IGNORE_CONTENT_TYPES;
 
@@ -56,7 +82,7 @@ export function wrapFetchWithReactotron(fetchFn: FetchFn, options: FetchIntercep
     const tronRequest = {
       url,
       method,
-      data: requestBody != null ? String(requestBody) : null,
+      data: requestBody != null ? parseRequestBody(requestBody) : null,
       headers: normalizeHeaders(rawHeaders),
       params: parseQueryParams(url),
     };

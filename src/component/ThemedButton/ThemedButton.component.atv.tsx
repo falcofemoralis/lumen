@@ -22,6 +22,8 @@ export default function ThemedButton({
   textStyle,
   isSelected,
   variant = 'filled',
+  leftImage,
+  leftImageStyle,
   rightImage,
   rightImageStyle,
   disableRootActive,
@@ -63,6 +65,12 @@ export default function ThemedButton({
           { ...iconProps }
         />
       ) }
+      { leftImage && (
+        <ThemedImage
+          style={ [styles.image, leftImageStyle] }
+          src={ leftImage }
+        />
+      ) }
       { children && (
         <Text
           style={ [
@@ -78,7 +86,7 @@ export default function ThemedButton({
       ) }
       { rightImage && (
         <ThemedImage
-          style={ [styles.rightIcon, rightImageStyle] }
+          style={ [styles.image, rightImageStyle] }
           src={ rightImage }
         />
       ) }
@@ -151,6 +159,12 @@ export default function ThemedButton({
           { ...iconProps }
         />
       ) }
+      { leftImage && (
+        <ThemedImage
+          style={ [styles.image, leftImageStyle] }
+          src={ leftImage }
+        />
+      ) }
       { children && (
         <Text
           style={ [
@@ -166,7 +180,7 @@ export default function ThemedButton({
       ) }
       { rightImage && (
         <ThemedImage
-          style={ [styles.rightIcon, rightImageStyle] }
+          style={ [styles.image, rightImageStyle] }
           src={ rightImage }
         />
       ) }

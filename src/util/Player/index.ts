@@ -57,6 +57,9 @@ const prepareSavedTimeObject = (
     voiceData.timestamps = {};
   }
 
+  voiceData.lastEpisodeId = voice.lastEpisodeId;
+  voiceData.lastSeasonId = voice.lastSeasonId;
+
   voiceData.timestamps[formatTimestampKey(voice)] = {
     time,
     progress,

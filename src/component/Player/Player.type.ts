@@ -96,6 +96,8 @@ export interface SavedTimestamp {
 
 export interface SavedTimeVoice {
   timestamps: Record<string, SavedTimestamp | null>; // seasonId+episodeId - time
+  lastSeasonId?: string;
+  lastEpisodeId?: string;
 }
 
 export interface SavedTime {
