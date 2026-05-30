@@ -1,0 +1,32 @@
+diff --git a/node_modules/react-native-worklets/lib/module/initializers/initializers.native.js b/node_modules/react-native-worklets/lib/module/initializers/initializers.native.js
+index c8ad4d7..6e19b6f 100644
+--- a/node_modules/react-native-worklets/lib/module/initializers/initializers.native.js
++++ b/node_modules/react-native-worklets/lib/module/initializers/initializers.native.js
+@@ -176,6 +176,9 @@ function installRNBindingsOnUIRuntime() {
+   runOnUISync(() => {
+     'worklet';
+ 
++    // Reanimated 4.4 still references legacy UI-runtime globals here.
++    globalThis.global = globalThis;
++    globalThis.__mapperRun ??= () => {};
+     /**
+      * TODO: Move `setupMicrotasks` and `setupRequestAnimationFrame` to a
+      * separate function once we have a better way to distinguish between
+diff --git a/node_modules/react-native-worklets/src/initializers/initializers.native.ts b/node_modules/react-native-worklets/src/initializers/initializers.native.ts
+index 9625b80..37f4765 100644
+--- a/node_modules/react-native-worklets/src/initializers/initializers.native.ts
++++ b/node_modules/react-native-worklets/src/initializers/initializers.native.ts
+@@ -202,6 +202,13 @@ function installRNBindingsOnUIRuntime() {
+ 
+   runOnUISync(() => {
+     'worklet';
++    // Reanimated 4.4 still references legacy UI-runtime globals here.
++    const runtimeGlobal = globalThis as typeof globalThis & {
++      global: typeof globalThis;
++      __mapperRun?: () => void;
++    };
++    runtimeGlobal.global = globalThis;
++    runtimeGlobal.__mapperRun ??= () => {};
+     /**
+      * TODO: Move `setupMicrotasks` and `setupRequestAnimationFrame` to a
+      * separate function once we have a better way to distinguish between
