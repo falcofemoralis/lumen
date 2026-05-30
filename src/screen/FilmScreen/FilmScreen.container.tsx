@@ -60,6 +60,55 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     isDeepLink = true;
   }
 
+  const updateFilmVoiceData = async (data: FilmInterface | null) => {
+    // logged in users already use service built-in system
+    if (!data) {
+      return;
+    }
+
+    const savedTime = getSavedTime(data);
+
+    if (!savedTime || !savedTime.voices || Object.keys(savedTime.voices).length === 0) {
+      return;
+    }
+
+    // Find the last watched voice with saved timestamps
+    let lastVoiceId: string | null = null;
+    let lastVoiceData = null;
+
+    if (savedTime.lastVoiceId) {
+      lastVoiceId = savedTime.lastVoiceId;
+
+      const voiceData = savedTime.voices[lastVoiceId];
+      if (voiceData && voiceData.timestamps && Object.keys(voiceData.timestamps).length > 0) {
+        lastVoiceData = voiceData;
+      }
+    }
+
+    if (!lastVoiceId || !lastVoiceData) {
+      return;
+    }
+
+    data.voices = data.voices.map((voice) => {
+      const isActive = voice.id === lastVoiceId;
+
+      return {
+        ...voice,
+        lastEpisodeId: isActive ? lastVoiceData.lastEpisodeId : voice.lastEpisodeId, // if we have saved voice data, then use its last saved episode is, otherwise fallback to default one
+        lastSeasonId: isActive ? lastVoiceData.lastSeasonId : voice.lastSeasonId,
+        isActive,
+      };
+    });
+
+    // load seasons if they're missing
+    const activeVoice = data.voices.find((voice) => voice.isActive);
+    if (data?.hasSeasons && activeVoice && !activeVoice.seasons) {
+      const result = await currentService.getFilmSeasons(data, activeVoice);
+
+      activeVoice.seasons = result.seasons;
+    }
+  };
+
   useFocusEffect(() => {
     const onBackPress = () => {
       if (isDeepLink) {
@@ -85,6 +134,10 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     const loadFilm = async () => {
       try {
         const loadedFilm = await currentService.getFilm(link);
+
+        if (!isSignedIn) {
+          await updateFilmVoiceData(loadedFilm);
+        }
 
         setFilm(loadedFilm);
       } catch (error) {
