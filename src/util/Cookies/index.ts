@@ -1,4 +1,4 @@
-import setCookieParser from 'set-cookie-parser';
+import setCookieParser, { parse, splitCookiesString } from 'set-cookie-parser';
 import { storage } from 'Util/Storage';
 
 export function parseCookies(cookieString: string): Record<string, setCookieParser.Cookie> {
@@ -11,11 +11,9 @@ export function parseCookies(cookieString: string): Record<string, setCookiePars
   // RN merges multiple Set-Cookie headers into one comma-joined string.
   // set-cookie-parser splits it correctly even when cookie names contain
   // '.' or '-' (e.g. techaro.lol-anubis-auth), which a plain regex cannot.
-  setCookieParser
-    .parse(setCookieParser.splitCookiesString(cookieString), { decodeValues: false })
-    .forEach((cookie) => {
-      cookies[cookie.name] = cookie;
-    });
+  parse(splitCookiesString(cookieString), { decodeValues: false }).forEach((cookie) => {
+    cookies[cookie.name] = cookie;
+  });
 
   return cookies;
 }

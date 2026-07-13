@@ -191,7 +191,6 @@ async function doSolve(
   };
 
   let setCookie = '';
-  let passStatus = -1;
 
   try {
     // Do NOT follow the 302 — the clearance cookie is on it, and following would
@@ -203,7 +202,6 @@ async function doSolve(
       keepalive: true,
     });
 
-    passStatus = passRes.status;
     setCookie = passRes.headers.get('Set-Cookie') ?? '';
   } catch (error) {
     console.warn('[Anubis] pass-challenge request failed', error);
@@ -225,14 +223,7 @@ async function doSolve(
 
   cookiesManager.set(hostname, valid);
 
-  const gotClearance = hasClearanceCookie(hostname);
-
-  console.log(
-    `[Anubis][diag] passStatus=${passStatus} setCookie="${setCookie}" ` +
-      `jarAfter=[${Object.keys(valid).join(', ')}] gotClearance=${gotClearance}`
-  );
-
-  if (!gotClearance) {
+  if (!hasClearanceCookie(hostname)) {
     console.warn('[Anubis] clearance cookie not obtained after solving');
 
     return false;
