@@ -1,22 +1,21 @@
 import setCookieParser from 'set-cookie-parser';
 import { storage } from 'Util/Storage';
 
-export function parseCookies(cookieString: string) {
-  const cookies: { [key: string]: any } = {};
-  const cookieArray = cookieString.split(/,(?=\s*\w+=)/);
+export function parseCookies(cookieString: string): Record<string, setCookieParser.Cookie> {
+  const cookies: Record<string, setCookieParser.Cookie> = {};
 
-  cookieArray.forEach((cookie) => {
-    const parts = cookie.split(';').map((part) => part.trim());
-    const [name, value] = parts[0].split('=');
-    const cookieObj: { [key: string]: any } = { value };
+  if (!cookieString) {
+    return cookies;
+  }
 
-    parts.slice(1).forEach((part) => {
-      const [key, val] = part.split('=');
-      cookieObj[key.trim()] = val ? val.trim() : true;
+  // RN merges multiple Set-Cookie headers into one comma-joined string.
+  // set-cookie-parser splits it correctly even when cookie names contain
+  // '.' or '-' (e.g. techaro.lol-anubis-auth), which a plain regex cannot.
+  setCookieParser
+    .parse(setCookieParser.splitCookiesString(cookieString), { decodeValues: false })
+    .forEach((cookie) => {
+      cookies[cookie.name] = cookie;
     });
-
-    cookies[name] = cookieObj;
-  });
 
   return cookies;
 }
