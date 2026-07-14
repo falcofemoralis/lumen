@@ -10,6 +10,7 @@ export const ThemedBottomSheetComponent = ({
   children,
   detents = [0.4, 'auto'],
   backgroundColor,
+  scrollable,
 }: ThemedBottomSheetComponentProps) => {
   const { theme, scale } = useAppTheme();
 
@@ -21,6 +22,7 @@ export const ThemedBottomSheetComponent = ({
           detents={ detents }
           cornerRadius={ 24 }
           backgroundColor={ backgroundColor ?? theme.colors.backgroundLight }
+          scrollable={ scrollable }
         >
           <View style={ { paddingTop: scale(32), paddingBottom: scale(8) } }>
             { children }
