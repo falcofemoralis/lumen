@@ -183,7 +183,6 @@ export const parseSeasons = (root: HTMLElementInterface): {
     if (episodeItems.length > 0) {
       episodeItems.forEach((el) => {
         if (el.classList.contains('active')) {
-          lastWatch.lastSeasonId = el.attributes['data-season_id'];
           lastWatch.lastEpisodeId = el.attributes['data-episode_id'];
         }
 
@@ -192,6 +191,8 @@ export const parseSeasons = (root: HTMLElementInterface): {
           episodeId: el.attributes['data-episode_id'],
         });
       });
+
+      lastWatch.lastSeasonId = '1';
 
       seasons.push({
         name: '',
