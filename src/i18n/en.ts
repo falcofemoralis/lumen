@@ -1,5 +1,7 @@
 /* eslint-disable max-len */
 const en = {
+  'Language': 'Language',
+  'Interface language': 'Interface language',
   'Home': 'Home',
   'Search': 'Search',
   'Bookmarks': 'Bookmarks',

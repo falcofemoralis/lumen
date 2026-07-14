@@ -2,7 +2,9 @@ import { ASPECT_RATIO_OPTIONS, DEFAULT_SPEEDS, getAspectRatioLabel, MAX_QUALITY 
 import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import * as Application from 'expo-application';
+import i18n from 'i18next';
 import { t } from 'i18n/translate';
+import { getStoredLanguage, setLanguage } from 'i18n/index';
 import {
   ArrowDown10,
   ArrowRight,
@@ -43,7 +45,7 @@ import {
   UserCog,
 } from 'lucide-react-native';
 import { reactNativeDownloads } from 'Modules/react-native-downloads';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTripleTap } from 'Screen/SettingsScreen/useTripleTap';
 import { TEST_URL } from 'Screen/WelcomeScreen/WelcomeScreen.config';
 import NotificationStore from 'Store/Notification.store';
@@ -117,6 +119,54 @@ export function SettingsScreenContainer() {
   };
 
   const [settings, setSettings] = useState<SettingItem[]>([
+    {
+      id: 'language-group',
+      type: SETTING_TYPE.GROUP,
+      title: t('Language'),
+      IconComponent: Globe,
+      settings: [
+        {
+          id: 'appLanguage',
+          title: t('Interface language'),
+          type: SETTING_TYPE.SELECT,
+          value: i18n.language || 'en',
+          options: [
+            { value: 'uk', label: 'Українська' },
+            { value: 'en', label: 'English' },
+            { value: 'ru', label: 'Русский' },
+          ],
+          IconComponent: Globe,
+          onSettingPress: async (value) => {
+            const lang = value as 'en' | 'ru' | 'uk';
+            await setLanguage(lang);
+
+            // Update group and item titles in state so they translate on the fly
+            setSettings((prevSettings) =>
+              prevSettings.map((group) => {
+                if (group.id === 'language-group') group.title = t('Language');
+                if (group.id === 'appearance-group') group.title = t('Appearance');
+                if (group.id === 'network-group') group.title = t('Network');
+                if (group.id === 'downloads-group') group.title = t('Downloads');
+                if (group.id === 'player-group') group.title = t('Player');
+                if (group.id === 'about-group') group.title = t('About');
+
+                if (group.settings) {
+                  group.settings = group.settings.map((st) => {
+                    if (st.id === 'appLanguage') st.title = t('Interface language');
+                    if (st.id === 'themeScheme') st.title = t('Theme scheme');
+                    // eslint-disable-next-line newline-before-return
+                    return st;
+                  });
+                }
+
+                return group;
+              }));
+
+            NotificationStore.displayMessage(t('Restart app to apply changes.'));
+          },
+        },
+      ],
+    },
     {
       id: 'appearance-group',
       type: SETTING_TYPE.GROUP,
@@ -342,8 +392,8 @@ export function SettingsScreenContainer() {
               const { voices } = film;
 
               if (!voices.length
-                    || !voices[0].video
-                    || !voices[0].video.streams.length
+                  || !voices[0].video
+                  || !voices[0].video.streams.length
               ) {
                 throw new Error('Something went wrong');
               }
@@ -630,7 +680,6 @@ export function SettingsScreenContainer() {
           })],
           onSettingPress: (value, key) => {
             const newValue = value === 'auto' ? undefined : convertStringToNumber(value);
-
             setConfig(key, newValue);
           },
           IconComponent: Loader,
@@ -722,6 +771,28 @@ export function SettingsScreenContainer() {
       ],
     },
   ]);
+
+  // Sync current language from storage on container load
+  useEffect(() => {
+    const syncLanguage = async () => {
+      const storedLang = await getStoredLanguage();
+      setSettings((prevSettings) =>
+        prevSettings.map((group) => {
+          if (group.id === 'language-group' && group.settings) {
+            group.settings = group.settings.map((st) => {
+              if (st.id === 'appLanguage') {
+                return { ...st, value: storedLang };
+              }
+
+              return st;
+            });
+          }
+
+          return group;
+        }));
+    };
+    syncLanguage();
+  }, []);
 
   const onSettingUpdate = async (setting: SettingItem, value: string) => {
     const { id, onSettingPress: onPress, disableUpdate, value: prevValue = '' } = setting;

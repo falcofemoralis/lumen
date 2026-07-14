@@ -2,14 +2,15 @@ import 'intl-pluralrules';
 
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
+import { storage } from 'Util/Storage';
 
 // if English isn't your default language, move Translations to the appropriate language file.
 import en, { Translations } from './en';
 import ru from './ru';
+import uk from './uk';
 
-const fallbackLocale = 'en-US';
-
-// const systemLocales = Localization.getLocales();
+const fallbackLocale = 'en';
+const STORAGE_KEY = 'user-language';
 
 export const transformKey = (key: string) => key.replace(/\s/g, '_').replace(/[!?,.:]/g, '_');
 
@@ -20,39 +21,45 @@ const convertResource = (obj: Record<string, string>) => {
 const resources = {
   en: { general: convertResource(en) },
   ru: { general: convertResource(ru) },
+  uk: { general: convertResource(uk) },
 };
-// const supportedTags = Object.keys(resources);
 
-// Checks to see if the device locale matches any of the supported locales
-// Device locale may be more specific and still match (e.g., en-US matches en)
-// const systemTagMatchesSupportedTags = (deviceTag: string) => {
-//   const primaryTag = deviceTag.split('-')[0];
+/**
+ * Get stored user language
+ */
+export const getStoredLanguage = (): string => {
+  try {
+    const savedLanguage = storage.getConfigStorage().loadString(STORAGE_KEY);
+    if (savedLanguage && Object.keys(resources).includes(savedLanguage)) {
+      return savedLanguage;
+    }
+  } catch (error) {
+    console.error('Error reading language from storage:', error);
+  }
 
-//   return supportedTags.includes(primaryTag);
-// };
+  return fallbackLocale;
+};
 
-// const pickSupportedLocale: () => Localization.Locale | undefined = () => {
-//   return systemLocales.find((locale) => systemTagMatchesSupportedTags(locale.languageTag));
-// };
-
-// const locale = pickSupportedLocale();
-
-// export let isRTL = false;
-
-// Need to set RTL ASAP to ensure the app is rendered correctly. Waiting for i18n to init is too late.
-// if (locale?.languageTag && locale?.textDirection === 'rtl') {
-//   I18nManager.allowRTL(true);
-//   isRTL = true;
-// } else {
-//   I18nManager.allowRTL(false);
-// }
+/**
+ * Function to change language in the app and save it
+ */
+export const setLanguage = async (lang: 'en' | 'ru' | 'uk') => {
+  try {
+    storage.getConfigStorage().saveString(STORAGE_KEY, lang);
+    await i18n.changeLanguage(lang);
+  } catch (error) {
+    console.error('Error saving language to storage:', error);
+  }
+};
 
 export const initI18n = async () => {
   i18n.use(initReactI18next);
 
+  const savedLng = getStoredLanguage();
+
   await i18n.init({
     resources,
-    lng: 'ru-RU', //locale?.languageTag ?? fallbackLocale,
+    lng: savedLng,
     fallbackLng: fallbackLocale,
     interpolation: {
       escapeValue: false,
@@ -65,7 +72,6 @@ export const initI18n = async () => {
 /**
  * Builds up valid keypaths for translations.
  */
-
 export type TxKeyPath = RecursiveKeyOf<Translations>
 
 // via: https://stackoverflow.com/a/65333050

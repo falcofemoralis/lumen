@@ -2,6 +2,8 @@ import { Translations } from './en';
 
 /* eslint-disable max-len */
 const ru: Translations = {
+  'Language': 'Язык',
+  'Interface language': 'Язык интерфейса',
   'Home': 'Главная',
   'Search': 'Поиск',
   'Bookmarks': 'Закладки',
