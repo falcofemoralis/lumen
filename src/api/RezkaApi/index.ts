@@ -1295,31 +1295,31 @@ const RezkaApi = {
   getHomeMenu: () => [
     {
       id: 'slider',
-      title: 'Горячие Новинки',
+      title: t('Hot New Releases'),
       path: '/engine/ajax/get_newest_slider_content.php',
       variables: { id: '0' },
       key: '.b-newest_slider__wrapper',
     },
     {
       id: 'new',
-      title: 'Новинки',
+      title: t('New Releases'),
       path: '/new',
     },
     {
       id: 'watching',
-      title: 'Сейчас смотрят',
+      title: t('Watching Now'),
       path: '/new',
       variables: { filter: 'watching' },
     },
     {
       id: 'popular',
-      title: 'Популярные',
+      title: t('Popular'),
       path: '/new',
       variables: { filter: 'popular' },
     },
     {
       id: 'soon',
-      title: 'В ожидании ',
+      title: t('Awaiting'),
       path: '/announce',
     },
   ] as MenuItemInterface[],

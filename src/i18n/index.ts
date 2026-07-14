@@ -9,7 +9,7 @@ import en, { Translations } from './en';
 import ru from './ru';
 import uk from './uk';
 
-const fallbackLocale = 'en';
+const fallbackLocale = 'ru';
 const STORAGE_KEY = 'user-language';
 
 export const transformKey = (key: string) => key.replace(/\s/g, '_').replace(/[!?,.:]/g, '_');
@@ -24,13 +24,19 @@ const resources = {
   uk: { general: convertResource(uk) },
 };
 
+export type Language = keyof typeof resources;
+
+const isSupportedLanguage = (lang: string): lang is Language => {
+  return Object.keys(resources).includes(lang);
+};
+
 /**
  * Get stored user language
  */
-export const getStoredLanguage = (): string => {
+export const getStoredLanguage = (): Language => {
   try {
     const savedLanguage = storage.getConfigStorage().loadString(STORAGE_KEY);
-    if (savedLanguage && Object.keys(resources).includes(savedLanguage)) {
+    if (savedLanguage && isSupportedLanguage(savedLanguage)) {
       return savedLanguage;
     }
   } catch (error) {
@@ -43,13 +49,26 @@ export const getStoredLanguage = (): string => {
 /**
  * Function to change language in the app and save it
  */
-export const setLanguage = async (lang: 'en' | 'ru' | 'uk') => {
+export const setLanguage = async (lang: Language) => {
   try {
     storage.getConfigStorage().saveString(STORAGE_KEY, lang);
     await i18n.changeLanguage(lang);
   } catch (error) {
     console.error('Error saving language to storage:', error);
   }
+};
+
+/**
+ * Get language currently used by the app
+ */
+export const getCurrentLanguage = (): Language => {
+  const lang = i18n.resolvedLanguage ?? i18n.language;
+
+  if (lang && isSupportedLanguage(lang)) {
+    return lang;
+  }
+
+  return getStoredLanguage();
 };
 
 export const initI18n = async () => {
