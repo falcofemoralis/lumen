@@ -25,6 +25,29 @@ export const getStaticUrl = (path: string): string => {
   return `https://statichdrezka.ac/${path}`;
 };
 
+const HELP_LINK_REGEXP = /^\/help\/([^/]+)\/?$/;
+
+/**
+ * Rezka wraps outgoing links as /help/<base64 of an url encoded url>/
+ */
+export const parseHelpLink = (rawLink?: string): string | undefined => {
+  if (!rawLink) {
+    return undefined;
+  }
+
+  const encoded = rawLink.match(HELP_LINK_REGEXP)?.[1];
+
+  if (!encoded) {
+    return rawLink;
+  }
+
+  try {
+    return decodeURIComponent(atob(encoded));
+  } catch {
+    return undefined;
+  }
+};
+
 export const parseFilmType = (type = '') => {
   if (type.includes('films')) {
     return FilmType.FILM;
