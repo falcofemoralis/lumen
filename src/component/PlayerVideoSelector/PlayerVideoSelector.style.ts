@@ -45,6 +45,8 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     borderTopColor: colors.divider,
   },
   episodesContainerNoBorder: {
+    marginTop: 0,
+    paddingTop: 0,
     borderTopWidth: 0,
   },
   episode: {
