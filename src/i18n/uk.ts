@@ -281,6 +281,11 @@ const uk: Translations = {
   'Duration end in ': 'Кінець о ',
   'Current season or episode not saved.': 'Поточний сезон або епізод не збережено.',
   'Download started': 'Завантаження почалось',
+  'Hot New Releases': 'Гарячі Новинки',
+  'New Releases': 'Новинки',
+  'Watching Now': 'Зараз дивляться',
+  'Popular': 'Популярні',
+  'Awaiting': 'В очікуванні',
 };
 
 export default uk;

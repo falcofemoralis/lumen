@@ -279,6 +279,11 @@ const en = {
   'Duration end in ': 'Duration end in ',
   'Current season or episode not saved.': 'Current season or episode not saved.',
   'Download started': 'Download started',
+  'Hot New Releases': 'Hot New Releases',
+  'New Releases': 'New Releases',
+  'Watching Now': 'Watching Now',
+  'Popular': 'Popular',
+  'Awaiting': 'Awaiting',
 };
 
 export default en;

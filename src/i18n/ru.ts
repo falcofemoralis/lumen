@@ -281,6 +281,11 @@ const ru: Translations = {
   'Duration end in ': 'Конец в ',
   'Current season or episode not saved.': 'Текущий сезон или эпизод не сохранён.',
   'Download started': 'Загрузка началась',
+  'Hot New Releases': 'Горячие Новинки',
+  'New Releases': 'Новинки',
+  'Watching Now': 'Сейчас смотрят',
+  'Popular': 'Популярные',
+  'Awaiting': 'В ожидании',
 };
 
 export default ru;
