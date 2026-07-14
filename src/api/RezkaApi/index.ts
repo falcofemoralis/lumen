@@ -38,7 +38,9 @@ import {
   parseActorCard,
   parseFilmCard,
   parseFilmsListRoot,
-  parseFilmType, parseSeasons,
+  parseFilmType,
+  parseHelpLink,
+  parseSeasons,
   parseStreams,
   parseSubtitles,
 } from './utils';
@@ -750,14 +752,18 @@ const RezkaApi = {
         switch (key) {
           case 'Рейтинги':
             film.ratingScale = 10;
-            film.ratings = value.childNodes.filter((node) => node.rawTagName === 'span').map((node) => (
-              {
+            film.ratings = value.childNodes.filter((node) => node.rawTagName === 'span').map((node) => {
+              const rawLink = (node.childNodes[0] as any)?.attributes?.['href'];
+
+              return {
                 text: node.rawText,
                 name: node.childNodes[0]?.rawText,
                 rating: Number(node.childNodes[2]?.rawText),
                 votes: Number(node.childNodes[4]?.rawText.replace('(', '').replace(')', '').replaceAll(' ', '')),
-              } as RatingInterface
-            ));
+                link: parseHelpLink(rawLink),
+              } as RatingInterface;
+            });
+
             break;
           case 'Входит в списки':
             film.includedIn = value.childNodes.reduce((acc: InfoListInterface[], node, idx) => {

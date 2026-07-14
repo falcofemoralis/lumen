@@ -46,9 +46,11 @@ import RouterStore from 'Store/Router.store';
 import { useAppTheme } from 'Theme/context';
 import { CollectionItemInterface } from 'Type/CollectionItem';
 import { FilmInterface } from 'Type/Film.interface';
+import { RatingInterface } from 'Type/Rating.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { isBookmarked } from 'Util/Film';
 import { noopFn } from 'Util/Function';
+import { openLinkInBrowser } from 'Util/Link';
 import { navigate } from 'Util/Navigation';
 
 import { componentStyles } from './FilmScreen.style';
@@ -657,6 +659,40 @@ export function FilmScreenComponent({
     );
   };
 
+  const renderRating = (rat: RatingInterface, idx: number) => {
+    const {
+      name,
+      rating,
+      votes,
+      link,
+    } = rat;
+
+    return (
+      <Text
+        key={ name }
+        style={ [
+          styles.textContainer,
+          idx === 0 ? styles.textContainerNoMargin : {},
+        ] }
+      >
+        <ThemedText
+          style={ [
+            styles.textTitle,
+            link ? styles.textLink : {},
+          ] }
+          onPress={ link ? () => openLinkInBrowser(link) : undefined }
+        >
+          { `${name}:` }
+        </ThemedText>
+        <ThemedText
+          style={ styles.text }
+        >
+          { ` ${rating} (${votes})` }
+        </ThemedText>
+      </Text>
+    );
+  };
+
   const renderRatings = () => {
     const { ratings = [], mainRating } = film;
 
@@ -670,7 +706,7 @@ export function FilmScreenComponent({
       return null;
     }
 
-    return allRatings.map(({ name, rating, votes }, i) => renderInfoText(`${rating} (${votes})`, name, i === 0));
+    return allRatings.map(renderRating);
   };
 
   const renderContent = () => {
