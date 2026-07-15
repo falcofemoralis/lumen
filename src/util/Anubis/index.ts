@@ -1,4 +1,5 @@
-import { cookiesManager, isCookieExpired, parseCookies } from 'Util/Cookies';
+import NotificationStore from 'Store/Notification.store';
+import { buildCookies, cookiesManager, isCookieExpired, setCookies } from 'Util/Cookies';
 
 import { parseChallenge, solvePow } from './challenge';
 
@@ -84,7 +85,7 @@ const inFlight = new Map<string, Promise<boolean>>();
  * (`cookiesManager`), which already persists to MMKV, so it is replayed with no
  * extra persistence code.
  */
-export async function solveAnubis(originalUrl: string, headers?: HeadersInit): Promise<boolean> {
+export async function solveAnubis(originalUrl: string, bodyText: string, headers?: HeadersInit): Promise<boolean> {
   let url: URL;
 
   try {
@@ -108,7 +109,7 @@ export async function solveAnubis(originalUrl: string, headers?: HeadersInit): P
     return pending;
   }
 
-  const attempt = doSolve(origin, hostname, headers).finally(() => inFlight.delete(hostname));
+  const attempt = doSolve(origin, hostname, bodyText, originalUrl, headers).finally(() => inFlight.delete(hostname));
 
   inFlight.set(hostname, attempt);
 
@@ -118,35 +119,17 @@ export async function solveAnubis(originalUrl: string, headers?: HeadersInit): P
 async function doSolve(
   origin: string,
   hostname: string,
+  bodyText: string,
+  originalUrl: string,
   headers?: HeadersInit
 ): Promise<boolean> {
   const userAgent = headerValue(headers, 'User-Agent');
   const baseHeaders: Record<string, string> = userAgent ? { 'User-Agent': userAgent } : {};
 
-  // Fetch a FRESH challenge here (not the one customFetch happened to receive)
-  // so the challenge id lines up with the verification cookie the server just
-  // issued for this exact request — immune to the concurrent burst.
-  let challengeHtml: string;
-
-  try {
-    const res = await fetch(`${origin}/`, {
-      method: 'GET',
-      headers: baseHeaders,
-      redirect: 'manual',
-      keepalive: true,
-    });
-
-    challengeHtml = await res.text();
-  } catch (error) {
-    console.warn('[Anubis] failed to fetch challenge', error);
-
-    return false;
-  }
-
-  const challenge = parseChallenge(challengeHtml);
+  const challenge = parseChallenge(bodyText);
 
   if (!challenge) {
-    console.warn('[Anubis] could not parse challenge');
+    NotificationStore.displayError('[Anubis] could not parse challenge');
 
     return false;
   }
@@ -166,14 +149,14 @@ async function doSolve(
     // No proof-of-work: Anubis only requires waiting out a short delay.
     await delay((difficulty + 1) * 1000);
   } else {
-    console.warn(`[Anubis] unsupported algorithm: ${algorithm}`);
+    NotificationStore.displayError(`[Anubis] unsupported algorithm: ${algorithm}`);
 
     return false;
   }
 
   const params: Record<string, string> = {
     id,
-    redir: `${origin}/`,
+    redir: originalUrl,
     elapsedTime: String(Date.now() - start),
   };
 
@@ -190,46 +173,34 @@ async function doSolve(
     Cookie: `${VERIFICATION_COOKIE}=${id}`,
   };
 
-  let setCookie = '';
-
   try {
     // Do NOT follow the 302 — the clearance cookie is on it, and following would
     // hide the Set-Cookie header.
     const passRes = await fetch(passUrl, {
       method: 'GET',
-      headers: requestHeaders,
+      headers: {
+        ...requestHeaders,
+        Cookie: buildCookies(hostname),
+      },
+      credentials: 'omit',
       redirect: 'manual',
       keepalive: true,
     });
 
-    setCookie = passRes.headers.get('Set-Cookie') ?? '';
+    setCookies(hostname, passRes);
   } catch (error) {
-    console.warn('[Anubis] pass-challenge request failed', error);
+    NotificationStore.displayError(`[Anubis] pass-challenge request failed${ error}`);
 
     return false;
   }
-
-  const existing = cookiesManager.get(hostname) || {};
-  const valid = Object.entries({ ...existing, ...parseCookies(setCookie) })
-    .filter(([, cookie]) => !isCookieExpired(cookie))
-    .reduce(
-      (acc, [name, cookie]) => {
-        acc[name] = cookie;
-
-        return acc;
-      },
-      {} as ReturnType<typeof parseCookies>
-    );
-
-  cookiesManager.set(hostname, valid);
 
   if (!hasClearanceCookie(hostname)) {
-    console.warn('[Anubis] clearance cookie not obtained after solving');
+    NotificationStore.displayError('[Anubis] clearance cookie not obtained after solving');
 
     return false;
   }
 
-  console.log(
+  console.warn(
     `[Anubis] solved (${algorithm}, difficulty ${difficulty}, nonce ${nonce}) for ${hostname}`
   );
 

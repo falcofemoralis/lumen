@@ -51,7 +51,7 @@ const RezkaApi = {
   serviceType: ApiServiceType.REZKA,
   defaultProviders: [
     'https://rezka.ag',
-    'https://rezka-ua.pub',
+    'https://rezka-ua.net',
     'http://hdrezka.tv',
     'https://hdrezka.ag',
   ],
