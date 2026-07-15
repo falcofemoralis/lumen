@@ -18,6 +18,7 @@ if (__DEV__) {
   // Note that you must be using metro's `inlineRequires` for this to work.
   // If you turn it off in metro.config.js, you'll have to manually import it.
   require('./devtools/ReactotronConfig.ts');
+  require('./devtools/FetchInterceptor.ts');
 
   const IGNORED_LOGS = [
     'i18next is made possible by our own product',

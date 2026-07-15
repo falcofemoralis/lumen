@@ -60,3 +60,30 @@ export class CookiesManager {
 }
 
 export const cookiesManager = new CookiesManager();
+
+export const setCookies = (hostname: string, res: Response) => {
+  const existingCookies = cookiesManager.get(hostname) || {};
+
+  const newCookies = parseCookies(res.headers.get('Set-Cookie') || '');
+
+  // Update the existing cookies with new ones
+  const combinedCookies = { ...existingCookies, ...newCookies };
+
+  // Filter out expired cookies
+  const validNewCookies = Object.entries(combinedCookies)
+    .filter(([, cookie]) => !isCookieExpired(cookie))
+    .reduce(
+      (acc, [name, cookie]) => {
+        acc[name] = cookie;
+
+        return acc;
+      },
+      {} as Record<string, setCookieParser.Cookie>
+    );
+
+  cookiesManager.set(hostname, validNewCookies);
+};
+
+export const buildCookies = (hostname: string) => {
+  return buildCookieString(cookiesManager.get(hostname) || {});
+};
