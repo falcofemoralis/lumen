@@ -38,7 +38,9 @@ import {
   parseActorCard,
   parseFilmCard,
   parseFilmsListRoot,
-  parseFilmType, parseSeasons,
+  parseFilmType,
+  parseHelpLink,
+  parseSeasons,
   parseStreams,
   parseSubtitles,
 } from './utils';
@@ -49,7 +51,7 @@ const RezkaApi = {
   serviceType: ApiServiceType.REZKA,
   defaultProviders: [
     'https://rezka.ag',
-    'https://rezka-ua.pub',
+    'https://rezka-ua.net',
     'http://hdrezka.tv',
     'https://hdrezka.ag',
   ],
@@ -750,14 +752,18 @@ const RezkaApi = {
         switch (key) {
           case 'Рейтинги':
             film.ratingScale = 10;
-            film.ratings = value.childNodes.filter((node) => node.rawTagName === 'span').map((node) => (
-              {
+            film.ratings = value.childNodes.filter((node) => node.rawTagName === 'span').map((node) => {
+              const rawLink = (node.childNodes[0] as any)?.attributes?.['href'];
+
+              return {
                 text: node.rawText,
                 name: node.childNodes[0]?.rawText,
                 rating: Number(node.childNodes[2]?.rawText),
                 votes: Number(node.childNodes[4]?.rawText.replace('(', '').replace(')', '').replaceAll(' ', '')),
-              } as RatingInterface
-            ));
+                link: parseHelpLink(rawLink),
+              } as RatingInterface;
+            });
+
             break;
           case 'Входит в списки':
             film.includedIn = value.childNodes.reduce((acc: InfoListInterface[], node, idx) => {
@@ -1295,31 +1301,31 @@ const RezkaApi = {
   getHomeMenu: () => [
     {
       id: 'slider',
-      title: 'Горячие Новинки',
+      title: t('Hot New Releases'),
       path: '/engine/ajax/get_newest_slider_content.php',
       variables: { id: '0' },
       key: '.b-newest_slider__wrapper',
     },
     {
       id: 'new',
-      title: 'Новинки',
+      title: t('New Releases'),
       path: '/new',
     },
     {
       id: 'watching',
-      title: 'Сейчас смотрят',
+      title: t('Watching Now'),
       path: '/new',
       variables: { filter: 'watching' },
     },
     {
       id: 'popular',
-      title: 'Популярные',
+      title: t('Popular'),
       path: '/new',
       variables: { filter: 'popular' },
     },
     {
       id: 'soon',
-      title: 'В ожидании ',
+      title: t('Awaiting'),
       path: '/announce',
     },
   ] as MenuItemInterface[],

@@ -9,7 +9,8 @@
         "http://hdrezka.tv/*",
         "https://rezka.ag/*",
         "https://hdrezka.tv/*",
-        "https://rezka-ua.org/*"
+        "https://rezka-ua.net/*",
+        "https://hdrzk.org/*"
       ],
       "js": [
         "/src/libs/firebase/firebase-app.js",
@@ -28,7 +29,8 @@
         "http://hdrezka.tv/*",
         "https://rezka.ag/*",
         "https://hdrezka.tv/*",
-        "https://rezka-ua.org/*"
+        "https://rezka-ua.net/*",
+        "https://hdrzk.org/*"
       ],
       "resources": ["/src/web_app.js"]
     }

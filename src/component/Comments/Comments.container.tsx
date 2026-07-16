@@ -68,7 +68,7 @@ export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>
             totalPages: newTotalsPages,
           };
 
-          setComments([...(comments ?? []), ...newItems]);
+          setComments(page === 1 ? newItems : [...(comments ?? []), ...newItems]);
         } catch (error) {
           NotificationStore.displayError(error as Error);
           updatingStateRef.current = false;

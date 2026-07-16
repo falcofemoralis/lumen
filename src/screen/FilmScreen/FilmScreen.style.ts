@@ -83,6 +83,9 @@ export const componentStyles = ({ scale, colors, text, spacing }: Theme) => ({
   text: {
     fontSize: scale(text.xs.fontSize),
   },
+  textLink: {
+    textDecorationLine: 'underline',
+  },
   collectionContainer: {
     flexDirection: 'row',
     gap: scale(2),

@@ -2,7 +2,7 @@
   "name": "Lumen App",
   "slug": "lumen",
   "scheme": "lumen",
-  "version": "1.5.6",
+  "version": "1.5.7",
   "userInterfaceStyle": "automatic",
   "icon": "./assets/images/app-icon-all.png",
   "updates": {
@@ -18,7 +18,7 @@
       "foregroundImage": "./assets/images/app-icon-android-adaptive-foreground.png",
       "backgroundImage": "./assets/images/app-icon-android-adaptive-background.png"
     },
-    "versionCode": 22,
+    "versionCode": 23,
     "googleServicesFile": "./google-services.json",
     "permissions": [
       "android.permission.MANAGE_EXTERNAL_STORAGE",
@@ -35,7 +35,7 @@
           },
           {
             "scheme": "https",
-            "host": "rezka-ua.pub"
+            "host": "rezka-ua.net"
           },
           {
             "scheme": "http",

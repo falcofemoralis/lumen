@@ -3,4 +3,5 @@ export interface RatingInterface {
   name: string;
   rating: number; // 0-10
   votes: number;
+  link?: string;
 }

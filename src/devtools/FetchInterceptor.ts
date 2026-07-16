@@ -1,3 +1,6 @@
+import { fetch } from 'expo/fetch';
+import { installGlobal } from 'Util/Global';
+
 const DEFAULT_IGNORE_CONTENT_TYPES = /^(image)\/.*$/i;
 
 export interface FetchInterceptorOptions {
@@ -126,3 +129,5 @@ export function wrapFetchWithReactotron(fetchFn: FetchFn, options: FetchIntercep
     }
   };
 }
+
+installGlobal('fetch', () => wrapFetchWithReactotron(fetch));

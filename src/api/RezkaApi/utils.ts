@@ -25,6 +25,29 @@ export const getStaticUrl = (path: string): string => {
   return `https://statichdrezka.ac/${path}`;
 };
 
+const HELP_LINK_REGEXP = /^\/help\/([^/]+)\/?$/;
+
+/**
+ * Rezka wraps outgoing links as /help/<base64 of an url encoded url>/
+ */
+export const parseHelpLink = (rawLink?: string): string | undefined => {
+  if (!rawLink) {
+    return undefined;
+  }
+
+  const encoded = rawLink.match(HELP_LINK_REGEXP)?.[1];
+
+  if (!encoded) {
+    return rawLink;
+  }
+
+  try {
+    return decodeURIComponent(atob(encoded));
+  } catch {
+    return undefined;
+  }
+};
+
 export const parseFilmType = (type = '') => {
   if (type.includes('films')) {
     return FilmType.FILM;
@@ -160,7 +183,6 @@ export const parseSeasons = (root: HTMLElementInterface): {
     if (episodeItems.length > 0) {
       episodeItems.forEach((el) => {
         if (el.classList.contains('active')) {
-          lastWatch.lastSeasonId = el.attributes['data-season_id'];
           lastWatch.lastEpisodeId = el.attributes['data-episode_id'];
         }
 
@@ -169,6 +191,8 @@ export const parseSeasons = (root: HTMLElementInterface): {
           episodeId: el.attributes['data-episode_id'],
         });
       });
+
+      lastWatch.lastSeasonId = '1';
 
       seasons.push({
         name: '',

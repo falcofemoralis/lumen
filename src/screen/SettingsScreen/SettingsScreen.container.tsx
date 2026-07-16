@@ -2,6 +2,7 @@ import { ASPECT_RATIO_OPTIONS, DEFAULT_SPEEDS, getAspectRatioLabel, MAX_QUALITY 
 import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import * as Application from 'expo-application';
+import { getCurrentLanguage, Language, setLanguage } from 'i18n/index';
 import { t } from 'i18n/translate';
 import {
   ArrowDown10,
@@ -138,6 +139,26 @@ export function SettingsScreenContainer() {
             setTimeoutSafe(() => {
               setThemeContextOverride((value as string) === 'system' ? undefined : (value as ThemeContextModeT));
             }, 50);
+          },
+        },
+        {
+          id: 'appLanguage',
+          title: t('Interface language'),
+          type: SETTING_TYPE.SELECT,
+          value: getCurrentLanguage(),
+          options: [
+            { value: 'uk', label: 'Українська' },
+            { value: 'en', label: 'English' },
+            { value: 'ru', label: 'Русский' },
+          ],
+          IconComponent: Globe,
+          onSettingPress: async (value) => {
+            await setLanguage(value as Language);
+
+            NotificationStore.displayMessage(t('Restart app to apply changes.'));
+            setTimeoutSafe(() => {
+              restartApp();
+            }, 2000);
           },
         },
         {
@@ -342,8 +363,8 @@ export function SettingsScreenContainer() {
               const { voices } = film;
 
               if (!voices.length
-                    || !voices[0].video
-                    || !voices[0].video.streams.length
+                  || !voices[0].video
+                  || !voices[0].video.streams.length
               ) {
                 throw new Error('Something went wrong');
               }
@@ -630,7 +651,6 @@ export function SettingsScreenContainer() {
           })],
           onSettingPress: (value, key) => {
             const newValue = value === 'auto' ? undefined : convertStringToNumber(value);
-
             setConfig(key, newValue);
           },
           IconComponent: Loader,

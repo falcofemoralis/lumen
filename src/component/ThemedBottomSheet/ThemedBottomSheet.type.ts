@@ -8,4 +8,5 @@ export interface ThemedBottomSheetComponentProps {
   children: ReactNode;
   detents?: SheetDetent[];
   backgroundColor?: string;
+  scrollable?: boolean;
 }
