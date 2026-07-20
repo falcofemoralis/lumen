@@ -22,6 +22,8 @@ export function FilmGridComponent({
   films,
   numberOfColumns,
   isAddSafeArea = true,
+  isEmpty,
+  ListEmptyComponent,
   handleOnPress,
   onNextLoad,
 }: FilmGridComponentProps) {
@@ -63,6 +65,11 @@ export function FilmGridComponent({
 
   const data = useMemo(() => {
     if (!films.length) {
+      // an empty loaded list renders ListEmptyComponent instead of loading placeholders
+      if (isEmpty) {
+        return [];
+      }
+
       return calculateRows(
         new Array(numberOfColumns * THUMBNAILS_ROWS).fill(null).map((_, index) => ({ id: `film-placeholder-${index}` })),
         numberOfColumns
@@ -77,7 +84,7 @@ export function FilmGridComponent({
       films,
       numberOfColumns
     ).map((items) => ({ id: items[0].id, items, width })); // width is required to make array unique with different width value
-  }, [films, width, numberOfColumns]); // width is required to recalculate rows after orientation change
+  }, [films, width, numberOfColumns, isEmpty]); // width is required to recalculate rows after orientation change
 
   return (
     <ThemedGrid
@@ -88,6 +95,7 @@ export function FilmGridComponent({
       onNextLoad={ onNextLoad }
       style={ styles.grid }
       ListHeaderComponent={ isAddSafeArea ? <View style={ { height: top } } /> : null }
+      ListEmptyComponent={ ListEmptyComponent }
     />
   );
 }

@@ -3,6 +3,7 @@ import { ProfileInterface } from 'Type/Profile.interface';
 
 export interface AccountScreenComponentProps {
   isSignedIn: boolean;
+  isLocalLibrary: boolean;
   profile: ProfileInterface | null;
   badgeData: BadgeData;
   handleViewProfile: () => void;

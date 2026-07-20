@@ -10,6 +10,7 @@ import { useServiceContext } from 'Context/ServiceContext';
 import { useEvent, useEventListener } from 'expo';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { useVideoPlayer, VideoContentFit, VideoPlayer, VideoTrack } from 'expo-video';
+import { useLocalBookmarks } from 'Hooks/useLocalLibrary';
 import { t } from 'i18n/translate';
 import { PLAYER_SCREEN } from 'Navigation/navigationRoutes';
 import {
@@ -27,6 +28,7 @@ import { FilmVideoInterface, SubtitleInterface } from 'Type/FilmVideo.interface'
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { isBookmarked } from 'Util/Film';
 import { createMasterPlaylist, getQualityFromResolution } from 'Util/Hls';
+import { upsertLocalHistoryItem } from 'Util/LocalLibrary';
 import { setIntervalSafe } from 'Util/Misc';
 import {
   getBufferTime,
@@ -65,6 +67,7 @@ export function PlayerContainer({
   const {
     isTV,
     isFirestore,
+    isLocalLibrary,
     playerSaveQuality,
     playerAutoNextEpisode,
     playerBufferTimeSetting,
@@ -109,10 +112,26 @@ export function PlayerContainer({
 
   const firestoreSavedTimeRef = useRef(false);
   const firestoreDb = useMemo(() => (
-    isFirestore && isSignedIn && !isOffline
+    isFirestore && isSignedIn && !isOffline && !isLocalLibrary
       ? getFirestore().collection<FirestoreDocument>(FIRESTORE_DB)
       : null
-  ), [isSignedIn, isFirestore, isOffline]);
+  ), [isSignedIn, isFirestore, isOffline, isLocalLibrary]);
+
+  const localBookmarks = useLocalBookmarks();
+
+  // in local mode the bookmark state is derived reactively from the local store
+  const isFilmBookmarkedValue = isLocalLibrary
+    ? localBookmarks.categories.some((category) => category.filmIds.includes(film.id))
+    : isFilmBookmarked;
+
+  // local history mirrors the moments the account receives saveWatch: playback
+  // start here, episode/voice change in changePlayerVideo (props are stable for
+  // the lifetime of a player session, and the upsert dedupes by film id)
+  useEffect(() => {
+    if (isLocalLibrary && !isOffline) {
+      upsertLocalHistoryItem(film, voice);
+    }
+  }, [film, voice, isOffline, isLocalLibrary]);
 
   const initFirestoreSavedTime = useCallback(async (p: VideoPlayer, savedTime: SavedTime | null) => {
     if (firestoreSavedTimeRef.current || !firestoreDb || !profile) {
@@ -296,7 +315,11 @@ export function PlayerContainer({
   };
 
   const changePlayerVideo = (newVideo: FilmVideoInterface, newVoice: FilmVoiceInterface) => {
-    if (isSignedIn) {
+    if (isLocalLibrary) {
+      if (!isOffline) {
+        upsertLocalHistoryItem(film, newVoice);
+      }
+    } else if (isSignedIn) {
       currentService.saveWatch(film, newVoice)
         .catch((error) => {
           NotificationStore.displayError(error as Error);
@@ -388,7 +411,7 @@ export function PlayerContainer({
   };
 
   const openBookmarksOverlay = () => {
-    if (!isSignedIn) {
+    if (!isSignedIn && !isLocalLibrary) {
       NotificationStore.displayMessage(t('Sign In to an Account'));
 
       return;
@@ -667,7 +690,7 @@ export function PlayerContainer({
     selectedAspectRatio,
     isLocked,
     isOverlayOpen,
-    isFilmBookmarked,
+    isFilmBookmarked: isFilmBookmarkedValue,
     isOffline,
     overlayQuality,
     isLoading,

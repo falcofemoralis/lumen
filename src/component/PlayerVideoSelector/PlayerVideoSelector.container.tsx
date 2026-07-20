@@ -38,7 +38,7 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
     ref
   ) => {
     const { voices = [] } = film;
-    const { isTV, isFirestore, playerAskQuality, sortVoicesByRating } = useConfigContext();
+    const { isTV, isFirestore, isLocalLibrary, playerAskQuality, sortVoicesByRating } = useConfigContext();
     const { selectedVoice: contextVoice, updateSelectedVoice } = usePlayerContext();
     const [isLoading, setIsLoading] = useState(false);
     const [selectedVoice, setSelectedVoice] = useState<FilmVoiceInterface>(
@@ -55,10 +55,10 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
     );
     const [savedTime, setSavedTime] = useState<SavedTime | null>(null);
     const firestoreDb = useMemo(() => (
-      isFirestore && isSignedIn && !isOffline
+      isFirestore && isSignedIn && !isOffline && !isLocalLibrary
         ? getFirestore().collection<FirestoreDocument>(FIRESTORE_DB)
         : null
-    ), [isSignedIn, isFirestore, isOffline]);
+    ), [isSignedIn, isFirestore, isOffline, isLocalLibrary]);
 
     const firestoreSavedTimeRef = useRef(false);
     const overlayRef = useRef<ThemedOverlayRef>(null);
@@ -192,7 +192,7 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
         return;
       }
 
-      if (isSignedIn && !isOffline) {
+      if (isSignedIn && !isOffline && !isLocalLibrary) {
         currentService.saveWatch(film, voice)
           .catch((error) => {
             NotificationStore.displayError(error as Error);

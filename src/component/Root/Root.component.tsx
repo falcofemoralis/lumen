@@ -11,7 +11,7 @@ import { ReactNode, useEffect } from 'react';
 import NotificationStore from 'Store/Notification.store';
 
 export const Root = ({ children }: { children: ReactNode }) => {
-  const { checkForUpdates } = useConfigContext();
+  const { checkForUpdates, isLocalLibrary } = useConfigContext();
   const { isSignedIn } = useServiceContext();
   const { fetchUserData } = useServiceContext();
   const { checkVersion } = useAppUpdaterContext();
@@ -24,10 +24,12 @@ export const Root = ({ children }: { children: ReactNode }) => {
   }, [checkForUpdates, checkVersion, isInternetAvailable]);
 
   useEffect(() => {
-    if (isSignedIn && isInternetAvailable) {
+    // in local mode notifications derive from the public updates widget, so
+    // they are fetched (and the badge recomputed) even while logged out
+    if ((isSignedIn || isLocalLibrary) && isInternetAvailable) {
       fetchUserData();
     }
-  }, [isSignedIn, fetchUserData, isInternetAvailable]);
+  }, [isSignedIn, isLocalLibrary, fetchUserData, isInternetAvailable]);
 
   useEffect( () => {
     getExistingDownloadTasks().then(tasks => {

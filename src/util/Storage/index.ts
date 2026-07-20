@@ -101,6 +101,7 @@ class Storage {
   private miscStorage: StorageWrapper|null = null;
   private downloadsStorage: StorageWrapper|null = null;
   private patchStorage: StorageWrapper|null = null;
+  private localLibraryStorage: StorageWrapper|null = null;
 
   getConfigStorage() {
     if (!this.configStorage) {
@@ -148,6 +149,14 @@ class Storage {
     }
 
     return this.patchStorage;
+  }
+
+  getLocalLibraryStorage() {
+    if (!this.localLibraryStorage) {
+      this.localLibraryStorage = new StorageWrapper(createMMKV({ id: 'localLibrary' }));
+    }
+
+    return this.localLibraryStorage;
   }
 }
 

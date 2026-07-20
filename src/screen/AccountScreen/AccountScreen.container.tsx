@@ -19,7 +19,7 @@ export function AccountScreenContainer() {
     badgeData,
     resetNotifications,
   } = useServiceContext();
-  const { isTV } = useConfigContext();
+  const { isTV, isLocalLibrary } = useConfigContext();
 
   const handleViewProfile = useCallback(() => {
     viewProfile();
@@ -52,6 +52,7 @@ export function AccountScreenContainer() {
 
   const containerProps = {
     isSignedIn,
+    isLocalLibrary,
     profile,
     badgeData,
     handleViewProfile,

@@ -22,6 +22,7 @@ import { AccountScreenComponentProps } from './AccountScreen.type';
 
 export function AccountScreenComponent({
   isSignedIn,
+  isLocalLibrary,
   profile,
   badgeData,
   handleViewProfile,
@@ -186,6 +187,25 @@ export function AccountScreenComponent({
     if (!isSignedIn) {
       return (
         <LoginForm withRedirect>
+          { isLocalLibrary && (
+            <View style={ styles.badgeContainer }>
+              { (badgeData[ACCOUNT_TAB] ?? 0) > 0 && (
+                <ThemedText style={ styles.badge }>
+                  { badgeData[ACCOUNT_TAB] }
+                </ThemedText>
+              ) }
+              <ThemedButton
+                IconComponent={ Bell }
+                onPress={ openNotifications }
+                iconProps={ {
+                  size: scale(20),
+                  color: theme.colors.icon,
+                } }
+              >
+                { t('Notifications') }
+              </ThemedButton>
+            </View>
+          ) }
           <ThemedButton
             IconComponent={ Download }
             onPress={ openDownloads }

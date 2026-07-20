@@ -11,7 +11,6 @@ import { FilmInterface } from 'Type/Film.interface';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { FilmListInterface } from 'Type/FilmList.interface';
 import { FilmStreamInterface } from 'Type/FilmStream.interface';
-import { FilmType } from 'Type/FilmType.type';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { InfoListInterface } from 'Type/InfoList.interface';
@@ -30,6 +29,7 @@ import { executeGet, executePost, Variables } from 'Util/Request';
 import { storage } from 'Util/Storage';
 import { updateUrlHost } from 'Util/Url';
 
+import { collectSeriesUpdateRows, parseSeriesUpdateBlocks } from './seriesUpdates';
 import { CommentsResult, FILM_SORTING, JSONResult, LikeResult, RatingResult, SeasonsResult, StreamsResult, TrailerResult } from './type';
 import {
   applyFilmSorting,
@@ -517,27 +517,11 @@ const RezkaApi = {
   async getUserData() {
     const root = await this.fetchPage('/');
 
-    const notifications = root.querySelectorAll('.b-seriesupdate__block').map((el) => {
-      const date = el.querySelector('.b-seriesupdate__block_date')?.rawText ?? '';
+    // tracked rows only (the account's subscriptions, marked server-side)
+    const notifications = parseSeriesUpdateBlocks(root, (el) => el.querySelectorAll('.tracked'));
 
-      const items = el.querySelectorAll('.tracked').map((item) => {
-        const season = item.querySelector('.season')?.rawText ?? '';
-        const episode = item.querySelector('.cell-2')?.rawText ?? '';
-        const info = `${season} - ${episode}`;
-        const itemLink = item.querySelector('.b-seriesupdate__block_list_link');
-
-        return {
-          name: itemLink?.rawText ?? '',
-          link: itemLink?.attributes.href ?? '',
-          info,
-        };
-      });
-
-      return {
-        date: date.replace(' развернуть', '').trim(),
-        items,
-      };
-    }) as NotificationInterface[];
+    // every update row, so local mode can match them against the local library
+    const updates = parseSeriesUpdateBlocks(root, collectSeriesUpdateRows);
 
     const premiumNode = root.querySelector('.b-tophead-premuser');
     const premiumDays = premiumNode ? parseInt(
@@ -546,6 +530,7 @@ const RezkaApi = {
 
     return {
       notifications,
+      updates,
       premiumDays,
     };
   },
@@ -731,7 +716,7 @@ const RezkaApi = {
     const film: FilmInterface = {
       id,
       link,
-      type: FilmType.FILM,
+      type: parseFilmType(link),
       title,
       poster,
       voices: [],

@@ -267,7 +267,7 @@ export function FilmPagerComponent(props: FilmPagerComponentProps) {
         onNextLoad={ (isRefresh) => onNextLoad(isRefresh, items[activePage]) }
         onItemFocus={ onRowFocus }
         isGridVisible={ isGridVisible }
-        isEmpty={ isEmpty }
+        isEmpty={ isEmpty && items[activePage].films !== null && !items[activePage].films?.length }
         ListHeaderComponent={ items.length > 1 ? renderMenu() : ListHeaderComponent }
         ListEmptyComponent={ ListEmptyComponent }
         menuDefaultFocus={ menuDefaultFocus }

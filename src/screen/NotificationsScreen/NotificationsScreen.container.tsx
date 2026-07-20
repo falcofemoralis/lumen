@@ -11,7 +11,7 @@ import NotificationsScreenComponent from './NotificationsScreen.component';
 import NotificationsScreenComponentTV from './NotificationsScreen.component.atv';
 
 export function NotificationsScreenContainer() {
-  const { isTV } = useConfigContext();
+  const { isTV, isLocalLibrary } = useConfigContext();
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState<NotificationInterface[]>([]);
   const { isSignedIn, currentService, resetNotifications, getNotifications } = useServiceContext();
@@ -30,7 +30,7 @@ export function NotificationsScreenContainer() {
   };
 
   const prepareNotifications = async () => {
-    if (isSignedIn && !data.length) {
+    if ((isSignedIn || isLocalLibrary) && !data.length) {
       const notifications = await getNotifications();
 
       if (notifications) {
@@ -46,10 +46,10 @@ export function NotificationsScreenContainer() {
   };
 
   useEffect(() => {
-    if (isSignedIn) {
+    if (isSignedIn || isLocalLibrary) {
       prepareNotifications();
     }
-  }, [isSignedIn]);
+  }, [isSignedIn, isLocalLibrary]);
 
   const handleSelectFilm = useCallback((film: FilmCardInterface) => {
     openFilm(film, navigation);

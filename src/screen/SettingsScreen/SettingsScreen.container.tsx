@@ -15,6 +15,7 @@ import {
   CircleQuestionMark,
   Cloud,
   CloudCog,
+  CloudOff,
   Dock,
   Download,
   ExternalLink,
@@ -53,6 +54,7 @@ import { GithubIcon, TelegramIcon } from 'Theme/icons';
 import { ThemeContextModeT } from 'Theme/types';
 import { restartApp } from 'Util/Device';
 import { openLinkInBrowser } from 'Util/Link';
+import { ensureDefaultLocalCategory } from 'Util/LocalLibrary';
 import { setTimeoutSafe } from 'Util/Misc';
 import { getPlayerQuality, updatePlayerQuality } from 'Util/Player';
 import { convertBooleanToString, convertStringToBoolean, convertStringToNumber } from 'Util/Type';
@@ -99,6 +101,7 @@ export function SettingsScreenContainer() {
     playerDefaultAspectRatio,
     playerDefaultSpeed,
     isContinueBtnEnabled,
+    isLocalLibrary,
   } = useConfigContext();
   const {
     currentService,
@@ -243,6 +246,22 @@ export function SettingsScreenContainer() {
           options: yesNoOptions,
           onSettingPress,
           IconComponent: ArrowRight,
+        },
+        {
+          id: 'isLocalLibrary',
+          title: t('Local bookmarks & history'),
+          subtitle: t('Store bookmarks and watch history on this device only.'),
+          type: SETTING_TYPE.SWITCH,
+          value: convertBooleanToString(isLocalLibrary),
+          options: yesNoOptions,
+          IconComponent: CloudOff,
+          onSettingPress: (value, key) => {
+            onSettingPress(value, key);
+
+            if (convertStringToBoolean(value)) {
+              ensureDefaultLocalCategory(t('Favorites'));
+            }
+          },
         },
       ],
     },

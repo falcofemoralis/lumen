@@ -17,6 +17,7 @@ import { NotificationInterface, NotificationItemInterface } from 'Type/Notificat
 import { ProfileInterface } from 'Type/Profile.interface';
 import { UserDataInterface } from 'Type/UserData.interface';
 import { openLinkInBrowser } from 'Util/Link';
+import { getLocalSeriesUpdates } from 'Util/LocalLibrary';
 import { formatURI, requestValidator } from 'Util/Request';
 import { storage } from 'Util/Storage';
 import { updateUrlHost } from 'Util/Url';
@@ -289,6 +290,16 @@ export const ServiceProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   /**
+   * The notifications relevant for the current mode: the account's tracked series,
+   * or the day's updates matched against the local library while local mode is on.
+   */
+  const selectNotifications = useCallback((userData: UserDataInterface): NotificationInterface[] => (
+    getGlobalConfig().isLocalLibrary
+      ? getLocalSeriesUpdates(userData.updates ?? [])
+      : userData.notifications ?? []
+  ), []);
+
+  /**
    * Reset notifications for the current service
    */
   const resetNotifications = useCallback(async () => {
@@ -296,10 +307,8 @@ export const ServiceProvider = ({ children }: { children: ReactNode }) => {
       { data: UserDataInterface }
     >(USER_DATA_STORAGE_CACHE) || { data: null };
 
-    if (userData?.notifications) {
-      const { notifications } = userData;
-
-      const newItems = notifications.reduce((acc: NotificationItemInterface[], item) => {
+    if (userData) {
+      const newItems = selectNotifications(userData).reduce((acc: NotificationItemInterface[], item) => {
         acc.push(...item.items);
 
         return acc;
@@ -311,7 +320,7 @@ export const ServiceProvider = ({ children }: { children: ReactNode }) => {
     setBadgeData({
       [getGlobalConfig().isTV ? NOTIFICATIONS_SCREEN : ACCOUNT_SCREEN]: 0,
     });
-  }, []);
+  }, [selectNotifications]);
 
   /**
    * Fetch the user data for the current service
@@ -323,11 +332,10 @@ export const ServiceProvider = ({ children }: { children: ReactNode }) => {
       if (cachedData) {
         const { data, ttl } = JSON.parse(cachedData) as { data: UserDataInterface; ttl: number };
 
-        if (Date.now() < ttl) {
-          const { notifications, premiumDays } = data;
-
-          updateNotifications(notifications);
-          updateProfile({ premiumDays });
+        // a cache written by an older build lacks `updates`; local mode needs them, so refetch
+        if (Date.now() < ttl && (!getGlobalConfig().isLocalLibrary || data.updates)) {
+          updateNotifications(selectNotifications(data));
+          updateProfile({ premiumDays: data.premiumDays });
 
           return data;
         }
@@ -340,9 +348,9 @@ export const ServiceProvider = ({ children }: { children: ReactNode }) => {
         ttl: Date.now() + USER_DATA_STORAGE_CACHE_TTL,
       });
 
-      const { notifications, premiumDays } = userData;
+      const { premiumDays } = userData;
 
-      updateNotifications(notifications);
+      updateNotifications(selectNotifications(userData));
       updateProfile({ premiumDays });
 
       return userData;
@@ -351,13 +359,13 @@ export const ServiceProvider = ({ children }: { children: ReactNode }) => {
 
       return null;
     }
-  }, [currentService, updateNotifications, updateProfile]);
+  }, [currentService, updateNotifications, updateProfile, selectNotifications]);
 
   const getNotifications = useCallback(async () => {
     const userData = await fetchUserData();
 
-    return userData?.notifications ?? [];
-  }, [fetchUserData]);
+    return userData ? selectNotifications(userData) : [];
+  }, [fetchUserData, selectNotifications]);
 
   const prepareShareBody = useCallback((film: FilmInterface) => {
     const { title, link } = film;

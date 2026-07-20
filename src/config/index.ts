@@ -31,6 +31,7 @@ export type DeviceConfigType = {
   playerDefaultAspectRatio: string;
   playerDefaultSpeed: number;
   isContinueBtnEnabled: boolean;
+  isLocalLibrary: boolean;
 }
 
 export const defaultConfig: DeviceConfigType = {
@@ -63,4 +64,5 @@ export const defaultConfig: DeviceConfigType = {
   playerDefaultAspectRatio: ASPECT_RATIO_OPTIONS[0],
   playerDefaultSpeed: DEFAULT_SPEED,
   isContinueBtnEnabled: false,
+  isLocalLibrary: false,
 };

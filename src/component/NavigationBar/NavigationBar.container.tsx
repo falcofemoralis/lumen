@@ -11,12 +11,13 @@ import { NavigationBarContainerProps } from './NavigationBar.type';
 export function NavigationBarContainer(props: NavigationBarContainerProps) {
   const { profile } = useServiceContext();
   const { isSignedIn } = useServiceContext();
-  const { isTV } = useConfigContext();
+  const { isTV, isLocalLibrary } = useConfigContext();
   const { navigation, state } = props;
 
   const getRedirectRoute = useCallback((name: string) => {
     // if not signed in, we should redirect to account page
-    if (!isSignedIn && (name === BOOKMARKS_TAB
+    // (in local mode these tabs work from device data, so they stay available)
+    if (!isSignedIn && !isLocalLibrary && (name === BOOKMARKS_TAB
       || name === RECENT_TAB
       || name === NOTIFICATIONS_TAB
     )) {
@@ -24,7 +25,7 @@ export function NavigationBarContainer(props: NavigationBarContainerProps) {
     }
 
     return name;
-  }, [isSignedIn]);
+  }, [isSignedIn, isLocalLibrary]);
 
   const onPress = useCallback((name: string) => {
     const route = getRedirectRoute(name);

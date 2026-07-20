@@ -3,18 +3,23 @@ import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useNetworkContext } from 'Context/NetworkContext';
 import { useServiceContext } from 'Context/ServiceContext';
-import { useEffect, useRef, useState } from 'react';
+import { useLocalHistory } from 'Hooks/useLocalLibrary';
+import { getCurrentLanguage } from 'i18n/index';
+import { t } from 'i18n/translate';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
 import { RecentItemInterface } from 'Type/RecentItem.interface';
+import { removeLocalHistoryItem, setLocalHistoryWatched } from 'Util/LocalLibrary';
 import { openFilm } from 'Util/Router';
 
 import RecentScreenComponent from './RecentScreen.component';
 import RecentScreenComponentTV from './RecentScreen.component.atv';
 
 export function RecentScreenContainer() {
-  const { isTV } = useConfigContext();
+  const { isTV, isLocalLibrary } = useConfigContext();
   const { isSignedIn, currentService } = useServiceContext();
   const [items, setItems] = useState<RecentItemInterface[]>([]);
+  const localHistory = useLocalHistory();
   const paginationRef = useRef({
     page: 1,
     totalPages: 1,
@@ -26,22 +31,54 @@ export function RecentScreenContainer() {
   const hideConfirmOverlayRef = useRef<ThemedOverlayRef | null>(null);
 
   useEffect(() => {
-    if (isSignedIn) {
+    if (isSignedIn && !isLocalLibrary) {
       setIsLoading(true);
 
       loadRecent(1, false).finally(() => {
         setIsLoading(false);
       });
+    } else {
+      setIsLoading(false);
     }
 
     return () => {
       currentService.unloadRecentScreen();
     };
-  }, [isSignedIn, currentService]);
+  }, [isSignedIn, isLocalLibrary, currentService]);
 
   useEffect(() => {
     updatingStateRef.current = false;
   }, [items]);
+
+  const localItems = useMemo((): RecentItemInterface[] => {
+    if (!isLocalLibrary) {
+      return [];
+    }
+
+    const locale = getCurrentLanguage();
+
+    return localHistory.map((historyItem) => ({
+      id: historyItem.id,
+      link: historyItem.link,
+      image: historyItem.poster,
+      name: historyItem.title,
+      date: new Date(historyItem.updatedAt).toLocaleDateString(locale, {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      }),
+      info: [
+        historyItem.voiceTitle,
+        historyItem.seasonId && historyItem.episodeId
+          ? t('Season {{season}} - Episode {{episode}}', {
+            season: historyItem.seasonId,
+            episode: historyItem.episodeId,
+          })
+          : undefined,
+      ].filter(Boolean).join(' - '),
+      isWatched: historyItem.isWatched,
+    }));
+  }, [localHistory, isLocalLibrary]);
 
   const loadRecent = async (
     page: number,
@@ -86,6 +123,10 @@ export function RecentScreenContainer() {
   };
 
   const onNextLoad = async (isRefresh = false) => {
+    if (isLocalLibrary) {
+      return;
+    }
+
     const newPage = isRefresh ? 1 : paginationRef.current.page + 1;
 
     if (newPage <= paginationRef.current.totalPages) {
@@ -99,6 +140,13 @@ export function RecentScreenContainer() {
 
   const removeItem = async (item: RecentItemInterface) => {
     const { id } = item;
+
+    if (isLocalLibrary) {
+      // the reactive local history hook refreshes the list
+      removeLocalHistoryItem(id);
+
+      return;
+    }
 
     setItems((prev) => prev.filter((i) => i.id !== id));
 
@@ -126,10 +174,16 @@ export function RecentScreenContainer() {
       return;
     }
 
-    const { id } = hideItemRef.current;
+    const { id, isWatched } = hideItemRef.current;
     hideItemRef.current = null;
 
     hideConfirmOverlayRef.current?.close();
+
+    if (isLocalLibrary) {
+      setLocalHistoryWatched(id, !isWatched);
+
+      return;
+    }
 
     setItems((prev) => {
       return prev.map((i) => i.id === id ? { ...i, isWatched: !i.isWatched } : i);
@@ -142,7 +196,7 @@ export function RecentScreenContainer() {
 
   const containerProps = {
     isSignedIn,
-    items,
+    items: isLocalLibrary ? localItems : items,
     isLoading,
     hideConfirmOverlayRef,
     onNextLoad,

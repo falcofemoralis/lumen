@@ -98,6 +98,8 @@ const TabButton = memo(({
 export const FilmPagerComponent = ({
   items,
   isAddSafeArea,
+  isEmpty,
+  ListEmptyComponent,
   sorting,
   selectedSorting,
   onPreLoad,
@@ -221,10 +223,12 @@ export const FilmPagerComponent = ({
       <FilmGrid
         films={ films ?? [] }
         isAddSafeArea={ isAddSafeArea }
+        isEmpty={ isEmpty && films !== null && !films.length }
+        ListEmptyComponent={ ListEmptyComponent }
         onNextLoad={ (isRefresh) => onNextLoad(isRefresh, pagerItem) }
       />
     );
-  }, [renderedTabs, isAddSafeArea, onNextLoad]);
+  }, [renderedTabs, isAddSafeArea, isEmpty, ListEmptyComponent, onNextLoad]);
 
   const pages = useMemo(() => (pagerItems).map((item, idx) => (
     <Wrapper key={ item.menuItem.id }>

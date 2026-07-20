@@ -8,6 +8,7 @@ import { PlayerVideoSelectorRef } from 'Component/PlayerVideoSelector/PlayerVide
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
+import { useLocalBookmarks } from 'Hooks/useLocalLibrary';
 import { t } from 'i18n/translate';
 import { FILM_TRAILER_SCREEN, PLAYER_SCREEN } from 'Navigation/navigationRoutes';
 import { AppStackParamList } from 'Navigation/navigationTypes';
@@ -27,6 +28,11 @@ import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { getDownloadsDir, normalizeName, TaskIdStorage, uuid } from 'Util/Download';
+import {
+  applyLocalScheduleMarks,
+  getLocalBookmarksForFilm,
+  setLocalScheduleMark,
+} from 'Util/LocalLibrary';
 import { navigate } from 'Util/Navigation';
 import { getPlayerQuality, getSavedTime } from 'Util/Player';
 import { openActor, openCategory, openFilm } from 'Util/Router';
@@ -39,7 +45,9 @@ import { FilmScreenContainerProps } from './FilmScreen.type';
 export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
   const { link: linkArg, thumbnailPoster } = (route.params ?? {}) as { link: string, thumbnailPoster?: string };
 
-  const { isTV, downloadsPath, downloadsSaveSubtitles, downloadsSavePoster, isContinueBtnEnabled } = useConfigContext();
+  const {
+    isTV, downloadsPath, downloadsSaveSubtitles, downloadsSavePoster, isContinueBtnEnabled, isLocalLibrary,
+  } = useConfigContext();
   const navigation = useNavigation<NativeStackNavigationProp<AppStackParamList>>();
   const { isSignedIn, currentService, prepareShareBody } = useServiceContext();
   const [film, setFilm] = useState<FilmInterface | null>(null);
@@ -135,7 +143,12 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
       try {
         const loadedFilm = await currentService.getFilm(link);
 
-        if (!isSignedIn) {
+        if (isLocalLibrary && loadedFilm) {
+          applyLocalScheduleMarks(loadedFilm);
+        }
+
+        // in local mode the account watch-state is not updated, so local saved time drives it
+        if (!isSignedIn || isLocalLibrary) {
           await updateFilmVoiceData(loadedFilm);
         }
 
@@ -147,6 +160,18 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
 
     loadFilm();
   }, []);
+
+  const localBookmarks = useLocalBookmarks();
+
+  // in local mode film.bookmarks is derived reactively from the local store, so the
+  // bookmark button and overlay stay in sync with local writes (including the overlay's own)
+  const filmValue = useMemo(() => {
+    if (!film || !isLocalLibrary) {
+      return film;
+    }
+
+    return { ...film, bookmarks: getLocalBookmarksForFilm(localBookmarks, film.id) };
+  }, [film, isLocalLibrary, localBookmarks]);
 
   const handleVideoSelect = (video: FilmVideoInterface, voice: FilmVoiceInterface, quality?: string) => {
     RouterStore.pushData(PLAYER_SCREEN, {
@@ -224,20 +249,28 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
   }, [film]);
 
   const handleUpdateScheduleWatch = useCallback(async (scheduleItem: ScheduleItemInterface) => {
-    const { id } = scheduleItem;
+    const { id, isWatched } = scheduleItem;
 
-    if (!isSignedIn) {
-      NotificationStore.displayMessage(t('Sign In to an Account'));
+    if (isLocalLibrary) {
+      if (!film) {
+        return false;
+      }
 
-      return false;
-    }
+      setLocalScheduleMark(film.id, id, !isWatched);
+    } else {
+      if (!isSignedIn) {
+        NotificationStore.displayMessage(t('Sign In to an Account'));
 
-    try {
-      currentService.saveScheduleWatch(id);
-    } catch (error) {
-      NotificationStore.displayError(error as Error);
+        return false;
+      }
 
-      return false;
+      try {
+        currentService.saveScheduleWatch(id);
+      } catch (error) {
+        NotificationStore.displayError(error as Error);
+
+        return false;
+      }
     }
 
     setFilm((prevFilm) => {
@@ -267,7 +300,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     });
 
     return true;
-  }, [isSignedIn, currentService]);
+  }, [isSignedIn, isLocalLibrary, currentService, film]);
 
   const handleShare = async () => {
     if (!film) {
@@ -284,7 +317,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
   };
 
   const openBookmarks = () => {
-    if (!isSignedIn) {
+    if (!isSignedIn && !isLocalLibrary) {
       NotificationStore.displayMessage(t('Sign In to an Account'));
 
       return;
@@ -597,7 +630,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
       let lastEpisodeId = null;
       let lastSeasonId = null;
 
-      if (isSignedIn) {
+      if (isSignedIn && !isLocalLibrary) {
         lastEpisodeId = voice.lastEpisodeId;
         lastSeasonId = voice.lastSeasonId;
       } else {
@@ -648,7 +681,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
   };
 
   const containerProps = {
-    film,
+    film: filmValue,
     thumbnailPoster,
     visibleScheduleItems: getVisibleScheduleItems(),
     playerVideoSelectorOverlayRef,
