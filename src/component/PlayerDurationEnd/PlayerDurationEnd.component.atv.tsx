@@ -3,8 +3,8 @@ import { useConfigContext } from 'Context/ConfigContext';
 import { usePlayerProgressContext } from 'Context/PlayerProgressContext';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
-import Moment from 'react-moment';
 import { View } from 'react-native';
+import { formatClockTime } from 'Util/Date';
 
 import { componentStyles } from './PlayerDurationEnd.style.atv';
 
@@ -25,16 +25,9 @@ export const PlayerDurationComponent = () => {
         <ThemedText style={ styles.durationText }>
           { t('Duration end in ') }
         </ThemedText>
-        { endDate ? (
-          <Moment
-            element={ ThemedText }
-            format="HH:mm"
-            locale="ru"
-            style={ styles.clockText }
-          >
-            { endDate }
-          </Moment>
-        ) : <ThemedText style={ styles.clockText }>-</ThemedText> }
+        <ThemedText style={ styles.clockText }>
+          { endDate ? formatClockTime(endDate) : '-' }
+        </ThemedText>
       </View>
     </View>
   );

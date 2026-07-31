@@ -1,4 +1,3 @@
-import moment from 'moment';
 import { ActorCardInterface } from 'Type/ActorCard.interface';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { FilmListInterface } from 'Type/FilmList.interface';
@@ -293,14 +292,14 @@ export const parseActorCard = (
   };
 };
 
-export const formatDurationWithMoment = (minutes: number): string => {
+export const formatDuration = (minutes: number): string => {
   if (!minutes || minutes <= 0) {
     return '0м';
   }
 
-  const duration = moment.duration(minutes, 'minutes');
-  const hours = Math.floor(duration.asHours());
-  const remainingMinutes = duration.minutes();
+  const totalMinutes = Math.floor(minutes);
+  const hours = Math.floor(totalMinutes / 60);
+  const remainingMinutes = totalMinutes % 60;
 
   if (hours === 0) {
     return `${remainingMinutes} мин.`;

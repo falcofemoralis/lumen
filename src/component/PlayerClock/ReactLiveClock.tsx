@@ -1,34 +1,26 @@
-import 'moment/locale/ru';
-
 import { ThemedText } from 'Component/ThemedText';
-import moment from 'moment';
-import { CSSProperties, useEffect, useState } from 'react';
-import Moment from 'react-moment';
+import { getCurrentLanguage } from 'i18n/index';
+import { useEffect, useState } from 'react';
+import { StyleProp, TextStyle } from 'react-native';
+import { formatClockDateTime } from 'Util/Date';
 
-const ReactLiveClock = ({ style }: { style?: CSSProperties }) => {
+const CLOCK_TICK_MS = 60000;
+
+const ReactLiveClock = ({ style }: { style?: StyleProp<TextStyle> }) => {
   const [currentTime, setCurrentTime] = useState(Date.now());
-
-  useEffect(() => {
-    moment.locale('ru');
-  }, []);
 
   useEffect(() => {
     const tick = setInterval(() => {
       setCurrentTime(Date.now());
-    }, 60000);
+    }, CLOCK_TICK_MS);
 
     return () => clearInterval(tick);
   }, []);
 
   return (
-    <Moment
-      element={ ThemedText }
-      format="ddd DD MMM HH:mm"
-      locale="ru"
-      style={ style }
-    >
-      { currentTime }
-    </Moment>
+    <ThemedText style={ style }>
+      { formatClockDateTime(currentTime, getCurrentLanguage()) }
+    </ThemedText>
   );
 };
 

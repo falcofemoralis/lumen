@@ -33,7 +33,7 @@ import { collectSeriesUpdateRows, parseSeriesUpdateBlocks } from './seriesUpdate
 import { CommentsResult, FILM_SORTING, JSONResult, LikeResult, RatingResult, SeasonsResult, StreamsResult, TrailerResult } from './type';
 import {
   applyFilmSorting,
-  formatDurationWithMoment,
+  formatDuration,
   getStaticUrl,
   parseActorCard,
   parseFilmCard,
@@ -795,7 +795,7 @@ const RezkaApi = {
             // film.age = value.rawText;
             break;
           case 'Время':
-            film.duration = formatDurationWithMoment(Number(value.rawText.replace(' мин.', '')));
+            film.duration = formatDuration(Number(value.rawText.replace(' мин.', '')));
             break;
           case 'Из серии':
             film.fromCollections = value.childNodes
