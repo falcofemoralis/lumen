@@ -4,12 +4,7 @@ import { Theme, ThemedStyles } from 'Theme/types';
 export const componentStyles = ({ scale, dimensions, spacing, colors }: Theme) => ({
   container: {
     height: '100%',
-    width: dimensions.width - scale(NAVIGATION_BAR_TV_WIDTH) - scale(spacing.wrapperPaddingTV) * 2,
-    marginInline: scale(spacing.wrapperPaddingTV),
-  },
-  content: {
-    height: '100%',
-    width: '100%',
+    width: dimensions.width - scale(NAVIGATION_BAR_TV_WIDTH),
   },
   fullscreen: {
     height: '100%',
@@ -18,10 +13,12 @@ export const componentStyles = ({ scale, dimensions, spacing, colors }: Theme) =
     marginTop: 0,
   },
   noConnectionContainer: {
+    width: '100%',
+    height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  btn: {
+  button: {
     marginTop: scale(16),
   },
 } satisfies ThemedStyles);

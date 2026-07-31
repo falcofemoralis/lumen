@@ -32,13 +32,17 @@ export const ConfirmOverlayComponent = ({
         ) }
         <View style={ styles.actions }>
           { !disableCancelButton && (
-            <ThemedButton onPress={ onCancel } contentStyle={ styles.button }>
-              { cancelButtonText ?? t('Cancel') }
-            </ThemedButton>
+            <ThemedButton
+              title={ cancelButtonText ?? t('Cancel') }
+              onPress={ onCancel }
+              contentStyle={ styles.button }
+            />
           ) }
-          <ThemedButton onPress={ onConfirm } contentStyle={ [styles.button, styles.buttonPrimary] }>
-            { confirmButtonText ?? t('Accept') }
-          </ThemedButton>
+          <ThemedButton
+            title={ confirmButtonText ?? t('Accept') }
+            onPress={ onConfirm }
+            contentStyle={ [styles.button, styles.buttonPrimary] }
+          />
         </View>
       </View>
     </ThemedOverlay>

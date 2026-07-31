@@ -1,4 +1,4 @@
-import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
+import { CollectionReference, doc, getDoc, setDoc } from '@react-native-firebase/firestore';
 import { AUTO_QUALITY, MAX_QUALITY } from 'Component/Player/Player.config';
 import { FirestoreDocument, SavedTime, SavedTimestamp, SavedTimeVoice } from 'Component/Player/Player.type';
 import * as Device from 'expo-device';
@@ -132,34 +132,33 @@ export const updateFirestoreSavedTime = async (
   film: FilmInterface,
   voice: FilmVoiceInterface,
   profile: ProfileInterface,
-  firestoreDb: FirebaseFirestoreTypes.CollectionReference<FirestoreDocument>,
+  firestoreDb: CollectionReference<FirestoreDocument>,
   time: number,
   progress: number
 ) => {
   const key = formatFirestoreKey(film, profile);
+  const docRef = doc(firestoreDb, key);
 
-  const doc = await firestoreDb.doc(key) .get();
-  const data = doc.data();
+  const snapshot = await getDoc(docRef);
+  const data = snapshot.data();
 
   const prevSavedTime = safeJsonParse<SavedTime | null>(data?.savedTime, null);
   const newSavedTime = prepareSavedTimeObject(film, voice, time, progress, prevSavedTime);
 
-  firestoreDb
-    .doc(key)
-    .set({
-      savedTime: JSON.stringify(newSavedTime),
-      updatedAt: getFormattedDate(),
-    });
+  setDoc(docRef, {
+    savedTime: JSON.stringify(newSavedTime),
+    updatedAt: getFormattedDate(),
+  });
 };
 
 export const getFirestoreSavedTime = async (
   film: FilmInterface,
   profile: ProfileInterface,
-  firestoreDb: FirebaseFirestoreTypes.CollectionReference<FirestoreDocument>
+  firestoreDb: CollectionReference<FirestoreDocument>
 ) => {
   const key = formatFirestoreKey(film, profile);
-  const doc = await firestoreDb.doc(key).get();
-  const data = doc.data();
+  const snapshot = await getDoc(doc(firestoreDb, key));
+  const data = snapshot.data();
 
   if (!data) {
     return null;

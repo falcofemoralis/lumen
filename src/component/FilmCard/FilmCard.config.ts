@@ -16,3 +16,8 @@ export const FILM_TYPE_COLORS = {
   [FilmType.ANIME]: '#696969',
   [FilmType.TV_SHOW]: '##909215',
 };
+
+// Keep in sync with the `poster` style (width / aspectRatio)
+export const POSTER_WIDTH_RATIO = 0.3;
+export const POSTER_ASPECT_WIDTH = 166;
+export const POSTER_ASPECT_HEIGHT = 250;

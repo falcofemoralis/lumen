@@ -8,7 +8,6 @@ import { t } from 'i18n/translate';
 import { Plus } from 'lucide-react-native';
 import { useState } from 'react';
 import { View } from 'react-native';
-import { DefaultFocus, SpatialNavigationView } from 'react-tv-space-navigation';
 import { useAppTheme } from 'Theme/context';
 
 import { componentStyles } from './BookmarksOverlay.style.atv';
@@ -45,30 +44,28 @@ export const BookmarksOverlayComponent = ({
   };
 
   const renderCreate = () => (
-    <DefaultFocus>
-      <View style={ styles.createContainer }>
-        <ThemedInput
-          style={ styles.input }
-          placeholder={ t('Category name') }
-          onChangeText={ setNewTitle }
-          maxLength={ 40 }
+    <View style={ styles.createContainer }>
+      <ThemedInput
+        autofocus
+        style={ styles.input }
+        placeholder={ t('Category name') }
+        onChangeText={ setNewTitle }
+        maxLength={ 40 }
+      />
+      <View style={ styles.actions }>
+        <ThemedButton
+          title={ t('Cancel') }
+          onPress={ cancelCreate }
+          contentStyle={ styles.button }
         />
-        <SpatialNavigationView direction="horizontal">
-          <View style={ styles.actions }>
-            <ThemedButton onPress={ cancelCreate } contentStyle={ styles.button }>
-              { t('Cancel') }
-            </ThemedButton>
-            <ThemedButton
-              onPress={ submitCreate }
-              disabled={ !newTitle.trim() }
-              contentStyle={ [styles.button, styles.buttonPrimary] }
-            >
-              { t('Create') }
-            </ThemedButton>
-          </View>
-        </SpatialNavigationView>
+        <ThemedButton
+          title={ t('Create') }
+          onPress={ submitCreate }
+          disabled={ !newTitle.trim() }
+          contentStyle={ [styles.button, styles.buttonPrimary] }
+        />
       </View>
-    </DefaultFocus>
+    </View>
   );
 
   const renderList = () => (
@@ -83,20 +80,17 @@ export const BookmarksOverlayComponent = ({
           : t('Go to site and create bookmarks group') }
       />
       { isLocalLibrary && (
-        <SpatialNavigationView direction="horizontal">
-          <View style={ styles.actions }>
-            <ThemedButton
-              IconComponent={ Plus }
-              iconProps={ {
-                size: scale(14),
-              } }
-              onPress={ () => setIsCreating(true) }
-              contentStyle={ styles.button }
-            >
-              { t('New category') }
-            </ThemedButton>
-          </View>
-        </SpatialNavigationView>
+        <View style={ styles.actions }>
+          <ThemedButton
+            title={ t('New category') }
+            IconComponent={ Plus }
+            iconProps={ {
+              size: scale(14),
+            } }
+            onPress={ () => setIsCreating(true) }
+            contentStyle={ styles.button }
+          />
+        </View>
       ) }
     </>
   );

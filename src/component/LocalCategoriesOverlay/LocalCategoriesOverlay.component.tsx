@@ -63,6 +63,7 @@ export const LocalCategoriesOverlayComponent = ({
       </ScrollView>
       <View style={ styles.actions }>
         <ThemedButton
+          title={ t('New category') }
           IconComponent={ Plus }
           iconProps={ {
             size: scale(16),
@@ -70,9 +71,7 @@ export const LocalCategoriesOverlayComponent = ({
           } }
           onPress={ startCreate }
           contentStyle={ styles.button }
-        >
-          { t('New category') }
-        </ThemedButton>
+        />
       </View>
     </>
   );
@@ -86,16 +85,17 @@ export const LocalCategoriesOverlayComponent = ({
         maxLength={ 40 }
       />
       <View style={ styles.actions }>
-        <ThemedButton onPress={ cancelCreate } contentStyle={ styles.button }>
-          { t('Cancel') }
-        </ThemedButton>
         <ThemedButton
+          title={ t('Cancel') }
+          onPress={ cancelCreate }
+          contentStyle={ styles.button }
+        />
+        <ThemedButton
+          title={ t('Create') }
           onPress={ submitCreate }
           disabled={ isCreateDisabled }
           contentStyle={ [styles.button, styles.buttonPrimary] }
-        >
-          { t('Create') }
-        </ThemedButton>
+        />
       </View>
     </>
   );
@@ -109,12 +109,16 @@ export const LocalCategoriesOverlayComponent = ({
         { t('The category and its bookmarks will be removed from this device.') }
       </ThemedText>
       <View style={ styles.actions }>
-        <ThemedButton onPress={ cancelDelete } contentStyle={ styles.button }>
-          { t('Cancel') }
-        </ThemedButton>
-        <ThemedButton onPress={ confirmDelete } contentStyle={ [styles.button, styles.buttonPrimary] }>
-          { t('Accept') }
-        </ThemedButton>
+        <ThemedButton
+          title={ t('Cancel') }
+          onPress={ cancelDelete }
+          contentStyle={ styles.button }
+        />
+        <ThemedButton
+          title={ t('Accept') }
+          onPress={ confirmDelete }
+          contentStyle={ [styles.button, styles.buttonPrimary] }
+        />
       </View>
     </>
   );

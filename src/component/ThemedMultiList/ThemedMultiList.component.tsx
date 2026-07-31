@@ -62,7 +62,7 @@ export const ThemedMultiListComponent = ({
         ) }
       </View>
     </ThemedPressable>
-  ), [handleOnChange]);
+  ), [handleOnChange, styles, theme]);
 
   const renderItems = () => {
     if (!values.length) {

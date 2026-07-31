@@ -5,16 +5,13 @@ import { CategoryScreenComponentProps } from './CategoryScreen.type';
 
 export function CategoryScreenComponent({
   pagerItems,
-  onLoadFilms,
-  onUpdateFilms,
+  ...pagerHandlers
 }: CategoryScreenComponentProps) {
   return (
     <Page>
       <FilmPager
-        items={ pagerItems }
-        onLoadFilms={ onLoadFilms }
-        onUpdateFilms={ onUpdateFilms }
-        loadOnInit
+        pagerItems={ pagerItems }
+        { ...pagerHandlers }
       />
     </Page>
   );

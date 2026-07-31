@@ -106,6 +106,7 @@ export function NavigationBarComponent({
           width: (width / state.routes.length) + scale(TAB_ADDITIONAL_SIZE),
           left: index * (width / state.routes.length) - scale(TAB_ADDITIONAL_SIZE / 2),
         }] }
+        contentStyle={ styles.tabContent }
         onPress={ () => onPress(name) }
         onLongPress={ () => onLongPress(name) }
         pressDelay={ 0 }

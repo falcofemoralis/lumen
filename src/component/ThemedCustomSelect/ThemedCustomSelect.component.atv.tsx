@@ -8,7 +8,6 @@ import { t } from 'i18n/translate';
 import { Plus } from 'lucide-react-native';
 import { useRef } from 'react';
 import { TextInput, View } from 'react-native';
-import { DefaultFocus, SpatialNavigationView } from 'react-tv-space-navigation';
 import NotificationStore from 'Store/Notification.store';
 import { ThemedStyles } from 'Theme/types';
 
@@ -42,7 +41,7 @@ const CustomSelectModalComponent = ({
   };
 
   return (
-    <SpatialNavigationView direction='vertical' style={ styles.modalView }>
+    <View style={ styles.modalView }>
       <ThemedInput
         ref={ textRef }
         placeholder={ t('Type or select value') }
@@ -55,12 +54,12 @@ const CustomSelectModalComponent = ({
         overlayRef={ dropdownRef }
         inputLabel={ t('Select from presets') }
       />
-      <DefaultFocus>
-        <ThemedButton onPress={ handleSelect }>
-          { t('Confirm') }
-        </ThemedButton>
-      </DefaultFocus>
-    </SpatialNavigationView>
+      <ThemedButton
+        title={ t('Confirm') }
+        autofocus
+        onPress={ handleSelect }
+      />
+    </View>
   );
 };
 
@@ -107,6 +106,7 @@ export const ThemedCustomSelectComponent = (props: ThemedCustomSelectComponentPr
 
     return (
       <ThemedButton
+        title={ value }
         style={ [styles.input, inputStyle] }
         contentStyle={ styles.inputContent }
         onPress={ () => {
@@ -118,9 +118,7 @@ export const ThemedCustomSelectComponent = (props: ThemedCustomSelectComponentPr
         } }
         IconComponent={ Plus }
         disabled={ disabled }
-      >
-        { value }
-      </ThemedButton>
+      />
     );
   };
 

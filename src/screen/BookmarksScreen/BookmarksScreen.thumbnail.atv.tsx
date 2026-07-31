@@ -7,13 +7,14 @@ export const BookmarksScreenThumbnail = () => {
   const { scale } = useAppTheme();
 
   return (
-    <View>
+    <View style={ { flex: 1 } }>
       <View
         style={ {
           flexDirection: 'row',
-          height: scale(40),
+          height: scale(42),
           gap: scale(8),
           marginBlockEnd: scale(16),
+          marginTop: scale(8),
         } }
       >
         { Array(3).fill(0).map((_, i) => (
@@ -25,7 +26,9 @@ export const BookmarksScreenThumbnail = () => {
           />
         )) }
       </View>
-      <FilmGrid films={ [] } />
+      <View style={ { flex: 1 } }>
+        <FilmGrid films={ [] } />
+      </View>
     </View>
   );
 };

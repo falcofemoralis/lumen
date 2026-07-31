@@ -1,5 +1,5 @@
 import { reactNativeDownloads } from 'Modules/react-native-downloads';
-import { DownloadFileInterface } from 'Type/DownloadFile.interface';
+import { DownloadFileInterface, DownloadFilmInterface } from 'Type/DownloadFile.interface';
 import { storage } from 'Util/Storage';
 
 const TASK_IDS_KEY = 'taskIds';
@@ -76,6 +76,16 @@ export const TaskIdStorage = {
     storage.getDownloadsStorage().remove(TASK_IDS_KEY);
   },
 };
+
+// A file that is still downloading is deliberately left out of the grouped
+// film's voices (see `groupDownloadedFiles`), so a film that has no stream
+// anywhere has nothing playable on disk yet.
+export const hasDownloadedVideo = ({ film }: DownloadFilmInterface): boolean => (film.voices ?? []).some(
+  (voice) => (voice.video?.streams.length ?? 0) > 0
+    || (voice.seasons ?? []).some(
+      (season) => season.episodes.some((episode) => (episode.video?.streams.length ?? 0) > 0)
+    )
+);
 
 export const normalizeName = (name: string) => {
   return name.replaceAll(/[\\\/:*?"<>|]/g, '').replaceAll(' ', '-').trim();

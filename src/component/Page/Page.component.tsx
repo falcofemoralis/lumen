@@ -18,38 +18,31 @@ export function PageComponent({
 }: PageComponentProps) {
   const styles = useThemedStyles(componentStyles);
 
-  if (!isConnected) {
-    return (
-      <View
-        style={ [
-          styles.container,
-          styles.noConnectionContainer,
-          style,
-        ] }
-      >
-        <Wrapper>
+  const renderContent = () => {
+    if (!isConnected) {
+      return (
+        <Wrapper style={ styles.noConnectionContainer }>
           <InfoBlock
             title={ t('Network error') }
             subtitle={ t('Network request failed. Please check your internet connection and try again.') }
             Icon={ GlobeX }
           />
-          <ThemedButton style={ styles.btn } onPress={ restartApp }>
-            { t('Retry') }
-          </ThemedButton>
+          <ThemedButton
+            title={ t('Retry') }
+            style={ styles.button }
+            onPress={ restartApp }
+          />
         </Wrapper>
-      </View>
-    );
-  }
+      );
+    }
+
+    return children;
+  };
 
   return (
     <Portal.Host>
-      <View
-        style={ [
-          styles.container,
-          style,
-        ] }
-      >
-        { children }
+      <View style={ [ styles.container, style ] }>
+        { renderContent() }
       </View>
     </Portal.Host>
   );

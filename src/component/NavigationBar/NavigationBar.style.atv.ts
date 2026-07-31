@@ -27,12 +27,24 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   barOpened: {
     width: scale(NAVIGATION_BAR_TV_TAB_WIDTH) + scale(NAVIGATION_BAR_TV_TAB_WIDTH_EXPANDED),
   },
+  tabsContent: {
+    flexGrow: 1,
+  },
   tabs: {
     width: '100%',
-    height: '100%',
-    justifyContent: 'space-between',
+    flex: 1,
     overflow: 'hidden',
     zIndex: NAVIGATION_BAR_Z_INDEX + 2,
+  },
+  middleTabs: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  tabButton: {
+    marginBottom: scale(12),
+  },
+  tabButtonContent: {
+    borderRadius: scale(24),
   },
   tab: {
     width: '100%',
@@ -40,8 +52,6 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     alignItems: 'center',
     justifyContent: 'flex-start',
     padding: scale(12),
-    borderRadius: scale(24),
-    marginBottom: scale(12),
   },
   tabSelected: {
     backgroundColor: colors.tertiary,

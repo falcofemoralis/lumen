@@ -2,98 +2,39 @@ import { Theme, ThemedStyles } from 'Theme/types';
 
 export const componentStyles = ({ scale, colors, text }: Theme) => ({
   container: {
+    flexDirection: 'row',
+    justifyContent: 'center',
     backgroundColor: colors.button,
+    borderRadius: scale(8),
+    color: colors.text,
+  },
+  content: {
     paddingHorizontal: scale(16),
     paddingVertical: scale(10),
-    borderWidth: 0,
     flexDirection: 'row',
+    justifyContent: 'center',
     gap: scale(6),
-    alignItems: 'center',
-    overflow: 'hidden',
   },
   text: {
     fontSize: scale(text.xs.fontSize),
   },
-  // filled
-  containerFilled: {
-    borderRadius: scale(44),
-  },
-  containerFilledSelected: {
-    backgroundColor: colors.primary,
-  },
-  containerFilledFocused: {
-    backgroundColor: colors.buttonFocused,
-  },
-  containerFilledDisabled: {
-    opacity: 0.5,
-  },
-  textFilled: {
-    color: colors.text,
-  },
-  textFilledSelected: {
+  textSelected: {
     color: colors.textOnTertiary,
   },
-  textFilledFocused: {
-    color: colors.textFocused,
-  },
-  icon: {
-    width: scale(18),
-    height: scale(18),
-  },
-  iconFilled: {
-    color: colors.text,
-  },
-  iconFilledSelected: {},
-  iconFilledFocused: {
-    color: colors.textFocused,
-  },
-  // outlined
-  containerOutlined: {
-    borderRadius: scale(44),
-    backgroundColor: colors.transparent,
-  },
-  containerOutlinedSelected: {
-    backgroundColor: colors.tertiary,
-  },
-  containerOutlinedFocused: {
-    backgroundColor: colors.backgroundFocused,
-  },
-  textOutlined: {
-    color: colors.text,
-  },
-  textOutlinedSelected: {
-    color: colors.textOnTertiary,
-  },
-  textOutlinedFocused: {
-    color: colors.textFocused,
-  },
-  iconOutlined: {
-    color: colors.text,
-  },
-  iconOutlinedSelected: {
-    color: colors.textOnTertiary,
-  },
-  iconOutlinedFocused: {
+  textFocused: {
     color: colors.textFocused,
   },
   image: {
     backgroundColor: colors.transparent,
   },
-  // long
-  containerLong: {
-    borderRadius: scale(44),
+  focused: {
+    backgroundColor: colors.backgroundFocused,
   },
-  containerLongSelected: {
+  selected: {
     backgroundColor: colors.primary,
   },
-  containerLongFocused: {
-    backgroundColor: colors.buttonFocused,
+  disabled: {
+    opacity: 0.5,
   },
-  // transparent
-  textLongSelected: {
-    color: colors.textOnTertiary,
-  },
-  textLongFocused: {
-    color: colors.textFocused,
-  },
+
 } satisfies ThemedStyles);

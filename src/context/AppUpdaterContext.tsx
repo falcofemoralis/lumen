@@ -74,6 +74,7 @@ export const AppUpdaterProvider = ({ children }: { children: ReactNode }) => {
       if (newVersion > currentVersion) {
         setUpdate(data);
       }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
     }
   }, [isConfigured, getCachedUpdate]);

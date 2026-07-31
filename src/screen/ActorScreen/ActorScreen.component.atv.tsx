@@ -5,7 +5,6 @@ import { ThemedText } from 'Component/ThemedText';
 import { Thumbnail } from 'Component/Thumbnail';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { View } from 'react-native';
-import { DefaultFocus } from 'react-tv-space-navigation';
 import { useAppTheme } from 'Theme/context';
 import { ActorInterface } from 'Type/Actor.interface';
 
@@ -121,14 +120,13 @@ export function ActorScreenComponent({
     }));
 
     return (
-      <DefaultFocus>
-        <FilmSections
-          data={ data }
-          handleOnPress={ handleSelectFilm }
-        >
-          { renderMainData() }
-        </FilmSections>
-      </DefaultFocus>
+      <FilmSections
+        autofocus
+        data={ data }
+        handleOnPress={ handleSelectFilm }
+      >
+        { renderMainData() }
+      </FilmSections>
     );
   };
 

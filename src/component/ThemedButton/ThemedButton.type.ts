@@ -1,37 +1,32 @@
-import { ComponentType, ReactNode, Ref } from 'react';
-import {
-  ImageStyle, StyleProp, TextStyle, ViewStyle,
-} from 'react-native';
-import { SpatialNavigationNodeRef } from 'react-tv-space-navigation';
-
-export type Variant = 'filled' | 'outlined' | 'long' | 'transparent';
+import { ComponentType, ReactElement } from 'react';
+import { ImageStyle, StyleProp, TextStyle, ViewStyle } from 'react-native';
 
 export interface ThemedButtonProps {
-  spatialRef?: Ref<SpatialNavigationNodeRef>;
-  children?: ReactNode;
+  title?: string;
+  disabled?: boolean;
   style?: StyleProp<ViewStyle>;
-  styleSelected?: StyleProp<ViewStyle>;
-  styleFocused?: StyleProp<ViewStyle>;
-  styleAdditional?: StyleProp<ViewStyle>;
   contentStyle?: StyleProp<ViewStyle>;
+  styleDisabled?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
-  leftImageStyle?: StyleProp<ImageStyle>
-  rightImageStyle?: StyleProp<ImageStyle>
-  isSelected?: boolean;
+  onPress?: () => void;
+  onLongPress?: () => void;
   IconComponent?: ComponentType<any>;
   iconProps?: Record<string, any>;
   iconColor?: string;
-  iconColorFocused?: string;
-  variant?: Variant;
   leftImage?: string;
+  leftImageStyle?: StyleProp<ImageStyle>;
   rightImage?: string;
-  onPress?: () => void;
-  onLongPress?: () => void;
+  rightImageStyle?: StyleProp<ImageStyle>;
+  topAdditionalElement?: (isFocused: boolean, isSelected: boolean) => ReactElement | null;
+  bottomAdditionalElement?: (isFocused: boolean, isSelected: boolean) => ReactElement | null;
+  // TV related
+  selected?: boolean;
+  styleSelected?: StyleProp<ViewStyle>;
+  styleFocused?: StyleProp<ViewStyle>;
+  textStyleFocused?: StyleProp<TextStyle>;
+  iconColorFocused?: string;
+  autofocus?: boolean;
+  focusKey?: string;
   onFocus?: () => void;
-  disableRootActive?: boolean;
-  disabled?: boolean;
-  additionalElement?: (isFocused: boolean, isSelected: boolean) => ReactNode;
-  withAnimation?: boolean;
-  zoomScale?: number;
-  isFocusVisible?: boolean;
+  onEnterPress?: () => void;
 }

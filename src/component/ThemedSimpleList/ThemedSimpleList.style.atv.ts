@@ -1,10 +1,19 @@
 import { Theme, ThemedStyles } from 'Theme/types';
 
-export const MAX_ITEMS_TO_DISPLAY = 6;
+export const MAX_ITEMS_TO_DISPLAY = 5;
 export const ITEM_HEIGHT = 48;
+export const HEADER_HEIGHT = 30;
+
+// Share of the screen the items viewport may take before it caps below
+// MAX_ITEMS_TO_DISPLAY. The rest is left to the header and to whatever chrome
+// wraps the list (the overlay's padding, border and screen margins).
+export const MAX_SCREEN_RATIO = 0.7;
 
 export const componentStyles = ({ scale, colors, text }: Theme) => ({
+  // Fixed height (single line, see `numberOfLines`) so the items viewport can be
+  // sized against it without measuring.
   header: {
+    height: scale(HEADER_HEIGHT),
     justifyContent: 'center',
     alignItems: 'center',
     paddingBottom: scale(10),
@@ -21,9 +30,10 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     flexDirection: 'column',
     flex: 0,
   },
+  // Height is set by the component: an exact number of rows, so the viewport
+  // never ends mid-item and never overflows what the overlay can show.
   listItemsWrapper: {
     flexDirection: 'column',
-    maxHeight: MAX_ITEMS_TO_DISPLAY * scale(ITEM_HEIGHT) - scale(42),
     width: scale(300),
     overflow: 'hidden',
     paddingHorizontal: scale(12),

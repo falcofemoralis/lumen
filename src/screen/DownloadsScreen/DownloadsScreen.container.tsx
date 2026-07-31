@@ -5,12 +5,13 @@ import {
   DownloadTask,
   getExistingDownloadTasks,
 } from '@kesha-antonov/react-native-background-downloader';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useConfigContext } from 'Context/ConfigContext';
 import { Directory, File } from 'expo-file-system';
 import * as IntentLauncher from 'expo-intent-launcher';
 import { t } from 'i18n/translate';
 import { PLAYER_SCREEN } from 'Navigation/navigationRoutes';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef } from 'react';
 import NotificationStore from 'Store/Notification.store';
 import RouterStore from 'Store/Router.store';
 import { DownloadFileInterface, DownloadFilmInterface } from 'Type/DownloadFile.interface';
@@ -19,15 +20,16 @@ import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { formatDestination, getDownloadsDir, TaskIdStorage } from 'Util/Download';
 import { navigate } from 'Util/Navigation';
+import { queryKeys } from 'Util/Query';
 
 import { DownloadsScreenComponent } from './DownloadsScreen.component';
 import { DownloadsScreenComponent as DownloadsScreenComponentTV } from './DownloadsScreen.component.atv';
 
 export const DownloadsScreenContainer = () => {
   const { isTV, downloadsPath } = useConfigContext();
-  const [downloadedFilms, setDownloadedFilms] = useState<DownloadFilmInterface[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
   const completeTimeoutRef = useRef<number | null>(null);
+  const downloadsQueryKey = queryKeys.downloads(downloadsPath);
 
   const readStorage = useCallback((): DownloadFileInterface[] => {
     try {
@@ -240,32 +242,39 @@ export const DownloadsScreenContainer = () => {
     return mappedFilmFiles;
   }, []);
 
-  const scanFiles = useCallback(async () => {
-    setIsLoading(true);
+  const { data: downloadedFilms = [], isLoading, refetch: scanFiles } = useQuery({
+    queryKey: downloadsQueryKey,
+    queryFn: async () => {
+      const files = readStorage();
+      const tasks = await readExistingTasks();
 
-    const files = readStorage();
-    const tasks = await readExistingTasks();
+      const merged = [...files];
+      tasks.forEach(file => {
+        const existingIndex = merged.findIndex(f => f.id === file.id);
+        if (existingIndex !== -1) {
+          merged[existingIndex] = {
+            ...merged[existingIndex],
+            ...file,
+          };
+        } else {
+          merged.push(file);
+        }
+      });
 
-    const merged = [...files];
-    tasks.forEach(file => {
-      const existingIndex = merged.findIndex(f => f.id === file.id);
-      if (existingIndex !== -1) {
-        merged[existingIndex] = {
-          ...merged[existingIndex],
-          ...file,
-        };
-      } else {
-        merged.push(file);
-      }
-    });
+      return groupDownloadedFiles(merged);
+    },
+  });
 
-    setDownloadedFilms(groupDownloadedFiles(merged));
-    setIsLoading(false);
-  }, [readExistingTasks, readStorage, groupDownloadedFiles]);
-
-  useEffect(() => {
-    scanFiles();
-  }, [scanFiles]);
+  /** Patches the cached list after a task's own state changed, without a full rescan */
+  const updateDownloadedFilms = useCallback(
+    (updater: (films: DownloadFilmInterface[]) => DownloadFilmInterface[]) => {
+      queryClient.setQueryData<DownloadFilmInterface[]>(
+        queryKeys.downloads(downloadsPath),
+        (prev) => (prev ? updater(prev) : prev)
+      );
+    },
+    [queryClient, downloadsPath]
+  );
 
   const handleVideoSelect = useCallback((film: FilmInterface, video: FilmVideoInterface, voice: FilmVoiceInterface, quality?: string) => {
     RouterStore.pushData(PLAYER_SCREEN, {
@@ -320,11 +329,11 @@ export const DownloadsScreenContainer = () => {
       await task.pause();
     }
 
-    setDownloadedFilms(prev => prev.map(film => ({
+    updateDownloadedFilms(prev => prev.map(film => ({
       ...film,
       tasks: film.tasks.map(ft => ft.id === taskId ? task : ft),
     })));
-  }, [downloadedFilms]);
+  }, [downloadedFilms, updateDownloadedFilms]);
 
   const restartTask = useCallback((task: DownloadTask) => {
     const destination = getFileDestination(task);
@@ -360,7 +369,7 @@ export const DownloadsScreenContainer = () => {
 
       newTask.start();
 
-      setDownloadedFilms(prev => prev.map(film => ({
+      updateDownloadedFilms(prev => prev.map(film => ({
         ...film,
         tasks: film.tasks.map(ft => ft.id === task.id ? newTask : ft),
       })));
@@ -371,7 +380,7 @@ export const DownloadsScreenContainer = () => {
 
       return null;
     }
-  }, [getFileDestination]);
+  }, [getFileDestination, updateDownloadedFilms]);
 
   const deleteTask = useCallback(async (task: DownloadTask, isRefresh: boolean = true) => {
     const destination = getFileDestination(task);

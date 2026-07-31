@@ -12,8 +12,8 @@ import { FilmCardComponentProps } from './FilmCard.type';
 export function FilmCardComponent({
   filmCard,
   style,
-  stylePoster,
   isFocused = false,
+  disableScaleAnimation,
 }: FilmCardComponentProps) {
   const {
     type,
@@ -57,8 +57,6 @@ export function FilmCardComponent({
     <ThemedImage
       style={ [
         styles.poster,
-        stylePoster,
-        isFocused && styles.posterFocused,
         isPendingRelease && styles.posterPendingRelease,
       ] }
       src={ poster }
@@ -97,7 +95,7 @@ export function FilmCardComponent({
     <Animated.View
       style={ [
         styles.card,
-        isFocused && styles.cardFocused,
+        isFocused && !disableScaleAnimation && styles.cardFocused,
         style,
       ] }
     >

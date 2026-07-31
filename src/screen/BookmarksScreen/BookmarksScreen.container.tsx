@@ -1,15 +1,15 @@
-import { pagerItemsReset, pagerItemsUpdater } from 'Component/FilmPager/FilmPager.config';
+import { useQuery } from '@tanstack/react-query';
 import { PagerItemInterface } from 'Component/FilmPager/FilmPager.type';
+import { useFilmPager } from 'Component/FilmPager/useFilmPager';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useConfigContext } from 'Context/ConfigContext';
-import { useNetworkContext } from 'Context/NetworkContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useLocalBookmarks } from 'Hooks/useLocalLibrary';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import NotificationStore from 'Store/Notification.store';
+import { useCallback, useMemo, useRef } from 'react';
 import { LocalBookmarksBlob } from 'Type/LocalLibrary.interface';
 import { MenuItemInterface } from 'Type/MenuItem.interface';
-import { getLocalBookmarks, getLocalFilmsForCategory } from 'Util/LocalLibrary';
+import { getLocalFilmsForCategory } from 'Util/LocalLibrary';
+import { queryKeys } from 'Util/Query';
 
 import BookmarksScreenComponent from './BookmarksScreen.component';
 import BookmarksScreenComponentTV from './BookmarksScreen.component.atv';
@@ -31,97 +31,58 @@ const buildLocalPagerItems = (blob: LocalBookmarksBlob): PagerItemInterface[] =>
 
 export function BookmarksScreenContainer() {
   const { isTV, isLocalLibrary } = useConfigContext();
-  const [isLoading, setIsLoading] = useState(true);
-  const [pagerItems, setPagerItems] = useState<PagerItemInterface[]>([]);
-  const { handleConnectionError } = useNetworkContext();
+  const { isSignedIn, currentService } = useServiceContext();
   const localBookmarks = useLocalBookmarks();
   const manageCategoriesOverlayRef = useRef<ThemedOverlayRef | null>(null);
 
-  const { isSignedIn, currentService } = useServiceContext();
+  const {
+    data: bookmarks,
+    isLoading: isBookmarksLoading,
+  } = useQuery({
+    queryKey: queryKeys.bookmarks(),
+    queryFn: () => currentService.getBookmarks(),
+    enabled: isSignedIn && !isLocalLibrary,
+  });
 
-  const loadBookmarks = async () => {
-    setIsLoading(true);
+  const menuItems = useMemo(
+    () => (bookmarks ?? []).map(({ id, title }) => ({ id, title, path: '' })),
+    [bookmarks]
+  );
 
-    try {
-      const items = await currentService.getBookmarks();
+  const getInitialFilms = useCallback(
+    (menuItem: MenuItemInterface) => bookmarks?.find(({ id }) => id === menuItem.id)?.filmList,
+    [bookmarks]
+  );
 
-      setPagerItems(items.reduce((acc, menuItem) => {
-        acc.push({
-          menuItem: {
-            ...menuItem,
-            path: '',
-          },
-          films: menuItem.filmList ? menuItem.filmList.films : null,
-          pagination: {
-            currentPage: 1,
-            totalPages: menuItem.filmList ? menuItem.filmList.totalPages : 1,
-          },
-        });
-
-        return acc;
-      }, [] as PagerItemInterface[]));
-    } catch (error) {
-      const handled = handleConnectionError(error as Error);
-
-      if (!handled) {
-        NotificationStore.displayError(error as Error);
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { pagerItems, onPreLoad, onNextLoad } = useFilmPager({
+    queryKey: queryKeys.films.bookmarks(),
+    menuItems,
+    fetchFilms: (menuItem, page) => currentService.getBookmarkedFilms({
+      id: menuItem.id,
+      title: menuItem.title,
+    }, page),
+    getInitialFilms,
+    enabled: !isLocalLibrary,
+  });
 
   // local items are purely derived, so FilmPager's paging round-trips can never
   // write duplicates back into them
-  const localPagerItems = useMemo(() => buildLocalPagerItems(localBookmarks), [localBookmarks]);
-
-  useEffect(() => {
-    if (isSignedIn && !isLocalLibrary) {
-      loadBookmarks();
-    }
-  }, [isSignedIn, isLocalLibrary]);
-
-  const onLoadFilms = async (
-    menuItem: MenuItemInterface,
-    currentPage: number,
-    isRefresh: boolean
-  ) => {
-    if (isLocalLibrary) {
-      return {
-        films: getLocalFilmsForCategory(getLocalBookmarks(), menuItem.id),
-        totalPages: 1,
-      };
-    }
-
-    if (isRefresh) {
-      setPagerItems(pagerItemsReset(menuItem.id));
-    }
-
-    return currentService.getBookmarkedFilms({
-      id: menuItem.id,
-      title: menuItem.title,
-    }, currentPage);
-  };
-
-  const onUpdateFilms = (key: string, item: PagerItemInterface) => {
-    if (isLocalLibrary) {
-      return;
-    }
-
-    setPagerItems(pagerItemsUpdater(key, item));
-  };
+  const localPagerItems = useMemo(
+    () => (isLocalLibrary ? buildLocalPagerItems(localBookmarks) : []),
+    [localBookmarks, isLocalLibrary]
+  );
 
   const openManageCategories = () => {
     manageCategoriesOverlayRef.current?.open();
   };
 
   const containerProps = {
-    isLoading: isLocalLibrary ? false : isLoading,
+    isLoading: isLocalLibrary ? false : !isSignedIn || isBookmarksLoading,
     pagerItems: isLocalLibrary ? localPagerItems : pagerItems,
     isLocalLibrary,
     manageCategoriesOverlayRef,
-    onLoadFilms,
-    onUpdateFilms,
+    onPreLoad,
+    onNextLoad,
     openManageCategories,
   };
 

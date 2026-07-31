@@ -7,13 +7,14 @@ import { ThemedButton } from 'Component/ThemedButton';
 import { ThemedDropdown } from 'Component/ThemedDropdown';
 import { ThemedInput } from 'Component/ThemedInput';
 import { ThemedOverlay } from 'Component/ThemedOverlay';
+import { ThemedScrollView } from 'Component/ThemedScrollView';
 import { ThemedText } from 'Component/ThemedText';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import { LayoutGrid, Mic, Search, Settings2 } from 'lucide-react-native';
-import { memo } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { View } from 'react-native';
-import { DefaultFocus, SpatialNavigationScrollView, SpatialNavigationView } from 'react-tv-space-navigation';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { useAppTheme } from 'Theme/context';
 import { ThemedStyles } from 'Theme/types';
 
@@ -51,40 +52,40 @@ const SearchHeader = memo(({
   );
 
   const renderSearchContainer = () => (
-    <DefaultFocus>
-      <SpatialNavigationView
-        style={ styles.searchContainer }
-        direction="horizontal"
-      >
-        <ThemedButton
-          style={ styles.actionBtn }
-          styleFocused={ recognizing && styles.speakActive }
-          IconComponent={ Mic }
-          onPress={ handleStartRecognition }
-          iconProps={ recognizing ? { color: theme.colors.iconOnContrast } : undefined }
-          withAnimation
-        />
-        <ThemedButton
-          style={ styles.actionBtn }
-          IconComponent={ Settings2 }
-          onPress={ openAdditionalContentOverlay }
-          withAnimation
-        />
-        { renderSearchBar() }
-        <ThemedButton
-          style={ styles.actionBtn }
-          IconComponent={ Search }
-          onPress={ handleApplySearch }
-          withAnimation
-        />
-        <ThemedButton
-          style={ styles.actionBtn }
-          IconComponent={ LayoutGrid }
-          onPress={ handleOpenCollections }
-          withAnimation
-        />
-      </SpatialNavigationView>
-    </DefaultFocus>
+    <View style={ styles.searchContainer }>
+      <ThemedButton
+        title=""
+        autofocus
+        style={ styles.actionBtn }
+        contentStyle={ styles.actionBtnContent }
+        styleFocused={ recognizing && styles.speakActive }
+        IconComponent={ Mic }
+        onPress={ handleStartRecognition }
+        iconProps={ recognizing ? { color: theme.colors.iconOnContrast } : undefined }
+      />
+      <ThemedButton
+        title=""
+        style={ styles.actionBtn }
+        contentStyle={ styles.actionBtnContent }
+        IconComponent={ Settings2 }
+        onPress={ openAdditionalContentOverlay }
+      />
+      { renderSearchBar() }
+      <ThemedButton
+        title=""
+        style={ styles.actionBtn }
+        contentStyle={ styles.actionBtnContent }
+        IconComponent={ Search }
+        onPress={ handleApplySearch }
+      />
+      <ThemedButton
+        title=""
+        style={ styles.actionBtn }
+        contentStyle={ styles.actionBtnContent }
+        IconComponent={ LayoutGrid }
+        onPress={ handleOpenCollections }
+      />
+    </View>
   );
 
   const renderSuggestions = () => {
@@ -96,25 +97,17 @@ const SearchHeader = memo(({
       <View
         style={ styles.suggestionsWrapper }
       >
-        <SpatialNavigationScrollView
-          horizontal
-          offsetFromStart={ 20 }
-        >
-          <SpatialNavigationView
-            direction="horizontal"
-            style={ styles.suggestions }
-          >
-            { suggestions.map((item) => (
-              <ThemedButton
-                key={ item }
-                onPress={ () => onApplySuggestion(item) }
-                onLongPress={ () => handleRemoveSuggestion(item) }
-              >
-                { item }
-              </ThemedButton>
-            )) }
-          </SpatialNavigationView>
-        </SpatialNavigationScrollView>
+        <ThemedScrollView horizontal style={ styles.suggestions }>
+          { suggestions.map((item) => (
+            <ThemedButton
+              key={ item }
+              title={ item }
+              onPress={ () => onApplySuggestion(item) }
+              onLongPress={ () => handleRemoveSuggestion(item) }
+              style={ styles.suggestion }
+            />
+          )) }
+        </ThemedScrollView>
       </View>
     );
   };
@@ -132,6 +125,7 @@ export function SearchScreenComponent(props: SearchScreenComponentProps) {
   const {
     pagerItems,
     query,
+    suggestions,
     isLoading,
     additionalContentOverlayRef,
     categories,
@@ -140,14 +134,46 @@ export function SearchScreenComponent(props: SearchScreenComponentProps) {
     selectedYear,
     isCategoriesLoading,
     confirmationOverlayRef,
-    onLoadFilms,
-    onUpdateFilms,
+    onPreLoad,
+    onNextLoad,
     handleApplyAdditionalContent,
     setSelectedCategory,
     setSelectedGenre,
     setSelectedYear,
     removeSuggestion,
   } = props;
+
+  // The header is a sibling above the grid, collapsed out of the way once focus
+  // leaves the first row -- same treatment as the pager menu.
+  const [headerVisible, setHeaderVisible] = useState(true);
+  // Without a query there is no grid to scroll, so the header always stays up.
+  const headerExpanded = headerVisible || !query;
+  // Computed rather than measured: measuring from inside the collapsing wrapper
+  // reads back the collapsed height and feeds itself.
+  const headerHeight = styles.actionBtn.height + styles.container.marginBottom
+    + (suggestions.length ? styles.suggestionsWrapper.marginTop + styles.suggestionsWrapper.height : 0);
+  const headerCollapse = useSharedValue(1);
+  // Kept in a shared value so the style below only ever reads shared values: a
+  // plain closure value would be baked in when Reanimated first attaches the
+  // style and never refreshed on the UI thread.
+  const headerHeightAnim = useSharedValue(headerHeight);
+
+  useEffect(() => {
+    headerHeightAnim.value = headerHeight;
+  }, [headerHeight, headerHeightAnim]);
+
+  useEffect(() => {
+    headerCollapse.value = withTiming(headerExpanded ? 1 : 0, { duration: 200 });
+  }, [headerExpanded, headerCollapse]);
+
+  const headerAnimatedStyle = useAnimatedStyle(() => ({
+    height: headerHeightAnim.value * headerCollapse.value,
+    opacity: headerCollapse.value,
+  }));
+
+  const handleAtTopChange = useCallback((atTop: boolean) => {
+    setHeaderVisible(atTop);
+  }, []);
 
   const renderEmptyBlock = () => (
     <View style={ styles.noResults }>
@@ -159,10 +185,12 @@ export function SearchScreenComponent(props: SearchScreenComponentProps) {
   );
 
   const renderSearchHeader = () => (
-    <SearchHeader
-      { ...props }
-      styles={ styles }
-    />
+    <Animated.View style={ [styles.headerCollapse, headerAnimatedStyle] }>
+      <SearchHeader
+        { ...props }
+        styles={ styles }
+      />
+    </Animated.View>
   );
 
   const renderCategories = () => {
@@ -179,7 +207,7 @@ export function SearchScreenComponent(props: SearchScreenComponentProps) {
     }
 
     return (
-      <SpatialNavigationView direction='vertical'>
+      <View>
         <View style={ styles.categories }>
           <ThemedText>
             { t('Choose format') }
@@ -226,16 +254,14 @@ export function SearchScreenComponent(props: SearchScreenComponentProps) {
             onChange={ (item) => setSelectedYear(item.value) }
             closeOnChange
           />
-          <DefaultFocus>
-            <ThemedButton
-              style={ styles.categoriesSelectBtn }
-              onPress={ handleApplyAdditionalContent }
-            >
-              { t('Lets search!') }
-            </ThemedButton>
-          </DefaultFocus>
+          <ThemedButton
+            title={ t('Lets search!') }
+            autofocus
+            style={ styles.categoriesSelectBtn }
+            onPress={ handleApplyAdditionalContent }
+          />
         </View>
-      </SpatialNavigationView>
+      </View>
     );
   };
 
@@ -266,14 +292,15 @@ export function SearchScreenComponent(props: SearchScreenComponentProps) {
     <Page>
       { renderCategoriesModal() }
       { renderConfirmationModal() }
+      { renderSearchHeader() }
       <FilmPager
-        items={ pagerItems }
-        onLoadFilms={ onLoadFilms }
-        onUpdateFilms={ onUpdateFilms }
-        isGridVisible={ !!query }
-        isEmpty={ !isLoading && !pagerItems[0].films?.length }
-        ListHeaderComponent={ renderSearchHeader() }
+        pagerItems={ pagerItems }
+        onPreLoad={ onPreLoad }
+        onNextLoad={ onNextLoad }
+        hideGrid={ !query }
+        isEmpty={ ! !isLoading && !pagerItems[0].films?.length }
         ListEmptyComponent={ renderEmptyBlock() }
+        onAtTopChange={ handleAtTopChange }
       />
     </Page>
   );

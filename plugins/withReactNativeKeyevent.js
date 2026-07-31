@@ -125,6 +125,21 @@ var withAndroidMainActivityBody = function (config) {
             '    KeyEventModule.getInstance().onKeyMultipleEvent(keyCode, repeatCount, event)',
             '    return super.onKeyMultiple(keyCode, repeatCount, event)',
             '}',
+            'override fun dispatchKeyEvent(event: KeyEvent): Boolean {',
+            '    val keyCode = event.keyCode',
+            '    if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_ENTER) {',
+            '        try {',
+            '            when (event.action) {',
+            '            KeyEvent.ACTION_DOWN -> KeyEventModule.getInstance().onKeyDownEvent(keyCode, event)',
+            '            KeyEvent.ACTION_UP -> KeyEventModule.getInstance().onKeyUpEvent(keyCode, event)',
+            '            }',
+            '        } catch (e: Exception) {',
+            '            e.printStackTrace()',
+            '        }',
+            '        return true',
+            '    }',
+            '    return super.dispatchKeyEvent(event)',
+            '}'
         ];
         var newConfig = (0, generateCode_1.mergeContents)({
             tag: 'react-native-keyevent-body',

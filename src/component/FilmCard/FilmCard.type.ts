@@ -3,19 +3,10 @@ import { FilmCardInterface } from 'Type/FilmCard.interface';
 
 export interface FilmCardContainerProps {
   filmCard: FilmCardInterface;
-  isFocused?: boolean;
   style?: StyleProp<ViewStyle>;
-  stylePoster?: StyleProp<ViewStyle>;
+  // TV related
+  isFocused?: boolean;
+  disableScaleAnimation?: boolean;
 }
 
-export interface FilmCardComponentProps {
-  filmCard: FilmCardInterface;
-  isFocused?: boolean;
-  style?: StyleProp<ViewStyle>;
-  stylePoster?: StyleProp<ViewStyle>;
-}
-
-export interface FilmCardDimensions {
-  height: number;
-  width: number;
-}
+export type FilmCardComponentProps = FilmCardContainerProps;

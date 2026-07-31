@@ -18,6 +18,7 @@ export const HeaderComponent = ({
   additionalAction,
   AdditionalActionIcon,
   isDeepLink = false,
+  onBack,
 }: HeaderComponentProps) => {
   const navigation = useNavigation<NativeStackNavigationProp<AppStackParamList>>();
   const { scale, theme } = useAppTheme();
@@ -31,7 +32,9 @@ export const HeaderComponent = ({
             style={ styles.topActionsButton }
             contentStyle={ styles.topActionsButtonContent }
             onPress={ () => {
-              if (isDeepLink) {
+              if (onBack) {
+                onBack();
+              } else if (isDeepLink) {
                 navigation.reset({
                   index: 0,
                   routes: [{ name: 'Tabs', params: { screen: 'Home-tab' } }],

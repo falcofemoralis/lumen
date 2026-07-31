@@ -9,7 +9,7 @@ export interface AccordionGroupInterface<T> {
 
 export interface ThemedAccordionContainerProps<T> {
   data: AccordionGroupInterface<T>[];
-  overlayContent?: ViewStyle;
+  overlayContentStyle?: ViewStyle;
   renderItem: (item: T, idx: number) => ReactNode;
 }
 

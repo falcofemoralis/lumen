@@ -1,101 +1,132 @@
-/* eslint-disable max-len */
+import { FlashList } from '@shopify/flash-list';
 import { FilmCard } from 'Component/FilmCard';
 import { FilmCardThumbnail } from 'Component/FilmCard/FilmCard.thumbnail';
-import { useFilmCardDimensions } from 'Component/FilmCard/useFilmCardDimensions';
-import { ThemedGrid } from 'Component/ThemedGrid';
-import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
-import { useThemedStyles } from 'Hooks/useThemedStyles';
-import { useCallback, useMemo } from 'react';
-import { Pressable, View } from 'react-native';
+import { memo, useCallback, useMemo } from 'react';
+import { Pressable, RefreshControl, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from 'Theme/context';
-import { calculateRows } from 'Util/List';
+import { FilmType } from 'Type/FilmType.type';
 
 import { THUMBNAILS_ROWS } from './FilmGrid.config';
-import { componentStyles, ROW_GAP } from './FilmGrid.style';
-import {
-  FilmGridComponentProps,
-  FilmGridRowType,
-} from './FilmGrid.type';
+import { ROW_GAP } from './FilmGrid.style';
+import { FilmGridComponentProps, FilmGridItemProps, FilmGridRowItem } from './FilmGrid.type';
+
+function FilmGridItem({
+  item,
+  handleOnPress,
+}: FilmGridItemProps) {
+  const { scale } = useAppTheme();
+
+  const style = useMemo(() => ({
+    marginHorizontal: scale(ROW_GAP) / 2,
+  }), [scale]);
+
+  if (item.isPlaceholder) {
+    return (
+      <View style={ style }>
+        <FilmCardThumbnail />
+      </View>
+    );
+  }
+
+  return (
+    <Pressable
+      style={ style }
+      onPress={ () => handleOnPress(item) }
+    >
+      <FilmCard filmCard={ item } />
+    </Pressable>
+  );
+}
+
+const MemoizedGridItem = memo(FilmGridItem);
 
 export function FilmGridComponent({
   films,
-  numberOfColumns,
-  isAddSafeArea = true,
+  disableEmptyComponent,
   isEmpty,
+  hideGrid,
+  numberOfColumns,
+  disableStatusbarSafeArea,
+  isRefreshing,
   ListEmptyComponent,
   handleOnPress,
-  onNextLoad,
+  handleScrollEnd,
+  handleRefresh,
 }: FilmGridComponentProps) {
   const { scale } = useAppTheme();
-  const styles = useThemedStyles(componentStyles);
-  const { width, height } = useFilmCardDimensions(numberOfColumns, scale(ROW_GAP));
   const { top } = useSafeAreaInsets();
 
-  const renderItem = useCallback(
-    ({ item: row }: ThemedGridRowProps<FilmGridRowType>) => {
-      const { items } = row;
+  const renderItem = useCallback(({ item, index }: { item: FilmGridRowItem, index: number }) => (
+    <MemoizedGridItem
+      index={ index }
+      item={ item }
+      handleOnPress={ handleOnPress }
+    />
+  ), [handleOnPress]);
 
-      if (row.isPlaceholder) {
-        return (
-          <View style={ styles.gridRow }>
-            { items.map((item) => (
-              <FilmCardThumbnail key={ item.id } width={ width } />
-            )) }
-          </View>
-        );
-      }
+  const filmsData = useMemo(() => {
+    if (isEmpty || hideGrid) {
+      return [];
+    }
 
-      return (
-        <View style={ styles.gridRow }>
-          { items.map((item) => (
-            <Pressable
-              key={ item.id }
-              style={ { width } }
-              onPress={ () => handleOnPress(item) }
-            >
-              <FilmCard filmCard={ item } />
-            </Pressable>
-          )) }
-        </View>
-      );
-    },
-    [width, handleOnPress, styles]
-  );
-
-  const data = useMemo(() => {
     if (!films.length) {
-      // an empty loaded list renders ListEmptyComponent instead of loading placeholders
-      if (isEmpty) {
-        return [];
-      }
-
-      return calculateRows(
-        new Array(numberOfColumns * THUMBNAILS_ROWS).fill(null).map((_, index) => ({ id: `film-placeholder-${index}` })),
-        numberOfColumns
-      ).map((items) => ({
-        id: items[0].id,
-        items,
+      return new Array(numberOfColumns * THUMBNAILS_ROWS).fill(null).map((_, index) => ({
+        id: `film-placeholder-${index}`,
+        link: '',
+        type: FilmType.FILM,
+        poster: '',
+        title: '',
+        subtitle: '',
         isPlaceholder: true,
       }));
     }
 
-    return calculateRows(
-      films,
-      numberOfColumns
-    ).map((items) => ({ id: items[0].id, items, width })); // width is required to make array unique with different width value
-  }, [films, width, numberOfColumns, isEmpty]); // width is required to recalculate rows after orientation change
+    return films;
+  }, [isEmpty, hideGrid, films, numberOfColumns]);
+
+  const contentContainerStyle = useMemo(() => ({
+    padding: scale(ROW_GAP) / 2,
+  }), [scale]);
+
+  const ItemSeparator = useCallback(() => (
+    <View style={ { height: scale(ROW_GAP) } } />
+  ), [scale]);
+
+  const keyExtractor = useCallback((item: FilmGridRowItem) => item.id, []);
+
+  const getItemType = useCallback(
+    (item: FilmGridRowItem) => (item.isPlaceholder ? 'placeholder' : 'film'),
+    []
+  );
+
+  const ListHeaderComponent = useMemo(() => (
+    disableStatusbarSafeArea ? null : <View style={ { height: top } } />
+  ), [disableStatusbarSafeArea, top]);
+
+  const refreshControl = useMemo(() => (
+    <RefreshControl
+      refreshing={ isRefreshing }
+      onRefresh={ handleRefresh }
+    />
+  ), [isRefreshing, handleRefresh]);
 
   return (
-    <ThemedGrid
-      data={ data }
-      numberOfColumns={ 1 }
-      itemSize={ height }
+    <FlashList
+      data={ filmsData }
       renderItem={ renderItem }
-      onNextLoad={ onNextLoad }
-      style={ styles.grid }
-      ListHeaderComponent={ isAddSafeArea ? <View style={ { height: top } } /> : null }
-      ListEmptyComponent={ ListEmptyComponent }
+      keyExtractor={ keyExtractor }
+      getItemType={ getItemType }
+      onEndReached={ handleScrollEnd }
+      onEndReachedThreshold={ 0.25 }
+      numColumns={ numberOfColumns }
+      contentContainerStyle={ contentContainerStyle }
+      ItemSeparatorComponent={ ItemSeparator }
+      ListHeaderComponent={ ListHeaderComponent }
+      ListEmptyComponent={ disableEmptyComponent || hideGrid ? undefined : ListEmptyComponent }
+      refreshControl={ refreshControl }
+      showsVerticalScrollIndicator={ false }
+      removeClippedSubviews={ true }
     />
   );
 }

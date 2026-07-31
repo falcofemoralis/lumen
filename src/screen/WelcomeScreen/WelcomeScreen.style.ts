@@ -13,7 +13,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     height: '100%',
     flexDirection: 'column',
     justifyContent: 'center',
-    gap: scale(24),
+    gap: scale(16),
   },
   containerLandscape: {
     alignSelf: 'center',
@@ -38,8 +38,6 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     borderRadius: scale(99),
     height: scale(54),
     width: scale(54),
-  },
-  icon: {
   },
   customImage: {
     height: scale(54),
@@ -79,21 +77,14 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     textAlign: 'center',
   },
   nextButton: {
-    flex: 1,
-  },
-  nextButtonPressable: {
     borderRadius: scale(16),
   },
   nextButtonContent: {
     flex: 1,
-    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     padding: scale(12),
     backgroundColor: colors.button,
-  },
-  nextButtonLandscape: {
-    maxWidth: '50%',
   },
   prevButtonContainer: {
     flexDirection: 'row',
@@ -111,13 +102,10 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   },
   configureWrapper: {
     alignSelf: 'center',
-    marginTop: scale(16),
-    gap: scale(12),
+    gap: scale(8),
     width: '80%',
   },
   configureButton: {
-  },
-  configureButtonPressable: {
     borderRadius: scale(16),
     height: scale(86),
   },
@@ -196,16 +184,14 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   providerOffModeRow: {
     width: '100%',
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    gap: scale(8),
   },
   cdnWrapper: {
     alignSelf: 'center',
     marginTop: scale(16),
     gap: scale(12),
     width: '80%',
-  },
-  cdnSlide: {
   },
   cdnSelector: {
     borderRadius: scale(16),

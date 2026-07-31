@@ -1,7 +1,6 @@
 import {
   createContext,
   ReactNode,
-  useCallback,
   useContext,
   useMemo,
   useState,
@@ -10,43 +9,31 @@ import {
 interface NavigationContextInterface {
   isMenuOpen: boolean;
   toggleMenu:(isOpen: boolean) => void
-  isNavigationLocked: boolean;
-  lockNavigation: () => void;
-  unlockNavigation: () => void;
+  isSceneHidden: boolean;
+  hideScene: (isHidden: boolean) => void;
 }
 
 const NavigationContext = createContext<NavigationContextInterface>({
   isMenuOpen: false,
   toggleMenu: () => {},
-  isNavigationLocked: false,
-  lockNavigation: () => {},
-  unlockNavigation: () => {},
+  isSceneHidden: false,
+  hideScene: () => {},
 });
 
 export const NavigationProvider = ({ children }: { children: ReactNode }) => {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
-  const [isNavigationLocked, setIsNavigationLocked] = useState<boolean>(false);
-
-  const lockNavigation = useCallback(() => {
-    setIsNavigationLocked(true);
-  }, []);
-
-  const unlockNavigation = useCallback(() => {
-    setIsNavigationLocked(false);
-  }, []);
+  const [isSceneHidden, setIsSceneHidden] = useState<boolean>(false);
 
   const value = useMemo(() => ({
     isMenuOpen,
     toggleMenu: setIsMenuOpen,
-    isNavigationLocked,
-    lockNavigation,
-    unlockNavigation,
+    isSceneHidden,
+    hideScene: setIsSceneHidden,
   }), [
     isMenuOpen,
     setIsMenuOpen,
-    isNavigationLocked,
-    lockNavigation,
-    unlockNavigation,
+    isSceneHidden,
+    setIsSceneHidden,
   ]);
 
   return (

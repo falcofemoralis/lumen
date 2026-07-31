@@ -1,8 +1,10 @@
 import { FilmPager } from 'Component/FilmPager';
 import { InfoBlock } from 'Component/InfoBlock';
 import { LocalCategoriesOverlay } from 'Component/LocalCategoriesOverlay';
+import { LoginForm } from 'Component/LoginForm';
 import { Page } from 'Component/Page';
 import { ThemedButton } from 'Component/ThemedButton';
+import { useServiceContext } from 'Context/ServiceContext';
 import { t } from 'i18n/translate';
 import { FolderCog } from 'lucide-react-native';
 import { View } from 'react-native';
@@ -15,15 +17,15 @@ import { BookmarksScreenComponentProps } from './BookmarksScreen.type';
 
 export function BookmarksScreenComponent({
   isLoading,
-  pagerItems,
   isLocalLibrary,
   manageCategoriesOverlayRef,
-  onLoadFilms,
-  onUpdateFilms,
   openManageCategories,
+  pagerItems,
+  ...pagerHandlers
 }: BookmarksScreenComponentProps) {
   const { top } = useSafeAreaInsets();
   const { scale, theme } = useAppTheme();
+  const { isSignedIn } = useServiceContext();
 
   const renderEmptyCategory = () => (
     <View style={ styles.emptyCategory }>
@@ -35,6 +37,10 @@ export function BookmarksScreenComponent({
   );
 
   const renderContent = () => {
+    if (!isSignedIn && !isLocalLibrary) {
+      return <LoginForm />;
+    }
+
     if (isLoading) {
       return <BookmarksScreenThumbnail />;
     }
@@ -50,15 +56,14 @@ export function BookmarksScreenComponent({
           />
           { isLocalLibrary && (
             <ThemedButton
+              title={ t('Manage categories') }
               IconComponent={ FolderCog }
               iconProps={ {
                 size: scale(18),
                 color: theme.colors.text,
               } }
               onPress={ openManageCategories }
-            >
-              { t('Manage categories') }
-            </ThemedButton>
+            />
           ) }
         </View>
       );
@@ -81,10 +86,8 @@ export function BookmarksScreenComponent({
           </View>
         ) }
         <FilmPager
-          items={ pagerItems }
-          onLoadFilms={ onLoadFilms }
-          onUpdateFilms={ onUpdateFilms }
-          isAddSafeArea={ !isLocalLibrary }
+          { ...pagerHandlers }
+          pagerItems={ pagerItems }
           isEmpty={ isLocalLibrary }
           ListEmptyComponent={ renderEmptyCategory() }
         />

@@ -4,7 +4,6 @@ import { ThemedText } from 'Component/ThemedText';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import { ScrollView, View } from 'react-native';
-import { DefaultFocus, SpatialNavigationRoot } from 'react-tv-space-navigation';
 
 import { componentStyles } from './ErrorBoundary.style';
 import { ErrorDetailsProps } from './ErrorBoundary.type';
@@ -22,43 +21,39 @@ export function ErrorDetails({
   const styles = useThemedStyles(componentStyles);
 
   return (
-    <SpatialNavigationRoot>
-      <ThemedSafeArea style={ styles.container }>
-        <View style={ styles.content }>
-          <ThemedText style={ styles.title }>
-            { t('Oops!') }
-          </ThemedText>
-          <ThemedText style={ styles.subtitle }>
-            { t('Something went wrong') }
-          </ThemedText>
-          <ThemedText style={ styles.error }>
-            { error.toString().trim() }
-          </ThemedText>
-          <ScrollView
-            style={ styles.scroll }
-            contentContainerStyle={ styles.scrollContent }
-            tvFocusable={ false }
-            focusable={ false }
-          >
-            { errorInfo && (
-              <ThemedText
-                selectable
-                style={ styles.errorBacktrace }
-              >
-                { (errorInfo?.componentStack ?? '').trim() }
-              </ThemedText>
-            ) }
-          </ScrollView>
-          <DefaultFocus>
-            <ThemedButton
-              style={ styles.button }
-              onPress={ onReset }
+    <ThemedSafeArea style={ styles.container }>
+      <View style={ styles.content }>
+        <ThemedText style={ styles.title }>
+          { t('Oops!') }
+        </ThemedText>
+        <ThemedText style={ styles.subtitle }>
+          { t('Something went wrong') }
+        </ThemedText>
+        <ThemedText style={ styles.error }>
+          { error.toString().trim() }
+        </ThemedText>
+        <ScrollView
+          style={ styles.scroll }
+          contentContainerStyle={ styles.scrollContent }
+          tvFocusable={ false }
+          focusable={ false }
+        >
+          { errorInfo && (
+            <ThemedText
+              selectable
+              style={ styles.errorBacktrace }
             >
-              { t('Try again') }
-            </ThemedButton>
-          </DefaultFocus>
-        </View>
-      </ThemedSafeArea>
-    </SpatialNavigationRoot>
+              { (errorInfo?.componentStack ?? '').trim() }
+            </ThemedText>
+          ) }
+        </ScrollView>
+        <ThemedButton
+          title={ t('Try again') }
+          style={ styles.button }
+          onPress={ onReset }
+          autofocus
+        />
+      </View>
+    </ThemedSafeArea>
   );
 }

@@ -1,12 +1,13 @@
 import { FilmPager } from 'Component/FilmPager';
 import { InfoBlock } from 'Component/InfoBlock';
 import { LocalCategoriesOverlay } from 'Component/LocalCategoriesOverlay';
+import { LoginForm } from 'Component/LoginForm';
 import { Page } from 'Component/Page';
 import { ThemedButton } from 'Component/ThemedButton';
+import { useServiceContext } from 'Context/ServiceContext';
 import { t } from 'i18n/translate';
 import { FolderCog } from 'lucide-react-native';
 import { View } from 'react-native';
-import { DefaultFocus } from 'react-tv-space-navigation';
 import { useAppTheme } from 'Theme/context';
 
 import { styles } from './BookmarksScreen.style.atv';
@@ -15,26 +16,25 @@ import { BookmarksScreenComponentProps } from './BookmarksScreen.type';
 
 export function BookmarksScreenComponent({
   isLoading,
-  pagerItems,
   isLocalLibrary,
   manageCategoriesOverlayRef,
-  onLoadFilms,
-  onUpdateFilms,
   openManageCategories,
+  pagerItems,
+  ...pagerHandlers
 }: BookmarksScreenComponentProps) {
   const { scale } = useAppTheme();
+  const { isSignedIn } = useServiceContext();
 
-  const renderManageButton = () => (
+  const renderManageButton = (autofocus = false) => (
     <ThemedButton
+      title={ t('Manage categories') }
+      autofocus={ autofocus }
       IconComponent={ FolderCog }
       iconProps={ {
         size: scale(18),
       } }
       onPress={ openManageCategories }
-      withAnimation
-    >
-      { t('Manage categories') }
-    </ThemedButton>
+    />
   );
 
   const renderEmptyCategory = () => (
@@ -47,6 +47,10 @@ export function BookmarksScreenComponent({
   );
 
   const renderContent = () => {
+    if (!isSignedIn && !isLocalLibrary) {
+      return <LoginForm autofocus />;
+    }
+
     if (isLoading) {
       return <BookmarksScreenThumbnail />;
     }
@@ -60,11 +64,7 @@ export function BookmarksScreenComponent({
               ? t('Create a category to start bookmarking')
               : t('Go to site and create bookmarks group') }
           />
-          { isLocalLibrary && (
-            <DefaultFocus>
-              { renderManageButton() }
-            </DefaultFocus>
-          ) }
+          { isLocalLibrary && renderManageButton(true) }
         </View>
       );
     }
@@ -77,12 +77,11 @@ export function BookmarksScreenComponent({
           </View>
         ) }
         <FilmPager
-          items={ pagerItems }
-          onLoadFilms={ onLoadFilms }
-          onUpdateFilms={ onUpdateFilms }
-          menuDefaultFocus
+          { ...pagerHandlers }
+          pagerItems={ pagerItems }
           isEmpty={ isLocalLibrary }
           ListEmptyComponent={ renderEmptyCategory() }
+          menuDefaultFocus
         />
       </View>
     );

@@ -1,6 +1,5 @@
 import { Loader } from 'Component/Loader';
 import { ThemedBottomSheet } from 'Component/ThemedBottomSheet';
-import { Portal } from 'Component/ThemedPortal';
 import { ThemedPressable } from 'Component/ThemedPressable';
 import { ThemedText } from 'Component/ThemedText';
 import { Wrapper } from 'Component/Wrapper';
@@ -147,26 +146,21 @@ export const AppUpdaterComponent = ({
   };
 
   return (
-    <View>
-      <Portal.Host>
-        <ThemedBottomSheet
-          ref={ bottomSheetRef }
-          detents={ ['auto'] }
-          backgroundColor={ theme.colors.background }
-        >
-          <GestureHandlerRootView style={ { flexGrow: 1 } }>
-            { renderLoader() }
-            <View style={ isLoading && styles.loadingContainer }>
-              <Wrapper style={ styles.wrapper }>
-                { renderHeader() }
-                { renderContent() }
-                { renderActions() }
-              </Wrapper>
-            </View>
-          </GestureHandlerRootView>
-        </ThemedBottomSheet>
-      </Portal.Host>
-    </View>
+    <ThemedBottomSheet
+      ref={ bottomSheetRef }
+      detents={ ['auto'] }
+    >
+      <GestureHandlerRootView style={ { flexGrow: 1 } }>
+        { renderLoader() }
+        <View style={ isLoading && styles.loadingContainer }>
+          <Wrapper style={ styles.wrapper }>
+            { renderHeader() }
+            { renderContent() }
+            { renderActions() }
+          </Wrapper>
+        </View>
+      </GestureHandlerRootView>
+    </ThemedBottomSheet>
   );
 };
 

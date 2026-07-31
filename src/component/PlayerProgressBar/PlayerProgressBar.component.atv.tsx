@@ -33,7 +33,7 @@ import { PlayerProgressBarComponentProps } from './PlayerProgressBar.type';
 export const PlayerProgressBarComponent = ({
   player,
   storyboardUrl,
-  thumbRef,
+  thumbFocusKey,
   hideActions,
   onFocus = noopFn,
   calculateCurrentTime,
@@ -239,8 +239,9 @@ export const PlayerProgressBarComponent = ({
   // Memoized thumb render to prevent unnecessary re-renders
   const renderThumb = useCallback(() => (
     <ThemedPressable
-      spatialRef={ thumbRef }
+      focusKey={ thumbFocusKey }
       onFocus={ onFocus }
+      autofocus
     >
       { ({ isFocused }) => (
         <View
@@ -251,7 +252,7 @@ export const PlayerProgressBarComponent = ({
         />
       ) }
     </ThemedPressable>
-  ), [thumbRef, onFocus, styles]);
+  ), [thumbFocusKey, onFocus, styles]);
 
   const renderStoryboard = () => {
     if (!storyboardUrl) {

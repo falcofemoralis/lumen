@@ -38,17 +38,27 @@ function SwitchInput(props: SwitchInputProps) {
   const styles = useThemedStyles(componentStyles);
 
   const animate = useRef(new Animated.Value(on ? 1 : 0)); // Initial value is set based on isActive
-  const opacity = useRef(new Animated.Value(0));
+  const opacity = useRef(new Animated.Value(on ? 1 : 0));
+
+  // Both values already start at the current state, so the first pass has nothing
+  // to animate. Skipping it matters where a screen mounts a column of toggles at
+  // once (settings groups): otherwise every mount schedules two no-op 300ms
+  // animations.
+  const hasAnimatedRef = useRef(false);
 
   useEffect(() => {
+    if (!hasAnimatedRef.current) {
+      hasAnimatedRef.current = true;
+
+      return;
+    }
+
     Animated.timing(animate.current, {
       toValue: on ? 1 : 0,
       duration: 300,
       useNativeDriver: true, // Enable native driver for smoother animations
     }).start();
-  }, [on]);
 
-  useEffect(() => {
     Animated.timing(opacity.current, {
       toValue: on ? 1 : 0,
       duration: 300,

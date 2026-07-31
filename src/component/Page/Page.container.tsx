@@ -9,11 +9,15 @@ export function PageContainer(props: PageContainerProps) {
   const { checkConnection = true, ...restProps } = props;
   const { isTV } = useConfigContext();
   const { isInternetAvailable } = useNetworkContext();
+
   const isConnected = checkConnection ? isInternetAvailable : true;
 
-  return isTV
-    ? <PageComponentTV { ...restProps } isConnected={ isConnected } />
-    : <PageComponent { ...restProps } isConnected={ isConnected } />;
+  const containerProps = {
+    isConnected,
+    ...restProps,
+  };
+
+  return isTV ? <PageComponentTV { ...containerProps } /> : <PageComponent { ...containerProps } />;
 }
 
 export default PageContainer;

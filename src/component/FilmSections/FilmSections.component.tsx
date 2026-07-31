@@ -1,113 +1,144 @@
-import { LegendList } from '@legendapp/list';
+import { FlashList } from '@shopify/flash-list';
 import { FilmCard } from 'Component/FilmCard';
 import { FilmCardThumbnail } from 'Component/FilmCard/FilmCard.thumbnail';
-import { useFilmCardDimensions } from 'Component/FilmCard/useFilmCardDimensions';
 import { ThemedText } from 'Component/ThemedText';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
-import { memo, useCallback, useMemo } from 'react';
+import { memo, ReactElement, useCallback, useMemo } from 'react';
 import { Pressable, View } from 'react-native';
+import { useAppTheme } from 'Theme/context';
 import { ThemedStyles } from 'Theme/types';
 
-import { componentStyles } from './FilmSections.style';
+import { componentStyles, ROW_GAP } from './FilmSections.style';
 import {
+  FilmSectionsCardProps,
   FilmSectionsComponentProps,
+  FilmSectionsHeaderProps,
   FilmSectionsItem,
-  FilmSectionsRowProps,
+  FilmSectionsItemType,
 } from './FilmSections.type';
 
-const FilmSectionsRow = ({
-  index,
-  row,
-  itemSize,
+type Styles = ThemedStyles<typeof componentStyles>;
+
+const FilmSectionsHeader = ({
+  header,
+  styles,
+}: FilmSectionsHeaderProps & { styles: Styles }) => (
+  <View style={ styles.header }>
+    <ThemedText style={ styles.headerText }>
+      { header }
+    </ThemedText>
+  </View>
+);
+
+const FilmSectionsCard = ({
+  item,
   handleOnPress,
   styles,
-}: FilmSectionsRowProps & { styles: ThemedStyles<typeof componentStyles> }) => {
-  const { header, films = [], isPlaceholder } = row;
+}: FilmSectionsCardProps & { styles: Styles }) => {
+  const { isPlaceholder, film } = item;
+  const { scale } = useAppTheme();
 
-  const renderHeader = () => (
-    <View>
-      <ThemedText style={ styles.headerText }>
-        { header }
-      </ThemedText>
-    </View>
-  );
+  const style = useMemo(() => ({
+    marginHorizontal: scale(ROW_GAP) / 2,
+  }), [scale]);
 
   if (isPlaceholder) {
     return (
-      <View>
-        <View style={ styles.gridRow }>
-          { films.map((item, idx) => (
-            <FilmCardThumbnail
-              // eslint-disable-next-line react/no-array-index-key
-              key={ `${index}-${idx}-${item.id}` }
-              width={ itemSize || 0 }
-            />
-          )) }
-        </View>
-      </View>
+      <FilmCardThumbnail />
     );
   }
 
   return (
-    <View>
-      { header && renderHeader() }
-      <View style={ styles.gridRow }>
-        { films.map((item, idx) => (
-          <Pressable
-            // eslint-disable-next-line react/no-array-index-key
-            key={ `${index}-${idx}-${item.id}` }
-            style={ { width: itemSize } }
-            onPress={ () => handleOnPress(item) }
-          >
-            <FilmCard
-              filmCard={ item }
-            />
-          </Pressable>
-        )) }
-      </View>
-    </View>
+    <Pressable
+      onPress={ () => handleOnPress(film) }
+      style={ style }
+    >
+      <FilmCard
+        filmCard={ film }
+      />
+    </Pressable>
   );
 };
 
-const MemoizedFilmSectionsRow = memo(FilmSectionsRow);
+const MemoizedFilmSectionsHeader = memo(FilmSectionsHeader);
+const MemoizedFilmSectionsCard = memo(FilmSectionsCard);
 
 export function FilmSectionsComponent({
-  data: films,
+  data,
+  stickyHeaderIndices,
   children,
   handleOnPress,
 }: FilmSectionsComponentProps) {
   const styles = useThemedStyles(componentStyles);
+  const { scale } = useAppTheme();
   const { numberOfColumnsMobile } = useConfigContext();
-  const { width, height } = useFilmCardDimensions(numberOfColumnsMobile, styles.gridRow.gap);
 
-  const renderItem = useCallback(({ item: row, index }: {item: FilmSectionsItem, index: number}) => (
-    <MemoizedFilmSectionsRow
-      index={ index }
-      row={ row }
-      itemSize={ width }
-      numberOfColumns={ numberOfColumnsMobile }
-      handleOnPress={ handleOnPress }
-      styles={ styles }
-    />
-  ), [width, styles]);
+  const renderItem = useCallback(({ item }: { item: FilmSectionsItem }) => {
+    if (item.type === FilmSectionsItemType.HEADER) {
+      return (
+        <MemoizedFilmSectionsHeader
+          header={ item.header }
+          styles={ styles }
+        />
+      );
+    }
 
-  const data = useMemo(() => films.map(
-    (row) => ({
-      ...row,
-    })
-  ), [films]);
+    if (item.type !== FilmSectionsItemType.FILM) {
+      return null;
+    }
+
+    return (
+      <MemoizedFilmSectionsCard
+        item={ item }
+        handleOnPress={ handleOnPress }
+        styles={ styles }
+      />
+    );
+  }, [styles, handleOnPress]);
+
+  // Headers and cards differ wildly in height, so recycle them separately --
+  // and so do real cards and their loading placeholders.
+  const getItemType = useCallback((item: FilmSectionsItem) => {
+    if (item.type !== FilmSectionsItemType.FILM) {
+      return item.type;
+    }
+
+    return item.isPlaceholder ? 'placeholder' : FilmSectionsItemType.FILM;
+  }, []);
+
+  // Cards take one grid column; a header takes the whole width, which also
+  // pushes the next section onto a fresh row.
+  const overrideItemLayout = useCallback((
+    layout: { span?: number },
+    item: FilmSectionsItem
+  ) => {
+    layout.span = item.type === FilmSectionsItemType.HEADER ? numberOfColumnsMobile : 1;
+  }, [numberOfColumnsMobile]);
+
+  const keyExtractor = useCallback((item: FilmSectionsItem) => item.key, []);
+
+  const contentContainerStyle = useMemo(() => ({
+    paddingHorizontal: scale(ROW_GAP),
+  }), [scale]);
+
+  const ItemSeparator = useCallback(() => (
+    <View style={ { height: scale(ROW_GAP) } } />
+  ), [scale]);
 
   return (
-    <LegendList
+    <FlashList
       data={ data }
-      numColumns={ 1 }
-      estimatedItemSize={ height }
       renderItem={ renderItem }
-      keyExtractor={ (item) => `${item.index}-film-list-row` }
-      recycleItems
+      keyExtractor={ keyExtractor }
+      getItemType={ getItemType }
+      numColumns={ numberOfColumnsMobile }
+      overrideItemLayout={ overrideItemLayout }
+      ItemSeparatorComponent={ ItemSeparator }
+      stickyHeaderIndices={ stickyHeaderIndices }
+      ListHeaderComponent={ children as ReactElement }
+      contentContainerStyle={ contentContainerStyle }
       showsVerticalScrollIndicator={ false }
-      ListHeaderComponent={ children }
     />
   );
 }

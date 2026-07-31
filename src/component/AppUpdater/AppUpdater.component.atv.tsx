@@ -6,7 +6,6 @@ import * as Application from 'expo-application';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import { Image, ScrollView, View } from 'react-native';
-import { DefaultFocus, SpatialNavigationView } from 'react-tv-space-navigation';
 
 import { componentStyles } from './AppUpdater.style.atv';
 import { AppUpdaterComponentProps } from './AppUpdater.type';
@@ -57,35 +56,25 @@ export const AppUpdaterComponent = ({
   );
 
   const renderActions = () => (
-    <SpatialNavigationView
-      direction="horizontal"
-      style={ styles.actions }
-    >
-      <View style={ styles.buttonContainer }>
-        <ThemedButton
-          style={ [
-            styles.button,
-            styles.skipButton,
-          ] }
-          onPress={ rejectUpdate }
-        >
-          { t('Reject') }
-        </ThemedButton>
-      </View>
-      <DefaultFocus>
-        <View style={ styles.buttonContainer }>
-          <ThemedButton
-            style={ [
-              styles.button,
-              styles.updateButton,
-            ] }
-            onPress={ acceptUpdate }
-          >
-            { t('Update') }
-          </ThemedButton>
-        </View>
-      </DefaultFocus>
-    </SpatialNavigationView>
+    <View style={ styles.actions }>
+      <ThemedButton
+        title={ t('Update') }
+        autofocus
+        style={ [
+          styles.button,
+          styles.updateButton,
+        ] }
+        onPress={ acceptUpdate }
+      />
+      <ThemedButton
+        title={ t('Reject') }
+        style={ [
+          styles.button,
+          styles.skipButton,
+        ] }
+        onPress={ rejectUpdate }
+      />
+    </View>
   );
 
   const renderLoader = () => {

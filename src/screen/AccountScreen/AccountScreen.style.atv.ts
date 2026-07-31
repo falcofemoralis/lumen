@@ -11,6 +11,10 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   profile: {
     width: '100%',
   },
+  guestContent: {
+    width: '100%',
+    height: '100%',
+  },
   profileInfo: {
     width: '50%',
     flexDirection: 'column',
@@ -43,20 +47,30 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     fontSize: scale(text.lg.fontSize),
     textAlign: 'center',
   },
+  profileActionsContainer: {
+    height: '100%',
+  },
+  profileActionsContent: {
+    height: '100%',
+  },
   profileActions: {
     width: '70%',
+    height: '100%',
     gap: scale(12),
     paddingBlock: scale(6),
     paddingInline: scale(16),
+    justifyContent: 'center',
   },
   profileAction: {
+    borderRadius: scale(99),
   },
   profileActionContent: {
+    flex: 1,
+    gap: scale(8),
+    paddingHorizontal: scale(16),
+    paddingVertical: scale(12),
     justifyContent: 'flex-start',
     alignItems: 'center',
-    gap: scale(8),
-    paddingHorizontal: scale(12),
-    paddingVertical: scale(12),
   },
   profileActionText: {
     fontSize: scale(text.xs.fontSize),

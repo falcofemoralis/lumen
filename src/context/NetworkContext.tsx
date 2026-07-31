@@ -4,9 +4,11 @@ import {
   ReactNode,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
 } from 'react';
+import { setConnectionErrorHandler } from 'Util/Query';
 
 import { useConfigContext } from './ConfigContext';
 
@@ -48,6 +50,14 @@ export const NetworkProvider = ({ children }: { children: ReactNode }) => {
 
     return false;
   }, []);
+
+  // failed queries and mutations report through the query client, which lives outside
+  // React - give it a way back into the offline state
+  useEffect(() => {
+    setConnectionErrorHandler(handleConnectionError);
+
+    return () => setConnectionErrorHandler(null);
+  }, [handleConnectionError]);
 
   const value = useMemo(() => ({
     isInternetAvailable,

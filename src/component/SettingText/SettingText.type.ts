@@ -1,6 +1,5 @@
-import { SettingItem } from 'Screen/SettingsScreen/SettingsScreen.type';
+import { SettingCommonProps } from 'Component/SettingBase/SettingBase.type';
 
-export type SettingTextComponentProps = {
-  setting: SettingItem;
-  onUpdate: (setting: SettingItem, value: string) => Promise<boolean>;
+export type SettingTextComponentProps = SettingCommonProps & {
+  onPress?: () => Promise<void> | void;
 };

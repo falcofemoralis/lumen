@@ -100,7 +100,6 @@ class Storage {
   private playerStorage: StorageWrapper|null = null;
   private miscStorage: StorageWrapper|null = null;
   private downloadsStorage: StorageWrapper|null = null;
-  private patchStorage: StorageWrapper|null = null;
   private localLibraryStorage: StorageWrapper|null = null;
 
   getConfigStorage() {
@@ -141,14 +140,6 @@ class Storage {
     }
 
     return this.downloadsStorage;
-  }
-
-  getPatchStorage() {
-    if (!this.patchStorage) {
-      this.patchStorage = new StorageWrapper(createMMKV({ id: 'patches' }));
-    }
-
-    return this.patchStorage;
   }
 
   getLocalLibraryStorage() {

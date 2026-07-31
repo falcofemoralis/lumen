@@ -1,12 +1,11 @@
 import { Image } from 'expo-image';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
-import { memo } from 'react';
 import { View } from 'react-native';
 
 import { componentStyles } from './ThemedImage.style';
 import { ThemedImageProps } from './ThemedImage.type';
 
-export const ThemedImage = ({
+export const ThemedImageComponent = ({
   src,
   style,
   blurRadius,
@@ -30,8 +29,4 @@ export const ThemedImage = ({
   );
 };
 
-function rowPropsAreEqual(prevProps: ThemedImageProps, props: ThemedImageProps) {
-  return prevProps.src === props.src;
-}
-
-export default memo(ThemedImage, rowPropsAreEqual);
+export default ThemedImageComponent;

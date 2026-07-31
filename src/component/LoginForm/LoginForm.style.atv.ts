@@ -6,20 +6,23 @@ export const componentStyles = ({ scale }: Theme) => ({
     flexDirection: 'column',
     justifyContent: 'center',
     alignSelf: 'center',
-    maxWidth: '50%',
+    gap: scale(16),
   },
   form: {
-    marginTop: scale(16),
     justifyContent: 'center',
     alignItems: 'center',
+    gap: scale(16),
   },
   inputContainer: {
     flexDirection: 'row',
-    margin: scale(8),
   },
   input: {
   },
   button: {
+    width: '100%',
     margin: scale(8),
+  },
+  overlay: {
+    maxWidth: '50%',
   },
 } satisfies ThemedStyles);

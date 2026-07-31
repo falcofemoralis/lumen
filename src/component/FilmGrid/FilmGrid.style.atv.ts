@@ -1,15 +1,4 @@
-import { Theme, ThemedStyles } from 'Theme/types';
+export const ROW_GAP = 16;
 
-export const ROW_GAP = 18;
-
-export const componentStyles = ({ scale }: Theme) => ({
-  grid: {
-    paddingTop: scale(13),
-    paddingHorizontal: scale(6),
-  },
-  rowStyle: {
-    flexDirection: 'row',
-    width: '100%',
-    gap: scale(ROW_GAP),
-  },
-} satisfies ThemedStyles);
+// Room below the last row for the bottom half of a focused card's zoom.
+export const FOCUS_OVERFLOW_GAP = 32;

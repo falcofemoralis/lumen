@@ -64,7 +64,7 @@ const ru: Translations = {
   'You are not logged in': 'Вы не вошли в аккаунт',
   'Sign in to sync content': 'Авторизуйтесь для синхронизации контента',
   'Sign in': 'Войти',
-  'Go to login page': 'Перейти на страницу авторизации',
+  'Log In': 'Войти в аккаунт',
   'Something went wrong': 'Что-то пошло не так',
   'Welcome to {{name}}': 'Добро пожаловать в\n {{name}}',
   'Your gateway to unlimited movies. Let’s set things up!': 'Перед просмотром фильмов нужно настроить приложение.',
@@ -189,6 +189,7 @@ const ru: Translations = {
   'Season {{season}}': 'Сезон {{season}}',
   'Episode {{episode}}': 'Эпизод {{episode}}',
   'No video streams available for {{key}}': 'Нет доступных потоков для {{key}}.',
+  'No episodes selected': 'Не выбрано ни одного эпизода',
   'No downloads': 'Нет загрузок',
   'You have not downloaded any films yet': 'Вы пока не загрузили ни одного фильма',
   'Open folder': 'Открыть папку',
@@ -204,6 +205,8 @@ const ru: Translations = {
   'Download subtitles': 'Загружать субтитры',
   'Download poster': 'Загружать постер',
   'Download failed': 'Ошибка загрузки',
+  'Downloading': 'Загружается',
+  'Film is still downloading': 'Фильм ещё загружается',
   'Please select or type a value': 'Пожалуйста, выберите или введите значение',
   'Type or select value': 'Введите или выберите значение',
   'Select from presets': 'Выбрать из списка',
@@ -297,6 +300,7 @@ const ru: Translations = {
   'Watching Now': 'Сейчас смотрят',
   'Popular': 'Популярные',
   'Awaiting': 'В ожидании',
+  'Welcome to the app!': 'Добро пожаловать в приложение!',
 };
 
 export default ru;

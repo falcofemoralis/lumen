@@ -29,4 +29,10 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   buttonPrimary: {
     backgroundColor: colors.primary,
   },
+  buttonPrimaryFocused: {
+    backgroundColor: colors.buttonFocused,
+  },
+  buttonPrimaryTextFocused: {
+    color: colors.textFocused,
+  },
 } satisfies ThemedStyles);

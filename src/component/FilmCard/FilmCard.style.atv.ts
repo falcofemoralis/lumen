@@ -1,5 +1,7 @@
 import { Theme, ThemedStyles } from 'Theme/types';
 
+import { POSTER_ASPECT_HEIGHT, POSTER_ASPECT_WIDTH } from './FilmCard.config';
+
 export const INFO_HEIGHT = 65;
 export const INFO_PADDING_HORIZONTAL = 8;
 export const INFO_PADDING_VERTICAL = 4;
@@ -7,7 +9,6 @@ export const INFO_PADDING_VERTICAL = 4;
 export const componentStyles = ({ scale, colors, text }: Theme) => ({
   card: {
     flexDirection: 'column',
-    width: '100%',
     borderRadius: scale(12),
     overflow: 'hidden',
     transform: [{ scale: 1 }],
@@ -19,8 +20,6 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   },
   posterWrapper: {
     position: 'relative',
-    width: '100%',
-    height: 'auto',
     flexDirection: 'column',
     borderBottomRightRadius: scale(8),
     borderBottomLeftRadius: scale(8),
@@ -31,12 +30,9 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     borderBottomLeftRadius: 0,
   },
   poster: {
-    aspectRatio: '166 / 250',
+    aspectRatio: `${POSTER_ASPECT_WIDTH} / ${POSTER_ASPECT_HEIGHT}`,
   },
-  posterFocused: {},
   info: {
-    width: '100%',
-    height: scale(INFO_HEIGHT),
     paddingHorizontal: scale(INFO_PADDING_HORIZONTAL),
     paddingVertical: scale(INFO_PADDING_VERTICAL),
   },

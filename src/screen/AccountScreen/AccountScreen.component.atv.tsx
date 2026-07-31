@@ -2,7 +2,9 @@ import { Loader } from 'Component/Loader';
 import { LoginForm } from 'Component/LoginForm';
 import { Page } from 'Component/Page';
 import { ThemedButton } from 'Component/ThemedButton';
+import { ThemedGroup } from 'Component/ThemedGroup';
 import { ThemedImage } from 'Component/ThemedImage';
+import { ThemedScrollView } from 'Component/ThemedScrollView';
 import { ThemedText } from 'Component/ThemedText';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
@@ -10,11 +12,13 @@ import { t } from 'i18n/translate';
 import { Download, LogOut, MessageSquareText, Star } from 'lucide-react-native';
 import { ComponentType } from 'react';
 import { Image, StyleProp, TextStyle, View, ViewStyle } from 'react-native';
-import { DefaultFocus, SpatialNavigationScrollView } from 'react-tv-space-navigation';
 import { useAppTheme } from 'Theme/context';
 
 import { componentStyles } from './AccountScreen.style.atv';
 import { AccountScreenComponentProps } from './AccountScreen.type';
+
+const GUEST_DOWNLOADS_FOCUS_KEY = 'ACCOUNT_GUEST_DOWNLOADS';
+const DEFAULT_ACTION_FOCUS_KEY = 'ACCOUNT_DEFAULT_ACTION';
 
 export function AccountScreenComponent({
   isSignedIn,
@@ -101,10 +105,14 @@ export function AccountScreenComponent({
     action: () => void,
     style?: StyleProp<ViewStyle>,
     textStyle?: StyleProp<TextStyle>,
-    iconStyle?: StyleProp<any>
+    iconStyle?: StyleProp<any>,
+    isDefault = false
   ) => {
     return (
       <ThemedButton
+        title={ title }
+        focusKey={ isDefault ? DEFAULT_ACTION_FOCUS_KEY : undefined }
+        autofocus={ isDefault }
         style={ [styles.profileAction, style] }
         contentStyle={ styles.profileActionContent }
         textStyle={ [styles.profileActionText, textStyle] }
@@ -114,11 +122,7 @@ export function AccountScreenComponent({
         iconProps={ {
           size: scale(20),
         } }
-        variant="long"
-        withAnimation
-      >
-        { title }
-      </ThemedButton>
+      />
     );
   };
 
@@ -126,39 +130,45 @@ export function AccountScreenComponent({
     const { premiumDays = 0 } = profile ?? {};
 
     return (
-      <SpatialNavigationScrollView>
-        <View style={ styles.profileActions }>
-          { /* eslint-disable-next-line max-len */ }
-          { renderActionButton(premiumDays > 0 ? t('Renew subscription') : t('Get subscription'), Star, handleViewPayments, styles.premiumButton, styles.premiumButtonText, styles.premiumButtonIcon) }
-          <DefaultFocus>
-            { renderActionButton(t('Downloads'), Download, openDownloads) }
-          </DefaultFocus>
-          { renderActionButton(t('Comments'), MessageSquareText, openNotImplemented) }
-          { renderActionButton(t('View Profile'), Star, handleViewProfile) }
-          { renderActionButton(t('Log out'), LogOut, handleLogout) }
-        </View>
-      </SpatialNavigationScrollView>
+      // Without a preferred child, focus entering the list resolves to the
+      // subscription button at the top and only then hops down to the default
+      // action once its `autofocus` claim runs.
+      <ThemedScrollView
+        style={ styles.profileActions }
+        contentContainerStyle={ styles.profileActionsContent }
+        containerStyle={ styles.profileActionsContainer }
+        preferredChildFocusKey={ DEFAULT_ACTION_FOCUS_KEY }
+      >
+        { /* eslint-disable-next-line max-len */ }
+        { renderActionButton(premiumDays > 0 ? t('Renew subscription') : t('Get subscription'), Star, handleViewPayments, styles.premiumButton, styles.premiumButtonText, styles.premiumButtonIcon) }
+        { renderActionButton(t('Downloads'), Download, openDownloads, undefined, undefined, undefined, true) }
+        { renderActionButton(t('Comments'), MessageSquareText, openNotImplemented) }
+        { renderActionButton(t('View Profile'), Star, handleViewProfile) }
+        { renderActionButton(t('Log out'), LogOut, handleLogout) }
+      </ThemedScrollView>
     );
   };
 
   const renderContent = () => {
     if (!isSignedIn) {
       return (
-        <LoginForm>
-          <DefaultFocus>
+        <ThemedGroup
+          style={ styles.guestContent }
+          preferredChildFocusKey={ GUEST_DOWNLOADS_FOCUS_KEY }
+        >
+          <LoginForm>
             <ThemedButton
+              title={ t('Downloads') }
+              focusKey={ GUEST_DOWNLOADS_FOCUS_KEY }
+              autofocus
               IconComponent={ Download }
               onPress={ openDownloads }
               iconProps={ {
                 size: scale(20),
               } }
-              variant="long"
-              withAnimation
-            >
-              { t('Downloads') }
-            </ThemedButton>
-          </DefaultFocus>
-        </LoginForm>
+            />
+          </LoginForm>
+        </ThemedGroup>
       );
     }
 
@@ -180,9 +190,7 @@ export function AccountScreenComponent({
   };
 
   return (
-    <Page
-      checkConnection={ false }
-    >
+    <Page checkConnection={ false }>
       { renderContent() }
     </Page>
   );

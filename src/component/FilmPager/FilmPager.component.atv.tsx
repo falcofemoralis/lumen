@@ -3,50 +3,40 @@ import { ThemedButton } from 'Component/ThemedButton';
 import { ThemedDropdown } from 'Component/ThemedDropdown';
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
+import { ThemedScrollView } from 'Component/ThemedScrollView';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
-import { createRef, memo, Ref, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
-import {
-  DefaultFocus,
-  SpatialNavigationNode,
-  SpatialNavigationNodeRef,
-  SpatialNavigationScrollView,
-  SpatialNavigationView,
-} from 'react-tv-space-navigation';
 import { useAppTheme } from 'Theme/context';
 import { ThemedStyles } from 'Theme/types';
-import { noopFn } from 'Util/Function';
 import { setTimeoutSafe } from 'Util/Misc';
 
 import { componentStyles } from './FilmPager.style.atv';
 import { FilmPagerComponentProps, PagerItemInterface } from './FilmPager.type';
 
 const TabButton = memo(({
-  ref,
   menuItem,
   isActive,
-  onFocus,
+  onItemFocus,
   styles,
-  isFocusVisible,
   sorting,
-  selectedSorting,
+  selectedSortingItem,
   handleSelectSorting,
 }: {
-  ref: Ref<SpatialNavigationNodeRef>,
   menuItem: PagerItemInterface['menuItem'];
   isActive: boolean;
-  onFocus: () => void;
+  onItemFocus: (menuItem: PagerItemInterface['menuItem']) => void;
   styles: ThemedStyles<typeof componentStyles>;
-  isFocusVisible: boolean;
   sorting?: FilmPagerComponentProps['sorting'];
-  selectedSorting?: FilmPagerComponentProps['selectedSorting'];
+  selectedSortingItem?: DropdownItem;
   handleSelectSorting?: FilmPagerComponentProps['handleSelectSorting'];
 }) => {
   const { scale } = useAppTheme();
   const sortingOverlayRef = useRef<ThemedOverlayRef>(null);
   const { id, title } = menuItem;
   const sortingHeightAnim = useSharedValue(0);
+  const currentSorting = selectedSortingItem ?? sorting?.[0];
 
   useEffect(() => {
     sortingHeightAnim.value = withTiming(isActive && sorting ? scale(14) : 0, {
@@ -72,18 +62,17 @@ const TabButton = memo(({
   return (
     <>
       <ThemedButton
-        spatialRef={ ref }
         key={ id }
-        variant='outlined'
-        isSelected={ isActive }
-        onFocus={ onFocus }
-        onPress={ handlePress }
-        style={ [
-          styles.tabButton,
-          sorting && styles.tabBarSorting,
-        ] }
-        isFocusVisible={ isFocusVisible }
-        additionalElement={ !sorting ? undefined : (isFocused) => (
+        title={ title }
+        selected={ isActive }
+        onFocus={ () => onItemFocus(menuItem) }
+        onPress={ () => onItemFocus(menuItem) }
+        onEnterPress={ handlePress }
+        style={ [ styles.tabButton, sorting && styles.tabBarSorting ] }
+        contentStyle={ styles.tabButtonContent }
+        styleSelected={ styles.tabButtonSelected }
+        styleFocused={ styles.tabButtonFocused }
+        bottomAdditionalElement={ !sorting ? undefined : (isFocused) => (
           <Animated.Text
             style={ [
               styles.sortingText,
@@ -91,17 +80,15 @@ const TabButton = memo(({
               sortingAnimatedStyle,
             ] }
           >
-            { selectedSorting?.[id]?.label ?? sorting[0].label }
+            { currentSorting?.label }
           </Animated.Text>
         ) }
-      >
-        { title }
-      </ThemedButton>
+      />
       { sorting && (
         <ThemedDropdown
           overlayRef={ sortingOverlayRef }
           data={ sorting }
-          value={ selectedSorting?.[id]?.value ?? sorting[0].value ?? '' }
+          value={ currentSorting?.value ?? '' }
           onChange={ handleSelect }
           asOverlay
         />
@@ -111,138 +98,118 @@ const TabButton = memo(({
 });
 
 const TopMenu = memo(({
-  items,
+  pagerItems,
   styles,
   sorting,
   selectedSorting,
   menuDefaultFocus,
   handlePageChange,
   handleSelectSorting,
-}: FilmPagerComponentProps & {
+}: Pick<
+  FilmPagerComponentProps,
+  'pagerItems' | 'sorting' | 'selectedSorting' | 'menuDefaultFocus' | 'handleSelectSorting'
+> & {
   handlePageChange: (page: number, pagerItem: PagerItemInterface) => void;
   styles: ThemedStyles<typeof componentStyles>;
 }) => {
-  const { scale } = useAppTheme();
   const debounce = useRef<number | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
-  const refs = useRef<any[]>(
-    items.map(() => createRef<any>())
-  );
-  const isActiveRef = useRef(false);
-  const [isFocusVisible, setIsFocusVisible] = useState(true);
+  const activeIndexRef = useRef(0);
+  const pagerItemsRef = useRef(pagerItems);
+  const handlePageChangeRef = useRef(handlePageChange);
 
-  const handleMenuItemChange = (pagerItem: PagerItemInterface) => {
-    if (!isActiveRef.current) {
-      setIsFocusVisible(false);
+  useEffect(() => {
+    pagerItemsRef.current = pagerItems;
+    handlePageChangeRef.current = handlePageChange;
+  }, [pagerItems, handlePageChange]);
 
+  useEffect(() => () => {
+    if (debounce.current) {
+      clearTimeout(debounce.current);
+    }
+  }, []);
+
+  const handleMenuItemChange = useCallback((menuItem: PagerItemInterface['menuItem']) => {
+    const items = pagerItemsRef.current;
+    const idx = items.findIndex((item) => item.menuItem?.id === menuItem.id);
+
+    if (idx === -1 || idx === activeIndexRef.current) {
       return;
     }
 
-    const { menuItem: { id: key } = {} } = pagerItem;
-    const { menuItem: { id: activeKey } = {} } = items[activeIndex] || {};
+    activeIndexRef.current = idx;
+    setActiveIndex(idx);
 
-    if (key !== activeKey) {
-      const idx = items.findIndex((item) => item.menuItem?.id === key);
-
-      setActiveIndex(items.findIndex((item) => item.menuItem?.id === key));
-
-      if (debounce.current) {
-        clearTimeout(debounce.current);
-      }
-
-      debounce.current = setTimeoutSafe(async () => {
-        handlePageChange(idx, pagerItem);
-      }, 650);
+    if (debounce.current) {
+      clearTimeout(debounce.current);
     }
-  };
 
-  const renderMenuItem = (item: PagerItemInterface, idx: number, focusVisible: boolean) => {
-    const { menuItem } = item;
-
-    return (
-      <TabButton
-        ref={ refs.current[idx] }
-        key={ menuItem.id }
-        menuItem={ menuItem }
-        isActive={ activeIndex === idx }
-        onFocus={ () => handleMenuItemChange(item) }
-        styles={ styles }
-        isFocusVisible={ focusVisible }
-        sorting={ sorting }
-        selectedSorting={ selectedSorting }
-        handleSelectSorting={ handleSelectSorting }
-      />
-    );
-  };
-
-  const renderItems = () => (
-    <SpatialNavigationView
-      direction="horizontal"
-      style={ styles.menuList }
-      alignInGrid={ false }
-    >
-      { items.map((item, idx) => renderMenuItem(item, idx, isFocusVisible)) }
-    </SpatialNavigationView>
-  );
+    debounce.current = setTimeoutSafe(() => {
+      handlePageChangeRef.current(idx, items[idx]);
+    }, 650);
+  }, []);
 
   return (
-    <SpatialNavigationNode>
-      { ({ isActive }) => {
-        isActiveRef.current = isActive;
-
-        if (isActive) {
-          // This fixes correct focus on menu when user navigates left\right in the grid. Because Header (Menu top), also uses isAlignInGrid property.
-          // See https://github.com/bamlab/react-tv-space-navigation/issues/95#issuecomment-2036199373
-          const ref = refs.current[activeIndex];
-          requestAnimationFrame(() => {
-            if (!isFocusVisible) {
-              setIsFocusVisible(true);
-            }
-
-            ref?.current?.focus();
-          });
-        }
-
-        return (
-          <View
-            style={ [
-              styles.menuListWrapper,
-              sorting && styles.menuListWrapperWithSorting,
-            ] }
-          >
-            <SpatialNavigationScrollView
-              horizontal
-              offsetFromStart={ scale(64) }
-              style={ styles.menuListScroll }
-            >
-              { menuDefaultFocus ? (
-                <DefaultFocus>
-                  { renderItems() }
-                </DefaultFocus>
-              ) : renderItems() }
-            </SpatialNavigationScrollView>
-          </View>
-        );
-      } }
-    </SpatialNavigationNode>
+    <ThemedScrollView
+      horizontal
+      containerStyle={ [styles.menuListWrapper, sorting && styles.menuListWrapperWithSorting] }
+      style={ styles.menuList }
+      autofocus={ menuDefaultFocus }
+    >
+      { pagerItems.map((item, idx) => (
+        <TabButton
+          key={ item.menuItem.id }
+          menuItem={ item.menuItem }
+          isActive={ activeIndex === idx }
+          onItemFocus={ handleMenuItemChange }
+          styles={ styles }
+          sorting={ sorting }
+          selectedSortingItem={ selectedSorting?.[item.menuItem.id] }
+          handleSelectSorting={ handleSelectSorting }
+        />
+      )) }
+    </ThemedScrollView>
   );
 });
 
-export function FilmPagerComponent(props: FilmPagerComponentProps) {
-  const {
-    items,
-    gridStyle,
-    isGridVisible,
-    isEmpty,
-    menuDefaultFocus,
-    ListHeaderComponent,
-    ListEmptyComponent,
-    onPreLoad,
-    onNextLoad,
-    onRowFocus = noopFn,
-  } = props;
+export function FilmPagerComponent({
+  pagerItems,
+  disableEmptyComponent,
+  isEmpty,
+  hideGrid,
+  menuDefaultFocus,
+  sorting,
+  selectedSorting,
+  handleSelectSorting,
+  ListHeaderComponent,
+  ListEmptyComponent,
+  onPreLoad,
+  onNextLoad,
+  onAtTopChange,
+}: FilmPagerComponentProps) {
   const styles = useThemedStyles(componentStyles);
+  const { scale } = useAppTheme();
   const [activePage, setActivePage] = useState(0);
+  // The menu is a sibling above the grid (a focus sibling, so the grid's focus
+  // never resolves to it), collapsed out of the way once focus leaves the first
+  // row. The grid reports first-row crossings via onAtTopChange.
+  const [menuVisible, setMenuVisible] = useState(true);
+  const menuCollapse = useSharedValue(1);
+  const menuHeight = (sorting ? styles.menuListWrapperWithSorting.height : styles.menuListWrapper.height) + scale(16);
+
+  useEffect(() => {
+    menuCollapse.value = withTiming(menuVisible ? 1 : 0, { duration: 200 });
+  }, [menuVisible, menuCollapse]);
+
+  const menuAnimatedStyle = useAnimatedStyle(() => ({
+    height: menuHeight * menuCollapse.value,
+    opacity: menuCollapse.value,
+  }));
+
+  const handleAtTopChange = useCallback((atTop: boolean) => {
+    setMenuVisible(atTop);
+    onAtTopChange?.(atTop);
+  }, [onAtTopChange]);
 
   const handlePageChange = useCallback((page: number, pagerItem: PagerItemInterface) => {
     setActivePage(page);
@@ -252,25 +219,44 @@ export function FilmPagerComponent(props: FilmPagerComponentProps) {
     }
   }, [onPreLoad]);
 
-  const renderMenu = () => (
-    <TopMenu
-      { ...props }
-      handlePageChange={ handlePageChange }
-      styles={ styles }
-    />
-  );
+  const renderMenu = () => {
+    if (pagerItems.length <= 1) {
+      return null;
+    }
+
+    return (
+      <TopMenu
+        pagerItems={ pagerItems }
+        sorting={ sorting }
+        selectedSorting={ selectedSorting }
+        menuDefaultFocus={ menuDefaultFocus }
+        handleSelectSorting={ handleSelectSorting }
+        handlePageChange={ handlePageChange }
+        styles={ styles }
+      />
+    );
+  };
+
+  const menu = renderMenu();
 
   return (
-    <View style={ [styles.grid, gridStyle] }>
+    <View style={ styles.container }>
+      { menu && (
+        <Animated.View style={ [styles.menuCollapse, menuAnimatedStyle] }>
+          { menu }
+        </Animated.View>
+      ) }
       <FilmGrid
-        films={ items[activePage].films ?? [] }
-        onNextLoad={ (isRefresh) => onNextLoad(isRefresh, items[activePage]) }
-        onItemFocus={ onRowFocus }
-        isGridVisible={ isGridVisible }
-        isEmpty={ isEmpty && items[activePage].films !== null && !items[activePage].films?.length }
-        ListHeaderComponent={ items.length > 1 ? renderMenu() : ListHeaderComponent }
+        films={ pagerItems[activePage].films ?? [] }
+        onNextLoad={ (isRefresh) => onNextLoad(isRefresh, pagerItems[activePage]) }
+        disableEmptyComponent={ disableEmptyComponent }
+        // empty flag it true, films array exist and this array is empty
+        isEmpty={ isEmpty && pagerItems[activePage].films !== null && !pagerItems[activePage].films?.length }
+        hideGrid={ hideGrid }
+        ListHeaderComponent={ ListHeaderComponent }
         ListEmptyComponent={ ListEmptyComponent }
-        menuDefaultFocus={ menuDefaultFocus }
+        disableAutofocus={ menuDefaultFocus }
+        onAtTopChange={ menu || onAtTopChange ? handleAtTopChange : undefined }
       />
     </View>
   );

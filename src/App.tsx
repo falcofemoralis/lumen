@@ -1,16 +1,4 @@
 /* eslint-disable import/first */
-/**
- * Welcome to the main entry point of the app. In this file, we'll
- * be kicking off our app.
- *
- * Most of this file is boilerplate and you shouldn't need to modify
- * it very often. But take some time to look through and understand
- * what is going on here.
- *
- * The app navigation resides in ./app/navigators, so head over there
- * if you're interested in adding screens and navigators.
- */
-
 import { LogBox } from 'react-native';
 
 if (__DEV__) {
@@ -42,6 +30,7 @@ if (__DEV__) {
 }
 
 import { LinkingOptions } from '@react-navigation/native';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { services } from 'Api/services';
 import { Awake } from 'Component/Awake';
 import { Root } from 'Component/Root';
@@ -50,33 +39,31 @@ import { DEFAULT_SERVICE } from 'Context/ServiceContext';
 import * as Linking from 'expo-linking';
 import * as SplashScreen from 'expo-splash-screen';
 import { AppNavigator } from 'Navigation/AppNavigator';
+import { NativeFocusTrap } from 'Navigation/NativeFocusTrap';
 import { AppStackParamList } from 'Navigation/navigationTypes';
 import { useEffect, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { initialWindowMetrics, SafeAreaProvider } from 'react-native-safe-area-context';
 import { ThemeProvider } from 'Theme/context';
-import { configureRemoteControl } from 'Util/RemoteControl';
+import { createQueryClient } from 'Util/Query';
 
 import { initI18n } from './i18n';
-import { applyPatches } from './patch';
 
 export const NAVIGATION_PERSISTENCE_KEY = 'NAVIGATION_STATE';
 
 SplashScreen.setOptions({
-  duration: 750,
   fade: true,
 });
 
 SplashScreen.preventAutoHideAsync();
 
+const queryClient = createQueryClient();
+
 export function App() {
   const [isI18nInitialized, setIsI18nInitialized] = useState(false);
 
   useEffect(() => {
-    configureRemoteControl();
-    applyPatches();
-
     initI18n().then(() => setIsI18nInitialized(true));
   }, []);
 
@@ -112,25 +99,28 @@ export function App() {
   };
 
   return (
-    <SafeAreaProvider initialMetrics={ initialWindowMetrics }>
-      <KeyboardProvider>
-        <AppProvider>
-          <ThemeProvider>
-            <GestureHandlerRootView>
-              <Root>
-                <Awake>
-                  <AppNavigator
-                    linking={ linking }
-                    onReady={ () => {
-                      SplashScreen.hideAsync();
-                    } }
-                  />
-                </Awake>
-              </Root>
-            </GestureHandlerRootView>
-          </ThemeProvider>
-        </AppProvider>
-      </KeyboardProvider>
-    </SafeAreaProvider>
+    <QueryClientProvider client={ queryClient }>
+      <SafeAreaProvider initialMetrics={ initialWindowMetrics }>
+        <KeyboardProvider>
+          <AppProvider>
+            <ThemeProvider>
+              <GestureHandlerRootView>
+                <Root>
+                  <Awake>
+                    <NativeFocusTrap />
+                    <AppNavigator
+                      linking={ linking }
+                      onReady={ () => {
+                        SplashScreen.hideAsync();
+                      } }
+                    />
+                  </Awake>
+                </Root>
+              </GestureHandlerRootView>
+            </ThemeProvider>
+          </AppProvider>
+        </KeyboardProvider>
+      </SafeAreaProvider>
+    </QueryClientProvider>
   );
 }

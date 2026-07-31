@@ -1,1 +1,1 @@
-export { default as WelcomeScreen } from './WelcomeScreen.container';
+export { default as WelcomeScreen } from './WelcomeScreen.component';

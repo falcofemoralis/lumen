@@ -51,14 +51,11 @@ export const ThemedDropdownComponent = ({
   };
 
   const renderInput = () => {
-    if (asOverlay) {
-      return null;
-    }
-
     const { label, startIcon, endIcon } = data.find((item) => item.value === value) ?? {};
 
     return (
       <ThemedButton
+        title={ inputLabel ?? label ?? '' }
         style={ [styles.input, inputStyle] }
         leftImageStyle={ styles.inputImage }
         rightImageStyle={ styles.inputImage }
@@ -66,11 +63,13 @@ export const ThemedDropdownComponent = ({
         onPress={ () => (overlayRef || componentOverlayRef).current?.open() }
         leftImage={ startIcon }
         rightImage={ endIcon }
-      >
-        { inputLabel ?? label }
-      </ThemedButton>
+      />
     );
   };
+
+  if (asOverlay) {
+    return renderModal();
+  }
 
   return (
     <View style={ style }>

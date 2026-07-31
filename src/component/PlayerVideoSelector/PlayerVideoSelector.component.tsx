@@ -163,7 +163,7 @@ export function PlayerVideoSelectorComponent({
             ] }
             contentStyle={ styles.seasonContent }
             onPress={ () => setSelectedSeasonId(season.seasonId) }
-            additionalElement={ renderSeasonTimeline(season) }
+            topAdditionalElement={ () => renderSeasonTimeline(season) }
           >
             <ThemedText
               style={ [
@@ -232,7 +232,7 @@ export function PlayerVideoSelectorComponent({
                 styles.episodeContent,
                 isSelectedForDownload ? styles.episodeDownloadSelected : undefined,
               ] }
-              additionalElement={ renderEpisodeTimeline(episodeId) }
+              topAdditionalElement={ () => renderEpisodeTimeline(episodeId) }
             >
               <ThemedText
                 style={ [
@@ -302,12 +302,11 @@ export function PlayerVideoSelectorComponent({
 
     return (
       <ThemedButton
+        title={ t('Download') }
         onPress={ handleEpisodesDownload }
         disabled={ !Object.values(episodesToDownload).filter((selected) => selected).length }
         style={ styles.downloadBtn }
-      >
-        { t('Download') }
-      </ThemedButton>
+      />
     );
   };
 

@@ -38,8 +38,8 @@ export function SearchScreenComponent({
   onChangeText,
   onApplySearch,
   onApplySuggestion,
-  onLoadFilms,
-  onUpdateFilms,
+  onPreLoad,
+  onNextLoad,
   handleStartRecognition,
   handleApplySearch,
   resetSearch,
@@ -187,10 +187,10 @@ export function SearchScreenComponent({
     return (
       <View style={ styles.grid }>
         <FilmPager
-          items={ pagerItems }
-          onLoadFilms={ onLoadFilms }
-          onUpdateFilms={ onUpdateFilms }
-          isAddSafeArea={ false }
+          pagerItems={ pagerItems }
+          onPreLoad={ onPreLoad }
+          onNextLoad={ onNextLoad }
+          disableStatusbarSafeArea
         />
       </View>
     );
@@ -258,11 +258,10 @@ export function SearchScreenComponent({
             closeOnChange
           />
           <ThemedButton
+            title={ t('Lets search!') }
             style={ styles.categoriesSelectBtn }
             onPress={ handleApplyAdditionalContent }
-          >
-            { t('Lets search!') }
-          </ThemedButton>
+          />
         </View>
       </ScrollView>
     );

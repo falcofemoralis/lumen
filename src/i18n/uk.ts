@@ -64,7 +64,7 @@ const uk: Translations = {
   'You are not logged in': 'Ви не увійшли в акаунт',
   'Sign in to sync content': 'Авторизуйтесь для синхронізації контенту',
   'Sign in': 'Увійти',
-  'Go to login page': 'Перейти на сторінку авторизації',
+  'Log In': 'Увійти в обліковий запис',
   'Something went wrong': 'Щось пішло не так',
   'Welcome to {{name}}': 'Вітаємо у\n {{name}}',
   'Your gateway to unlimited movies. Let’s set things up!': 'Перед переглядом фільмів потрібно налаштувати додаток.',
@@ -189,6 +189,7 @@ const uk: Translations = {
   'Season {{season}}': 'Сезон {{season}}',
   'Episode {{episode}}': 'Епізод {{episode}}',
   'No video streams available for {{key}}': 'Немає доступних потоків для {{key}}.',
+  'No episodes selected': 'Не вибрано жодного епізоду',
   'No downloads': 'Немає завантажень',
   'You have not downloaded any films yet': 'Ви ще не завантажили жодного фільму',
   'Open folder': 'Відкрити папку',
@@ -204,6 +205,8 @@ const uk: Translations = {
   'Download subtitles': 'Завантажувати субтитри',
   'Download poster': 'Завантажувати постер',
   'Download failed': 'Помилка завантаження',
+  'Downloading': 'Завантажується',
+  'Film is still downloading': 'Фільм ще завантажується',
   'Please select or type a value': 'Будь ласка, виберіть або введіть значення',
   'Type or select value': 'Введіть або виберіть значення',
   'Select from presets': 'Вибрати зі списку',
@@ -297,6 +300,7 @@ const uk: Translations = {
   'Watching Now': 'Зараз дивляться',
   'Popular': 'Популярні',
   'Awaiting': 'В очікуванні',
+  'Welcome to the app!': 'Ласкаво просимо до застосунку!',
 };
 
 export default uk;

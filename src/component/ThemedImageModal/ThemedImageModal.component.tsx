@@ -1,3 +1,4 @@
+import { POSTER_ASPECT_HEIGHT, POSTER_ASPECT_WIDTH } from 'Component/FilmCard/FilmCard.config';
 import { ThemedImage } from 'Component/ThemedImage';
 import { ThemedPressable } from 'Component/ThemedPressable';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
@@ -19,7 +20,7 @@ export const ThemedImageModalComponent = ({
   imageStyle,
 }: ThemedImageModalComponentProps) => {
   const { scale, theme } = useAppTheme();
-  const height = theme.dimensions.width / (166 / 250);
+  const height = theme.dimensions.width / (POSTER_ASPECT_WIDTH / POSTER_ASPECT_HEIGHT);
   const [isOpened, setIsOpened] = useState(false);
   const { top } = useSafeAreaInsets();
   const styles = useThemedStyles(componentStyles);

@@ -1,1 +1,0 @@
-export { default as SettingGroup } from './SettingGroup.container';

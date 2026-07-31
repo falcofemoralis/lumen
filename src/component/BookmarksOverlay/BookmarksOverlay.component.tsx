@@ -52,16 +52,17 @@ export const BookmarksOverlayComponent = ({
         maxLength={ 40 }
       />
       <View style={ styles.actions }>
-        <ThemedButton onPress={ cancelCreate } contentStyle={ styles.button }>
-          { t('Cancel') }
-        </ThemedButton>
         <ThemedButton
+          title={ t('Cancel') }
+          onPress={ cancelCreate }
+          contentStyle={ styles.button }
+        />
+        <ThemedButton
+          title={ t('Create') }
           onPress={ submitCreate }
           disabled={ !newTitle.trim() }
           contentStyle={ [styles.button, styles.buttonPrimary] }
-        >
-          { t('Create') }
-        </ThemedButton>
+        />
       </View>
     </View>
   );
@@ -80,6 +81,7 @@ export const BookmarksOverlayComponent = ({
       { isLocalLibrary && (
         <View style={ styles.actions }>
           <ThemedButton
+            title={ t('New category') }
             IconComponent={ Plus }
             iconProps={ {
               size: scale(16),
@@ -87,9 +89,7 @@ export const BookmarksOverlayComponent = ({
             } }
             onPress={ () => setIsCreating(true) }
             contentStyle={ styles.button }
-          >
-            { t('New category') }
-          </ThemedButton>
+          />
         </View>
       ) }
     </>

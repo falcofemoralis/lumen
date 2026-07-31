@@ -1,12 +1,12 @@
 import { ThemedButton } from 'Component/ThemedButton';
 import { ThemedInput } from 'Component/ThemedInput';
 import { ThemedOverlay } from 'Component/ThemedOverlay';
+import { ThemedScrollView } from 'Component/ThemedScrollView';
 import { ThemedText } from 'Component/ThemedText';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import { Plus, Trash2 } from 'lucide-react-native';
 import { View } from 'react-native';
-import { DefaultFocus, SpatialNavigationScrollView, SpatialNavigationView } from 'react-tv-space-navigation';
 import { useAppTheme } from 'Theme/context';
 
 import { componentStyles } from './LocalCategoriesOverlay.style.atv';
@@ -32,79 +32,71 @@ export const LocalCategoriesOverlayComponent = ({
 
   const renderList = () => (
     <>
-      <SpatialNavigationScrollView style={ styles.list }>
+      <ThemedScrollView style={ styles.list }>
         { !categories.length && (
           <ThemedText style={ styles.emptyText }>
             { t('No bookmarks group') }
           </ThemedText>
         ) }
         { categories.map((category) => (
-          <SpatialNavigationView
-            key={ category.id }
-            direction="horizontal"
-          >
-            <View style={ styles.row }>
-              <ThemedText style={ styles.rowTitle }>
-                { category.title }
-              </ThemedText>
-              <ThemedText style={ styles.rowCount }>
-                { category.count }
-              </ThemedText>
-              <ThemedButton
-                style={ styles.rowDelete }
-                contentStyle={ styles.rowDeleteContent }
-                IconComponent={ Trash2 }
-                iconProps={ {
-                  size: scale(14),
-                } }
-                onPress={ () => requestDelete(category.id) }
-              />
-            </View>
-          </SpatialNavigationView>
-        )) }
-      </SpatialNavigationScrollView>
-      <SpatialNavigationView direction="horizontal">
-        <View style={ styles.actions }>
-          <DefaultFocus>
+          <View key={ category.id } style={ styles.row }>
+            <ThemedText style={ styles.rowTitle }>
+              { category.title }
+            </ThemedText>
+            <ThemedText style={ styles.rowCount }>
+              { category.count }
+            </ThemedText>
             <ThemedButton
-              IconComponent={ Plus }
+              title=""
+              style={ styles.rowDelete }
+              contentStyle={ styles.rowDeleteContent }
+              IconComponent={ Trash2 }
               iconProps={ {
                 size: scale(14),
               } }
-              onPress={ startCreate }
-              contentStyle={ styles.button }
-            >
-              { t('New category') }
-            </ThemedButton>
-          </DefaultFocus>
-        </View>
-      </SpatialNavigationView>
+              onPress={ () => requestDelete(category.id) }
+            />
+          </View>
+        )) }
+      </ThemedScrollView>
+      <View style={ styles.actions }>
+        <ThemedButton
+          title={ t('New category') }
+          autofocus
+          IconComponent={ Plus }
+          iconProps={ {
+            size: scale(14),
+          } }
+          onPress={ startCreate }
+          contentStyle={ styles.button }
+        />
+      </View>
     </>
   );
 
   const renderCreate = () => (
-    <DefaultFocus>
+    <>
       <ThemedInput
+        autofocus
         style={ styles.input }
         placeholder={ t('Category name') }
         onChangeText={ onChangeTitle }
         maxLength={ 40 }
       />
-      <SpatialNavigationView direction="horizontal">
-        <View style={ styles.actions }>
-          <ThemedButton onPress={ cancelCreate } contentStyle={ styles.button }>
-            { t('Cancel') }
-          </ThemedButton>
-          <ThemedButton
-            onPress={ submitCreate }
-            disabled={ isCreateDisabled }
-            contentStyle={ [styles.button, styles.buttonPrimary] }
-          >
-            { t('Create') }
-          </ThemedButton>
-        </View>
-      </SpatialNavigationView>
-    </DefaultFocus>
+      <View style={ styles.actions }>
+        <ThemedButton
+          title={ t('Cancel') }
+          onPress={ cancelCreate }
+          contentStyle={ styles.button }
+        />
+        <ThemedButton
+          title={ t('Create') }
+          onPress={ submitCreate }
+          disabled={ isCreateDisabled }
+          contentStyle={ [styles.button, styles.buttonPrimary] }
+        />
+      </View>
+    </>
   );
 
   const renderConfirmDelete = () => (
@@ -115,18 +107,19 @@ export const LocalCategoriesOverlayComponent = ({
       <ThemedText style={ styles.confirmMessage }>
         { t('The category and its bookmarks will be removed from this device.') }
       </ThemedText>
-      <SpatialNavigationView direction="horizontal">
-        <View style={ styles.actions }>
-          <DefaultFocus>
-            <ThemedButton onPress={ cancelDelete } contentStyle={ styles.button }>
-              { t('Cancel') }
-            </ThemedButton>
-          </DefaultFocus>
-          <ThemedButton onPress={ confirmDelete } contentStyle={ [styles.button, styles.buttonPrimary] }>
-            { t('Accept') }
-          </ThemedButton>
-        </View>
-      </SpatialNavigationView>
+      <View style={ styles.actions }>
+        <ThemedButton
+          title={ t('Cancel') }
+          autofocus
+          onPress={ cancelDelete }
+          contentStyle={ styles.button }
+        />
+        <ThemedButton
+          title={ t('Accept') }
+          onPress={ confirmDelete }
+          contentStyle={ [styles.button, styles.buttonPrimary] }
+        />
+      </View>
     </>
   );
 

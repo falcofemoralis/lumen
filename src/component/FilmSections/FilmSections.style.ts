@@ -1,13 +1,12 @@
 import { Theme, ThemedStyles } from 'Theme/types';
 
-const ROW_GAP = 8;
+export const ROW_GAP = 8;
 
-export const componentStyles = ({ scale, text }: Theme) => ({
-  gridRow: {
-    flexDirection: 'row',
+export const componentStyles = ({ scale, text, colors }: Theme) => ({
+  header: {
     width: '100%',
-    gap: scale(ROW_GAP),
-    paddingBottom: scale(ROW_GAP),
+    // Sticky headers float above the rows, so they need to be opaque.
+    backgroundColor: colors.background,
   },
   headerText: {
     fontSize: scale(text.xl.fontSize),

@@ -1,7 +1,7 @@
 import { Loader } from 'Component/Loader';
+import { ThemedGrid } from 'Component/ThemedGrid';
 import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
 import { ThemedImage } from 'Component/ThemedImage';
-import { ThemedList } from 'Component/ThemedList';
 import { ThemedPressable } from 'Component/ThemedPressable';
 import { ThemedText } from 'Component/ThemedText';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
@@ -102,7 +102,6 @@ export const CommentsComponent = ({
   onNextLoad,
   handlePostLike,
 }: CommentsComponentProps) => {
-  const { scale } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
 
   const renderItem = useCallback(
@@ -136,9 +135,9 @@ export const CommentsComponent = ({
   }
 
   return (
-    <ThemedList
+    <ThemedGrid
+      numberOfColumns={ 1 }
       data={ comments }
-      estimatedItemSize={ scale(100) }
       renderItem={ renderItem }
       onNextLoad={ onNextLoad }
     />

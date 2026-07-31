@@ -39,6 +39,20 @@ export type ThemeContextType = {
 
 export const ThemeContext = createContext<ThemeContextType | null>(null);
 
+/**
+ * Style factories are pure functions of the theme, but every component instance
+ * runs its own factory on mount -- on a TV screen that mounts dozens of rows at
+ * once (settings groups, film grids) that adds up to real jank.
+ *
+ * Cache the result per theme, then per factory. Both levels are WeakMaps, so the
+ * whole cache for a theme is collectable as soon as that theme object is
+ * replaced (scheme switch, dimension change).
+ *
+ * The returned objects are shared between every consumer of a factory, exactly
+ * like StyleSheet output -- treat them as immutable.
+ */
+const themedStylesCache = new WeakMap<Theme, WeakMap<object, unknown>>();
+
 export interface ThemeProviderProps {
   initialContext?: ThemeContextModeT
 }
@@ -141,7 +155,18 @@ export const ThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = ({
 
   const themedStyles = useCallback(
     <T, >(styleOrStyleFn: ThemedStyle<T>): T => {
-      return (styleOrStyleFn as ThemedStyle<T>)(theme);
+      let cachedForTheme = themedStylesCache.get(theme);
+
+      if (!cachedForTheme) {
+        cachedForTheme = new WeakMap();
+        themedStylesCache.set(theme, cachedForTheme);
+      }
+
+      if (!cachedForTheme.has(styleOrStyleFn)) {
+        cachedForTheme.set(styleOrStyleFn, styleOrStyleFn(theme));
+      }
+
+      return cachedForTheme.get(styleOrStyleFn) as T;
     },
     [theme]
   );

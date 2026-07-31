@@ -1,13 +1,10 @@
 import { InfoBlock } from 'Component/InfoBlock';
+import { ThemedGrid } from 'Component/ThemedGrid';
 import { ThemedPressable } from 'Component/ThemedPressable';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import { Square, SquareCheck } from 'lucide-react-native';
 import { Text, View } from 'react-native';
-import {
-  DefaultFocus,
-  SpatialNavigationVirtualizedList,
-} from 'react-tv-space-navigation';
 import { useAppTheme } from 'Theme/context';
 
 import { componentStyles } from './ThemedMultiList.style.atv';
@@ -37,8 +34,9 @@ export const ThemedMultiListComponent = ({
     );
   };
 
-  const renderItem = ({ item }: { item: ListItem }) => (
+  const renderItem = ({ item, index }: { item: ListItem; index: number }) => (
     <ThemedPressable
+      autofocus={ index === 0 }
       onPress={ () => { handleOnChange(item.value, !item.isChecked); } }
     >
       { ({ isFocused }) => (
@@ -85,14 +83,11 @@ export const ThemedMultiListComponent = ({
     }
 
     return (
-      <DefaultFocus>
-        <SpatialNavigationVirtualizedList
-          data={ values }
-          renderItem={ renderItem }
-          itemSize={ styles.item.height }
-          orientation="vertical"
-        />
-      </DefaultFocus>
+      <ThemedGrid
+        numberOfColumns={ 1 }
+        data={ values }
+        renderItem={ renderItem }
+      />
     );
   };
 

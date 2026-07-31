@@ -4,8 +4,13 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   wrapper: {
     width: '100%',
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    alignItems: 'center',
     gap: scale(8),
+  },
+  inputContainer: {
+    // Takes the leftover row width instead of `100%`, which would push the
+    // secure icon out of the wrapper.
+    flex: 1,
   },
   input: {
     backgroundColor: colors.input,
@@ -14,9 +19,6 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     color: colors.text,
     fontSize: scale(text.xs.fontSize),
   },
-  inputPressable: {
-    width: '100%',
-  },
   inputFocus: {
     backgroundColor: colors.inputFocused,
     color: colors.textFocused,
@@ -24,11 +26,10 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   secureIcon: {
     justifyContent: 'center',
     alignItems: 'center',
-    aspectRatio: 1,
   },
   secureIconInner: {
     width: scale(40),
-    height: '100%',
+    height: scale(40),
     borderRadius: scale(99),
     justifyContent: 'center',
     alignItems: 'center',

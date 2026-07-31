@@ -88,7 +88,6 @@ export function useBackButtonHandler(canExit: (routeName: string) => boolean) {
           }, BACK_HANDLER_DELAY);
         } else {
           BackHandler.exitApp();
-
         }
 
         return true;

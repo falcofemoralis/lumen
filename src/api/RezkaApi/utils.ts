@@ -330,6 +330,7 @@ export const applyFilmSorting = (sort: string, variables: Variables, nameArg?: s
       variables[name] = '82';
       break;
     default:
+      delete variables[name];
       break;
   }
 };

@@ -107,7 +107,7 @@ module.exports = defineConfig([
       'react-native/no-inline-styles': 0,
       'react-native/no-raw-text': 0,
       'react/prop-types': 'off',
-      'react/no-unstable-nested-components': 'warn',
+      'react/no-unstable-nested-components': 'off',
       'react/style-prop-object': 'off',
       'react/prefer-stateless-function': 'off',
       'react/no-unused-prop-types': 'off',

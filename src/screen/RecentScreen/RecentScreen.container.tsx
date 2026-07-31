@@ -1,15 +1,16 @@
 import { useNavigation } from '@react-navigation/native';
+import { useMutation } from '@tanstack/react-query';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useConfigContext } from 'Context/ConfigContext';
-import { useNetworkContext } from 'Context/NetworkContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useLocalHistory } from 'Hooks/useLocalLibrary';
+import { usePaginatedQuery } from 'Hooks/usePaginatedQuery';
 import { getCurrentLanguage } from 'i18n/index';
 import { t } from 'i18n/translate';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import NotificationStore from 'Store/Notification.store';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { RecentItemInterface } from 'Type/RecentItem.interface';
 import { removeLocalHistoryItem, setLocalHistoryWatched } from 'Util/LocalLibrary';
+import { queryKeys } from 'Util/Query';
 import { openFilm } from 'Util/Router';
 
 import RecentScreenComponent from './RecentScreen.component';
@@ -18,37 +19,22 @@ import RecentScreenComponentTV from './RecentScreen.component.atv';
 export function RecentScreenContainer() {
   const { isTV, isLocalLibrary } = useConfigContext();
   const { isSignedIn, currentService } = useServiceContext();
-  const [items, setItems] = useState<RecentItemInterface[]>([]);
   const localHistory = useLocalHistory();
-  const paginationRef = useRef({
-    page: 1,
-    totalPages: 1,
-  });
-  const updatingStateRef = useRef(false);
   const navigation = useNavigation();
-  const [isLoading, setIsLoading] = useState(true);
-  const { handleConnectionError } = useNetworkContext();
   const hideConfirmOverlayRef = useRef<ThemedOverlayRef | null>(null);
 
-  useEffect(() => {
-    if (isSignedIn && !isLocalLibrary) {
-      setIsLoading(true);
+  const isRemote = isSignedIn && !isLocalLibrary;
 
-      loadRecent(1, false).finally(() => {
-        setIsLoading(false);
-      });
-    } else {
-      setIsLoading(false);
-    }
+  const { items, isLoading, onNextLoad, updateItems } = usePaginatedQuery<RecentItemInterface>({
+    queryKey: queryKeys.recent(),
+    fetchPage: (page, isRefresh) => currentService.getRecent(page, { isRefresh }),
+    enabled: isRemote,
+  });
 
-    return () => {
-      currentService.unloadRecentScreen();
-    };
-  }, [isSignedIn, isLocalLibrary, currentService]);
-
-  useEffect(() => {
-    updatingStateRef.current = false;
-  }, [items]);
+  useEffect(() => () => {
+    // the service keeps the full parsed list around to page through it locally
+    currentService.unloadRecentScreen();
+  }, [currentService]);
 
   const localItems = useMemo((): RecentItemInterface[] => {
     if (!isLocalLibrary) {
@@ -80,65 +66,37 @@ export function RecentScreenContainer() {
     }));
   }, [localHistory, isLocalLibrary]);
 
-  const loadRecent = async (
-    page: number,
-    isRefresh: boolean
-  ) => {
-    const { totalPages } = paginationRef.current;
-
-    if (page > totalPages) {
-      return;
-    }
-
-    if (!updatingStateRef.current) {
-      updatingStateRef.current = true;
-
-      try {
-        const {
-          items: resItems,
-          totalPages: resTotalPages,
-        } = await currentService.getRecent(
-          page,
-          { isRefresh }
-        );
-
-        paginationRef.current = {
-          page,
-          totalPages: resTotalPages,
-        };
-
-        const newItems = isRefresh ? resItems : [...items, ...resItems];
-
-        setItems(newItems);
-      } catch (error) {
-        const handled = handleConnectionError(error as Error);
-
-        if (!handled) {
-          NotificationStore.displayError(error as Error);
-        }
-
-        updatingStateRef.current = false;
-      }
-    }
-  };
-
-  const onNextLoad = async (isRefresh = false) => {
+  const handleNextLoad = async (isRefresh = false) => {
     if (isLocalLibrary) {
       return;
     }
 
-    const newPage = isRefresh ? 1 : paginationRef.current.page + 1;
-
-    if (newPage <= paginationRef.current.totalPages) {
-      await loadRecent(isRefresh ? 1 : newPage, isRefresh);
-    }
+    await onNextLoad(isRefresh);
   };
 
-  const handleOnPress = (item: RecentItemInterface) => {
+  const handleOnPress = useCallback((item: RecentItemInterface) => {
     openFilm({ link: item.link, poster: item.image }, navigation);
-  };
+  }, [navigation]);
 
-  const removeItem = async (item: RecentItemInterface) => {
+  const { mutate: removeRecent } = useMutation({
+    mutationFn: (id: string) => currentService.removeRecent(id),
+    // the row disappears immediately; a failure only surfaces as a toast, matching
+    // the previous fire-and-forget behavior
+    onMutate: (id: string) => {
+      updateItems((pageItems) => pageItems.filter((i) => i.id !== id));
+    },
+  });
+
+  const { mutate: hideRecent } = useMutation({
+    mutationFn: (id: string) => currentService.hideRecent(id),
+    onMutate: (id: string) => {
+      updateItems((pageItems) => pageItems.map(
+        (i) => (i.id === id ? { ...i, isWatched: !i.isWatched } : i)
+      ));
+    },
+  });
+
+  const removeItem = useCallback((item: RecentItemInterface) => {
     const { id } = item;
 
     if (isLocalLibrary) {
@@ -148,28 +106,12 @@ export function RecentScreenContainer() {
       return;
     }
 
-    setItems((prev) => prev.filter((i) => i.id !== id));
-
-    currentService.removeRecent(id).catch((error) => {
-      NotificationStore.displayError(error as Error);
-    });
-  };
+    removeRecent(id);
+  }, [isLocalLibrary, removeRecent]);
 
   const hideItemRef = useRef<RecentItemInterface | null>(null);
 
-  const openHideConfirmOverlay = (item: RecentItemInterface) => {
-    if (item.isWatched) {
-      hideItemRef.current = item;
-      hideItem();
-
-      return;
-    }
-
-    hideItemRef.current = item;
-    hideConfirmOverlayRef.current?.open();
-  };
-
-  const hideItem = async () => {
+  const hideItem = useCallback(() => {
     if (!hideItemRef.current) {
       return;
     }
@@ -185,21 +127,27 @@ export function RecentScreenContainer() {
       return;
     }
 
-    setItems((prev) => {
-      return prev.map((i) => i.id === id ? { ...i, isWatched: !i.isWatched } : i);
-    });
+    hideRecent(id);
+  }, [isLocalLibrary, hideRecent]);
 
-    currentService.hideRecent(id).catch((error) => {
-      NotificationStore.displayError(error as Error);
-    });
-  };
+  const openHideConfirmOverlay = useCallback((item: RecentItemInterface) => {
+    if (item.isWatched) {
+      hideItemRef.current = item;
+      hideItem();
+
+      return;
+    }
+
+    hideItemRef.current = item;
+    hideConfirmOverlayRef.current?.open();
+  }, [hideItem]);
 
   const containerProps = {
     isSignedIn,
     items: isLocalLibrary ? localItems : items,
     isLoading,
     hideConfirmOverlayRef,
-    onNextLoad,
+    onNextLoad: handleNextLoad,
     handleOnPress,
     removeItem,
     openHideConfirmOverlay,

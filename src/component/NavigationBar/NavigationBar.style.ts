@@ -21,6 +21,9 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     borderRadius: 99,
     position: 'absolute',
   },
+  tabContent: {
+    flex: 1,
+  },
   tab: {
     flexDirection: 'column',
     gap: scale(2),

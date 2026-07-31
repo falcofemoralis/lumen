@@ -8,7 +8,6 @@ import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from 'Theme/context';
-import { ActorInterface } from 'Type/Actor.interface';
 
 import { componentStyles } from './ActorScreen.style';
 import { ActorScreenComponentProps } from './ActorScreen.type';
@@ -22,8 +21,26 @@ export function ActorScreenComponent({
   const styles = useThemedStyles(componentStyles);
   const { top } = useSafeAreaInsets();
 
-  if (!actor) {
-    actor = null as unknown as ActorInterface; // dirty hack to avoid null checks
+  if (!actor || isLoading) {
+    return (
+      <Page>
+        <View style={ [styles.mainContent, { paddingTop: top }] }>
+          <Thumbnail
+            style={ styles.photoWrapper }
+          />
+          <View style={ [styles.additionalInfo, { marginTop: 0 }] }>
+            { Array(5).fill(0).map((_, i) => (
+              <Thumbnail
+              // eslint-disable-next-line react/no-array-index-key
+                key={ `${i}-thumb-actor-info` }
+                height={ scale(16) }
+                width={ scale(32) * (i+1) }
+              />
+            )) }
+          </View>
+        </View>
+      </Page>
+    );
   }
 
   const renderPhoto = () => {
@@ -79,7 +96,7 @@ export function ActorScreenComponent({
     );
   };
 
-  const renderInfo = () => (
+  const renderActorInfo = () => (
     <View>
       { renderName() }
       { renderOriginalName() }
@@ -87,31 +104,11 @@ export function ActorScreenComponent({
     </View>
   );
 
-  const renderMainData = () => {
-    if (!actor || isLoading) {
-      return (
-        <View style={ [styles.mainContent, { paddingTop: top }] }>
-          <Thumbnail
-            style={ styles.photoWrapper }
-          />
-          <View style={ [styles.additionalInfo, { marginTop: 0 }] }>
-            { Array(5).fill(0).map((_, i) => (
-              <Thumbnail
-              // eslint-disable-next-line react/no-array-index-key
-                key={ `${i}-thumb-actor-info` }
-                height={ scale(16) }
-                width={ scale(32) * (i+1) }
-              />
-            )) }
-          </View>
-        </View>
-      );
-    }
-
+  const renderActorData = () => {
     return (
       <View style={ [styles.mainContent, { paddingTop: top }] }>
         { renderPhoto() }
-        { renderInfo() }
+        { renderActorInfo() }
       </View>
     );
   };
@@ -130,7 +127,7 @@ export function ActorScreenComponent({
           data={ data }
           handleOnPress={ handleSelectFilm }
         >
-          { renderMainData() }
+          { renderActorData() }
         </FilmSections>
       </View>
     );

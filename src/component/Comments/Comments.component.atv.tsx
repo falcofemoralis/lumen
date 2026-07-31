@@ -1,7 +1,8 @@
+import { setFocus } from '@noriginmedia/norigin-spatial-navigation-core';
 import { Loader } from 'Component/Loader';
+import { ThemedGrid } from 'Component/ThemedGrid';
 import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
 import { ThemedImage } from 'Component/ThemedImage';
-import { ThemedList } from 'Component/ThemedList';
 import { ThemedPressable } from 'Component/ThemedPressable';
 import { ThemedText } from 'Component/ThemedText';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
@@ -12,13 +13,13 @@ import {
   memo,
   useCallback,
   useEffect,
+  useId,
   useImperativeHandle,
   useMemo,
   useRef,
   useState,
 } from 'react';
 import { LayoutRectangle, useWindowDimensions, View } from 'react-native';
-import { SpatialNavigationNodeRef } from 'react-tv-space-navigation';
 import { useAppTheme } from 'Theme/context';
 import { ThemedStyles } from 'Theme/types';
 import { CommentInterface, CommentTextType } from 'Type/Comment.interface';
@@ -51,18 +52,18 @@ export const CommentItem = forwardRef<CommentItemRef, CommentItemProps & { style
     isDisabled,
   } = comment;
   const { scale, theme } = useAppTheme();
-  const commentRef = useRef<SpatialNavigationNodeRef>(null);
+  const commentFocusKey = useId();
   const commentTextRef = useRef<CommentTextRef>(null);
 
   const leftIndent = styles.indentSize.width * comment.indent;
 
   useImperativeHandle(ref, () => ({
-    focus: () => commentRef.current?.focus(),
-  }), [commentRef]);
+    focus: () => setFocus(commentFocusKey),
+  }), [commentFocusKey]);
 
   return (
     <ThemedPressable
-      spatialRef={ commentRef }
+      focusKey={ commentFocusKey }
       onPress={ () => commentTextRef.current?.openSpoilers() }
       onLongPress={ () => handlePostLike(comment.id) }
     >
@@ -340,10 +341,6 @@ const CommentsList = ({
     return acc;
   }, [] as CommentInterface[]), [commentCalculatedHeights, comments, height, styles]);
 
-  const getCalculatedItemSize = useCallback((
-    item: CommentInterface
-  ) => commentCalculatedHeights[item.id].height, [commentCalculatedHeights]);
-
   const getCalculatedItemLines = useCallback((
     item: CommentInterface
   ) => commentCalculatedHeights[item.id].lines ?? [], [commentCalculatedHeights]);
@@ -358,13 +355,13 @@ const CommentsList = ({
       handlePostLike={ handlePostLike }
       styles={ styles }
     />
-  ), [getCalculatedItemLines, containerWidth, styles]);
+  ), [containerWidth, getCalculatedItemLines, handlePostLike, styles]);
 
   return (
-    <ThemedList
+    <ThemedGrid
+      numberOfColumns={ 1 }
       data={ stringifiedComments ?? [] }
       renderItem={ renderItem }
-      getEstimatedItemSize={ (_, item) => getCalculatedItemSize(item) }
       onNextLoad={ onNextLoad }
     />
   );

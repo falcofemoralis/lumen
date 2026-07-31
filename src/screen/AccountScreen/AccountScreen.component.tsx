@@ -130,6 +130,7 @@ export function AccountScreenComponent({
   ) => {
     return (
       <ThemedButton
+        title={ title }
         style={ [styles.profileAction, style] }
         contentStyle={ styles.profileActionContent }
         textStyle={ [styles.profileActionText, textStyle] }
@@ -139,9 +140,7 @@ export function AccountScreenComponent({
           size: scale(20),
           color: iconStyle ? iconStyle.color : theme.colors.icon,
         } }
-      >
-        { title }
-      </ThemedButton>
+      />
     );
   };
 
@@ -186,7 +185,7 @@ export function AccountScreenComponent({
   const renderContent = () => {
     if (!isSignedIn) {
       return (
-        <LoginForm withRedirect>
+        <LoginForm>
           { isLocalLibrary && (
             <View style={ styles.badgeContainer }>
               { (badgeData[ACCOUNT_TAB] ?? 0) > 0 && (
@@ -195,27 +194,25 @@ export function AccountScreenComponent({
                 </ThemedText>
               ) }
               <ThemedButton
+                title={ t('Notifications') }
                 IconComponent={ Bell }
                 onPress={ openNotifications }
                 iconProps={ {
                   size: scale(20),
                   color: theme.colors.icon,
                 } }
-              >
-                { t('Notifications') }
-              </ThemedButton>
+              />
             </View>
           ) }
           <ThemedButton
+            title={ t('Downloads') }
             IconComponent={ Download }
             onPress={ openDownloads }
             iconProps={ {
               size: scale(20),
               color: theme.colors.icon,
             } }
-          >
-            { t('Downloads') }
-          </ThemedButton>
+          />
         </LoginForm>
       );
     }

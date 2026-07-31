@@ -1,6 +1,6 @@
-import { SettingItem } from 'Screen/SettingsScreen/SettingsScreen.type';
+import { SettingChangeHandler, SettingCommonProps } from 'Component/SettingBase/SettingBase.type';
 
-export type SettingInputComponentProps = {
-  setting: SettingItem;
-  onUpdate: (setting: SettingItem, value: string) => Promise<boolean>;
+export type SettingInputComponentProps = SettingCommonProps & {
+  value: string;
+  onChange: SettingChangeHandler<string>;
 };

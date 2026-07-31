@@ -17,11 +17,6 @@ export const DOWNLOADS_SCREEN = 'Downloads';
 export const COLLECTION_SCREEN = 'Collection';
 export const FILM_TRAILER_SCREEN = 'FilmTrailer';
 
-export const COMMENTS_MODAL_SCREEN = 'CommentsModal';
-export const LOGIN_MODAL_SCREEN = 'LoginModal';
-export const SCHEDULE_MODAL_SCREEN = 'ScheduleModal';
-export const SETTINGS_MODAL_SCREEN = 'SettingsModal';
-
 export const ACCOUNT_TAB = `${ACCOUNT_SCREEN}-tab`;
 export const HOME_TAB = `${HOME_SCREEN}-tab`;
 export const SEARCH_TAB = `${SEARCH_SCREEN}-tab`;

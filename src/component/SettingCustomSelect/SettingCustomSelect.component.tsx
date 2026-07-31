@@ -1,5 +1,4 @@
 import { SettingBase } from 'Component/SettingBase';
-import { propsAreEqual } from 'Component/SettingBase/SettingBase.component';
 import { ThemedCustomSelect } from 'Component/ThemedCustomSelect';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { memo, useCallback, useRef, useState } from 'react';
@@ -8,44 +7,43 @@ import { View } from 'react-native';
 import { SettingCustomSelectComponentProps } from './SettingCustomSelect.type';
 
 export const SettingCustomSelectComponent = memo(({
-  setting,
-  onUpdate,
+  value,
+  options,
+  onChange,
+  ...baseProps
 }: SettingCustomSelectComponentProps) => {
-  const {
-    options,
-    value,
-  } = setting;
   const overlayRef = useRef<ThemedOverlayRef>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const onChange = useCallback(async (val: string) => {
+  const onSelect = useCallback(async (newValue: string) => {
     setIsLoading(true);
 
     try {
-      await onUpdate(setting, val);
+      await onChange(newValue);
     } catch (error) {
-      console.error('error updating SettingCustomSelectComponent', error);
+      console.error('Error in SettingCustomSelectComponent onChange:', error);
     } finally {
       setIsLoading(false);
     }
-  }, [onUpdate, setting]);
+  }, [onChange]);
 
   return (
     <View>
       <SettingBase
-        setting={ setting }
-        onPress={ () => overlayRef.current?.open() }
+        { ...baseProps }
+        subtitle={ value }
         isLoading={ isLoading }
+        onPress={ () => overlayRef.current?.open() }
       />
       <ThemedCustomSelect
         asOverlay
         overlayRef={ overlayRef }
-        value={ value ?? '' }
-        options={ (options ?? [] ).map((option) => option.value) }
-        onSelect={ onChange }
+        value={ value }
+        options={ options }
+        onSelect={ onSelect }
       />
     </View>
   );
-}, propsAreEqual);
+});
 
 export default SettingCustomSelectComponent;

@@ -7,46 +7,38 @@ import { THUMBNAILS_AMOUNT_TV } from './RecentScreen.config';
 import { componentStyles } from './RecentScreen.style.atv';
 
 export const RecentScreenThumbnail = ({
-  width: containerWidth,
   styles,
 }: {
-  width: number;
   styles: ThemedStyles<typeof componentStyles>;
 }) => {
-  const { scale, theme } = useAppTheme();
-
-  const width = containerWidth / 2;
-  const height = theme.dimensions.height / THUMBNAILS_AMOUNT_TV;
+  const { scale } = useAppTheme();
 
   return (
-    <View style={ styles.grid }>
+    <View style={ [styles.grid, { gap: scale(12) }] }>
       { Array(THUMBNAILS_AMOUNT_TV).fill(0).map((_, index) => (
         <View
           // eslint-disable-next-line react/no-array-index-key
           key={ `recent-page-thumb-row-${index}` }
-          style={ [
-            styles.item,
-            { width, height },
-          ] }
+          style={ styles.row }
         >
-          <View>
+          <View style={ [styles.fill, styles.item] }>
             <Thumbnail
               style={ styles.poster }
             />
-          </View>
-          <View style={ styles.itemContent }>
-            <Thumbnail
-              height={ scale(30) }
-              width="60%"
-            />
-            <Thumbnail
-              height={ scale(20) }
-              width="10%"
-            />
-            <Thumbnail
-              height={ scale(20) }
-              width="30%"
-            />
+            <View style={ styles.itemContent }>
+              <Thumbnail
+                height={ scale(30) }
+                width="60%"
+              />
+              <Thumbnail
+                height={ scale(20) }
+                width="10%"
+              />
+              <Thumbnail
+                height={ scale(20) }
+                width="30%"
+              />
+            </View>
           </View>
         </View>
       )) }

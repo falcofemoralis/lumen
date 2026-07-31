@@ -2,26 +2,26 @@ import { Thumbnail } from 'Component/Thumbnail';
 import { View } from 'react-native';
 import { useAppTheme } from 'Theme/context';
 
-export const FilmCardThumbnail = ({
-  width,
-}: {
-  width: number;
-}) => {
+import { POSTER_ASPECT_HEIGHT, POSTER_ASPECT_WIDTH } from './FilmCard.config';
+
+export const FilmCardThumbnail = () => {
   const { scale } = useAppTheme();
 
   return (
-    <View style={ [{ gap: scale(8) }, { width }] }>
-      <Thumbnail
-        height={ width * (250 / 166) }
-        width={ width }
-      />
+    <View style={ { gap: scale(8) } }>
+      <View style={ { aspectRatio: `${POSTER_ASPECT_WIDTH} / ${POSTER_ASPECT_HEIGHT}` } }>
+        <Thumbnail
+          height='100%'
+          width='100%'
+        />
+      </View>
       <Thumbnail
         height={ scale(24) }
-        width={ width }
+        width='100%'
       />
       <Thumbnail
         height={ scale(16) }
-        width={ width * 0.5 }
+        width={ scale(40) }
       />
     </View>
   );};

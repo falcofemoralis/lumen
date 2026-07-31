@@ -3,9 +3,6 @@ import { Theme, ThemedStyles } from 'Theme/types';
 export const ROW_GAP = 16;
 
 export const componentStyles = ({ scale, colors, text }: Theme) => ({
-  page: {
-    marginTop: 0,
-  },
   grid: {
     marginTop: scale(24),
   },

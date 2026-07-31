@@ -1,7 +1,7 @@
-import { DimensionValue, ViewStyle } from 'react-native';
+import { StyleProp, ViewStyle } from 'react-native';
 
 export interface ThumbnailComponentProps {
-  style?: ViewStyle | undefined;
-  height?: DimensionValue;
-  width?: DimensionValue;
+  width?: number | string;
+  height?: number | string;
+  style?: StyleProp<ViewStyle> | undefined;
 }

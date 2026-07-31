@@ -62,7 +62,7 @@ const en = {
   'You are not logged in': 'You are not logged in',
   'Sign in to sync content': 'Sign in to sync content',
   'Sign in': 'Sign in',
-  'Go to login page': 'Go to login page',
+  'Log In': 'Log In',
   'Something went wrong': 'Something went wrong',
   'Welcome to {{name}}': 'Welcome to\n {{name}}',
   'Your gateway to unlimited movies. Let’s set things up!': 'Your gateway to unlimited movies. Let’s set things up!',
@@ -187,6 +187,7 @@ const en = {
   'Season {{season}}': 'Season {{season}}',
   'Episode {{episode}}': 'Episode {{episode}}',
   'No video streams available for {{key}}': 'No video streams available for {{key}}',
+  'No episodes selected': 'No episodes selected',
   'No downloads': 'No downloads',
   'You have not downloaded any films yet': 'You have not downloaded any films yet',
   'Open folder': 'Open folder',
@@ -202,6 +203,8 @@ const en = {
   'Download subtitles': 'Download subtitles',
   'Download poster': 'Download poster',
   'Download failed': 'Download failed',
+  'Downloading': 'Downloading',
+  'Film is still downloading': 'Film is still downloading',
   'Please select or type a value': 'Please select or type a value',
   'Type or select value': 'Type or select value',
   'Select from presets': 'Select from presets',
@@ -295,6 +298,7 @@ const en = {
   'Watching Now': 'Watching Now',
   'Popular': 'Popular',
   'Awaiting': 'Awaiting',
+  'Welcome to the app!': 'Welcome to the app!',
 };
 
 export default en;

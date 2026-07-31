@@ -1,3 +1,4 @@
+import { ASPECT_RATIO_OPTIONS, DEFAULT_SPEEDS, getAspectRatioLabel, MAX_QUALITY } from 'Component/Player/Player.config';
 import { t } from 'i18n/translate';
 import {
   ACCOUNT_SCREEN,
@@ -7,9 +8,6 @@ import {
   RECENT_SCREEN,
   SEARCH_SCREEN,
 } from 'Navigation/navigationRoutes';
-import { convertBooleanToString } from 'Util/Type';
-
-import { SettingItem } from './SettingsScreen.type';
 
 export const GITHUB_LINK = 'https://github.com/falcofemoralis/lumen';
 export const TELEGRAM_LINK = 'https://t.me/lumen_app';
@@ -64,47 +62,78 @@ export const MOBILE_SCREENS = [
   },
 ];
 
-export const yesNoOptions = [
-  {
-    value: convertBooleanToString(true),
-    label: t('Yes'),
-  },
-  {
-    value: convertBooleanToString(false),
-    label: t('No'),
-  },
+export const THEME_SCHEME_OPTIONS = [
+  { value: 'system', label: t('System default') },
+  { value: 'dark', label: t('Dark') },
+  { value: 'light', label: t('Light') },
 ];
 
-export const checkEnabled = (setting: SettingItem, allSettings: SettingItem[]) => {
-  const { dependsOn } = setting;
+export const APP_LANGUAGE_OPTIONS = [
+  { value: 'uk', label: 'Українська' },
+  { value: 'en', label: 'English' },
+  { value: 'ru', label: 'Русский' },
+];
 
-  if (!dependsOn) {
-    return setting.isEnabled !== undefined ? setting.isEnabled : true;
-  }
+export const COLUMNS_MOBILE_OPTIONS = Array.from({ length: 9 }, (_, index) => ({
+  value: (index + 2).toString(),
+  label: (index + 2).toString(),
+}));
 
-  const { field, value } = dependsOn;
+export const COLUMNS_TV_OPTIONS = Array.from({ length: 11 }, (_, index) => ({
+  value: (index + 2).toString(),
+  label: (index + 2).toString(),
+}));
 
-  const dependedSetting = allSettings.find((s) => s.id === field);
+export const PLAYER_QUALITY_OPTIONS = [
+  MAX_QUALITY,
+  { value: '4K', label: '4K' },
+  { value: '2K', label: '2K' },
+  { value: '1080p Ultra', label: '1080p Ultra' },
+  { value: '1080p', label: '1080p' },
+  { value: '720p', label: '720p' },
+  { value: '480p', label: '480p' },
+  { value: '360p', label: '360p' },
+];
 
-  return dependedSetting?.value === value;
-};
+export const PLAYER_REWIND_OPTIONS = Array.from({ length: 12 }, (_, index) => {
+  const value = (index + 1) * 5;
 
-export const updateSettings = (settings: SettingItem[], value?: string, id?: string) => {
-  const settingsWithNewValue = settings.map((st) => ({
-    ...st,
-    value: st.id === id ? value : st.value,
-    settings: st.settings?.map((s) => ({
-      ...s,
-      value: s.id === id ? value : s.value,
-    })),
-  }));
+  return {
+    value: value.toString(),
+    label: t('{{seconds}} seconds', { seconds: value }),
+  };
+});
 
-  return settingsWithNewValue.map((st) => ({
-    ...st,
-    isEnabled: checkEnabled(st, settingsWithNewValue),
-    settings: st.settings?.map((s) => ({
-      ...s,
-      isEnabled: checkEnabled(s, st.settings ?? []),
-    })),
-  }));
-};
+export const PLAYER_ASPECT_RATIO_OPTIONS = ASPECT_RATIO_OPTIONS.map((option) => ({
+  value: option,
+  label: getAspectRatioLabel(option),
+}));
+
+export const PLAYER_LONG_PRESS_SPEED_OPTIONS = Array.from({ length: 12 }, (_, index) => {
+  const value = (index + 1) * 0.25;
+
+  return {
+    value: value.toString(),
+    label: `${value.toString()}x`,
+  };
+});
+
+export const PLAYER_SPEED_OPTIONS = DEFAULT_SPEEDS.map((value) => ({
+  value: value.toString(),
+  label: `${value.toString()}x`,
+}));
+
+export const PLAYER_BUFFER_TIME_OPTIONS = [
+  {
+    value: 'auto',
+    label: t('Auto'),
+  },
+  ...Array.from({ length: 12 }, (_, index) => {
+    const value = (index + 1) * 15;
+
+    return {
+      value: value.toString(),
+      label: t('{{seconds}} seconds', { seconds: value }),
+    };
+  }),
+];

@@ -87,6 +87,8 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   commentsOverlay: {
     width: '40%',
     height: '100%',
+    // overrides the overlay's default maxHeight, which would clamp it to half the screen
+    maxHeight: '100%',
     marginRight: 0,
   },
   commentsOverlayModal: {

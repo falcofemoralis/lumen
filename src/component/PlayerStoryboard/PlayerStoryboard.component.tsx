@@ -86,6 +86,12 @@ const PlayerStoryboardComponent = ({
   const [storyboard, setStoryboard] = useState<VTTItem[] | null>([]);
   const [img, setImg] = useState<string>('');
 
+  const updateImg = (newImg: string) => {
+    if (newImg !== img) {
+      setImg(newImg);
+    }
+  };
+
   useEffect(() => {
     updateImg('');
 
@@ -93,12 +99,6 @@ const PlayerStoryboardComponent = ({
       setStoryboard(parsedStoryboard);
     });
   }, [storyboardUrl]);
-
-  const updateImg = (newImg: string) => {
-    if (newImg !== img) {
-      setImg(newImg);
-    }
-  };
 
   useEffect(() => {
     if (!storyboard) {

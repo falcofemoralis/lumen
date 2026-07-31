@@ -1,11 +1,12 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useLocalBookmarks } from 'Hooks/useLocalLibrary';
 import { t } from 'i18n/translate';
-import { useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
 import { filmToFilmCard } from 'Util/Film';
 import { createLocalCategory, toggleLocalBookmark } from 'Util/LocalLibrary';
+import { queryKeys } from 'Util/Query';
 
 import BookmarksOverlayComponent from './BookmarksOverlay.component';
 import BookmarksOverlayComponentTV from './BookmarksOverlay.component.atv';
@@ -17,14 +18,34 @@ export const BookmarksOverlayContainer = ({
   onClose,
   onBookmarkChange,
 }: BookmarksOverlayContainerProps) => {
-  const [isLoading, setIsLoading] = useState(false);
   const { currentService } = useServiceContext();
   const { isTV, isLocalLibrary } = useConfigContext();
   const localBookmarks = useLocalBookmarks();
+  const queryClient = useQueryClient();
 
-  const postBookmark = async (bookmarkId: string, isChecked: boolean) => {
-    const { id } = film;
+  const { mutate: toggleBookmark, isPending: isLoading } = useMutation({
+    mutationFn: ({ bookmarkId, isChecked }: { bookmarkId: string, isChecked: boolean }) => {
+      const { id } = film;
 
+      return isChecked
+        ? currentService.addBookmark(id, bookmarkId)
+        : currentService.removeBookmark(id, bookmarkId);
+    },
+    onSuccess: (_result, { bookmarkId, isChecked }) => {
+      const bk = film.bookmarks?.findIndex((b) => b.id === bookmarkId) ?? -1;
+
+      if (bk !== -1 && film.bookmarks) {
+        film.bookmarks[bk].isBookmarked = isChecked;
+        onBookmarkChange?.(film);
+      }
+
+      // the bookmarks tab lists the same categories, so it has to re-read them
+      queryClient.invalidateQueries({ queryKey: queryKeys.bookmarks() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.films.bookmarks() });
+    },
+  });
+
+  const postBookmark = (bookmarkId: string, isChecked: boolean) => {
     if (isLocalLibrary) {
       // reactive local-bookmarks consumers (film screen, bookmarks tab) pick this up
       toggleLocalBookmark(filmToFilmCard(film), bookmarkId, isChecked);
@@ -32,25 +53,7 @@ export const BookmarksOverlayContainer = ({
       return;
     }
 
-    try {
-      setIsLoading(true);
-
-      if (isChecked) {
-        await currentService.addBookmark(id, bookmarkId);
-      } else {
-        await currentService.removeBookmark(id, bookmarkId);
-      }
-
-      const bk = film.bookmarks?.findIndex((b) => b.id === bookmarkId) ?? -1;
-      if (bk !== -1 && film.bookmarks) {
-        film.bookmarks[bk].isBookmarked = isChecked;
-        onBookmarkChange?.(film);
-      }
-    } catch (error) {
-      NotificationStore.displayError(error as Error);
-    } finally {
-      setIsLoading(false);
-    }
+    toggleBookmark({ bookmarkId, isChecked });
   };
 
   const createCategory = (title: string): boolean => {

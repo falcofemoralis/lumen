@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
-import { pagerItemsReset, pagerItemsUpdater } from 'Component/FilmPager/FilmPager.config';
-import { PagerItemInterface } from 'Component/FilmPager/FilmPager.type';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { useFilmPager } from 'Component/FilmPager/useFilmPager';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
@@ -9,14 +9,14 @@ import {
   useSpeechRecognitionEvent,
 } from 'expo-speech-recognition';
 import { COLLECTION_SCREEN } from 'Navigation/navigationRoutes';
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Keyboard } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
-import { MenuItemInterface } from 'Type/MenuItem.interface';
 import { SearchableCategoryInterface } from 'Type/SearchableCategoryInterface.interface';
 import { safeJsonParse } from 'Util/Json';
 import { setTimeoutSafe } from 'Util/Misc';
 import { navigate } from 'Util/Navigation';
+import { queryKeys, STALE_TIME } from 'Util/Query';
 import { openCategory } from 'Util/Router';
 import { storage } from 'Util/Storage';
 
@@ -24,36 +24,92 @@ import SearchScreenComponent from './SearchScreen.component';
 import SearchScreenComponentTV from './SearchScreen.component.atv';
 import { MAX_USER_SUGGESTIONS, SEARCH_DEBOUNCE_TIME, SEARCH_MENU_ITEM, USER_SUGGESTIONS } from './SearchScreen.config';
 
+const loadUserSuggestions = (): string[] => (
+  safeJsonParse<string[]>(storage.getMiscStorage().loadString(USER_SUGGESTIONS), []) || []
+);
+
 export function SearchScreenContainer() {
   const { isTV } = useConfigContext();
   const [query, setQuery] = useState('');
   const navigation = useNavigation();
-  const [suggestions, setSuggestions] = useState<string[]>(
-    safeJsonParse(storage.getMiscStorage().loadString(USER_SUGGESTIONS), []) || []
-  );
-  const [pagerItems, setPagerItems] = useState<PagerItemInterface[]>([{
-    menuItem: SEARCH_MENU_ITEM,
-    films: null,
-    pagination: {
-      currentPage: 1,
-      totalPages: 1,
-    },
-  }]);
+  const [userSuggestions, setUserSuggestions] = useState<string[]>(loadUserSuggestions);
+  // the debounced text the remote suggestions are fetched for
+  const [suggestionQuery, setSuggestionQuery] = useState('');
   const [enteredText, setEnteredText] = useState('');
   const [recognizing, setRecognizing] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const debounce = useRef<number | null>(null);
   const { currentService } = useServiceContext();
+  const searchMenuItems = useMemo(() => [SEARCH_MENU_ITEM], []);
+
+  const { pagerItems, isLoading, onPreLoad, onNextLoad } = useFilmPager({
+    queryKey: queryKeys.films.search(query),
+    menuItems: searchMenuItems,
+    fetchFilms: (_menuItem, page) => currentService.search(query, page),
+    enabled: !!query,
+  });
   const confirmationOverlayRef = useRef<ThemedOverlayRef>(null);
 
   const additionalContentOverlayRef = useRef<ThemedOverlayRef>(null);
-  const [categories, setCategories] = useState<SearchableCategoryInterface[] | null>(null);
-  const [isCategoriesLoading, setIsCategoriesLoading] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<SearchableCategoryInterface | null>(null);
-  const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
-  const [selectedYear, setSelectedYear] = useState<string | null>(null);
-  const isLoadingAdditionalContentRef = useRef(false);
-  const isLoadedAdditionalContentRef = useRef(false);
+  const [isAdditionalContentRequested, setIsAdditionalContentRequested] = useState(false);
+  const [selectedCategoryName, setSelectedCategoryName] = useState<string | null>(null);
+  const [pickedGenre, setPickedGenre] = useState<string | null>(null);
+  const [pickedYear, setPickedYear] = useState<string | null>(null);
+
+  const { data: remoteSuggestions } = useQuery({
+    queryKey: queryKeys.search.suggestions(suggestionQuery),
+    queryFn: () => currentService.searchSuggestions(suggestionQuery),
+    enabled: !!suggestionQuery,
+    // keep the previous list visible while the next one is in flight
+    placeholderData: keepPreviousData,
+    staleTime: STALE_TIME.MEDIUM,
+  });
+
+  const { data: categories = null, isLoading: isCategoriesLoading } = useQuery({
+    queryKey: queryKeys.search.additionalContent(),
+    queryFn: () => currentService.loadAdditionalContent(),
+    // the overlay is what triggers the (one time) load
+    enabled: isAdditionalContentRequested,
+    staleTime: Infinity,
+  });
+
+  // the pickers default to the first category and its first genre/year, so the
+  // selection is derived rather than seeded once the content arrives
+  const selectedCategory = useMemo(() => {
+    if (!categories?.length) {
+      return null;
+    }
+
+    return categories.find(({ name }) => name === selectedCategoryName) ?? categories[0];
+  }, [categories, selectedCategoryName]);
+
+  const selectedGenre = pickedGenre ?? selectedCategory?.genres[0]?.value ?? null;
+  const selectedYear = pickedYear ?? selectedCategory?.years[0]?.value ?? null;
+
+  const suggestions = suggestionQuery ? remoteSuggestions ?? userSuggestions : userSuggestions;
+
+  const updateUserSuggestions = (q: string) => {
+    const newArray = [q, ...loadUserSuggestions()];
+    const mArray = new Set(newArray);
+    const uniqueArray = [...mArray];
+
+    storage.getMiscStorage().save(
+      USER_SUGGESTIONS,
+      uniqueArray.slice(0, MAX_USER_SUGGESTIONS)
+    );
+  };
+
+  const onApplySuggestion = async (q: string) => {
+    if (!q) {
+      return;
+    }
+
+    setQuery(q);
+    setEnteredText(q);
+    updateUserSuggestions(q);
+    setUserSuggestions(loadUserSuggestions());
+
+    Keyboard.dismiss();
+  };
 
   useSpeechRecognitionEvent('start', () => setRecognizing(true));
   useSpeechRecognitionEvent('end', () => setRecognizing(false));
@@ -61,62 +117,23 @@ export function SearchScreenContainer() {
     onApplySuggestion(event.results[0]?.transcript);
   });
 
-  const searchSuggestions = async (q: string) => {
-    try {
-      const res = await currentService.searchSuggestions(q);
-
-      setSuggestions(res);
-    } catch (error) {
-      NotificationStore.displayError(error as Error);
-    }
-  };
-
-  const search = async (q: string) => {
-    if (!q) {
-      return;
-    }
-
-    setIsLoading(true);
-
-    try {
-      const page = 1;
-
-      const filmsList = await currentService.search(q, page);
-
-      onUpdateFilms('search', {
-        ...pagerItems[0],
-        films: filmsList.films,
-        pagination: {
-          currentPage: page,
-          totalPages: filmsList.totalPages,
-        },
-      });
-    } catch (error) {
-      NotificationStore.displayError(error as Error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const onChangeText = async (q: string) => {
     resetSearch();
     setEnteredText(q);
-
-    if (!q) {
-      if (debounce.current) {
-        clearTimeout(debounce.current);
-      }
-      setSuggestions(safeJsonParse(storage.getMiscStorage().loadString(USER_SUGGESTIONS), []) || []);
-
-      return;
-    }
 
     if (debounce.current) {
       clearTimeout(debounce.current);
     }
 
-    debounce.current = setTimeoutSafe(async () => {
-      await searchSuggestions(q);
+    if (!q) {
+      // an empty suggestion query falls back to the stored user suggestions
+      setSuggestionQuery('');
+
+      return;
+    }
+
+    debounce.current = setTimeoutSafe(() => {
+      setSuggestionQuery(q);
     }, SEARCH_DEBOUNCE_TIME);
   };
 
@@ -131,52 +148,15 @@ export function SearchScreenContainer() {
 
     Keyboard.dismiss();
 
+    // setting the query starts the search: it is part of the films query key
     setQuery(q);
     setEnteredText(q);
     updateUserSuggestions(q);
-
-    search(q);
-  };
-
-  const onApplySuggestion = async (q: string) => {
-    if (!q) {
-      return;
-    }
-
-    setQuery(q);
-    setEnteredText(q);
-    updateUserSuggestions(q);
-
-    search(q);
-
-    Keyboard.dismiss();
-  };
-
-  const updateUserSuggestions = (q: string) => {
-    const userSuggestions = safeJsonParse(storage.getMiscStorage().loadString(USER_SUGGESTIONS), []) || [];
-
-    const newArray = [q, ...userSuggestions];
-    const mArray = new Set(newArray);
-    const uniqueArray = [...mArray];
-
-    storage.getMiscStorage().save(
-      USER_SUGGESTIONS,
-      uniqueArray.slice(0, MAX_USER_SUGGESTIONS)
-    );
+    setUserSuggestions(loadUserSuggestions());
   };
 
   const resetSearch = () => {
-    if (pagerItems[0]?.films?.length) {
-      onUpdateFilms('search', {
-        ...pagerItems[0],
-        films: null,
-        pagination: {
-          currentPage: 1,
-          totalPages: 1,
-        },
-      });
-    }
-
+    // clearing the query changes the films query key, so the shown films reset automatically
     if (query) {
       setQuery('');
     }
@@ -184,7 +164,7 @@ export function SearchScreenContainer() {
 
   const clearSearch = () => {
     setEnteredText('');
-    setSuggestions(safeJsonParse(storage.getMiscStorage().loadString(USER_SUGGESTIONS), []) || []);
+    setSuggestionQuery('');
     resetSearch();
   };
 
@@ -213,65 +193,16 @@ export function SearchScreenContainer() {
     });
   };
 
-  const onLoadFilms = async (
-    menuItem: MenuItemInterface,
-    currentPage: number,
-    isRefresh: boolean
-  ) => {
-    if (isRefresh) {
-      setPagerItems(pagerItemsReset(menuItem.id));
-    }
-
-    return currentService.search(query, currentPage);
-  };
-
-  const onUpdateFilms = async (key: string, item: PagerItemInterface) => {
-    setPagerItems(pagerItemsUpdater(key, item));
-  };
-
   const openAdditionalContentOverlay = () => {
     additionalContentOverlayRef.current?.open();
-
-    if (isLoadedAdditionalContentRef.current || isLoadingAdditionalContentRef.current) {
-      return;
-    }
-
-    isLoadingAdditionalContentRef.current = true;
-    setIsCategoriesLoading(true);
-
-    currentService.loadAdditionalContent()
-      .then((cats) => {
-        if (cats.length > 0) {
-          const firstCat = cats[0];
-          setCategories(cats);
-          setSelectedCategory(firstCat);
-
-          if (firstCat.genres.length > 0) {
-            setSelectedGenre(firstCat.genres[0].value);
-          }
-
-          if (firstCat.years.length > 0) {
-            setSelectedYear(firstCat.years[0].value);
-          }
-        }
-      })
-      .finally(() => {
-        setIsCategoriesLoading(false);
-        isLoadingAdditionalContentRef.current = false;
-        isLoadedAdditionalContentRef.current = true;
-      });
+    setIsAdditionalContentRequested(true);
   };
 
   const handleSelectCategory = (cat: SearchableCategoryInterface) => {
-    setSelectedCategory(cat);
-
-    if (cat.genres.length > 0) {
-      setSelectedGenre(cat.genres[0].value);
-    }
-
-    if (cat.years.length > 0) {
-      setSelectedYear(cat.years[0].value);
-    }
+    setSelectedCategoryName(cat.name);
+    // clearing the picks falls back to the new category's first genre/year
+    setPickedGenre(null);
+    setPickedYear(null);
   };
 
   const handleApplyAdditionalContent = () => {
@@ -306,13 +237,12 @@ export function SearchScreenContainer() {
       return;
     }
 
-    const userSuggestions = safeJsonParse(storage.getMiscStorage().loadString(USER_SUGGESTIONS), []) || [];
-    const newSuggestions = userSuggestions.filter((s: string) => s !== suggestionToRemove.current);
+    const newSuggestions = loadUserSuggestions().filter((s) => s !== suggestionToRemove.current);
     storage.getMiscStorage().save(
       USER_SUGGESTIONS,
       newSuggestions
     );
-    setSuggestions(newSuggestions);
+    setUserSuggestions(newSuggestions);
     suggestionToRemove.current = null;
     confirmationOverlayRef.current?.close();
   };
@@ -334,13 +264,13 @@ export function SearchScreenContainer() {
     handleApplyAdditionalContent,
     handleOpenCollections,
     setSelectedCategory: handleSelectCategory,
-    setSelectedGenre,
-    setSelectedYear,
+    setSelectedGenre: setPickedGenre,
+    setSelectedYear: setPickedYear,
     onChangeText,
     onApplySearch,
     onApplySuggestion,
-    onLoadFilms,
-    onUpdateFilms,
+    onPreLoad,
+    onNextLoad,
     handleStartRecognition,
     handleApplySearch,
     resetSearch,

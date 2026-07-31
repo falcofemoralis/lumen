@@ -1,3 +1,5 @@
+import { setFocus } from '@noriginmedia/norigin-spatial-navigation-core';
+import { FocusContext, useFocusable } from '@noriginmedia/norigin-spatial-navigation-react-native-tvos';
 import { BookmarksOverlay } from 'Component/BookmarksOverlay';
 import { CommentsOverlay } from 'Component/CommentsOverlay';
 import { Loader } from 'Component/Loader';
@@ -33,7 +35,6 @@ import {
 } from 'lucide-react-native';
 import {
   ComponentType,
-  Ref,
   useEffect,
   useRef,
   useState,
@@ -44,11 +45,6 @@ import {
 } from 'react-native';
 import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
-import {
-  DefaultFocus,
-  SpatialNavigationNodeRef,
-  SpatialNavigationView,
-} from 'react-tv-space-navigation';
 import { useAppTheme } from 'Theme/context';
 import { ClosedCaptionFilled } from 'Theme/icons';
 import { setTimeoutSafe } from 'Util/Misc';
@@ -66,6 +62,10 @@ import {
 } from './Player.config';
 import { componentStyles } from './Player.style.atv';
 import { PlayerComponentProps } from './Player.type';
+
+const TOP_ACTION_FOCUS_KEY = 'player-top-action';
+const PROGRESS_THUMB_FOCUS_KEY = 'player-progress-thumb';
+const BOTTOM_ACTION_FOCUS_KEY = 'player-bottom-action';
 
 export function PlayerComponent({
   player,
@@ -117,9 +117,8 @@ export function PlayerComponent({
   const [hideActions, setHideActions] = useState(false);
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const controlsTimeout = useRef<number | null>(null);
-  const topActionRef = useRef<SpatialNavigationNodeRef | null>(null);
-  const middleActionRef = useRef<SpatialNavigationNodeRef | null>(null);
-  const bottomActionRef = useRef<SpatialNavigationNodeRef | null>(null);
+  const { ref: topRowRef, focusKey: topRowFocusKey } = useFocusable();
+  const { ref: bottomRowRef, focusKey: bottomRowFocusKey } = useFocusable();
   const isPlayingRef = useRef(isPlaying);
   const showControlsRef = useRef(showControls);
   const isOverlayOpenRef = useRef(isOverlayOpen);
@@ -142,7 +141,7 @@ export function PlayerComponent({
   const closeControls = () => {
     setShowControls(false);
     updateFocusedElement(FocusedElement.PROGRESS_THUMB);
-    middleActionRef.current?.focus();
+    setFocus(PROGRESS_THUMB_FOCUS_KEY);
   };
 
   const setControlsTimeout = () => {
@@ -197,7 +196,7 @@ export function PlayerComponent({
 
         if (type === SupportedKeys.UP) {
           updateFocusedElement(FocusedElement.TOP_ACTION);
-          topActionRef.current?.focus();
+          setFocus(TOP_ACTION_FOCUS_KEY);
         }
 
         if (type === SupportedKeys.ENTER
@@ -205,7 +204,7 @@ export function PlayerComponent({
           || type === SupportedKeys.RIGHT
         ) {
           updateFocusedElement(FocusedElement.PROGRESS_THUMB);
-          middleActionRef.current?.focus();
+          setFocus(PROGRESS_THUMB_FOCUS_KEY);
 
           if (type === SupportedKeys.LEFT || type === SupportedKeys.RIGHT) {
             setHideActions(true);
@@ -217,7 +216,7 @@ export function PlayerComponent({
 
         if (type === SupportedKeys.DOWN) {
           updateFocusedElement(FocusedElement.BOTTOM_ACTION);
-          bottomActionRef.current?.focus();
+          setFocus(BOTTOM_ACTION_FOCUS_KEY);
         }
 
         if (playerStopPlayOnButtonTV && type === SupportedKeys.ENTER) {
@@ -240,14 +239,56 @@ export function PlayerComponent({
           togglePlayPause();
         }
 
-        if ((type === SupportedKeys.UP || type === SupportedKeys.DOWN) && hideActionsRef.current) {
-          setHideActions(false);
+        if (type === SupportedKeys.UP || type === SupportedKeys.DOWN) {
+          // Reveal the action rows if they were hidden while seeking, then move
+          // focus onto the row explicitly. We can't rely on norigin's geometry
+          // navigation here: the row was just un-hidden (opacity/reflow) and
+          // navigating from the stale layout drops focus. Consume the event so
+          // the layout adapter doesn't also run a conflicting geometry pass.
+          if (hideActionsRef.current) {
+            setHideActions(false);
+          }
+
+          const isUp = type === SupportedKeys.UP;
+
+          updateFocusedElement(isUp ? FocusedElement.TOP_ACTION : FocusedElement.BOTTOM_ACTION);
+          setFocus(isUp ? TOP_ACTION_FOCUS_KEY : BOTTOM_ACTION_FOCUS_KEY);
+
+          return true;
         }
 
         if (type === SupportedKeys.LEFT || type === SupportedKeys.RIGHT) {
           setHideActions(true);
           setShowControls(true);
         }
+      }
+
+      // Vertical navigation for the action rows is handled explicitly. The
+      // inward hop lands on the thumb (a small element positioned at the current
+      // progress %, so it rarely overlaps the focused action vertically and
+      // norigin's geometry navigation skips it). The outward key is swallowed:
+      // there is nothing focusable above the top row / below the bottom row, so
+      // letting norigin run would navigate focus out and drop it. Either way we
+      // consume both vertical keys; LEFT/RIGHT stay geometry-driven so in-row
+      // navigation keeps working.
+      // eslint-disable-next-line max-len
+      if (focusedElementRef.current === FocusedElement.TOP_ACTION && (type === SupportedKeys.UP || type === SupportedKeys.DOWN)) {
+        if (type === SupportedKeys.DOWN) {
+          updateFocusedElement(FocusedElement.PROGRESS_THUMB);
+          setFocus(PROGRESS_THUMB_FOCUS_KEY);
+        }
+
+        return true;
+      }
+
+      // eslint-disable-next-line max-len
+      if (focusedElementRef.current === FocusedElement.BOTTOM_ACTION && (type === SupportedKeys.UP || type === SupportedKeys.DOWN)) {
+        if (type === SupportedKeys.UP) {
+          updateFocusedElement(FocusedElement.PROGRESS_THUMB);
+          setFocus(PROGRESS_THUMB_FOCUS_KEY);
+        }
+
+        return true;
       }
 
       return false;
@@ -263,6 +304,8 @@ export function PlayerComponent({
 
     const backAction = () => {
       if (showControlsRef.current) {
+        updateFocusedElement(FocusedElement.PROGRESS_THUMB);
+        setFocus(PROGRESS_THUMB_FOCUS_KEY);
         setShowControls(false);
 
         return true;
@@ -349,10 +392,10 @@ export function PlayerComponent({
     IconComponent: ComponentType<any>,
     el: FocusedElement,
     action?: () => void,
-    ref?: Ref<SpatialNavigationNodeRef>
+    focusKey?: string
   ) => (
     <ThemedPressable
-      spatialRef={ ref }
+      focusKey={ focusKey }
       onPress={ action }
       onFocus={ () => updateFocusedElement(el) }
     >
@@ -375,12 +418,12 @@ export function PlayerComponent({
   const renderTopAction = (
     icon: ComponentType<any>,
     action?: () => void,
-    ref?: Ref<SpatialNavigationNodeRef>
+    focusKey?: string
   ) => renderAction(
     icon,
     FocusedElement.TOP_ACTION,
     action,
-    ref
+    focusKey
   );
 
   const renderTopActionLine = () => {
@@ -398,36 +441,37 @@ export function PlayerComponent({
   const renderBottomAction = (
     icon: ComponentType<any>,
     action?: () => void,
-    ref?: Ref<SpatialNavigationNodeRef>
+    focusKey?: string
   ) => renderAction(
     icon,
     FocusedElement.BOTTOM_ACTION,
     action,
-    ref
+    focusKey
   );
 
   const renderTopActions = () => (
-    <SpatialNavigationView
-      direction="horizontal"
+    <View
       style={ {
         ...styles.controlsRowLine,
         ...(hideActions ? styles.controlsRowHidden : {}),
       } }
     >
-      <View style={ styles.controlsRow }>
-        { renderTopAction(isPlaying || status === 'loading' ? Pause : Play, togglePlayPause, topActionRef) }
-        { film.hasSeasons && (
-          <>
-            { renderTopAction(SkipBack, () => handleNewEpisode(RewindDirection.BACKWARD)) }
-            { renderTopAction(SkipForward, () => handleNewEpisode(RewindDirection.FORWARD)) }
-          </>
-        ) }
-        { renderTopAction(Gauge, openSpeedSelector) }
-        { !isOffline && renderTopAction(MessageSquareText, handleOpenComments) }
-        { renderTopAction(Undo2, backwardToStart) }
-      </View>
+      <FocusContext.Provider value={ topRowFocusKey }>
+        <View ref={ topRowRef } style={ styles.controlsRow }>
+          { renderTopAction(isPlaying || status === 'loading' ? Pause : Play, togglePlayPause, TOP_ACTION_FOCUS_KEY) }
+          { film.hasSeasons && (
+            <>
+              { renderTopAction(SkipBack, () => handleNewEpisode(RewindDirection.BACKWARD)) }
+              { renderTopAction(SkipForward, () => handleNewEpisode(RewindDirection.FORWARD)) }
+            </>
+          ) }
+          { renderTopAction(Gauge, openSpeedSelector) }
+          { !isOffline && renderTopAction(MessageSquareText, handleOpenComments) }
+          { renderTopAction(Undo2, backwardToStart) }
+        </View>
+      </FocusContext.Provider>
       { renderTopActionLine() }
-    </SpatialNavigationView>
+    </View>
   );
 
   const renderProgressBar = () => {
@@ -439,7 +483,7 @@ export function PlayerComponent({
         storyboardUrl={ storyboardUrl }
         calculateCurrentTime={ calculateCurrentTime }
         seekToPosition={ seekToPosition }
-        thumbRef={ middleActionRef }
+        thumbFocusKey={ PROGRESS_THUMB_FOCUS_KEY }
         onFocus={ () => updateFocusedElement(FocusedElement.PROGRESS_THUMB) }
         rewindPosition={ rewindPosition }
         togglePlayPause={ togglePlayPause }
@@ -480,23 +524,25 @@ export function PlayerComponent({
 
     return (
       <View style={ styles.bottomActions }>
-        <SpatialNavigationView
-          direction="horizontal"
-          style={ {
-            ...styles.controlsRow,
-            ...(hideActions ? styles.controlsRowHidden : {}),
-          } }
-        >
-          { renderBottomAction(Settings2, openQualitySelector, bottomActionRef) }
-          { isPlaylistSelector && renderBottomAction(ListVideo, openVideoSelector) }
-          { subtitles.length > 0 && renderBottomAction(
-            // eslint-disable-next-line max-len
-            selectedSubtitle?.languageCode === '' ? ClosedCaption : ClosedCaptionFilled({ color: theme.colors.iconOnContrast }),
-            openSubtitleSelector
-          ) }
-          { !isOffline && renderBottomAction(isFilmBookmarked ? BookmarkCheck : Bookmark, openBookmarksOverlay) }
-          { renderBottomAction(Maximize2, handleAspectRatioChange) }
-        </SpatialNavigationView>
+        <FocusContext.Provider value={ bottomRowFocusKey }>
+          <View
+            ref={ bottomRowRef }
+            style={ {
+              ...styles.controlsRow,
+              ...(hideActions ? styles.controlsRowHidden : {}),
+            } }
+          >
+            { renderBottomAction(Settings2, openQualitySelector, BOTTOM_ACTION_FOCUS_KEY) }
+            { isPlaylistSelector && renderBottomAction(ListVideo, openVideoSelector) }
+            { subtitles.length > 0 && renderBottomAction(
+              // eslint-disable-next-line max-len
+              selectedSubtitle?.languageCode === '' ? ClosedCaption : ClosedCaptionFilled({ color: theme.colors.iconOnContrast }),
+              openSubtitleSelector
+            ) }
+            { !isOffline && renderBottomAction(isFilmBookmarked ? BookmarkCheck : Bookmark, openBookmarksOverlay) }
+            { renderBottomAction(Maximize2, handleAspectRatioChange) }
+          </View>
+        </FocusContext.Provider>
         { renderDuration() }
       </View>
     );
@@ -517,9 +563,7 @@ export function PlayerComponent({
     <Animated.View style={ [styles.controls, controlsAnimation] }>
       { renderTopInfo() }
       { renderTopActions() }
-      <DefaultFocus>
-        { renderProgressBar() }
-      </DefaultFocus>
+      { renderProgressBar() }
       { renderBottomActions() }
     </Animated.View>
   );

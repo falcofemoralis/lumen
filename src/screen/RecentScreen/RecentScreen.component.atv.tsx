@@ -1,5 +1,7 @@
+import { FocusContext, useFocusable } from '@noriginmedia/norigin-spatial-navigation-react-native-tvos';
 import { ConfirmOverlay } from 'Component/ConfirmOverlay';
 import { InfoBlock } from 'Component/InfoBlock';
+import { LoginForm } from 'Component/LoginForm';
 import { Page } from 'Component/Page';
 import { ThemedButton } from 'Component/ThemedButton';
 import { ThemedGrid } from 'Component/ThemedGrid';
@@ -7,20 +9,121 @@ import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
 import { ThemedImage } from 'Component/ThemedImage';
 import { ThemedPressable } from 'Component/ThemedPressable';
 import { ThemedText } from 'Component/ThemedText';
-import { useLayout } from 'Hooks/useLayout';
+import { useConfigContext } from 'Context/ConfigContext';
+import { useServiceContext } from 'Context/ServiceContext';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import { Eye, EyeOff, Trash2 } from 'lucide-react-native';
 import { useCallback } from 'react';
 import { View } from 'react-native';
 import Animated from 'react-native-reanimated';
-import { DefaultFocus } from 'react-tv-space-navigation';
-import { useAppTheme } from 'Theme/context';
+import { ThemedStyles } from 'Theme/types';
 
 import { NUMBER_OF_COLUMNS_TV } from './RecentScreen.config';
 import { componentStyles } from './RecentScreen.style.atv';
 import { RecentScreenThumbnail } from './RecentScreen.thumbnail.atv';
 import { RecentGridItem, RecentScreenComponentProps } from './RecentScreen.type';
+
+type RecentRowProps = {
+  item: RecentGridItem;
+  styles: ThemedStyles<typeof componentStyles>;
+  handleOnPress: (item: RecentGridItem) => void;
+  removeItem: (item: RecentGridItem) => void;
+  openHideConfirmOverlay: (item: RecentGridItem) => void;
+};
+
+// The zoom is applied to the row -- not to the item -- so it also covers the
+// gap and grows the row as one block. `hasFocusedChild` keeps it applied while
+// focus moves between the item and the two action buttons, and the buttons
+// counter-scale so they keep their fixed square size.
+function RecentRow({
+  item,
+  styles,
+  handleOnPress,
+  removeItem,
+  openHideConfirmOverlay,
+}: RecentRowProps) {
+  const { ref, focusKey, hasFocusedChild } = useFocusable<object, View>({
+    trackChildren: true,
+    saveLastFocusedChild: false,
+  });
+
+  const {
+    image,
+    name,
+    date,
+    info,
+    additionalInfo,
+  } = item;
+
+  return (
+    <FocusContext.Provider value={ focusKey }>
+      <Animated.View
+        ref={ ref }
+        style={ [styles.row, hasFocusedChild && styles.rowFocused] }
+        tvFocusable={ false }
+      >
+        <ThemedPressable
+          style={ styles.fill }
+          contentStyle={ styles.fill }
+          onPress={ () => handleOnPress(item) }
+        >
+          { ({ isFocused }) => {
+            return (
+              <Animated.View
+                style={ [
+                  styles.fill,
+                  styles.item,
+                  isFocused && styles.itemFocused,
+                  item.isWatched && styles.itemHidden,
+                ] }
+              >
+                <View style={ [styles.poster, styles.posterContainer, isFocused && styles.posterContainerFocused] }>
+                  <ThemedImage
+                    style={ styles.poster }
+                    src={ image }
+                  />
+                </View>
+                <View style={ styles.itemContent }>
+                  <ThemedText style={ [styles.name, isFocused && styles.nameFocused] }>
+                    { name }
+                  </ThemedText>
+                  <ThemedText style={ [styles.date, isFocused && styles.dateFocused] }>
+                    { date }
+                  </ThemedText>
+                  { info && (
+                    <ThemedText style={ [styles.info, isFocused && styles.infoFocused] }>
+                      { info }
+                    </ThemedText>
+                  ) }
+                  { additionalInfo && (
+                    <ThemedText
+                      style={ [styles.additionalInfo, isFocused && styles.additionalInfoFocused] }
+                    >
+                      { additionalInfo }
+                    </ThemedText>
+                  ) }
+                </View>
+              </Animated.View>
+            );
+          } }
+        </ThemedPressable>
+        <ThemedButton
+          style={ [styles.actionButton, hasFocusedChild && styles.actionButtonUnzoomed] }
+          contentStyle={ styles.actionButtonContent }
+          IconComponent={ Trash2 }
+          onPress={ () => removeItem(item) }
+        />
+        <ThemedButton
+          style={ [styles.actionButton, hasFocusedChild && styles.actionButtonUnzoomed] }
+          contentStyle={ styles.actionButtonContent }
+          IconComponent={ item.isWatched ? EyeOff : Eye }
+          onPress={ () => openHideConfirmOverlay(item) }
+        />
+      </Animated.View>
+    </FocusContext.Provider>
+  );
+}
 
 export function RecentScreenComponent({
   items,
@@ -31,116 +134,29 @@ export function RecentScreenComponent({
   removeItem,
   openHideConfirmOverlay,
   hideItem,
-}: RecentScreenComponentProps & { items: RecentGridItem[] }) {
-  const { width: containerWidth } = useLayout();
-  const { theme } = useAppTheme();
+}: RecentScreenComponentProps) {
   const styles = useThemedStyles(componentStyles);
+  const { isSignedIn } = useServiceContext();
+  const { isLocalLibrary } = useConfigContext();
 
-  const prepareItems = () => {
-    const rowsItems = [] as RecentGridItem[];
-
-    items.forEach((item) => {
-      rowsItems.push(item);
-      rowsItems.push({
-        ...item,
-        isDeleteButton: true,
-      });
-      rowsItems.push({
-        ...item,
-        isHideButton: true,
-      });
-    });
-
-    return rowsItems;
-  };
-
-  const renderItem = useCallback(({ item }: ThemedGridRowProps<RecentGridItem>) => {
-    const {
-      image,
-      name,
-      date,
-      info,
-      additionalInfo,
-      isDeleteButton,
-      isHideButton,
-    } = item;
-
-    const width = containerWidth / 1.6;
-
-    if (isDeleteButton) {
-      return (
-        <ThemedButton
-          style={ styles.actionButton }
-          IconComponent={ Trash2 }
-          onPress={ () => removeItem(item) }
-          withAnimation
-        />
-      );
-    }
-
-    if (isHideButton) {
-      return (
-        <ThemedButton
-          style={ styles.actionButton }
-          IconComponent={ item.isWatched ? EyeOff : Eye }
-          onPress={ () => openHideConfirmOverlay(item) }
-          withAnimation
-        />
-      );
-    }
-
-    return (
-      <ThemedPressable
-        onPress={ () => handleOnPress(item) }
-      >
-        { ({ isFocused }) => {
-          return (
-            <Animated.View
-              style={ [
-                styles.item,
-                { width },
-                isFocused && styles.itemFocused,
-                item.isWatched && styles.itemHidden,
-              ] }
-            >
-              <View style={ [styles.poster, styles.posterContainer, isFocused && styles.posterContainerFocused] }>
-                <ThemedImage
-                  style={ styles.poster }
-                  src={ image }
-                />
-              </View>
-              <View style={ styles.itemContent }>
-                <ThemedText style={ [styles.name, isFocused && styles.nameFocused] }>
-                  { name }
-                </ThemedText>
-                <ThemedText style={ [styles.date, isFocused && styles.dateFocused] }>
-                  { date }
-                </ThemedText>
-                { info && (
-                  <ThemedText style={ [styles.info, isFocused && styles.infoFocused] }>
-                    { info }
-                  </ThemedText>
-                ) }
-                { additionalInfo && (
-                  <ThemedText
-                    style={ [styles.additionalInfo, isFocused && styles.additionalInfoFocused] }
-                  >
-                    { additionalInfo }
-                  </ThemedText>
-                ) }
-              </View>
-            </Animated.View>
-          );
-        } }
-      </ThemedPressable>
-    );
-  }, [handleOnPress, styles]);
+  const renderItem = useCallback(({ item }: ThemedGridRowProps<RecentGridItem>) => (
+    <RecentRow
+      item={ item }
+      styles={ styles }
+      handleOnPress={ handleOnPress }
+      removeItem={ removeItem }
+      openHideConfirmOverlay={ openHideConfirmOverlay }
+    />
+  ), [handleOnPress, openHideConfirmOverlay, removeItem, styles]);
 
   const renderContent = () => {
+    if (!isSignedIn && !isLocalLibrary) {
+      return <LoginForm autofocus />;
+    }
+
     if (isLoading) {
       return (
         <RecentScreenThumbnail
-          width={ containerWidth }
           styles={ styles }
         />
       );
@@ -158,18 +174,16 @@ export function RecentScreenComponent({
     }
 
     return (
-      <DefaultFocus>
-        <ThemedGrid
-          style={ styles.grid }
-          rowStyle={ styles.rowStyle }
-          data={ prepareItems() }
-          numberOfColumns={ NUMBER_OF_COLUMNS_TV + 2 }
-          itemSize={ theme.dimensions.height / 3 }
-          renderItem={ renderItem }
-          onNextLoad={ onNextLoad }
-          scrollBehavior='stick-to-center'
-        />
-      </DefaultFocus>
+      <ThemedGrid
+        autofocus
+        style={ styles.grid }
+        rowStyle={ styles.rowStyle }
+        data={ items }
+        numberOfColumns={ NUMBER_OF_COLUMNS_TV }
+        renderItem={ renderItem }
+        onNextLoad={ onNextLoad }
+        scrollBehavior='stick-to-center'
+      />
     );
   };
 
@@ -185,7 +199,7 @@ export function RecentScreenComponent({
   };
 
   return (
-    <Page contentStyle={ styles.page }>
+    <Page>
       { renderConfirmOverlay() }
       { renderContent() }
     </Page>

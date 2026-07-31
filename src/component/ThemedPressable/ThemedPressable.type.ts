@@ -1,28 +1,29 @@
 import { ReactElement, ReactNode, Ref } from 'react';
 import { StyleProp, View, ViewStyle } from 'react-native';
-import { SpatialNavigationNodeRef } from 'react-tv-space-navigation';
 
 export type ThemedFocusableNodeState = {
   isFocused: boolean;
-  isRootActive: boolean;
 }
 
 export type ThemedPressableContainerProps ={
   onPress?: () => void;
   onLongPress?: () => void;
-  onFocus?: () => void;
-  onBlur?: () => void;
   children?: ReactNode | ((props: ThemedFocusableNodeState) => ReactElement);
-  style?: StyleProp<ViewStyle>;
-  contentStyle?: StyleProp<ViewStyle>;
+  ref?: Ref<View>;
+  style?: StyleProp<ViewStyle> | ((state: ThemedFocusableNodeState) => StyleProp<ViewStyle>);
+  contentStyle?: StyleProp<ViewStyle> | ((state: ThemedFocusableNodeState) => StyleProp<ViewStyle>);
   disabled?: boolean;
   mode?: 'light' | 'dark';
   pressDelay?: number;
-  ref?: Ref<View>;
-  spatialRef?: Ref<SpatialNavigationNodeRef>;
-  additionalElement?: ReactNode;
-  withAnimation?: boolean;
-  zoomScale?: number;
+  topAdditionalElement?: (state: ThemedFocusableNodeState) => ReactElement | null;
+  bottomAdditionalElement?: (state: ThemedFocusableNodeState) => ReactElement | null;
+  // TV related
+  onFocus?: () => void;
+  onBlur?: () => void;
+  onEnterPress?: () => void;
+  extraProps?: any;
+  focusKey?: string;
+  autofocus?: boolean;
 }
 
 export type ThemedPressableComponentProps = ThemedPressableContainerProps;

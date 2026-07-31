@@ -3,16 +3,13 @@ import { Loader } from 'Component/Loader';
 import { PlayerVideoRating } from 'Component/PlayerVideoRating';
 import { ThemedButton } from 'Component/ThemedButton';
 import { ThemedDropdown } from 'Component/ThemedDropdown';
+import { ThemedGroup } from 'Component/ThemedGroup';
 import { ThemedOverlay } from 'Component/ThemedOverlay';
+import { ThemedScrollView } from 'Component/ThemedScrollView';
 import { ThemedSimpleList } from 'Component/ThemedSimpleList';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import { View } from 'react-native';
-import {
-  DefaultFocus,
-  SpatialNavigationScrollView,
-  SpatialNavigationView,
-} from 'react-tv-space-navigation';
 import { EpisodeInterface, SeasonInterface } from 'Type/FilmVoice.interface';
 import { getVideoProgress } from 'Util/Player';
 
@@ -73,10 +70,7 @@ export function PlayerVideoSelectorComponent({
 
     if (seasons.length) {
       return (
-        <SpatialNavigationView
-          direction="horizontal"
-          style={ styles.voicesWrapper }
-        >
+        <ThemedGroup style={ styles.voicesWrapper }>
           <ThemedDropdown
             data={ voices.map((voice) => ({
               label: voice.title,
@@ -92,7 +86,7 @@ export function PlayerVideoSelectorComponent({
             overlayRef={ voiceOverlayRef }
           />
           { renderVoiceRating() }
-        </SpatialNavigationView>
+        </ThemedGroup>
       );
     }
 
@@ -184,13 +178,10 @@ export function PlayerVideoSelectorComponent({
     const rows = calculateRows<SeasonInterface>(seasons);
 
     return (
-      <SpatialNavigationView
-        alignInGrid
-        direction="vertical"
-      >
+      <View>
         { rows.map((listRow) => (
-          <SpatialNavigationView
-            direction="horizontal"
+          <View
+            style={ styles.row }
             key={ `${listRow[0].seasonId}-row` }
           >
             { listRow.map((season) => {
@@ -199,20 +190,19 @@ export function PlayerVideoSelectorComponent({
               return (
                 <ThemedButton
                   key={ seasonId }
-                  isSelected={ selectedSeasonId === seasonId }
+                  title={ name }
+                  selected={ selectedSeasonId === seasonId }
                   onPress={ () => setSelectedSeasonId(seasonId) }
                   style={ styles.button }
-                  additionalElement={
+                  topAdditionalElement={
                     (isFocused, isSelected) => renderSeasonTimeline(season, isFocused, isSelected)
                   }
-                >
-                  { name }
-                </ThemedButton>
+                />
               );
             }) }
-          </SpatialNavigationView>
+          </View>
         )) }
-      </SpatialNavigationView>
+      </View>
     );
   };
 
@@ -250,17 +240,15 @@ export function PlayerVideoSelectorComponent({
     const rows = calculateRows<EpisodeInterface>(episodes);
 
     return (
-      <SpatialNavigationView
-        alignInGrid
-        direction="vertical"
+      <View
         style={ [
           styles.episodesContainer,
           seasons.length === 1 && seasons[0].isOnlyEpisodes && styles.episodesContainerNoBorder,
         ] }
       >
         { rows.map((listRow) => (
-          <SpatialNavigationView
-            direction="horizontal"
+          <View
+            style={ styles.row }
             key={ `${listRow[0].episodeId}-row` }
           >
             { listRow.map((season) => {
@@ -269,27 +257,25 @@ export function PlayerVideoSelectorComponent({
                   && episodesToDownload[formatDownloadKey(selectedSeasonId, episodeId)];
 
               return (
-                <DefaultFocus
+                <ThemedButton
                   key={ episodeId }
-                  enable={ selectedEpisodeId === episodeId }
-                >
-                  <ThemedButton
-                    isSelected={ selectedEpisodeId === episodeId }
-                    onPress={ () => handleSelectEpisode(episodeId) }
-                    style={ styles.button }
-                    styleAdditional={ isSelectedForDownload ? styles.episodeDownloadSelected : undefined }
-                    additionalElement={
-                      (isFocused, isSelected) => renderEpisodeTimeline(episodeId, isFocused, isSelected)
-                    }
-                  >
-                    { name }
-                  </ThemedButton>
-                </DefaultFocus>
+                  title={ name }
+                  selected={ selectedEpisodeId === episodeId }
+                  autofocus={ selectedEpisodeId === episodeId }
+                  onPress={ () => handleSelectEpisode(episodeId) }
+                  style={ [
+                    styles.button,
+                    isSelectedForDownload ? styles.episodeDownloadSelected : undefined,
+                  ] }
+                  topAdditionalElement={
+                    (isFocused, isSelected) => renderEpisodeTimeline(episodeId, isFocused, isSelected)
+                  }
+                />
               );
             }) }
-          </SpatialNavigationView>
+          </View>
         )) }
-      </SpatialNavigationView>
+      </View>
     );
   };
 
@@ -299,10 +285,10 @@ export function PlayerVideoSelectorComponent({
     }
 
     return (
-      <SpatialNavigationScrollView>
+      <View>
         { renderSeasons() }
         { renderEpisodes() }
-      </SpatialNavigationScrollView>
+      </View>
     );
   };
 
@@ -322,17 +308,29 @@ export function PlayerVideoSelectorComponent({
     </View>
   );
 
+  const renderVoicesContent = () => {
+    return renderVoices();
+  };
+
+  const renderSeasonsContent = () => {
+    return (
+      <ThemedScrollView>
+        { renderVoices() }
+        { renderSeriesSelection() }
+      </ThemedScrollView>
+    );
+  };
+
   const renderContent = () => {
     if (isOffline && !seasons.length && (voices.length > 0 && !voices[0].video?.streams?.length)) {
       return renderEmpty();
     }
 
-    return (
-      <>
-        { renderVoices() }
-        { renderSeriesSelection() }
-      </>
-    );
+    if (seasons.length) {
+      return renderSeasonsContent();
+    }
+
+    return renderVoicesContent();
   };
 
   const renderDownloadButton = () => {
@@ -342,12 +340,11 @@ export function PlayerVideoSelectorComponent({
 
     return (
       <ThemedButton
+        title={ t('Download') }
         onPress={ handleEpisodesDownload }
         disabled={ !Object.values(episodesToDownload).filter((selected) => selected).length }
         style={ styles.downloadBtn }
-      >
-        { t('Download') }
-      </ThemedButton>
+      />
     );
   };
 
@@ -374,7 +371,7 @@ export function PlayerVideoSelectorComponent({
   return (
     <ThemedOverlay
       ref={ overlayRef }
-      contentContainerStyle={ seasons.length > 0 ? styles.container : undefined }
+      contentContainerStyle={ seasons.length > 0 ? styles.containerSeasons : styles.containerVoices }
       onOpen={ onOverlayOpen }
       onClose={ onClose }
     >

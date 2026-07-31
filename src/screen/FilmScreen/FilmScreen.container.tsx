@@ -4,6 +4,7 @@ import {
 } from '@kesha-antonov/react-native-background-downloader';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { PlayerVideoSelectorRef } from 'Component/PlayerVideoSelector/PlayerVideoSelector.container';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useConfigContext } from 'Context/ConfigContext';
@@ -14,10 +15,8 @@ import { FILM_TRAILER_SCREEN, PLAYER_SCREEN } from 'Navigation/navigationRoutes'
 import { AppStackParamList } from 'Navigation/navigationTypes';
 import {
   useCallback,
-  useEffect,
   useMemo,
   useRef,
-  useState,
 } from 'react';
 import { BackHandler, Share } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
@@ -35,6 +34,7 @@ import {
 } from 'Util/LocalLibrary';
 import { navigate } from 'Util/Navigation';
 import { getPlayerQuality, getSavedTime } from 'Util/Player';
+import { queryKeys } from 'Util/Query';
 import { openActor, openCategory, openFilm } from 'Util/Router';
 
 import FilmScreenComponent from './FilmScreen.component';
@@ -50,7 +50,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
   } = useConfigContext();
   const navigation = useNavigation<NativeStackNavigationProp<AppStackParamList>>();
   const { isSignedIn, currentService, prepareShareBody } = useServiceContext();
-  const [film, setFilm] = useState<FilmInterface | null>(null);
+  const queryClient = useQueryClient();
   const playerVideoSelectorOverlayRef = useRef<PlayerVideoSelectorRef>(null);
   const scheduleOverlayRef = useRef<ThemedOverlayRef>(null);
   const commentsOverlayRef = useRef<ThemedOverlayRef>(null);
@@ -58,7 +58,6 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
   const descriptionOverlayRef = useRef<ThemedOverlayRef>(null);
   const playerVideoDownloaderOverlayRef = useRef<PlayerVideoSelectorRef>(null);
   const ratingOverlayRef = useRef<ThemedOverlayRef>(null);
-  const [isContinueWatchingLoading, setIsContinueWatchingLoading] = useState(false);
 
   // fallback to deep link url
   let link = linkArg;
@@ -138,28 +137,34 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     };
   });
 
-  useEffect(() => {
-    const loadFilm = async () => {
-      try {
-        const loadedFilm = await currentService.getFilm(link);
+  const filmQueryKey = useMemo(() => queryKeys.film(link), [link]);
 
-        if (isLocalLibrary && loadedFilm) {
-          applyLocalScheduleMarks(loadedFilm);
-        }
+  const { data: film = null } = useQuery({
+    queryKey: filmQueryKey,
+    enabled: !!link,
+    queryFn: async () => {
+      const loadedFilm = await currentService.getFilm(link);
 
-        // in local mode the account watch-state is not updated, so local saved time drives it
-        if (!isSignedIn || isLocalLibrary) {
-          await updateFilmVoiceData(loadedFilm);
-        }
-
-        setFilm(loadedFilm);
-      } catch (error) {
-        NotificationStore.displayError(error as Error);
+      if (isLocalLibrary && loadedFilm) {
+        applyLocalScheduleMarks(loadedFilm);
       }
-    };
 
-    loadFilm();
-  }, []);
+      // in local mode the account watch-state is not updated, so local saved time drives it
+      if (!isSignedIn || isLocalLibrary) {
+        await updateFilmVoiceData(loadedFilm);
+      }
+
+      return loadedFilm;
+    },
+  });
+
+  // updates the cached film in place so mutation handlers stay the single source of truth
+  const updateFilm = useCallback(
+    (updater: (prevFilm: FilmInterface | null) => FilmInterface | null) => {
+      queryClient.setQueryData<FilmInterface | null>(filmQueryKey, (prevFilm) => updater(prevFilm ?? null));
+    },
+    [queryClient, filmQueryKey]
+  );
 
   const localBookmarks = useLocalBookmarks();
 
@@ -248,6 +253,10 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     return initialItems;
   }, [film]);
 
+  const { mutate: saveScheduleWatch } = useMutation({
+    mutationFn: (scheduleItemId: string) => currentService.saveScheduleWatch(scheduleItemId),
+  });
+
   const handleUpdateScheduleWatch = useCallback(async (scheduleItem: ScheduleItemInterface) => {
     const { id, isWatched } = scheduleItem;
 
@@ -264,16 +273,10 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
         return false;
       }
 
-      try {
-        currentService.saveScheduleWatch(id);
-      } catch (error) {
-        NotificationStore.displayError(error as Error);
-
-        return false;
-      }
+      saveScheduleWatch(id);
     }
 
-    setFilm((prevFilm) => {
+    updateFilm((prevFilm) => {
       if (!prevFilm) {
         return prevFilm;
       }
@@ -300,7 +303,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     });
 
     return true;
-  }, [isSignedIn, isLocalLibrary, currentService, film]);
+  }, [isSignedIn, isLocalLibrary, saveScheduleWatch, film, updateFilm]);
 
   const handleShare = async () => {
     if (!film) {
@@ -327,7 +330,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
   };
 
   const handleBookmarkChange = (f: FilmInterface) => {
-    setFilm((prevFilm) => {
+    updateFilm((prevFilm) => {
       if (!prevFilm) {
         return prevFilm;
       }
@@ -505,17 +508,22 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     ratingOverlayRef.current?.open();
   };
 
-  const handleRatingSelect = async (rating: number) => {
-    if (!film) {
-      return;
-    }
+  const openComments = () => {
+    commentsOverlayRef.current?.open();
+  };
 
-    const { id } = film ;
+  const openDescription = () => {
+    descriptionOverlayRef.current?.open();
+  };
 
-    try {
-      const result = await currentService.postRating(id, rating);
+  const openSchedule = () => {
+    scheduleOverlayRef.current?.open();
+  };
 
-      setFilm((prevFilm) => {
+  const { mutate: postRating } = useMutation({
+    mutationFn: ({ id, rating }: { id: string, rating: number }) => currentService.postRating(id, rating),
+    onSuccess: (result) => {
+      updateFilm((prevFilm) => {
         if (!prevFilm) {
           return prevFilm;
         }
@@ -531,9 +539,15 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
           },
         };
       });
-    } catch (error) {
-      NotificationStore.displayError(error as Error);
+    },
+  });
+
+  const handleRatingSelect = (rating: number) => {
+    if (!film) {
+      return;
     }
+
+    postRating({ id: film.id, rating });
   };
 
   const shouldDisplayContinueWatching = useMemo(() => {
@@ -566,7 +580,62 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     return false;
   }, [film, isContinueBtnEnabled]);
 
-  const continueWatching = async () => {
+  const {
+    mutate: resumeVoice,
+    isPending: isContinueWatchingLoading,
+  } = useMutation({
+    mutationFn: async ({
+      voice,
+      lastSeasonId,
+      lastEpisodeId,
+    }: {
+      voice: FilmVoiceInterface,
+      lastSeasonId?: string,
+      lastEpisodeId?: string,
+    }) => {
+      if (!film) {
+        return null;
+      }
+
+      const updatedVoice = { ...voice };
+
+      if (!film.hasSeasons) {
+        // for movies, fetch the video for the voice
+        return { video: await currentService.getFilmStreamsByVoice(film, voice), voice: updatedVoice };
+      }
+
+      if (!lastSeasonId || !lastEpisodeId) {
+        NotificationStore.displayMessage(t('Current season or episode not saved.'));
+
+        return null;
+      }
+
+      // for series, fetch the video for the specific episode
+      const video = await currentService.getFilmStreamsByEpisodeId(film, voice, lastSeasonId, lastEpisodeId);
+
+      updatedVoice.lastSeasonId = lastSeasonId;
+      updatedVoice.lastEpisodeId = lastEpisodeId;
+
+      return { video, voice: updatedVoice };
+    },
+    onSuccess: (result) => {
+      if (!result) {
+        return;
+      }
+
+      const { video, voice } = result;
+
+      if (!video) {
+        NotificationStore.displayMessage(t('No video available'));
+
+        return;
+      }
+
+      handleVideoSelect(video, voice, getPlayerQuality());
+    },
+  });
+
+  const continueWatching = () => {
     if (!film) {
       return;
     }
@@ -621,63 +690,14 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
       return;
     }
 
-    try {
-      setIsContinueWatchingLoading(true);
+    // signed-in accounts track the watch state server side; local mode uses the saved time
+    const useAccountState = isSignedIn && !isLocalLibrary;
 
-      let video: FilmVideoInterface | undefined;
-      const updatedVoice = { ...voice };
-
-      let lastEpisodeId = null;
-      let lastSeasonId = null;
-
-      if (isSignedIn && !isLocalLibrary) {
-        lastEpisodeId = voice.lastEpisodeId;
-        lastSeasonId = voice.lastSeasonId;
-      } else {
-        lastEpisodeId = lastVoiceData.lastEpisodeId;
-        lastSeasonId = lastVoiceData.lastSeasonId;
-      }
-
-      if (film.hasSeasons) {
-        if (!lastSeasonId || !lastEpisodeId) {
-          NotificationStore.displayMessage(t('Current season or episode not saved.'));
-          setIsContinueWatchingLoading(false);
-
-          return;
-        }
-
-        // For series, fetch the video for the specific episode
-        video = await currentService.getFilmStreamsByEpisodeId(
-          film,
-          voice,
-          lastSeasonId,
-          lastEpisodeId
-        );
-
-        updatedVoice.lastSeasonId = lastSeasonId;
-        updatedVoice.lastEpisodeId = lastEpisodeId;
-      } else {
-        // For movies, fetch the video for the voice
-        video = await currentService.getFilmStreamsByVoice(film, voice);
-      }
-
-      if (!video) {
-        NotificationStore.displayMessage(t('No video available'));
-        setIsContinueWatchingLoading(false);
-
-        return;
-      }
-
-      // Get the quality preference
-      const quality = getPlayerQuality();
-
-      // Navigate to player with the video and voice
-      handleVideoSelect(video, updatedVoice, quality);
-
-      setIsContinueWatchingLoading(false);
-    } catch (error) {
-      NotificationStore.displayError(error as Error);
-    }
+    resumeVoice({
+      voice,
+      lastSeasonId: useAccountState ? voice.lastSeasonId : lastVoiceData.lastSeasonId,
+      lastEpisodeId: useAccountState ? voice.lastEpisodeId : lastVoiceData.lastEpisodeId,
+    });
   };
 
   const containerProps = {
@@ -707,6 +727,9 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     openTrailerOverlay,
     handleRatingSelect,
     openRatingOverlay,
+    openComments,
+    openDescription,
+    openSchedule,
     shouldDisplayContinueWatching,
     continueWatching,
   };

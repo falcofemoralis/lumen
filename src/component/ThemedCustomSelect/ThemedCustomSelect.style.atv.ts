@@ -3,6 +3,7 @@ import { Theme, ThemedStyles } from 'Theme/types';
 export const componentStyles = ({ scale, colors }: Theme) => ({
   input: {
     backgroundColor: colors.backgroundLighter,
+    justifyContent: 'flex-start',
   },
   inputContent: {
     justifyContent: 'flex-start',

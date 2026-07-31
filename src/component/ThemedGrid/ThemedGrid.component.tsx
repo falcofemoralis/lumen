@@ -1,4 +1,4 @@
-import { LegendList } from '@legendapp/list';
+import { FlashList } from '@shopify/flash-list';
 import { useCallback } from 'react';
 import { RefreshControl } from 'react-native';
 import { noopFn } from 'Util/Function';
@@ -8,7 +8,6 @@ import { ThemedGridComponentProps } from './ThemedGrid.type';
 export const ThemedGridComponent = ({
   data,
   numberOfColumns,
-  itemSize,
   isRefreshing = false,
   ListHeaderComponent,
   ListEmptyComponent,
@@ -23,15 +22,18 @@ export const ThemedGridComponent = ({
     />
   ), [isRefreshing, handleRefresh]);
 
+  // FlashList's renderItem must return an element, the prop returns a ReactNode.
+  const renderCell = useCallback(({ item, index }: { item: any; index: number }) => (
+    <>{ renderItem({ item, index }) }</>
+  ), [renderItem]);
+
   return (
-    <LegendList
+    <FlashList
       data={ data }
       numColumns={ numberOfColumns }
-      estimatedItemSize={ itemSize }
-      renderItem={ renderItem }
+      renderItem={ renderCell }
       refreshControl={ renderRefreshControl() }
       keyExtractor={ (item, idx) => `${item.id}-row-${idx}` }
-      recycleItems
       showsVerticalScrollIndicator={ false }
       ListHeaderComponent={ ListHeaderComponent }
       ListEmptyComponent={ ListEmptyComponent }

@@ -1,4 +1,5 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
+import { restartApp } from 'Util/Device';
 
 import { ErrorDetails } from './ErrorDetails';
 
@@ -34,7 +35,8 @@ class ErrorBoundary extends Component<Props, State> {
 
   // Reset the error back to null
   resetError = () => {
-    this.setState({ error: null, errorInfo: null });
+    // this.setState({ error: null, errorInfo: null });
+    restartApp();
   };
 
   // To avoid unnecessary re-renders

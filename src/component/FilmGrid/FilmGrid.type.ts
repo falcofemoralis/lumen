@@ -3,43 +3,36 @@ import { FilmCardInterface } from 'Type/FilmCard.interface';
 
 export interface FilmGridContainerProps {
   films: FilmCardInterface[];
-  isGridVisible?: boolean;
+  disableEmptyComponent?: boolean;
   isEmpty?: boolean;
-  isAddSafeArea?: boolean;
-  menuDefaultFocus?: boolean;
+  hideGrid?: boolean;
   ListHeaderComponent?: ComponentType<any> | ReactElement | null | undefined;
   ListEmptyComponent?: ComponentType<any> | ReactElement | null | undefined;
   onNextLoad?: (isRefresh: boolean) => Promise<void>;
-  onItemFocus?: (row: number) => void;
+  // Mobile related
+  disableStatusbarSafeArea?: boolean;
+  // TV related
+  disableAutofocus?: boolean;
+  /** Fired when grid focus enters (true) or leaves (false) the first row. */
+  onAtTopChange?: (atTop: boolean) => void;
 }
 
-export interface FilmGridComponentProps {
-  films: FilmCardInterface[];
+export interface FilmGridComponentProps extends Omit<FilmGridContainerProps, 'onNextLoad'> {
   numberOfColumns: number;
-  isGridVisible?: boolean;
-  isEmpty?: boolean;
-  isAddSafeArea?: boolean;
-  menuDefaultFocus?: boolean;
-  ListHeaderComponent?: ComponentType<any> | ReactElement | null | undefined;
-  ListEmptyComponent?: ComponentType<any> | ReactElement | null | undefined;
+  isRefreshing: boolean;
   handleOnPress: (film: FilmCardInterface) => void;
-  handleItemFocus: (index: number) => void;
-  onNextLoad?: (isRefresh: boolean) => Promise<void>;
+  handleScrollEnd?: () => void;
+  handleRefresh?: () => void;
 }
 
 export type FilmGridRowItem = FilmCardInterface & {
   isPlaceholder?: boolean;
 };
 
-export type FilmGridRowType = {
-  id: string;
-  items: FilmGridRowItem[];
-}
-
 export interface FilmGridItemProps {
   index: number;
-  row: FilmGridRowType,
-  width: number;
+  item: FilmGridRowItem,
+  // TV related
+  isLastRow?: boolean;
   handleOnPress: (film: FilmCardInterface) => void;
-  handleItemFocus?: (index: number) => void;
 }

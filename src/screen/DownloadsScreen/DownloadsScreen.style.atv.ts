@@ -1,122 +1,179 @@
+import { POSTER_ASPECT_HEIGHT, POSTER_ASPECT_WIDTH } from 'Component/FilmCard/FilmCard.config';
 import { Theme, ThemedStyles } from 'Theme/types';
 
-const ROW_GAP = 24;
+import { ITEMS_ON_SCREEN_TV } from './DownloadsScreen.config';
 
-export const componentStyles = ({ scale, colors, text }: Theme) => ({
-  grid: {
-    padding: scale(ROW_GAP),
-    marginLeft: scale(ROW_GAP),
-    marginRight: scale(ROW_GAP),
-  },
-  rowStyle: {
-    flexDirection: 'row',
-    width: '100%',
-    gap: scale(8),
-    paddingBlock: scale(8),
-    paddingHorizontal: scale(8),
-  },
-  card: {
-    width: '100%',
-    flexDirection: 'row',
-    gap: scale(12),
-    padding: scale(6),
-  },
-  item: {
-    width: '100%',
-    height: 250,
-    flexDirection: 'row',
-    gap: scale(8),
-    opacity: 0.7,
-    transform: [{ scale: 1 }],
-    transitionProperty: 'all',
-    transitionDuration: '250ms',
-  },
-  itemFocused: {
-    opacity: 1,
-    transform: [{ scale: 1.1 }],
-  },
-  posterContainer: {
-    borderRadius: 8,
-    borderWidth: scale(2),
-    borderColor: colors.transparent,
-    overflow: 'hidden',
-  },
-  posterContainerFocused: {
-    borderWidth: scale(2),
-    borderColor: colors.icon,
-  },
-  poster: {
-    height: scale(150),
-    width: 'auto',
-    aspectRatio: '166 / 250',
-  },
-  cardContent: {
-    flexDirection: 'column',
-    flex: 1,
-    gap: scale(6),
-  },
-  title: {
-    fontWeight: 'bold',
-    fontSize: scale(text.sm.fontSize),
-  },
-  actionsBtn: {
-    backgroundColor: colors.transparent,
-  },
-  iconFocused: {
-    backgroundColor: colors.icon,
-  },
-  taskContainer: {
-    width: '100%',
-    height: 'auto',
-    flexDirection: 'column',
-    marginTop: scale(4),
-  },
-  taskContent: {
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  taskActions: {
-    flexDirection: 'row',
-  },
-  progressBar: {
-    pointerEvents: 'none',
-    marginTop: scale(12),
-  },
-  error: {
-    color: colors.error,
-  },
-  overlayActions: {
-    width: '100%',
-    flexDirection: 'row',
-  },
-  empty: {
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  taskRow: {
-    flexDirection: 'row',
-  },
-  taskRowContent: {
-    flexDirection: 'row',
-    gap: scale(8),
-    padding: scale(10),
-    borderRadius: scale(50),
-    backgroundColor: colors.transparent,
-    transitionProperty: 'backgroundColor',
-    transitionDuration: '250ms',
-  },
-  taskRowContentFocused: {
-    backgroundColor: colors.icon,
-  },
-  taskRowTextFocused: {
-    color: colors.textFocused,
-  },
-  tasksOverlay: {
-    width: '60%',
-  },
-  refreshBtn: {
-    marginTop: scale(16),
-  },
-} as ThemedStyles);
+const ROW_GAP = 24;
+const CELL_GAP = 8;
+const ACTION_BUTTON_SIZE = 64;
+const ZOOM = 1.1;
+// A row grows symmetrically, so it bleeds half of the added size on every side.
+const ZOOM_BLEED = (ZOOM - 1) / 2;
+const TRANSITION_DURATION = '350ms';
+
+export const componentStyles = ({ scale, colors, text, dimensions }: Theme) => {
+  // The grid has to reserve the room the focused row bleeds into, otherwise the
+  // scaled row is clipped by the list viewport -- on the sides for every row,
+  // and on top for the first one. Both paddings are derived from ZOOM so they
+  // stay correct if the zoom is retuned.
+  const paddingVertical = Math.max(scale(ROW_GAP), (dimensions.height / ITEMS_ON_SCREEN_TV) * ZOOM_BLEED);
+  const paddingHorizontal = Math.max(scale(ROW_GAP), dimensions.width * ZOOM_BLEED);
+
+  // Each row takes screen height / ITEMS_ON_SCREEN_TV so exactly that many rows
+  // are visible. The grid padding and the gap the grid adds around every cell
+  // are subtracted, otherwise the last row is cut off.
+  const rowHeight = (dimensions.height - paddingVertical * 2) / ITEMS_ON_SCREEN_TV - scale(CELL_GAP);
+
+  return {
+    grid: {
+      paddingVertical,
+      paddingHorizontal,
+    },
+    rowStyle: {
+      gap: scale(CELL_GAP),
+    },
+    // One grid cell holds the whole row: the download item takes the remaining
+    // space, the actions button keeps a fixed square size. The focus zoom lives
+    // here rather than on the item, because ThemedPressable's wrapper forces
+    // overflow: 'hidden' and would clip a scaled child.
+    row: {
+      height: rowHeight,
+      flexDirection: 'row',
+      gap: scale(CELL_GAP),
+      transform: [{ scale: 1 }],
+      transitionProperty: 'transform',
+      transitionDuration: TRANSITION_DURATION,
+    },
+    rowFocused: {
+      transform: [{ scale: ZOOM }],
+    },
+    fill: {
+      flex: 1,
+    },
+    item: {
+      height: '100%',
+      flexDirection: 'row',
+      gap: scale(CELL_GAP),
+      opacity: 0.7,
+      transitionProperty: 'opacity',
+      transitionDuration: TRANSITION_DURATION,
+    },
+    itemFocused: {
+      opacity: 1,
+    },
+    posterContainer: {
+      borderRadius: scale(8),
+      borderWidth: scale(2),
+      borderColor: colors.transparent,
+      overflow: 'hidden',
+    },
+    posterContainerFocused: {
+      borderWidth: scale(2),
+      borderColor: colors.icon,
+    },
+    // The poster drives its own width off the row height via the aspect ratio.
+    poster: {
+      height: '100%',
+      width: 'auto',
+      aspectRatio: `${POSTER_ASPECT_WIDTH} / ${POSTER_ASPECT_HEIGHT}`,
+    },
+    itemContent: {
+      height: '100%',
+      justifyContent: 'center',
+      gap: scale(CELL_GAP),
+      padding: scale(16),
+      flex: 1,
+    },
+    title: {
+      fontWeight: 'bold',
+      fontSize: scale(text.sm.fontSize),
+    },
+    downloading: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: scale(8),
+    },
+    actionButton: {
+      alignSelf: 'center',
+      width: scale(ACTION_BUTTON_SIZE),
+      height: scale(ACTION_BUTTON_SIZE),
+      transform: [{ scale: 1 }],
+      transitionProperty: 'transform',
+      transitionDuration: TRANSITION_DURATION,
+      backgroundColor: colors.transparent,
+      borderRadius: scale(99),
+    },
+    // Cancels the row zoom so the button keeps its fixed size while the rest of
+    // the row grows around it.
+    actionButtonUnzoomed: {
+      transform: [{ scale: 1 / ZOOM }],
+    },
+    // Fill the fixed-size box so the whole square is the press/focus target.
+    actionButtonContent: {
+      flex: 1,
+      paddingHorizontal: 0,
+      paddingVertical: 0,
+    },
+    actionsBtn: {
+      backgroundColor: colors.transparent,
+    },
+    taskContainer: {
+      width: '100%',
+      height: 'auto',
+      flexDirection: 'column',
+      marginTop: scale(4),
+    },
+    taskContent: {
+      width: '100%',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+    },
+    taskActions: {
+      flexDirection: 'row',
+    },
+    progressBar: {
+      pointerEvents: 'none',
+      marginTop: scale(12),
+    },
+    error: {
+      color: colors.error,
+    },
+    overlayActions: {
+      width: '100%',
+      flexDirection: 'row',
+    },
+    empty: {
+      height: '100%',
+      width: '100%',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    taskRow: {
+      flexDirection: 'row',
+    },
+    taskRowContent: {
+      flexDirection: 'row',
+      gap: scale(8),
+      padding: scale(10),
+      borderRadius: scale(50),
+      backgroundColor: colors.transparent,
+      transitionProperty: 'backgroundColor',
+      transitionDuration: '250ms',
+    },
+    taskRowContentFocused: {
+      backgroundColor: colors.icon,
+    },
+    taskRowTextFocused: {
+      color: colors.textFocused,
+    },
+    tasks: {
+      width: '100%',
+    },
+    tasksOverlay: {
+      width: '60%',
+    },
+    refreshBtn: {
+      marginTop: scale(16),
+    },
+  } satisfies ThemedStyles;
+};

@@ -38,7 +38,10 @@ export interface FilmScreenComponentProps {
   openVideoDownloader: () => void;
   handleDownloadSelect: (links: DownloadLinkInterface[]) => void;
   openTrailerOverlay: () => void;
-  handleRatingSelect: (rating: number) => Promise<void>;
+  handleRatingSelect: (rating: number) => void;
   openRatingOverlay: () => void;
+  openComments: () => void;
+  openDescription: () => void;
+  openSchedule: () => void;
   continueWatching: () => void;
 }

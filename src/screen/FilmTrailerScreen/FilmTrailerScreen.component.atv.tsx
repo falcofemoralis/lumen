@@ -5,7 +5,6 @@ import { ThemedPressable } from 'Component/ThemedPressable';
 import { t } from 'i18n/translate';
 import { TVFocusGuideView } from 'react-native';
 import { PlayerState, useYouTubeEvent, useYouTubePlayer, YoutubeView } from 'react-native-youtube-bridge';
-import { DefaultFocus } from 'react-tv-space-navigation';
 
 import { FilmTrailerScreenComponentProps } from './FilmTrailerScreen.type';
 
@@ -28,6 +27,7 @@ const TrailerPlayer = ({ trailerUrl }: { trailerUrl: string }) => {
   return (
     <TVFocusGuideView focusable={ false } style={ { flex: 1 } }>
       <ThemedPressable
+        autofocus
         onPress={ handleTogglePlay }
         style={ { width: '100%', height: '100%' } }
       >
@@ -57,9 +57,7 @@ export const FilmTrailerComponent = ({
     }
 
     return (
-      <DefaultFocus>
-        <TrailerPlayer trailerUrl={ trailerUrl } />
-      </DefaultFocus>
+      <TrailerPlayer trailerUrl={ trailerUrl } />
     );
   };
 

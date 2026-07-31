@@ -61,9 +61,6 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     gap: scale(8),
     marginTop: scale(16),
   },
-  buttonContainer: {
-    flex: 1,
-  },
   button: {
     alignItems: 'center',
     justifyContent: 'center',

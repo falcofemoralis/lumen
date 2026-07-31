@@ -1,3 +1,4 @@
+import { POSTER_ASPECT_HEIGHT, POSTER_ASPECT_WIDTH } from 'Component/FilmCard/FilmCard.config';
 import { Theme, ThemedStyles } from 'Theme/types';
 
 export const componentStyles = ({ scale, colors, spacing }: Theme) => ({
@@ -21,7 +22,7 @@ export const componentStyles = ({ scale, colors, spacing }: Theme) => ({
   poster: {
     height: scale(100),
     width: 'auto',
-    aspectRatio: '166 / 250',
+    aspectRatio: `${POSTER_ASPECT_WIDTH} / ${POSTER_ASPECT_HEIGHT}`,
     borderRadius: scale(8),
   },
   cardContent: {

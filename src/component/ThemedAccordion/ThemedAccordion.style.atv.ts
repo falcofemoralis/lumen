@@ -8,6 +8,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     width: '100%',
   },
   group: {
+    width: '100%',
     padding: scale(12),
     borderRadius: scale(8),
     fontSize: scale(text.xs.fontSize),
@@ -23,9 +24,8 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     maxHeight: '70%',
     maxWidth: '50%',
   },
-  items: {
-    flexDirection: 'column',
+  itemsContainer: {
     width: '100%',
-    height: '100%',
+    height: 'auto',
   },
 } satisfies ThemedStyles);

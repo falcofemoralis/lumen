@@ -1,1 +1,0 @@
-export { default as SettingsStructure } from './SettingsStructure.container';

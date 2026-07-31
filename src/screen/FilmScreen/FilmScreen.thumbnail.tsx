@@ -81,7 +81,7 @@ export const FilmScreenThumbnail = ({
                 <Thumbnail
                   // eslint-disable-next-line react/no-array-index-key
                   key={ `${i}-thumb-action` }
-                  style={ styles.middleActionButton }
+                  style={ [styles.middleActionButton, { backgroundColor: theme.colors.backgroundLight }] }
                 />
               </View>
             )) }

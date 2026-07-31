@@ -2,40 +2,50 @@ import { Theme, ThemedStyles } from 'Theme/types';
 
 export const componentStyles = ({ scale, colors, text }: Theme) => ({
   container: {
-    width: '100%',
-    height: '100%',
+    flex: 1,
+    zIndex: 2,
+    marginTop: scale(8),
+  },
+  menuCollapse: {
+    overflow: 'hidden',
   },
   menuListWrapper: {
-    position: 'relative',
     zIndex: 10,
-    backgroundColor: colors.background,
-    marginBottom: scale(16),
-    height: scale(40),
+    height: scale(42),
+    flexGrow: 0,
+    flexShrink: 0,
   },
   menuListWrapperWithSorting: {
-    height: scale(46),
+    height: scale(48),
   },
-  menuListScroll: {},
   menuList: {
     gap: scale(8),
   },
-  grid: {
-    zIndex: 2,
-  },
   tabButton: {
     height: '100%',
-    gap: 0,
-    paddingVertical: scale(6),
+    borderRadius: scale(44),
+    backgroundColor: colors.transparent,
   },
   tabBarSorting: {
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
   },
+  tabButtonContent: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 0,
+  },
+  tabButtonSelected: {
+    backgroundColor: colors.tertiary,
+  },
+  tabButtonFocused: {
+    backgroundColor: colors.backgroundFocused,
+  },
   sortingText: {
     color: colors.text,
-    fontSize: scale(text.xxs.fontSize),
-    overflow: 'hidden',
+    fontSize: scale(12),
   },
   sortingTextFocused: {
     color: colors.textFocused,

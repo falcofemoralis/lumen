@@ -21,12 +21,13 @@ import { View } from 'react-native';
 import { Slider } from 'react-native-awesome-slider';
 import Animated, { FadeOut, LinearTransition, useSharedValue } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import NotificationStore from 'Store/Notification.store';
 import { useAppTheme } from 'Theme/context';
 import { ThemedStyles } from 'Theme/types';
 import { DownloadFilmInterface } from 'Type/DownloadFile.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
-import { formatBytes } from 'Util/Download';
+import { formatBytes, hasDownloadedVideo } from 'Util/Download';
 
 import { NUMBER_OF_COLUMNS } from './DownloadsScreen.config';
 import { componentStyles } from './DownloadsScreen.style';
@@ -231,6 +232,18 @@ const DownloadItem = (props: DownloadItemProps & { styles: ThemedStyles<typeof c
   } = item;
   const { scale, theme } = useAppTheme();
 
+  const isPlayable = hasDownloadedVideo(item);
+
+  const handlePress = useCallback(() => {
+    if (!isPlayable) {
+      NotificationStore.displayMessage(t('Film is still downloading'));
+
+      return;
+    }
+
+    playerVideoSelectorOverlayRef.current?.open();
+  }, [isPlayable]);
+
   const handleActions = useCallback((action: ListItem) => {
     if (action.value === 'open') {
       openFolder(folder);
@@ -327,9 +340,7 @@ const DownloadItem = (props: DownloadItemProps & { styles: ThemedStyles<typeof c
       { renderActionsOverlay() }
       <ThemedPressable
         contentStyle={ styles.cardContainer }
-        onPress={
-          () => playerVideoSelectorOverlayRef.current?.open()
-        }
+        onPress={ handlePress }
       >
         <View style={ styles.card }>
           { renderPoster() }

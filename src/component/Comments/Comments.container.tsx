@@ -1,10 +1,13 @@
+import { useMutation } from '@tanstack/react-query';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import * as Haptics from 'expo-haptics';
+import { usePaginatedQuery } from 'Hooks/usePaginatedQuery';
 import { t } from 'i18n/translate';
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
 import { CommentInterface } from 'Type/Comment.interface';
+import { queryKeys } from 'Util/Query';
 
 import CommentsComponent from './Comments.component';
 import CommentsComponentTV from './Comments.component.atv';
@@ -18,73 +21,41 @@ export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>
   ({ film, loaderFullScreen, style, initialLoad }, ref) => {
     const { isTV } = useConfigContext();
     const { id } = film;
-    const [comments, setComments] = useState<CommentInterface[] | null>(null);
-    const paginationRef = useRef({
-      page: 1,
-      totalPages: 1,
-    });
-    const updatingStateRef = useRef(false);
-    const [isLoading, setIsLoading] = useState(false);
     const { isSignedIn, currentService } = useServiceContext();
+    // comments are only fetched once the overlay that hosts them is opened
+    const [isStarted, setIsStarted] = useState(!!initialLoad);
 
-    useEffect(() => {
-      if (initialLoad) {
-        loadComments(1);
-      }
-    }, [initialLoad]);
-
-    useEffect(() => {
-      updatingStateRef.current = false;
-    }, [comments]);
+    const {
+      itemsOrNull: comments,
+      isFetching,
+      onNextLoad,
+      updateItems,
+    } = usePaginatedQuery<CommentInterface>({
+      queryKey: queryKeys.comments(id),
+      fetchPage: (page) => currentService.getComments(id, page),
+      enabled: isStarted,
+    });
 
     useImperativeHandle(ref, () => ({
       loadComments: () => {
-        loadComments(1);
+        setIsStarted(true);
       },
     }));
 
-    const loadComments = async (page: number) => {
-      const { totalPages } = paginationRef.current;
+    const { mutate: postLike } = useMutation({
+      mutationFn: (commentId: string) => currentService.postLike(commentId),
+      onSuccess: ({ type }, commentId) => {
+        updateItems((pageItems) => pageItems.map((comment) => {
+          if (comment.id !== commentId) {
+            return comment;
+          }
 
-      if (page > totalPages) {
-        return;
-      }
+          const likes = type === 'plus' ? comment.likes + 1 : comment.likes - 1;
 
-      if (!updatingStateRef.current) {
-        updatingStateRef.current = true;
-        setIsLoading(true);
-
-        try {
-          const {
-            items: newItems,
-            totalPages: newTotalsPages,
-          } = await currentService.getComments(
-            id,
-            page
-          );
-
-          paginationRef.current = {
-            page,
-            totalPages: newTotalsPages,
-          };
-
-          setComments(page === 1 ? newItems : [...(comments ?? []), ...newItems]);
-        } catch (error) {
-          NotificationStore.displayError(error as Error);
-          updatingStateRef.current = false;
-        } finally {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    const onNextLoad = async () => {
-      const newPage = paginationRef.current.page + 1;
-
-      if (newPage <= paginationRef.current.totalPages) {
-        await loadComments(newPage);
-      }
-    };
+          return { ...comment, likes, isDisabled: type === 'plus' };
+        }));
+      },
+    });
 
     const handlePostLike = useCallback((commentId: string) => {
       if (!isSignedIn) {
@@ -97,31 +68,13 @@ export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>
         Haptics.performAndroidHapticsAsync(Haptics.AndroidHaptics.Gesture_Start);
       }
 
-      currentService.postLike(commentId).then(({ type }) => {
-        setComments((prevComments) => {
-          if (!prevComments) {
-            return prevComments;
-          }
-
-          return prevComments.map((comment) => {
-            if (comment.id === commentId) {
-              const likes = type === 'plus' ? comment.likes + 1 : comment.likes - 1;
-
-              return { ...comment, likes, isDisabled: type === 'plus' };
-            }
-
-            return comment;
-          });
-        });
-      }).catch((error) => {
-        NotificationStore.displayError(error as Error);
-      });
-    }, [currentService, isTV]);
+      postLike(commentId);
+    }, [isSignedIn, isTV, postLike]);
 
     const containerProps = {
       comments,
       style,
-      isLoading,
+      isLoading: isFetching,
       loaderFullScreen,
       onNextLoad,
       handlePostLike,

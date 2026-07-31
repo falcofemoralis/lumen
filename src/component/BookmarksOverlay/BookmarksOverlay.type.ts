@@ -15,7 +15,7 @@ export interface BookmarksOverlayComponentProps {
   items: ListItem[];
   isLoading: boolean;
   isLocalLibrary: boolean;
-  postBookmark: (id: string, isChecked: boolean) => Promise<void>;
+  postBookmark: (id: string, isChecked: boolean) => void;
   createCategory: (title: string) => boolean;
   onClose?: () => void;
 }

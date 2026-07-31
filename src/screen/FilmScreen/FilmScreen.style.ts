@@ -1,3 +1,4 @@
+import { POSTER_ASPECT_HEIGHT, POSTER_ASPECT_WIDTH } from 'Component/FilmCard/FilmCard.config';
 import { Theme, ThemedStyles } from 'Theme/types';
 
 export const componentStyles = ({ scale, colors, text, spacing }: Theme) => ({
@@ -31,7 +32,7 @@ export const componentStyles = ({ scale, colors, text, spacing }: Theme) => ({
   },
   posterWrapper: {
     width: '40%',
-    aspectRatio: '166 / 250',
+    aspectRatio: `${POSTER_ASPECT_WIDTH} / ${POSTER_ASPECT_HEIGHT}`,
   },
   title: {
     fontSize: scale(text.lg.fontSize),
@@ -150,6 +151,9 @@ export const componentStyles = ({ scale, colors, text, spacing }: Theme) => ({
     width: scale(44),
     height: scale(44),
     borderRadius: scale(100),
+  },
+  middleActionContent: {
+    flex: 1,
   },
   middleActionButtonDisabled: {
     opacity: 0.5,
@@ -310,11 +314,7 @@ export const componentStyles = ({ scale, colors, text, spacing }: Theme) => ({
   franchiseSelected: {
     color: colors.secondary,
   },
-  infoListHeader: {
-    fontSize: scale(text.sm.fontSize),
-    paddingBottom: scale(8),
-    paddingHorizontal: scale(spacing.wrapperPadding),
-  },
+
   infoListItem: {
   },
   infoListItemContent: {

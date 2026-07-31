@@ -1,10 +1,10 @@
 import { useNavigation } from '@react-navigation/native';
+import { useQuery } from '@tanstack/react-query';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
-import { useCallback, useEffect, useState } from 'react';
-import NotificationStore from 'Store/Notification.store';
-import { ActorInterface } from 'Type/Actor.interface';
+import { useCallback } from 'react';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
+import { queryKeys } from 'Util/Query';
 import { openFilm } from 'Util/Router';
 
 import ActorScreenComponent from './ActorScreen.component';
@@ -14,32 +14,18 @@ import { ActorScreenContainerProps } from './ActorScreen.type';
 export function ActorScreenContainer({ route }: ActorScreenContainerProps) {
   const { link } = route.params as { link: string };
   const { isTV } = useConfigContext();
-  const [isLoading, setIsLoading] = useState(true);
-  const [actor, setActor] = useState<ActorInterface | null>(null);
   const { currentService } = useServiceContext();
   const navigation = useNavigation();
 
-  const fetchActor = async () => {
-    try {
-      setIsLoading(true);
-
-      const data = await currentService.getActorDetails(link);
-
-      setActor(data);
-    } catch (error) {
-      NotificationStore.displayError(error as Error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchActor();
-  }, []);
+  const { data: actor = null, isLoading } = useQuery({
+    queryKey: queryKeys.actor(link),
+    queryFn: () => currentService.getActorDetails(link),
+    enabled: !!link,
+  });
 
   const handleSelectFilm = useCallback((film: FilmCardInterface) => {
     openFilm(film, navigation);
-  }, []);
+  }, [navigation]);
 
   const containerProps = {
     isLoading,

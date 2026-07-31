@@ -1,4 +1,4 @@
-import { getFirestore } from '@react-native-firebase/firestore';
+import { collection, CollectionReference, getFirestore } from '@react-native-firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import { PlayerVideoSelectorRef } from 'Component/PlayerVideoSelector/PlayerVideoSelector.container';
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
@@ -113,7 +113,7 @@ export function PlayerContainer({
   const firestoreSavedTimeRef = useRef(false);
   const firestoreDb = useMemo(() => (
     isFirestore && isSignedIn && !isOffline && !isLocalLibrary
-      ? getFirestore().collection<FirestoreDocument>(FIRESTORE_DB)
+      ? collection(getFirestore(), FIRESTORE_DB) as CollectionReference<FirestoreDocument>
       : null
   ), [isSignedIn, isFirestore, isOffline, isLocalLibrary]);
 

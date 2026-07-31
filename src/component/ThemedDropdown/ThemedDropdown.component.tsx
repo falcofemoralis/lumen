@@ -61,6 +61,7 @@ export const ThemedDropdownComponent = ({
 
     return (
       <ThemedButton
+        title={ inputLabel ?? label }
         style={ [styles.input, inputStyle] }
         contentStyle={ styles.inputContent }
         textStyle={ styles.inputText }
@@ -74,9 +75,7 @@ export const ThemedDropdownComponent = ({
         } }
         leftImage={ startIcon }
         rightImage={ endIcon }
-      >
-        { inputLabel ?? label }
-      </ThemedButton>
+      />
     );
   };
 
