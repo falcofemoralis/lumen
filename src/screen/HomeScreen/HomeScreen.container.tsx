@@ -1,5 +1,5 @@
 import { useFilmPager } from 'Component/FilmPager/useFilmPager';
-import { useConfigContext } from 'Context/ConfigContext';
+import { useIsTV } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useMemo } from 'react';
 import { MenuItemInterface } from 'Type/MenuItem.interface';
@@ -10,7 +10,7 @@ import HomeScreenComponentTV from './HomeScreen.component.atv';
 
 export function HomeScreenContainer() {
   const { currentService } = useServiceContext();
-  const { isTV } = useConfigContext();
+  const isTV = useIsTV();
   const sortingOptions = useMemo(() => currentService.getFilmSortingOptions(), [currentService]);
   const menuItems = useMemo(() => currentService.getHomeMenu(), [currentService]);
 

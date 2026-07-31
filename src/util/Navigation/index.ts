@@ -5,7 +5,7 @@ import {
   PartialState,
 } from '@react-navigation/native';
 import { BACK_HANDLER_DELAY } from 'Component/Page/Page.config';
-import { useConfigContext } from 'Context/ConfigContext';
+import { useIsTV } from 'Context/ConfigContext';
 import { t } from 'i18n/translate';
 import { AppStackParamList } from 'Navigation/navigationTypes';
 import { useEffect, useRef } from 'react';
@@ -53,7 +53,7 @@ export function useBackButtonHandler(canExit: (routeName: string) => boolean) {
   // The reason we're using a ref here is because we need to be able
   // to update the canExit function without re-setting up all the listeners
   const canExitRef = useRef(Platform.OS !== 'android' ? iosExit : canExit);
-  const { isTV } = useConfigContext();
+  const isTV = useIsTV();
   const backPressedOnceRef = useRef(false);
 
   useEffect(() => {

@@ -5,7 +5,7 @@ import { ThemedMultiList } from 'Component/ThemedMultiList';
 import { ThemedOverlay } from 'Component/ThemedOverlay';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
-import { Plus } from 'lucide-react-native';
+import Plus from 'lucide-react-native/icons/plus';
 import { useState } from 'react';
 import { View } from 'react-native';
 import { useAppTheme } from 'Theme/context';

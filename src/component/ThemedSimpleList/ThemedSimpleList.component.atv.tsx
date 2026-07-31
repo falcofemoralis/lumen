@@ -5,7 +5,6 @@ import { ThemedImage } from 'Component/ThemedImage';
 import { ThemedPressable } from 'Component/ThemedPressable';
 import { ScrollContext } from 'Component/ThemedScrollView/ScrollContext';
 import { ThemedText } from 'Component/ThemedText';
-import { useConfigContext } from 'Context/ConfigContext';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { memo, useCallback, useEffect, useId, useMemo, useRef } from 'react';
 import { useWindowDimensions, View } from 'react-native';

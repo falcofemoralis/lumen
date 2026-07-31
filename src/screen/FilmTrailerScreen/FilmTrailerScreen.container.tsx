@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
-import { useConfigContext } from 'Context/ConfigContext';
+import { useIsTV } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import * as NavigationBar from 'expo-navigation-bar';
 import * as StatusBar from 'expo-status-bar';
@@ -30,7 +30,7 @@ export const FilmTrailerScreenContainer = ({
   film,
 }: FilmTrailerScreenContainerProps) => {
   const { currentService } = useServiceContext();
-  const { isTV } = useConfigContext();
+  const isTV = useIsTV();
   const overlayRef = useRef<ThemedOverlayRef | null>(null);
 
   const { data: trailerUrl = null, isLoading } = useQuery({

@@ -1,5 +1,5 @@
 import { CommonActions } from '@react-navigation/native';
-import { useConfigContext } from 'Context/ConfigContext';
+import { useIsTV } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useCallback } from 'react';
 
@@ -9,7 +9,7 @@ import { NavigationBarContainerProps } from './NavigationBar.type';
 
 export function NavigationBarContainer(props: NavigationBarContainerProps) {
   const { profile } = useServiceContext();
-  const { isTV } = useConfigContext();
+  const isTV = useIsTV();
   const { navigation, state } = props;
 
   const onPress = useCallback((route: string) => {

@@ -21,6 +21,15 @@ const ConfigContext = createContext<ConfigContextInterface>({
   setConfig: () => {},
 });
 
+/**
+ * `isTV` on its own. The whole config lives in one MMKV blob, so the config
+ * context value changes identity on every settings write -- and the ~50
+ * components that only branch on the device type would all re-render, memo or
+ * not, since context reads bypass `memo`. This carries a primitive, so React
+ * skips consumers whenever the device type itself hasn't changed.
+ */
+const IsTVContext = createContext<boolean>(defaultConfig.isTV);
+
 // External access to global config. Avoid using it!
 let globalConfig: any = null;
 export const getGlobalConfig = (): DeviceConfigType => {
@@ -78,7 +87,9 @@ export const ConfigProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <ConfigContext.Provider value={ value }>
-      { children }
+      <IsTVContext.Provider value={ config.isTV }>
+        { children }
+      </IsTVContext.Provider>
     </ConfigContext.Provider>
   );
 };
@@ -89,3 +100,9 @@ export const useConfigContext = () => {
 
   return context;
 };
+
+/**
+ * Prefer this over `useConfigContext().isTV` when the device type is all a
+ * component needs -- see IsTVContext above.
+ */
+export const useIsTV = () => useContext(IsTVContext);

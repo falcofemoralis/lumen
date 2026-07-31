@@ -3,7 +3,8 @@ import { ThemedGrid } from 'Component/ThemedGrid';
 import { ThemedPressable } from 'Component/ThemedPressable';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
-import { Square, SquareCheck } from 'lucide-react-native';
+import Square from 'lucide-react-native/icons/square';
+import SquareCheck from 'lucide-react-native/icons/square-check';
 import { Text, View } from 'react-native';
 import { useAppTheme } from 'Theme/context';
 

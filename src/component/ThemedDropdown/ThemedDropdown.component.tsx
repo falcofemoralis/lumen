@@ -3,7 +3,7 @@ import { ThemedOverlay } from 'Component/ThemedOverlay';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { ThemedSimpleList } from 'Component/ThemedSimpleList';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
-import { Plus } from 'lucide-react-native';
+import Plus from 'lucide-react-native/icons/plus';
 import { useRef } from 'react';
 import { View } from 'react-native';
 import { useAppTheme } from 'Theme/context';

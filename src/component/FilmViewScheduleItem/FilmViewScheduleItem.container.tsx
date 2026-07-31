@@ -1,11 +1,11 @@
-import { useConfigContext } from 'Context/ConfigContext';
+import { useIsTV } from 'Context/ConfigContext';
 
 import FilmViewScheduleItemComponent from './FilmViewScheduleItem.component';
 import FilmViewScheduleItemComponentTV from './FilmViewScheduleItem.component.atv';
 import { FilmViewScheduleItemContainerProps } from './FilmViewScheduleItem.type';
 
 export function FilmViewScheduleItemContainer(props: FilmViewScheduleItemContainerProps) {
-  const { isTV } = useConfigContext();
+  const isTV = useIsTV();
 
   return isTV
     ? <FilmViewScheduleItemComponentTV { ...props } />

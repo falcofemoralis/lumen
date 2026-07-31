@@ -5,10 +5,11 @@ import { ThemedOverlay } from 'Component/ThemedOverlay';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { ThemedPressable } from 'Component/ThemedPressable';
 import { ThemedText } from 'Component/ThemedText';
-import { useConfigContext } from 'Context/ConfigContext';
+import { useIsTV } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { t } from 'i18n/translate';
-import { Info, LogIn } from 'lucide-react-native';
+import Info from 'lucide-react-native/icons/info';
+import LogIn from 'lucide-react-native/icons/log-in';
 import {
   useCallback,
   useRef,
@@ -29,7 +30,7 @@ export const LoginSlide = ({
   ...props
 }: BaseSlideProps) => {
   const { theme, scale } = useAppTheme();
-  const { isTV } = useConfigContext();
+  const isTV = useIsTV();
   const { profile, currentService, isSignedIn, login } = useServiceContext();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const usernameRef = useRef<string | null>(null);

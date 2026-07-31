@@ -2,7 +2,7 @@ import { Header } from 'Component/Header';
 import { Thumbnail } from 'Component/Thumbnail';
 import { Wrapper } from 'Component/Wrapper';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Forward } from 'lucide-react-native';
+import Forward from 'lucide-react-native/icons/forward';
 import { View } from 'react-native';
 import { useAppTheme } from 'Theme/context';
 import { ThemedStyles } from 'Theme/types';

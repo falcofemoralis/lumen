@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import { useQuery } from '@tanstack/react-query';
-import { useConfigContext } from 'Context/ConfigContext';
+import { useIsTV } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useCallback } from 'react';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
@@ -13,7 +13,7 @@ import { ActorScreenContainerProps } from './ActorScreen.type';
 
 export function ActorScreenContainer({ route }: ActorScreenContainerProps) {
   const { link } = route.params as { link: string };
-  const { isTV } = useConfigContext();
+  const isTV = useIsTV();
   const { currentService } = useServiceContext();
   const navigation = useNavigation();
 

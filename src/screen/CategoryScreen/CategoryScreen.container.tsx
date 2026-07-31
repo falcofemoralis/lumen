@@ -1,5 +1,5 @@
 import { useFilmPager } from 'Component/FilmPager/useFilmPager';
-import { useConfigContext } from 'Context/ConfigContext';
+import { useIsTV } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useMemo } from 'react';
 import { queryKeys } from 'Util/Query';
@@ -11,7 +11,7 @@ import { CategoryScreenContainerProps } from './CategoryScreen.type';
 
 export function CategoryScreenContainer({ route }: CategoryScreenContainerProps) {
   const { link } = route.params as { link: string };
-  const { isTV } = useConfigContext();
+  const isTV = useIsTV();
   const { currentService } = useServiceContext();
   const menuItems = useMemo(() => [CATEGORY_MENU_ITEM], []);
 

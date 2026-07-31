@@ -7,7 +7,7 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ErrorBoundary } from 'Component/ErrorBoundary';
-import { useConfigContext } from 'Context/ConfigContext';
+import { useConfigContext, useIsTV } from 'Context/ConfigContext';
 import { StatusBar } from 'expo-status-bar';
 import { ErrorScreen } from 'Screen/ErrorScreen';
 import { FilmTrailerScreen } from 'Screen/FilmTrailerScreen';
@@ -79,7 +79,7 @@ const AppStack = () => {
 
 export const AppNavigator = (props: NavigationProps) => {
   const { navigationTheme, themeContext } = useAppTheme();
-  const { isTV } = useConfigContext();
+  const isTV = useIsTV();
 
   useBackButtonHandler((routeName) => (isTV ? exitRoutesTV : exitRoutes).includes(routeName));
 

@@ -18,21 +18,19 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { VideoView } from 'expo-video';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
-import {
-  Bookmark,
-  BookmarkCheck,
-  ClosedCaption,
-  Gauge,
-  ListVideo,
-  Maximize2,
-  MessageSquareText,
-  Pause,
-  Play,
-  Settings2,
-  SkipBack,
-  SkipForward,
-  Undo2,
-} from 'lucide-react-native';
+import Bookmark from 'lucide-react-native/icons/bookmark';
+import BookmarkCheck from 'lucide-react-native/icons/bookmark-check';
+import ClosedCaption from 'lucide-react-native/icons/closed-caption';
+import Gauge from 'lucide-react-native/icons/gauge';
+import ListVideo from 'lucide-react-native/icons/list-video';
+import Maximize2 from 'lucide-react-native/icons/maximize-2';
+import MessageSquareText from 'lucide-react-native/icons/message-square-text';
+import Pause from 'lucide-react-native/icons/pause';
+import Play from 'lucide-react-native/icons/play';
+import Settings2 from 'lucide-react-native/icons/settings-2';
+import SkipBack from 'lucide-react-native/icons/skip-back';
+import SkipForward from 'lucide-react-native/icons/skip-forward';
+import Undo2 from 'lucide-react-native/icons/undo-2';
 import {
   ComponentType,
   useEffect,

@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 import { useNavigation } from '@react-navigation/native';
-import { useConfigContext } from 'Context/ConfigContext';
+import { useIsTV } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { usePaginatedQuery } from 'Hooks/usePaginatedQuery';
 import { ContentCollectionInterface } from 'Type/ContentCollection.interface';
@@ -11,7 +11,7 @@ import CollectionScreenComponent from './CollectionScreen.component';
 import CollectionScreenComponentTV from './CollectionScreen.component.atv';
 
 export function CollectionScreenContainer() {
-  const { isTV } = useConfigContext();
+  const isTV = useIsTV();
   const { currentService } = useServiceContext();
   const navigation = useNavigation();
 

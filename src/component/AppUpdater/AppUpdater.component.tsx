@@ -6,7 +6,7 @@ import { Wrapper } from 'Component/Wrapper';
 import * as Application from 'expo-application';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
-import { X } from 'lucide-react-native';
+import X from 'lucide-react-native/icons/x';
 import { Image, Pressable, ScrollView, View } from 'react-native';
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useAppTheme } from 'Theme/context';

@@ -1,7 +1,7 @@
 import { SettingBase } from 'Component/SettingBase';
 import { ThemedOverlay } from 'Component/ThemedOverlay';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
-import { useConfigContext } from 'Context/ConfigContext';
+import { useIsTV } from 'Context/ConfigContext';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { memo, useCallback, useRef } from 'react';
 import { Image } from 'react-native';
@@ -14,7 +14,7 @@ export const SettingLinkComponent = memo(({
   onPress,
   ...baseProps
 }: SettingLinkComponentProps) => {
-  const { isTV } = useConfigContext();
+  const isTV = useIsTV();
   const styles = useThemedStyles(componentStyles);
   const overlayRef = useRef<ThemedOverlayRef>(null);
 

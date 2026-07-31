@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useConfigContext } from 'Context/ConfigContext';
+import { useIsTV } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { t } from 'i18n/translate';
 import { useCallback } from 'react';
@@ -14,7 +14,7 @@ export function LoginFormContainer({
   autofocus,
 }: LoginFormContainerProps) {
   const { login, isSignedIn } = useServiceContext();
-  const { isTV } = useConfigContext();
+  const isTV = useIsTV();
   const queryClient = useQueryClient();
 
   const { mutateAsync: submitLogin, isPending: isLoading } = useMutation({

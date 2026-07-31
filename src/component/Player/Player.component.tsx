@@ -19,27 +19,25 @@ import * as StatusBar from 'expo-status-bar';
 import { isPictureInPictureSupported, VideoView } from 'expo-video';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
-import {
-  ArrowLeft,
-  Bookmark,
-  BookmarkCheck,
-  ClosedCaption,
-  FastForward,
-  Forward,
-  Gauge,
-  ListVideo,
-  LockKeyhole,
-  LockKeyholeOpen,
-  Maximize2,
-  MessageSquareText,
-  Pause,
-  PictureInPicture2,
-  Play,
-  Rewind,
-  Settings2,
-  SkipBack,
-  SkipForward,
-} from 'lucide-react-native';
+import ArrowLeft from 'lucide-react-native/icons/arrow-left';
+import Bookmark from 'lucide-react-native/icons/bookmark';
+import BookmarkCheck from 'lucide-react-native/icons/bookmark-check';
+import ClosedCaption from 'lucide-react-native/icons/closed-caption';
+import FastForward from 'lucide-react-native/icons/fast-forward';
+import Forward from 'lucide-react-native/icons/forward';
+import Gauge from 'lucide-react-native/icons/gauge';
+import ListVideo from 'lucide-react-native/icons/list-video';
+import LockKeyhole from 'lucide-react-native/icons/lock-keyhole';
+import LockKeyholeOpen from 'lucide-react-native/icons/lock-keyhole-open';
+import Maximize2 from 'lucide-react-native/icons/maximize-2';
+import MessageSquareText from 'lucide-react-native/icons/message-square-text';
+import Pause from 'lucide-react-native/icons/pause';
+import PictureInPicture2 from 'lucide-react-native/icons/picture-in-picture-2';
+import Play from 'lucide-react-native/icons/play';
+import Rewind from 'lucide-react-native/icons/rewind';
+import Settings2 from 'lucide-react-native/icons/settings-2';
+import SkipBack from 'lucide-react-native/icons/skip-back';
+import SkipForward from 'lucide-react-native/icons/skip-forward';
 import { ComponentType, Fragment, useEffect, useRef, useState } from 'react';
 import { AppState, Dimensions, View } from 'react-native';
 import {

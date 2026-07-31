@@ -3,7 +3,7 @@ import { ThemedPressable } from 'Component/ThemedPressable';
 import { ThemedText } from 'Component/ThemedText';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
-import { Star } from 'lucide-react-native';
+import Star from 'lucide-react-native/icons/star';
 import { memo } from 'react';
 import { View } from 'react-native';
 import { useAppTheme } from 'Theme/context';

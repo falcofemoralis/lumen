@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { createLucideIcon } from 'lucide-react-native';
+import { createLucideIcon } from './createLucideIcon';
 
 export const ClosedCaptionFilled = ({ color }: { color: string }) => {
   return createLucideIcon('ClosedCaptionFilled', [

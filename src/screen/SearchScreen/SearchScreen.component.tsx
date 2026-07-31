@@ -14,7 +14,13 @@ import { Wrapper } from 'Component/Wrapper';
 import * as Haptics from 'expo-haptics';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
-import { ArrowUpLeft, History, LayoutGrid, Mic, Search, Settings2, X } from 'lucide-react-native';
+import ArrowUpLeft from 'lucide-react-native/icons/arrow-up-left';
+import LayoutGrid from 'lucide-react-native/icons/layout-grid';
+import Mic from 'lucide-react-native/icons/mic';
+import History from 'lucide-react-native/icons/rotate-ccw-clock';
+import Search from 'lucide-react-native/icons/search';
+import Settings2 from 'lucide-react-native/icons/settings-2';
+import X from 'lucide-react-native/icons/x';
 import { ScrollView, View } from 'react-native';
 import { useAppTheme } from 'Theme/context';
 

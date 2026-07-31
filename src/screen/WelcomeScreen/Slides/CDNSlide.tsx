@@ -5,7 +5,9 @@ import { ThemedText } from 'Component/ThemedText';
 import { ThemedToggle } from 'Component/ThemedToggle';
 import { useServiceContext } from 'Context/ServiceContext';
 import { t } from 'i18n/translate';
-import { Check, CircleAlert, RefreshCw } from 'lucide-react-native';
+import Check from 'lucide-react-native/icons/check';
+import CircleAlert from 'lucide-react-native/icons/circle-alert';
+import RefreshCw from 'lucide-react-native/icons/refresh-cw';
 import {
   useCallback,
   useState,

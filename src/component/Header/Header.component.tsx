@@ -4,7 +4,7 @@ import { ThemedPressable } from 'Component/ThemedPressable';
 import { ThemedText } from 'Component/ThemedText';
 import { Wrapper } from 'Component/Wrapper';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
-import { ArrowLeft } from 'lucide-react-native';
+import ArrowLeft from 'lucide-react-native/icons/arrow-left';
 import { AppStackParamList } from 'Navigation/navigationTypes';
 import { View } from 'react-native';
 import { useAppTheme } from 'Theme/context';

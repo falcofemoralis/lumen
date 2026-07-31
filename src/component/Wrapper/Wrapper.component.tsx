@@ -1,4 +1,4 @@
-import { useConfigContext } from 'Context/ConfigContext';
+import { useIsTV } from 'Context/ConfigContext';
 import { View } from 'react-native';
 import { useAppTheme } from 'Theme/context';
 
@@ -9,7 +9,7 @@ export const WrapperComponent = ({
   style,
 }: WrapperProps) => {
   const { scale, theme } = useAppTheme();
-  const { isTV } = useConfigContext();
+  const isTV = useIsTV();
 
   return (
     <View

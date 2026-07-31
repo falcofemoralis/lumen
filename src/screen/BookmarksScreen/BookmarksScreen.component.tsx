@@ -6,7 +6,7 @@ import { Page } from 'Component/Page';
 import { ThemedButton } from 'Component/ThemedButton';
 import { useServiceContext } from 'Context/ServiceContext';
 import { t } from 'i18n/translate';
-import { FolderCog } from 'lucide-react-native';
+import FolderCog from 'lucide-react-native/icons/folder-cog';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from 'Theme/context';

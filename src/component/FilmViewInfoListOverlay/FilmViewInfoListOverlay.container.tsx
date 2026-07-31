@@ -1,5 +1,5 @@
 import { AccordionGroupInterface } from 'Component/ThemedAccordion/ThemedAccordion.type';
-import { useConfigContext } from 'Context/ConfigContext';
+import { useIsTV } from 'Context/ConfigContext';
 import { t } from 'i18n/translate';
 import { useMemo } from 'react';
 import { InfoListInterface } from 'Type/InfoList.interface';
@@ -12,7 +12,7 @@ export function FilmViewInfoListOverlayContainer({
   film,
   handleSelectCategory,
 }: FilmViewInfoListOverlayContainerProps) {
-  const { isTV } = useConfigContext();
+  const isTV = useIsTV();
 
   const data = useMemo<AccordionGroupInterface<InfoListInterface>[]>(() => {
     const { includedIn = [], fromCollections = [] } = film;

@@ -22,18 +22,16 @@ import { useServiceContext } from 'Context/ServiceContext';
 import { useLayout } from 'Hooks/useLayout';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
-import {
-  ArrowRight,
-  Bookmark,
-  BookmarkCheck,
-  Clapperboard,
-  Clock,
-  Download,
-  MessageSquareText,
-  Play,
-  ShieldOff,
-  Star,
-} from 'lucide-react-native';
+import ArrowRight from 'lucide-react-native/icons/arrow-right';
+import Bookmark from 'lucide-react-native/icons/bookmark';
+import BookmarkCheck from 'lucide-react-native/icons/bookmark-check';
+import Clapperboard from 'lucide-react-native/icons/clapperboard';
+import Clock from 'lucide-react-native/icons/clock';
+import Download from 'lucide-react-native/icons/download';
+import MessageSquareText from 'lucide-react-native/icons/message-square-text';
+import Play from 'lucide-react-native/icons/play';
+import ShieldOff from 'lucide-react-native/icons/shield-off';
+import Star from 'lucide-react-native/icons/star';
 import { ComponentType, useState } from 'react';
 import { useWindowDimensions, View } from 'react-native';
 import NotificationStore from 'Store/Notification.store';

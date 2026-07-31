@@ -1,4 +1,4 @@
-import { useConfigContext } from 'Context/ConfigContext';
+import { useIsTV } from 'Context/ConfigContext';
 import { useLocalBookmarks } from 'Hooks/useLocalLibrary';
 import { t } from 'i18n/translate';
 import { useState } from 'react';
@@ -16,7 +16,7 @@ import {
 export const LocalCategoriesOverlayContainer = ({
   overlayRef,
 }: LocalCategoriesOverlayContainerProps) => {
-  const { isTV } = useConfigContext();
+  const isTV = useIsTV();
   const localBookmarks = useLocalBookmarks();
   const [mode, setMode] = useState<LocalCategoriesOverlayMode>('list');
   const [newTitle, setNewTitle] = useState('');

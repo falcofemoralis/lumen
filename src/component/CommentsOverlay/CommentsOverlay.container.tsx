@@ -1,11 +1,11 @@
-import { useConfigContext } from 'Context/ConfigContext';
+import { useIsTV } from 'Context/ConfigContext';
 
 import CommentsOverlayComponent from './CommentsOverlay.component';
 import CommentsOverlayComponentTV from './CommentsOverlay.component.atv';
 import { CommentsOverlayContainerProps } from './CommentsOverlay.type';
 
 export function CommentsOverlayContainer(props: CommentsOverlayContainerProps) {
-  const { isTV } = useConfigContext();
+  const isTV = useIsTV();
 
   return isTV ? <CommentsOverlayComponentTV { ...props } /> : <CommentsOverlayComponent { ...props } />;
 }

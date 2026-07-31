@@ -1,4 +1,4 @@
-import { useConfigContext } from 'Context/ConfigContext';
+import { useIsTV } from 'Context/ConfigContext';
 import { useOverlayContext } from 'Context/OverlayContext';
 import { forwardRef, useId, useImperativeHandle, useState } from 'react';
 
@@ -10,7 +10,7 @@ export const ThemedOverlayContainer = forwardRef<ThemedOverlayRef, ThemedOverlay
   const [isOpened, setIsOpened] = useState(false);
   const [contentVisible, setContentVisible] = useState(false);
   const { setIsOverlayOpen } = useOverlayContext();
-  const { isTV } = useConfigContext();
+  const isTV = useIsTV();
   const overlayId = useId();
 
   useImperativeHandle(ref, () => ({

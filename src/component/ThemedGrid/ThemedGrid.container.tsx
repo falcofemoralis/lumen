@@ -1,4 +1,4 @@
-import { useConfigContext } from 'Context/ConfigContext';
+import { useIsTV } from 'Context/ConfigContext';
 import {
   useRef,
   useState,
@@ -21,7 +21,7 @@ export function ThemedGridContainer({
   renderItem,
   onNextLoad,
 }: ThemedGridContainerProps) {
-  const { isTV } = useConfigContext();
+  const isTV = useIsTV();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const updatingStateRef = useRef(false);
 

@@ -6,7 +6,7 @@ import { ThemedPressable } from 'Component/ThemedPressable';
 import { ThemedText } from 'Component/ThemedText';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
-import { ThumbsUp } from 'lucide-react-native';
+import ThumbsUp from 'lucide-react-native/icons/thumbs-up';
 import { memo, useCallback } from 'react';
 import { View } from 'react-native';
 import { useAppTheme } from 'Theme/context';

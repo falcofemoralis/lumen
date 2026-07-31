@@ -2,7 +2,7 @@ import { Loader } from 'Component/Loader';
 import { ThemedPressable } from 'Component/ThemedPressable';
 import { ThemedText } from 'Component/ThemedText';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
-import { CircleCheck } from 'lucide-react-native';
+import CircleCheck from 'lucide-react-native/icons/circle-check';
 import {
   memo,
   useCallback,

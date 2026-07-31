@@ -5,7 +5,8 @@ import { ThemedScrollView } from 'Component/ThemedScrollView';
 import { ThemedText } from 'Component/ThemedText';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
-import { Plus, Trash2 } from 'lucide-react-native';
+import Plus from 'lucide-react-native/icons/plus';
+import Trash2 from 'lucide-react-native/icons/trash-2';
 import { View } from 'react-native';
 import { useAppTheme } from 'Theme/context';
 

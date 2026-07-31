@@ -1,6 +1,6 @@
 import { ThemedBottomSheetRef } from 'Component/ThemedBottomSheet/ThemedBottomSheet.type';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
-import { useConfigContext } from 'Context/ConfigContext';
+import { useIsTV } from 'Context/ConfigContext';
 import { RefObject } from 'react';
 
 import FilmViewScheduleOverlayComponent from './FilmViewScheduleOverlay.component';
@@ -14,7 +14,7 @@ export function FilmViewScheduleOverlayContainer<T extends FilmViewScheduleOverl
   ref,
   ...props
 }: FilmViewScheduleOverlayContainerProps<T>) {
-  const { isTV } = useConfigContext();
+  const isTV = useIsTV();
 
   // Each platform renders a different overlay primitive, so the caller owns the
   // matching ref type - TV passes ThemedOverlayRef, mobile passes ThemedBottomSheetRef.

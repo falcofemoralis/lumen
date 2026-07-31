@@ -1,4 +1,4 @@
-import { useConfigContext } from 'Context/ConfigContext';
+import { useIsTV } from 'Context/ConfigContext';
 import { memo, useCallback, useState } from 'react';
 
 import ThemedMultiListComponent from './ThemedMultiList.component';
@@ -12,7 +12,7 @@ export function ThemedMultiListContainer({
   noItemsSubtitle,
   onChange,
 }: ThemedMultiListContainerProps) {
-  const { isTV } = useConfigContext();
+  const isTV = useIsTV();
   const [values, setValues] = useState<ListItem[]>(data);
 
   const handleOnChange = useCallback((value: string, isChecked: boolean) => {

@@ -11,42 +11,40 @@ import { ThemedSafeArea } from 'Component/ThemedSafeArea';
 import { ThemedScrollView } from 'Component/ThemedScrollView';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
-import {
-  ArrowDown10,
-  ArrowRight,
-  BookImage,
-  Brush,
-  CircleGauge,
-  CircleQuestionMark,
-  Cloud,
-  CloudCog,
-  CloudOff,
-  Download,
-  ExternalLink,
-  FolderCog,
-  FolderDown,
-  FolderLock,
-  Gauge,
-  Globe,
-  GlobeLock,
-  Grid3x2,
-  Info,
-  Loader,
-  LoaderCircle,
-  Maximize2,
-  MoveRight,
-  Palette,
-  Pin,
-  RefreshCw,
-  Rewind,
-  Route,
-  Settings2,
-  ShieldCheck,
-  StepForward,
-  Subtitles,
-  TvMinimalPlay,
-  UserCog,
-} from 'lucide-react-native';
+import ArrowDown10 from 'lucide-react-native/icons/arrow-down-1-0';
+import ArrowRight from 'lucide-react-native/icons/arrow-right';
+import BookImage from 'lucide-react-native/icons/book-image';
+import Brush from 'lucide-react-native/icons/brush';
+import Subtitles from 'lucide-react-native/icons/captions';
+import CircleGauge from 'lucide-react-native/icons/circle-gauge';
+import CircleQuestionMark from 'lucide-react-native/icons/circle-question-mark';
+import Cloud from 'lucide-react-native/icons/cloud';
+import CloudCog from 'lucide-react-native/icons/cloud-cog';
+import CloudOff from 'lucide-react-native/icons/cloud-off';
+import Download from 'lucide-react-native/icons/download';
+import ExternalLink from 'lucide-react-native/icons/external-link';
+import FolderCog from 'lucide-react-native/icons/folder-cog';
+import FolderDown from 'lucide-react-native/icons/folder-down';
+import FolderLock from 'lucide-react-native/icons/folder-lock';
+import Gauge from 'lucide-react-native/icons/gauge';
+import Globe from 'lucide-react-native/icons/globe';
+import GlobeLock from 'lucide-react-native/icons/globe-lock';
+import Grid3x2 from 'lucide-react-native/icons/grid-3x2';
+import Info from 'lucide-react-native/icons/info';
+import Loader from 'lucide-react-native/icons/loader';
+import LoaderCircle from 'lucide-react-native/icons/loader-circle';
+import Maximize2 from 'lucide-react-native/icons/maximize-2';
+import MoveRight from 'lucide-react-native/icons/move-right';
+import Palette from 'lucide-react-native/icons/palette';
+import Pin from 'lucide-react-native/icons/pin';
+import RefreshCw from 'lucide-react-native/icons/refresh-cw';
+import Rewind from 'lucide-react-native/icons/rewind';
+import Route from 'lucide-react-native/icons/route';
+import Settings2 from 'lucide-react-native/icons/settings-2';
+import ShieldCheck from 'lucide-react-native/icons/shield-check';
+import StepForward from 'lucide-react-native/icons/step-forward';
+import TvMinimalPlay from 'lucide-react-native/icons/tv-minimal-play';
+import UserCog from 'lucide-react-native/icons/user-cog';
 import { reactNativeDownloads } from 'Modules/react-native-downloads';
 import { useCallback, useEffect, useState } from 'react';
 import { BackHandler, View } from 'react-native';

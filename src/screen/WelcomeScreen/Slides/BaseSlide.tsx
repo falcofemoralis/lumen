@@ -6,7 +6,7 @@ import { ThemedText } from 'Component/ThemedText';
 import { useOverlayContext } from 'Context/OverlayContext';
 import { useLandscape } from 'Hooks/useLandscape';
 import { t } from 'i18n/translate';
-import { ChevronLeft } from 'lucide-react-native';
+import ChevronLeft from 'lucide-react-native/icons/chevron-left';
 import {
   ComponentType,
   ReactNode,

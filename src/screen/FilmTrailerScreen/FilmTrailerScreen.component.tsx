@@ -5,7 +5,7 @@ import { ThemedPressable } from 'Component/ThemedPressable';
 import { ThemedSafeArea } from 'Component/ThemedSafeArea';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
-import { ArrowLeft } from 'lucide-react-native';
+import ArrowLeft from 'lucide-react-native/icons/arrow-left';
 import { View } from 'react-native';
 import { useYouTubePlayer, YoutubeView } from 'react-native-youtube-bridge';
 import { useAppTheme } from 'Theme/context';

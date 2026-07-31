@@ -2,7 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useFilmPager } from 'Component/FilmPager/useFilmPager';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
-import { useConfigContext } from 'Context/ConfigContext';
+import { useIsTV } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import {
   ExpoSpeechRecognitionModule,
@@ -29,7 +29,7 @@ const loadUserSuggestions = (): string[] => (
 );
 
 export function SearchScreenContainer() {
-  const { isTV } = useConfigContext();
+  const isTV = useIsTV();
   const [query, setQuery] = useState('');
   const navigation = useNavigation();
   const [userSuggestions, setUserSuggestions] = useState<string[]>(loadUserSuggestions);

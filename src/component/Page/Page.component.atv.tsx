@@ -5,7 +5,7 @@ import { Portal } from 'Component/ThemedPortal';
 import { useIsScreenFocused } from 'Hooks/useIsScreenFocused';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
-import { GlobeX } from 'lucide-react-native';
+import GlobeX from 'lucide-react-native/icons/globe-x';
 import { View } from 'react-native';
 import { restartApp } from 'Util/Device';
 

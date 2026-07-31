@@ -2,7 +2,7 @@ import { POSTER_ASPECT_HEIGHT, POSTER_ASPECT_WIDTH } from 'Component/FilmCard/Fi
 import { ThemedImage } from 'Component/ThemedImage';
 import { ThemedPressable } from 'Component/ThemedPressable';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
-import { ArrowLeft } from 'lucide-react-native';
+import ArrowLeft from 'lucide-react-native/icons/arrow-left';
 import { useState } from 'react';
 import { Modal, TouchableHighlight, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';

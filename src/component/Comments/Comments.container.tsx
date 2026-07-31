@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import { useConfigContext } from 'Context/ConfigContext';
+import { useIsTV } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import * as Haptics from 'expo-haptics';
 import { usePaginatedQuery } from 'Hooks/usePaginatedQuery';
@@ -19,7 +19,7 @@ export type CommentsRef = {
 
 export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>(
   ({ film, loaderFullScreen, style, initialLoad }, ref) => {
-    const { isTV } = useConfigContext();
+    const isTV = useIsTV();
     const { id } = film;
     const { isSignedIn, currentService } = useServiceContext();
     // comments are only fetched once the overlay that hosts them is opened

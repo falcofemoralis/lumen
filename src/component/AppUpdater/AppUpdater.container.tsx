@@ -2,7 +2,7 @@ import { pause, resume } from '@noriginmedia/norigin-spatial-navigation-core';
 import { ThemedBottomSheetRef } from 'Component/ThemedBottomSheet/ThemedBottomSheet.type';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useAppUpdaterContext } from 'Context/AppUpdaterContext';
-import { useConfigContext } from 'Context/ConfigContext';
+import { useIsTV } from 'Context/ConfigContext';
 import { useEffect, useRef, useState } from 'react';
 import { Platform } from 'react-native';
 import { Installer } from 'Util/App/installer';
@@ -12,7 +12,7 @@ import AppUpdaterComponentTV from './AppUpdater.component.atv';
 
 export const AppUpdaterContainer = () => {
   const { update, isUpdateRejected, resetUpdate } = useAppUpdaterContext();
-  const { isTV } = useConfigContext();
+  const isTV = useIsTV();
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const overlayRef = useRef<ThemedOverlayRef>(null);

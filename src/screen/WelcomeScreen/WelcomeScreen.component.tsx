@@ -3,7 +3,12 @@ import { Wrapper } from 'Component/Wrapper';
 import * as Application from 'expo-application';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
-import { CircleCheck, Clapperboard, CloudCog, FolderCog, MonitorCog, UserCog } from 'lucide-react-native';
+import CircleCheck from 'lucide-react-native/icons/circle-check';
+import Clapperboard from 'lucide-react-native/icons/clapperboard';
+import CloudCog from 'lucide-react-native/icons/cloud-cog';
+import FolderCog from 'lucide-react-native/icons/folder-cog';
+import MonitorCog from 'lucide-react-native/icons/monitor-cog';
+import UserCog from 'lucide-react-native/icons/user-cog';
 import { useCallback, useState } from 'react';
 import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated';
 

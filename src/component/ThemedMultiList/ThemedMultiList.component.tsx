@@ -3,7 +3,8 @@ import { ThemedPressable } from 'Component/ThemedPressable';
 import { useLandscape } from 'Hooks/useLandscape';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
-import { Square, SquareCheck } from 'lucide-react-native';
+import Square from 'lucide-react-native/icons/square';
+import SquareCheck from 'lucide-react-native/icons/square-check';
 import { useCallback } from 'react';
 import {
   ScrollView,

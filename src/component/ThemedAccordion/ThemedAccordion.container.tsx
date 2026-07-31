@@ -1,4 +1,4 @@
-import { useConfigContext } from 'Context/ConfigContext';
+import { useIsTV } from 'Context/ConfigContext';
 import { useState } from 'react';
 
 import ThemedAccordionComponent from './ThemedAccordion.component';
@@ -7,7 +7,7 @@ import { ExpandedItem, ThemedAccordionContainerProps } from './ThemedAccordion.t
 
 export const ThemedAccordionContainer = (props: ThemedAccordionContainerProps<any>) => {
   const [expanded, setExpanded] = useState<ExpandedItem>({});
-  const { isTV } = useConfigContext();
+  const isTV = useIsTV();
 
   const openAccordionGroup = (id: string) => {
     setExpanded({
