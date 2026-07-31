@@ -40,10 +40,16 @@ export const setIntervalSafe = (callback: () => void, ms?: number): number | nul
 
 export const wait = (ms: number): Promise<void> => new Promise((resolve) => { setTimeoutSafe(resolve, ms); });
 
+/**
+ * A comparable number for a `major.minor.patch` version. Each segment gets its
+ * own decimal band, so multi-digit segments still order correctly (a plain digit
+ * concatenation made 1.5.10 look newer than 1.6.0).
+ */
 export const versionStringToNumber = (versionString: string): number => {
-  const parts = versionString.replace(/[^\d.]/g, '').split('.');
+  const [major = 0, minor = 0, patch = 0] = versionString
+    .replace(/[^\d.]/g, '')
+    .split('.')
+    .map((part) => parseInt(part, 10) || 0);
 
-  const numberString = parts.join('');
-
-  return parseInt(numberString, 10) || 0;
+  return (major * 1000000) + (minor * 1000) + patch;
 };

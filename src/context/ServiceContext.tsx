@@ -1,7 +1,7 @@
 import { ApiInterface, ApiServiceType } from 'Api/index';
 import { services } from 'Api/services';
 import { t } from 'i18n/translate';
-import { ACCOUNT_SCREEN, ACCOUNT_TAB, NOTIFICATIONS_SCREEN, NOTIFICATIONS_TAB } from 'Navigation/navigationRoutes';
+import { ACCOUNT_TAB, NOTIFICATIONS_TAB } from 'Navigation/navigationRoutes';
 import {
   createContext,
   ReactNode,
@@ -39,6 +39,7 @@ export interface ServiceContextInterface {
   badgeData: BadgeData;
   updateCurrentService: (service: ApiServiceType) => void;
   setAuthorization: (auth: string, name: string, password: string) => void;
+  removeProfile: () => void;
   login: (name: string, password: string) => Promise<void>;
   logout: (forceLogout?: boolean) => void;
   updateProvider: (value: string) => Promise<void>;
@@ -63,6 +64,7 @@ const ServiceContext = createContext<ServiceContextInterface>({
   badgeData: {},
   updateCurrentService: () => {},
   setAuthorization: () => {},
+  removeProfile: () => {},
   login: async () => {},
   logout: () => {},
   updateProvider: async () => {},
@@ -317,8 +319,9 @@ export const ServiceProvider = ({ children }: { children: ReactNode }) => {
       storage.getMiscStorage().save(NOTIFICATIONS_STORAGE, newItems);
     }
 
+    // must match the key updateNotifications writes, which is what the tab bar reads
     setBadgeData({
-      [getGlobalConfig().isTV ? NOTIFICATIONS_SCREEN : ACCOUNT_SCREEN]: 0,
+      [getGlobalConfig().isTV ? NOTIFICATIONS_TAB : ACCOUNT_TAB]: 0,
     });
   }, [selectNotifications]);
 

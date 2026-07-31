@@ -26,6 +26,22 @@ export const NetworkProvider = ({ children }: { children: ReactNode }) => {
   const { strictConnectionCheck } = useConfigContext();
   const { isConnected, isInternetReachable, type } = useNetworkState();
   const [errorOccurred, setErrorOccurred] = useState<boolean>(false);
+  const [wasOnline, setWasOnline] = useState<boolean>(false);
+
+  const isOnline = !!isConnected && !!isInternetReachable;
+
+  // A request failure latches the offline state, so the OS reporting a reachable
+  // network again is what clears it - otherwise one failed fetch keeps the app
+  // offline until restart. Adjusted during render rather than in an effect, so the
+  // recovery lands in the same commit as the connectivity change.
+  // https://react.dev/learn/you-might-not-need-an-effect
+  if (isOnline !== wasOnline) {
+    setWasOnline(isOnline);
+
+    if (isOnline) {
+      setErrorOccurred(false);
+    }
+  }
 
   const isInternetAvailable = useMemo(() => {
     if (!type) {

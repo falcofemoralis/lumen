@@ -9,7 +9,7 @@ import {
   useSpeechRecognitionEvent,
 } from 'expo-speech-recognition';
 import { COLLECTION_SCREEN } from 'Navigation/navigationRoutes';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Keyboard } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
 import { SearchableCategoryInterface } from 'Type/SearchableCategoryInterface.interface';
@@ -85,6 +85,12 @@ export function SearchScreenContainer() {
   const selectedGenre = pickedGenre ?? selectedCategory?.genres[0]?.value ?? null;
   const selectedYear = pickedYear ?? selectedCategory?.years[0]?.value ?? null;
 
+  useEffect(() => () => {
+    if (debounce.current) {
+      clearTimeout(debounce.current);
+    }
+  }, []);
+
   const suggestions = suggestionQuery ? remoteSuggestions ?? userSuggestions : userSuggestions;
 
   const updateUserSuggestions = (q: string) => {
@@ -114,6 +120,12 @@ export function SearchScreenContainer() {
   useSpeechRecognitionEvent('start', () => setRecognizing(true));
   useSpeechRecognitionEvent('end', () => setRecognizing(false));
   useSpeechRecognitionEvent('result', (event) => {
+    // interimResults is on, so partial transcripts arrive too - acting on those
+    // would fire a search and persist a user suggestion for every fragment
+    if (!event.isFinal) {
+      return;
+    }
+
     onApplySuggestion(event.results[0]?.transcript);
   });
 

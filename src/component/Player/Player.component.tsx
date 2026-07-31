@@ -39,7 +39,7 @@ import Settings2 from 'lucide-react-native/icons/settings-2';
 import SkipBack from 'lucide-react-native/icons/skip-back';
 import SkipForward from 'lucide-react-native/icons/skip-forward';
 import { ComponentType, Fragment, useEffect, useRef, useState } from 'react';
-import { AppState, Dimensions, View } from 'react-native';
+import { AppState, useWindowDimensions, View } from 'react-native';
 import {
   Gesture,
   GestureDetector,
@@ -65,8 +65,6 @@ import {
 } from './Player.config';
 import { componentStyles, MiddleActionVariant } from './Player.style';
 import { DoubleTapAction, PlayerComponentProps } from './Player.type';
-
-const { width: screenWidth } = Dimensions.get('window');
 
 export function PlayerComponent({
   player,
@@ -115,6 +113,7 @@ export function PlayerComponent({
   handleBackButtonPress,
 }: PlayerComponentProps) {
   const { playerLongPressSpeed } = useConfigContext();
+  const { width: screenWidth } = useWindowDimensions();
   const { scale, theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
   const { playerRewindSeconds } = useConfigContext();
@@ -164,6 +163,10 @@ export function PlayerComponent({
   useEffect(() => {
     return () => {
       isComponentMounted.current = false;
+
+      if (doubleTapTimeout.current) {
+        clearTimeout(doubleTapTimeout.current);
+      }
     };
   }, []);
 
@@ -727,7 +730,7 @@ export function PlayerComponent({
     <View
       style={ [
         styles.container,
-        isCommentsOpen && { width: (Dimensions.get('window').width) * 0.45 },
+        isCommentsOpen && { width: screenWidth * 0.45 },
       ] }
     >
       <VideoView

@@ -38,6 +38,11 @@ export const PlayerProgressProvider = ({ children }: { children: ReactNode }) =>
 
   const updateProgressStatus = useCallback(
     (currentTime: number, bufferedPosition: number, duration: number) => {
+      // an unloaded video reports duration 0, which would publish NaN percentages
+      if (!duration || duration <= 0) {
+        return;
+      }
+
       setProgressStatus({
         progressPercentage: (currentTime / duration) * 100,
         playablePercentage: (bufferedPosition / duration) * 100,

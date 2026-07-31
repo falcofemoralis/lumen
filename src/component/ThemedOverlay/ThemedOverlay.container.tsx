@@ -1,6 +1,13 @@
 import { useIsTV } from 'Context/ConfigContext';
 import { useOverlayContext } from 'Context/OverlayContext';
-import { forwardRef, useId, useImperativeHandle, useState } from 'react';
+import {
+  forwardRef,
+  useEffect,
+  useId,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 
 import ThemedOverlayComponent from './ThemedOverlay.component';
 import ThemedOverlayComponentTV from './ThemedOverlay.component.atv';
@@ -12,6 +19,30 @@ export const ThemedOverlayContainer = forwardRef<ThemedOverlayRef, ThemedOverlay
   const { setIsOverlayOpen } = useOverlayContext();
   const isTV = useIsTV();
   const overlayId = useId();
+  // the open/close callbacks are deferred past the animation, so an overlay that
+  // unmounts mid-animation would still run them against a gone component
+  const animationTimeout = useRef<number | null>(null);
+
+  useEffect(() => () => {
+    if (animationTimeout.current) {
+      clearTimeout(animationTimeout.current);
+    }
+  }, []);
+
+  const close = () => {
+    setIsOpened(false);
+    setIsOverlayOpen(overlayId, false);
+
+    if (animationTimeout.current) {
+      clearTimeout(animationTimeout.current);
+    }
+
+    animationTimeout.current = setTimeout(() => {
+      animationTimeout.current = null;
+      setContentVisible(false);
+      props.onClose?.();
+    }, 250) as unknown as number;
+  };
 
   useImperativeHandle(ref, () => ({
     open: () => {
@@ -19,29 +50,20 @@ export const ThemedOverlayContainer = forwardRef<ThemedOverlayRef, ThemedOverlay
       setContentVisible(true);
       setIsOverlayOpen(overlayId, true);
 
-      setTimeout(() => {
-        props.onOpen?.();
-      }, 250);
-    },
-    close: () => {
-      setIsOpened(false);
-      setIsOverlayOpen(overlayId, false);
+      if (animationTimeout.current) {
+        clearTimeout(animationTimeout.current);
+      }
 
-      setTimeout(() => {
-        setContentVisible(false);
-        props.onClose?.();
-      }, 250);
+      animationTimeout.current = setTimeout(() => {
+        animationTimeout.current = null;
+        props.onOpen?.();
+      }, 250) as unknown as number;
     },
+    close,
   }));
 
   const handleModalRequestClose = () => {
-    setIsOpened(false);
-    setIsOverlayOpen(overlayId, false);
-
-    setTimeout(() => {
-      setContentVisible(false);
-      props.onClose?.();
-    }, 250);
+    close();
   };
 
   const containerProps = {

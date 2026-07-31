@@ -36,7 +36,9 @@ export const getGlobalConfig = (): DeviceConfigType => {
   if (!globalConfig) {
     const storedConfig = storage.getConfigStorage().load<DeviceConfigType>(DEVICE_CONFIG);
 
+    // defaults first, so a key the stored blob predates is not read as undefined
     globalConfig = {
+      ...defaultConfig,
       ...(globalConfig || {}),
       ...(storedConfig || {}),
     };

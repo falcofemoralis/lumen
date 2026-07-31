@@ -152,7 +152,10 @@ export function PlayerContainer({
 
   const videoUrl = useMemo(() => {
     if (isOffline) {
-      return `file://${getPlayerStream(video, selectedQuality).url}`;
+      const { url } = getPlayerStream(video, selectedQuality);
+
+      // getPlayerStream reports a miss as a null url, which would become "file://null"
+      return url ? `file://${url}` : null;
     }
 
     if (selectedQuality === AUTO_QUALITY.value) {
@@ -457,7 +460,8 @@ export function PlayerContainer({
     } else {
       const newStream = getPlayerStream(videoArg, getQualityFromStreams(videoArg, qualityArg));
 
-      if (!newStream) {
+      // a miss is reported as a null url, not a missing object
+      if (!newStream.url) {
         return;
       }
 

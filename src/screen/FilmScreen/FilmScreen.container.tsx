@@ -116,7 +116,9 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     }
   };
 
-  useFocusEffect(() => {
+  // useFocusEffect re-runs whenever the callback identity changes, so it has to be
+  // memoized - an inline arrow re-subscribes the back handler on every render
+  useFocusEffect(useCallback(() => {
     const onBackPress = () => {
       if (isDeepLink) {
         navigation.reset({
@@ -135,7 +137,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     return () => {
       backHandler.remove();
     };
-  });
+  }, [isDeepLink, navigation]));
 
   const filmQueryKey = useMemo(() => queryKeys.film(link), [link]);
 
@@ -227,7 +229,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     openCategory(categoryLink, navigation);
   }, [navigation]);
 
-  const getVisibleScheduleItems = useCallback(() => {
+  const visibleScheduleItems = useMemo(() => {
     if (!film) {
       return [];
     }
@@ -392,7 +394,8 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
 
       const name = [...taskName, ...filmName].join('-');
       const taskUrl = url.replace(':hls:manifest.m3u8', '');
-      const extension = taskUrl.split('.').pop();
+      // strip any query string, like the poster and subtitle destinations do
+      const extension = taskUrl.split('.').pop()?.split('?')[0] || 'mp4';
       const destination = `${folderPath}/${name}.${extension}`;
 
       const allSubtitles = [];
@@ -703,7 +706,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
   const containerProps = {
     film: filmValue,
     thumbnailPoster,
-    visibleScheduleItems: getVisibleScheduleItems(),
+    visibleScheduleItems,
     playerVideoSelectorOverlayRef,
     scheduleOverlayRef,
     commentsOverlayRef,

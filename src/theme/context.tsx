@@ -171,7 +171,10 @@ export const ThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = ({
     [theme]
   );
 
-  const value = {
+  // useAppTheme/useThemedStyles are consumed by almost every component, so an
+  // unmemoized value here re-renders the whole tree on any ThemeProvider render
+  // (config write, colour scheme change, dimension change).
+  const value = useMemo(() => ({
     navigationTheme,
     theme,
     themeContext,
@@ -180,7 +183,16 @@ export const ThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = ({
     themed,
     themedStyles,
     scale,
-  };
+  }), [
+    navigationTheme,
+    theme,
+    themeContext,
+    themeScheme,
+    setThemeContextOverride,
+    themed,
+    themedStyles,
+    scale,
+  ]);
 
   return <ThemeContext.Provider value={ value }>{ children }</ThemeContext.Provider>;
 };

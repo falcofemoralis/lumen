@@ -206,6 +206,9 @@ export function FilmPagerComponent({
     opacity: menuCollapse.value,
   }));
 
+  // pagerItems can shrink (menu items change) while activePage still points past its end
+  const currentPagerItem = pagerItems[Math.min(activePage, pagerItems.length - 1)];
+
   const handleAtTopChange = useCallback((atTop: boolean) => {
     setMenuVisible(atTop);
     onAtTopChange?.(atTop);
@@ -247,11 +250,11 @@ export function FilmPagerComponent({
         </Animated.View>
       ) }
       <FilmGrid
-        films={ pagerItems[activePage].films ?? [] }
-        onNextLoad={ (isRefresh) => onNextLoad(isRefresh, pagerItems[activePage]) }
+        films={ currentPagerItem?.films ?? [] }
+        onNextLoad={ (isRefresh) => currentPagerItem && onNextLoad(isRefresh, currentPagerItem) }
         disableEmptyComponent={ disableEmptyComponent }
         // empty flag it true, films array exist and this array is empty
-        isEmpty={ isEmpty && pagerItems[activePage].films !== null && !pagerItems[activePage].films?.length }
+        isEmpty={ isEmpty && currentPagerItem?.films !== null && !currentPagerItem?.films?.length }
         hideGrid={ hideGrid }
         ListHeaderComponent={ ListHeaderComponent }
         ListEmptyComponent={ ListEmptyComponent }

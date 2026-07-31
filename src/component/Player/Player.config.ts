@@ -61,13 +61,20 @@ export const DOUBLE_TAP_ANIMATION_DELAY = 150;
 
 export const FIRESTORE_DB = 'timestamps';
 
+// i18n is initialised asynchronously after the module graph has loaded, so a `t()`
+// evaluated here would freeze the untranslated key. Read the label lazily instead -
+// that also keeps it correct after a language change.
 export const MAX_QUALITY: DropdownItem = {
-  label: t('Maximum'),
+  get label() {
+    return t('Maximum');
+  },
   value: 'max',
 };
 
 export const AUTO_QUALITY: DropdownItem = {
-  label: t('Auto'),
+  get label() {
+    return t('Auto');
+  },
   value: 'auto',
 };
 

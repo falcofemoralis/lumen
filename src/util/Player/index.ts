@@ -228,6 +228,10 @@ export const getQualityFromStreams = (video: FilmVideoInterface, quality: string
     return quality;
   }
 
+  if (!streams.length) {
+    return quality;
+  }
+
   // if quality is not found in the list of available qualities or this is MAX quality
   // return the max available quality (last item in the list)
   const stream = streams.find((s) => s.quality === quality);

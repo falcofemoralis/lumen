@@ -11,7 +11,7 @@ import { Directory, File } from 'expo-file-system';
 import * as IntentLauncher from 'expo-intent-launcher';
 import { t } from 'i18n/translate';
 import { PLAYER_SCREEN } from 'Navigation/navigationRoutes';
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import NotificationStore from 'Store/Notification.store';
 import RouterStore from 'Store/Router.store';
 import { DownloadFileInterface, DownloadFilmInterface } from 'Type/DownloadFile.interface';
@@ -30,6 +30,12 @@ export const DownloadsScreenContainer = () => {
   const queryClient = useQueryClient();
   const completeTimeoutRef = useRef<number | null>(null);
   const downloadsQueryKey = queryKeys.downloads(downloadsPath);
+
+  useEffect(() => () => {
+    if (completeTimeoutRef.current) {
+      clearTimeout(completeTimeoutRef.current);
+    }
+  }, []);
 
   const readStorage = useCallback((): DownloadFileInterface[] => {
     try {
@@ -91,10 +97,10 @@ export const DownloadsScreenContainer = () => {
           return;
         }
 
-        const additionalName = taskInfo.quality;
+        let additionalName = taskInfo.quality;
 
         if (taskInfo.episodeId && taskInfo.seasonId) {
-          additionalName.concat(` - S${taskInfo.seasonId}E${taskInfo.episodeId}`);
+          additionalName += ` - S${taskInfo.seasonId}E${taskInfo.episodeId}`;
         }
 
         task.metadata = {
