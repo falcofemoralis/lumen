@@ -65,9 +65,11 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     backgroundColor: colors.button,
     color: colors.button,
   },
+  // The sheet's content view is sized to the largest detent, so these must stay
+  // top-aligned - anything centered or 100% tall lands below the visible area.
   loader: {
-    height: '100%',
     width: '100%',
+    paddingTop: scale(24),
   },
   measureText: {
     opacity: 0,
@@ -75,12 +77,9 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     alignSelf: 'baseline',
   },
   noComments: {
-    height: '100%',
     width: '100%',
-    justifyContent: 'center',
-    alignContent: 'center',
     alignItems: 'center',
-    paddingBottom: scale(24),
+    paddingTop: scale(24),
   },
   noCommentsText: {
     color: colors.text,

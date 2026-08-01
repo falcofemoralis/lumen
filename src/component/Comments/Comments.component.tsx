@@ -7,7 +7,7 @@ import { ThemedText } from 'Component/ThemedText';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import ThumbsUp from 'lucide-react-native/icons/thumbs-up';
-import { memo, useCallback } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import { View } from 'react-native';
 import { useAppTheme } from 'Theme/context';
 import { ThemedStyles } from 'Theme/types';
@@ -116,30 +116,31 @@ export const CommentsComponent = ({
     [styles, handlePostLike]
   );
 
-  if (!comments || (isLoading && !comments.length)) {
-    return (
+  // Kept inside the list rather than returned early: TrueSheet pins the ScrollView to the
+  // sheet behavior when it presents, and only re-checks on direct children of its content
+  // view. A list that mounts once the fetch resolves is never found, so the sheet swallows
+  // the drags instead of scrolling.
+  const listEmptyComponent = useMemo(() => (
+    (!comments || isLoading) ? (
       <View style={ styles.loader }>
-        <Loader isLoading fullScreen />
+        <Loader isLoading />
       </View>
-    );
-  }
-
-  if (!comments.length) {
-    return (
+    ) : (
       <View style={ styles.noComments }>
         <ThemedText style={ styles.noCommentsText }>
           { t('No comments yet') }
         </ThemedText>
       </View>
-    );
-  }
+    )
+  ), [comments, isLoading, styles]);
 
   return (
     <ThemedGrid
       numberOfColumns={ 1 }
-      data={ comments }
+      data={ comments ?? [] }
       renderItem={ renderItem }
       onNextLoad={ onNextLoad }
+      ListEmptyComponent={ listEmptyComponent }
     />
   );
 };

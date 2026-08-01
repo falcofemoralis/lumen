@@ -89,7 +89,7 @@ export const AppNavigator = (props: NavigationProps) => {
   const exitRoutes = useMemo(() => {
     const routes = isTV ? exitRoutesTV : exitRoutesMobile;
 
-    if (isLocalLibrary) {
+    if (isLocalLibrary && isTV) {
       routes.push(DOWNLOADS_SCREEN);
     }
 
