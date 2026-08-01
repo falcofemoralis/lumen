@@ -157,7 +157,7 @@ const uk: Translations = {
   'Auto': 'Автоматично',
   'No bookmarks group': 'Розділи відсутні',
   'Go to site and create bookmarks group': 'Перейдіть на сайт і створіть розділи',
-  'Local bookmarks & history': 'Локальні закладки та історія',
+  'Local mode': 'Локальний режим',
   'Store bookmarks and watch history on this device only.': 'Зберігати закладки та історію перегляду лише на цьому пристрої.',
   'Favorites': 'Обране',
   'New category': 'Нова категорія',

@@ -189,26 +189,17 @@ export function AccountScreenComponent({
 
   const renderContent = () => {
     if (!isSignedIn) {
+      if (isLocalLibrary) {
+        return (
+          <View style={ styles.guestContent }>
+            { renderNotificationButton() }
+            { renderActionButton(t('Downloads'), Download, openDownloads) }
+          </View>
+        );
+      }
+
       return (
         <LoginForm>
-          { isLocalLibrary && (
-            <View style={ styles.badgeContainer }>
-              { (badgeData[ACCOUNT_TAB] ?? 0) > 0 && (
-                <ThemedText style={ styles.badge }>
-                  { badgeData[ACCOUNT_TAB] }
-                </ThemedText>
-              ) }
-              <ThemedButton
-                title={ t('Notifications') }
-                IconComponent={ Bell }
-                onPress={ openNotifications }
-                iconProps={ {
-                  size: scale(20),
-                  color: theme.colors.icon,
-                } }
-              />
-            </View>
-          ) }
           <ThemedButton
             title={ t('Downloads') }
             IconComponent={ Download }

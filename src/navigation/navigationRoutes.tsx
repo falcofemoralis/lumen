@@ -28,5 +28,5 @@ export const NOTIFICATIONS_TAB = `${NOTIFICATIONS_SCREEN}-tab`;
 * This is a list of all the screen names that will exit the app if the back button
 * is pressed while in that screen. Only affects Android.
 */
-export const exitRoutes = [HOME_SCREEN, SEARCH_SCREEN, BOOKMARKS_SCREEN, RECENT_SCREEN, ACCOUNT_SCREEN];
+export const exitRoutesMobile = [HOME_SCREEN, SEARCH_SCREEN, BOOKMARKS_SCREEN, RECENT_SCREEN, ACCOUNT_SCREEN];
 export const exitRoutesTV = [ACCOUNT_SCREEN, NOTIFICATIONS_SCREEN, HOME_SCREEN, RECENT_SCREEN, BOOKMARKS_SCREEN, SEARCH_SCREEN, SETTINGS_SCREEN];

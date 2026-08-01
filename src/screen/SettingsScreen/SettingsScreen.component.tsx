@@ -214,6 +214,13 @@ export function SettingsScreenComponent({
         onChange={ (value) => onConfigUpdate('numberOfColumnsMobile', Number(value)) }
       />
       <SettingSwitch
+        title={ t('Local mode') }
+        subtitle={ t('Store bookmarks and watch history on this device only.') }
+        IconComponent={ CloudOff }
+        value={ isLocalLibrary }
+        onChange={ onLocalLibraryChange }
+      />
+      <SettingSwitch
         title={ t('Sort voices by rating') }
         subtitle={ t('Toggle sorting voices by rating.') }
         IconComponent={ ArrowDown10 }
@@ -226,13 +233,6 @@ export function SettingsScreenComponent({
         IconComponent={ ArrowRight }
         value={ isContinueBtnEnabled }
         onChange={ (value) => onConfigUpdate('isContinueBtnEnabled', value) }
-      />
-      <SettingSwitch
-        title={ t('Local bookmarks & history') }
-        subtitle={ t('Store bookmarks and watch history on this device only.') }
-        IconComponent={ CloudOff }
-        value={ isLocalLibrary }
-        onChange={ onLocalLibraryChange }
       />
     </ThemedScrollView>
   );

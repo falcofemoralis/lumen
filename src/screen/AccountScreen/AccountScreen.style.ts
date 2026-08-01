@@ -7,10 +7,16 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   scrollView: {
     height: '100%',
     justifyContent: 'center',
-    alignItems: 'center',
   },
   content: {
     paddingBottom: scale(8),
+  },
+  guestContent: {
+    width: '100%',
+    height: '100%',
+    flexDirection: 'column',
+    gap: scale(16),
+    justifyContent: 'center',
   },
   topBar: {
     flexDirection: 'row',

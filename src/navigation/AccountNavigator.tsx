@@ -14,6 +14,9 @@ import {
 
 const Stack = createNativeStackNavigator();
 
+// NOTE: created once, calling it inline in JSX would remount the screen on every render
+const NotificationsNavigator = createFilmNavigator(NOTIFICATIONS_TAB, NotificationsScreen);
+
 const AccountNavigator = ({ name, component }: { name: string, component: any }) => {
   const { theme } = useAppTheme();
 
@@ -32,7 +35,7 @@ const AccountNavigator = ({ name, component }: { name: string, component: any })
         />
         <Stack.Screen
           name={ NOTIFICATIONS_SCREEN }
-          component={ createFilmNavigator(NOTIFICATIONS_TAB, NotificationsScreen) }
+          component={ NotificationsNavigator }
         />
         <Stack.Screen
           name={ SETTINGS_SCREEN }

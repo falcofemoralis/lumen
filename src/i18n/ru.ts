@@ -157,7 +157,7 @@ const ru: Translations = {
   'Auto': 'Автоматически',
   'No bookmarks group': 'Разделы отсутствуют',
   'Go to site and create bookmarks group': 'Перейдите на сайт и создайте разделы',
-  'Local bookmarks & history': 'Локальные закладки и история',
+  'Local mode': 'Локальный режим',
   'Store bookmarks and watch history on this device only.': 'Хранить закладки и историю просмотра только на этом устройстве.',
   'Favorites': 'Избранное',
   'New category': 'Новая категория',

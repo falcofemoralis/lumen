@@ -155,7 +155,7 @@ const en = {
   'Auto': 'Auto',
   'No bookmarks group': 'No bookmarks group',
   'Go to site and create bookmarks group': 'Go to site and create bookmarks group',
-  'Local bookmarks & history': 'Local bookmarks & history',
+  'Local mode': 'Local mode',
   'Store bookmarks and watch history on this device only.': 'Store bookmarks and watch history on this device only.',
   'Favorites': 'Favorites',
   'New category': 'New category',

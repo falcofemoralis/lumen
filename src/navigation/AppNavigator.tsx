@@ -9,6 +9,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ErrorBoundary } from 'Component/ErrorBoundary';
 import { useConfigContext, useIsTV } from 'Context/ConfigContext';
 import { StatusBar } from 'expo-status-bar';
+import { useMemo } from 'react';
 import { ErrorScreen } from 'Screen/ErrorScreen';
 import { FilmTrailerScreen } from 'Screen/FilmTrailerScreen';
 import { PlayerScreen } from 'Screen/PlayerScreen';
@@ -17,8 +18,9 @@ import { useAppTheme } from 'Theme/context';
 import { navigationRef, useBackButtonHandler } from 'Util/Navigation';
 
 import {
+  DOWNLOADS_SCREEN,
   ERROR_SCREEN,
-  exitRoutes,
+  exitRoutesMobile,
   exitRoutesTV,
   FILM_TRAILER_SCREEN,
   PLAYER_SCREEN,
@@ -79,9 +81,20 @@ const AppStack = () => {
 
 export const AppNavigator = (props: NavigationProps) => {
   const { navigationTheme, themeContext } = useAppTheme();
+  const { isLocalLibrary } = useConfigContext();
   const isTV = useIsTV();
 
-  useBackButtonHandler((routeName) => (isTV ? exitRoutesTV : exitRoutes).includes(routeName));
+  const exitRoutes = useMemo(() => {
+    const routes = isTV ? exitRoutesTV : exitRoutesMobile;
+
+    if (isLocalLibrary) {
+      routes.push(DOWNLOADS_SCREEN);
+    }
+
+    return routes;
+  }, [isLocalLibrary, isTV]);
+
+  useBackButtonHandler((routeName) => exitRoutes.includes(routeName));
 
   return (
     <>

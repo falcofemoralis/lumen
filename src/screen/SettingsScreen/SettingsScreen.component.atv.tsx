@@ -212,6 +212,13 @@ export function SettingsScreenComponent({
         onChange={ (value) => onConfigUpdate('isTVGridAnimation', value) }
       />
       <SettingSwitch
+        title={ t('Local mode') }
+        subtitle={ t('Store bookmarks and watch history on this device only.') }
+        IconComponent={ CloudOff }
+        value={ isLocalLibrary }
+        onChange={ onLocalLibraryChange }
+      />
+      <SettingSwitch
         title={ t('TV awake') }
         subtitle={ t('Toggle TV awake.') }
         IconComponent={ MonitorPlay }
@@ -231,13 +238,6 @@ export function SettingsScreenComponent({
         IconComponent={ ArrowRight }
         value={ isContinueBtnEnabled }
         onChange={ (value) => onConfigUpdate('isContinueBtnEnabled', value) }
-      />
-      <SettingSwitch
-        title={ t('Local bookmarks & history') }
-        subtitle={ t('Store bookmarks and watch history on this device only.') }
-        IconComponent={ CloudOff }
-        value={ isLocalLibrary }
-        onChange={ onLocalLibraryChange }
       />
     </ThemedScrollView>
   );

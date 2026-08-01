@@ -9,7 +9,7 @@ import { useNavigationContext } from 'Context/NavigationContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
-import { ACCOUNT_TAB, SETTINGS_SCREEN } from 'Navigation/navigationRoutes';
+import { ACCOUNT_TAB, DOWNLOADS_SCREEN, SETTINGS_SCREEN } from 'Navigation/navigationRoutes';
 import { ComponentType, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Image, View } from 'react-native';
 import Animated from 'react-native-reanimated';
@@ -263,6 +263,9 @@ export function NavigationBarComponent({
           break;
         case SETTINGS_SCREEN:
           bt.push({ route, index });
+          break;
+        case DOWNLOADS_SCREEN:
+          tt.push({ route, index });
           break;
         default:
           mt.push({ route, index });
