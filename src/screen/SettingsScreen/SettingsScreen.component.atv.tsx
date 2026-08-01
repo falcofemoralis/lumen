@@ -251,7 +251,7 @@ export function SettingsScreenComponent({
         value={ officialMode }
         confirmation={ {
           title: t('Are you sure?'),
-          message: t('Please wait a bit after enabling.'),
+          message: t('Log in to use official mode, otherwise, films won\'t load. Please wait a bit after enabling.'),
         } }
         withLoader
         onChange={ onOfficialModeChange }
@@ -267,14 +267,6 @@ export function SettingsScreenComponent({
         } }
         withLoader
         onChange={ onProviderChange }
-      />
-      <SettingCustomSelect
-        title={ t('Official mode share link') }
-        IconComponent={ ExternalLink }
-        value={ officialShareLink }
-        options={ providerOptions }
-        isEnabled={ officialMode }
-        onChange={ onOfficialShareLinkChange }
       />
       <SettingSwitch
         title={ t('Automatic CDN') }
@@ -304,6 +296,14 @@ export function SettingsScreenComponent({
         IconComponent={ GlobeLock }
         value={ strictConnectionCheck }
         onChange={ (value) => onConfigUpdate('strictConnectionCheck', value) }
+      />
+      <SettingCustomSelect
+        title={ t('Official mode share link') }
+        IconComponent={ ExternalLink }
+        value={ officialShareLink }
+        options={ providerOptions }
+        isEnabled={ officialMode }
+        onChange={ onOfficialShareLinkChange }
       />
       <SettingInput
         title={ t('Useragent') }

@@ -29,18 +29,12 @@ if (__DEV__) {
   console.error = withoutIgnored(console.error);
 }
 
-import { LinkingOptions } from '@react-navigation/native';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { services } from 'Api/services';
-import { Awake } from 'Component/Awake';
 import { Root } from 'Component/Root';
 import { AppProvider } from 'Context/AppContext';
-import { DEFAULT_SERVICE } from 'Context/ServiceContext';
-import * as Linking from 'expo-linking';
 import * as SplashScreen from 'expo-splash-screen';
 import { AppNavigator } from 'Navigation/AppNavigator';
 import { NativeFocusTrap } from 'Navigation/NativeFocusTrap';
-import { AppStackParamList } from 'Navigation/navigationTypes';
 import { useEffect, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
@@ -53,6 +47,7 @@ import { initI18n } from './i18n';
 export const NAVIGATION_PERSISTENCE_KEY = 'NAVIGATION_STATE';
 
 SplashScreen.setOptions({
+  duration: 750,
   fade: true,
 });
 
@@ -71,33 +66,6 @@ export function App() {
     return null;
   }
 
-  const linking: LinkingOptions<AppStackParamList> = {
-    prefixes: [
-      Linking.createURL('/'),
-      services[DEFAULT_SERVICE].officialMirror,
-      ...services[DEFAULT_SERVICE].defaultProviders,
-    ],
-    config: {
-      screens: {
-        Tabs: {
-          screens: {
-            'Home-tab': {
-              screens: {
-                Film: {
-                  path: '*',
-                  parse: {
-                    link: (_: string, url: string) => url,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-    filter: (url: string) => url.includes('.html'),
-  };
-
   return (
     <QueryClientProvider client={ queryClient }>
       <SafeAreaProvider initialMetrics={ initialWindowMetrics }>
@@ -106,15 +74,12 @@ export function App() {
             <ThemeProvider>
               <GestureHandlerRootView>
                 <Root>
-                  <Awake>
-                    <NativeFocusTrap />
-                    <AppNavigator
-                      linking={ linking }
-                      onReady={ () => {
-                        SplashScreen.hideAsync();
-                      } }
-                    />
-                  </Awake>
+                  <NativeFocusTrap />
+                  <AppNavigator
+                    onReady={ () => {
+                      SplashScreen.hideAsync();
+                    } }
+                  />
                 </Root>
               </GestureHandlerRootView>
             </ThemeProvider>

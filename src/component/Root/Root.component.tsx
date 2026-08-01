@@ -9,6 +9,7 @@ import { useAppUpdaterContext } from 'Context/AppUpdaterContext';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useNetworkContext } from 'Context/NetworkContext';
 import { useServiceContext } from 'Context/ServiceContext';
+import { useAwake } from 'Hooks/useAwake';
 import { ReactNode, useEffect } from 'react';
 import NotificationStore from 'Store/Notification.store';
 import { RemoteControlLayoutAdapter } from 'Util/RemoteControl/RemoteControlLayoutAdapter';
@@ -19,6 +20,11 @@ export const Root = ({ children }: { children: ReactNode }) => {
   const { fetchUserData } = useServiceContext();
   const { checkVersion } = useAppUpdaterContext();
   const { isInternetAvailable } = useNetworkContext();
+  const { startAwake } = useAwake();
+
+  useEffect(() => {
+    return startAwake();
+  }, [startAwake]);
 
   useEffect(() => {
     if (checkForUpdates && isInternetAvailable) {

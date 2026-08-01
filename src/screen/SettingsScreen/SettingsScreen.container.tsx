@@ -33,12 +33,12 @@ export function SettingsScreenContainer() {
   const { theme, themeScheme, setThemeContextOverride } = useAppTheme();
   const [appLanguage, setAppLanguage] = useState(getCurrentLanguage());
   const [playerQuality, setPlayerQuality] = useState(getPlayerQuality());
-  const [officialMode, setOfficialMode] = useState(currentService.isOfficialMode());
-  const [provider, setProvider] = useState(currentService.getDefaultProvider());
-  const [officialShareLink, setOfficialShareLink] = useState(currentService.getOfficialShareLink());
-  const [automaticCDN, setAutomaticCDN] = useState(currentService.isAutomaticCDN());
+  const [officialMode, setOfficialMode] = useState(!!currentService.getConfig('officialMode'));
+  const [provider, setProvider] = useState(currentService.getConfig('provider'));
+  const [officialShareLink, setOfficialShareLink] = useState(currentService.getConfig('officialModeShareLink'));
+  const [automaticCDN, setAutomaticCDN] = useState(currentService.getConfig('autoCdn'));
   const [cdn, setCdn] = useState(currentService.getCDN());
-  const [userAgent, setUserAgent] = useState(currentService.getUserAgent());
+  const [userAgent, setUserAgent] = useState(currentService.getConfig('userAgentNew'));
 
   const providerOptions = useMemo(
     () => currentService.defaultProviders,
@@ -103,10 +103,19 @@ export function SettingsScreenContainer() {
 
       await reLogin();
     } catch (error) {
-      NotificationStore.displayError(error as Error);
+      if (value) {
+        NotificationStore.displayError(error as Error);
+      } else {
+        NotificationStore.displayError(
+          t('Provider is not available. Update the provider before disabling official mode.')
+        );
+      }
 
       setOfficialMode(!value);
       updateOfficialMode(!value);
+
+      // relogin back
+      await reLogin();
 
       return false;
     }
@@ -116,30 +125,37 @@ export function SettingsScreenContainer() {
 
   const onProviderChange = useCallback(async (value: string) => {
     const prevProvider = provider;
+    const prevOfficialMode = officialMode;
 
     setProvider(value);
+    updateOfficialMode(false);
 
     try {
       await validateUrl(value);
 
       updateProvider(value);
 
-      await reLogin();
+      if (!prevOfficialMode) {
+        await reLogin();
+      }
     } catch (error) {
       NotificationStore.displayError(error as Error);
 
       setProvider(prevProvider);
       updateProvider(prevProvider);
+      updateOfficialMode(prevOfficialMode);
 
       return false;
+    } finally {
+      updateOfficialMode(prevOfficialMode);
     }
 
     return true;
-  }, [provider, reLogin, updateProvider, validateUrl]);
+  }, [officialMode, provider, reLogin, updateOfficialMode, updateProvider, validateUrl]);
 
   const onOfficialShareLinkChange = useCallback((value: string) => {
     setOfficialShareLink(value);
-    currentService.setOfficialShareLink(value);
+    currentService.setConfig('officialModeShareLink', value);
   }, [currentService]);
 
   const onAutomaticCDNChange = useCallback((value: boolean) => {

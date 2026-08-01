@@ -11,6 +11,11 @@ export const ThemedImageComponent = ({
   blurRadius,
   transition = 250,
   cachePolicy,
+  resizeMode = 'cover',
+  onLoadStart,
+  onProgress,
+  onLoad,
+  onLoadEnd,
 }: ThemedImageProps) => {
   const styles = useThemedStyles(componentStyles);
 
@@ -19,11 +24,15 @@ export const ThemedImageComponent = ({
       <Image
         style={ styles.image }
         source={ src }
-        contentFit="cover"
         transition={ transition }
         recyclingKey={ src }
         blurRadius={ blurRadius }
         cachePolicy={ cachePolicy }
+        contentFit={ resizeMode }
+        onLoadStart={ onLoadStart }
+        onProgress={ onProgress }
+        onLoad={ onLoad }
+        onLoadEnd={ onLoadEnd }
       />
     </View>
   );

@@ -27,8 +27,8 @@ export const ProviderSlide = ({
 }: BaseSlideProps) => {
   const { theme } = useAppTheme();
   const { currentService, updateProvider, updateOfficialMode, logout, validateUrl } = useServiceContext();
-  const [selectedProvider, setSelectedProvider] = useState<string | null>(currentService.getDefaultProvider());
-  const [isOfficialMode, setIsOfficialMode] = useState<boolean>(currentService.isOfficialMode());
+  const [selectedProvider, setSelectedProvider] = useState<string | null>(currentService.getConfig('provider'));
+  const [isOfficialMode, setIsOfficialMode] = useState<boolean>(!!currentService.getConfig('officialMode'));
 
   // the mutation status is the validation result: idle -> not checked yet, error -> invalid
   const {

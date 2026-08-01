@@ -1,5 +1,4 @@
-import { services } from 'Api/services';
-import { DEFAULT_SERVICE } from 'Context/ServiceContext';
+import { DEFAULT_SERVICE, services } from 'Api/index';
 import webvtt from 'node-webvtt';
 
 export interface VTTItem {

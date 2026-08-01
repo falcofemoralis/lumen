@@ -39,7 +39,7 @@ export const LoginSlide = ({
   const confirmOverlayRef = useRef<ThemedOverlayRef>(null);
 
   const handleNext = useCallback(() => {
-    if (currentService.isOfficialMode() && !isSignedIn) {
+    if (currentService.getConfig('officialMode') && !isSignedIn) {
       confirmOverlayRef.current?.open();
 
       return;

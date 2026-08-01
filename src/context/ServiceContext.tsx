@@ -1,5 +1,6 @@
-import { ApiInterface, ApiServiceType } from 'Api/index';
-import { services } from 'Api/services';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { DEFAULT_SERVICE, services } from 'Api/index';
+import { ApiInterface, ApiServiceType } from 'Api/type';
 import { t } from 'i18n/translate';
 import { ACCOUNT_TAB, NOTIFICATIONS_TAB } from 'Navigation/navigationRoutes';
 import {
@@ -18,27 +19,22 @@ import { ProfileInterface } from 'Type/Profile.interface';
 import { UserDataInterface } from 'Type/UserData.interface';
 import { openLinkInBrowser } from 'Util/Link';
 import { getLocalSeriesUpdates } from 'Util/LocalLibrary';
-import { formatURI, requestValidator } from 'Util/Request';
+import { queryKeys, STALE_TIME } from 'Util/Query';
 import { storage } from 'Util/Storage';
-import { updateUrlHost } from 'Util/Url';
 
 import { getGlobalConfig } from './ConfigContext';
 
 export const CREDENTIALS_STORAGE = 'CREDENTIALS_STORAGE';
-export const PROFILE_STORAGE = 'PROFILE_STORAGE';
 export const NOTIFICATIONS_STORAGE = 'NOTIFICATIONS_STORAGE';
 export const USER_DATA_STORAGE_CACHE = 'USER_DATA_STORAGE_CACHE';
 export const USER_DATA_STORAGE_CACHE_TTL = 1000 * 60 * 60; // 1 hour
-
-export const DEFAULT_SERVICE = ApiServiceType.REZKA;
 
 export interface ServiceContextInterface {
   isSignedIn: boolean;
   profile: ProfileInterface | null;
   currentService: ApiInterface;
   badgeData: BadgeData;
-  updateCurrentService: (service: ApiServiceType) => void;
-  setAuthorization: (auth: string, name: string, password: string) => void;
+  changeCurrentService: (service: ApiServiceType) => void;
   removeProfile: () => void;
   login: (name: string, password: string) => Promise<void>;
   logout: (forceLogout?: boolean) => void;
@@ -62,8 +58,7 @@ const ServiceContext = createContext<ServiceContextInterface>({
   profile: null,
   currentService: services[DEFAULT_SERVICE],
   badgeData: {},
-  updateCurrentService: () => {},
-  setAuthorization: () => {},
+  changeCurrentService: () => {},
   removeProfile: () => {},
   login: async () => {},
   logout: () => {},
@@ -83,73 +78,46 @@ const ServiceContext = createContext<ServiceContextInterface>({
 });
 
 export const ServiceProvider = ({ children }: { children: ReactNode }) => {
-  const [currentService, setCurrentService] = useState<ApiInterface>(services[DEFAULT_SERVICE]);
+  const queryClient = useQueryClient();
+
+  const [selectedServiceId, setSelectedServiceId] = useState<ApiServiceType>(DEFAULT_SERVICE);
+  const [currentService, setSelectedService] = useState<ApiInterface>(services[selectedServiceId]);
   const [isSignedIn, setIsSignedIn] = useState<boolean>(currentService.isSignedIn());
-  const [profile, setProfile] = useState<ProfileInterface | null>(() => {
-    const value = storage.getMiscStorage().load<ProfileInterface>(PROFILE_STORAGE);
-
-    if (!value) return null;
-
-    return {
-      ...value,
-      avatar: currentService.getPhotoUrl(value.avatar),
-    };
-  });
   const [badgeData, setBadgeData] = useState<BadgeData>({});
 
-  /**
-   * Update the current service
-   * @param {ApiServiceType} service - The service to set as current
-   */
-  const updateCurrentService = useCallback((service: ApiServiceType) => {
-    setCurrentService(services[service]);
+  const profileKey = useMemo(() => queryKeys.profile(selectedServiceId), [selectedServiceId]);
+
+  const { data: profile = null } = useQuery<ProfileInterface | null>({
+    queryKey: profileKey,
+    queryFn: () => currentService.getProfile(),
+    enabled: isSignedIn,
+    staleTime: STALE_TIME.LONG,
+  });
+
+  const changeCurrentService = useCallback((service: ApiServiceType) => {
+    const newService = services[service];
+
+    setSelectedServiceId(service);
+    setSelectedService(newService);
+    setIsSignedIn(newService.isSignedIn());
   }, []);
 
   /**
-   * Set the authorization for the current service
-   * @param {string} auth - The authorization token
-   * @param {string} name - The username
-   * @param {string} password - The password
+   * Update the cached profile for the current service
    */
-  const setAuthorization = useCallback((auth: string, name: string, password: string) => {
-    currentService.setAuthorization(auth);
-    storage.getMiscStorage().save(CREDENTIALS_STORAGE, { name, password });
-  }, [currentService]);
-
-  /**
-   * Load the profile for the current service
-   */
-  const loadProfile = useCallback(async () => {
-    const value = await currentService.getProfile();
-
-    storage.getMiscStorage().save(PROFILE_STORAGE, value);
-    setProfile({
-      ...value,
-      avatar: currentService.getPhotoUrl(value.avatar),
-    });
-  }, [currentService]);
-
-  /**
-   * Update the profile for the current service
-   */
-  const updateProfile = useCallback(async (p: Partial<ProfileInterface>) => {
-    const value = storage.getMiscStorage().load<ProfileInterface>(PROFILE_STORAGE);
-
-    if (!value) return;
-
-    storage.getMiscStorage().save(PROFILE_STORAGE, {
-      ...value,
-      ...p,
-    });
-  }, []);
+  const updateProfile = useCallback((p: Partial<ProfileInterface>) => {
+    queryClient.setQueryData<ProfileInterface | null>(
+      profileKey,
+      (value) => (value ? { ...value, ...p } : value)
+    );
+  }, [queryClient, profileKey]);
 
   /**
    * Remove the profile for the current service
    */
   const removeProfile = useCallback(() => {
-    storage.getMiscStorage().remove(PROFILE_STORAGE);
-    setProfile(null);
-  }, []);
+    queryClient.setQueryData<ProfileInterface | null>(profileKey, null);
+  }, [queryClient, profileKey]);
 
   /**
    * Login to the current service
@@ -157,38 +125,30 @@ export const ServiceProvider = ({ children }: { children: ReactNode }) => {
    * @param {string} password - The password
    */
   const login = useCallback(async (name: string, password: string) => {
-    const auth = await currentService.login(name, password);
-    setAuthorization(auth, name, password);
+    await currentService.login(name, password);
 
-    await loadProfile();
+    // keep original credentials for relogin purpose
+    storage.getMiscStorage().save(CREDENTIALS_STORAGE, { name, password });
 
     setIsSignedIn(true);
-  }, [currentService, setAuthorization, loadProfile]);
+
+    // the service dropped the previous session's profile, so this refetches it
+    await queryClient.invalidateQueries({ queryKey: profileKey });
+  }, [currentService, queryClient, profileKey]);
 
   /**
    * Logout from the current service
    */
-  const logout = useCallback((forceLogout: boolean = false) => {
+  const logout = useCallback(() => {
     currentService.logout();
-    currentService.setAuthorization('');
 
-    if (forceLogout) {
-      setIsSignedIn(false);
-    }
-
+    setIsSignedIn(false);
     removeProfile();
+
     storage.getMiscStorage().remove(CREDENTIALS_STORAGE);
     storage.getMiscStorage().remove(NOTIFICATIONS_STORAGE);
     storage.getMiscStorage().remove(USER_DATA_STORAGE_CACHE);
   }, [currentService, removeProfile]);
-
-  /**
-   * Validate the URL for the current service
-   * @param {string} url - The URL to validate
-   */
-  const validateUrl = useCallback(async (url: string, headers?: HeadersInit) => {
-    await requestValidator(url, headers ?? currentService.getHeaders());
-  }, [currentService]);
 
   /**
    * Re-login to the current service using the stored credentials. This is useful when the provider is changed, so we can re-login to get the new profile and other data.
@@ -197,7 +157,6 @@ export const ServiceProvider = ({ children }: { children: ReactNode }) => {
     const data = storage.getMiscStorage().load<{ name: string; password: string }>(CREDENTIALS_STORAGE);
 
     currentService.logout();
-    currentService.setAuthorization('');
 
     if (data && data.name && data.password) {
       await login(data.name, data.password);
@@ -205,12 +164,20 @@ export const ServiceProvider = ({ children }: { children: ReactNode }) => {
   }, [currentService, login]);
 
   /**
+   * Validate the URL for the current service
+   * @param {string} url - The URL to validate
+   */
+  const validateUrl = useCallback(async (url: string) => {
+    await currentService.validateUrl(url);
+  }, [currentService]);
+
+  /**
    * Update the provider for the current service
    * @param {string} value - The provider URL
    */
   const updateProvider = useCallback(async (value: string) => {
     const cleanedValue = value.replace(/\/+$/, '');
-    currentService.setProvider(cleanedValue);
+    currentService.setConfig('provider', cleanedValue);
   }, [currentService]);
 
   /**
@@ -219,7 +186,7 @@ export const ServiceProvider = ({ children }: { children: ReactNode }) => {
    */
   const updateCDN = useCallback(async (value: string) => {
     const cleanedValue = value.replace(/\/+$/, '');
-    currentService.setCDN(cleanedValue);
+    currentService.setConfig('cdn', cleanedValue);
   }, [currentService]);
 
   /**
@@ -227,7 +194,7 @@ export const ServiceProvider = ({ children }: { children: ReactNode }) => {
    * @param {string} value - The user agent string
    */
   const updateUserAgent = useCallback((value: string) => {
-    currentService.setUserAgent(value);
+    currentService.setConfig('userAgentNew', value);
   }, [currentService]);
 
   /**
@@ -235,7 +202,7 @@ export const ServiceProvider = ({ children }: { children: ReactNode }) => {
    * @param {boolean} isActive - Whether the official mode is active
    */
   const updateOfficialMode = useCallback((isActive: boolean) => {
-    currentService.setOfficialMode(isActive ? '1' : '');
+    currentService.setConfig('officialMode', isActive ? '1' : '');
   }, [currentService]);
 
   /**
@@ -243,27 +210,27 @@ export const ServiceProvider = ({ children }: { children: ReactNode }) => {
    * @param {boolean} isActive - Whether the automatic CDN mode is active
    */
   const updateAutomaticCDN = useCallback((isActive: boolean) => {
-    currentService.setAutomaticCDN(isActive);
+    currentService.setConfig('autoCdn', isActive);
   }, [currentService]);
 
+  /**
+   * Open profile in the browser
+   */
   const viewProfile = useCallback(() => {
-    let link = `${currentService.getProvider()}/user/${profile?.id}/`;
+    if (!profile) {
+      NotificationStore.displayError('Profile is missing!');
 
-    if (currentService.isOfficialMode()) {
-      link = updateUrlHost(link, currentService.getOfficialShareLink());
+      return;
     }
 
-    openLinkInBrowser(link);
+    openLinkInBrowser(currentService.getProfileLink(profile));
   }, [currentService, profile]);
 
+  /**
+   * Open payments in the browser
+   */
   const viewPayments = useCallback(() => {
-    let link = `${currentService.getProvider()}/payments/`;
-
-    if (currentService.isOfficialMode()) {
-      link = updateUrlHost(link, currentService.getOfficialShareLink());
-    }
-
-    openLinkInBrowser(link);
+    openLinkInBrowser(currentService.getPaymentsLink());
   }, [currentService]);
 
   /**
@@ -364,20 +331,22 @@ export const ServiceProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [currentService, updateNotifications, updateProfile, selectNotifications]);
 
+  /**
+   * Get fresh notifications
+   */
   const getNotifications = useCallback(async () => {
     const userData = await fetchUserData();
 
     return userData ? selectNotifications(userData) : [];
   }, [fetchUserData, selectNotifications]);
 
+  /**
+   * Prepare film share body
+   */
   const prepareShareBody = useCallback((film: FilmInterface) => {
-    const { title, link } = film;
+    const { title } = film;
 
-    let shareLink = formatURI(link, {}, currentService.getProvider());;
-
-    if (currentService.isOfficialMode()) {
-      shareLink = updateUrlHost(shareLink, currentService.getOfficialShareLink());
-    }
+    const shareLink = currentService.getShareLink(film);
 
     return t('Watch {{title}}:\n {{link}}', { title, link: shareLink });
   }, [currentService]);
@@ -387,8 +356,7 @@ export const ServiceProvider = ({ children }: { children: ReactNode }) => {
     profile,
     currentService,
     badgeData,
-    updateCurrentService,
-    setAuthorization,
+    changeCurrentService,
     removeProfile,
     login,
     logout,
@@ -410,8 +378,7 @@ export const ServiceProvider = ({ children }: { children: ReactNode }) => {
     profile,
     currentService,
     badgeData,
-    updateCurrentService,
-    setAuthorization,
+    changeCurrentService,
     removeProfile,
     login,
     logout,

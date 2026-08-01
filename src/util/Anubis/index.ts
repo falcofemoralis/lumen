@@ -200,9 +200,5 @@ async function doSolve(
     return false;
   }
 
-  // console.log(
-  //   `[Anubis] solved (${algorithm}, difficulty ${difficulty}, nonce ${nonce}) for ${hostname}`
-  // );
-
   return true;
 }

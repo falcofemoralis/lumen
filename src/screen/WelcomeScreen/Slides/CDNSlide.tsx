@@ -29,7 +29,7 @@ export const CDNSlide = ({
   const { theme } = useAppTheme();
   const { currentService, validateUrl, updateAutomaticCDN, updateCDN } = useServiceContext();
   const [selectedCDN, setSelectedCDN] = useState<string | null>(currentService.getCDN());
-  const [isAutomatic, setIsAutomatic] = useState<boolean>(currentService.isAutomaticCDN());
+  const [isAutomatic, setIsAutomatic] = useState<boolean>(currentService.getConfig('autoCdn'));
 
   // the mutation status is the validation result: idle -> not checked yet, error -> invalid
   const {

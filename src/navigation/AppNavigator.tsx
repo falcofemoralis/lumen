@@ -6,6 +6,7 @@
  */
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { DeepLinkHandler } from 'Component/DeepLinkHandler';
 import { ErrorBoundary } from 'Component/ErrorBoundary';
 import { useConfigContext, useIsTV } from 'Context/ConfigContext';
 import { StatusBar } from 'expo-status-bar';
@@ -28,6 +29,7 @@ import {
 } from './navigationRoutes';
 import type { AppStackParamList, NavigationProps } from './navigationTypes';
 import { TabsNavigator } from './TabsNavigator';
+
 const Stack = createNativeStackNavigator<AppStackParamList>();
 
 const AppStack = () => {
@@ -100,6 +102,7 @@ export const AppNavigator = (props: NavigationProps) => {
     <>
       <NavigationContainer ref={ navigationRef } theme={ navigationTheme } { ...props }>
         <ErrorBoundary catchErrors="always">
+          <DeepLinkHandler />
           <AppStack />
         </ErrorBoundary>
       </NavigationContainer>

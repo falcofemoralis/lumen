@@ -1,23 +1,8 @@
 import RezkaApi from './RezkaApi';
+import { ApiInterface, ApiServiceType } from './type';
 
-export type ApiInterface = typeof RezkaApi;
+export const services: Record<ApiServiceType, ApiInterface> = {
+  [ApiServiceType.REZKA]: RezkaApi,
+};
 
-export enum ApiServiceType {
-  REZKA = 'REZKA',
-  // KINOKONG = 'KINOKONG',
-}
-
-export interface ApiParams {
-  key?: string;
-  isRefresh?: boolean;
-}
-
-export interface ServiceConfigInterface {
-  provider: string;
-  cdn: string;
-  autoCdn: boolean;
-  auth: string;
-  userAgentNew: string;
-  officialMode: string;
-  officialModeShareLink: string;
-}
+export const DEFAULT_SERVICE = ApiServiceType.REZKA;

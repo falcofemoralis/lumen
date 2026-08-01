@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { ApiParams, ApiServiceType, ServiceConfigInterface } from 'Api/index';
+import { ApiInterface, ApiInterfaceConfig, ApiServiceType } from 'Api/type';
 import * as Device from 'expo-device';
 import { t } from 'i18n/translate';
 import NotificationStore from 'Store/Notification.store';
@@ -9,14 +9,10 @@ import { CommentTextInterface, CommentTextType } from 'Type/Comment.interface';
 import { ContentCollectionInterface } from 'Type/ContentCollection.interface';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
-import { FilmListInterface } from 'Type/FilmList.interface';
-import { FilmStreamInterface } from 'Type/FilmStream.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { InfoListInterface } from 'Type/InfoList.interface';
-import { MenuItemInterface } from 'Type/MenuItem.interface';
-import { ModifiedProvider } from 'Type/ModifiedProvider.interface';
-import { NotificationInterface } from 'Type/Notification.interface';
+import { ProfileInterface } from 'Type/Profile.interface';
 import { RatingInterface } from 'Type/Rating.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { VoiceRatingInterface } from 'Type/VoiceRating.interface';
@@ -25,12 +21,21 @@ import { decodeHtml } from 'Util/Html';
 import { safeJsonParse } from 'Util/Json';
 import { HTMLElementInterface, parseHtml } from 'Util/Parser';
 import { processPromisesBatch } from 'Util/Promise';
-import { executeGet, executePost, Variables } from 'Util/Request';
+import { executeGet, executePostFormData, formatURI, Variables } from 'Util/Request';
 import { storage } from 'Util/Storage';
 import { updateUrlHost } from 'Util/Url';
 
 import { collectSeriesUpdateRows, parseSeriesUpdateBlocks } from './seriesUpdates';
-import { CommentsResult, FILM_SORTING, JSONResult, LikeResult, RatingResult, SeasonsResult, StreamsResult, TrailerResult } from './type';
+import {
+  CommentsResult,
+  FILM_SORTING,
+  JSONResult,
+  LikeResult,
+  RatingResult,
+  SeasonsResult,
+  StreamsResult,
+  TrailerResult,
+} from './type';
 import {
   applyFilmSorting,
   formatDuration,
@@ -46,9 +51,33 @@ import {
 } from './utils';
 
 const REZKA_CONFIG = 'rezkaConfig';
+const REZKA_PROFILE = 'rezkaProfile';
 
-const RezkaApi = {
-  serviceType: ApiServiceType.REZKA,
+/** The shared service contract plus the internals only Rezka itself uses */
+type RezkaApiInterface = ApiInterface & {
+  // configuration
+  getConfigFromStorage: () => ApiInterfaceConfig | null;
+  loadConfig: () => ApiInterfaceConfig;
+
+  // connection
+  getRequest: (query: string, variables?: Variables) => Promise<string>;
+  postRequest: (query: string, variables?: Variables) => Promise<string>;
+  fetchPage: (query: string, variables?: Variables) => Promise<HTMLElementInterface>;
+  fetchJson: <T>(query: string, variables?: Variables) => Promise<T | null>;
+
+  // utils
+  parseContent: (content: string) => HTMLElementInterface;
+  stripHtmlFromMessage: (message?: string) => string;
+  formatFilmVideo: (json: StreamsResult) => FilmVideoInterface;
+
+  // vars
+  recentItems: HTMLElementInterface[] | null;
+};
+
+const RezkaApi: RezkaApiInterface = {
+  type: ApiServiceType.REZKA,
+  name: 'Rezka',
+
   defaultProviders: [
     'https://rezka.ag',
     'https://rezka-ua.net',
@@ -70,19 +99,20 @@ const RezkaApi = {
   ],
   defaultUserAgent: `Mozilla/5.0 (Linux; Android ${Device.osVersion}; ${Device.manufacturer} ${Device.modelName}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36`,
   officialMirror: 'https://hdrzk.org',
-  config: null as ServiceConfigInterface | null,
+  config: null,
   supportEmail: 'mirror@hdrezka.org',
 
-  getConfigFromStorage(): ServiceConfigInterface | null {
-    return storage.getConfigStorage().load<ServiceConfigInterface>(REZKA_CONFIG);
+  /** Configuration */
+
+  getConfigFromStorage() {
+    return storage.getConfigStorage().load<ApiInterfaceConfig>(REZKA_CONFIG);
   },
 
   loadConfig() {
-    this.config = {
+    const defaultConfig: ApiInterfaceConfig = {
       provider: this.defaultProviders[0],
       cdn: '',
       autoCdn: true,
-      auth: '',
       userAgentNew: this.defaultUserAgent,
       officialMode: '1', // back compatibility with old version where this value was a provider, but right now it is boolean and can be any value
       officialModeShareLink: this.defaultProviders[0],
@@ -90,25 +120,18 @@ const RezkaApi = {
 
     const config = this.getConfigFromStorage();
 
-    if (config) {
-      this.config = {
-        ...this.config,
-        ...config,
-      };
-    }
+    this.config = config ? { ...defaultConfig, ...config } : defaultConfig;
 
     return this.config;
   },
 
-  getConfig() {
-    if (!this.config) {
-      this.loadConfig();
-    }
+  getConfig<K extends keyof ApiInterfaceConfig>(key: K): ApiInterfaceConfig[K] {
+    const config = this.config ?? this.loadConfig();
 
-    return this.config as ServiceConfigInterface;
+    return config[key];
   },
 
-  updateConfig(key: keyof ServiceConfigInterface, value: unknown) {
+  setConfig(key: keyof ApiInterfaceConfig, value: unknown) {
     const result = storage.getConfigStorage().save(REZKA_CONFIG, {
       ...this.config,
       [key]: value,
@@ -123,60 +146,24 @@ const RezkaApi = {
     this.loadConfig();
   },
 
-  setProvider(provider: string): void {
-    this.updateConfig('provider', provider);
-  },
-
-  getDefaultProvider(): string {
-    return this.getConfig().provider;
-  },
-
-  getProvider(): string {
-    if (this.isOfficialMode()) {
+  getProvider() {
+    if (this.getConfig('officialMode')) {
       return this.officialMirror;
     }
 
-    return this.getDefaultProvider();
+    return this.getConfig('provider');
   },
 
-  setCDN(cdn: string): void {
-    this.updateConfig('cdn', cdn);
+  getCDN() {
+    return this.getConfig('cdn') || this.defaultCDNs[0];
   },
 
-  getCDN(): string {
-    return this.getConfig().cdn || this.defaultCDNs[0];
-  },
-
-  setAutomaticCDN(isActive: boolean): void {
-    this.updateConfig('autoCdn', isActive);
-  },
-
-  isAutomaticCDN(): boolean {
-    return this.getConfig().autoCdn;
-  },
-
-  setUserAgent(agent: string): void {
-    this.updateConfig('userAgentNew', agent);
-  },
-
-  getUserAgent(): string {
-    return this.getConfig().userAgentNew;
-  },
-
-  setAuthorization(auth: string): void {
-    this.updateConfig('auth', auth);
-  },
-
-  getAuthorization(): string {
-    return this.getConfig().auth;
-  },
-
-  getHeaders(): HeadersInit {
+  getHeaders() {
     const headers: HeadersInit = {
-      'User-Agent': this.getUserAgent(),
+      'User-Agent': this.getConfig('userAgentNew'),
     };
 
-    if (this.isOfficialMode()) {
+    if (this.getConfig('officialMode')) {
       headers['X-Hdrezka-Android-App'] = '1';
       headers['X-Hdrezka-Android-App-Version'] = '2.2.1';
     }
@@ -184,53 +171,25 @@ const RezkaApi = {
     return headers;
   },
 
-  parseContent(content: string): HTMLElementInterface {
-    const page = parseHtml(content);
-
-    const error = page.querySelector('.error-code');
-
-    if (error) {
-      NotificationStore.displayErrorScreen(
-        page.querySelector('.error-code div')?.textContent,
-        page.querySelector('.error-title')?.textContent,
-        t('Try again later')
-      );
-      throw new Error('Service temporarily unavailable');
-    }
-
-    return page;
+  async getRequest(query, variables = {}) {
+    return executeGet(
+      query,
+      this.getProvider(),
+      this.getHeaders(),
+      variables
+    );
   },
 
-  /**
-   * Strip HTML tags from message and return plain text
-   * @param message
-   * @returns plain text message
-   */
-  stripHtmlFromMessage(message?: string): string {
-    if (!message) {
-      return '';
-    }
-
-    try {
-      const parsed = parseHtml(`<div>${message}</div>`);
-
-      return parsed.rawText.trim().replace(/\s+/g, ' ');
-    } catch {
-      // If parsing fails, return the original message
-      return message;
-    }
+  async postRequest(query, variables = {} ) {
+    return executePostFormData(
+      `${query}/?t=${Date.now()}`,
+      this.getProvider(),
+      this.getHeaders(),
+      variables
+    );
   },
 
-  /**
-     * Fetch page
-     * @param query
-     * @param variables
-     * @returns HTMLElement
-     */
-  async fetchPage(
-    query: string,
-    variables: Variables = {}
-  ) {
+  async fetchPage(query, variables = {}) {
     const res = await this.getRequest(query, variables);
 
     return this.parseContent(res);
@@ -244,57 +203,32 @@ const RezkaApi = {
     return json;
   },
 
-  /**
-     * Get request
-     * @param queryInput
-     * @param variables
-     * @returns text
-     */
-  async getRequest(
-    queryInput: string,
-    variables: Variables = {}
-  ) {
-    const { query, provider } = this.modifyProvider(queryInput);
-    const headers = this.getHeaders();
+  async validateUrl(url) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-    return executeGet(
-      query,
-      provider,
-      headers,
-      variables
-    );
+    try {
+      await executeGet(
+        url,
+        '',
+        this.getHeaders(),
+        {},
+        controller.signal
+      );
+    } catch (error) {
+      console.log('fail');
+
+      console.error(error);
+      throw new Error(t('Invalid URL'));
+    } finally {
+      clearTimeout(timeoutId);
+    }
   },
 
-  /**
-     * Post request
-     * @param queryInput
-     * @param variables
-     * @returns JSON object
-     */
-  async postRequest(
-    queryInput: string,
-    variables: Record<string, string> = {}
-  ) {
-    const { query, provider } = this.modifyProvider(queryInput);
-    const headers = this.getHeaders();
-
-    return executePost(
-      `${query}/?t=${Date.now()}`,
-      provider,
-      headers,
-      variables
-    );
-  },
-
-  /**
-  * Modify CDN for streams
-  * @param streams
-  * @returns streams with modified URLs
-  */
-  modifyCDN(streams: FilmStreamInterface[]) {
+  modifyCDN(streams) {
     const cdn = this.getCDN();
 
-    if (this.isAutomaticCDN()) {
+    if (this.getConfig('autoCdn')) {
       return streams;
     }
 
@@ -308,61 +242,56 @@ const RezkaApi = {
     });
   },
 
-  /**
-  * Modify provider URL
-  * @param query
-  * @returns ModifiedUrl
-  */
-  modifyProvider(query: string): ModifiedProvider {
-    return {
-      query: query,
-      provider: this.getProvider(),
-    };
+  /** Account */
+
+  isSignedIn() {
+    const { hostname } = new URL(this.getProvider());
+    const cookies = cookiesManager.get(hostname);
+
+    if (!cookies || !cookies['dle_password']) {
+      return false;
+    }
+
+    return !!cookies['dle_password'].value;
+  },
+
+  async login(name, password) {
+    const data = await this.fetchJson<JSONResult>('/ajax/login/', {
+      login_name: name,
+      login_password: password,
+      login_not_save: '0',
+    });
+
+    if (!data?.success) {
+      throw new Error(this.stripHtmlFromMessage(data?.message));
+    }
+
+    // the stored profile belongs to the account of the previous session
+    storage.getMiscStorage().remove(REZKA_PROFILE);
+  },
+
+  async logout() {
+    cookiesManager.reset();
+    storage.getMiscStorage().remove(REZKA_PROFILE);
   },
 
   /**
-  * Set official mode
-  * @param mode
-  */
-  setOfficialMode(mode: string): void {
-    this.updateConfig('officialMode', mode);
-  },
-
-  /**
-  * Get official mode
-  * @returns string
-  */
-  getOfficialMode(): string {
-    return this.getConfig().officialMode;
-  },
-
-  /**
-   * Set official share link
-   * @param link
+   * The profile is persisted, so it is only fetched when there is nothing
+   * stored for the current session yet. `login`/`logout` drop the stored copy.
    */
-  setOfficialShareLink(link: string): void {
-    this.updateConfig('officialModeShareLink', link);
-  },
+  async getProfile(id) {
+    const storedProfile = storage.getMiscStorage().load<ProfileInterface>(REZKA_PROFILE);
 
-  /**
-   * Get official share link
-   */
-  getOfficialShareLink(): string {
-    return this.getConfig().officialModeShareLink;
-  },
+    if (storedProfile) {
+      return {
+        ...storedProfile,
+        avatar: getStaticUrl(storedProfile.avatar),
+      };
+    }
 
-  /**
-  * Check if official mode is enabled
-  * @returns boolean
-  */
-  isOfficialMode() {
-    return !!this.getOfficialMode();
-  },
-
-  async getProfile(id?: string) {
     const url = new URL(this.getProvider());
     const cookies = cookiesManager.get(url.hostname);
-    const userId = cookies ? cookies.dle_user_id.value : id;
+    const userId = cookies?.dle_user_id?.value ?? id;
 
     if (!userId) {
       throw new Error('Something went wrong');
@@ -371,22 +300,180 @@ const RezkaApi = {
     const root = await this.fetchPage(`/user/${userId}`);
 
     const premiumNode = root.querySelector('.b-tophead-premuser');
+    const avatar = root.querySelector('.b-userprofile__avatar_holder img')?.attributes.src;
 
-    return {
+    const profile: ProfileInterface = {
       id: userId,
       name: root.querySelector('head title')?.rawText ?? '',
       email: root.querySelector('#email')?.attributes.value ?? '',
-      avatar: root.querySelector('.b-userprofile__avatar_holder img')?.attributes.src ?? '',
+      avatar: avatar ? getStaticUrl(avatar) : '',
       premiumDays: premiumNode ? parseInt(
         premiumNode?.rawText.replace('Осталось', '').replace('днейПродлить', '').trim()
       ) : undefined,
     };
+
+    storage.getMiscStorage().save(REZKA_PROFILE, profile);
+
+    return profile;
   },
 
-  /**
-   * Get bookmarks
-   * @returns Bookmark[]
-   */
+  async getUserData() {
+    const root = await this.fetchPage('/');
+
+    // tracked rows only (the account's subscriptions, marked server-side)
+    const notifications = parseSeriesUpdateBlocks(root, (el) => el.querySelectorAll('.tracked'));
+
+    // every update row, so local mode can match them against the local library
+    const updates = parseSeriesUpdateBlocks(root, collectSeriesUpdateRows);
+
+    const premiumNode = root.querySelector('.b-tophead-premuser');
+    const premiumDays = premiumNode ? parseInt(
+      premiumNode?.rawText.replace('Осталось', '').replace('днейПродлить', '').trim()
+    ) : undefined;
+
+    return {
+      notifications,
+      updates,
+      premiumDays,
+    };
+  },
+
+  async getFilmsFromNotifications(notifications) {
+    const links = notifications.reduce((acc, notification) => {
+      acc.push(...notification.items.map((item) => item.link));
+
+      return acc;
+    }, [] as string[]);
+
+    const films = {} as {
+      [key: string]: FilmCardInterface;
+    };
+
+    const linksUnique = [...new Set(links)];
+
+    const getFilm = async (link: string): Promise<FilmCardInterface> => {
+      const root = await this.fetchPage(link);
+
+      const id = root.querySelector('#user-favorites-holder')?.attributes['data-post_id'] ?? '';
+      const title = root.querySelector('.b-post__title h1')?.rawText ?? '';
+      const poster = root.querySelector('.b-sidecover img')?.attributes.src ?? '';
+      const type = parseFilmType(link);
+
+      const infoTable = root.querySelectorAll('.b-post__info tr');
+      const subtitle = infoTable.reduce<string[]>((acc, el) => {
+        el.childNodes = el.childNodes.filter((node) => node.rawTagName === 'td');
+        const key = el.firstChild?.rawText.replace(':', '');
+        const value = el.lastChild as HTMLElementInterface | undefined;
+
+        if (key && value) {
+          switch (key) {
+            case 'Дата выхода': {
+              const rel = value.querySelector('a')?.rawText;
+
+              if (rel) {
+                acc.push(rel);
+              }
+
+              return acc;
+            }
+            case 'Страна': {
+              const countries = value.childNodes
+                .filter((node) => node.rawTagName === 'a')
+                .map((node) => node.rawText);
+
+              if (countries.length > 0) {
+                acc.push(countries[0]);
+              }
+
+              return acc;
+            }
+            case 'Жанр': {
+              const genres = value.childNodes
+                .filter((node) => node.rawTagName === 'a')
+                .map((node) => node.rawText);
+
+              if (genres.length > 0) {
+                acc.push(genres[0]);
+              }
+
+              return acc;
+            }
+            default:
+              return acc;
+          }
+        }
+
+        return acc;
+      }, []);
+
+      return {
+        id,
+        link,
+        type,
+        poster,
+        title,
+        subtitle: subtitle.join(', '),
+      };
+    };
+
+    const results = await processPromisesBatch<string, FilmCardInterface>(linksUnique, 3, getFilm);
+
+    results.forEach((result) => {
+      films[result.link] = result;
+    });
+
+    return notifications.map((notification) => {
+      const items = notification.items.map((item) => {
+        const film = { ...films[item.link] } as FilmCardInterface;
+        film.info = item.info;
+
+        return {
+          ...item,
+          film,
+        };
+      });
+
+      return {
+        ...notification,
+        items,
+      };
+    });
+  },
+
+  getProfileLink(profile) {
+    let link = `${this.getProvider()}/user/${profile?.id}/`;
+
+    if (this.getConfig('officialMode')) {
+      link = updateUrlHost(link, this.getConfig('officialModeShareLink'));
+    }
+
+    return link;
+  },
+
+  getPaymentsLink() {
+    let link = `${this.getProvider()}/payments/`;
+
+    if (this.getConfig('officialMode')) {
+      link = updateUrlHost(link, this.getConfig('officialModeShareLink'));
+    }
+
+    return link;
+  },
+
+  getShareLink(film) {
+    const { link } = film;
+
+    let shareLink = formatURI(link, {}, this.getProvider());
+
+    if (this.getConfig('officialMode')) {
+      shareLink = updateUrlHost(shareLink, this.getConfig('officialModeShareLink'));
+    }
+
+    return shareLink;
+  },
+
+  /** Bookmarks */
+
   async getBookmarks() {
     const bookmarks: BookmarkInterface[] = [];
 
@@ -414,11 +501,15 @@ const RezkaApi = {
     return bookmarks;
   },
 
-  /**
-   * Add a bookmark
-   * @param filmId string
-   */
-  async addBookmark(filmId: string, bookmarkId: string) {
+  async getBookmarkedFilms(bookmark, page) {
+    const { id } = bookmark;
+
+    const filmsList = await this.getFilms(page, `/favorites/${id}`);
+
+    return filmsList;
+  },
+
+  async addBookmark(filmId, bookmarkId) {
     const res = await this.fetchJson<JSONResult>('/ajax/favorites', {
       post_id: filmId,
       cat_id: bookmarkId,
@@ -430,21 +521,15 @@ const RezkaApi = {
     }
   },
 
-  /**
-  * Remove a bookmark
-  * @param filmId string
-  */
-  async removeBookmark(filmId: string, bookmarkId: string) {
+  async removeBookmark(filmId, bookmarkId) {
     this.addBookmark(filmId, bookmarkId);
   },
 
-  recentItems: null as HTMLElementInterface[] | null,
+  /** Recently watched */
 
-  /**
-   * Get watch later list
-   * @returns FilmListInterface
-   */
-  async getRecent(page: number, params?: ApiParams) {
+  recentItems: null,
+
+  async getRecent(page, params) {
     const { isRefresh } = params || {};
     const itemsPerPage = 20;
 
@@ -488,7 +573,7 @@ const RezkaApi = {
     };
   },
 
-  async removeRecent(filmId: string) {
+  async removeRecent(filmId) {
     const data = await this.fetchJson<JSONResult>('/engine/ajax/cdn_saves_remove.php', { id: filmId });
 
     if (!data?.success) {
@@ -498,7 +583,7 @@ const RezkaApi = {
     return true;
   },
 
-  async hideRecent(filmId: string) {
+  async hideRecent(filmId) {
     const data = await this.fetchJson<JSONResult>('/engine/ajax/cdn_saves_view.php', {
       id: filmId,
     });
@@ -514,168 +599,108 @@ const RezkaApi = {
     this.recentItems = null;
   },
 
-  async getUserData() {
-    const root = await this.fetchPage('/');
+  /** Films */
 
-    // tracked rows only (the account's subscriptions, marked server-side)
-    const notifications = parseSeriesUpdateBlocks(root, (el) => el.querySelectorAll('.tracked'));
-
-    // every update row, so local mode can match them against the local library
-    const updates = parseSeriesUpdateBlocks(root, collectSeriesUpdateRows);
-
-    const premiumNode = root.querySelector('.b-tophead-premuser');
-    const premiumDays = premiumNode ? parseInt(
-      premiumNode?.rawText.replace('Осталось', '').replace('днейПродлить', '').trim()
-    ) : undefined;
-
-    return {
-      notifications,
-      updates,
-      premiumDays,
-    };
+  getHomeMenu: () => {
+    return [
+      {
+        id: 'slider',
+        title: t('Hot New Releases'),
+        path: '/engine/ajax/get_newest_slider_content.php',
+        variables: { 'id': '0' } as Variables,
+        key: '.b-newest_slider__wrapper',
+      },
+      {
+        id: 'new',
+        title: t('New Releases'),
+        path: '/new',
+      },
+      {
+        id: 'watching',
+        title: t('Watching Now'),
+        path: '/new',
+        variables: { 'filter': 'watching' } as Variables,
+      },
+      {
+        id: 'popular',
+        title: t('Popular'),
+        path: '/new',
+        variables: { 'filter': 'popular' } as Variables,
+      },
+      {
+        id: 'soon',
+        title: t('Awaiting'),
+        path: '/announce',
+      },
+    ];
   },
 
-  async saveScheduleWatch(id: string) {
-    const data = await this.fetchJson<JSONResult>('/engine/ajax/schedule_watched.php', { id });
+  async getHomeMenuFilms(menuItem, page, sort, params) {
+    const { path, key, variables = {} } = menuItem;
 
-    if (!data?.success) {
-      throw new Error(this.stripHtmlFromMessage(data?.message) || 'Something went wrong');
-    }
-  },
+    const sortVariable = key === '.b-newest_slider__wrapper' ? 'id' : undefined;
 
-  getPhotoUrl(url: string) {
-    return getStaticUrl(url);
-  },
-
-  async login(name: string, password: string) {
-    const data = await this.fetchJson<JSONResult>('/ajax/login/', {
-      login_name: name,
-      login_password: password,
-      login_not_save: '0',
-    });
-
-    if (!data?.success) {
-      throw new Error(this.stripHtmlFromMessage(data?.message));
-    }
-
-    return 'authorized';
-  },
-
-  async logout() {
-    cookiesManager.reset();
-  },
-
-  async getComments(filmId: string, page: number) {
-    const json = await this.getRequest('/ajax/get_comments', {
-      t: String(Date.now()),
-      news_id: filmId,
-      cstart: String(page),
-      type: '0',
-      comment_id: '0',
-      skin: 'hdrezka',
-    });
-
-    const result = safeJsonParse<CommentsResult>(json);
-
-    if (!result) {
-      throw new Error('Failed to fetch comments');
+    if (sort) {
+      applyFilmSorting(sort, variables, sortVariable);
     }
 
-    const {
-      comments: commentsHtml,
-      navigation: navigationHtml,
-    } = result;
+    if (key === '.b-newest_slider__wrapper') {
+      const films: FilmCardInterface[] = [];
 
-    const commentsRoot = this.parseContent(commentsHtml);
-    const navigationRoot = this.parseContent(navigationHtml);
+      const res = await this.postRequest(path, variables);
 
-    const comments = commentsRoot.querySelectorAll('.comments-tree-item')
-      .map((comment) => {
-        const id = comment.attributes['data-id'];
-        const avatar = comment.querySelector('.ava img')?.attributes.src ?? '';
-        const username = comment.querySelector('.name')?.rawText ?? '';
-        const date = comment.querySelector('.date')?.rawText ?? '';
-        const indent = comment.attributes['data-indent'];
-        const likes = comment.querySelector('.b-comment__like_it')?.attributes['data-likes_num'];
-        const isDisabled = comment.querySelector('.show-likes-comment')?.classList.contains('disabled') ?? false;
-        const textElements = comment.querySelector('.text div');
+      const root = this.parseContent(`<div>${res}</div>`);
 
-        const text = textElements?.childNodes.reduce<CommentTextInterface[]>((acc, el) => {
-          let type = CommentTextType.REGULAR;
+      const filmElements = root.querySelectorAll('.b-content__inline_item');
 
-          switch (el.rawTagName) {
-            case 'b':
-              type = CommentTextType.BOLD;
-              break;
-            case 'i':
-              type = CommentTextType.INCLINED;
-              break;
-            case 'u':
-              type = CommentTextType.UNDERLINE;
-              break;
-            case 's':
-              type = CommentTextType.CROSSED;
-              break;
-            case 'br':
-              type = CommentTextType.BREAK;
-              break;
-            default:
+      filmElements.forEach((el) => {
+        const film = parseFilmCard(el);
 
-              if ((el as any).classList?.contains('text_spoiler')) {
-                type = CommentTextType.SPOILER;
-              }
-              break;
-          }
-
-          if (!(el as any).classList?.contains('title_spoiler')) {
-            acc.push({
-              type,
-              text: decodeHtml(el.rawText),
-            });
-          }
-
-          return acc;
-        }, []) ?? [];
-
-        return {
-          id,
-          avatar,
-          username,
-          date: date.replace('оставлен ', ''),
-          indent: Number(indent),
-          likes: Number(likes),
-          isDisabled,
-          isControls: false,
-          text,
-        };
+        if (film) {
+          films.push(film);
+        }
       });
 
-    let totalPages = 1;
-
-    const navs = navigationRoot.querySelectorAll('.b-navigation a');
-    if (navs.length > 0) {
-      totalPages = Number(navs[navs.length - 2].rawText);
+      return {
+        films,
+        totalPages: 1,
+      };
     }
 
-    return {
-      items: comments,
-      totalPages,
-    };
+    const filmsList = await this.getFilms(page, path, variables, {
+      ...params,
+      key,
+    });
+
+    return filmsList;
   },
 
-  /**
-   * Get films list by params
-   * @param page
-   * @param path
-   * @returns FilmList
-   */
-  async getFilms(
-    page: number,
-    path = '',
-    variables?: Variables,
-    params?: ApiParams,
-    sort?: string
-  ): Promise<FilmListInterface> {
+  getFilmSortingOptions() {
+    return [
+      {
+        label: t('All'),
+        value: FILM_SORTING.ALL as string,
+      },
+      {
+        label: t('Films'),
+        value: FILM_SORTING.FILMS as string,
+      },
+      {
+        label: t('Series'),
+        value: FILM_SORTING.SERIES as string,
+      },
+      {
+        label: t('Multfilms'),
+        value: FILM_SORTING.MULFILMS as string,
+      },
+      {
+        label: t('Anime'),
+        value: FILM_SORTING.ANIME as string,
+      },
+    ];
+  },
+
+  async getFilms(page, path = '', variables, params, sort){
     const { key } = params || {};
 
     if (sort && variables) {
@@ -699,12 +724,7 @@ const RezkaApi = {
     return parseFilmsListRoot(content);
   },
 
-  /**
-   * Get film by link
-   * @param link
-   * @returns Film
-   */
-  async getFilm(link: string): Promise<FilmInterface | null> {
+  async getFilm(link) {
     const root = await this.fetchPage(link, {});
 
     // base data
@@ -1033,99 +1053,152 @@ const RezkaApi = {
     return film;
   },
 
-  getFilmSortingOptions() {
-    return [
-      {
-        label: t('All'),
-        value: FILM_SORTING.ALL as string,
-      },
-      {
-        label: t('Films'),
-        value: FILM_SORTING.FILMS as string,
-      },
-      {
-        label: t('Series'),
-        value: FILM_SORTING.SERIES as string,
-      },
-      {
-        label: t('Multfilms'),
-        value: FILM_SORTING.MULFILMS as string,
-      },
-      {
-        label: t('Anime'),
-        value: FILM_SORTING.ANIME as string,
-      },
-    ];
-  },
-
-  /**
-   * Get films from home menu
-   * @param menuItem
-   * @param page
-   * @param sort
-   * @param params
-   * @returns FilmList
-   */
-  async getHomeMenuFilms(menuItem: MenuItemInterface, page: number, sort?: string, params?: ApiParams) {
-    const { path, key, variables = {} } = menuItem;
-
-    const sortVariable = key === '.b-newest_slider__wrapper' ? 'id' : undefined;
-
-    if (sort) {
-      applyFilmSorting(sort, variables, sortVariable);
-    }
-
-    if (key === '.b-newest_slider__wrapper') {
-      const films: FilmCardInterface[] = [];
-
-      const res = await this.postRequest(path, variables);
-
-      const root = this.parseContent(`<div>${res}</div>`);
-
-      const filmElements = root.querySelectorAll('.b-content__inline_item');
-
-      filmElements.forEach((el) => {
-        const film = parseFilmCard(el);
-
-        if (film) {
-          films.push(film);
-        }
-      });
-
-      return {
-        films,
-        totalPages: 1,
-      };
-    }
-
-    const filmsList = await this.getFilms(page, path, variables, {
-      ...params,
-      key,
+  async getFilmTrailer(filmId) {
+    const result = await this.fetchJson<TrailerResult>('/engine/ajax/gettrailervideo.php', {
+      id: filmId,
     });
 
-    return filmsList;
+    if (!result || !result.success) {
+      return null;
+    }
+
+    const code = result.code;
+
+    const startIndex = code.indexOf('https://');
+    const endIndex = code.indexOf('lay=1') + 5;
+
+    return code.substring(startIndex, endIndex);
   },
 
-  /**
-   * Get films from bookmark
-   * @param bookmark
-   * @param page
-   * @returns
-   */
-  async getBookmarkedFilms(bookmark: BookmarkInterface, page: number) {
-    const { id } = bookmark;
+  async getFilmSeasons(film, voice) {
+    const { id: filmId } = film;
+    const { id: voiceId } = voice;
 
-    const filmsList = await this.getFilms(page, `/favorites/${id}`);
+    const result = await this.fetchJson<SeasonsResult>('/ajax/get_cdn_series', {
+      id: filmId,
+      translator_id: voiceId,
+      action: 'get_episodes',
+    });
 
-    return filmsList;
+    if (!result) {
+      throw new Error('Failed to get seasons');
+    }
+
+    const { seasons } = result;
+    const { episodes } = result;
+
+    const root = parseHtml(`<div>${seasons}${episodes}</div>`);
+
+    return {
+      ...voice,
+      ...parseSeasons(root),
+    };
   },
 
-  /**
-   * Get actor details
-   * @param link
-   * @returns
-   */
-  async getActorDetails(link: string) {
+  async getFilmStreamsByVoice(film, voice) {
+    const { id: filmId } = film;
+    const {
+      id: voiceId,
+      isCamrip,
+      isAds,
+      isDirector,
+    } = voice;
+
+    const json = await this.fetchJson<StreamsResult>('/ajax/get_cdn_series', {
+      id: filmId,
+      translator_id: voiceId,
+      is_camrip: isCamrip,
+      is_ads: isAds,
+      is_director: isDirector,
+      action: 'get_movie',
+    });
+
+    if (!json?.success) {
+      throw new Error(json?.message);
+    }
+
+    try {
+      return this.formatFilmVideo(json);
+    } catch (error) {
+      NotificationStore.displayError(error as Error);
+
+      return {
+        streams: [],
+      };
+    }
+  },
+
+  async getFilmStreamsByEpisodeId(film, voice, seasonId, episodeId){
+    const { id: filmId } = film;
+    const { id: voiceId } = voice;
+
+    const json = await this.fetchJson<StreamsResult>('/ajax/get_cdn_series', {
+      id: filmId,
+      translator_id: voiceId,
+      season: seasonId,
+      episode: episodeId,
+      action: 'get_stream',
+    });
+
+    if (!json?.success) {
+      throw new Error(json?.message);
+    }
+
+    try {
+      return this.formatFilmVideo(json);
+    } catch (error) {
+      NotificationStore.displayError(error as Error);
+
+      return {
+        streams: [],
+      };
+    }
+  },
+
+  async saveWatch(film, voice) {
+    const { id: filmId } = film;
+    const { id: voiceId } = voice;
+
+    this.fetchJson<JSONResult>('/ajax/send_save', {
+      post_id: filmId,
+      translator_id: voiceId,
+      season: voice.lastSeasonId ?? '0',
+      episode: voice.lastEpisodeId ?? '0',
+      current_time: '1',
+    });
+
+    // res.success is always false for some reason ¯\_(ツ)_/¯
+
+    // if (!res.success) {
+    //   throw new Error(res.message);
+    // }
+  },
+
+  async saveScheduleWatch(id) {
+    const data = await this.fetchJson<JSONResult>('/engine/ajax/schedule_watched.php', { id });
+
+    if (!data?.success) {
+      throw new Error(this.stripHtmlFromMessage(data?.message) || 'Something went wrong');
+    }
+  },
+
+  async postRating(filmId, rating) {
+    const data = await this.fetchJson<RatingResult>('/engine/ajax/rating.php', {
+      news_id: filmId,
+      go_rate: String(rating),
+      skin: 'hdrezka',
+    });
+
+    if (!data?.success) {
+      throw new Error('Failed to update rating');
+    }
+
+    return data;
+  },
+
+  /** actor */
+
+  async getActorDetails(link) {
     const root = await this.fetchPage(link);
 
     const roles = root.querySelectorAll('.b-person__career').map((el) => {
@@ -1181,286 +1254,48 @@ const RezkaApi = {
     return actor;
   },
 
-  async getFilmsFromNotifications(notifications: NotificationInterface[]) {
-    const links = notifications.reduce((acc, notification) => {
-      acc.push(...notification.items.map((item) => item.link));
+  /** Collections */
 
-      return acc;
-    }, [] as string[]);
+  async getCollections(page) {
+    const root = await this.fetchPage(`/collections/page/${page}/`);
 
-    const films = {} as {
-      [key: string]: FilmCardInterface;
-    };
-
-    const linksUnique = [...new Set(links)];
-
-    const getFilm = async (link: string): Promise<FilmCardInterface> => {
-      const root = await this.fetchPage(link);
-
-      const id = root.querySelector('#user-favorites-holder')?.attributes['data-post_id'] ?? '';
-      const title = root.querySelector('.b-post__title h1')?.rawText ?? '';
-      const poster = root.querySelector('.b-sidecover img')?.attributes.src ?? '';
-      const type = parseFilmType(link);
-
-      const infoTable = root.querySelectorAll('.b-post__info tr');
-      const subtitle = infoTable.reduce<string[]>((acc, el) => {
-        el.childNodes = el.childNodes.filter((node) => node.rawTagName === 'td');
-        const key = el.firstChild?.rawText.replace(':', '');
-        const value = el.lastChild as HTMLElementInterface | undefined;
-
-        if (key && value) {
-          switch (key) {
-            case 'Дата выхода': {
-              const rel = value.querySelector('a')?.rawText;
-
-              if (rel) {
-                acc.push(rel);
-              }
-
-              return acc;
-            }
-            case 'Страна': {
-              const countries = value.childNodes
-                .filter((node) => node.rawTagName === 'a')
-                .map((node) => node.rawText);
-
-              if (countries.length > 0) {
-                acc.push(countries[0]);
-              }
-
-              return acc;
-            }
-            case 'Жанр': {
-              const genres = value.childNodes
-                .filter((node) => node.rawTagName === 'a')
-                .map((node) => node.rawText);
-
-              if (genres.length > 0) {
-                acc.push(genres[0]);
-              }
-
-              return acc;
-            }
-            default:
-              return acc;
-          }
-        }
-
-        return acc;
-      }, []);
+    const collections = root.querySelectorAll('.b-content__collections_item').map((item) => {
+      const title = item.querySelector('.title')?.rawText ?? '';
+      const image = item.querySelector('.cover')?.attributes.src ?? '';
+      const url = item.attributes['data-url'] ?? '';
+      const amount = item.querySelector('.num')?.rawText ?? 0;
 
       return {
-        id,
-        link,
-        type,
-        poster,
+        id: title,
         title,
-        subtitle: subtitle.join(', '),
-      };
-    };
-
-    const results = await processPromisesBatch<string, FilmCardInterface>(linksUnique, 3, getFilm);
-
-    results.forEach((result) => {
-      films[result.link] = result;
+        image,
+        url,
+        amount: Number(amount),
+      } as ContentCollectionInterface;
     });
 
-    return notifications.map((notification) => {
-      const items = notification.items.map((item) => {
-        const film = { ...films[item.link] } as FilmCardInterface;
-        film.info = item.info;
-
-        return {
-          ...item,
-          film,
-        };
-      });
-
-      return {
-        ...notification,
-        items,
-      };
-    });
-  },
-
-  getHomeMenu: () => [
-    {
-      id: 'slider',
-      title: t('Hot New Releases'),
-      path: '/engine/ajax/get_newest_slider_content.php',
-      variables: { id: '0' },
-      key: '.b-newest_slider__wrapper',
-    },
-    {
-      id: 'new',
-      title: t('New Releases'),
-      path: '/new',
-    },
-    {
-      id: 'watching',
-      title: t('Watching Now'),
-      path: '/new',
-      variables: { filter: 'watching' },
-    },
-    {
-      id: 'popular',
-      title: t('Popular'),
-      path: '/new',
-      variables: { filter: 'popular' },
-    },
-    {
-      id: 'soon',
-      title: t('Awaiting'),
-      path: '/announce',
-    },
-  ] as MenuItemInterface[],
-
-  formatFilmVideo(json: StreamsResult): FilmVideoInterface {
-    const streams = parseStreams(json.url);
-    const subtitles = parseSubtitles(
-      json.subtitle,
-      json.subtitle_def,
-      json.subtitle_lns
-    );
-
-    const result = {
-      streams: this.modifyCDN(streams),
-      subtitles,
-      storyboardUrl: json.thumbnails ? this.getProvider() + json.thumbnails : undefined,
-    };
-
-    return result;
-  },
-
-  async getFilmStreamsByVoice(
-    film: FilmInterface,
-    voice: FilmVoiceInterface
-  ): Promise<FilmVideoInterface> {
-    const { id: filmId } = film;
-    const {
-      id: voiceId,
-      isCamrip,
-      isAds,
-      isDirector,
-    } = voice;
-
-    const json = await this.fetchJson<StreamsResult>('/ajax/get_cdn_series', {
-      id: filmId,
-      translator_id: voiceId,
-      is_camrip: isCamrip,
-      is_ads: isAds,
-      is_director: isDirector,
-      action: 'get_movie',
-    });
-
-    if (!json?.success) {
-      throw new Error(json?.message);
-    }
-
-    try {
-      return this.formatFilmVideo(json);
-    } catch (error) {
-      NotificationStore.displayError(error as Error);
-
-      return {
-        streams: [],
-      };
-    }
-  },
-
-  /**
-   * Get film streams by season and episode id
-   * @param season
-   * @param episode
-   */
-  async getFilmStreamsByEpisodeId(
-    film: FilmInterface,
-    voice: FilmVoiceInterface,
-    seasonId: string,
-    episodeId: string
-  ): Promise<FilmVideoInterface> {
-    const { id: filmId } = film;
-    const { id: voiceId } = voice;
-
-    const json = await this.fetchJson<StreamsResult>('/ajax/get_cdn_series', {
-      id: filmId,
-      translator_id: voiceId,
-      season: seasonId,
-      episode: episodeId,
-      action: 'get_stream',
-    });
-
-    if (!json?.success) {
-      throw new Error(json?.message);
-    }
-
-    try {
-      return this.formatFilmVideo(json);
-    } catch (error) {
-      NotificationStore.displayError(error as Error);
-
-      return {
-        streams: [],
-      };
-    }
-  },
-
-  /**
-   * Get film seasons
-   * @param film
-   * @param voice
-   */
-  async getFilmSeasons(
-    film: FilmInterface,
-    voice: FilmVoiceInterface
-  ): Promise<FilmVoiceInterface> {
-    const { id: filmId } = film;
-    const { id: voiceId } = voice;
-
-    const result = await this.fetchJson<SeasonsResult>('/ajax/get_cdn_series', {
-      id: filmId,
-      translator_id: voiceId,
-      action: 'get_episodes',
-    });
-
-    if (!result) {
-      throw new Error('Failed to get seasons');
-    }
-
-    const { seasons } = result;
-    const { episodes } = result;
-
-    const root = parseHtml(`<div>${seasons}${episodes}</div>`);
+    const navs = root.querySelectorAll('.b-navigation a');
 
     return {
-      ...voice,
-      ...parseSeasons(root),
+      items: collections,
+      totalPages: navs.length > 0 ? Number(navs[navs.length - 2].rawText) : 1,
     };
   },
 
-  async saveWatch(
-    film: FilmInterface,
-    voice: FilmVoiceInterface
-  ): Promise<void> {
-    const { id: filmId } = film;
-    const { id: voiceId } = voice;
+  /** Search */
 
-    this.fetchJson<JSONResult>('/ajax/send_save', {
-      post_id: filmId,
-      translator_id: voiceId,
-      season: voice.lastSeasonId ?? '0',
-      episode: voice.lastEpisodeId ?? '0',
-      current_time: '1',
+  async search(query, page) {
+    const root = await this.fetchPage('/search/', {
+      do: 'search',
+      subaction: 'search',
+      q: query,
+      page: String(page),
     });
 
-    // res.success is always false for some reason ¯\_(ツ)_/¯
-
-    // if (!res.success) {
-    //   throw new Error(res.message);
-    // }
+    return parseFilmsListRoot(root);
   },
 
-  async searchSuggestions(query: string) {
+  async searchSuggestions(query) {
     const res = await this.postRequest('/engine/ajax/search.php', {
       q: query,
     });
@@ -1473,28 +1308,6 @@ const RezkaApi = {
     const uniqueArray = [...mArray];
 
     return uniqueArray;
-  },
-
-  async search(query: string, page: number) {
-    const root = await this.fetchPage('/search/', {
-      do: 'search',
-      subaction: 'search',
-      q: query,
-      page: String(page),
-    });
-
-    return parseFilmsListRoot(root);
-  },
-
-  isSignedIn() {
-    const { hostname } = new URL(this.getProvider());
-    const cookies = cookiesManager.get(hostname);
-
-    if (!cookies || !cookies['dle_password']) {
-      return false;
-    }
-
-    return !!cookies['dle_password'].value;
   },
 
   async loadAdditionalContent() {
@@ -1536,64 +1349,107 @@ const RezkaApi = {
     return categories;
   },
 
-  async getCollections(page: number) {
-    const root = await this.fetchPage(`/collections/page/${page}/`);
+  /** Comments */
 
-    const collections = root.querySelectorAll('.b-content__collections_item').map((item) => {
-      const title = item.querySelector('.title')?.rawText ?? '';
-      const image = item.querySelector('.cover')?.attributes.src ?? '';
-      const url = item.attributes['data-url'] ?? '';
-      const amount = item.querySelector('.num')?.rawText ?? 0;
-
-      return {
-        id: title,
-        title,
-        image,
-        url,
-        amount: Number(amount),
-      } as ContentCollectionInterface;
-    });
-
-    const navs = root.querySelectorAll('.b-navigation a');
-
-    return {
-      items: collections,
-      totalPages: navs.length > 0 ? Number(navs[navs.length - 2].rawText) : 1,
-    };
-  },
-
-  async getFilmTrailer(filmId: string) {
-    const result = await this.fetchJson<TrailerResult>('/engine/ajax/gettrailervideo.php', {
-      id: filmId,
-    });
-
-    if (!result || !result.success) {
-      return null;
-    }
-
-    const code = result.code;
-
-    const startIndex = code.indexOf('https://');
-    const endIndex = code.indexOf('lay=1') + 5;
-
-    return code.substring(startIndex, endIndex);
-  },
-
-  async postRating(filmId: string, rating: number) {
-    const data = await this.fetchJson<RatingResult>('/engine/ajax/rating.php', {
+  async getComments(filmId, page) {
+    const json = await this.getRequest('/ajax/get_comments', {
+      t: String(Date.now()),
       news_id: filmId,
-      go_rate: String(rating),
+      cstart: String(page),
+      type: '0',
+      comment_id: '0',
       skin: 'hdrezka',
     });
 
-    if (!data?.success) {
-      throw new Error('Failed to update rating');
+    const result = safeJsonParse<CommentsResult>(json);
+
+    if (!result) {
+      throw new Error('Failed to fetch comments');
     }
 
-    return data;
+    const {
+      comments: commentsHtml,
+      navigation: navigationHtml,
+    } = result;
+
+    const commentsRoot = this.parseContent(commentsHtml);
+    const navigationRoot = this.parseContent(navigationHtml);
+
+    const comments = commentsRoot.querySelectorAll('.comments-tree-item')
+      .map((comment) => {
+        const id = comment.attributes['data-id'];
+        const avatar = comment.querySelector('.ava img')?.attributes.src ?? '';
+        const username = comment.querySelector('.name')?.rawText ?? '';
+        const date = comment.querySelector('.date')?.rawText ?? '';
+        const indent = comment.attributes['data-indent'];
+        const likes = comment.querySelector('.b-comment__like_it')?.attributes['data-likes_num'];
+        const isDisabled = comment.querySelector('.show-likes-comment')?.classList.contains('disabled') ?? false;
+        const textElements = comment.querySelector('.text div');
+
+        const text = textElements?.childNodes.reduce<CommentTextInterface[]>((acc, el) => {
+          let type = CommentTextType.REGULAR;
+
+          switch (el.rawTagName) {
+            case 'b':
+              type = CommentTextType.BOLD;
+              break;
+            case 'i':
+              type = CommentTextType.INCLINED;
+              break;
+            case 'u':
+              type = CommentTextType.UNDERLINE;
+              break;
+            case 's':
+              type = CommentTextType.CROSSED;
+              break;
+            case 'br':
+              type = CommentTextType.BREAK;
+              break;
+            default:
+
+              if ((el as any).classList?.contains('text_spoiler')) {
+                type = CommentTextType.SPOILER;
+              }
+              break;
+          }
+
+          if (!(el as any).classList?.contains('title_spoiler')) {
+            acc.push({
+              type,
+              text: decodeHtml(el.rawText),
+            });
+          }
+
+          return acc;
+        }, []) ?? [];
+
+        return {
+          id,
+          avatar,
+          username,
+          date: date.replace('оставлен ', ''),
+          indent: Number(indent),
+          likes: Number(likes),
+          isDisabled,
+          isControls: false,
+          text,
+        };
+      });
+
+    let totalPages = 1;
+
+    const navs = navigationRoot.querySelectorAll('.b-navigation a');
+    if (navs.length > 0) {
+      totalPages = Number(navs[navs.length - 2].rawText);
+    }
+
+    return {
+      items: comments,
+      totalPages,
+    };
   },
 
-  async postLike(commentId: string) {
+  async postLike(commentId) {
     const data = await this.fetchJson<LikeResult>('/engine/ajax/comments_like.php', {
       id: commentId,
     });
@@ -1603,6 +1459,56 @@ const RezkaApi = {
     }
 
     return data;
+  },
+
+  /** Utils */
+
+  parseContent(content) {
+    const page = parseHtml(content);
+
+    const error = page.querySelector('.error-code');
+
+    if (error) {
+      NotificationStore.displayErrorScreen(
+        page.querySelector('.error-code div')?.textContent,
+        page.querySelector('.error-title')?.textContent,
+        t('Try again later')
+      );
+      throw new Error('Service temporarily unavailable');
+    }
+
+    return page;
+  },
+
+  stripHtmlFromMessage(message) {
+    if (!message) {
+      return '';
+    }
+
+    try {
+      const parsed = parseHtml(`<div>${message}</div>`);
+
+      return parsed.rawText.trim().replace(/\s+/g, ' ');
+    } catch {
+      return message;
+    }
+  },
+
+  formatFilmVideo(json: StreamsResult): FilmVideoInterface {
+    const streams = parseStreams(json.url);
+    const subtitles = parseSubtitles(
+      json.subtitle,
+      json.subtitle_def,
+      json.subtitle_lns
+    );
+
+    const result = {
+      streams: this.modifyCDN(streams),
+      subtitles,
+      storyboardUrl: json.thumbnails ? this.getProvider() + json.thumbnails : undefined,
+    };
+
+    return result;
   },
 };
 

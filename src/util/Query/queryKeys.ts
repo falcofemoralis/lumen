@@ -16,6 +16,9 @@ export const queryKeys = {
     bookmarks: () => ['films', 'bookmarks'] as const,
   },
 
+  /** Scoped by service, so switching services never shows the previous account */
+  profile: (service: string) => ['profile', service] as const,
+
   actor: (link: string) => ['actor', link] as const,
   bookmarks: () => ['bookmarks'] as const,
   collections: () => ['collections'] as const,

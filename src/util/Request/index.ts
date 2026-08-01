@@ -1,5 +1,4 @@
 import { t } from 'i18n/translate';
-import { Platform } from 'react-native';
 import { customFetch } from 'Util/Fetch';
 
 export type Variables = Record<string, string>;
@@ -10,7 +9,14 @@ export const formatURI = (query: string, variables: Variables, url: string): str
   }
 
   const stringifyVariables = Object.keys(variables).reduce(
-    (acc, variable) => [...acc, `${variable}=${JSON.stringify(variables[variable])}`],
+    (acc, variable) => {
+      const value = variables[variable];
+      const entries = Array.isArray(value)
+        ? value.map(v => `${variable}=${v}`)
+        : [`${variable}=${JSON.stringify(value)}`];
+
+      return [...acc, ...entries];
+    },
     ['']
   );
 
@@ -30,33 +36,20 @@ export const getFetch = (
 ): Promise<Response> => customFetch(uri, {
   method: 'GET',
   signal,
-  headers: {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-    ...headers,
-  },
+  headers,
 });
 
 export const postFetch = (
   uri: string,
   headers: HeadersInit,
-  variables: FormData,
+  body: BodyInit,
   signal?: AbortSignal
-): Promise<Response> => {
-  if (Platform.OS === 'android') {
-    headers = {
-      'Content-Type': 'multipart/form-data',
-      ...headers,
-    };
-  }
-
-  return customFetch(uri, {
-    method: 'POST',
-    body: variables,
-    signal,
-    headers,
-  });
-};
+): Promise<Response> => customFetch(uri, {
+  method: 'POST',
+  body,
+  signal,
+  headers,
+});
 
 export const parseResponse = async (response: Response): Promise<string> => {
   const promiseResponse = await response;
@@ -83,13 +76,17 @@ export const executeGet = async (
   query: string,
   endpoint: string,
   headers: HeadersInit,
-  variables: Variables,
+  params: Variables,
   signal?: AbortSignal
 ): Promise<string> => {
-  const uri = formatURI(query, variables, endpoint);
+  const uri = formatURI(query, params, endpoint);
 
   try {
-    const response = await getFetch(uri, headers, signal);
+    const response = await getFetch(uri, {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      ...headers,
+    }, signal);
 
     handleRequestError(response);
 
@@ -101,23 +98,30 @@ export const executeGet = async (
   }
 };
 
-export const executePost = async (
+export const executePostFormData = async (
   query: string,
   endpoint: string,
   headers: HeadersInit,
-  variables: Variables,
+  formData: Variables,
   signal?: AbortSignal
 ): Promise<string> => {
   const uri = formatURI(query, {}, endpoint);
 
   try {
-    const formData = new FormData();
+    const formDataObject = new FormData();
 
-    Object.entries(variables).forEach(([key, value]) => {
-      formData.append(key, value);
+    Object.entries(formData).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        value.forEach(v => formDataObject.append(`${key}[]`, v));
+      } else {
+        formDataObject.append(key, value);
+      }
     });
 
-    const response = await postFetch(uri, headers, formData, signal);
+    const response = await postFetch(uri, {
+      'Content-Type': 'multipart/form-data',
+      ...headers,
+    }, formDataObject, signal);
 
     handleRequestError(response);
 
@@ -129,24 +133,67 @@ export const executePost = async (
   }
 };
 
-export const requestValidator = async (
-  host: string,
-  headers: HeadersInit
-) => {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 15000);
+export const executePostJson = async (
+  query: string,
+  endpoint: string,
+  headers: HeadersInit,
+  variables: Variables,
+  params?: Variables,
+  signal?: AbortSignal
+): Promise<string> => {
+  const uri = formatURI(query, params || {}, endpoint);
 
   try {
-    await executeGet(
-      '/',
-      host,
-      headers,
-      {},
-      controller.signal
-    );
+    const response = await postFetch(uri, {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      ...headers,
+    }, JSON.stringify(variables), signal);
+
+    handleRequestError(response);
+
+    const parsedRes = await parseResponse(response);
+
+    return parsedRes;
   } catch (error) {
-    throw new Error(t('Invalid URL'));
-  } finally {
-    clearTimeout(timeoutId);
+    throw new Error(error as string);
+  }
+};
+
+export const executePostEncoded = async (
+  query: string,
+  endpoint: string,
+  headers: HeadersInit,
+  variables: Variables,
+  params?: Variables,
+  signal?: AbortSignal
+): Promise<string> => {
+  const uri = formatURI(query, params || {}, endpoint);
+
+  try {
+    const response = await postFetch(uri, {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      ...headers,
+    }, (() => {
+      const searchParams = new URLSearchParams();
+
+      Object.entries(variables).forEach(([key, value]) => {
+        if (Array.isArray(value)) {
+          value.forEach(v => searchParams.append(key, v));
+        } else {
+          searchParams.append(key, value);
+        }
+      });
+
+      return searchParams.toString();
+    })(), signal);
+
+    handleRequestError(response);
+
+    const parsedRes = await parseResponse(response);
+
+    return parsedRes;
+  } catch (error) {
+    throw new Error(error as string);
   }
 };
