@@ -252,6 +252,30 @@ export const getQualityFromStreams = (video: FilmVideoInterface, quality: string
   return quality;
 };
 
+// streams are listed from the lowest quality to the highest, so stepping down is
+// simply the previous entry. `auto` and `max` are not streams of their own - the
+// step down from them is the best concrete stream, which also pins the player to
+// a single track instead of letting it negotiate one.
+export const getLowerQuality = (video: FilmVideoInterface, quality: string): string | null => {
+  const { streams } = video;
+
+  if (!streams.length) {
+    return null;
+  }
+
+  if (quality === AUTO_QUALITY.value || quality === MAX_QUALITY.value) {
+    return streams[streams.length - 1].quality;
+  }
+
+  const index = streams.findIndex((s) => s.quality === quality);
+
+  if (index <= 0) {
+    return null;
+  }
+
+  return streams[index - 1].quality;
+};
+
 export const getPlayerStream = (video: FilmVideoInterface, quality: string) => {
   const { streams } = video;
 

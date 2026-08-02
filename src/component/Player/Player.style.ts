@@ -224,6 +224,29 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   backButtonContent: {
     padding: scale(12),
   },
+  error: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: [{ translateX: '-50%' }, { translateY: '-50%' }],
+    alignItems: 'center',
+    gap: scale(4),
+    paddingBlock: scale(12),
+    paddingInline: scale(24),
+    borderRadius: scale(12),
+    backgroundColor: colors.modal,
+    zIndex: 60,
+  },
+  errorText: {
+    fontSize: scale(text.lg.fontSize),
+    fontWeight: '700',
+    color: colors.textOnContrast,
+    textAlign: 'center',
+  },
+  errorHint: {
+    color: colors.textOnContrast,
+    textAlign: 'center',
+  },
 } satisfies ThemedStyles);
 
 export type MiddleActionVariant = 'big' | 'small';

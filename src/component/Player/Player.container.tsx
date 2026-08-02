@@ -45,6 +45,7 @@ import {
   getExternalSubtitles,
   getFirestoreSavedTime,
   getFirestoreVideoTime,
+  getLowerQuality,
   getPlayerMetadata,
   getPlayerQuality,
   getPlayerStream,
@@ -126,6 +127,7 @@ export function PlayerContainer({
   const [isFilmBookmarked, setIsFilmBookmarked] = useState<boolean>(isBookmarked(film));
   const [videoSize, setVideoSize] = useState<{ width: number; height: number } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [playbackFailed, setPlaybackFailed] = useState(false);
 
   const stopEventsRef = useRef<boolean>(false);
   const updateTimeTimeout = useRef<number | null>(null);
@@ -234,6 +236,11 @@ export function PlayerContainer({
   });
 
   const { status, isPlaying } = useVideoPlayerState(player);
+
+  // the native player reports every failure as an error status, so a player that
+  // is playable again - the lower quality took over, or the source recovered on
+  // its own - has nothing left to tell the user about
+  const hasPlaybackError = playbackFailed && status !== 'readyToPlay';
 
   const updateTime = useCallback(() => {
     const { currentTime, duration } = player;
@@ -356,6 +363,10 @@ export function PlayerContainer({
     qualityArg: string,
     voiceArg: FilmVoiceInterface
   ) => {
+    // a new source gets its own chance to load - whatever failed before is not
+    // the state of what is about to play
+    setPlaybackFailed(false);
+
     if (qualityArg === AUTO_QUALITY.value) {
       // temporary solution
       // unfortunately it doesn't work because player loading becomes stuck
@@ -545,9 +556,35 @@ export function PlayerContainer({
     onPlaybackEnd(currentTime, duration);
   });
 
-  useEvent(player, 'onError', (error: VideoRuntimeError) => {
-    NotificationStore.displayError(`An error occurred : ${error?.message}`);
-  });
+  /**
+   * A stream can fail because the device (or the connection) cannot carry it,
+   * so before telling the user anything the next lower quality is given a try.
+   * Every failure steps one quality down until the lowest one is reached, and
+   * only then the error is shown. Downloaded files have nothing to fall back to.
+   */
+  const handlePlaybackError = (error: VideoRuntimeError) => {
+    // the message is for the log only, the user gets a plain text instead
+    console.error('Player error:', error?.message);
+
+    const lowerQuality = !isOffline ? getLowerQuality(selectedVideo, selectedQuality) : null;
+
+    if (!lowerQuality) {
+      setPlaybackFailed(true);
+
+      return;
+    }
+
+    NotificationStore.displayMessage(t('Playback error, switching to a lower quality'));
+
+    // the fallback is not persisted through `playerSaveQuality` on purpose - it
+    // is a recovery for this playback, not a quality the user picked
+    setSelectedQuality(lowerQuality);
+    setOverlayQuality(lowerQuality);
+
+    updatePlayerStream(selectedVideo, lowerQuality, selectedVoice);
+  };
+
+  useEvent(player, 'onError', handlePlaybackError);
 
   // headphones pulled out or a bluetooth headset walking out of range - carrying
   // on would blast the film out of the device speaker
@@ -575,6 +612,7 @@ export function PlayerContainer({
   }, []);
 
   useEvent(player, 'onLoad', ({ width, height }) => {
+    setPlaybackFailed(false);
     updateVideoSize(width, height);
     applySubtitle(selectedSubtitle);
   });
@@ -825,6 +863,7 @@ export function PlayerContainer({
     isOffline,
     overlayQuality,
     isLoading,
+    hasPlaybackError,
     togglePlayPause,
     rewindPosition,
     seekToPosition,

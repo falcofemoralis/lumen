@@ -89,6 +89,7 @@ export function PlayerComponent({
   overlayQuality,
   selectedAspectRatio,
   isLoading,
+  hasPlaybackError,
   togglePlayPause,
   rewindPosition,
   openQualitySelector,
@@ -540,10 +541,27 @@ export function PlayerComponent({
 
   const renderLoader = () => (
     <Loader
-      isLoading={ isLoading || status === 'loading' }
+      isLoading={ !hasPlaybackError && (isLoading || status === 'loading') }
       fullScreen
     />
   );
+
+  const renderError = () => {
+    if (!hasPlaybackError) {
+      return null;
+    }
+
+    return (
+      <View style={ styles.error }>
+        <ThemedText style={ styles.errorText }>
+          { t('Failed to load the video') }
+        </ThemedText>
+        <ThemedText style={ styles.errorHint }>
+          { t('Check your connection or try another quality') }
+        </ThemedText>
+      </View>
+    );
+  };
 
   const renderQualitySelector = () => {
     return (
@@ -666,6 +684,7 @@ export function PlayerComponent({
       { renderBackground() }
       { renderControls() }
       { renderLoader() }
+      { renderError() }
       { renderModals() }
     </Animated.View>
   );

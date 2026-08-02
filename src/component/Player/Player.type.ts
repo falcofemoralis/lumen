@@ -49,6 +49,7 @@ export interface PlayerComponentProps {
   isOffline?: boolean;
   overlayQuality: string;
   isLoading: boolean;
+  hasPlaybackError: boolean;
   togglePlayPause: (state?: boolean, stopEvents?: boolean) => void;
   rewindPosition: (type: RewindDirection, seconds: number) => void;
   seekToPosition: (percent: number) => void;

@@ -106,4 +106,27 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     textAlign: 'right',
     color: colors.textOnContrast,
   },
+  error: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: [{ translateX: '-50%' }, { translateY: '-50%' }],
+    alignItems: 'center',
+    gap: scale(8),
+    paddingBlock: scale(16),
+    paddingInline: scale(32),
+    borderRadius: scale(12),
+    backgroundColor: colors.modal,
+    zIndex: 3,
+  },
+  errorText: {
+    fontSize: scale(text.xl.fontSize),
+    color: colors.textOnContrast,
+    textAlign: 'center',
+  },
+  errorHint: {
+    fontSize: scale(text.md.fontSize),
+    color: colors.textOnContrast,
+    textAlign: 'center',
+  },
 } satisfies ThemedStyles);
