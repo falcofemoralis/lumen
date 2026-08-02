@@ -824,8 +824,8 @@ export function PlayerContainer({
   };
 
   const onBookmarkChange = (f: FilmInterface) => {
-    // BookmarksOverlay edits the very film object it was handed, so there is
-    // nothing to copy over - only the derived flag has to catch up
+    // BookmarksOverlay hands back a copy of the film with the updated categories and
+    // keeps its own checked state, so only the derived flag has to catch up here
     setIsFilmBookmarked(isBookmarked(f));
   };
 

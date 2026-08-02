@@ -3,6 +3,7 @@ import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useLocalBookmarks } from 'Hooks/useLocalLibrary';
 import { t } from 'i18n/translate';
+import { useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
 import { filmToFilmCard } from 'Util/Film';
 import { createLocalCategory, toggleLocalBookmark } from 'Util/LocalLibrary';
@@ -23,6 +24,16 @@ export const BookmarksOverlayContainer = ({
   const localBookmarks = useLocalBookmarks();
   const queryClient = useQueryClient();
 
+  // the overlay stays mounted between opens and the parent may keep handing back the same
+  // film object, so the toggles made here are remembered locally instead of mutating the prop
+  const [checkedOverrides, setCheckedOverrides] = useState<Record<string, boolean>>({});
+  const [syncedFilmId, setSyncedFilmId] = useState(film.id);
+
+  if (syncedFilmId !== film.id) {
+    setSyncedFilmId(film.id);
+    setCheckedOverrides({});
+  }
+
   const { mutate: toggleBookmark, isPending: isLoading } = useMutation({
     mutationFn: ({ bookmarkId, isChecked }: { bookmarkId: string, isChecked: boolean }) => {
       const { id } = film;
@@ -32,11 +43,14 @@ export const BookmarksOverlayContainer = ({
         : currentService.removeBookmark(id, bookmarkId);
     },
     onSuccess: (_result, { bookmarkId, isChecked }) => {
-      const bk = film.bookmarks?.findIndex((b) => b.id === bookmarkId) ?? -1;
+      const { bookmarks } = film;
 
-      if (bk !== -1 && film.bookmarks) {
-        film.bookmarks[bk].isBookmarked = isChecked;
-        onBookmarkChange?.(film);
+      if (bookmarks?.some((b) => b.id === bookmarkId)) {
+        setCheckedOverrides((prev) => ({ ...prev, [bookmarkId]: isChecked }));
+        onBookmarkChange?.({
+          ...film,
+          bookmarks: bookmarks.map((b) => (b.id === bookmarkId ? { ...b, isBookmarked: isChecked } : b)),
+        });
       }
 
       // the bookmarks tab lists the same categories, so it has to re-read them
@@ -80,7 +94,7 @@ export const BookmarksOverlayContainer = ({
     return bookmarks.map((bookmark) => ({
       label: bookmark.title,
       value: bookmark.id,
-      isChecked: bookmark.isBookmarked ?? false,
+      isChecked: checkedOverrides[bookmark.id] ?? bookmark.isBookmarked ?? false,
     }));
   };
 

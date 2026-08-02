@@ -35,7 +35,7 @@ import MessageSquareText from 'lucide-react-native/icons/message-square-text';
 import Play from 'lucide-react-native/icons/play';
 import ShieldOff from 'lucide-react-native/icons/shield-off';
 import Star from 'lucide-react-native/icons/star';
-import { ComponentType, useRef } from 'react';
+import { ComponentType, useCallback, useRef } from 'react';
 import {
   ScrollView,
   Text,
@@ -51,6 +51,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from 'Theme/context';
+import { ThemedStyles } from 'Theme/types';
 import { CollectionItemInterface } from 'Type/CollectionItem';
 import { RatingInterface } from 'Type/Rating.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
@@ -61,6 +62,42 @@ import { openLinkInBrowser } from 'Util/Link';
 import { componentStyles } from './FilmScreen.style';
 import { FilmScreenThumbnail } from './FilmScreen.thumbnail';
 import { FilmScreenComponentProps } from './FilmScreen.type';
+
+// a real component rather than a render helper: it takes an `action` that reads a bottom
+// sheet ref, and a ref-reading closure may only travel as a prop, never as a call argument
+const MiddleAction = ({
+  styles,
+  IconComponent,
+  action,
+  disabled,
+}: {
+  styles: ThemedStyles<typeof componentStyles>;
+  IconComponent: ComponentType<any>;
+  action?: () => void;
+  disabled?: boolean;
+}) => {
+  const { scale, theme } = useAppTheme();
+
+  return (
+    <View style={ styles.middleAction }>
+      <ThemedPressable
+        style={ [
+          styles.middleActionButton,
+          disabled && styles.middleActionButtonDisabled,
+        ] }
+        contentStyle={ styles.middleActionContent }
+        onPress={ action }
+        disabled={ disabled }
+      >
+        <IconComponent
+          style={ styles.middleActionIcon }
+          size={ scale(20) }
+          color={ theme.colors.icon }
+        />
+      </ThemedPressable>
+    </View>
+  );
+};
 
 export function FilmScreenComponent({
   film,
@@ -120,6 +157,15 @@ export function FilmScreenComponent({
     };
   });
 
+  // kept as callbacks so the sheet refs are only read on press, never while rendering
+  const openComments = useCallback(() => {
+    commentsRef.current?.present();
+  }, []);
+
+  const openSchedule = useCallback(() => {
+    scheduleRef.current?.present();
+  }, []);
+
   if (!film) {
     return (
       <Page>
@@ -127,14 +173,6 @@ export function FilmScreenComponent({
       </Page>
     );
   }
-
-  const openComments = () => {
-    commentsRef.current?.present();
-  };
-
-  const openSchedule = () => {
-    scheduleRef.current?.present();
-  };
 
   const renderTitle = () => {
     const { title, originalTitle } = film;
@@ -253,38 +291,36 @@ export function FilmScreenComponent({
     );
   };
 
-  const renderMiddleAction = (
-    IconComponent: ComponentType<any>,
-    text: string,
-    action?: () => void,
-    disabled?: boolean
-  ) => (
-    <View style={ styles.middleAction }>
-      <ThemedPressable
-        style={ [
-          styles.middleActionButton,
-          disabled && styles.middleActionButtonDisabled,
-        ] }
-        contentStyle={ styles.middleActionContent }
-        onPress={ action }
-        disabled={ disabled }
-      >
-        <IconComponent
-          style={ styles.middleActionIcon }
-          size={ scale(20) }
-          color={ theme.colors.icon }
-        />
-      </ThemedPressable>
-    </View>
-  );
-
   const renderMiddleActions = () => (
     <View style={ styles.middleActions }>
-      { isSignedIn && renderMiddleAction(Star, 'Rate', openRatingOverlay, film.isRatingPosted) }
-      { renderMiddleAction(Clapperboard, 'Trailer', openTrailerOverlay) }
-      { renderMiddleAction(MessageSquareText, 'Comments', openComments) }
-      { renderMiddleAction(isBookmarked(film) ? BookmarkCheck : Bookmark, 'Bookmark', openBookmarks) }
-      { renderMiddleAction(Download, 'Download', openVideoDownloader) }
+      { isSignedIn && (
+        <MiddleAction
+          styles={ styles }
+          IconComponent={ Star }
+          action={ openRatingOverlay }
+          disabled={ film.isRatingPosted }
+        />
+      ) }
+      <MiddleAction
+        styles={ styles }
+        IconComponent={ Clapperboard }
+        action={ openTrailerOverlay }
+      />
+      <MiddleAction
+        styles={ styles }
+        IconComponent={ MessageSquareText }
+        action={ openComments }
+      />
+      <MiddleAction
+        styles={ styles }
+        IconComponent={ isBookmarked(film) ? BookmarkCheck : Bookmark }
+        action={ openBookmarks }
+      />
+      <MiddleAction
+        styles={ styles }
+        IconComponent={ Download }
+        action={ openVideoDownloader }
+      />
     </View>
   );
 

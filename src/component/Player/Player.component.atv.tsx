@@ -32,6 +32,7 @@ import SkipBack from 'lucide-react-native/icons/skip-back';
 import SkipForward from 'lucide-react-native/icons/skip-forward';
 import Undo2 from 'lucide-react-native/icons/undo-2';
 import {
+  ComponentProps,
   ComponentType,
   useCallback,
   useEffect,
@@ -66,6 +67,56 @@ import { PlayerComponentProps } from './Player.type';
 const TOP_ACTION_FOCUS_KEY = 'player-top-action';
 const PROGRESS_THUMB_FOCUS_KEY = 'player-progress-thumb';
 const BOTTOM_ACTION_FOCUS_KEY = 'player-bottom-action';
+
+// a real component rather than a render helper, so that handlers reach it as props
+// instead of as call arguments (see react-hooks/refs)
+const PlayerAction = ({
+  IconComponent,
+  el,
+  action,
+  focusKey,
+}: {
+  IconComponent: ComponentType<any>;
+  el: FocusedElement;
+  action?: () => void;
+  focusKey?: string;
+}) => {
+  const { scale, theme } = useAppTheme();
+  const styles = useThemedStyles(componentStyles);
+  const { updateFocusedElement } = usePlayerContext();
+
+  return (
+    <ThemedPressable
+      focusKey={ focusKey }
+      onPress={ action }
+      onFocus={ () => updateFocusedElement(el) }
+    >
+      { ({ isFocused }) => (
+        <View
+          style={ [
+            styles.action,
+            isFocused && styles.focusedAction,
+          ] }
+        >
+          <IconComponent
+            size={ scale(26) }
+            color={ theme.colors.iconOnContrast }
+          />
+        </View>
+      ) }
+    </ThemedPressable>
+  );
+};
+
+type PlayerRowActionProps = Omit<ComponentProps<typeof PlayerAction>, 'el'>;
+
+const PlayerTopAction = (props: PlayerRowActionProps) => (
+  <PlayerAction { ...props } el={ FocusedElement.TOP_ACTION } />
+);
+
+const PlayerBottomAction = (props: PlayerRowActionProps) => (
+  <PlayerAction { ...props } el={ FocusedElement.BOTTOM_ACTION } />
+);
 
 export function PlayerComponent({
   player,
@@ -111,7 +162,7 @@ export function PlayerComponent({
   handleAspectRatioChange,
 }: PlayerComponentProps) {
   const { playerStopPlayOnButtonTV, playerStopPlayShowInterfaceTV } = useConfigContext();
-  const { scale, theme } = useAppTheme();
+  const { theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
   const { focusedElement, updateFocusedElement } = usePlayerContext();
   const [showControls, setShowControls] = useState(false);
@@ -379,44 +430,6 @@ export function PlayerComponent({
     );
   };
 
-  const renderAction = (
-    IconComponent: ComponentType<any>,
-    el: FocusedElement,
-    action?: () => void,
-    focusKey?: string
-  ) => (
-    <ThemedPressable
-      focusKey={ focusKey }
-      onPress={ action }
-      onFocus={ () => updateFocusedElement(el) }
-    >
-      { ({ isFocused }) => (
-        <View
-          style={ [
-            styles.action,
-            isFocused && styles.focusedAction,
-          ] }
-        >
-          <IconComponent
-            size={ scale(26) }
-            color={ theme.colors.iconOnContrast }
-          />
-        </View>
-      ) }
-    </ThemedPressable>
-  );
-
-  const renderTopAction = (
-    icon: ComponentType<any>,
-    action?: () => void,
-    focusKey?: string
-  ) => renderAction(
-    icon,
-    FocusedElement.TOP_ACTION,
-    action,
-    focusKey
-  );
-
   const renderTopActionLine = () => {
     return (
       <View style={ styles.topActionLine }>
@@ -429,17 +442,6 @@ export function PlayerComponent({
     );
   };
 
-  const renderBottomAction = (
-    icon: ComponentType<any>,
-    action?: () => void,
-    focusKey?: string
-  ) => renderAction(
-    icon,
-    FocusedElement.BOTTOM_ACTION,
-    action,
-    focusKey
-  );
-
   const renderTopActions = () => (
     <View
       style={ {
@@ -449,16 +451,37 @@ export function PlayerComponent({
     >
       <FocusContext.Provider value={ topRowFocusKey }>
         <View ref={ topRowRef } style={ styles.controlsRow }>
-          { renderTopAction(isPlaying || status === 'loading' ? Pause : Play, togglePlayPause, TOP_ACTION_FOCUS_KEY) }
+          <PlayerTopAction
+            IconComponent={ isPlaying || status === 'loading' ? Pause : Play }
+            action={ togglePlayPause }
+            focusKey={ TOP_ACTION_FOCUS_KEY }
+          />
           { film.hasSeasons && (
             <>
-              { renderTopAction(SkipBack, () => handleNewEpisode(RewindDirection.BACKWARD)) }
-              { renderTopAction(SkipForward, () => handleNewEpisode(RewindDirection.FORWARD)) }
+              <PlayerTopAction
+                IconComponent={ SkipBack }
+                action={ () => handleNewEpisode(RewindDirection.BACKWARD) }
+              />
+              <PlayerTopAction
+                IconComponent={ SkipForward }
+                action={ () => handleNewEpisode(RewindDirection.FORWARD) }
+              />
             </>
           ) }
-          { renderTopAction(Gauge, openSpeedSelector) }
-          { !isOffline && renderTopAction(MessageSquareText, handleOpenComments) }
-          { renderTopAction(Undo2, backwardToStart) }
+          <PlayerTopAction
+            IconComponent={ Gauge }
+            action={ openSpeedSelector }
+          />
+          { !isOffline && (
+            <PlayerTopAction
+              IconComponent={ MessageSquareText }
+              action={ handleOpenComments }
+            />
+          ) }
+          <PlayerTopAction
+            IconComponent={ Undo2 }
+            action={ backwardToStart }
+          />
         </View>
       </FocusContext.Provider>
       { renderTopActionLine() }
@@ -503,15 +526,35 @@ export function PlayerComponent({
               ...(hideActions ? styles.controlsRowHidden : {}),
             } }
           >
-            { renderBottomAction(Settings2, openQualitySelector, BOTTOM_ACTION_FOCUS_KEY) }
-            { isPlaylistSelector && renderBottomAction(ListVideo, openVideoSelector) }
-            { subtitles.length > 0 && renderBottomAction(
-              // eslint-disable-next-line max-len
-              !selectedSubtitle?.languageCode ? ClosedCaption : ClosedCaptionFilled({ color: theme.colors.iconOnContrast }),
-              openSubtitleSelector
+            <PlayerBottomAction
+              IconComponent={ Settings2 }
+              action={ openQualitySelector }
+              focusKey={ BOTTOM_ACTION_FOCUS_KEY }
+            />
+            { isPlaylistSelector && (
+              <PlayerBottomAction
+                IconComponent={ ListVideo }
+                action={ openVideoSelector }
+              />
             ) }
-            { !isOffline && renderBottomAction(isFilmBookmarked ? BookmarkCheck : Bookmark, openBookmarksOverlay) }
-            { renderBottomAction(Maximize2, handleAspectRatioChange) }
+            { subtitles.length > 0 && (
+              <PlayerBottomAction
+                IconComponent={ !selectedSubtitle?.languageCode
+                  ? ClosedCaption
+                  : ClosedCaptionFilled({ color: theme.colors.iconOnContrast }) }
+                action={ openSubtitleSelector }
+              />
+            ) }
+            { !isOffline && (
+              <PlayerBottomAction
+                IconComponent={ isFilmBookmarked ? BookmarkCheck : Bookmark }
+                action={ openBookmarksOverlay }
+              />
+            ) }
+            <PlayerBottomAction
+              IconComponent={ Maximize2 }
+              action={ handleAspectRatioChange }
+            />
           </View>
         </FocusContext.Provider>
         { renderDuration() }

@@ -74,6 +74,35 @@ import {
 import { componentStyles, MiddleActionVariant } from './Player.style';
 import { DoubleTapAction, PlayerComponentProps } from './Player.type';
 
+// a real component rather than a render helper, so that handlers reach it as props
+// instead of as call arguments (see react-hooks/refs)
+const PlayerAction = ({
+  IconComponent,
+  action,
+  onInteraction,
+}: {
+  IconComponent: ComponentType<any>;
+  action?: () => void;
+  onInteraction: (action?: () => void) => void;
+}) => {
+  const { scale, theme } = useAppTheme();
+  const styles = useThemedStyles(componentStyles);
+
+  return (
+    <GestureDetector gesture={ Gesture.Tap() }>
+      <ThemedPressable
+        style={ styles.action }
+        onPress={ () => onInteraction(action) }
+      >
+        <IconComponent
+          size={ scale(28) }
+          color={ theme.colors.iconOnContrast }
+        />
+      </ThemedPressable>
+    </GestureDetector>
+  );
+};
+
 export function PlayerComponent({
   player,
   status,
@@ -279,23 +308,6 @@ export function PlayerComponent({
     setTimeout(enterPictureInPicture, 0);
   };
 
-  const renderAction = (
-    IconComponent: ComponentType<any>,
-    action?: () => void
-  ) => (
-    <GestureDetector gesture={ Gesture.Tap() }>
-      <ThemedPressable
-        style={ styles.action }
-        onPress={ () => handleUserInteraction(action) }
-      >
-        <IconComponent
-          size={ scale(28) }
-          color={ theme.colors.iconOnContrast }
-        />
-      </ThemedPressable>
-    </GestureDetector>
-  );
-
   const renderBackButton = () => (
     <View style={ styles.backButtonContainer }>
       <ThemedPressable
@@ -360,10 +372,14 @@ export function PlayerComponent({
       return null;
     }
 
-    return renderAction(
-
-      !selectedSubtitle?.languageCode ? ClosedCaption : ClosedCaptionFilled({ color: theme.colors.iconOnContrast }),
-      openSubtitleSelector
+    return (
+      <PlayerAction
+        IconComponent={ !selectedSubtitle?.languageCode
+          ? ClosedCaption
+          : ClosedCaptionFilled({ color: theme.colors.iconOnContrast }) }
+        action={ openSubtitleSelector }
+        onInteraction={ handleUserInteraction }
+      />
     );
   };
 
@@ -377,12 +393,30 @@ export function PlayerComponent({
             isLocked && styles.actionsRowDisabled,
           ] }
         >
-          { isPipSupported && renderAction(PictureInPicture2, enablePIP) }
-          { renderAction(Gauge, openSpeedSelector) }
-          { renderAction(Settings2, openQualitySelector) }
+          { isPipSupported && (
+            <PlayerAction
+              IconComponent={ PictureInPicture2 }
+              action={ enablePIP }
+              onInteraction={ handleUserInteraction }
+            />
+          ) }
+          <PlayerAction
+            IconComponent={ Gauge }
+            action={ openSpeedSelector }
+            onInteraction={ handleUserInteraction }
+          />
+          <PlayerAction
+            IconComponent={ Settings2 }
+            action={ openQualitySelector }
+            onInteraction={ handleUserInteraction }
+          />
           { renderSubtitlesActions() }
         </View>
-        { renderAction(!isLocked ? LockKeyholeOpen : LockKeyhole, handleLockControls) }
+        <PlayerAction
+          IconComponent={ !isLocked ? LockKeyholeOpen : LockKeyhole }
+          action={ handleLockControls }
+          onInteraction={ handleUserInteraction }
+        />
       </View>
     </View>
   );
@@ -484,11 +518,39 @@ export function PlayerComponent({
               isLocked && styles.bottomActionsRowLocked,
             ] }
           >
-            { isPlaylistSelector && renderAction(ListVideo, openVideoSelector) }
-            { !isOffline && renderAction(MessageSquareText, handleOpenComments) }
-            { !isOffline && renderAction(isFilmBookmarked ? BookmarkCheck : Bookmark, openBookmarksOverlay) }
-            { !isOffline && renderAction(Forward, handleShare) }
-            { renderAction(Maximize2, handleAspectRatioChange) }
+            { isPlaylistSelector && (
+              <PlayerAction
+                IconComponent={ ListVideo }
+                action={ openVideoSelector }
+                onInteraction={ handleUserInteraction }
+              />
+            ) }
+            { !isOffline && (
+              <PlayerAction
+                IconComponent={ MessageSquareText }
+                action={ handleOpenComments }
+                onInteraction={ handleUserInteraction }
+              />
+            ) }
+            { !isOffline && (
+              <PlayerAction
+                IconComponent={ isFilmBookmarked ? BookmarkCheck : Bookmark }
+                action={ openBookmarksOverlay }
+                onInteraction={ handleUserInteraction }
+              />
+            ) }
+            { !isOffline && (
+              <PlayerAction
+                IconComponent={ Forward }
+                action={ handleShare }
+                onInteraction={ handleUserInteraction }
+              />
+            ) }
+            <PlayerAction
+              IconComponent={ Maximize2 }
+              action={ handleAspectRatioChange }
+              onInteraction={ handleUserInteraction }
+            />
           </View>
         </View>
       </View>

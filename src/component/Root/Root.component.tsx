@@ -2,7 +2,6 @@ import {
   completeHandler,
   getExistingDownloadTasks,
 } from '@kesha-antonov/react-native-background-downloader';
-import { init } from '@noriginmedia/norigin-spatial-navigation-core';
 import { AppUpdater } from 'Component/AppUpdater';
 import { Portal } from 'Component/ThemedPortal';
 import { useAppUpdaterContext } from 'Context/AppUpdaterContext';

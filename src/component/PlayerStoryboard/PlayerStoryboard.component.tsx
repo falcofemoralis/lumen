@@ -85,34 +85,40 @@ const PlayerStoryboardComponent = ({
 }: PlayerStoryboardComponentProps) => {
   const [storyboard, setStoryboard] = useState<VTTItem[] | null>([]);
   const [img, setImg] = useState<string>('');
+  const [syncedUrl, setSyncedUrl] = useState<string>(storyboardUrl);
 
-  const updateImg = (newImg: string) => {
-    if (newImg !== img) {
-      setImg(newImg);
-    }
-  };
+  // a new storyboard invalidates both the parsed cues and the tile currently on screen
+  const isUrlStale = syncedUrl !== storyboardUrl;
+
+  if (isUrlStale) {
+    setSyncedUrl(storyboardUrl);
+    setStoryboard([]);
+    setImg('');
+  }
 
   useEffect(() => {
-    updateImg('');
+    let isCancelled = false;
 
     storyboardParser(storyboardUrl).then((parsedStoryboard) => {
-      setStoryboard(parsedStoryboard);
+      if (!isCancelled) {
+        setStoryboard(parsedStoryboard);
+      }
     });
+
+    return () => {
+      isCancelled = true;
+    };
   }, [storyboardUrl]);
 
-  useEffect(() => {
-    if (!storyboard) {
-      return;
-    }
+  // the tile is derived from the cues plus the playhead, so pick it during render and
+  // keep the previous one whenever no cue covers the current time
+  const item = isUrlStale
+    ? undefined
+    : storyboard?.find(({ start, end }) => currentTime >= start && currentTime <= end);
 
-    const item = storyboard.find((
-      { start, end }
-    ) => currentTime >= start && currentTime <= end);
-
-    if (item) {
-      updateImg(item.part.trim());
-    }
-  }, [currentTime]);
+  if (item && item.part.trim() !== img) {
+    setImg(item.part.trim());
+  }
 
   return (
     <View style={ style }>

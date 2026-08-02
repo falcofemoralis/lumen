@@ -374,7 +374,6 @@ export const DownloadsScreenComponent = (props: DownloadsScreenComponentProps) =
     isLoading,
     handleRefresh,
   } = props;
-  const { scale } = useAppTheme();
   const { top } = useSafeAreaInsets();
   const styles = useThemedStyles(componentStyles);
 

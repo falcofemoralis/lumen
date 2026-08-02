@@ -1,4 +1,4 @@
-import { FunctionComponent, useState } from 'react';
+import { FunctionComponent } from 'react';
 import {
   Animated,
   type ImageStyle,
@@ -32,23 +32,7 @@ const Star: FunctionComponent<StarProps> = ({
   position = 1,
   starSelectedInPosition = () => {},
 }) => {
-  const [selected, setSelected] = useState<boolean>(false);
   const springValue = new Animated.Value(1);
-
-  const spring = () => {
-    springValue.setValue(1.2);
-
-    Animated.spring(springValue, {
-      toValue: 1,
-      friction: 2,
-      tension: 1,
-      useNativeDriver: true,
-    }).start();
-
-    setSelected(!selected);
-
-    starSelectedInPosition(position);
-  };
 
   const starSource =
     fill && selectedColor === null ? STAR_SELECTED_IMAGE : starImage;

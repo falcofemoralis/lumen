@@ -6,7 +6,6 @@ import { Thumbnail } from 'Component/Thumbnail';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { View } from 'react-native';
 import { useAppTheme } from 'Theme/context';
-import { ActorInterface } from 'Type/Actor.interface';
 
 import { componentStyles } from './ActorScreen.style.atv';
 import { ActorScreenComponentProps } from './ActorScreen.type';
@@ -19,8 +18,26 @@ export function ActorScreenComponent({
   const { scale } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
 
-  if (!actor) {
-    actor = null as unknown as ActorInterface; // dirty hack to avoid null checks
+  if (!actor || isLoading) {
+    return (
+      <Page>
+        <View style={ styles.mainContent }>
+          <Thumbnail
+            style={ styles.photo }
+          />
+          <View style={ [styles.additionalInfo, { marginTop: 0 }] }>
+            { Array(5).fill(0).map((_, i) => (
+              <Thumbnail
+              // eslint-disable-next-line react/no-array-index-key
+                key={ `$actor-thumb-${i}` }
+                height={ scale(32) }
+                width={ scale(200) }
+              />
+            )) }
+          </View>
+        </View>
+      </Page>
+    );
   }
 
   const renderPhoto = () => {

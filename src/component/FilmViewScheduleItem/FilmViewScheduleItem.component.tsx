@@ -6,7 +6,6 @@ import CircleCheck from 'lucide-react-native/icons/circle-check';
 import {
   memo,
   useCallback,
-  useEffect,
   useState,
 } from 'react';
 import { View } from 'react-native';
@@ -33,14 +32,14 @@ export function FilmViewScheduleItemComponent({
   const { scale, theme } = useAppTheme();
   const [isLoading, setIsLoading] = useState(false);
   const [isChecked, setIsChecked] = useState(isWatched);
+  const [syncedIsWatched, setSyncedIsWatched] = useState(isWatched);
 
-  useEffect(() => {
-    if (!useInternalState) {
-      return;
-    }
-
+  // the prop is the source of truth, `isChecked` only holds the optimistic press state,
+  // so re-sync during render whenever the item comes back with a new watched flag
+  if (syncedIsWatched !== isWatched) {
+    setSyncedIsWatched(isWatched);
     setIsChecked(isWatched);
-  }, [isWatched]);
+  }
 
   const handlePress = useCallback(async () => {
     setIsLoading(true);

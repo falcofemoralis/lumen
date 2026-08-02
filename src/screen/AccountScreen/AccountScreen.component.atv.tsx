@@ -23,6 +23,46 @@ import { AccountScreenComponentProps } from './AccountScreen.type';
 const GUEST_DOWNLOADS_FOCUS_KEY = 'ACCOUNT_GUEST_DOWNLOADS';
 const DEFAULT_ACTION_FOCUS_KEY = 'ACCOUNT_DEFAULT_ACTION';
 
+// a real component rather than a render helper, so that handlers reach it as props
+// instead of as call arguments (see react-hooks/refs)
+const AccountActionButton = ({
+  title,
+  IconComponent,
+  action,
+  style,
+  textStyle,
+  iconStyle,
+  isDefault = false,
+}: {
+  title: string;
+  IconComponent: ComponentType<any>;
+  action: () => void;
+  style?: StyleProp<ViewStyle>;
+  textStyle?: StyleProp<TextStyle>;
+  iconStyle?: StyleProp<any>;
+  isDefault?: boolean;
+}) => {
+  const { scale } = useAppTheme();
+  const styles = useThemedStyles(componentStyles);
+
+  return (
+    <ThemedButton
+      title={ title }
+      focusKey={ isDefault ? DEFAULT_ACTION_FOCUS_KEY : undefined }
+      autofocus={ isDefault }
+      style={ [styles.profileAction, style] }
+      contentStyle={ styles.profileActionContent }
+      textStyle={ [styles.profileActionText, textStyle] }
+      iconColor={ iconStyle?.color }
+      IconComponent={ IconComponent }
+      onPress={ action }
+      iconProps={ {
+        size: scale(20),
+      } }
+    />
+  );
+};
+
 export function AccountScreenComponent({
   isSignedIn,
   profile,
@@ -102,33 +142,6 @@ export function AccountScreenComponent({
     );
   };
 
-  const renderActionButton = (
-    title: string,
-    icon: ComponentType<any>,
-    action: () => void,
-    style?: StyleProp<ViewStyle>,
-    textStyle?: StyleProp<TextStyle>,
-    iconStyle?: StyleProp<any>,
-    isDefault = false
-  ) => {
-    return (
-      <ThemedButton
-        title={ title }
-        focusKey={ isDefault ? DEFAULT_ACTION_FOCUS_KEY : undefined }
-        autofocus={ isDefault }
-        style={ [styles.profileAction, style] }
-        contentStyle={ styles.profileActionContent }
-        textStyle={ [styles.profileActionText, textStyle] }
-        iconColor={ iconStyle?.color }
-        IconComponent={ icon }
-        onPress={ action }
-        iconProps={ {
-          size: scale(20),
-        } }
-      />
-    );
-  };
-
   const renderActions = () => {
     const { premiumDays = 0 } = profile ?? {};
 
@@ -142,12 +155,35 @@ export function AccountScreenComponent({
         containerStyle={ styles.profileActionsContainer }
         preferredChildFocusKey={ DEFAULT_ACTION_FOCUS_KEY }
       >
-        { /* eslint-disable-next-line max-len */ }
-        { renderActionButton(premiumDays > 0 ? t('Renew subscription') : t('Get subscription'), Star, handleViewPayments, styles.premiumButton, styles.premiumButtonText, styles.premiumButtonIcon) }
-        { renderActionButton(t('Downloads'), Download, openDownloads, undefined, undefined, undefined, true) }
-        { renderActionButton(t('Comments'), MessageSquareText, openNotImplemented) }
-        { renderActionButton(t('View Profile'), Star, handleViewProfile) }
-        { renderActionButton(t('Log out'), LogOut, handleLogout) }
+        <AccountActionButton
+          title={ premiumDays > 0 ? t('Renew subscription') : t('Get subscription') }
+          IconComponent={ Star }
+          action={ handleViewPayments }
+          style={ styles.premiumButton }
+          textStyle={ styles.premiumButtonText }
+          iconStyle={ styles.premiumButtonIcon }
+        />
+        <AccountActionButton
+          isDefault
+          title={ t('Downloads') }
+          IconComponent={ Download }
+          action={ openDownloads }
+        />
+        <AccountActionButton
+          title={ t('Comments') }
+          IconComponent={ MessageSquareText }
+          action={ openNotImplemented }
+        />
+        <AccountActionButton
+          title={ t('View Profile') }
+          IconComponent={ Star }
+          action={ handleViewProfile }
+        />
+        <AccountActionButton
+          title={ t('Log out') }
+          IconComponent={ LogOut }
+          action={ handleLogout }
+        />
       </ThemedScrollView>
     );
   };

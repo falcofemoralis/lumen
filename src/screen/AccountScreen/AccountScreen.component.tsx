@@ -25,6 +25,42 @@ import { useAppTheme } from 'Theme/context';
 import { componentStyles } from './AccountScreen.style';
 import { AccountScreenComponentProps } from './AccountScreen.type';
 
+// a real component rather than a render helper, so that handlers reach it as props
+// instead of as call arguments (see react-hooks/refs)
+const AccountActionButton = ({
+  title,
+  IconComponent,
+  action,
+  style,
+  textStyle,
+  iconStyle,
+}: {
+  title: string;
+  IconComponent: ComponentType<any>;
+  action: () => void;
+  style?: StyleProp<ViewStyle>;
+  textStyle?: StyleProp<TextStyle>;
+  iconStyle?: StyleProp<any>;
+}) => {
+  const { scale, theme } = useAppTheme();
+  const styles = useThemedStyles(componentStyles);
+
+  return (
+    <ThemedButton
+      title={ title }
+      style={ [styles.profileAction, style] }
+      contentStyle={ styles.profileActionContent }
+      textStyle={ [styles.profileActionText, textStyle] }
+      IconComponent={ IconComponent }
+      onPress={ action }
+      iconProps={ {
+        size: scale(20),
+        color: iconStyle ? iconStyle.color : theme.colors.icon,
+      } }
+    />
+  );
+};
+
 export function AccountScreenComponent({
   isSignedIn,
   isLocalLibrary,
@@ -125,30 +161,6 @@ export function AccountScreenComponent({
     );
   };
 
-  const renderActionButton = (
-    title: string,
-    icon: ComponentType<any>,
-    action: () => void,
-    style?: StyleProp<ViewStyle>,
-    textStyle?: StyleProp<TextStyle>,
-    iconStyle?: StyleProp<any>
-  ) => {
-    return (
-      <ThemedButton
-        title={ title }
-        style={ [styles.profileAction, style] }
-        contentStyle={ styles.profileActionContent }
-        textStyle={ [styles.profileActionText, textStyle] }
-        IconComponent={ icon }
-        onPress={ action }
-        iconProps={ {
-          size: scale(20),
-          color: iconStyle ? iconStyle.color : theme.colors.icon,
-        } }
-      />
-    );
-  };
-
   const renderNotificationButton = () => {
     const badge = badgeData[ACCOUNT_TAB] ?? 0;
 
@@ -159,7 +171,11 @@ export function AccountScreenComponent({
             { badge }
           </ThemedText>
         ) }
-        { renderActionButton(t('Notifications'), Bell, openNotifications) }
+        <AccountActionButton
+          title={ t('Notifications') }
+          IconComponent={ Bell }
+          action={ openNotifications }
+        />
       </View>
     );
   };
@@ -173,15 +189,37 @@ export function AccountScreenComponent({
           { renderPremiumBadge() }
         </View>
         <View style={ [styles.profileActionsGroup] }>
-          { /* eslint-disable-next-line max-len */ }
-          { renderActionButton(premiumDays > 0 ? t('Renew subscription') : t('Get subscription'), Star, handleViewPayments, styles.premiumButton, styles.premiumButtonText, styles.premiumButtonIcon) }
+          <AccountActionButton
+            title={ premiumDays > 0 ? t('Renew subscription') : t('Get subscription') }
+            IconComponent={ Star }
+            action={ handleViewPayments }
+            style={ styles.premiumButton }
+            textStyle={ styles.premiumButtonText }
+            iconStyle={ styles.premiumButtonIcon }
+          />
           { renderNotificationButton() }
-          { renderActionButton(t('Downloads'), Download, openDownloads) }
-          { renderActionButton(t('Comments'), MessageSquareText, openNotImplemented) }
-          { renderActionButton(t('View Profile'), Star, handleViewProfile) }
+          <AccountActionButton
+            title={ t('Downloads') }
+            IconComponent={ Download }
+            action={ openDownloads }
+          />
+          <AccountActionButton
+            title={ t('Comments') }
+            IconComponent={ MessageSquareText }
+            action={ openNotImplemented }
+          />
+          <AccountActionButton
+            title={ t('View Profile') }
+            IconComponent={ Star }
+            action={ handleViewProfile }
+          />
         </View>
         <View style={ [styles.profileActionsGroup] }>
-          { renderActionButton(t('Log out'), LogOut, handleLogout) }
+          <AccountActionButton
+            title={ t('Log out') }
+            IconComponent={ LogOut }
+            action={ handleLogout }
+          />
         </View>
       </View>
     );
@@ -193,7 +231,11 @@ export function AccountScreenComponent({
         return (
           <View style={ styles.guestContent }>
             { renderNotificationButton() }
-            { renderActionButton(t('Downloads'), Download, openDownloads) }
+            <AccountActionButton
+              title={ t('Downloads') }
+              IconComponent={ Download }
+              action={ openDownloads }
+            />
           </View>
         );
       }

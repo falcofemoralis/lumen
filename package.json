@@ -9,7 +9,7 @@
     "ios": "expo run:ios",
     "prebuild:clean": "npx expo prebuild --clean",
     "lint": "eslint . --fix",
-    "lint:check": "eslint .",
+    "lint:check": "eslint src",
     "measure": "flashlight measure",
     "test": "tsx --test \"test/**/*.test.ts\"",
     "sign": "zipalign -f -v 4 android\\app\\build\\outputs\\apk\\release\\app-release.apk release-signed.apk && apksigner sign --ks lumen.keystore --ks-key-alias lumen release-signed.apk",

@@ -1,5 +1,4 @@
 import { DownloadTask } from '@kesha-antonov/react-native-background-downloader';
-import { ThemedStyles } from 'Theme/types';
 import { DownloadFilmInterface } from 'Type/DownloadFile.interface';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
