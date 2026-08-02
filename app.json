@@ -96,13 +96,6 @@
       }
     ],
     [
-      "expo-video",
-      {
-        "supportsBackgroundPlayback": true,
-        "supportsPictureInPicture": true
-      }
-    ],
-    [
       "expo-screen-orientation",
       {
         "initialOrientation": "DEFAULT"
@@ -112,7 +105,19 @@
     "@react-native-firebase/app",
     "@kesha-antonov/react-native-background-downloader",
     "expo-image",
-    "expo-status-bar"
+    "expo-status-bar",
+    "./plugins/withVideoPlaybackService.js",
+    [
+      "react-native-video",
+      {
+        "enableAndroidPictureInPicture": true,
+        "enableBackgroundAudio": true,
+        "androidExtensions": {
+          "useExoplayerDash": true,
+          "useExoplayerHls": true
+        }
+      }
+    ]
   ],
   "experiments": {
     "tsconfigPaths": true,

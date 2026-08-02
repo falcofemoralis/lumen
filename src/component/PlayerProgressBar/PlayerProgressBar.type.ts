@@ -1,5 +1,5 @@
 import { RewindDirection } from 'Component/Player/Player.config';
-import { VideoPlayer } from 'expo-video';
+import { VideoPlayer } from 'react-native-video';
 
 export interface PlayerProgressBarContainerProps {
   player: VideoPlayer;

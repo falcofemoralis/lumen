@@ -11,11 +11,12 @@ import { ThemedPressable } from 'Component/ThemedPressable';
 import { useConfigContext } from 'Context/ConfigContext';
 import { usePlayerContext } from 'Context/PlayerContext';
 import { usePlayerProgressContext } from 'Context/PlayerProgressContext';
+import { useLatest } from 'Hooks/useLatest';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import {
   useCallback,
   useEffect,
-  useMemo,
+  useEffectEvent,
   useRef,
 } from 'react';
 import { View } from 'react-native';
@@ -83,7 +84,7 @@ export const PlayerProgressBarComponent = ({
   }, [progressStatus]);
 
   const toggleSmartSeeking = useCallback((direction: RewindDirection) => {
-    const { duration = 0, playing } = player;
+    const { duration = 0, isPlaying: playing } = player;
 
     if (smartSeekingRef.current.active) {
       smartSeekingRef.current.active = false;
@@ -190,42 +191,59 @@ export const PlayerProgressBarComponent = ({
     }
   }, [toggleSmartSeeking, rewindPosition, playerRewindSeconds]);
 
-  // Memoized remote control event listeners
-  const remoteControlListeners = useMemo(() => {
-    const keyDownListener = (type: SupportedKeys) => {
-      if (focusedElement === FocusedElement.PROGRESS_THUMB) {
-        if (type === SupportedKeys.LEFT) {
-          handleProgressThumbKeyDown(type, RewindDirection.BACKWARD);
-        }
+  // Read at call time: `progressStatus` ticks constantly, so anything the
+  // listeners close over directly would force a re-subscribe on every frame.
+  const getFocusedElement = useLatest(focusedElement);
+  const onThumbKeyDown = useEffectEvent(
+    (key: SupportedKeys, direction: RewindDirection) => handleProgressThumbKeyDown(key, direction)
+  );
+  const onThumbKeyUp = useEffectEvent(
+    (key: SupportedKeys, direction: RewindDirection) => handleProgressThumbKeyUp(key, direction)
+  );
 
-        if (type === SupportedKeys.RIGHT) {
-          handleProgressThumbKeyDown(type, RewindDirection.FORWARD);
-        }
+  // Remote control event listeners setup
+  useEffect(() => {
+    const keyDownListener = (type: SupportedKeys) => {
+      if (getFocusedElement() !== FocusedElement.PROGRESS_THUMB) {
+        return false;
+      }
+
+      if (type === SupportedKeys.LEFT) {
+        onThumbKeyDown(type, RewindDirection.BACKWARD);
+
+        // Consume the key so it never reaches the norigin layout adapter (the
+        // first listener registered, hence the last one to run). Horizontally
+        // the thumb only seeks - there is nothing to navigate to - but the
+        // action rows are merely dimmed (opacity: 0), so a geometry pass
+        // happily moves focus onto an invisible button and the thumb renders
+        // unfocused/small.
+        return true;
+      }
+
+      if (type === SupportedKeys.RIGHT) {
+        onThumbKeyDown(type, RewindDirection.FORWARD);
+
+        return true;
       }
 
       return false;
     };
 
     const keyUpListener = (type: SupportedKeys) => {
-      if (focusedElement === FocusedElement.PROGRESS_THUMB) {
-        if (type === SupportedKeys.LEFT) {
-          handleProgressThumbKeyUp(type, RewindDirection.BACKWARD);
-        }
+      if (getFocusedElement() !== FocusedElement.PROGRESS_THUMB) {
+        return false;
+      }
 
-        if (type === SupportedKeys.RIGHT) {
-          handleProgressThumbKeyUp(type, RewindDirection.FORWARD);
-        }
+      if (type === SupportedKeys.LEFT) {
+        onThumbKeyUp(type, RewindDirection.BACKWARD);
+      }
+
+      if (type === SupportedKeys.RIGHT) {
+        onThumbKeyUp(type, RewindDirection.FORWARD);
       }
 
       return false;
     };
-
-    return { keyDownListener, keyUpListener };
-  }, [focusedElement, handleProgressThumbKeyDown, handleProgressThumbKeyUp]);
-
-  // Remote control event listeners setup
-  useEffect(() => {
-    const { keyDownListener, keyUpListener } = remoteControlListeners;
 
     const remoteControlDownListener = RemoteControlManager.addKeydownListener(keyDownListener);
     const remoteControlUpListener = RemoteControlManager.addKeyupListener(keyUpListener);
@@ -234,7 +252,12 @@ export const PlayerProgressBarComponent = ({
       RemoteControlManager.removeKeydownListener(remoteControlDownListener);
       RemoteControlManager.removeKeyupListener(remoteControlUpListener);
     };
-  }, [remoteControlListeners]);
+    // Subscribe once per mount. `RemoteControlManager` dispatches newest
+    // listener first, and Player's listener (registered after ours, since
+    // parent effects run last) has to see LEFT/RIGHT before we consume it -
+    // that is what reveals the seek-only controls layout. Re-subscribing here
+    // would flip that order.
+  }, [getFocusedElement]);
 
   // Memoized thumb render to prevent unnecessary re-renders
   const renderThumb = useCallback(() => (

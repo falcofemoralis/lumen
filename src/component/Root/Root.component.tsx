@@ -12,10 +12,9 @@ import { useServiceContext } from 'Context/ServiceContext';
 import { useAwake } from 'Hooks/useAwake';
 import { ReactNode, useEffect } from 'react';
 import NotificationStore from 'Store/Notification.store';
-import { RemoteControlLayoutAdapter } from 'Util/RemoteControl/RemoteControlLayoutAdapter';
 
 export const Root = ({ children }: { children: ReactNode }) => {
-  const { checkForUpdates, isLocalLibrary, isConfigured, isTV } = useConfigContext();
+  const { checkForUpdates, isLocalLibrary } = useConfigContext();
   const { isSignedIn } = useServiceContext();
   const { fetchUserData } = useServiceContext();
   const { checkVersion } = useAppUpdaterContext();
@@ -54,14 +53,6 @@ export const Root = ({ children }: { children: ReactNode }) => {
       });
     });
   }, []);
-
-  useEffect(() => {
-    if (isTV || !isConfigured) {
-      init({
-        layoutAdapter: RemoteControlLayoutAdapter,
-      });
-    }
-  }, [isTV, isConfigured]);
 
   return (
     // App-wide portal host: the updater sits outside any Page, so its overlay

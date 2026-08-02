@@ -29,6 +29,7 @@ if (__DEV__) {
   console.error = withoutIgnored(console.error);
 }
 
+import { init } from '@noriginmedia/norigin-spatial-navigation-core';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { Root } from 'Component/Root';
 import { AppProvider } from 'Context/AppContext';
@@ -41,6 +42,7 @@ import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { initialWindowMetrics, SafeAreaProvider } from 'react-native-safe-area-context';
 import { ThemeProvider } from 'Theme/context';
 import { createQueryClient } from 'Util/Query';
+import RemoteControlLayoutAdapter from 'Util/RemoteControl/RemoteControlLayoutAdapter';
 
 import { initI18n } from './i18n';
 
@@ -60,6 +62,10 @@ export function App() {
 
   useEffect(() => {
     initI18n().then(() => setIsI18nInitialized(true));
+
+    init({
+      layoutAdapter: RemoteControlLayoutAdapter,
+    });
   }, []);
 
   if (!isI18nInitialized) {

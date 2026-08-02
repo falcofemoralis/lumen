@@ -24,6 +24,7 @@ export type DeviceConfigType = {
   playerStopPlayOnButtonTV: boolean;
   playerStopPlayShowInterfaceTV: boolean;
   playerBufferTimeSetting?: number;
+  playerBackBufferTimeSetting: number;
   checkForUpdates: boolean;
   playerSaveQuality: boolean;
   playerAskQuality: boolean;
@@ -58,6 +59,7 @@ export const defaultConfig: DeviceConfigType = {
   playerStopPlayOnButtonTV: false,
   playerStopPlayShowInterfaceTV: true,
   playerBufferTimeSetting: undefined,
+  playerBackBufferTimeSetting: 30,
   sortVoicesByRating: false,
   checkForUpdates: true,
   strictConnectionCheck: true,

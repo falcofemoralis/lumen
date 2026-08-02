@@ -76,7 +76,7 @@ export interface ApiInterface {
   setConfig: (key: keyof ApiInterfaceConfig, value: unknown) => void;
   getProvider: () => string;
   getCDN: () => string;
-  getHeaders: () => HeadersInit;
+  getHeaders: () => Record<string, string>;
   validateUrl: (url: string) => Promise<void>;
   modifyCDN: (streams: FilmStreamInterface[]) => FilmStreamInterface[];
 

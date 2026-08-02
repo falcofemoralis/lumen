@@ -1,4 +1,5 @@
 import { Page } from 'Component/Page';
+import { getAspectRatio } from 'Component/Player/Player.config';
 import { SettingBase } from 'Component/SettingBase';
 import { SettingCustomSelect } from 'Component/SettingCustomSelect';
 import { SettingInput } from 'Component/SettingInput';
@@ -57,6 +58,7 @@ import {
   COLUMNS_TV_OPTIONS,
   GITHUB_LINK,
   PLAYER_ASPECT_RATIO_OPTIONS,
+  PLAYER_BACK_BUFFER_TIME_OPTIONS,
   PLAYER_BUFFER_TIME_OPTIONS,
   PLAYER_QUALITY_OPTIONS,
   PLAYER_REWIND_OPTIONS,
@@ -82,6 +84,7 @@ export function SettingsScreenComponent({
   playerAutoNextEpisode,
   sortVoicesByRating,
   playerBufferTimeSetting,
+  playerBackBufferTimeSetting,
   checkForUpdates,
   playerSaveQuality,
   playerAskQuality,
@@ -373,7 +376,7 @@ export function SettingsScreenComponent({
       <SettingSelect
         title={ t('Player default aspect ratio') }
         IconComponent={ Maximize2 }
-        value={ playerDefaultAspectRatio }
+        value={ getAspectRatio(playerDefaultAspectRatio) }
         options={ PLAYER_ASPECT_RATIO_OPTIONS }
         onChange={ (value) => onConfigUpdate('playerDefaultAspectRatio', value) }
       />
@@ -429,6 +432,14 @@ export function SettingsScreenComponent({
           'playerBufferTimeSetting',
           value === 'auto' ? undefined : Number(value)
         ) }
+      />
+      <SettingSelect
+        title={ t('Player rewind buffer') }
+        subtitle={ t('How much played video is kept in memory so rewinding does not reload it.') }
+        IconComponent={ Rewind }
+        value={ playerBackBufferTimeSetting.toString() }
+        options={ PLAYER_BACK_BUFFER_TIME_OPTIONS }
+        onChange={ (value) => onConfigUpdate('playerBackBufferTimeSetting', Number(value)) }
       />
     </ThemedScrollView>
   );

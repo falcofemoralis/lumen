@@ -246,6 +246,9 @@ const en = {
   'Stop play on button TV': 'Stop play on button TV',
   'Toggle stop play on button TV.': 'Toggle stop play on button TV.',
   'Player buffer time settings': 'Player buffer time settings',
+  'Player rewind buffer': 'Player rewind buffer',
+  'How much played video is kept in memory so rewinding does not reload it.':
+    'How much played video is kept in memory so rewinding does not reload it. Longer buffers use more memory.',
   'Check for updates': 'Check for updates',
   'Toggle check for updates.': 'Toggle check for updates.',
   'Player config quality': 'Player config quality',

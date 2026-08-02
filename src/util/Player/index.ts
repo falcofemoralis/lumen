@@ -1,8 +1,15 @@
 import { CollectionReference, doc, getDoc, setDoc } from '@react-native-firebase/firestore';
 import { AUTO_QUALITY, MAX_QUALITY } from 'Component/Player/Player.config';
-import { FirestoreDocument, SavedTime, SavedTimestamp, SavedTimeVoice } from 'Component/Player/Player.type';
+import {
+  FirestoreDocument,
+  PlayerVideoTrack,
+  SavedTime,
+  SavedTimestamp,
+  SavedTimeVoice,
+} from 'Component/Player/Player.type';
 import * as Device from 'expo-device';
-import { VideoTrack } from 'expo-video';
+import { t } from 'i18n/translate';
+import { VideoConfig, VideoPlayer } from 'react-native-video';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
@@ -14,6 +21,9 @@ import { storage } from 'Util/Storage';
 
 export const PLAYER_SAVED_TIME_STORAGE_KEY = 'playerTime';
 export const PLAYER_QUALITY_STORAGE_KEY = 'playerQuality';
+
+// react-native-video's own default, kept here so getBufferConfig can clamp it
+const DEFAULT_MIN_BUFFER_MS = 5000;
 
 const formatPlayerKeyTime = (film: FilmInterface) => {
   const { id: filmId } = film;
@@ -253,16 +263,15 @@ export const getPlayerStream = (video: FilmVideoInterface, quality: string) => {
   return stream;
 };
 
-export const formatVideoTrackInfo = (videoTrack: VideoTrack|null) => {
+export const formatVideoTrackInfo = (videoTrack: PlayerVideoTrack|null) => {
   if (!videoTrack) {
     return '-';
   }
 
   const {
-    // size: { height = 0, width = 0 } = {},
-    mimeType: quality,
-    // frameRate,
-    // bitrate,
+    quality,
+    // width,
+    // height,
   } = videoTrack;
 
   const info = [];
@@ -271,16 +280,8 @@ export const formatVideoTrackInfo = (videoTrack: VideoTrack|null) => {
     info.push(quality);
   }
 
-  // if (frameRate) {
-  //   info.push(`${frameRate}`);
-  // }
-
-  // if (mimeType) {
-  //   info.push(getCodecName(mimeType));
-  // }
-
-  // if (bitrate) {
-  //   info.push(`${bitrate / 1000}kbps`);
+  // if (width && height) {
+  //   info.push(`${width}x${height}`);
   // }
 
   return info.join('/');
@@ -312,6 +313,87 @@ export const getBufferTime = (quality: string) => {
   }
 
   return 180;
+};
+
+// `rate` is a plain setter with no method form, and the player is an imperative
+// native handle rather than a React value - keeping the write out of the
+// component body is what tells the compiler this mutation is intentional.
+export const applyPlayerRate = (player: VideoPlayer, rate: number) => {
+  player.rate = rate;
+};
+
+// expo-video took a single forward buffer duration in seconds. react-native-video
+// configures ExoPlayer's load control in milliseconds, so the same number drives
+// `maxBufferMs` on Android and `preferredForwardBufferDurationMs` on iOS. The
+// minimum is kept below the maximum, otherwise ExoPlayer rejects the config.
+export const getBufferConfig = (
+  quality: string,
+  bufferTimeSetting?: number,
+  backBufferTimeSetting?: number
+): NonNullable<VideoConfig['bufferConfig']> => {
+  const forwardSeconds = bufferTimeSetting ?? getBufferTime(quality);
+  const bufferMs = forwardSeconds * 1000;
+
+  // ExoPlayer discards everything behind the playhead by default, so rewinding
+  // even a few seconds re-downloads the segment. Keeping a back buffer makes
+  // those seeks instant, at the cost of holding the media in memory - never more
+  // than the forward buffer already costs, which is what the clamp is for.
+  const backBufferMs = Math.min(backBufferTimeSetting ?? 0, forwardSeconds) * 1000;
+
+  return {
+    minBufferMs: Math.min(DEFAULT_MIN_BUFFER_MS, bufferMs),
+    maxBufferMs: bufferMs,
+    preferredForwardBufferDurationMs: bufferMs,
+    backBufferDurationMs: backBufferMs,
+  };
+};
+
+// react-native-video hands external subtitles to the native player, which parses
+// and times them itself. Entries without a url are language slots the site lists
+// but does not actually ship a file for.
+export const getExternalSubtitles = (
+  video: FilmVideoInterface,
+  isOffline?: boolean
+): VideoConfig['externalSubtitles'] => {
+  const { subtitles = [] } = video;
+
+  return subtitles
+    .filter(({ url }) => Boolean(url))
+    .map(({ name, url, languageCode }) => ({
+      // downloaded subtitles are stored as bare paths, but a download can leave
+      // an entry pointing at the original remote url, so only add the scheme
+      // when there is none
+      uri: isOffline && !url.includes('://') ? `file://${url}` : url,
+      label: name,
+      language: languageCode || 'und',
+      // the urls carry query strings often enough that extension sniffing is
+      // unreliable, and every subtitle this app resolves is WebVTT
+      type: 'vtt' as const,
+    }));
+};
+
+// what the media notification and the lock screen show while this player owns
+// the media session
+export const getPlayerMetadata = (
+  film: FilmInterface,
+  voice: FilmVoiceInterface
+): VideoConfig['metadata'] => {
+  const { title, poster, hasSeasons } = film;
+  const { title: voiceTitle, lastSeasonId, lastEpisodeId } = voice;
+
+  const episode = hasSeasons && lastSeasonId && lastEpisodeId
+    ? t('Season {{season}} - Episode {{episode}}', {
+      season: lastSeasonId,
+      episode: lastEpisodeId,
+    })
+    : undefined;
+
+  return {
+    title,
+    subtitle: episode ?? voiceTitle ?? undefined,
+    artist: voiceTitle ?? undefined,
+    imageUri: poster,
+  };
 };
 
 export const getPlayerAvailableQualityItems = (video: FilmVideoInterface) => {

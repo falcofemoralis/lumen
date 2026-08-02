@@ -5,7 +5,6 @@ import { PlayerClock } from 'Component/PlayerClock';
 import { PlayerDuration } from 'Component/PlayerDuration';
 import { PlayerDurationEnd } from 'Component/PlayerDurationEnd';
 import { PlayerProgressBar } from 'Component/PlayerProgressBar';
-import { PlayerSubtitles } from 'Component/PlayerSubtitles';
 import { PlayerVideoSelector } from 'Component/PlayerVideoSelector';
 import { ThemedDropdown } from 'Component/ThemedDropdown';
 import { ThemedPressable } from 'Component/ThemedPressable';
@@ -16,7 +15,9 @@ import * as NavigationBar from 'expo-navigation-bar';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { OrientationLock } from 'expo-screen-orientation';
 import * as StatusBar from 'expo-status-bar';
-import { isPictureInPictureSupported, VideoView } from 'expo-video';
+import { useLatest } from 'Hooks/useLatest';
+import { usePictureInPicture } from 'Hooks/usePictureInPicture';
+import { useRestartableTimeout } from 'Hooks/useRestartableTimeout';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import ArrowLeft from 'lucide-react-native/icons/arrow-left';
@@ -38,7 +39,13 @@ import Rewind from 'lucide-react-native/icons/rewind';
 import Settings2 from 'lucide-react-native/icons/settings-2';
 import SkipBack from 'lucide-react-native/icons/skip-back';
 import SkipForward from 'lucide-react-native/icons/skip-forward';
-import { ComponentType, Fragment, useEffect, useRef, useState } from 'react';
+import {
+  ComponentType,
+  Fragment,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
 import { AppState, useWindowDimensions, View } from 'react-native';
 import {
   Gesture,
@@ -48,10 +55,10 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
+import { VideoView } from 'react-native-video';
 import { scheduleOnRN } from 'react-native-worklets';
 import { useAppTheme } from 'Theme/context';
 import { ClosedCaptionFilled } from 'Theme/icons';
-import { setTimeoutSafe } from 'Util/Misc';
 import { formatVideoTrackInfo, getPlayerAvailableQualityItems } from 'Util/Player';
 
 import {
@@ -62,6 +69,7 @@ import {
   PLAYER_CONTROLS_ANIMATION,
   PLAYER_CONTROLS_TIMEOUT,
   RewindDirection,
+  SUBTITLES_OFF,
 } from './Player.config';
 import { componentStyles, MiddleActionVariant } from './Player.style';
 import { DoubleTapAction, PlayerComponentProps } from './Player.type';
@@ -122,57 +130,40 @@ export function PlayerComponent({
   const [doubleTapAction, setDoubleTapAction] = useState<DoubleTapAction | null>(null);
   const [longTapAction, setLongTapAction] = useState(false);
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
-  const controlsTimeout = useRef<number | null>(null);
-  const playerRef = useRef<VideoView>(null);
-  const doubleTapTimeout = useRef<number | null>(null);
-  const isPlayingRef = useRef(isPlaying);
-  const showControlsRef = useRef(showControls);
-  const isOverlayOpenRef = useRef(isOverlayOpen);
-  const isScrollingRef = useRef(isScrolling);
-  const isComponentMounted = useRef(true);
+  const {
+    ref: videoViewRef,
+    isSupported: isPipSupported,
+    enter: enterPictureInPicture,
+  } = usePictureInPicture(status);
+  const controlsTimeout = useRestartableTimeout();
+  const doubleTapTimeout = useRestartableTimeout();
+
+  // the auto hide timeout fires seconds after it was armed, so it has to read
+  // these when it runs rather than from the render that scheduled it
+  const getIsPlaying = useLatest(isPlaying);
+  const getShowControls = useLatest(showControls);
+  const getIsOverlayOpen = useLatest(isOverlayOpen);
+  const getIsScrolling = useLatest(isScrolling);
 
   const controlsAnimation = useAnimatedStyle(() => ({
     opacity: withTiming(showControls ? 1 : 0, { duration: PLAYER_CONTROLS_ANIMATION }),
   }));
 
-  const setControlsTimeout = () => {
-    if (controlsTimeout.current) {
-      clearTimeout(controlsTimeout.current);
-    }
-
-    controlsTimeout.current = setTimeoutSafe(() => {
-      if (!isComponentMounted.current) return;
-
-      if (isPlayingRef.current
-        && showControlsRef.current
-        && !isOverlayOpenRef.current
-        && !isScrollingRef.current
+  const setControlsTimeout = useCallback(() => {
+    controlsTimeout.start(() => {
+      if (getIsPlaying()
+        && getShowControls()
+        && !getIsOverlayOpen()
+        && !getIsScrolling()
       ) {
         setShowControls(false);
       }
     }, PLAYER_CONTROLS_TIMEOUT);
-  };
-
-  useEffect(() => {
-    isPlayingRef.current = isPlaying;
-    showControlsRef.current = showControls;
-    isScrollingRef.current = isScrolling;
-    isOverlayOpenRef.current = isOverlayOpen;
-  }, [showControls, isOverlayOpen, isScrolling, isPlaying]);
-
-  useEffect(() => {
-    return () => {
-      isComponentMounted.current = false;
-
-      if (doubleTapTimeout.current) {
-        clearTimeout(doubleTapTimeout.current);
-      }
-    };
-  }, []);
+  }, [controlsTimeout, getIsPlaying, getShowControls, getIsOverlayOpen, getIsScrolling]);
 
   useEffect(() => {
     setControlsTimeout();
-  }, [isPlaying, isOverlayOpen, player]);
+  }, [isPlaying, isOverlayOpen, player, setControlsTimeout]);
 
   useEffect(() => {
     ScreenOrientation.lockAsync(OrientationLock.LANDSCAPE);
@@ -185,15 +176,12 @@ export function PlayerComponent({
       StatusBar.setStatusBarHidden(true, 'none');
     });
 
+    // the controls and double tap timeouts clear themselves on unmount
     return () => {
       ScreenOrientation.unlockAsync();
       NavigationBar.setVisibilityAsync('visible');
       StatusBar.setStatusBarHidden(false, 'slide');
       focusSubscription.remove();
-
-      if (controlsTimeout.current) {
-        clearTimeout(controlsTimeout.current);
-      }
     };
   }, []);
 
@@ -228,11 +216,7 @@ export function PlayerComponent({
       isVisible: true,
     });
 
-    if (doubleTapTimeout.current) {
-      clearTimeout(doubleTapTimeout.current);
-    }
-
-    doubleTapTimeout.current = setTimeoutSafe(() => {
+    doubleTapTimeout.start(() => {
       setDoubleTapAction((prev) => prev ? { ...prev, isVisible: false } : null);
 
       setTimeout(() => {
@@ -289,9 +273,9 @@ export function PlayerComponent({
 
   const enablePIP = () => {
     setShowControls(false);
-    setTimeout(() => {
-      playerRef.current?.startPictureInPicture();
-    }, 0);
+    // let the controls unmount first, they would otherwise be captured in the
+    // picture in picture window
+    setTimeout(enterPictureInPicture, 0);
   };
 
   const renderAction = (
@@ -376,8 +360,8 @@ export function PlayerComponent({
     }
 
     return renderAction(
-      // eslint-disable-next-line max-len
-      selectedSubtitle?.languageCode === '' ? ClosedCaption : ClosedCaptionFilled({ color: theme.colors.iconOnContrast }),
+
+      !selectedSubtitle?.languageCode ? ClosedCaption : ClosedCaptionFilled({ color: theme.colors.iconOnContrast }),
       openSubtitleSelector
     );
   };
@@ -392,7 +376,7 @@ export function PlayerComponent({
             isLocked && styles.actionsRowDisabled,
           ] }
         >
-          { isPictureInPictureSupported() && renderAction(PictureInPicture2, enablePIP) }
+          { isPipSupported && renderAction(PictureInPicture2, enablePIP) }
           { renderAction(Gauge, openSpeedSelector) }
           { renderAction(Settings2, openQualitySelector) }
           { renderSubtitlesActions() }
@@ -462,26 +446,6 @@ export function PlayerComponent({
         calculateCurrentTime={ calculateCurrentTime }
         handleIsScrolling={ handleIsScrolling }
         handleUserInteraction={ handleUserInteraction }
-      />
-    );
-  };
-
-  const renderSubtitles = () => {
-    if (!selectedSubtitle) {
-      return null;
-    }
-
-    const { url } = selectedSubtitle;
-
-    if (!url) {
-      return null;
-    }
-
-    return (
-      <PlayerSubtitles
-        player={ player }
-        subtitleUrl={ url }
-        isOffline={ isOffline }
       />
     );
   };
@@ -665,11 +629,14 @@ export function PlayerComponent({
         asOverlay
         overlayRef={ subtitleOverlayRef }
         header={ t('Subtitles') }
-        value={ selectedSubtitle?.languageCode }
-        data={ subtitles.map((subtitle) => ({
-          label: subtitle.name,
-          value: subtitle.languageCode,
-        })) }
+        value={ selectedSubtitle?.languageCode ?? SUBTITLES_OFF.value }
+        data={ [
+          SUBTITLES_OFF,
+          ...subtitles.map((subtitle) => ({
+            label: subtitle.name,
+            value: subtitle.languageCode,
+          })),
+        ] }
         onChange={ handleSubtitleChange }
         onClose={ closeOverlay }
       />
@@ -734,14 +701,13 @@ export function PlayerComponent({
       ] }
     >
       <VideoView
-        ref={ playerRef }
+        ref={ videoViewRef }
         style={ styles.video }
         player={ player }
-        contentFit={ selectedAspectRatio }
-        nativeControls={ false }
-        allowsPictureInPicture={ isPictureInPictureSupported() }
+        resizeMode={ selectedAspectRatio }
+        controls={ false }
+        pictureInPicture={ isPipSupported }
       />
-      { renderSubtitles() }
       { renderControls() }
       { renderLoader() }
       { renderModals() }

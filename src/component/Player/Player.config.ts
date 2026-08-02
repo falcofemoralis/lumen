@@ -1,6 +1,6 @@
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
-import { VideoContentFit } from 'expo-video';
 import { t } from 'i18n/translate';
+import { ResizeMode } from 'react-native-video';
 
 import { ProgressStatus } from './Player.type';
 
@@ -78,13 +78,39 @@ export const AUTO_QUALITY: DropdownItem = {
   value: 'auto',
 };
 
-export const ASPECT_RATIO_OPTIONS: VideoContentFit[] = ['contain', 'cover', 'fill'];
+// the provider only ever lists real languages, so an empty code is free to stand
+// for "no subtitles" - the player disables its text track for it
+export const SUBTITLES_OFF: DropdownItem = {
+  get label() {
+    return t('Off');
+  },
+  value: '',
+};
 
-export const getAspectRatioLabel = (aspectRatio: VideoContentFit): string => {
+export const ASPECT_RATIO_OPTIONS: ResizeMode[] = ['contain', 'cover', 'stretch'];
+
+// expo-video called the stretching mode `fill`, react-native-video calls it
+// `stretch`. The setting is persisted by value, so old configs have to be mapped.
+const LEGACY_ASPECT_RATIOS: Record<string, ResizeMode> = {
+  fill: 'stretch',
+};
+
+export const getAspectRatio = (value?: string): ResizeMode => {
+  const aspectRatio = LEGACY_ASPECT_RATIOS[value ?? ''] ?? value as ResizeMode;
+
+  return ASPECT_RATIO_OPTIONS.includes(aspectRatio) ? aspectRatio : ASPECT_RATIO_OPTIONS[0];
+};
+
+export const getAspectRatioLabel = (aspectRatio: ResizeMode): string => {
   switch (aspectRatio) {
     case 'contain': return t('Contain');
     case 'cover': return t('Cover');
-    case 'fill': return t('Fill');
+    case 'stretch': return t('Fill');
     default: return aspectRatio;
   }
 };
+
+// react-native-video refuses to build a source from an empty uri, so an
+// unresolvable stream gets this placeholder - the player then reports a load
+// error through `onError` instead of sitting on an empty source forever.
+export const EMPTY_VIDEO_URL = 'file:///dev/null';

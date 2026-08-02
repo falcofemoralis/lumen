@@ -7,7 +7,6 @@ import { PlayerClock } from 'Component/PlayerClock';
 import { PlayerDuration } from 'Component/PlayerDuration';
 import { PlayerDurationEnd } from 'Component/PlayerDurationEnd';
 import { PlayerProgressBar } from 'Component/PlayerProgressBar';
-import { PlayerSubtitles } from 'Component/PlayerSubtitles';
 import { PlayerVideoSelector } from 'Component/PlayerVideoSelector';
 import { ThemedDropdown } from 'Component/ThemedDropdown';
 import { ThemedPressable } from 'Component/ThemedPressable';
@@ -15,7 +14,8 @@ import { ThemedText } from 'Component/ThemedText';
 import { useConfigContext } from 'Context/ConfigContext';
 import { usePlayerContext } from 'Context/PlayerContext';
 import { LinearGradient } from 'expo-linear-gradient';
-import { VideoView } from 'expo-video';
+import { useLatest } from 'Hooks/useLatest';
+import { useRestartableTimeout } from 'Hooks/useRestartableTimeout';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import Bookmark from 'lucide-react-native/icons/bookmark';
@@ -33,8 +33,9 @@ import SkipForward from 'lucide-react-native/icons/skip-forward';
 import Undo2 from 'lucide-react-native/icons/undo-2';
 import {
   ComponentType,
+  useCallback,
   useEffect,
-  useRef,
+  useEffectEvent,
   useState,
 } from 'react';
 import {
@@ -42,10 +43,10 @@ import {
   View,
 } from 'react-native';
 import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import { VideoView } from 'react-native-video';
 import { scheduleOnRN } from 'react-native-worklets';
 import { useAppTheme } from 'Theme/context';
 import { ClosedCaptionFilled } from 'Theme/icons';
-import { setTimeoutSafe } from 'Util/Misc';
 import { formatVideoTrackInfo, getPlayerAvailableQualityItems } from 'Util/Player';
 import RemoteControlManager from 'Util/RemoteControl/RemoteControlManager';
 import { SupportedKeys } from 'Util/RemoteControl/SupportedKeys';
@@ -57,6 +58,7 @@ import {
   PLAYER_CONTROLS_ANIMATION,
   PLAYER_CONTROLS_TIMEOUT,
   RewindDirection,
+  SUBTITLES_OFF,
 } from './Player.config';
 import { componentStyles } from './Player.style.atv';
 import { PlayerComponentProps } from './Player.type';
@@ -114,15 +116,20 @@ export function PlayerComponent({
   const [showControls, setShowControls] = useState(false);
   const [hideActions, setHideActions] = useState(false);
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
-  const controlsTimeout = useRef<number | null>(null);
+  const controlsTimeout = useRestartableTimeout();
   const { ref: topRowRef, focusKey: topRowFocusKey } = useFocusable();
   const { ref: bottomRowRef, focusKey: bottomRowFocusKey } = useFocusable();
-  const isPlayingRef = useRef(isPlaying);
-  const showControlsRef = useRef(showControls);
-  const isOverlayOpenRef = useRef(isOverlayOpen);
-  const isComponentMounted = useRef(true);
-  const focusedElementRef = useRef(focusedElement);
-  const hideActionsRef = useRef(hideActions);
+
+  // the remote listeners below are registered once per player and the auto hide
+  // timeout fires seconds after it was armed, so both have to read the current
+  // values at call time instead of closing over the render that created them
+  const getIsPlaying = useLatest(isPlaying);
+  const getShowControls = useLatest(showControls);
+  const getIsOverlayOpen = useLatest(isOverlayOpen);
+  const getFocusedElement = useLatest(focusedElement);
+  const getHideActions = useLatest(hideActions);
+  const onTogglePlayPause = useEffectEvent(() => togglePlayPause());
+  const onBackwardToStart = useEffectEvent(() => backwardToStart());
 
   const controlsAnimation = useAnimatedStyle(() => ({
     opacity: withTiming(
@@ -136,58 +143,38 @@ export function PlayerComponent({
     ),
   }));
 
-  const closeControls = () => {
+  const closeControls = useCallback(() => {
     setShowControls(false);
     updateFocusedElement(FocusedElement.PROGRESS_THUMB);
     setFocus(PROGRESS_THUMB_FOCUS_KEY);
-  };
+  }, [updateFocusedElement]);
 
-  const setControlsTimeout = () => {
-    if (controlsTimeout.current) {
-      clearTimeout(controlsTimeout.current);
-    }
-
-    controlsTimeout.current = setTimeoutSafe(() => {
-      if (!isComponentMounted.current) return;
-
-      if (isPlayingRef.current
-          && showControlsRef.current
-          && !isOverlayOpenRef.current
+  const setControlsTimeout = useCallback(() => {
+    controlsTimeout.start(() => {
+      if (getIsPlaying()
+          && getShowControls()
+          && !getIsOverlayOpen()
       ) {
         closeControls();
       }
     }, PLAYER_CONTROLS_TIMEOUT);
-  };
-
-  useEffect(() => {
-    isOverlayOpenRef.current = isOverlayOpen;
-    showControlsRef.current = showControls;
-    focusedElementRef.current = focusedElement;
-    hideActionsRef.current = hideActions;
-    isPlayingRef.current = isPlaying;
-  }, [showControls, isOverlayOpen, focusedElement, hideActions, isPlaying]);
-
-  useEffect(() => {
-    return () => {
-      isComponentMounted.current = false;
-    };
-  }, []);
+  }, [controlsTimeout, getIsPlaying, getShowControls, getIsOverlayOpen, closeControls]);
 
   useEffect(() => {
     setControlsTimeout();
-  }, [isPlaying, isOverlayOpen, player]);
+  }, [isPlaying, isOverlayOpen, player, setControlsTimeout]);
 
   useEffect(() => {
     const keyDownListener = (type: SupportedKeys) => {
-      if (!isComponentMounted.current || isOverlayOpenRef.current) return false;
+      if (getIsOverlayOpen()) return false;
 
       if (type === SupportedKeys.BACKWARD) {
-        backwardToStart();
+        onBackwardToStart();
 
         return true;
       }
 
-      if (!showControlsRef.current) {
+      if (!getShowControls()) {
         if (type === SupportedKeys.BACK) {
           return true;
         }
@@ -218,7 +205,7 @@ export function PlayerComponent({
         }
 
         if (playerStopPlayOnButtonTV && type === SupportedKeys.ENTER) {
-          togglePlayPause();
+          onTogglePlayPause();
 
           if (playerStopPlayShowInterfaceTV) {
             setShowControls(true);
@@ -232,9 +219,9 @@ export function PlayerComponent({
         return false;
       }
 
-      if (focusedElementRef.current === FocusedElement.PROGRESS_THUMB) {
+      if (getFocusedElement() === FocusedElement.PROGRESS_THUMB) {
         if (type === SupportedKeys.ENTER) {
-          togglePlayPause();
+          onTogglePlayPause();
         }
 
         if (type === SupportedKeys.UP || type === SupportedKeys.DOWN) {
@@ -243,7 +230,7 @@ export function PlayerComponent({
           // navigation here: the row was just un-hidden (opacity/reflow) and
           // navigating from the stale layout drops focus. Consume the event so
           // the layout adapter doesn't also run a conflicting geometry pass.
-          if (hideActionsRef.current) {
+          if (getHideActions()) {
             setHideActions(false);
           }
 
@@ -270,7 +257,7 @@ export function PlayerComponent({
       // consume both vertical keys; LEFT/RIGHT stay geometry-driven so in-row
       // navigation keeps working.
       // eslint-disable-next-line max-len
-      if (focusedElementRef.current === FocusedElement.TOP_ACTION && (type === SupportedKeys.UP || type === SupportedKeys.DOWN)) {
+      if (getFocusedElement() === FocusedElement.TOP_ACTION && (type === SupportedKeys.UP || type === SupportedKeys.DOWN)) {
         if (type === SupportedKeys.DOWN) {
           updateFocusedElement(FocusedElement.PROGRESS_THUMB);
           setFocus(PROGRESS_THUMB_FOCUS_KEY);
@@ -280,7 +267,7 @@ export function PlayerComponent({
       }
 
       // eslint-disable-next-line max-len
-      if (focusedElementRef.current === FocusedElement.BOTTOM_ACTION && (type === SupportedKeys.UP || type === SupportedKeys.DOWN)) {
+      if (getFocusedElement() === FocusedElement.BOTTOM_ACTION && (type === SupportedKeys.UP || type === SupportedKeys.DOWN)) {
         if (type === SupportedKeys.UP) {
           updateFocusedElement(FocusedElement.PROGRESS_THUMB);
           setFocus(PROGRESS_THUMB_FOCUS_KEY);
@@ -293,15 +280,13 @@ export function PlayerComponent({
     };
 
     const keyUpListener = (_type: SupportedKeys) => {
-      if (!isComponentMounted.current) return false;
-
       setControlsTimeout();
 
       return false;
     };
 
     const backAction = () => {
-      if (showControlsRef.current) {
+      if (getShowControls()) {
         updateFocusedElement(FocusedElement.PROGRESS_THUMB);
         setFocus(PROGRESS_THUMB_FOCUS_KEY);
         setShowControls(false);
@@ -324,13 +309,20 @@ export function PlayerComponent({
       RemoteControlManager.removeKeydownListener(remoteControlDownListener);
       RemoteControlManager.removeKeyupListener(remoteControlUpListener);
       backHandler.remove();
-
-      if (controlsTimeout.current) {
-        clearTimeout(controlsTimeout.current);
-        controlsTimeout.current = null;
-      }
     };
-  }, [player]);
+    // everything the listeners read goes through a stable getter on purpose -
+    // re-subscribing the remote on each render drops key events mid-press
+  }, [
+    player,
+    setControlsTimeout,
+    getShowControls,
+    getIsOverlayOpen,
+    getFocusedElement,
+    getHideActions,
+    updateFocusedElement,
+    playerStopPlayOnButtonTV,
+    playerStopPlayShowInterfaceTV,
+  ]);
 
   const handleOpenComments = () => {
     closeControls();
@@ -490,26 +482,6 @@ export function PlayerComponent({
     );
   };
 
-  const renderSubtitles = () => {
-    if (!selectedSubtitle) {
-      return null;
-    }
-
-    const { url } = selectedSubtitle;
-
-    if (!url) {
-      return null;
-    }
-
-    return (
-      <PlayerSubtitles
-        player={ player }
-        subtitleUrl={ url }
-        isOffline={ isOffline }
-      />
-    );
-  };
-
   const renderDuration = () => (
     <PlayerDuration />
   );
@@ -534,7 +506,7 @@ export function PlayerComponent({
             { isPlaylistSelector && renderBottomAction(ListVideo, openVideoSelector) }
             { subtitles.length > 0 && renderBottomAction(
               // eslint-disable-next-line max-len
-              selectedSubtitle?.languageCode === '' ? ClosedCaption : ClosedCaptionFilled({ color: theme.colors.iconOnContrast }),
+              !selectedSubtitle?.languageCode ? ClosedCaption : ClosedCaptionFilled({ color: theme.colors.iconOnContrast }),
               openSubtitleSelector
             ) }
             { !isOffline && renderBottomAction(isFilmBookmarked ? BookmarkCheck : Bookmark, openBookmarksOverlay) }
@@ -614,11 +586,14 @@ export function PlayerComponent({
         asOverlay
         overlayRef={ subtitleOverlayRef }
         header={ t('Subtitles') }
-        value={ selectedSubtitle?.languageCode }
-        data={ subtitles.map((subtitle) => ({
-          label: subtitle.name,
-          value: subtitle.languageCode,
-        })) }
+        value={ selectedSubtitle?.languageCode ?? SUBTITLES_OFF.value }
+        data={ [
+          SUBTITLES_OFF,
+          ...subtitles.map((subtitle) => ({
+            label: subtitle.name,
+            value: subtitle.languageCode,
+          })),
+        ] }
         onChange={ handleSubtitleChange }
         onClose={ closeOverlay }
       />
@@ -684,11 +659,10 @@ export function PlayerComponent({
       <VideoView
         style={ styles.video }
         player={ player }
-        contentFit={ selectedAspectRatio }
-        nativeControls={ false }
-        allowsPictureInPicture={ false }
+        resizeMode={ selectedAspectRatio }
+        controls={ false }
+        pictureInPicture={ false }
       />
-      { renderSubtitles() }
       { renderBackground() }
       { renderControls() }
       { renderLoader() }

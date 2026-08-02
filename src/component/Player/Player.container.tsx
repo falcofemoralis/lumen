@@ -7,10 +7,9 @@ import { useConfigContext } from 'Context/ConfigContext';
 import { usePlayerContext } from 'Context/PlayerContext';
 import { usePlayerProgressActions } from 'Context/PlayerProgressContext';
 import { useServiceContext } from 'Context/ServiceContext';
-import { useEvent, useEventListener } from 'expo';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
-import { useVideoPlayer, VideoContentFit, VideoPlayer, VideoTrack } from 'expo-video';
 import { useLocalBookmarks } from 'Hooks/useLocalLibrary';
+import { useVideoPlayerState } from 'Hooks/useVideoPlayerState';
 import { t } from 'i18n/translate';
 import { PLAYER_SCREEN } from 'Navigation/navigationRoutes';
 import {
@@ -21,6 +20,16 @@ import {
   useState,
 } from 'react';
 import { BackHandler, Share } from 'react-native';
+import {
+  BandwidthData,
+  onProgressData,
+  ResizeMode,
+  useEvent,
+  useVideoPlayer,
+  VideoConfig,
+  VideoPlayer,
+  VideoRuntimeError,
+} from 'react-native-video';
 import NotificationStore from 'Store/Notification.store';
 import RouterStore from 'Store/Router.store';
 import { FilmInterface } from 'Type/Film.interface';
@@ -31,9 +40,12 @@ import { createMasterPlaylist, getQualityFromResolution } from 'Util/Hls';
 import { upsertLocalHistoryItem } from 'Util/LocalLibrary';
 import { setIntervalSafe } from 'Util/Misc';
 import {
-  getBufferTime,
+  applyPlayerRate,
+  getBufferConfig,
+  getExternalSubtitles,
   getFirestoreSavedTime,
   getFirestoreVideoTime,
+  getPlayerMetadata,
   getPlayerQuality,
   getPlayerStream,
   getQualityFromStreams,
@@ -50,12 +62,25 @@ import {
   ASPECT_RATIO_OPTIONS,
   AUTO_QUALITY,
   AWAKE_TAG,
+  EMPTY_VIDEO_URL,
   FIRESTORE_DB,
+  getAspectRatio,
   MAX_QUALITY,
   RewindDirection,
   SAVE_TIME_EVERY_MS,
+  SUBTITLES_OFF,
 } from './Player.config';
-import { FirestoreDocument, PlayerContainerProps, SavedTime } from './Player.type';
+import {
+  FirestoreDocument,
+  PlayerContainerProps,
+  PlayerVideoTrack,
+  SavedTime,
+} from './Player.type';
+
+// expo-video emitted a time update once per second (`timeUpdateEventInterval`).
+// react-native-video reports progress every 250ms and offers no way to slow it
+// down, so the progress fan-out is throttled here to keep the previous cadence.
+const PROGRESS_UPDATE_EVERY_MS = 1000;
 
 export function PlayerContainer({
   video,
@@ -71,6 +96,7 @@ export function PlayerContainer({
     playerSaveQuality,
     playerAutoNextEpisode,
     playerBufferTimeSetting,
+    playerBackBufferTimeSetting,
     playerDefaultAspectRatio,
     playerDefaultSpeed,
   } = useConfigContext();
@@ -92,17 +118,21 @@ export function PlayerContainer({
     selectedVideo.subtitles?.find(({ isDefault }) => isDefault)
   );
   const [selectedSpeed, setSelectedSpeed] = useState<number>(playerDefaultSpeed);
-  const [selectedAspectRatio, setSelectedAspectRatio] = useState<VideoContentFit>(
-    playerDefaultAspectRatio as VideoContentFit
+  const [selectedAspectRatio, setSelectedAspectRatio] = useState<ResizeMode>(
+    getAspectRatio(playerDefaultAspectRatio)
   );
   const [isLocked, setIsLocked] = useState<boolean>(false);
   const [isOverlayOpen, setIsOverlayOpen] = useState<boolean>(false);
   const [isFilmBookmarked, setIsFilmBookmarked] = useState<boolean>(isBookmarked(film));
-  const [selectedVideoTrack, setSelectedVideoTrack] = useState<VideoTrack | null>(null);
+  const [videoSize, setVideoSize] = useState<{ width: number; height: number } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const stopEventsRef = useRef<boolean>(false);
   const updateTimeTimeout = useRef<number | null>(null);
+  const lastProgressUpdate = useRef<number>(0);
+  // react-native-video exposes the buffered position only through onProgress,
+  // there is no property to read it back from the player
+  const bufferedPosition = useRef<number>(0);
   const qualityOverlayRef = useRef<ThemedOverlayRef>(null);
   const subtitleOverlayRef = useRef<ThemedOverlayRef>(null);
   const playerVideoSelectorOverlayRef = useRef<PlayerVideoSelectorRef>(null);
@@ -165,25 +195,45 @@ export function PlayerContainer({
     return getPlayerStream(video, selectedQuality).url;
   }, [selectedQuality, video, isOffline]);
 
-  const player = useVideoPlayer(videoUrl, (p) => {
+  const buildVideoSource = useCallback((
+    url: string,
+    quality: string,
+    videoArg: FilmVideoInterface,
+    voiceArg: FilmVoiceInterface
+  ): VideoConfig => ({
+    uri: url,
+    bufferConfig: getBufferConfig(quality, playerBufferTimeSetting, playerBackBufferTimeSetting),
+    externalSubtitles: getExternalSubtitles(videoArg, isOffline),
+    metadata: getPlayerMetadata(film, voiceArg),
+    headers: currentService.getHeaders(),
+  }), [
+    playerBufferTimeSetting,
+    playerBackBufferTimeSetting,
+    isOffline,
+    film,
+    currentService,
+  ]);
+
+  const videoSource = useMemo(
+    () => buildVideoSource(videoUrl ?? EMPTY_VIDEO_URL, selectedQuality, video, voice),
+    [buildVideoSource, videoUrl, selectedQuality, video, voice]
+  );
+
+  const player = useVideoPlayer(videoSource, (p) => {
     const savedTime = getSavedTime(film);
 
     p.loop = false;
-    p.timeUpdateEventInterval = 1;
     p.currentTime = getVideoTime(selectedVoice, savedTime);
-    p.preservesPitch = true;
-    p.playbackRate = playerDefaultSpeed;
-    p.bufferOptions = {
-      ...p.bufferOptions,
-      preferredForwardBufferDuration: playerBufferTimeSetting ?? getBufferTime(selectedQuality),
-    };
+    p.rate = playerDefaultSpeed;
+    // hands the player a media session, which is what makes the headset button,
+    // the notification and the lock screen controls reach it
+    p.showNotificationControls = true;
     p.play();
 
     initFirestoreSavedTime(p, savedTime);
   });
 
-  const { isPlaying } = useEvent(player, 'playingChange', { isPlaying: player.playing });
-  const { status } = useEvent(player, 'statusChange', { status: player.status });
+  const { status, isPlaying } = useVideoPlayerState(player);
 
   const updateTime = useCallback(() => {
     const { currentTime, duration } = player;
@@ -208,30 +258,74 @@ export function PlayerContainer({
     }
   }, [player, selectedVoice, firestoreDb, profile, film]);
 
-  const createUpdateTimeTimeout = useCallback(() => {
+  const removeUpdateTimeTimeout = useCallback(() => {
     if (updateTimeTimeout.current) {
       clearInterval(updateTimeTimeout.current);
       updateTimeTimeout.current = null;
     }
+  }, []);
+
+  const createUpdateTimeTimeout = useCallback(() => {
+    removeUpdateTimeTimeout();
 
     updateTimeTimeout.current = setIntervalSafe(() => {
       try {
-        const { playing } = player;
+        const { isPlaying: playing } = player;
 
         if (playing) {
           updateTime();
         }
       } catch (error) {
+        // the only way to get here is a released player, and this closure holds
+        // that same instance - retrying would just repeat the failure. The effect
+        // below re-arms the interval as soon as a new player is created.
         console.error('Error updating time:', error);
-        // If we get an error accessing the player, reset the timeout
-        createUpdateTimeTimeout();
+        removeUpdateTimeTimeout();
       }
     }, SAVE_TIME_EVERY_MS);
-  }, [player, updateTime]);
+  }, [player, updateTime, removeUpdateTimeTimeout]);
+
+  const resetUpdateTimeTimeout = useCallback(() => {
+    removeUpdateTimeTimeout();
+    createUpdateTimeTimeout();
+  }, [removeUpdateTimeTimeout, createUpdateTimeTimeout]);
 
   const handleBack = useCallback(() => {
     updateTime();
   }, [updateTime]);
+
+  const pausePlayback = useCallback(() => {
+    if (!player.isPlaying) {
+      return;
+    }
+
+    player.pause();
+    updateTime();
+  }, [player, updateTime]);
+
+  /**
+   * Subtitles are handed to the native player as external tracks, so ExoPlayer
+   * parses and times them itself. Every external track is flagged as a default
+   * one, which means the player picks a subtitle on its own unless the choice is
+   * restated - hence the call on every load, not only on user selection.
+   */
+  const applySubtitle = useCallback((subtitle?: SubtitleInterface) => {
+    try {
+      const track = subtitle
+        ? player.getAvailableTextTracks().find(({ label }) => label === subtitle.name)
+        : undefined;
+
+      // re-selecting the track that is already showing rebuilds the whole track
+      // selection for nothing, and a rebuffer sends us through here again
+      if (track && player.selectedTrack?.id === track.id) {
+        return;
+      }
+
+      player.selectTextTrack(track ?? null);
+    } catch (error) {
+      console.error('Error selecting subtitle track:', error);
+    }
+  }, [player]);
 
   useEffect(() => {
     activateKeepAwakeAsync(AWAKE_TAG);
@@ -252,183 +346,11 @@ export function PlayerContainer({
       backHandler.remove();
       resetProgressStatus();
     };
-  }, [handleBack, createUpdateTimeTimeout, initFirestoreSavedTime, resetProgressStatus]);
+  }, [handleBack, createUpdateTimeTimeout, removeUpdateTimeTimeout, resetProgressStatus]);
 
-  useEventListener(
-    player,
-    'timeUpdate',
-    ({ currentTime, bufferedPosition }) => {
-      if (stopEventsRef.current) {
-        return;
-      }
-
-      const { duration, playing } = player;
-
-      if (duration <= 0) {
-        return;
-      }
-
-      updateProgressStatus(currentTime, !isOffline ? bufferedPosition : 0, duration);
-
-      if (!playing) {
-        return;
-      }
-
-      onPlaybackEnd(currentTime, duration);
-    }
-  );
-
-  useEventListener(player, 'statusChange', ({ status: playerStatus, error }) => {
-    if (playerStatus === 'error') {
-      NotificationStore.displayError(`An error occurred : ${error?.message}`);
-    }
-  });
-
-  useEventListener(player, 'videoTrackChange', ({ videoTrack }) => {
-    if (!videoTrack) {
-      setSelectedVideoTrack(null);
-
-      return;
-    }
-
-    // we still can display actual video params, but it will be confusing to the user
-    if (selectedQuality === AUTO_QUALITY.value) {
-      setSelectedVideoTrack({
-        ...videoTrack,
-        mimeType: getQualityFromResolution(videoTrack.size.width, videoTrack.size.height),
-      });
-
-      return;
-    }
-
-    setSelectedVideoTrack({
-      ...videoTrack,
-      mimeType: selectedQuality,
-    });
-  });
-
-  const onPlaybackEnd = (currentTime: number, duration: number) => {
-    if (!playerAutoNextEpisode) {
-      return;
-    }
-
-    if (currentTime >= duration - 1) {
-      handleNewEpisode(RewindDirection.FORWARD);
-    }
-  };
-
-  const changePlayerVideo = (newVideo: FilmVideoInterface, newVoice: FilmVoiceInterface) => {
-    if (isLocalLibrary) {
-      if (!isOffline) {
-        upsertLocalHistoryItem(film, newVoice);
-      }
-    } else if (isSignedIn) {
-      currentService.saveWatch(film, newVoice)
-        .catch((error) => {
-          NotificationStore.displayError(error as Error);
-        });
-    }
-
-    updateTime();
-    resetProgressStatus();
-    setSelectedVideo(newVideo);
-    setSelectedVoice(newVoice);
-    resetUpdateTimeTimeout();
-    setSelectedSubtitle(newVideo.subtitles?.find(({ isDefault }) => isDefault));
-    updateSelectedVoice(film.id, newVoice);
-    updatePlayerStream(newVideo, selectedQuality, newVoice);
-  };
-
-  const togglePlayPause = (pause?: boolean, stopEvents?: boolean) => {
-    const { playing } = player;
-
-    if (stopEvents !== undefined) {
-      stopEventsRef.current = stopEvents;
-    }
-
-    const newPlaying = pause !== undefined ? pause : playing;
-
-    if (newPlaying) {
-      player.pause();
-      updateTime();
-    } else {
-      player.play();
-    }
-  };
-
-  const calculateCurrentTime = (percent: number) => {
-    const { duration } = player;
-
-    if (!duration) return 0;
-
-    return (percent / 100) * duration;
-  };
-
-  const seekToPosition = async (percent: number) => {
-    const { bufferedPosition, duration } = player;
-
-    const newTime = calculateCurrentTime(percent);
-
-    updateProgressStatus(newTime, bufferedPosition, duration);
-
-    player.currentTime = newTime;
-  };
-
-  const rewindPosition = async (type: RewindDirection, seconds: number) => {
-    const { currentTime, bufferedPosition, duration } = player;
-
-    const seekTime = type === RewindDirection.BACKWARD ? seconds * -1 : seconds;
-    const newTime = currentTime + seekTime;
-
-    updateProgressStatus(newTime, bufferedPosition, duration);
-
-    player.seekBy(seekTime);
-  };
-
-  const openOverlay = () => {
-    setIsOverlayOpen(true);
-  };
-
-  const closeOverlay = () => {
-    setIsOverlayOpen(false);
-  };
-
-  const openQualitySelector = () => {
-    qualityOverlayRef.current?.open();
-    openOverlay();
-  };
-
-  const openVideoSelector = () => {
-    playerVideoSelectorOverlayRef.current?.open();
-    openOverlay();
-  };
-
-  const openSubtitleSelector = () => {
-    subtitleOverlayRef.current?.open();
-    openOverlay();
-  };
-
-  const openCommentsOverlay = () => {
-    commentsOverlayRef.current?.open();
-    openOverlay();
-  };
-
-  const openBookmarksOverlay = () => {
-    if (!isSignedIn && !isLocalLibrary) {
-      NotificationStore.displayMessage(t('Sign In to an Account'));
-
-      return;
-    }
-
-    bookmarksOverlayRef.current?.open();
-    openOverlay();
-  };
-
-  const openSpeedSelector = () => {
-    speedOverlayRef.current?.open();
-    openOverlay();
-  };
-
+  // source switching lives above the event subscriptions on purpose: onProgress
+  // reaches into this chain to auto-advance episodes, and a handler the player
+  // events call has to be declared before them
   const updatePlayerStream = (
     videoArg: FilmVideoInterface,
     qualityArg: string,
@@ -438,7 +360,7 @@ export function PlayerContainer({
       // temporary solution
       // unfortunately it doesn't work because player loading becomes stuck
       // so the only way is to reload the player page entirely
-      //player.replaceAsync(createMasterPlaylist(filmVideo.streams));
+      //player.replaceSourceAsync(createMasterPlaylist(filmVideo.streams).uri);
 
       RouterStore.pushData(PLAYER_SCREEN, {
         video: videoArg,
@@ -465,51 +387,32 @@ export function PlayerContainer({
         return;
       }
 
-      player.replaceAsync(newStream.url);
+      player.replaceSourceAsync(
+        buildVideoSource(newStream.url, newStream.quality, videoArg, voiceArg || selectedVoice)
+      );
     }
   };
 
-  const handleQualityChange = (item: DropdownItem) => {
-    const { value: quality } = item;
-
-    if (selectedQuality === quality) {
-      qualityOverlayRef.current?.close();
-
-      return;
-    }
-
-    setOverlayQuality(quality);
-    setSelectedQuality(getQualityFromStreams(selectedVideo, quality));
-
-    if (playerSaveQuality) {
-      updatePlayerQuality(quality);
+  const changePlayerVideo = (newVideo: FilmVideoInterface, newVoice: FilmVoiceInterface) => {
+    if (isLocalLibrary) {
+      if (!isOffline) {
+        upsertLocalHistoryItem(film, newVoice);
+      }
+    } else if (isSignedIn) {
+      currentService.saveWatch(film, newVoice)
+        .catch((error) => {
+          NotificationStore.displayError(error as Error);
+        });
     }
 
     updateTime();
-    updatePlayerStream(selectedVideo, quality, selectedVoice);
-
-    qualityOverlayRef.current?.close();
-  };
-
-  const handleSubtitleChange = (item: DropdownItem) => {
-    const { value: languageCode } = item;
-
-    if (selectedSubtitle?.languageCode === languageCode) {
-      subtitleOverlayRef.current?.close();
-
-      return;
-    }
-
-    const newSubtitle = selectedVideo.subtitles?.find((s) => s.languageCode === languageCode);
-
-    if (!newSubtitle) {
-      return;
-    }
-
-    setSelectedSubtitle(newSubtitle);
-    updateTime();
-
-    subtitleOverlayRef.current?.close();
+    resetProgressStatus();
+    setSelectedVideo(newVideo);
+    setSelectedVoice(newVoice);
+    resetUpdateTimeTimeout();
+    setSelectedSubtitle(newVideo.subtitles?.find(({ isDefault }) => isDefault));
+    updateSelectedVoice(film.id, newVoice);
+    updatePlayerStream(newVideo, selectedQuality, newVoice);
   };
 
   const handleNewEpisode = async (direction: RewindDirection) => {
@@ -599,16 +502,239 @@ export function PlayerContainer({
     }
   };
 
-  const removeUpdateTimeTimeout = () => {
-    if (updateTimeTimeout.current) {
-      clearInterval(updateTimeTimeout.current);
-      updateTimeTimeout.current = null;
+  const onPlaybackEnd = (currentTime: number, duration: number) => {
+    if (!playerAutoNextEpisode) {
+      return;
+    }
+
+    if (currentTime >= duration - 1) {
+      handleNewEpisode(RewindDirection.FORWARD);
     }
   };
 
-  const resetUpdateTimeTimeout = () => {
-    removeUpdateTimeTimeout();
-    createUpdateTimeTimeout();
+  useEvent(player, 'onProgress', ({ currentTime, bufferDuration }: onProgressData) => {
+    // bufferDuration is the buffer ahead of the playhead, everything else here
+    // works with an absolute position
+    bufferedPosition.current = currentTime + bufferDuration;
+
+    if (stopEventsRef.current) {
+      return;
+    }
+
+    const { duration, isPlaying: playing } = player;
+
+    // an unloaded player reports the duration as NaN
+    if (!(duration > 0)) {
+      return;
+    }
+
+    const now = Date.now();
+
+    if (now - lastProgressUpdate.current < PROGRESS_UPDATE_EVERY_MS) {
+      return;
+    }
+
+    lastProgressUpdate.current = now;
+
+    updateProgressStatus(currentTime, !isOffline ? bufferedPosition.current : 0, duration);
+
+    if (!playing) {
+      return;
+    }
+
+    onPlaybackEnd(currentTime, duration);
+  });
+
+  useEvent(player, 'onError', (error: VideoRuntimeError) => {
+    NotificationStore.displayError(`An error occurred : ${error?.message}`);
+  });
+
+  // headphones pulled out or a bluetooth headset walking out of range - carrying
+  // on would blast the film out of the device speaker
+  useEvent(player, 'onAudioBecomingNoisy', pausePlayback);
+
+  // an incoming call or another app taking over audio. react-native-video only
+  // reports the loss, pausing is left to us. Playback is deliberately not
+  // resumed on regain - after a call the user decides when to carry on.
+  useEvent(player, 'onAudioFocusChange', (hasAudioFocus: boolean) => {
+    if (!hasAudioFocus) {
+      pausePlayback();
+    }
+  });
+
+  // there is no video track selection in react-native-video, so the rendered
+  // resolution is the only signal about the track that is actually playing
+  const updateVideoSize = useCallback((width?: number, height?: number) => {
+    if (!width || !height) {
+      return;
+    }
+
+    setVideoSize((prev) => (
+      prev?.width === width && prev?.height === height ? prev : { width, height }
+    ));
+  }, []);
+
+  useEvent(player, 'onLoad', ({ width, height }) => {
+    updateVideoSize(width, height);
+    applySubtitle(selectedSubtitle);
+  });
+
+  useEvent(player, 'onBandwidthUpdate', ({ width, height }: BandwidthData) => {
+    updateVideoSize(width, height);
+  });
+
+  const selectedVideoTrack = useMemo<PlayerVideoTrack | null>(() => {
+    if (!videoSize) {
+      return null;
+    }
+
+    const { width, height } = videoSize;
+
+    // outside of auto mode the stream is fixed - showing the negotiated
+    // resolution instead of the picked quality would only confuse the user
+    return {
+      quality: selectedQuality === AUTO_QUALITY.value
+        ? getQualityFromResolution(width, height)
+        : selectedQuality,
+      width,
+      height,
+    };
+  }, [videoSize, selectedQuality]);
+
+  const togglePlayPause = (pause?: boolean, stopEvents?: boolean) => {
+    const { isPlaying: playing } = player;
+
+    if (stopEvents !== undefined) {
+      stopEventsRef.current = stopEvents;
+    }
+
+    const newPlaying = pause !== undefined ? pause : playing;
+
+    if (newPlaying) {
+      player.pause();
+      updateTime();
+    } else {
+      player.play();
+    }
+  };
+
+  const calculateCurrentTime = (percent: number) => {
+    const { duration } = player;
+
+    if (!duration) return 0;
+
+    return (percent / 100) * duration;
+  };
+
+  const seekToPosition = async (percent: number) => {
+    const { duration } = player;
+
+    const newTime = calculateCurrentTime(percent);
+
+    updateProgressStatus(newTime, bufferedPosition.current, duration);
+
+    player.seekTo(newTime);
+  };
+
+  const rewindPosition = async (type: RewindDirection, seconds: number) => {
+    const { currentTime, duration } = player;
+
+    const seekTime = type === RewindDirection.BACKWARD ? seconds * -1 : seconds;
+    const newTime = currentTime + seekTime;
+
+    updateProgressStatus(newTime, bufferedPosition.current, duration);
+
+    player.seekBy(seekTime);
+  };
+
+  const openOverlay = () => {
+    setIsOverlayOpen(true);
+  };
+
+  const closeOverlay = () => {
+    setIsOverlayOpen(false);
+  };
+
+  const openQualitySelector = () => {
+    qualityOverlayRef.current?.open();
+    openOverlay();
+  };
+
+  const openVideoSelector = () => {
+    playerVideoSelectorOverlayRef.current?.open();
+    openOverlay();
+  };
+
+  const openSubtitleSelector = () => {
+    subtitleOverlayRef.current?.open();
+    openOverlay();
+  };
+
+  const openCommentsOverlay = () => {
+    commentsOverlayRef.current?.open();
+    openOverlay();
+  };
+
+  const openBookmarksOverlay = () => {
+    if (!isSignedIn && !isLocalLibrary) {
+      NotificationStore.displayMessage(t('Sign In to an Account'));
+
+      return;
+    }
+
+    bookmarksOverlayRef.current?.open();
+    openOverlay();
+  };
+
+  const openSpeedSelector = () => {
+    speedOverlayRef.current?.open();
+    openOverlay();
+  };
+
+  const handleQualityChange = (item: DropdownItem) => {
+    const { value: quality } = item;
+
+    if (selectedQuality === quality) {
+      qualityOverlayRef.current?.close();
+
+      return;
+    }
+
+    setOverlayQuality(quality);
+    setSelectedQuality(getQualityFromStreams(selectedVideo, quality));
+
+    if (playerSaveQuality) {
+      updatePlayerQuality(quality);
+    }
+
+    updateTime();
+    updatePlayerStream(selectedVideo, quality, selectedVoice);
+
+    qualityOverlayRef.current?.close();
+  };
+
+  const handleSubtitleChange = (item: DropdownItem) => {
+    const { value: languageCode } = item;
+
+    if ((selectedSubtitle?.languageCode ?? SUBTITLES_OFF.value) === languageCode) {
+      subtitleOverlayRef.current?.close();
+
+      return;
+    }
+
+    const newSubtitle = languageCode === SUBTITLES_OFF.value
+      ? undefined
+      : selectedVideo.subtitles?.find((s) => s.languageCode === languageCode);
+
+    if (!newSubtitle && languageCode !== SUBTITLES_OFF.value) {
+      return;
+    }
+
+    setSelectedSubtitle(newSubtitle);
+    applySubtitle(newSubtitle);
+    updateTime();
+
+    subtitleOverlayRef.current?.close();
   };
 
   const handleVideoSelect = (newVideo: FilmVideoInterface, newVoice: FilmVoiceInterface) => {
@@ -618,7 +744,7 @@ export function PlayerContainer({
   };
 
   const setPlayerRate = (rate = 1) => {
-    player.playbackRate = rate;
+    applyPlayerRate(player, rate);
   };
 
   const handleSpeedChange = (item: DropdownItem) => {
@@ -660,8 +786,9 @@ export function PlayerContainer({
   };
 
   const onBookmarkChange = (f: FilmInterface) => {
-    film.bookmarks = f.bookmarks;
-    setIsFilmBookmarked(isBookmarked(film));
+    // BookmarksOverlay edits the very film object it was handed, so there is
+    // nothing to copy over - only the derived flag has to catch up
+    setIsFilmBookmarked(isBookmarked(f));
   };
 
   const backwardToStart = () => {

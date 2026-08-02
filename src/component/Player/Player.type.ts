@@ -1,13 +1,21 @@
 import { PlayerVideoSelectorRef } from 'Component/PlayerVideoSelector/PlayerVideoSelector.container';
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
-import { VideoContentFit, VideoPlayer, VideoPlayerStatus, VideoTrack } from 'expo-video';
 import { RefObject } from 'react';
+import { ResizeMode, VideoPlayer, VideoPlayerStatus } from 'react-native-video';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface, SubtitleInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 
 import { RewindDirection } from './Player.config';
+
+// react-native-video has no video track selection API - the track we display is
+// derived from what the player actually renders (`onLoad` / `onBandwidthUpdate`).
+export interface PlayerVideoTrack {
+  quality: string;
+  width?: number;
+  height?: number;
+}
 
 export interface PlayerContainerProps {
   video: FilmVideoInterface;
@@ -24,7 +32,7 @@ export interface PlayerComponentProps {
   video: FilmVideoInterface;
   film: FilmInterface;
   voice: FilmVoiceInterface;
-  videoTrack: VideoTrack | null;
+  videoTrack: PlayerVideoTrack | null;
   selectedQuality: string;
   selectedSubtitle?: SubtitleInterface;
   qualityOverlayRef: RefObject<ThemedOverlayRef | null>;
@@ -34,7 +42,7 @@ export interface PlayerComponentProps {
   bookmarksOverlayRef: RefObject<ThemedOverlayRef | null>;
   speedOverlayRef: RefObject<ThemedOverlayRef | null>;
   selectedSpeed: number;
-  selectedAspectRatio: VideoContentFit;
+  selectedAspectRatio: ResizeMode;
   isLocked: boolean;
   isOverlayOpen: boolean;
   isFilmBookmarked: boolean;

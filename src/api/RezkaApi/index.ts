@@ -159,7 +159,7 @@ const RezkaApi: RezkaApiInterface = {
   },
 
   getHeaders() {
-    const headers: HeadersInit = {
+    const headers: Record<string, string> = {
       'User-Agent': this.getConfig('userAgentNew'),
     };
 
