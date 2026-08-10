@@ -14,7 +14,7 @@ export const ThemedScrollViewComponent = ({
   style,
   containerStyle,
   contentContainerStyle,
-  autofocus,
+  autofocus = false,
   preferredChildFocusKey,
   viewPosition = 0.5,
 }: ThemedScrollViewComponentProps) => {
@@ -40,7 +40,7 @@ export const ThemedScrollViewComponent = ({
 
   // Claim focus when the enclosing screen loads or is returned to -- not only on
   // mount, so autofocus survives navigating back to this screen.
-  useDefaultFocus(focusKey, !!autofocus);
+  useDefaultFocus(focusKey, autofocus);
 
   const handleLayout = useCallback((event: LayoutChangeEvent) => {
     const { width, height } = event.nativeEvent.layout;

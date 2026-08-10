@@ -5,6 +5,7 @@ import { t } from 'i18n/translate';
 import {
   useCallback,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 import {
@@ -27,6 +28,7 @@ export const ConfigureSlide = ({
   const { isTV, setConfig } = useConfigContext();
   const { theme } = useAppTheme();
   const [selectedDeviceType, setSelectedDeviceType] = useState<DeviceType | null>(null);
+  const focusedTypeRef = useRef<DeviceType | null>(null);
 
   // Flipping `isTV` swaps the TV/mobile variants of the components the slide is
   // built from (ThemedGroup ...), so React remounts them -- including the
@@ -39,9 +41,11 @@ export const ConfigureSlide = ({
       return;
     }
 
-    setFocus(
-      selectedDeviceType === DeviceType.TV ? CONFIGURE_TV_FOCUS_KEY : CONFIGURE_MOBILE_FOCUS_KEY
-    );
+    if (focusedTypeRef.current) {
+      setFocus(
+        selectedDeviceType === DeviceType.TV ? CONFIGURE_TV_FOCUS_KEY : CONFIGURE_MOBILE_FOCUS_KEY
+      );
+    }
   }, [selectedDeviceType, isTV]);
 
   const handleNext = useCallback(() => {
@@ -59,13 +63,9 @@ export const ConfigureSlide = ({
     setConfig('isTV', type === DeviceType.TV);
   }, [setConfig]);
 
-  const handleSelectTV = useCallback(() => {
-    configureDeviceType(DeviceType.TV);
-  }, [configureDeviceType]);
-
-  const handleSelectMobile = useCallback(() => {
-    configureDeviceType(DeviceType.MOBILE);
-  }, [configureDeviceType]);
+  const focusDeviceType = useCallback((type: DeviceType) => {
+    focusedTypeRef.current = type;
+  }, []);
 
   return (
     <BaseSlide
@@ -81,7 +81,8 @@ export const ConfigureSlide = ({
             styles.configureButtonContent,
             selectedDeviceType === DeviceType.TV && styles.configureButtonSelected,
           ] }
-          onPress={ handleSelectTV }
+          onPress={ () => configureDeviceType(DeviceType.TV) }
+          onFocus={ () => focusDeviceType(DeviceType.TV) }
           styles={ styles }
         >
           { ({ isFocused }) => (
@@ -119,7 +120,8 @@ export const ConfigureSlide = ({
             styles.configureButtonContent,
             selectedDeviceType === DeviceType.MOBILE && styles.configureButtonSelected,
           ] }
-          onPress={ handleSelectMobile }
+          onPress={ () => configureDeviceType(DeviceType.MOBILE) }
+          onFocus={ () => focusDeviceType(DeviceType.MOBILE) }
           styles={ styles }
         >
           { ({ isFocused }) => (

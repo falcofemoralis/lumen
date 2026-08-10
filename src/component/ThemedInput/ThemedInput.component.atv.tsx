@@ -18,7 +18,7 @@ export const ThemedInputComponent = ({
   onChangeText,
   style,
   editable = true,
-  autofocus,
+  autofocus = false,
   secureTextEntry,
   ref: propRef,
   focusKey,
@@ -80,7 +80,7 @@ export const ThemedInputComponent = ({
     onBlur,
   });
 
-  useDefaultFocus(realFocusKey, !!autofocus);
+  useDefaultFocus(realFocusKey, autofocus);
 
   // Mirrors the spatial focus into a ref so the overlay effect below can read it
   // without re-running on every focus change.

@@ -11,6 +11,7 @@ const utilsColors = {
   fade: 'rgba(0, 0, 0, 0.8)',
   pressableHighlight: 'rgba(191, 191, 191, 0.5)',
   pressableHighlightOpposite: '#383838',
+  backdrop: 'rgba(0, 0, 0, 0.3)',
 };
 
 const textColors = {

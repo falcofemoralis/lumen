@@ -1,5 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { ThemedCustomSelect } from 'Component/ThemedCustomSelect';
+import { ThemedGroup } from 'Component/ThemedGroup';
 import { ThemedPressable } from 'Component/ThemedPressable';
 import { ThemedText } from 'Component/ThemedText';
 import { ThemedToggle } from 'Component/ThemedToggle';
@@ -21,6 +22,8 @@ import { FilmInterface } from 'Type/Film.interface';
 
 import { TEST_URL } from '../WelcomeScreen.config';
 import { BaseSlide, BaseSlideProps } from './BaseSlide';
+
+const CDN_VALIDATE_FOCUS_KEY = 'CDN_VALIDATE_BTN';
 
 export const CDNSlide = ({
   styles,
@@ -92,7 +95,10 @@ export const CDNSlide = ({
       { ...props }
       styles={ styles }
     >
-      <View style={ styles.cdnWrapper }>
+      <ThemedGroup
+        style={ styles.cdnWrapper }
+        preferredChildFocusKey={ CDN_VALIDATE_FOCUS_KEY }
+      >
         <ThemedCustomSelect
           options={ currentService.defaultCDNs }
           value={ selectedCDN ?? '' }
@@ -104,6 +110,8 @@ export const CDNSlide = ({
             { t('Automatic') }
           </ThemedText>
           <ThemedToggle
+            containerStyle={ styles.providerOffModeToggle }
+            inputWrapperStyle={ styles.providerOffModeToggleInput }
             value={ isAutomatic }
             onValueChange={ handleAutomaticMode }
           />
@@ -116,6 +124,7 @@ export const CDNSlide = ({
           ] }
           onPress={ handleValidateCDN }
           disabled={ isLoading }
+          focusKey={ CDN_VALIDATE_FOCUS_KEY }
         >
           { ({ isFocused }) => (
             <View style={ [
@@ -143,7 +152,7 @@ export const CDNSlide = ({
             </View>
           ) }
         </ThemedPressable>
-      </View>
+      </ThemedGroup>
     </BaseSlide>
   );
 };

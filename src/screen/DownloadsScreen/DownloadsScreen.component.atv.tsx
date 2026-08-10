@@ -230,6 +230,7 @@ const DownloadItem = (props: DownloadItemProps & { styles: ThemedStyles<typeof c
   const playerVideoSelectorOverlayRef = useRef<PlayerVideoSelectorRef>(null);
   const actionsOverlayRef = useRef<ThemedOverlayRef>(null);
   const tasksOverlayRef = useRef<ThemedOverlayRef>(null);
+  const { scale } = useAppTheme();
 
   const {
     film: {
@@ -414,6 +415,9 @@ const DownloadItem = (props: DownloadItemProps & { styles: ThemedStyles<typeof c
           contentStyle={ styles.actionButtonContent }
           IconComponent={ EllipsisVertical }
           onPress={ () => actionsOverlayRef.current?.open() }
+          iconProps={ {
+            size: scale(20),
+          } }
         />
       </Animated.View>
     </FocusContext.Provider>
@@ -483,9 +487,7 @@ export const DownloadsScreenComponent = (props: DownloadsScreenComponentProps) =
   };
 
   return (
-    <Page
-      checkConnection={ false }
-    >
+    <Page checkConnection={ false }>
       { renderContent() }
     </Page>
   );

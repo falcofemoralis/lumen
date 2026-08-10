@@ -62,7 +62,8 @@ export const BookmarksOverlayComponent = ({
           title={ t('Create') }
           onPress={ submitCreate }
           disabled={ !newTitle.trim() }
-          contentStyle={ [styles.button, styles.buttonPrimary] }
+          style={ styles.buttonPrimary }
+          contentStyle={ styles.button }
         />
       </View>
     </View>
@@ -98,6 +99,7 @@ export const BookmarksOverlayComponent = ({
   return (
     <ThemedOverlay
       ref={ overlayRef }
+      contentContainerStyle={ styles.overlayContent }
       onClose={ handleClose }
       useKeyboardAdjustment
     >

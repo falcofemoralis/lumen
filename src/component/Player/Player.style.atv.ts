@@ -93,6 +93,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   },
   commentsOverlayModal: {
     backgroundColor: colors.transparent,
+    paddingRight: scale(12),
   },
   commentsOverlayContent: {
     height: '100%',
@@ -117,7 +118,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     paddingInline: scale(32),
     borderRadius: scale(12),
     backgroundColor: colors.modal,
-    zIndex: 3,
+    zIndex: 1,
   },
   errorText: {
     fontSize: scale(text.xl.fontSize),

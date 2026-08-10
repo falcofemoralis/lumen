@@ -263,6 +263,10 @@ export const parseSubtitles = (
   Object.entries(subtitleLns).forEach(([name, languageCode]) => {
     const rawSubtitle = rawSubtitles.find((s) => s.name === name);
 
+    if (name === 'откл.') {
+      return;
+    }
+
     subtitles.push({
       name: rawSubtitle?.name ?? name,
       languageCode,

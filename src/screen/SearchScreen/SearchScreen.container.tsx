@@ -9,7 +9,7 @@ import {
   useSpeechRecognitionEvent,
 } from 'expo-speech-recognition';
 import { COLLECTION_SCREEN } from 'Navigation/navigationRoutes';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Keyboard } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
 import { SearchableCategoryInterface } from 'Type/SearchableCategoryInterface.interface';
@@ -239,7 +239,18 @@ export function SearchScreenContainer() {
 
   const suggestionToRemove = useRef<string | null>(null);
 
+  // Only the stored history can be removed: while the input has text the list
+  // shows the service's suggestions instead, and those are not ours to delete.
+  const isRemovableSuggestion = useCallback(
+    (suggestion: string) => userSuggestions.includes(suggestion),
+    [userSuggestions]
+  );
+
   const handleRemoveSuggestion = (suggestion: string) => {
+    if (!isRemovableSuggestion(suggestion)) {
+      return;
+    }
+
     suggestionToRemove.current = suggestion;
     confirmationOverlayRef.current?.open();
   };
@@ -288,6 +299,7 @@ export function SearchScreenContainer() {
     resetSearch,
     clearSearch,
     openAdditionalContentOverlay,
+    isRemovableSuggestion,
     handleRemoveSuggestion,
     removeSuggestion,
   };

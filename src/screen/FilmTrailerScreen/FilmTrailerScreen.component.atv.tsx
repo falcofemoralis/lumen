@@ -11,7 +11,7 @@ import { FilmTrailerScreenComponentProps } from './FilmTrailerScreen.type';
 const TrailerPlayer = ({ trailerUrl }: { trailerUrl: string }) => {
   const player = useYouTubePlayer({ url: trailerUrl }, {
     autoplay: true,
-    controls: false,
+    controls: true,
   });
 
   const state = useYouTubeEvent(player, 'stateChange');
@@ -30,6 +30,7 @@ const TrailerPlayer = ({ trailerUrl }: { trailerUrl: string }) => {
         autofocus
         onPress={ handleTogglePlay }
         style={ { width: '100%', height: '100%' } }
+        contentStyle={ { width: '100%', height: '100%' } }
       >
         <YoutubeView player={ player } style={ { width: '100%', height: '100%' } } />
       </ThemedPressable>

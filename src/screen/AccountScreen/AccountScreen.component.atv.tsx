@@ -1,3 +1,4 @@
+import { ConfirmOverlay } from 'Component/ConfirmOverlay';
 import { Loader } from 'Component/Loader';
 import { LoginForm } from 'Component/LoginForm';
 import { Page } from 'Component/Page';
@@ -69,6 +70,8 @@ export function AccountScreenComponent({
   handleViewProfile,
   handleViewPayments,
   handleLogout,
+  confirmLogout,
+  logoutConfirmOverlayRef,
   openNotImplemented,
   openDownloads,
 }: AccountScreenComponentProps) {
@@ -188,6 +191,18 @@ export function AccountScreenComponent({
     );
   };
 
+  const renderLogoutConfirmOverlay = () => {
+    return (
+      <ConfirmOverlay
+        overlayRef={ logoutConfirmOverlayRef }
+        title={ t('Are you sure?') }
+        message={ t('Are you sure you want to log out?') }
+        confirmButtonText={ t('Log out') }
+        onConfirm={ confirmLogout }
+      />
+    );
+  };
+
   const renderContent = () => {
     if (!isSignedIn) {
       return (
@@ -230,6 +245,7 @@ export function AccountScreenComponent({
 
   return (
     <Page checkConnection={ false }>
+      { renderLogoutConfirmOverlay() }
       { renderContent() }
     </Page>
   );

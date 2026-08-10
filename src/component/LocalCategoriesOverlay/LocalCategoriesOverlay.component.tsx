@@ -71,7 +71,8 @@ export const LocalCategoriesOverlayComponent = ({
             color: theme.colors.text,
           } }
           onPress={ startCreate }
-          contentStyle={ styles.button }
+          style={ styles.button }
+          contentStyle={ styles.buttonContent }
         />
       </View>
     </>
@@ -89,13 +90,15 @@ export const LocalCategoriesOverlayComponent = ({
         <ThemedButton
           title={ t('Cancel') }
           onPress={ cancelCreate }
-          contentStyle={ styles.button }
+          style={ styles.button }
+          contentStyle={ styles.buttonContent }
         />
         <ThemedButton
           title={ t('Create') }
           onPress={ submitCreate }
           disabled={ isCreateDisabled }
-          contentStyle={ [styles.button, styles.buttonPrimary] }
+          style={ [styles.button, styles.buttonPrimary] }
+          contentStyle={ styles.buttonContent }
         />
       </View>
     </>
@@ -113,12 +116,14 @@ export const LocalCategoriesOverlayComponent = ({
         <ThemedButton
           title={ t('Cancel') }
           onPress={ cancelDelete }
-          contentStyle={ styles.button }
+          style={ styles.button }
+          contentStyle={ styles.buttonContent }
         />
         <ThemedButton
           title={ t('Accept') }
           onPress={ confirmDelete }
-          contentStyle={ [styles.button, styles.buttonPrimary] }
+          style={ [styles.button, styles.buttonPrimary] }
+          contentStyle={ styles.buttonContent }
         />
       </View>
     </>

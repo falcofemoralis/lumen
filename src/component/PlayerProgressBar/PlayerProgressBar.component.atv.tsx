@@ -136,7 +136,7 @@ export const PlayerProgressBarComponent = ({
           smartSeekingRef.current.percentage = 0;
           // eslint-disable-next-line react-compiler/react-compiler
           progress.value = smartSeekingRef.current.percentage;
-          updateProgressStatus(newTime <= 0 ? 0 : duration, 0, duration);
+          updateProgressStatus(newTime <= 0 ? 0 : duration, 0, duration, player.rate);
 
           return;
         }
@@ -145,7 +145,7 @@ export const PlayerProgressBarComponent = ({
         smartSeekingRef.current.iterations++;
 
         progress.value = smartSeekingRef.current.percentage;
-        updateProgressStatus(newTime, 0, duration);
+        updateProgressStatus(newTime, 0, duration, player.rate);
 
         lastUpdateTime = timestamp;
       }

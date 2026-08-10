@@ -98,7 +98,10 @@ const MemoCommentItem = memo(CommentItem, rowPropsAreEqual);
 
 export const CommentsComponent = ({
   comments,
+  style,
   isLoading,
+  loaderFullScreen,
+  disableRefresh,
   onNextLoad,
   handlePostLike,
 }: CommentsComponentProps) => {
@@ -122,24 +125,30 @@ export const CommentsComponent = ({
   // the drags instead of scrolling.
   const listEmptyComponent = useMemo(() => (
     (!comments || isLoading) ? (
-      <View style={ styles.loader }>
+      <View style={ loaderFullScreen ? styles.loaderCentered : styles.loader }>
         <Loader isLoading />
       </View>
     ) : (
-      <View style={ styles.noComments }>
+      <View style={ [
+        styles.noComments,
+        loaderFullScreen && styles.noCommentsCentered,
+      ] }
+      >
         <ThemedText style={ styles.noCommentsText }>
           { t('No comments yet') }
         </ThemedText>
       </View>
     )
-  ), [comments, isLoading, styles]);
+  ), [comments, isLoading, loaderFullScreen, styles]);
 
   return (
     <ThemedGrid
       numberOfColumns={ 1 }
+      style={ style }
       data={ comments ?? [] }
       renderItem={ renderItem }
       onNextLoad={ onNextLoad }
+      disableRefresh={ disableRefresh }
       ListEmptyComponent={ listEmptyComponent }
     />
   );

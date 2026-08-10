@@ -55,13 +55,15 @@ export const BookmarksOverlayComponent = ({
         <ThemedButton
           title={ t('Cancel') }
           onPress={ cancelCreate }
-          contentStyle={ styles.button }
+          style={ styles.button }
+          contentStyle={ styles.buttonContent }
         />
         <ThemedButton
           title={ t('Create') }
           onPress={ submitCreate }
           disabled={ !newTitle.trim() }
-          contentStyle={ [styles.button, styles.buttonPrimary] }
+          style={ [styles.button, styles.buttonPrimary] }
+          contentStyle={ styles.buttonContent }
         />
       </View>
     </View>
@@ -88,7 +90,8 @@ export const BookmarksOverlayComponent = ({
               color: theme.colors.text,
             } }
             onPress={ () => setIsCreating(true) }
-            contentStyle={ styles.button }
+            style={ styles.button }
+            contentStyle={ styles.buttonContent }
           />
         </View>
       ) }
@@ -98,6 +101,7 @@ export const BookmarksOverlayComponent = ({
   return (
     <ThemedOverlay
       ref={ overlayRef }
+      contentContainerStyle={ styles.overlayContent }
       onClose={ handleClose }
       useKeyboardAdjustment
     >

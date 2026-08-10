@@ -29,11 +29,15 @@ class ReactNativeApkInstallerModule : Module() {
       }
 
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-        val authority = appContext.reactContext?.packageName + ".fileprovider"
+        // must stay unique: react-native-webview also registers a FileProvider
+        // under `${applicationId}.fileprovider`, and Android binds an authority
+        // to a single provider, so sharing it would hand our lookups webview's
+        // paths (external storage only) instead of the ones in file_paths.xml
+        val authority = appContext.reactContext?.packageName + ".apkinstaller.fileprovider"
         val contentUri: Uri = try {
           FileProvider.getUriForFile(appContext.reactContext!!, authority, apkFile)
         } catch (e: Exception) {
-          promise.reject("102", "installApk exception with authority name '$authority'", null)
+          promise.reject("102", "installApk exception with authority name '$authority': ${e.message}", null)
           return@AsyncFunction
         }
         val installApp = Intent(Intent.ACTION_INSTALL_PACKAGE)

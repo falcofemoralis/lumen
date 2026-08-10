@@ -16,12 +16,12 @@ import { ProfileInterface } from 'Type/Profile.interface';
 import { RatingInterface } from 'Type/Rating.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { VoiceRatingInterface } from 'Type/VoiceRating.interface';
-import { cookiesManager } from 'Util/Cookies';
+import { buildCookies, cookiesManager } from 'Util/Cookies';
 import { decodeHtml } from 'Util/Html';
 import { safeJsonParse } from 'Util/Json';
 import { HTMLElementInterface, parseHtml } from 'Util/Parser';
 import { processPromisesBatch } from 'Util/Promise';
-import { executeGet, executePostFormData, formatURI, Variables } from 'Util/Request';
+import { executeGet, executePostFormData, formatURI, NotFoundError, Variables } from 'Util/Request';
 import { storage } from 'Util/Storage';
 import { updateUrlHost } from 'Util/Url';
 
@@ -158,7 +158,7 @@ const RezkaApi: RezkaApiInterface = {
     return this.getConfig('cdn') || this.defaultCDNs[0];
   },
 
-  getHeaders() {
+  getHeaders(includeHeaders) {
     const headers: Record<string, string> = {
       'User-Agent': this.getConfig('userAgentNew'),
     };
@@ -166,6 +166,17 @@ const RezkaApi: RezkaApiInterface = {
     if (this.getConfig('officialMode')) {
       headers['X-Hdrezka-Android-App'] = '1';
       headers['X-Hdrezka-Android-App-Version'] = '2.2.1';
+    }
+
+    // Requests made outside of customFetch (e.g. the native player) don't get
+    // the cookie jar applied for them, so attach it explicitly on demand.
+    if (includeHeaders) {
+      const { hostname } = new URL(this.getProvider());
+      const cookies = buildCookies(hostname);
+
+      if (cookies) {
+        headers.Cookie = cookies;
+      }
     }
 
     return headers;
@@ -216,8 +227,6 @@ const RezkaApi: RezkaApiInterface = {
         controller.signal
       );
     } catch (error) {
-      console.log('fail');
-
       console.error(error);
       throw new Error(t('Invalid URL'));
     } finally {
@@ -675,6 +684,46 @@ const RezkaApi: RezkaApiInterface = {
     return filmsList;
   },
 
+  getCategoryMenu: (link) => {
+    if (link.includes('/best/')) {
+      return [
+        {
+          id: 'category',
+          title: 'Category',
+          path: link,
+          isHidden: true,
+        },
+      ];
+    }
+
+    return [
+      {
+        id: 'last',
+        title: t('Last Additions'),
+        path: link,
+        variables: { 'filter': 'last' } as Variables,
+      },
+      {
+        id: 'popular',
+        title: t('Popular'),
+        path: link,
+        variables: { 'filter': 'popular' } as Variables,
+      },
+      {
+        id: 'soon',
+        title: t('Awaiting'),
+        path: link,
+        variables: { 'filter': 'soon' } as Variables,
+      },
+      {
+        id: 'watching',
+        title: t('Watching Now'),
+        path: link,
+        variables: { 'filter': 'watching' } as Variables,
+      },
+    ];
+  },
+
   getFilmSortingOptions() {
     return [
       {
@@ -707,10 +756,25 @@ const RezkaApi: RezkaApiInterface = {
       applyFilmSorting(sort, variables);
     }
 
-    const root = await this.fetchPage(
-      `${path === '/' ? '' : path}/page/${page}/`,
-      variables
-    );
+    let root;
+
+    try {
+      root = await this.fetchPage(
+        `${path === '/' ? '' : path}/page/${page}/`,
+        variables
+      );
+    } catch (error) {
+      // an empty listing (a filter with no films, a page past the last one)
+      // answers with a 404 -- an empty result, not a failure
+      if (error instanceof NotFoundError) {
+        return {
+          films: [],
+          totalPages: 1,
+        };
+      }
+
+      throw error;
+    }
 
     const content = key ? root.querySelector(key) : root;
 

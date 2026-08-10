@@ -63,7 +63,6 @@ export function FilmScreenComponent({
   handleSelectCategory,
   openBookmarks,
   handleUpdateScheduleWatch,
-  handleBookmarkChange,
   openVideoDownloader,
   handleDownloadSelect,
   openTrailerOverlay,
@@ -516,7 +515,6 @@ export function FilmScreenComponent({
     <BookmarksOverlay
       overlayRef={ bookmarksOverlayRef }
       film={ film }
-      onBookmarkChange={ handleBookmarkChange }
     />
   );
 

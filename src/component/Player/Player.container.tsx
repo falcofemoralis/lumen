@@ -11,7 +11,6 @@ import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { useLocalBookmarks } from 'Hooks/useLocalLibrary';
 import { useVideoPlayerState } from 'Hooks/useVideoPlayerState';
 import { t } from 'i18n/translate';
-import { PLAYER_SCREEN } from 'Navigation/navigationRoutes';
 import {
   useCallback,
   useEffect,
@@ -31,7 +30,6 @@ import {
   VideoRuntimeError,
 } from 'react-native-video';
 import NotificationStore from 'Store/Notification.store';
-import RouterStore from 'Store/Router.store';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface, SubtitleInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
@@ -135,6 +133,11 @@ export function PlayerContainer({
   // react-native-video exposes the buffered position only through onProgress,
   // there is no property to read it back from the player
   const bufferedPosition = useRef<number>(0);
+  // every `player.*` read is a synchronous call into the native player, and the seek
+  // bubble asks for the duration on every frame of a drag - which stalls the JS thread
+  // for as long as the drag lasts. onProgress already reports it, so cache it here and
+  // only touch the player when nothing has been reported for the current source yet.
+  const durationRef = useRef<number>(0);
   const qualityOverlayRef = useRef<ThemedOverlayRef>(null);
   const subtitleOverlayRef = useRef<ThemedOverlayRef>(null);
   const playerVideoSelectorOverlayRef = useRef<PlayerVideoSelectorRef>(null);
@@ -207,7 +210,7 @@ export function PlayerContainer({
     bufferConfig: getBufferConfig(quality, playerBufferTimeSetting, playerBackBufferTimeSetting),
     externalSubtitles: getExternalSubtitles(videoArg, isOffline),
     metadata: getPlayerMetadata(film, voiceArg),
-    headers: currentService.getHeaders(),
+    headers: currentService.getHeaders(true),
   }), [
     playerBufferTimeSetting,
     playerBackBufferTimeSetting,
@@ -216,12 +219,17 @@ export function PlayerContainer({
     currentService,
   ]);
 
-  const videoSource = useMemo(
-    () => buildVideoSource(videoUrl ?? EMPTY_VIDEO_URL, selectedQuality, video, voice),
-    [buildVideoSource, videoUrl, selectedQuality, video, voice]
+  // react-native-video's `useVideoPlayer` rebuilds the native player whenever the
+  // source it is handed changes - unlike expo-video, where the argument was only
+  // the initial source. A rebuilt player drops the playback state, the media
+  // session and the progress reporting of the running one, so the hook only ever
+  // sees the source this session started with. Every later switch (quality,
+  // episode, voice) goes through `replaceSourceAsync` in updatePlayerStream.
+  const [initialVideoSource] = useState(
+    () => buildVideoSource(videoUrl ?? EMPTY_VIDEO_URL, selectedQuality, video, voice)
   );
 
-  const player = useVideoPlayer(videoSource, (p) => {
+  const player = useVideoPlayer(initialVideoSource, (p) => {
     const savedTime = getSavedTime(film);
 
     p.loop = false;
@@ -235,12 +243,18 @@ export function PlayerContainer({
     initFirestoreSavedTime(p, savedTime);
   });
 
-  const { status, isPlaying } = useVideoPlayerState(player);
+  const { status, isPlaying, isBuffering } = useVideoPlayerState(player);
 
   // the native player reports every failure as an error status, so a player that
   // is playable again - the lower quality took over, or the source recovered on
   // its own - has nothing left to tell the user about
   const hasPlaybackError = playbackFailed && status !== 'readyToPlay';
+
+  // everything the UI treats as "the video is not ready yet": a source being
+  // loaded, a stall mid playback, and our own fetch of the next episode. An
+  // errored player is excluded - it is not going to finish loading, and the
+  // error message says so instead
+  const isVideoLoading = !hasPlaybackError && (isLoading || isBuffering || status === 'loading');
 
   const updateTime = useCallback(() => {
     const { currentTime, duration } = player;
@@ -366,42 +380,41 @@ export function PlayerContainer({
     // a new source gets its own chance to load - whatever failed before is not
     // the state of what is about to play
     setPlaybackFailed(false);
+    // the cached duration belongs to the outgoing source
+    durationRef.current = 0;
 
-    if (qualityArg === AUTO_QUALITY.value) {
-      // temporary solution
-      // unfortunately it doesn't work because player loading becomes stuck
-      // so the only way is to reload the player page entirely
-      //player.replaceSourceAsync(createMasterPlaylist(filmVideo.streams).uri);
+    const newStream = getPlayerStream(videoArg, getQualityFromStreams(videoArg, qualityArg));
 
-      RouterStore.pushData(PLAYER_SCREEN, {
-        video: videoArg,
-        film,
-        voice: voiceArg || selectedVoice,
-      });
-
-      const state = navigation.getState();
-      const filteredRoutes = state?.routes.filter((r) => r.name !== PLAYER_SCREEN) ?? [];
-      filteredRoutes.push({
-        key: `${PLAYER_SCREEN}-${Date.now()}`,
-        name: PLAYER_SCREEN,
-      });
-
-      navigation.reset({
-        index: state?.index ?? 0,
-        routes: filteredRoutes as any,
-      });
-    } else {
-      const newStream = getPlayerStream(videoArg, getQualityFromStreams(videoArg, qualityArg));
-
-      // a miss is reported as a null url, not a missing object
-      if (!newStream.url) {
-        return;
-      }
-
-      player.replaceSourceAsync(
-        buildVideoSource(newStream.url, newStream.quality, videoArg, voiceArg || selectedVoice)
-      );
+    // a miss is reported as a null url, not a missing object
+    if (!newStream.url) {
+      return;
     }
+
+    const newVoice = voiceArg || selectedVoice;
+    // replacing a source re-prepares the player from zero: it neither restores
+    // the position nor resumes on its own. The position is read back the same
+    // way the initial load does it - the callers save the current one first, so
+    // a quality switch lands where playback was, and an episode switch lands on
+    // whatever was watched of that episode.
+    const resumeTime = getVideoTime(newVoice, getSavedTime(film));
+
+    player.replaceSourceAsync(
+      buildVideoSource(newStream.url, newStream.quality, videoArg, newVoice)
+    )
+      .then(() => {
+        if (resumeTime > 0) {
+          // the property setter seeks unconditionally, `seekTo` clamps against
+          // a duration the freshly prepared source does not report yet
+          player.currentTime = resumeTime;
+        }
+
+        player.play();
+      })
+      .catch((error) => {
+        // a rejected switch already reached the user through onError, which
+        // steps the quality down or raises the playback error screen
+        console.error('Error replacing player source:', error);
+      });
   };
 
   const changePlayerVideo = (newVideo: FilmVideoInterface, newVoice: FilmVoiceInterface) => {
@@ -539,6 +552,8 @@ export function PlayerContainer({
       return;
     }
 
+    durationRef.current = duration;
+
     const now = Date.now();
 
     if (now - lastProgressUpdate.current < PROGRESS_UPDATE_EVERY_MS) {
@@ -547,7 +562,7 @@ export function PlayerContainer({
 
     lastProgressUpdate.current = now;
 
-    updateProgressStatus(currentTime, !isOffline ? bufferedPosition.current : 0, duration);
+    updateProgressStatus(currentTime, !isOffline ? bufferedPosition.current : 0, duration, player.rate);
 
     if (!playing) {
       return;
@@ -656,23 +671,38 @@ export function PlayerContainer({
     }
   };
 
-  const calculateCurrentTime = (percent: number) => {
+  const getDuration = useCallback(() => {
+    if (durationRef.current > 0) {
+      return durationRef.current;
+    }
+
     const { duration } = player;
+
+    if (duration > 0) {
+      durationRef.current = duration;
+    }
+
+    return durationRef.current;
+  }, [player]);
+
+  // both of these end up in the deps of the seek bar's pan gesture, so they have to keep
+  // their identity across renders - a gesture rebuilt while a drag is in flight stops
+  // reporting updates, and the seek bubble freezes on whatever value it last received
+  const calculateCurrentTime = useCallback((percent: number) => {
+    const duration = getDuration();
 
     if (!duration) return 0;
 
     return (percent / 100) * duration;
-  };
+  }, [getDuration]);
 
-  const seekToPosition = async (percent: number) => {
-    const { duration } = player;
-
+  const seekToPosition = useCallback((percent: number) => {
     const newTime = calculateCurrentTime(percent);
 
-    updateProgressStatus(newTime, bufferedPosition.current, duration);
+    updateProgressStatus(newTime, bufferedPosition.current, getDuration(), player.rate);
 
     player.seekTo(newTime);
-  };
+  }, [calculateCurrentTime, getDuration, updateProgressStatus, player]);
 
   const rewindPosition = async (type: RewindDirection, seconds: number) => {
     const { currentTime, duration } = player;
@@ -680,7 +710,7 @@ export function PlayerContainer({
     const seekTime = type === RewindDirection.BACKWARD ? seconds * -1 : seconds;
     const newTime = currentTime + seekTime;
 
-    updateProgressStatus(newTime, bufferedPosition.current, duration);
+    updateProgressStatus(newTime, bufferedPosition.current, duration, player.rate);
 
     player.seekBy(seekTime);
   };
@@ -794,8 +824,16 @@ export function PlayerContainer({
       return;
     }
 
-    setSelectedSpeed(Number(speed));
-    setPlayerRate(Number(speed));
+    const newSpeed = Number(speed);
+
+    setSelectedSpeed(newSpeed);
+    setPlayerRate(newSpeed);
+
+    // the end time is only recomputed on a progress tick, and a paused player
+    // never fires one - republish it here so the new speed shows up right away
+    const { currentTime, duration } = player;
+
+    updateProgressStatus(currentTime, !isOffline ? bufferedPosition.current : 0, duration, newSpeed);
 
     speedOverlayRef.current?.close();
   };
@@ -862,7 +900,7 @@ export function PlayerContainer({
     isFilmBookmarked: isFilmBookmarkedValue,
     isOffline,
     overlayQuality,
-    isLoading,
+    isVideoLoading,
     hasPlaybackError,
     togglePlayPause,
     rewindPosition,

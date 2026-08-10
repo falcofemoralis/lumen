@@ -6,19 +6,18 @@ import { queryKeys } from 'Util/Query';
 
 import CategoryScreenComponent from './CategoryScreen.component';
 import CategoryScreenComponentTV from './CategoryScreen.component.atv';
-import { CATEGORY_MENU_ITEM } from './CategoryScreen.config';
 import { CategoryScreenContainerProps } from './CategoryScreen.type';
 
 export function CategoryScreenContainer({ route }: CategoryScreenContainerProps) {
   const { link } = route.params as { link: string };
   const isTV = useIsTV();
   const { currentService } = useServiceContext();
-  const menuItems = useMemo(() => [CATEGORY_MENU_ITEM], []);
+  const menuItems = useMemo(() => currentService.getCategoryMenu(link), [currentService, link]);
 
   const { pagerItems, onPreLoad, onNextLoad } = useFilmPager({
     queryKey: queryKeys.films.category(link),
     menuItems,
-    fetchFilms: (_menuItem, page) => currentService.getFilms(page, link),
+    fetchFilms: (menuItem, page) => currentService.getFilms(page, menuItem.path, { ...menuItem.variables }),
   });
 
   const containerProps = {

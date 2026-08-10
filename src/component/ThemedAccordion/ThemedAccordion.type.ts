@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { ViewStyle } from 'react-native';
+import { TextStyle, ViewStyle } from 'react-native';
 
 export interface AccordionGroupInterface<T> {
   id: string;
@@ -10,6 +10,8 @@ export interface AccordionGroupInterface<T> {
 export interface ThemedAccordionContainerProps<T> {
   data: AccordionGroupInterface<T>[];
   overlayContentStyle?: ViewStyle;
+  // resting look of the group button, merged under its focused state (TV only)
+  groupStyle?: TextStyle;
   renderItem: (item: T, idx: number) => ReactNode;
 }
 

@@ -11,10 +11,8 @@ import { ThemedPressable } from 'Component/ThemedPressable';
 import { ThemedText } from 'Component/ThemedText';
 import { useConfigContext } from 'Context/ConfigContext';
 import * as Haptics from 'expo-haptics';
-import * as NavigationBar from 'expo-navigation-bar';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { OrientationLock } from 'expo-screen-orientation';
-import * as StatusBar from 'expo-status-bar';
 import { useLatest } from 'Hooks/useLatest';
 import { usePictureInPicture } from 'Hooks/usePictureInPicture';
 import { useRestartableTimeout } from 'Hooks/useRestartableTimeout';
@@ -59,6 +57,7 @@ import { VideoView } from 'react-native-video';
 import { scheduleOnRN } from 'react-native-worklets';
 import { useAppTheme } from 'Theme/context';
 import { ClosedCaptionFilled } from 'Theme/icons';
+import { hideSystemBars, showSystemBars } from 'Util/Device';
 import { formatVideoTrackInfo, getPlayerAvailableQualityItems } from 'Util/Player';
 
 import {
@@ -125,7 +124,7 @@ export function PlayerComponent({
   isFilmBookmarked,
   isOffline,
   overlayQuality,
-  isLoading,
+  isVideoLoading,
   hasPlaybackError,
   togglePlayPause,
   seekToPosition,
@@ -198,34 +197,34 @@ export function PlayerComponent({
   useEffect(() => {
     ScreenOrientation.lockAsync(OrientationLock.LANDSCAPE);
 
-    NavigationBar.setVisibilityAsync('hidden');
-    StatusBar.setStatusBarHidden(true, 'slide');
+    hideSystemBars('slide');
 
     const focusSubscription = AppState.addEventListener('focus', () => {
-      NavigationBar.setVisibilityAsync('hidden');
-      StatusBar.setStatusBarHidden(true, 'none');
+      hideSystemBars('none');
     });
 
     // the controls and double tap timeouts clear themselves on unmount
     return () => {
       ScreenOrientation.unlockAsync();
-      NavigationBar.setVisibilityAsync('visible');
-      StatusBar.setStatusBarHidden(false, 'slide');
+      showSystemBars('slide');
       focusSubscription.remove();
     };
   }, []);
 
-  const handleUserInteraction = (action?: () => void) => {
+  // the seek bar folds both of these into the deps of its pan gesture. Dragging flips
+  // `isScrolling`, which re-renders this component, so a fresh identity here would rebuild
+  // that gesture in the middle of the drag it was started by.
+  const handleUserInteraction = useCallback((action?: () => void) => {
     setControlsTimeout();
 
     if (action) {
       action();
     }
-  };
+  }, [setControlsTimeout]);
 
-  const handleIsScrolling = (value: boolean) => {
+  const handleIsScrolling = useCallback((value: boolean) => {
     setIsScrolling(value);
-  };
+  }, []);
 
   const handleOpenComments = () => {
     setShowControls(false);
@@ -439,6 +438,17 @@ export function PlayerComponent({
     </GestureDetector>
   );
 
+  // the control is the only thing standing where the full screen loader spins,
+  // so it takes the spinner over instead of showing a play icon for a video that
+  // is not ready to play yet
+  const getPlayPauseIcon = () => {
+    if (isVideoLoading) {
+      return Loader;
+    }
+
+    return isPlaying ? Pause : Play;
+  };
+
   const renderMiddleControls = () => {
     if (isLocked) {
       return null;
@@ -451,7 +461,7 @@ export function PlayerComponent({
           () => handleNewEpisode(RewindDirection.BACKWARD)
         ) }
         { renderMiddleControl(
-          isPlaying || status === 'loading' ? Pause : Play,
+          getPlayPauseIcon(),
           togglePlayPause,
           'big'
         ) }
@@ -571,7 +581,7 @@ export function PlayerComponent({
         >
           <View style={ styles.doubleTapContainer }>
             <View style={ styles.doubleTapIcon }>
-              <Rewind color={ theme.colors.icon } />
+              <Rewind color={ theme.colors.iconOnContrast } />
             </View>
             <ThemedText style={ styles.longTapText }>
               { t('{{seconds}} seconds', { seconds: `-${seconds}` }) }
@@ -587,7 +597,7 @@ export function PlayerComponent({
         >
           <View style={ styles.doubleTapContainer }>
             <View style={ styles.doubleTapIcon }>
-              <FastForward color={ theme.colors.icon } />
+              <FastForward color={ theme.colors.iconOnContrast } />
             </View>
             <ThemedText style={ styles.longTapText }>
               { t('{{seconds}} seconds', { seconds: `${seconds}` }) }
@@ -644,9 +654,11 @@ export function PlayerComponent({
     </GestureDetector>
   );
 
+  // only when the play/pause control is not there to hold the spinner itself:
+  // both sit dead centre, so showing the two of them just stacks them
   const renderLoader = () => (
     <Loader
-      isLoading={ !hasPlaybackError && (isLoading || status === 'loading') }
+      isLoading={ isVideoLoading && (!showControls || isLocked) }
       fullScreen
     />
   );
@@ -788,9 +800,9 @@ export function PlayerComponent({
         controls={ false }
         pictureInPicture={ isPipSupported }
       />
+      { renderError() }
       { renderControls() }
       { renderLoader() }
-      { renderError() }
       { renderModals() }
     </View>
   );

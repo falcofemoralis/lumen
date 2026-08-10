@@ -5,7 +5,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     flexDirection: 'row',
     gap: scale(24),
     width: '100%',
-    paddingBottom: scale(8),
+    paddingTop: scale(8),
   },
   photo: {
     width: '15%',

@@ -13,6 +13,7 @@
   ],
   "android": {
     "icon": "./assets/images/app-icon-all.png",
+    "backgroundColor": "#000000",
     "package": "com.falcofemoralis.lumen",
     "adaptiveIcon": {
       "foregroundImage": "./assets/images/app-icon-android-adaptive-foreground.png",

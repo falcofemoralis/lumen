@@ -7,6 +7,10 @@ export const componentStyles = ({ scale, colors }: Theme) => ({
     height: '100%',
     width: '100%',
   },
+  // Replaces the native Modal's backdropColor, which went away with the Modal.
+  backdrop: {
+    backgroundColor: colors.modal,
+  },
   contentContainerStyle: {
     backgroundColor: colors.backgroundLight,
     padding: scale(8),

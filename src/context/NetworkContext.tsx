@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { NetworkStateType, useNetworkState } from 'expo-network';
 import {
   createContext,
@@ -24,6 +25,7 @@ const NetworkContext = createContext<NetworkContextInterface>({
 
 export const NetworkProvider = ({ children }: { children: ReactNode }) => {
   const { strictConnectionCheck } = useConfigContext();
+  const queryClient = useQueryClient();
   const { isConnected, isInternetReachable, type } = useNetworkState();
   const [errorOccurred, setErrorOccurred] = useState<boolean>(false);
   const [wasOnline, setWasOnline] = useState<boolean>(false);
@@ -42,6 +44,24 @@ export const NetworkProvider = ({ children }: { children: ReactNode }) => {
       setErrorOccurred(false);
     }
   }
+
+  // Queries that failed while offline stay parked in `error` with no data, and nothing
+  // brings them back on its own: their observers live above <Page>, so hiding the screen
+  // behind the offline block never unmounts them (no refetch-on-mount), and
+  // `refetchOnReconnect` is inert in React Native - react-query's onlineManager only
+  // listens for browser online/offline events, so it reports "online" forever.
+  // Without this the screen returns from the offline block into an endless skeleton.
+  // Feeding onlineManager from expo-network instead would pause queries rather than let
+  // them fail, and a failed request is exactly what `errorOccurred` above is built on.
+  useEffect(() => {
+    if (!isOnline) {
+      return;
+    }
+
+    queryClient.resetQueries({
+      predicate: ({ state }) => state.status === 'error',
+    });
+  }, [isOnline, queryClient]);
 
   const isInternetAvailable = useMemo(() => {
     if (!type) {

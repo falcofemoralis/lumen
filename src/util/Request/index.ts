@@ -3,11 +3,13 @@ import { customFetch } from 'Util/Fetch';
 
 export type Variables = Record<string, string>;
 
-export const formatURI = (query: string, variables: Variables, url: string): string => {
-  if (query.includes('http')) {
-    return query;
-  }
+/**
+ * A 404 from the provider. Listings use it for "there is nothing here" (an empty
+ * filter, a page past the last one), so callers can tell it from a real failure.
+ */
+export class NotFoundError extends Error {}
 
+export const formatURI = (query: string, variables: Variables, url: string): string => {
   const stringifyVariables = Object.keys(variables).reduce(
     (acc, variable) => {
       const value = variables[variable];
@@ -26,7 +28,15 @@ export const formatURI = (query: string, variables: Variables, url: string): str
 
   const queryVars = stringifyVariables.join('&').replaceAll('"', '');
 
-  return `${url}${query}${queryVars !== '' ? `?${queryVars}` : ''}`;
+  // the site's own hrefs (film genres, collections) are absolute -- they carry
+  // the host already, but still take the variables
+  const uri = query.includes('http') ? query : `${url}${query}`;
+
+  if (queryVars === '') {
+    return uri;
+  }
+
+  return `${uri}${uri.includes('?') ? '&' : '?'}${queryVars}`;
 };
 
 export const getFetch = (
@@ -68,7 +78,7 @@ export const handleRequestError = (response: Response): void => {
   }
 
   if (response.status === 404) {
-    throw new Error(t('Not found'));
+    throw new NotFoundError(t('Not found'));
   }
 };
 
@@ -94,6 +104,12 @@ export const executeGet = async (
 
     return parsedRes;
   } catch (error) {
+    // kept as is, callers check for it -- everything else keeps the stringified
+    // shape the connection error handler matches on
+    if (error instanceof NotFoundError) {
+      throw error;
+    }
+
     throw new Error(error as string);
   }
 };
@@ -129,6 +145,12 @@ export const executePostFormData = async (
 
     return parsedRes;
   } catch (error) {
+    // kept as is, callers check for it -- everything else keeps the stringified
+    // shape the connection error handler matches on
+    if (error instanceof NotFoundError) {
+      throw error;
+    }
+
     throw new Error(error as string);
   }
 };
@@ -156,6 +178,12 @@ export const executePostJson = async (
 
     return parsedRes;
   } catch (error) {
+    // kept as is, callers check for it -- everything else keeps the stringified
+    // shape the connection error handler matches on
+    if (error instanceof NotFoundError) {
+      throw error;
+    }
+
     throw new Error(error as string);
   }
 };
@@ -194,6 +222,12 @@ export const executePostEncoded = async (
 
     return parsedRes;
   } catch (error) {
+    // kept as is, callers check for it -- everything else keeps the stringified
+    // shape the connection error handler matches on
+    if (error instanceof NotFoundError) {
+      throw error;
+    }
+
     throw new Error(error as string);
   }
 };

@@ -13,6 +13,8 @@ import { useAppTheme } from 'Theme/context';
 import { componentStyles } from './LocalCategoriesOverlay.style.atv';
 import { LocalCategoriesOverlayComponentProps } from './LocalCategoriesOverlay.type';
 
+const NEW_CATEGORY_FOCUS_KEY = 'LOCAL_CATEGORIES_NEW_CATEGORY';
+
 export const LocalCategoriesOverlayComponent = ({
   overlayRef,
   categories,
@@ -33,7 +35,7 @@ export const LocalCategoriesOverlayComponent = ({
 
   const renderList = () => (
     <>
-      <ThemedScrollView style={ styles.list }>
+      <ThemedScrollView containerStyle={ styles.list }>
         { !categories.length && (
           <ThemedText style={ styles.emptyText }>
             { t('No bookmarks group') }
@@ -63,6 +65,7 @@ export const LocalCategoriesOverlayComponent = ({
       <View style={ styles.actions }>
         <ThemedButton
           title={ t('New category') }
+          focusKey={ NEW_CATEGORY_FOCUS_KEY }
           autofocus
           IconComponent={ Plus }
           iconProps={ {
@@ -94,7 +97,8 @@ export const LocalCategoriesOverlayComponent = ({
           title={ t('Create') }
           onPress={ submitCreate }
           disabled={ isCreateDisabled }
-          contentStyle={ [styles.button, styles.buttonPrimary] }
+          style={ styles.buttonPrimary }
+          contentStyle={ styles.button }
         />
       </View>
     </>
@@ -118,7 +122,8 @@ export const LocalCategoriesOverlayComponent = ({
         <ThemedButton
           title={ t('Accept') }
           onPress={ confirmDelete }
-          contentStyle={ [styles.button, styles.buttonPrimary] }
+          style={ styles.buttonPrimary }
+          contentStyle={ styles.button }
         />
       </View>
     </>
@@ -141,6 +146,9 @@ export const LocalCategoriesOverlayComponent = ({
       ref={ overlayRef }
       contentContainerStyle={ styles.overlay }
       onClose={ resetMode }
+      // the list sits above the actions, so entry focus would otherwise land on
+      // the scroll view -- on itself, while there are no categories to focus
+      preferredChildFocusKey={ NEW_CATEGORY_FOCUS_KEY }
       useKeyboardAdjustment
     >
       <View style={ styles.container }>

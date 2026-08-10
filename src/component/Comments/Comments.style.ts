@@ -71,6 +71,14 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     width: '100%',
     paddingTop: scale(24),
   },
+  // The overlay host (the player) does give the list its full height, so there the
+  // loader is centered in it instead of pinned to the top.
+  loaderCentered: {
+    flex: 1,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   measureText: {
     opacity: 0,
     position: 'absolute',
@@ -80,6 +88,11 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     width: '100%',
     alignItems: 'center',
     paddingTop: scale(24),
+  },
+  noCommentsCentered: {
+    flex: 1,
+    paddingTop: 0,
+    justifyContent: 'center',
   },
   noCommentsText: {
     color: colors.text,

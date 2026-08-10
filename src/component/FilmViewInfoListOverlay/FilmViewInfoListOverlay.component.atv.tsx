@@ -15,6 +15,7 @@ export function FilmViewInfoListOverlayComponent({
     <ThemedAccordion
       data={ data }
       overlayContentStyle={ styles.infoListAccordionOverlay }
+      groupStyle={ styles.infoListGroup }
       renderItem={ (subItem) => (
         <FilmViewInfoList
           key={ `info-list-${subItem.name}` }

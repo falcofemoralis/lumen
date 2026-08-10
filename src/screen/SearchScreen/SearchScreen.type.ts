@@ -29,6 +29,7 @@ export interface SearchScreenComponentProps extends FilmPagerHandlers {
   resetSearch: () => void;
   clearSearch: () => void;
   openAdditionalContentOverlay: () => void;
+  isRemovableSuggestion: (suggestion: string) => boolean;
   handleRemoveSuggestion: (suggestion: string) => void;
   removeSuggestion: () => void;
 }

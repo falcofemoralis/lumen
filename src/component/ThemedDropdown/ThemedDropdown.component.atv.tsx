@@ -57,6 +57,7 @@ export const ThemedDropdownComponent = ({
       <ThemedButton
         title={ inputLabel ?? label ?? '' }
         style={ [styles.input, inputStyle] }
+        contentStyle={ styles.inputContent }
         leftImageStyle={ styles.inputImage }
         rightImageStyle={ styles.inputImage }
         IconComponent={ Plus }

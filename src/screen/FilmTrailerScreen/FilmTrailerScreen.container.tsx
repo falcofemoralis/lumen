@@ -2,13 +2,12 @@ import { useQuery } from '@tanstack/react-query';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useIsTV } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
-import * as NavigationBar from 'expo-navigation-bar';
-import * as StatusBar from 'expo-status-bar';
 import { FILM_TRAILER_SCREEN } from 'Navigation/navigationRoutes';
 import { useEffect, useRef } from 'react';
 import { AppState } from 'react-native';
 import RouterStore from 'Store/Router.store';
 import { FilmInterface } from 'Type/Film.interface';
+import { hideSystemBars, showSystemBars } from 'Util/Device';
 import { navigationRef } from 'Util/Navigation';
 import { queryKeys, STALE_TIME } from 'Util/Query';
 
@@ -40,17 +39,14 @@ export const FilmTrailerScreenContainer = ({
   });
 
   useEffect(() => {
-    NavigationBar.setVisibilityAsync('hidden');
-    StatusBar.setStatusBarHidden(true, 'slide');
+    hideSystemBars('slide');
 
     const focusSubscription = AppState.addEventListener('focus', () => {
-      NavigationBar.setVisibilityAsync('hidden');
-      StatusBar.setStatusBarHidden(true, 'none');
+      hideSystemBars('none');
     });
 
     return () => {
-      NavigationBar.setVisibilityAsync('visible');
-      StatusBar.setStatusBarHidden(false, 'slide');
+      showSystemBars('slide');
       focusSubscription.remove();
     };
   }, []);

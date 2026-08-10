@@ -40,37 +40,20 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     marginHorizontal: scale(-12),
   },
   item: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: scale(10),
     height: scale(ITEM_HEIGHT),
     borderRadius: scale(12),
+    backgroundColor: colors.transparent,
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
-  itemFocused: {
-    backgroundColor: colors.backgroundFocused,
-    borderRadius: scale(12),
+  itemContent: {
+    flex: 1,
+    height: scale(ITEM_HEIGHT),
+    justifyContent: 'flex-start',
+    paddingHorizontal: scale(10),
   },
-  itemSelected: {
-    backgroundColor: colors.primary,
-    borderRadius: scale(12),
-  },
-  itemContainer: {
-    flexDirection: 'row',
-    width: '100%',
-  },
-  text: {
-    color: colors.text,
+  itemText: {
     fontSize: scale(text.xs.fontSize),
-    lineHeight: scale(20),
-    fontWeight: '500',
-    maxWidth: '90%',
-  },
-  textFocused: {
-    color: colors.textFocused,
-  },
-  textSelected: {
-    color: colors.textOnTertiary,
   },
   icon: {
     marginRight: scale(5),
@@ -78,9 +61,5 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     width: scale(20),
     minWidth: scale(20),
     backgroundColor: colors.transparent,
-  },
-  iconFocused: {
-  },
-  iconSelected: {
   },
 } satisfies ThemedStyles);

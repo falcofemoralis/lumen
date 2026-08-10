@@ -69,7 +69,7 @@ export const ThemedGridComponent = ({
   style,
   rowStyle,
   scrollBehavior = 'stick-to-start',
-  autofocus,
+  autofocus = false,
   ListHeaderComponent,
   ListEmptyComponent,
   renderItem,
@@ -108,7 +108,7 @@ export const ThemedGridComponent = ({
   // container layout before it renders any item, so on the first commit the grid
   // is still childless and Norigin would resolve the claim to the grid container
   // itself, silently consuming the one claim this screen visit gets.
-  useDefaultFocus(focusKey, !!autofocus && data.length > 0 && hasCells);
+  useDefaultFocus(focusKey, autofocus && data.length > 0 && hasCells);
 
   const viewPosition = scrollBehavior === 'stick-to-center' ? 0.5 : 0;
 
@@ -127,10 +127,10 @@ export const ThemedGridComponent = ({
 
     listRef.current?.scrollToIndex({
       index,
-      animated: true,
+      animated: isTVGridAnimation,
       viewPosition,
     });
-  }, [numberOfColumns, viewPosition]);
+  }, [numberOfColumns, viewPosition, isTVGridAnimation]);
 
   // BACK jumps to the top of the grid (scroll + focus the first cell), matching
   // the previous VirtualizedList behaviour.
@@ -202,7 +202,6 @@ export const ThemedGridComponent = ({
           ListEmptyComponent={ ListEmptyComponent }
           contentContainerStyle={ StyleSheet.flatten(style) }
           showsVerticalScrollIndicator={ false }
-          scrollAnimationEnabled={ isTVGridAnimation }
         />
       </View>
     </FocusContext.Provider>

@@ -144,6 +144,7 @@ export const componentStyles = ({ scale, text, colors }: Theme) => ({
   },
   descriptionOverlay: {
     width: '80%',
+    maxHeight: '100%',
   },
   descriptionOverlayText: {
     fontSize: scale(text.sm.fontSize),

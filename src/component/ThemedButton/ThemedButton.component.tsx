@@ -11,6 +11,7 @@ export default function ThemedButton({
   title,
   disabled,
   style,
+  styleOverride,
   contentStyle,
   styleDisabled,
   textStyle,
@@ -25,6 +26,7 @@ export default function ThemedButton({
   rightImageStyle,
   topAdditionalElement,
   bottomAdditionalElement,
+  rightAdditionalElement,
 }: ThemedButtonProps) {
   const { scale, theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
@@ -34,6 +36,7 @@ export default function ThemedButton({
       style={ [
         styles.container,
         style,
+        styleOverride,
         disabled && styles.disabled,
         disabled && styleDisabled ? styleDisabled: undefined,
       ] }
@@ -52,7 +55,7 @@ export default function ThemedButton({
         <IconComponent
           style={ styles.icon }
           size={ scale(18) }
-          iconColor={ iconColor || theme.colors.icon }
+          color={ iconColor || theme.colors.icon }
           { ...iconProps }
         />
       ) }
@@ -62,15 +65,18 @@ export default function ThemedButton({
           src={ leftImage }
         />
       ) }
-      <ThemedText style={ [styles.text, textStyle] }>
-        { title }
-      </ThemedText>
+      { title && (
+        <ThemedText style={ [styles.text, textStyle] }>
+          { title }
+        </ThemedText>
+      ) }
       { rightImage && (
         <ThemedImage
           style={ [styles.image, rightImageStyle] }
           src={ rightImage }
         />
       ) }
+      { rightAdditionalElement && rightAdditionalElement(false, false) }
     </ThemedPressable>
   );
 }

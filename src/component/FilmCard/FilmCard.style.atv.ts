@@ -18,6 +18,10 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   cardFocused: {
     transform: [{ scale: 1.1 }],
   },
+  // Overrides the transition above, so the zoom lands in one frame.
+  cardWithoutTransition: {
+    transitionProperty: 'none' as const,
+  },
   posterWrapper: {
     position: 'relative',
     flexDirection: 'column',

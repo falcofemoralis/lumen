@@ -10,14 +10,21 @@ import {
 } from 'react';
 import { convertSecondsToTime } from 'Util/Date';
 
+type UpdateProgressStatus = (
+  currentTime: number,
+  bufferedPosition: number,
+  duration: number,
+  rate?: number,
+) => void;
+
 interface PlayerProgressContextInterface {
   progressStatus: ProgressStatus;
-  updateProgressStatus: (currentTime: number, bufferedPosition: number, duration: number) => void;
+  updateProgressStatus: UpdateProgressStatus;
   resetProgressStatus: () => void;
 }
 
 interface PlayerProgressActionsInterface {
-  updateProgressStatus: (currentTime: number, bufferedPosition: number, duration: number) => void;
+  updateProgressStatus: UpdateProgressStatus;
   resetProgressStatus: () => void;
 }
 
@@ -36,21 +43,28 @@ const PlayerProgressActionsContext = createContext<PlayerProgressActionsInterfac
 export const PlayerProgressProvider = ({ children }: { children: ReactNode }) => {
   const [progressStatus, setProgressStatus] = useState(DEFAULT_PROGRESS_STATUS);
 
-  const updateProgressStatus = useCallback(
-    (currentTime: number, bufferedPosition: number, duration: number) => {
+  const updateProgressStatus = useCallback<UpdateProgressStatus>(
+    (currentTime, bufferedPosition, duration, rate = 1) => {
       // an unloaded video reports duration 0, which would publish NaN percentages
       if (!duration || duration <= 0) {
         return;
       }
+
+      // the film has `duration - currentTime` seconds of content left, but it is
+      // played out `rate` seconds per real second - at 2x the end of it arrives
+      // in half the wall clock time. A rate of 0 is the player's way of pausing,
+      // and there is no meaningful end time for that
+      const remainingSeconds = duration - currentTime;
+      const remainingRealSeconds = rate > 0 ? remainingSeconds / rate : remainingSeconds;
 
       setProgressStatus({
         progressPercentage: (currentTime / duration) * 100,
         playablePercentage: (bufferedPosition / duration) * 100,
         currentTime: convertSecondsToTime(currentTime),
         durationTime: convertSecondsToTime(duration),
-        remainingTime: convertSecondsToTime(duration - currentTime),
+        remainingTime: convertSecondsToTime(remainingSeconds),
         bufferedTime: bufferedPosition > currentTime ? convertSecondsToTime(bufferedPosition - currentTime) : '0',
-        endDate: Date.now() + (duration - currentTime) * 1000,
+        endDate: Date.now() + remainingRealSeconds * 1000,
       });
     },
     []

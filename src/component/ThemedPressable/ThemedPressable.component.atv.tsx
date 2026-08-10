@@ -25,7 +25,7 @@ export const ThemedPressableComponent = ({
   bottomAdditionalElement,
   extraProps,
   focusKey,
-  autofocus,
+  autofocus = false,
 }: ThemedPressableComponentProps) => {
   const { scrollTo } = useScrollContext();
   const { theme } = useAppTheme();
@@ -40,7 +40,7 @@ export const ThemedPressableComponent = ({
     onEnterPress: onEnterPress ?? onPress,
   });
 
-  useDefaultFocus(realFocusKey, !!autofocus);
+  useDefaultFocus(realFocusKey, autofocus);
 
   // `Pressable.onLongPress` only covers air-mouse/touch presses -- this adds the
   // same behavior for holding the d-pad OK button while this node is focused.
@@ -59,11 +59,7 @@ export const ThemedPressableComponent = ({
       return null;
     }
 
-    if (typeof children === 'function') {
-      return topAdditionalElement(state);
-    }
-
-    return children as ReactElement;
+    return topAdditionalElement(state);
   };
 
   const renderBottomAdditionalElement = (state: ThemedFocusableNodeState): ReactElement|null => {
@@ -71,17 +67,14 @@ export const ThemedPressableComponent = ({
       return null;
     }
 
-    if (typeof children === 'function') {
-      return bottomAdditionalElement(state);
-    }
-
-    return children as ReactElement;
+    return bottomAdditionalElement(state);
   };
 
   const state = { isFocused: focused };
 
   return (
     <View style={ [typeof style === 'function' ? style(state) : style, { overflow: 'hidden' }] }>
+      { renderTopAdditionalElement(state) }
       <Pressable
         ref={ ref }
         onPress={ onPress }
@@ -99,7 +92,6 @@ export const ThemedPressableComponent = ({
         tvFocusable={ false }
         focusable={ false }
       >
-        { renderTopAdditionalElement(state) }
         { renderChildren(state) }
         { renderBottomAdditionalElement(state) }
       </Pressable>

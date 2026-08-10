@@ -19,6 +19,8 @@ export interface FilmPagerContainerProps extends FilmPagerHandlers {
   hideGrid?: boolean;
   ListHeaderComponent?: ComponentType<any> | ReactElement | null | undefined;
   ListEmptyComponent?: ComponentType<any> | ReactElement | null | undefined;
+  /** Center the empty component in the grid instead of leaving it at the top. */
+  centerEmptyComponent?: boolean;
   // Mobile related
   disableStatusbarSafeArea?: boolean;
   // TV related

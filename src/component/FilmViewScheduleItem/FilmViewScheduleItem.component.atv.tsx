@@ -17,6 +17,7 @@ import { FilmViewScheduleItemComponentProps } from './FilmViewScheduleItem.type'
 export function FilmViewScheduleItemComponent({
   item,
   handleUpdateScheduleWatch,
+  style,
 }: FilmViewScheduleItemComponentProps) {
   const styles = useThemedStyles(componentStyles);
   const {
@@ -62,6 +63,7 @@ export function FilmViewScheduleItemComponent({
         <View
           style={ [
             styles.scheduleItem,
+            style,
             isFocused && styles.scheduleItemFocused,
           ] }
         >

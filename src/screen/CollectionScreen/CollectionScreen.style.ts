@@ -3,6 +3,10 @@ import { Theme, ThemedStyles } from 'Theme/types';
 export const ROW_GAP = 6;
 
 export const componentStyles = ({ scale, colors, text }: Theme) => ({
+  // FlashList has no intrinsic height, so the Wrapper has to claim the page.
+  wrapper: {
+    flex: 1,
+  },
   item: {
     position: 'relative',
     marginBottom: scale(ROW_GAP),

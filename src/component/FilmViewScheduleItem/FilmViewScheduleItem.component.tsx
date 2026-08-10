@@ -18,6 +18,7 @@ export function FilmViewScheduleItemComponent({
   item,
   useInternalState,
   handleUpdateScheduleWatch,
+  style,
 }: FilmViewScheduleItemComponentProps) {
   const styles = useThemedStyles(componentStyles);
   const {
@@ -58,7 +59,7 @@ export function FilmViewScheduleItemComponent({
   }, [handleUpdateScheduleWatch, item]);
 
   return (
-    <View style={ styles.scheduleItem }>
+    <View style={ [ styles.scheduleItem, style] }>
       <View style={ styles.scheduleItemInfoWrapper }>
         <View style={ styles.scheduleItemEpisodeWrapper }>
           <ThemedText style={ [

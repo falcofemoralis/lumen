@@ -19,6 +19,8 @@ export interface ThemedGridContainerProps<T = any> {
   // TV related
   scrollBehavior?: 'stick-to-start' | 'stick-to-center';
   autofocus?: boolean;
+  // Mobile related
+  disableRefresh?: boolean;
 }
 
 export interface ThemedGridComponentProps<T = any> extends Omit<ThemedGridContainerProps<T>, 'renderItem | onNextLoad'> {

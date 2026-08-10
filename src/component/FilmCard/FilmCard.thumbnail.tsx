@@ -24,4 +24,5 @@ export const FilmCardThumbnail = () => {
         width={ scale(40) }
       />
     </View>
-  );};
+  );
+};

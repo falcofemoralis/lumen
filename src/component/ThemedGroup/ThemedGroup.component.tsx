@@ -1,6 +1,6 @@
 import { View } from 'react-native';
 
-import { ThemedGroupComponentProps } from './ThemedScrollView.type';
+import { ThemedGroupComponentProps } from './ThemedGroup.type';
 
 export const ThemedScrollViewComponent = ({
   children,

@@ -7,6 +7,7 @@ export interface CommentsContainerProps {
   loaderFullScreen?: boolean;
   style?: StyleProp<ViewStyle> | undefined;
   initialLoad?: boolean;
+  disableRefresh?: boolean;
 }
 
 export interface CommentsComponentProps {
@@ -14,6 +15,7 @@ export interface CommentsComponentProps {
   style?: StyleProp<ViewStyle> | undefined;
   isLoading: boolean;
   loaderFullScreen?: boolean;
+  disableRefresh?: boolean;
   onNextLoad: () => Promise<void>;
   handlePostLike: (commentId: string) => void;
 }

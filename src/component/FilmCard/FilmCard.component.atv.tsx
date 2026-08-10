@@ -14,6 +14,7 @@ export function FilmCardComponent({
   style,
   isFocused = false,
   disableScaleAnimation,
+  disableScaleTransition,
 }: FilmCardComponentProps) {
   const {
     type,
@@ -60,6 +61,11 @@ export function FilmCardComponent({
         isPendingRelease && styles.posterPendingRelease,
       ] }
       src={ poster }
+      // Grid cells are recycled constantly while browsing, and the same posters
+      // come back the moment focus turns around. Keeping the decoded bitmaps in
+      // memory spares a disk read and a decode per card -- the bulk of what it
+      // costs to draw a row on a slow device.
+      cachePolicy="memory-disk"
     />
   );
 
@@ -95,6 +101,7 @@ export function FilmCardComponent({
     <Animated.View
       style={ [
         styles.card,
+        disableScaleTransition && styles.cardWithoutTransition,
         isFocused && !disableScaleAnimation && styles.cardFocused,
         style,
       ] }

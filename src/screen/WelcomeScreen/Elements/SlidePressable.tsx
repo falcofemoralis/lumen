@@ -21,8 +21,9 @@ export const SlidePressable = ({
   contentStyle,
   children,
   styles,
-  autofocus,
+  autofocus = false,
   onPress,
+  onFocus,
   focusKey: propFocusKey,
 }: {
   style?: StyleProp<ViewStyle>;
@@ -31,15 +32,17 @@ export const SlidePressable = ({
   styles: ThemedStyles<typeof componentStyles>;
   autofocus?: boolean;
   onPress?: () => void;
+  onFocus?: () => void;
   focusKey?: string;
 }) => {
   const { theme } = useAppTheme();
   const { ref, focusKey, focused } = useFocusable({
     focusKey: propFocusKey,
     onEnterPress: onPress,
+    onFocus,
   });
 
-  useDefaultFocus(focusKey, !!autofocus);
+  useDefaultFocus(focusKey, autofocus);
 
   return (
     <View style={ [style, { overflow: 'hidden' }] }>

@@ -120,7 +120,6 @@ const PlayerBottomAction = (props: PlayerRowActionProps) => (
 
 export function PlayerComponent({
   player,
-  status,
   isPlaying,
   video,
   film,
@@ -139,7 +138,7 @@ export function PlayerComponent({
   isOffline,
   overlayQuality,
   selectedAspectRatio,
-  isLoading,
+  isVideoLoading,
   hasPlaybackError,
   togglePlayPause,
   rewindPosition,
@@ -442,6 +441,16 @@ export function PlayerComponent({
     );
   };
 
+  // a video that is not ready to play yet gets a spinner in place of the icon,
+  // rather than a play button that only starts once the loading is done
+  const getPlayPauseIcon = () => {
+    if (isVideoLoading) {
+      return Loader;
+    }
+
+    return isPlaying ? Pause : Play;
+  };
+
   const renderTopActions = () => (
     <View
       style={ {
@@ -452,7 +461,7 @@ export function PlayerComponent({
       <FocusContext.Provider value={ topRowFocusKey }>
         <View ref={ topRowRef } style={ styles.controlsRow }>
           <PlayerTopAction
-            IconComponent={ isPlaying || status === 'loading' ? Pause : Play }
+            IconComponent={ getPlayPauseIcon() }
             action={ togglePlayPause }
             focusKey={ TOP_ACTION_FOCUS_KEY }
           />
@@ -582,9 +591,11 @@ export function PlayerComponent({
     </Animated.View>
   );
 
+  // the play/pause action carries the spinner while the controls are up, so the
+  // full screen one only steps in once they are gone
   const renderLoader = () => (
     <Loader
-      isLoading={ !hasPlaybackError && (isLoading || status === 'loading') }
+      isLoading={ isVideoLoading && (!showControls || hideActions) }
       fullScreen
     />
   );
@@ -724,6 +735,7 @@ export function PlayerComponent({
         controls={ false }
         pictureInPicture={ false }
       />
+      { renderError() }
       { renderBackground() }
       { renderControls() }
       { renderLoader() }

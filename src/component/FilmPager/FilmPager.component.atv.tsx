@@ -4,6 +4,7 @@ import { ThemedDropdown } from 'Component/ThemedDropdown';
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { ThemedScrollView } from 'Component/ThemedScrollView';
+import { useConfigContext } from 'Context/ConfigContext';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
@@ -183,10 +184,12 @@ export function FilmPagerComponent({
   handleSelectSorting,
   ListHeaderComponent,
   ListEmptyComponent,
+  centerEmptyComponent,
   onPreLoad,
   onNextLoad,
   onAtTopChange,
 }: FilmPagerComponentProps) {
+  const { isLowMode } = useConfigContext();
   const styles = useThemedStyles(componentStyles);
   const { scale } = useAppTheme();
   const [activePage, setActivePage] = useState(0);
@@ -198,8 +201,12 @@ export function FilmPagerComponent({
   const menuHeight = (sorting ? styles.menuListWrapperWithSorting.height : styles.menuListWrapper.height) + scale(16);
 
   useEffect(() => {
-    menuCollapse.value = withTiming(menuVisible ? 1 : 0, { duration: 200 });
-  }, [menuVisible, menuCollapse]);
+    const collapse = menuVisible ? 1 : 0;
+
+    // In low mode the grid jumps between rows, so the menu has to snap with it --
+    // a timed collapse would trail behind the scroll.
+    menuCollapse.value = isLowMode ? collapse : withTiming(collapse, { duration: 200 });
+  }, [menuVisible, menuCollapse, isLowMode]);
 
   const menuAnimatedStyle = useAnimatedStyle(() => ({
     height: menuHeight * menuCollapse.value,
@@ -258,6 +265,7 @@ export function FilmPagerComponent({
         hideGrid={ hideGrid }
         ListHeaderComponent={ ListHeaderComponent }
         ListEmptyComponent={ ListEmptyComponent }
+        centerEmptyComponent={ centerEmptyComponent }
         disableAutofocus={ menuDefaultFocus }
         onAtTopChange={ menu || onAtTopChange ? handleAtTopChange : undefined }
       />

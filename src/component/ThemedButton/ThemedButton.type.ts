@@ -7,6 +7,7 @@ export interface ThemedButtonProps {
   style?: StyleProp<ViewStyle>;
   contentStyle?: StyleProp<ViewStyle>;
   styleDisabled?: StyleProp<ViewStyle>;
+  styleOverride?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
   onPress?: () => void;
   onLongPress?: () => void;
@@ -19,14 +20,16 @@ export interface ThemedButtonProps {
   rightImageStyle?: StyleProp<ImageStyle>;
   topAdditionalElement?: (isFocused: boolean, isSelected: boolean) => ReactElement | null;
   bottomAdditionalElement?: (isFocused: boolean, isSelected: boolean) => ReactElement | null;
+  rightAdditionalElement?: (isFocused: boolean, isSelected: boolean) => ReactElement | null;
   // TV related
   selected?: boolean;
   styleSelected?: StyleProp<ViewStyle>;
   styleFocused?: StyleProp<ViewStyle>;
   textStyleFocused?: StyleProp<TextStyle>;
   iconColorFocused?: string;
-  autofocus?: boolean;
+  extraProps?: any;
   focusKey?: string;
+  autofocus?: boolean;
   onFocus?: () => void;
   onEnterPress?: () => void;
 }

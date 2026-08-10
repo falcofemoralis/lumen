@@ -5,6 +5,8 @@ import { useLocalBookmarks } from 'Hooks/useLocalLibrary';
 import { t } from 'i18n/translate';
 import { useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
+import { BookmarkInterface } from 'Type/Bookmark.interface';
+import { FilmInterface } from 'Type/Film.interface';
 import { filmToFilmCard } from 'Util/Film';
 import { createLocalCategory, toggleLocalBookmark } from 'Util/LocalLibrary';
 import { queryKeys } from 'Util/Query';
@@ -34,6 +36,23 @@ export const BookmarksOverlayContainer = ({
     setCheckedOverrides({});
   }
 
+  // the film screen renders its own cached copy of the film and the player is handed a
+  // snapshot of it, so the toggle is written back into the cache - otherwise coming back
+  // from the player shows the film as not bookmarked and invites a second toggle
+  const syncCachedFilm = (bookmarks: BookmarkInterface[]) => {
+    queryClient.setQueriesData<FilmInterface | null>(
+      // film details live under ['film', link]; trailer/comments keys share the prefix
+      { predicate: ({ queryKey }) => queryKey[0] === 'film' && queryKey.length === 2 },
+      (prevFilm) => {
+        if (!prevFilm || prevFilm.id !== film.id) {
+          return prevFilm;
+        }
+
+        return { ...prevFilm, bookmarks };
+      }
+    );
+  };
+
   const { mutate: toggleBookmark, isPending: isLoading } = useMutation({
     mutationFn: ({ bookmarkId, isChecked }: { bookmarkId: string, isChecked: boolean }) => {
       const { id } = film;
@@ -46,11 +65,11 @@ export const BookmarksOverlayContainer = ({
       const { bookmarks } = film;
 
       if (bookmarks?.some((b) => b.id === bookmarkId)) {
+        const newBookmarks = bookmarks.map((b) => (b.id === bookmarkId ? { ...b, isBookmarked: isChecked } : b));
+
         setCheckedOverrides((prev) => ({ ...prev, [bookmarkId]: isChecked }));
-        onBookmarkChange?.({
-          ...film,
-          bookmarks: bookmarks.map((b) => (b.id === bookmarkId ? { ...b, isBookmarked: isChecked } : b)),
-        });
+        syncCachedFilm(newBookmarks);
+        onBookmarkChange?.({ ...film, bookmarks: newBookmarks });
       }
 
       // the bookmarks tab lists the same categories, so it has to re-read them

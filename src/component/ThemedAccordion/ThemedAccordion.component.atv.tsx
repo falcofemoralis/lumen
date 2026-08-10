@@ -13,6 +13,7 @@ import { AccordionGroupInterface, ThemedAccordionComponentProps } from './Themed
 export const ThemedAccordionComponent = ({
   data,
   overlayContentStyle,
+  groupStyle,
   renderItem,
 }: ThemedAccordionComponentProps<any>) => {
   const styles = useThemedStyles(componentStyles);
@@ -44,6 +45,7 @@ export const ThemedAccordionComponent = ({
             <ThemedText
               style={ [
                 styles.group,
+                groupStyle,
                 isFocused && styles.groupFocused,
               ] }
             >

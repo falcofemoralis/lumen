@@ -5,14 +5,21 @@ import { LoginForm } from 'Component/LoginForm';
 import { Page } from 'Component/Page';
 import { ThemedButton } from 'Component/ThemedButton';
 import { useServiceContext } from 'Context/ServiceContext';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import FolderCog from 'lucide-react-native/icons/folder-cog';
 import { View } from 'react-native';
 import { useAppTheme } from 'Theme/context';
 
-import { styles } from './BookmarksScreen.style.atv';
+import { componentStyles } from './BookmarksScreen.style.atv';
 import { BookmarksScreenThumbnail } from './BookmarksScreen.thumbnail.atv';
 import { BookmarksScreenComponentProps } from './BookmarksScreen.type';
+
+// One key for both placements of the button -- they are mutually exclusive
+// branches, so it is never registered twice, and closing the overlay after the
+// first category was created restores focus to whichever one is now mounted
+// (the empty state's button is gone by then, the header's has taken its place).
+const MANAGE_CATEGORIES_FOCUS_KEY = 'BOOKMARKS_MANAGE_CATEGORIES';
 
 export function BookmarksScreenComponent({
   isLoading,
@@ -24,10 +31,12 @@ export function BookmarksScreenComponent({
 }: BookmarksScreenComponentProps) {
   const { scale } = useAppTheme();
   const { isSignedIn } = useServiceContext();
+  const styles = useThemedStyles(componentStyles);
 
   const renderManageButton = (autofocus = false) => (
     <ThemedButton
       title={ t('Manage categories') }
+      focusKey={ MANAGE_CATEGORIES_FOCUS_KEY }
       autofocus={ autofocus }
       IconComponent={ FolderCog }
       iconProps={ {
@@ -81,6 +90,7 @@ export function BookmarksScreenComponent({
           pagerItems={ pagerItems }
           isEmpty={ isLocalLibrary }
           ListEmptyComponent={ renderEmptyCategory() }
+          centerEmptyComponent
           menuDefaultFocus
         />
       </View>

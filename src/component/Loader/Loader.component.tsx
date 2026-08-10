@@ -5,10 +5,16 @@ import { useAppTheme } from 'Theme/context';
 import { styles } from './Loader.style';
 import { LoaderComponentProps } from './Loader.type';
 
+// `isLoading`, `size` and `color` default to the shape an icon component is
+// rendered with, so this can be dropped in wherever one is expected (the player
+// swaps its play/pause icon for a spinner while the video loads).
 export const LoaderComponent = ({
-  isLoading,
+  isLoading = true,
   fullScreen,
   style,
+  backdrop,
+  size = 'large',
+  color,
 }: LoaderComponentProps) => {
   const { theme } = useAppTheme();
 
@@ -16,11 +22,12 @@ export const LoaderComponent = ({
     <ActivityIndicator
       style={ [
         fullScreen && styles.fullscreenLoader,
+        backdrop && isLoading && { backgroundColor: theme.colors.backdrop },
         style,
       ] }
       animating={ isLoading }
-      size="large"
-      color={ theme.colors.secondary }
+      size={ size }
+      color={ color ?? theme.colors.secondary }
     />
   );
 };

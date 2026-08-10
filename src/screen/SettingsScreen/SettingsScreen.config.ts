@@ -143,8 +143,12 @@ export const PLAYER_BACK_BUFFER_TIME_OPTIONS = [
     value: '0',
     label: t('Off'),
   },
-  ...[15, 30, 45, 60, 90, 120].map((value) => ({
-    value: value.toString(),
-    label: t('{{seconds}} seconds', { seconds: value }),
-  })),
+  ...Array.from({ length: 12 }, (_, index) => {
+    const value = (index + 1) * 15;
+
+    return {
+      value: value.toString(),
+      label: t('{{seconds}} seconds', { seconds: value }),
+    };
+  }),
 ];

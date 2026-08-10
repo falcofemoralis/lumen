@@ -6,6 +6,7 @@ export type ThemedGroupContainerProps = {
   style?: StyleProp<ViewStyle>
   // TV related
   preferredChildFocusKey?: string
+  focusKey?: string
 }
 
 export type ThemedGroupComponentProps = ThemedGroupContainerProps;

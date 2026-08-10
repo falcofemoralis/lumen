@@ -16,6 +16,7 @@ export default function ThemedButton({
   styleDisabled,
   styleSelected,
   styleFocused,
+  styleOverride,
   textStyle,
   onPress,
   onLongPress,
@@ -29,11 +30,13 @@ export default function ThemedButton({
   leftImageStyle,
   rightImage,
   rightImageStyle,
-  autofocus,
+  extraProps,
   focusKey,
+  autofocus,
   textStyleFocused,
   topAdditionalElement,
   bottomAdditionalElement,
+  rightAdditionalElement,
 }: ThemedButtonProps) {
   const { scale, theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
@@ -49,6 +52,7 @@ export default function ThemedButton({
         style,
         selected && styles.selected,
         selected && styleSelected ? styleSelected: undefined,
+        styleOverride,
         isFocused && styles.focused,
         isFocused && styleFocused ? styleFocused : undefined,
         disabled && styles.disabled,
@@ -61,8 +65,9 @@ export default function ThemedButton({
       bottomAdditionalElement={ bottomAdditionalElement
         ? ({ isFocused }) => bottomAdditionalElement(isFocused, selected ?? false)
         : undefined }
-      autofocus={ autofocus }
+      extraProps={ extraProps }
       focusKey={ focusKey }
+      autofocus={ autofocus }
     >
       { ({ isFocused }) => (
         <>
@@ -98,6 +103,7 @@ export default function ThemedButton({
               src={ rightImage }
             />
           ) }
+          { rightAdditionalElement && rightAdditionalElement(isFocused, selected ?? false) }
         </>
       ) }
     </ThemedPressable>

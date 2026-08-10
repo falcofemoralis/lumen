@@ -1,4 +1,4 @@
-import { FilmSections } from 'Component/FilmSections';
+import { FilmGrid } from 'Component/FilmGrid';
 import { InfoBlock } from 'Component/InfoBlock';
 import { Page } from 'Component/Page';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
@@ -11,7 +11,6 @@ import { NotificationsScreenComponentProps } from './NotificationsScreen.type';
 export function NotificationsScreenComponent({
   data,
   isLoading,
-  handleSelectFilm,
 }: NotificationsScreenComponentProps) {
   const styles = useThemedStyles(componentStyles);
 
@@ -31,11 +30,7 @@ export function NotificationsScreenComponent({
   return (
     <Page>
       <View style={ styles.container }>
-        <FilmSections
-          autofocus
-          data={ data }
-          handleOnPress={ handleSelectFilm }
-        />
+        <FilmGrid sections={ data } />
       </View>
     </Page>
   );

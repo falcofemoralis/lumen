@@ -44,9 +44,13 @@ import { FilmScreenContainerProps } from './FilmScreen.type';
 
 export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
   const { link: linkArg, thumbnailPoster } = (route.params ?? {}) as { link: string, thumbnailPoster?: string };
-
   const {
-    isTV, downloadsPath, downloadsSaveSubtitles, downloadsSavePoster, isContinueBtnEnabled, isLocalLibrary,
+    isTV,
+    downloadsPath,
+    downloadsSaveSubtitles,
+    downloadsSavePoster,
+    isContinueBtnEnabled,
+    isLocalLibrary,
   } = useConfigContext();
   const navigation = useNavigation<NativeStackNavigationProp<AppStackParamList>>();
   const { isSignedIn, currentService, prepareShareBody } = useServiceContext();
@@ -329,19 +333,6 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     }
 
     bookmarksOverlayRef.current?.open();
-  };
-
-  const handleBookmarkChange = (f: FilmInterface) => {
-    updateFilm((prevFilm) => {
-      if (!prevFilm) {
-        return prevFilm;
-      }
-
-      return {
-        ...prevFilm,
-        bookmarks: f.bookmarks,
-      };
-    });
   };
 
   const handleDownloadSelect = async (links: DownloadLinkInterface[]) => {
@@ -724,7 +715,6 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     handleUpdateScheduleWatch,
     handleShare,
     openBookmarks,
-    handleBookmarkChange,
     openVideoDownloader,
     handleDownloadSelect,
     openTrailerOverlay,

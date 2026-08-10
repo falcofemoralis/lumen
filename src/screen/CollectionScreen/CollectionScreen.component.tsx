@@ -100,7 +100,7 @@ export function CollectionScreenComponent({
 
   return (
     <Page>
-      <Wrapper>
+      <Wrapper style={ styles.wrapper }>
         <ThemedGrid
           data={ items }
           numberOfColumns={ NUMBER_OF_COLUMNS }

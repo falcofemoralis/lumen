@@ -3,8 +3,9 @@ import { FocusContext, useFocusable } from '@noriginmedia/norigin-spatial-naviga
 import KeyboardAdjuster from 'Component/KeyboardAdjuster/KeyboardAdjuster.component';
 import { Portal } from 'Component/ThemedPortal';
 import { OverlayScopeProvider } from 'Context/OverlayContext';
+import { useIsScreenFocused } from 'Hooks/useIsScreenFocused';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
-import { memo, ReactNode, useEffect, useRef } from 'react';
+import { memo, ReactNode, RefObject, useEffect, useRef } from 'react';
 import { BackHandler, Pressable, StyleProp, StyleSheet, ViewStyle } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { noopFn } from 'Util/Function';
@@ -16,6 +17,10 @@ import { ThemedOverlayComponentProps } from './ThemedOverlay.type';
 // fade-out finishes just as the node is removed.
 const ANIMATION_DURATION = 250;
 
+// Slightly over norigin's own AUTO_RESTORE_FOCUS_DELAY (300ms): the window in
+// which a focusable removed elsewhere can still trigger a debounced auto-restore.
+const AUTO_RESTORE_SETTLE_DELAY = 350;
+
 type OverlayContentProps = {
   children: ReactNode;
   isOpened: boolean;
@@ -25,7 +30,10 @@ type OverlayContentProps = {
   transparent?: boolean;
   contentVisible: boolean;
   useKeyboardAdjustment?: boolean;
+  isScreenFocused: boolean;
   handleModalRequestClose: () => void;
+  preferredChildFocusKey?: string;
+  fallbackRestoreFocusKeyRef?: RefObject<string | null>;
 };
 
 // Rendered in-window through a Portal, NOT a native Modal. A RN Modal is a
@@ -43,13 +51,27 @@ function OverlayContent({
   transparent,
   contentVisible,
   useKeyboardAdjustment,
+  isScreenFocused,
   handleModalRequestClose,
+  preferredChildFocusKey,
+  fallbackRestoreFocusKeyRef,
 }: OverlayContentProps) {
   const styles = useThemedStyles(componentStyles);
+  // Portaled overlays hang off SN:ROOT, so they stay siblings of every other
+  // screen's content. An overlay that is left open under a pushed screen (a
+  // category opened from the film's info lists) would keep answering D-Pad
+  // presses from the visible screen -- marking it non-focusable drops its whole
+  // subtree out of the sibling search, the same way Page does for a covered
+  // screen, without unmounting anything.
   const { ref, focusKey, focusSelf } = useFocusable({
     isFocusBoundary: true,
     trackChildren: true,
     autoRestoreFocus: true,
+    focusable: isScreenFocused,
+    // Norigin resolves a claim on this node to the child closest to the top-left
+    // otherwise -- and setFocus is async, so a child's own autofocus claim can
+    // be overridden by the focusSelf below rather than the other way round.
+    preferredChildFocusKey,
   });
 
   // Content that arrives after the overlay opens (a lazy `onOpen` fill, an async
@@ -90,8 +112,69 @@ function OverlayContent({
     focusSelf();
   }, [focusSelf]);
 
+  // Read at teardown time: an overlay that closes *because* its selection pushed
+  // a screen (the film screen's voice selector opening the player) is torn down
+  // one animation later, by which point its own screen is already covered.
+  const isScreenFocusedRef = useRef(isScreenFocused);
+
+  useEffect(() => {
+    isScreenFocusedRef.current = isScreenFocused;
+  }, [isScreenFocused]);
+
+  // An overlay can survive a screen push instead of closing (picking a category
+  // in the film's info lists keeps the list up, so the user can come back and
+  // pick the next one). The pushed screen took focus with it and hands nothing
+  // back on the way out: the page's own default-focus targets stay deferred
+  // while an overlay is open, so the overlay has to claim focus itself when its
+  // screen is on top again. focusSelf resolves to the item focused last.
+  const wasScreenFocusedRef = useRef(isScreenFocused);
+
+  useEffect(() => {
+    const wasScreenFocused = wasScreenFocusedRef.current;
+
+    wasScreenFocusedRef.current = isScreenFocused;
+
+    let settleTimeout: number | undefined;
+
+    if (isScreenFocused && !wasScreenFocused && isOpened) {
+      focusSelf();
+
+      // The screen we came back from unregisters its focusables around now,
+      // which makes norigin schedule a debounced auto-restore that would land on
+      // whatever it finds first -- behind this overlay. Claim again once that
+      // window has passed (a manual setFocus also cancels a pending restore).
+      settleTimeout = setTimeout(focusSelf, AUTO_RESTORE_SETTLE_DELAY) as unknown as number;
+    }
+
+    return () => clearTimeout(settleTimeout);
+  }, [isScreenFocused, isOpened, focusSelf]);
+
+  // Mirrored so the mount-scoped teardown effect below can read the fallback
+  // without listing the prop as a dependency -- re-running that effect would
+  // fire the restore while the overlay is still up.
+  const fallbackRef = useRef(fallbackRestoreFocusKeyRef);
+
+  useEffect(() => {
+    fallbackRef.current = fallbackRestoreFocusKeyRef;
+  }, [fallbackRestoreFocusKeyRef]);
+
   useEffect(() => () => {
-    const restoreFocusKey = restoreFocusKeyRef.current;
+    const triggerFocusKey = restoreFocusKeyRef.current;
+    // The trigger is gone -- the action taken in the overlay removed it (the
+    // list item it was opened for). Fall back to wherever the opener said focus
+    // should land instead.
+    const restoreFocusKey = triggerFocusKey && doesFocusableExist(triggerFocusKey)
+      ? triggerFocusKey
+      : fallbackRef.current?.current;
+
+    // The trigger stays mounted under the pushed screen, so it is still a valid
+    // focus target - but focusing it parks spatial navigation on a screen the
+    // user can no longer see, and every following key press drives that hidden
+    // screen (ENTER on the covered "watch" button re-opens this very overlay
+    // behind the player). The screen on top has claimed focus itself by now.
+    if (!isScreenFocusedRef.current) {
+      return;
+    }
 
     if (restoreFocusKey && doesFocusableExist(restoreFocusKey)) {
       setFocus(restoreFocusKey);
@@ -112,6 +195,13 @@ function OverlayContent({
 
   useEffect(() => {
     const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      // An overlay left open on a screen that is no longer on top must not claim
+      // the press: it is invisible, and consuming the event would cost the user
+      // a back press that looks like it did nothing.
+      if (!isScreenFocusedRef.current) {
+        return false;
+      }
+
       closeRef.current();
 
       return true;
@@ -164,7 +254,13 @@ export function ThemedOverlayComponent({
   useKeyboardAdjustment,
   handleModalRequestClose,
   onShow,
+  preferredChildFocusKey,
+  fallbackRestoreFocusKeyRef,
 }: ThemedOverlayComponentProps) {
+  // Read here rather than inside OverlayContent: the content is portaled into
+  // the page host, which drops the navigation context this hook needs.
+  const isScreenFocused = useIsScreenFocused();
+
   useEffect(() => {
     if (isOpened) {
       onShow?.();
@@ -187,7 +283,10 @@ export function ThemedOverlayComponent({
         transparent={ transparent }
         contentVisible={ contentVisible }
         useKeyboardAdjustment={ useKeyboardAdjustment }
+        isScreenFocused={ isScreenFocused }
         handleModalRequestClose={ handleModalRequestClose }
+        preferredChildFocusKey={ preferredChildFocusKey }
+        fallbackRestoreFocusKeyRef={ fallbackRestoreFocusKeyRef }
       >
         { children }
       </OverlayContent>

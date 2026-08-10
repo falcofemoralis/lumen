@@ -1,8 +1,9 @@
+import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { t } from 'i18n/translate';
 import { DOWNLOADS_SCREEN, NOTIFICATIONS_SCREEN, SETTINGS_SCREEN } from 'Navigation/navigationRoutes';
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import NotificationStore from 'Store/Notification.store';
 import { navigate } from 'Util/Navigation';
 
@@ -20,6 +21,7 @@ export function AccountScreenContainer() {
     resetNotifications,
   } = useServiceContext();
   const { isTV, isLocalLibrary } = useConfigContext();
+  const logoutConfirmOverlayRef = useRef<ThemedOverlayRef | null>(null);
 
   const handleViewProfile = useCallback(() => {
     viewProfile();
@@ -30,6 +32,11 @@ export function AccountScreenContainer() {
   }, [viewPayments]);
 
   const handleLogout = useCallback(() => {
+    logoutConfirmOverlayRef.current?.open();
+  }, []);
+
+  const confirmLogout = useCallback(() => {
+    logoutConfirmOverlayRef.current?.close();
     logout(true);
     resetNotifications();
   }, [logout, resetNotifications]);
@@ -58,6 +65,8 @@ export function AccountScreenContainer() {
     handleViewProfile,
     handleViewPayments,
     handleLogout,
+    confirmLogout,
+    logoutConfirmOverlayRef,
     openSettings,
     openNotifications,
     openNotImplemented,

@@ -6,7 +6,7 @@ export type DeviceConfigType = {
   isTV: boolean;
   isFirestore: boolean;
   securedSettings: boolean;
-  isTVGridAnimation: boolean;
+  isLowMode: boolean;
   isTVAwake: boolean;
   numberOfColumnsMobile: number;
   numberOfColumnsTV: number;
@@ -40,7 +40,7 @@ export const defaultConfig: DeviceConfigType = {
   isTV: false,
   isFirestore: false,
   securedSettings: false,
-  isTVGridAnimation: true,
+  isLowMode: false,
   isTVAwake: false,
   numberOfColumnsMobile: 3,
   numberOfColumnsTV: 6,

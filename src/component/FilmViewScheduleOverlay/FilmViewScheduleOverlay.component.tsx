@@ -50,6 +50,7 @@ const ScheduleModalComponent = ({
       item={ item }
       handleUpdateScheduleWatch={ handleUpdateScheduleWatch }
       useInternalState
+      style={ styles.item }
     />
   ), [handleUpdateScheduleWatch]);
 

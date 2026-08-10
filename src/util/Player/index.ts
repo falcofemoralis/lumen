@@ -314,7 +314,7 @@ export const formatVideoTrackInfo = (videoTrack: PlayerVideoTrack|null) => {
 export const getBufferTime = (quality: string) => {
   const { totalMemory } = Device;
 
-  // less then 2GB
+  // less then 2GB and this this is a high quality video
   if (
     totalMemory && totalMemory <= (2.5 * 1024 * 1024 * 1024)
     && (quality === '4K' || quality === '2K' || quality === '1080p Ultra')
@@ -336,7 +336,7 @@ export const getBufferTime = (quality: string) => {
     return 30;
   }
 
-  return 180;
+  return 120;
 };
 
 // `rate` is a plain setter with no method form, and the player is an imperative
@@ -365,7 +365,7 @@ export const getBufferConfig = (
   const backBufferMs = Math.min(backBufferTimeSetting ?? 0, forwardSeconds) * 1000;
 
   return {
-    minBufferMs: Math.min(DEFAULT_MIN_BUFFER_MS, bufferMs),
+    minBufferMs: bufferMs / 2,
     maxBufferMs: bufferMs,
     preferredForwardBufferDurationMs: bufferMs,
     backBufferDurationMs: backBufferMs,

@@ -1,27 +1,48 @@
 import { FlashList } from '@shopify/flash-list';
 import { FilmCard } from 'Component/FilmCard';
 import { FilmCardThumbnail } from 'Component/FilmCard/FilmCard.thumbnail';
-import { memo, useCallback, useMemo } from 'react';
+import { ThemedSafeArea } from 'Component/ThemedSafeArea';
+import { ThemedText } from 'Component/ThemedText';
+import { useThemedStyles } from 'Hooks/useThemedStyles';
+import { ComponentType, memo, ReactElement, ReactNode, useCallback, useMemo } from 'react';
 import { Pressable, RefreshControl, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from 'Theme/context';
-import { FilmType } from 'Type/FilmType.type';
+import { ThemedStyles } from 'Theme/types';
 
-import { THUMBNAILS_ROWS } from './FilmGrid.config';
-import { ROW_GAP } from './FilmGrid.style';
-import { FilmGridComponentProps, FilmGridItemProps, FilmGridRowItem } from './FilmGrid.type';
+import { componentStyles, ROW_GAP } from './FilmGrid.style';
+import {
+  FilmGridComponentProps,
+  FilmGridHeaderProps,
+  FilmGridItem,
+  FilmGridItemProps,
+  FilmGridItemType,
+} from './FilmGrid.type';
 
-function FilmGridItem({
+type Styles = ThemedStyles<typeof componentStyles>;
+
+const FilmGridHeader = ({
+  header,
+  styles,
+}: FilmGridHeaderProps & { styles: Styles }) => (
+  <View style={ styles.header }>
+    <ThemedText style={ styles.headerText }>
+      { header }
+    </ThemedText>
+  </View>
+);
+
+function FilmGridItemCard({
   item,
   handleOnPress,
 }: FilmGridItemProps) {
+  const { isPlaceholder, film } = item;
   const { scale } = useAppTheme();
 
   const style = useMemo(() => ({
     marginHorizontal: scale(ROW_GAP) / 2,
   }), [scale]);
 
-  if (item.isPlaceholder) {
+  if (isPlaceholder) {
     return (
       <View style={ style }>
         <FilmCardThumbnail />
@@ -32,98 +53,122 @@ function FilmGridItem({
   return (
     <Pressable
       style={ style }
-      onPress={ () => handleOnPress(item) }
+      onPress={ () => handleOnPress(film) }
     >
-      <FilmCard filmCard={ item } />
+      <FilmCard filmCard={ film } />
     </Pressable>
   );
 }
 
-const MemoizedGridItem = memo(FilmGridItem);
+const MemoizedHeader = memo(FilmGridHeader);
+const MemoizedGridItem = memo(FilmGridItemCard);
 
 export function FilmGridComponent({
-  films,
-  disableEmptyComponent,
-  isEmpty,
-  hideGrid,
+  data,
+  stickyHeaderIndices,
   numberOfColumns,
+  disableEmptyComponent,
+  hideGrid,
   disableStatusbarSafeArea,
   isRefreshing,
+  ListHeaderComponent,
   ListEmptyComponent,
+  centerEmptyComponent,
   handleOnPress,
   handleScrollEnd,
   handleRefresh,
 }: FilmGridComponentProps) {
+  const styles = useThemedStyles(componentStyles);
   const { scale } = useAppTheme();
-  const { top } = useSafeAreaInsets();
 
-  const renderItem = useCallback(({ item, index }: { item: FilmGridRowItem, index: number }) => (
-    <MemoizedGridItem
-      index={ index }
-      item={ item }
-      handleOnPress={ handleOnPress }
-    />
-  ), [handleOnPress]);
-
-  const filmsData = useMemo(() => {
-    if (isEmpty || hideGrid) {
-      return [];
+  const renderItem = useCallback(({ item }: { item: FilmGridItem }) => {
+    if (item.type === FilmGridItemType.HEADER) {
+      return (
+        <MemoizedHeader
+          header={ item.header }
+          styles={ styles }
+        />
+      );
     }
 
-    if (!films.length) {
-      return new Array(numberOfColumns * THUMBNAILS_ROWS).fill(null).map((_, index) => ({
-        id: `film-placeholder-${index}`,
-        link: '',
-        type: FilmType.FILM,
-        poster: '',
-        title: '',
-        subtitle: '',
-        isPlaceholder: true,
-      }));
+    return (
+      <MemoizedGridItem
+        item={ item }
+        handleOnPress={ handleOnPress }
+      />
+    );
+  }, [styles, handleOnPress]);
+
+  // Headers and cards differ wildly in height, so recycle them separately --
+  // and so do real cards and their loading placeholders.
+  const getItemType = useCallback((item: FilmGridItem) => {
+    if (item.type !== FilmGridItemType.FILM) {
+      return item.type;
     }
 
-    return films;
-  }, [isEmpty, hideGrid, films, numberOfColumns]);
+    return item.isPlaceholder ? 'placeholder' : FilmGridItemType.FILM;
+  }, []);
 
-  const contentContainerStyle = useMemo(() => ({
-    padding: scale(ROW_GAP) / 2,
-  }), [scale]);
+  // Cards take one grid column; a header takes the whole width, which also
+  // pushes the next section onto a fresh row.
+  const overrideItemLayout = useCallback((
+    layout: { span?: number },
+    item: FilmGridItem
+  ) => {
+    layout.span = item.type === FilmGridItemType.HEADER ? numberOfColumns : 1;
+  }, [numberOfColumns]);
+
+  const keyExtractor = useCallback((item: FilmGridItem) => item.key, []);
 
   const ItemSeparator = useCallback(() => (
     <View style={ { height: scale(ROW_GAP) } } />
   ), [scale]);
 
-  const keyExtractor = useCallback((item: FilmGridRowItem) => item.id, []);
+  const renderSafeArea = useCallback((children?: ComponentType<any> | ReactElement | null) => {
+    if (disableStatusbarSafeArea) {
+      return children;
+    }
 
-  const getItemType = useCallback(
-    (item: FilmGridRowItem) => (item.isPlaceholder ? 'placeholder' : 'film'),
-    []
+    return (
+      <ThemedSafeArea>
+        { children as ReactNode }
+      </ThemedSafeArea>
+    );
+  }, [disableStatusbarSafeArea]);
+
+  // A caller-supplied header replaces the status bar spacer -- it is expected
+  // to carry the inset itself.
+  const listHeader = useMemo(
+    () => renderSafeArea(ListHeaderComponent),
+    [ListHeaderComponent, renderSafeArea]
   );
 
-  const ListHeaderComponent = useMemo(() => (
-    disableStatusbarSafeArea ? null : <View style={ { height: top } } />
-  ), [disableStatusbarSafeArea, top]);
+  const contentContainerStyle = useMemo(() => (
+    centerEmptyComponent && !data.length ? styles.centeredEmpty : undefined
+  ), [centerEmptyComponent, data.length, styles]);
 
-  const refreshControl = useMemo(() => (
+  const refreshControl = useMemo(() => (handleRefresh ? (
     <RefreshControl
       refreshing={ isRefreshing }
       onRefresh={ handleRefresh }
     />
-  ), [isRefreshing, handleRefresh]);
+  ) : undefined), [isRefreshing, handleRefresh]);
 
   return (
     <FlashList
-      data={ filmsData }
+      data={ data }
       renderItem={ renderItem }
       keyExtractor={ keyExtractor }
       getItemType={ getItemType }
       onEndReached={ handleScrollEnd }
       onEndReachedThreshold={ 0.25 }
       numColumns={ numberOfColumns }
-      contentContainerStyle={ contentContainerStyle }
+      overrideItemLayout={ overrideItemLayout }
       ItemSeparatorComponent={ ItemSeparator }
-      ListHeaderComponent={ ListHeaderComponent }
+      stickyHeaderIndices={ stickyHeaderIndices.length ? stickyHeaderIndices : undefined }
+      ListHeaderComponent={ listHeader }
       ListEmptyComponent={ disableEmptyComponent || hideGrid ? undefined : ListEmptyComponent }
+      contentContainerStyle={ contentContainerStyle }
       refreshControl={ refreshControl }
       showsVerticalScrollIndicator={ false }
       removeClippedSubviews={ true }

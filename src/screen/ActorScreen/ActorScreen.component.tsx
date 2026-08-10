@@ -1,4 +1,4 @@
-import { FilmSections } from 'Component/FilmSections';
+import { FilmGrid } from 'Component/FilmGrid';
 import { Page } from 'Component/Page';
 import { ThemedImageModal } from 'Component/ThemedImageModal';
 import { ThemedText } from 'Component/ThemedText';
@@ -15,35 +15,16 @@ import { ActorScreenComponentProps } from './ActorScreen.type';
 export function ActorScreenComponent({
   isLoading,
   actor,
-  handleSelectFilm,
 }: ActorScreenComponentProps) {
   const { scale } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
   const { top } = useSafeAreaInsets();
 
-  if (!actor || isLoading) {
-    return (
-      <Page>
-        <View style={ [styles.mainContent, { paddingTop: top }] }>
-          <Thumbnail
-            style={ styles.photoWrapper }
-          />
-          <View style={ [styles.additionalInfo, { marginTop: 0 }] }>
-            { Array(5).fill(0).map((_, i) => (
-              <Thumbnail
-              // eslint-disable-next-line react/no-array-index-key
-                key={ `${i}-thumb-actor-info` }
-                height={ scale(16) }
-                width={ scale(32) * (i+1) }
-              />
-            )) }
-          </View>
-        </View>
-      </Page>
-    );
-  }
-
   const renderPhoto = () => {
+    if (!actor) {
+      return null;
+    }
+
     const { photo } = actor;
 
     return (
@@ -57,6 +38,10 @@ export function ActorScreenComponent({
   };
 
   const renderName = () => {
+    if (!actor) {
+      return null;
+    }
+
     const { name } = actor;
 
     return (
@@ -67,6 +52,10 @@ export function ActorScreenComponent({
   };
 
   const renderOriginalName = () => {
+    if (!actor) {
+      return null;
+    }
+
     const { originalName } = actor;
 
     if (!originalName) {
@@ -81,6 +70,10 @@ export function ActorScreenComponent({
   };
 
   const renderAdditionalInfo = () => {
+    if (!actor) {
+      return null;
+    }
+
     const {
       dob,
       birthPlace,
@@ -105,8 +98,28 @@ export function ActorScreenComponent({
   );
 
   const renderActorData = () => {
+    if (!actor || isLoading) {
+      return (
+        <View style={ [styles.mainContent] }>
+          <Thumbnail
+            style={ styles.photoWrapper }
+          />
+          <View style={ [styles.additionalInfo, { marginTop: 0 }] }>
+            { Array(5).fill(0).map((_, i) => (
+              <Thumbnail
+                // eslint-disable-next-line react/no-array-index-key
+                key={ `${i}-thumb-actor-info` }
+                height={ scale(16) }
+                width={ scale(32) * (i+1) }
+              />
+            )) }
+          </View>
+        </View>
+      );
+    }
+
     return (
-      <View style={ [styles.mainContent, { paddingTop: top }] }>
+      <View style={ styles.mainContent }>
         { renderPhoto() }
         { renderActorInfo() }
       </View>
@@ -123,12 +136,10 @@ export function ActorScreenComponent({
 
     return (
       <View style={ styles.grid }>
-        <FilmSections
-          data={ data }
-          handleOnPress={ handleSelectFilm }
-        >
-          { renderActorData() }
-        </FilmSections>
+        <FilmGrid
+          sections={ data }
+          ListHeaderComponent={ renderActorData() }
+        />
       </View>
     );
   };

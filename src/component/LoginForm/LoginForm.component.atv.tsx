@@ -4,6 +4,7 @@ import { ThemedButton } from 'Component/ThemedButton';
 import { ThemedInput } from 'Component/ThemedInput';
 import { ThemedOverlay } from 'Component/ThemedOverlay';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
+import { ThemedText } from 'Component/ThemedText';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import { useCallback, useRef } from 'react';
@@ -47,6 +48,14 @@ export function LoginFormComponent({
 
   const renderForm = () => (
     <View style={ styles.form }>
+      <View style={ styles.heading }>
+        <ThemedText style={ styles.title }>
+          { t('Log In') }
+        </ThemedText>
+        <ThemedText style={ styles.subtitle }>
+          { t('Enter your credentials to continue') }
+        </ThemedText>
+      </View>
       <View style={ styles.inputContainer }>
         <ThemedInput
           style={ styles.input }

@@ -25,6 +25,9 @@ import { ThemedStyles } from 'Theme/types';
 import { SlidePressable } from '../Elements/SlidePressable';
 import { componentStyles } from '../WelcomeScreen.style';
 
+export const BACK_BUTTON_FOCUS_KEY = 'BACK_BUTTON';
+export const NEXT_BUTTON_FOCUS_KEY = 'NEXT_BUTTON';
+
 export interface BaseSlideProps {
   title: string;
   subtitle: string;
@@ -109,6 +112,7 @@ export const BaseSlide = ({
               contentStyle={ styles.prevButtonContent }
               onPress={ goBack }
               styles={ styles }
+              focusKey={ BACK_BUTTON_FOCUS_KEY }
             >
               { ({ isFocused }) => (
                 <ChevronLeft
@@ -125,6 +129,7 @@ export const BaseSlide = ({
           contentStyle={ styles.nextButtonContent }
           onPress={ goNext }
           styles={ styles }
+          focusKey={ NEXT_BUTTON_FOCUS_KEY }
         >
           { ({ isFocused }) => (
             <ThemedText

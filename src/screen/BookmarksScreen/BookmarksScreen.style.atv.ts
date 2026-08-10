@@ -1,6 +1,6 @@
-import { ThemedStyles } from 'Theme/types';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-export const styles = {
+export const componentStyles = ({ scale, colors, text }: Theme) => ({
   empty: {
     height: '100%',
     width: '100%',
@@ -15,11 +15,11 @@ export const styles = {
   header: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    paddingHorizontal: 32,
-    paddingBottom: 8,
+    paddingHorizontal: scale(32),
+    paddingBottom: scale(8),
+    marginTop: scale(12),
   },
   emptyCategory: {
-    paddingTop: 80,
     alignItems: 'center',
   },
-} satisfies ThemedStyles;
+} satisfies ThemedStyles);

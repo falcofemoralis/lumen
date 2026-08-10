@@ -18,6 +18,7 @@ export function ThemedGridContainer({
   ListHeaderComponent,
   scrollBehavior,
   autofocus,
+  disableRefresh,
   renderItem,
   onNextLoad,
 }: ThemedGridContainerProps) {
@@ -62,6 +63,7 @@ export function ThemedGridContainer({
     rowStyle,
     scrollBehavior,
     autofocus,
+    disableRefresh,
     ListHeaderComponent,
     ListEmptyComponent,
     renderItem,

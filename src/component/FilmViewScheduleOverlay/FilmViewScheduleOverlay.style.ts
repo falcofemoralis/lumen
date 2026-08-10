@@ -1,6 +1,6 @@
 import { Theme, ThemedStyles } from 'Theme/types';
 
-export const componentStyles = ({ scale }: Theme) => ({
+export const componentStyles = ({ scale, colors }: Theme) => ({
   content: {
     flex: 1,
   },
@@ -11,5 +11,8 @@ export const componentStyles = ({ scale }: Theme) => ({
   // top-aligned - anything centered lands below the visible area.
   loader: {
     paddingTop: scale(24),
+  },
+  item: {
+    backgroundColor: colors.button,
   },
 } satisfies ThemedStyles);

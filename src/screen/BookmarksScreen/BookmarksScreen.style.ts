@@ -1,12 +1,12 @@
-import { ThemedStyles } from 'Theme/types';
+import { Theme, ThemedStyles } from 'Theme/types';
 
-export const styles = {
+export const componentStyles = ({ scale, colors, text }: Theme) => ({
   empty: {
     height: '100%',
     width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 16,
+    gap: scale(16),
   },
   content: {
     height: '100%',
@@ -15,18 +15,17 @@ export const styles = {
   header: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    paddingHorizontal: 16,
-    paddingBottom: 4,
+    paddingHorizontal: scale(16),
+    paddingBottom: scale(16),
   },
   manageButton: {
-    width: 44,
-    height: 44,
+    width: scale(42),
+    height: scale(42),
   },
   manageButtonContent: {
     padding: 0,
   },
   emptyCategory: {
-    paddingTop: 120,
     alignItems: 'center',
   },
-} satisfies ThemedStyles;
+} satisfies ThemedStyles);

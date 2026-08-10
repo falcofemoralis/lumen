@@ -19,6 +19,7 @@ import Trash2 from 'lucide-react-native/icons/trash-2';
 import { useCallback } from 'react';
 import { View } from 'react-native';
 import Animated from 'react-native-reanimated';
+import { useAppTheme } from 'Theme/context';
 import { ThemedStyles } from 'Theme/types';
 
 import { NUMBER_OF_COLUMNS_TV } from './RecentScreen.config';
@@ -49,6 +50,7 @@ function RecentRow({
     trackChildren: true,
     saveLastFocusedChild: false,
   });
+  const { scale } = useAppTheme();
 
   const {
     image,
@@ -115,12 +117,18 @@ function RecentRow({
           contentStyle={ styles.actionButtonContent }
           IconComponent={ Trash2 }
           onPress={ () => removeItem(item) }
+          iconProps={ {
+            size: scale(20),
+          } }
         />
         <ThemedButton
           style={ [styles.actionButton, hasFocusedChild && styles.actionButtonUnzoomed] }
           contentStyle={ styles.actionButtonContent }
           IconComponent={ item.isWatched ? EyeOff : Eye }
           onPress={ () => openHideConfirmOverlay(item) }
+          iconProps={ {
+            size: scale(20),
+          } }
         />
       </Animated.View>
     </FocusContext.Provider>

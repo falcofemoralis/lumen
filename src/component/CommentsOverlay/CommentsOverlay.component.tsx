@@ -1,8 +1,6 @@
 import { Comments } from 'Component/Comments';
-import { CommentsRef } from 'Component/Comments/Comments.container';
 import { ThemedOverlay } from 'Component/ThemedOverlay';
-import { ThemedSafeArea } from 'Component/ThemedSafeArea';
-import { useCallback, useRef } from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { CommentsOverlayComponentProps } from './CommentsOverlay.type';
 
@@ -15,30 +13,23 @@ export const CommentsOverlayComponent = ({
   contentContainerStyle,
   onClose,
 }: CommentsOverlayComponentProps) => {
-  const commentsRef = useRef<CommentsRef>(null);
-
-  const onOverlayVisible = useCallback(() => {
-    commentsRef.current?.loadComments();
-  }, []);
+  const { right, left } = useSafeAreaInsets();
 
   return (
     <ThemedOverlay
       ref={ overlayRef }
       style={ style }
       containerStyle={ containerStyle }
-      contentContainerStyle={ contentContainerStyle }
-      onShow={ onOverlayVisible }
+      contentContainerStyle={ [{ right: left > 0 ? left : right }, contentContainerStyle] }
       onClose={ onClose }
       transparent
     >
-      <ThemedSafeArea edges={ ['top', 'bottom', 'left', 'right'] }>
-        <Comments
-          ref={ commentsRef }
-          style={ contentStyle }
-          film={ film }
-          loaderFullScreen
-        />
-      </ThemedSafeArea>
+      <Comments
+        style={ contentStyle }
+        film={ film }
+        initialLoad
+        loaderFullScreen
+      />
     </ThemedOverlay>
   );
 };

@@ -6,6 +6,7 @@ import { View } from 'react-native';
 
 import { componentStyles } from './FilmViewInfoList.style.atv';
 import { FilmViewInfoListComponentProps } from './FilmViewInfoList.type';
+import { formatInfoListPosition } from './FilmViewInfoList.utils';
 
 export function FilmViewInfoListComponent({
   list,
@@ -13,6 +14,25 @@ export function FilmViewInfoListComponent({
 }: FilmViewInfoListComponentProps) {
   const styles = useThemedStyles(componentStyles);
   const { name, position, link } = list;
+
+  const positionLabel = formatInfoListPosition(position);
+
+  const renderPosition = (isFocused: boolean) => {
+    if (!positionLabel) {
+      return null;
+    }
+
+    return (
+      <ThemedText
+        style={ [
+          styles.infoListPosition,
+          isFocused && styles.infoListTextFocused,
+        ] }
+      >
+        { positionLabel }
+      </ThemedText>
+    );
+  };
 
   return (
     <ThemedPressable
@@ -31,11 +51,12 @@ export function FilmViewInfoListComponent({
           <ThemedText
             style={ [
               styles.infoListName,
-              isFocused && styles.infoListNameFocused,
+              isFocused && styles.infoListTextFocused,
             ] }
           >
-            { `${name} ${position || ''}` }
+            { name }
           </ThemedText>
+          { renderPosition(isFocused) }
         </View>
       ) }
     </ThemedPressable>

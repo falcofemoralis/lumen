@@ -1,0 +1,20 @@
+diff --git a/node_modules/react-native-restart/android/src/main/java/com/reactnativerestart/RestartModule.java b/node_modules/react-native-restart/android/src/main/java/com/reactnativerestart/RestartModule.java
+index 6bc58df..08fb2c4 100644
+--- a/node_modules/react-native-restart/android/src/main/java/com/reactnativerestart/RestartModule.java
++++ b/node_modules/react-native-restart/android/src/main/java/com/reactnativerestart/RestartModule.java
+@@ -100,13 +100,13 @@ public class RestartModule extends ReactContextBaseJavaModule {
+     @ReactMethod
+     public void Restart(String reason) {
+         restartReason = reason;
+-        loadBundle();
++        ProcessPhoenix.triggerRebirth(getReactApplicationContext());
+     }
+ 
+     @ReactMethod
+     public void restart(String reason) {
+         restartReason = reason;
+-        loadBundle();
++        ProcessPhoenix.triggerRebirth(getReactApplicationContext());
+     }
+     
+     @ReactMethod

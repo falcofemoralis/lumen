@@ -1,6 +1,5 @@
 import { InfoBlock } from 'Component/InfoBlock';
 import { ThemedButton } from 'Component/ThemedButton';
-import { Portal } from 'Component/ThemedPortal';
 import { Wrapper } from 'Component/Wrapper';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
@@ -39,12 +38,15 @@ export function PageComponent({
     return children;
   };
 
+  // No portal host here on purpose: the only thing portaled on mobile is
+  // ThemedOverlay, and a host on the page would clip it to the scene -- the tab
+  // bar is a sibling below the scene, so the backdrop would neither dim it nor
+  // block taps on it. Falling through to the app-wide host in Root covers the
+  // whole window, the way the native Modal used to.
   return (
-    <Portal.Host>
-      <View style={ [ styles.container, style ] }>
-        { renderContent() }
-      </View>
-    </Portal.Host>
+    <View style={ [ styles.container, style ] }>
+      { renderContent() }
+    </View>
   );
 }
 

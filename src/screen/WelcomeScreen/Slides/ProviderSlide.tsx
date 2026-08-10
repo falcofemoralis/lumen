@@ -1,5 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { ThemedCustomSelect } from 'Component/ThemedCustomSelect';
+import { ThemedGroup } from 'Component/ThemedGroup';
 import { ThemedPressable } from 'Component/ThemedPressable';
 import { ThemedText } from 'Component/ThemedText';
 import { ThemedToggle } from 'Component/ThemedToggle';
@@ -19,6 +20,8 @@ import NotificationStore from 'Store/Notification.store';
 import { useAppTheme } from 'Theme/context';
 
 import { BaseSlide, BaseSlideProps } from './BaseSlide';
+
+const PROVIDER_VALIDATE_FOCUS_KEY = 'PROVIDER_VALIDATE_BTN';
 
 export const ProviderSlide = ({
   goNext,
@@ -84,7 +87,10 @@ export const ProviderSlide = ({
       goNext={ handleNext }
       styles={ styles }
     >
-      <View style={ styles.providerWrapper }>
+      <ThemedGroup
+        style={ styles.providerWrapper }
+        preferredChildFocusKey={ PROVIDER_VALIDATE_FOCUS_KEY }
+      >
         <ThemedCustomSelect
           options={ currentService.defaultProviders }
           value={ selectedProvider ?? '' }
@@ -96,6 +102,8 @@ export const ProviderSlide = ({
             { t('Official mode') }
           </ThemedText>
           <ThemedToggle
+            containerStyle={ styles.providerOffModeToggle }
+            inputWrapperStyle={ styles.providerOffModeToggleInput }
             value={ isOfficialMode }
             onValueChange={ handleOfficialMode }
           />
@@ -108,6 +116,7 @@ export const ProviderSlide = ({
           ] }
           onPress={ handleValidateProvider }
           disabled={ isLoading }
+          focusKey={ PROVIDER_VALIDATE_FOCUS_KEY }
         >
           { ({ isFocused }) => (
             <View style={ [
@@ -135,7 +144,7 @@ export const ProviderSlide = ({
             </View>
           ) }
         </ThemedPressable>
-      </View>
+      </ThemedGroup>
     </BaseSlide>
   );
 };

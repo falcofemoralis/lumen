@@ -18,7 +18,7 @@ export type CommentsRef = {
 };
 
 export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>(
-  ({ film, loaderFullScreen, style, initialLoad }, ref) => {
+  ({ film, loaderFullScreen, style, initialLoad, disableRefresh }, ref) => {
     const isTV = useIsTV();
     const { id } = film;
     const { isSignedIn, currentService } = useServiceContext();
@@ -76,6 +76,7 @@ export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>
       style,
       isLoading: isFetching,
       loaderFullScreen,
+      disableRefresh,
       onNextLoad,
       handlePostLike,
     };

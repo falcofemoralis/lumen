@@ -76,7 +76,7 @@ export interface ApiInterface {
   setConfig: (key: keyof ApiInterfaceConfig, value: unknown) => void;
   getProvider: () => string;
   getCDN: () => string;
-  getHeaders: () => Record<string, string>;
+  getHeaders: (includeHeaders?: boolean) => Record<string, string>;
   validateUrl: (url: string) => Promise<void>;
   modifyCDN: (streams: FilmStreamInterface[]) => FilmStreamInterface[];
 
@@ -111,6 +111,7 @@ export interface ApiInterface {
     sort?: string,
     params?: ApiParams
   ) => Promise<FilmListInterface>;
+  getCategoryMenu: (link: string) => MenuItemInterface[];
   getFilmSortingOptions: () => ApiSortingOptionInterface[];
   getFilms: (
     page: number,

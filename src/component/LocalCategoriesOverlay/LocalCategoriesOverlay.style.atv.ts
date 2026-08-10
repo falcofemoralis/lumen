@@ -13,7 +13,13 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     fontSize: scale(text.lg.fontSize),
     fontWeight: '700',
   },
+  // Goes on the scroll viewport, not its content: ThemedScrollView defaults the
+  // viewport to `height: '100%'`, which resolves against the height the overlay
+  // hands down (its own `maxHeight: '50%'`) and leaves the actions row outside
+  // the clipped content box.
   list: {
+    height: 'auto',
+    flexShrink: 1,
     maxHeight: scale(180),
   },
   emptyText: {

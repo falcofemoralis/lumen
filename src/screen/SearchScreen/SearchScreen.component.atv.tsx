@@ -15,7 +15,7 @@ import LayoutGrid from 'lucide-react-native/icons/layout-grid';
 import Mic from 'lucide-react-native/icons/mic';
 import Search from 'lucide-react-native/icons/search';
 import Settings2 from 'lucide-react-native/icons/settings-2';
-import { memo, useCallback, useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { useAppTheme } from 'Theme/context';
@@ -23,6 +23,14 @@ import { ThemedStyles } from 'Theme/types';
 
 import { componentStyles } from './SearchScreen.style.atv';
 import { SearchScreenComponentProps } from './SearchScreen.type';
+
+// Derived from the text rather than the index, so the key of every suggestion
+// that survives a removal stays the same across the re-render.
+const suggestionFocusKey = (suggestion: string) => `SEARCH_SUGGESTION_${suggestion}`;
+
+// First button of the search container -- where focus lands when the suggestion
+// list has nothing left to fall back to.
+const SEARCH_ACTIONS_FOCUS_KEY = 'SEARCH_ACTION_SPEAK';
 
 const SearchHeader = memo(({
   suggestions,
@@ -36,6 +44,7 @@ const SearchHeader = memo(({
   handleApplySearch,
   openAdditionalContentOverlay,
   handleOpenCollections,
+  isRemovableSuggestion,
   handleRemoveSuggestion,
 }: SearchScreenComponentProps & {
   styles: ThemedStyles<typeof componentStyles>;
@@ -59,6 +68,7 @@ const SearchHeader = memo(({
       <ThemedButton
         title=""
         autofocus
+        focusKey={ SEARCH_ACTIONS_FOCUS_KEY }
         style={ styles.actionBtn }
         contentStyle={ styles.actionBtnContent }
         styleFocused={ recognizing && styles.speakActive }
@@ -104,9 +114,14 @@ const SearchHeader = memo(({
           { suggestions.map((item) => (
             <ThemedButton
               key={ item }
+              focusKey={ suggestionFocusKey(item) }
               title={ item }
               onPress={ () => onApplySuggestion(item) }
-              onLongPress={ () => handleRemoveSuggestion(item) }
+              // Only history entries can be removed -- the service's suggestions
+              // must not bring up the confirmation at all.
+              onLongPress={ isRemovableSuggestion(item)
+                ? () => handleRemoveSuggestion(item)
+                : undefined }
               style={ styles.suggestion }
             />
           )) }
@@ -143,8 +158,40 @@ export function SearchScreenComponent(props: SearchScreenComponentProps) {
     setSelectedCategory,
     setSelectedGenre,
     setSelectedYear,
+    handleRemoveSuggestion,
     removeSuggestion,
   } = props;
+
+  // The suggestion whose removal the open confirmation is about, so the focus
+  // handover below knows which button is about to disappear.
+  const suggestionToRemove = useRef<string | null>(null);
+
+  const handleOpenRemoveConfirmation = useCallback((suggestion: string) => {
+    suggestionToRemove.current = suggestion;
+    handleRemoveSuggestion(suggestion);
+  }, [handleRemoveSuggestion]);
+
+  // The overlay hands focus back to the button that opened it, which is exactly
+  // the one the removal unmounts -- nothing would be focused once it closes.
+  // Point it at the suggestion that takes the removed one's place instead (the
+  // new last one, if it was the tail), or back up to the search actions once the
+  // list is empty.
+  const handleConfirmRemoveSuggestion = useCallback(() => {
+    const removed = suggestionToRemove.current;
+    suggestionToRemove.current = null;
+
+    if (removed) {
+      const removedIndex = Math.max(suggestions.indexOf(removed), 0);
+      const remaining = suggestions.filter((suggestion) => suggestion !== removed);
+      const nextFocused = remaining[Math.min(removedIndex, remaining.length - 1)];
+
+      confirmationOverlayRef.current?.setFallbackRestoreFocusKey(
+        nextFocused ? suggestionFocusKey(nextFocused) : SEARCH_ACTIONS_FOCUS_KEY
+      );
+    }
+
+    removeSuggestion();
+  }, [suggestions, confirmationOverlayRef, removeSuggestion]);
 
   // The header is a sibling above the grid, collapsed out of the way once focus
   // leaves the first row -- same treatment as the pager menu.
@@ -191,6 +238,7 @@ export function SearchScreenComponent(props: SearchScreenComponentProps) {
     <Animated.View style={ [styles.headerCollapse, headerAnimatedStyle] }>
       <SearchHeader
         { ...props }
+        handleRemoveSuggestion={ handleOpenRemoveConfirmation }
         styles={ styles }
       />
     </Animated.View>
@@ -283,7 +331,7 @@ export function SearchScreenComponent(props: SearchScreenComponentProps) {
     return (
       <ConfirmOverlay
         overlayRef={ confirmationOverlayRef }
-        onConfirm={ removeSuggestion }
+        onConfirm={ handleConfirmRemoveSuggestion }
         title={ t('Are you sure?') }
         message={ t('Do you want to remove this suggestion from history?') }
         confirmButtonText={ t('Remove') }
@@ -301,7 +349,7 @@ export function SearchScreenComponent(props: SearchScreenComponentProps) {
         onPreLoad={ onPreLoad }
         onNextLoad={ onNextLoad }
         hideGrid={ !query }
-        isEmpty={ ! !isLoading && !pagerItems[0].films?.length }
+        isEmpty={ !isLoading && !pagerItems[0].films?.length }
         ListEmptyComponent={ renderEmptyBlock() }
         onAtTopChange={ handleAtTopChange }
       />

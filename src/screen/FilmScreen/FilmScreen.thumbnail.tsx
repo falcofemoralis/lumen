@@ -93,7 +93,7 @@ export const FilmScreenThumbnail = ({
           <Wrapper>
             <Thumbnail
               style={ styles.description }
-              height="60%"
+              height="70%"
               width="100%"
             />
           </Wrapper>

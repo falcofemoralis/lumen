@@ -5,7 +5,7 @@ import { ITEMS_ON_SCREEN_TV } from './RecentScreen.config';
 
 const ROW_GAP = 24;
 const CELL_GAP = 8;
-const ACTION_BUTTON_SIZE = 64;
+const ACTION_BUTTON_SIZE = 48;
 const ZOOM = 1.1;
 // A row grows symmetrically, so it bleeds half of the added size on every side.
 const ZOOM_BLEED = (ZOOM - 1) / 2;

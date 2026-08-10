@@ -8,19 +8,23 @@ import { ThemedGridComponentProps } from './ThemedGrid.type';
 export const ThemedGridComponent = ({
   data,
   numberOfColumns,
+  style,
   isRefreshing = false,
+  disableRefresh = false,
   ListHeaderComponent,
   ListEmptyComponent,
   renderItem,
   handleScrollEnd,
   handleRefresh = noopFn,
 }: ThemedGridComponentProps) => {
-  const renderRefreshControl = useCallback(() => (
+  // Without a refresh control the downward drag at the top of the list is left
+  // unconsumed, so a host like a bottom sheet can take it over as a dismiss gesture.
+  const renderRefreshControl = useCallback(() => (disableRefresh ? undefined : (
     <RefreshControl
       refreshing={ isRefreshing }
       onRefresh={ handleRefresh }
     />
-  ), [isRefreshing, handleRefresh]);
+  )), [disableRefresh, isRefreshing, handleRefresh]);
 
   // FlashList's renderItem must return an element, the prop returns a ReactNode.
   const renderCell = useCallback(({ item, index }: { item: any; index: number }) => (
@@ -30,6 +34,7 @@ export const ThemedGridComponent = ({
   return (
     <FlashList
       data={ data }
+      style={ style }
       numColumns={ numberOfColumns }
       renderItem={ renderCell }
       refreshControl={ renderRefreshControl() }

@@ -48,6 +48,13 @@ import { initI18n } from './i18n';
 
 export const NAVIGATION_PERSISTENCE_KEY = 'NAVIGATION_STATE';
 
+/**
+ * Shortest gap between two spatial-navigation moves. Roughly one move per four
+ * frames -- fast enough to feel responsive when holding a direction, slow enough
+ * that a low-end box can finish drawing one row before it is asked for the next.
+ */
+const KEY_THROTTLE_MS = 60;
+
 SplashScreen.setOptions({
   duration: 750,
   fade: true,
@@ -65,6 +72,14 @@ export function App() {
 
     init({
       layoutAdapter: RemoteControlLayoutAdapter,
+      // A d-pad repeats far faster than a slow TV box can answer: every press
+      // re-measures the focused node's siblings and drives a scroll, so an
+      // unthrottled hold builds a backlog that keeps moving focus long after the
+      // key is released. Norigin throttles leading-edge, so the first press is
+      // still instant and the extra ones are dropped rather than queued.
+      throttle: KEY_THROTTLE_MS,
+      // Apply it to held keys too -- that is the case that produces the backlog.
+      throttleKeypresses: true,
     });
   }, []);
 

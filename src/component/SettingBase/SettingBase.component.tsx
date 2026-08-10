@@ -99,7 +99,6 @@ const SettingBaseComponent = ({
           <Loader
             isLoading={ isLoading || isLoadingProp }
             fullScreen
-            style={ styles.loaderContainer }
           />
         ) }
       </ThemedPressable>

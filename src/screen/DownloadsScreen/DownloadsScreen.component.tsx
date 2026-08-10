@@ -413,9 +413,7 @@ export const DownloadsScreenComponent = (props: DownloadsScreenComponentProps) =
   };
 
   return (
-    <Page
-      checkConnection={ false }
-    >
+    <Page checkConnection={ false }>
       <ThemedGrid
         data={ downloadedFilms }
         numberOfColumns={ NUMBER_OF_COLUMNS }

@@ -146,11 +146,13 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     fontSize: scale(text.sm.fontSize),
     fontWeight: '700',
     zIndex: 10,
+    color: colors.textOnContrast,
   },
   premiumBadgeText: {
     fontSize: scale(text.xs.fontSize),
     fontWeight: '500',
     zIndex: 10,
+    color: colors.textOnContrast,
   },
   premiumButton: {
     backgroundColor: '#5B359A',

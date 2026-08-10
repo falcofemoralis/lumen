@@ -109,6 +109,7 @@ export const FilmPagerComponent = ({
   hideGrid,
   disableStatusbarSafeArea,
   ListEmptyComponent,
+  centerEmptyComponent,
   sorting,
   selectedSorting,
   onPreLoad,
@@ -248,11 +249,12 @@ export const FilmPagerComponent = ({
         isEmpty={ isEmpty && films !== null && !films.length }
         hideGrid={ hideGrid }
         ListEmptyComponent={ ListEmptyComponent }
+        centerEmptyComponent={ centerEmptyComponent }
         onNextLoad={ (isRefresh) => onNextLoad(isRefresh, pagerItem) }
       />
     );
   // eslint-disable-next-line max-len
-  }, [renderedIndexes, disableEmptyComponent, disableStatusbarSafeArea, isEmpty, hideGrid, ListEmptyComponent, onNextLoad]);
+  }, [renderedIndexes, disableEmptyComponent, disableStatusbarSafeArea, isEmpty, hideGrid, ListEmptyComponent, centerEmptyComponent, onNextLoad]);
 
   const pages = useMemo(() => (pagerItems).map((item, idx) => (
     <Wrapper key={ item.menuItem.id }>

@@ -1,20 +1,16 @@
 import { InfoBlock } from 'Component/InfoBlock';
-import { ThemedPressable } from 'Component/ThemedPressable';
-import { useLandscape } from 'Hooks/useLandscape';
+import { ThemedSimpleList } from 'Component/ThemedSimpleList';
+import { ListItem as SimpleListItem } from 'Component/ThemedSimpleList/ThemedSimpleList.type';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import Square from 'lucide-react-native/icons/square';
 import SquareCheck from 'lucide-react-native/icons/square-check';
-import { useCallback } from 'react';
-import {
-  ScrollView,
-  Text,
-  View,
-} from 'react-native';
+import { useCallback, useMemo } from 'react';
+import { View } from 'react-native';
 import { useAppTheme } from 'Theme/context';
 
 import { componentStyles } from './ThemedMultiList.style';
-import { ListItem, ThemedMultiListComponentProps } from './ThemedMultiList.type';
+import { ThemedMultiListComponentProps } from './ThemedMultiList.type';
 
 export const ThemedMultiListComponent = ({
   values,
@@ -25,81 +21,45 @@ export const ThemedMultiListComponent = ({
 }: ThemedMultiListComponentProps) => {
   const { theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
-  const isLandscape = useLandscape();
 
-  const renderHeader = () => {
-    if (!header) {
-      return null;
-    }
-
-    return (
-      <View style={ styles.listHeader }>
-        <Text style={ styles.listHeaderText }>
-          { header }
-        </Text>
-      </View>
-    );
-  };
-
-  const renderItem = useCallback(({ item }: { item: ListItem }) => (
-    <ThemedPressable
-      key={ item.value }
-      onPress={ () => handleOnChange(item.value, !item.isChecked) }
-      style={ styles.listItem }
-      contentStyle={ styles.listItemContent }
-    >
-      <View style={ styles.item }>
-        <Text style={ styles.itemLabel }>
-          { item.label }
-        </Text>
-        { item.isChecked ? (
-          <SquareCheck
-            color={ theme.colors.secondary }
-          />
-        ) : (
-          <Square
-            color={ theme.colors.icon }
-          />
-        ) }
-      </View>
-    </ThemedPressable>
-  ), [handleOnChange, styles, theme]);
-
-  const renderItems = () => {
-    if (!values.length) {
-      return (
-        <InfoBlock
-          title={ noItemsTitle ?? t('No items') }
-          subtitle={ noItemsSubtitle ?? '' }
-          hideIcon
-          style={ styles.emptyBlock }
-        />
-      );
-    }
-
-    return (
-      <ScrollView>
-        { values.map((item) => renderItem({ item })) }
-      </ScrollView>
-    );
-  };
-
-  const renderContent = () => (
-    <View
-      style={ [
-        styles.listItems,
-        isLandscape && styles.listItemsLandscape,
-      ] }
-    >
-      { renderItems() }
-    </View>
+  // The list items carry no checked state of their own, so it is resolved back
+  // from `values` by value whenever an item renders or is pressed.
+  const checkedByValue = useMemo(
+    () => new Map(values.map(({ value, isChecked }) => [value, isChecked])),
+    [values]
   );
 
-  return (
-    <View style={ styles.listContainer }>
-      { renderHeader() }
-      { renderContent() }
+  const renderCheckbox = useCallback((item: SimpleListItem) => (
+    <View style={ styles.checkbox }>
+      { checkedByValue.get(item.value) ? (
+        <SquareCheck color={ theme.colors.secondary } />
+      ) : (
+        <Square color={ theme.colors.icon } />
+      ) }
     </View>
+  ), [checkedByValue, styles, theme]);
+
+  const onChange = useCallback((item: SimpleListItem) => {
+    handleOnChange(item.value, !checkedByValue.get(item.value));
+  }, [handleOnChange, checkedByValue]);
+
+  const emptyComponent = useMemo(() => (
+    <InfoBlock
+      title={ noItemsTitle ?? t('No items') }
+      subtitle={ noItemsSubtitle ?? '' }
+      hideIcon
+      style={ styles.emptyBlock }
+    />
+  ), [noItemsTitle, noItemsSubtitle, styles]);
+
+  return (
+    <ThemedSimpleList
+      data={ values }
+      header={ header }
+      onChange={ onChange }
+      rightAdditionalElement={ renderCheckbox }
+      emptyComponent={ emptyComponent }
+    />
   );
 };
 

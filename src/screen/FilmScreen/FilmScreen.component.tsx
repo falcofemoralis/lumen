@@ -118,7 +118,6 @@ export function FilmScreenComponent({
   handleUpdateScheduleWatch,
   handleShare,
   openBookmarks,
-  handleBookmarkChange,
   openVideoDownloader,
   handleDownloadSelect,
   openTrailerOverlay,
@@ -545,7 +544,6 @@ export function FilmScreenComponent({
     <BookmarksOverlay
       overlayRef={ bookmarksOverlayRef }
       film={ film }
-      onBookmarkChange={ handleBookmarkChange }
     />
   );
 
@@ -571,9 +569,11 @@ export function FilmScreenComponent({
       scrollable
     >
       <Wrapper style={ { flex: 1 } }>
+        { /* pull-to-refresh would eat the downward drag the sheet needs to dismiss */ }
         <Comments
           film={ film }
           initialLoad
+          disableRefresh
         />
       </Wrapper>
     </ThemedBottomSheet>

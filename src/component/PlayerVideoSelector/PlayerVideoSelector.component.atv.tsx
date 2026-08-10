@@ -9,6 +9,7 @@ import { ThemedScrollView } from 'Component/ThemedScrollView';
 import { ThemedSimpleList } from 'Component/ThemedSimpleList';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
+import ArrowDownToLine from 'lucide-react-native/icons/arrow-down-to-line';
 import { View } from 'react-native';
 import { EpisodeInterface, SeasonInterface } from 'Type/FilmVoice.interface';
 import { getVideoProgress } from 'Util/Player';
@@ -263,10 +264,8 @@ export function PlayerVideoSelectorComponent({
                   selected={ selectedEpisodeId === episodeId }
                   autofocus={ selectedEpisodeId === episodeId }
                   onPress={ () => handleSelectEpisode(episodeId) }
-                  style={ [
-                    styles.button,
-                    isSelectedForDownload ? styles.episodeDownloadSelected : undefined,
-                  ] }
+                  style={ styles.button }
+                  styleOverride={ isSelectedForDownload && styles.episodeDownloadSelected }
                   topAdditionalElement={
                     (isFocused, isSelected) => renderEpisodeTimeline(episodeId, isFocused, isSelected)
                   }
@@ -296,6 +295,7 @@ export function PlayerVideoSelectorComponent({
     <Loader
       isLoading={ isLoading }
       fullScreen
+      backdrop
     />
   );
 
@@ -344,6 +344,7 @@ export function PlayerVideoSelectorComponent({
         onPress={ handleEpisodesDownload }
         disabled={ !Object.values(episodesToDownload).filter((selected) => selected).length }
         style={ styles.downloadBtn }
+        IconComponent={ ArrowDownToLine }
       />
     );
   };

@@ -4,6 +4,7 @@ import { ThemedBottomSheet } from 'Component/ThemedBottomSheet';
 import { ThemedBottomSheetRef } from 'Component/ThemedBottomSheet/ThemedBottomSheet.type';
 import { ThemedButton } from 'Component/ThemedButton';
 import { ThemedInput } from 'Component/ThemedInput';
+import { ThemedText } from 'Component/ThemedText';
 import { Wrapper } from 'Component/Wrapper';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
@@ -47,6 +48,14 @@ export function LoginFormComponent({
 
   const renderForm = () => (
     <View style={ styles.form }>
+      <View style={ styles.heading }>
+        <ThemedText style={ styles.title }>
+          { t('Log In') }
+        </ThemedText>
+        <ThemedText style={ styles.subtitle }>
+          { t('Enter your credentials to continue') }
+        </ThemedText>
+      </View>
       <ThemedInput
         style={ styles.input }
         placeholder={ t('Login or email') }

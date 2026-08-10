@@ -56,6 +56,7 @@ export function SearchScreenComponent({
   setSelectedCategory,
   setSelectedGenre,
   setSelectedYear,
+  isRemovableSuggestion,
   handleRemoveSuggestion,
   removeSuggestion,
 }: SearchScreenComponentProps) {
@@ -148,10 +149,14 @@ export function SearchScreenComponent({
           <ThemedPressable
             key={ suggestion }
             onPress={ () => onApplySuggestion(suggestion) }
-            onLongPress={ () => {
-              Haptics.performAndroidHapticsAsync(Haptics.AndroidHaptics.Gesture_Start);
-              handleRemoveSuggestion(suggestion);
-            } }
+            // Only history entries can be removed -- the service's suggestions
+            // must not bring up the confirmation at all.
+            onLongPress={ isRemovableSuggestion(suggestion)
+              ? () => {
+                Haptics.performAndroidHapticsAsync(Haptics.AndroidHaptics.Gesture_Start);
+                handleRemoveSuggestion(suggestion);
+              }
+              : undefined }
             style={ styles.suggestion }
             contentStyle={ styles.suggestionContent }
           >

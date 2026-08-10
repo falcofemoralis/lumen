@@ -12,6 +12,9 @@ interface StoryImageProps {
   scale?: number;
 }
 
+// `#xywh=x,y,w,h` media fragment naming the tile inside the sprite sheet
+const XYWH_REGEX = /xywh=(-?\d+),(-?\d+),(-?\d+),(-?\d+)/;
+
 export const CacheImage = ({ uri }: { uri: string }) => (
   <Image
     style={ {
@@ -19,6 +22,8 @@ export const CacheImage = ({ uri }: { uri: string }) => (
       height: '100%',
     } }
     source={ { uri } }
+    // sheets are revisited constantly while scrubbing, so keep decoded bitmaps around
+    cachePolicy="memory-disk"
   />
 );
 
@@ -28,7 +33,7 @@ function imagePropsAreEqual(prevProps: StoryImageProps, props: StoryImageProps) 
 
 const MemoizedCacheImage = memo(CacheImage, imagePropsAreEqual);
 
-const StoryImage = ({ uri, scale = 1 }: StoryImageProps) => {
+const StoryImageComponent = ({ uri, scale = 1 }: StoryImageProps) => {
   const { theme } = useAppTheme();
 
   if (!uri) {
@@ -42,16 +47,15 @@ const StoryImage = ({ uri, scale = 1 }: StoryImageProps) => {
   let width = STORYBOARD_TILE_WIDTH;
   let height = STORYBOARD_TILE_HEIGHT;
 
-  if (split.length > 1) {
-    const params = new URLSearchParams(split[1]);
-    const xywh = params.get('xywh');
-    if (xywh) {
-      const [x, y, w, h] = xywh.split(',').map(Number);
-      offsetX = x * scale;
-      offsetY = y * scale;
-      width = w * scale;
-      height = h * scale;
-    }
+  // a regex rather than URLSearchParams: the RN polyfill builds a whole URL object per call,
+  // which is far too expensive to run on every frame of a scrub
+  const fragment = split.length > 1 ? XYWH_REGEX.exec(split[1]) : null;
+
+  if (fragment) {
+    offsetX = Number(fragment[1]) * scale;
+    offsetY = Number(fragment[2]) * scale;
+    width = Number(fragment[3]) * scale;
+    height = Number(fragment[4]) * scale;
   }
 
   return (
@@ -76,6 +80,30 @@ const StoryImage = ({ uri, scale = 1 }: StoryImageProps) => {
     </View>
   );
 };
+
+const StoryImage = memo(StoryImageComponent);
+
+// cues are ordered by start time, so the covering one can be found without walking the list --
+// which matters because a long video parses into thousands of them
+function findCue(cues: VTTItem[], time: number): VTTItem | undefined {
+  let low = 0;
+  let high = cues.length - 1;
+
+  while (low <= high) {
+    const mid = (low + high) >> 1;
+    const cue = cues[mid];
+
+    if (!cue || time < cue.start) {
+      high = mid - 1;
+    } else if (time > cue.end) {
+      low = mid + 1;
+    } else {
+      return cue;
+    }
+  }
+
+  return undefined;
+}
 
 const PlayerStoryboardComponent = ({
   storyboardUrl,
@@ -112,9 +140,9 @@ const PlayerStoryboardComponent = ({
 
   // the tile is derived from the cues plus the playhead, so pick it during render and
   // keep the previous one whenever no cue covers the current time
-  const item = isUrlStale
+  const item = isUrlStale || !storyboard
     ? undefined
-    : storyboard?.find(({ start, end }) => currentTime >= start && currentTime <= end);
+    : findCue(storyboard, currentTime);
 
   if (item && item.part.trim() !== img) {
     setImg(item.part.trim());

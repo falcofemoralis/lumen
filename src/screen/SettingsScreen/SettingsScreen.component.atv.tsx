@@ -106,7 +106,7 @@ export function SettingsScreenComponent({
   providerOptions,
   cdnOptions,
   downloadsPathOptions,
-  isTVGridAnimation,
+  isLowMode,
   isTVAwake,
   playerStopPlayOnButtonTV,
   playerStopPlayShowInterfaceTV,
@@ -208,11 +208,11 @@ export function SettingsScreenComponent({
         onChange={ (value) => onConfigUpdate('numberOfColumnsTV', Number(value)) }
       />
       <SettingSwitch
-        title={ t('Grid animation') }
-        subtitle={ t('Toggle grid animation.') }
+        title={ t('Low mode') }
+        subtitle={ t('Drop animations to keep navigation responsive on slow devices.') }
         IconComponent={ Blend }
-        value={ isTVGridAnimation }
-        onChange={ (value) => onConfigUpdate('isTVGridAnimation', value) }
+        value={ isLowMode }
+        onChange={ (value) => onConfigUpdate('isLowMode', value) }
       />
       <SettingSwitch
         title={ t('Local mode') }

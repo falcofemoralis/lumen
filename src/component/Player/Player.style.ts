@@ -128,15 +128,24 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   },
   commentsOverlayModal: {
     backgroundColor: colors.transparent,
+    // the overlay's default gutter would keep the panel off the screen edge
+    paddingHorizontal: 0,
   },
   commentsOverlay: {
     width: '100%',
     height: '100%',
   },
+  // Overrides the overlay's landscape placement (a small card inset 10% from the
+  // right): here the panel is the full-height side sheet the video shrinks for,
+  // so it is flush with the right edge, with only its left corners rounded.
   commentsOverlayContent: {
     height: '100%',
     maxHeight: '100%',
+    width: '50%',
     maxWidth: '50%',
+    borderTopRightRadius: 0,
+    borderBottomRightRadius: 0,
+    borderRightWidth: 0,
   },
   commentsOverlayList: {
     height: '100%',
@@ -235,7 +244,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     paddingInline: scale(24),
     borderRadius: scale(12),
     backgroundColor: colors.modal,
-    zIndex: 60,
+    zIndex: 10,
   },
   errorText: {
     fontSize: scale(text.lg.fontSize),

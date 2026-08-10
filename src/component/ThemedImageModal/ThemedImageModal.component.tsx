@@ -4,8 +4,8 @@ import { ThemedPressable } from 'Component/ThemedPressable';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import ArrowLeft from 'lucide-react-native/icons/arrow-left';
 import { useState } from 'react';
-import { Modal, TouchableHighlight, View } from 'react-native';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Modal, View } from 'react-native';
+import { GestureHandlerRootView, Pressable } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from 'Theme/context';
 
@@ -71,14 +71,14 @@ export const ThemedImageModalComponent = ({
 
   return (
     <View style={ style }>
-      <TouchableHighlight
+      <Pressable
         onPress={ handleOpen }
       >
         <ThemedImage
           src={ src }
           style={ imageStyle }
         />
-      </TouchableHighlight>
+      </Pressable>
       { renderOverlay() }
     </View>
   );

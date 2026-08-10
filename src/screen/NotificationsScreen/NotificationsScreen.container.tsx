@@ -1,11 +1,9 @@
-import { useNavigation } from '@react-navigation/native';
 import { useQuery } from '@tanstack/react-query';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { queryKeys, STALE_TIME } from 'Util/Query';
-import { openFilm } from 'Util/Router';
 
 import NotificationsScreenComponent from './NotificationsScreen.component';
 import NotificationsScreenComponentTV from './NotificationsScreen.component.atv';
@@ -13,7 +11,6 @@ import NotificationsScreenComponentTV from './NotificationsScreen.component.atv'
 export function NotificationsScreenContainer() {
   const { isTV, isLocalLibrary } = useConfigContext();
   const { isSignedIn, currentService, resetNotifications, getNotifications } = useServiceContext();
-  const navigation = useNavigation();
 
   const { data = [], isLoading } = useQuery({
     queryKey: queryKeys.notifications(),
@@ -34,10 +31,6 @@ export function NotificationsScreenContainer() {
     staleTime: STALE_TIME.MEDIUM,
   });
 
-  const handleSelectFilm = useCallback((film: FilmCardInterface) => {
-    openFilm(film, navigation);
-  }, [navigation]);
-
   const groupedData = useMemo(() => data.map((notification) => ({
     header: notification.date,
     films: notification.items
@@ -48,7 +41,6 @@ export function NotificationsScreenContainer() {
   const containerProps = {
     isLoading,
     data: groupedData,
-    handleSelectFilm,
   };
 
   // eslint-disable-next-line max-len

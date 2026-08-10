@@ -34,7 +34,6 @@ export interface FilmScreenComponentProps {
   handleUpdateScheduleWatch: (scheduleItem: ScheduleItemInterface) => Promise<boolean>;
   handleShare: () => void;
   openBookmarks: () => void;
-  handleBookmarkChange: (film: FilmInterface) => void;
   openVideoDownloader: () => void;
   handleDownloadSelect: (links: DownloadLinkInterface[]) => void;
   openTrailerOverlay: () => void;
