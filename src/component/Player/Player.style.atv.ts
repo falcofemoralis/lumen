@@ -80,8 +80,10 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     height: scale(46),
     width: scale(46),
   },
-  focusedAction: {
+  actionPressable: {
     borderRadius: scale(50),
+  },
+  focusedAction: {
     backgroundColor: colors.pressableHighlight,
   },
   commentsOverlay: {

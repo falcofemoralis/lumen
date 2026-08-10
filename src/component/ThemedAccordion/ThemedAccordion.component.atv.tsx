@@ -40,7 +40,10 @@ export const ThemedAccordionComponent = ({
         key={ `group-${id}` }
         style={ styles.groupContainer }
       >
-        <ThemedPressable onPress={ () => showOverlay(id) }>
+        <ThemedPressable
+          onPress={ () => showOverlay(id) }
+          style={ styles.groupPressable }
+        >
           { ({ isFocused }) => (
             <ThemedText
               style={ [

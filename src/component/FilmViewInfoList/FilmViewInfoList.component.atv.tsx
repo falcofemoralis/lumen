@@ -39,6 +39,7 @@ export function FilmViewInfoListComponent({
       onPress={ () => {
         handleSelectCategory(link);
       } }
+      style={ styles.infoListPressable }
       contentStyle={ styles.infoListContent }
     >
       { ({ isFocused }) => (

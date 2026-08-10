@@ -10,8 +10,10 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   group: {
     width: '100%',
     padding: scale(12),
-    borderRadius: scale(8),
     fontSize: scale(text.xs.fontSize),
+  },
+  groupPressable: {
+    borderRadius: scale(8),
   },
   groupFocused: {
     backgroundColor: colors.backgroundFocused,

@@ -9,7 +9,6 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     color: colors.text,
   },
   content: {
-    flex: 1,
     paddingHorizontal: scale(16),
     paddingVertical: scale(10),
     flexDirection: 'row',

@@ -90,6 +90,7 @@ const PlayerAction = ({
       focusKey={ focusKey }
       onPress={ action }
       onFocus={ () => updateFocusedElement(el) }
+      style={ styles.actionPressable }
     >
       { ({ isFocused }) => (
         <View

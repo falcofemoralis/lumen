@@ -26,11 +26,11 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   secureIcon: {
     justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: scale(99),
   },
   secureIconInner: {
     width: scale(40),
     height: scale(40),
-    borderRadius: scale(99),
     justifyContent: 'center',
     alignItems: 'center',
   },

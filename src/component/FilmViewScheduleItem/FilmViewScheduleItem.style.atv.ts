@@ -7,6 +7,8 @@ export const componentStyles = ({ scale, text, colors }: Theme) => ({
     width: '100%',
     gap: scale(8),
     padding: scale(16),
+  },
+  scheduleItemPressable: {
     marginVertical: scale(4),
     borderRadius: scale(16),
     backgroundColor: colors.button,

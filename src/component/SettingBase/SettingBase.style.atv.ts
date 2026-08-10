@@ -7,8 +7,10 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     backgroundColor: colors.transparent,
     minHeight: scale(64),
     justifyContent: 'center',
-    borderRadius: scale(16),
     width: '100%',
+  },
+  settingPressable: {
+    borderRadius: scale(16),
   },
   settingFocused: {
     backgroundColor: colors.backgroundFocused,

@@ -434,6 +434,7 @@ export function FilmScreenComponent({
           title={ t('View full schedule') }
           onPress={ openSchedule }
           style={ styles.scheduleViewAll }
+          contentStyle={ styles.scheduleViewAllContent }
         />
       </FilmViewSection>
     );

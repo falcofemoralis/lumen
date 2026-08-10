@@ -6,6 +6,7 @@ export const componentStyles = ({ scale }: Theme) => ({
     justifyContent: 'flex-start',
   },
   inputContent: {
+    flex: 1,
     justifyContent: 'flex-start',
   },
   inputFocused: {

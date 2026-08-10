@@ -33,6 +33,7 @@ export function FilmViewFranchiseItemComponent({
   return (
     <ThemedPressable
       onPress={ onSelect }
+      style={ styles.franchiseItemPressable }
     >
       { ({ isFocused }) => (
         <View style={ [styles.franchiseItem, isFocused && styles.franchiseItemFocused] }>

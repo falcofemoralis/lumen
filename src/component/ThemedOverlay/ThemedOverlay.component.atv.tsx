@@ -21,6 +21,13 @@ const ANIMATION_DURATION = 250;
 // which a focusable removed elsewhere can still trigger a debounced auto-restore.
 const AUTO_RESTORE_SETTLE_DELAY = 350;
 
+// Restore target passed on by an overlay that tore down after another one had
+// already taken focus from it -- see the teardown effect below. Module-level
+// because the two overlays know nothing about each other: they are separate
+// components, portaled as siblings, and the handover happens between the first
+// one's unmount and the second one's.
+let handedOverRestoreFocusKey: string | null = null;
+
 type OverlayContentProps = {
   children: ReactNode;
   isOpened: boolean;
@@ -63,7 +70,13 @@ function OverlayContent({
   // presses from the visible screen -- marking it non-focusable drops its whole
   // subtree out of the sibling search, the same way Page does for a covered
   // screen, without unmounting anything.
-  const { ref, focusKey, focusSelf } = useFocusable({
+  const {
+    ref,
+    focusKey,
+    focusSelf,
+    focused,
+    hasFocusedChild,
+  } = useFocusable({
     isFocusBoundary: true,
     trackChildren: true,
     autoRestoreFocus: true,
@@ -111,6 +124,15 @@ function OverlayContent({
 
     focusSelf();
   }, [focusSelf]);
+
+  // Read at teardown time, when the render that lost focus is long committed: the
+  // overlay stays mounted for one animation after it closes, which is enough for
+  // an overlay opened from its own action to claim focus in the meantime.
+  const ownsFocusRef = useRef(false);
+
+  useEffect(() => {
+    ownsFocusRef.current = focused || hasFocusedChild;
+  }, [focused, hasFocusedChild]);
 
   // Read at teardown time: an overlay that closes *because* its selection pushed
   // a screen (the film screen's voice selector opening the player) is torn down
@@ -160,12 +182,17 @@ function OverlayContent({
 
   useEffect(() => () => {
     const triggerFocusKey = restoreFocusKeyRef.current;
+    // This overlay opened while another one was already closing, so the trigger
+    // it captured was that overlay's own button -- gone by now. Take over the
+    // target the closing overlay handed down instead.
+    const inheritedFocusKey = handedOverRestoreFocusKey;
+
     // The trigger is gone -- the action taken in the overlay removed it (the
     // list item it was opened for). Fall back to wherever the opener said focus
     // should land instead.
     const restoreFocusKey = triggerFocusKey && doesFocusableExist(triggerFocusKey)
       ? triggerFocusKey
-      : fallbackRef.current?.current;
+      : fallbackRef.current?.current ?? inheritedFocusKey;
 
     // The trigger stays mounted under the pushed screen, so it is still a valid
     // focus target - but focusing it parks spatial navigation on a screen the
@@ -176,8 +203,26 @@ function OverlayContent({
       return;
     }
 
+    // Focus already moved on to an overlay opened by this one's own action (the
+    // Confirm button of a setting's confirmation opening that setting's value
+    // picker): this node is only unmounting now, one animation later. Restoring
+    // here would pull focus out of the overlay the user is looking at. Hand the
+    // trigger down instead, so closing THAT overlay lands back on it.
+    if (!ownsFocusRef.current) {
+      handedOverRestoreFocusKey = restoreFocusKey ?? null;
+
+      return;
+    }
+
     if (restoreFocusKey && doesFocusableExist(restoreFocusKey)) {
       setFocus(restoreFocusKey);
+    }
+
+    // Cleared only once it has actually been claimed -- an overlay that closed
+    // back onto its own trigger (the presets dropdown inside a value picker)
+    // must leave the handover for the overlay it is nested in.
+    if (restoreFocusKey === inheritedFocusKey) {
+      handedOverRestoreFocusKey = null;
     }
   }, []);
 

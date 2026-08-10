@@ -3,7 +3,11 @@ import { Theme, ThemedStyles } from 'Theme/types';
 export const componentStyles = ({ scale, text, colors }: Theme) => ({
   infoListContent: {
     justifyContent: 'flex-start',
+  },
+  infoListPressable: {
     borderRadius: scale(12),
+    backgroundColor: colors.button,
+    marginBottom: scale(8),
   },
   infoList: {
     flexDirection: 'row',
@@ -11,9 +15,7 @@ export const componentStyles = ({ scale, text, colors }: Theme) => ({
     gap: scale(12),
     padding: scale(12),
     width: '100%',
-    marginBottom: scale(8),
     borderRadius: scale(12),
-    backgroundColor: colors.button,
   },
   infoListFocused: {
     backgroundColor: colors.backgroundFocused,

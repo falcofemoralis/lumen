@@ -9,6 +9,7 @@ export const componentStyles = ({ scale, colors }: Theme) => ({
     justifyContent: 'flex-start',
     gap: scale(8),
     padding: scale(8),
+    flex: 1,
   },
   overlayContent: {
     width: '35%',

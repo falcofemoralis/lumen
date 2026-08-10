@@ -58,6 +58,7 @@ const CustomSelectModalComponent = ({
         title={ t('Confirm') }
         autofocus
         onPress={ handleSelect }
+        contentStyle={ { flex: 1 } }
       />
     </View>
   );

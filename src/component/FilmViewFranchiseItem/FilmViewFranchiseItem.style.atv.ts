@@ -7,9 +7,11 @@ export const componentStyles = ({ scale, text, colors }: Theme) => ({
     paddingBlock: scale(12),
     paddingInline: scale(8),
   },
+  franchiseItemPressable: {
+    borderRadius: scale(8),
+  },
   franchiseItemFocused: {
     backgroundColor: colors.backgroundFocused,
-    borderRadius: scale(8),
   },
   franchiseName: {
     flex: 1,

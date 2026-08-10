@@ -58,6 +58,7 @@ export function FilmViewScheduleItemComponent({
   return (
     <ThemedPressable
       onPress={ handlePress }
+      style={ styles.scheduleItemPressable }
     >
       { ({ isFocused }) => (
         <View

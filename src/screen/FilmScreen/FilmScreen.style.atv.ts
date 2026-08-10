@@ -129,6 +129,9 @@ export const componentStyles = ({ scale, text, colors }: Theme) => ({
     marginTop: scale(4),
     width: '35%',
   },
+  scheduleViewAllContent: {
+    flex: 1,
+  },
   relatedList: {
     flexDirection: 'row',
     gap: scale(16),

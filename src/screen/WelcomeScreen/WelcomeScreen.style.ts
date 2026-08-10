@@ -260,4 +260,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     flex: 1,
     backgroundColor: colors.primary,
   },
+  loginButtonContent: {
+    flex: 1,
+  },
 } satisfies ThemedStyles);

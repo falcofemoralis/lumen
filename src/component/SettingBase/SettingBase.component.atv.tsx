@@ -71,6 +71,7 @@ const SettingBaseComponent = ({
       <ThemedPressable
         onPress={ (!isEnabled || isLoading || isLoadingProp) ? undefined : () => handleOnPress() }
         onFocus={ onFocus }
+        style={ styles.settingPressable }
       >
         { ({ isFocused }) => (
           <View style={ [

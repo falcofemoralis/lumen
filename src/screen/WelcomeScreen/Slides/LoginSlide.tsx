@@ -94,6 +94,7 @@ export const LoginSlide = ({
         <ThemedButton
           title={ t('Sign in') }
           style={ styles.loginButton }
+          contentStyle={ styles.loginButtonContent }
           onPress={ handleLogin }
           disabled={ isLoading }
           focusKey={ SIGN_IN_FOCUS_KEY }
