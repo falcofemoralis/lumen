@@ -2,7 +2,6 @@ import { setFocus } from '@noriginmedia/norigin-spatial-navigation-core';
 import { FocusContext, useFocusable } from '@noriginmedia/norigin-spatial-navigation-react-native-tvos';
 import { FlashList, FlashListRef } from '@shopify/flash-list';
 import { ScrollContext } from 'Component/ThemedScrollView/ScrollContext';
-import { useConfigContext } from 'Context/ConfigContext';
 import { useDefaultFocus } from 'Hooks/useDefaultFocus';
 import { memo, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -77,7 +76,6 @@ export const ThemedGridComponent = ({
 }: ThemedGridComponentProps) => {
   const listRef = useRef<FlashListRef<any>>(null);
   const lastRowRef = useRef(-1);
-  const { isTVGridAnimation } = useConfigContext();
 
   // Live index -> focus key map of the cells FlashList currently has mounted.
   // Rebuilt continuously as cells are recycled, so it always points at the node
@@ -127,10 +125,10 @@ export const ThemedGridComponent = ({
 
     listRef.current?.scrollToIndex({
       index,
-      animated: isTVGridAnimation,
+      animated: true,
       viewPosition,
     });
-  }, [numberOfColumns, viewPosition, isTVGridAnimation]);
+  }, [numberOfColumns, viewPosition]);
 
   // BACK jumps to the top of the grid (scroll + focus the first cell), matching
   // the previous VirtualizedList behaviour.

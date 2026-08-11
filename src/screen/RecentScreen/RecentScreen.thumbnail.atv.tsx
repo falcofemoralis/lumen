@@ -14,30 +14,34 @@ export const RecentScreenThumbnail = ({
   const { scale } = useAppTheme();
 
   return (
-    <View style={ [styles.grid, { gap: scale(12) }] }>
+    <View style={ styles.grid }>
       { Array(THUMBNAILS_AMOUNT_TV).fill(0).map((_, index) => (
         <View
           // eslint-disable-next-line react/no-array-index-key
           key={ `recent-page-thumb-row-${index}` }
-          style={ styles.row }
+          style={ styles.cell }
         >
-          <View style={ [styles.fill, styles.item] }>
-            <Thumbnail
-              style={ styles.poster }
-            />
-            <View style={ styles.itemContent }>
-              <Thumbnail
-                height={ scale(30) }
-                width="60%"
-              />
-              <Thumbnail
-                height={ scale(20) }
-                width="10%"
-              />
-              <Thumbnail
-                height={ scale(20) }
-                width="30%"
-              />
+          <View style={ styles.row }>
+            <View style={ [styles.fill, styles.item] }>
+              <View style={ [styles.poster, styles.posterContainer] }>
+                <Thumbnail
+                  style={ styles.poster }
+                />
+              </View>
+              <View style={ styles.itemContent }>
+                <Thumbnail
+                  height={ scale(30) }
+                  width="60%"
+                />
+                <Thumbnail
+                  height={ scale(20) }
+                  width="10%"
+                />
+                <Thumbnail
+                  height={ scale(20) }
+                  width="30%"
+                />
+              </View>
             </View>
           </View>
         </View>

@@ -32,6 +32,13 @@ export const componentStyles = ({ scale, colors, text, dimensions }: Theme) => {
     rowStyle: {
       gap: scale(CELL_GAP),
     },
+    // ThemedGrid pads every cell with half of `rowStyle`'s gap; the loading
+    // state renders its rows itself, so it has to reproduce that inset -- and
+    // the spacing it implies between rows -- or the placeholder posters sit off
+    // the real ones.
+    cell: {
+      padding: scale(CELL_GAP) / 2,
+    },
     // One grid cell holds the whole row: the recent item takes the remaining
     // space, the two action buttons keep a fixed square size. The focus zoom
     // lives here rather than on the item, because ThemedPressable's wrapper
