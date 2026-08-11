@@ -10,6 +10,7 @@ export type DeviceConfigType = {
   isTVAwake: boolean;
   numberOfColumnsMobile: number;
   numberOfColumnsTV: number;
+  recentTwoColumnsTV: boolean;
   initialRoute: string;
   playerRewindSeconds: number;
   playerShowBufferTime: boolean;
@@ -44,6 +45,7 @@ export const defaultConfig: DeviceConfigType = {
   isTVAwake: false,
   numberOfColumnsMobile: 3,
   numberOfColumnsTV: 6,
+  recentTwoColumnsTV: false,
   initialRoute: HOME_SCREEN,
   playerRewindSeconds: 10,
   playerShowBufferTime: false,

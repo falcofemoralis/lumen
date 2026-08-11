@@ -7,29 +7,49 @@ import { ThemedButton } from 'Component/ThemedButton';
 import { ThemedGrid } from 'Component/ThemedGrid';
 import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
 import { ThemedImage } from 'Component/ThemedImage';
+import { ThemedOverlay } from 'Component/ThemedOverlay';
+import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { ThemedPressable } from 'Component/ThemedPressable';
+import { ThemedSimpleList } from 'Component/ThemedSimpleList';
+import { ListItem } from 'Component/ThemedSimpleList/ThemedSimpleList.type';
 import { ThemedText } from 'Component/ThemedText';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
+import EllipsisVertical from 'lucide-react-native/icons/ellipsis-vertical';
 import Eye from 'lucide-react-native/icons/eye';
 import EyeOff from 'lucide-react-native/icons/eye-off';
 import Trash2 from 'lucide-react-native/icons/trash-2';
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useAppTheme } from 'Theme/context';
 import { ThemedStyles } from 'Theme/types';
 
-import { NUMBER_OF_COLUMNS_TV } from './RecentScreen.config';
-import { componentStyles } from './RecentScreen.style.atv';
+import {
+  ITEMS_ON_SCREEN_TV,
+  NUMBER_OF_COLUMNS_TV,
+  NUMBER_OF_COLUMNS_TV_TWO_COLUMNS,
+} from './RecentScreen.config';
+import { componentStyles, componentStylesTwoColumns } from './RecentScreen.style.atv';
 import { RecentScreenThumbnail } from './RecentScreen.thumbnail.atv';
 import { RecentGridItem, RecentScreenComponentProps } from './RecentScreen.type';
+
+const ACTION_REMOVE = 'remove';
+const ACTION_HIDE = 'hide';
+
+const NAME_MAX_LINES = 2;
+const INFO_MAX_LINES = 2;
+const ACTION_ICON_SIZE = 20;
 
 type RecentRowProps = {
   item: RecentGridItem;
   styles: ThemedStyles<typeof componentStyles>;
+  // Two-column cells are half as wide, and a row of buttons costs width the
+  // title needs -- so there the actions collapse into one button opening a menu.
+  // A full-width row has the room to keep them all out in the open.
+  compactActions: boolean;
   handleOnPress: (item: RecentGridItem) => void;
   removeItem: (item: RecentGridItem) => void;
   openHideConfirmOverlay: (item: RecentGridItem) => void;
@@ -37,11 +57,12 @@ type RecentRowProps = {
 
 // The zoom is applied to the row -- not to the item -- so it also covers the
 // gap and grows the row as one block. `hasFocusedChild` keeps it applied while
-// focus moves between the item and the two action buttons, and the buttons
+// focus moves between the item and the action buttons, and the buttons
 // counter-scale so they keep their fixed square size.
 function RecentRow({
   item,
   styles,
+  compactActions,
   handleOnPress,
   removeItem,
   openHideConfirmOverlay,
@@ -51,6 +72,7 @@ function RecentRow({
     saveLastFocusedChild: false,
   });
   const { scale } = useAppTheme();
+  const actionsOverlayRef = useRef<ThemedOverlayRef>(null);
 
   const {
     image,
@@ -58,7 +80,88 @@ function RecentRow({
     date,
     info,
     additionalInfo,
+    isWatched,
   } = item;
+
+  const handleAction = useCallback((action: ListItem) => {
+    actionsOverlayRef.current?.close();
+
+    if (action.value === ACTION_REMOVE) {
+      removeItem(item);
+
+      return;
+    }
+
+    // Either toggles a watched item back on the spot or opens the screen's
+    // confirmation -- which is a second overlay, so this one has to be closing
+    // already for focus to hand over to it.
+    openHideConfirmOverlay(item);
+  }, [item, removeItem, openHideConfirmOverlay]);
+
+  const renderActionsOverlay = () => {
+    if (!compactActions) {
+      return null;
+    }
+
+    return (
+      <ThemedOverlay ref={ actionsOverlayRef }>
+        <View style={ styles.overlayActions }>
+          <ThemedSimpleList
+            data={ [
+              {
+                label: t('Remove'),
+                value: ACTION_REMOVE,
+              },
+              {
+                label: isWatched ? t('Show') : t('Hide'),
+                value: ACTION_HIDE,
+              },
+            ] }
+            onChange={ handleAction }
+          />
+        </View>
+      </ThemedOverlay>
+    );
+  };
+
+  const renderActions = () => {
+    if (compactActions) {
+      return (
+        <ThemedButton
+          style={ [styles.actionButton, hasFocusedChild && styles.actionButtonUnzoomed] }
+          contentStyle={ styles.actionButtonContent }
+          IconComponent={ EllipsisVertical }
+          onPress={ () => actionsOverlayRef.current?.open() }
+          iconProps={ {
+            size: scale(ACTION_ICON_SIZE),
+          } }
+        />
+      );
+    }
+
+    return (
+      <>
+        <ThemedButton
+          style={ [styles.actionButton, hasFocusedChild && styles.actionButtonUnzoomed] }
+          contentStyle={ styles.actionButtonContent }
+          IconComponent={ Trash2 }
+          onPress={ () => removeItem(item) }
+          iconProps={ {
+            size: scale(ACTION_ICON_SIZE),
+          } }
+        />
+        <ThemedButton
+          style={ [styles.actionButton, hasFocusedChild && styles.actionButtonUnzoomed] }
+          contentStyle={ styles.actionButtonContent }
+          IconComponent={ isWatched ? EyeOff : Eye }
+          onPress={ () => openHideConfirmOverlay(item) }
+          iconProps={ {
+            size: scale(ACTION_ICON_SIZE),
+          } }
+        />
+      </>
+    );
+  };
 
   return (
     <FocusContext.Provider value={ focusKey }>
@@ -67,6 +170,7 @@ function RecentRow({
         style={ [styles.row, hasFocusedChild && styles.rowFocused] }
         tvFocusable={ false }
       >
+        { renderActionsOverlay() }
         <ThemedPressable
           style={ styles.fill }
           contentStyle={ styles.fill }
@@ -88,21 +192,35 @@ function RecentRow({
                     src={ image }
                   />
                 </View>
+                { /* The row is a fixed height and its content is centred, so
+                     text that wraps past it is clipped at both ends rather than
+                     pushing the row taller -- every line count is capped. Long
+                     titles are the common case; two lines then an ellipsis. */ }
                 <View style={ styles.itemContent }>
-                  <ThemedText style={ [styles.name, isFocused && styles.nameFocused] }>
+                  <ThemedText
+                    style={ [styles.name, isFocused && styles.nameFocused] }
+                    numberOfLines={ NAME_MAX_LINES }
+                  >
                     { name }
                   </ThemedText>
-                  <ThemedText style={ [styles.date, isFocused && styles.dateFocused] }>
+                  <ThemedText
+                    style={ [styles.date, isFocused && styles.dateFocused] }
+                    numberOfLines={ 1 }
+                  >
                     { date }
                   </ThemedText>
                   { info && (
-                    <ThemedText style={ [styles.info, isFocused && styles.infoFocused] }>
+                    <ThemedText
+                      style={ [styles.info, isFocused && styles.infoFocused] }
+                      numberOfLines={ INFO_MAX_LINES }
+                    >
                       { info }
                     </ThemedText>
                   ) }
                   { additionalInfo && (
                     <ThemedText
                       style={ [styles.additionalInfo, isFocused && styles.additionalInfoFocused] }
+                      numberOfLines={ INFO_MAX_LINES }
                     >
                       { additionalInfo }
                     </ThemedText>
@@ -112,24 +230,7 @@ function RecentRow({
             );
           } }
         </ThemedPressable>
-        <ThemedButton
-          style={ [styles.actionButton, hasFocusedChild && styles.actionButtonUnzoomed] }
-          contentStyle={ styles.actionButtonContent }
-          IconComponent={ Trash2 }
-          onPress={ () => removeItem(item) }
-          iconProps={ {
-            size: scale(20),
-          } }
-        />
-        <ThemedButton
-          style={ [styles.actionButton, hasFocusedChild && styles.actionButtonUnzoomed] }
-          contentStyle={ styles.actionButtonContent }
-          IconComponent={ item.isWatched ? EyeOff : Eye }
-          onPress={ () => openHideConfirmOverlay(item) }
-          iconProps={ {
-            size: scale(20),
-          } }
-        />
+        { renderActions() }
       </Animated.View>
     </FocusContext.Provider>
   );
@@ -145,19 +246,22 @@ export function RecentScreenComponent({
   openHideConfirmOverlay,
   hideItem,
 }: RecentScreenComponentProps) {
-  const styles = useThemedStyles(componentStyles);
   const { isSignedIn } = useServiceContext();
-  const { isLocalLibrary } = useConfigContext();
+  const { isLocalLibrary, recentTwoColumnsTV } = useConfigContext();
+
+  const numberOfColumns = recentTwoColumnsTV ? NUMBER_OF_COLUMNS_TV_TWO_COLUMNS : NUMBER_OF_COLUMNS_TV;
+  const styles = useThemedStyles(recentTwoColumnsTV ? componentStylesTwoColumns : componentStyles);
 
   const renderItem = useCallback(({ item }: ThemedGridRowProps<RecentGridItem>) => (
     <RecentRow
       item={ item }
       styles={ styles }
+      compactActions={ recentTwoColumnsTV }
       handleOnPress={ handleOnPress }
       removeItem={ removeItem }
       openHideConfirmOverlay={ openHideConfirmOverlay }
     />
-  ), [handleOnPress, openHideConfirmOverlay, removeItem, styles]);
+  ), [handleOnPress, openHideConfirmOverlay, removeItem, styles, recentTwoColumnsTV]);
 
   const renderContent = () => {
     if (!isSignedIn && !isLocalLibrary) {
@@ -168,6 +272,7 @@ export function RecentScreenComponent({
       return (
         <RecentScreenThumbnail
           styles={ styles }
+          thumbnailsAmount={ ITEMS_ON_SCREEN_TV * numberOfColumns }
         />
       );
     }
@@ -185,11 +290,15 @@ export function RecentScreenComponent({
 
     return (
       <ThemedGrid
+        // FlashList measures its cells off the column count, so a fresh list is
+        // cheaper -- and safer -- than making it re-measure when the setting flips
+        // while the screen stays mounted.
+        key={ numberOfColumns }
         autofocus
         style={ styles.grid }
         rowStyle={ styles.rowStyle }
         data={ items }
-        numberOfColumns={ NUMBER_OF_COLUMNS_TV }
+        numberOfColumns={ numberOfColumns }
         renderItem={ renderItem }
         onNextLoad={ onNextLoad }
         scrollBehavior='stick-to-center'

@@ -21,6 +21,7 @@ import CircleQuestionMark from 'lucide-react-native/icons/circle-question-mark';
 import Cloud from 'lucide-react-native/icons/cloud';
 import CloudCog from 'lucide-react-native/icons/cloud-cog';
 import CloudOff from 'lucide-react-native/icons/cloud-off';
+import Columns2 from 'lucide-react-native/icons/columns-2';
 import Dock from 'lucide-react-native/icons/dock';
 import Download from 'lucide-react-native/icons/download';
 import ExternalLink from 'lucide-react-native/icons/external-link';
@@ -73,6 +74,7 @@ import { SETTING_GROUP, SettingsScreenComponentProps } from './SettingsScreen.ty
 export function SettingsScreenComponent({
   initialRoute,
   numberOfColumnsTV,
+  recentTwoColumnsTV,
   playerRewindSeconds,
   playerShowBufferTime,
   playerShowEndTime,
@@ -206,6 +208,13 @@ export function SettingsScreenComponent({
         value={ numberOfColumnsTV.toString() }
         options={ COLUMNS_TV_OPTIONS }
         onChange={ (value) => onConfigUpdate('numberOfColumnsTV', Number(value)) }
+      />
+      <SettingSwitch
+        title={ t('Two columns in recent') }
+        subtitle={ t('Show recent items in two columns.') }
+        IconComponent={ Columns2 }
+        value={ recentTwoColumnsTV }
+        onChange={ (value) => onConfigUpdate('recentTwoColumnsTV', value) }
       />
       <SettingSwitch
         title={ t('Low mode') }

@@ -3,19 +3,20 @@ import { View } from 'react-native';
 import { useAppTheme } from 'Theme/context';
 import { ThemedStyles } from 'Theme/types';
 
-import { THUMBNAILS_AMOUNT_TV } from './RecentScreen.config';
 import { componentStyles } from './RecentScreen.style.atv';
 
 export const RecentScreenThumbnail = ({
   styles,
+  thumbnailsAmount,
 }: {
   styles: ThemedStyles<typeof componentStyles>;
+  thumbnailsAmount: number;
 }) => {
   const { scale } = useAppTheme();
 
   return (
-    <View style={ styles.grid }>
-      { Array(THUMBNAILS_AMOUNT_TV).fill(0).map((_, index) => (
+    <View style={ [styles.grid, styles.thumbnailGrid] }>
+      { Array(thumbnailsAmount).fill(0).map((_, index) => (
         <View
           // eslint-disable-next-line react/no-array-index-key
           key={ `recent-page-thumb-row-${index}` }
