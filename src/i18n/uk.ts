@@ -158,6 +158,7 @@ const uk: Translations = {
   'Show recent items in two columns.': 'Показувати нещодавні фільми у два стовпці.',
   'Restart app to apply changes.': 'Застосування змін... Додаток буде перезавантажено.',
   'Initial route': 'Стартовий екран',
+  'Default home tab': 'Стартова вкладка головної',
   'Account': 'Акаунт',
   'Auto': 'Автоматично',
   'No bookmarks group': 'Розділи відсутні',

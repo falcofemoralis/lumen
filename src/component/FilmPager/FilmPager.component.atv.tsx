@@ -6,7 +6,7 @@ import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { ThemedScrollView } from 'Component/ThemedScrollView';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useId, useRef, useState } from 'react';
 import { View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { useAppTheme } from 'Theme/context';
@@ -19,6 +19,7 @@ import { FilmPagerComponentProps, PagerItemInterface } from './FilmPager.type';
 const TabButton = memo(({
   menuItem,
   isActive,
+  focusKey,
   onItemFocus,
   styles,
   sorting,
@@ -27,6 +28,7 @@ const TabButton = memo(({
 }: {
   menuItem: PagerItemInterface['menuItem'];
   isActive: boolean;
+  focusKey: string;
   onItemFocus: (menuItem: PagerItemInterface['menuItem']) => void;
   styles: ThemedStyles<typeof componentStyles>;
   sorting?: FilmPagerComponentProps['sorting'];
@@ -65,6 +67,7 @@ const TabButton = memo(({
       <ThemedButton
         key={ id }
         title={ title }
+        focusKey={ focusKey }
         selected={ isActive }
         onFocus={ () => onItemFocus(menuItem) }
         onPress={ () => onItemFocus(menuItem) }
@@ -104,20 +107,26 @@ const TopMenu = memo(({
   sorting,
   selectedSorting,
   menuDefaultFocus,
+  initialPage,
   handlePageChange,
   handleSelectSorting,
 }: Pick<
   FilmPagerComponentProps,
   'pagerItems' | 'sorting' | 'selectedSorting' | 'menuDefaultFocus' | 'handleSelectSorting'
 > & {
+  initialPage: number;
   handlePageChange: (page: number, pagerItem: PagerItemInterface) => void;
   styles: ThemedStyles<typeof componentStyles>;
 }) => {
   const debounce = useRef<number | null>(null);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const activeIndexRef = useRef(0);
+  const [activeIndex, setActiveIndex] = useState(initialPage);
+  const activeIndexRef = useRef(initialPage);
   const pagerItemsRef = useRef(pagerItems);
   const handlePageChangeRef = useRef(handlePageChange);
+  // focus keys are global, and several pagers can be mounted at once (one per
+  // screen kept alive by the navigator), so they are namespaced per instance
+  const menuId = useId();
+  const getTabFocusKey = (menuItemId: string) => `${menuId}-tab-${menuItemId}`;
 
   useEffect(() => {
     pagerItemsRef.current = pagerItems;
@@ -156,12 +165,18 @@ const TopMenu = memo(({
       containerStyle={ [styles.menuListWrapper, sorting && styles.menuListWrapperWithSorting] }
       style={ styles.menuList }
       autofocus={ menuDefaultFocus }
+      // without it focus entering the menu lands on the first tab and drags the
+      // active page back with it
+      preferredChildFocusKey={ pagerItems[activeIndex]
+        ? getTabFocusKey(pagerItems[activeIndex].menuItem.id)
+        : undefined }
     >
       { pagerItems.map((item, idx) => (
         <TabButton
           key={ item.menuItem.id }
           menuItem={ item.menuItem }
           isActive={ activeIndex === idx }
+          focusKey={ getTabFocusKey(item.menuItem.id) }
           onItemFocus={ handleMenuItemChange }
           styles={ styles }
           sorting={ sorting }
@@ -181,6 +196,7 @@ export function FilmPagerComponent({
   menuDefaultFocus,
   sorting,
   selectedSorting,
+  initialPage = 0,
   handleSelectSorting,
   ListHeaderComponent,
   ListEmptyComponent,
@@ -192,7 +208,7 @@ export function FilmPagerComponent({
   const { isLowMode } = useConfigContext();
   const styles = useThemedStyles(componentStyles);
   const { scale } = useAppTheme();
-  const [activePage, setActivePage] = useState(0);
+  const [activePage, setActivePage] = useState(initialPage);
   // The menu is a sibling above the grid (a focus sibling, so the grid's focus
   // never resolves to it), collapsed out of the way once focus leaves the first
   // row. The grid reports first-row crossings via onAtTopChange.
@@ -240,6 +256,7 @@ export function FilmPagerComponent({
         sorting={ sorting }
         selectedSorting={ selectedSorting }
         menuDefaultFocus={ menuDefaultFocus }
+        initialPage={ initialPage }
         handleSelectSorting={ handleSelectSorting }
         handlePageChange={ handlePageChange }
         styles={ styles }

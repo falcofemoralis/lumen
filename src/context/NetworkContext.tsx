@@ -13,13 +13,23 @@ import { setConnectionErrorHandler } from 'Util/Query';
 
 import { useConfigContext } from './ConfigContext';
 
+// How long to wait for the first network reading before assuming there is a connection.
+// Only a guard against the reading never landing at all - the real one arrives in a tick.
+const NETWORK_PROBE_TIMEOUT = 3000;
+
 interface NetworkContextInterface {
+  // known to be online - false while the first network reading is still pending, so
+  // nothing fetches before the connectivity state is actually known
   isInternetAvailable: boolean;
+  // known to be offline - false while pending, so the page shows its usual skeletons
+  // instead of flashing the network error screen on every cold start
+  isOffline: boolean;
   handleConnectionError: (error: Error) => boolean;
 }
 
 const NetworkContext = createContext<NetworkContextInterface>({
   isInternetAvailable: false,
+  isOffline: false,
   handleConnectionError: () => false,
 });
 
@@ -63,17 +73,44 @@ export const NetworkProvider = ({ children }: { children: ReactNode }) => {
     });
   }, [isOnline, queryClient]);
 
+  // expo-network resolves its first reading asynchronously - `useNetworkState` starts as
+  // an empty object - so on a cold start every field is undefined for a tick. Treating
+  // that tick as "online" let every query fire before the connectivity state was known,
+  // and offline they all failed immediately.
+  const isNetworkStateKnown = type !== undefined;
+
+  // Should that reading never land (a rejected native call leaves the hook empty forever),
+  // nothing would ever fetch again - fall back to the optimistic assumption instead.
+  const [probeTimedOut, setProbeTimedOut] = useState<boolean>(false);
+
+  useEffect(() => {
+    const timeout = isNetworkStateKnown
+      ? undefined
+      : setTimeout(() => setProbeTimedOut(true), NETWORK_PROBE_TIMEOUT);
+
+    return () => clearTimeout(timeout);
+  }, [isNetworkStateKnown]);
+
   const isInternetAvailable = useMemo(() => {
-    if (!type) {
-      return true;
+    if (!isNetworkStateKnown) {
+      return probeTimedOut;
     }
 
-    const result = strictConnectionCheck
-      ? isConnected && isInternetReachable && type !== NetworkStateType.VPN && !errorOccurred
+    return strictConnectionCheck
+      ? !!isConnected && !!isInternetReachable && type !== NetworkStateType.VPN && !errorOccurred
       : !errorOccurred;
+  }, [
+    isConnected,
+    isInternetReachable,
+    type,
+    isNetworkStateKnown,
+    probeTimedOut,
+    errorOccurred,
+    strictConnectionCheck,
+  ]);
 
-    return result ?? true;
-  }, [isConnected, isInternetReachable, type, errorOccurred, strictConnectionCheck]);
+  // pending is neither online nor offline - only a known-bad state blocks the page
+  const isOffline = isNetworkStateKnown && !isInternetAvailable;
 
   const handleConnectionError = useCallback((error: Error) => {
     const msg = error instanceof Error ? error.message : String(error);
@@ -97,9 +134,11 @@ export const NetworkProvider = ({ children }: { children: ReactNode }) => {
 
   const value = useMemo(() => ({
     isInternetAvailable,
+    isOffline,
     handleConnectionError,
   }), [
     isInternetAvailable,
+    isOffline,
     handleConnectionError,
   ]);
 

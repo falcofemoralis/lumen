@@ -8,6 +8,7 @@ export interface FilmPagerHandlers {
   pagerItems: PagerItemInterface[];
   sorting?: DropdownItem[];
   selectedSorting?: Record<string, DropdownItem> | null;
+  initialPage?: number;
   onPreLoad: (item: PagerItemInterface) => void;
   onNextLoad: (isRefresh: boolean, item: PagerItemInterface) => Promise<void>;
   handleSelectSorting?: (menuItem: MenuItemInterface, item: DropdownItem) => void;

@@ -2,6 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useMutation } from '@tanstack/react-query';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useConfigContext } from 'Context/ConfigContext';
+import { useNetworkContext } from 'Context/NetworkContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useLocalHistory } from 'Hooks/useLocalLibrary';
 import { usePaginatedQuery } from 'Hooks/usePaginatedQuery';
@@ -22,13 +23,14 @@ export function RecentScreenContainer() {
   const localHistory = useLocalHistory();
   const navigation = useNavigation();
   const hideConfirmOverlayRef = useRef<ThemedOverlayRef | null>(null);
+  const { isInternetAvailable } = useNetworkContext();
 
   const isRemote = isSignedIn && !isLocalLibrary;
 
   const { items, isLoading, onNextLoad, updateItems } = usePaginatedQuery<RecentItemInterface>({
     queryKey: queryKeys.recent(),
     fetchPage: (page, isRefresh) => currentService.getRecent(page, { isRefresh }),
-    enabled: isRemote,
+    enabled: isRemote && isInternetAvailable,
   });
 
   useEffect(() => () => {

@@ -12,6 +12,8 @@ export type DeviceConfigType = {
   numberOfColumnsTV: number;
   recentTwoColumnsTV: boolean;
   initialRoute: string;
+  /** Id of the home menu item opened first; empty falls back to the first tab. */
+  homeDefaultTab: string;
   playerRewindSeconds: number;
   playerShowBufferTime: boolean;
   playerShowEndTime: boolean;
@@ -47,6 +49,7 @@ export const defaultConfig: DeviceConfigType = {
   numberOfColumnsTV: 6,
   recentTwoColumnsTV: false,
   initialRoute: HOME_SCREEN,
+  homeDefaultTab: '',
   playerRewindSeconds: 10,
   playerShowBufferTime: false,
   playerShowEndTime: false,

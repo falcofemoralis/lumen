@@ -3,6 +3,7 @@ import { PagerItemInterface } from 'Component/FilmPager/FilmPager.type';
 import { useFilmPager } from 'Component/FilmPager/useFilmPager';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useConfigContext } from 'Context/ConfigContext';
+import { useNetworkContext } from 'Context/NetworkContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useLocalBookmarks } from 'Hooks/useLocalLibrary';
 import { useCallback, useMemo, useRef } from 'react';
@@ -34,6 +35,9 @@ export function BookmarksScreenContainer() {
   const { isSignedIn, currentService } = useServiceContext();
   const localBookmarks = useLocalBookmarks();
   const manageCategoriesOverlayRef = useRef<ThemedOverlayRef | null>(null);
+  const { isInternetAvailable } = useNetworkContext();
+
+  const isRemote = isSignedIn && !isLocalLibrary;
 
   const {
     data: bookmarks,
@@ -41,7 +45,7 @@ export function BookmarksScreenContainer() {
   } = useQuery({
     queryKey: queryKeys.bookmarks(),
     queryFn: () => currentService.getBookmarks(),
-    enabled: isSignedIn && !isLocalLibrary,
+    enabled: isRemote && isInternetAvailable,
   });
 
   const menuItems = useMemo(

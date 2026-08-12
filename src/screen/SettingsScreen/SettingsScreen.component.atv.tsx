@@ -32,6 +32,7 @@ import Gauge from 'lucide-react-native/icons/gauge';
 import Globe from 'lucide-react-native/icons/globe';
 import GlobeLock from 'lucide-react-native/icons/globe-lock';
 import Grid3x2 from 'lucide-react-native/icons/grid-3x2';
+import House from 'lucide-react-native/icons/house';
 import Info from 'lucide-react-native/icons/info';
 import Loader from 'lucide-react-native/icons/loader';
 import LoaderCircle from 'lucide-react-native/icons/loader-circle';
@@ -73,6 +74,7 @@ import { SETTING_GROUP, SettingsScreenComponentProps } from './SettingsScreen.ty
 
 export function SettingsScreenComponent({
   initialRoute,
+  homeDefaultTab,
   numberOfColumnsTV,
   recentTwoColumnsTV,
   playerRewindSeconds,
@@ -107,6 +109,7 @@ export function SettingsScreenComponent({
   userAgent,
   providerOptions,
   cdnOptions,
+  homeMenuOptions,
   downloadsPathOptions,
   isLowMode,
   isTVAwake,
@@ -201,6 +204,13 @@ export function SettingsScreenComponent({
         value={ initialRoute }
         options={ TV_SCREENS }
         onChange={ (value) => onConfigUpdate('initialRoute', value) }
+      />
+      <SettingSelect
+        title={ t('Default home tab') }
+        IconComponent={ House }
+        value={ homeDefaultTab || homeMenuOptions[0]?.value || '' }
+        options={ homeMenuOptions }
+        onChange={ (value) => onConfigUpdate('homeDefaultTab', value) }
       />
       <SettingSelect
         title={ t('Columns in list') }

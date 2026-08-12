@@ -1,3 +1,4 @@
+import { SettingItemOption } from 'Component/SettingSelect/SettingSelect.type';
 import { Language } from 'i18n/index';
 import { DeviceConfigType } from 'src/config';
 import { ThemeContextType } from 'Theme/context';
@@ -15,10 +16,8 @@ export type SettingsScreenComponentProps = {
   userAgent: string
   providerOptions: string[]
   cdnOptions: string[]
-  downloadsPathOptions: {
-    value: string;
-    label: string;
-  }[]
+  homeMenuOptions: SettingItemOption[]
+  downloadsPathOptions: SettingItemOption[]
   appVersion: string
   onConfigUpdate: (key: keyof DeviceConfigType, value: unknown) => void
   onLanguageChange: (value: string) => Promise<void>

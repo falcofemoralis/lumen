@@ -158,6 +158,7 @@ const ru: Translations = {
   'Show recent items in two columns.': 'Показывать недавние фильмы в два столбца.',
   'Restart app to apply changes.': 'Применение изменений... Приложение будет перезагружено.',
   'Initial route': 'Стартовый экран',
+  'Default home tab': 'Стартовая вкладка главной',
   'Account': 'Аккаунт',
   'Auto': 'Автоматически',
   'No bookmarks group': 'Разделы отсутствуют',

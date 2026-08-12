@@ -156,6 +156,7 @@ const en = {
   'Show recent items in two columns.': 'Show recent items in two columns.',
   'Restart app to apply changes.': 'Restart app to apply changes.',
   'Initial route': 'Initial route',
+  'Default home tab': 'Default home tab',
   'Account': 'Account',
   'Auto': 'Auto',
   'No bookmarks group': 'No bookmarks group',

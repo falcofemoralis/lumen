@@ -1,5 +1,6 @@
 import { useQueries, useQueryClient } from '@tanstack/react-query';
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
+import { useNetworkContext } from 'Context/NetworkContext';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { FilmListInterface } from 'Type/FilmList.interface';
@@ -30,6 +31,8 @@ export interface UseFilmPagerOptions {
   ) => Promise<FilmListInterface>;
   /** Seed films for an item without fetching (e.g. bookmarks payload already contains the first list) */
   getInitialFilms?: (menuItem: MenuItemInterface) => FilmListInterface | undefined;
+  /** Tab the pager opens on; it is the one fetched before anything is selected */
+  initialIndex?: number;
   enabled?: boolean;
 }
 
@@ -39,9 +42,11 @@ export function useFilmPager({
   sorting,
   fetchFilms,
   getInitialFilms,
+  initialIndex = 0,
   enabled = true,
 }: UseFilmPagerOptions) {
   const queryClient = useQueryClient();
+  const { isInternetAvailable } = useNetworkContext();
   const [selectedSorting, setSelectedSorting] = useState<Record<string, DropdownItem>>({});
   // items become "started" once their tab has been opened; only started items are fetched
   const [startedItems, setStartedItems] = useState<Record<string, boolean>>({});
@@ -71,7 +76,9 @@ export function useFilmPager({
             ? { films: initialFilms.films, currentPage: 1, totalPages: initialFilms.totalPages }
             : undefined;
         },
-        enabled: enabled && (startedItems[menuItem.id] ?? index === 0),
+        // fetching while offline only parks the query in `error` with no data - wait for
+        // the connection instead, react-query then fetches the tab on its own
+        enabled: enabled && isInternetAvailable && (startedItems[menuItem.id] ?? index === initialIndex),
         staleTime: FILMS_STALE_TIME,
       };
     }),
@@ -169,6 +176,7 @@ export function useFilmPager({
     pagerItems,
     sorting,
     selectedSorting,
+    initialPage: initialIndex,
     isLoading,
     onPreLoad,
     onNextLoad,

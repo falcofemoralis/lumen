@@ -50,6 +50,11 @@ export function SettingsScreenContainer() {
     [currentService]
   );
 
+  const homeMenuOptions = useMemo(
+    () => currentService.getHomeMenu().map(({ id, title }) => ({ value: id, label: title })),
+    [currentService]
+  );
+
   const downloadsPathOptions = useMemo(
     () => reactNativeDownloads.getDownloadsDirectories().map((dir) => ({
       value: dir.downloadsPath,
@@ -225,6 +230,7 @@ export function SettingsScreenContainer() {
     userAgent,
     providerOptions,
     cdnOptions,
+    homeMenuOptions,
     downloadsPathOptions,
     appVersion,
     onConfigUpdate,

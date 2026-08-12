@@ -8,9 +8,11 @@ import { PageContainerProps } from './Page.type';
 export function PageContainer(props: PageContainerProps) {
   const { checkConnection = true, ...restProps } = props;
   const isTV = useIsTV();
-  const { isInternetAvailable } = useNetworkContext();
+  const { isOffline } = useNetworkContext();
 
-  const isConnected = checkConnection ? isInternetAvailable : true;
+  // only a known-offline state blocks the page: while the first network reading is still
+  // pending the screen keeps rendering, with its queries parked until the state is known
+  const isConnected = checkConnection ? !isOffline : true;
 
   const containerProps = {
     isConnected,
