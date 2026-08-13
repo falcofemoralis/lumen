@@ -15,7 +15,7 @@ export interface DownloadsScreenComponentProps {
   openFolder: (destination: string) => void;
   handleRefresh: (isRefresh: boolean) => Promise<void>;
   completeTask: (task: DownloadTask) => void;
-  toggleTask: (taskId: string, paused: boolean) => void;
+  toggleTask: (taskId: string, isActive: boolean) => Promise<void>;
   handleTaskError: (task: DownloadTask) => void;
 }
 

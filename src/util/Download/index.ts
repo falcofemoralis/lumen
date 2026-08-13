@@ -4,6 +4,11 @@ import { storage } from 'Util/Storage';
 
 const TASK_IDS_KEY = 'taskIds';
 
+/** Mirrors the downloader library's own DEFAULT_MAX_PARALLEL_DOWNLOADS. */
+export const DEFAULT_MAX_PARALLEL_DOWNLOADS = 4;
+
+export const MAX_PARALLEL_DOWNLOADS_OPTIONS = [1, 2, 3, 4, 6, 8];
+
 export const uuid = () => Math.random().toString(36).substring(2, 6);
 
 export const getDownloadsDir = (customPath?: string): string => {
@@ -86,6 +91,25 @@ export const hasDownloadedVideo = ({ film }: DownloadFilmInterface): boolean => 
       (season) => season.episodes.some((episode) => (episode.video?.streams.length ?? 0) > 0)
     )
 );
+
+/**
+ * Extension of the file a url points at, without its query string.
+ * Urls whose last path segment carries no extension (`.../poster`) would
+ * otherwise yield the whole `host/path` tail and turn the destination into a
+ * nested path, so anything that does not look like an extension falls back.
+ */
+export const getUrlExtension = (url: string, fallback: string): string => {
+  const path = url.split(/[?#]/)[0];
+  const fileName = path.split('/').pop() ?? '';
+
+  if (!fileName.includes('.')) {
+    return fallback;
+  }
+
+  const extension = fileName.split('.').pop() ?? '';
+
+  return (/^[a-zA-Z0-9]{1,5}$/).test(extension) ? extension : fallback;
+};
 
 export const normalizeName = (name: string) => {
   return name.replaceAll(/[\\\/:*?"<>|]/g, '').replaceAll(' ', '-').trim();

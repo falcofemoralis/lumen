@@ -23,11 +23,12 @@
   },
   "dependencies": {
     "@expo/metro-runtime": "^57.0.7",
-    "@kesha-antonov/react-native-background-downloader": "4.5.2",
+    "@kesha-antonov/react-native-background-downloader": "4.6.1",
     "@lodev09/react-native-true-sheet": "^3.11.9",
     "@logicwind/react-native-exit-app": "^0.2.0",
     "@noble/hashes": "^2.2.0",
     "@noriginmedia/norigin-spatial-navigation-react-native-tvos": "^4.0.0",
+    "@react-native-clipboard/clipboard": "^1.16.3",
     "@react-native-firebase/analytics": "^25.1.0",
     "@react-native-firebase/app": "^25.1.0",
     "@react-native-firebase/firestore": "^25.1.0",

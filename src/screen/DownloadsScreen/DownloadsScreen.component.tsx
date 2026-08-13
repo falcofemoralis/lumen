@@ -4,18 +4,22 @@ import { Loader } from 'Component/Loader';
 import { Page } from 'Component/Page';
 import { PlayerVideoSelector } from 'Component/PlayerVideoSelector';
 import { PlayerVideoSelectorRef } from 'Component/PlayerVideoSelector/PlayerVideoSelector.container';
+import { ThemedButton } from 'Component/ThemedButton';
 import { ThemedGrid } from 'Component/ThemedGrid';
 import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
 import { ThemedImage } from 'Component/ThemedImage';
 import { ThemedOverlay } from 'Component/ThemedOverlay';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { ThemedPressable } from 'Component/ThemedPressable';
+import { ThemedScrollView } from 'Component/ThemedScrollView';
 import { ThemedSimpleList } from 'Component/ThemedSimpleList';
 import { ListItem } from 'Component/ThemedSimpleList/ThemedSimpleList.type';
 import { ThemedText } from 'Component/ThemedText';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
+import Copy from 'lucide-react-native/icons/copy';
 import EllipsisVertical from 'lucide-react-native/icons/ellipsis-vertical';
+import Link from 'lucide-react-native/icons/link';
 import Pause from 'lucide-react-native/icons/pause';
 import Play from 'lucide-react-native/icons/play';
 import RotateCcw from 'lucide-react-native/icons/rotate-ccw';
@@ -31,6 +35,7 @@ import { ThemedStyles } from 'Theme/types';
 import { DownloadFilmInterface } from 'Type/DownloadFile.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
+import { copyToClipboard } from 'Util/Clipboard';
 import { formatBytes, hasDownloadedVideo } from 'Util/Download';
 
 import { NUMBER_OF_COLUMNS } from './DownloadsScreen.config';
@@ -51,14 +56,19 @@ const DownloadItemTask = ({
   const [total, setTotal] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [progressPercentage, setProgressPercentage] = useState(0);
+  // `task.state` is mutated in place by the downloader, and the task object the
+  // list holds keeps its identity across a pause/resume -- so a render never
+  // picks the change up. Mirror the state the screen cares about here instead.
+  const [isPaused, setIsPaused] = useState(task.state === 'PAUSED');
+  const sourceOverlayRef = useRef<ThemedOverlayRef>(null);
 
   const progress = useSharedValue(0);
   const minimumValue = useSharedValue(0);
   const maximumValue = useSharedValue(100);
 
   const {
-    metadata: { taskFileName } = {},
-  } = task as DownloadTask & { metadata?: { taskFileName?: string } };
+    metadata: { taskFileName, url } = {},
+  } = task as DownloadTask & { metadata?: { taskFileName?: string, url?: string } };
 
   const processTask = (taskArg: DownloadTask) => {
     taskArg
@@ -89,15 +99,35 @@ const DownloadItemTask = ({
 
   const handleTaskRestart = () => {
     setError(null);
+    setIsPaused(false);
     const newTask = restartTask(task);
     if (newTask) {
       processTask(newTask);
     }
   };
 
+  const handleToggle = async (isActive: boolean) => {
+    setIsPaused(!isActive);
+
+    try {
+      await toggleTask(task.id, isActive);
+    } catch {
+      setIsPaused(isActive);
+    }
+  };
+
+  const handleCopySource = () => {
+    if (!url) {
+      return;
+    }
+
+    copyToClipboard(url);
+    NotificationStore.displayMessage(t('Link copied'));
+  };
+
   const renderContent = () => {
     return (
-      <View>
+      <View style={ styles.taskInfo }>
         { taskFileName && (
           <ThemedText>
             { taskFileName }
@@ -118,15 +148,46 @@ const DownloadItemTask = ({
     );
   };
 
-  const renderToggleActions = () => {
-    if (task.state === 'FAILED') {
+  // A source url is long enough to blow the row's layout apart, so it lives in
+  // an overlay of its own where it can wrap, be selected and be copied.
+  const renderSourceOverlay = () => {
+    if (!url) {
       return null;
     }
 
-    return task.state === 'PAUSED' ? (
+    return (
+      <ThemedOverlay ref={ sourceOverlayRef }>
+        <View style={ styles.sourceOverlay }>
+          <ThemedText style={ styles.sourceTitle }>
+            { t('Download link') }
+          </ThemedText>
+          { /* containerStyle, not style: `style` lands on the scroll view's
+               inner content view, where a maxHeight would clip the url instead
+               of letting it scroll. */ }
+          <ThemedScrollView containerStyle={ styles.sourceScroll }>
+            <ThemedText selectable>
+              { url }
+            </ThemedText>
+          </ThemedScrollView>
+          <ThemedButton
+            title={ t('Copy link') }
+            IconComponent={ Copy }
+            onPress={ handleCopySource }
+          />
+        </View>
+      </ThemedOverlay>
+    );
+  };
+
+  const renderToggleActions = () => {
+    if (error) {
+      return null;
+    }
+
+    return isPaused ? (
       <ThemedPressable
         style={ styles.actionsBtn }
-        onPress={ () => toggleTask(task.id, true) }
+        onPress={ () => handleToggle(true) }
       >
         <Play
           size={ scale(24) }
@@ -136,7 +197,7 @@ const DownloadItemTask = ({
     ) : (
       <ThemedPressable
         style={ styles.actionsBtn }
-        onPress={ () => toggleTask(task.id, false) }
+        onPress={ () => handleToggle(false) }
       >
         <Pause
           size={ scale(24) }
@@ -149,12 +210,23 @@ const DownloadItemTask = ({
   const renderActions = () => {
     return (
       <View style={ styles.taskActions }>
-        { task.state === 'FAILED' && (
+        { error && (
           <ThemedPressable
             style={ styles.actionsBtn }
             onPress={ handleTaskRestart }
           >
             <RotateCcw
+              size={ scale(24) }
+              color={ theme.colors.icon }
+            />
+          </ThemedPressable>
+        ) }
+        { url && (
+          <ThemedPressable
+            style={ styles.actionsBtn }
+            onPress={ () => sourceOverlayRef.current?.open() }
+          >
+            <Link
               size={ scale(24) }
               color={ theme.colors.icon }
             />
@@ -201,6 +273,7 @@ const DownloadItemTask = ({
       layout={ LinearTransition }
       style={ styles.taskContainer }
     >
+      { renderSourceOverlay() }
       <View>
         <View style={ styles.taskContent }>
           { renderContent() }

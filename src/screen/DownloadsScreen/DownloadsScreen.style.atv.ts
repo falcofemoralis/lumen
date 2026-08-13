@@ -138,6 +138,19 @@ export const componentStyles = ({ scale, colors, text, dimensions }: Theme) => {
     error: {
       color: colors.error,
     },
+    sourceOverlayContainer: {
+      width: '60%',
+    },
+    sourceOverlay: {
+      width: '100%',
+      gap: scale(12),
+    },
+    sourceTitle: {
+      fontWeight: 'bold',
+    },
+    sourceText: {
+      color: colors.textSecondary,
+    },
     overlayActions: {
       width: '100%',
       flexDirection: 'row',
@@ -168,6 +181,9 @@ export const componentStyles = ({ scale, colors, text, dimensions }: Theme) => {
     },
     tasks: {
       width: '100%',
+    },
+    tasksScroll: {
+      maxHeight: scale(320),
     },
     tasksOverlay: {
       width: '60%',

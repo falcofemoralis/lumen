@@ -1,5 +1,6 @@
 import { ASPECT_RATIO_OPTIONS, DEFAULT_SPEED } from 'Component/Player/Player.config';
 import { HOME_SCREEN } from 'Navigation/navigationRoutes';
+import { DEFAULT_MAX_PARALLEL_DOWNLOADS } from 'Util/Download';
 
 export type DeviceConfigType = {
   isConfigured: boolean;
@@ -12,7 +13,6 @@ export type DeviceConfigType = {
   numberOfColumnsTV: number;
   recentTwoColumnsTV: boolean;
   initialRoute: string;
-  /** Id of the home menu item opened first; empty falls back to the first tab. */
   homeDefaultTab: string;
   playerRewindSeconds: number;
   playerShowBufferTime: boolean;
@@ -21,6 +21,7 @@ export type DeviceConfigType = {
   downloadsPath?: string;
   downloadsSaveSubtitles: boolean;
   downloadsSavePoster: boolean;
+  downloadsMaxParallel: number;
   playerAutoNextEpisode: boolean;
   playerLongPressSpeed: number;
   sortVoicesByRating: boolean;
@@ -57,6 +58,7 @@ export const defaultConfig: DeviceConfigType = {
   downloadsPath: undefined,
   downloadsSaveSubtitles: true,
   downloadsSavePoster: true,
+  downloadsMaxParallel: DEFAULT_MAX_PARALLEL_DOWNLOADS,
   playerSaveQuality: true,
   playerAskQuality: false,
   playerAutoNextEpisode: true,

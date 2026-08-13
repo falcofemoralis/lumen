@@ -1,3 +1,4 @@
+import { getCurrentFocusKey, setFocus } from '@noriginmedia/norigin-spatial-navigation-core';
 import { FocusContext, FocusHandler, useFocusable } from '@noriginmedia/norigin-spatial-navigation-react-native-tvos';
 import { FlashList, FlashListRef } from '@shopify/flash-list';
 import { ThemedButton } from 'Component/ThemedButton';
@@ -126,6 +127,19 @@ export const ThemedListComponent = ({
   const { ref, focusKey } = useFocusable<object, View>({
     preferredChildFocusKey: selectedFocusKey,
   });
+
+  // FlashList needs its container layout before it renders any row, so on the
+  // first open there is nothing registered for an incoming claim to resolve to
+  // -- Norigin lands it on this node instead and the list looks unfocused. (Open
+  // it a second time and the rows mount early enough that the preferred key is
+  // already there, which is why it only ever misses the first time.) Take the
+  // claim once the selected row has registered, but only while it is still
+  // parked here: a row that already holds focus must keep it.
+  useEffect(() => {
+    if (selectedFocusKey && getCurrentFocusKey() === focusKey) {
+      setFocus(selectedFocusKey);
+    }
+  }, [selectedFocusKey, focusKey]);
 
   const scrollTo: FocusHandler<ListItemExtraProps> = useCallback((_layout, props) => {
     if (props?.index === undefined) {

@@ -1,0 +1,57 @@
+diff --git a/node_modules/@kesha-antonov/react-native-background-downloader/android/src/main/java/com/eko/RNBackgroundDownloaderModuleImpl.kt b/node_modules/@kesha-antonov/react-native-background-downloader/android/src/main/java/com/eko/RNBackgroundDownloaderModuleImpl.kt
+index e9e582d..945c285 100644
+--- a/node_modules/@kesha-antonov/react-native-background-downloader/android/src/main/java/com/eko/RNBackgroundDownloaderModuleImpl.kt
++++ b/node_modules/@kesha-antonov/react-native-background-downloader/android/src/main/java/com/eko/RNBackgroundDownloaderModuleImpl.kt
+@@ -777,10 +777,33 @@ class RNBackgroundDownloaderModuleImpl(private val reactContext: ReactApplicatio
+       return started
+     }
+ 
+-    // On Android 16+ (API 36), DownloadManager has strict path restrictions and throws
+-    // SecurityException for app-specific external storage paths. Use ResumableDownloader instead.
+-    if (Build.VERSION.SDK_INT >= 36) {
+-      logD(NAME, "Android 16+ detected: Using ResumableDownloader to avoid DownloadManager path restrictions")
++    // LUMEN PATCH: use ResumableDownloader on every Android version, not only on
++    // Android 16+ (API 36).
++    //
++    // Upstream only takes this path when DownloadManager's path restrictions force
++    // it, and falls back to DownloadManager on API <= 33. That fallback breaks two
++    // things for us:
++    //   * pause() on the DownloadManager path is implemented as
++    //     DownloadManager.remove(), which DELETES the partial file. resume() then
++    //     replays a stale byte offset into a file that is no longer there, so
++    //     resuming either corrupts the download or fails outright.
++    //   * a failed DownloadManager download is reported as TASK_CANCELING, which
++    //     the JS layer stops and drops from getExistingDownloadTasks(), so a failed
++    //     task silently disappears from the downloads screen on the next refresh.
++    // Downloads to our public Downloads/<film> folder also behave inconsistently
++    // through DownloadManager, which runs in the system downloads process and does
++    // not share the app's network stack.
++    //
++    // ResumableDownloader (a plain HttpURLConnection with Range headers, run in a
++    // UIDT job on API 34+ and in the foreground service below that) has none of
++    // these problems, so route everything through it.
++    //
++    // The condition is always true (BASE is API 1). It is kept as a version check
++    // rather than dropped so the DownloadManager code below stays reachable for
++    // the compiler - no unreachable-code warnings, and the patch stays a one-line
++    // change that is easy to re-apply on the next upgrade.
++    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.BASE) {
++      logD(NAME, "Lumen patch: using ResumableDownloader on every Android version")
+       startWithResumableDownloader()
+       return
+     }
+diff --git a/node_modules/@kesha-antonov/react-native-background-downloader/android/src/main/java/com/eko/uidt/UIDTJobState.kt b/node_modules/@kesha-antonov/react-native-background-downloader/android/src/main/java/com/eko/uidt/UIDTJobState.kt
+index 5004af7..cf9bad8 100644
+--- a/node_modules/@kesha-antonov/react-native-background-downloader/android/src/main/java/com/eko/uidt/UIDTJobState.kt
++++ b/node_modules/@kesha-antonov/react-native-background-downloader/android/src/main/java/com/eko/uidt/UIDTJobState.kt
+@@ -38,8 +38,8 @@ enum class NotificationGroupingMode {
+  * Configuration for notification display.
+  */
+ data class NotificationConfig(
+-    var groupingEnabled: Boolean = false,
+-    var showNotificationsEnabled: Boolean = false,
++    var groupingEnabled: Boolean = true,
++    var showNotificationsEnabled: Boolean = true,
+     // Post a "download complete" notification when a download finishes.
+     // Opt-in: it alerts on its own channel, unlike the silent progress one.
+     var showCompletionNotification: Boolean = false,

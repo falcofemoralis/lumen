@@ -1,6 +1,7 @@
 import {
   completeHandler,
   getExistingDownloadTasks,
+  setConfig as setDownloaderConfig,
 } from '@kesha-antonov/react-native-background-downloader';
 import { AppUpdater } from 'Component/AppUpdater';
 import { Portal } from 'Component/ThemedPortal';
@@ -13,7 +14,7 @@ import { ReactNode, useEffect } from 'react';
 import NotificationStore from 'Store/Notification.store';
 
 export const Root = ({ children }: { children: ReactNode }) => {
-  const { checkForUpdates, isLocalLibrary } = useConfigContext();
+  const { checkForUpdates, isLocalLibrary, downloadsMaxParallel } = useConfigContext();
   const { isSignedIn } = useServiceContext();
   const { fetchUserData } = useServiceContext();
   const { checkVersion } = useAppUpdaterContext();
@@ -37,6 +38,13 @@ export const Root = ({ children }: { children: ReactNode }) => {
       fetchUserData();
     }
   }, [isSignedIn, isLocalLibrary, fetchUserData, isInternetAvailable]);
+
+  // Applied on every change: the cap is read when a download looks for a free
+  // slot, so raising it lets already queued downloads start without a restart,
+  // and lowering it leaves running transfers alone.
+  useEffect(() => {
+    setDownloaderConfig({ maxParallelDownloads: downloadsMaxParallel });
+  }, [downloadsMaxParallel]);
 
   useEffect( () => {
     getExistingDownloadTasks().then(tasks => {

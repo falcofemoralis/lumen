@@ -11,6 +11,7 @@ import { ThemedScrollView } from 'Component/ThemedScrollView';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import ArrowDown10 from 'lucide-react-native/icons/arrow-down-1-0';
+import ArrowDownUp from 'lucide-react-native/icons/arrow-down-up';
 import ArrowRight from 'lucide-react-native/icons/arrow-right';
 import Blend from 'lucide-react-native/icons/blend';
 import BookImage from 'lucide-react-native/icons/book-image';
@@ -85,6 +86,8 @@ export function SettingsScreenComponent({
   downloadsPath,
   downloadsSaveSubtitles,
   downloadsSavePoster,
+  downloadsMaxParallel,
+  downloadsMaxParallelOptions,
   playerAutoNextEpisode,
   sortVoicesByRating,
   playerBufferTimeSetting,
@@ -358,6 +361,14 @@ export function SettingsScreenComponent({
         IconComponent={ BookImage }
         value={ downloadsSavePoster }
         onChange={ (value) => onConfigUpdate('downloadsSavePoster', value) }
+      />
+      <SettingSelect
+        title={ t('Parallel downloads') }
+        subtitle={ t('How many files are downloaded at the same time. The rest wait in a queue.') }
+        IconComponent={ ArrowDownUp }
+        value={ String(downloadsMaxParallel) }
+        options={ downloadsMaxParallelOptions }
+        onChange={ (value) => onConfigUpdate('downloadsMaxParallel', Number(value)) }
       />
     </ThemedScrollView>
   );

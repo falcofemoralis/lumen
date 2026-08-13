@@ -1697,10 +1697,10 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@kesha-antonov/react-native-background-downloader@4.5.2":
-  version "4.5.2"
-  resolved "https://registry.yarnpkg.com/@kesha-antonov/react-native-background-downloader/-/react-native-background-downloader-4.5.2.tgz#53c87f506c84fcc51b640f0c948b6da3831cba2a"
-  integrity sha512-5hALp7YCq77FV7HL4N5i+OXGgGEoxYL3lsD7oXycPplBQU3twqLpBo4w/Nn9TleKOZnNstaahGy1BskmvTSdrQ==
+"@kesha-antonov/react-native-background-downloader@4.6.1":
+  version "4.6.1"
+  resolved "https://registry.yarnpkg.com/@kesha-antonov/react-native-background-downloader/-/react-native-background-downloader-4.6.1.tgz#34b19d4fd1adb78364b480ac3b33d53b9b1e7b89"
+  integrity sha512-dDVqo4eaoBYAz5bsENFqxBirx5JfAEHOh/Zb6Zv/bXni7a6pFtD5PJLEL/N6ZLcsoAmlmO56siY3nCoJV7KkGg==
 
 "@lodev09/react-native-true-sheet@^3.11.9":
   version "3.11.9"
@@ -1826,6 +1826,11 @@
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@protobufjs/utf8/-/utf8-1.1.2.tgz#78d476333d85d5b1c792e257bca74ba080da49a4"
   integrity sha512-b1UQwcEZ4yCnMCD8DAL1VlbvBJE9/IX4FTIp7BG1xYpf29SLazLSrqUkj4w7Y5y7cCVP6E5tcqqcI0xemPkHug==
+
+"@react-native-clipboard/clipboard@^1.16.3":
+  version "1.16.3"
+  resolved "https://registry.yarnpkg.com/@react-native-clipboard/clipboard/-/clipboard-1.16.3.tgz#7807a90fd9984bf4d3a96faf2eee20457984a9bd"
+  integrity sha512-cMIcvoZKIrShzJHEaHbTAp458R9WOv0fB6UyC7Ek4Qk561Ow/DrzmmJmH/rAZg21Z6ixJ4YSdFDC14crqIBmCQ==
 
 "@react-native-firebase/analytics@^25.1.0":
   version "25.1.0"

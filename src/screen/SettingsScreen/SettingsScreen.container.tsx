@@ -11,6 +11,7 @@ import NotificationStore from 'Store/Notification.store';
 import { useAppTheme } from 'Theme/context';
 import { ThemeContextModeT } from 'Theme/types';
 import { restartApp } from 'Util/Device';
+import { MAX_PARALLEL_DOWNLOADS_OPTIONS } from 'Util/Download';
 import { ensureDefaultLocalCategory } from 'Util/LocalLibrary';
 import { setTimeoutSafe } from 'Util/Misc';
 import { getPlayerQuality, updatePlayerQuality } from 'Util/Player';
@@ -61,6 +62,14 @@ export function SettingsScreenContainer() {
       label: dir.isPrimary
         ? 'Internal storage'
         : (dir.isRemovable ? 'SD Card' : 'External storage'),
+    })),
+    []
+  );
+
+  const downloadsMaxParallelOptions = useMemo(
+    () => MAX_PARALLEL_DOWNLOADS_OPTIONS.map((amount) => ({
+      value: String(amount),
+      label: String(amount),
     })),
     []
   );
@@ -232,6 +241,7 @@ export function SettingsScreenContainer() {
     cdnOptions,
     homeMenuOptions,
     downloadsPathOptions,
+    downloadsMaxParallelOptions,
     appVersion,
     onConfigUpdate,
     onLanguageChange,

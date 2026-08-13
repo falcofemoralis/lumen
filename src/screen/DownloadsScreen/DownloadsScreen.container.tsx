@@ -103,9 +103,14 @@ export const DownloadsScreenContainer = () => {
           additionalName += ` - S${taskInfo.seasonId}E${taskInfo.episodeId}`;
         }
 
+        // The native side only reports `destination` for some of its download
+        // mechanisms, and never reports the source url -- both are kept in
+        // TaskIdStorage, so put them on the task where the UI can read them.
         task.metadata = {
           ...task.metadata,
           name: additionalName,
+          url: taskInfo.url,
+          destination: taskInfo.destination,
         };
 
         files.push({
@@ -329,17 +334,18 @@ export const DownloadsScreenContainer = () => {
       return;
     }
 
-    if (isActive) {
-      await task.resume();
-    } else {
-      await task.pause();
-    }
+    try {
+      if (isActive) {
+        await task.resume();
+      } else {
+        await task.pause();
+      }
+    } catch (e) {
+      NotificationStore.displayError(e as Error);
 
-    updateDownloadedFilms(prev => prev.map(film => ({
-      ...film,
-      tasks: film.tasks.map(ft => ft.id === taskId ? task : ft),
-    })));
-  }, [downloadedFilms, updateDownloadedFilms]);
+      throw e;
+    }
+  }, [downloadedFilms]);
 
   const restartTask = useCallback((task: DownloadTask) => {
     const destination = getFileDestination(task);

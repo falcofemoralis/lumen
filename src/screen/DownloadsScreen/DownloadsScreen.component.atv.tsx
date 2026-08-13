@@ -12,12 +12,15 @@ import { ThemedImage } from 'Component/ThemedImage';
 import { ThemedOverlay } from 'Component/ThemedOverlay';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { ThemedPressable } from 'Component/ThemedPressable';
+import { ThemedScrollView } from 'Component/ThemedScrollView';
 import { ThemedSimpleList } from 'Component/ThemedSimpleList';
 import { ListItem } from 'Component/ThemedSimpleList/ThemedSimpleList.type';
 import { ThemedText } from 'Component/ThemedText';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
+import Copy from 'lucide-react-native/icons/copy';
 import EllipsisVertical from 'lucide-react-native/icons/ellipsis-vertical';
+import Link from 'lucide-react-native/icons/link';
 import Pause from 'lucide-react-native/icons/pause';
 import Play from 'lucide-react-native/icons/play';
 import RotateCcw from 'lucide-react-native/icons/rotate-ccw';
@@ -32,6 +35,7 @@ import { ThemedStyles } from 'Theme/types';
 import { DownloadFilmInterface } from 'Type/DownloadFile.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
+import { copyToClipboard } from 'Util/Clipboard';
 import { formatBytes, hasDownloadedVideo } from 'Util/Download';
 
 import { NUMBER_OF_COLUMNS_TV } from './DownloadsScreen.config';
@@ -52,14 +56,19 @@ const DownloadItemTask = ({
   const [total, setTotal] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [progressPercentage, setProgressPercentage] = useState(0);
+  // `task.state` is mutated in place by the downloader, and the task object the
+  // list holds keeps its identity across a pause/resume -- so a render never
+  // picks the change up. Mirror the state the screen cares about here instead.
+  const [isPaused, setIsPaused] = useState(task.state === 'PAUSED');
+  const sourceOverlayRef = useRef<ThemedOverlayRef>(null);
 
   const progress = useSharedValue(0);
   const minimumValue = useSharedValue(0);
   const maximumValue = useSharedValue(100);
 
   const {
-    metadata: { taskFileName } = {},
-  } = task as DownloadTask & { metadata?: { taskFileName?: string } };
+    metadata: { taskFileName, url } = {},
+  } = task as DownloadTask & { metadata?: { taskFileName?: string, url?: string } };
 
   const processTask = (taskArg: DownloadTask) => {
     taskArg
@@ -90,10 +99,65 @@ const DownloadItemTask = ({
 
   const handleTaskRestart = () => {
     setError(null);
+    setIsPaused(false);
     const newTask = restartTask(task);
     if (newTask) {
       processTask(newTask);
     }
+  };
+
+  const handleToggle = async (isActive: boolean) => {
+    setIsPaused(!isActive);
+
+    try {
+      await toggleTask(task.id, isActive);
+    } catch {
+      setIsPaused(isActive);
+    }
+  };
+
+  const handleCopySource = () => {
+    if (!url) {
+      return;
+    }
+
+    copyToClipboard(url);
+    NotificationStore.displayMessage(t('Link copied'));
+  };
+
+  // A source url is long enough to blow the task row apart, so it lives in an
+  // overlay of its own where it can wrap and be copied.
+  const renderSourceOverlay = () => {
+    if (!url) {
+      return null;
+    }
+
+    return (
+      <ThemedOverlay ref={ sourceOverlayRef } containerStyle={ styles.sourceOverlayContainer }>
+        <View style={ styles.sourceOverlay }>
+          <ThemedText style={ styles.sourceTitle }>
+            { t('Download link') }
+          </ThemedText>
+          { /* Deliberately not a ThemedScrollView: on TV it forces height 100%
+               on itself, which pushes the copy button out of the overlay's
+               clipped content box -- and it can only be scrolled by focusing a
+               child, which plain text never is. Cap the lines instead; the point
+               of the overlay is to copy the link, not to read all of it. */ }
+          <ThemedText
+            style={ styles.sourceText }
+            numberOfLines={ 6 }
+          >
+            { url }
+          </ThemedText>
+          <ThemedButton
+            autofocus
+            title={ t('Copy link') }
+            IconComponent={ Copy }
+            onPress={ handleCopySource }
+          />
+        </View>
+      </ThemedOverlay>
+    );
   };
 
   const renderContent = () => {
@@ -133,20 +197,20 @@ const DownloadItemTask = ({
   };
 
   const renderToggleActions = () => {
-    if (task.state === 'FAILED') {
+    if (error) {
       return null;
     }
 
-    return task.state === 'PAUSED' ? (
+    return isPaused ? (
       <ThemedButton
         style={ styles.actionsBtn }
-        onPress={ () => toggleTask(task.id, true) }
+        onPress={ () => handleToggle(true) }
         IconComponent={ Play }
       />
     ) : (
       <ThemedButton
         style={ styles.actionsBtn }
-        onPress={ () => toggleTask(task.id, false) }
+        onPress={ () => handleToggle(false) }
         IconComponent={ Pause }
       />
     );
@@ -160,6 +224,13 @@ const DownloadItemTask = ({
             style={ styles.actionsBtn }
             onPress={ handleTaskRestart }
             IconComponent={ RotateCcw }
+          />
+        ) }
+        { url && (
+          <ThemedButton
+            style={ styles.actionsBtn }
+            onPress={ () => sourceOverlayRef.current?.open() }
+            IconComponent={ Link }
           />
         ) }
         <ThemedButton
@@ -199,6 +270,7 @@ const DownloadItemTask = ({
       layout={ LinearTransition }
       style={ styles.taskContainer }
     >
+      { renderSourceOverlay() }
       <View style={ styles.taskRow }>
         <View style={ styles.taskContent }>
           { renderContent() }
@@ -275,11 +347,19 @@ const DownloadItem = (props: DownloadItemProps & { styles: ThemedStyles<typeof c
     playerVideoSelectorOverlayRef.current?.close();
   }, [item, handleVideoSelect]);
 
+  // Deleting one of several tasks leaves the list worth looking at, so keep the
+  // overlays up and let the row drop out of it. Only the last task takes the
+  // overlays down with it -- what is left behind then is an empty-state block.
   const handleDeleteTask = useCallback((task: DownloadTask) => {
     deleteTask(task);
+
+    if (tasks.length > 1) {
+      return;
+    }
+
     tasksOverlayRef.current?.close();
     actionsOverlayRef.current?.close();
-  }, [deleteTask]);
+  }, [deleteTask, tasks.length]);
 
   const renderPlayerVideoSelector = () => {
     const { film } = item;
@@ -304,8 +384,16 @@ const DownloadItem = (props: DownloadItemProps & { styles: ThemedStyles<typeof c
       );
     }
 
+    // A film downloading a whole season has more task rows than the overlay can
+    // show. The scroll view is driven by child focus, which the rows' own action
+    // buttons provide, and needs a bounded height of its own to scroll at all --
+    // the overlay's maxHeight is a percentage the scroll view cannot resolve
+    // against, so without this the rows just spill out of the clipped box.
     return (
-      <View style={ styles.tasks }>
+      <ThemedScrollView
+        style={ styles.tasks }
+        containerStyle={ styles.tasksScroll }
+      >
         { tasks.map((task) => (
           <DownloadItemTask
             { ...props }
@@ -315,7 +403,7 @@ const DownloadItem = (props: DownloadItemProps & { styles: ThemedStyles<typeof c
             deleteTask={ handleDeleteTask }
           />
         )) }
-      </View>
+      </ThemedScrollView>
     );
   };
 

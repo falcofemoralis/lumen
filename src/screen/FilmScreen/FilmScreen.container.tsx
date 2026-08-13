@@ -26,7 +26,7 @@ import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
-import { getDownloadsDir, normalizeName, TaskIdStorage, uuid } from 'Util/Download';
+import { getDownloadsDir, getUrlExtension, normalizeName, TaskIdStorage, uuid } from 'Util/Download';
 import {
   applyLocalScheduleMarks,
   getLocalBookmarksForFilm,
@@ -345,10 +345,10 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     const folderName = filmName.join('-');
     const folderPath = `${getDownloadsDir(downloadsPath)}/${folderName}`;
 
-    const posterExtension = poster.split('.').pop()?.split('?')[0] || 'jpg';
+    const posterExtension = getUrlExtension(poster, 'jpg');
     const posterDestination = `${folderPath}/poster.${posterExtension}`;
 
-    if (downloadsSavePoster) {
+    if (downloadsSavePoster && poster) {
       const posterTask = createDownloadTask({
         id: uuid(),
         url: poster,
@@ -362,7 +362,9 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
           completeHandler(posterTask.id);
         })
         .error(({ error }) => {
-          NotificationStore.displayError(error);
+          // The poster is not listed as a task on the downloads screen, so this
+          // notification is the only place its failure ever surfaces.
+          NotificationStore.displayError(t('Poster download failed: {{error}}', { error: String(error) }));
           completeHandler(posterTask.id);
         });
 
@@ -385,8 +387,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
 
       const name = [...taskName, ...filmName].join('-');
       const taskUrl = url.replace(':hls:manifest.m3u8', '');
-      // strip any query string, like the poster and subtitle destinations do
-      const extension = taskUrl.split('.').pop()?.split('?')[0] || 'mp4';
+      const extension = getUrlExtension(taskUrl, 'mp4');
       const destination = `${folderPath}/${name}.${extension}`;
 
       const allSubtitles = [];
@@ -401,7 +402,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
             };
           }
 
-          const subtitleExtension = subtitleUrl.split('.').pop()?.split('?')[0] || 'vtt';
+          const subtitleExtension = getUrlExtension(subtitleUrl, 'vtt');
           const subtitleDestination = `${folderPath}/${name}-${languageCode}.${subtitleExtension}`;
 
           return {
@@ -434,7 +435,8 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
               completeHandler(subtitleTask.id);
             })
             .error(({ error }) => {
-              NotificationStore.displayError(error);
+              // Subtitles are not listed as tasks on the downloads screen either.
+              NotificationStore.displayError(t('Subtitles download failed: {{error}}', { error: String(error) }));
               completeHandler(subtitleTask.id);
             });
 

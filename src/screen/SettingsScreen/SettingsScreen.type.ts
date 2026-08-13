@@ -18,6 +18,7 @@ export type SettingsScreenComponentProps = {
   cdnOptions: string[]
   homeMenuOptions: SettingItemOption[]
   downloadsPathOptions: SettingItemOption[]
+  downloadsMaxParallelOptions: SettingItemOption[]
   appVersion: string
   onConfigUpdate: (key: keyof DeviceConfigType, value: unknown) => void
   onLanguageChange: (value: string) => Promise<void>

@@ -47,6 +47,20 @@ export const componentStyles = ({ scale, colors, spacing }: Theme) => ({
   taskContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    gap: scale(8),
+  },
+  taskInfo: {
+    flex: 1,
+  },
+  sourceOverlay: {
+    width: '100%',
+    gap: scale(12),
+  },
+  sourceTitle: {
+    fontWeight: 'bold',
+  },
+  sourceScroll: {
+    maxHeight: scale(160),
   },
   taskActions: {
     flexDirection: 'row',
