@@ -22,6 +22,8 @@ export interface DownloadsScreenComponentProps {
 export interface DownloadItemProps extends Omit<DownloadsScreenComponentProps, 'handleRefresh' | 'isLoading'> {
   index: number;
   item: DownloadFilmInterface;
+  // TV related
+  isLastRow?: boolean;
 }
 
 export interface DownloadItemTaskProps extends Omit<DownloadsScreenComponentProps, 'handleRefresh' | 'isLoading'> {

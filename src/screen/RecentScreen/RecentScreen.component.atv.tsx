@@ -50,6 +50,7 @@ type RecentRowProps = {
   // title needs -- so there the actions collapse into one button opening a menu.
   // A full-width row has the room to keep them all out in the open.
   compactActions: boolean;
+  isLastRow: boolean;
   handleOnPress: (item: RecentGridItem) => void;
   removeItem: (item: RecentGridItem) => void;
   openHideConfirmOverlay: (item: RecentGridItem) => void;
@@ -63,6 +64,7 @@ function RecentRow({
   item,
   styles,
   compactActions,
+  isLastRow,
   handleOnPress,
   removeItem,
   openHideConfirmOverlay,
@@ -167,7 +169,7 @@ function RecentRow({
     <FocusContext.Provider value={ focusKey }>
       <Animated.View
         ref={ ref }
-        style={ [styles.row, hasFocusedChild && styles.rowFocused] }
+        style={ [styles.row, isLastRow && styles.lastRow, hasFocusedChild && styles.rowFocused] }
         tvFocusable={ false }
       >
         { renderActionsOverlay() }
@@ -252,16 +254,21 @@ export function RecentScreenComponent({
   const numberOfColumns = recentTwoColumnsTV ? NUMBER_OF_COLUMNS_TV_TWO_COLUMNS : NUMBER_OF_COLUMNS_TV;
   const styles = useThemedStyles(recentTwoColumnsTV ? componentStylesTwoColumns : componentStyles);
 
-  const renderItem = useCallback(({ item }: ThemedGridRowProps<RecentGridItem>) => (
+  // Start of the last -- possibly partly filled -- row: every cell of that row
+  // has to reserve the room the focus zoom bleeds past the end of the list.
+  const lastRowStart = Math.floor(Math.max(items.length - 1, 0) / numberOfColumns) * numberOfColumns;
+
+  const renderItem = useCallback(({ item, index }: ThemedGridRowProps<RecentGridItem>) => (
     <RecentRow
       item={ item }
       styles={ styles }
       compactActions={ recentTwoColumnsTV }
+      isLastRow={ index >= lastRowStart }
       handleOnPress={ handleOnPress }
       removeItem={ removeItem }
       openHideConfirmOverlay={ openHideConfirmOverlay }
     />
-  ), [handleOnPress, openHideConfirmOverlay, removeItem, styles, recentTwoColumnsTV]);
+  ), [handleOnPress, openHideConfirmOverlay, removeItem, styles, recentTwoColumnsTV, lastRowStart]);
 
   const renderContent = () => {
     if (!isSignedIn && !isLocalLibrary) {

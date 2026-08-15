@@ -290,6 +290,7 @@ const DownloadItem = (props: DownloadItemProps & { styles: ThemedStyles<typeof c
   const {
     item,
     styles,
+    isLastRow,
     openFolder,
     deleteFilm,
     handleVideoSelect,
@@ -486,7 +487,7 @@ const DownloadItem = (props: DownloadItemProps & { styles: ThemedStyles<typeof c
     <FocusContext.Provider value={ focusKey }>
       <Animated.View
         ref={ ref }
-        style={ [styles.row, hasFocusedChild && styles.rowFocused] }
+        style={ [styles.row, isLastRow && styles.lastRow, hasFocusedChild && styles.rowFocused] }
         tvFocusable={ false }
       >
         { renderPlayerVideoSelector() }
@@ -529,9 +530,10 @@ export const DownloadsScreenComponent = (props: DownloadsScreenComponentProps) =
         index={ index }
         item={ item }
         styles={ styles }
+        isLastRow={ index === downloadedFilms.length - 1 }
       />
     );
-  }, [styles, props]);
+  }, [styles, props, downloadedFilms.length]);
 
   const renderContent = () => {
     if (isLoading) {

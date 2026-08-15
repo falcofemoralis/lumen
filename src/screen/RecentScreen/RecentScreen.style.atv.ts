@@ -88,6 +88,14 @@ const createComponentStyles = ({
     rowFocused: {
       transform: [{ scale: zoom }],
     },
+    // A focused row grows around its centre, so half of the growth hangs below
+    // its box. Focus scrolling only brings an item's own box into view, so the
+    // last row has to carry that overflow itself -- the grid's bottom padding
+    // does not help, `scrollToIndex` stops at the last item and the viewport
+    // clips what bleeds past it.
+    lastRow: {
+      marginBottom: rowHeight * zoomBleed,
+    },
     fill: {
       flex: 1,
     },
