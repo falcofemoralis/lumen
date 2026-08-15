@@ -151,4 +151,5 @@ export interface ApiInterface {
   // comments
   getComments: (filmId: string, page: number) => Promise<CommentListInterface>;
   postLike: (commentId: string) => Promise<ApiLikeInterface>;
+  postComment: (filmId: string, text: string, replyToId?: string) => Promise<string|undefined>;
 }

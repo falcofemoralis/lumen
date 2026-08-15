@@ -16,17 +16,18 @@ import { ProfileInterface } from 'Type/Profile.interface';
 import { RatingInterface } from 'Type/Rating.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { VoiceRatingInterface } from 'Type/VoiceRating.interface';
-import { buildCookies, cookiesManager } from 'Util/Cookies';
+import { buildCookies, cookiesManager, setCookie } from 'Util/Cookies';
 import { decodeHtml } from 'Util/Html';
 import { safeJsonParse } from 'Util/Json';
 import { HTMLElementInterface, parseHtml } from 'Util/Parser';
 import { processPromisesBatch } from 'Util/Promise';
-import { executeGet, executePostFormData, formatURI, NotFoundError, Variables } from 'Util/Request';
+import { executeGet, executePostEncoded, executePostFormData, formatURI, NotFoundError, Variables } from 'Util/Request';
 import { storage } from 'Util/Storage';
 import { updateUrlHost } from 'Util/Url';
 
 import { collectSeriesUpdateRows, parseSeriesUpdateBlocks } from './seriesUpdates';
 import {
+  CommentResult,
   CommentsResult,
   FILM_SORTING,
   JSONResult,
@@ -63,7 +64,7 @@ type RezkaApiInterface = ApiInterface & {
   getRequest: (query: string, variables?: Variables) => Promise<string>;
   postRequest: (query: string, variables?: Variables) => Promise<string>;
   fetchPage: (query: string, variables?: Variables) => Promise<HTMLElementInterface>;
-  fetchJson: <T>(query: string, variables?: Variables) => Promise<T | null>;
+  postJson: <T>(query: string, variables?: Variables) => Promise<T | null>;
 
   // utils
   parseContent: (content: string) => HTMLElementInterface;
@@ -206,7 +207,7 @@ const RezkaApi: RezkaApiInterface = {
     return this.parseContent(res);
   },
 
-  async fetchJson<T>(query: string, variables: Variables = {}) {
+  async postJson<T>(query: string, variables: Variables = {}) {
     const result = await this.postRequest(query, variables);
 
     const json = safeJsonParse<T>(result);
@@ -265,7 +266,7 @@ const RezkaApi: RezkaApiInterface = {
   },
 
   async login(name, password) {
-    const data = await this.fetchJson<JSONResult>('/ajax/login/', {
+    const data = await this.postJson<JSONResult>('/ajax/login/', {
       login_name: name,
       login_password: password,
       login_not_save: '0',
@@ -519,7 +520,7 @@ const RezkaApi: RezkaApiInterface = {
   },
 
   async addBookmark(filmId, bookmarkId) {
-    const res = await this.fetchJson<JSONResult>('/ajax/favorites', {
+    const res = await this.postJson<JSONResult>('/ajax/favorites', {
       post_id: filmId,
       cat_id: bookmarkId,
       action: 'add_post',
@@ -583,7 +584,7 @@ const RezkaApi: RezkaApiInterface = {
   },
 
   async removeRecent(filmId) {
-    const data = await this.fetchJson<JSONResult>('/engine/ajax/cdn_saves_remove.php', { id: filmId });
+    const data = await this.postJson<JSONResult>('/engine/ajax/cdn_saves_remove.php', { id: filmId });
 
     if (!data?.success) {
       throw new Error(this.stripHtmlFromMessage(data?.message));
@@ -593,7 +594,7 @@ const RezkaApi: RezkaApiInterface = {
   },
 
   async hideRecent(filmId) {
-    const data = await this.fetchJson<JSONResult>('/engine/ajax/cdn_saves_view.php', {
+    const data = await this.postJson<JSONResult>('/engine/ajax/cdn_saves_view.php', {
       id: filmId,
     });
 
@@ -1118,7 +1119,7 @@ const RezkaApi: RezkaApiInterface = {
   },
 
   async getFilmTrailer(filmId) {
-    const result = await this.fetchJson<TrailerResult>('/engine/ajax/gettrailervideo.php', {
+    const result = await this.postJson<TrailerResult>('/engine/ajax/gettrailervideo.php', {
       id: filmId,
     });
 
@@ -1138,7 +1139,7 @@ const RezkaApi: RezkaApiInterface = {
     const { id: filmId } = film;
     const { id: voiceId } = voice;
 
-    const result = await this.fetchJson<SeasonsResult>('/ajax/get_cdn_series', {
+    const result = await this.postJson<SeasonsResult>('/ajax/get_cdn_series', {
       id: filmId,
       translator_id: voiceId,
       action: 'get_episodes',
@@ -1168,7 +1169,7 @@ const RezkaApi: RezkaApiInterface = {
       isDirector,
     } = voice;
 
-    const json = await this.fetchJson<StreamsResult>('/ajax/get_cdn_series', {
+    const json = await this.postJson<StreamsResult>('/ajax/get_cdn_series', {
       id: filmId,
       translator_id: voiceId,
       is_camrip: isCamrip,
@@ -1196,7 +1197,7 @@ const RezkaApi: RezkaApiInterface = {
     const { id: filmId } = film;
     const { id: voiceId } = voice;
 
-    const json = await this.fetchJson<StreamsResult>('/ajax/get_cdn_series', {
+    const json = await this.postJson<StreamsResult>('/ajax/get_cdn_series', {
       id: filmId,
       translator_id: voiceId,
       season: seasonId,
@@ -1223,7 +1224,7 @@ const RezkaApi: RezkaApiInterface = {
     const { id: filmId } = film;
     const { id: voiceId } = voice;
 
-    this.fetchJson<JSONResult>('/ajax/send_save', {
+    this.postJson<JSONResult>('/ajax/send_save', {
       post_id: filmId,
       translator_id: voiceId,
       season: voice.lastSeasonId ?? '0',
@@ -1239,7 +1240,7 @@ const RezkaApi: RezkaApiInterface = {
   },
 
   async saveScheduleWatch(id) {
-    const data = await this.fetchJson<JSONResult>('/engine/ajax/schedule_watched.php', { id });
+    const data = await this.postJson<JSONResult>('/engine/ajax/schedule_watched.php', { id });
 
     if (!data?.success) {
       throw new Error(this.stripHtmlFromMessage(data?.message) || 'Something went wrong');
@@ -1247,7 +1248,7 @@ const RezkaApi: RezkaApiInterface = {
   },
 
   async postRating(filmId, rating) {
-    const data = await this.fetchJson<RatingResult>('/engine/ajax/rating.php', {
+    const data = await this.postJson<RatingResult>('/engine/ajax/rating.php', {
       news_id: filmId,
       go_rate: String(rating),
       skin: 'hdrezka',
@@ -1514,7 +1515,7 @@ const RezkaApi: RezkaApiInterface = {
   },
 
   async postLike(commentId) {
-    const data = await this.fetchJson<LikeResult>('/engine/ajax/comments_like.php', {
+    const data = await this.postJson<LikeResult>('/engine/ajax/comments_like.php', {
       id: commentId,
     });
 
@@ -1523,6 +1524,58 @@ const RezkaApi: RezkaApiInterface = {
     }
 
     return data;
+  },
+
+  async postComment(filmId, text, replyToId) {
+    const payload: Variables = {
+      comments: text,
+      post_id: filmId,
+      type: '0',
+      parent: replyToId ?? '0',
+      g_recaptcha_response: '',
+      has_adb: '2',
+    };
+
+    if (replyToId) {
+      payload['replyto_id'] = replyToId;
+    }
+
+    // The site's own page sets this once it decides comments are open, and the
+    // handler refuses the post without it. Nothing the app fetches hands it to
+    // the jar, so seed it before the request builds its Cookie header.
+    setCookie(new URL(this.getProvider()).hostname, 'allowed_comments', '1');
+
+    const result = await executePostEncoded(
+      '/ajax/add_comment/',
+      this.getProvider(),
+      {
+        ...this.getHeaders(),
+        'X-Requested-With': 'XMLHttpRequest',
+        Origin: this.getProvider(),
+      },
+      payload
+    );
+
+    const data = safeJsonParse<CommentResult>(result);
+
+    if (!data) {
+      throw new Error(this.stripHtmlFromMessage(result).slice(0, 300) || 'Failed to post a comment');
+    }
+
+    const rawMessage = data.message as string[] | string | undefined;
+    const message = this.stripHtmlFromMessage(
+      Array.isArray(rawMessage) ? rawMessage.join(' ') : rawMessage
+    );
+
+    if (data.on_moderation) {
+      return message ? `Комментарий успешно добавлен. ${message}` : 'Комментарий находится на модерации.';
+    }
+
+    if (!data.success) {
+      throw new Error(message || 'Failed to post a comment');
+    }
+
+    return '';
   },
 
   /** Utils */

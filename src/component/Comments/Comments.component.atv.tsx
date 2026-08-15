@@ -24,10 +24,16 @@ import { useAppTheme } from 'Theme/context';
 import { ThemedStyles } from 'Theme/types';
 import { CommentInterface, CommentTextType } from 'Type/Comment.interface';
 
-import { MEASURE_TEXT_STRING } from './Comments.config';
+import { CommentActions, CommentActionsRef } from './CommentActions.atv';
+import { CommentForm } from './CommentForm.atv';
+import { getCommentId, MEASURE_TEXT_STRING } from './Comments.config';
 import { componentStyles } from './Comments.style.atv';
 import {
-  CalculatedLine, CalculatedText, CommentItemProps, CommentsComponentProps,
+  CalculatedLine,
+  CalculatedText,
+  CommentItemProps,
+  CommentsComponentProps,
+  SplitCommentInterface,
 } from './Comments.type';
 import { CommentText, CommentTextRef } from './CommentText.atv';
 
@@ -41,7 +47,7 @@ export const CommentItem = forwardRef<CommentItemRef, CommentItemProps & { style
   containerWidth = 0,
   lines = [],
   styles,
-  handlePostLike,
+  handleReply,
 }, ref) => {
   const {
     id,
@@ -65,7 +71,7 @@ export const CommentItem = forwardRef<CommentItemRef, CommentItemProps & { style
     <ThemedPressable
       focusKey={ commentFocusKey }
       onPress={ () => commentTextRef.current?.openSpoilers() }
-      onLongPress={ () => handlePostLike(comment.id) }
+      onLongPress={ () => handleReply(comment) }
     >
       { ({ isFocused }) => (
         <View
@@ -145,18 +151,26 @@ function rowPropsAreEqual(prevProps: CommentItemProps, props: CommentItemProps) 
 
 const MemoCommentItem = memo(CommentItem, rowPropsAreEqual);
 
+type CommentsListProps = Pick<
+  CommentsComponentProps,
+  'comments' | 'onNextLoad' | 'canPostComments' | 'handlePostLike'
+> & {
+  containerWidth: number;
+  charLayout: LayoutRectangle | null;
+  styles: ThemedStyles<typeof componentStyles>;
+  handleReply: (comment: CommentInterface) => void;
+};
+
 const CommentsList = ({
   comments,
   onNextLoad,
   containerWidth,
   charLayout,
   styles,
+  canPostComments,
   handlePostLike,
-}: CommentsComponentProps & {
-  containerWidth: number;
-  charLayout: LayoutRectangle | null;
-  styles: ThemedStyles<typeof componentStyles>;
-}) => {
+  handleReply,
+}: CommentsListProps) => {
   const { height } = useWindowDimensions();
   const defaultItemRef = useRef<CommentItemRef>(null);
 
@@ -332,6 +346,8 @@ const CommentsList = ({
         acc.push({
           ...comment,
           id: virtualId,
+          // liking or replying still has to reach the comment the service knows
+          originalId: comment.id,
         });
       });
     } else {
@@ -339,7 +355,7 @@ const CommentsList = ({
     }
 
     return acc;
-  }, [] as CommentInterface[]), [commentCalculatedHeights, comments, height, styles]);
+  }, [] as SplitCommentInterface[]), [commentCalculatedHeights, comments, height, styles]);
 
   const getCalculatedItemLines = useCallback((
     item: CommentInterface
@@ -352,10 +368,12 @@ const CommentsList = ({
       idx={ index }
       containerWidth={ containerWidth }
       lines={ getCalculatedItemLines(item) }
+      canPostComments={ canPostComments }
       handlePostLike={ handlePostLike }
+      handleReply={ handleReply }
       styles={ styles }
     />
-  ), [containerWidth, getCalculatedItemLines, handlePostLike, styles]);
+  ), [canPostComments, containerWidth, getCalculatedItemLines, handlePostLike, handleReply, styles]);
 
   return (
     <ThemedGrid
@@ -371,12 +389,28 @@ export const CommentsComponent = ({
   comments,
   style,
   isLoading,
+  canPostComments,
+  isPosting,
   onNextLoad,
   handlePostLike,
+  handlePostComment,
 }: CommentsComponentProps) => {
   const styles = useThemedStyles(componentStyles);
   const [containerWidth, setContainerWidth] = useState(0);
   const [charLayout, setCharLayout] = useState<LayoutRectangle|null>(null);
+  const actionsRef = useRef<CommentActionsRef>(null);
+
+  // With posting switched off there is nothing to choose between, so the long
+  // press keeps doing what it always did on TV and likes the comment outright.
+  const handleReply = useCallback((comment: CommentInterface) => {
+    if (!canPostComments) {
+      handlePostLike(getCommentId(comment));
+
+      return;
+    }
+
+    actionsRef.current?.open(comment);
+  }, [canPostComments, handlePostLike]);
 
   const renderComments = () => {
     if (!comments || (isLoading && !comments.length)) {
@@ -403,13 +437,49 @@ export const CommentsComponent = ({
     return (
       <CommentsList
         comments={ comments }
-        style={ style }
-        isLoading={ isLoading }
         onNextLoad={ onNextLoad }
         containerWidth={ containerWidth }
         charLayout={ charLayout }
         styles={ styles }
+        canPostComments={ canPostComments }
         handlePostLike={ handlePostLike }
+        handleReply={ handleReply }
+      />
+    );
+  };
+
+  // On TV the composer goes above the list: it is the first thing the D-Pad
+  // reaches on the way up, and a form pinned below a full-height list would sit
+  // off screen. It stays a real sibling of the grid rather than its header -
+  // a focusable inside the list pulls focus back to the top whenever a focused
+  // item unmounts (virtualization, load-more).
+  const renderForm = () => {
+    if (!canPostComments) {
+      return null;
+    }
+
+    return (
+      <CommentForm
+        isPosting={ isPosting }
+        replyTo={ null }
+        styles={ styles }
+        handlePostComment={ handlePostComment }
+      />
+    );
+  };
+
+  const renderActions = () => {
+    if (!canPostComments) {
+      return null;
+    }
+
+    return (
+      <CommentActions
+        ref={ actionsRef }
+        isPosting={ isPosting }
+        styles={ styles }
+        handlePostLike={ handlePostLike }
+        handlePostComment={ handlePostComment }
       />
     );
   };
@@ -441,7 +511,9 @@ export const CommentsComponent = ({
       } }
     >
       { renderMeasureText() }
+      { renderForm() }
       { renderComments() }
+      { renderActions() }
     </View>
   );
 };

@@ -37,6 +37,8 @@ export type DeviceConfigType = {
   playerDefaultSpeed: number;
   isContinueBtnEnabled: boolean;
   isLocalLibrary: boolean;
+  commentPostingMobile: boolean;
+  commentPostingTV: boolean;
 }
 
 export const defaultConfig: DeviceConfigType = {
@@ -74,4 +76,6 @@ export const defaultConfig: DeviceConfigType = {
   playerDefaultSpeed: DEFAULT_SPEED,
   isContinueBtnEnabled: false,
   isLocalLibrary: false,
+  commentPostingMobile: true,
+  commentPostingTV: false,
 };

@@ -1,32 +1,7 @@
 /* eslint-disable import/first */
-import { LogBox } from 'react-native';
-
 if (__DEV__) {
-  // Load Reactotron in development only.
-  // Note that you must be using metro's `inlineRequires` for this to work.
-  // If you turn it off in metro.config.js, you'll have to manually import it.
   require('./devtools/ReactotronConfig.ts');
   require('./devtools/FetchInterceptor.ts');
-
-  const IGNORED_LOGS = [
-    'i18next is made possible by our own product',
-    '`new NativeEventEmitter()`',
-  ];
-
-  LogBox.ignoreLogs(IGNORED_LOGS);
-
-  const withoutIgnored = (logger: (...args: any[]) => void) => (...args: any[]) => {
-    const output = args.join(' ');
-
-    if (!IGNORED_LOGS.some(log => output.includes(log))) {
-      logger(...args);
-    }
-  };
-
-  console.log = withoutIgnored(console.log);
-  console.info = withoutIgnored(console.info);
-  console.warn = withoutIgnored(console.warn);
-  console.error = withoutIgnored(console.error);
 }
 
 import { init } from '@noriginmedia/norigin-spatial-navigation-core';

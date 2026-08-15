@@ -38,6 +38,7 @@ import Info from 'lucide-react-native/icons/info';
 import Loader from 'lucide-react-native/icons/loader';
 import LoaderCircle from 'lucide-react-native/icons/loader-circle';
 import Maximize2 from 'lucide-react-native/icons/maximize-2';
+import MessageSquarePlus from 'lucide-react-native/icons/message-square-plus';
 import MonitorPlay from 'lucide-react-native/icons/monitor-play';
 import MoveRight from 'lucide-react-native/icons/move-right';
 import Palette from 'lucide-react-native/icons/palette';
@@ -100,6 +101,7 @@ export function SettingsScreenComponent({
   playerDefaultSpeed,
   isContinueBtnEnabled,
   isLocalLibrary,
+  commentPostingTV,
   theme,
   themeScheme,
   appLanguage,
@@ -263,6 +265,13 @@ export function SettingsScreenComponent({
         IconComponent={ ArrowRight }
         value={ isContinueBtnEnabled }
         onChange={ (value) => onConfigUpdate('isContinueBtnEnabled', value) }
+      />
+      <SettingSwitch
+        title={ t('Enable ability to add comments') }
+        subtitle={ t('Toggle writing comments and replies.') }
+        IconComponent={ MessageSquarePlus }
+        value={ commentPostingTV }
+        onChange={ (value) => onConfigUpdate('commentPostingTV', value) }
       />
     </ThemedScrollView>
   );

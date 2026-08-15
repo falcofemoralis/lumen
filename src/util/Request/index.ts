@@ -201,6 +201,7 @@ export const executePostEncoded = async (
   try {
     const response = await postFetch(uri, {
       'Content-Type': 'application/x-www-form-urlencoded',
+      'Accept': 'application/json',
       ...headers,
     }, (() => {
       const searchParams = new URLSearchParams();

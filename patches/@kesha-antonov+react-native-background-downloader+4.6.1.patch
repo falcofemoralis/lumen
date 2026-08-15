@@ -55,3 +55,49 @@ index 5004af7..cf9bad8 100644
      // Post a "download complete" notification when a download finishes.
      // Opt-in: it alerts on its own channel, unlike the silent progress one.
      var showCompletionNotification: Boolean = false,
+diff --git a/node_modules/@kesha-antonov/react-native-background-downloader/lib/index.js b/node_modules/@kesha-antonov/react-native-background-downloader/lib/index.js
+index b41bb0f..3fbe077 100644
+--- a/node_modules/@kesha-antonov/react-native-background-downloader/lib/index.js
++++ b/node_modules/@kesha-antonov/react-native-background-downloader/lib/index.js
+@@ -174,7 +174,10 @@ function initializeEventListeners() {
+         // RCTEventEmitter on native side requires NativeEventEmitter on JS side
+         // RNBackgroundDownloader is guaranteed to be non-null here since initializeEventListeners
+         // is only called after ensureNativeModuleInitialized() succeeds
+-        const eventEmitter = new react_native_1.NativeEventEmitter(RNBackgroundDownloader);
++        // LUMEN PATCH: mirrors the src/index.ts change - on Android the module has no
++        // JS-visible addListener/removeListeners under the new architecture, so passing
++        // it only produces two NativeEventEmitter warnings. See src/index.ts for why.
++        const eventEmitter = new react_native_1.NativeEventEmitter(react_native_1.Platform.OS === 'android' ? undefined : RNBackgroundDownloader);
+         eventSubscriptions.push(eventEmitter.addListener('downloadBegin', (data) => {
+             const { id, ...rest } = data;
+             (0, logger_1.log)('downloadBegin', id, rest);
+diff --git a/node_modules/@kesha-antonov/react-native-background-downloader/src/index.ts b/node_modules/@kesha-antonov/react-native-background-downloader/src/index.ts
+index 530669b..b708bdd 100644
+--- a/node_modules/@kesha-antonov/react-native-background-downloader/src/index.ts
++++ b/node_modules/@kesha-antonov/react-native-background-downloader/src/index.ts
+@@ -247,7 +247,24 @@ function initializeEventListeners () {
+     // RCTEventEmitter on native side requires NativeEventEmitter on JS side
+     // RNBackgroundDownloader is guaranteed to be non-null here since initializeEventListeners
+     // is only called after ensureNativeModuleInitialized() succeeds
+-    const eventEmitter = new NativeEventEmitter(RNBackgroundDownloader!)
++    //
++    // LUMEN PATCH: do not hand the native module to NativeEventEmitter on Android.
++    //
++    // This branch also runs on Android under the new architecture (the check above
++    // is iOS-only by construction), where NativeModules.RNBackgroundDownloader
++    // resolves to the TurboModule host object. That object only exposes methods
++    // declared in the codegen spec, and addListener/removeListeners are not in it -
++    // they are plain @ReactMethod stubs on the Kotlin side. So NativeEventEmitter
++    // finds neither and logs two warnings on the first call into this library:
++    //   `new NativeEventEmitter()` was called with a non-null argument without the
++    //   required `addListener` / `removeListeners` method.
++    //
++    // Passing the module is pointless on Android anyway: those Kotlin stubs have
++    // empty bodies, and events are emitted globally through RCTDeviceEventEmitter,
++    // which NativeEventEmitter subscribes to regardless of its argument. iOS keeps
++    // receiving the module, because RCTEventEmitter there drives startObserving /
++    // stopObserving off the listener count and would stop emitting without it.
++    const eventEmitter = new NativeEventEmitter(Platform.OS === 'android' ? undefined : RNBackgroundDownloader!)
+ 
+     eventSubscriptions.push(
+       eventEmitter.addListener('downloadBegin', (data: DownloadBeginEvent) => {

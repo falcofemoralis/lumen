@@ -12,7 +12,6 @@ import { Header } from 'Component/Header';
 import { Loader } from 'Component/Loader';
 import { Page } from 'Component/Page';
 import { PlayerVideoSelector } from 'Component/PlayerVideoSelector';
-import { ThemedBottomSheet } from 'Component/ThemedBottomSheet';
 import { ThemedBottomSheetRef } from 'Component/ThemedBottomSheet/ThemedBottomSheet.type';
 import { ThemedButton } from 'Component/ThemedButton';
 import { ThemedDropdown } from 'Component/ThemedDropdown';
@@ -562,21 +561,14 @@ export function FilmScreenComponent({
     );
   };
 
+  // Owns the sheet itself, so it can hand the composer to TrueSheet as the
+  // floating footer that stays on screen at a partly open detent.
   const renderCommentsOverlay = () => (
-    <ThemedBottomSheet
-      ref={ commentsRef }
-      detents={ [0.6, 1] }
-      scrollable
-    >
-      <Wrapper style={ { flex: 1 } }>
-        { /* pull-to-refresh would eat the downward drag the sheet needs to dismiss */ }
-        <Comments
-          film={ film }
-          initialLoad
-          disableRefresh
-        />
-      </Wrapper>
-    </ThemedBottomSheet>
+    <Comments
+      sheetRef={ commentsRef }
+      film={ film }
+      disableRefresh
+    />
   );
 
   const renderScheduleOverlay = () => (
