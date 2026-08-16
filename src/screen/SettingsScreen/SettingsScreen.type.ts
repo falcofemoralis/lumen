@@ -21,6 +21,7 @@ export type SettingsScreenComponentProps = {
   downloadsMaxParallelOptions: SettingItemOption[]
   appVersion: string
   isTvChannelsSupported: boolean
+  isTvSearchSupported: boolean
   onConfigUpdate: (key: keyof DeviceConfigType, value: unknown) => void
   onTvChannelsAddToHome: () => Promise<void>
   onLanguageChange: (value: string) => Promise<void>

@@ -331,6 +331,8 @@ const ru: Translations = {
   'Android asks for each row separately.': 'Android спросит про каждую строку отдельно.',
   'Added to the home screen': 'Добавлено на домашний экран',
   'No channels were added': 'Ни один канал не добавлен',
+  'Search from the TV home screen': 'Поиск с домашнего экрана ТВ',
+  'Show films from the app in the Android TV search.': 'Показывать фильмы из приложения в поиске Android TV.',
 };
 
 export default ru;

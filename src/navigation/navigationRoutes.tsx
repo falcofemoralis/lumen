@@ -13,6 +13,7 @@ export const RECENT_SCREEN = 'Recent';
 export const SEARCH_SCREEN = 'Search';
 export const SETTINGS_SCREEN = 'Settings';
 export const WELCOME_SCREEN = 'Welcome';
+export const TABS_SCREEN = 'Tabs';
 export const DOWNLOADS_SCREEN = 'Downloads';
 export const COLLECTION_SCREEN = 'Collection';
 export const FILM_TRAILER_SCREEN = 'FilmTrailer';

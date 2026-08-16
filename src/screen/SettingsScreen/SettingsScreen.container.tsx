@@ -5,6 +5,7 @@ import { getCurrentLanguage, Language, setLanguage } from 'i18n/index';
 import { t } from 'i18n/translate';
 import { reactNativeDownloads } from 'Modules/react-native-downloads';
 import { reactNativeTvChannels } from 'Modules/react-native-tv-channels';
+import { reactNativeTvSearch } from 'Modules/react-native-tv-search';
 import { useCallback, useMemo, useState } from 'react';
 import { TEST_URL } from 'Screen/WelcomeScreen/WelcomeScreen.config';
 import { DeviceConfigType } from 'src/config';
@@ -83,6 +84,9 @@ export function SettingsScreenContainer() {
 
   // TV boxes running Android 7 and below have no TvProvider to publish channels to
   const isTvChannelsSupported = useMemo(() => reactNativeTvChannels.isSupported(), []);
+
+  // only a TV has a global search box that asks apps for suggestions
+  const isTvSearchSupported = useMemo(() => reactNativeTvSearch.isSupported(), []);
 
   const onConfigUpdate = (key: keyof DeviceConfigType, value: unknown) => {
     setConfig(key, value);
@@ -266,6 +270,7 @@ export function SettingsScreenContainer() {
     downloadsMaxParallelOptions,
     appVersion,
     isTvChannelsSupported,
+    isTvSearchSupported,
     onConfigUpdate,
     onTvChannelsAddToHome,
     onLanguageChange,

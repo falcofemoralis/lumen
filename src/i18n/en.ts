@@ -329,6 +329,8 @@ const en = {
   'Android asks for each row separately.': 'Android asks for each row separately.',
   'Added to the home screen': 'Added to the home screen',
   'No channels were added': 'No channels were added',
+  'Search from the TV home screen': 'Search from the TV home screen',
+  'Show films from the app in the Android TV search.': 'Show films from the app in the Android TV search.',
 };
 
 export default en;

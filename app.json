@@ -60,6 +60,7 @@
   },
   "plugins": [
     "./plugins/withReactNativeKeyevent.js",
+    "./plugins/withTvSearchable.js",
     [
       "@react-native-tvos/config-tv",
       {

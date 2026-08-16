@@ -40,6 +40,7 @@ export type DeviceConfigType = {
   commentPostingMobile: boolean;
   commentPostingTV: boolean;
   tvChannelsEnabled: boolean;
+  tvSearchEnabled: boolean;
 }
 
 export const defaultConfig: DeviceConfigType = {
@@ -79,5 +80,9 @@ export const defaultConfig: DeviceConfigType = {
   isLocalLibrary: false,
   commentPostingMobile: true,
   commentPostingTV: false,
-  tvChannelsEnabled: false,
+  // Both TV surfaces are on unless the user says otherwise. Note that a default
+  // reaches everyone who never touched the switch, upgrades included - `setConfig`
+  // only ever stores keys that were explicitly written.
+  tvChannelsEnabled: true,
+  tvSearchEnabled: true,
 };

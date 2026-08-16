@@ -11,6 +11,7 @@ import { useNetworkContext } from 'Context/NetworkContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useAwake } from 'Hooks/useAwake';
 import { useTvChannels } from 'Hooks/useTvChannels';
+import { useTvSearch } from 'Hooks/useTvSearch';
 import { ReactNode, useEffect } from 'react';
 import NotificationStore from 'Store/Notification.store';
 import { runAfterStartup } from 'Util/Startup';
@@ -21,6 +22,7 @@ export const Root = ({ children }: { children: ReactNode }) => {
     isLocalLibrary,
     downloadsMaxParallel,
     tvChannelsEnabled,
+    tvSearchEnabled,
   } = useConfigContext();
   const { isSignedIn } = useServiceContext();
   const { fetchUserData } = useServiceContext();
@@ -29,6 +31,7 @@ export const Root = ({ children }: { children: ReactNode }) => {
   const { startAwake } = useAwake();
 
   useTvChannels(tvChannelsEnabled);
+  useTvSearch(tvSearchEnabled);
 
   useEffect(() => {
     return startAwake();

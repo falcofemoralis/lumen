@@ -48,6 +48,7 @@ import RefreshCw from 'lucide-react-native/icons/refresh-cw';
 import Rewind from 'lucide-react-native/icons/rewind';
 import Route from 'lucide-react-native/icons/route';
 import Rows3 from 'lucide-react-native/icons/rows-3';
+import Search from 'lucide-react-native/icons/search';
 import Settings2 from 'lucide-react-native/icons/settings-2';
 import ShieldCheck from 'lucide-react-native/icons/shield-check';
 import StepForward from 'lucide-react-native/icons/step-forward';
@@ -106,6 +107,8 @@ export function SettingsScreenComponent({
   commentPostingTV,
   tvChannelsEnabled,
   isTvChannelsSupported,
+  tvSearchEnabled,
+  isTvSearchSupported,
   theme,
   themeScheme,
   appLanguage,
@@ -294,6 +297,14 @@ export function SettingsScreenComponent({
         isHidden={ !isTvChannelsSupported }
         withLoader
         onPress={ onTvChannelsAddToHome }
+      />
+      <SettingSwitch
+        title={ t('Search from the TV home screen') }
+        subtitle={ t('Show films from the app in the Android TV search.') }
+        IconComponent={ Search }
+        value={ tvSearchEnabled }
+        isHidden={ !isTvSearchSupported }
+        onChange={ (value) => onConfigUpdate('tvSearchEnabled', value) }
       />
     </ThemedScrollView>
   );

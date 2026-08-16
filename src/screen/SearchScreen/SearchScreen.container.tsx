@@ -19,6 +19,7 @@ import { navigate } from 'Util/Navigation';
 import { queryKeys, STALE_TIME } from 'Util/Query';
 import { openCategory } from 'Util/Router';
 import { storage } from 'Util/Storage';
+import { consumeTvSearchRequest, subscribeToTvSearchRequests } from 'Util/TvSearch/request';
 
 import SearchScreenComponent from './SearchScreen.component';
 import SearchScreenComponentTV from './SearchScreen.component.atv';
@@ -30,12 +31,15 @@ const loadUserSuggestions = (): string[] => (
 
 export function SearchScreenContainer() {
   const isTV = useIsTV();
-  const [query, setQuery] = useState('');
+  // a search handed to the app from outside (the Android TV search box) is waiting by
+  // the time this mounts, since opening the screen is how it got here
+  const [query, setQuery] = useState(consumeTvSearchRequest);
   const navigation = useNavigation();
   const [userSuggestions, setUserSuggestions] = useState<string[]>(loadUserSuggestions);
   // the debounced text the remote suggestions are fetched for
   const [suggestionQuery, setSuggestionQuery] = useState('');
-  const [enteredText, setEnteredText] = useState('');
+  // seeded from the query above, so an externally requested search also shows in the input
+  const [enteredText, setEnteredText] = useState(query);
   const [recognizing, setRecognizing] = useState(false);
   const debounce = useRef<number | null>(null);
   const { currentService } = useServiceContext();
@@ -90,6 +94,13 @@ export function SearchScreenContainer() {
       clearTimeout(debounce.current);
     }
   }, []);
+
+  // The screen stays mounted once its tab has been visited, so a later search handed
+  // over from outside finds it already open and the seeding above has long happened.
+  useEffect(() => subscribeToTvSearchRequests((requestedQuery) => {
+    setQuery(requestedQuery);
+    setEnteredText(requestedQuery);
+  }), []);
 
   const suggestions = suggestionQuery ? remoteSuggestions ?? userSuggestions : userSuggestions;
 

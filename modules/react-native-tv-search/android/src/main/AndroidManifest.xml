@@ -1,0 +1,17 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="expo.modules.tvsearch">
+
+    <!--
+      TvSearchSuggestionProvider is deliberately NOT declared here.
+
+      Its authority has to match `android:searchSuggestAuthority` in res/xml/searchable.xml,
+      and a resource file cannot resolve the `${applicationId}` manifest placeholder - so the
+      authority would have to be written down once here and once in a resource this module has
+      no way to generate. A mismatch between the two fails silently (global search simply never
+      calls the provider), which is exactly the kind of breakage that is hard to notice.
+
+      Both the <provider> element and searchable.xml are therefore emitted together by
+      plugins/withTvSearchable.js, which knows the app's package and keeps them in step.
+    -->
+
+</manifest>

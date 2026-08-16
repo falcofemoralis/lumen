@@ -8,6 +8,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { DeepLinkHandler } from 'Component/DeepLinkHandler';
 import { ErrorBoundary } from 'Component/ErrorBoundary';
+import { TvSearchHandler } from 'Component/TvSearchHandler';
 import { useConfigContext, useIsTV } from 'Context/ConfigContext';
 import { StatusBar } from 'expo-status-bar';
 import { useMemo } from 'react';
@@ -25,6 +26,7 @@ import {
   exitRoutesTV,
   FILM_TRAILER_SCREEN,
   PLAYER_SCREEN,
+  TABS_SCREEN,
   WELCOME_SCREEN,
 } from './navigationRoutes';
 import type { AppStackParamList, NavigationProps } from './navigationTypes';
@@ -59,10 +61,10 @@ const AppStack = () => {
         navigationBarColor: theme.colors.background,
         contentStyle: { backgroundColor: theme.colors.background },
       } }
-      initialRouteName="Tabs"
+      initialRouteName={ TABS_SCREEN }
     >
       <Stack.Screen
-        name="Tabs"
+        name={ TABS_SCREEN }
         component={ TabsNavigator }
       />
       <Stack.Screen
@@ -103,6 +105,7 @@ export const AppNavigator = (props: NavigationProps) => {
       <NavigationContainer ref={ navigationRef } theme={ navigationTheme } { ...props }>
         <ErrorBoundary catchErrors="always">
           <DeepLinkHandler />
+          <TvSearchHandler />
           <AppStack />
         </ErrorBoundary>
       </NavigationContainer>

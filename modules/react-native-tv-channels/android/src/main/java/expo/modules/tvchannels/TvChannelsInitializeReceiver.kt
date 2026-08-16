@@ -10,8 +10,10 @@ import androidx.tvprovider.media.tv.TvContractCompat
  * updated, asking it to populate its channels. Nothing can be fetched from a
  * receiver, so this just queues a one-shot sync job.
  *
- * The JS task bails out when the feature is switched off, so a fresh install (where
- * it defaults to off) queues a job that does nothing and stops there.
+ * On a fresh install this queues a job that does nothing and stops there: the broadcast
+ * arrives before the app has ever run, so the config the JS task reads is still all
+ * defaults - including `isTV`, which is only known once the app has started - and the
+ * task bails. After an update, where that config exists, the sync actually runs.
  */
 class TvChannelsInitializeReceiver : BroadcastReceiver() {
   override fun onReceive(context: Context, intent: Intent) {
