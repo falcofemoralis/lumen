@@ -20,7 +20,9 @@ export type SettingsScreenComponentProps = {
   downloadsPathOptions: SettingItemOption[]
   downloadsMaxParallelOptions: SettingItemOption[]
   appVersion: string
+  isTvChannelsSupported: boolean
   onConfigUpdate: (key: keyof DeviceConfigType, value: unknown) => void
+  onTvChannelsAddToHome: () => Promise<void>
   onLanguageChange: (value: string) => Promise<void>
   onThemeSchemeChange: (value: string) => void
   onLocalLibraryChange: (value: boolean) => void

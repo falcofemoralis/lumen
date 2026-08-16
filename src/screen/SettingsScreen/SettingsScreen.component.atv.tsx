@@ -40,12 +40,14 @@ import LoaderCircle from 'lucide-react-native/icons/loader-circle';
 import Maximize2 from 'lucide-react-native/icons/maximize-2';
 import MessageSquarePlus from 'lucide-react-native/icons/message-square-plus';
 import MonitorPlay from 'lucide-react-native/icons/monitor-play';
+import MonitorUp from 'lucide-react-native/icons/monitor-up';
 import MoveRight from 'lucide-react-native/icons/move-right';
 import Palette from 'lucide-react-native/icons/palette';
 import Pin from 'lucide-react-native/icons/pin';
 import RefreshCw from 'lucide-react-native/icons/refresh-cw';
 import Rewind from 'lucide-react-native/icons/rewind';
 import Route from 'lucide-react-native/icons/route';
+import Rows3 from 'lucide-react-native/icons/rows-3';
 import Settings2 from 'lucide-react-native/icons/settings-2';
 import ShieldCheck from 'lucide-react-native/icons/shield-check';
 import StepForward from 'lucide-react-native/icons/step-forward';
@@ -102,6 +104,8 @@ export function SettingsScreenComponent({
   isContinueBtnEnabled,
   isLocalLibrary,
   commentPostingTV,
+  tvChannelsEnabled,
+  isTvChannelsSupported,
   theme,
   themeScheme,
   appLanguage,
@@ -132,6 +136,7 @@ export function SettingsScreenComponent({
   onCDNChange,
   onUserAgentChange,
   onPlayerQualityChange,
+  onTvChannelsAddToHome,
 }: SettingsScreenComponentProps) {
   const styles = useThemedStyles(componentStyles);
   const [currentGroup, setCurrentGroup] = useState<SETTING_GROUP>(SETTING_GROUP.APPEARANCE);
@@ -272,6 +277,23 @@ export function SettingsScreenComponent({
         IconComponent={ MessageSquarePlus }
         value={ commentPostingTV }
         onChange={ (value) => onConfigUpdate('commentPostingTV', value) }
+      />
+      <SettingSwitch
+        title={ t('Recommendations channels') }
+        subtitle={ t('Show a row per home tab on the Android TV home screen.') }
+        IconComponent={ Rows3 }
+        value={ tvChannelsEnabled }
+        isHidden={ !isTvChannelsSupported }
+        onChange={ (value) => onConfigUpdate('tvChannelsEnabled', value) }
+      />
+      <SettingLink
+        title={ t('Add channels to the home screen') }
+        subtitle={ t('Android asks for each row separately.') }
+        IconComponent={ MonitorUp }
+        isEnabled={ tvChannelsEnabled }
+        isHidden={ !isTvChannelsSupported }
+        withLoader
+        onPress={ onTvChannelsAddToHome }
       />
     </ThemedScrollView>
   );

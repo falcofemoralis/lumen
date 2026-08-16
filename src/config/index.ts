@@ -39,6 +39,7 @@ export type DeviceConfigType = {
   isLocalLibrary: boolean;
   commentPostingMobile: boolean;
   commentPostingTV: boolean;
+  tvChannelsEnabled: boolean;
 }
 
 export const defaultConfig: DeviceConfigType = {
@@ -78,4 +79,5 @@ export const defaultConfig: DeviceConfigType = {
   isLocalLibrary: false,
   commentPostingMobile: true,
   commentPostingTV: false,
+  tvChannelsEnabled: false,
 };

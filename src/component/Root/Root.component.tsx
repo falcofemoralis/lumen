@@ -10,16 +10,24 @@ import { useConfigContext } from 'Context/ConfigContext';
 import { useNetworkContext } from 'Context/NetworkContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useAwake } from 'Hooks/useAwake';
+import { useTvChannels } from 'Hooks/useTvChannels';
 import { ReactNode, useEffect } from 'react';
 import NotificationStore from 'Store/Notification.store';
 
 export const Root = ({ children }: { children: ReactNode }) => {
-  const { checkForUpdates, isLocalLibrary, downloadsMaxParallel } = useConfigContext();
+  const {
+    checkForUpdates,
+    isLocalLibrary,
+    downloadsMaxParallel,
+    tvChannelsEnabled,
+  } = useConfigContext();
   const { isSignedIn } = useServiceContext();
   const { fetchUserData } = useServiceContext();
   const { checkVersion } = useAppUpdaterContext();
   const { isInternetAvailable } = useNetworkContext();
   const { startAwake } = useAwake();
+
+  useTvChannels(tvChannelsEnabled);
 
   useEffect(() => {
     return startAwake();

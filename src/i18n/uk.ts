@@ -325,6 +325,12 @@ const uk: Translations = {
   'Welcome to the app!': 'Ласкаво просимо до застосунку!',
   'Are you sure you want to log out?': 'Ви впевнені, що хочете вийти з акаунта?',
   'Enter your credentials to continue': 'Введіть дані свого акаунта, щоб продовжити',
+  'Recommendations channels': 'Канали рекомендацій',
+  'Show a row per home tab on the Android TV home screen.': 'Показувати по рядку для кожної вкладки головної на домашньому екрані Android TV.',
+  'Add channels to the home screen': 'Додати канали на домашній екран',
+  'Android asks for each row separately.': 'Android запитає про кожен рядок окремо.',
+  'Added to the home screen': 'Додано на домашній екран',
+  'No channels were added': 'Жодного каналу не додано',
 };
 
 export default uk;

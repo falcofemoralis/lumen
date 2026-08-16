@@ -4,6 +4,7 @@ import * as Application from 'expo-application';
 import { getCurrentLanguage, Language, setLanguage } from 'i18n/index';
 import { t } from 'i18n/translate';
 import { reactNativeDownloads } from 'Modules/react-native-downloads';
+import { reactNativeTvChannels } from 'Modules/react-native-tv-channels';
 import { useCallback, useMemo, useState } from 'react';
 import { TEST_URL } from 'Screen/WelcomeScreen/WelcomeScreen.config';
 import { DeviceConfigType } from 'src/config';
@@ -15,6 +16,7 @@ import { MAX_PARALLEL_DOWNLOADS_OPTIONS } from 'Util/Download';
 import { ensureDefaultLocalCategory } from 'Util/LocalLibrary';
 import { setTimeoutSafe } from 'Util/Misc';
 import { getPlayerQuality, updatePlayerQuality } from 'Util/Player';
+import { requestTvChannelsBrowsable, syncTvChannels } from 'Util/TvChannels';
 
 import SettingsScreenComponent from './SettingsScreen.component';
 import SettingsScreenComponentTV from './SettingsScreen.component.atv';
@@ -78,6 +80,9 @@ export function SettingsScreenContainer() {
     () => Application.nativeApplicationVersion ?? '0.0.0',
     []
   );
+
+  // TV boxes running Android 7 and below have no TvProvider to publish channels to
+  const isTvChannelsSupported = useMemo(() => reactNativeTvChannels.isSupported(), []);
 
   const onConfigUpdate = (key: keyof DeviceConfigType, value: unknown) => {
     setConfig(key, value);
@@ -225,6 +230,23 @@ export function SettingsScreenContainer() {
     updatePlayerQuality(value);
   }, []);
 
+  /**
+   * The channels have to exist before the launcher can be asked to show them, and
+   * the periodic sync may not have run yet (it was just switched on, or the last one
+   * is still within its interval), so this publishes them first.
+   */
+  const onTvChannelsAddToHome = useCallback(async () => {
+    await syncTvChannels(currentService, { force: true });
+
+    const accepted = await requestTvChannelsBrowsable();
+
+    NotificationStore.displayMessage(
+      accepted
+        ? t('Added to the home screen')
+        : t('No channels were added')
+    );
+  }, [currentService]);
+
   const containerProps = {
     ...config,
     theme,
@@ -243,7 +265,9 @@ export function SettingsScreenContainer() {
     downloadsPathOptions,
     downloadsMaxParallelOptions,
     appVersion,
+    isTvChannelsSupported,
     onConfigUpdate,
+    onTvChannelsAddToHome,
     onLanguageChange,
     onThemeSchemeChange,
     onLocalLibraryChange,

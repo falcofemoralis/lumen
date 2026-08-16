@@ -5,9 +5,19 @@ import { navigate } from 'Util/Navigation';
 
 class NotificationStore {
   private isErrorOccurred = false;
+  private isSilent = false;
+
+  /**
+   * Suppresses toasts, for work that runs with the app closed - a background sync
+   * hitting an Anubis challenge would otherwise put a toast over whatever the user
+   * is actually watching.
+   */
+  setSilent(isSilent: boolean) {
+    this.isSilent = isSilent;
+  }
 
   displayMessage(msg: string) {
-    if (this.isErrorOccurred) {
+    if (this.isErrorOccurred || this.isSilent) {
       return;
     }
 
@@ -15,7 +25,7 @@ class NotificationStore {
   }
 
   displayError(error: string | Error) {
-    if (this.isErrorOccurred) {
+    if (this.isErrorOccurred || this.isSilent) {
       return;
     }
 

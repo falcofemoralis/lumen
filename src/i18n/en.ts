@@ -323,6 +323,12 @@ const en = {
   'Welcome to the app!': 'Welcome to the app!',
   'Are you sure you want to log out?': 'Are you sure you want to log out?',
   'Enter your credentials to continue': 'Enter your credentials to continue',
+  'Recommendations channels': 'Recommendations channels',
+  'Show a row per home tab on the Android TV home screen.': 'Show a row per home tab on the Android TV home screen.',
+  'Add channels to the home screen': 'Add channels to the home screen',
+  'Android asks for each row separately.': 'Android asks for each row separately.',
+  'Added to the home screen': 'Added to the home screen',
+  'No channels were added': 'No channels were added',
 };
 
 export default en;
