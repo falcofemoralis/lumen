@@ -18,9 +18,11 @@ export const TV_CHANNELS_SYNC_TASK = 'TvChannelsSync';
  * whole reason the refresh stayed in JS instead of being rebuilt natively.
  */
 export const tvChannelsSyncTask = async (): Promise<void> => {
-  const { isTV, tvChannelsEnabled } = getGlobalConfig();
+  const { isTV, isConfigured, tvChannelsEnabled } = getGlobalConfig();
 
-  if (!isTV || !tvChannelsEnabled) {
+  // `isConfigured` is what says a provider has actually been picked - onboarding
+  // sets `isTV` on its first slide, long before there is anything to fetch from
+  if (!isTV || !isConfigured || !tvChannelsEnabled) {
     return;
   }
 

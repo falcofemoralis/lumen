@@ -19,9 +19,11 @@ export const TV_SEARCH_QUERY_TASK = 'TvSearchQuery';
  * screen typing into the search box, and this process was started for that.
  */
 export const tvSearchQueryTask = async ({ query }: { query: string }): Promise<void> => {
-  const { isTV, tvSearchEnabled } = getGlobalConfig();
+  const { isTV, isConfigured, tvSearchEnabled } = getGlobalConfig();
 
-  if (!isTV || !tvSearchEnabled || !query) {
+  // searching before onboarding has settled on a provider only produces a 404, and
+  // the launcher would show the failure as "no results" for the app
+  if (!isTV || !isConfigured || !tvSearchEnabled || !query) {
     return;
   }
 

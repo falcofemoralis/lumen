@@ -1,4 +1,4 @@
-import { useIsTV } from 'Context/ConfigContext';
+import { useConfigContext, useIsTV } from 'Context/ConfigContext';
 import { useNetworkContext } from 'Context/NetworkContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useEffect, useRef } from 'react';
@@ -16,14 +16,23 @@ import { removeTvChannels, setTvChannelsBackgroundSync, syncTvChannels } from 'U
  */
 export const useTvChannels = (isEnabled: boolean) => {
   const isTV = useIsTV();
+  const { isConfigured } = useConfigContext();
   const { currentService } = useServiceContext();
   const { isInternetAvailable } = useNetworkContext();
   // a sync walks every home tab, so overlapping runs would multiply the requests
   const isSyncingRef = useRef(false);
   const wasEnabledRef = useRef(isEnabled);
 
+  /**
+   * `isTV` is not enough on its own: onboarding sets it on its first slide but only
+   * settles on a provider (and gets past the anti-bot challenge) several slides
+   * later, so a sync started in between talks to a provider that is not there yet
+   * and fails with a 404.
+   */
+  const canSync = isTV && isEnabled && isConfigured;
+
   useEffect(() => {
-    if (!isTV || !isEnabled) {
+    if (!canSync) {
       return () => {};
     }
 
@@ -55,15 +64,16 @@ export const useTvChannels = (isEnabled: boolean) => {
       cancelStartupSync?.();
       subscription.remove();
     };
-  }, [isTV, isEnabled, isInternetAvailable, currentService]);
+  }, [canSync, isInternetAvailable, currentService]);
 
   // The job is what keeps the rows fresh once the app is closed. Both calls are
-  // idempotent, so this simply follows the setting on every start.
+  // idempotent, so this simply follows the setting on every start. Nothing is
+  // registered until onboarding is done, for the same reason the sync waits.
   useEffect(() => {
-    if (isTV) {
+    if (isTV && isConfigured) {
       setTvChannelsBackgroundSync(isEnabled);
     }
-  }, [isTV, isEnabled]);
+  }, [isTV, isConfigured, isEnabled]);
 
   // Only on the transition, never on mount: the channels of a user who has the
   // feature switched off were already taken down when they switched it off, and
