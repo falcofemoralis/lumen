@@ -13,6 +13,7 @@ import { useAwake } from 'Hooks/useAwake';
 import { useTvChannels } from 'Hooks/useTvChannels';
 import { ReactNode, useEffect } from 'react';
 import NotificationStore from 'Store/Notification.store';
+import { runAfterStartup } from 'Util/Startup';
 
 export const Root = ({ children }: { children: ReactNode }) => {
   const {
@@ -33,18 +34,30 @@ export const Root = ({ children }: { children: ReactNode }) => {
     return startAwake();
   }, [startAwake]);
 
+  // Deferred: an update banner is not what the user opened the app for, so it has no
+  // claim on the connection while the first screen is still filling in.
   useEffect(() => {
-    if (checkForUpdates && isInternetAvailable) {
-      checkVersion();
+    if (!checkForUpdates || !isInternetAvailable) {
+      return () => {};
     }
+
+    return runAfterStartup(() => {
+      checkVersion();
+    });
   }, [checkForUpdates, checkVersion, isInternetAvailable]);
 
+  // Deferred as well - this only feeds the tab bar's notification badge, which can
+  // appear a moment after the tabs themselves do.
   useEffect(() => {
     // in local mode notifications derive from the public updates widget, so
     // they are fetched (and the badge recomputed) even while logged out
-    if ((isSignedIn || isLocalLibrary) && isInternetAvailable) {
-      fetchUserData();
+    if (!(isSignedIn || isLocalLibrary) || !isInternetAvailable) {
+      return () => {};
     }
+
+    return runAfterStartup(() => {
+      fetchUserData();
+    });
   }, [isSignedIn, isLocalLibrary, fetchUserData, isInternetAvailable]);
 
   // Applied on every change: the cap is read when a download looks for a free

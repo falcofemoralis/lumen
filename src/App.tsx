@@ -11,7 +11,6 @@ import { AppProvider } from 'Context/AppContext';
 import * as SplashScreen from 'expo-splash-screen';
 import { AppNavigator } from 'Navigation/AppNavigator';
 import { NativeFocusTrap } from 'Navigation/NativeFocusTrap';
-import { useEffect, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { initialWindowMetrics, SafeAreaProvider } from 'react-native-safe-area-context';
@@ -31,7 +30,7 @@ export const NAVIGATION_PERSISTENCE_KEY = 'NAVIGATION_STATE';
 const KEY_THROTTLE_MS = 60;
 
 SplashScreen.setOptions({
-  duration: 750,
+  duration: 250,
   fade: true,
 });
 
@@ -39,29 +38,26 @@ SplashScreen.preventAutoHideAsync();
 
 const queryClient = createQueryClient();
 
+// i18next only defers its load when it has to ask a backend -- with the resources
+// passed inline it is initialized by the time the call returns. Doing it here rather
+// than from an effect keeps the whole provider tree off a second render pass, and
+// removes the window in which `t()` (used while the navigators render) would still
+// be falling back to raw keys.
+initI18n();
+
+init({
+  layoutAdapter: RemoteControlLayoutAdapter,
+  // A d-pad repeats far faster than a slow TV box can answer: every press
+  // re-measures the focused node's siblings and drives a scroll, so an
+  // unthrottled hold builds a backlog that keeps moving focus long after the
+  // key is released. Norigin throttles leading-edge, so the first press is
+  // still instant and the extra ones are dropped rather than queued.
+  throttle: KEY_THROTTLE_MS,
+  // Apply it to held keys too -- that is the case that produces the backlog.
+  throttleKeypresses: true,
+});
+
 export function App() {
-  const [isI18nInitialized, setIsI18nInitialized] = useState(false);
-
-  useEffect(() => {
-    initI18n().then(() => setIsI18nInitialized(true));
-
-    init({
-      layoutAdapter: RemoteControlLayoutAdapter,
-      // A d-pad repeats far faster than a slow TV box can answer: every press
-      // re-measures the focused node's siblings and drives a scroll, so an
-      // unthrottled hold builds a backlog that keeps moving focus long after the
-      // key is released. Norigin throttles leading-edge, so the first press is
-      // still instant and the extra ones are dropped rather than queued.
-      throttle: KEY_THROTTLE_MS,
-      // Apply it to held keys too -- that is the case that produces the backlog.
-      throttleKeypresses: true,
-    });
-  }, []);
-
-  if (!isI18nInitialized) {
-    return null;
-  }
-
   return (
     <QueryClientProvider client={ queryClient }>
       <SafeAreaProvider initialMetrics={ initialWindowMetrics }>

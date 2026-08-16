@@ -1832,13 +1832,6 @@
   resolved "https://registry.yarnpkg.com/@react-native-clipboard/clipboard/-/clipboard-1.16.3.tgz#7807a90fd9984bf4d3a96faf2eee20457984a9bd"
   integrity sha512-cMIcvoZKIrShzJHEaHbTAp458R9WOv0fB6UyC7Ek4Qk561Ow/DrzmmJmH/rAZg21Z6ixJ4YSdFDC14crqIBmCQ==
 
-"@react-native-firebase/analytics@^25.1.0":
-  version "25.1.0"
-  resolved "https://registry.yarnpkg.com/@react-native-firebase/analytics/-/analytics-25.1.0.tgz#86403866033d53b4353f70028dc9aaac811f27cf"
-  integrity sha512-H8IrrJ5Hn0PvFzRWkvriUtQCTLqJcdpgEURDJxrEnc+hRtI9VHDH8HKDVawcBlJS34Oj6pppdlzxJl2QOWlq5A==
-  dependencies:
-    superstruct "^2.0.2"
-
 "@react-native-firebase/app@^25.1.0":
   version "25.1.0"
   resolved "https://registry.yarnpkg.com/@react-native-firebase/app/-/app-25.1.0.tgz#7260d6f8b48078b9f651ca07804b140e9787397a"
@@ -6981,11 +6974,6 @@ structured-headers@^0.4.1:
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/structured-headers/-/structured-headers-0.4.1.tgz#77abd9410622c6926261c09b9d16cf10592694d1"
   integrity sha512-0MP/Cxx5SzeeZ10p/bZI0S6MpgD+yxAhi1BOQ34jgnMXsCq3j1t6tQnZu+KdlL7dvJTLT3g9xN8tl10TqgFMcg==
-
-superstruct@^2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/superstruct/-/superstruct-2.0.2.tgz#3f6d32fbdc11c357deff127d591a39b996300c54"
-  integrity sha512-uV+TFRZdXsqXTL2pRvujROjdZQ4RAlBUS5BTh9IGm+jTqQntYThciG/qu57Gs69yjnVUSqdxF9YLmSnpupBW9A==
 
 supports-color@^5.3.0:
   version "5.5.0"

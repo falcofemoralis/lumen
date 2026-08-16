@@ -29,7 +29,6 @@
     "@noble/hashes": "^2.2.0",
     "@noriginmedia/norigin-spatial-navigation-react-native-tvos": "^4.0.0",
     "@react-native-clipboard/clipboard": "^1.16.3",
-    "@react-native-firebase/analytics": "^25.1.0",
     "@react-native-firebase/app": "^25.1.0",
     "@react-native-firebase/firestore": "^25.1.0",
     "@react-navigation/bottom-tabs": "^7.18.14",

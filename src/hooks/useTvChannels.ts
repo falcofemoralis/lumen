@@ -3,6 +3,7 @@ import { useNetworkContext } from 'Context/NetworkContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useEffect, useRef } from 'react';
 import { AppState } from 'react-native';
+import { runAfterStartup } from 'Util/Startup';
 import { removeTvChannels, setTvChannelsBackgroundSync, syncTvChannels } from 'Util/TvChannels';
 
 /**
@@ -40,15 +41,18 @@ export const useTvChannels = (isEnabled: boolean) => {
       }
     };
 
-    if (isInternetAvailable) {
-      sync();
-    }
+    // A due sync walks every home tab, so it is the single heaviest thing the app can
+    // do to itself on a cold start - and it is for the launcher's benefit, not the
+    // user's, who is waiting on the tab in front of them. Held back until the startup
+    // burst is over; the throttle means it is skipped entirely most of the time.
+    const cancelStartupSync = isInternetAvailable ? runAfterStartup(sync) : undefined;
 
     // coming back from standby is the moment the cards are most likely stale, and on
     // a TV that is the only "app start" the user ever performs after the first one
     const subscription = AppState.addEventListener('focus', sync);
 
     return () => {
+      cancelStartupSync?.();
       subscription.remove();
     };
   }, [isTV, isEnabled, isInternetAvailable, currentService]);

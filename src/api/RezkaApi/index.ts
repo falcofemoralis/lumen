@@ -790,7 +790,11 @@ const RezkaApi: RezkaApiInterface = {
   },
 
   async getFilm(link) {
-    const root = await this.fetchPage(link, {});
+    // the raw response is kept around: the player payload is only reachable by
+    // string search (see below), and re-serializing the parsed tree to get it
+    // back would rebuild the whole document for nothing
+    const res = await this.getRequest(link, {});
+    const root = this.parseContent(res);
 
     // base data
     const id = root.querySelector('#user-favorites-holder')?.attributes['data-post_id'] ?? '';
@@ -950,7 +954,7 @@ const RezkaApi: RezkaApiInterface = {
 
       if (!voices.length) {
         const isMovie = root.querySelector('meta[property=og:type]')?.attributes.content?.includes('video.movie');
-        const stringedDoc = root.innerHTML;
+        const stringedDoc = res;
 
         if (isMovie) {
           const index = stringedDoc.indexOf('initCDNMoviesEvents');
