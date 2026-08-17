@@ -3,6 +3,7 @@ import { useServiceContext } from 'Context/ServiceContext';
 import * as Application from 'expo-application';
 import { getCurrentLanguage, Language, setLanguage } from 'i18n/index';
 import { t } from 'i18n/translate';
+import { reactNativeAfr } from 'Modules/react-native-afr';
 import { reactNativeDownloads } from 'Modules/react-native-downloads';
 import { reactNativeTvChannels } from 'Modules/react-native-tv-channels';
 import { reactNativeTvSearch } from 'Modules/react-native-tv-search';
@@ -87,6 +88,10 @@ export function SettingsScreenContainer() {
 
   // only a TV has a global search box that asks apps for suggestions
   const isTvSearchSupported = useMemo(() => reactNativeTvSearch.isSupported(), []);
+
+  // a phone panel has a fixed refresh rate there is no point matching a video to, and
+  // below Android 6 there is no display mode API to ask
+  const isAutoFrameRateSupported = useMemo(() => reactNativeAfr.isSupported(), []);
 
   const onConfigUpdate = (key: keyof DeviceConfigType, value: unknown) => {
     setConfig(key, value);
@@ -271,6 +276,7 @@ export function SettingsScreenContainer() {
     appVersion,
     isTvChannelsSupported,
     isTvSearchSupported,
+    isAutoFrameRateSupported,
     onConfigUpdate,
     onTvChannelsAddToHome,
     onLanguageChange,

@@ -47,7 +47,7 @@ import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated'
 import { VideoView } from 'react-native-video';
 import { scheduleOnRN } from 'react-native-worklets';
 import { useAppTheme } from 'Theme/context';
-import { ClosedCaptionFilled } from 'Theme/icons';
+import { AutoFrameRateIcon, ClosedCaptionFilled } from 'Theme/icons';
 import { formatVideoTrackInfo, getPlayerAvailableQualityItems } from 'Util/Player';
 import RemoteControlManager from 'Util/RemoteControl/RemoteControlManager';
 import { SupportedKeys } from 'Util/RemoteControl/SupportedKeys';
@@ -141,6 +141,9 @@ export function PlayerComponent({
   selectedAspectRatio,
   isVideoLoading,
   hasPlaybackError,
+  isAutoFrameRateSupported,
+  isAutoFrameRateEnabled,
+  toggleAutoFrameRate,
   togglePlayPause,
   rewindPosition,
   openQualitySelector,
@@ -565,6 +568,15 @@ export function PlayerComponent({
               IconComponent={ Maximize2 }
               action={ handleAspectRatioChange }
             />
+            { isAutoFrameRateSupported && (
+              <PlayerBottomAction
+                IconComponent={ AutoFrameRateIcon({
+                  color: theme.colors.iconOnContrast,
+                  isFilled: isAutoFrameRateEnabled,
+                }) }
+                action={ toggleAutoFrameRate }
+              />
+            ) }
           </View>
         </FocusContext.Provider>
         { renderDuration() }

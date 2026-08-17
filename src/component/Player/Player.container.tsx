@@ -8,6 +8,7 @@ import { usePlayerContext } from 'Context/PlayerContext';
 import { usePlayerProgressActions } from 'Context/PlayerProgressContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
+import { useAutoFrameRateAction } from 'Hooks/useAutoFrameRate';
 import { useLocalBookmarks } from 'Hooks/useLocalLibrary';
 import { useVideoPlayerState } from 'Hooks/useVideoPlayerState';
 import { t } from 'i18n/translate';
@@ -153,6 +154,12 @@ export function PlayerContainer({
   ), [isSignedIn, isFirestore, isOffline, isLocalLibrary]);
 
   const localBookmarks = useLocalBookmarks();
+
+  const {
+    isAutoFrameRateSupported,
+    isAutoFrameRateEnabled,
+    toggleAutoFrameRate,
+  } = useAutoFrameRateAction();
 
   // in local mode the bookmark state is derived reactively from the local store
   const isFilmBookmarkedValue = isLocalLibrary
@@ -902,6 +909,9 @@ export function PlayerContainer({
     overlayQuality,
     isVideoLoading,
     hasPlaybackError,
+    isAutoFrameRateSupported,
+    isAutoFrameRateEnabled,
+    toggleAutoFrameRate,
     togglePlayPause,
     rewindPosition,
     seekToPosition,

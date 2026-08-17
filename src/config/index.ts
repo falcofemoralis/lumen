@@ -23,6 +23,8 @@ export type DeviceConfigType = {
   downloadsSavePoster: boolean;
   downloadsMaxParallel: number;
   playerAutoNextEpisode: boolean;
+  playerAutoFrameRateEnabled: boolean;
+  playerAutoFrameRate: boolean;
   playerLongPressSpeed: number;
   sortVoicesByRating: boolean;
   playerStopPlayOnButtonTV: boolean;
@@ -66,6 +68,16 @@ export const defaultConfig: DeviceConfigType = {
   playerSaveQuality: true,
   playerAskQuality: false,
   playerAutoNextEpisode: true,
+  // Two switches rather than one, because they answer different questions. This one is
+  // whether the player offers frame rate matching at all, and it is off by default:
+  // switching the refresh rate blanks the TV for a moment every time a source starts, and
+  // a good few devices report no mode to switch to anyway - neither of which is worth
+  // handing to everyone who never asked for it, nor worth a button they will never press.
+  playerAutoFrameRateEnabled: false,
+  // ...and this one is whether matching is currently on, which the player's own button
+  // toggles. Kept apart so that turning the feature off in the settings does not throw
+  // away the choice someone made about their films.
+  playerAutoFrameRate: false,
   playerLongPressSpeed: 1.5,
   playerStopPlayOnButtonTV: false,
   playerStopPlayShowInterfaceTV: true,

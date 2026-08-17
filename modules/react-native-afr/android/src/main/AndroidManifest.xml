@@ -1,0 +1,10 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="expo.modules.afr">
+
+    <!--
+      Nothing to declare: switching the display mode is a property of the app's own
+      window (`WindowManager.LayoutParams.preferredDisplayModeId`), which needs no
+      permission and no component of its own.
+    -->
+
+</manifest>

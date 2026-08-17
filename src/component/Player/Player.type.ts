@@ -50,6 +50,10 @@ export interface PlayerComponentProps {
   overlayQuality: string;
   isVideoLoading: boolean;
   hasPlaybackError: boolean;
+  // TV only - a phone panel has a fixed refresh rate there is no point matching to
+  isAutoFrameRateSupported: boolean;
+  isAutoFrameRateEnabled: boolean;
+  toggleAutoFrameRate: () => void;
   togglePlayPause: (state?: boolean, stopEvents?: boolean) => void;
   rewindPosition: (type: RewindDirection, seconds: number) => void;
   seekToPosition: (percent: number) => void;

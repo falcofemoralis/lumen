@@ -39,6 +39,7 @@ import Loader from 'lucide-react-native/icons/loader';
 import LoaderCircle from 'lucide-react-native/icons/loader-circle';
 import Maximize2 from 'lucide-react-native/icons/maximize-2';
 import MessageSquarePlus from 'lucide-react-native/icons/message-square-plus';
+import MonitorCog from 'lucide-react-native/icons/monitor-cog';
 import MonitorPlay from 'lucide-react-native/icons/monitor-play';
 import MonitorUp from 'lucide-react-native/icons/monitor-up';
 import MoveRight from 'lucide-react-native/icons/move-right';
@@ -109,6 +110,8 @@ export function SettingsScreenComponent({
   isTvChannelsSupported,
   tvSearchEnabled,
   isTvSearchSupported,
+  playerAutoFrameRateEnabled,
+  isAutoFrameRateSupported,
   theme,
   themeScheme,
   appLanguage,
@@ -512,6 +515,14 @@ export function SettingsScreenComponent({
         value={ playerBackBufferTimeSetting.toString() }
         options={ PLAYER_BACK_BUFFER_TIME_OPTIONS }
         onChange={ (value) => onConfigUpdate('playerBackBufferTimeSetting', Number(value)) }
+      />
+      <SettingSwitch
+        title={ t('Frame rate matching') }
+        subtitle={ t('Adds a button to the player that matches the TV refresh rate to the video.') }
+        IconComponent={ MonitorCog }
+        value={ playerAutoFrameRateEnabled }
+        isHidden={ !isAutoFrameRateSupported }
+        onChange={ (value) => onConfigUpdate('playerAutoFrameRateEnabled', value) }
       />
     </ThemedScrollView>
   );

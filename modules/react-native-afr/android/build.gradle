@@ -1,0 +1,68 @@
+apply plugin: 'com.android.library'
+
+group = 'expo.modules.afr'
+version = '0.0.1'
+
+def expoModulesCorePlugin = new File(project(":expo-modules-core").projectDir.absolutePath, "ExpoModulesCorePlugin.gradle")
+apply from: expoModulesCorePlugin
+applyKotlinExpoModulesCorePlugin()
+useCoreDependencies()
+useExpoPublishing()
+
+// If you want to use the managed Android SDK versions from expo-modules-core, set this to true.
+// The Android SDK versions will be bumped from time to time in SDK releases and may introduce breaking changes in your module code.
+// Most of the time, you may like to manage the Android SDK versions yourself.
+def useManagedAndroidSdkVersions = false
+if (useManagedAndroidSdkVersions) {
+  useDefaultAndroidSdkVersions()
+} else {
+  buildscript {
+    // Simple helper that allows the root project to override versions declared by this library.
+    ext.safeExtGet = { prop, fallback ->
+      rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+    }
+  }
+  project.android {
+    compileSdkVersion safeExtGet("compileSdkVersion", 34)
+    defaultConfig {
+      minSdkVersion safeExtGet("minSdkVersion", 21)
+      targetSdkVersion safeExtGet("targetSdkVersion", 34)
+    }
+  }
+}
+
+android {
+  namespace "expo.modules.afr"
+  defaultConfig {
+    versionCode 1
+    versionName "0.0.1"
+  }
+  lintOptions {
+    abortOnError false
+  }
+}
+
+// Only the player knows the frame rate of what is playing, so this module reads it off
+// react-native-video's ExoPlayer through its plugin API (`ReactNativeVideoPlugin`).
+//
+// Everything below is `compileOnly` on purpose: react-native-video is autolinked into the
+// app and brings both itself and its own media3 version at runtime. Declaring either as
+// `implementation` would put a second copy on the app's classpath and let this module
+// decide the media3 version, which is react-native-video's call to make.
+dependencies {
+  // The project names come from autolinking, which names them after the package.
+  compileOnly project(':react-native-video')
+
+  // react-native-video's player is a Nitro hybrid object, so reading anything off it
+  // needs its supertype on the compile classpath even though nothing here touches Nitro.
+  compileOnly project(':react-native-nitro-modules')
+
+  // Mirrors `RNVideo_media3Version` in react-native-video's gradle.properties. Only
+  // `Format`, `C` and `ExoPlayer.setVideoChangeFrameRateStrategy` are touched here, all
+  // of which have been stable since media3 1.0 - a newer runtime version needs no change,
+  // and this only has to be bumped if the module stops compiling.
+  def media3Version = rootProject.ext.has("media3Version") ? rootProject.ext.get("media3Version") : "1.4.1"
+  compileOnly "androidx.media3:media3-common:$media3Version"
+  compileOnly "androidx.media3:media3-exoplayer:$media3Version"
+  compileOnly "androidx.media3:media3-ui:$media3Version"
+}

@@ -9,6 +9,54 @@ export const ClosedCaptionFilled = ({ color }: { color: string }) => {
   ]);
 };
 
+/**
+ * The badge the letters sit in, matching the closed caption icon's so the two read as the
+ * same kind of control when they sit next to each other in the player.
+ */
+const AFR_BADGE = {
+  x: '2',
+  y: '5',
+  width: '20',
+  height: '14',
+  rx: '2',
+} as const;
+
+/**
+ * Real type rather than hand drawn strokes: three letters in a box this size come out as
+ * ~4 units wide each, where drawn glyphs turn into a blob and a font stays legible.
+ *
+ * `stroke: none` matters - every node inherits the icon's 2 unit stroke otherwise, which
+ * on text is thicker than the letterforms themselves.
+ */
+const AFR_LABEL = {
+  x: '12',
+  // the baseline, not the centre: 5..19 has its middle at 12, and half a cap height below
+  // that is where 8 unit letters look centred
+  y: '14.9',
+  fontSize: '8',
+  fontWeight: 'bold',
+  textAnchor: 'middle',
+  stroke: 'none',
+  children: 'AFR',
+} as const;
+
+/**
+ * Auto frame rate, drawn the way the closed caption icon is: an outlined badge with solid
+ * letters while it is off, and the whole badge filled with the letters knocked out of it
+ * once it is on.
+ *
+ * Takes the colour rather than reading it off the icon's own `color` prop, because that
+ * one only ever reaches `stroke` - a filled badge and filled letters both need it in
+ * `fill`, which no static node can ask for. Same reason [ClosedCaptionFilled] is a
+ * function.
+ */
+export const AutoFrameRateIcon = ({ color, isFilled }: { color: string; isFilled: boolean }) => {
+  return createLucideIcon('AutoFrameRate', [
+    ['rect', { ...AFR_BADGE, fill: isFilled ? color : 'none', key: 'ipm5vs' }],
+    ['text', { ...AFR_LABEL, fill: isFilled ? 'black' : color, key: '1kd8ba' }],
+  ]);
+};
+
 export const GithubIcon = createLucideIcon('Github', [
   [
     'path',
