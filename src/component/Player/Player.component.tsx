@@ -15,6 +15,7 @@ import * as ScreenOrientation from 'expo-screen-orientation';
 import { OrientationLock } from 'expo-screen-orientation';
 import { useLatest } from 'Hooks/useLatest';
 import { usePictureInPicture } from 'Hooks/usePictureInPicture';
+import { usePlayerSlideGestures } from 'Hooks/usePlayerSlideGestures';
 import { useRestartableTimeout } from 'Hooks/useRestartableTimeout';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
@@ -67,11 +68,13 @@ import {
   DOUBLE_TAP_ANIMATION_DELAY,
   PLAYER_CONTROLS_ANIMATION,
   PLAYER_CONTROLS_TIMEOUT,
+  PlayerSlideControl,
   RewindDirection,
   SUBTITLES_OFF,
 } from './Player.config';
 import { componentStyles, MiddleActionVariant } from './Player.style';
 import { DoubleTapAction, PlayerComponentProps } from './Player.type';
+import { PlayerSlideIndicator } from './PlayerSlideIndicator';
 
 // a real component rather than a render helper, so that handlers reach it as props
 // instead of as call arguments (see react-hooks/refs)
@@ -166,6 +169,13 @@ export function PlayerComponent({
   } = usePictureInPicture(status);
   const controlsTimeout = useRestartableTimeout();
   const doubleTapTimeout = useRestartableTimeout();
+  const {
+    slideGesture,
+    volumeIndicator,
+    brightnessIndicator,
+    isVolumeGestureEnabled,
+    isBrightnessGestureEnabled,
+  } = usePlayerSlideGestures(!isLocked);
 
   // the auto hide timeout fires seconds after it was armed, so it has to read
   // these when it runs rather than from the render that scheduled it
@@ -629,12 +639,32 @@ export function PlayerComponent({
     );
   };
 
+  // each level shows up on the half the finger is not on - the hand adjusting it would
+  // otherwise sit right on top of it
+  const renderSlideIndicators = () => (
+    <Fragment>
+      { isVolumeGestureEnabled && (
+        <PlayerSlideIndicator
+          control={ PlayerSlideControl.VOLUME }
+          indicator={ volumeIndicator }
+        />
+      ) }
+      { isBrightnessGestureEnabled && (
+        <PlayerSlideIndicator
+          control={ PlayerSlideControl.BRIGHTNESS }
+          indicator={ brightnessIndicator }
+        />
+      ) }
+    </Fragment>
+  );
+
   const renderControls = () => (
     <GestureDetector
       gesture={ Gesture.Race(
         doubleTap,
         singleTap,
-        longPressGesture
+        longPressGesture,
+        slideGesture
       ) }
     >
       <View style={ styles.controlsContainer }>
@@ -650,6 +680,7 @@ export function PlayerComponent({
         </Animated.View>
         { renderDoubleTapAction() }
         { renderLongTapAction() }
+        { renderSlideIndicators() }
       </View>
     </GestureDetector>
   );

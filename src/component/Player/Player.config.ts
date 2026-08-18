@@ -59,6 +59,43 @@ export const DEFAULT_SPEEDS = [0.25, 0.5, 0.75, 1, 1.10, 1.25, 1.5, 1.75, 2, 2.2
 export const DOUBLE_TAP_ANIMATION = 2000;
 export const DOUBLE_TAP_ANIMATION_DELAY = 150;
 
+/** What a vertical slide over one half of the player adjusts. */
+export enum PlayerSlideControl {
+  VOLUME = 'VOLUME',
+  BRIGHTNESS = 'BRIGHTNESS',
+}
+
+/**
+ * How much of the player's height a finger travels to cross the whole 0..1 range.
+ * Less than all of it, so the ends stay in reach of a thumb that started somewhere
+ * comfortable rather than at the very edge of the screen.
+ */
+export const SLIDE_RANGE_RATIO = 0.75;
+
+/** Vertical travel before a slide takes the touch away from the taps it shares the player with. */
+export const SLIDE_ACTIVATION_DISTANCE = 12;
+
+/** ...and the horizontal travel that hands the touch back to them instead. */
+export const SLIDE_FAIL_DISTANCE = 20;
+
+/**
+ * Steps the range is applied to the device in. The bar follows the finger frame by
+ * frame on the UI thread; the device only hears about a step it is not already on,
+ * which keeps a full drag to a few dozen native calls rather than one per frame.
+ */
+export const SLIDE_STEPS = 50;
+
+export const SLIDE_INDICATOR_ANIMATION = 150;
+
+/**
+ * How far in from the edge the level sits, as a percent of the player width. It is
+ * placed at whichever of the two the finger is not on, so the hand does not cover it.
+ */
+export const SLIDE_INDICATOR_OFFSET = 20;
+
+/** How long the level stays on screen after the finger lifts. */
+export const SLIDE_INDICATOR_TIMEOUT = 600;
+
 export const FIRESTORE_DB = 'timestamps';
 
 // i18n is initialised asynchronously after the module graph has loaded, so a `t()`

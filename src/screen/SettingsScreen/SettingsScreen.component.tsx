@@ -14,6 +14,7 @@ import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import ArrowDown10 from 'lucide-react-native/icons/arrow-down-1-0';
 import ArrowDownUp from 'lucide-react-native/icons/arrow-down-up';
+import ArrowLeftRight from 'lucide-react-native/icons/arrow-left-right';
 import ArrowRight from 'lucide-react-native/icons/arrow-right';
 import BookImage from 'lucide-react-native/icons/book-image';
 import Brush from 'lucide-react-native/icons/brush';
@@ -47,8 +48,10 @@ import Route from 'lucide-react-native/icons/route';
 import Settings2 from 'lucide-react-native/icons/settings-2';
 import ShieldCheck from 'lucide-react-native/icons/shield-check';
 import StepForward from 'lucide-react-native/icons/step-forward';
+import Sun from 'lucide-react-native/icons/sun';
 import TvMinimalPlay from 'lucide-react-native/icons/tv-minimal-play';
 import UserCog from 'lucide-react-native/icons/user-cog';
+import Volume2 from 'lucide-react-native/icons/volume-2';
 import { reactNativeDownloads } from 'Modules/react-native-downloads';
 import { useCallback, useEffect, useState } from 'react';
 import { BackHandler, View } from 'react-native';
@@ -91,6 +94,9 @@ export function SettingsScreenComponent({
   downloadsMaxParallelOptions,
   playerAutoNextEpisode,
   playerLongPressSpeed,
+  playerVolumeGesture,
+  playerBrightnessGesture,
+  playerSwapGestureSides,
   sortVoicesByRating,
   playerBufferTimeSetting,
   playerBackBufferTimeSetting,
@@ -418,6 +424,29 @@ export function SettingsScreenComponent({
         value={ playerLongPressSpeed.toString() }
         options={ PLAYER_LONG_PRESS_SPEED_OPTIONS }
         onChange={ (value) => onConfigUpdate('playerLongPressSpeed', Number(value)) }
+      />
+      <SettingSwitch
+        title={ t('Volume gesture') }
+        subtitle={ t('Slide up and down on the right half of the player to change the volume.') }
+        IconComponent={ Volume2 }
+        value={ playerVolumeGesture }
+        onChange={ (value) => onConfigUpdate('playerVolumeGesture', value) }
+      />
+      <SettingSwitch
+        title={ t('Brightness gesture') }
+        subtitle={ t('Slide up and down on the left half of the player to change the screen brightness.') }
+        IconComponent={ Sun }
+        value={ playerBrightnessGesture }
+        onChange={ (value) => onConfigUpdate('playerBrightnessGesture', value) }
+      />
+      { /* with only one of the two on it owns the whole width, so there are no sides to swap */ }
+      <SettingSwitch
+        title={ t('Swap gesture sides') }
+        subtitle={ t('Put the volume on the left half of the player and the brightness on the right.') }
+        IconComponent={ ArrowLeftRight }
+        value={ playerSwapGestureSides }
+        isEnabled={ playerVolumeGesture && playerBrightnessGesture }
+        onChange={ (value) => onConfigUpdate('playerSwapGestureSides', value) }
       />
       <SettingSelect
         title={ t('Player default speed') }

@@ -257,6 +257,15 @@ const ru: Translations = {
   'Play the video to match its frame rate': 'Запустите видео, чтобы подстроить частоту',
   'Frame rate matching is not available on this device': 'Подстройка частоты обновления недоступна на этом устройстве',
   'Player long press speed': 'Скорость перемотки при долгом нажатии',
+  'Volume gesture': 'Жест громкости',
+  'Slide up and down on the right half of the player to change the volume.':
+    'Проведите пальцем вверх или вниз по правой половине плеера, чтобы изменить громкость.',
+  'Brightness gesture': 'Жест яркости',
+  'Slide up and down on the left half of the player to change the screen brightness.':
+    'Проведите пальцем вверх или вниз по левой половине плеера, чтобы изменить яркость экрана.',
+  'Swap gesture sides': 'Поменять стороны жестов',
+  'Put the volume on the left half of the player and the brightness on the right.':
+    'Громкость будет на левой половине плеера, а яркость - на правой.',
   'Sort voices by rating': 'Сортировать озвучки по рейтингу',
   'Toggle sorting voices by rating.': 'Переключить сортировку озвучек по рейтингу. Озвучки с высшим рейтингом будут показаны в начале списка.',
   'Stop play on button TV': 'Воспроизведение по нажатию',

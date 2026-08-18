@@ -257,6 +257,15 @@ const uk: Translations = {
   'Play the video to match its frame rate': 'Запустіть відео, щоб підлаштувати частоту',
   'Frame rate matching is not available on this device': 'Підлаштування частоти оновлення недоступне на цьому пристрої',
   'Player long press speed': 'Швидкість перемотки при довгому натисканні',
+  'Volume gesture': 'Жест гучності',
+  'Slide up and down on the right half of the player to change the volume.':
+    'Проведіть пальцем вгору або вниз по правій половині плеєра, щоб змінити гучність.',
+  'Brightness gesture': 'Жест яскравості',
+  'Slide up and down on the left half of the player to change the screen brightness.':
+    'Проведіть пальцем вгору або вниз по лівій половині плеєра, щоб змінити яскравість екрана.',
+  'Swap gesture sides': 'Поміняти сторони жестів',
+  'Put the volume on the left half of the player and the brightness on the right.':
+    'Гучність буде на лівій половині плеєра, а яскравість - на правій.',
   'Sort voices by rating': 'Сортувати озвучки за рейтингом',
   'Toggle sorting voices by rating.': 'Перемкнути сортування озвучок за рейтингом. Озвучки з найвищим рейтингом будуть показані на початку списку.',
   'Stop play on button TV': 'Відтворення за натисканням',

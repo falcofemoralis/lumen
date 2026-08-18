@@ -26,6 +26,9 @@ export type DeviceConfigType = {
   playerAutoFrameRateEnabled: boolean;
   playerAutoFrameRate: boolean;
   playerLongPressSpeed: number;
+  playerVolumeGesture: boolean;
+  playerBrightnessGesture: boolean;
+  playerSwapGestureSides: boolean;
   sortVoicesByRating: boolean;
   playerStopPlayOnButtonTV: boolean;
   playerStopPlayShowInterfaceTV: boolean;
@@ -79,6 +82,14 @@ export const defaultConfig: DeviceConfigType = {
   // away the choice someone made about their films.
   playerAutoFrameRate: false,
   playerLongPressSpeed: 1.5,
+  // Both off unless asked for: they claim a vertical swipe over half the player each,
+  // and someone who does not know they are there only ever meets them by accident -
+  // as a video that suddenly went silent, or a screen that went dark on its own.
+  playerVolumeGesture: false,
+  playerBrightnessGesture: false,
+  // volume on the right and brightness on the left, which is where the players people
+  // are coming from put them - the switch is for the hand that disagrees
+  playerSwapGestureSides: false,
   playerStopPlayOnButtonTV: false,
   playerStopPlayShowInterfaceTV: true,
   playerBufferTimeSetting: undefined,

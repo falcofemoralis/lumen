@@ -255,6 +255,15 @@ const en = {
   'Play the video to match its frame rate': 'Play the video to match its frame rate',
   'Frame rate matching is not available on this device': 'Frame rate matching is not available on this device',
   'Player long press speed': 'Player long press speed',
+  'Volume gesture': 'Volume gesture',
+  'Slide up and down on the right half of the player to change the volume.':
+    'Slide up and down on the right half of the player to change the volume.',
+  'Brightness gesture': 'Brightness gesture',
+  'Slide up and down on the left half of the player to change the screen brightness.':
+    'Slide up and down on the left half of the player to change the screen brightness.',
+  'Swap gesture sides': 'Swap gesture sides',
+  'Put the volume on the left half of the player and the brightness on the right.':
+    'Put the volume on the left half of the player and the brightness on the right.',
   'Sort voices by rating': 'Sort voices by rating',
   'Toggle sorting voices by rating.': 'Toggle sorting voices by rating.',
   'Stop play on button TV': 'Stop play on button TV',

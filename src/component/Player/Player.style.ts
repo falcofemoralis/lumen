@@ -182,6 +182,47 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     fontSize: scale(text.sm.fontSize),
     fontWeight: '700',
   },
+  // `left` is animated: which side the level lands on depends on where the finger came
+  // down, which is not fixed once a single gesture is allowed to own the whole width
+  slideIndicator: {
+    position: 'absolute',
+    top: '50%',
+    transform: [{ translateX: '-50%' }, { translateY: '-50%' }],
+    opacity: 0,
+    pointerEvents: 'none',
+  },
+  // fixed rather than sized to its contents: the label below runs from "0%" to "100%",
+  // and a pill that measured itself against that would grow as the finger moved. Wide
+  // enough for the widest of those in any of the app's languages, which is what the
+  // label's `numberOfLines` is there to hold it to
+  slideIndicatorContainer: {
+    width: scale(64),
+    alignItems: 'center',
+    gap: scale(8),
+    paddingBlock: scale(12),
+    paddingInline: scale(10),
+    borderRadius: scale(24),
+    backgroundColor: colors.modal,
+  },
+  slideIndicatorTrack: {
+    width: scale(4),
+    height: scale(80),
+    borderRadius: scale(4),
+    backgroundColor: '#ffffff55',
+    justifyContent: 'flex-end',
+    overflow: 'hidden',
+  },
+  slideIndicatorFill: {
+    width: '100%',
+    borderRadius: scale(4),
+    backgroundColor: colors.secondary,
+  },
+  slideIndicatorText: {
+    fontSize: scale(text.sm.fontSize),
+    fontWeight: '700',
+    color: colors.textOnContrast,
+    textAlign: 'center',
+  },
   longTapAction: {
     position: 'absolute',
     top: '80%',

@@ -2,6 +2,7 @@ import { PlayerVideoSelectorRef } from 'Component/PlayerVideoSelector/PlayerVide
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { RefObject } from 'react';
+import { SharedValue } from 'react-native-reanimated';
 import { ResizeMode, VideoPlayer, VideoPlayerStatus } from 'react-native-video';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface, SubtitleInterface } from 'Type/FilmVideo.interface';
@@ -93,6 +94,18 @@ export interface LongEvent {
   isKeyDownPressed: boolean;
   longTimeout: number | null;
   isLongFired: boolean;
+}
+
+/**
+ * Everything a slide indicator draws itself from, all of it on the UI thread: the level
+ * the bar fills to, the fade that shows and hides it, and the percent of the player
+ * width it sits at - the side away from the finger, which is not fixed once a single
+ * gesture is allowed to own the whole width.
+ */
+export interface PlayerSlideIndicatorState {
+  value: SharedValue<number>;
+  opacity: SharedValue<number>;
+  offset: SharedValue<number>;
 }
 
 export interface DoubleTapAction {
