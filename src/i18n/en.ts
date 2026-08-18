@@ -154,7 +154,6 @@ const en = {
   'Columns in list': 'Columns in list',
   'Two columns in recent': 'Two columns in recent',
   'Show recent items in two columns.': 'Show recent items in two columns.',
-  'Restart app to apply changes.': 'Restart app to apply changes.',
   'Initial route': 'Initial route',
   'Default home tab': 'Default home tab',
   'Account': 'Account',

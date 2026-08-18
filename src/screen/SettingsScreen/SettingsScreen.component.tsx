@@ -74,6 +74,7 @@ import {
   TELEGRAM_LINK,
   THEME_SCHEME_OPTIONS,
 } from './SettingsScreen.config';
+import { handOverGroup, takeHandedOverGroup } from './SettingsScreen.reload';
 import { componentStyles } from './SettingsScreen.style';
 import { SETTING_GROUP, SettingsScreenComponentProps } from './SettingsScreen.type';
 import { useTripleTap } from './useTripleTap';
@@ -138,11 +139,18 @@ export function SettingsScreenComponent({
 }: SettingsScreenComponentProps) {
   const { handleTap } = useTripleTap();
   const styles = useThemedStyles(componentStyles);
-  const [currentGroup, setCurrentGroup] = useState<SETTING_GROUP | null>(null);
+  const [currentGroup, setCurrentGroup] = useState<SETTING_GROUP | null>(takeHandedOverGroup);
 
   const handleOpenGroup = useCallback((group: SETTING_GROUP) => {
     setCurrentGroup(group);
   }, []);
+
+  // the change remounts the screen tree, so the open group has to be handed over first
+  const handleLanguageChange = useCallback((value: string) => {
+    handOverGroup(currentGroup);
+
+    return onLanguageChange(value);
+  }, [currentGroup, onLanguageChange]);
 
   const handleBackToGroups = useCallback(() => {
     setCurrentGroup(null);
@@ -214,7 +222,7 @@ export function SettingsScreenComponent({
         IconComponent={ Globe }
         value={ appLanguage }
         options={ APP_LANGUAGE_OPTIONS }
-        onChange={ onLanguageChange }
+        onChange={ handleLanguageChange }
       />
       <SettingSelect
         title={ t('Initial route') }

@@ -156,7 +156,6 @@ const ru: Translations = {
   'Columns in list': 'Фильмов в ряду',
   'Two columns in recent': 'Два столбца в недавних',
   'Show recent items in two columns.': 'Показывать недавние фильмы в два столбца.',
-  'Restart app to apply changes.': 'Применение изменений... Приложение будет перезагружено.',
   'Initial route': 'Стартовый экран',
   'Default home tab': 'Стартовая вкладка главной',
   'Account': 'Аккаунт',

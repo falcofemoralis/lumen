@@ -75,6 +75,7 @@ import {
   THEME_SCHEME_OPTIONS,
   TV_SCREENS,
 } from './SettingsScreen.config';
+import { handOverGroup, takeHandedOverGroup } from './SettingsScreen.reload';
 import { componentStyles } from './SettingsScreen.style.atv';
 import { SETTING_GROUP, SettingsScreenComponentProps } from './SettingsScreen.type';
 
@@ -145,7 +146,9 @@ export function SettingsScreenComponent({
   onTvChannelsAddToHome,
 }: SettingsScreenComponentProps) {
   const styles = useThemedStyles(componentStyles);
-  const [currentGroup, setCurrentGroup] = useState<SETTING_GROUP>(SETTING_GROUP.APPEARANCE);
+  const [currentGroup, setCurrentGroup] = useState<SETTING_GROUP>(
+    () => takeHandedOverGroup() ?? SETTING_GROUP.APPEARANCE
+  );
 
   /**
    * The group switches on FOCUS, so every D-Pad move in the menu swaps the whole
@@ -162,6 +165,13 @@ export function SettingsScreenComponent({
   const handleOpenGroup = useCallback((group: SETTING_GROUP) => {
     setCurrentGroup(group);
   }, []);
+
+  // the change remounts the screen tree, so the open group has to be handed over first
+  const handleLanguageChange = useCallback((value: string) => {
+    handOverGroup(currentGroup);
+
+    return onLanguageChange(value);
+  }, [currentGroup, onLanguageChange]);
 
   const renderGroups = () => (
     <ThemedScrollView autofocus>
@@ -212,7 +222,7 @@ export function SettingsScreenComponent({
         IconComponent={ Globe }
         value={ appLanguage }
         options={ APP_LANGUAGE_OPTIONS }
-        onChange={ onLanguageChange }
+        onChange={ handleLanguageChange }
       />
       <SettingSelect
         title={ t('Initial route') }

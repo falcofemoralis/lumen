@@ -12,60 +12,103 @@ import {
 export const GITHUB_LINK = 'https://github.com/falcofemoralis/lumen';
 export const TELEGRAM_LINK = 'https://t.me/lumen_app';
 
+/**
+ * Every label in this file is read through a getter rather than being translated where
+ * the constant is declared. The module body runs while it is imported, which is before
+ * `initI18n()` gets to run, so an eager `t()` would freeze the untranslated key - and a
+ * getter is also what keeps the label right once the language is changed.
+ */
 export const TV_SCREENS = [
   {
     value: ACCOUNT_SCREEN,
-    label: t('Account'),
+    get label() {
+      return t('Account');
+    },
   },
   {
     value: NOTIFICATIONS_SCREEN,
-    label: t('Notifications'),
+    get label() {
+      return t('Notifications');
+    },
   },
   {
     value: HOME_SCREEN,
-    label: t('Home'),
+    get label() {
+      return t('Home');
+    },
   },
   {
     value: RECENT_SCREEN,
-    label: t('Recent'),
+    get label() {
+      return t('Recent');
+    },
   },
   {
     value: SEARCH_SCREEN,
-    label: t('Search'),
+    get label() {
+      return t('Search');
+    },
   },
   {
     value: BOOKMARKS_SCREEN,
-    label: t('Bookmarks'),
+    get label() {
+      return t('Bookmarks');
+    },
   },
 ];
 
 export const MOBILE_SCREENS = [
   {
     value: HOME_SCREEN,
-    label: t('Home'),
+    get label() {
+      return t('Home');
+    },
   },
   {
     value: SEARCH_SCREEN,
-    label: t('Search'),
+    get label() {
+      return t('Search');
+    },
   },
   {
     value: BOOKMARKS_SCREEN,
-    label: t('Bookmarks'),
+    get label() {
+      return t('Bookmarks');
+    },
   },
   {
     value: RECENT_SCREEN,
-    label: t('Recent'),
+    get label() {
+      return t('Recent');
+    },
   },
   {
     value: ACCOUNT_SCREEN,
-    label: t('Account'),
+    get label() {
+      return t('Account');
+    },
   },
 ];
 
 export const THEME_SCHEME_OPTIONS = [
-  { value: 'system', label: t('System default') },
-  { value: 'dark', label: t('Dark') },
-  { value: 'light', label: t('Light') },
+  {
+    value: 'system',
+    get label() {
+      return t('System default');
+    },
+  },
+  {
+    value: 'dark',
+    get label() {
+      return t('Dark');
+    },
+  },
+  {
+    value: 'light',
+    get label() {
+      return t('Light');
+    },
+  },
 ];
 
 export const APP_LANGUAGE_OPTIONS = [
@@ -100,13 +143,17 @@ export const PLAYER_REWIND_OPTIONS = Array.from({ length: 12 }, (_, index) => {
 
   return {
     value: value.toString(),
-    label: t('{{seconds}} seconds', { seconds: value }),
+    get label() {
+      return t('{{seconds}} seconds', { seconds: value });
+    },
   };
 });
 
 export const PLAYER_ASPECT_RATIO_OPTIONS = ASPECT_RATIO_OPTIONS.map((option) => ({
   value: option,
-  label: getAspectRatioLabel(option),
+  get label() {
+    return getAspectRatioLabel(option);
+  },
 }));
 
 export const PLAYER_LONG_PRESS_SPEED_OPTIONS = Array.from({ length: 12 }, (_, index) => {
@@ -126,14 +173,18 @@ export const PLAYER_SPEED_OPTIONS = DEFAULT_SPEEDS.map((value) => ({
 export const PLAYER_BUFFER_TIME_OPTIONS = [
   {
     value: 'auto',
-    label: t('Auto'),
+    get label() {
+      return t('Auto');
+    },
   },
   ...Array.from({ length: 12 }, (_, index) => {
     const value = (index + 1) * 15;
 
     return {
       value: value.toString(),
-      label: t('{{seconds}} seconds', { seconds: value }),
+      get label() {
+        return t('{{seconds}} seconds', { seconds: value });
+      },
     };
   }),
 ];
@@ -141,14 +192,18 @@ export const PLAYER_BUFFER_TIME_OPTIONS = [
 export const PLAYER_BACK_BUFFER_TIME_OPTIONS = [
   {
     value: '0',
-    label: t('Off'),
+    get label() {
+      return t('Off');
+    },
   },
   ...Array.from({ length: 12 }, (_, index) => {
     const value = (index + 1) * 15;
 
     return {
       value: value.toString(),
-      label: t('{{seconds}} seconds', { seconds: value }),
+      get label() {
+        return t('{{seconds}} seconds', { seconds: value });
+      },
     };
   }),
 ];

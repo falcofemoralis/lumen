@@ -13,7 +13,6 @@ import { DeviceConfigType } from 'src/config';
 import NotificationStore from 'Store/Notification.store';
 import { useAppTheme } from 'Theme/context';
 import { ThemeContextModeT } from 'Theme/types';
-import { restartApp } from 'Util/Device';
 import { MAX_PARALLEL_DOWNLOADS_OPTIONS } from 'Util/Download';
 import { ensureDefaultLocalCategory } from 'Util/LocalLibrary';
 import { setTimeoutSafe } from 'Util/Misc';
@@ -97,16 +96,12 @@ export function SettingsScreenContainer() {
     setConfig(key, value);
   };
 
+  // the app shell remounts the screens off i18next's own event, so there is nothing to
+  // do here beyond storing the choice - see `useLanguageReload`
   const onLanguageChange = useCallback(async (value: string) => {
     setAppLanguage(value as Language);
 
     await setLanguage(value as Language);
-
-    NotificationStore.displayMessage(t('Restart app to apply changes.'));
-
-    setTimeoutSafe(() => {
-      restartApp();
-    }, 2000);
   }, []);
 
   const onThemeSchemeChange = useCallback((value: string) => {
