@@ -55,6 +55,7 @@ import Search from 'lucide-react-native/icons/search';
 import Settings2 from 'lucide-react-native/icons/settings-2';
 import ShieldCheck from 'lucide-react-native/icons/shield-check';
 import StepForward from 'lucide-react-native/icons/step-forward';
+import Tag from 'lucide-react-native/icons/tag';
 import TvMinimalPlay from 'lucide-react-native/icons/tv-minimal-play';
 import UserCog from 'lucide-react-native/icons/user-cog';
 import { reactNativeDownloads } from 'Modules/react-native-downloads';
@@ -91,6 +92,7 @@ export function SettingsScreenComponent({
   playerRewindSeconds,
   playerShowBufferTime,
   playerShowEndTime,
+  playerShowEpisodeName,
   isFirestore,
   securedSettings,
   downloadsPath,
@@ -520,6 +522,13 @@ export function SettingsScreenComponent({
         IconComponent={ MoveRight }
         value={ playerShowEndTime }
         onChange={ (value) => onConfigUpdate('playerShowEndTime', value) }
+      />
+      <SettingSwitch
+        title={ t('Show episode name') }
+        subtitle={ t('Show the name the schedule gives the episode under the title in the player.') }
+        IconComponent={ Tag }
+        value={ playerShowEpisodeName }
+        onChange={ (value) => onConfigUpdate('playerShowEpisodeName', value) }
       />
       <SettingSelect
         title={ t('Player buffer time settings') }

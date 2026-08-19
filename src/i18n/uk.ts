@@ -244,6 +244,9 @@ const uk: Translations = {
   'Toggle buffer time display.': 'Завантажений час (на скільки відео завантажилось) буде показано поряд із загальним часом після знаку +.',
   'Show end time': 'Показувати час, коли відео закінчиться',
   'Toggle end time display.': 'Перемкнути відображення часу завершення фільму.',
+  'Show episode name': 'Показувати назву серії',
+  'Show the name the schedule gives the episode under the title in the player.':
+    'Назву поточної серії з розкладу виходу серій буде показано у плеєрі під назвою серіалу.',
   'Auto next episode': 'Автоматично включати наступну серію',
   'Toggle auto next episode.': 'Після завершення серії автоматично буде включатись наступна.',
   'Frame rate matching': 'Підлаштування частоти оновлення',

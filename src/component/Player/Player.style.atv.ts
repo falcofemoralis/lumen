@@ -63,6 +63,12 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     marginBottom: scale(4),
     color: colors.textOnContrast,
   },
+  episodeName: {
+    fontSize: scale(text.lg.fontSize),
+    marginBottom: scale(4),
+    color: colors.textOnContrast,
+    opacity: 0.8,
+  },
   subtitle: {
     fontSize: scale(text.md.fontSize),
     marginBottom: scale(20),

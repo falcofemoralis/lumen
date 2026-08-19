@@ -19,11 +19,10 @@ import { getDeviceId } from 'Util/DeviceId';
 import { safeJsonParse } from 'Util/Json';
 import { storage } from 'Util/Storage';
 
+export { getScheduleEpisodeName } from './scheduleEpisode';
+
 export const PLAYER_SAVED_TIME_STORAGE_KEY = 'playerTime';
 export const PLAYER_QUALITY_STORAGE_KEY = 'playerQuality';
-
-// react-native-video's own default, kept here so getBufferConfig can clamp it
-const DEFAULT_MIN_BUFFER_MS = 5000;
 
 const formatPlayerKeyTime = (film: FilmInterface) => {
   const { id: filmId } = film;

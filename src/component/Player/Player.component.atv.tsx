@@ -48,7 +48,11 @@ import { VideoView } from 'react-native-video';
 import { scheduleOnRN } from 'react-native-worklets';
 import { useAppTheme } from 'Theme/context';
 import { AutoFrameRateIcon, ClosedCaptionFilled } from 'Theme/icons';
-import { formatVideoTrackInfo, getPlayerAvailableQualityItems } from 'Util/Player';
+import {
+  formatVideoTrackInfo,
+  getPlayerAvailableQualityItems,
+  getScheduleEpisodeName,
+} from 'Util/Player';
 import RemoteControlManager from 'Util/RemoteControl/RemoteControlManager';
 import { SupportedKeys } from 'Util/RemoteControl/SupportedKeys';
 
@@ -164,7 +168,11 @@ export function PlayerComponent({
   backwardToStart,
   handleAspectRatioChange,
 }: PlayerComponentProps) {
-  const { playerStopPlayOnButtonTV, playerStopPlayShowInterfaceTV } = useConfigContext();
+  const {
+    playerStopPlayOnButtonTV,
+    playerStopPlayShowInterfaceTV,
+    playerShowEpisodeName,
+  } = useConfigContext();
   const { theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
   const { focusedElement, updateFocusedElement } = usePlayerContext();
@@ -388,6 +396,24 @@ export function PlayerComponent({
     }, 250);
   };
 
+  const renderEpisodeName = () => {
+    if (!playerShowEpisodeName) {
+      return null;
+    }
+
+    const episodeName = getScheduleEpisodeName(film, voice);
+
+    if (!episodeName) {
+      return null;
+    }
+
+    return (
+      <ThemedText style={ styles.episodeName } numberOfLines={ 1 }>
+        { episodeName }
+      </ThemedText>
+    );
+  };
+
   const renderTitle = () => {
     const { title, hasSeasons } = film;
 
@@ -404,6 +430,7 @@ export function PlayerComponent({
             }) }
           </ThemedText>
         ) }
+        { renderEpisodeName() }
       </View>
     );
   };

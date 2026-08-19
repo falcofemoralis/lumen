@@ -123,6 +123,10 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     fontWeight: '700',
     color: colors.textOnContrast,
   },
+  episodeName: {
+    color: colors.textOnContrast,
+    opacity: 0.8,
+  },
   subtitle: {
     color: colors.textOnContrast,
   },

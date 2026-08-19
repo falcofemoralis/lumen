@@ -244,6 +244,9 @@ const ru: Translations = {
   'Toggle buffer time display.': 'Загруженное время (на сколько видео загрузилось) будет показано напротив общего времени после знака +.',
   'Show end time': 'Показывать время когда видео закончится',
   'Toggle end time display.': 'Переключить отображение времени окончания фильма.',
+  'Show episode name': 'Показывать название серии',
+  'Show the name the schedule gives the episode under the title in the player.':
+    'Название текущей серии из расписания выхода серий будет показано в плеере под названием сериала.',
   'Auto next episode': 'Автоматически включать следующую серию',
   'Toggle auto next episode.': 'После окончания серии автоматически будет включаться следующая.',
   'Frame rate matching': 'Подстройка частоты обновления',

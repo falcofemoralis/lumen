@@ -242,6 +242,9 @@ const en = {
   'Toggle buffer time display.': 'Toggle buffer time display.',
   'Show end time': 'Show end time',
   'Toggle end time display.': 'Toggle end time display.',
+  'Show episode name': 'Show episode name',
+  'Show the name the schedule gives the episode under the title in the player.':
+    'Show the name the schedule gives the episode under the title in the player.',
   'Auto next episode': 'Auto next episode',
   'Toggle auto next episode.': 'Toggle auto next episode.',
   'Frame rate matching': 'Frame rate matching',

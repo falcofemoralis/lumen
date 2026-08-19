@@ -59,7 +59,11 @@ import { scheduleOnRN } from 'react-native-worklets';
 import { useAppTheme } from 'Theme/context';
 import { ClosedCaptionFilled } from 'Theme/icons';
 import { hideSystemBars, showSystemBars } from 'Util/Device';
-import { formatVideoTrackInfo, getPlayerAvailableQualityItems } from 'Util/Player';
+import {
+  formatVideoTrackInfo,
+  getPlayerAvailableQualityItems,
+  getScheduleEpisodeName,
+} from 'Util/Player';
 
 import {
   DEFAULT_SPEED,
@@ -156,7 +160,7 @@ export function PlayerComponent({
   const { width: screenWidth } = useWindowDimensions();
   const { scale, theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
-  const { playerRewindSeconds } = useConfigContext();
+  const { playerRewindSeconds, playerShowEpisodeName } = useConfigContext();
   const [showControls, setShowControls] = useState(false);
   const [isScrolling, setIsScrolling] = useState(false);
   const [doubleTapAction, setDoubleTapAction] = useState<DoubleTapAction | null>(null);
@@ -332,6 +336,24 @@ export function PlayerComponent({
     </View>
   );
 
+  const renderEpisodeName = () => {
+    if (!playerShowEpisodeName) {
+      return null;
+    }
+
+    const episodeName = getScheduleEpisodeName(film, voice);
+
+    if (!episodeName) {
+      return null;
+    }
+
+    return (
+      <ThemedText style={ styles.episodeName } numberOfLines={ 1 }>
+        { episodeName }
+      </ThemedText>
+    );
+  };
+
   const renderTitle = () => {
     const { title, hasSeasons } = film;
 
@@ -348,6 +370,7 @@ export function PlayerComponent({
             }) }
           </ThemedText>
         ) }
+        { renderEpisodeName() }
       </View>
     );
   };
