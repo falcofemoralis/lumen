@@ -17,6 +17,7 @@ export const ThemedMultiListComponent = ({
   header,
   noItemsTitle,
   noItemsSubtitle,
+  searchComponent,
   handleOnChange,
 }: ThemedMultiListComponentProps) => {
   const { theme } = useAppTheme();
@@ -59,6 +60,7 @@ export const ThemedMultiListComponent = ({
       onChange={ onChange }
       rightAdditionalElement={ renderCheckbox }
       emptyComponent={ emptyComponent }
+      searchComponent={ searchComponent }
     />
   );
 };

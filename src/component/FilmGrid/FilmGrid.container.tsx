@@ -1,8 +1,9 @@
 import { useNavigation } from '@react-navigation/native';
-import { useConfigContext } from 'Context/ConfigContext';
+import { useConfigContext, useHiddenCountries } from 'Context/ConfigContext';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { FilmType } from 'Type/FilmType.type';
+import { isFilmCardHidden } from 'Util/Film';
 import { noopFn } from 'Util/Function';
 import { openFilm } from 'Util/Router';
 
@@ -42,6 +43,7 @@ export function FilmGridContainer({
 }: FilmGridContainerProps) {
   const navigation = useNavigation();
   const { isTV, numberOfColumnsMobile, numberOfColumnsTV } = useConfigContext();
+  const hiddenCountries = useHiddenCountries();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const updatingStateRef = useRef(false);
 
@@ -49,8 +51,14 @@ export function FilmGridContainer({
   const isSectioned = sections !== undefined;
 
   const handleOnPress = useCallback((film: FilmCardInterface) => {
+    // A hidden card is still focusable, so that the grid keeps its shape -- but
+    // opening the film it covers would defeat the point of covering it.
+    if (isFilmCardHidden(film, hiddenCountries)) {
+      return;
+    }
+
     openFilm(film, navigation);
-  }, [navigation]);
+  }, [navigation, hiddenCountries]);
 
   // Flatten the films -- grouped or not -- into the mixed header/film list
   // FlashList wants for section lists, plus the positions of the headers

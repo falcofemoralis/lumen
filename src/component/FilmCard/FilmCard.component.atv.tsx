@@ -2,10 +2,12 @@ import { ThemedImage } from 'Component/ThemedImage';
 import { ThemedText } from 'Component/ThemedText';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
+import Ban from 'lucide-react-native/icons/ban';
 import { View } from 'react-native';
 import Animated from 'react-native-reanimated';
+import { useAppTheme } from 'Theme/context';
 
-import { FILM_TYPE_COLORS, TYPE_LABELS } from './FilmCard.config';
+import { FILM_TYPE_COLORS, HIDDEN_ICON_SIZE_TV, TYPE_LABELS } from './FilmCard.config';
 import { componentStyles } from './FilmCard.style.atv';
 import { FilmCardComponentProps } from './FilmCard.type';
 
@@ -15,6 +17,7 @@ export function FilmCardComponent({
   isFocused = false,
   disableScaleAnimation,
   disableScaleTransition,
+  isHidden,
 }: FilmCardComponentProps) {
   const {
     type,
@@ -25,6 +28,7 @@ export function FilmCardComponent({
     isPendingRelease,
   } = filmCard;
   const styles = useThemedStyles(componentStyles);
+  const { theme, scale } = useAppTheme();
 
   const renderType = () => (
     <ThemedText
@@ -97,15 +101,45 @@ export function FilmCardComponent({
     </ThemedText>
   );
 
+  const cardStyle = [
+    styles.card,
+    disableScaleTransition && styles.cardWithoutTransition,
+    isFocused && !disableScaleAnimation && styles.cardFocused,
+    style,
+  ];
+
+  if (isHidden) {
+    return (
+      <Animated.View style={ cardStyle }>
+        { /* `posterWrapperFocused` is left off: it squares the bottom corners to
+           meet the info bar, which a hidden card does not draw. */ }
+        <View style={ styles.posterWrapper }>
+          <View
+            style={ [
+              styles.poster,
+              styles.hiddenPoster,
+              isFocused && styles.hiddenPosterFocused,
+            ] }
+          >
+            <Ban
+              size={ scale(HIDDEN_ICON_SIZE_TV) }
+              color={ theme.colors.textSecondary }
+            />
+            <ThemedText
+              style={ styles.hiddenText }
+              numberOfLines={ 3 }
+            >
+              { t('Hidden based on your preferences') }
+            </ThemedText>
+          </View>
+        </View>
+        <View style={ [styles.info, styles.hiddenInfo] } />
+      </Animated.View>
+    );
+  }
+
   return (
-    <Animated.View
-      style={ [
-        styles.card,
-        disableScaleTransition && styles.cardWithoutTransition,
-        isFocused && !disableScaleAnimation && styles.cardFocused,
-        style,
-      ] }
-    >
+    <Animated.View style={ cardStyle }>
       <View
         style={ [
           styles.posterWrapper,

@@ -350,6 +350,11 @@ const uk: Translations = {
   'No channels were added': 'Жодного каналу не додано',
   'Search from the TV home screen': 'Пошук з домашнього екрана ТБ',
   'Show films from the app in the Android TV search.': 'Показувати фільми з застосунку в пошуку Android TV.',
+  'Hidden countries': 'Приховані країни',
+  'Cover up films from the selected countries in the lists.': 'Приховувати фільми обраних країн у списках.',
+  'Hidden based on your preferences': 'Приховано на основі ваших уподобань',
+  'Nothing found': 'Нічого не знайдено',
+  'and {{amount}} more': 'і ще {{amount}}',
 };
 
 export default uk;

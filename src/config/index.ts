@@ -12,6 +12,7 @@ export type DeviceConfigType = {
   numberOfColumnsMobile: number;
   numberOfColumnsTV: number;
   recentTwoColumnsTV: boolean;
+  hiddenCountries: string[];
   initialRoute: string;
   homeDefaultTab: string;
   playerRewindSeconds: number;
@@ -58,6 +59,7 @@ export const defaultConfig: DeviceConfigType = {
   numberOfColumnsMobile: 3,
   numberOfColumnsTV: 6,
   recentTwoColumnsTV: false,
+  hiddenCountries: [],
   initialRoute: HOME_SCREEN,
   homeDefaultTab: '',
   playerRewindSeconds: 10,

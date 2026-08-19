@@ -4,6 +4,7 @@ import { SettingBase } from 'Component/SettingBase';
 import { SettingCustomSelect } from 'Component/SettingCustomSelect';
 import { SettingInput } from 'Component/SettingInput';
 import { SettingLink } from 'Component/SettingLink';
+import { SettingMultiSelect } from 'Component/SettingMultiSelect';
 import { SettingSelect } from 'Component/SettingSelect';
 import { SettingSwitch } from 'Component/SettingSwitch';
 import { SettingText } from 'Component/SettingText';
@@ -26,6 +27,7 @@ import Columns2 from 'lucide-react-native/icons/columns-2';
 import Dock from 'lucide-react-native/icons/dock';
 import Download from 'lucide-react-native/icons/download';
 import ExternalLink from 'lucide-react-native/icons/external-link';
+import EyeOff from 'lucide-react-native/icons/eye-off';
 import FolderCog from 'lucide-react-native/icons/folder-cog';
 import FolderDown from 'lucide-react-native/icons/folder-down';
 import FolderLock from 'lucide-react-native/icons/folder-lock';
@@ -64,6 +66,7 @@ import { openLinkInBrowser } from 'Util/Link';
 import {
   APP_LANGUAGE_OPTIONS,
   COLUMNS_TV_OPTIONS,
+  FILM_COUNTRY_OPTIONS,
   GITHUB_LINK,
   PLAYER_ASPECT_RATIO_OPTIONS,
   PLAYER_BACK_BUFFER_TIME_OPTIONS,
@@ -84,6 +87,7 @@ export function SettingsScreenComponent({
   homeDefaultTab,
   numberOfColumnsTV,
   recentTwoColumnsTV,
+  hiddenCountries,
   playerRewindSeconds,
   playerShowBufferTime,
   playerShowEndTime,
@@ -244,6 +248,15 @@ export function SettingsScreenComponent({
         value={ numberOfColumnsTV.toString() }
         options={ COLUMNS_TV_OPTIONS }
         onChange={ (value) => onConfigUpdate('numberOfColumnsTV', Number(value)) }
+      />
+      <SettingMultiSelect
+        title={ t('Hidden countries') }
+        subtitle={ t('Cover up films from the selected countries in the lists.') }
+        IconComponent={ EyeOff }
+        values={ hiddenCountries }
+        options={ FILM_COUNTRY_OPTIONS }
+        withSearch
+        onChange={ (values) => onConfigUpdate('hiddenCountries', values) }
       />
       <SettingSwitch
         title={ t('Two columns in recent') }

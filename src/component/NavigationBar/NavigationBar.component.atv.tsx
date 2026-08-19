@@ -23,7 +23,7 @@ import { NavigationBarComponentProps } from './NavigationBar.type';
 
 export const SIDEBAR_FOCUS_KEY = 'SIDEBAR';
 
-const TAB_SELECT_DEBOUNCE_MS = 500;
+const TAB_SELECT_DEBOUNCE_MS = 400;
 
 const getTabFocusKey = (name: string) => `sidebar-tab-${name}`;
 

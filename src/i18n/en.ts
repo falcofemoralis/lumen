@@ -348,6 +348,11 @@ const en = {
   'No channels were added': 'No channels were added',
   'Search from the TV home screen': 'Search from the TV home screen',
   'Show films from the app in the Android TV search.': 'Show films from the app in the Android TV search.',
+  'Hidden countries': 'Hidden countries',
+  'Cover up films from the selected countries in the lists.': 'Cover up films from the selected countries in the lists.',
+  'Hidden based on your preferences': 'Hidden based on your preferences',
+  'Nothing found': 'Nothing found',
+  'and {{amount}} more': 'and {{amount}} more',
 };
 
 export default en;

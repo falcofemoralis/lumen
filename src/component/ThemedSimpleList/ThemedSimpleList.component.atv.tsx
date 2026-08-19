@@ -79,6 +79,7 @@ export const ThemedListComponent = ({
   onChange,
   rightAdditionalElement,
   emptyComponent,
+  searchComponent,
 }: ThemedSimpleListComponentProps) => {
   const styles = useThemedStyles(componentStyles);
   const listRef = useRef<FlashListRef<ListItem>>(null);
@@ -184,7 +185,9 @@ export const ThemedListComponent = ({
   // included -- as soon as a hidden child is focused or hovered.
   const viewportHeight = useMemo(() => {
     const itemHeight = styles.item.height;
-    const availableHeight = windowHeight * MAX_SCREEN_RATIO - (header ? styles.header.height : 0);
+    const availableHeight = windowHeight * MAX_SCREEN_RATIO
+      - (header ? styles.header.height : 0)
+      - (searchComponent ? styles.search.height : 0);
     const visibleItems = Math.min(
       data.length,
       MAX_ITEMS_TO_DISPLAY,
@@ -192,7 +195,7 @@ export const ThemedListComponent = ({
     );
 
     return visibleItems * itemHeight;
-  }, [styles, header, windowHeight, data.length]);
+  }, [styles, header, searchComponent, windowHeight, data.length]);
 
   // The row-aligned height only makes sense for the list itself -- with no data
   // it collapses to zero and would clip the empty component, which sizes itself.
@@ -229,6 +232,18 @@ export const ThemedListComponent = ({
     );
   };
 
+  const renderSearch = () => {
+    if (!searchComponent) {
+      return null;
+    }
+
+    return (
+      <View style={ styles.search }>
+        { searchComponent }
+      </View>
+    );
+  };
+
   const renderList = () => (
     <FocusContext.Provider value={ focusKey }>
       <ScrollContext.Provider value={ scrollContextValue }>
@@ -256,6 +271,7 @@ export const ThemedListComponent = ({
   return (
     <View style={ [styles.listContainer, style] }>
       { renderHeader() }
+      { renderSearch() }
       { renderList() }
     </View>
   );

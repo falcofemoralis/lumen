@@ -5,6 +5,7 @@ export const MAX_ITEMS_TO_DISPLAY_LANDSCAPE = 5;
 
 export const ITEM_HEIGHT = 48;
 export const HEADER_HEIGHT = 32;
+export const SEARCH_HEIGHT = 64;
 
 // Share of the screen the items viewport may take before it caps below
 // MAX_ITEMS_TO_DISPLAY. The rest is left to the header and to whatever chrome
@@ -28,6 +29,13 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     fontSize: scale(text.sm.fontSize),
     lineHeight: scale(16),
     fontWeight: '500',
+  },
+  // Fixed height for the same reason as the header: the items viewport is sized
+  // against it, so whatever the caller puts here must not change the layout.
+  search: {
+    height: scale(SEARCH_HEIGHT),
+    justifyContent: 'center',
+    paddingVertical: scale(8),
   },
   // `flexBasis: 'auto'` rather than `flex: 1`: the list is commonly the child of
   // a container sized by its own content (an overlay panel). A zero basis makes

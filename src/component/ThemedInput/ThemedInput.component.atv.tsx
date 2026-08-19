@@ -65,10 +65,6 @@ export const ThemedInputComponent = ({
       return;
     }
 
-    if (trapRefGlobal) {
-      trapRefGlobal.current?.requestTVFocus();
-    }
-
     setTimeout(() => {
       textInputRef.current?.blur();
     }, 100);
@@ -78,6 +74,19 @@ export const ThemedInputComponent = ({
     focusKey,
     onEnterPress,
     onBlur,
+    onArrowPress: (key) => {
+      switch (key) {
+        case 'left':
+        case 'down':
+        case 'right':
+        case 'up':
+          if (trapRefGlobal) {
+            trapRefGlobal.current?.requestTVFocus();
+          }
+      }
+
+      return true;
+    },
   });
 
   useDefaultFocus(realFocusKey, autofocus);

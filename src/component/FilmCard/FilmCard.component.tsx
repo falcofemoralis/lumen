@@ -2,15 +2,18 @@ import { ThemedImage } from 'Component/ThemedImage';
 import { ThemedText } from 'Component/ThemedText';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
+import Ban from 'lucide-react-native/icons/ban';
 import { View } from 'react-native';
+import { useAppTheme } from 'Theme/context';
 
-import { FILM_TYPE_COLORS, TYPE_LABELS } from './FilmCard.config';
+import { FILM_TYPE_COLORS, HIDDEN_ICON_SIZE, TYPE_LABELS } from './FilmCard.config';
 import { componentStyles } from './FilmCard.style';
 import { FilmCardComponentProps } from './FilmCard.type';
 
 export function FilmCardComponent({
   filmCard,
   style,
+  isHidden,
 }: FilmCardComponentProps) {
   const {
     type,
@@ -21,6 +24,7 @@ export function FilmCardComponent({
     isPendingRelease,
   } = filmCard;
   const styles = useThemedStyles(componentStyles);
+  const { theme, scale } = useAppTheme();
 
   const renderType = () => (
     <ThemedText
@@ -81,6 +85,28 @@ export function FilmCardComponent({
       { subtitle }
     </ThemedText>
   );
+
+  if (isHidden) {
+    return (
+      <View style={ [styles.card, style] }>
+        <View style={ styles.posterWrapper }>
+          <View style={ [styles.poster, styles.hiddenPoster] }>
+            <Ban
+              size={ scale(HIDDEN_ICON_SIZE) }
+              color={ theme.colors.textSecondary }
+            />
+            <ThemedText
+              style={ styles.hiddenText }
+              numberOfLines={ 3 }
+            >
+              { t('Hidden based on your preferences') }
+            </ThemedText>
+          </View>
+        </View>
+        <View style={ [styles.info, styles.hiddenInfo] } />
+      </View>
+    );
+  }
 
   return (
     <View style={ [styles.card, style] }>

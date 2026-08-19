@@ -17,6 +17,10 @@ export const FILM_TYPE_COLORS = {
   [FilmType.TV_SHOW]: '##909215',
 };
 
+// The `Ban` mark a hidden card shows in place of its poster.
+export const HIDDEN_ICON_SIZE = 40;
+export const HIDDEN_ICON_SIZE_TV = 32;
+
 // Keep in sync with the `poster` style (width / aspectRatio)
 export const POSTER_WIDTH_RATIO = 0.3;
 export const POSTER_ASPECT_WIDTH = 166;

@@ -10,15 +10,27 @@ export function ThemedMultiListContainer({
   header,
   noItemsTitle,
   noItemsSubtitle,
+  disableCounter,
+  searchComponent,
   onChange,
 }: ThemedMultiListContainerProps) {
   const isTV = useIsTV();
-  const [values, setValues] = useState<ListItem[]>(data);
+  const [countedValues, setCountedValues] = useState<ListItem[]>(data);
+
+  // The counted copy exists only to write the `(n)` tallies into, and it is
+  // seeded once -- so while it is in use the caller cannot change what is on
+  // screen. With the counter off there is nothing to write, and the items are
+  // rendered as handed over, which is what a filtered list needs.
+  const values = disableCounter ? data : countedValues;
 
   const handleOnChange = useCallback((value: string, isChecked: boolean) => {
     onChange(value, isChecked);
 
-    setValues(values.map((item) => {
+    if (disableCounter) {
+      return;
+    }
+
+    setCountedValues((prevValues) => prevValues.map((item) => {
       if (item.value === value) {
         const labelMatch = item.label.match(/(.*?)\((\d+)\)$/);
         const label = labelMatch ? labelMatch[1] : item.label;
@@ -33,13 +45,14 @@ export function ThemedMultiListContainer({
 
       return item;
     }));
-  }, [onChange, values]);
+  }, [onChange, disableCounter]);
 
   const containerProps = {
     values,
     header,
     noItemsTitle,
     noItemsSubtitle,
+    searchComponent,
     handleOnChange,
   };
 
@@ -51,7 +64,8 @@ function propsAreEqual(
   prevProps: ThemedMultiListContainerProps,
   props: ThemedMultiListContainerProps
 ) {
-  return JSON.stringify(prevProps.data) === JSON.stringify(props.data);
+  return JSON.stringify(prevProps.data) === JSON.stringify(props.data)
+    && prevProps.searchComponent === props.searchComponent;
 }
 
 export default memo(ThemedMultiListContainer, propsAreEqual);

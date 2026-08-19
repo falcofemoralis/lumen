@@ -22,6 +22,7 @@ export const ThemedListComponent = ({
   onChange,
   rightAdditionalElement,
   emptyComponent,
+  searchComponent,
 }: ThemedSimpleListComponentProps) => {
   const styles = useThemedStyles(componentStyles);
   const isLandscape = useLandscape();
@@ -35,7 +36,9 @@ export const ThemedListComponent = ({
   // clipped ancestor cuts the last row with no way to scroll it into view.
   const viewportHeight = useMemo(() => {
     const itemHeight = styles.item.height;
-    const availableHeight = windowHeight * MAX_SCREEN_RATIO - (header ? styles.header.height : 0);
+    const availableHeight = windowHeight * MAX_SCREEN_RATIO
+      - (header ? styles.header.height : 0)
+      - (searchComponent ? styles.search.height : 0);
     const visibleItems = Math.min(
       data.length,
       isLandscape ? MAX_ITEMS_TO_DISPLAY_LANDSCAPE : MAX_ITEMS_TO_DISPLAY,
@@ -43,7 +46,7 @@ export const ThemedListComponent = ({
     );
 
     return visibleItems * itemHeight;
-  }, [styles, header, windowHeight, isLandscape, data.length]);
+  }, [styles, header, searchComponent, windowHeight, isLandscape, data.length]);
 
   // The row-aligned height only makes sense for the list itself -- with no data
   // it collapses to zero and would clip the empty component, which sizes itself.
@@ -74,6 +77,18 @@ export const ThemedListComponent = ({
         >
           { header }
         </ThemedText>
+      </View>
+    );
+  };
+
+  const renderSearch = () => {
+    if (!searchComponent) {
+      return null;
+    }
+
+    return (
+      <View style={ styles.search }>
+        { searchComponent }
       </View>
     );
   };
@@ -115,6 +130,7 @@ export const ThemedListComponent = ({
   return (
     <View style={ [styles.container, style] }>
       { renderHeader() }
+      { renderSearch() }
       { renderList() }
     </View>
   );

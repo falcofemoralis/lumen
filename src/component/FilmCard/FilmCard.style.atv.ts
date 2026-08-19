@@ -84,4 +84,30 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   posterPendingRelease: {
     opacity: 0.5,
   },
+  hiddenPoster: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: scale(8),
+    padding: scale(8),
+    backgroundColor: colors.backgroundLight,
+    // The border is always there, only ever transparent, so that gaining focus
+    // does not resize the card it sits in.
+    borderWidth: scale(2),
+    borderColor: 'transparent',
+    borderRadius: scale(12),
+  },
+  hiddenPosterFocused: {
+    borderColor: colors.backgroundFocused,
+  },
+  hiddenText: {
+    fontSize: scale(text.xs.fontSize),
+    color: colors.textSecondary,
+    textAlign: 'center',
+  },
+  // A hidden card has no title or subtitle to fill its info block, so the space
+  // those would take is held open -- a row of nothing but hidden cards would
+  // otherwise come out shorter than every other row.
+  hiddenInfo: {
+    height: scale(INFO_HEIGHT),
+  },
 } satisfies ThemedStyles);

@@ -350,6 +350,11 @@ const ru: Translations = {
   'No channels were added': 'Ни один канал не добавлен',
   'Search from the TV home screen': 'Поиск с домашнего экрана ТВ',
   'Show films from the app in the Android TV search.': 'Показывать фильмы из приложения в поиске Android TV.',
+  'Hidden countries': 'Скрытые страны',
+  'Cover up films from the selected countries in the lists.': 'Скрывать фильмы выбранных стран в списках.',
+  'Hidden based on your preferences': 'Скрыто на основе ваших предпочтений',
+  'Nothing found': 'Ничего не найдено',
+  'and {{amount}} more': 'и ещё {{amount}}',
 };
 
 export default ru;

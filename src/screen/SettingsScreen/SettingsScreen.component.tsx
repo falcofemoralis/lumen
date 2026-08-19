@@ -5,6 +5,7 @@ import { SettingBase } from 'Component/SettingBase';
 import { SettingCustomSelect } from 'Component/SettingCustomSelect';
 import { SettingInput } from 'Component/SettingInput';
 import { SettingLink } from 'Component/SettingLink';
+import { SettingMultiSelect } from 'Component/SettingMultiSelect';
 import { SettingSelect } from 'Component/SettingSelect';
 import { SettingSwitch } from 'Component/SettingSwitch';
 import { SettingText } from 'Component/SettingText';
@@ -26,6 +27,7 @@ import CloudCog from 'lucide-react-native/icons/cloud-cog';
 import CloudOff from 'lucide-react-native/icons/cloud-off';
 import Download from 'lucide-react-native/icons/download';
 import ExternalLink from 'lucide-react-native/icons/external-link';
+import EyeOff from 'lucide-react-native/icons/eye-off';
 import FolderCog from 'lucide-react-native/icons/folder-cog';
 import FolderDown from 'lucide-react-native/icons/folder-down';
 import FolderLock from 'lucide-react-native/icons/folder-lock';
@@ -62,6 +64,7 @@ import { openLinkInBrowser } from 'Util/Link';
 import {
   APP_LANGUAGE_OPTIONS,
   COLUMNS_MOBILE_OPTIONS,
+  FILM_COUNTRY_OPTIONS,
   GITHUB_LINK,
   MOBILE_SCREENS,
   PLAYER_ASPECT_RATIO_OPTIONS,
@@ -83,6 +86,7 @@ export function SettingsScreenComponent({
   initialRoute,
   homeDefaultTab,
   numberOfColumnsMobile,
+  hiddenCountries,
   playerRewindSeconds,
   playerShowBufferTime,
   playerShowEndTime,
@@ -244,6 +248,15 @@ export function SettingsScreenComponent({
         value={ numberOfColumnsMobile.toString() }
         options={ COLUMNS_MOBILE_OPTIONS }
         onChange={ (value) => onConfigUpdate('numberOfColumnsMobile', Number(value)) }
+      />
+      <SettingMultiSelect
+        title={ t('Hidden countries') }
+        subtitle={ t('Cover up films from the selected countries in the lists.') }
+        IconComponent={ EyeOff }
+        values={ hiddenCountries }
+        options={ FILM_COUNTRY_OPTIONS }
+        withSearch
+        onChange={ (values) => onConfigUpdate('hiddenCountries', values) }
       />
       <SettingSwitch
         title={ t('Local mode') }

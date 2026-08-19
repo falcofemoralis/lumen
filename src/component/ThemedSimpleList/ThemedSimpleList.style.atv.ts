@@ -3,6 +3,7 @@ import { Theme, ThemedStyles } from 'Theme/types';
 export const MAX_ITEMS_TO_DISPLAY = 5;
 export const ITEM_HEIGHT = 48;
 export const HEADER_HEIGHT = 30;
+export const SEARCH_HEIGHT = 64;
 
 // Share of the screen the items viewport may take before it caps below
 // MAX_ITEMS_TO_DISPLAY. The rest is left to the header and to whatever chrome
@@ -29,6 +30,13 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   listContainer: {
     flexDirection: 'column',
     flex: 0,
+  },
+  // Fixed height for the same reason as the header: the items viewport is sized
+  // against it, so whatever the caller puts here must not change the layout.
+  search: {
+    height: scale(SEARCH_HEIGHT),
+    justifyContent: 'center',
+    paddingVertical: scale(8),
   },
   // Height is set by the component: an exact number of rows, so the viewport
   // never ends mid-item and never overflows what the overlay can show.
