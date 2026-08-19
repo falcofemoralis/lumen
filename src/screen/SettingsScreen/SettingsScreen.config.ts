@@ -118,10 +118,6 @@ export const APP_LANGUAGE_OPTIONS = [
 ];
 
 export const FILM_COUNTRY_OPTIONS = [
-  'test1',
-  'test2',
-  'abcd',
-  'ukraine',
   'Россия',
   'СССР',
   'США',
