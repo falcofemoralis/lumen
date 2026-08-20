@@ -7,10 +7,12 @@ import { t } from 'i18n/translate';
 import { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
 import { CommentInterface } from 'Type/Comment.interface';
+import { addLocalComment } from 'Util/LocalComments';
 import { queryKeys } from 'Util/Query';
 
 import CommentsComponent from './Comments.component';
 import CommentsComponentTV from './Comments.component.atv';
+import { getCommentId } from './Comments.config';
 import { CommentsContainerProps } from './Comments.type';
 
 export type CommentsRef = {
@@ -79,12 +81,22 @@ export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>
       postLike(commentId);
     }, [isSignedIn, isTV, postLike]);
 
+    // The reply target reaches the mutation as an id only. On TV that id is the
+    // one the service knows, which a split comment carries as `originalId` --
+    // `getCommentId` resolves both forms.
+    const findUsername = (commentId: string) => comments?.find(
+      (comment) => getCommentId(comment) === commentId
+    )?.username;
+
     const { mutateAsync: postComment, isPending: isPosting } = useMutation({
       mutationFn: ({ text, replyToId }: { text: string; replyToId?: string }) => {
         return currentService.postComment(id, text, replyToId);
       },
-      onSuccess: (result) => {
+      onSuccess: (result, { text, replyToId }) => {
         setReplyTo(null);
+        // The service offers no way to list what this account has written, so
+        // the comment is only ever recoverable from what is kept here.
+        addLocalComment(film, text, replyToId ? findUsername(replyToId) : undefined);
         NotificationStore.displayMessage(result ?? t('Comment posted'));
 
         // the service assigns the id and the date, so the new comment can only

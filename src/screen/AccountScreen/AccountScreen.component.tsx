@@ -74,7 +74,7 @@ export function AccountScreenComponent({
   logoutConfirmOverlayRef,
   openSettings,
   openNotifications,
-  openNotImplemented,
+  openMyComments,
   openDownloads,
 }: AccountScreenComponentProps) {
   const { scale, theme } = useAppTheme();
@@ -209,7 +209,7 @@ export function AccountScreenComponent({
           <AccountActionButton
             title={ t('Comments') }
             IconComponent={ MessageSquareText }
-            action={ openNotImplemented }
+            action={ openMyComments }
           />
           <AccountActionButton
             title={ t('View Profile') }

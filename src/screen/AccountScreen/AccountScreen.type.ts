@@ -15,6 +15,6 @@ export interface AccountScreenComponentProps {
   logoutConfirmOverlayRef: RefObject<ThemedOverlayRef | null>;
   openSettings: () => void;
   openNotifications: () => void;
-  openNotImplemented: () => void;
+  openMyComments: () => void;
   openDownloads: () => void;
 }

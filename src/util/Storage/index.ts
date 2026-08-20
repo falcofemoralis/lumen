@@ -101,6 +101,7 @@ class Storage {
   private miscStorage: StorageWrapper|null = null;
   private downloadsStorage: StorageWrapper|null = null;
   private localLibraryStorage: StorageWrapper|null = null;
+  private commentsStorage: StorageWrapper|null = null;
 
   getConfigStorage() {
     if (!this.configStorage) {
@@ -148,6 +149,14 @@ class Storage {
     }
 
     return this.localLibraryStorage;
+  }
+
+  getCommentsStorage() {
+    if (!this.commentsStorage) {
+      this.commentsStorage = new StorageWrapper(createMMKV({ id: 'comments' }));
+    }
+
+    return this.commentsStorage;
   }
 }
 

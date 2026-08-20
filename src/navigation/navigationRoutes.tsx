@@ -17,6 +17,7 @@ export const TABS_SCREEN = 'Tabs';
 export const DOWNLOADS_SCREEN = 'Downloads';
 export const COLLECTION_SCREEN = 'Collection';
 export const FILM_TRAILER_SCREEN = 'FilmTrailer';
+export const MY_COMMENTS_SCREEN = 'MyComments';
 
 export const ACCOUNT_TAB = `${ACCOUNT_SCREEN}-tab`;
 export const HOME_TAB = `${HOME_SCREEN}-tab`;
@@ -24,6 +25,7 @@ export const SEARCH_TAB = `${SEARCH_SCREEN}-tab`;
 export const BOOKMARKS_TAB = `${BOOKMARKS_SCREEN}-tab`;
 export const RECENT_TAB = `${RECENT_SCREEN}-tab`;
 export const NOTIFICATIONS_TAB = `${NOTIFICATIONS_SCREEN}-tab`;
+export const MY_COMMENTS_TAB = `${MY_COMMENTS_SCREEN}-tab`;
 
 /**
 * This is a list of all the screen names that will exit the app if the back button

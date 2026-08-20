@@ -1,10 +1,13 @@
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
-import { t } from 'i18n/translate';
-import { DOWNLOADS_SCREEN, NOTIFICATIONS_SCREEN, SETTINGS_SCREEN } from 'Navigation/navigationRoutes';
+import {
+  DOWNLOADS_SCREEN,
+  MY_COMMENTS_SCREEN,
+  NOTIFICATIONS_SCREEN,
+  SETTINGS_SCREEN,
+} from 'Navigation/navigationRoutes';
 import { useCallback, useRef } from 'react';
-import NotificationStore from 'Store/Notification.store';
 import { navigate } from 'Util/Navigation';
 
 import AccountScreenComponent from './AccountScreen.component';
@@ -53,8 +56,8 @@ export function AccountScreenContainer() {
     navigate(DOWNLOADS_SCREEN);
   }, []);
 
-  const openNotImplemented = useCallback(() => {
-    NotificationStore.displayMessage(t('Not implemented'));
+  const openMyComments = useCallback(() => {
+    navigate(MY_COMMENTS_SCREEN);
   }, []);
 
   const containerProps = {
@@ -69,7 +72,7 @@ export function AccountScreenContainer() {
     logoutConfirmOverlayRef,
     openSettings,
     openNotifications,
-    openNotImplemented,
+    openMyComments,
     openDownloads,
   };
 
