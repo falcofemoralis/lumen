@@ -1,3 +1,35 @@
+diff --git a/node_modules/@kesha-antonov/react-native-background-downloader/android/src/main/java/com/eko/DownloadConstants.kt b/node_modules/@kesha-antonov/react-native-background-downloader/android/src/main/java/com/eko/DownloadConstants.kt
+index 84b0206..341d1aa 100644
+--- a/node_modules/@kesha-antonov/react-native-background-downloader/android/src/main/java/com/eko/DownloadConstants.kt
++++ b/node_modules/@kesha-antonov/react-native-background-downloader/android/src/main/java/com/eko/DownloadConstants.kt
+@@ -44,6 +44,27 @@ object DownloadConstants {
+      */
+     const val UNMETERED_RECHECK_DELAY_MS = 3_000L
+ 
++    // ========== Transient Error Recovery ==========
++    // LUMEN PATCH: a download that loses its connection waits and reconnects from
++    // its byte offset instead of failing outright.
++    // See ResumableDownloader.downloadWithResume.
++
++    /** Delay before the first reconnect attempt (milliseconds) */
++    const val RETRY_INITIAL_DELAY_MS = 2_000L
++
++    /** Ceiling for the exponential backoff between reconnect attempts (milliseconds) */
++    const val RETRY_MAX_DELAY_MS = 30_000L
++
++    /**
++     * How long a download may keep failing before the error is reported to JS.
++     * The window restarts whenever an attempt manages to transfer more bytes, so
++     * only a sustained outage fails a long download over a flaky link.
++     */
++    const val RETRY_TOTAL_WINDOW_MS = 5 * 60 * 1_000L
++
++    /** How often the wait between attempts re-checks for a pause/cancel (milliseconds) */
++    const val RETRY_POLL_INTERVAL_MS = 500L
++
+     // ========== HTTP Headers ==========
+ 
+     /** Keep-Alive header value for connection pooling */
 diff --git a/node_modules/@kesha-antonov/react-native-background-downloader/android/src/main/java/com/eko/RNBackgroundDownloaderModuleImpl.kt b/node_modules/@kesha-antonov/react-native-background-downloader/android/src/main/java/com/eko/RNBackgroundDownloaderModuleImpl.kt
 index e9e582d..945c285 100644
 --- a/node_modules/@kesha-antonov/react-native-background-downloader/android/src/main/java/com/eko/RNBackgroundDownloaderModuleImpl.kt
@@ -40,6 +72,303 @@ index e9e582d..945c285 100644
        startWithResumableDownloader()
        return
      }
+diff --git a/node_modules/@kesha-antonov/react-native-background-downloader/android/src/main/java/com/eko/ResumableDownloader.kt b/node_modules/@kesha-antonov/react-native-background-downloader/android/src/main/java/com/eko/ResumableDownloader.kt
+index 9f74748..f25cb67 100644
+--- a/node_modules/@kesha-antonov/react-native-background-downloader/android/src/main/java/com/eko/ResumableDownloader.kt
++++ b/node_modules/@kesha-antonov/react-native-background-downloader/android/src/main/java/com/eko/ResumableDownloader.kt
+@@ -1,6 +1,7 @@
+ package com.eko
+ 
+ import android.net.Network
++import android.os.SystemClock
+ import com.eko.utils.HeaderUtils
+ import java.io.File
+ import java.io.FileOutputStream
+@@ -239,12 +240,28 @@ class ResumableDownloader {
+     // Download directly to destination file
+     val destFile = File(destination)
+ 
+-    // Clean up any existing destination file if starting fresh (startByte == 0)
++    // LUMEN PATCH: a caller asking for a fresh start (startByte == 0) that finds
++    // bytes already on disk continues from them instead of throwing them away.
++    //
++    // This is what makes the downloads screen's restart button resume. The JS side
++    // has no way to pass a byte offset - DownloadOption carries none - so a restart
++    // after a failed transfer would otherwise delete the partial file and re-fetch a
++    // multi-GB film from zero. Destinations here are 1:1 with a film/voice/quality/
++    // episode, so an existing partial file is always the same content, even when the
++    // CDN has since handed out a fresh signed url for it.
++    //
++    // Safe when that assumption does not hold: a server that ignores the Range
++    // header answers 200 rather than 206, and the HTTP_OK branch in executeDownload
++    // resets the counter and truncates the file.
++    var effectiveStartByte = startByte
+     if (startByte == 0L && destFile.exists()) {
+-      if (!destFile.delete()) {
++      val partialLength = destFile.length()
++
++      if (partialLength > 0) {
++        effectiveStartByte = partialLength
++        RNBackgroundDownloaderModuleImpl.logD(TAG, "Resuming from existing partial file: $destination ($partialLength bytes)")
++      } else if (!destFile.delete()) {
+         RNBackgroundDownloaderModuleImpl.logW(TAG, "Failed to delete existing destination file: $destination")
+-      } else {
+-        RNBackgroundDownloaderModuleImpl.logD(TAG, "Deleted existing destination file: $destination")
+       }
+     }
+ 
+@@ -257,10 +274,13 @@ class ResumableDownloader {
+       isAllowedOverMetered = isAllowedOverMetered
+     )
+ 
+-    // Set initial bytes downloaded (only for explicit resume with startByte > 0)
+-    if (startByte > 0) {
+-      state.bytesDownloaded.set(startByte)
+-      state.hasReportedBegin = true // Don't report begin again for resumed downloads
++    // Set initial bytes downloaded (only when resuming from a non-zero offset)
++    if (effectiveStartByte > 0) {
++      state.bytesDownloaded.set(effectiveStartByte)
++      // An explicit resume (startByte > 0) already reported begin on the attempt it
++      // is continuing. A restart that picked its offset up off disk is a brand new
++      // task in JS and still needs one, so leave the flag alone there.
++      state.hasReportedBegin = startByte > 0
+ 
+       // Ensure parent directories exist
+       val parentDir = destFile.parentFile
+@@ -389,32 +409,165 @@ class ResumableDownloader {
+ 
+   fun getBytesTotal(id: String): Long = activeDownloads[id]?.bytesTotal ?: -1
+ 
++  /**
++   * LUMEN PATCH: a dropped connection is not a failure yet.
++   *
++   * Switching Wi-Fi networks, or falling back to mobile data, aborts the socket
++   * mid-read ("unexpected end of stream"). Upstream reports that straight to JS as
++   * a terminal error, which loses every byte transferred so far. Instead keep the
++   * bytes and the offset, wait, and reconnect using the Range header this
++   * downloader already sends.
++   *
++   * Only a failure still failing after RETRY_TOTAL_WINDOW_MS, or one that waiting
++   * cannot fix (404, expired link, no space left), reaches the listener - so
++   * executeDownload no longer reports errors itself, this does.
++   */
+   private fun downloadWithResume(state: DownloadState, listener: DownloadListener, expectedSessionId: Long) {
+-    val result = executeDownload(state, listener, expectedSessionId)
++    var current = state
++    var retryDeadline = 0L
++    var retryDelayMs = DownloadConstants.RETRY_INITIAL_DELAY_MS
++    var lastFailureBytes = -1L
++
++    while (true) {
++      when (val result = executeDownload(current, listener, expectedSessionId)) {
++        is DownloadResult.Success -> {
++          // Already notified in executeDownload
++          return
++        }
++        is DownloadResult.Paused -> {
++          // Paused state - no listener callback needed, user can resume later
++          RNBackgroundDownloaderModuleImpl.logD(TAG, "Download paused: ${result.id} at ${result.bytesDownloaded} bytes")
++          return
++        }
++        is DownloadResult.Cancelled -> {
++          // Cancelled - no callback, cleanup already done
++          RNBackgroundDownloaderModuleImpl.logD(TAG, "Download cancelled: ${result.id}")
++          return
++        }
++        is DownloadResult.SessionInvalidated -> {
++          // Session invalidated - stale thread, no callback
++          RNBackgroundDownloaderModuleImpl.logD(TAG, "Download session invalidated: ${result.id}")
++          return
++        }
++        is DownloadResult.Error -> {
++          // A redirect swaps the canonical entry for one carrying the resolved url;
++          // retry that one instead of re-resolving the redirect on every attempt.
++          current = activeDownloads[current.id] ?: current
++
++          val now = SystemClock.elapsedRealtime()
++          val bytesNow = current.bytesDownloaded.get()
++
++          // A first failure, or one that arrived after the previous attempt made
++          // progress, opens a fresh window: a long download over a flaky link must
++          // not run out of patience because of a blip an hour ago.
++          if (retryDeadline == 0L || bytesNow > lastFailureBytes) {
++            retryDeadline = now + DownloadConstants.RETRY_TOTAL_WINDOW_MS
++            retryDelayMs = DownloadConstants.RETRY_INITIAL_DELAY_MS
++          }
++          lastFailureBytes = bytesNow
++
++          if (!isRetryable(result) || now >= retryDeadline) {
++            RNBackgroundDownloaderModuleImpl.logE(
++              TAG,
++              "Download failed: ${result.id} - ${result.message} (code ${result.errorCode})"
++            )
++            listener.onError(result.id, result.message, result.errorCode)
++            return
++          }
+ 
+-    // Handle the result by notifying the listener
+-    when (result) {
+-      is DownloadResult.Success -> {
+-        // Already notified in executeDownload
+-      }
+-      is DownloadResult.Paused -> {
+-        // Paused state - no listener callback needed, user can resume later
+-        RNBackgroundDownloaderModuleImpl.logD(TAG, "Download paused: ${result.id} at ${result.bytesDownloaded} bytes")
+-      }
+-      is DownloadResult.Cancelled -> {
+-        // Cancelled - no callback, cleanup already done
+-        RNBackgroundDownloaderModuleImpl.logD(TAG, "Download cancelled: ${result.id}")
++          RNBackgroundDownloaderModuleImpl.logW(
++            TAG,
++            "Transient error on ${result.id} at $bytesNow bytes (${result.message}), reconnecting in ${retryDelayMs}ms"
++          )
++
++          // The counter tracks bytes handed to the output stream; a connection that
++          // died mid-write can leave the file shorter than that. Append to what is
++          // really on disk, or the resumed range lands at the wrong offset.
++          syncToFileLength(current)
++
++          if (!awaitRetry(current, expectedSessionId, retryDelayMs)) {
++            return
++          }
++
++          retryDelayMs = (retryDelayMs * 2).coerceAtMost(DownloadConstants.RETRY_MAX_DELAY_MS)
++        }
+       }
+-      is DownloadResult.SessionInvalidated -> {
+-        // Session invalidated - stale thread, no callback
+-        RNBackgroundDownloaderModuleImpl.logD(TAG, "Download session invalidated: ${result.id}")
++    }
++  }
++
++  /**
++   * Whether waiting and reconnecting could plausibly fix this failure. Anything the
++   * server or the device will keep answering the same way - a missing file, an
++   * expired link, a full disk - fails immediately instead of stalling for minutes.
++   */
++  private fun isRetryable(error: DownloadResult.Error): Boolean {
++    val code = error.errorCode
++
++    // Non-HTTP failure: classify by the exception behind it
++    if (code < 0) {
++      val cause = error.cause ?: return false
++
++      // Thrown for a destination path that cannot be opened, not for a lost socket
++      if (cause is java.io.FileNotFoundException) return false
++
++      val message = (cause.message ?: "").lowercase()
++      if (message.contains("enospc") || message.contains("no space left")) return false
++      if (message.contains("eacces") || message.contains("permission denied")) return false
++
++      // Socket resets, unexpected end of stream, DNS failures and read timeouts all
++      // surface as IOException from Android's HttpURLConnection
++      return cause is java.io.IOException
++    }
++
++    // 416 (range not satisfiable) and the rest of 4xx will not change on a retry
++    return code == 408 || code == 429 || code in 500..599
++  }
++
++  /**
++   * Wait before the next attempt, giving up the moment the user pauses or cancels,
++   * or the download is superseded. Returns false when the caller must stop without
++   * reporting anything - those outcomes carry their own (absent) callbacks.
++   */
++  private fun awaitRetry(state: DownloadState, expectedSessionId: Long, delayMs: Long): Boolean {
++    val until = SystemClock.elapsedRealtime() + delayMs
++
++    // A stale interrupt left over from the failed transfer would make every sleep
++    // below throw at once. The stop conditions are checked explicitly here, so the
++    // flag carries no information worth keeping.
++    Thread.interrupted()
++
++    while (true) {
++      if (state.sessionId.get() != expectedSessionId || state.isCancelled.get() || state.isPaused.get()) {
++        RNBackgroundDownloaderModuleImpl.logD(TAG, "Retry wait ended early for ${state.id} (paused, cancelled or superseded)")
++        return false
+       }
+-      is DownloadResult.Error -> {
+-        // Error already reported to listener in executeDownload
++
++      val remaining = until - SystemClock.elapsedRealtime()
++      if (remaining <= 0) return true
++
++      try {
++        Thread.sleep(remaining.coerceAtMost(DownloadConstants.RETRY_POLL_INTERVAL_MS))
++      } catch (e: InterruptedException) {
++        // pause() and cancel() interrupt the thread to end this wait promptly. Clear
++        // the flag and loop, so the checks at the top of the loop decide what the
++        // interrupt meant rather than this handler guessing - an interrupt with no
++        // stop condition behind it must not strand the download with no callback.
++        Thread.interrupted()
+       }
+     }
+   }
+ 
++  /** Re-point the resume offset at what actually made it to disk. */
++  private fun syncToFileLength(state: DownloadState) {
++    val onDisk = File(state.destination).length()
++    val counted = state.bytesDownloaded.get()
++
++    if (onDisk != counted) {
++      RNBackgroundDownloaderModuleImpl.logW(TAG, "Resume offset for ${state.id} corrected from $counted to on-disk length $onDisk")
++      state.bytesDownloaded.set(onDisk)
++    }
++  }
++
+   /**
+    * Execute the download and return a DownloadResult.
+    * This method handles all download logic and returns a type-safe result.
+@@ -544,14 +697,28 @@ class ResumableDownloader {
+             return DownloadResult.Success(state.id, state.destination, state.bytesTotal, state.bytesTotal)
+           }
+ 
+-          val error = DownloadResult.httpError(state.id, responseCode, "Range not satisfiable")
+-          listener.onError(state.id, error.message, error.errorCode)
+-          return error
++          // LUMEN PATCH: the offset we resumed from does not fit this url - the file
++          // on disk is stale, or the server's copy shrank. Start over instead of
++          // failing: the offset was inferred from the file (see registerNewDownload),
++          // so the caller never asked for it and cannot be expected to correct it.
++          if (startByte > 0) {
++            RNBackgroundDownloaderModuleImpl.logW(TAG, "Discarding stale partial file for ${state.id}, restarting from zero")
++            connection.disconnect()
++            state.bytesDownloaded.set(0)
++
++            if (destFile.exists() && !destFile.delete()) {
++              RNBackgroundDownloaderModuleImpl.logW(TAG, "Failed to delete stale partial file: ${state.destination}")
++            }
++
++            // Cannot recurse again: the retried attempt starts from byte 0
++            return executeDownload(state, listener, expectedSessionId)
++          }
++
++          // Reported by downloadWithResume, which decides whether to retry first
++          return DownloadResult.httpError(state.id, responseCode, "Range not satisfiable")
+         }
+         else -> {
+-          val error = DownloadResult.httpError(state.id, responseCode)
+-          listener.onError(state.id, error.message, error.errorCode)
+-          return error
++          return DownloadResult.httpError(state.id, responseCode)
+         }
+       }
+ 
+@@ -678,11 +845,9 @@ class ResumableDownloader {
+           DownloadResult.Paused(state.id, state.bytesDownloaded.get(), state.bytesTotal)
+         }
+         else -> {
+-          // Unexpected error - log with stack trace and report to listener
+-          RNBackgroundDownloaderModuleImpl.logE(TAG, "Download error: ${e.message}")
+-          val error = DownloadResult.fromException(state.id, e)
+-          listener.onError(state.id, error.message, error.errorCode)
+-          error
++          // Reported by downloadWithResume, which decides whether to retry first
++          RNBackgroundDownloaderModuleImpl.logD(TAG, "Download transfer error: ${state.id} - ${e.message}")
++          DownloadResult.fromException(state.id, e)
+         }
+       }
+     } finally {
 diff --git a/node_modules/@kesha-antonov/react-native-background-downloader/android/src/main/java/com/eko/uidt/UIDTJobState.kt b/node_modules/@kesha-antonov/react-native-background-downloader/android/src/main/java/com/eko/uidt/UIDTJobState.kt
 index 5004af7..cf9bad8 100644
 --- a/node_modules/@kesha-antonov/react-native-background-downloader/android/src/main/java/com/eko/uidt/UIDTJobState.kt

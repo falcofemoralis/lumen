@@ -185,8 +185,9 @@ export const DownloadsScreenContainer = () => {
         });
       }
 
-      // do not add files that are still downloading
-      if (file.task) {
+      // A file that is still downloading, or that a failed download left half
+      // written, has nothing playable on disk yet
+      if (file.task || file.isPartial) {
         return;
       }
 
@@ -319,6 +320,13 @@ export const DownloadsScreenContainer = () => {
   }, [getFileDestination]);
 
   const completeTask = useCallback((task: DownloadTask) => {
+    const destination = getFileDestination(task);
+
+    // The file is whole now, so a rescan may offer it for playback
+    if (destination) {
+      TaskIdStorage.setComplete(destination);
+    }
+
     if (completeTimeoutRef.current) {
       clearTimeout(completeTimeoutRef.current);
     }
@@ -326,7 +334,7 @@ export const DownloadsScreenContainer = () => {
     completeTimeoutRef.current = setTimeout(() => {
       scanFiles();
     }, 100);
-  }, [scanFiles]);
+  }, [scanFiles, getFileDestination]);
 
   const toggleTask = useCallback(async (taskId: string, isActive: boolean) => {
     const task = downloadedFilms.flatMap(film => film.tasks).find((tsk) => tsk.id === taskId);
@@ -347,6 +355,15 @@ export const DownloadsScreenContainer = () => {
     }
   }, [downloadedFilms]);
 
+  /**
+   * Re-create a failed task so it can be run again. The native downloader picks the
+   * partial file at the destination back up, so this continues from the last byte
+   * rather than fetching the film again from zero.
+   *
+   * The returned task is NOT started: `done`/`error`/`progress` hold a single
+   * handler each, so the caller has to attach its own before starting, or an
+   * immediate failure would land on a task nothing is listening to.
+   */
   const restartTask = useCallback((task: DownloadTask) => {
     const destination = getFileDestination(task);
     if (!destination) {
@@ -370,16 +387,7 @@ export const DownloadsScreenContainer = () => {
         url: taskInfo.url,
         destination: taskInfo.destination,
         metadata: task.metadata,
-      })
-        .done(() => {
-          completeHandler(task.id);
-        })
-        .error(({ error }) => {
-          NotificationStore.displayError(error);
-          completeHandler(task.id);
-        });
-
-      newTask.start();
+      });
 
       updateDownloadedFilms(prev => prev.map(film => ({
         ...film,
@@ -411,10 +419,6 @@ export const DownloadsScreenContainer = () => {
       completeTask(task);
     }
   }, [deleteFile, completeTask, getFileDestination]);
-
-  const handleTaskError = useCallback((task: DownloadTask) => {
-    deleteFile(task);
-  }, [deleteFile]);
 
   const deleteFilm = useCallback(async (item: DownloadFilmInterface) => {
     const { tasks, folder: destination } = item;
@@ -454,7 +458,6 @@ export const DownloadsScreenContainer = () => {
     downloadedFilms,
     isLoading,
     handleVideoSelect,
-    deleteFile,
     restartTask,
     deleteTask,
     deleteFilm,
@@ -462,7 +465,6 @@ export const DownloadsScreenContainer = () => {
     handleRefresh,
     completeTask,
     toggleTask,
-    handleTaskError,
   };
 
   return isTV ? <DownloadsScreenComponentTV { ...containerProps } /> : <DownloadsScreenComponent { ...containerProps } />;

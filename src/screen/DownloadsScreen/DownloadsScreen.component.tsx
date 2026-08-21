@@ -36,7 +36,7 @@ import { DownloadFilmInterface } from 'Type/DownloadFile.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { copyToClipboard } from 'Util/Clipboard';
-import { formatBytes, hasDownloadedVideo } from 'Util/Download';
+import { formatBytes, getDownloadErrorMessage, hasDownloadedVideo } from 'Util/Download';
 
 import { NUMBER_OF_COLUMNS } from './DownloadsScreen.config';
 import { componentStyles } from './DownloadsScreen.style';
@@ -46,7 +46,6 @@ const DownloadItemTask = ({
   task,
   styles,
   deleteTask,
-  deleteFile,
   restartTask,
   toggleTask,
   completeTask,
@@ -83,13 +82,12 @@ const DownloadItemTask = ({
       .done(() => {
         completeTask(task);
       })
-      .error(({ error: err }) => {
-        deleteFile(task);
-        setError(err ?? t('Download failed'));
-        setDownloaded(0);
-        setTotal(0);
-        setProgressPercentage(0);
-        progress.value = 0;
+      .error(({ error: err, errorCode }) => {
+        // The partial file deliberately stays on disk. The native downloader has
+        // already spent its retry window reconnecting before reporting this, and
+        // restarting resumes from the last byte instead of re-fetching the film
+        // from zero -- so the progress shown here stays put too.
+        setError(getDownloadErrorMessage(err, errorCode));
       });
   };
 
@@ -102,7 +100,9 @@ const DownloadItemTask = ({
     setIsPaused(false);
     const newTask = restartTask(task);
     if (newTask) {
+      // Handlers first: restartTask hands the task over unstarted for this reason
       processTask(newTask);
+      newTask.start();
     }
   };
 

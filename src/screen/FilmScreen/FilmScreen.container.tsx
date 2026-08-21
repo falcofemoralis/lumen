@@ -26,7 +26,9 @@ import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
-import { getDownloadsDir, getUrlExtension, normalizeName, TaskIdStorage, uuid } from 'Util/Download';
+import {
+  getDownloadErrorMessage, getDownloadsDir, getUrlExtension, normalizeName, TaskIdStorage, uuid,
+} from 'Util/Download';
 import {
   applyLocalScheduleMarks,
   getLocalBookmarksForFilm,
@@ -481,10 +483,14 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
         },
       })
         .done(() => {
+          // The downloads screen clears this too, but only for a task it is
+          // rendering -- a film downloaded without ever opening that screen would
+          // otherwise stay flagged as half written forever.
+          TaskIdStorage.setComplete(destination);
           completeHandler(task.id);
         })
-        .error(({ error }) => {
-          NotificationStore.displayError(error ?? t('Download failed'));
+        .error(({ error, errorCode }) => {
+          NotificationStore.displayError(getDownloadErrorMessage(error, errorCode));
           completeHandler(task.id);
         });
 

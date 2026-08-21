@@ -8,7 +8,6 @@ export interface DownloadsScreenComponentProps {
   downloadedFilms: DownloadFilmInterface[];
   isLoading: boolean;
   handleVideoSelect: (film: FilmInterface, video: FilmVideoInterface, voice: FilmVoiceInterface) => void;
-  deleteFile: (task: DownloadTask) => void;
   restartTask: (task: DownloadTask) => DownloadTask|null;
   deleteTask: (task: DownloadTask) => void;
   deleteFilm: (item: DownloadFilmInterface) => void;
@@ -16,7 +15,6 @@ export interface DownloadsScreenComponentProps {
   handleRefresh: (isRefresh: boolean) => Promise<void>;
   completeTask: (task: DownloadTask) => void;
   toggleTask: (taskId: string, isActive: boolean) => Promise<void>;
-  handleTaskError: (task: DownloadTask) => void;
 }
 
 export interface DownloadItemProps extends Omit<DownloadsScreenComponentProps, 'handleRefresh' | 'isLoading'> {

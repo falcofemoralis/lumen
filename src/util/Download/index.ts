@@ -1,3 +1,4 @@
+import { t } from 'i18n/translate';
 import { reactNativeDownloads } from 'Modules/react-native-downloads';
 import { DownloadFileInterface, DownloadFilmInterface } from 'Type/DownloadFile.interface';
 import { storage } from 'Util/Storage';
@@ -58,17 +59,37 @@ export const TaskIdStorage = {
   getOrCreate: (destination: string, data: Omit<DownloadFileInterface, 'id'>): string => {
     const mapping = TaskIdStorage.load();
 
-    if (mapping[destination]) return mapping[destination].id;
+    // A download that is only starting now has nothing complete on disk, whether
+    // this is its first attempt or a retry of one that failed earlier
+    if (mapping[destination]) {
+      const { id } = mapping[destination];
+      mapping[destination] = { ...mapping[destination], isPartial: true };
+      TaskIdStorage.save(mapping);
+
+      return id;
+    }
 
     const newId = uuid();
     mapping[destination] = {
       id: newId,
       ...data,
+      isPartial: true,
     };
 
     TaskIdStorage.save(mapping);
 
     return newId;
+  },
+
+  /** Mark a destination's file as fully downloaded and playable. */
+  setComplete: (destination: string) => {
+    const mapping = TaskIdStorage.load();
+    const entry = mapping[destination];
+
+    if (!entry || !entry.isPartial) return;
+
+    mapping[destination] = { ...entry, isPartial: false };
+    TaskIdStorage.save(mapping);
   },
 
   clear: (url: string) => {
@@ -109,6 +130,38 @@ export const getUrlExtension = (url: string, fallback: string): string => {
   const extension = fileName.split('.').pop() ?? '';
 
   return (/^[a-zA-Z0-9]{1,5}$/).test(extension) ? extension : fallback;
+};
+
+/**
+ * A native download failure, phrased for someone watching films rather than
+ * reading logcat.
+ *
+ * The downloader reports transport level strings -- "unexpected end of stream",
+ * "HTTP error: 403" -- which say nothing useful on screen. By the time one of them
+ * reaches JS the native side has already spent its retry window reconnecting from
+ * the last byte, so the only thing worth telling the user is which kind of failure
+ * it settled on: a link that will never work again, no room on the device, or the
+ * generic case they can just retry.
+ */
+export const getDownloadErrorMessage = (error?: string | null, errorCode?: number): string => {
+  if (__DEV__) {
+    console.warn('Download failed:', errorCode, error);
+  }
+
+  // The signed url the film was resolved with has expired, or the file is gone
+  // from the CDN. Retrying this url never succeeds -- the film has to be opened
+  // again so a fresh link is resolved.
+  if (errorCode === 403 || errorCode === 404 || errorCode === 410) {
+    return t('Download link is no longer valid');
+  }
+
+  const message = (error ?? '').toLowerCase();
+
+  if (message.includes('enospc') || message.includes('no space left')) {
+    return t('Not enough free space');
+  }
+
+  return t('Failed to download the file');
 };
 
 export const normalizeName = (name: string) => {
