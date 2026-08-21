@@ -59,6 +59,7 @@
     ]
   },
   "plugins": [
+    "./plugins/withAbiSplits.js",
     "./plugins/withReactNativeKeyevent.js",
     "./plugins/withTvSearchable.js",
     [

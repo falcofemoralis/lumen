@@ -12,13 +12,13 @@
     "lint:check": "eslint src",
     "measure": "flashlight measure",
     "test": "tsx --test \"test/**/*.test.ts\"",
-    "sign": "zipalign -f -v 4 android\\app\\build\\outputs\\apk\\release\\app-release.apk release-signed.apk && apksigner sign --ks lumen.keystore --ks-key-alias lumen release-signed.apk",
-    "build": "npx expo prebuild --clean --platform android && cd android && gradlew assembleRelease",
-    "build:mac": "npx expo prebuild --clean --platform android && cd android && ./gradlew assembleRelease",
+    "sign": "node scripts/sign.mjs",
+    "build": "npm run lint:check && npx expo prebuild --clean --platform android && cd android && gradlew assembleRelease",
+    "build:mac": "npm run lint:check && npx expo prebuild --clean --platform android && cd android && ./gradlew assembleRelease",
     "adb:connect": "adb connect 192.168.1.104",
     "adb:disconnect": "adb disconnect 192.168.1.104",
     "adb:install:dev": "adb install android/app/build/outputs/apk/release/app-release.apk",
-    "adb:install:prod": "adb install release-signed.apk",
+    "adb:install:prod": "adb install -r dist/lumen-arm64-v8a.apk",
     "postinstall": "patch-package"
   },
   "dependencies": {
