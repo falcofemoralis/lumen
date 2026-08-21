@@ -2,6 +2,8 @@ import { Page } from 'Component/Page';
 import { getAspectRatio } from 'Component/Player/Player.config';
 import { SettingBase } from 'Component/SettingBase';
 import { SettingCustomSelect } from 'Component/SettingCustomSelect';
+import { SettingExport } from 'Component/SettingExport';
+import { SettingImport } from 'Component/SettingImport';
 import { SettingInput } from 'Component/SettingInput';
 import { SettingLink } from 'Component/SettingLink';
 import { SettingMultiSelect } from 'Component/SettingMultiSelect';
@@ -24,6 +26,7 @@ import Cloud from 'lucide-react-native/icons/cloud';
 import CloudCog from 'lucide-react-native/icons/cloud-cog';
 import CloudOff from 'lucide-react-native/icons/cloud-off';
 import Columns2 from 'lucide-react-native/icons/columns-2';
+import DatabaseBackup from 'lucide-react-native/icons/database-backup';
 import Dock from 'lucide-react-native/icons/dock';
 import Download from 'lucide-react-native/icons/download';
 import ExternalLink from 'lucide-react-native/icons/external-link';
@@ -204,6 +207,12 @@ export function SettingsScreenComponent({
         IconComponent={ TvMinimalPlay }
         onFocus={ () => handleOpenGroup(SETTING_GROUP.PLAYER) }
         onPress={ () => handleOpenGroup(SETTING_GROUP.PLAYER) }
+      />
+      <SettingBase
+        title={ t('Import/Export') }
+        IconComponent={ DatabaseBackup }
+        onFocus={ () => handleOpenGroup(SETTING_GROUP.BACKUP) }
+        onPress={ () => handleOpenGroup(SETTING_GROUP.BACKUP) }
       />
       <SettingBase
         title={ t('About') }
@@ -559,6 +568,13 @@ export function SettingsScreenComponent({
     </ThemedScrollView>
   );
 
+  const renderBackup = () => (
+    <ThemedScrollView>
+      <SettingExport />
+      <SettingImport />
+    </ThemedScrollView>
+  );
+
   const renderAbout = () => (
     <ThemedScrollView>
       <SettingLink
@@ -616,6 +632,8 @@ export function SettingsScreenComponent({
         return renderDownloads();
       case SETTING_GROUP.PLAYER:
         return renderPlayer();
+      case SETTING_GROUP.BACKUP:
+        return renderBackup();
       case SETTING_GROUP.ABOUT:
         return renderAbout();
       default:

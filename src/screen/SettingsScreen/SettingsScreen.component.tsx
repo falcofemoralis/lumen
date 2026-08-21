@@ -3,6 +3,8 @@ import { Page } from 'Component/Page';
 import { getAspectRatio } from 'Component/Player/Player.config';
 import { SettingBase } from 'Component/SettingBase';
 import { SettingCustomSelect } from 'Component/SettingCustomSelect';
+import { SettingExport } from 'Component/SettingExport';
+import { SettingImport } from 'Component/SettingImport';
 import { SettingInput } from 'Component/SettingInput';
 import { SettingLink } from 'Component/SettingLink';
 import { SettingMultiSelect } from 'Component/SettingMultiSelect';
@@ -25,6 +27,7 @@ import CircleQuestionMark from 'lucide-react-native/icons/circle-question-mark';
 import Cloud from 'lucide-react-native/icons/cloud';
 import CloudCog from 'lucide-react-native/icons/cloud-cog';
 import CloudOff from 'lucide-react-native/icons/cloud-off';
+import DatabaseBackup from 'lucide-react-native/icons/database-backup';
 import Download from 'lucide-react-native/icons/download';
 import ExternalLink from 'lucide-react-native/icons/external-link';
 import EyeOff from 'lucide-react-native/icons/eye-off';
@@ -205,6 +208,11 @@ export function SettingsScreenComponent({
         title={ t('Player') }
         IconComponent={ TvMinimalPlay }
         onPress={ () => handleOpenGroup(SETTING_GROUP.PLAYER) }
+      />
+      <SettingBase
+        title={ t('Import/Export') }
+        IconComponent={ DatabaseBackup }
+        onPress={ () => handleOpenGroup(SETTING_GROUP.BACKUP) }
       />
       <SettingBase
         title={ t('About') }
@@ -520,6 +528,13 @@ export function SettingsScreenComponent({
     </ThemedScrollView>
   );
 
+  const renderBackup = () => (
+    <ThemedScrollView>
+      <SettingExport />
+      <SettingImport />
+    </ThemedScrollView>
+  );
+
   const renderAbout = () => (
     <ThemedScrollView>
       <SettingLink
@@ -577,6 +592,8 @@ export function SettingsScreenComponent({
         return renderDownloads();
       case SETTING_GROUP.PLAYER:
         return renderPlayer();
+      case SETTING_GROUP.BACKUP:
+        return renderBackup();
       case SETTING_GROUP.ABOUT:
         return renderAbout();
       default:
@@ -594,6 +611,8 @@ export function SettingsScreenComponent({
         return t('Downloads');
       case SETTING_GROUP.PLAYER:
         return t('Player');
+      case SETTING_GROUP.BACKUP:
+        return t('Import/Export');
       case SETTING_GROUP.ABOUT:
         return t('About');
       default:

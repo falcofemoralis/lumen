@@ -1,5 +1,7 @@
 import { ASPECT_RATIO_OPTIONS, DEFAULT_SPEED } from 'Component/Player/Player.config';
 import { HOME_SCREEN } from 'Navigation/navigationRoutes';
+import { BACKUP_SECTION } from 'Type/Backup.interface';
+import { BackupConfigKey, SettingsSection } from 'Util/Backup/logic';
 import { DEFAULT_MAX_PARALLEL_DOWNLOADS } from 'Util/Download';
 
 export type DeviceConfigType = {
@@ -97,3 +99,51 @@ export const defaultConfig: DeviceConfigType = {
   tvChannelsEnabled: true,
   tvSearchEnabled: true,
 };
+
+export const CONFIG_KEY_SECTIONS = {
+  themeScheme: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  initialRoute: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  homeDefaultTab: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  numberOfColumnsMobile: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  numberOfColumnsTV: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  recentTwoColumnsTV: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  hiddenCountries: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  isLocalLibrary: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  isLowMode: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  isTVAwake: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  sortVoicesByRating: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  isContinueBtnEnabled: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  commentPostingMobile: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  commentPostingTV: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  tvChannelsEnabled: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  tvSearchEnabled: BACKUP_SECTION.SETTINGS_APPEARANCE,
+
+  strictConnectionCheck: BACKUP_SECTION.SETTINGS_NETWORK,
+
+  downloadsSaveSubtitles: BACKUP_SECTION.SETTINGS_DOWNLOADS,
+  downloadsSavePoster: BACKUP_SECTION.SETTINGS_DOWNLOADS,
+  downloadsMaxParallel: BACKUP_SECTION.SETTINGS_DOWNLOADS,
+
+  playerSaveQuality: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerAskQuality: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerRewindSeconds: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerDefaultAspectRatio: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerDefaultSpeed: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerAutoNextEpisode: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerAutoFrameRateEnabled: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerAutoFrameRate: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerLongPressSpeed: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerVolumeGesture: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerBrightnessGesture: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerSwapGestureSides: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerStopPlayOnButtonTV: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerStopPlayShowInterfaceTV: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerShowBufferTime: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerShowEndTime: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerShowEpisodeName: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerBufferTimeSetting: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerBackBufferTimeSetting: BACKUP_SECTION.SETTINGS_PLAYER,
+
+  checkForUpdates: BACKUP_SECTION.SETTINGS_OTHER,
+  isFirestore: BACKUP_SECTION.SETTINGS_OTHER,
+} as const satisfies Record<BackupConfigKey, SettingsSection>;
