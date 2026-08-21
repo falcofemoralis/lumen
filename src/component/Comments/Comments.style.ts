@@ -115,6 +115,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     flexDirection: 'row',
     alignItems: 'center',
     gap: scale(4),
+    paddingTop: scale(4),
   },
   formToolbarBtn: {
     padding: scale(8),

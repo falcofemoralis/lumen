@@ -1,7 +1,6 @@
 import { KeyboardAdjuster } from 'Component/KeyboardAdjuster';
 import { ThemedGroup } from 'Component/ThemedGroup';
 import { ThemedImage } from 'Component/ThemedImage';
-import { Portal } from 'Component/ThemedPortal';
 import { ThemedText } from 'Component/ThemedText';
 import { useOverlayContext } from 'Context/OverlayContext';
 import { useLandscape } from 'Hooks/useLandscape';
@@ -146,20 +145,21 @@ export const BaseSlide = ({
     );
   };
 
+  // The portal host lives at the screen root, outside the Wrapper: a host
+  // mounted here would give the overlay an absolute fill the size of the
+  // wrapper's box, leaving its horizontal margins undimmed.
   return (
-    <Portal.Host>
-      <ScrollView
-        contentContainerStyle={ [
-          styles.container,
-          isLandscape && styles.containerLandscape,
-          style,
-        ] }
-      >
-        { renderContent() }
-        { children }
-        <KeyboardAdjuster isActive={ !isOverlayOpen } />
-        { renderBaseNavigation() }
-      </ScrollView>
-    </Portal.Host>
+    <ScrollView
+      contentContainerStyle={ [
+        styles.container,
+        isLandscape && styles.containerLandscape,
+        style,
+      ] }
+    >
+      { renderContent() }
+      { children }
+      <KeyboardAdjuster isActive={ !isOverlayOpen } />
+      { renderBaseNavigation() }
+    </ScrollView>
   );
 };

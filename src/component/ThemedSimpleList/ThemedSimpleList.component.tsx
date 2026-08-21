@@ -37,7 +37,7 @@ export const ThemedListComponent = ({
   const viewportHeight = useMemo(() => {
     const itemHeight = styles.item.height;
     const availableHeight = windowHeight * MAX_SCREEN_RATIO
-      - (header ? styles.header.height : 0)
+      - (header ? styles.header.height + styles.header.marginBottom : 0)
       - (searchComponent ? styles.search.height : 0);
     const visibleItems = Math.min(
       data.length,

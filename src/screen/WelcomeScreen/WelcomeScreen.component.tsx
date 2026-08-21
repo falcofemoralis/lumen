@@ -1,3 +1,4 @@
+import { Portal } from 'Component/ThemedPortal';
 import { ThemedSafeArea } from 'Component/ThemedSafeArea';
 import { Wrapper } from 'Component/Wrapper';
 import * as Application from 'expo-application';
@@ -102,19 +103,24 @@ export const WelcomeScreenComponent = () => {
   };
 
   return (
-    <ThemedSafeArea edges={ ['top', 'bottom', 'left', 'right'] }>
-      <Animated.View
-        key={ currentSlide }
-        entering={ FadeIn }
-        exiting={ FadeOut }
-        layout={ LinearTransition }
-        style={ styles.page }
-      >
-        <Wrapper style={ styles.wrapper }>
-          { renderCurrentSlide() }
-        </Wrapper>
-      </Animated.View>
-    </ThemedSafeArea>
+    // Outermost on purpose: a portaled overlay fills its host's box, so a host
+    // placed under the safe area or the Wrapper would leave their insets and
+    // horizontal margins outside the backdrop -- undimmed strips down the sides.
+    <Portal.Host>
+      <ThemedSafeArea edges={ ['top', 'bottom', 'left', 'right'] }>
+        <Animated.View
+          key={ currentSlide }
+          entering={ FadeIn }
+          exiting={ FadeOut }
+          layout={ LinearTransition }
+          style={ styles.page }
+        >
+          <Wrapper style={ styles.wrapper }>
+            { renderCurrentSlide() }
+          </Wrapper>
+        </Animated.View>
+      </ThemedSafeArea>
+    </Portal.Host>
   );
 };
 
