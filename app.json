@@ -60,6 +60,7 @@
   },
   "plugins": [
     "./plugins/withAbiSplits.js",
+    "./plugins/withTrimmedNativeLibs.js",
     "./plugins/withReactNativeKeyevent.js",
     "./plugins/withTvSearchable.js",
     [
@@ -94,7 +95,8 @@
           "usesCleartextTraffic": true,
           "enableMinifyInReleaseBuilds": true,
           "enableShrinkResourcesInReleaseBuilds": true,
-          "usePrecompiledHeaders": true
+          "usePrecompiledHeaders": true,
+          "useLegacyPackaging": true
         }
       }
     ],
