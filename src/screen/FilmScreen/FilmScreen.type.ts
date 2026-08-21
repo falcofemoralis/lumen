@@ -26,6 +26,8 @@ export interface FilmScreenComponentProps {
   ratingOverlayRef: RefObject<ThemedOverlayRef | null>;
   shouldDisplayContinueWatching: boolean;
   isContinueWatchingLoading: boolean;
+  showVotesCount: boolean;
+  showRecommendations: boolean;
   playFilm: () => void;
   handleVideoSelect: (video: FilmVideoInterface, voice: FilmVoiceInterface) => void;
   handleSelectFilm: (film: FilmInterface) => void;

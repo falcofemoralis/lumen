@@ -31,6 +31,7 @@ import Dock from 'lucide-react-native/icons/dock';
 import Download from 'lucide-react-native/icons/download';
 import ExternalLink from 'lucide-react-native/icons/external-link';
 import EyeOff from 'lucide-react-native/icons/eye-off';
+import FastForward from 'lucide-react-native/icons/fast-forward';
 import FolderCog from 'lucide-react-native/icons/folder-cog';
 import FolderDown from 'lucide-react-native/icons/folder-down';
 import FolderLock from 'lucide-react-native/icons/folder-lock';
@@ -57,10 +58,12 @@ import Rows3 from 'lucide-react-native/icons/rows-3';
 import Search from 'lucide-react-native/icons/search';
 import Settings2 from 'lucide-react-native/icons/settings-2';
 import ShieldCheck from 'lucide-react-native/icons/shield-check';
+import Sparkles from 'lucide-react-native/icons/sparkles';
 import StepForward from 'lucide-react-native/icons/step-forward';
 import Tag from 'lucide-react-native/icons/tag';
 import TvMinimalPlay from 'lucide-react-native/icons/tv-minimal-play';
 import UserCog from 'lucide-react-native/icons/user-cog';
+import Users from 'lucide-react-native/icons/users';
 import { reactNativeDownloads } from 'Modules/react-native-downloads';
 import { useCallback, useDeferredValue, useState } from 'react';
 import { View } from 'react-native';
@@ -93,6 +96,7 @@ export function SettingsScreenComponent({
   recentTwoColumnsTV,
   hiddenCountries,
   playerRewindSeconds,
+  playerBackwardRewindSeconds,
   playerShowBufferTime,
   playerShowEndTime,
   playerShowEpisodeName,
@@ -116,6 +120,8 @@ export function SettingsScreenComponent({
   isContinueBtnEnabled,
   isLocalLibrary,
   commentPostingTV,
+  showVotesCount,
+  showRecommendations,
   tvChannelsEnabled,
   isTvChannelsSupported,
   tvSearchEnabled,
@@ -305,6 +311,20 @@ export function SettingsScreenComponent({
         onChange={ (value) => onConfigUpdate('sortVoicesByRating', value) }
       />
       <SettingSwitch
+        title={ t('Show votes count') }
+        subtitle={ t('Show how many votes a rating is made of, next to it.') }
+        IconComponent={ Users }
+        value={ showVotesCount }
+        onChange={ (value) => onConfigUpdate('showVotesCount', value) }
+      />
+      <SettingSwitch
+        title={ t('Recommendations') }
+        subtitle={ t('Show similar films at the bottom of a film page.') }
+        IconComponent={ Sparkles }
+        value={ showRecommendations }
+        onChange={ (value) => onConfigUpdate('showRecommendations', value) }
+      />
+      <SettingSwitch
         title={ t('Continue button enabled') }
         subtitle={ t('Toggle continue button.') }
         IconComponent={ ArrowRight }
@@ -476,11 +496,18 @@ export function SettingsScreenComponent({
         onChange={ (value) => onConfigUpdate('playerAskQuality', value) }
       />
       <SettingSelect
-        title={ t('Player rewind seconds') }
-        IconComponent={ Rewind }
+        title={ t('Player forward rewind seconds') }
+        IconComponent={ FastForward }
         value={ playerRewindSeconds.toString() }
         options={ PLAYER_REWIND_OPTIONS }
         onChange={ (value) => onConfigUpdate('playerRewindSeconds', Number(value)) }
+      />
+      <SettingSelect
+        title={ t('Player backward rewind seconds') }
+        IconComponent={ Rewind }
+        value={ playerBackwardRewindSeconds.toString() }
+        options={ PLAYER_REWIND_OPTIONS }
+        onChange={ (value) => onConfigUpdate('playerBackwardRewindSeconds', Number(value)) }
       />
       <SettingSelect
         title={ t('Player default aspect ratio') }

@@ -56,6 +56,8 @@ export function FilmScreenComponent({
   playerVideoDownloaderOverlayRef,
   ratingOverlayRef,
   shouldDisplayContinueWatching,
+  showVotesCount,
+  showRecommendations,
   playFilm,
   handleVideoSelect,
   handleSelectFilm,
@@ -199,7 +201,9 @@ export function FilmScreenComponent({
 
     return (
       <View
-        key={ text }
+        // the title, where there is one: two ratings shown without their vote counts
+        // are regularly the same number
+        key={ title ? `${title}-${text}` : text }
         style={ styles.textContainer }
       >
         { title && (
@@ -229,7 +233,10 @@ export function FilmScreenComponent({
 
     return (
       <View style={ styles.ratingsRow }>
-        { allRatings.map(({ name, rating, votes }) => renderInfoText(`${rating} (${votes})`, name)) }
+        { allRatings.map(({ name, rating, votes }) => renderInfoText(
+          showVotesCount ? `${rating} (${votes})` : `${rating}`,
+          name
+        )) }
       </View>
     );
   };
@@ -483,6 +490,10 @@ export function FilmScreenComponent({
 
   const renderRelated = () => {
     const { related = [] } = film;
+
+    if (!showRecommendations || !related.length) {
+      return null;
+    }
 
     return (
       <FilmViewSection title={ t('Related') }>

@@ -51,6 +51,8 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     downloadsSavePoster,
     isContinueBtnEnabled,
     isLocalLibrary,
+    showVotesCount,
+    showRecommendations,
   } = useConfigContext();
   const navigation = useNavigation<NativeStackNavigationProp<AppStackParamList>>();
   const { isSignedIn, currentService, prepareShareBody } = useServiceContext();
@@ -709,6 +711,8 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     isDeepLink,
     ratingOverlayRef,
     isContinueWatchingLoading,
+    showVotesCount,
+    showRecommendations,
     playFilm,
     handleVideoSelect,
     handleSelectFilm,

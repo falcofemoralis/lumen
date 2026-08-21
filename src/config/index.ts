@@ -17,7 +17,9 @@ export type DeviceConfigType = {
   hiddenCountries: string[];
   initialRoute: string;
   homeDefaultTab: string;
+  /** How far a forward rewind jumps. Backward has its own, see below. */
   playerRewindSeconds: number;
+  playerBackwardRewindSeconds: number;
   playerShowBufferTime: boolean;
   playerShowEndTime: boolean;
   playerShowEpisodeName: boolean;
@@ -50,6 +52,8 @@ export type DeviceConfigType = {
   commentPostingTV: boolean;
   tvChannelsEnabled: boolean;
   tvSearchEnabled: boolean;
+  showVotesCount: boolean;
+  showRecommendations: boolean;
 }
 
 export const defaultConfig: DeviceConfigType = {
@@ -66,6 +70,7 @@ export const defaultConfig: DeviceConfigType = {
   initialRoute: HOME_SCREEN,
   homeDefaultTab: '',
   playerRewindSeconds: 10,
+  playerBackwardRewindSeconds: 10,
   playerShowBufferTime: false,
   playerShowEndTime: false,
   playerShowEpisodeName: false,
@@ -98,6 +103,8 @@ export const defaultConfig: DeviceConfigType = {
   commentPostingTV: false,
   tvChannelsEnabled: true,
   tvSearchEnabled: true,
+  showVotesCount: true,
+  showRecommendations: true,
 };
 
 export const CONFIG_KEY_SECTIONS = {
@@ -117,6 +124,8 @@ export const CONFIG_KEY_SECTIONS = {
   commentPostingTV: BACKUP_SECTION.SETTINGS_APPEARANCE,
   tvChannelsEnabled: BACKUP_SECTION.SETTINGS_APPEARANCE,
   tvSearchEnabled: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  showVotesCount: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  showRecommendations: BACKUP_SECTION.SETTINGS_APPEARANCE,
 
   strictConnectionCheck: BACKUP_SECTION.SETTINGS_NETWORK,
 
@@ -127,6 +136,7 @@ export const CONFIG_KEY_SECTIONS = {
   playerSaveQuality: BACKUP_SECTION.SETTINGS_PLAYER,
   playerAskQuality: BACKUP_SECTION.SETTINGS_PLAYER,
   playerRewindSeconds: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerBackwardRewindSeconds: BACKUP_SECTION.SETTINGS_PLAYER,
   playerDefaultAspectRatio: BACKUP_SECTION.SETTINGS_PLAYER,
   playerDefaultSpeed: BACKUP_SECTION.SETTINGS_PLAYER,
   playerAutoNextEpisode: BACKUP_SECTION.SETTINGS_PLAYER,

@@ -160,7 +160,11 @@ export function PlayerComponent({
   const { width: screenWidth } = useWindowDimensions();
   const { scale, theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
-  const { playerRewindSeconds, playerShowEpisodeName } = useConfigContext();
+  const {
+    playerRewindSeconds,
+    playerBackwardRewindSeconds,
+    playerShowEpisodeName,
+  } = useConfigContext();
   const [showControls, setShowControls] = useState(false);
   const [isScrolling, setIsScrolling] = useState(false);
   const [doubleTapAction, setDoubleTapAction] = useState<DoubleTapAction | null>(null);
@@ -250,7 +254,9 @@ export function PlayerComponent({
   };
 
   const handleDoubleTap = (direction: RewindDirection) => {
-    const seconds = playerRewindSeconds;
+    const seconds = direction === RewindDirection.BACKWARD
+      ? playerBackwardRewindSeconds
+      : playerRewindSeconds;
 
     rewindPosition(direction, seconds);
     setDoubleTapAction({

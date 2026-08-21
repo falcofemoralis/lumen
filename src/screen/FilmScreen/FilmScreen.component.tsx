@@ -109,6 +109,8 @@ export function FilmScreenComponent({
   ratingOverlayRef,
   shouldDisplayContinueWatching,
   isContinueWatchingLoading,
+  showVotesCount,
+  showRecommendations,
   playFilm,
   handleVideoSelect,
   handleSelectFilm,
@@ -477,6 +479,10 @@ export function FilmScreenComponent({
   const renderRelated = () => {
     const { related = [] } = film;
 
+    if (!showRecommendations || !related.length) {
+      return null;
+    }
+
     return (
       <Wrapper>
         <FilmViewSection title={ t('Related') }>
@@ -692,7 +698,7 @@ export function FilmScreenComponent({
         <ThemedText
           style={ styles.text }
         >
-          { ` ${rating} (${votes})` }
+          { showVotesCount ? ` ${rating} (${votes})` : ` ${rating}` }
         </ThemedText>
       </Text>
     );

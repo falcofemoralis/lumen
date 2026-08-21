@@ -47,7 +47,7 @@ export const PlayerProgressBarComponent = ({
   const { focusedElement } = usePlayerContext();
   const { progressStatus, updateProgressStatus } = usePlayerProgressContext();
   const rewindTimer = useRef<number | null>(null);
-  const { playerRewindSeconds } = useConfigContext();
+  const { playerRewindSeconds, playerBackwardRewindSeconds } = useConfigContext();
 
   // Refs for performance-critical values to avoid re-renders
   const smartSeekingRef = useRef<SmartSeekingParams>({ ...DEFAULT_SMART_SEEKING_PARAMS });
@@ -187,9 +187,11 @@ export const PlayerProgressBarComponent = ({
     if (e.longTimeout) {
       // Button press
       clearTimeout(e.longTimeout);
-      rewindPosition(direction, playerRewindSeconds);
+      rewindPosition(direction, direction === RewindDirection.BACKWARD
+        ? playerBackwardRewindSeconds
+        : playerRewindSeconds);
     }
-  }, [toggleSmartSeeking, rewindPosition, playerRewindSeconds]);
+  }, [toggleSmartSeeking, rewindPosition, playerRewindSeconds, playerBackwardRewindSeconds]);
 
   // Read at call time: `progressStatus` ticks constantly, so anything the
   // listeners close over directly would force a re-subscribe on every frame.
