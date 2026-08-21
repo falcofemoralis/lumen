@@ -1,5 +1,13 @@
-import { ASPECT_RATIO_OPTIONS, DEFAULT_SPEEDS, getAspectRatioLabel, MAX_QUALITY } from 'Component/Player/Player.config';
+import {
+  ASPECT_RATIO_OPTIONS,
+  DEFAULT_SPEEDS,
+  getAspectRatioLabel,
+  MAX_QUALITY,
+  SUBTITLES_BOTTOM_OFFSETS,
+  SUBTITLES_SIZE_SCALES,
+} from 'Component/Player/Player.config';
 import { t } from 'i18n/translate';
+import { SubtitleEdgeType } from 'Modules/react-native-subtitle-style';
 import {
   ACCOUNT_SCREEN,
   BOOKMARKS_SCREEN,
@@ -384,4 +392,124 @@ export const PLAYER_BACK_BUFFER_TIME_OPTIONS = [
       },
     };
   }),
+];
+
+// Both of these are relative to the height of the player rather than absolute, so they
+// are shown as what they are: 100% is the size the player draws by default, and the
+// offset is how much of the picture stands between the subtitles and its bottom edge.
+export const PLAYER_SUBTITLES_SIZE_OPTIONS = SUBTITLES_SIZE_SCALES.map((scale) => ({
+  value: scale.toString(),
+  label: `${Math.round(scale * 100)}%`,
+}));
+
+export const PLAYER_SUBTITLES_BOTTOM_OFFSET_OPTIONS = SUBTITLES_BOTTOM_OFFSETS.map((offset) => ({
+  value: offset.toString(),
+  label: `${Math.round(offset * 100)}%`,
+}));
+
+// #AARRGGBB, i.e. the alpha comes first - the native side hands these to
+// `Color.parseColor`, which reads them the Android way rather than the CSS way.
+export const PLAYER_SUBTITLES_COLOR_OPTIONS = [
+  {
+    value: '#FFFFFF',
+    get label() {
+      return t('White');
+    },
+  },
+  {
+    value: '#FFFF00',
+    get label() {
+      return t('Yellow');
+    },
+  },
+  {
+    value: '#00FFFF',
+    get label() {
+      return t('Cyan');
+    },
+  },
+  {
+    value: '#00FF00',
+    get label() {
+      return t('Green');
+    },
+  },
+  {
+    value: '#BFBFBF',
+    get label() {
+      return t('Grey');
+    },
+  },
+  {
+    value: '#000000',
+    get label() {
+      return t('Black');
+    },
+  },
+];
+
+export const PLAYER_SUBTITLES_BACKGROUND_OPTIONS = [
+  {
+    value: '#00000000',
+    get label() {
+      return t('None');
+    },
+  },
+  {
+    value: '#80000000',
+    get label() {
+      return t('Translucent black');
+    },
+  },
+  {
+    value: '#FF000000',
+    get label() {
+      return t('Black');
+    },
+  },
+  {
+    value: '#80808080',
+    get label() {
+      return t('Translucent grey');
+    },
+  },
+  {
+    value: '#FFFFFFFF',
+    get label() {
+      return t('White');
+    },
+  },
+];
+
+export const PLAYER_SUBTITLES_EDGE_OPTIONS = [
+  {
+    value: SubtitleEdgeType.NONE,
+    get label() {
+      return t('None');
+    },
+  },
+  {
+    value: SubtitleEdgeType.OUTLINE,
+    get label() {
+      return t('Outline');
+    },
+  },
+  {
+    value: SubtitleEdgeType.DROP_SHADOW,
+    get label() {
+      return t('Drop shadow');
+    },
+  },
+  {
+    value: SubtitleEdgeType.RAISED,
+    get label() {
+      return t('Raised');
+    },
+  },
+  {
+    value: SubtitleEdgeType.DEPRESSED,
+    get label() {
+      return t('Depressed');
+    },
+  },
 ];

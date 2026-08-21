@@ -280,6 +280,33 @@ const ru: Translations = {
   'Player rewind buffer': 'Буфер перемотки назад',
   'How much played video is kept in memory so rewinding does not reload it.':
     'Сколько просмотренного видео хранится в памяти, чтобы перемотка назад не перезагружала его. Больший буфер занимает больше памяти.',
+  'Custom subtitles style': 'Свой стиль субтитров',
+  'Style the subtitles here instead of following the system captioning settings.':
+    'Оформлять субтитры здесь, а не по системным настройкам субтитров. Пока включено, цвета и размеры шрифта, заданные внутри дорожки субтитров, не учитываются.',
+  'Subtitles size': 'Размер субтитров',
+  'Relative to the size of the picture, so it holds at any resolution.':
+    'Задаётся относительно картинки, поэтому одинаково выглядит при любом разрешении.',
+  'Subtitles color': 'Цвет субтитров',
+  'Subtitles background': 'Фон субтитров',
+  'Subtitles outline': 'Обводка субтитров',
+  'What separates the letters from the picture behind them.':
+    'То, что отделяет буквы от картинки за ними.',
+  'Subtitles position': 'Положение субтитров',
+  'How much of the picture stands between the subtitles and its bottom edge.':
+    'Сколько картинки остаётся между субтитрами и её нижним краем.',
+  'None': 'Нет',
+  'White': 'Белый',
+  'Yellow': 'Жёлтый',
+  'Cyan': 'Голубой',
+  'Green': 'Зелёный',
+  'Grey': 'Серый',
+  'Black': 'Чёрный',
+  'Translucent black': 'Полупрозрачный чёрный',
+  'Translucent grey': 'Полупрозрачный серый',
+  'Outline': 'Контур',
+  'Drop shadow': 'Тень',
+  'Raised': 'Выпуклая',
+  'Depressed': 'Вдавленная',
   'Check for updates': 'Проверять обновления',
   'Toggle check for updates.': 'Включить проверку обновлений. Если включено, приложение будет проверять наличие обновлений при каждом запуске.',
   'Player config quality': 'Качество в настройках плеера',

@@ -278,6 +278,33 @@ const en = {
   'Player rewind buffer': 'Player rewind buffer',
   'How much played video is kept in memory so rewinding does not reload it.':
     'How much played video is kept in memory so rewinding does not reload it. Longer buffers use more memory.',
+  'Custom subtitles style': 'Custom subtitles style',
+  'Style the subtitles here instead of following the system captioning settings.':
+    'Style the subtitles here instead of following the system captioning settings. The colors and font sizes written into a subtitle track are ignored while this is on.',
+  'Subtitles size': 'Subtitles size',
+  'Relative to the size of the picture, so it holds at any resolution.':
+    'Relative to the size of the picture, so it holds at any resolution.',
+  'Subtitles color': 'Subtitles color',
+  'Subtitles background': 'Subtitles background',
+  'Subtitles outline': 'Subtitles outline',
+  'What separates the letters from the picture behind them.':
+    'What separates the letters from the picture behind them.',
+  'Subtitles position': 'Subtitles position',
+  'How much of the picture stands between the subtitles and its bottom edge.':
+    'How much of the picture stands between the subtitles and its bottom edge.',
+  'None': 'None',
+  'White': 'White',
+  'Yellow': 'Yellow',
+  'Cyan': 'Cyan',
+  'Green': 'Green',
+  'Grey': 'Grey',
+  'Black': 'Black',
+  'Translucent black': 'Translucent black',
+  'Translucent grey': 'Translucent grey',
+  'Outline': 'Outline',
+  'Drop shadow': 'Drop shadow',
+  'Raised': 'Raised',
+  'Depressed': 'Depressed',
   'Check for updates': 'Check for updates',
   'Toggle check for updates.': 'Toggle check for updates.',
   'Player config quality': 'Player config quality',

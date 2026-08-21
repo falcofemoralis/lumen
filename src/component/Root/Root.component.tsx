@@ -11,6 +11,7 @@ import { useNetworkContext } from 'Context/NetworkContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useAutoFrameRate } from 'Hooks/useAutoFrameRate';
 import { useAwake } from 'Hooks/useAwake';
+import { useSubtitleStyle } from 'Hooks/useSubtitleStyle';
 import { useTvChannels } from 'Hooks/useTvChannels';
 import { useTvSearch } from 'Hooks/useTvSearch';
 import { ReactNode, useEffect } from 'react';
@@ -36,6 +37,7 @@ export const Root = ({ children }: { children: ReactNode }) => {
   useTvChannels(tvChannelsEnabled);
   useTvSearch(tvSearchEnabled);
   useAutoFrameRate(playerAutoFrameRateEnabled && playerAutoFrameRate);
+  useSubtitleStyle();
 
   // Deferred: an update banner is not what the user opened the app for, so it has no
   // claim on the connection while the first screen is still filling in.

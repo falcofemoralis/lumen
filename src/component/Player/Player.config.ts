@@ -59,6 +59,29 @@ export const DEFAULT_SPEEDS = [0.25, 0.5, 0.75, 1, 1.10, 1.25, 1.5, 1.75, 2, 2.2
 export const DOUBLE_TAP_ANIMATION = 2000;
 export const DOUBLE_TAP_ANIMATION_DELAY = 150;
 
+/**
+ * How the subtitles look, as the settings store it.
+ *
+ * The size is a multiple of what the player draws by default rather than a point size,
+ * and the offset is a fraction of the player's height rather than a distance - both are
+ * turned into what media3 takes in `useSubtitleStyle`. Neither has a unit that means
+ * anything on its own: the same subtitles are drawn on a phone held at arm's length and
+ * on a TV across the room, and only a size relative to the picture reads the same on both.
+ *
+ * The values below repeat `SubtitleView`'s own defaults rather than importing them,
+ * because everything this file is imported from has to stay loadable outside the app -
+ * see the config tests.
+ */
+export const DEFAULT_SUBTITLES_SIZE_SCALE = 1;
+export const SUBTITLES_SIZE_SCALES = [0.75, 0.85, 1, 1.15, 1.3, 1.5, 1.75, 2];
+
+export const DEFAULT_SUBTITLES_BOTTOM_OFFSET = 0.08;
+export const SUBTITLES_BOTTOM_OFFSETS = [0, 0.04, 0.08, 0.12, 0.16, 0.2, 0.25, 0.3];
+
+export const DEFAULT_SUBTITLES_COLOR = '#FFFFFF';
+export const DEFAULT_SUBTITLES_BACKGROUND_COLOR = '#FF000000';
+export const DEFAULT_SUBTITLES_EDGE_TYPE = 'outline';
+
 /** What a vertical slide over one half of the player adjusts. */
 export enum PlayerSlideControl {
   VOLUME = 'VOLUME',

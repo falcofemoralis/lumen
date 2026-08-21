@@ -280,6 +280,33 @@ const uk: Translations = {
   'Player rewind buffer': 'Буфер перемотування назад',
   'How much played video is kept in memory so rewinding does not reload it.':
     'Скільки переглянутого відео зберігається в пам’яті, щоб перемотування назад не перезавантажувало його. Більший буфер займає більше пам’яті.',
+  'Custom subtitles style': 'Власний стиль субтитрів',
+  'Style the subtitles here instead of following the system captioning settings.':
+    'Оформлювати субтитри тут, а не за системними налаштуваннями субтитрів. Поки увімкнено, кольори та розміри шрифту, задані всередині доріжки субтитрів, не враховуються.',
+  'Subtitles size': 'Розмір субтитрів',
+  'Relative to the size of the picture, so it holds at any resolution.':
+    'Задається відносно картинки, тому однаково виглядає за будь-якої роздільної здатності.',
+  'Subtitles color': 'Колір субтитрів',
+  'Subtitles background': 'Фон субтитрів',
+  'Subtitles outline': 'Обведення субтитрів',
+  'What separates the letters from the picture behind them.':
+    'Те, що відокремлює літери від картинки за ними.',
+  'Subtitles position': 'Положення субтитрів',
+  'How much of the picture stands between the subtitles and its bottom edge.':
+    'Скільки картинки лишається між субтитрами та її нижнім краєм.',
+  'None': 'Немає',
+  'White': 'Білий',
+  'Yellow': 'Жовтий',
+  'Cyan': 'Блакитний',
+  'Green': 'Зелений',
+  'Grey': 'Сірий',
+  'Black': 'Чорний',
+  'Translucent black': 'Напівпрозорий чорний',
+  'Translucent grey': 'Напівпрозорий сірий',
+  'Outline': 'Контур',
+  'Drop shadow': 'Тінь',
+  'Raised': 'Опукле',
+  'Depressed': 'Втиснуте',
   'Check for updates': 'Перевіряти оновлення',
   'Toggle check for updates.': 'Увімкнути перевірку оновлень. Якщо увімкнено, додаток буде перевіряти наявність оновлень при кожному запуску.',
   'Player config quality': 'Якість у налаштуваннях плеєра',

@@ -15,6 +15,8 @@ import { ThemedSafeArea } from 'Component/ThemedSafeArea';
 import { ThemedScrollView } from 'Component/ThemedScrollView';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
+import ALargeSmall from 'lucide-react-native/icons/a-large-small';
+import AlignVerticalJustifyEnd from 'lucide-react-native/icons/align-vertical-justify-end';
 import ArrowDown10 from 'lucide-react-native/icons/arrow-down-1-0';
 import ArrowDownUp from 'lucide-react-native/icons/arrow-down-up';
 import ArrowLeftRight from 'lucide-react-native/icons/arrow-left-right';
@@ -39,6 +41,7 @@ import Gauge from 'lucide-react-native/icons/gauge';
 import Globe from 'lucide-react-native/icons/globe';
 import GlobeLock from 'lucide-react-native/icons/globe-lock';
 import Grid3x2 from 'lucide-react-native/icons/grid-3x2';
+import Highlighter from 'lucide-react-native/icons/highlighter';
 import House from 'lucide-react-native/icons/house';
 import Info from 'lucide-react-native/icons/info';
 import Loader from 'lucide-react-native/icons/loader';
@@ -46,6 +49,7 @@ import LoaderCircle from 'lucide-react-native/icons/loader-circle';
 import Maximize2 from 'lucide-react-native/icons/maximize-2';
 import MessageSquarePlus from 'lucide-react-native/icons/message-square-plus';
 import MoveRight from 'lucide-react-native/icons/move-right';
+import PaintBucket from 'lucide-react-native/icons/paint-bucket';
 import Palette from 'lucide-react-native/icons/palette';
 import Pin from 'lucide-react-native/icons/pin';
 import RefreshCw from 'lucide-react-native/icons/refresh-cw';
@@ -81,6 +85,11 @@ import {
   PLAYER_QUALITY_OPTIONS,
   PLAYER_REWIND_OPTIONS,
   PLAYER_SPEED_OPTIONS,
+  PLAYER_SUBTITLES_BACKGROUND_OPTIONS,
+  PLAYER_SUBTITLES_BOTTOM_OFFSET_OPTIONS,
+  PLAYER_SUBTITLES_COLOR_OPTIONS,
+  PLAYER_SUBTITLES_EDGE_OPTIONS,
+  PLAYER_SUBTITLES_SIZE_OPTIONS,
   TELEGRAM_LINK,
   THEME_SCHEME_OPTIONS,
 } from './SettingsScreen.config';
@@ -99,6 +108,12 @@ export function SettingsScreenComponent({
   playerShowBufferTime,
   playerShowEndTime,
   playerShowEpisodeName,
+  playerSubtitlesCustomStyle,
+  playerSubtitlesSizeScale,
+  playerSubtitlesColor,
+  playerSubtitlesBackgroundColor,
+  playerSubtitlesEdgeType,
+  playerSubtitlesBottomOffset,
   isFirestore,
   securedSettings,
   downloadsPath,
@@ -425,6 +440,66 @@ export function SettingsScreenComponent({
     </ThemedScrollView>
   );
 
+  /**
+   * The look of the subtitles the player draws. It is styled natively (see
+   * `useSubtitleStyle`), so nothing here is previewed - the switch is what decides
+   * between these settings and whatever the device's own captioning settings say.
+   */
+  const renderSubtitlesStyle = () => (
+    <>
+      <SettingSwitch
+        title={ t('Custom subtitles style') }
+        subtitle={ t('Style the subtitles here instead of following the system captioning settings.') }
+        IconComponent={ Subtitles }
+        value={ playerSubtitlesCustomStyle }
+        onChange={ (value) => onConfigUpdate('playerSubtitlesCustomStyle', value) }
+      />
+      <SettingSelect
+        title={ t('Subtitles size') }
+        subtitle={ t('Relative to the size of the picture, so it holds at any resolution.') }
+        IconComponent={ ALargeSmall }
+        value={ playerSubtitlesSizeScale.toString() }
+        options={ PLAYER_SUBTITLES_SIZE_OPTIONS }
+        isEnabled={ playerSubtitlesCustomStyle }
+        onChange={ (value) => onConfigUpdate('playerSubtitlesSizeScale', Number(value)) }
+      />
+      <SettingSelect
+        title={ t('Subtitles color') }
+        IconComponent={ Palette }
+        value={ playerSubtitlesColor }
+        options={ PLAYER_SUBTITLES_COLOR_OPTIONS }
+        isEnabled={ playerSubtitlesCustomStyle }
+        onChange={ (value) => onConfigUpdate('playerSubtitlesColor', value) }
+      />
+      <SettingSelect
+        title={ t('Subtitles background') }
+        IconComponent={ PaintBucket }
+        value={ playerSubtitlesBackgroundColor }
+        options={ PLAYER_SUBTITLES_BACKGROUND_OPTIONS }
+        isEnabled={ playerSubtitlesCustomStyle }
+        onChange={ (value) => onConfigUpdate('playerSubtitlesBackgroundColor', value) }
+      />
+      <SettingSelect
+        title={ t('Subtitles outline') }
+        subtitle={ t('What separates the letters from the picture behind them.') }
+        IconComponent={ Highlighter }
+        value={ playerSubtitlesEdgeType }
+        options={ PLAYER_SUBTITLES_EDGE_OPTIONS }
+        isEnabled={ playerSubtitlesCustomStyle }
+        onChange={ (value) => onConfigUpdate('playerSubtitlesEdgeType', value) }
+      />
+      <SettingSelect
+        title={ t('Subtitles position') }
+        subtitle={ t('How much of the picture stands between the subtitles and its bottom edge.') }
+        IconComponent={ AlignVerticalJustifyEnd }
+        value={ playerSubtitlesBottomOffset.toString() }
+        options={ PLAYER_SUBTITLES_BOTTOM_OFFSET_OPTIONS }
+        isEnabled={ playerSubtitlesCustomStyle }
+        onChange={ (value) => onConfigUpdate('playerSubtitlesBottomOffset', Number(value)) }
+      />
+    </>
+  );
+
   const renderPlayer = () => (
     <ThemedScrollView>
       <SettingSelect
@@ -552,6 +627,7 @@ export function SettingsScreenComponent({
         options={ PLAYER_BACK_BUFFER_TIME_OPTIONS }
         onChange={ (value) => onConfigUpdate('playerBackBufferTimeSetting', Number(value)) }
       />
+      { renderSubtitlesStyle() }
     </ThemedScrollView>
   );
 

@@ -1,4 +1,12 @@
-import { ASPECT_RATIO_OPTIONS, DEFAULT_SPEED } from 'Component/Player/Player.config';
+import {
+  ASPECT_RATIO_OPTIONS,
+  DEFAULT_SPEED,
+  DEFAULT_SUBTITLES_BACKGROUND_COLOR,
+  DEFAULT_SUBTITLES_BOTTOM_OFFSET,
+  DEFAULT_SUBTITLES_COLOR,
+  DEFAULT_SUBTITLES_EDGE_TYPE,
+  DEFAULT_SUBTITLES_SIZE_SCALE,
+} from 'Component/Player/Player.config';
 import { HOME_SCREEN } from 'Navigation/navigationRoutes';
 import { BACKUP_SECTION } from 'Type/Backup.interface';
 import { BackupConfigKey, SettingsSection } from 'Util/Backup/logic';
@@ -17,12 +25,17 @@ export type DeviceConfigType = {
   hiddenCountries: string[];
   initialRoute: string;
   homeDefaultTab: string;
-  /** How far a forward rewind jumps. Backward has its own, see below. */
   playerRewindSeconds: number;
   playerBackwardRewindSeconds: number;
   playerShowBufferTime: boolean;
   playerShowEndTime: boolean;
   playerShowEpisodeName: boolean;
+  playerSubtitlesCustomStyle: boolean;
+  playerSubtitlesSizeScale: number;
+  playerSubtitlesColor: string;
+  playerSubtitlesBackgroundColor: string;
+  playerSubtitlesEdgeType: string;
+  playerSubtitlesBottomOffset: number;
   themeScheme?: string;
   downloadsPath?: string;
   downloadsSaveSubtitles: boolean;
@@ -74,6 +87,12 @@ export const defaultConfig: DeviceConfigType = {
   playerShowBufferTime: false,
   playerShowEndTime: false,
   playerShowEpisodeName: false,
+  playerSubtitlesCustomStyle: false,
+  playerSubtitlesSizeScale: DEFAULT_SUBTITLES_SIZE_SCALE,
+  playerSubtitlesColor: DEFAULT_SUBTITLES_COLOR,
+  playerSubtitlesBackgroundColor: DEFAULT_SUBTITLES_BACKGROUND_COLOR,
+  playerSubtitlesEdgeType: DEFAULT_SUBTITLES_EDGE_TYPE,
+  playerSubtitlesBottomOffset: DEFAULT_SUBTITLES_BOTTOM_OFFSET,
   themeScheme: undefined,
   downloadsPath: undefined,
   downloadsSaveSubtitles: true,
@@ -151,6 +170,12 @@ export const CONFIG_KEY_SECTIONS = {
   playerShowBufferTime: BACKUP_SECTION.SETTINGS_PLAYER,
   playerShowEndTime: BACKUP_SECTION.SETTINGS_PLAYER,
   playerShowEpisodeName: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerSubtitlesCustomStyle: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerSubtitlesSizeScale: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerSubtitlesColor: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerSubtitlesBackgroundColor: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerSubtitlesEdgeType: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerSubtitlesBottomOffset: BACKUP_SECTION.SETTINGS_PLAYER,
   playerBufferTimeSetting: BACKUP_SECTION.SETTINGS_PLAYER,
   playerBackBufferTimeSetting: BACKUP_SECTION.SETTINGS_PLAYER,
 
