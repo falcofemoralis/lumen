@@ -4,8 +4,8 @@ import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useAppUpdaterContext } from 'Context/AppUpdaterContext';
 import { useIsTV } from 'Context/ConfigContext';
 import { useEffect, useRef, useState } from 'react';
-import { Platform } from 'react-native';
 import { Installer } from 'Util/App/installer';
+import { getAndroidDownloadUrl } from 'Util/App/update';
 
 import AppUpdaterComponent from './AppUpdater.component';
 import AppUpdaterComponentTV from './AppUpdater.component.atv';
@@ -53,11 +53,6 @@ export const AppUpdaterContainer = () => {
   }
 
   const acceptUpdate = async () => {
-    const {
-      downloadAndroidUrl,
-      downloadIosUrl,
-    } = update;
-
     if (isLoading) {
       return;
     }
@@ -68,7 +63,8 @@ export const AppUpdaterContainer = () => {
 
     setIsLoading(true);
 
-    const url = Platform.OS === 'android' ? downloadAndroidUrl : downloadIosUrl;
+    // non-Android platforms are rejected by the installer itself
+    const url = getAndroidDownloadUrl(update);
 
     const result = await Installer.downloadAndInstallApk(url, (receivedNum, totalNum) => {
       setProgress(Math.round((receivedNum / totalNum) * 100));
