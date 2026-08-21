@@ -43,6 +43,7 @@ import GlobeLock from 'lucide-react-native/icons/globe-lock';
 import Grid3x2 from 'lucide-react-native/icons/grid-3x2';
 import Highlighter from 'lucide-react-native/icons/highlighter';
 import House from 'lucide-react-native/icons/house';
+import Images from 'lucide-react-native/icons/images';
 import Info from 'lucide-react-native/icons/info';
 import Loader from 'lucide-react-native/icons/loader';
 import LoaderCircle from 'lucide-react-native/icons/loader-circle';
@@ -115,6 +116,7 @@ export function SettingsScreenComponent({
   playerSubtitlesBackgroundColor,
   playerSubtitlesEdgeType,
   playerSubtitlesBottomOffset,
+  playerStoryboardAdjacentFrames,
   isFirestore,
   securedSettings,
   downloadsPath,
@@ -583,6 +585,13 @@ export function SettingsScreenComponent({
         value={ playerBackwardRewindSeconds.toString() }
         options={ PLAYER_REWIND_OPTIONS }
         onChange={ (value) => onConfigUpdate('playerBackwardRewindSeconds', Number(value)) }
+      />
+      <SettingSwitch
+        title={ t('Adjacent preview frames') }
+        subtitle={ t('Show the previous and the next preview frame beside the current one while seeking.') }
+        IconComponent={ Images }
+        value={ playerStoryboardAdjacentFrames }
+        onChange={ (value) => onConfigUpdate('playerStoryboardAdjacentFrames', value) }
       />
       <SettingSelect
         title={ t('Player default aspect ratio') }

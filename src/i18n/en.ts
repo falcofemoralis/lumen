@@ -173,6 +173,9 @@ const en = {
   'No items': 'No items',
   'Player forward rewind seconds': 'Player forward rewind seconds',
   'Player backward rewind seconds': 'Player backward rewind seconds',
+  'Adjacent preview frames': 'Adjacent preview frames',
+  'Show the previous and the next preview frame beside the current one while seeking.':
+    'Show the previous and the next preview frame beside the current one while seeking.',
   'Stars': 'Stars',
   'You have {{days}} days left.': 'You have {{days}} days left.',
   'Downloads': 'Downloads',

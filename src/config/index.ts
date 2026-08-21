@@ -36,6 +36,7 @@ export type DeviceConfigType = {
   playerSubtitlesBackgroundColor: string;
   playerSubtitlesEdgeType: string;
   playerSubtitlesBottomOffset: number;
+  playerStoryboardAdjacentFrames: boolean;
   themeScheme?: string;
   downloadsPath?: string;
   downloadsSaveSubtitles: boolean;
@@ -93,6 +94,7 @@ export const defaultConfig: DeviceConfigType = {
   playerSubtitlesBackgroundColor: DEFAULT_SUBTITLES_BACKGROUND_COLOR,
   playerSubtitlesEdgeType: DEFAULT_SUBTITLES_EDGE_TYPE,
   playerSubtitlesBottomOffset: DEFAULT_SUBTITLES_BOTTOM_OFFSET,
+  playerStoryboardAdjacentFrames: false,
   themeScheme: undefined,
   downloadsPath: undefined,
   downloadsSaveSubtitles: true,
@@ -176,6 +178,7 @@ export const CONFIG_KEY_SECTIONS = {
   playerSubtitlesBackgroundColor: BACKUP_SECTION.SETTINGS_PLAYER,
   playerSubtitlesEdgeType: BACKUP_SECTION.SETTINGS_PLAYER,
   playerSubtitlesBottomOffset: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerStoryboardAdjacentFrames: BACKUP_SECTION.SETTINGS_PLAYER,
   playerBufferTimeSetting: BACKUP_SECTION.SETTINGS_PLAYER,
   playerBackBufferTimeSetting: BACKUP_SECTION.SETTINGS_PLAYER,
 

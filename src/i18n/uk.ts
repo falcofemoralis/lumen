@@ -175,6 +175,9 @@ const uk: Translations = {
   'No items': 'Список порожній',
   'Player forward rewind seconds': 'Секунди перемотки вперед',
   'Player backward rewind seconds': 'Секунди перемотки назад',
+  'Adjacent preview frames': 'Сусідні кадри попереднього перегляду',
+  'Show the previous and the next preview frame beside the current one while seeking.':
+    'Під час перемотки поряд із поточним кадром попереднього перегляду буде показано попередній і наступний.',
   'Stars': 'Зірки',
   'You have {{days}} days left.': 'У вас залишилось {{days}} днів.',
   'Downloads': 'Завантаження',

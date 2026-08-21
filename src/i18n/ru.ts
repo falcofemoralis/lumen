@@ -175,6 +175,9 @@ const ru: Translations = {
   'No items': 'Список пустой',
   'Player forward rewind seconds': 'Секунды перемотки вперед',
   'Player backward rewind seconds': 'Секунды перемотки назад',
+  'Adjacent preview frames': 'Соседние кадры предпросмотра',
+  'Show the previous and the next preview frame beside the current one while seeking.':
+    'При перемотке рядом с текущим кадром предпросмотра будут показаны предыдущий и следующий.',
   'Stars': 'Звезды',
   'You have {{days}} days left.': 'У вас осталось {{days}} дней.',
   'Downloads': 'Загрузки',
