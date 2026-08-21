@@ -14,6 +14,16 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     width: '100%',
     height: '100%',
   },
+  // Takes air-mouse / touch presses anywhere on the picture and toggles the
+  // controls with them, the way the d-pad does. It sits above the video and
+  // below the controls, so a press on an actual button never reaches it.
+  tapSurface: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
   background: {
     position: 'absolute',
     left: 0,
@@ -23,6 +33,9 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     zIndex: 1,
     backgroundColor: colors.transparent,
     opacity: 1,
+    // purely a backdrop for the controls - it must not eat the presses meant
+    // for the tap surface it covers
+    pointerEvents: 'none',
   },
   backgroundGradient: {
     height: '100%',
@@ -50,8 +63,11 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     justifyContent: 'space-between',
     alignItems: 'flex-end',
   },
+  // dimmed away while seeking - and untouchable with it, so a pointer press
+  // cannot land on a button nobody can see
   controlsRowHidden: {
     opacity: 0,
+    pointerEvents: 'none',
   },
   topInfo: {
   },

@@ -18,6 +18,7 @@ import {
   useEffect,
   useEffectEvent,
   useRef,
+  useState,
 } from 'react';
 import { View } from 'react-native';
 import { Slider } from 'react-native-awesome-slider';
@@ -31,6 +32,15 @@ import { SupportedKeys } from 'Util/RemoteControl/SupportedKeys';
 import { componentStyles } from './PlayerProgressBar.style.atv';
 import { PlayerProgressBarComponentProps } from './PlayerProgressBar.type';
 
+// The bar itself is only a few pixels tall - fine for a d-pad, which never has to
+// hit it, but far too thin to grab with an air-mouse pointer.
+const POINTER_HIT_SLOP = { top: 24, bottom: 24 };
+
+// How long a finished drag keeps owning the thumb, waiting for the seek it asked
+// for to show up in the player's own reporting. Same grace the d-pad smart
+// seeking gives itself.
+const SEEK_SETTLE_DELAY = 50;
+
 export const PlayerProgressBarComponent = ({
   player,
   storyboardUrl,
@@ -41,6 +51,8 @@ export const PlayerProgressBarComponent = ({
   seekToPosition,
   rewindPosition = noopFn,
   togglePlayPause = noopFn,
+  handleIsScrolling = noopFn,
+  handleUserInteraction = noopFn,
 }: PlayerProgressBarComponentProps) => {
   const { theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
@@ -51,6 +63,12 @@ export const PlayerProgressBarComponent = ({
 
   // Refs for performance-critical values to avoid re-renders
   const smartSeekingRef = useRef<SmartSeekingParams>({ ...DEFAULT_SMART_SEEKING_PARAMS });
+
+  // Pointer (air-mouse / touch) scrubbing. The d-pad drives `progress` itself
+  // through smart seeking; a drag instead hands the thumb to the slider, so the
+  // ticking `progressStatus` has to keep its hands off until the seek has landed.
+  const isSlidingRef = useRef(false);
+  const [slidingPercentage, setSlidingPercentage] = useState<number | null>(null);
 
   // Shared values for smooth animations
   const progress = useSharedValue(0);
@@ -75,7 +93,7 @@ export const PlayerProgressBarComponent = ({
   useEffect(() => {
     const { progressPercentage, playablePercentage } = progressStatus;
 
-    if (smartSeekingRef.current.seeking) {
+    if (smartSeekingRef.current.seeking || isSlidingRef.current) {
       return;
     }
 
@@ -261,22 +279,58 @@ export const PlayerProgressBarComponent = ({
     // would flip that order.
   }, [getFocusedElement]);
 
+  const onSlidingStart = useCallback(() => {
+    isSlidingRef.current = true;
+    handleIsScrolling(true);
+    handleUserInteraction();
+  }, [handleIsScrolling, handleUserInteraction]);
+
+  const onValueChange = useCallback((percentage: number) => {
+    // also fires for a plain tap on the track, which seeks straight away and
+    // never opens a preview
+    if (!isSlidingRef.current) {
+      return;
+    }
+
+    setSlidingPercentage(percentage);
+  }, []);
+
+  const onSlidingComplete = useCallback((percentage: number) => {
+    setSlidingPercentage(null);
+    seekToPosition(percentage);
+    handleIsScrolling(false);
+    handleUserInteraction();
+
+    // The seek does not land in the same tick. Keep the guard up until the
+    // player reports from the new position, or the `progressStatus` still in
+    // flight would snap the thumb back to where the drag started.
+    setTimeoutSafe(() => {
+      isSlidingRef.current = false;
+    }, SEEK_SETTLE_DELAY);
+  }, [seekToPosition, handleIsScrolling, handleUserInteraction]);
+
   // Memoized thumb render to prevent unnecessary re-renders
   const renderThumb = useCallback(() => (
-    <ThemedPressable
-      focusKey={ thumbFocusKey }
-      onFocus={ onFocus }
-      autofocus
-    >
-      { ({ isFocused }) => (
-        <View
-          style={ [
-            styles.thumb,
-            isFocused && styles.focusedThumb,
-          ] }
-        />
-      ) }
-    </ThemedPressable>
+    // The thumb is a norigin focusable, hence a gesture-handler button, and it
+    // sits right on top of the track - left touchable it would swallow the drag
+    // it is supposed to follow. Its layout is still measured, so the d-pad keeps
+    // finding it.
+    <View pointerEvents="none">
+      <ThemedPressable
+        focusKey={ thumbFocusKey }
+        onFocus={ onFocus }
+        autofocus
+      >
+        { ({ isFocused }) => (
+          <View
+            style={ [
+              styles.thumb,
+              isFocused && styles.focusedThumb,
+            ] }
+          />
+        ) }
+      </ThemedPressable>
+    </View>
   ), [thumbFocusKey, onFocus, styles]);
 
   const renderStoryboard = () => {
@@ -284,13 +338,16 @@ export const PlayerProgressBarComponent = ({
       return null;
     }
 
-    const currentTime = hideActions ? calculateCurrentTime(
-      progressStatus.progressPercentage
+    // shown for either way of scrubbing: holding left/right on the remote, which
+    // dims the action rows, or dragging the bar with a pointer
+    const isPreviewVisible = hideActions || slidingPercentage !== null;
+    const currentTime = isPreviewVisible ? calculateCurrentTime(
+      slidingPercentage ?? progressStatus.progressPercentage
     ) : 0;
 
     return (
       <PlayerStoryboard
-        style={ [styles.storyBoard, hideActions && styles.storyBoardVisible] }
+        style={ [styles.storyBoard, isPreviewVisible && styles.storyBoardVisible] }
         storyboardUrl={ storyboardUrl }
         currentTime={ currentTime }
         scale={ 1.5 }
@@ -314,6 +371,10 @@ export const PlayerProgressBarComponent = ({
           bubbleBackgroundColor: theme.colors.secondary,
         } }
         renderThumb={ renderThumb }
+        panHitSlop={ POINTER_HIT_SLOP }
+        onSlidingStart={ onSlidingStart }
+        onValueChange={ onValueChange }
+        onSlidingComplete={ onSlidingComplete }
       />
     </View>
   );

@@ -29,7 +29,12 @@ export const ThemedPressableComponent = ({
 }: ThemedPressableComponentProps) => {
   const { scrollTo } = useScrollContext();
   const { theme } = useAppTheme();
-  const { ref, focused, focusKey: realFocusKey } = useFocusable({
+  const {
+    ref,
+    focused,
+    focusKey: realFocusKey,
+    focusSelf,
+  } = useFocusable({
     focusKey,
     onFocus: (layout, props, details) => {
       onFocus?.();
@@ -41,6 +46,17 @@ export const ThemedPressableComponent = ({
   });
 
   useDefaultFocus(realFocusKey, autofocus);
+
+  // A pointer press (air-mouse, touch screen) never reaches norigin -- it only
+  // ever hears about the d-pad -- so the virtual focus would stay wherever the
+  // remote left it and this node's `onFocus` side effects would never run. Claim
+  // the focus here, so whatever was clicked is also where the remote carries on
+  // from. It is a no-op for the d-pad path: `onEnterPress` fires on a node that
+  // is focused already.
+  const handlePress = () => {
+    focusSelf();
+    onPress?.();
+  };
 
   // `Pressable.onLongPress` only covers air-mouse/touch presses -- this adds the
   // same behavior for holding the d-pad OK button while this node is focused.
@@ -77,7 +93,7 @@ export const ThemedPressableComponent = ({
       { renderTopAdditionalElement(state) }
       <Pressable
         ref={ ref }
-        onPress={ onPress }
+        onPress={ handlePress }
         onLongPress={ onLongPress }
         disabled={ disabled }
         android_ripple={ {

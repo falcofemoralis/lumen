@@ -7,17 +7,16 @@ export interface PlayerProgressBarContainerProps {
   seekToPosition: (percent: number) => void;
   calculateCurrentTime: (percent: number) => number;
 
-  // TV Only
+  // both platforms - a pointer drag holds the controls open on either
   handleIsScrolling?: (value: boolean) => void;
+  handleUserInteraction?: () => void;
 
-  // Mobile Only
+  // TV Only
   thumbFocusKey?: string;
   hideActions?: boolean;
   onFocus?: () => void
-  // toggleSeekMode?: () => void;
   rewindPosition?: (direction: RewindDirection, seconds: number) => void;
   togglePlayPause?: (state?: boolean, stopEvents?: boolean) => void;
-  handleUserInteraction?: () => void;
 }
 
 export interface PlayerProgressBarComponentProps extends PlayerProgressBarContainerProps {
