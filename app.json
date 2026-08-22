@@ -5,9 +5,6 @@
   "version": "1.5.7",
   "userInterfaceStyle": "automatic",
   "icon": "./assets/images/app-icon-all.png",
-  "updates": {
-    "fallbackToCacheTimeout": 0
-  },
   "assetBundlePatterns": [
     "**/*"
   ],
