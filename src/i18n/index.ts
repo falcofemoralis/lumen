@@ -1,6 +1,6 @@
 import 'intl-pluralrules';
 
-import i18n from 'i18next';
+import i18n, { changeLanguage, init, use as i18nUse } from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import { storage } from 'Util/Storage';
 
@@ -52,7 +52,7 @@ export const getStoredLanguage = (): Language => {
 export const setLanguage = async (lang: Language) => {
   try {
     storage.getConfigStorage().saveString(LANGUAGE_STORAGE_KEY, lang);
-    await i18n.changeLanguage(lang);
+    await changeLanguage(lang);
   } catch (error) {
     console.error('Error saving language to storage:', error);
   }
@@ -72,11 +72,11 @@ export const getCurrentLanguage = (): Language => {
 };
 
 export const initI18n = async () => {
-  i18n.use(initReactI18next);
+  i18nUse(initReactI18next);
 
   const savedLng = getStoredLanguage();
 
-  await i18n.init({
+  await init({
     resources,
     lng: savedLng,
     fallbackLng: fallbackLocale,
