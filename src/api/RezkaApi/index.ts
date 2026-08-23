@@ -883,7 +883,7 @@ const RezkaApi: RezkaApiInterface = {
           case 'В переводе':
             break;
           case 'Возраст':
-            // film.age = value.rawText;
+            film.age = value.rawText;
             break;
           case 'Время':
             film.duration = formatDuration(Number(value.rawText.replace(' мин.', '')));

@@ -55,6 +55,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     isLocalLibrary,
     showVotesCount,
     showRecommendations,
+    showAgeRating,
   } = useConfigContext();
   const navigation = useNavigation<NativeStackNavigationProp<AppStackParamList>>();
   const { isSignedIn, currentService, prepareShareBody } = useServiceContext();
@@ -719,6 +720,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     isContinueWatchingLoading,
     showVotesCount,
     showRecommendations,
+    showAgeRating,
     playFilm,
     handleVideoSelect,
     handleSelectFilm,

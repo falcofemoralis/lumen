@@ -57,6 +57,7 @@ import RefreshCw from 'lucide-react-native/icons/refresh-cw';
 import Rewind from 'lucide-react-native/icons/rewind';
 import Route from 'lucide-react-native/icons/route';
 import Settings2 from 'lucide-react-native/icons/settings-2';
+import ShieldAlert from 'lucide-react-native/icons/shield-alert';
 import ShieldCheck from 'lucide-react-native/icons/shield-check';
 import Sparkles from 'lucide-react-native/icons/sparkles';
 import StepForward from 'lucide-react-native/icons/step-forward';
@@ -142,6 +143,7 @@ export function SettingsScreenComponent({
   commentPostingMobile,
   showVotesCount,
   showRecommendations,
+  showAgeRating,
   theme,
   themeScheme,
   appLanguage,
@@ -318,6 +320,13 @@ export function SettingsScreenComponent({
         IconComponent={ Sparkles }
         value={ showRecommendations }
         onChange={ (value) => onConfigUpdate('showRecommendations', value) }
+      />
+      <SettingSwitch
+        title={ t('Show age rating') }
+        subtitle={ t('Show the age a film is rated for on its page.') }
+        IconComponent={ ShieldAlert }
+        value={ showAgeRating }
+        onChange={ (value) => onConfigUpdate('showAgeRating', value) }
       />
       <SettingSwitch
         title={ t('Continue button enabled') }

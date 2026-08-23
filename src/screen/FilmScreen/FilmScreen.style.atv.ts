@@ -80,6 +80,11 @@ export const componentStyles = ({ scale, text, colors }: Theme) => ({
     lineHeight: scale(text.xs.lineHeight),
     opacity: 0.8,
   },
+  // the age is a whole sentence on some films, so it has to wrap
+  // inside the card instead of running past its edge
+  ageText: {
+    flexShrink: 1,
+  },
   collectionContainer: {
     marginTop: scale(8),
     gap: scale(10),

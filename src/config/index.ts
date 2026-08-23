@@ -68,6 +68,7 @@ export type DeviceConfigType = {
   tvSearchEnabled: boolean;
   showVotesCount: boolean;
   showRecommendations: boolean;
+  showAgeRating: boolean;
 }
 
 export const defaultConfig: DeviceConfigType = {
@@ -126,6 +127,7 @@ export const defaultConfig: DeviceConfigType = {
   tvSearchEnabled: true,
   showVotesCount: true,
   showRecommendations: true,
+  showAgeRating: false,
 };
 
 export const CONFIG_KEY_SECTIONS = {
@@ -147,6 +149,7 @@ export const CONFIG_KEY_SECTIONS = {
   tvSearchEnabled: BACKUP_SECTION.SETTINGS_APPEARANCE,
   showVotesCount: BACKUP_SECTION.SETTINGS_APPEARANCE,
   showRecommendations: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  showAgeRating: BACKUP_SECTION.SETTINGS_APPEARANCE,
 
   strictConnectionCheck: BACKUP_SECTION.SETTINGS_NETWORK,
 

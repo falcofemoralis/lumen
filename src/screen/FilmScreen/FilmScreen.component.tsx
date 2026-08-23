@@ -111,6 +111,7 @@ export function FilmScreenComponent({
   isContinueWatchingLoading,
   showVotesCount,
   showRecommendations,
+  showAgeRating,
   playFilm,
   handleVideoSelect,
   handleSelectFilm,
@@ -657,6 +658,7 @@ export function FilmScreenComponent({
       releaseDate,
       countries = [],
       duration,
+      age,
     } = film;
 
     return (
@@ -666,6 +668,7 @@ export function FilmScreenComponent({
         { renderInfoText(duration, t('Time')) }
         { renderDirectors() }
         { renderCollection(countries, t('Country'), handleSelectCategory) }
+        { showAgeRating && renderInfoText(age, t('Age')) }
       </View>
     );
   };

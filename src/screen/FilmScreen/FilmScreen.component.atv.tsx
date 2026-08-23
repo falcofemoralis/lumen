@@ -58,6 +58,7 @@ export function FilmScreenComponent({
   shouldDisplayContinueWatching,
   showVotesCount,
   showRecommendations,
+  showAgeRating,
   playFilm,
   handleVideoSelect,
   handleSelectFilm,
@@ -218,6 +219,28 @@ export function FilmScreenComponent({
     );
   };
 
+  const renderAge = () => {
+    const { age } = film;
+
+    if (!showAgeRating || !age) {
+      return null;
+    }
+
+    return (
+      <View style={ styles.textContainer }>
+        <ThemedText style={ styles.textTitle }>
+          { `${t('Age')}: ` }
+        </ThemedText>
+        <ThemedText
+          style={ [styles.text, styles.ageText] }
+          numberOfLines={ 2 }
+        >
+          { age }
+        </ThemedText>
+      </View>
+    );
+  };
+
   const renderRatings = () => {
     const { ratings = [], mainRating } = film;
 
@@ -347,6 +370,7 @@ export function FilmScreenComponent({
         { renderRatings() }
         { renderDirectors() }
         { renderCollection(countries, t('Country'), handleSelectCategory) }
+        { renderAge() }
         { renderDescription() }
       </ThemedGroup>
     );

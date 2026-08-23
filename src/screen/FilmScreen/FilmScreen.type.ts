@@ -28,6 +28,7 @@ export interface FilmScreenComponentProps {
   isContinueWatchingLoading: boolean;
   showVotesCount: boolean;
   showRecommendations: boolean;
+  showAgeRating: boolean;
   playFilm: () => void;
   handleVideoSelect: (video: FilmVideoInterface, voice: FilmVoiceInterface) => void;
   handleSelectFilm: (film: FilmInterface) => void;
