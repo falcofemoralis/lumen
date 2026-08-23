@@ -66,6 +66,13 @@ export interface FilmGridContainerProps {
    * in the middle of it rather than at the top. */
   centerEmptyComponent?: boolean;
   onNextLoad?: (isRefresh: boolean) => Promise<void>;
+  /**
+   * Whether the source still has pages left to load. Drives the mobile footer:
+   * a spinner while more is coming, an end marker once it is not. Left out when
+   * the caller cannot tell, in which case the footer falls back to spinning only
+   * while a page is actually in flight.
+   */
+  hasMorePages?: boolean;
   // Mobile related
   disableStatusbarSafeArea?: boolean;
   // TV related
@@ -89,6 +96,8 @@ export interface FilmGridComponentProps extends FilmGridLayoutProps {
   isSectioned: boolean;
   numberOfColumns: number;
   isRefreshing: boolean;
+  /** Whether a next page requested by scrolling to the end is still in flight. */
+  isLoadingNext: boolean;
   handleOnPress: (film: FilmCardInterface) => void;
   handleScrollEnd?: () => void;
   handleRefresh?: () => void;

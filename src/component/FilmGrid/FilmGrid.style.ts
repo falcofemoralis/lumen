@@ -14,6 +14,14 @@ export const componentStyles = ({ scale, text, colors }: Theme) => ({
     paddingBottom: scale(4),
     marginBottom: scale(4),
   },
+  // Sits below the last row, where the item separators no longer apply -- it has
+  // to space itself off the grid.
+  footer: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: scale(ROW_GAP * 2),
+  },
   // The list content is as tall as its items, so an empty list has to be grown
   // to the grid's height before its empty component can be centered in it.
   centeredEmpty: {

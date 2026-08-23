@@ -269,11 +269,12 @@ export const FilmPagerComponent = ({
       return null;
     }
 
-    const { films } = pagerItem;
+    const { films, pagination } = pagerItem;
 
     return (
       <FilmGrid
         films={ films ?? [] }
+        hasMorePages={ pagination.currentPage < pagination.totalPages }
         disableEmptyComponent={ disableEmptyComponent }
         disableStatusbarSafeArea={ disableStatusbarSafeArea }
         // empty flag it true, films array exist and this array is empty

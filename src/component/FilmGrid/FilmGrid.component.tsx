@@ -1,6 +1,7 @@
 import { FlashList } from '@shopify/flash-list';
 import { FilmCard } from 'Component/FilmCard';
 import { FilmCardThumbnail } from 'Component/FilmCard/FilmCard.thumbnail';
+import { Loader } from 'Component/Loader';
 import { ThemedSafeArea } from 'Component/ThemedSafeArea';
 import { ThemedText } from 'Component/ThemedText';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
@@ -66,11 +67,14 @@ const MemoizedGridItem = memo(FilmGridItemCard);
 export function FilmGridComponent({
   data,
   stickyHeaderIndices,
+  hasFilms,
   numberOfColumns,
   disableEmptyComponent,
   hideGrid,
   disableStatusbarSafeArea,
   isRefreshing,
+  isLoadingNext,
+  hasMorePages,
   ListHeaderComponent,
   ListEmptyComponent,
   centerEmptyComponent,
@@ -143,6 +147,28 @@ export function FilmGridComponent({
     [ListHeaderComponent, renderSafeArea]
   );
 
+  // Tells a list that is still growing apart from one that has ended: a long
+  // grid otherwise just stops, with nothing to say whether the bottom is the
+  // bottom or the next page is on its way.
+  const listFooter = useMemo(() => {
+    // Nothing to page through, or nothing but loading placeholders so far.
+    if (!handleScrollEnd || !hasFilms) {
+      return null;
+    }
+
+    // `hasMorePages` knows about the page after this one before it is asked for;
+    // without it all the grid can report is the request it has in flight.
+    if (!(hasMorePages ?? isLoadingNext)) {
+      return null;
+    }
+
+    return (
+      <View style={ styles.footer }>
+        <Loader />
+      </View>
+    );
+  }, [handleScrollEnd, hasFilms, hasMorePages, isLoadingNext, styles]);
+
   const contentContainerStyle = useMemo(() => (
     centerEmptyComponent && !data.length ? styles.centeredEmpty : undefined
   ), [centerEmptyComponent, data.length, styles]);
@@ -168,6 +194,7 @@ export function FilmGridComponent({
       stickyHeaderIndices={ stickyHeaderIndices.length ? stickyHeaderIndices : undefined }
       ListHeaderComponent={ listHeader }
       ListEmptyComponent={ disableEmptyComponent || hideGrid ? undefined : ListEmptyComponent }
+      ListFooterComponent={ listFooter }
       contentContainerStyle={ contentContainerStyle }
       refreshControl={ refreshControl }
       showsVerticalScrollIndicator={ false }

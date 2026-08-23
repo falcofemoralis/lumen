@@ -4,7 +4,6 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { FilmType } from 'Type/FilmType.type';
 import { isFilmCardHidden } from 'Util/Film';
-import { noopFn } from 'Util/Function';
 import { openFilm } from 'Util/Router';
 
 import FilmGridComponent from './FilmGrid.component';
@@ -45,6 +44,7 @@ export function FilmGridContainer({
   const { isTV, numberOfColumnsMobile, numberOfColumnsTV } = useConfigContext();
   const hiddenCountries = useHiddenCountries();
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isLoadingNext, setIsLoadingNext] = useState(false);
   const updatingStateRef = useRef(false);
 
   const numberOfColumns = isTV ? numberOfColumnsTV : numberOfColumnsMobile;
@@ -152,7 +152,7 @@ export function FilmGridContainer({
   };
 
   const handleScrollEnd = async () => {
-    loadNextPage(noopFn);
+    loadNextPage(setIsLoadingNext);
   };
 
   const handleRefresh = async () => {
@@ -166,6 +166,7 @@ export function FilmGridContainer({
     isSectioned,
     numberOfColumns,
     isRefreshing,
+    isLoadingNext,
     isEmpty,
     hideGrid,
     handleOnPress,
