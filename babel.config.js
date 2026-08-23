@@ -3,6 +3,13 @@ module.exports = function (api) {
 
   return {
     presets: ['babel-preset-expo'],
-    plugins: ['react-native-boost/plugin'],
+    plugins: [
+      [
+        'react-native-boost/plugin',
+        {
+          silent: true,
+        },
+      ],
+    ],
   };
 };
