@@ -2,7 +2,7 @@
   "name": "Lumen App",
   "slug": "lumen",
   "scheme": "lumen",
-  "version": "1.5.7",
+  "version": "1.6.0",
   "userInterfaceStyle": "automatic",
   "icon": "./assets/images/app-icon-all.png",
   "assetBundlePatterns": [
@@ -16,7 +16,7 @@
       "foregroundImage": "./assets/images/app-icon-android-adaptive-foreground.png",
       "backgroundImage": "./assets/images/app-icon-android-adaptive-background.png"
     },
-    "versionCode": 23,
+    "versionCode": 24,
     "googleServicesFile": "./google-services.json",
     "permissions": [
       "android.permission.MANAGE_EXTERNAL_STORAGE",
