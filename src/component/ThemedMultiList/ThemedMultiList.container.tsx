@@ -1,59 +1,31 @@
 import { useIsTV } from 'Context/ConfigContext';
-import { memo, useCallback, useState } from 'react';
+import { memo } from 'react';
 
 import ThemedMultiListComponent from './ThemedMultiList.component';
 import ThemedMultiListComponentTV from './ThemedMultiList.component.atv';
-import { ListItem, ThemedMultiListContainerProps } from './ThemedMultiList.type';
+import { ThemedMultiListContainerProps } from './ThemedMultiList.type';
 
+// Fully controlled: the items are rendered exactly as handed over, so what is on
+// screen is whatever the caller last passed. Labels that carry a `(n)` tally are
+// the caller's to keep current -- a copy kept here could only be seeded once, and
+// went stale the moment the overlay holding it was torn down and remounted.
 export function ThemedMultiListContainer({
   data,
   header,
   noItemsTitle,
   noItemsSubtitle,
-  disableCounter,
   searchComponent,
   onChange,
 }: ThemedMultiListContainerProps) {
   const isTV = useIsTV();
-  const [countedValues, setCountedValues] = useState<ListItem[]>(data);
-
-  // The counted copy exists only to write the `(n)` tallies into, and it is
-  // seeded once -- so while it is in use the caller cannot change what is on
-  // screen. With the counter off there is nothing to write, and the items are
-  // rendered as handed over, which is what a filtered list needs.
-  const values = disableCounter ? data : countedValues;
-
-  const handleOnChange = useCallback((value: string, isChecked: boolean) => {
-    onChange(value, isChecked);
-
-    if (disableCounter) {
-      return;
-    }
-
-    setCountedValues((prevValues) => prevValues.map((item) => {
-      if (item.value === value) {
-        const labelMatch = item.label.match(/(.*?)\((\d+)\)$/);
-        const label = labelMatch ? labelMatch[1] : item.label;
-        const number = labelMatch ? parseInt(labelMatch[2], 10) : 0;
-
-        return {
-          ...item,
-          isChecked,
-          label: `${label}(${isChecked ? number + 1 : number - 1})`,
-        };
-      }
-
-      return item;
-    }));
-  }, [onChange, disableCounter]);
 
   const containerProps = {
-    values,
+    values: data,
     header,
     noItemsTitle,
     noItemsSubtitle,
     searchComponent,
-    handleOnChange,
+    handleOnChange: onChange,
   };
 
   // eslint-disable-next-line max-len

@@ -43,7 +43,6 @@ export const SettingExportComponent = ({
           <ThemedMultiList
             header={ t('What to export') }
             data={ items }
-            disableCounter
             onChange={ onToggle }
           />
           <ThemedText style={ styles.note }>

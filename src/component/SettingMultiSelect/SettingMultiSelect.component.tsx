@@ -73,7 +73,6 @@ export const SettingMultiSelectComponent = memo(({
           noItemsTitle={ query ? t('Nothing found') : noItemsTitle }
           noItemsSubtitle={ query ? '' : noItemsSubtitle }
           searchComponent={ withSearch ? searchComponent : undefined }
-          disableCounter
           onChange={ handleOnChange }
         />
       </ThemedOverlay>

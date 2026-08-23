@@ -15,6 +15,26 @@ import BookmarksOverlayComponent from './BookmarksOverlay.component';
 import BookmarksOverlayComponentTV from './BookmarksOverlay.component.atv';
 import { BookmarksOverlayContainerProps } from './BookmarksOverlay.type';
 
+// The service bakes the category size into the label it serves ("Watch later (12)") and
+// the toggle endpoint answers with no new count, so a pending change is applied to the
+// label text. Left alone when there is no tally to move.
+const CATEGORY_SIZE = /\((\d+)\)\s*$/;
+
+const applySizeDelta = (title: string, delta: number): string => {
+  const size = title.match(CATEGORY_SIZE)?.[1];
+
+  if (!size || !delta) {
+    return title;
+  }
+
+  return title.replace(CATEGORY_SIZE, `(${Math.max(0, Number(size) + delta)})`);
+};
+
+type BookmarkOverride = {
+  isChecked: boolean;
+  title: string;
+};
+
 export const BookmarksOverlayContainer = ({
   overlayRef,
   film,
@@ -27,13 +47,14 @@ export const BookmarksOverlayContainer = ({
   const queryClient = useQueryClient();
 
   // the overlay stays mounted between opens and the parent may keep handing back the same
-  // film object, so the toggles made here are remembered locally instead of mutating the prop
-  const [checkedOverrides, setCheckedOverrides] = useState<Record<string, boolean>>({});
+  // film object, so the toggles made here are remembered locally instead of mutating the
+  // prop - the label included, since it carries the category size the toggle just changed
+  const [overrides, setOverrides] = useState<Record<string, BookmarkOverride>>({});
   const [syncedFilmId, setSyncedFilmId] = useState(film.id);
 
   if (syncedFilmId !== film.id) {
     setSyncedFilmId(film.id);
-    setCheckedOverrides({});
+    setOverrides({});
   }
 
   // the film screen renders its own cached copy of the film and the player is handed a
@@ -63,11 +84,17 @@ export const BookmarksOverlayContainer = ({
     },
     onSuccess: (_result, { bookmarkId, isChecked }) => {
       const { bookmarks } = film;
+      const bookmark = bookmarks?.find((b) => b.id === bookmarkId);
 
-      if (bookmarks?.some((b) => b.id === bookmarkId)) {
-        const newBookmarks = bookmarks.map((b) => (b.id === bookmarkId ? { ...b, isBookmarked: isChecked } : b));
+      if (bookmarks && bookmark) {
+        // moved off what is on screen rather than off the served label, so toggling the
+        // same category twice lands back on the size it started at
+        const title = applySizeDelta(overrides[bookmarkId]?.title ?? bookmark.title, isChecked ? 1 : -1);
+        const newBookmarks = bookmarks.map(
+          (b) => (b.id === bookmarkId ? { ...b, title, isBookmarked: isChecked } : b)
+        );
 
-        setCheckedOverrides((prev) => ({ ...prev, [bookmarkId]: isChecked }));
+        setOverrides((prev) => ({ ...prev, [bookmarkId]: { isChecked, title } }));
         syncCachedFilm(newBookmarks);
         onBookmarkChange?.({ ...film, bookmarks: newBookmarks });
       }
@@ -110,11 +137,15 @@ export const BookmarksOverlayContainer = ({
 
     const { bookmarks = [] } = film;
 
-    return bookmarks.map((bookmark) => ({
-      label: bookmark.title,
-      value: bookmark.id,
-      isChecked: checkedOverrides[bookmark.id] ?? bookmark.isBookmarked ?? false,
-    }));
+    return bookmarks.map((bookmark) => {
+      const override = overrides[bookmark.id];
+
+      return {
+        label: override?.title ?? bookmark.title,
+        value: bookmark.id,
+        isChecked: override?.isChecked ?? bookmark.isBookmarked ?? false,
+      };
+    });
   };
 
   const containerProps = {

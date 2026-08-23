@@ -531,8 +531,10 @@ const RezkaApi: RezkaApiInterface = {
     }
   },
 
+  // the endpoint toggles, so removal is the same call - awaited, so a failed removal
+  // rejects instead of reporting success before the request is even out
   async removeBookmark(filmId, bookmarkId) {
-    this.addBookmark(filmId, bookmarkId);
+    await this.addBookmark(filmId, bookmarkId);
   },
 
   /** Recently watched */
