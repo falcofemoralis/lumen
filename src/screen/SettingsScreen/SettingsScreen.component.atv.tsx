@@ -669,7 +669,7 @@ export function SettingsScreenComponent({
         onChange={ (value) => onConfigUpdate('playerBackBufferTimeSetting', Number(value)) }
       />
       <SettingSwitch
-        title={ t('Frame rate matching') }
+        title={ t('Frame rate matching (AFR)') }
         subtitle={ t('Adds a button to the player that matches the TV refresh rate to the video.') }
         IconComponent={ MonitorCog }
         value={ playerAutoFrameRateEnabled }

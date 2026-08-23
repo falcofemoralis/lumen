@@ -252,7 +252,7 @@ const en = {
     'Show the name the schedule gives the episode under the title in the player.',
   'Auto next episode': 'Auto next episode',
   'Toggle auto next episode.': 'Toggle auto next episode.',
-  'Frame rate matching': 'Frame rate matching',
+  'Frame rate matching (AFR)': 'Frame rate matching (AFR)',
   'Adds a button to the player that matches the TV refresh rate to the video.': 'Adds a button to the player that switches the TV to a refresh rate fitting the video, removing the judder of 24fps films on a 60Hz screen. The picture blanks for a moment on each switch, and not every TV supports it.',
   'Frame rate matching off': 'Frame rate matching off',
   'Matching the TV to {{fps}} fps': 'Matching the TV to {{fps}} fps',
