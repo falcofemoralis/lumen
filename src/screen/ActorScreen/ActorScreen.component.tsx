@@ -6,7 +6,6 @@ import { Thumbnail } from 'Component/Thumbnail';
 import { Wrapper } from 'Component/Wrapper';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from 'Theme/context';
 
 import { componentStyles } from './ActorScreen.style';
@@ -18,7 +17,6 @@ export function ActorScreenComponent({
 }: ActorScreenComponentProps) {
   const { scale } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
-  const { top } = useSafeAreaInsets();
 
   const renderPhoto = () => {
     if (!actor) {
