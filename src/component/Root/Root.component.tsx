@@ -16,6 +16,7 @@ import { useTvChannels } from 'Hooks/useTvChannels';
 import { useTvSearch } from 'Hooks/useTvSearch';
 import { ReactNode, useEffect } from 'react';
 import NotificationStore from 'Store/Notification.store';
+import { Installer } from 'Util/App/installer';
 import { runAfterStartup } from 'Util/Startup';
 
 export const Root = ({ children }: { children: ReactNode }) => {
@@ -50,6 +51,13 @@ export const Root = ({ children }: { children: ReactNode }) => {
       checkVersion();
     });
   }, [checkForUpdates, checkVersion, isInternetAvailable]);
+
+  // The APK an update downloaded is tens of megabytes and is useless once this
+  // launch has happened - the install either went through or the user dropped
+  // it - so reclaim the space here, where nothing can still be reading it.
+  useEffect(() => runAfterStartup(() => {
+    Installer.cleanupApk();
+  }), []);
 
   // Deferred as well - this only feeds the tab bar's notification badge, which can
   // appear a moment after the tabs themselves do.

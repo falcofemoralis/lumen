@@ -56,18 +56,47 @@ export class Installer {
     }
   }
 
+  // The system installer keeps reading the APK after `install()` returns - the
+  // copy into the install session happens once the user confirms the dialog -
+  // so the file cannot be dropped right after the intent is fired. It is
+  // removed on the next launch instead: by then the install has either gone
+  // through (this very launch is the new build) or been cancelled.
+  static cleanupApk(): void {
+    if (Platform.OS !== 'android') {
+      return;
+    }
+
+    try {
+      const file = Installer.getApkFile();
+
+      if (file.exists) {
+        file.delete();
+      }
+    } catch {
+      // a stale APK only costs disk space, and the next download replaces it
+    }
+  }
+
+  // app-private storage: needs no runtime permission and is exposed through
+  // the installer's FileProvider (`files-path`), so the install intent can
+  // still read the APK back
+  private static getApkPath(): string {
+    return `${directories.documents}/${Installer.APK_NAME}`;
+  }
+
+  private static getApkFile(): File {
+    return new File(`file://${Installer.getApkPath()}`);
+  }
+
   private static downloadApk(
     url: string,
     onProgress?: (received: number, total: number) => void
   ): Promise<string> {
-    // app-private storage: needs no runtime permission and is exposed through
-    // the installer's FileProvider (`files-path`), so the install intent can
-    // still read the APK back
-    const filePath = `${directories.documents}/${Installer.APK_NAME}`;
+    const filePath = Installer.getApkPath();
 
     // a leftover file from an interrupted attempt would be resumed rather than
     // re-downloaded, which produces a corrupt APK once the update URL changes
-    const previousFile = new File(`file://${filePath}`);
+    const previousFile = Installer.getApkFile();
 
     if (previousFile.exists) {
       previousFile.delete();
