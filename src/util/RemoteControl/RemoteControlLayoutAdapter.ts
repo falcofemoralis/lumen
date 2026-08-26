@@ -1,5 +1,7 @@
 import type { AddEventListenersOptions, Key } from '@noriginmedia/norigin-spatial-navigation-core';
 import { ReactNativeLayoutAdapter } from '@noriginmedia/norigin-spatial-navigation-react-native-tvos';
+import { trapRefGlobal } from 'Navigation/NativeFocusTrap';
+import { Keyboard, Platform } from 'react-native';
 
 import RemoteControlManager from './RemoteControlManager';
 import { SupportedKeys } from './SupportedKeys';
@@ -11,8 +13,8 @@ import { SupportedKeys } from './SupportedKeys';
  * old `configureRemoteControl` used, so the rest of the app keeps getting its
  * keys from a single source.
  *
- * Layout/native-focus logic (measureLayout / focusNode / blurNode) is inherited
- * unchanged from the base adapter — only the event source is swapped out.
+ * `measureLayout` / `blurNode` are inherited unchanged; `focusNode` is replaced
+ * (see below) so the virtual cursor never drags the native focus along.
  *
  * norigin only understands the five spatial keys below. LONG_ENTER / BACK /
  * BACKWARD are emitted by RemoteControlManager but consumed per-component
@@ -52,6 +54,29 @@ export class RemoteControlLayoutAdapter extends ReactNativeLayoutAdapter {
     if (this.keyDownListener) {
       RemoteControlManager.removeKeydownListener(this.keyDownListener);
       this.keyDownListener = undefined;
+    }
+  };
+
+  /**
+   * The base adapter mirrors every focus change onto the native focus engine
+   * with `node.requestTVFocus()`. On Android that is a liability rather than a
+   * sync: a plain `View` is not natively focusable, so `requestFocus` falls
+   * through to the first focusable descendant (`FOCUS_BEFORE_DESCENDANTS`) —
+   * an RNGH button, which is natively focusable no matter what we pass it. Real
+   * focus then sits on a button instead of the trap, and from there the native
+   * focus engine moves it on its own and drags ScrollViews along.
+   *
+   * Nothing in the app reads native focus, so instead of following the virtual
+   * cursor we park focus back on the trap. The layout bookkeeping the base does
+   * here feeds its own `TVEventHandler` pan handling, which `addEventListeners`
+   * above already replaced — so there is nothing left to keep in sync.
+   *
+   * The keyboard check is kept from the base: while the IME is up the EditText
+   * legitimately owns native focus and must not be interrupted mid-typing.
+   */
+  focusNode = (): void => {
+    if (Platform.isTV && !Keyboard.isVisible()) {
+      trapRefGlobal.current?.requestTVFocus();
     }
   };
 }

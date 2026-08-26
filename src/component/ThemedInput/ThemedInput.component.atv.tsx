@@ -46,12 +46,10 @@ export const ThemedInputComponent = ({
       }
 
       // `focus()` is a no-op whenever React Native already believes this field is
-      // focused, and Android hands the EditText native focus behind our back: the
-      // Norigin adapter calls `requestTVFocus()` on every node it focuses, and a
-      // plain View is not natively focusable, so Android forwards that request to
-      // its first focusable descendant -- the EditText -- which reports focus to
-      // JS without anyone ever opening the IME. Dropping that stale focus first is
-      // what makes the request reach native and raise the keyboard.
+      // focused, which happens whenever Android hands the EditText native focus
+      // behind our back -- it reports focus to JS without anyone ever opening the
+      // IME. Dropping that stale focus first is what makes the request reach
+      // native and raise the keyboard.
       if (TextInput.State.currentlyFocusedInput() === input) {
         input.blur();
       }
@@ -113,12 +111,11 @@ export const ThemedInputComponent = ({
 
   const renderInput = () => {
     return (
-      // `focusable` keeps the node the Norigin adapter targets with
-      // `requestTVFocus()` natively focusable, so Android stops at this wrapper
-      // instead of forwarding the request down to the EditText. Without it the
-      // input silently holds native focus with no keyboard, and the next
-      // `focus()` call is swallowed as a redundant one.
-      <View ref={ ref } focusable style={ styles.inputContainer }>
+      // Deliberately not `focusable`: the adapter no longer mirrors the virtual
+      // cursor onto this node (see RemoteControlLayoutAdapter.focusNode), so
+      // nothing requests native focus here, and leaving it focusable would only
+      // give Android's own focus recovery one more view to land on.
+      <View ref={ ref } style={ styles.inputContainer }>
         <TextInput
           autoComplete="off"
           ref={ textInputRef }
