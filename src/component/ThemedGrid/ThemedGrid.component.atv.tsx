@@ -3,6 +3,7 @@ import { FocusContext, useFocusable } from '@noriginmedia/norigin-spatial-naviga
 import { FlashList, FlashListRef } from '@shopify/flash-list';
 import { ScrollContext } from 'Component/ThemedScrollView/ScrollContext';
 import { useDefaultFocus } from 'Hooks/useDefaultFocus';
+import { useFocusScroll } from 'Hooks/useFocusScroll';
 import { memo, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import RemoteControlManager from 'Util/RemoteControl/RemoteControlManager';
@@ -112,6 +113,14 @@ export const ThemedGridComponent = ({
 
   const gap = (StyleSheet.flatten(rowStyle) as { gap?: number } | undefined)?.gap ?? 0;
 
+  // Focus scrolling of its own rather than the list's: FlashList can only hand
+  // an animated scroll to the platform, at the platform's speed.
+  const {
+    attachScrollRef,
+    handleScroll,
+    scrollToRow,
+  } = useFocusScroll(listRef, { viewPosition });
+
   const scrollToIndex = useCallback((index: number) => {
     // Only scroll when the focused row changes -- moving between cells within a
     // row that is already on screen must not trigger an animated re-center.
@@ -123,12 +132,8 @@ export const ThemedGridComponent = ({
 
     lastRowRef.current = row;
 
-    listRef.current?.scrollToIndex({
-      index,
-      animated: true,
-      viewPosition,
-    });
-  }, [numberOfColumns, viewPosition]);
+    scrollToRow(index);
+  }, [numberOfColumns, scrollToRow]);
 
   // BACK jumps to the top of the grid (scroll + focus the first cell), matching
   // the previous VirtualizedList behaviour.
@@ -155,7 +160,9 @@ export const ThemedGridComponent = ({
     const keyDownListener = (type: SupportedKeys) => {
       if (type === SupportedKeys.BACKWARD) {
         lastRowRef.current = -1;
-        listRef.current?.scrollToIndex({ index: 0, animated: true });
+        // Where focusing the first cell would scroll to anyway, so the scroll
+        // and the focus that follows it a few frames later agree.
+        scrollToRow(0);
         focusFirstCell();
 
         return true;
@@ -173,7 +180,7 @@ export const ThemedGridComponent = ({
         cancelAnimationFrame(frame);
       }
     };
-  }, []);
+  }, [scrollToRow]);
 
   const renderCell = useCallback(({ item, index }: { item: any; index: number }) => (
     <MemoizedGridCell
@@ -194,6 +201,9 @@ export const ThemedGridComponent = ({
           data={ data }
           renderItem={ renderCell }
           numColumns={ numberOfColumns }
+          onLoad={ attachScrollRef }
+          onScroll={ handleScroll }
+          scrollEventThrottle={ 16 }
           onEndReached={ handleScrollEnd }
           onEndReachedThreshold={ 0.25 }
           ListHeaderComponent={ ListHeaderComponent }

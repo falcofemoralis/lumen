@@ -9,6 +9,7 @@ import { ScrollContext, useScrollContext } from 'Component/ThemedScrollView/Scro
 import { ThemedText } from 'Component/ThemedText';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useDefaultFocus } from 'Hooks/useDefaultFocus';
+import { useFocusScroll } from 'Hooks/useFocusScroll';
 import { useLatest } from 'Hooks/useLatest';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { memo, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
@@ -186,6 +187,19 @@ function FilmGridList({
   const isScrollAnimated = !isLowMode;
 
   const listRef = useRef<FlashListRef<FilmGridItem>>(null);
+
+  // Focus scrolling of its own rather than the list's: FlashList can only hand
+  // an animated scroll to the platform, at the platform's speed.
+  const {
+    attachScrollRef,
+    handleScroll,
+    scrollToOffset,
+    scrollToRow,
+  } = useFocusScroll(listRef, {
+    viewPosition: FOCUSED_ROW_VIEW_POSITION,
+    isAnimated: isScrollAnimated,
+  });
+
   const lastIndexRef = useRef(-1);
   // Whether the focused row sits in the preload zone at the end of the grid --
   // where a scroll to it gets clamped for want of rows below it.
@@ -322,7 +336,10 @@ function FilmGridList({
   // container itself, leaving nothing focused. Wait for the first draw.
   const [isDrawn, setIsDrawn] = useState(false);
 
-  const handleLoad = useCallback(() => setIsDrawn(true), []);
+  const handleLoad = useCallback(() => {
+    attachScrollRef();
+    setIsDrawn(true);
+  }, [attachScrollRef]);
 
   // Focus the grid (restoring the last focused card via saveLastFocusedChild)
   // whenever the screen loads or is returned to. Enabled only once real films
@@ -385,22 +402,18 @@ function FilmGridList({
       loadNextPage?.();
     }
 
-    // Top of the list: scroll to the absolute offset rather than to the item.
-    // scrollToIndex ignores the ListHeaderComponent's height and would align the
-    // first item flush to the top, scrolling the screen header (e.g. an actor's
-    // main data) off -- scrollToOffset(0) keeps it in view.
+    // Top of the list: scroll to the absolute offset rather than to the row.
+    // A row's own offset ignores the ListHeaderComponent's height and would
+    // align the first item flush to the top, scrolling the screen header (e.g.
+    // an actor's main data) off -- offset 0 keeps it in view.
     if (index === 0) {
-      listRef.current?.scrollToOffset({ offset: 0, animated: isScrollAnimated });
+      scrollToOffset(0);
 
       return;
     }
 
-    listRef.current?.scrollToIndex({
-      index,
-      animated: isScrollAnimated,
-      viewPosition: FOCUSED_ROW_VIEW_POSITION,
-    });
-  }, [onAtTopChange, getPagination, isScrollAnimated]);
+    scrollToRow(index);
+  }, [onAtTopChange, getPagination, scrollToOffset, scrollToRow]);
 
   const scrollContextValue = useMemo(() => ({ scrollTo }), [scrollTo]);
 
@@ -409,8 +422,8 @@ function FilmGridList({
     // focus entering it only makes sense with the list back at the very top.
     // Reaching it from the first row leaves it there already; this covers the
     // rest (a touch scroll, an autofocused menu on a screen just opened).
-    scrollTo: () => listRef.current?.scrollToOffset({ offset: 0, animated: isScrollAnimated }),
-  }), [isScrollAnimated]);
+    scrollTo: () => scrollToOffset(0),
+  }), [scrollToOffset]);
 
   /**
    * The menu belongs above the first row but inside the list, so that it scrolls
@@ -455,12 +468,8 @@ function FilmGridList({
       return;
     }
 
-    listRef.current?.scrollToIndex({
-      index: lastIndexRef.current,
-      animated: isScrollAnimated,
-      viewPosition: FOCUSED_ROW_VIEW_POSITION,
-    });
-  }, [data.length, isScrollAnimated]);
+    scrollToRow(lastIndexRef.current);
+  }, [data.length, scrollToRow]);
 
   // Start of the last -- possibly partly filled -- row: every card of that row
   // shares its scrollIndex.
@@ -543,6 +552,8 @@ function FilmGridList({
             keyExtractor={ keyExtractor }
             getItemType={ getItemType }
             onLoad={ handleLoad }
+            onScroll={ handleScroll }
+            scrollEventThrottle={ 16 }
             onEndReached={ handleScrollEnd }
             onEndReachedThreshold={ 0.5 }
             drawDistance={ drawDistance }
