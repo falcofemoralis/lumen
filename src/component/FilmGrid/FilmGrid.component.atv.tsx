@@ -1,4 +1,4 @@
-import { NextFocusResolver } from '@noriginmedia/norigin-spatial-navigation-core';
+import { getCurrentFocusKey, NextFocusResolver, setFocus } from '@noriginmedia/norigin-spatial-navigation-core';
 import { FocusContext, FocusHandler, useFocusable } from '@noriginmedia/norigin-spatial-navigation-react-native-tvos';
 import { FlashList, FlashListRef } from '@shopify/flash-list';
 import { FilmCard } from 'Component/FilmCard';
@@ -11,7 +11,7 @@ import { useConfigContext } from 'Context/ConfigContext';
 import { useDefaultFocus } from 'Hooks/useDefaultFocus';
 import { useLatest } from 'Hooks/useLatest';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { Pressable } from 'react-native-gesture-handler';
 import { useAppTheme } from 'Theme/context';
@@ -143,7 +143,23 @@ const MemoizedGridItem = memo(FilmGridItemCard);
 // row above it visible as a hint that there is more up there.
 const FOCUSED_ROW_VIEW_POSITION = 0.05;
 
-export function FilmGridComponent({
+// A list header can be given either as an element or as a component to render.
+const renderListComponent = (Component: FilmGridComponentProps['ListHeaderComponent']) => {
+  if (!Component) {
+    return null;
+  }
+
+  return typeof Component === 'function' ? <Component /> : Component;
+};
+
+type FilmGridListProps = FilmGridComponentProps & {
+  /** Focus key of the enclosing grid container -- the menu's focus parent. */
+  gridFocusKey: string;
+  /** Focus key this list registers under; every card is a focus child of it. */
+  cardsFocusKey: string;
+};
+
+function FilmGridList({
   data,
   hasFilms,
   isSectioned,
@@ -151,13 +167,16 @@ export function FilmGridComponent({
   disableEmptyComponent,
   hideGrid,
   ListHeaderComponent,
+  ListMenuComponent,
   ListEmptyComponent,
   centerEmptyComponent,
   disableAutofocus,
+  gridFocusKey,
+  cardsFocusKey,
   handleOnPress,
   handleScrollEnd,
   onAtTopChange,
-}: FilmGridComponentProps) {
+}: FilmGridListProps) {
   const styles = useThemedStyles(componentStyles);
   const { scale, theme: { dimensions } } = useAppTheme();
   // An animated scroll runs over several frames while the row being entered is
@@ -289,7 +308,8 @@ export function FilmGridComponent({
     return siblings.find((sibling) => sibling.focusKey === currentFocusKey) ?? null;
   }, [getRows, getIsLowMode]);
 
-  const { ref, focusKey } = useFocusable<object, View>({
+  const { ref } = useFocusable<object, View>({
+    focusKey: cardsFocusKey,
     saveLastFocusedChild: true,
     // Safe only because `nextFocusResolver` answers without needing geometry.
     measureChildrenLayout: false,
@@ -308,7 +328,21 @@ export function FilmGridComponent({
   // whenever the screen loads or is returned to. Enabled only once real films
   // are drawn -- `data` is never empty (it holds loading placeholders meanwhile)
   // and Norigin cannot focus a card that is not registered as focusable yet.
-  useDefaultFocus(focusKey, !disableAutofocus && hasFilms && isDrawn);
+  // Claimed through the outer container, so a user who left from the menu comes
+  // back to it; with nothing focused yet its preferred child is this list.
+  useDefaultFocus(gridFocusKey, !disableAutofocus && hasFilms && isDrawn);
+
+  // A data swap -- a page change, a refresh -- unmounts the focused card, and
+  // Norigin restores focus to this container. While the replacement cards are
+  // not registered yet (the grid shows placeholders, which are not focusable)
+  // there is no child to descend into, so focus is left sitting on the container
+  // itself: a dead end no arrow key leads out of downwards. Step back into the
+  // grid once there are cards to step into.
+  useEffect(() => {
+    if (hasFilms && isDrawn && getCurrentFocusKey() === cardsFocusKey) {
+      setFocus(cardsFocusKey);
+    }
+  }, [data, hasFilms, isDrawn, cardsFocusKey]);
 
   // Read at focus time rather than captured, so scrollTo -- and with it the
   // scroll context every card consumes -- keeps its identity as pages arrive.
@@ -333,7 +367,7 @@ export function FilmGridComponent({
 
     lastIndexRef.current = index;
 
-    // Tell the pager to reveal/collapse the menu as focus crosses the first row.
+    // Let the screen collapse headers of its own as focus crosses the first row.
     if ((prevIndex === 0) !== (index === 0)) {
       onAtTopChange?.(index === 0);
     }
@@ -369,6 +403,39 @@ export function FilmGridComponent({
   }, [onAtTopChange, getPagination, isScrollAnimated]);
 
   const scrollContextValue = useMemo(() => ({ scrollTo }), [scrollTo]);
+
+  const menuScrollContextValue = useMemo(() => ({
+    // The menu rides in the list header and scrolls away with the content, so
+    // focus entering it only makes sense with the list back at the very top.
+    // Reaching it from the first row leaves it there already; this covers the
+    // rest (a touch scroll, an autofocused menu on a screen just opened).
+    scrollTo: () => listRef.current?.scrollToOffset({ offset: 0, animated: isScrollAnimated }),
+  }), [isScrollAnimated]);
+
+  /**
+   * The menu belongs above the first row but inside the list, so that it scrolls
+   * away with the content instead of collapsing above it. Re-parenting it to the
+   * grid container makes it a focus *sibling* of the cards rather than one of
+   * them -- see `FilmGridComponent` for why that split is what makes this work.
+   */
+  const listHeader = useMemo(() => {
+    if (!ListMenuComponent) {
+      return ListHeaderComponent;
+    }
+
+    return (
+      <>
+        { renderListComponent(ListHeaderComponent) }
+        <FocusContext.Provider value={ gridFocusKey }>
+          <ScrollContext.Provider value={ menuScrollContextValue }>
+            <View style={ styles.menu }>
+              { ListMenuComponent }
+            </View>
+          </ScrollContext.Provider>
+        </FocusContext.Provider>
+      </>
+    );
+  }, [ListMenuComponent, ListHeaderComponent, gridFocusKey, menuScrollContextValue, styles]);
 
   // A row focused near the end cannot be pulled up to its usual position -- the
   // list has nothing below it left to scroll -- so it stays wherever the clamped
@@ -466,7 +533,7 @@ export function FilmGridComponent({
   }, [dimensions.width, scale, numberOfColumns]);
 
   return (
-    <FocusContext.Provider value={ focusKey }>
+    <FocusContext.Provider value={ cardsFocusKey }>
       <ScrollContext.Provider value={ scrollContextValue }>
         <View ref={ ref } style={ styles.grid } tvFocusable={ false }>
           <FlashList
@@ -484,12 +551,76 @@ export function FilmGridComponent({
             scrollEnabled={ true }
             contentContainerStyle={ contentContainerStyle }
             ItemSeparatorComponent={ ItemSeparator }
-            ListHeaderComponent={ ListHeaderComponent }
+            ListHeaderComponent={ listHeader }
             ListEmptyComponent={ disableEmptyComponent || hideGrid ? null : ListEmptyComponent }
             showsVerticalScrollIndicator={ false }
           />
         </View>
       </ScrollContext.Provider>
+    </FocusContext.Provider>
+  );
+}
+
+/**
+ * The grid's outer focus container, with exactly two focus children: the menu
+ * that rides in the list header, and the container that owns every card.
+ *
+ * Two levels rather than one flat one is what makes a menu inside the list
+ * workable at all:
+ *
+ * - Norigin restores focus to the *parent* of a focused component that
+ *   unmounts, and resolves it to the child closest to the origin once the last
+ *   focused one has gone with it. Cards unmount under the user routinely (a page
+ *   swap, a refresh, recycling), and in a flat tree the child closest to the
+ *   origin is the menu -- every such unmount would throw the user back to the
+ *   top of the list. Cards in a container of their own leave a restore nothing
+ *   to land on but another card, and only the drawn ones are registered, so it
+ *   lands near where the user already was.
+ * - Leaving the first row upwards is answered here by identity rather than by
+ *   coordinates -- which could not answer it: the menu sits physically *inside*
+ *   the cards container's box, so no measurement would ever place it above.
+ */
+export function FilmGridComponent(props: FilmGridComponentProps) {
+  const styles = useThemedStyles(componentStyles);
+  // Focus keys are global, and several grids can be mounted at once (one per
+  // screen kept alive by the navigator), so they are namespaced per instance.
+  const gridId = useId();
+  const cardsFocusKey = `${gridId}-cards`;
+
+  const resolveSectionFocus = useCallback<NextFocusResolver>((direction, currentFocusKey, siblings) => {
+    // Only the first row bubbles up this far -- the cards container answers
+    // every other row from its own geometry-free grid arithmetic.
+    if (direction === 'up' && currentFocusKey === cardsFocusKey) {
+      return siblings.find((sibling) => sibling.focusKey !== cardsFocusKey) ?? null;
+    }
+
+    if (direction === 'down' && currentFocusKey !== cardsFocusKey) {
+      return siblings.find((sibling) => sibling.focusKey === cardsFocusKey) ?? null;
+    }
+
+    // Everything else leaves the grid: `null` bubbles up to the screen, which is
+    // what reaches the sidebar.
+    return null;
+  }, [cardsFocusKey]);
+
+  const { ref, focusKey } = useFocusable<object, View>({
+    // Safe only because `nextFocusResolver` answers without needing geometry.
+    measureChildrenLayout: false,
+    nextFocusResolver: resolveSectionFocus,
+    // Entering a grid nothing has been focused in yet means the cards, never the
+    // menu: a screen wanting the menu focused says so through its own autofocus.
+    preferredChildFocusKey: cardsFocusKey,
+  });
+
+  return (
+    <FocusContext.Provider value={ focusKey }>
+      <View ref={ ref } style={ styles.grid } tvFocusable={ false }>
+        <FilmGridList
+          { ...props }
+          gridFocusKey={ focusKey }
+          cardsFocusKey={ cardsFocusKey }
+        />
+      </View>
     </FocusContext.Provider>
   );
 }

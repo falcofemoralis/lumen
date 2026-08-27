@@ -6,9 +6,6 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     zIndex: 2,
     marginTop: scale(8),
   },
-  menuCollapse: {
-    overflow: 'hidden',
-  },
   menuListWrapper: {
     zIndex: 10,
     height: scale(42),

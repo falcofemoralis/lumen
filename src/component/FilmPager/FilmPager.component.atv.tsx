@@ -4,7 +4,6 @@ import { ThemedDropdown } from 'Component/ThemedDropdown';
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { ThemedScrollView } from 'Component/ThemedScrollView';
-import { useConfigContext } from 'Context/ConfigContext';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { memo, useCallback, useEffect, useId, useRef, useState } from 'react';
 import { View } from 'react-native';
@@ -205,37 +204,11 @@ export function FilmPagerComponent({
   onNextLoad,
   onAtTopChange,
 }: FilmPagerComponentProps) {
-  const { isLowMode } = useConfigContext();
   const styles = useThemedStyles(componentStyles);
-  const { scale } = useAppTheme();
   const [activePage, setActivePage] = useState(initialPage);
-  // The menu is a sibling above the grid (a focus sibling, so the grid's focus
-  // never resolves to it), collapsed out of the way once focus leaves the first
-  // row. The grid reports first-row crossings via onAtTopChange.
-  const [menuVisible, setMenuVisible] = useState(true);
-  const menuCollapse = useSharedValue(1);
-  const menuHeight = (sorting ? styles.menuListWrapperWithSorting.height : styles.menuListWrapper.height) + scale(16);
-
-  useEffect(() => {
-    const collapse = menuVisible ? 1 : 0;
-
-    // In low mode the grid jumps between rows, so the menu has to snap with it --
-    // a timed collapse would trail behind the scroll.
-    menuCollapse.value = isLowMode ? collapse : withTiming(collapse, { duration: 200 });
-  }, [menuVisible, menuCollapse, isLowMode]);
-
-  const menuAnimatedStyle = useAnimatedStyle(() => ({
-    height: menuHeight * menuCollapse.value,
-    opacity: menuCollapse.value,
-  }));
 
   // pagerItems can shrink (menu items change) while activePage still points past its end
   const currentPagerItem = pagerItems[Math.min(activePage, pagerItems.length - 1)];
-
-  const handleAtTopChange = useCallback((atTop: boolean) => {
-    setMenuVisible(atTop);
-    onAtTopChange?.(atTop);
-  }, [onAtTopChange]);
 
   const handlePageChange = useCallback((page: number, pagerItem: PagerItemInterface) => {
     setActivePage(page);
@@ -268,11 +241,6 @@ export function FilmPagerComponent({
 
   return (
     <View style={ styles.container }>
-      { menu && (
-        <Animated.View style={ [styles.menuCollapse, menuAnimatedStyle] }>
-          { menu }
-        </Animated.View>
-      ) }
       <FilmGrid
         films={ currentPagerItem?.films ?? [] }
         onNextLoad={ (isRefresh) => currentPagerItem && onNextLoad(isRefresh, currentPagerItem) }
@@ -281,10 +249,13 @@ export function FilmPagerComponent({
         isEmpty={ isEmpty && currentPagerItem?.films !== null && !currentPagerItem?.films?.length }
         hideGrid={ hideGrid }
         ListHeaderComponent={ ListHeaderComponent }
+        // The menu scrolls away with the grid rather than collapsing above it,
+        // so it is rendered inside the list -- as a focus sibling of the cards.
+        ListMenuComponent={ menu }
         ListEmptyComponent={ ListEmptyComponent }
         centerEmptyComponent={ centerEmptyComponent }
         disableAutofocus={ menuDefaultFocus }
-        onAtTopChange={ menu || onAtTopChange ? handleAtTopChange : undefined }
+        onAtTopChange={ onAtTopChange }
       />
     </View>
   );

@@ -11,6 +11,12 @@ export const componentStyles = ({ scale }: Theme) => ({
   grid: {
     flex: 1,
   },
+  // The menu rides in the list header; separate it from the first row the way
+  // the rows are separated from each other.
+  menu: {
+    width: '100%',
+    paddingBottom: scale(ROW_GAP),
+  },
   header: {
     width: '100%',
     paddingTop: scale(ROW_GAP),

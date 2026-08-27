@@ -1,4 +1,4 @@
-import { ComponentType, ReactElement } from 'react';
+import { ComponentType, ReactElement, ReactNode } from 'react';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 
 /** A group of films rendered under a title of its own. */
@@ -77,6 +77,12 @@ export interface FilmGridContainerProps {
   disableStatusbarSafeArea?: boolean;
   // TV related
   disableAutofocus?: boolean;
+  /**
+   * A menu belonging above the first row. Rendered inside the list -- so that it
+   * scrolls away with the content rather than collapsing above it -- but kept a
+   * focus sibling of the cards rather than one of them.
+   */
+  ListMenuComponent?: ReactNode;
   /** Fired when grid focus enters (true) or leaves (false) the first row. */
   onAtTopChange?: (atTop: boolean) => void;
 }
