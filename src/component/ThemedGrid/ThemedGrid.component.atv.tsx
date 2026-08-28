@@ -3,7 +3,7 @@ import { FocusContext, useFocusable } from '@noriginmedia/norigin-spatial-naviga
 import { FlashList, FlashListRef } from '@shopify/flash-list';
 import { ScrollContext } from 'Component/ThemedScrollView/ScrollContext';
 import { useDefaultFocus } from 'Hooks/useDefaultFocus';
-import { useFocusScroll } from 'Hooks/useFocusScroll';
+import { FOCUS_SCROLL_EVENT_THROTTLE, useFocusScroll } from 'Hooks/useFocusScroll';
 import { memo, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import RemoteControlManager from 'Util/RemoteControl/RemoteControlManager';
@@ -203,7 +203,7 @@ export const ThemedGridComponent = ({
           numColumns={ numberOfColumns }
           onLoad={ attachScrollRef }
           onScroll={ handleScroll }
-          scrollEventThrottle={ 16 }
+          scrollEventThrottle={ FOCUS_SCROLL_EVENT_THROTTLE }
           onEndReached={ handleScrollEnd }
           onEndReachedThreshold={ 0.25 }
           ListHeaderComponent={ ListHeaderComponent }

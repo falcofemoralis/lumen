@@ -25,3 +25,19 @@ export const DRAW_DISTANCE_ROWS_TV = 1;
  * is already parked at the bottom of the screen waiting for the page.
  */
 export const PRELOAD_ROWS_TV = 3;
+
+/**
+ * Whether the focus zoom snaps instead of gliding when focus changes row (TV).
+ *
+ * A row change already asks a lot of one 250ms window: the list scrolls, a new
+ * row mounts, and both cards of the move run a scale transition. That transition
+ * is the most expensive of the three per frame -- the card clips its children to
+ * a rounded box, so scaling it re-rasterises that clip every frame, twice over --
+ * and it is the only one the user does not actually need to see: the eye is
+ * following the row, not the zoom. Dropping it there buys the scroll its frames
+ * back, while moving along a row, which draws nothing, keeps the glide.
+ *
+ * Set to `false` to get the transition back on row changes (low mode drops it
+ * regardless).
+ */
+export const INSTANT_ZOOM_ON_ROW_CHANGE_TV = true;

@@ -9,7 +9,7 @@ import { ScrollContext, useScrollContext } from 'Component/ThemedScrollView/Scro
 import { ThemedText } from 'Component/ThemedText';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useDefaultFocus } from 'Hooks/useDefaultFocus';
-import { useFocusScroll } from 'Hooks/useFocusScroll';
+import { FOCUS_SCROLL_EVENT_THROTTLE, useFocusScroll } from 'Hooks/useFocusScroll';
 import { useLatest } from 'Hooks/useLatest';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { memo, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
@@ -18,7 +18,11 @@ import { Pressable } from 'react-native-gesture-handler';
 import { useAppTheme } from 'Theme/context';
 import { ThemedStyles } from 'Theme/types';
 
-import { DRAW_DISTANCE_ROWS_TV, PRELOAD_ROWS_TV } from './FilmGrid.config';
+import {
+  DRAW_DISTANCE_ROWS_TV,
+  INSTANT_ZOOM_ON_ROW_CHANGE_TV,
+  PRELOAD_ROWS_TV,
+} from './FilmGrid.config';
 import { componentStyles, FOCUS_OVERFLOW_GAP, ROW_GAP } from './FilmGrid.style.atv';
 import {
   FilmGridCardHandle,
@@ -304,7 +308,7 @@ function FilmGridList({
        * focus change anyway. It also lands before `focused` flips, so the
        * transition is already configured when it would otherwise start.
        */
-      const isInstantZoom = getIsLowMode() && isVertical;
+      const isInstantZoom = isVertical && (INSTANT_ZOOM_ON_ROW_CHANGE_TV || getIsLowMode());
 
       currentCard.setInstantZoom(isInstantZoom);
       cardByFocusKeyRef.current.get(next.focusKey)?.setInstantZoom(isInstantZoom);
@@ -553,7 +557,7 @@ function FilmGridList({
             getItemType={ getItemType }
             onLoad={ handleLoad }
             onScroll={ handleScroll }
-            scrollEventThrottle={ 16 }
+            scrollEventThrottle={ FOCUS_SCROLL_EVENT_THROTTLE }
             onEndReached={ handleScrollEnd }
             onEndReachedThreshold={ 0.5 }
             drawDistance={ drawDistance }

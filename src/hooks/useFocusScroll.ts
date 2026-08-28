@@ -25,6 +25,23 @@ export const FOCUS_SCROLL_DURATION = 250;
  */
 export const FOCUS_SCROLL_EASING = Easing.bezier(0.25, 0.1, 0.25, 1);
 
+/**
+ * How often, in ms, the list is told where it has scrolled to.
+ *
+ * The animation runs on the UI thread, but every scroll event it produces is
+ * answered on the JS thread: FlashList computes velocity, viewability and its
+ * render window on each one, and commits a re-render whenever that window moves.
+ * Left unthrottled that is ~60 rounds of it per second, landing in the same
+ * frames the scroll is trying to draw -- the list only needs to keep up with the
+ * scroll, not with every frame of it.
+ *
+ * The trade-off is staleness: Android throttles on the leading edge only and
+ * emits no trailing event, so when the scroll stops the list can be up to this
+ * far behind. Keep it well under the time it takes to scroll `drawDistance`
+ * worth of pixels, or the buffer runs out before the list is told to refill it.
+ */
+export const FOCUS_SCROLL_EVENT_THROTTLE = 50;
+
 type FocusScrollParams = {
   /**
    * Where a focused row is parked in the viewport: 0 flush to the top, 0.5
@@ -58,7 +75,7 @@ type FocusScrollParams = {
  *   ref={ listRef }
  *   onLoad={ attachScrollRef }
  *   onScroll={ handleScroll }
- *   scrollEventThrottle={ 16 }
+ *   scrollEventThrottle={ FOCUS_SCROLL_EVENT_THROTTLE }
  * />
  * ```
  */
