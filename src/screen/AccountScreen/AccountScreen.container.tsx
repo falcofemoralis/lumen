@@ -1,9 +1,13 @@
+import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
-import { t } from 'i18n/translate';
-import { DOWNLOADS_SCREEN, NOTIFICATIONS_SCREEN, SETTINGS_SCREEN } from 'Navigation/navigationRoutes';
-import { useCallback } from 'react';
-import NotificationStore from 'Store/Notification.store';
+import {
+  DOWNLOADS_SCREEN,
+  MY_COMMENTS_SCREEN,
+  NOTIFICATIONS_SCREEN,
+  SETTINGS_SCREEN,
+} from 'Navigation/navigationRoutes';
+import { useCallback, useRef } from 'react';
 import { navigate } from 'Util/Navigation';
 
 import AccountScreenComponent from './AccountScreen.component';
@@ -19,7 +23,8 @@ export function AccountScreenContainer() {
     badgeData,
     resetNotifications,
   } = useServiceContext();
-  const { isTV } = useConfigContext();
+  const { isTV, isLocalLibrary } = useConfigContext();
+  const logoutConfirmOverlayRef = useRef<ThemedOverlayRef | null>(null);
 
   const handleViewProfile = useCallback(() => {
     viewProfile();
@@ -30,6 +35,11 @@ export function AccountScreenContainer() {
   }, [viewPayments]);
 
   const handleLogout = useCallback(() => {
+    logoutConfirmOverlayRef.current?.open();
+  }, []);
+
+  const confirmLogout = useCallback(() => {
+    logoutConfirmOverlayRef.current?.close();
     logout(true);
     resetNotifications();
   }, [logout, resetNotifications]);
@@ -46,20 +56,23 @@ export function AccountScreenContainer() {
     navigate(DOWNLOADS_SCREEN);
   }, []);
 
-  const openNotImplemented = useCallback(() => {
-    NotificationStore.displayMessage(t('Not implemented'));
+  const openMyComments = useCallback(() => {
+    navigate(MY_COMMENTS_SCREEN);
   }, []);
 
   const containerProps = {
     isSignedIn,
+    isLocalLibrary,
     profile,
     badgeData,
     handleViewProfile,
     handleViewPayments,
     handleLogout,
+    confirmLogout,
+    logoutConfirmOverlayRef,
     openSettings,
     openNotifications,
-    openNotImplemented,
+    openMyComments,
     openDownloads,
   };
 

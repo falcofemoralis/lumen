@@ -1,21 +1,10 @@
 import { ParamListBase, RouteProp } from '@react-navigation/native';
-import { PagerItemInterface } from 'Component/FilmPager/FilmPager.type';
-import { FilmListInterface } from 'Type/FilmList.interface';
-import { MenuItemInterface } from 'Type/MenuItem.interface';
+import { FilmPagerHandlers, PagerItemInterface } from 'Component/FilmPager/FilmPager.type';
 
 export interface CategoryScreenContainerProps {
   route: RouteProp<ParamListBase, string>;
 }
 
-export interface CategoryScreenComponentProps {
+export interface CategoryScreenComponentProps extends FilmPagerHandlers {
   pagerItems: PagerItemInterface[];
-  onLoadFilms: (
-    menuItem: MenuItemInterface,
-    currentPage: number,
-    isRefresh: boolean
-  ) => Promise<FilmListInterface>;
-  onUpdateFilms: (
-    key: string,
-    item: PagerItemInterface
-  ) => void;
 }

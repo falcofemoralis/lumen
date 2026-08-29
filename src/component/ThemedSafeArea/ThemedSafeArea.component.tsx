@@ -5,7 +5,7 @@ import { ThemedSafeAreaComponentProps } from './ThemedSafeArea.type';
 
 export const ThemedSafeAreaComponent = ({
   children,
-  edges = ['top'],
+  edges = ['top', 'left', 'right'],
   style,
 }: ThemedSafeAreaComponentProps) => {
   const { top, bottom, left, right } = useSafeAreaInsets();

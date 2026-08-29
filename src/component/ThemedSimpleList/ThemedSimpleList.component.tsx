@@ -1,12 +1,17 @@
-import { ThemedImage } from 'Component/ThemedImage';
-import { ThemedPressable } from 'Component/ThemedPressable';
+import { FlashList } from '@shopify/flash-list';
+import { ThemedButton } from 'Component/ThemedButton';
 import { ThemedText } from 'Component/ThemedText';
 import { useLandscape } from 'Hooks/useLandscape';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
-import { useCallback, useRef } from 'react';
-import { ScrollView, View } from 'react-native';
+import { useCallback, useMemo } from 'react';
+import { useWindowDimensions, View } from 'react-native';
 
-import { componentStyles } from './ThemedSimpleList.style';
+import {
+  componentStyles,
+  MAX_ITEMS_TO_DISPLAY,
+  MAX_ITEMS_TO_DISPLAY_LANDSCAPE,
+  MAX_SCREEN_RATIO,
+} from './ThemedSimpleList.style';
 import { ListItem, ThemedSimpleListComponentProps } from './ThemedSimpleList.type';
 
 export const ThemedListComponent = ({
@@ -15,24 +20,49 @@ export const ThemedListComponent = ({
   value,
   style,
   onChange,
+  rightAdditionalElement,
+  emptyComponent,
+  searchComponent,
 }: ThemedSimpleListComponentProps) => {
   const styles = useThemedStyles(componentStyles);
-  const scrollViewRef = useRef<ScrollView>(null);
   const isLandscape = useLandscape();
+  const { height: windowHeight } = useWindowDimensions();
 
-  const handleLayout = () => {
-    const itemIdx = data.findIndex((item) => item.value === value);
+  const selectedIndex = useMemo(() => data.findIndex((item) => item.value === value), [data, value]);
 
-    if (itemIdx <= 5) {
-      return;
-    }
+  // FlashList has no intrinsic height, so the wrapper needs an explicit one, and
+  // it has to be a whole number of rows that actually fits on screen next to the
+  // header. Anything taller is clipped by the overlay wrapping the list, and a
+  // clipped ancestor cuts the last row with no way to scroll it into view.
+  const viewportHeight = useMemo(() => {
+    const itemHeight = styles.item.height;
+    const availableHeight = windowHeight * MAX_SCREEN_RATIO
+      - (header ? styles.header.height + styles.header.marginBottom : 0)
+      - (searchComponent ? styles.search.height : 0);
+    const visibleItems = Math.min(
+      data.length,
+      isLandscape ? MAX_ITEMS_TO_DISPLAY_LANDSCAPE : MAX_ITEMS_TO_DISPLAY,
+      Math.max(1, Math.floor(availableHeight / itemHeight))
+    );
 
-    const scrollIndex = itemIdx + 2;
+    return visibleItems * itemHeight;
+  }, [styles, header, searchComponent, windowHeight, isLandscape, data.length]);
 
-    if (scrollViewRef.current) {
-      scrollViewRef.current.scrollTo({ y: scrollIndex * styles.item.height, animated: false });
-    }
-  };
+  // The row-aligned height only makes sense for the list itself -- with no data
+  // it collapses to zero and would clip the empty component, which sizes itself.
+  const wrapperStyle = useMemo(
+    () => [styles.items, data.length > 0 ? { height: viewportHeight } : undefined],
+    [styles, viewportHeight, data.length]
+  );
+
+  // `initialScrollIndex` alone puts the selected item at the top of the
+  // viewport. This offset is the same maths `scrollToIndex` applies for
+  // `viewPosition: 0.5` (`layout.y - (viewport - item) * 0.5`), so the list
+  // opens with the current value centred instead.
+  const initialScrollIndexParams = useMemo(
+    () => ({ viewOffset: -(viewportHeight - styles.item.height) / 2 }),
+    [viewportHeight, styles]
+  );
 
   const renderHeader = () => {
     if (!header) {
@@ -41,59 +71,66 @@ export const ThemedListComponent = ({
 
     return (
       <View style={ styles.header }>
-        <ThemedText style={ styles.headerText }>
+        <ThemedText
+          style={ styles.headerText }
+          numberOfLines={ 1 }
+        >
           { header }
         </ThemedText>
       </View>
     );
   };
 
-  const renderItem = useCallback(({ item }: { item: ListItem }) => (
-    <ThemedPressable
-      key={ item.value }
-      onPress={ () => { onChange(item); } }
-      style={ styles.listItem }
-      contentStyle={ [styles.listItemContent, item.value === value && styles.listItemSelected] }
-    >
-      <View style={ styles.item }>
-        { item.startIcon && (
-          <ThemedImage
-            style={ styles.icon }
-            src={ item.startIcon }
-          />
-        ) }
-        <ThemedText style={ styles.itemLabel }>
-          { item.label }
-        </ThemedText>
-        { item.endIcon && (
-          <ThemedImage
-            style={ styles.icon }
-            src={ item.endIcon }
-          />
-        ) }
+  const renderSearch = () => {
+    if (!searchComponent) {
+      return null;
+    }
+
+    return (
+      <View style={ styles.search }>
+        { searchComponent }
       </View>
-    </ThemedPressable>
-  ), [onChange, value, styles]);
+    );
+  };
+
+  const renderItem = useCallback(({ item }: { item: ListItem }) => (
+    <ThemedButton
+      title={ item.label }
+      onPress={ () => { onChange(item); } }
+      style={ styles.item }
+      contentStyle={ [styles.itemContent, item.value === value && styles.listItemSelected] }
+      textStyle={ styles.itemText }
+      leftImage={ item.startIcon }
+      leftImageStyle={ styles.icon }
+      rightImage={ item.endIcon }
+      rightImageStyle={ styles.icon }
+      rightAdditionalElement={
+        rightAdditionalElement ? (isFocused, selected) => rightAdditionalElement(item, isFocused, selected) : undefined
+      }
+    />
+  ), [onChange, value, styles, rightAdditionalElement]);
+
+  const keyExtractor = useCallback((item: ListItem) => item.value, []);
 
   const renderList = () => (
-    <View
-      style={ [
-        styles.listItems,
-        isLandscape && styles.listItemsLandscape,
-      ] }
-    >
-      <ScrollView
-        ref={ scrollViewRef }
-        onLayout={ handleLayout }
-      >
-        { data.map((item) => renderItem({ item })) }
-      </ScrollView>
+    <View style={ wrapperStyle }>
+      { data.length > 0 ? (
+        <FlashList
+          data={ data }
+          renderItem={ renderItem }
+          keyExtractor={ keyExtractor }
+          extraData={ selectedIndex }
+          initialScrollIndex={ selectedIndex > 0 ? selectedIndex : undefined }
+          initialScrollIndexParams={ initialScrollIndexParams }
+        />
+      ) : emptyComponent }
     </View>
   );
 
   return (
-    <View style={ [styles.listContainer, style] }>
+    <View style={ [styles.container, style] }>
       { renderHeader() }
+      { renderSearch() }
       { renderList() }
     </View>
   );

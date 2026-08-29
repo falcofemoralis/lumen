@@ -5,7 +5,7 @@ import { ThemedOverlay } from 'Component/ThemedOverlay';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
-import { Plus } from 'lucide-react-native';
+import Plus from 'lucide-react-native/icons/plus';
 import { useRef } from 'react';
 import { TextInput, View } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
@@ -55,9 +55,7 @@ const CustomSelectModalComponent = ({
         overlayRef={ dropdownRef }
         inputLabel={ t('Select from presets') }
       />
-      <ThemedButton onPress={ handleSelect }>
-        { t('Confirm') }
-      </ThemedButton>
+      <ThemedButton title={ t('Confirm') } onPress={ handleSelect } />
     </View>
   );
 };
@@ -107,6 +105,7 @@ export const ThemedCustomSelectComponent = (props: ThemedCustomSelectComponentPr
 
     return (
       <ThemedButton
+        title={ value }
         style={ [styles.input, inputStyle] }
         contentStyle={ styles.inputContent }
         onPress={ () => (overlayRef || componentOverlayRef).current?.open() }
@@ -116,9 +115,7 @@ export const ThemedCustomSelectComponent = (props: ThemedCustomSelectComponentPr
           size: scale(18),
         } }
         disabled={ disabled }
-      >
-        { value }
-      </ThemedButton>
+      />
     );
   };
 

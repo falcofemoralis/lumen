@@ -1,118 +1,73 @@
 import { InfoBlock } from 'Component/InfoBlock';
-import { ThemedPressable } from 'Component/ThemedPressable';
+import { ThemedSimpleList } from 'Component/ThemedSimpleList';
+import { ListItem as SimpleListItem } from 'Component/ThemedSimpleList/ThemedSimpleList.type';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
-import { Square, SquareCheck } from 'lucide-react-native';
-import { Text, View } from 'react-native';
-import {
-  DefaultFocus,
-  SpatialNavigationVirtualizedList,
-} from 'react-tv-space-navigation';
+import Square from 'lucide-react-native/icons/square';
+import SquareCheck from 'lucide-react-native/icons/square-check';
+import { useCallback, useMemo } from 'react';
+import { View } from 'react-native';
 import { useAppTheme } from 'Theme/context';
 
 import { componentStyles } from './ThemedMultiList.style.atv';
-import { ListItem, ThemedMultiListComponentProps } from './ThemedMultiList.type';
+import { ThemedMultiListComponentProps } from './ThemedMultiList.type';
 
 export const ThemedMultiListComponent = ({
   values,
   header,
   noItemsTitle,
   noItemsSubtitle,
+  searchComponent,
   handleOnChange,
 }: ThemedMultiListComponentProps) => {
   const { scale, theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
 
-  const renderHeader = () => {
-    if (!header) {
-      return null;
-    }
-
-    return (
-      <View style={ styles.header }>
-        <Text style={ styles.headerText }>
-          { header }
-        </Text>
-      </View>
-    );
-  };
-
-  const renderItem = ({ item }: { item: ListItem }) => (
-    <ThemedPressable
-      onPress={ () => { handleOnChange(item.value, !item.isChecked); } }
-    >
-      { ({ isFocused }) => (
-        <View style={ [
-          styles.item,
-          isFocused && styles.itemFocused,
-        ] }
-        >
-          <View style={ styles.itemContainer }>
-            <Text style={ [
-              styles.text,
-              isFocused && styles.textFocused,
-            ] }
-            >
-              { item.label }
-            </Text>
-          </View>
-          { item.isChecked ? (
-            <SquareCheck
-              color={ theme.colors.secondary }
-              size={ scale(20) }
-            />
-          ) : (
-            <Square
-              color={ isFocused ? theme.colors.iconFocused : theme.colors.icon }
-              size={ scale(20) }
-            />
-          ) }
-        </View>
-      ) }
-    </ThemedPressable>
+  // The list items carry no checked state of their own, so it is resolved back
+  // from `values` by value whenever an item renders or is pressed.
+  const checkedByValue = useMemo(
+    () => new Map(values.map(({ value, isChecked }) => [value, isChecked])),
+    [values]
   );
 
-  const renderItems = () => {
-    if (!values.length) {
-      return (
-        <InfoBlock
-          title={ noItemsTitle ?? t('No items') }
-          subtitle={ noItemsSubtitle ?? '' }
-          hideIcon
-          style={ styles.emptyBlock }
+  const renderCheckbox = useCallback((item: SimpleListItem, isFocused: boolean) => (
+    <View style={ styles.checkbox }>
+      { checkedByValue.get(item.value) ? (
+        <SquareCheck
+          color={ theme.colors.secondary }
+          size={ scale(20) }
         />
-      );
-    }
-
-    return (
-      <DefaultFocus>
-        <SpatialNavigationVirtualizedList
-          data={ values }
-          renderItem={ renderItem }
-          itemSize={ styles.item.height }
-          orientation="vertical"
+      ) : (
+        <Square
+          color={ isFocused ? theme.colors.iconFocused : theme.colors.icon }
+          size={ scale(20) }
         />
-      </DefaultFocus>
-    );
-  };
+      ) }
+    </View>
+  ), [checkedByValue, styles, theme, scale]);
 
-  const renderContent = () => {
-    return (
-      <View
-        style={ styles.scrollViewContainer }
-      >
-        { renderItems() }
-      </View>
-    );
-  };
+  const onChange = useCallback((item: SimpleListItem) => {
+    handleOnChange(item.value, !checkedByValue.get(item.value));
+  }, [handleOnChange, checkedByValue]);
+
+  const emptyComponent = useMemo(() => (
+    <InfoBlock
+      title={ noItemsTitle ?? t('No items') }
+      subtitle={ noItemsSubtitle ?? '' }
+      hideIcon
+      style={ styles.emptyBlock }
+    />
+  ), [noItemsTitle, noItemsSubtitle, styles]);
 
   return (
-    <View style={ styles.listContainer }>
-      <View style={ styles.contentContainer }>
-        { renderHeader() }
-        { renderContent() }
-      </View>
-    </View>
+    <ThemedSimpleList
+      data={ values }
+      header={ header }
+      onChange={ onChange }
+      rightAdditionalElement={ renderCheckbox }
+      emptyComponent={ emptyComponent }
+      searchComponent={ searchComponent }
+    />
   );
 };
 

@@ -1,10 +1,9 @@
-import { FilmSections } from 'Component/FilmSections';
+import { FilmGrid } from 'Component/FilmGrid';
 import { InfoBlock } from 'Component/InfoBlock';
 import { Page } from 'Component/Page';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import { View } from 'react-native';
-import { DefaultFocus } from 'react-tv-space-navigation';
 
 import { componentStyles } from './NotificationsScreen.style.atv';
 import { NotificationsScreenComponentProps } from './NotificationsScreen.type';
@@ -12,7 +11,6 @@ import { NotificationsScreenComponentProps } from './NotificationsScreen.type';
 export function NotificationsScreenComponent({
   data,
   isLoading,
-  handleSelectFilm,
 }: NotificationsScreenComponentProps) {
   const styles = useThemedStyles(componentStyles);
 
@@ -32,12 +30,7 @@ export function NotificationsScreenComponent({
   return (
     <Page>
       <View style={ styles.container }>
-        <DefaultFocus>
-          <FilmSections
-            data={ data }
-            handleOnPress={ handleSelectFilm }
-          />
-        </DefaultFocus>
+        <FilmGrid sections={ data } />
       </View>
     </Page>
   );

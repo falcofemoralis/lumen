@@ -1,265 +1,110 @@
 import { ThemedImage } from 'Component/ThemedImage';
 import { ThemedPressable } from 'Component/ThemedPressable';
+import { ThemedText } from 'Component/ThemedText';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
-import { Text, View } from 'react-native';
 import { useAppTheme } from 'Theme/context';
 
 import { componentStyles } from './ThemedButton.style.atv';
 import { ThemedButtonProps } from './ThemedButton.type';
 
 export default function ThemedButton({
-  spatialRef,
+  title,
+  disabled,
+  selected,
+  style,
+  contentStyle,
+  styleDisabled,
+  styleSelected,
+  styleFocused,
+  styleOverride,
+  textStyle,
   onPress,
   onLongPress,
   onFocus,
-  children,
-  style,
-  styleSelected,
-  styleFocused,
-  styleAdditional,
+  onEnterPress,
   IconComponent,
   iconProps,
-  textStyle,
-  isSelected,
-  variant = 'filled',
+  iconColor,
+  iconColorFocused,
   leftImage,
   leftImageStyle,
   rightImage,
   rightImageStyle,
-  disableRootActive,
-  additionalElement,
-  withAnimation = false,
-  zoomScale = 1.1,
-  isFocusVisible = true,
-  disabled = false,
-  iconColor,
-  iconColorFocused,
+  extraProps,
+  focusKey,
+  autofocus,
+  textStyleFocused,
+  topAdditionalElement,
+  bottomAdditionalElement,
+  rightAdditionalElement,
 }: ThemedButtonProps) {
   const { scale, theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
 
-  const renderFilled = (isFocused: boolean) => (
-    <View
-      style={ [
-        styles.container,
-        styles.containerFilled,
-        style,
-        isSelected && styles.containerFilledSelected,
-        isSelected && styleSelected,
-        styleAdditional,
-        isFocused && styles.containerFilledFocused,
-        isFocused && styleFocused,
-        disabled && styles.containerFilledDisabled,
-      ] }
-    >
-      { additionalElement && additionalElement(isFocused, isSelected ?? false) }
-      { IconComponent && (
-        <IconComponent
-          style={ [
-            styles.iconFilled,
-            isSelected && styles.iconFilledSelected,
-            isFocused && styles.iconFilledFocused,
-          ] }
-          size={ scale(18) }
-          color={ isFocused ? (iconColorFocused || theme.colors.iconFocused) : (iconColor || theme.colors.icon) }
-          { ...iconProps }
-        />
-      ) }
-      { leftImage && (
-        <ThemedImage
-          style={ [styles.image, leftImageStyle] }
-          src={ leftImage }
-        />
-      ) }
-      { children && (
-        <Text
-          style={ [
-            styles.text,
-            styles.textFilled,
-            textStyle,
-            isSelected && styles.textFilledSelected,
-            isFocused && styles.textFilledFocused,
-          ] }
-        >
-          { children }
-        </Text>
-      ) }
-      { rightImage && (
-        <ThemedImage
-          style={ [styles.image, rightImageStyle] }
-          src={ rightImage }
-        />
-      ) }
-    </View>
-  );
-
-  const renderOutlined = (isFocused: boolean) => (
-    <View
-      style={ [
-        styles.container,
-        styles.containerOutlined,
-        style,
-        isSelected && styles.containerOutlinedSelected,
-        isSelected && styleSelected,
-        isFocused && styles.containerOutlinedFocused,
-        isFocused && styleFocused,
-      ] }
-    >
-      { IconComponent && (
-        <IconComponent
-          style={ [
-            styles.iconFilled,
-            isSelected && styles.iconFilledSelected,
-            isFocused && styles.iconFilledFocused,
-          ] }
-          size={ scale(18) }
-          color={ isFocused ? theme.colors.iconFocused : theme.colors.icon }
-          { ...iconProps }
-        />
-      ) }
-      { children && (
-        <Text
-          style={ [
-            styles.text,
-            styles.textOutlined,
-            textStyle,
-            isSelected && styles.textOutlinedSelected,
-            isFocused && styles.textOutlinedFocused,
-          ] }
-        >
-          { children }
-        </Text>
-      ) }
-      { additionalElement && additionalElement(isFocused, isSelected ?? false) }
-    </View>
-  );
-
-  const renderLong = (isFocused: boolean) => (
-    <View
-      style={ [
-        styles.container,
-        styles.containerLong,
-        style,
-        isSelected && styles.containerLongSelected,
-        isSelected && styleSelected,
-        isFocused && styles.containerLongFocused,
-        isFocused && styleFocused,
-      ] }
-    >
-      { additionalElement && additionalElement(isFocused, isSelected ?? false) }
-      { IconComponent && (
-        <IconComponent
-          style={ [
-            styles.iconFilled,
-            isSelected && styles.iconFilledSelected,
-            isFocused && styles.iconFilledFocused,
-          ] }
-          size={ scale(18) }
-          color={ isFocused ? theme.colors.iconFocused : theme.colors.icon }
-          { ...iconProps }
-        />
-      ) }
-      { leftImage && (
-        <ThemedImage
-          style={ [styles.image, leftImageStyle] }
-          src={ leftImage }
-        />
-      ) }
-      { children && (
-        <Text
-          style={ [
-            styles.text,
-            styles.textFilled,
-            textStyle,
-            isSelected && styles.textFilledSelected,
-            isFocused && styles.textFilledFocused,
-          ] }
-        >
-          { children }
-        </Text>
-      ) }
-      { rightImage && (
-        <ThemedImage
-          style={ [styles.image, rightImageStyle] }
-          src={ rightImage }
-        />
-      ) }
-    </View>
-  );
-
-  const renderTransparent = (isFocused: boolean) => (
-    <View
-      style={ [
-        styles.container,
-        styles.containerOutlined,
-        style,
-        isSelected && styleSelected,
-        isFocused && styleFocused,
-      ] }
-    >
-      { IconComponent && (
-        <IconComponent
-          style={ [
-            styles.iconFilled,
-            isSelected && styles.iconFilledSelected,
-            isFocused && styles.iconFilledFocused,
-          ] }
-          size={ scale(18) }
-          color={ isFocused ? theme.colors.iconFocused : theme.colors.icon }
-          { ...iconProps }
-        />
-      ) }
-      { children && (
-        <Text
-          style={ [
-            styles.text,
-            styles.textOutlined,
-            textStyle,
-            isSelected && styles.textLongSelected,
-            isFocused && styles.textLongFocused,
-          ] }
-        >
-          { children }
-        </Text>
-      ) }
-    </View>
-  );
-
-  const renderButton = (isFocused: boolean) => {
-    if (variant === 'outlined') {
-      return renderOutlined(isFocused);
-    }
-
-    if (variant === 'long') {
-      return renderLong(isFocused);
-    }
-
-    if (variant === 'transparent') {
-      return renderTransparent(isFocused);
-    }
-
-    return renderFilled(isFocused);
-  };
-
-  const isActive = (isFocused: boolean, isRootActive: boolean) => {
-    if (disableRootActive) {
-      return isFocused && isFocusVisible;
-    }
-
-    return isFocused && isRootActive && isFocusVisible;
-  };
-
   return (
     <ThemedPressable
-      spatialRef={ spatialRef }
       onPress={ onPress }
       onLongPress={ onLongPress }
       onFocus={ onFocus }
-      withAnimation={ withAnimation }
-      zoomScale={ zoomScale }
+      onEnterPress={ onEnterPress }
+      style={ ({ isFocused }) => ([
+        styles.container,
+        style,
+        selected && styles.selected,
+        selected && styleSelected ? styleSelected: undefined,
+        styleOverride,
+        isFocused && styles.focused,
+        isFocused && styleFocused ? styleFocused : undefined,
+        disabled && styles.disabled,
+        disabled && styleDisabled ? styleDisabled: undefined,
+      ]) }
+      contentStyle={ [styles.content, contentStyle] }
+      topAdditionalElement={ topAdditionalElement
+        ? ({ isFocused }) => topAdditionalElement(isFocused, selected ?? false)
+        : undefined }
+      bottomAdditionalElement={ bottomAdditionalElement
+        ? ({ isFocused }) => bottomAdditionalElement(isFocused, selected ?? false)
+        : undefined }
+      extraProps={ extraProps }
+      focusKey={ focusKey }
+      autofocus={ autofocus }
     >
-      { ({ isFocused, isRootActive }) => (
-        renderButton(isActive(isFocused, isRootActive))
+      { ({ isFocused }) => (
+        <>
+          { IconComponent && (
+            <IconComponent
+              size={ scale(18) }
+              color={ isFocused ? (iconColorFocused || theme.colors.iconFocused) : (iconColor || theme.colors.icon) }
+              { ...iconProps }
+            />
+          ) }
+          { leftImage && (
+            <ThemedImage
+              style={ [styles.image, leftImageStyle] }
+              src={ leftImage }
+            />
+          ) }
+          { title && (
+            <ThemedText
+              style={ [
+                styles.text,
+                textStyle,
+                selected && styles.textSelected,
+                isFocused && styles.textFocused,
+                isFocused && textStyleFocused,
+              ] }
+            >
+              { title }
+            </ThemedText>
+          ) }
+          { rightImage && (
+            <ThemedImage
+              style={ [styles.image, rightImageStyle] }
+              src={ rightImage }
+            />
+          ) }
+          { rightAdditionalElement && rightAdditionalElement(isFocused, selected ?? false) }
+        </>
       ) }
     </ThemedPressable>
   );

@@ -1,5 +1,6 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { DownloadsScreen } from 'Screen/DownloadsScreen';
+import { MyCommentsScreen } from 'Screen/MyCommentsScreen';
 import { NotificationsScreen } from 'Screen/NotificationsScreen';
 import { SettingsScreen } from 'Screen/SettingsScreen';
 import { useAppTheme } from 'Theme/context';
@@ -7,12 +8,20 @@ import { useAppTheme } from 'Theme/context';
 import { createFilmNavigator } from './FilmNavigator';
 import {
   DOWNLOADS_SCREEN,
+  MY_COMMENTS_SCREEN,
+  MY_COMMENTS_TAB,
   NOTIFICATIONS_SCREEN,
   NOTIFICATIONS_TAB,
   SETTINGS_SCREEN,
 } from './navigationRoutes';
 
 const Stack = createNativeStackNavigator();
+
+// NOTE: created once, calling it inline in JSX would remount the screen on every render
+const NotificationsNavigator = createFilmNavigator(NOTIFICATIONS_TAB, NotificationsScreen);
+// Wrapped in a film navigator of its own: a comment row opens the film it was
+// written on, which is a screen this stack does not carry.
+const MyCommentsNavigator = createFilmNavigator(MY_COMMENTS_TAB, MyCommentsScreen);
 
 const AccountNavigator = ({ name, component }: { name: string, component: any }) => {
   const { theme } = useAppTheme();
@@ -32,7 +41,7 @@ const AccountNavigator = ({ name, component }: { name: string, component: any })
         />
         <Stack.Screen
           name={ NOTIFICATIONS_SCREEN }
-          component={ createFilmNavigator(NOTIFICATIONS_TAB, NotificationsScreen) }
+          component={ NotificationsNavigator }
         />
         <Stack.Screen
           name={ SETTINGS_SCREEN }
@@ -41,6 +50,10 @@ const AccountNavigator = ({ name, component }: { name: string, component: any })
         <Stack.Screen
           name={ DOWNLOADS_SCREEN }
           component={ DownloadsScreen }
+        />
+        <Stack.Screen
+          name={ MY_COMMENTS_SCREEN }
+          component={ MyCommentsNavigator }
         />
       </Stack.Group>
     </Stack.Navigator>

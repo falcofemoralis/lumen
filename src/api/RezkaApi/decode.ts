@@ -64,7 +64,7 @@ const cartesianProduct = (symbols: string[], n: number): string[] =>
 const indexesOf = (input: string, search: string): number[] => {
   const indexes: number[] = [];
   let index = 0;
-  while ((index = input.indexOf(search, index)) != -1) {
+  while ((index = input.indexOf(search, index)) !== -1) {
     indexes.push(index++);
   }
 

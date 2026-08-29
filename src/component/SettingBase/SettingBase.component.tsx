@@ -4,35 +4,28 @@ import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { ThemedPressable } from 'Component/ThemedPressable';
 import { ThemedText } from 'Component/ThemedText';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { View } from 'react-native';
-import { SETTING_TYPE } from 'Screen/SettingsScreen/SettingsScreen.type';
 import { useAppTheme } from 'Theme/context';
 
 import { componentStyles } from './SettingBase.style';
 import { SettingBaseComponentProps } from './SettingBase.type';
 
 const SettingBaseComponent = ({
-  setting,
-  children,
+  title,
+  subtitle,
+  isHidden = false,
+  isEnabled = true,
   isLoading: isLoadingProp = false,
+  IconComponent,
+  iconProps,
+  confirmation,
+  withLoader = false,
+  children,
   onPress,
 }: SettingBaseComponentProps) => {
   const { scale, theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
-  const {
-    title,
-    subtitle,
-    isHidden,
-    isEnabled,
-    IconComponent,
-    iconProps,
-    confirmation,
-    withLoader,
-    value,
-    type,
-    options,
-  } = setting;
 
   const confirmOverlayRef = useRef<ThemedOverlayRef>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -67,20 +60,6 @@ const SettingBaseComponent = ({
     }
   }, [confirmation, isEnabled, isLoading, onPress, withLoader]);
 
-  const secondText = useMemo(() => {
-    if (type === SETTING_TYPE.INPUT || type === SETTING_TYPE.CUSTOM_SELECT) {
-      return value;
-    }
-
-    if (type === SETTING_TYPE.SELECT && options) {
-      const selectedOption = options.find(option => option.value === value);
-
-      return selectedOption ? selectedOption.label : subtitle;
-    }
-
-    return subtitle ? subtitle : null;
-  }, [options, subtitle, type, value]);
-
   if (isHidden) {
     return null;
   }
@@ -105,9 +84,9 @@ const SettingBaseComponent = ({
           <ThemedText style={ styles.settingTitle }>
             { title }
           </ThemedText>
-          { secondText && (
+          { subtitle && (
             <ThemedText style={ styles.settingSubtitle }>
-              { secondText }
+              { subtitle }
             </ThemedText>
           ) }
         </View>
@@ -120,7 +99,6 @@ const SettingBaseComponent = ({
           <Loader
             isLoading={ isLoading || isLoadingProp }
             fullScreen
-            style={ styles.loaderContainer }
           />
         ) }
       </ThemedPressable>
@@ -135,21 +113,5 @@ const SettingBaseComponent = ({
     </>
   );
 };
-
-export function propsAreEqual(prevProps: SettingBaseComponentProps, props: SettingBaseComponentProps) {
-  const {
-    setting: {
-      id,
-      value,
-      isEnabled,
-      isHidden,
-    },
-  } = props;
-
-  return prevProps.setting.id === id
-          && prevProps.setting.value === value
-          && prevProps.setting.isEnabled === isEnabled
-          && prevProps.setting.isHidden === isHidden;
-}
 
 export default SettingBaseComponent;

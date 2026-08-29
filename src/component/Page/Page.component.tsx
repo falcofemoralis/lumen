@@ -1,10 +1,9 @@
 import { InfoBlock } from 'Component/InfoBlock';
 import { ThemedButton } from 'Component/ThemedButton';
-import { Portal } from 'Component/ThemedPortal';
 import { Wrapper } from 'Component/Wrapper';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
-import { GlobeX } from 'lucide-react-native';
+import GlobeX from 'lucide-react-native/icons/globe-x';
 import { View } from 'react-native';
 import { restartApp } from 'Util/Device';
 
@@ -18,40 +17,36 @@ export function PageComponent({
 }: PageComponentProps) {
   const styles = useThemedStyles(componentStyles);
 
-  if (!isConnected) {
-    return (
-      <View
-        style={ [
-          styles.container,
-          styles.noConnectionContainer,
-          style,
-        ] }
-      >
-        <Wrapper>
+  const renderContent = () => {
+    if (!isConnected) {
+      return (
+        <Wrapper style={ styles.noConnectionContainer }>
           <InfoBlock
             title={ t('Network error') }
             subtitle={ t('Network request failed. Please check your internet connection and try again.') }
             Icon={ GlobeX }
           />
-          <ThemedButton style={ styles.btn } onPress={ restartApp }>
-            { t('Retry') }
-          </ThemedButton>
+          <ThemedButton
+            title={ t('Retry') }
+            style={ styles.button }
+            onPress={ restartApp }
+          />
         </Wrapper>
-      </View>
-    );
-  }
+      );
+    }
 
+    return children;
+  };
+
+  // No portal host here on purpose: the only thing portaled on mobile is
+  // ThemedOverlay, and a host on the page would clip it to the scene -- the tab
+  // bar is a sibling below the scene, so the backdrop would neither dim it nor
+  // block taps on it. Falling through to the app-wide host in Root covers the
+  // whole window, the way the native Modal used to.
   return (
-    <Portal.Host>
-      <View
-        style={ [
-          styles.container,
-          style,
-        ] }
-      >
-        { children }
-      </View>
-    </Portal.Host>
+    <View style={ [ styles.container, style ] }>
+      { renderContent() }
+    </View>
   );
 }
 

@@ -1,11 +1,19 @@
+import {
+  completeHandler,
+  createDownloadTask,
+  directories,
+} from '@kesha-antonov/react-native-background-downloader';
+import { File } from 'expo-file-system';
 import { t } from 'i18n/translate';
 import { ApkInstaller } from 'Modules/react-native-apk-installer';
-import { Alert, PermissionsAndroid, Platform } from 'react-native';
-import ReactNativeBlobUtil from 'react-native-blob-util';
+import { Alert, Platform } from 'react-native';
 import { wait } from 'Util/Misc';
 
 export class Installer {
-  private static readonly DOWNLOAD_TIMEOUT = 300000;
+  // the download is aborted when it makes no progress at all for this long,
+  // instead of capping the total time — a big APK over a slow TV connection
+  // is legitimately slow, a dead socket is not
+  private static readonly STALL_TIMEOUT = 60000;
   private static readonly APK_NAME = 'lumen-update.apk';
 
   static async downloadAndInstallApk(
@@ -19,13 +27,6 @@ export class Installer {
     }
 
     try {
-      const grantedStorage = await this.requestStoragePermission();
-      if (!grantedStorage) {
-        Alert.alert(t('Error'), t('Storage permission is required to download APK'));
-
-        return false;
-      }
-
       const grantedInstall = await ApkInstaller.haveUnknownAppSourcesPermission();
       if (!grantedInstall) {
         ApkInstaller.showUnknownAppSourcesPermission();
@@ -33,11 +34,7 @@ export class Installer {
         return false;
       }
 
-      const apkPath = await Promise.race([
-        this.downloadApk(url, onProgress),
-        new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error('Download timeout')), this.DOWNLOAD_TIMEOUT)),
-      ]);
+      const apkPath = await this.downloadApk(url, onProgress);
 
       if (onProgress) {
         onProgress(100, 100); // Ensure progress is set to 100% on completion
@@ -59,128 +56,116 @@ export class Installer {
     }
   }
 
-  private static async requestStoragePermission(): Promise<boolean> {
+  // The system installer keeps reading the APK after `install()` returns - the
+  // copy into the install session happens once the user confirms the dialog -
+  // so the file cannot be dropped right after the intent is fired. It is
+  // removed on the next launch instead: by then the install has either gone
+  // through (this very launch is the new build) or been cancelled.
+  static cleanupApk(): void {
+    if (Platform.OS !== 'android') {
+      return;
+    }
+
     try {
-      const androidVersion = Number(Platform.Version);
+      const file = Installer.getApkFile();
 
-      // For different Android versions, we need different permissions
-      if (androidVersion >= 33) {
-        // Android 13+ (API 33+) - Scoped storage, but Downloads folder should be accessible
-        return true; // Downloads folder is generally accessible without special permissions
+      if (file.exists) {
+        file.delete();
       }
-
-      try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-          {
-            title: t('Storage Permission Required'),
-            message: t('This app needs storage access to download updates to your Downloads folder.'),
-            buttonNeutral: t('Ask Me Later'),
-            buttonNegative: t('Cancel'),
-            buttonPositive: t('OK'),
-          }
-        );
-
-        return granted === PermissionsAndroid.RESULTS.GRANTED;
-      } catch {
-        console.error('Storage permission request failed, but Downloads folder might still be accessible');
-
-        return true;
-      }
-    } catch (error) {
-      // if permission request fails, we can still try to proceed
-      // as Downloads folder might still be accessible
-      console.error('Error checking/requesting storage permission:', error);
-
-      return true;
+    } catch {
+      // a stale APK only costs disk space, and the next download replaces it
     }
   }
 
-  private static async downloadApk(
+  // app-private storage: needs no runtime permission and is exposed through
+  // the installer's FileProvider (`files-path`), so the install intent can
+  // still read the APK back
+  private static getApkPath(): string {
+    return `${directories.documents}/${Installer.APK_NAME}`;
+  }
+
+  private static getApkFile(): File {
+    return new File(`file://${Installer.getApkPath()}`);
+  }
+
+  private static downloadApk(
     url: string,
     onProgress?: (received: number, total: number) => void
   ): Promise<string> {
-    const { fs } = ReactNativeBlobUtil;
+    const filePath = Installer.getApkPath();
 
-    const filePath = `${fs.dirs.DownloadDir}/${Installer.APK_NAME}`;
+    // a leftover file from an interrupted attempt would be resumed rather than
+    // re-downloaded, which produces a corrupt APK once the update URL changes
+    const previousFile = Installer.getApkFile();
 
-    try {
-      const dirExists = await fs.exists(fs.dirs.DownloadDir);
-      if (!dirExists) {
-        await fs.mkdir(fs.dirs.DownloadDir);
-      }
-    } catch (error) {
-      console.error(error);
+    if (previousFile.exists) {
+      previousFile.delete();
     }
 
-    const previousFileExists = await fs.exists(filePath);
-    if (previousFileExists) {
-      await fs.unlink(filePath);
-    }
+    return new Promise<string>((resolve, reject) => {
+      const task = createDownloadTask({
+        id: `app-update-${Date.now()}`,
+        url,
+        destination: filePath,
+      });
 
-    try {
-      const response = await ReactNativeBlobUtil.config({
-        path: filePath,
-        fileCache: true,
-      })
-        .fetch('GET', url)
-        .progress((received, total) => {
-          if (onProgress && Number(total) > 0) {
-            const receivedNum = Number(received);
-            const totalNum = Number(total);
-            onProgress(receivedNum, totalNum);
+      let stallTimer: ReturnType<typeof setTimeout> | undefined;
+      let isSettled = false;
+
+      const settle = (action: () => void) => {
+        if (isSettled) {
+          return;
+        }
+
+        isSettled = true;
+
+        if (stallTimer) {
+          clearTimeout(stallTimer);
+        }
+
+        action();
+      };
+
+      const watchStall = () => {
+        if (stallTimer) {
+          clearTimeout(stallTimer);
+        }
+
+        stallTimer = setTimeout(() => {
+          task.stop();
+          settle(() => reject(new Error('Download timeout')));
+        }, Installer.STALL_TIMEOUT);
+      };
+
+      task
+        .begin(() => {
+          watchStall();
+        })
+        .progress(({ bytesDownloaded, bytesTotal }) => {
+          watchStall();
+
+          if (onProgress && bytesTotal > 0) {
+            onProgress(bytesDownloaded, bytesTotal);
           }
+        })
+        .done(({ location }) => {
+          completeHandler(task.id);
+          settle(() => resolve(location || filePath));
+        })
+        .error(({ error }) => {
+          completeHandler(task.id);
+          settle(() => reject(new Error(error || 'Download failed')));
         });
 
-      const statusCode = response.info().status;
-      if (statusCode !== 200) {
-        console.error('Response info:', response.info());
-        throw new Error(`Download failed with status code: ${statusCode}`);
-      }
-
-      const downloadedPath = response.path();
-
-      const exists = await fs.exists(downloadedPath);
-      if (!exists) {
-        throw new Error('Downloaded file does not exist');
-      }
-
-      const stats = await fs.stat(downloadedPath);
-      if (stats.size === 0) {
-        throw new Error('Downloaded file is empty');
-      }
-
-      return downloadedPath;
-    } catch (error) {
-      console.error(error);
-      // Fallback to download manager which should handle Downloads folder correctly
-      const fallbackResponse = await ReactNativeBlobUtil.config({
-        addAndroidDownloads: {
-          useDownloadManager: true,
-          notification: true,
-          title: 'Downloading Lumen Update',
-          description: 'Downloading the latest version...',
-          mime: 'application/vnd.android.package-archive',
-          mediaScannable: true, // Make it visible in Downloads folder
-        },
-      }).fetch('GET', url);
-
-      const statusCode = fallbackResponse.info().status;
-      if (statusCode !== 200) {
-        console.error('Fallback response info:', fallbackResponse.info());
-        throw new Error(`Fallback download failed with status code: ${statusCode}`);
-      }
-
-      return fallbackResponse.path();
-    }
+      watchStall();
+      task.start();
+    });
   }
 
   private static async installApk(apkPath: string): Promise<boolean> {
     try {
-      const { fs } = ReactNativeBlobUtil;
-      const exists = await fs.exists(apkPath);
-
-      if (!exists) {
+      // `apkPath` is a plain path — ApkInstaller resolves it with java.io.File
+      if (!new File(`file://${apkPath}`).exists) {
         throw new Error('APK file not found');
       }
 

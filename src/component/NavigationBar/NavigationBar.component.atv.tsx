@@ -1,230 +1,109 @@
+import { FocusContext, useFocusable } from '@noriginmedia/norigin-spatial-navigation-react-native-tvos';
+import { BottomTabNavigationOptions } from '@react-navigation/bottom-tabs';
 import { NavigationRoute, ParamListBase } from '@react-navigation/native';
 import { ThemedImage } from 'Component/ThemedImage';
 import { ThemedPressable } from 'Component/ThemedPressable';
+import { ThemedScrollView } from 'Component/ThemedScrollView';
 import { ThemedText } from 'Component/ThemedText';
 import { useNavigationContext } from 'Context/NavigationContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
-import { ACCOUNT_TAB, LOADER_SCREEN, SETTINGS_SCREEN } from 'Navigation/navigationRoutes';
-import { ComponentType, createRef, memo, useCallback, useMemo, useRef } from 'react';
+import { ACCOUNT_TAB, DOWNLOADS_SCREEN, SETTINGS_SCREEN } from 'Navigation/navigationRoutes';
+import { ComponentType, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Image, View } from 'react-native';
 import Animated from 'react-native-reanimated';
-import { DefaultFocus, Directions, SpatialNavigationRoot, SpatialNavigationView } from 'react-tv-space-navigation';
 import { useAppTheme } from 'Theme/context';
 import { ThemedStyles } from 'Theme/types';
-import { BadgeData } from 'Type/BadgeData.interface';
 import { ProfileInterface } from 'Type/Profile.interface';
 import { setTimeoutSafe } from 'Util/Misc';
 
 import { componentStyles } from './NavigationBar.style.atv';
 import { NavigationBarComponentProps } from './NavigationBar.type';
 
-export const navigationBarRef = createRef<View>();
+export const SIDEBAR_FOCUS_KEY = 'SIDEBAR';
 
-export function NavigationBarComponent({
-  state,
-  descriptors,
-  profile,
-  onPress,
-  onReload,
-}: NavigationBarComponentProps) {
-  const { isMenuOpen, toggleMenu } = useNavigationContext();
-  const { badgeData } = useServiceContext();
-  const styles = useThemedStyles(componentStyles);
-  const lastPage = useRef<string | null>(state.routes[state.index]?.name || null);
-  const timerRef = useRef<number | null>(null);
+const TAB_SELECT_DEBOUNCE_MS = 400;
 
-  const onDirectionHandledWithoutMovement = useCallback(
-    (movement: string) => {
-      if (movement === Directions.RIGHT) {
-        toggleMenu(false);
-      }
-    },
-    [toggleMenu]
-  );
+const getTabFocusKey = (name: string) => `sidebar-tab-${name}`;
 
-  const onTabSelect = useCallback((name: string) => {
-    if (!isMenuOpen) {
-      return;
-    }
-
-    if (lastPage.current !== LOADER_SCREEN) {
-      setTimeoutSafe(() => {
-        onPress(LOADER_SCREEN);
-      }, 0);
-      lastPage.current = LOADER_SCREEN;
-    }
-
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-    }
-
-    timerRef.current = setTimeoutSafe(() => {
-      onPress(name);
-      lastPage.current = name;
-    }, 500);
-  }, [onPress, isMenuOpen]);
-
-  const renderTab = (
-    route: NavigationRoute<ParamListBase, string>,
-    index: number
-  ) => {
-    return (
-      <MemoizedNavigationTab
-        key={ route.name }
-        styles={ styles }
-        onTabSelect={ onTabSelect }
-        badgeData={ badgeData }
-        descriptors={ descriptors }
-        profile={ profile }
-        isActiveTab={ state.index === index }
-        name={ route.name }
-        routeKey={ route.key }
-        onReload={ onReload }
-      />
-    );
-  };
-
-  const { topTabs, middleTabs, bottomTabs } = useMemo(() => {
-    const tt = [] as { route: NavigationRoute<ParamListBase, string>, index: number }[];
-    const mt = [] as { route: NavigationRoute<ParamListBase, string>, index: number }[];
-    const bt = [] as { route: NavigationRoute<ParamListBase, string>, index: number }[];
-
-    state.routes.forEach((route, index) => {
-      switch (route.name) {
-        case ACCOUNT_TAB:
-          tt.push({ route, index });
-          break;
-        case SETTINGS_SCREEN:
-          bt.push({ route, index });
-          break;
-        case LOADER_SCREEN:
-          break;
-        default:
-          mt.push({ route, index });
-          break;
-      }
-    });
-
-    return { topTabs: tt, middleTabs: mt, bottomTabs: bt };
-  }, [state.routes]);
-
-  return (
-    <SpatialNavigationRoot
-      isActive={ isMenuOpen }
-      onDirectionHandledWithoutMovement={ onDirectionHandledWithoutMovement }
-    >
-      <Animated.View style={ [styles.bar, isMenuOpen && styles.barOpened] }>
-        <SpatialNavigationView direction="vertical" style={ { width: '100%' } }>
-          <View style={ styles.tabs }>
-            <View>
-              { topTabs.map(({ route, index }) => renderTab(route, index)) }
-            </View>
-            <View>
-              { middleTabs.map(({ route, index }) => renderTab(route, index)) }
-            </View>
-            <View>
-              { bottomTabs.map(({ route, index }) => renderTab(route, index)) }
-            </View>
-          </View>
-        </SpatialNavigationView>
-      </Animated.View>
-    </SpatialNavigationRoot>
-  );
-}
+type TabBarLabel = BottomTabNavigationOptions['tabBarLabel'];
 
 type NavigationTabProps = {
   styles: ThemedStyles<typeof componentStyles>,
-  badgeData: BadgeData,
-  onTabSelect: (name: string) => void,
-  descriptors: Record<string, any>,
+  name: string,
+  label?: TabBarLabel,
+  IconComponent?: ComponentType<any>,
+  badgeCount: number,
   profile?: ProfileInterface | null,
   isActiveTab: boolean,
-  name: string,
-  routeKey: string,
-  onReload: () => void;
+  isMenuOpened: boolean,
+  onTabSelect: (name: string) => void,
+  onTabFocus: (name: string) => void,
+  onReload: () => void,
 };
 
 const NavigationTab = ({
   styles,
-  onTabSelect,
-  badgeData,
-  descriptors,
+  name,
+  label,
+  IconComponent,
+  badgeCount,
   profile,
   isActiveTab,
-  name,
-  routeKey,
+  isMenuOpened,
+  onTabSelect,
+  onTabFocus,
   onReload,
 }: NavigationTabProps) => {
   const { theme } = useAppTheme();
   const { isSignedIn } = useServiceContext();
 
-  const renderDefaultTab = (
-    isRootActive: boolean,
-    isf: boolean
-  ) => {
-    const { options } = descriptors[routeKey] ?? {};
-    const { tabBarIcon: IconComponent } = options as { tabBarIcon: ComponentType<any> };
-    const { tabBarLabel } = options;
-    const badgeCount = badgeData[name] || 0;
+  const renderLabel = (isFocused: boolean) => {
+    if (typeof label === 'function') {
+      return label({
+        focused: isActiveTab,
+        color: isFocused && isMenuOpened ? theme.colors.iconFocused : theme.colors.icon,
+        position: 'below-icon',
+        children: '',
+      });
+    }
 
-    return (
-      <View
-        style={ [
-          styles.tab,
-          isActiveTab && !isRootActive && styles.tabSelected,
-          isf && isRootActive && styles.tabFocused,
-        ] }
-      >
-        <View>
-          { IconComponent && (
-            <IconComponent
-              style={ styles.tabIcon }
-              size={ styles.tabIcon.width }
-              color={ isf && isRootActive ? theme.colors.iconFocused : theme.colors.icon }
-            />
-          ) }
-          { badgeCount > 0 && (
-            <ThemedText style={ styles.badge }>
-              { badgeCount }
-            </ThemedText>
-          ) }
-        </View>
-        <ThemedText
-          style={ [
-            styles.tabText,
-            isf && isRootActive && styles.tabContentFocused,
-          ] }
-        >
-          { typeof tabBarLabel === 'function'
-            ? tabBarLabel({
-              focused: isActiveTab,
-              color: isf && isRootActive ? theme.colors.iconFocused : theme.colors.icon,
-              position: 'below-icon',
-              children: '',
-            }) : tabBarLabel }
-        </ThemedText>
-      </View>
-    );
+    return label;
   };
 
-  const renderAccountTab = (
-    isRootActive: boolean,
-    isf: boolean
-  ) => {
-    const { options } = descriptors[routeKey] ?? {};
-    const { tabBarLabel } = options;
+  const renderDefaultTab = (isFocused: boolean) => (
+    <>
+      <View>
+        { IconComponent && (
+          <IconComponent
+            style={ styles.tabIcon }
+            size={ styles.tabIcon.width }
+            color={ isFocused && isMenuOpened ? theme.colors.iconFocused : theme.colors.icon }
+          />
+        ) }
+        { badgeCount > 0 && (
+          <ThemedText style={ styles.badge }>
+            { badgeCount }
+          </ThemedText>
+        ) }
+      </View>
+      <ThemedText
+        style={ [
+          styles.tabText,
+          isFocused && isMenuOpened && styles.tabContentFocused,
+        ] }
+      >
+        { renderLabel(isFocused) }
+      </ThemedText>
+    </>
+  );
+
+  const renderAccountTab = (isFocused: boolean) => {
     const { avatar } = profile ?? {};
 
     return (
-      <View
-        style={ [
-          styles.tab,
-          isActiveTab && !isRootActive && styles.tabSelected,
-          isf && isRootActive && styles.tabFocused,
-        ] }
-      >
+      <>
         <View style={ styles.profileAvatarContainer }>
           { avatar ? (
             <ThemedImage
@@ -243,55 +122,204 @@ const NavigationTab = ({
             style={ [
               styles.tabText,
               styles.profileNameText,
-              isf && isRootActive && styles.tabContentFocused,
+              isFocused && isMenuOpened && styles.tabContentFocused,
             ] }
           >
-            { typeof tabBarLabel === 'function'
-              ? tabBarLabel({
-                focused: isActiveTab,
-                color: isf && isRootActive ? theme.colors.iconFocused : theme.colors.icon,
-                position: 'below-icon',
-                children: '',
-              }) : tabBarLabel }
+            { renderLabel(isFocused) }
           </ThemedText>
           <ThemedText
             style={ [
               styles.tabText,
               styles.profileSwitchText,
-              isf && isRootActive && styles.tabContentFocused,
+              isFocused && isMenuOpened && styles.tabContentFocused,
             ] }
           >
             { isSignedIn ? t('You') : t('Sign in') }
           </ThemedText>
         </View>
-      </View>
+      </>
     );
   };
 
   return (
-    <DefaultFocus
-      key={ name }
-      enable={ isActiveTab }
+    <ThemedPressable
+      focusKey={ getTabFocusKey(name) }
+      onFocus={ () => onTabFocus(name) }
+      onEnterPress={ onReload }
+      onPress={ () => onTabSelect(name) }
+      style={ styles.tabButton }
+      contentStyle={ styles.tabButtonContent }
     >
-      <ThemedPressable
-        onFocus={ () => {
-          onTabSelect(name);
-        } }
-        onPress={ () => onReload() }
-      >
-        { ({ isRootActive, isFocused: isf }) => {
-          switch (name) {
-            case ACCOUNT_TAB:
-              return renderAccountTab(isRootActive, isf);
-            default:
-              return renderDefaultTab(isRootActive, isf);
-          }
-        } }
-      </ThemedPressable>
-    </DefaultFocus>
+      { ({ isFocused }) => (
+        <View
+          style={ [
+            styles.tab,
+            isActiveTab && !isMenuOpened && styles.tabSelected,
+            isFocused && isMenuOpened && styles.tabFocused,
+          ] }
+        >
+          { name === ACCOUNT_TAB ? renderAccountTab(isFocused) : renderDefaultTab(isFocused) }
+        </View>
+      ) }
+    </ThemedPressable>
   );
 };
 
 const MemoizedNavigationTab = memo(NavigationTab);
+
+export function NavigationBarComponent({
+  state,
+  descriptors,
+  profile,
+  onPress,
+  onReload,
+}: NavigationBarComponentProps) {
+  const { badgeData } = useServiceContext();
+  const { toggleMenu, hideScene } = useNavigationContext();
+  const styles = useThemedStyles(componentStyles);
+  const timerRef = useRef<number | null>(null);
+  const pendingTabRef = useRef<string | null>(null);
+  const hasFocusedChildRef = useRef(false);
+  const [focusedTabName, setFocusedTabName] = useState<string | null>(null);
+
+  const activeTabName = state.routes[state.index]?.name ?? null;
+
+  const { ref, focusKey, hasFocusedChild } = useFocusable({
+    focusKey: SIDEBAR_FOCUS_KEY,
+    trackChildren: true,
+    isFocusBoundary: true,
+    focusBoundaryDirections: ['left'],
+    saveLastFocusedChild: false,
+    preferredChildFocusKey: activeTabName ? getTabFocusKey(activeTabName) : undefined,
+  });
+
+  useEffect(() => {
+    hasFocusedChildRef.current = hasFocusedChild;
+    toggleMenu(hasFocusedChild);
+
+    // the user left the sidebar before the debounce elapsed — commit the tab now,
+    // so navigation never lands while focus already sits inside the content
+    if (!hasFocusedChild && timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+
+      if (pendingTabRef.current) {
+        onPress(pendingTabRef.current);
+        pendingTabRef.current = null;
+      }
+    }
+  }, [hasFocusedChild, toggleMenu, onPress]);
+
+  // mask the scene only while a *different* tab is being previewed — browsing back
+  // onto the tab you are already on should reveal it again, not hide it
+  useEffect(() => {
+    hideScene(
+      hasFocusedChild
+      && focusedTabName !== null
+      && focusedTabName !== activeTabName
+    );
+  }, [hasFocusedChild, focusedTabName, activeTabName, hideScene]);
+
+  useEffect(() => () => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+  }, []);
+
+  const onTabSelect = useCallback((name: string) => {
+    setFocusedTabName(name);
+
+    onPress(name);
+  }, [onPress]);
+
+  const onTabFocus = useCallback((name: string) => {
+    if (!hasFocusedChildRef.current) {
+      return;
+    }
+
+    setFocusedTabName(name);
+
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+
+    pendingTabRef.current = name;
+    timerRef.current = setTimeoutSafe(() => {
+      timerRef.current = null;
+      pendingTabRef.current = null;
+      onTabSelect(name);
+    }, TAB_SELECT_DEBOUNCE_MS);
+  }, [onTabSelect]);
+
+  const { topTabs, middleTabs, bottomTabs } = useMemo(() => {
+    const tt = [] as { route: NavigationRoute<ParamListBase, string>, index: number }[];
+    const mt = [] as { route: NavigationRoute<ParamListBase, string>, index: number }[];
+    const bt = [] as { route: NavigationRoute<ParamListBase, string>, index: number }[];
+
+    state.routes.forEach((route, index) => {
+      switch (route.name) {
+        case ACCOUNT_TAB:
+          tt.push({ route, index });
+          break;
+        case SETTINGS_SCREEN:
+          bt.push({ route, index });
+          break;
+        case DOWNLOADS_SCREEN:
+          tt.push({ route, index });
+          break;
+        default:
+          mt.push({ route, index });
+          break;
+      }
+    });
+
+    return { topTabs: tt, middleTabs: mt, bottomTabs: bt };
+  }, [state.routes]);
+
+  const renderTab = (
+    route: NavigationRoute<ParamListBase, string>,
+    index: number
+  ) => {
+    const { options } = descriptors[route.key] ?? {};
+
+    return (
+      <MemoizedNavigationTab
+        key={ route.name }
+        styles={ styles }
+        name={ route.name }
+        label={ options?.tabBarLabel }
+        IconComponent={ options?.tabBarIcon }
+        badgeCount={ badgeData[route.name] || 0 }
+        profile={ route.name === ACCOUNT_TAB ? profile : undefined }
+        isActiveTab={ state.index === index }
+        isMenuOpened={ hasFocusedChild }
+        onTabSelect={ onTabSelect }
+        onTabFocus={ onTabFocus }
+        onReload={ onReload }
+      />
+    );
+  };
+
+  return (
+    <FocusContext.Provider value={ focusKey }>
+      <Animated.View ref={ ref } style={ [styles.bar, hasFocusedChild && styles.barOpened] }>
+        <ThemedScrollView
+          style={ styles.tabs }
+          contentContainerStyle={ styles.tabsContent }
+        >
+          <View>
+            { topTabs.map(({ route, index }) => renderTab(route, index)) }
+          </View>
+          <View style={ styles.middleTabs }>
+            { middleTabs.map(({ route, index }) => renderTab(route, index)) }
+          </View>
+          <View>
+            { bottomTabs.map(({ route, index }) => renderTab(route, index)) }
+          </View>
+        </ThemedScrollView>
+      </Animated.View>
+    </FocusContext.Provider>
+  );
+}
 
 export default NavigationBarComponent;

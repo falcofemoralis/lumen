@@ -47,3 +47,8 @@ export type LikeResult = JSONResult & {
   count: number;
   type: 'minus' | 'plus';
 };
+
+export type CommentResult = JSONResult & {
+  message: string[]
+  on_moderation: true
+}

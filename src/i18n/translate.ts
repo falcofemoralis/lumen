@@ -1,5 +1,5 @@
 import type { TOptions } from 'i18next';
-import i18n from 'i18next';
+import i18n, { t as i18nT } from 'i18next';
 
 import { transformKey, TxKeyPath } from '.';
 
@@ -27,7 +27,7 @@ import { transformKey, TxKeyPath } from '.';
  */
 export function t(key: TxKeyPath, options?: TOptions): string {
   if (i18n.isInitialized) {
-    return i18n.t(`general:${transformKey(key)}`, options);
+    return i18nT(`general:${transformKey(key)}`, options);
   }
 
   return key;

@@ -3,16 +3,12 @@ import { ThemedImage } from 'Component/ThemedImage';
 import { ThemedOverlay } from 'Component/ThemedOverlay';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { ThemedPressable } from 'Component/ThemedPressable';
+import { ThemedScrollView } from 'Component/ThemedScrollView';
 import { ThemedText } from 'Component/ThemedText';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
-import { CircleHelp } from 'lucide-react-native';
+import CircleHelp from 'lucide-react-native/icons/circle-question-mark';
 import { useMemo, useRef } from 'react';
 import { View } from 'react-native';
-import {
-  DefaultFocus,
-  SpatialNavigationScrollView,
-  SpatialNavigationView,
-} from 'react-tv-space-navigation';
 import { useAppTheme } from 'Theme/context';
 import { VoiceRatingInterface } from 'Type/VoiceRating.interface';
 
@@ -36,20 +32,20 @@ export const PlayerVideoRatingComponent = ({
   const renderButton = () => {
     return (
       <ThemedButton
+        title=""
         IconComponent={ CircleHelp }
         iconProps={ {
           size: scale(20),
         } }
         onPress={ () => ratingOverlayRef.current?.open() }
         style={ styles.voiceRatingInput }
-        withAnimation
       />
     );
   };
 
-  const renderRating = (item: VoiceRatingInterface) => {
+  const renderRating = (item: VoiceRatingInterface, index: number) => {
     return (
-      <ThemedPressable key={ item.title } withAnimation>
+      <ThemedPressable key={ item.title } autofocus={ index === 0 } style={ styles.voiceRatingButton }>
         { ({ isFocused }) => (
           <View
             style={ [
@@ -113,18 +109,11 @@ export const PlayerVideoRatingComponent = ({
         containerStyle={ styles.voiceRatingOverlayContainer }
       >
         <View style={ styles.voiceRatingContainer }>
-          <SpatialNavigationScrollView
-            offsetFromStart={ styles.voiceRatingOverlay.height / 2 }
-          >
-            <SpatialNavigationView
-              direction="vertical"
-              style={ styles.voiceRatingNavigationView }
-            >
-              <DefaultFocus>
-                { voiceRating.map((item) => renderRating(item)) }
-              </DefaultFocus>
-            </SpatialNavigationView>
-          </SpatialNavigationScrollView>
+          <ThemedScrollView>
+            <View style={ styles.voiceRatingNavigationView }>
+              { voiceRating.map((item, index) => renderRating(item, index)) }
+            </View>
+          </ThemedScrollView>
         </View>
       </ThemedOverlay>
     );

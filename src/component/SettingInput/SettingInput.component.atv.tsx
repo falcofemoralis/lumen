@@ -1,5 +1,4 @@
 import { SettingBase } from 'Component/SettingBase';
-import { propsAreEqual } from 'Component/SettingBase/SettingBase.component.atv';
 import { ThemedButton } from 'Component/ThemedButton';
 import { ThemedInput } from 'Component/ThemedInput';
 import { ThemedOverlay } from 'Component/ThemedOverlay';
@@ -9,19 +8,16 @@ import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import { memo, useCallback, useRef, useState } from 'react';
 import { View } from 'react-native';
-import { DefaultFocus } from 'react-tv-space-navigation';
 
 import { componentStyles } from './SettingInput.style.atv';
 import { SettingInputComponentProps } from './SettingInput.type';
 
 export const SettingInputComponent = memo(({
-  setting,
-  onUpdate,
+  value,
+  onChange,
+  ...baseProps
 }: SettingInputComponentProps) => {
-  const {
-    title,
-    value,
-  } = setting;
+  const { title } = baseProps;
   const styles = useThemedStyles(componentStyles);
   const overlayRef = useRef<ThemedOverlayRef>(null);
   const [inputValue, setInputValue] = useState(value);
@@ -46,19 +42,20 @@ export const SettingInputComponent = memo(({
       return;
     }
 
-    const success = await onUpdate(setting, inputValue);
-
-    if (success) {
-      overlayRef.current?.close();
-    } else {
+    if (await onChange(inputValue) === false) {
       setHasError(true);
+
+      return;
     }
-  }, [inputValue, value, onUpdate, setting]);
+
+    overlayRef.current?.close();
+  }, [inputValue, value, onChange]);
 
   return (
     <View>
       <SettingBase
-        setting={ setting }
+        { ...baseProps }
+        subtitle={ value }
         onPress={ () => overlayRef.current?.open() }
       />
       <ThemedOverlay
@@ -67,28 +64,25 @@ export const SettingInputComponent = memo(({
         onClose={ () => setInputValue(value) }
         useKeyboardAdjustment
       >
-        <DefaultFocus>
-          <ThemedText style={ styles.overlayTitle }>
-            { title }
-          </ThemedText>
-          <ThemedInput
-            style={ styles.overlayInput }
-            placeholder={ title }
-            onChangeText={ onChangeText }
-            defaultValue={ value || '' }
-            multiline
-          />
-          <ThemedButton
-            style={ styles.overlayButton }
-            onPress={ onSave }
-            disabled={ !inputValue || hasError }
-          >
-            { t('Save') }
-          </ThemedButton>
-        </DefaultFocus>
+        <ThemedText style={ styles.overlayTitle }>
+          { title }
+        </ThemedText>
+        <ThemedInput
+          style={ styles.overlayInput }
+          placeholder={ title }
+          onChangeText={ onChangeText }
+          defaultValue={ value }
+          multiline
+        />
+        <ThemedButton
+          title={ t('Save') }
+          style={ styles.overlayButton }
+          onPress={ onSave }
+          disabled={ !inputValue || hasError }
+        />
       </ThemedOverlay>
     </View>
   );
-}, propsAreEqual);
+});
 
 export default SettingInputComponent;

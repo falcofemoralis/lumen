@@ -5,8 +5,18 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     opacity: 0.5,
     pointerEvents: 'none',
   },
+  // The overlay caps its content at a share of the screen and clips the rest, so
+  // the card has to shrink into that box (RN defaults flexShrink to 0) -- only
+  // the changelog scrolls, the actions stay visible.
+  container: {
+    flexShrink: 1,
+  },
   overlay: {
     width: '40%',
+    // The shared overlay caps every card at 50% of the screen, which leaves the
+    // changelog a couple of lines tall -- release notes are the whole point of
+    // this one, so give it most of the height and let the ScrollView take the rest.
+    maxHeight: '80%',
     padding: scale(16),
   },
   header: {
@@ -55,16 +65,17 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     fontSize: scale(text.xs.fontSize),
     color: colors.textSecondary,
   },
+  description: {
+    flexShrink: 1,
+  },
   actions: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     gap: scale(8),
     marginTop: scale(16),
-  },
-  buttonContainer: {
-    flex: 1,
+    flexShrink: 0,
   },
   button: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },

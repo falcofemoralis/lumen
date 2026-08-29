@@ -1,6 +1,5 @@
 import { Loader } from 'Component/Loader';
 import { SettingBase } from 'Component/SettingBase';
-import { propsAreEqual } from 'Component/SettingBase/SettingBase.component';
 import { ThemedDropdown } from 'Component/ThemedDropdown';
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
@@ -10,50 +9,56 @@ import { View } from 'react-native';
 import { SettingSelectComponentProps } from './SettingSelect.type';
 
 export const SettingSelectComponent = memo(({
-  setting,
-  onUpdate,
+  value,
+  options,
+  onChange,
+  ...baseProps
 }: SettingSelectComponentProps) => {
-  const {
-    id,
-    title,
-    options,
-    value,
-  } = setting;
+  const { title, subtitle } = baseProps;
   const overlayRef = useRef<ThemedOverlayRef>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const onChange = useCallback(async (option: DropdownItem) => {
+  const selectedOption = options.find((option) => option.value === value);
+
+  const onSelect = useCallback(async (option: DropdownItem) => {
     setIsLoading(true);
 
-    const success = await onUpdate(setting, option.value);
-
-    if (success) {
-      overlayRef.current?.close();
+    try {
+      if (await onChange(option.value) !== false) {
+        overlayRef.current?.close();
+      }
+    } catch (error) {
+      console.error('Error in SettingSelectComponent onChange:', error);
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
-  }, [id, onUpdate]);
+  }, [onChange]);
 
   return (
     <View>
       <SettingBase
-        setting={ setting }
+        { ...baseProps }
+        subtitle={ selectedOption ? selectedOption.label : subtitle }
         onPress={ () => overlayRef.current?.open() }
       />
       <ThemedDropdown
         asOverlay
         overlayRef={ overlayRef }
-        value={ value ?? '' }
-        data={ options ?? [] }
-        onChange={ onChange }
+        value={ value }
+        data={ options }
+        onChange={ onSelect }
         header={ title }
       />
-      <Loader
-        isLoading={ isLoading }
-        fullScreen
-      />
+      { /* Mounted only while loading -- an idle ActivityIndicator is still a
+           native view, and a settings group renders a whole column of these. */ }
+      { isLoading && (
+        <Loader
+          isLoading
+          fullScreen
+        />
+      ) }
     </View>
   );
-}, propsAreEqual);
+});
 
 export default SettingSelectComponent;

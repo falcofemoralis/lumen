@@ -4,19 +4,12 @@ import { Page } from 'Component/Page';
 import { HomeScreenComponentProps } from './HomeScreen.type';
 
 export function HomeScreenComponent({
-  pagerItems,
-  sorting,
-  onLoadFilms,
-  onUpdateFilms,
+  ...pagerHandlers
 }: HomeScreenComponentProps) {
   return (
     <Page>
       <FilmPager
-        items={ pagerItems }
-        onLoadFilms={ onLoadFilms }
-        onUpdateFilms={ onUpdateFilms }
-        loadOnInit
-        sorting={ sorting }
+        { ...pagerHandlers }
       />
     </Page>
   );

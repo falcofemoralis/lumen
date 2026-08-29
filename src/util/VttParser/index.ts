@@ -1,5 +1,4 @@
-import { services } from 'Api/services';
-import { DEFAULT_SERVICE } from 'Context/ServiceContext';
+import { DEFAULT_SERVICE, services } from 'Api/index';
 import webvtt from 'node-webvtt';
 
 export interface VTTItem {
@@ -28,29 +27,6 @@ export const vttLoader = async (url: string, isOffline?: boolean) => {
   }
 
   return await services[DEFAULT_SERVICE].getRequest(url);
-};
-
-export const subtitleParser = async (subtitleUrl: string, isOffline?: boolean): Promise<VTTItem[]> => {
-  const subtitleData = await vttLoader(subtitleUrl, isOffline);
-  const subtitleType = subtitleUrl.split('.')[subtitleUrl.split('.').length - 1];
-
-  const result: VTTItem[] = [];
-
-  if (subtitleType === 'vtt') {
-    const parsedSubtitle = webvtt.parse(subtitleData) as ParsedVTTResult;
-
-    if (parsedSubtitle.valid) {
-      parsedSubtitle.cues.forEach(({ start, end, text }) => {
-        result.push({
-          start,
-          end,
-          part: text,
-        });
-      });
-    }
-  }
-
-  return result;
 };
 
 export const storyboardParser = async (storyboardUrl: string): Promise<VTTItem[]> => {

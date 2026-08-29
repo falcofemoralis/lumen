@@ -4,7 +4,7 @@ import { ThemedImage } from 'Component/ThemedImage';
 import { ThemedPressable } from 'Component/ThemedPressable';
 import { ThemedText } from 'Component/ThemedText';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
-import { CircleHelp } from 'lucide-react-native';
+import CircleHelp from 'lucide-react-native/icons/circle-question-mark';
 import { useRef } from 'react';
 import { ScrollView, View } from 'react-native';
 import { useAppTheme } from 'Theme/context';

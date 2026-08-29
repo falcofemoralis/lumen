@@ -4,7 +4,7 @@ import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { Wrapper } from 'Component/Wrapper';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { NativeSyntheticEvent, ScrollView, View } from 'react-native';
 import { Pressable } from 'react-native-gesture-handler';
 import { usePagerView } from 'react-native-pager-view';
@@ -19,6 +19,13 @@ import { ThemedStyles } from 'Theme/types';
 
 import { componentStyles } from './FilmPager.style';
 import { FilmPagerComponentProps, PagerItemInterface } from './FilmPager.type';
+
+type TabsState = {
+  key: string;
+  indexes: Set<number>;
+};
+
+const EMPTY_INDEXES: ReadonlySet<number> = new Set<number>();
 
 const TabButton = memo(({
   menuItem,
@@ -96,10 +103,16 @@ const TabButton = memo(({
 });
 
 export const FilmPagerComponent = ({
-  items,
-  isAddSafeArea,
+  pagerItems,
+  disableEmptyComponent,
+  isEmpty,
+  hideGrid,
+  disableStatusbarSafeArea,
+  ListEmptyComponent,
+  centerEmptyComponent,
   sorting,
   selectedSorting,
+  initialPage = 0,
   onPreLoad,
   onNextLoad,
   handleSelectSorting,
@@ -107,43 +120,78 @@ export const FilmPagerComponent = ({
   const { scale, theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
   const { AnimatedPagerView, ref: pagerViewRef } = usePagerView({ pagesAmount: 10 });
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [activeTab, setActiveTab] = useState(0);
-  const [renderedTabs, setRenderedTabs] = useState<boolean[]>([]);
+  const [activeIndex, setActiveIndex] = useState(initialPage);
+  const [activeTab, setActiveTab] = useState(initialPage);
   const scrollViewRef = useRef<ScrollView>(null);
   const tabWidthsRef = useRef<number[]>([]);
-  const loadedTabsRef = useRef<boolean[]>([]);
   const scrollState = useRef<'idle' | 'dragging' | 'settling'>('idle');
-  const pagerItems = useMemo(() => Object.values(items), [items]);
+  // the tab bar starts scrolled to the initial tab, which can only happen once
+  // the widths before it are measured
+  const initialScrollDoneRef = useRef(initialPage === 0);
 
-  // Initialize arrays when pagerItems changes
-  useEffect(() => {
-    const length = pagerItems.length;
-    setRenderedTabs(Array(length).fill(false));
-    loadedTabsRef.current = Array(length).fill(false);
-  }, [pagerItems.length]);
+  // identifies the current set of tabs; pagerItems itself gets a new identity on every
+  // render, so the ids are what tells an actual tab change from a films update
+  const tabsKey = pagerItems.map(({ menuItem }) => menuItem.id).join('|');
+
+  const [renderedTabs, setRenderedTabs] = useState<TabsState>(() => ({ key: tabsKey, indexes: new Set() }));
+  const loadedTabsRef = useRef<TabsState>({ key: tabsKey, indexes: new Set() });
+
+  // entries left over from a previous set of tabs are ignored on read, which keeps the
+  // reset out of an effect and off the render path
+  const renderedIndexes = renderedTabs.key === tabsKey ? renderedTabs.indexes : EMPTY_INDEXES;
+
+  const getTabOffset = (index: number) => tabWidthsRef.current
+    .slice(0, index)
+    .reduce((acc, width) => acc + width, 0);
+
+  const handleTabLayout = useCallback((index: number, width: number) => {
+    tabWidthsRef.current[index] = width;
+
+    if (initialScrollDoneRef.current) {
+      return;
+    }
+
+    // every tab before the initial one has to be measured for the offset to be right
+    for (let i = 0; i < initialPage; i++) {
+      if (tabWidthsRef.current[i] === undefined) {
+        return;
+      }
+    }
+
+    initialScrollDoneRef.current = true;
+    const offsetX = getTabOffset(initialPage);
+
+    // the layout pass this runs in is the one sizing the content, so the scroll
+    // has to wait for it or it clamps back to 0
+    requestAnimationFrame(() => {
+      scrollViewRef.current?.scrollTo({ x: offsetX, animated: false });
+    });
+  }, [initialPage]);
 
   const updateActiveTab = useCallback((index: number) => {
     if (index !== activeTab) {
       setActiveTab(index);
-      const offsetX = tabWidthsRef.current.slice(0, index).reduce((acc, width) => acc + width, 0);
-      scrollViewRef.current?.scrollTo({ x: offsetX, animated: true });
+      scrollViewRef.current?.scrollTo({ x: getTabOffset(index), animated: true });
     }
 
-    if (!renderedTabs[index]) {
-      setRenderedTabs((prev) => {
-        const newLoadedTabs = [...prev];
-        newLoadedTabs[index] = true;
+    setRenderedTabs((prev) => {
+      const isCurrent = prev.key === tabsKey;
 
-        return newLoadedTabs;
-      });
-    }
-  }, [activeTab, renderedTabs]);
+      if (isCurrent && prev.indexes.has(index)) {
+        return prev;
+      }
+
+      const indexes = new Set(isCurrent ? prev.indexes : []);
+      indexes.add(index);
+
+      return { key: tabsKey, indexes };
+    });
+  }, [activeTab, tabsKey]);
 
   const handleTabPress = useCallback((index: number) => {
     pagerViewRef.current?.setPage(index);
     updateActiveTab(index);
-  }, [updateActiveTab]);
+  }, [updateActiveTab, pagerViewRef]);
 
   const handlePageSelect = useCallback((e: NativeSyntheticEvent<OnPageSelectedEventData>) => {
     const { position } = e.nativeEvent;
@@ -151,11 +199,17 @@ export const FilmPagerComponent = ({
     setActiveIndex(position);
     updateActiveTab(position);
 
-    if (!loadedTabsRef.current[position] && position !== 0) {
-      onPreLoad(pagerItems[position]);
-      loadedTabsRef.current[position] = true;
+    if (loadedTabsRef.current.key !== tabsKey) {
+      loadedTabsRef.current = { key: tabsKey, indexes: new Set() };
     }
-  }, [onPreLoad, pagerItems, updateActiveTab]);
+
+    const { indexes } = loadedTabsRef.current;
+
+    if (!indexes.has(position) && position !== initialPage) {
+      onPreLoad(pagerItems[position]);
+      indexes.add(position);
+    }
+  }, [onPreLoad, pagerItems, updateActiveTab, tabsKey, initialPage]);
 
   const handlePageScroll = useCallback((e: NativeSyntheticEvent<OnPageScrollEventData>) => {
     const { offset, position } = e.nativeEvent;
@@ -199,7 +253,7 @@ export const FilmPagerComponent = ({
             menuItem={ menuItem }
             isActive={ activeTab === i }
             onPress={ () => handleTabPress(i) }
-            onLayout={ (width) => tabWidthsRef.current[i] = width }
+            onLayout={ (width) => handleTabLayout(i, width) }
             styles={ styles }
             sorting={ sorting }
             selectedSorting={ selectedSorting }
@@ -208,23 +262,31 @@ export const FilmPagerComponent = ({
         )) }
       </ScrollView>
     </Wrapper>
-  ), [styles, pagerItems, activeTab, sorting, selectedSorting, handleSelectSorting, handleTabPress]);
+  ), [styles, pagerItems, activeTab, sorting, selectedSorting, handleSelectSorting, handleTabPress, handleTabLayout]);
 
   const renderPage = useCallback((pagerItem: PagerItemInterface, idx: number) => {
-    if (!renderedTabs[idx] && idx !== 0) {
+    if (!renderedIndexes.has(idx) && idx !== initialPage) {
       return null;
     }
 
-    const { films } = pagerItem;
+    const { films, pagination } = pagerItem;
 
     return (
       <FilmGrid
         films={ films ?? [] }
-        isAddSafeArea={ isAddSafeArea }
+        hasMorePages={ pagination.currentPage < pagination.totalPages }
+        disableEmptyComponent={ disableEmptyComponent }
+        disableStatusbarSafeArea={ disableStatusbarSafeArea }
+        // empty flag it true, films array exist and this array is empty
+        isEmpty={ isEmpty && films !== null && !films.length }
+        hideGrid={ hideGrid }
+        ListEmptyComponent={ ListEmptyComponent }
+        centerEmptyComponent={ centerEmptyComponent }
         onNextLoad={ (isRefresh) => onNextLoad(isRefresh, pagerItem) }
       />
     );
-  }, [renderedTabs, isAddSafeArea, onNextLoad]);
+  // eslint-disable-next-line max-len
+  }, [renderedIndexes, initialPage, disableEmptyComponent, disableStatusbarSafeArea, isEmpty, hideGrid, ListEmptyComponent, centerEmptyComponent, onNextLoad]);
 
   const pages = useMemo(() => (pagerItems).map((item, idx) => (
     <Wrapper key={ item.menuItem.id }>
@@ -236,7 +298,7 @@ export const FilmPagerComponent = ({
     <AnimatedPagerView
       ref={ pagerViewRef }
       style={ { flex: 1, backgroundColor: theme.colors.background } }
-      initialPage={ 0 }
+      initialPage={ initialPage }
       onPageScroll={ handlePageScroll }
       onPageSelected={ handlePageSelect }
       onPageScrollStateChanged={ handlePageScrollStateChanged }
@@ -250,6 +312,7 @@ export const FilmPagerComponent = ({
     handlePageScroll,
     handlePageSelect,
     handlePageScrollStateChanged,
+    initialPage,
     pages,
     scale,
     theme,

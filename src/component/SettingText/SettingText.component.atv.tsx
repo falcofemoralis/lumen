@@ -1,10 +1,10 @@
 import { SettingBase } from 'Component/SettingBase';
+import { memo } from 'react';
 
 import { SettingTextComponentProps } from './SettingText.type';
 
-export const SettingTextComponent = ({
-  setting,
-  onUpdate,
-}: SettingTextComponentProps) => <SettingBase setting={ setting } onPress={ () => onUpdate(setting, '') } />;
+export const SettingTextComponent = memo((props: SettingTextComponentProps) => (
+  <SettingBase { ...props } />
+));
 
 export default SettingTextComponent;

@@ -1,7 +1,10 @@
 import { ParamListBase, RouteProp } from '@react-navigation/native';
+import { ThemedButton } from 'Component/ThemedButton';
 import { ThemedText } from 'Component/ThemedText';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
+import { t } from 'i18n/translate';
 import { View } from 'react-native';
+import { restartApp } from 'Util/Device';
 
 import { componentStyles } from './ErrorScreen.styles';
 
@@ -22,6 +25,11 @@ export default function ErrorScreen({ route }: { route: RouteProp<ParamListBase,
           { info.trim() }
         </ThemedText>
       ) }
+      <ThemedButton
+        title={ t('Retry') }
+        onPress={ restartApp }
+        autofocus
+      />
     </View>
   );
 }

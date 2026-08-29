@@ -1,3 +1,4 @@
+import { ConfirmOverlay } from 'Component/ConfirmOverlay';
 import { Loader } from 'Component/Loader';
 import { LoginForm } from 'Component/LoginForm';
 import { Page } from 'Component/Page';
@@ -10,7 +11,12 @@ import { Wrapper } from 'Component/Wrapper';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
-import { Bell, Download, LogOut, MessageSquareText, Settings, Star } from 'lucide-react-native';
+import Bell from 'lucide-react-native/icons/bell';
+import Download from 'lucide-react-native/icons/download';
+import LogOut from 'lucide-react-native/icons/log-out';
+import MessageSquareText from 'lucide-react-native/icons/message-square-text';
+import Settings from 'lucide-react-native/icons/settings';
+import Star from 'lucide-react-native/icons/star';
 import { ACCOUNT_TAB } from 'Navigation/navigationRoutes';
 import { ComponentType } from 'react';
 import { Image, ScrollView, StyleProp, TextStyle, View, ViewStyle } from 'react-native';
@@ -20,16 +26,55 @@ import { useAppTheme } from 'Theme/context';
 import { componentStyles } from './AccountScreen.style';
 import { AccountScreenComponentProps } from './AccountScreen.type';
 
+// a real component rather than a render helper, so that handlers reach it as props
+// instead of as call arguments (see react-hooks/refs)
+const AccountActionButton = ({
+  title,
+  IconComponent,
+  action,
+  style,
+  textStyle,
+  iconStyle,
+}: {
+  title: string;
+  IconComponent: ComponentType<any>;
+  action: () => void;
+  style?: StyleProp<ViewStyle>;
+  textStyle?: StyleProp<TextStyle>;
+  iconStyle?: StyleProp<any>;
+}) => {
+  const { scale, theme } = useAppTheme();
+  const styles = useThemedStyles(componentStyles);
+
+  return (
+    <ThemedButton
+      title={ title }
+      style={ [styles.profileAction, style] }
+      contentStyle={ styles.profileActionContent }
+      textStyle={ [styles.profileActionText, textStyle] }
+      IconComponent={ IconComponent }
+      onPress={ action }
+      iconProps={ {
+        size: scale(20),
+        color: iconStyle ? iconStyle.color : theme.colors.icon,
+      } }
+    />
+  );
+};
+
 export function AccountScreenComponent({
   isSignedIn,
+  isLocalLibrary,
   profile,
   badgeData,
   handleViewProfile,
   handleViewPayments,
   handleLogout,
+  confirmLogout,
+  logoutConfirmOverlayRef,
   openSettings,
   openNotifications,
-  openNotImplemented,
+  openMyComments,
   openDownloads,
 }: AccountScreenComponentProps) {
   const { scale, theme } = useAppTheme();
@@ -119,31 +164,6 @@ export function AccountScreenComponent({
     );
   };
 
-  const renderActionButton = (
-    title: string,
-    icon: ComponentType<any>,
-    action: () => void,
-    style?: StyleProp<ViewStyle>,
-    textStyle?: StyleProp<TextStyle>,
-    iconStyle?: StyleProp<any>
-  ) => {
-    return (
-      <ThemedButton
-        style={ [styles.profileAction, style] }
-        contentStyle={ styles.profileActionContent }
-        textStyle={ [styles.profileActionText, textStyle] }
-        IconComponent={ icon }
-        onPress={ action }
-        iconProps={ {
-          size: scale(20),
-          color: iconStyle ? iconStyle.color : theme.colors.icon,
-        } }
-      >
-        { title }
-      </ThemedButton>
-    );
-  };
-
   const renderNotificationButton = () => {
     const badge = badgeData[ACCOUNT_TAB] ?? 0;
 
@@ -154,7 +174,11 @@ export function AccountScreenComponent({
             { badge }
           </ThemedText>
         ) }
-        { renderActionButton(t('Notifications'), Bell, openNotifications) }
+        <AccountActionButton
+          title={ t('Notifications') }
+          IconComponent={ Bell }
+          action={ openNotifications }
+        />
       </View>
     );
   };
@@ -168,34 +192,80 @@ export function AccountScreenComponent({
           { renderPremiumBadge() }
         </View>
         <View style={ [styles.profileActionsGroup] }>
-          { /* eslint-disable-next-line max-len */ }
-          { renderActionButton(premiumDays > 0 ? t('Renew subscription') : t('Get subscription'), Star, handleViewPayments, styles.premiumButton, styles.premiumButtonText, styles.premiumButtonIcon) }
+          <AccountActionButton
+            title={ premiumDays > 0 ? t('Renew subscription') : t('Get subscription') }
+            IconComponent={ Star }
+            action={ handleViewPayments }
+            style={ styles.premiumButton }
+            textStyle={ styles.premiumButtonText }
+            iconStyle={ styles.premiumButtonIcon }
+          />
           { renderNotificationButton() }
-          { renderActionButton(t('Downloads'), Download, openDownloads) }
-          { renderActionButton(t('Comments'), MessageSquareText, openNotImplemented) }
-          { renderActionButton(t('View Profile'), Star, handleViewProfile) }
+          <AccountActionButton
+            title={ t('Downloads') }
+            IconComponent={ Download }
+            action={ openDownloads }
+          />
+          <AccountActionButton
+            title={ t('Comments') }
+            IconComponent={ MessageSquareText }
+            action={ openMyComments }
+          />
+          <AccountActionButton
+            title={ t('View Profile') }
+            IconComponent={ Star }
+            action={ handleViewProfile }
+          />
         </View>
         <View style={ [styles.profileActionsGroup] }>
-          { renderActionButton(t('Log out'), LogOut, handleLogout) }
+          <AccountActionButton
+            title={ t('Log out') }
+            IconComponent={ LogOut }
+            action={ handleLogout }
+          />
         </View>
       </View>
     );
   };
 
+  const renderLogoutConfirmOverlay = () => {
+    return (
+      <ConfirmOverlay
+        overlayRef={ logoutConfirmOverlayRef }
+        title={ t('Are you sure?') }
+        message={ t('Are you sure you want to log out?') }
+        confirmButtonText={ t('Log out') }
+        onConfirm={ confirmLogout }
+      />
+    );
+  };
+
   const renderContent = () => {
     if (!isSignedIn) {
+      if (isLocalLibrary) {
+        return (
+          <View style={ styles.guestContent }>
+            { renderNotificationButton() }
+            <AccountActionButton
+              title={ t('Downloads') }
+              IconComponent={ Download }
+              action={ openDownloads }
+            />
+          </View>
+        );
+      }
+
       return (
-        <LoginForm withRedirect>
+        <LoginForm>
           <ThemedButton
+            title={ t('Downloads') }
             IconComponent={ Download }
             onPress={ openDownloads }
             iconProps={ {
               size: scale(20),
               color: theme.colors.icon,
             } }
-          >
-            { t('Downloads') }
-          </ThemedButton>
+          />
         </LoginForm>
       );
     }
@@ -218,9 +288,8 @@ export function AccountScreenComponent({
   };
 
   return (
-    <Page
-      checkConnection={ false }
-    >
+    <Page checkConnection={ false }>
+      { renderLogoutConfirmOverlay() }
       <ThemedSafeArea edges={ ['left', 'right'] }>
         <ScrollView style={ { paddingTop: top } } contentContainerStyle={ styles.scrollView }>
           <Wrapper style={ styles.wrapper }>

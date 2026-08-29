@@ -1,92 +1,100 @@
 import { InfoBlock } from 'Component/InfoBlock';
 import { Loader } from 'Component/Loader';
+import { ThemedBottomSheet } from 'Component/ThemedBottomSheet';
+import { ThemedBottomSheetRef } from 'Component/ThemedBottomSheet/ThemedBottomSheet.type';
 import { ThemedButton } from 'Component/ThemedButton';
 import { ThemedInput } from 'Component/ThemedInput';
+import { ThemedText } from 'Component/ThemedText';
+import { Wrapper } from 'Component/Wrapper';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
-import { LOGIN_MODAL_SCREEN } from 'Navigation/navigationRoutes';
-import { useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import { View } from 'react-native';
-import { goBack, navigate } from 'Util/Navigation';
 
 import { componentStyles } from './LoginForm.style';
 import { LoginFormComponentProps } from './LoginForm.type';
 
 export function LoginFormComponent({
   isLoading,
-  withRedirect,
   style,
   children,
   handleLogin,
 }: LoginFormComponentProps) {
   const loginRef = useRef({ username: '', password: '' });
   const styles = useThemedStyles(componentStyles);
+  const sheetRef = useRef<ThemedBottomSheetRef>(null);
 
-  const onLogin = async () => {
+  const onLogin = useCallback(async () => {
     const success = await handleLogin(loginRef.current.username, loginRef.current.password);
 
     if (success) {
-      goBack();
+      sheetRef.current?.dismiss();
     }
-  };
+  }, [handleLogin]);
 
-  const openForm = () => {
-    navigate(LOGIN_MODAL_SCREEN);
-  };
+  const renderInfoBlock = () => (
+    <InfoBlock
+      title={ t('You are not logged in') }
+      subtitle={ t('Sign in to sync content') }
+    />
+  );
 
-  const renderForm = () => {
-    if (withRedirect) {
-      return (
-        <ThemedButton
-          style={ styles.modalButton }
-          contentStyle={ styles.modalButtonContent }
-          onPress={ openForm }
-        >
-          { t('Go to login page') }
-        </ThemedButton>
-      );
-    }
+  const renderButton = () => (
+    <ThemedButton
+      title={ t('Log In') }
+      onPress={ () => sheetRef?.current?.present() }
+    />
+  );
 
-    return (
-      <View style={ styles.form }>
-        <ThemedInput
-          style={ styles.input }
-          placeholder={ t('Login or email') }
-          onChangeText={ (text) => { loginRef.current.username = text; } }
-        />
-        <ThemedInput
-          style={ styles.input }
-          placeholder={ t('Password') }
-          onChangeText={ (text) => { loginRef.current.password = text; } }
-          secureTextEntry
-        />
-        <ThemedButton
-          style={ styles.button }
-          onPress={ onLogin }
-        >
-          { t('Sign in') }
-        </ThemedButton>
-        <Loader
-          isLoading={ isLoading }
-          fullScreen
-        />
+  const renderForm = () => (
+    <View style={ styles.form }>
+      <View style={ styles.heading }>
+        <ThemedText style={ styles.title }>
+          { t('Log In') }
+        </ThemedText>
+        <ThemedText style={ styles.subtitle }>
+          { t('Enter your credentials to continue') }
+        </ThemedText>
       </View>
-    );
-  };
-
-  const renderInfoBlock = () => {
-    return (
-      <InfoBlock
-        title={ t('You are not logged in') }
-        subtitle={ t('Sign in to sync content') }
+      <ThemedInput
+        style={ styles.input }
+        placeholder={ t('Login or email') }
+        onChangeText={ (text) => { loginRef.current.username = text; } }
       />
-    );
-  };
+      <ThemedInput
+        style={ styles.input }
+        placeholder={ t('Password') }
+        onChangeText={ (text) => { loginRef.current.password = text; } }
+        secureTextEntry
+      />
+      <ThemedButton
+        title={ t('Sign in') }
+        style={ styles.action }
+        onPress={ onLogin }
+      />
+      <Loader
+        isLoading={ isLoading }
+        fullScreen
+      />
+    </View>
+  );
+
+  const renderModal = () => (
+    <ThemedBottomSheet
+      ref={ sheetRef }
+      detents={ ['auto'] }
+    >
+      <Wrapper>
+        { renderForm() }
+      </Wrapper>
+    </ThemedBottomSheet>
+  );
 
   return (
-    <View style={ [styles.container, withRedirect && styles.redirectContainer, style] }>
+    <View style={ [styles.container, style] }>
+      { renderModal() }
       { renderInfoBlock() }
-      { renderForm() }
+      { renderButton() }
       { children }
     </View>
   );

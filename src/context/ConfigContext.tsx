@@ -21,13 +21,32 @@ const ConfigContext = createContext<ConfigContextInterface>({
   setConfig: () => {},
 });
 
+/**
+ * `isTV` on its own. The whole config lives in one MMKV blob, so the config
+ * context value changes identity on every settings write -- and the ~50
+ * components that only branch on the device type would all re-render, memo or
+ * not, since context reads bypass `memo`. This carries a primitive, so React
+ * skips consumers whenever the device type itself hasn't changed.
+ */
+const IsTVContext = createContext<boolean>(defaultConfig.isTV);
+
+/**
+ * The hidden countries on their own, for the same reason as `IsTVContext`: every
+ * film card in a grid reads them, and they must not be re-rendered whenever an
+ * unrelated setting is written. Lowercased once here so that matching a card
+ * against them stays a plain lookup -- see `isFilmCardHidden`.
+ */
+const HiddenCountriesContext = createContext<Set<string>>(new Set<string>());
+
 // External access to global config. Avoid using it!
 let globalConfig: any = null;
 export const getGlobalConfig = (): DeviceConfigType => {
   if (!globalConfig) {
     const storedConfig = storage.getConfigStorage().load<DeviceConfigType>(DEVICE_CONFIG);
 
+    // defaults first, so a key the stored blob predates is not read as undefined
     globalConfig = {
+      ...defaultConfig,
       ...(globalConfig || {}),
       ...(storedConfig || {}),
     };
@@ -76,9 +95,24 @@ export const ConfigProvider = ({ children }: { children: ReactNode }) => {
     setConfig,
   ]);
 
+  // The array is rebuilt on every settings write, so the set is keyed off the
+  // countries themselves -- otherwise its identity, and every card reading it,
+  // would change along with any other setting.
+  const hiddenCountriesKey = config.hiddenCountries.join('\n');
+  const hiddenCountries = useMemo(() => new Set(
+    hiddenCountriesKey
+      .split('\n')
+      .map((country) => country.trim().toLowerCase())
+      .filter(Boolean)
+  ), [hiddenCountriesKey]);
+
   return (
     <ConfigContext.Provider value={ value }>
-      { children }
+      <IsTVContext.Provider value={ config.isTV }>
+        <HiddenCountriesContext.Provider value={ hiddenCountries }>
+          { children }
+        </HiddenCountriesContext.Provider>
+      </IsTVContext.Provider>
     </ConfigContext.Provider>
   );
 };
@@ -89,3 +123,15 @@ export const useConfigContext = () => {
 
   return context;
 };
+
+/**
+ * Prefer this over `useConfigContext().isTV` when the device type is all a
+ * component needs -- see IsTVContext above.
+ */
+export const useIsTV = () => useContext(IsTVContext);
+
+/**
+ * The lowercased countries the user chose to hide. Prefer this over
+ * `useConfigContext().hiddenCountries` -- see HiddenCountriesContext above.
+ */
+export const useHiddenCountries = () => useContext(HiddenCountriesContext);

@@ -79,7 +79,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     alignItems: 'center',
   },
   skipButton: {
-    backgroundColor: colors.backgroundLight,
+    backgroundColor: colors.backgroundLighter,
   },
   updateButton: {
     backgroundColor: colors.secondary,

@@ -26,6 +26,9 @@ export interface FilmScreenComponentProps {
   ratingOverlayRef: RefObject<ThemedOverlayRef | null>;
   shouldDisplayContinueWatching: boolean;
   isContinueWatchingLoading: boolean;
+  showVotesCount: boolean;
+  showRecommendations: boolean;
+  showAgeRating: boolean;
   playFilm: () => void;
   handleVideoSelect: (video: FilmVideoInterface, voice: FilmVoiceInterface) => void;
   handleSelectFilm: (film: FilmInterface) => void;
@@ -34,11 +37,13 @@ export interface FilmScreenComponentProps {
   handleUpdateScheduleWatch: (scheduleItem: ScheduleItemInterface) => Promise<boolean>;
   handleShare: () => void;
   openBookmarks: () => void;
-  handleBookmarkChange: (film: FilmInterface) => void;
   openVideoDownloader: () => void;
   handleDownloadSelect: (links: DownloadLinkInterface[]) => void;
   openTrailerOverlay: () => void;
-  handleRatingSelect: (rating: number) => Promise<void>;
+  handleRatingSelect: (rating: number) => void;
   openRatingOverlay: () => void;
+  openComments: () => void;
+  openDescription: () => void;
+  openSchedule: () => void;
   continueWatching: () => void;
 }

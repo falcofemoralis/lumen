@@ -10,7 +10,6 @@ import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import { useCallback, useMemo } from 'react';
 import { View } from 'react-native';
-import { DefaultFocus } from 'react-tv-space-navigation';
 import { useAppTheme } from 'Theme/context';
 import { ContentCollectionInterface } from 'Type/ContentCollection.interface';
 
@@ -47,7 +46,6 @@ export function CollectionScreenComponent({
             <View
               style={ [
                 styles.item,
-                { width },
                 isFocused && styles.itemFocused,
               ] }
             >
@@ -63,7 +61,7 @@ export function CollectionScreenComponent({
         } }
       </ThemedPressable>
     );
-  }, [handleOnPress, styles]);
+  }, [handleOnPress, height, scale, styles]);
 
   const renderContent = () => {
     if (isLoading) {
@@ -88,23 +86,20 @@ export function CollectionScreenComponent({
     }
 
     return (
-      <DefaultFocus>
-        <ThemedGrid
-          style={ styles.grid }
-          rowStyle={ styles.rowStyle }
-          data={ items }
-          numberOfColumns={ NUMBER_OF_COLUMNS_TV }
-          itemSize={ height + ROW_GAP }
-          renderItem={ renderItem }
-          onNextLoad={ onNextLoad }
-          tvOptimized
-        />
-      </DefaultFocus>
+      <ThemedGrid
+        autofocus
+        style={ styles.grid }
+        rowStyle={ styles.rowStyle }
+        data={ items }
+        numberOfColumns={ NUMBER_OF_COLUMNS_TV }
+        renderItem={ renderItem }
+        onNextLoad={ onNextLoad }
+      />
     );
   };
 
   return (
-    <Page contentStyle={ styles.page }>
+    <Page>
       { renderContent() }
     </Page>
   );

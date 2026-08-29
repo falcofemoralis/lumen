@@ -1,14 +1,11 @@
 import { InfoBlock } from 'Component/InfoBlock';
 import { Loader } from 'Component/Loader';
 import { Page } from 'Component/Page';
-import { ThemedPressable } from 'Component/ThemedPressable';
 import { ThemedSafeArea } from 'Component/ThemedSafeArea';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
-import { ArrowLeft } from 'lucide-react-native';
 import { View } from 'react-native';
 import { useYouTubePlayer, YoutubeView } from 'react-native-youtube-bridge';
-import { useAppTheme } from 'Theme/context';
 
 import { componentStyles } from './FilmTrailerScreen.style';
 import { FilmTrailerScreenComponentProps } from './FilmTrailerScreen.type';
@@ -31,23 +28,7 @@ export const FilmTrailerComponent = ({
   isLoading,
   backHandler,
 }: FilmTrailerScreenComponentProps) => {
-  const { scale, theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
-
-  const renderCloseButton = () => {
-    return (
-      <ThemedPressable
-        style={ styles.topActionsButton }
-        contentStyle={ styles.topActionsButtonContent }
-        onPress={ backHandler }
-      >
-        <ArrowLeft
-          size={ scale(24) }
-          color={ theme.colors.icon }
-        />
-      </ThemedPressable>
-    );
-  };
 
   const renderContent = () => {
     if (isLoading) {

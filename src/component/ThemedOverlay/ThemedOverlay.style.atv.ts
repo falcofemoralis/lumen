@@ -1,37 +1,28 @@
 import { Theme, ThemedStyles } from 'Theme/types';
 
-export const ANIMATION_DURATION = 250;
-
 export const componentStyles = ({ scale, colors }: Theme) => ({
   modal: {
     position: 'absolute',
     top: 0,
-    width: '100%',
+    left: 0,
+    right: 0,
     bottom: 0,
+    paddingHorizontal: scale(8),
+    paddingRight: scale(64),
     justifyContent: 'center',
-    backgroundColor: colors.modal,
+    alignItems: 'flex-end',
     zIndex: 1000,
-    opacity: 0,
-    transitionProperty: 'opacity',
-    transitionDuration: `${ANIMATION_DURATION}ms`,
-    transitionTimingFunction: 'ease-in-out',
   },
-  modalVisible: {
-    opacity: 1,
+  backdrop: {
+    backgroundColor: colors.modal,
   },
-  container: {
-    flex: 0,
-    minHeight: scale(100),
-    minWidth: scale(100),
-    width: 'auto',
+  contentContainerStyle: {
     backgroundColor: colors.backgroundLight,
+    padding: scale(8),
     borderRadius: scale(16),
     borderColor: colors.darkBorder,
     borderWidth: 1,
-    padding: scale(12),
-    alignSelf: 'flex-end',
-    marginRight: scale(64),
-  },
-  contentContainer: {
+    maxHeight: '50%',
+    overflow: 'hidden',
   },
 } satisfies ThemedStyles);

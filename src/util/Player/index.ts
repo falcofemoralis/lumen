@@ -1,8 +1,15 @@
-import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
+import { CollectionReference, doc, getDoc, setDoc } from '@react-native-firebase/firestore';
 import { AUTO_QUALITY, MAX_QUALITY } from 'Component/Player/Player.config';
-import { FirestoreDocument, SavedTime, SavedTimestamp, SavedTimeVoice } from 'Component/Player/Player.type';
+import {
+  FirestoreDocument,
+  PlayerVideoTrack,
+  SavedTime,
+  SavedTimestamp,
+  SavedTimeVoice,
+} from 'Component/Player/Player.type';
 import * as Device from 'expo-device';
-import { VideoTrack } from 'expo-video';
+import { t } from 'i18n/translate';
+import { VideoConfig, VideoPlayer } from 'react-native-video';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
@@ -11,6 +18,8 @@ import { getFormattedDate } from 'Util/Date';
 import { getDeviceId } from 'Util/DeviceId';
 import { safeJsonParse } from 'Util/Json';
 import { storage } from 'Util/Storage';
+
+export { getScheduleEpisodeName } from './scheduleEpisode';
 
 export const PLAYER_SAVED_TIME_STORAGE_KEY = 'playerTime';
 export const PLAYER_QUALITY_STORAGE_KEY = 'playerQuality';
@@ -132,34 +141,33 @@ export const updateFirestoreSavedTime = async (
   film: FilmInterface,
   voice: FilmVoiceInterface,
   profile: ProfileInterface,
-  firestoreDb: FirebaseFirestoreTypes.CollectionReference<FirestoreDocument>,
+  firestoreDb: CollectionReference<FirestoreDocument>,
   time: number,
   progress: number
 ) => {
   const key = formatFirestoreKey(film, profile);
+  const docRef = doc(firestoreDb, key);
 
-  const doc = await firestoreDb.doc(key) .get();
-  const data = doc.data();
+  const snapshot = await getDoc(docRef);
+  const data = snapshot.data();
 
   const prevSavedTime = safeJsonParse<SavedTime | null>(data?.savedTime, null);
   const newSavedTime = prepareSavedTimeObject(film, voice, time, progress, prevSavedTime);
 
-  firestoreDb
-    .doc(key)
-    .set({
-      savedTime: JSON.stringify(newSavedTime),
-      updatedAt: getFormattedDate(),
-    });
+  setDoc(docRef, {
+    savedTime: JSON.stringify(newSavedTime),
+    updatedAt: getFormattedDate(),
+  });
 };
 
 export const getFirestoreSavedTime = async (
   film: FilmInterface,
   profile: ProfileInterface,
-  firestoreDb: FirebaseFirestoreTypes.CollectionReference<FirestoreDocument>
+  firestoreDb: CollectionReference<FirestoreDocument>
 ) => {
   const key = formatFirestoreKey(film, profile);
-  const doc = await firestoreDb.doc(key).get();
-  const data = doc.data();
+  const snapshot = await getDoc(doc(firestoreDb, key));
+  const data = snapshot.data();
 
   if (!data) {
     return null;
@@ -229,6 +237,10 @@ export const getQualityFromStreams = (video: FilmVideoInterface, quality: string
     return quality;
   }
 
+  if (!streams.length) {
+    return quality;
+  }
+
   // if quality is not found in the list of available qualities or this is MAX quality
   // return the max available quality (last item in the list)
   const stream = streams.find((s) => s.quality === quality);
@@ -237,6 +249,30 @@ export const getQualityFromStreams = (video: FilmVideoInterface, quality: string
   }
 
   return quality;
+};
+
+// streams are listed from the lowest quality to the highest, so stepping down is
+// simply the previous entry. `auto` and `max` are not streams of their own - the
+// step down from them is the best concrete stream, which also pins the player to
+// a single track instead of letting it negotiate one.
+export const getLowerQuality = (video: FilmVideoInterface, quality: string): string | null => {
+  const { streams } = video;
+
+  if (!streams.length) {
+    return null;
+  }
+
+  if (quality === AUTO_QUALITY.value || quality === MAX_QUALITY.value) {
+    return streams[streams.length - 1].quality;
+  }
+
+  const index = streams.findIndex((s) => s.quality === quality);
+
+  if (index <= 0) {
+    return null;
+  }
+
+  return streams[index - 1].quality;
 };
 
 export const getPlayerStream = (video: FilmVideoInterface, quality: string) => {
@@ -250,16 +286,15 @@ export const getPlayerStream = (video: FilmVideoInterface, quality: string) => {
   return stream;
 };
 
-export const formatVideoTrackInfo = (videoTrack: VideoTrack|null) => {
+export const formatVideoTrackInfo = (videoTrack: PlayerVideoTrack|null) => {
   if (!videoTrack) {
     return '-';
   }
 
   const {
-    // size: { height = 0, width = 0 } = {},
-    mimeType: quality,
-    // frameRate,
-    // bitrate,
+    quality,
+    // width,
+    // height,
   } = videoTrack;
 
   const info = [];
@@ -268,16 +303,8 @@ export const formatVideoTrackInfo = (videoTrack: VideoTrack|null) => {
     info.push(quality);
   }
 
-  // if (frameRate) {
-  //   info.push(`${frameRate}`);
-  // }
-
-  // if (mimeType) {
-  //   info.push(getCodecName(mimeType));
-  // }
-
-  // if (bitrate) {
-  //   info.push(`${bitrate / 1000}kbps`);
+  // if (width && height) {
+  //   info.push(`${width}x${height}`);
   // }
 
   return info.join('/');
@@ -286,7 +313,7 @@ export const formatVideoTrackInfo = (videoTrack: VideoTrack|null) => {
 export const getBufferTime = (quality: string) => {
   const { totalMemory } = Device;
 
-  // less then 2GB
+  // less then 2GB and this this is a high quality video
   if (
     totalMemory && totalMemory <= (2.5 * 1024 * 1024 * 1024)
     && (quality === '4K' || quality === '2K' || quality === '1080p Ultra')
@@ -308,7 +335,88 @@ export const getBufferTime = (quality: string) => {
     return 30;
   }
 
-  return 180;
+  return 120;
+};
+
+// `rate` is a plain setter with no method form, and the player is an imperative
+// native handle rather than a React value - keeping the write out of the
+// component body is what tells the compiler this mutation is intentional.
+export const applyPlayerRate = (player: VideoPlayer, rate: number) => {
+  player.rate = rate;
+};
+
+// expo-video took a single forward buffer duration in seconds. react-native-video
+// configures ExoPlayer's load control in milliseconds, so the same number drives
+// `maxBufferMs` on Android and `preferredForwardBufferDurationMs` on iOS. The
+// minimum is kept below the maximum, otherwise ExoPlayer rejects the config.
+export const getBufferConfig = (
+  quality: string,
+  bufferTimeSetting?: number,
+  backBufferTimeSetting?: number
+): NonNullable<VideoConfig['bufferConfig']> => {
+  const forwardSeconds = bufferTimeSetting ?? getBufferTime(quality);
+  const bufferMs = forwardSeconds * 1000;
+
+  // ExoPlayer discards everything behind the playhead by default, so rewinding
+  // even a few seconds re-downloads the segment. Keeping a back buffer makes
+  // those seeks instant, at the cost of holding the media in memory - never more
+  // than the forward buffer already costs, which is what the clamp is for.
+  const backBufferMs = Math.min(backBufferTimeSetting ?? 0, forwardSeconds) * 1000;
+
+  return {
+    minBufferMs: bufferMs / 2,
+    maxBufferMs: bufferMs,
+    preferredForwardBufferDurationMs: bufferMs,
+    backBufferDurationMs: backBufferMs,
+  };
+};
+
+// react-native-video hands external subtitles to the native player, which parses
+// and times them itself. Entries without a url are language slots the site lists
+// but does not actually ship a file for.
+export const getExternalSubtitles = (
+  video: FilmVideoInterface,
+  isOffline?: boolean
+): VideoConfig['externalSubtitles'] => {
+  const { subtitles = [] } = video;
+
+  return subtitles
+    .filter(({ url }) => Boolean(url))
+    .map(({ name, url, languageCode }) => ({
+      // downloaded subtitles are stored as bare paths, but a download can leave
+      // an entry pointing at the original remote url, so only add the scheme
+      // when there is none
+      uri: isOffline && !url.includes('://') ? `file://${url}` : url,
+      label: name,
+      language: languageCode || 'und',
+      // the urls carry query strings often enough that extension sniffing is
+      // unreliable, and every subtitle this app resolves is WebVTT
+      type: 'vtt' as const,
+    }));
+};
+
+// what the media notification and the lock screen show while this player owns
+// the media session
+export const getPlayerMetadata = (
+  film: FilmInterface,
+  voice: FilmVoiceInterface
+): VideoConfig['metadata'] => {
+  const { title, poster, hasSeasons } = film;
+  const { title: voiceTitle, lastSeasonId, lastEpisodeId } = voice;
+
+  const episode = hasSeasons && lastSeasonId && lastEpisodeId
+    ? t('Season {{season}} - Episode {{episode}}', {
+      season: lastSeasonId,
+      episode: lastEpisodeId,
+    })
+    : undefined;
+
+  return {
+    title,
+    subtitle: episode ?? voiceTitle ?? undefined,
+    artist: voiceTitle ?? undefined,
+    imageUri: poster,
+  };
 };
 
 export const getPlayerAvailableQualityItems = (video: FilmVideoInterface) => {

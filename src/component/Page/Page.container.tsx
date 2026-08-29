@@ -1,4 +1,4 @@
-import { useConfigContext } from 'Context/ConfigContext';
+import { useIsTV } from 'Context/ConfigContext';
 import { useNetworkContext } from 'Context/NetworkContext';
 
 import PageComponent from './Page.component';
@@ -7,13 +7,19 @@ import { PageContainerProps } from './Page.type';
 
 export function PageContainer(props: PageContainerProps) {
   const { checkConnection = true, ...restProps } = props;
-  const { isTV } = useConfigContext();
-  const { isInternetAvailable } = useNetworkContext();
-  const isConnected = checkConnection ? isInternetAvailable : true;
+  const isTV = useIsTV();
+  const { isOffline } = useNetworkContext();
 
-  return isTV
-    ? <PageComponentTV { ...restProps } isConnected={ isConnected } />
-    : <PageComponent { ...restProps } isConnected={ isConnected } />;
+  // only a known-offline state blocks the page: while the first network reading is still
+  // pending the screen keeps rendering, with its queries parked until the state is known
+  const isConnected = checkConnection ? !isOffline : true;
+
+  const containerProps = {
+    isConnected,
+    ...restProps,
+  };
+
+  return isTV ? <PageComponentTV { ...containerProps } /> : <PageComponent { ...containerProps } />;
 }
 
 export default PageContainer;

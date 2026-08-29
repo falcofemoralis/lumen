@@ -8,6 +8,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     paddingHorizontal: 0,
     paddingVertical: 0,
     justifyContent: 'center',
+    borderRadius: scale(99),
   },
   voiceRatingInputIcon: {
     padding: 0,
@@ -15,7 +16,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   },
   voiceRatingOverlay: {
     width: scale(400),
-    height: scale(350),
+    maxHeight: '70%',
   },
   voiceRatingOverlayContainer: {
     padding: scale(4),
@@ -27,7 +28,10 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   },
   voiceRatingNavigationView: {
     paddingBlock: scale(4),
-    paddingHorizontal: scale(12),
+    paddingHorizontal: scale(4),
+  },
+  voiceRatingButton: {
+    borderRadius: scale(16),
   },
   voiceRatingItemContainer: {
     flexDirection: 'row',

@@ -1,16 +1,24 @@
 import { t } from 'i18n/translate';
-import { Platform } from 'react-native';
 import { customFetch } from 'Util/Fetch';
 
 export type Variables = Record<string, string>;
 
-export const formatURI = (query: string, variables: Variables, url: string): string => {
-  if (query.includes('http')) {
-    return query;
-  }
+/**
+ * A 404 from the provider. Listings use it for "there is nothing here" (an empty
+ * filter, a page past the last one), so callers can tell it from a real failure.
+ */
+export class NotFoundError extends Error {}
 
+export const formatURI = (query: string, variables: Variables, url: string): string => {
   const stringifyVariables = Object.keys(variables).reduce(
-    (acc, variable) => [...acc, `${variable}=${JSON.stringify(variables[variable])}`],
+    (acc, variable) => {
+      const value = variables[variable];
+      const entries = Array.isArray(value)
+        ? value.map(v => `${variable}=${v}`)
+        : [`${variable}=${JSON.stringify(value)}`];
+
+      return [...acc, ...entries];
+    },
     ['']
   );
 
@@ -20,7 +28,15 @@ export const formatURI = (query: string, variables: Variables, url: string): str
 
   const queryVars = stringifyVariables.join('&').replaceAll('"', '');
 
-  return `${url}${query}${queryVars !== '' ? `?${queryVars}` : ''}`;
+  // the site's own hrefs (film genres, collections) are absolute -- they carry
+  // the host already, but still take the variables
+  const uri = query.includes('http') ? query : `${url}${query}`;
+
+  if (queryVars === '') {
+    return uri;
+  }
+
+  return `${uri}${uri.includes('?') ? '&' : '?'}${queryVars}`;
 };
 
 export const getFetch = (
@@ -30,33 +46,20 @@ export const getFetch = (
 ): Promise<Response> => customFetch(uri, {
   method: 'GET',
   signal,
-  headers: {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-    ...headers,
-  },
+  headers,
 });
 
 export const postFetch = (
   uri: string,
   headers: HeadersInit,
-  variables: FormData,
+  body: BodyInit,
   signal?: AbortSignal
-): Promise<Response> => {
-  if (Platform.OS === 'android') {
-    headers = {
-      'Content-Type': 'multipart/form-data',
-      ...headers,
-    };
-  }
-
-  return customFetch(uri, {
-    method: 'POST',
-    body: variables,
-    signal,
-    headers,
-  });
-};
+): Promise<Response> => customFetch(uri, {
+  method: 'POST',
+  body,
+  signal,
+  headers,
+});
 
 export const parseResponse = async (response: Response): Promise<string> => {
   const promiseResponse = await response;
@@ -75,7 +78,7 @@ export const handleRequestError = (response: Response): void => {
   }
 
   if (response.status === 404) {
-    throw new Error(t('Not found'));
+    throw new NotFoundError(t('Not found'));
   }
 };
 
@@ -83,13 +86,17 @@ export const executeGet = async (
   query: string,
   endpoint: string,
   headers: HeadersInit,
-  variables: Variables,
+  params: Variables,
   signal?: AbortSignal
 ): Promise<string> => {
-  const uri = formatURI(query, variables, endpoint);
+  const uri = formatURI(query, params, endpoint);
 
   try {
-    const response = await getFetch(uri, headers, signal);
+    const response = await getFetch(uri, {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      ...headers,
+    }, signal);
 
     handleRequestError(response);
 
@@ -97,27 +104,40 @@ export const executeGet = async (
 
     return parsedRes;
   } catch (error) {
+    // kept as is, callers check for it -- everything else keeps the stringified
+    // shape the connection error handler matches on
+    if (error instanceof NotFoundError) {
+      throw error;
+    }
+
     throw new Error(error as string);
   }
 };
 
-export const executePost = async (
+export const executePostFormData = async (
   query: string,
   endpoint: string,
   headers: HeadersInit,
-  variables: Variables,
+  formData: Variables,
   signal?: AbortSignal
 ): Promise<string> => {
   const uri = formatURI(query, {}, endpoint);
 
   try {
-    const formData = new FormData();
+    const formDataObject = new FormData();
 
-    Object.entries(variables).forEach(([key, value]) => {
-      formData.append(key, value);
+    Object.entries(formData).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        value.forEach(v => formDataObject.append(`${key}[]`, v));
+      } else {
+        formDataObject.append(key, value);
+      }
     });
 
-    const response = await postFetch(uri, headers, formData, signal);
+    const response = await postFetch(uri, {
+      'Content-Type': 'multipart/form-data',
+      ...headers,
+    }, formDataObject, signal);
 
     handleRequestError(response);
 
@@ -125,28 +145,90 @@ export const executePost = async (
 
     return parsedRes;
   } catch (error) {
+    // kept as is, callers check for it -- everything else keeps the stringified
+    // shape the connection error handler matches on
+    if (error instanceof NotFoundError) {
+      throw error;
+    }
+
     throw new Error(error as string);
   }
 };
 
-export const requestValidator = async (
-  host: string,
-  headers: HeadersInit
-) => {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 15000);
+export const executePostJson = async (
+  query: string,
+  endpoint: string,
+  headers: HeadersInit,
+  variables: Variables,
+  params?: Variables,
+  signal?: AbortSignal
+): Promise<string> => {
+  const uri = formatURI(query, params || {}, endpoint);
 
   try {
-    await executeGet(
-      '/',
-      host,
-      headers,
-      {},
-      controller.signal
-    );
+    const response = await postFetch(uri, {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      ...headers,
+    }, JSON.stringify(variables), signal);
+
+    handleRequestError(response);
+
+    const parsedRes = await parseResponse(response);
+
+    return parsedRes;
   } catch (error) {
-    throw new Error(t('Invalid URL'));
-  } finally {
-    clearTimeout(timeoutId);
+    // kept as is, callers check for it -- everything else keeps the stringified
+    // shape the connection error handler matches on
+    if (error instanceof NotFoundError) {
+      throw error;
+    }
+
+    throw new Error(error as string);
+  }
+};
+
+export const executePostEncoded = async (
+  query: string,
+  endpoint: string,
+  headers: HeadersInit,
+  variables: Variables,
+  params?: Variables,
+  signal?: AbortSignal
+): Promise<string> => {
+  const uri = formatURI(query, params || {}, endpoint);
+
+  try {
+    const response = await postFetch(uri, {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Accept': 'application/json',
+      ...headers,
+    }, (() => {
+      const searchParams = new URLSearchParams();
+
+      Object.entries(variables).forEach(([key, value]) => {
+        if (Array.isArray(value)) {
+          value.forEach(v => searchParams.append(key, v));
+        } else {
+          searchParams.append(key, value);
+        }
+      });
+
+      return searchParams.toString();
+    })(), signal);
+
+    handleRequestError(response);
+
+    const parsedRes = await parseResponse(response);
+
+    return parsedRes;
+  } catch (error) {
+    // kept as is, callers check for it -- everything else keeps the stringified
+    // shape the connection error handler matches on
+    if (error instanceof NotFoundError) {
+      throw error;
+    }
+
+    throw new Error(error as string);
   }
 };

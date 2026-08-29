@@ -2,6 +2,7 @@ import { Theme, ThemedStyles } from 'Theme/types';
 
 export const componentStyles = ({ scale }: Theme) => ({
   container: {
+    flex: 1,
   },
   empty: {
     height: '100%',

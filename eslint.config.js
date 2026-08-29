@@ -10,13 +10,13 @@ const tsParser = require('@typescript-eslint/parser');
 const reactCompiler = require('eslint-plugin-react-compiler');
 
 module.exports = defineConfig([
-  expoConfig,
   {
+    // global ignores - must stay in a block of its own, otherwise they only
+    // narrow the config object they are declared in
     ignores: [
       'dist/**',
-      'src/libs/**',
-      'dist/**',
-      'src/libs/**',
+      // vendored third-party bundles (jquery/firebase shipped with the chrome extension)
+      '**/libs/**',
       'node_modules',
       'ios',
       'android',
@@ -26,6 +26,9 @@ module.exports = defineConfig([
       'package.json',
       '.eslintignore',
     ],
+  },
+  expoConfig,
+  {
     plugins: {
       '@stylistic-plugin': stylistic,
       'eslint-comments': eslintComments,
@@ -87,6 +90,7 @@ module.exports = defineConfig([
       '@typescript-eslint/no-shadow': 'error',
       '@typescript-eslint/no-use-before-define': 'off',
       '@typescript-eslint/no-require-imports': 'off',
+      '@typescript-eslint/no-empty-object-type': 'off',
       // eslint-plugin-eslint-comments
       'eslint-comments/require-description': ['off', {
         ignore: [],
@@ -107,7 +111,7 @@ module.exports = defineConfig([
       'react-native/no-inline-styles': 0,
       'react-native/no-raw-text': 0,
       'react/prop-types': 'off',
-      'react/no-unstable-nested-components': 'warn',
+      'react/no-unstable-nested-components': 'off',
       'react/style-prop-object': 'off',
       'react/prefer-stateless-function': 'off',
       'react/no-unused-prop-types': 'off',
@@ -236,6 +240,21 @@ module.exports = defineConfig([
       'react/display-name': 'off',
       // eslint-plugin-react-compiler
       'react-compiler/react-compiler': 'error',
+    },
+  },
+  {
+    // the chrome extension is plain browser JS: its dependencies are loaded as globals
+    // by the manifest / injected page rather than imported
+    files: ['extensions/**/*.js'],
+    languageOptions: {
+      globals: {
+        $: 'readonly',
+        CDNPlayer: 'readonly',
+        chrome: 'readonly',
+        DB_COLLECTION: 'readonly',
+        firebase: 'readonly',
+        firebaseConfig: 'readonly',
+      },
     },
   },
 ]);

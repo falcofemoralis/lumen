@@ -1,48 +1,29 @@
-import { pagerItemsReset, pagerItemsUpdater } from 'Component/FilmPager/FilmPager.config';
-import { PagerItemInterface } from 'Component/FilmPager/FilmPager.type';
-import { useConfigContext } from 'Context/ConfigContext';
+import { useFilmPager } from 'Component/FilmPager/useFilmPager';
+import { useIsTV } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
-import { useState } from 'react';
-import { MenuItemInterface } from 'Type/MenuItem.interface';
+import { useMemo } from 'react';
+import { queryKeys } from 'Util/Query';
 
 import CategoryScreenComponent from './CategoryScreen.component';
 import CategoryScreenComponentTV from './CategoryScreen.component.atv';
-import { CATEGORY_MENU_ITEM } from './CategoryScreen.config';
 import { CategoryScreenContainerProps } from './CategoryScreen.type';
 
 export function CategoryScreenContainer({ route }: CategoryScreenContainerProps) {
   const { link } = route.params as { link: string };
-  const { isTV } = useConfigContext();
-  const [pagerItems, setPagerItems] = useState<PagerItemInterface[]>([{
-    menuItem: CATEGORY_MENU_ITEM,
-    films: null,
-    pagination: {
-      currentPage: 1,
-      totalPages: 1,
-    },
-  }]);
+  const isTV = useIsTV();
   const { currentService } = useServiceContext();
+  const menuItems = useMemo(() => currentService.getCategoryMenu(link), [currentService, link]);
 
-  const onLoadFilms = async (
-    menuItem: MenuItemInterface,
-    currentPage: number,
-    isRefresh: boolean
-  ) => {
-    if (isRefresh) {
-      setPagerItems(pagerItemsReset(menuItem.id));
-    }
-
-    return currentService.getFilms(currentPage, link);
-  };
-
-  const onUpdateFilms = (key: string, item: PagerItemInterface) => {
-    setPagerItems(pagerItemsUpdater(key, item));
-  };
+  const { pagerItems, onPreLoad, onNextLoad } = useFilmPager({
+    queryKey: queryKeys.films.category(link),
+    menuItems,
+    fetchFilms: (menuItem, page) => currentService.getFilms(page, menuItem.path, { ...menuItem.variables }),
+  });
 
   const containerProps = {
     pagerItems,
-    onLoadFilms,
-    onUpdateFilms,
+    onPreLoad,
+    onNextLoad,
   };
 
   return isTV ? <CategoryScreenComponentTV { ...containerProps } /> : <CategoryScreenComponent { ...containerProps } />;

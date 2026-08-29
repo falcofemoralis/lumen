@@ -1,21 +1,19 @@
+import { pause, resume } from '@noriginmedia/norigin-spatial-navigation-core';
 import { ThemedBottomSheetRef } from 'Component/ThemedBottomSheet/ThemedBottomSheet.type';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useAppUpdaterContext } from 'Context/AppUpdaterContext';
-import { useConfigContext } from 'Context/ConfigContext';
+import { useIsTV } from 'Context/ConfigContext';
 import { useEffect, useRef, useState } from 'react';
-import { Platform } from 'react-native';
-import { useLockSpatialNavigation } from 'react-tv-space-navigation';
 import { Installer } from 'Util/App/installer';
+import { getAndroidDownloadUrl } from 'Util/App/update';
 
 import AppUpdaterComponent from './AppUpdater.component';
 import AppUpdaterComponentTV from './AppUpdater.component.atv';
-import { AppUpdaterContainerProps } from './AppUpdater.type';;
 
-export const AppUpdaterContainer = ({ position }: AppUpdaterContainerProps) => {
+export const AppUpdaterContainer = () => {
   const { update, isUpdateRejected, resetUpdate } = useAppUpdaterContext();
-  const { isTV } = useConfigContext();
+  const isTV = useIsTV();
   const [isLoading, setIsLoading] = useState(false);
-  const { lock, unlock } = useLockSpatialNavigation();
   const [progress, setProgress] = useState(0);
   const overlayRef = useRef<ThemedOverlayRef>(null);
   const bottomSheetRef = useRef<ThemedBottomSheetRef>(null);
@@ -50,37 +48,23 @@ export const AppUpdaterContainer = ({ position }: AppUpdaterContainerProps) => {
     }
   }, [update]);
 
-  if (isTV) {
-    if (position === 'root') {
-      return null;
-    }
-  } else {
-    if (position === 'page') {
-      return null;
-    }
-  }
-
   if (!update || isUpdateRejected) {
     return null;
   }
 
   const acceptUpdate = async () => {
-    const {
-      downloadAndroidUrl,
-      downloadIosUrl,
-    } = update;
-
     if (isLoading) {
       return;
     }
 
     if (isTV) {
-      lock();
+      pause();
     }
 
     setIsLoading(true);
 
-    const url = Platform.OS === 'android' ? downloadAndroidUrl : downloadIosUrl;
+    // non-Android platforms are rejected by the installer itself
+    const url = getAndroidDownloadUrl(update);
 
     const result = await Installer.downloadAndInstallApk(url, (receivedNum, totalNum) => {
       setProgress(Math.round((receivedNum / totalNum) * 100));
@@ -90,7 +74,7 @@ export const AppUpdaterContainer = ({ position }: AppUpdaterContainerProps) => {
       setIsLoading(false);
 
       if (isTV) {
-        unlock();
+        resume();
       }
 
       return;

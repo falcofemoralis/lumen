@@ -1,56 +1,47 @@
-import { ComponentType, Dispatch, SetStateAction } from 'react';
+import { SettingItemOption } from 'Component/SettingSelect/SettingSelect.type';
+import { Language } from 'i18n/index';
+import { DeviceConfigType } from 'src/config';
+import { ThemeContextType } from 'Theme/context';
 
-export interface SettingsScreenComponentProps {
-  settings: SettingItem[];
-  onSettingUpdate: (setting: SettingItem, value: string) => Promise<boolean>;
-}
+type ConfigProps = Omit<DeviceConfigType, 'isTV'> & Pick<ThemeContextType, 'theme' | 'themeScheme'>
 
-export enum SETTING_TYPE {
-  INPUT = 'INPUT',
-  SELECT = 'SELECT',
-  TEXT = 'TEXT',
-  LINK = 'LINK',
-  GROUP = 'GROUP',
-  CUSTOM_SELECT = 'CUSTOM_SELECT',
-  SWITCH = 'SWITCH',
-}
+export type SettingsScreenComponentProps = {
+  appLanguage: Language
+  playerQuality: string
+  officialMode: boolean
+  provider: string
+  officialShareLink: string
+  automaticCDN: boolean
+  cdn: string
+  userAgent: string
+  providerOptions: string[]
+  cdnOptions: string[]
+  homeMenuOptions: SettingItemOption[]
+  downloadsPathOptions: SettingItemOption[]
+  downloadsMaxParallelOptions: SettingItemOption[]
+  appVersion: string
+  isTvChannelsSupported: boolean
+  isTvSearchSupported: boolean
+  isAutoFrameRateSupported: boolean
+  onConfigUpdate: (key: keyof DeviceConfigType, value: unknown) => void
+  onTvChannelsAddToHome: () => Promise<void>
+  onLanguageChange: (value: string) => Promise<void>
+  onThemeSchemeChange: (value: string) => void
+  onLocalLibraryChange: (value: boolean) => void
+  onOfficialModeChange: (value: boolean) => Promise<boolean>
+  onProviderChange: (value: string) => Promise<boolean>
+  onOfficialShareLinkChange: (value: string) => void
+  onAutomaticCDNChange: (value: boolean) => void
+  onCDNChange: (value: string) => Promise<boolean>
+  onUserAgentChange: (value: string) => void
+  onPlayerQualityChange: (value: string) => void
+} & ConfigProps;
 
-export type SettingType = keyof typeof SETTING_TYPE;
-
-export type SettingItemOption = {
-  label: string;
-  value: string;
-}
-
-export type SettingItemDependsOn = {
-  field: string;
-  value: string | null;
-}
-
-export type SettingItem = {
-  id: string;
-  type: SettingType;
-  title: string;
-  subtitle?: string;
-  value?: string | null;
-  options?: SettingItemOption[];
-  dependsOn?: SettingItemDependsOn;
-  isEnabled?: boolean;
-  isHidden?: boolean;
-  disableUpdate?: boolean;
-  onSettingPress?: (
-    value: string | null,
-    key: any,
-    setSettings: Dispatch<SetStateAction<SettingItem[]>>
-  ) => Promise<boolean | void> | boolean | void;
-  settings?: SettingItem[];
-  IconComponent?: ComponentType<any>;
-  iconProps?: Record<string, any>;
-  iconPropsFocused?: Record<string, any>;
-  confirmation?: {
-    title: string;
-    message?: string;
-  };
-  withLoader?: boolean;
-  imageLink?: string;
+export enum SETTING_GROUP {
+  APPEARANCE = 'APPEARANCE',
+  NETWORK = 'NETWORK',
+  DOWNLOADS = 'DOWNLOADS',
+  PLAYER = 'PLAYER',
+  BACKUP = 'BACKUP',
+  ABOUT = 'ABOUT',
 }

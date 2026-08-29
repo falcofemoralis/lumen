@@ -1,6 +1,11 @@
+import { useFocusable } from '@noriginmedia/norigin-spatial-navigation-react-native-tvos';
+import { useScrollContext } from 'Component/ThemedScrollView/ScrollContext';
+import { useDefaultFocus } from 'Hooks/useDefaultFocus';
+import { useLongEnterPress } from 'Hooks/useLongEnterPress';
 import { ReactElement } from 'react';
-import Animated from 'react-native-reanimated';
-import { SpatialNavigationFocusableView } from 'react-tv-space-navigation';
+import { View } from 'react-native';
+import { Pressable } from 'react-native-gesture-handler';
+import { useAppTheme } from 'Theme/context';
 
 import { ThemedFocusableNodeState, ThemedPressableComponentProps } from './ThemedPressable.type';
 
@@ -9,14 +14,54 @@ export const ThemedPressableComponent = ({
   onLongPress,
   onFocus,
   onBlur,
+  onEnterPress,
   children,
   style,
   contentStyle,
-  spatialRef,
-  disabled = false,
-  withAnimation = false,
-  zoomScale = 1.05,
+  disabled,
+  mode = 'light',
+  pressDelay = 50,
+  topAdditionalElement,
+  bottomAdditionalElement,
+  extraProps,
+  focusKey,
+  autofocus = false,
 }: ThemedPressableComponentProps) => {
+  const { scrollTo } = useScrollContext();
+  const { theme } = useAppTheme();
+  const {
+    ref,
+    focused,
+    focusKey: realFocusKey,
+    focusSelf,
+  } = useFocusable({
+    focusKey,
+    onFocus: (layout, props, details) => {
+      onFocus?.();
+      scrollTo?.(layout, props, details);
+    },
+    onBlur,
+    extraProps,
+    onEnterPress: onEnterPress ?? onPress,
+  });
+
+  useDefaultFocus(realFocusKey, autofocus);
+
+  // A pointer press (air-mouse, touch screen) never reaches norigin -- it only
+  // ever hears about the d-pad -- so the virtual focus would stay wherever the
+  // remote left it and this node's `onFocus` side effects would never run. Claim
+  // the focus here, so whatever was clicked is also where the remote carries on
+  // from. It is a no-op for the d-pad path: `onEnterPress` fires on a node that
+  // is focused already.
+  const handlePress = () => {
+    focusSelf();
+    onPress?.();
+  };
+
+  // `Pressable.onLongPress` only covers air-mouse/touch presses -- this adds the
+  // same behavior for holding the d-pad OK button while this node is focused.
+  useLongEnterPress(onLongPress, focused && !disabled);
+
   const renderChildren = (state: ThemedFocusableNodeState): ReactElement => {
     if (typeof children === 'function') {
       return children(state);
@@ -25,34 +70,48 @@ export const ThemedPressableComponent = ({
     return children as ReactElement;
   };
 
+  const renderTopAdditionalElement = (state: ThemedFocusableNodeState): ReactElement|null => {
+    if (!topAdditionalElement) {
+      return null;
+    }
+
+    return topAdditionalElement(state);
+  };
+
+  const renderBottomAdditionalElement = (state: ThemedFocusableNodeState): ReactElement|null => {
+    if (!bottomAdditionalElement) {
+      return null;
+    }
+
+    return bottomAdditionalElement(state);
+  };
+
+  const state = { isFocused: focused };
+
   return (
-    <SpatialNavigationFocusableView
-      ref={ spatialRef }
-      onSelect={ disabled ? undefined : onPress }
-      onLongSelect={ disabled ? undefined : onLongPress }
-      onFocus={ onFocus }
-      onBlur={ onBlur }
-      style={ style }
-    >
-      { ({ isFocused, isRootActive }) => withAnimation ? (
-        <Animated.View
-          style={ [
-            {
-              transform: [{ scale: 1 }],
-              transitionProperty: 'transform',
-              transitionDuration: '250ms',
-            },
-            contentStyle,
-            isFocused && isRootActive && {
-              transform: [{ scale: zoomScale }],
-            },
-            disabled && { opacity: 0.5 },
-          ] }
-        >
-          { renderChildren({ isFocused, isRootActive }) }
-        </Animated.View>
-      ) : renderChildren({ isFocused, isRootActive }) }
-    </SpatialNavigationFocusableView>
+    <View style={ [typeof style === 'function' ? style(state) : style, { overflow: 'hidden' }] }>
+      { renderTopAdditionalElement(state) }
+      <Pressable
+        ref={ ref }
+        onPress={ handlePress }
+        onLongPress={ onLongPress }
+        disabled={ disabled }
+        android_ripple={ {
+          color: mode === 'light' ? theme.colors.pressableHighlight : theme.colors.pressableHighlightOpposite,
+        } }
+        unstable_pressDelay={ pressDelay }
+        style={ [{
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }, typeof contentStyle === 'function' ? contentStyle(state) : contentStyle] }
+        tvFocusable={ false }
+        focusable={ false }
+      >
+        { renderChildren(state) }
+        { renderBottomAdditionalElement(state) }
+      </Pressable>
+    </View>
   );
 };
 

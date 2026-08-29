@@ -1,6 +1,6 @@
 import { ThemedText } from 'Component/ThemedText';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
-import { Info } from 'lucide-react-native';
+import Info from 'lucide-react-native/icons/info';
 import { View } from 'react-native';
 import { useAppTheme } from 'Theme/context';
 

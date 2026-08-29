@@ -1,36 +1,28 @@
 import { Theme, ThemedStyles } from 'Theme/types';
 
-const MAX_ITEMS_TO_DISPLAY = 6;
-const MAX_ITEMS_TO_DISPLAY_LANDSCAPE = 5;
+export const MAX_ITEMS_TO_DISPLAY = 6;
+export const MAX_ITEMS_TO_DISPLAY_LANDSCAPE = 5;
 
 export const ITEM_HEIGHT = 48;
+export const HEADER_HEIGHT = 32;
+export const HEADER_MARGIN_BOTTOM = 8;
+export const SEARCH_HEIGHT = 64;
+
+// Share of the screen the items viewport may take before it caps below
+// MAX_ITEMS_TO_DISPLAY. The rest is left to the header and to whatever chrome
+// wraps the list (the overlay's padding, border and screen margins).
+export const MAX_SCREEN_RATIO = 0.7;
 
 export const componentStyles = ({ scale, colors, text }: Theme) => ({
-  item: {
-    paddingHorizontal: scale(12),
-    height: scale(ITEM_HEIGHT),
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  itemLabel: {
-    flex: 1,
-    fontSize: scale(text.sm.fontSize),
-    color: colors.text,
-  },
-  icon: {
-    marginRight: scale(5),
-    height: scale(20),
-    width: scale(20),
-    backgroundColor: colors.transparent,
-  },
+  // Fixed height (single line, see `numberOfLines`) so the items viewport can be
+  // sized against it without measuring.
   header: {
+    height: scale(HEADER_HEIGHT),
+    marginBottom: scale(HEADER_MARGIN_BOTTOM),
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: scale(8),
-    marginBottom: scale(8),
+    paddingHorizontal: scale(8),
     borderBottomColor: colors.divider,
     borderBottomWidth: 1,
   },
@@ -40,24 +32,52 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     lineHeight: scale(16),
     fontWeight: '500',
   },
-  listContainer: {
+  // Fixed height for the same reason as the header: the items viewport is sized
+  // against it, so whatever the caller puts here must not change the layout.
+  search: {
+    height: scale(SEARCH_HEIGHT),
+    justifyContent: 'center',
+    paddingBottom: scale(8),
+  },
+  // `flexBasis: 'auto'` rather than `flex: 1`: the list is commonly the child of
+  // a container sized by its own content (an overlay panel). A zero basis makes
+  // that parent measure the list as nothing and collapse to its padding, leaving
+  // the rows to spill out over the screen. An auto basis measures the rows, and
+  // grow/shrink still fill or fit a parent that does have a height of its own.
+  container: {
     flexDirection: 'column',
-    flex: 1,
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: 'auto',
   },
-  listItems: {
+  // Height is set by the component: an exact number of rows, so the viewport
+  // never ends mid-item and never overflows what its container can show.
+  items: {
     flexDirection: 'column',
-    maxHeight: MAX_ITEMS_TO_DISPLAY * scale(ITEM_HEIGHT) - scale(8),
   },
-  listItemsLandscape: {
-    maxHeight: MAX_ITEMS_TO_DISPLAY_LANDSCAPE * scale(ITEM_HEIGHT) - scale(8),
-  },
-  listItem: {
+  item: {
+    height: scale(ITEM_HEIGHT),
     borderRadius: scale(16),
+    backgroundColor: colors.transparent,
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
-  listItemContent: {
+  itemContent: {
     flex: 1,
+    height: scale(ITEM_HEIGHT),
+    justifyContent: 'flex-start',
+    paddingHorizontal: scale(12),
+  },
+  itemText: {
+    fontSize: scale(15),
   },
   listItemSelected: {
     backgroundColor: colors.primary,
+  },
+  icon: {
+    marginRight: scale(5),
+    height: scale(20),
+    width: scale(20),
+    backgroundColor: colors.transparent,
   },
 } satisfies ThemedStyles);

@@ -4,7 +4,6 @@ import { ThemedText } from 'Component/ThemedText';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import { View } from 'react-native';
-import { DefaultFocus, SpatialNavigationView } from 'react-tv-space-navigation';
 
 import { componentStyles } from './ConfirmOverlay.style.atv';
 import { ConfirmOverlayProps } from './ConfirmOverlay.type';
@@ -31,20 +30,23 @@ export const ConfirmOverlayComponent = ({
         { message && (
           <ThemedText style={ styles.message }>{ message }</ThemedText>
         ) }
-        <SpatialNavigationView direction='horizontal'>
-          <View style={ styles.actions }>
-            { !disableCancelButton && (
-              <ThemedButton onPress={ onCancel } contentStyle={ styles.button }>
-                { cancelButtonText ?? t('Cancel') }
-              </ThemedButton>
-            ) }
-            <DefaultFocus>
-              <ThemedButton onPress={ onConfirm } contentStyle={ [styles.button, styles.buttonPrimary] }>
-                { confirmButtonText ?? t('Accept') }
-              </ThemedButton>
-            </DefaultFocus>
-          </View>
-        </SpatialNavigationView>
+        <View style={ styles.actions }>
+          <ThemedButton
+            title={ confirmButtonText ?? t('Accept') }
+            onPress={ onConfirm }
+            contentStyle={ styles.button }
+            style={ styles.buttonPrimary }
+            styleFocused={ styles.buttonPrimaryFocused }
+            textStyleFocused={ styles.buttonPrimaryTextFocused }
+          />
+          { !disableCancelButton && (
+            <ThemedButton
+              title={ cancelButtonText ?? t('Cancel') }
+              onPress={ onCancel }
+              contentStyle={ styles.button }
+            />
+          ) }
+        </View>
       </View>
     </ThemedOverlay>
   );

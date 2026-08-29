@@ -1,136 +1,89 @@
 /* eslint-disable import/first */
-/**
- * Welcome to the main entry point of the app. In this file, we'll
- * be kicking off our app.
- *
- * Most of this file is boilerplate and you shouldn't need to modify
- * it very often. But take some time to look through and understand
- * what is going on here.
- *
- * The app navigation resides in ./app/navigators, so head over there
- * if you're interested in adding screens and navigators.
- */
-
-import { LogBox } from 'react-native';
-
 if (__DEV__) {
-  // Load Reactotron in development only.
-  // Note that you must be using metro's `inlineRequires` for this to work.
-  // If you turn it off in metro.config.js, you'll have to manually import it.
   require('./devtools/ReactotronConfig.ts');
   require('./devtools/FetchInterceptor.ts');
-
-  const IGNORED_LOGS = [
-    'i18next is made possible by our own product',
-    '`new NativeEventEmitter()`',
-  ];
-
-  LogBox.ignoreLogs(IGNORED_LOGS);
-
-  const withoutIgnored = (logger: (...args: any[]) => void) => (...args: any[]) => {
-    const output = args.join(' ');
-
-    if (!IGNORED_LOGS.some(log => output.includes(log))) {
-      logger(...args);
-    }
-  };
-
-  console.log = withoutIgnored(console.log);
-  console.info = withoutIgnored(console.info);
-  console.warn = withoutIgnored(console.warn);
-  console.error = withoutIgnored(console.error);
 }
 
-import { LinkingOptions } from '@react-navigation/native';
-import { services } from 'Api/services';
-import { Awake } from 'Component/Awake';
+import { init } from '@noriginmedia/norigin-spatial-navigation-core';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { Root } from 'Component/Root';
 import { AppProvider } from 'Context/AppContext';
-import { DEFAULT_SERVICE } from 'Context/ServiceContext';
-import * as Linking from 'expo-linking';
 import * as SplashScreen from 'expo-splash-screen';
+import { useLanguageReload } from 'Hooks/useLanguageReload';
 import { AppNavigator } from 'Navigation/AppNavigator';
-import { AppStackParamList } from 'Navigation/navigationTypes';
-import { useEffect, useState } from 'react';
+import { NativeFocusTrap } from 'Navigation/NativeFocusTrap';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { initialWindowMetrics, SafeAreaProvider } from 'react-native-safe-area-context';
 import { ThemeProvider } from 'Theme/context';
-import { configureRemoteControl } from 'Util/RemoteControl';
+import { createQueryClient } from 'Util/Query';
+import RemoteControlLayoutAdapter from 'Util/RemoteControl/RemoteControlLayoutAdapter';
 
 import { initI18n } from './i18n';
-import { applyPatches } from './patch';
 
 export const NAVIGATION_PERSISTENCE_KEY = 'NAVIGATION_STATE';
 
+/**
+ * Shortest gap between two spatial-navigation moves. Roughly one move per four
+ * frames -- fast enough to feel responsive when holding a direction, slow enough
+ * that a low-end box can finish drawing one row before it is asked for the next.
+ */
+const KEY_THROTTLE_MS = 60;
+
 SplashScreen.setOptions({
-  duration: 750,
+  duration: 250,
   fade: true,
 });
 
 SplashScreen.preventAutoHideAsync();
 
+const queryClient = createQueryClient();
+
+// i18next only defers its load when it has to ask a backend -- with the resources
+// passed inline it is initialized by the time the call returns. Doing it here rather
+// than from an effect keeps the whole provider tree off a second render pass, and
+// removes the window in which `t()` (used while the navigators render) would still
+// be falling back to raw keys.
+initI18n();
+
+init({
+  layoutAdapter: RemoteControlLayoutAdapter,
+  // A d-pad repeats far faster than a slow TV box can answer: every press
+  // re-measures the focused node's siblings and drives a scroll, so an
+  // unthrottled hold builds a backlog that keeps moving focus long after the
+  // key is released. Norigin throttles leading-edge, so the first press is
+  // still instant and the extra ones are dropped rather than queued.
+  throttle: KEY_THROTTLE_MS,
+  // Apply it to held keys too -- that is the case that produces the backlog.
+  throttleKeypresses: true,
+});
+
 export function App() {
-  const [isI18nInitialized, setIsI18nInitialized] = useState(false);
-
-  useEffect(() => {
-    configureRemoteControl();
-    applyPatches();
-
-    initI18n().then(() => setIsI18nInitialized(true));
-  }, []);
-
-  if (!isI18nInitialized) {
-    return null;
-  }
-
-  const linking: LinkingOptions<AppStackParamList> = {
-    prefixes: [
-      Linking.createURL('/'),
-      services[DEFAULT_SERVICE].officialMirror,
-      ...services[DEFAULT_SERVICE].defaultProviders,
-    ],
-    config: {
-      screens: {
-        Tabs: {
-          screens: {
-            'Home-tab': {
-              screens: {
-                Film: {
-                  path: '*',
-                  parse: {
-                    link: (_: string, url: string) => url,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-    filter: (url: string) => url.includes('.html'),
-  };
+  const { language, navigationState } = useLanguageReload();
 
   return (
-    <SafeAreaProvider initialMetrics={ initialWindowMetrics }>
-      <KeyboardProvider>
-        <AppProvider>
-          <ThemeProvider>
-            <GestureHandlerRootView>
-              <Root>
-                <Awake>
+    <QueryClientProvider client={ queryClient }>
+      <SafeAreaProvider initialMetrics={ initialWindowMetrics }>
+        <KeyboardProvider>
+          <AppProvider>
+            <ThemeProvider>
+              <GestureHandlerRootView>
+                <Root>
+                  <NativeFocusTrap />
+                  { /* keyed on the language so a change remounts the screens - see useLanguageReload */ }
                   <AppNavigator
-                    linking={ linking }
+                    key={ language }
+                    initialState={ navigationState }
                     onReady={ () => {
                       SplashScreen.hideAsync();
                     } }
                   />
-                </Awake>
-              </Root>
-            </GestureHandlerRootView>
-          </ThemeProvider>
-        </AppProvider>
-      </KeyboardProvider>
-    </SafeAreaProvider>
+                </Root>
+              </GestureHandlerRootView>
+            </ThemeProvider>
+          </AppProvider>
+        </KeyboardProvider>
+      </SafeAreaProvider>
+    </QueryClientProvider>
   );
 }

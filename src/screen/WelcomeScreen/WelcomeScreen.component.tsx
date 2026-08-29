@@ -1,121 +1,126 @@
+import { Portal } from 'Component/ThemedPortal';
 import { ThemedSafeArea } from 'Component/ThemedSafeArea';
 import { Wrapper } from 'Component/Wrapper';
+import * as Application from 'expo-application';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
-import { useMemo, useState } from 'react';
+import { t } from 'i18n/translate';
+import CircleCheck from 'lucide-react-native/icons/circle-check';
+import Clapperboard from 'lucide-react-native/icons/clapperboard';
+import CloudCog from 'lucide-react-native/icons/cloud-cog';
+import FolderCog from 'lucide-react-native/icons/folder-cog';
+import MonitorCog from 'lucide-react-native/icons/monitor-cog';
+import UserCog from 'lucide-react-native/icons/user-cog';
+import { useCallback, useState } from 'react';
 import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated';
 
-import { BaseSlide, CDNSlide, ConfigureSlide, LoginSlide, ProviderSlide } from './SlideElements';
+import { BaseSlide } from './Slides/BaseSlide';
+import { CDNSlide } from './Slides/CDNSlide';
+import { CompleteSlide } from './Slides/CompleteSlide';
+import { ConfigureSlide } from './Slides/ConfigureSlide';
+import { LoginSlide } from './Slides/LoginSlide';
+import { ProviderSlide } from './Slides/ProviderSlide';
 import { componentStyles } from './WelcomeScreen.style';
-import { SlideInterface, WelcomeScreenComponentProps } from './WelcomeScreen.type';
+import { SLIDE_TYPE } from './WelcomeScreen.type';
 
-export const WelcomeScreenComponent = ({
-  slides,
-  selectedDeviceType,
-  configureDeviceType,
-  complete,
-}: WelcomeScreenComponentProps) => {
+export const WelcomeScreenComponent = () => {
   const styles = useThemedStyles(componentStyles);
-  const [currentPage, setCurrentPage] = useState(0);
+  const [currentSlide, setCurrentSlide] = useState<SLIDE_TYPE>(SLIDE_TYPE.WELCOME);
 
-  const goBack = (_slide: SlideInterface) => {
-    if (currentPage > 0) {
-      setCurrentPage(currentPage - 1);
+  const handleChangeSlide = useCallback((slide: SLIDE_TYPE) => {
+    setCurrentSlide(slide);
+  }, []);
+
+  const renderCurrentSlide = () => {
+    switch (currentSlide) {
+      case SLIDE_TYPE.WELCOME:
+        return (
+          <BaseSlide
+            title={ t('Welcome to {{name}}', { name: Application.applicationName ?? '' }) }
+            subtitle={ t('Your gateway to unlimited movies. Let’s set things up!') }
+            IconComponent={ Clapperboard }
+            goNext={ () => handleChangeSlide(SLIDE_TYPE.CONFIGURE) }
+            image={ require('../../../assets/images/app-icon-all.png') }
+            styles={ styles }
+          />
+        );
+      case SLIDE_TYPE.CONFIGURE:
+        return (
+          <ConfigureSlide
+            title={ t('Personalize Your Experience') }
+            subtitle={ t('Choose your device type for a tailored movie-watching journey.') }
+            IconComponent={ MonitorCog }
+            goBack={ () => handleChangeSlide(SLIDE_TYPE.WELCOME) }
+            goNext={ () => handleChangeSlide(SLIDE_TYPE.PROVIDER) }
+            styles={ styles }
+          />
+        );
+      case SLIDE_TYPE.PROVIDER:
+        return (
+          <ProviderSlide
+            title={ t('Select Your Content Provider') }
+            subtitle={ t('Connect with streaming services for the best selection.') }
+            IconComponent={ CloudCog }
+            goBack={ () => handleChangeSlide(SLIDE_TYPE.CONFIGURE) }
+            goNext={ () => handleChangeSlide(SLIDE_TYPE.LOGIN) }
+            styles={ styles }
+          />
+        );
+      case SLIDE_TYPE.LOGIN:
+        return (
+          <LoginSlide
+            title={ t('Sign In to an Account') }
+            subtitle={ t('Log in to sync your content and enjoy a seamless experience.') }
+            IconComponent={ UserCog }
+            goBack={ () => handleChangeSlide(SLIDE_TYPE.PROVIDER) }
+            goNext={ () => handleChangeSlide(SLIDE_TYPE.CDN) }
+            styles={ styles }
+          />
+        );
+      case SLIDE_TYPE.CDN:
+        return (
+          <CDNSlide
+            title={ t('Optimize Streaming Performance') }
+            subtitle={ t('Choose a content delivery network (CDN) for faster streaming.') }
+            IconComponent={ FolderCog }
+            goBack={ () => handleChangeSlide(SLIDE_TYPE.LOGIN) }
+            goNext={ () => handleChangeSlide(SLIDE_TYPE.COMPLETE) }
+            styles={ styles }
+          />
+        );
+      case SLIDE_TYPE.COMPLETE:
+        return (
+          <CompleteSlide
+            title={ t('Setup Complete!') }
+            subtitle={ t('You’re all set. Grab some popcorn and start watching!') }
+            IconComponent={ CircleCheck }
+            goBack={ () => handleChangeSlide(SLIDE_TYPE.CDN) }
+            styles={ styles }
+          />
+        );
+      default:
+        return null;
     }
   };
-
-  const goNext = (_slide: SlideInterface) => {
-    if (currentPage < slides.length - 1) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  const renderWelcomeSlide = (slide: SlideInterface) => (
-    <BaseSlide
-      slide={ slide }
-      goBack={ goBack }
-      goNext={ goNext }
-      canBack={ false }
-      image={ require('../../../assets/images/app-icon-all.png') }
-      styles={ styles }
-    />
-  );
-
-  const renderConfigureSlide = (slide: SlideInterface) => (
-    <ConfigureSlide
-      slide={ slide }
-      goBack={ goBack }
-      goNext={ goNext }
-      selectedDeviceType={ selectedDeviceType }
-      configureDeviceType={ configureDeviceType }
-      styles={ styles }
-    />
-  );
-
-  const renderProviderSlide = (slide: SlideInterface) => (
-    <ProviderSlide
-      slide={ slide }
-      goBack={ goBack }
-      goNext={ goNext }
-      styles={ styles }
-    />
-  );
-
-  const renderLoginSlide = (slide: SlideInterface) => (
-    <LoginSlide
-      slide={ slide }
-      goBack={ goBack }
-      goNext={ goNext }
-      styles={ styles }
-    />
-  );
-
-  const renderCDNSlide = (slide: SlideInterface) => (
-    <CDNSlide
-      slide={ slide }
-      goBack={ goBack }
-      goNext={ goNext }
-      styles={ styles }
-    />
-  );
-
-  const renderCompleteSlide = (slide: SlideInterface) => (
-    <BaseSlide
-      slide={ slide }
-      goBack={ goBack }
-      goNext={ goNext }
-      style={ styles.completeSlide }
-      canNext={ false }
-      canComplete
-      complete={ complete }
-      styles={ styles }
-    />
-  );
-
-  const RENDER_MAP = {
-    WELCOME: renderWelcomeSlide,
-    CONFIGURE: renderConfigureSlide,
-    PROVIDER: renderProviderSlide,
-    CDN: renderCDNSlide,
-    LOGIN: renderLoginSlide,
-    COMPLETE: renderCompleteSlide,
-  };
-
-  const activeSlide = useMemo(() => slides[currentPage], [currentPage, slides]);
 
   return (
-    <ThemedSafeArea edges={ ['top', 'bottom', 'left', 'right'] }>
-      <Animated.View
-        key={ activeSlide.id }
-        entering={ FadeIn }
-        exiting={ FadeOut }
-        layout={ LinearTransition }
-        style={ styles.page }
-      >
-        <Wrapper style={ styles.wrapper }>
-          { RENDER_MAP[activeSlide.id](activeSlide) }
-        </Wrapper>
-      </Animated.View>
-    </ThemedSafeArea>
+    // Outermost on purpose: a portaled overlay fills its host's box, so a host
+    // placed under the safe area or the Wrapper would leave their insets and
+    // horizontal margins outside the backdrop -- undimmed strips down the sides.
+    <Portal.Host>
+      <ThemedSafeArea edges={ ['top', 'bottom', 'left', 'right'] }>
+        <Animated.View
+          key={ currentSlide }
+          entering={ FadeIn }
+          exiting={ FadeOut }
+          layout={ LinearTransition }
+          style={ styles.page }
+        >
+          <Wrapper style={ styles.wrapper }>
+            { renderCurrentSlide() }
+          </Wrapper>
+        </Animated.View>
+      </ThemedSafeArea>
+    </Portal.Host>
   );
 };
 

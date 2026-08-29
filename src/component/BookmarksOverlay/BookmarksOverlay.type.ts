@@ -14,6 +14,8 @@ export interface BookmarksOverlayComponentProps {
   overlayRef: RefObject<ThemedOverlayRef | null>;
   items: ListItem[];
   isLoading: boolean;
-  postBookmark: (id: string, isChecked: boolean) => Promise<void>;
+  isLocalLibrary: boolean;
+  postBookmark: (id: string, isChecked: boolean) => void;
+  createCategory: (title: string) => boolean;
   onClose?: () => void;
 }

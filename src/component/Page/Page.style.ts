@@ -6,10 +6,11 @@ export const componentStyles = ({ scale }: Theme) => ({
     width: '100%',
   },
   noConnectionContainer: {
+    height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  btn: {
+  button: {
     marginTop: scale(16),
   },
 } satisfies ThemedStyles);

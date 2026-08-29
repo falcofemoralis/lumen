@@ -77,6 +77,56 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   },
   textFocused: {
   },
+  formWrapper: {
+    width: '100%',
+    flexDirection: 'column',
+    gap: scale(8),
+    paddingBottom: scale(8),
+  },
+  form: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: scale(8),
+  },
+  formToolbar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: scale(8),
+  },
+  formToolbarBtn: {
+    width: scale(48),
+  },
+  formInputContainer: {
+    flex: 1,
+  },
+  formInput: {
+    height: scale(40),
+  },
+  actionsOverlay: {
+    minWidth: '30%',
+    maxWidth: '50%',
+  },
+  actions: {
+    flexDirection: 'column',
+    gap: scale(8),
+  },
+  actionsTitle: {
+    fontSize: scale(text.sm.fontSize),
+    color: colors.textSecondary,
+    paddingBottom: scale(4),
+  },
+  actionButton: {
+    width: '100%',
+  },
+  replyOverlay: {
+    minWidth: '50%',
+    maxWidth: '70%',
+  },
+  replyForm: {
+    flexDirection: 'column',
+    gap: scale(8),
+  },
   loader: {
     alignSelf: 'center',
     height: '100%',

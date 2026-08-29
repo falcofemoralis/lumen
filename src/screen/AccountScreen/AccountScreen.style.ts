@@ -7,10 +7,16 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   scrollView: {
     height: '100%',
     justifyContent: 'center',
-    alignItems: 'center',
   },
   content: {
     paddingBottom: scale(8),
+  },
+  guestContent: {
+    width: '100%',
+    height: '100%',
+    flexDirection: 'column',
+    gap: scale(16),
+    justifyContent: 'center',
   },
   topBar: {
     flexDirection: 'row',
@@ -140,11 +146,13 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     fontSize: scale(text.sm.fontSize),
     fontWeight: '700',
     zIndex: 10,
+    color: colors.textOnContrast,
   },
   premiumBadgeText: {
     fontSize: scale(text.xs.fontSize),
     fontWeight: '500',
     zIndex: 10,
+    color: colors.textOnContrast,
   },
   premiumButton: {
     backgroundColor: '#5B359A',

@@ -1,6 +1,6 @@
 /* eslint-disable react/destructuring-assignment */
 import { useThemedStyles } from 'Hooks/useThemedStyles';
-import { ComponentType, useCallback, useEffect, useMemo, useRef } from 'react';
+import { ComponentType, useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Animated,
   GestureResponderEvent,
@@ -38,11 +38,12 @@ function SwitchInput(props: SwitchInputProps) {
   const { theme: { colors } } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
 
-  const animate = useRef(new Animated.Value(on ? 1 : 0)); // Initial value is set based on isActive
-  const opacity = useRef(new Animated.Value(0));
+  // lazy state, not a ref: the driver values are read during render (interpolate / opacity)
+  const [animate] = useState(() => new Animated.Value(on ? 1 : 0)); // Initial value is set based on isActive
+  const [opacity] = useState(() => new Animated.Value(0));
 
   useEffect(() => {
-    Animated.timing(animate.current, {
+    Animated.timing(animate, {
       toValue: on ? 1 : 0,
       duration: 300,
       useNativeDriver: true, // Enable native driver for smoother animations
@@ -50,7 +51,7 @@ function SwitchInput(props: SwitchInputProps) {
   }, [on]);
 
   useEffect(() => {
-    Animated.timing(opacity.current, {
+    Animated.timing(opacity, {
       toValue: on ? 1 : 0,
       duration: 300,
       useNativeDriver: true,
@@ -108,7 +109,7 @@ function SwitchInput(props: SwitchInputProps) {
 
   const outputRange = [offsetLeft, (+(knobWidth || 0) + offsetRight)];
 
-  const $animatedSwitchKnob = animate.current.interpolate({
+  const $animatedSwitchKnob = animate.interpolate({
     inputRange: [0, 1],
     outputRange,
   });
@@ -120,7 +121,7 @@ function SwitchInput(props: SwitchInputProps) {
           $themedSwitchInner,
           { backgroundColor: onBackgroundColor },
           $innerStyleOverride,
-          { opacity: opacity.current },
+          { opacity },
         ] }
       />
 

@@ -1,4 +1,4 @@
-import { FunctionComponent, ReactElement, useEffect, useState } from 'react';
+import { FunctionComponent, ReactElement, useState } from 'react';
 import {
   type ImageStyle,
   type StyleProp,
@@ -126,14 +126,13 @@ const TapRating: FunctionComponent<TapRatingProps> = ({
   starStyle,
 }) => {
   const [position, setPosition] = useState<number>(defaultRating);
+  const [syncedRating, setSyncedRating] = useState<number>(defaultRating);
 
-  useEffect(() => {
-    if (defaultRating === null || defaultRating === undefined) {
-      setPosition(3);
-    } else {
-      setPosition(defaultRating);
-    }
-  }, [defaultRating]);
+  // `position` tracks the locally tapped star, so re-sync during render when the prop moves
+  if (syncedRating !== defaultRating) {
+    setSyncedRating(defaultRating);
+    setPosition(defaultRating ?? 3);
+  }
 
   const renderStars = (rating_array: ReactElement[]) => {
     return rating_array.map((star) => star);

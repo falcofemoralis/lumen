@@ -1,52 +1,51 @@
 import {
   createContext,
   ReactNode,
-  useCallback,
   useContext,
   useMemo,
   useState,
 } from 'react';
+import { makeMutable, SharedValue } from 'react-native-reanimated';
+
+// NOTE: a shared value, not React state -- every `ThemedPressable` in the app reads
+// this context (through `useDefaultFocus`), so masking the scene as state re-rendered
+// the whole tree twice per tab preview and made the sidebar stutter. Only `SceneMask`
+// reads it, and it animates on the UI thread.
+//
+// It lives at module level rather than in `useSharedValue` on purpose: there is exactly
+// one sidebar in the app, and writing to a value that was passed to a hook is what
+// react-hooks/immutability is there to catch.
+const sceneHidden = makeMutable(false);
+
+const hideScene = (isHidden: boolean) => {
+  sceneHidden.value = isHidden;
+};
 
 interface NavigationContextInterface {
   isMenuOpen: boolean;
   toggleMenu:(isOpen: boolean) => void
-  isNavigationLocked: boolean;
-  lockNavigation: () => void;
-  unlockNavigation: () => void;
+  isSceneHidden: SharedValue<boolean>;
+  hideScene: (isHidden: boolean) => void;
 }
 
 const NavigationContext = createContext<NavigationContextInterface>({
   isMenuOpen: false,
   toggleMenu: () => {},
-  isNavigationLocked: false,
-  lockNavigation: () => {},
-  unlockNavigation: () => {},
+  isSceneHidden: sceneHidden,
+  hideScene,
 });
 
 export const NavigationProvider = ({ children }: { children: ReactNode }) => {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
-  const [isNavigationLocked, setIsNavigationLocked] = useState<boolean>(false);
-
-  const lockNavigation = useCallback(() => {
-    setIsNavigationLocked(true);
-  }, []);
-
-  const unlockNavigation = useCallback(() => {
-    setIsNavigationLocked(false);
-  }, []);
 
   const value = useMemo(() => ({
     isMenuOpen,
     toggleMenu: setIsMenuOpen,
-    isNavigationLocked,
-    lockNavigation,
-    unlockNavigation,
+    isSceneHidden: sceneHidden,
+    hideScene,
   }), [
     isMenuOpen,
     setIsMenuOpen,
-    isNavigationLocked,
-    lockNavigation,
-    unlockNavigation,
   ]);
 
   return (

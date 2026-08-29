@@ -13,7 +13,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     height: '100%',
     flexDirection: 'column',
     justifyContent: 'center',
-    gap: scale(24),
+    gap: scale(16),
   },
   containerLandscape: {
     alignSelf: 'center',
@@ -38,8 +38,6 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     borderRadius: scale(99),
     height: scale(54),
     width: scale(54),
-  },
-  icon: {
   },
   customImage: {
     height: scale(54),
@@ -79,21 +77,14 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     textAlign: 'center',
   },
   nextButton: {
-    flex: 1,
-  },
-  nextButtonPressable: {
     borderRadius: scale(16),
   },
   nextButtonContent: {
     flex: 1,
-    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     padding: scale(12),
     backgroundColor: colors.button,
-  },
-  nextButtonLandscape: {
-    maxWidth: '50%',
   },
   prevButtonContainer: {
     flexDirection: 'row',
@@ -111,13 +102,10 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   },
   configureWrapper: {
     alignSelf: 'center',
-    marginTop: scale(16),
-    gap: scale(12),
+    gap: scale(8),
     width: '80%',
   },
   configureButton: {
-  },
-  configureButtonPressable: {
     borderRadius: scale(16),
     height: scale(86),
   },
@@ -196,16 +184,21 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   providerOffModeRow: {
     width: '100%',
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    gap: scale(8),
+  },
+  providerOffModeToggle: {
+    flex: 1,
+  },
+  providerOffModeToggleInput: {
+    width: '100%',
+    justifyContent: 'flex-end',
   },
   cdnWrapper: {
     alignSelf: 'center',
     marginTop: scale(16),
     gap: scale(12),
     width: '80%',
-  },
-  cdnSlide: {
   },
   cdnSelector: {
     borderRadius: scale(16),
@@ -259,110 +252,15 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   },
   valid: {
   },
-  registrationContainer: {
-    alignSelf: 'center',
+  loginButtons: {
     flexDirection: 'row',
-    gap: scale(4),
-  },
-  signUpText: {
-    color: colors.secondary,
-    fontSize: scale(text.sm.fontSize),
-    fontWeight: '700',
-  },
-  signUpTextFocused: {
-    color: colors.textFocused,
-    backgroundColor: colors.buttonFocused,
-    borderRadius: scale(4),
-  },
-  registrationOverlay: {
-    flexDirection: 'column',
-    gap: scale(8),
-    padding: scale(8),
-  },
-  registrationOverlayTV: {
-    maxWidth: '50%',
-    maxHeight: '80%',
-  },
-  registrationRow: {
-    flexDirection: 'column',
-  },
-  registrationRowWrapper: {
-    flexDirection: 'row',
-    gap: scale(6),
-  },
-  registrationRowNumber: {
-    fontSize: scale(16),
-    borderRadius: scale(99),
-    backgroundColor: colors.backgroundLighter,
-    height: scale(24),
-    width: scale(24),
-    textAlign: 'center',
-    fontWeight: '700',
-  },
-  registrationRowTitle: {
-    width: '90%',
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
-    fontSize: scale(text.sm.fontSize),
-  },
-  registrationRowContent: {
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
-    marginStart: scale(30),
-    marginTop: scale(4),
-    gap: scale(4),
-  },
-  supportEmailButton: {
-    height: scale(24),
-  },
-  supportEmailButtonText: {
-    color: colors.secondary,
-  },
-  supportEmailButtonTextFocused: {
-    color: colors.textFocused,
-    backgroundColor: colors.buttonFocused,
-    borderRadius: scale(4),
-  },
-  registrationHintContainer: {
-    flexGrow: 1,
-    width: '90%',
-    flexDirection: 'row',
-    gap: scale(8),
-    alignItems: 'center',
-  },
-  registrationHint: {
-    fontSize: scale(text.xs.fontSize),
-    fontWeight: '700',
-  },
-  registrationConfirmButtonWrapper: {
-    width: '100%',
-  },
-  registrationConfirmButton: {
-    backgroundColor: colors.primary,
+    gap: scale(12),
   },
   loginButton: {
-    height: 'auto',
-    alignSelf: 'center',
-    justifyContent: 'center',
-    borderRadius: scale(16),
-    overflow: 'hidden',
+    flex: 1,
+    backgroundColor: colors.primary,
   },
   loginButtonContent: {
-    flex: 0,
-  },
-  loginButtonInner: {
-    flexDirection: 'row',
-    gap: scale(6),
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingBlock: scale(8),
-    paddingInline: scale(16),
-  },
-  loginButtonDisabled: {
-    opacity: 0.5,
-    pointerEvents: 'none',
-  },
-  loginButtonText: {
-    fontSize: scale(text.sm.fontSize),
+    flex: 1,
   },
 } satisfies ThemedStyles);

@@ -14,7 +14,13 @@ import { Wrapper } from 'Component/Wrapper';
 import * as Haptics from 'expo-haptics';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
-import { ArrowUpLeft, History, LayoutGrid, Mic, Search, Settings2, X } from 'lucide-react-native';
+import ArrowUpLeft from 'lucide-react-native/icons/arrow-up-left';
+import LayoutGrid from 'lucide-react-native/icons/layout-grid';
+import Mic from 'lucide-react-native/icons/mic';
+import History from 'lucide-react-native/icons/rotate-ccw-clock';
+import Search from 'lucide-react-native/icons/search';
+import Settings2 from 'lucide-react-native/icons/settings-2';
+import X from 'lucide-react-native/icons/x';
 import { ScrollView, View } from 'react-native';
 import { useAppTheme } from 'Theme/context';
 
@@ -38,8 +44,8 @@ export function SearchScreenComponent({
   onChangeText,
   onApplySearch,
   onApplySuggestion,
-  onLoadFilms,
-  onUpdateFilms,
+  onPreLoad,
+  onNextLoad,
   handleStartRecognition,
   handleApplySearch,
   resetSearch,
@@ -50,6 +56,7 @@ export function SearchScreenComponent({
   setSelectedCategory,
   setSelectedGenre,
   setSelectedYear,
+  isRemovableSuggestion,
   handleRemoveSuggestion,
   removeSuggestion,
 }: SearchScreenComponentProps) {
@@ -142,10 +149,14 @@ export function SearchScreenComponent({
           <ThemedPressable
             key={ suggestion }
             onPress={ () => onApplySuggestion(suggestion) }
-            onLongPress={ () => {
-              Haptics.performAndroidHapticsAsync(Haptics.AndroidHaptics.Gesture_Start);
-              handleRemoveSuggestion(suggestion);
-            } }
+            // Only history entries can be removed -- the service's suggestions
+            // must not bring up the confirmation at all.
+            onLongPress={ isRemovableSuggestion(suggestion)
+              ? () => {
+                Haptics.performAndroidHapticsAsync(Haptics.AndroidHaptics.Gesture_Start);
+                handleRemoveSuggestion(suggestion);
+              }
+              : undefined }
             style={ styles.suggestion }
             contentStyle={ styles.suggestionContent }
           >
@@ -187,10 +198,10 @@ export function SearchScreenComponent({
     return (
       <View style={ styles.grid }>
         <FilmPager
-          items={ pagerItems }
-          onLoadFilms={ onLoadFilms }
-          onUpdateFilms={ onUpdateFilms }
-          isAddSafeArea={ false }
+          pagerItems={ pagerItems }
+          onPreLoad={ onPreLoad }
+          onNextLoad={ onNextLoad }
+          disableStatusbarSafeArea
         />
       </View>
     );
@@ -258,11 +269,10 @@ export function SearchScreenComponent({
             closeOnChange
           />
           <ThemedButton
+            title={ t('Lets search!') }
             style={ styles.categoriesSelectBtn }
             onPress={ handleApplyAdditionalContent }
-          >
-            { t('Lets search!') }
-          </ThemedButton>
+          />
         </View>
       </ScrollView>
     );

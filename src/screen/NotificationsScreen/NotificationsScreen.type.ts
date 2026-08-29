@@ -1,8 +1,6 @@
-import { FilmSectionsData } from 'Component/FilmSections/FilmSections.type';
-import { FilmCardInterface } from 'Type/FilmCard.interface';
+import { FilmGridSection } from 'Component/FilmGrid/FilmGrid.type';
 
 export interface NotificationsScreenComponentProps {
   isLoading: boolean;
-  data: FilmSectionsData[];
-  handleSelectFilm: (film: FilmCardInterface) => void;
+  data: FilmGridSection[];
 }

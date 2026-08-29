@@ -20,7 +20,9 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     justifyContent: 'flex-end',
   },
   button: {
-    flex: 0,
+    flex: 1,
+  },
+  buttonContent: {
     paddingInline: scale(20),
   },
   buttonPrimary: {

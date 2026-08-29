@@ -7,4 +7,6 @@ export type HeaderComponentProps = {
   additionalAction?: () => void;
   AdditionalActionIcon?: ComponentType<any>;
   isDeepLink?: boolean;
+  /** Overrides the default navigation.goBack() behaviour. */
+  onBack?: () => void;
 };

@@ -1,11 +1,11 @@
-import { useConfigContext } from 'Context/ConfigContext';
+import { useIsTV } from 'Context/ConfigContext';
 
 import ThemedButtonComponent from './ThemedButton.component';
 import ThemedButtonComponentTV from './ThemedButton.component.atv';
 import { ThemedButtonProps } from './ThemedButton.type';
 
 export function ThemedButtonContainer(props: ThemedButtonProps) {
-  const { isTV } = useConfigContext();
+  const isTV = useIsTV();
 
   return isTV ? <ThemedButtonComponentTV { ...props } /> : <ThemedButtonComponent { ...props } />;
 }

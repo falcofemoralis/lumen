@@ -1,7 +1,6 @@
 import { CommonActions } from '@react-navigation/native';
-import { useConfigContext } from 'Context/ConfigContext';
+import { useIsTV } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
-import { ACCOUNT_TAB, BOOKMARKS_TAB, NOTIFICATIONS_TAB, RECENT_TAB } from 'Navigation/navigationRoutes';
 import { useCallback } from 'react';
 
 import NavigationBarComponent from './NavigationBar.component';
@@ -10,25 +9,10 @@ import { NavigationBarContainerProps } from './NavigationBar.type';
 
 export function NavigationBarContainer(props: NavigationBarContainerProps) {
   const { profile } = useServiceContext();
-  const { isSignedIn } = useServiceContext();
-  const { isTV } = useConfigContext();
+  const isTV = useIsTV();
   const { navigation, state } = props;
 
-  const getRedirectRoute = useCallback((name: string) => {
-    // if not signed in, we should redirect to account page
-    if (!isSignedIn && (name === BOOKMARKS_TAB
-      || name === RECENT_TAB
-      || name === NOTIFICATIONS_TAB
-    )) {
-      return ACCOUNT_TAB;
-    }
-
-    return name;
-  }, [isSignedIn]);
-
-  const onPress = useCallback((name: string) => {
-    const route = getRedirectRoute(name);
-
+  const onPress = useCallback((route: string) => {
     const routes = Array.from(state.routes);
     const rn = routes.find((r) => r.name === route);
 
@@ -48,11 +32,9 @@ export function NavigationBarContainer(props: NavigationBarContainerProps) {
         target: state.key,
       });
     }
-  }, [getRedirectRoute, navigation, state]);
+  }, [navigation, state]);
 
-  const onLongPress = useCallback((name: string) => {
-    const route = getRedirectRoute(name);
-
+  const onLongPress = useCallback((route: string) => {
     const routes = Array.from(state.routes);
     const rn = routes.find((r) => r.name === route);
 
@@ -64,7 +46,7 @@ export function NavigationBarContainer(props: NavigationBarContainerProps) {
       type: 'tabLongPress',
       target: rn.key,
     });
-  }, [getRedirectRoute, navigation, state]);
+  }, [navigation, state]);
 
   const onReload = useCallback(() => {
     const currentRoute = state.routes[state.index];

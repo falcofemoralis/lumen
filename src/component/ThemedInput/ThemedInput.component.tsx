@@ -1,6 +1,7 @@
 import { ThemedPressable } from 'Component/ThemedPressable';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
-import { Eye, EyeOff } from 'lucide-react-native';
+import Eye from 'lucide-react-native/icons/eye';
+import EyeOff from 'lucide-react-native/icons/eye-off';
 import { useState } from 'react';
 import { TextInput, View } from 'react-native';
 import { useAppTheme } from 'Theme/context';

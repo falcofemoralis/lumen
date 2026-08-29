@@ -1,12 +1,12 @@
 import { NAVIGATION_BAR_TV_WIDTH } from 'Component/NavigationBar/NavigationBar.style.atv';
-import { useConfigContext } from 'Context/ConfigContext';
+import { useIsTV } from 'Context/ConfigContext';
 import { useMemo } from 'react';
 import { useWindowDimensions } from 'react-native';
 import { useAppTheme } from 'Theme/context';
 
 export const useLayout = (additionalWidth?: number) => {
   const { width } = useWindowDimensions();
-  const { isTV } = useConfigContext();
+  const isTV = useIsTV();
   const { scale, theme } = useAppTheme();
 
   const layoutWidth = useMemo(() => {

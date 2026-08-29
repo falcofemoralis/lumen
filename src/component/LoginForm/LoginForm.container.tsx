@@ -1,7 +1,8 @@
-import { useConfigContext } from 'Context/ConfigContext';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useIsTV } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { t } from 'i18n/translate';
-import { useState } from 'react';
+import { useCallback } from 'react';
 import NotificationStore from 'Store/Notification.store';
 
 import LoginFormComponent from './LoginForm.component';
@@ -9,30 +10,34 @@ import LoginFormComponentTV from './LoginForm.component.atv';
 import { LoginFormContainerProps } from './LoginForm.type';
 
 export function LoginFormContainer({
-  withRedirect,
   children,
+  autofocus,
 }: LoginFormContainerProps) {
-  const [isLoading, setIsLoading] = useState(false);
   const { login, isSignedIn } = useServiceContext();
-  const { isTV } = useConfigContext();
+  const isTV = useIsTV();
+  const queryClient = useQueryClient();
 
-  const handleLogin = async (username: string, password: string) => {
-    setIsLoading(true);
-
-    try {
-      await login(username.trim(), password.trim());
-
+  const { mutateAsync: submitLogin, isPending: isLoading } = useMutation({
+    mutationFn: ({ username, password }: { username: string, password: string }) => (
+      login(username.trim(), password.trim())
+    ),
+    onSuccess: () => {
       NotificationStore.displayMessage(t('Successfully logged in!'));
-      setIsLoading(false);
+      // everything cached so far was fetched as a signed-out user
+      queryClient.invalidateQueries();
+    },
+  });
+
+  const handleLogin = useCallback(async (username: string, password: string) => {
+    try {
+      await submitLogin({ username, password });
 
       return true;
-    } catch (error) {
-      NotificationStore.displayError(error as Error);
-      setIsLoading(false);
-
+    } catch {
+      // the failure is already reported by the query client
       return false;
     }
-  };
+  }, [submitLogin]);
 
   if (isSignedIn) {
     return null;
@@ -40,8 +45,8 @@ export function LoginFormContainer({
 
   const containerProps = {
     isLoading,
-    withRedirect,
     children,
+    autofocus,
     handleLogin,
   };
 

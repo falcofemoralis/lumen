@@ -100,7 +100,8 @@ class Storage {
   private playerStorage: StorageWrapper|null = null;
   private miscStorage: StorageWrapper|null = null;
   private downloadsStorage: StorageWrapper|null = null;
-  private patchStorage: StorageWrapper|null = null;
+  private localLibraryStorage: StorageWrapper|null = null;
+  private commentsStorage: StorageWrapper|null = null;
 
   getConfigStorage() {
     if (!this.configStorage) {
@@ -142,12 +143,20 @@ class Storage {
     return this.downloadsStorage;
   }
 
-  getPatchStorage() {
-    if (!this.patchStorage) {
-      this.patchStorage = new StorageWrapper(createMMKV({ id: 'patches' }));
+  getLocalLibraryStorage() {
+    if (!this.localLibraryStorage) {
+      this.localLibraryStorage = new StorageWrapper(createMMKV({ id: 'localLibrary' }));
     }
 
-    return this.patchStorage;
+    return this.localLibraryStorage;
+  }
+
+  getCommentsStorage() {
+    if (!this.commentsStorage) {
+      this.commentsStorage = new StorageWrapper(createMMKV({ id: 'comments' }));
+    }
+
+    return this.commentsStorage;
   }
 }
 

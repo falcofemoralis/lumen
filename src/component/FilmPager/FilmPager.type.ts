@@ -1,51 +1,37 @@
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import { ComponentType, ReactElement } from 'react';
-import { StyleProp, ViewStyle } from 'react-native';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
-import { FilmListInterface } from 'Type/FilmList.interface';
 import { MenuItemInterface } from 'Type/MenuItem.interface';
 import { PaginationInterface } from 'Type/Pagination.interface';
 
-export interface FilmPagerContainerProps {
-  items: PagerItemInterface[];
-  loadOnInit?: boolean;
-  gridStyle?: StyleProp<ViewStyle>;
-  isGridVisible?: boolean;
-  isEmpty?: boolean;
-  isAddSafeArea?: boolean;
-  sorting?: DropdownItem[];
-  menuDefaultFocus?: boolean;
-  ListHeaderComponent?: ComponentType<any> | ReactElement | null | undefined;
-  ListEmptyComponent?: ComponentType<any> | ReactElement | null | undefined;
-  onLoadFilms: (
-    menuItem: MenuItemInterface,
-    currentPage: number,
-    isRefresh: boolean,
-    sort?: string
-  ) => Promise<FilmListInterface>;
-  onUpdateFilms: (
-    key: string,
-    item: PagerItemInterface
-  ) => void;
-  onRowFocus?: (row: number) => void;
-}
-
-export interface FilmPagerComponentProps {
-  items: PagerItemInterface[];
-  gridStyle?: StyleProp<ViewStyle>;
-  isGridVisible?: boolean;
-  isEmpty?: boolean;
-  isAddSafeArea?: boolean;
+export interface FilmPagerHandlers {
+  pagerItems: PagerItemInterface[];
   sorting?: DropdownItem[];
   selectedSorting?: Record<string, DropdownItem> | null;
-  menuDefaultFocus?: boolean;
+  initialPage?: number;
+  onPreLoad: (item: PagerItemInterface) => void;
+  onNextLoad: (isRefresh: boolean, item: PagerItemInterface) => Promise<void>;
+  handleSelectSorting?: (menuItem: MenuItemInterface, item: DropdownItem) => void;
+}
+
+export interface FilmPagerContainerProps extends FilmPagerHandlers {
+  disableEmptyComponent?: boolean;
+  isEmpty?: boolean;
+  hideGrid?: boolean;
   ListHeaderComponent?: ComponentType<any> | ReactElement | null | undefined;
   ListEmptyComponent?: ComponentType<any> | ReactElement | null | undefined;
-  onNextLoad: (isRefresh: boolean, item: PagerItemInterface) => Promise<void>;
-  onPreLoad: (item: PagerItemInterface) => void;
-  onRowFocus?: (row: number) => void;
-  handleSelectSorting: (menuItem: PagerItemInterface['menuItem'], item: DropdownItem) => void;
+  /** Center the empty component in the grid instead of leaving it at the top. */
+  centerEmptyComponent?: boolean;
+  // Mobile related
+  disableStatusbarSafeArea?: boolean;
+  // TV related
+  menuDefaultFocus?: boolean;
+  // Fires when grid focus enters/leaves the first row, so the screen can
+  // collapse its own headers alongside the pager menu.
+  onAtTopChange?: (atTop: boolean) => void;
 }
+
+export type FilmPagerComponentProps = FilmPagerContainerProps;
 
 export interface PagerItemInterface {
   menuItem: MenuItemInterface;

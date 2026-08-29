@@ -1,5 +1,4 @@
 import { DownloadTask } from '@kesha-antonov/react-native-background-downloader';
-import { ThemedStyles } from 'Theme/types';
 import { DownloadFilmInterface } from 'Type/DownloadFile.interface';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
@@ -9,20 +8,20 @@ export interface DownloadsScreenComponentProps {
   downloadedFilms: DownloadFilmInterface[];
   isLoading: boolean;
   handleVideoSelect: (film: FilmInterface, video: FilmVideoInterface, voice: FilmVoiceInterface) => void;
-  deleteFile: (task: DownloadTask) => void;
   restartTask: (task: DownloadTask) => DownloadTask|null;
   deleteTask: (task: DownloadTask) => void;
   deleteFilm: (item: DownloadFilmInterface) => void;
   openFolder: (destination: string) => void;
   handleRefresh: (isRefresh: boolean) => Promise<void>;
   completeTask: (task: DownloadTask) => void;
-  toggleTask: (taskId: string, paused: boolean) => void;
-  handleTaskError: (task: DownloadTask) => void;
+  toggleTask: (taskId: string, isActive: boolean) => Promise<void>;
 }
 
 export interface DownloadItemProps extends Omit<DownloadsScreenComponentProps, 'handleRefresh' | 'isLoading'> {
   index: number;
   item: DownloadFilmInterface;
+  // TV related
+  isLastRow?: boolean;
 }
 
 export interface DownloadItemTaskProps extends Omit<DownloadsScreenComponentProps, 'handleRefresh' | 'isLoading'> {

@@ -15,8 +15,6 @@ export interface RecentScreenComponentProps {
 
 export type RecentGridItem = RecentItemInterface & {
   idx?: number;
-  isDeleteButton?: boolean;
-  isHideButton?: boolean;
 };
 
 export interface RecentGridRowProps {

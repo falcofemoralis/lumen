@@ -1,12 +1,3 @@
-import { ComponentType } from 'react';
-
-export interface WelcomeScreenComponentProps {
-  slides: SlideInterface[];
-  selectedDeviceType: DeviceType | null;
-  configureDeviceType: (type: DeviceType) => void;
-  complete: () => void;
-}
-
 export enum SLIDE_TYPE {
   WELCOME = 'WELCOME',
   CONFIGURE = 'CONFIGURE',
@@ -14,15 +5,6 @@ export enum SLIDE_TYPE {
   CDN = 'CDN',
   LOGIN = 'LOGIN',
   COMPLETE = 'COMPLETE',
-}
-
-export type SlideType = keyof typeof SLIDE_TYPE;
-
-export interface SlideInterface {
-  id: SLIDE_TYPE;
-  title: string;
-  subtitle: string;
-  IconComponent: ComponentType<any>,
 }
 
 export enum DeviceType {

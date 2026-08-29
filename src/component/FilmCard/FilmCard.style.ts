@@ -1,5 +1,7 @@
 import { Theme, ThemedStyles } from 'Theme/types';
 
+import { POSTER_ASPECT_HEIGHT, POSTER_ASPECT_WIDTH } from './FilmCard.config';
+
 export const INFO_HEIGHT = 40;
 export const INFO_PADDING_TOP = 8;
 
@@ -15,10 +17,28 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     borderRadius: scale(12),
   },
   poster: {
-    aspectRatio: '166 / 250',
+    aspectRatio: `${POSTER_ASPECT_WIDTH} / ${POSTER_ASPECT_HEIGHT}`,
   },
   posterPendingRelease: {
     opacity: 0.5,
+  },
+  hiddenPoster: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: scale(8),
+    padding: scale(8),
+    backgroundColor: colors.backgroundLight,
+  },
+  hiddenText: {
+    fontSize: scale(text.xxs.fontSize),
+    color: colors.textSecondary,
+    textAlign: 'center',
+  },
+  // A hidden card has no title or subtitle to fill its info block, so the space
+  // those would take is held open -- a row of nothing but hidden cards would
+  // otherwise come out shorter than every other row.
+  hiddenInfo: {
+    height: scale(INFO_HEIGHT),
   },
   info: {
     width: '100%',

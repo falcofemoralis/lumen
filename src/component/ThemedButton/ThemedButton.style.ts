@@ -7,9 +7,9 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     backgroundColor: colors.button,
     borderRadius: scale(8),
     color: colors.text,
-    fontSize: scale(text.sm.fontSize),
   },
   content: {
+    width: '100%',
     padding: scale(12),
     flexDirection: 'row',
     justifyContent: 'center',

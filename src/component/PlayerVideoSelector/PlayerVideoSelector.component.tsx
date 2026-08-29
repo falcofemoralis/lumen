@@ -9,8 +9,10 @@ import { ThemedSimpleList } from 'Component/ThemedSimpleList';
 import { ThemedText } from 'Component/ThemedText';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
+import ArrowDownToLine from 'lucide-react-native/icons/arrow-down-to-line';
 import { View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
+import { useAppTheme } from 'Theme/context';
 import { SeasonInterface } from 'Type/FilmVoice.interface';
 import { getVideoProgress } from 'Util/Player';
 
@@ -46,6 +48,7 @@ export function PlayerVideoSelectorComponent({
   playerAskQuality,
   handleQualitySelect,
 }: PlayerVideoSelectorComponentProps) {
+  const { theme, scale } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
 
   const renderVoiceRating = () => {
@@ -163,7 +166,7 @@ export function PlayerVideoSelectorComponent({
             ] }
             contentStyle={ styles.seasonContent }
             onPress={ () => setSelectedSeasonId(season.seasonId) }
-            additionalElement={ renderSeasonTimeline(season) }
+            topAdditionalElement={ () => renderSeasonTimeline(season) }
           >
             <ThemedText
               style={ [
@@ -226,13 +229,13 @@ export function PlayerVideoSelectorComponent({
               style={ [
                 styles.episode,
                 selectedEpisodeId === episodeId && styles.episodeSelected,
+                isSelectedForDownload && styles.episodeDownloadSelected,
               ] }
               onPress={ () => handleSelectEpisode(episodeId) }
               contentStyle={ [
                 styles.episodeContent,
-                isSelectedForDownload ? styles.episodeDownloadSelected : undefined,
               ] }
-              additionalElement={ renderEpisodeTimeline(episodeId) }
+              topAdditionalElement={ () => renderEpisodeTimeline(episodeId) }
             >
               <ThemedText
                 style={ [
@@ -266,6 +269,7 @@ export function PlayerVideoSelectorComponent({
     <Loader
       isLoading={ isLoading }
       fullScreen
+      backdrop
     />
   );
 
@@ -302,12 +306,16 @@ export function PlayerVideoSelectorComponent({
 
     return (
       <ThemedButton
+        title={ t('Download') }
         onPress={ handleEpisodesDownload }
         disabled={ !Object.values(episodesToDownload).filter((selected) => selected).length }
         style={ styles.downloadBtn }
-      >
-        { t('Download') }
-      </ThemedButton>
+        IconComponent={ ArrowDownToLine }
+        iconProps={ {
+          color: theme.colors.icon,
+          size: scale(18),
+        } }
+      />
     );
   };
 

@@ -1,13 +1,12 @@
 import { Loader } from 'Component/Loader';
 import { ThemedBottomSheet } from 'Component/ThemedBottomSheet';
-import { Portal } from 'Component/ThemedPortal';
 import { ThemedPressable } from 'Component/ThemedPressable';
 import { ThemedText } from 'Component/ThemedText';
 import { Wrapper } from 'Component/Wrapper';
 import * as Application from 'expo-application';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
-import { X } from 'lucide-react-native';
+import X from 'lucide-react-native/icons/x';
 import { Image, Pressable, ScrollView, View } from 'react-native';
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useAppTheme } from 'Theme/context';
@@ -147,26 +146,21 @@ export const AppUpdaterComponent = ({
   };
 
   return (
-    <View>
-      <Portal.Host>
-        <ThemedBottomSheet
-          ref={ bottomSheetRef }
-          detents={ ['auto'] }
-          backgroundColor={ theme.colors.background }
-        >
-          <GestureHandlerRootView style={ { flexGrow: 1 } }>
-            { renderLoader() }
-            <View style={ isLoading && styles.loadingContainer }>
-              <Wrapper style={ styles.wrapper }>
-                { renderHeader() }
-                { renderContent() }
-                { renderActions() }
-              </Wrapper>
-            </View>
-          </GestureHandlerRootView>
-        </ThemedBottomSheet>
-      </Portal.Host>
-    </View>
+    <ThemedBottomSheet
+      ref={ bottomSheetRef }
+      detents={ ['auto'] }
+    >
+      <GestureHandlerRootView style={ { flexGrow: 1 } }>
+        { renderLoader() }
+        <View style={ isLoading && styles.loadingContainer }>
+          <Wrapper style={ styles.wrapper }>
+            { renderHeader() }
+            { renderContent() }
+            { renderActions() }
+          </Wrapper>
+        </View>
+      </GestureHandlerRootView>
+    </ThemedBottomSheet>
   );
 };
 

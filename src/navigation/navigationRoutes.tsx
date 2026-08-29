@@ -13,14 +13,11 @@ export const RECENT_SCREEN = 'Recent';
 export const SEARCH_SCREEN = 'Search';
 export const SETTINGS_SCREEN = 'Settings';
 export const WELCOME_SCREEN = 'Welcome';
+export const TABS_SCREEN = 'Tabs';
 export const DOWNLOADS_SCREEN = 'Downloads';
 export const COLLECTION_SCREEN = 'Collection';
 export const FILM_TRAILER_SCREEN = 'FilmTrailer';
-
-export const COMMENTS_MODAL_SCREEN = 'CommentsModal';
-export const LOGIN_MODAL_SCREEN = 'LoginModal';
-export const SCHEDULE_MODAL_SCREEN = 'ScheduleModal';
-export const SETTINGS_MODAL_SCREEN = 'SettingsModal';
+export const MY_COMMENTS_SCREEN = 'MyComments';
 
 export const ACCOUNT_TAB = `${ACCOUNT_SCREEN}-tab`;
 export const HOME_TAB = `${HOME_SCREEN}-tab`;
@@ -28,10 +25,11 @@ export const SEARCH_TAB = `${SEARCH_SCREEN}-tab`;
 export const BOOKMARKS_TAB = `${BOOKMARKS_SCREEN}-tab`;
 export const RECENT_TAB = `${RECENT_SCREEN}-tab`;
 export const NOTIFICATIONS_TAB = `${NOTIFICATIONS_SCREEN}-tab`;
+export const MY_COMMENTS_TAB = `${MY_COMMENTS_SCREEN}-tab`;
 
 /**
 * This is a list of all the screen names that will exit the app if the back button
 * is pressed while in that screen. Only affects Android.
 */
-export const exitRoutes = [HOME_SCREEN, SEARCH_SCREEN, BOOKMARKS_SCREEN, RECENT_SCREEN, ACCOUNT_SCREEN];
-export const exitRoutesTV = [ACCOUNT_SCREEN, NOTIFICATIONS_SCREEN, HOME_SCREEN, RECENT_SCREEN, BOOKMARKS_SCREEN, SEARCH_SCREEN, SETTINGS_SCREEN];
+export const exitRoutesMobile = [HOME_SCREEN, SEARCH_SCREEN, BOOKMARKS_SCREEN, RECENT_SCREEN, ACCOUNT_SCREEN, ERROR_SCREEN];
+export const exitRoutesTV = [ACCOUNT_SCREEN, NOTIFICATIONS_SCREEN, HOME_SCREEN, RECENT_SCREEN, BOOKMARKS_SCREEN, SEARCH_SCREEN, SETTINGS_SCREEN, ERROR_SCREEN];

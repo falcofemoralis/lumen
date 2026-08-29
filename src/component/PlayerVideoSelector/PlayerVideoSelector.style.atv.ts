@@ -1,8 +1,11 @@
 import { Theme, ThemedStyles } from 'Theme/types';
 
 export const componentStyles = ({ scale, colors, text }: Theme) => ({
-  container: {
+  containerSeasons: {
     maxHeight: scale(300),
+  },
+  containerVoices: {
+    maxHeight: '100%',
   },
   voicesInput: {
     marginBottom: scale(10),
@@ -15,15 +18,19 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   episodesContainerNoBorder: {
     borderTopWidth: 0,
   },
+  row: {
+    flexDirection: 'row',
+  },
   button: {
     marginEnd: scale(10),
     marginBottom: scale(10),
+    borderRadius: scale(99),
   },
   voicesWrapper: {
     width: '100%',
     minWidth: scale(288),
     maxHeight: scale(288),
-    flexDirection: 'column',
+    flexDirection: 'row',
     gap: scale(4),
   },
   voicesContainer: {

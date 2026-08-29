@@ -21,8 +21,12 @@ export const componentStyles = ({ scale, colors }: Theme) => ({
   overlay: {
     padding: scale(8),
   },
+  // ThemedSimpleList already sizes itself to a whole number of rows that fits the
+  // screen, so the overlay must not add a cap of its own (it defaults to 50% of
+  // the screen, which clipped the last row).
   overlayContent: {
     width: '100%',
     flexDirection: 'row',
+    maxHeight: '100%',
   },
 } satisfies ThemedStyles);

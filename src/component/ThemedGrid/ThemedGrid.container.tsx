@@ -1,4 +1,4 @@
-import { useConfigContext } from 'Context/ConfigContext';
+import { useIsTV } from 'Context/ConfigContext';
 import {
   useRef,
   useState,
@@ -12,17 +12,17 @@ import { ThemedGridContainerProps } from './ThemedGrid.type';
 export function ThemedGridContainer({
   data,
   numberOfColumns,
-  itemSize,
   style,
   rowStyle,
   ListEmptyComponent,
   ListHeaderComponent,
   scrollBehavior,
-  tvOptimized,
+  autofocus,
+  disableRefresh,
   renderItem,
   onNextLoad,
 }: ThemedGridContainerProps) {
-  const { isTV } = useConfigContext();
+  const isTV = useIsTV();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const updatingStateRef = useRef(false);
 
@@ -59,11 +59,11 @@ export function ThemedGridContainer({
     data,
     numberOfColumns,
     isRefreshing,
-    itemSize,
     style,
     rowStyle,
     scrollBehavior,
-    tvOptimized,
+    autofocus,
+    disableRefresh,
     ListHeaderComponent,
     ListEmptyComponent,
     renderItem,

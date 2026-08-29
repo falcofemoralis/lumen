@@ -5,8 +5,12 @@ import { ThemedText } from 'Component/ThemedText';
 import * as Application from 'expo-application';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
-import { Image, ScrollView, View } from 'react-native';
-import { DefaultFocus, SpatialNavigationView } from 'react-tv-space-navigation';
+import { Image, View } from 'react-native';
+// RN's own ScrollView never sees the touch stream here: the overlay's content is
+// wrapped in a plain RN Pressable, which takes the JS responder and swallows the
+// drag. The gesture-handler ScrollView competes in the native orchestrator
+// instead, so the air-mouse drag reaches it (same one ThemedScrollView uses).
+import { ScrollView } from 'react-native-gesture-handler';
 
 import { componentStyles } from './AppUpdater.style.atv';
 import { AppUpdaterComponentProps } from './AppUpdater.type';
@@ -45,7 +49,9 @@ export const AppUpdaterComponent = ({
           versionTo: versionName,
         }) }
       </ThemedText>
-      <ScrollView>
+      { /* Nothing inside is focusable, so the D-Pad cannot reach it -- the bar is
+           kept up permanently as the only hint that there is more to scroll. */ }
+      <ScrollView style={ styles.description } persistentScrollbar>
         <ThemedText style={ styles.newText }>
           { t('What\'s new') }
         </ThemedText>
@@ -57,35 +63,25 @@ export const AppUpdaterComponent = ({
   );
 
   const renderActions = () => (
-    <SpatialNavigationView
-      direction="horizontal"
-      style={ styles.actions }
-    >
-      <View style={ styles.buttonContainer }>
-        <ThemedButton
-          style={ [
-            styles.button,
-            styles.skipButton,
-          ] }
-          onPress={ rejectUpdate }
-        >
-          { t('Reject') }
-        </ThemedButton>
-      </View>
-      <DefaultFocus>
-        <View style={ styles.buttonContainer }>
-          <ThemedButton
-            style={ [
-              styles.button,
-              styles.updateButton,
-            ] }
-            onPress={ acceptUpdate }
-          >
-            { t('Update') }
-          </ThemedButton>
-        </View>
-      </DefaultFocus>
-    </SpatialNavigationView>
+    <View style={ styles.actions }>
+      <ThemedButton
+        title={ t('Update') }
+        autofocus
+        style={ [
+          styles.button,
+          styles.updateButton,
+        ] }
+        onPress={ acceptUpdate }
+      />
+      <ThemedButton
+        title={ t('Reject') }
+        style={ [
+          styles.button,
+          styles.skipButton,
+        ] }
+        onPress={ rejectUpdate }
+      />
+    </View>
   );
 
   const renderLoader = () => {
@@ -110,7 +106,11 @@ export const AppUpdaterComponent = ({
       onClose={ rejectUpdate }
     >
       { renderLoader() }
-      <View style={ isLoading && styles.loadingContainer }>
+      <View style={ [
+        styles.container,
+        isLoading && styles.loadingContainer,
+      ] }
+      >
         { renderHeader() }
         { renderContent() }
         { renderActions() }

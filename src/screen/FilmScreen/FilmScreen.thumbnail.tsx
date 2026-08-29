@@ -2,7 +2,7 @@ import { Header } from 'Component/Header';
 import { Thumbnail } from 'Component/Thumbnail';
 import { Wrapper } from 'Component/Wrapper';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Forward } from 'lucide-react-native';
+import Forward from 'lucide-react-native/icons/forward';
 import { View } from 'react-native';
 import { useAppTheme } from 'Theme/context';
 import { ThemedStyles } from 'Theme/types';
@@ -81,7 +81,7 @@ export const FilmScreenThumbnail = ({
                 <Thumbnail
                   // eslint-disable-next-line react/no-array-index-key
                   key={ `${i}-thumb-action` }
-                  style={ styles.middleActionButton }
+                  style={ [styles.middleActionButton, { backgroundColor: theme.colors.backgroundLight }] }
                 />
               </View>
             )) }
@@ -93,7 +93,7 @@ export const FilmScreenThumbnail = ({
           <Wrapper>
             <Thumbnail
               style={ styles.description }
-              height="60%"
+              height="70%"
               width="100%"
             />
           </Wrapper>

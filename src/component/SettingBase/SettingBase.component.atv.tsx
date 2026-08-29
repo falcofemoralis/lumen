@@ -4,37 +4,30 @@ import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { ThemedPressable } from 'Component/ThemedPressable';
 import { ThemedText } from 'Component/ThemedText';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { View } from 'react-native';
-import { SETTING_TYPE } from 'Screen/SettingsScreen/SettingsScreen.type';
 import { useAppTheme } from 'Theme/context';
 
 import { componentStyles } from './SettingBase.style.atv';
 import { SettingBaseComponentProps } from './SettingBase.type';
 
 const SettingBaseComponent = ({
-  setting,
-  children,
+  title,
+  subtitle,
+  isHidden = false,
+  isEnabled = true,
   isLoading: isLoadingProp = false,
+  IconComponent,
+  iconProps,
+  iconPropsFocused,
+  confirmation,
+  withLoader = false,
+  children,
   onPress,
   onFocus,
 }: SettingBaseComponentProps) => {
   const { scale, theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
-  const {
-    title,
-    subtitle,
-    isHidden,
-    isEnabled,
-    IconComponent,
-    iconProps,
-    iconPropsFocused,
-    confirmation,
-    withLoader,
-    value,
-    type,
-    options,
-  } = setting;
 
   const confirmOverlayRef = useRef<ThemedOverlayRef>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -69,20 +62,6 @@ const SettingBaseComponent = ({
     }
   }, [confirmation, isEnabled, isLoading, onPress, withLoader]);
 
-  const secondText = useMemo(() => {
-    if (type === SETTING_TYPE.INPUT || type === SETTING_TYPE.CUSTOM_SELECT) {
-      return value;
-    }
-
-    if (type === SETTING_TYPE.SELECT && options) {
-      const selectedOption = options.find(option => option.value === value);
-
-      return selectedOption ? selectedOption.label : subtitle;
-    }
-
-    return subtitle ? subtitle : null;
-  }, [options, subtitle, type, value]);
-
   if (isHidden) {
     return null;
   }
@@ -92,12 +71,12 @@ const SettingBaseComponent = ({
       <ThemedPressable
         onPress={ (!isEnabled || isLoading || isLoadingProp) ? undefined : () => handleOnPress() }
         onFocus={ onFocus }
-        withAnimation
+        style={ styles.settingPressable }
       >
-        { ({ isFocused, isRootActive }) => (
+        { ({ isFocused }) => (
           <View style={ [
             styles.setting,
-            isFocused && isRootActive && styles.settingFocused,
+            isFocused && styles.settingFocused,
             (!isEnabled || isLoading || isLoadingProp) && styles.settingHidden,
           ] }
           >
@@ -106,26 +85,26 @@ const SettingBaseComponent = ({
                 <IconComponent
                   style={ styles.settingIcon }
                   size={ scale(24) }
-                  color={ isFocused && isRootActive ? theme.colors.textFocused : theme.colors.text }
+                  color={ isFocused ? theme.colors.textFocused : theme.colors.text }
                   { ...iconProps }
-                  { ...(isFocused && isRootActive ? iconPropsFocused : undefined) }
+                  { ...(isFocused ? iconPropsFocused : undefined) }
                 />
               ) }
               <View style={ styles.settingContent }>
                 <ThemedText style={ [
                   styles.settingTitle,
-                  isFocused && isRootActive && styles.settingTitleFocused,
+                  isFocused && styles.settingTitleFocused,
                 ] }
                 >
                   { title }
                 </ThemedText>
-                { secondText && (
+                { subtitle && (
                   <ThemedText style={ [
                     styles.settingSubtitle,
-                    isFocused && isRootActive && styles.settingSubtitleFocused,
+                    isFocused && styles.settingSubtitleFocused,
                   ] }
                   >
-                    { secondText }
+                    { subtitle }
                   </ThemedText>
                 ) }
               </View>
@@ -134,8 +113,8 @@ const SettingBaseComponent = ({
                   { children }
                 </View>
               ) }
-              { withLoader && (
-                <Loader isLoading={ isLoading || isLoadingProp } fullScreen />
+              { withLoader && (isLoading || isLoadingProp) && (
+                <Loader isLoading fullScreen />
               ) }
             </View>
           </View>
@@ -152,21 +131,5 @@ const SettingBaseComponent = ({
     </>
   );
 };
-
-export function propsAreEqual(prevProps: SettingBaseComponentProps, props: SettingBaseComponentProps) {
-  const {
-    setting: {
-      id,
-      value,
-      isEnabled,
-      isHidden,
-    },
-  } = props;
-
-  return prevProps.setting.id === id
-      && prevProps.setting.value === value
-      && prevProps.setting.isEnabled === isEnabled
-      && prevProps.setting.isHidden === isHidden;
-}
 
 export default SettingBaseComponent;

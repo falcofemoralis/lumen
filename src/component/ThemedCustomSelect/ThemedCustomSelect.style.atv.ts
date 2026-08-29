@@ -3,11 +3,13 @@ import { Theme, ThemedStyles } from 'Theme/types';
 export const componentStyles = ({ scale, colors }: Theme) => ({
   input: {
     backgroundColor: colors.backgroundLighter,
+    justifyContent: 'flex-start',
   },
   inputContent: {
     justifyContent: 'flex-start',
     gap: scale(8),
     padding: scale(8),
+    flex: 1,
   },
   overlayContent: {
     width: '35%',

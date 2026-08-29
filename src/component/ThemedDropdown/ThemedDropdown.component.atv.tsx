@@ -3,7 +3,7 @@ import { ThemedOverlay } from 'Component/ThemedOverlay';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { ThemedSimpleList } from 'Component/ThemedSimpleList';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
-import { Plus } from 'lucide-react-native';
+import Plus from 'lucide-react-native/icons/plus';
 import { memo, useRef } from 'react';
 import { View } from 'react-native';
 
@@ -51,26 +51,26 @@ export const ThemedDropdownComponent = ({
   };
 
   const renderInput = () => {
-    if (asOverlay) {
-      return null;
-    }
-
     const { label, startIcon, endIcon } = data.find((item) => item.value === value) ?? {};
 
     return (
       <ThemedButton
+        title={ inputLabel ?? label ?? '' }
         style={ [styles.input, inputStyle] }
+        contentStyle={ styles.inputContent }
         leftImageStyle={ styles.inputImage }
         rightImageStyle={ styles.inputImage }
         IconComponent={ Plus }
         onPress={ () => (overlayRef || componentOverlayRef).current?.open() }
         leftImage={ startIcon }
         rightImage={ endIcon }
-      >
-        { inputLabel ?? label }
-      </ThemedButton>
+      />
     );
   };
+
+  if (asOverlay) {
+    return renderModal();
+  }
 
   return (
     <View style={ style }>

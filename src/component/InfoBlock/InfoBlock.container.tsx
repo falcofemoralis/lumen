@@ -1,4 +1,4 @@
-import { useConfigContext } from 'Context/ConfigContext';
+import { useIsTV } from 'Context/ConfigContext';
 
 import InfoBlockComponent from './InfoBlock.component';
 import InfoBlockComponentTV from './InfoBlock.component.atv';
@@ -11,7 +11,7 @@ export function InfoBlockContainer({
   style,
   Icon,
 }: InfoBlockContainerProps) {
-  const { isTV } = useConfigContext();
+  const isTV = useIsTV();
 
   const containerProps = {
     title,

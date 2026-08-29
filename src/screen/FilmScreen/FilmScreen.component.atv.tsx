@@ -1,41 +1,42 @@
 import { BookmarksOverlay } from 'Component/BookmarksOverlay';
 import { CommentsOverlay } from 'Component/CommentsOverlay';
+import { FilmViewActor } from 'Component/FilmViewActor';
+import { FilmViewFranchiseItem } from 'Component/FilmViewFranchiseItem';
+import { FilmViewInfoListOverlay } from 'Component/FilmViewInfoListOverlay';
+import { FilmViewRelatedItem } from 'Component/FilmViewRelatedItem';
+import { FilmViewScheduleItem } from 'Component/FilmViewScheduleItem';
+import { FilmViewScheduleOverlay } from 'Component/FilmViewScheduleOverlay';
+import { FilmViewSection } from 'Component/FilmViewSection';
 import { Page } from 'Component/Page';
 import { PlayerVideoSelector } from 'Component/PlayerVideoSelector';
 import { Rating } from 'Component/Rating';
-import { ThemedAccordion } from 'Component/ThemedAccordion';
 import { ThemedButton } from 'Component/ThemedButton';
 import { ThemedDropdown } from 'Component/ThemedDropdown';
+import { ThemedGroup } from 'Component/ThemedGroup';
 import { ThemedImage } from 'Component/ThemedImage';
 import { ThemedOverlay } from 'Component/ThemedOverlay';
+import { ThemedScrollView } from 'Component/ThemedScrollView';
 import { ThemedText } from 'Component/ThemedText';
+import { Wrapper } from 'Component/Wrapper';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useLayout } from 'Hooks/useLayout';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
-import {
-  ArrowRight,
-  Bookmark,
-  BookmarkCheck,
-  Clapperboard,
-  Clock,
-  Download,
-  MessageSquareText,
-  Play,
-  ShieldOff,
-  Star,
-} from 'lucide-react-native';
+import ArrowRight from 'lucide-react-native/icons/arrow-right';
+import Bookmark from 'lucide-react-native/icons/bookmark';
+import BookmarkCheck from 'lucide-react-native/icons/bookmark-check';
+import Clapperboard from 'lucide-react-native/icons/clapperboard';
+import Clock from 'lucide-react-native/icons/clock';
+import Download from 'lucide-react-native/icons/download';
+import MessageSquareText from 'lucide-react-native/icons/message-square-text';
+import Play from 'lucide-react-native/icons/play';
+import ShieldOff from 'lucide-react-native/icons/shield-off';
+import Star from 'lucide-react-native/icons/star';
 import { ComponentType, useState } from 'react';
-import { Dimensions, useWindowDimensions, View } from 'react-native';
-import {
-  DefaultFocus,
-  SpatialNavigationScrollView,
-  SpatialNavigationView,
-} from 'react-tv-space-navigation';
+import { useWindowDimensions, View } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
 import { useAppTheme } from 'Theme/context';
 import { CollectionItemInterface } from 'Type/CollectionItem';
-import { FilmInterface } from 'Type/Film.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { isBookmarked } from 'Util/Film';
 import { noopFn } from 'Util/Function';
@@ -43,15 +44,6 @@ import { noopFn } from 'Util/Function';
 import { componentStyles } from './FilmScreen.style.atv';
 import { FilmScreenThumbnail } from './FilmScreen.thumbnail.atv';
 import { FilmScreenComponentProps } from './FilmScreen.type';
-import {
-  ActorView,
-  FranchiseItemComponent,
-  InfoList,
-  RelatedItem,
-  ScheduleItem,
-  ScheduleOverlay,
-  Section,
-} from './FilmScreenElements.atv';
 
 export function FilmScreenComponent({
   film,
@@ -64,6 +56,9 @@ export function FilmScreenComponent({
   playerVideoDownloaderOverlayRef,
   ratingOverlayRef,
   shouldDisplayContinueWatching,
+  showVotesCount,
+  showRecommendations,
+  showAgeRating,
   playFilm,
   handleVideoSelect,
   handleSelectFilm,
@@ -71,11 +66,13 @@ export function FilmScreenComponent({
   handleSelectCategory,
   openBookmarks,
   handleUpdateScheduleWatch,
-  handleBookmarkChange,
   openVideoDownloader,
   handleDownloadSelect,
   openTrailerOverlay,
   openRatingOverlay,
+  openComments,
+  openDescription,
+  openSchedule,
   handleRatingSelect,
   continueWatching,
 }: FilmScreenComponentProps) {
@@ -88,7 +85,11 @@ export function FilmScreenComponent({
   const [actionsWidth, setActionsWidth] = useState(0);
 
   if (!film) {
-    film = null as unknown as FilmInterface; // dirty hack to avoid null checks
+    return (
+      <Page>
+        <FilmScreenThumbnail styles={ styles } />
+      </Page>
+    );
   }
 
   const shouldShowReadMore = (content: number) => {
@@ -104,17 +105,14 @@ export function FilmScreenComponent({
     isDisabled?: boolean
   ) => (
     <ThemedButton
-      variant="outlined"
+      title={ text ?? '' }
       onPress={ isDisabled ? noopFn : onPress }
       IconComponent={ IconComponent }
       iconProps={ { size: scale(18) } }
-      style={ [styles.actionButton, isDisabled && styles.actionButtonDisabled] }
       textStyle={ styles.actionButtonText }
-      disableRootActive
       disabled={ isDisabled }
-    >
-      { text }
-    </ThemedButton>
+      style={ styles.actionButton }
+    />
   );
 
   const renderPlayButton = () => {
@@ -144,33 +142,21 @@ export function FilmScreenComponent({
   };
 
   const renderActions = () => (
-    <View
-      style={ [
-        styles.actionsWrapper,
-        actionsWidth < width && styles.actionsWrapperCentered,
-      ] }
-    >
-      <SpatialNavigationScrollView
-        horizontal
-        offsetFromStart={ width / 2 }
-      >
-        <DefaultFocus>
-          <SpatialNavigationView
-            direction="horizontal"
-            style={ styles.actions }
-            alignInGrid={ false }
-            onLayout={ (e) => setActionsWidth(e.nativeEvent.layout.width) }
-          >
-            { shouldDisplayContinueWatching && renderAction(ArrowRight, t('Continue Watching'), continueWatching) }
-            { renderPlayButton() }
-            { renderAction(MessageSquareText, t('Comments'), () => commentsOverlayRef?.current?.open()) }
-            { renderAction(Clapperboard, t('Trailer'), openTrailerOverlay) }
-            { renderAction(isBookmarked(film) ? BookmarkCheck : Bookmark, t('Bookmark'), openBookmarks) }
-            { renderAction(Download, t('Download'), openVideoDownloader) }
-            { isSignedIn && renderAction(Star, t('Rate'), openRatingOverlay, film.isRatingPosted) }
-          </SpatialNavigationView>
-        </DefaultFocus>
-      </SpatialNavigationScrollView>
+    <View style={ [styles.actionsWrapper, actionsWidth <= width && styles.actionsWrapperCentered] }>
+      <ThemedScrollView horizontal>
+        <View
+          style={ styles.actions }
+          onLayout={ (e) => setActionsWidth(e.nativeEvent.layout.width) }
+        >
+          { shouldDisplayContinueWatching && renderAction(ArrowRight, t('Continue Watching'), continueWatching) }
+          { renderPlayButton() }
+          { renderAction(MessageSquareText, t('Comments'), openComments) }
+          { renderAction(Clapperboard, t('Trailer'), openTrailerOverlay) }
+          { renderAction(isBookmarked(film) ? BookmarkCheck : Bookmark, t('Bookmark'), openBookmarks) }
+          { renderAction(Download, t('Download'), openVideoDownloader) }
+          { isSignedIn && renderAction(Star, t('Rate'), openRatingOverlay, film.isRatingPosted) }
+        </View>
+      </ThemedScrollView>
     </View>
   );
 
@@ -190,25 +176,21 @@ export function FilmScreenComponent({
 
     return (
       <View style={ styles.collectionContainer }>
-        <SpatialNavigationScrollView
+        <ThemedScrollView
           horizontal
+          style={ styles.collection }
         >
-          <SpatialNavigationView
-            style={ styles.collection }
-            direction="horizontal"
-          >
-            { genres.map(({ name, link }) => (
-              <ThemedButton
-                key={ name }
-                style={ styles.collectionButton }
-                textStyle={ styles.collectionButtonText }
-                onPress={ () => handleSelectCategory(link) }
-              >
-                { name }
-              </ThemedButton>
-            )) }
-          </SpatialNavigationView>
-        </SpatialNavigationScrollView>
+          { genres.map(({ name, link }) => (
+            <ThemedButton
+              key={ name }
+              title={ name }
+              style={ styles.collectionButton }
+              contentStyle={ styles.collectionButtonContent }
+              textStyle={ styles.collectionButtonText }
+              onPress={ () => handleSelectCategory(link) }
+            />
+          )) }
+        </ThemedScrollView>
       </View>
     );
   };
@@ -220,7 +202,9 @@ export function FilmScreenComponent({
 
     return (
       <View
-        key={ text }
+        // the title, where there is one: two ratings shown without their vote counts
+        // are regularly the same number
+        key={ title ? `${title}-${text}` : text }
         style={ styles.textContainer }
       >
         { title && (
@@ -230,6 +214,28 @@ export function FilmScreenComponent({
         ) }
         <ThemedText style={ styles.text }>
           { text }
+        </ThemedText>
+      </View>
+    );
+  };
+
+  const renderAge = () => {
+    const { age } = film;
+
+    if (!showAgeRating || !age) {
+      return null;
+    }
+
+    return (
+      <View style={ styles.textContainer }>
+        <ThemedText style={ styles.textTitle }>
+          { `${t('Age')}: ` }
+        </ThemedText>
+        <ThemedText
+          style={ [styles.text, styles.ageText] }
+          numberOfLines={ 2 }
+        >
+          { age }
         </ThemedText>
       </View>
     );
@@ -250,7 +256,10 @@ export function FilmScreenComponent({
 
     return (
       <View style={ styles.ratingsRow }>
-        { allRatings.map(({ name, rating, votes }) => renderInfoText(`${rating} (${votes})`, name)) }
+        { allRatings.map(({ name, rating, votes }) => renderInfoText(
+          showVotesCount ? `${rating} (${votes})` : `${rating}`,
+          name
+        )) }
       </View>
     );
   };
@@ -264,26 +273,21 @@ export function FilmScreenComponent({
       <ThemedText style={ styles.collectionTitle }>
         { title }
       </ThemedText>
-      <SpatialNavigationScrollView
+      <ThemedScrollView
         horizontal
-        offsetFromStart={ scale(20) }
+        style={ styles.collection }
       >
-        <SpatialNavigationView
-          style={ styles.collection }
-          direction="horizontal"
-        >
-          { collection.map(({ name, link }) => (
-            <ThemedButton
-              key={ name }
-              style={ styles.collectionButton }
-              textStyle={ styles.collectionButtonText }
-              onPress={ () => handler && handler(link) }
-            >
-              { name }
-            </ThemedButton>
-          )) }
-        </SpatialNavigationView>
-      </SpatialNavigationScrollView>
+        { collection.map(({ name, link }) => (
+          <ThemedButton
+            key={ name }
+            title={ name }
+            style={ styles.collectionButton }
+            contentStyle={ styles.collectionButtonContent }
+            textStyle={ styles.collectionButtonText }
+            onPress={ () => handler && handler(link) }
+          />
+        )) }
+      </ThemedScrollView>
     </View>
   );
 
@@ -330,9 +334,10 @@ export function FilmScreenComponent({
               !showReadMore && styles.readMoreButtonHidden,
             ] }
           >
-            <ThemedButton onPress={ () => descriptionOverlayRef?.current?.open() }>
-              { t('Read more') }
-            </ThemedButton>
+            <ThemedButton
+              title={ t('Read more') }
+              onPress={ openDescription }
+            />
           </View>
         ) }
       </View>
@@ -349,7 +354,7 @@ export function FilmScreenComponent({
     } = film;
 
     return (
-      <View style={ [styles.card, styles.mainInfo ] }>
+      <ThemedGroup style={ [styles.card, styles.mainInfo ] }>
         <ThemedText style={ styles.title }>{ title }</ThemedText>
         { originalTitle && (
           <ThemedText style={ styles.originalTitle }>
@@ -365,8 +370,9 @@ export function FilmScreenComponent({
         { renderRatings() }
         { renderDirectors() }
         { renderCollection(countries, t('Country'), handleSelectCategory) }
+        { renderAge() }
         { renderDescription() }
-      </View>
+      </ThemedGroup>
     );
   };
 
@@ -409,38 +415,31 @@ export function FilmScreenComponent({
     }
 
     return (
-      <Section title={ t('Actors') } styles={ styles }>
+      <FilmViewSection title={ t('Actors') }>
         <View style={ styles.actorsListWrapper }>
-          <SpatialNavigationScrollView
+          <ThemedScrollView
             horizontal
-            offsetFromStart={ Dimensions.get('window').width / 2 }
+            style={ styles.actorsCollection }
           >
-            <SpatialNavigationView
-              style={ styles.actorsCollection }
-              direction="horizontal"
-            >
-              { persons.map((actor, index) => (
-                <ActorView
-                  // eslint-disable-next-line react/no-array-index-key
-                  key={ `actor-${actor.name}-${index}` }
-                  actor={ actor }
-                  handleSelectActor={ handleSelectActor }
-                  styles={ styles }
-                />
-              )) }
-            </SpatialNavigationView>
-          </SpatialNavigationScrollView>
+            { persons.map((actor, index) => (
+              <FilmViewActor
+                // eslint-disable-next-line react/no-array-index-key
+                key={ `actor-${actor.name}-${index}` }
+                actor={ actor }
+                handleSelectActor={ handleSelectActor }
+              />
+            )) }
+          </ThemedScrollView>
         </View>
-      </Section>
+      </FilmViewSection>
     );
   };
 
   const renderScheduleOverlay = () => (
-    <ScheduleOverlay
-      scheduleOverlayRef={ scheduleOverlayRef }
+    <FilmViewScheduleOverlay
+      ref={ scheduleOverlayRef }
       film={ film }
       handleUpdateScheduleWatch={ handleUpdateScheduleWatch }
-      styles={ styles }
     />
   );
 
@@ -452,34 +451,23 @@ export function FilmScreenComponent({
     }
 
     return (
-      <Section title={ t('Schedule') } styles={ styles }>
-        <View style={ styles.visibleScheduleItems }>
-          <SpatialNavigationScrollView
-            offsetFromStart={ scale(32) }
-          >
-            <DefaultFocus>
-              <View>
-                { visibleScheduleItems.map((item: ScheduleItemInterface, idx: number) => (
-                  <ScheduleItem
-                    key={ `visible-${item.name}` }
-                    item={ item }
-                    handleUpdateScheduleWatch={ handleUpdateScheduleWatch }
-                    styles={ styles }
-                  />
-                )) }
-              </View>
-            </DefaultFocus>
-          </SpatialNavigationScrollView>
-        </View>
-        <View style={ { width: '100%' } }>
-          <ThemedButton
-            onPress={ () => scheduleOverlayRef?.current?.open() }
-            style={ styles.scheduleViewAll }
-          >
-            { t('View full schedule') }
-          </ThemedButton>
-        </View>
-      </Section>
+      <FilmViewSection title={ t('Schedule') }>
+        <ThemedGroup style={ styles.scheduleListWrapper }>
+          { visibleScheduleItems.map((item: ScheduleItemInterface) => (
+            <FilmViewScheduleItem
+              key={ `visible-${item.name}` }
+              item={ item }
+              handleUpdateScheduleWatch={ handleUpdateScheduleWatch }
+            />
+          )) }
+        </ThemedGroup>
+        <ThemedButton
+          title={ t('View full schedule') }
+          onPress={ openSchedule }
+          style={ styles.scheduleViewAll }
+          contentStyle={ styles.scheduleViewAllContent }
+        />
+      </FilmViewSection>
     );
   };
 
@@ -491,20 +479,19 @@ export function FilmScreenComponent({
     }
 
     return (
-      <Section title={ t('Franchise') } styles={ styles }>
-        <View style={ styles.franchiseList }>
+      <FilmViewSection title={ t('Franchise') }>
+        <View>
           { franchise.map((item, idx) => (
-            <FranchiseItemComponent
+            <FilmViewFranchiseItem
               key={ `franchise-${item.link}` }
               film={ film }
               item={ item }
               idx={ idx }
               handleSelectFilm={ handleSelectFilm }
-              styles={ styles }
             />
           )) }
         </View>
-      </Section>
+      </FilmViewSection>
     );
   };
 
@@ -515,69 +502,39 @@ export function FilmScreenComponent({
       return null;
     }
 
-    const data = [];
-
-    if (includedIn.length) {
-      data.push({
-        id: 'included-in',
-        title: t('Included in the lists'),
-        items: includedIn,
-      });
-    }
-
-    if (fromCollections.length) {
-      data.push({
-        id: 'from-collections',
-        title: t('From collections'),
-        items: fromCollections,
-      });
-    }
-
     return (
-      <Section title={ t('Included in') } styles={ styles }>
-        <ThemedAccordion
-          data={ data }
-          overlayContent={ styles.infoListAccordionOverlay }
-          renderItem={ (subItem) => (
-            <InfoList
-              key={ `info-list-${subItem.name}` }
-              list={ subItem }
-              handleSelectCategory={ handleSelectCategory }
-              styles={ styles }
-            />
-          ) }
+      <FilmViewSection title={ t('Included in') }>
+        <FilmViewInfoListOverlay
+          film={ film }
+          handleSelectCategory={ handleSelectCategory }
         />
-      </Section>
+      </FilmViewSection>
     );
   };
 
   const renderRelated = () => {
     const { related = [] } = film;
 
+    if (!showRecommendations || !related.length) {
+      return null;
+    }
+
     return (
-      <Section title={ t('Related') } styles={ styles }>
-        <View style={ styles.relatedListWrapper }>
-          <SpatialNavigationScrollView
-            horizontal
-            offsetFromStart={ Dimensions.get('window').width / 2 }
-          >
-            <SpatialNavigationView
-              style={ styles.relatedList }
-              direction="horizontal"
-            >
-              { related.map((item, idx) => (
-                <RelatedItem
-                  // eslint-disable-next-line react/no-array-index-key -- idx is unique
-                  key={ `${item.id}-${idx}` }
-                  item={ item }
-                  handleSelectFilm={ handleSelectFilm }
-                  styles={ styles }
-                />
-              )) }
-            </SpatialNavigationView>
-          </SpatialNavigationScrollView>
-        </View>
-      </Section>
+      <FilmViewSection title={ t('Related') }>
+        <ThemedScrollView
+          horizontal
+          style={ styles.relatedList }
+        >
+          { related.map((item, idx) => (
+            <FilmViewRelatedItem
+              // eslint-disable-next-line react/no-array-index-key -- idx is unique
+              key={ `${item.id}-${idx}` }
+              item={ item }
+              handleSelectFilm={ handleSelectFilm }
+            />
+          )) }
+        </ThemedScrollView>
+      </FilmViewSection>
     );
   };
 
@@ -594,7 +551,6 @@ export function FilmScreenComponent({
     <BookmarksOverlay
       overlayRef={ bookmarksOverlayRef }
       film={ film }
-      onBookmarkChange={ handleBookmarkChange }
     />
   );
 
@@ -636,15 +592,11 @@ export function FilmScreenComponent({
     </>
   );
 
-  const renderContent = () => {
-    if (!film) {
-      return <FilmScreenThumbnail styles={ styles } />;
-    }
-
-    return (
-      <SpatialNavigationScrollView offsetFromStart={ height / 2.1 }>
-        <View>
-          { renderModals() }
+  return (
+    <Page style={ styles.page }>
+      <Wrapper>
+        { renderModals() }
+        <ThemedScrollView autofocus>
           { renderActions() }
           { renderMainContent() }
           { renderActors() }
@@ -652,14 +604,8 @@ export function FilmScreenComponent({
           { renderSchedule() }
           { renderInfoLists() }
           { renderRelated() }
-        </View>
-      </SpatialNavigationScrollView>
-    );
-  };
-
-  return (
-    <Page style={ styles.page }>
-      { renderContent() }
+        </ThemedScrollView>
+      </Wrapper>
     </Page>
   );
 }

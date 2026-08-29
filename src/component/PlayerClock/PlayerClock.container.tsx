@@ -1,10 +1,10 @@
-import { useConfigContext } from 'Context/ConfigContext';
+import { useIsTV } from 'Context/ConfigContext';
 
 import PlayerClockComponent from './PlayerClock.component';
 import PlayerClockComponentTV from './PlayerClock.component.atv';
 
 export const PlayerClockContainer = () => {
-  const { isTV } = useConfigContext();
+  const isTV = useIsTV();
 
   return isTV ? <PlayerClockComponentTV /> : <PlayerClockComponent />;
 };

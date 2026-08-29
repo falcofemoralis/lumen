@@ -1,7 +1,9 @@
+import { POSTER_ASPECT_HEIGHT, POSTER_ASPECT_WIDTH } from 'Component/FilmCard/FilmCard.config';
 import { Theme, ThemedStyles } from 'Theme/types';
 
 export const componentStyles = ({ scale, text, colors }: Theme) => ({
   page: {
+    marginTop: scale(8),
   },
   actionsWrapper: {
     height: scale(44),
@@ -9,6 +11,8 @@ export const componentStyles = ({ scale, text, colors }: Theme) => ({
   },
   actionsWrapperCentered: {
     alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'center',
   },
   actions: {
     flex: 1,
@@ -16,16 +20,8 @@ export const componentStyles = ({ scale, text, colors }: Theme) => ({
     gap: scale(8),
     marginTop: scale(4),
   },
-  actionButton: {
-    paddingVertical: scale(8),
-  },
-  actionButtonDisabled: {
-    opacity: 0.5,
-  },
   actionButtonText: {
     fontSize: scale(text.xs.fontSize),
-  },
-  actionButtonIcon: {
   },
   mainContent: {
     flexDirection: 'row',
@@ -35,7 +31,7 @@ export const componentStyles = ({ scale, text, colors }: Theme) => ({
   },
   poster: {
     width: '30%',
-    aspectRatio: '166 / 250',
+    aspectRatio: `${POSTER_ASPECT_WIDTH} / ${POSTER_ASPECT_HEIGHT}`,
     borderRadius: scale(16),
   },
   mainInfo: {
@@ -84,6 +80,11 @@ export const componentStyles = ({ scale, text, colors }: Theme) => ({
     lineHeight: scale(text.xs.lineHeight),
     opacity: 0.8,
   },
+  // the age is a whole sentence on some films, so it has to wrap
+  // inside the card instead of running past its edge
+  ageText: {
+    flexShrink: 1,
+  },
   collectionContainer: {
     marginTop: scale(8),
     gap: scale(10),
@@ -100,9 +101,11 @@ export const componentStyles = ({ scale, text, colors }: Theme) => ({
   },
   collectionButton: {
     borderRadius: scale(8),
+    backgroundColor: colors.chip,
+  },
+  collectionButtonContent: {
     paddingHorizontal: scale(8),
     paddingVertical: scale(2),
-    backgroundColor: colors.chip,
   },
   collectionButtonText: {
     fontSize: scale(text.xxs.fontSize),
@@ -121,198 +124,35 @@ export const componentStyles = ({ scale, text, colors }: Theme) => ({
   readMoreButtonHidden: {
     display: 'none',
   },
-  section: {
-    marginTop: scale(16),
-    padding: scale(16),
-  },
-  sectionHeading: {
-    fontSize: scale(text.lg.fontSize),
-    fontWeight: '700',
-  },
-  sectionContent: {
-    marginTop: scale(8),
-  },
   actorsListWrapper: {
     flexDirection: 'row',
   },
-  actorsList: {
-    flexDirection: 'row',
-    gap: scale(10),
-  },
-  actor: {
-    width: scale(90),
-    paddingBottom: scale(4),
-  },
-  actorFocused: {
-    backgroundColor: colors.backgroundFocused,
-    borderRadius: scale(12),
-  },
-  actorPhoto: {
-    height: scale(130),
-    borderRadius: scale(12),
-  },
-  actorName: {
-    fontSize: scale(text.xxs.fontSize),
-    textAlign: 'center',
-    marginTop: scale(8),
-  },
-  actorJob: {
-    fontSize: scale(text.xxs.fontSize),
-    textAlign: 'center',
-  },
-  actorNameFocused: {
-    color: colors.textFocused,
-  },
-  director: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    flexDirection: 'row',
-    gap: scale(4),
-    backgroundColor: colors.modal,
-    alignItems: 'center',
-    paddingInline: scale(4),
-    width: '100%',
-  },
-  directorText: {
-    fontSize: scale(text.xs.fontSize),
-    lineHeight: scale(text.xs.lineHeight),
-  },
-  visibleScheduleItems: {
-    flexDirection: 'row',
-  },
-  scheduleItems: {
-  },
-  scheduleItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    gap: scale(8),
-    padding: scale(16),
-    marginVertical: scale(4),
-    borderRadius: scale(16),
-    backgroundColor: colors.button,
-  },
-  scheduleItemFocused: {
-    backgroundColor: colors.backgroundFocused,
-    borderRadius: scale(16),
-  },
-  scheduleItemInfoWrapper: {
-    flexDirection: 'column',
-    flex: 1,
-  },
-  scheduleItemEpisodeWrapper: {
-    flexDirection: 'column',
-  },
-  scheduleItemNameWrapper: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  scheduleItemReleaseWrapper: {
-    width: scale(80),
-    justifyContent: 'center',
-  },
-  scheduleItemText: {
-    fontSize: scale(text.xs.fontSize),
-  },
-  scheduleItemTextFocused: {
-    color: colors.textFocused,
-  },
-  scheduleItemEpisodeName: {
-  },
-  scheduleItemEpisodeOgName: {
-  },
-  scheduleItemReleaseDate: {
-    textAlign: 'center',
-  },
-  scheduleItemMarkIcon: {
-    width: scale(32),
-    alignSelf: 'center',
-  },
-  scheduleSeason: {
-    fontSize: scale(text.lg.fontSize),
-    padding: scale(8),
-    fontWeight: '700',
-    borderBottomColor: colors.secondary,
-    borderBottomWidth: 1,
-    marginBottom: scale(4),
+  scheduleListWrapper: {
+    height: 'auto',
   },
   scheduleViewAll: {
     marginTop: scale(4),
     width: '35%',
   },
-  scheduleOverlay: {
-    width: '50%',
-  },
-  scheduleOverlayContent: {
-    flexDirection: 'row',
-  },
-  scheduleAccordionOverlay: {
-    flexGrow: 1,
-  },
-  franchiseList: {
-  },
-  franchiseItem: {
-    flexDirection: 'row',
-    gap: scale(12),
-    paddingBlock: scale(12),
-    paddingInline: scale(8),
-  },
-  franchiseItemFocused: {
-    backgroundColor: colors.backgroundFocused,
-    borderRadius: scale(8),
-  },
-  franchiseName: {
+  scheduleViewAllContent: {
     flex: 1,
-  },
-  franchiseText: {
-    fontSize: scale(text.xs.fontSize),
-  },
-  franchiseTextFocused: {
-    color: colors.textFocused,
-  },
-  franchiseSelected: {
-    color: colors.secondary,
-  },
-  infoList: {
-    padding: scale(8),
-  },
-  infoListFocused: {
-    backgroundColor: colors.backgroundFocused,
-    borderRadius: scale(8),
-  },
-  infoListName: {
-  },
-  infoListNameFocused: {
-    color: colors.textFocused,
-  },
-  infoListAccordionOverlay: {
-    flex: 0,
-  },
-  relatedListWrapper: {
-    flexDirection: 'row',
   },
   relatedList: {
     flexDirection: 'row',
     gap: scale(16),
-    paddingBlock: scale(12),
-    paddingHorizontal: scale(6),
-  },
-  relatedListItem: {
-    flex: 0,
-    width: scale(100),
-  },
-  relatedListItemPoster: {
   },
   commentsOverlay: {
     width: '50%',
     height: '100%',
+    // overrides the overlay's default maxHeight, which would clamp it to half the screen
+    maxHeight: '100%',
   },
   commentsOverlayContent: {
     height: '100%',
   },
   descriptionOverlay: {
     width: '80%',
+    maxHeight: '100%',
   },
   descriptionOverlayText: {
     fontSize: scale(text.sm.fontSize),
@@ -327,7 +167,9 @@ export const componentStyles = ({ scale, text, colors }: Theme) => ({
   actorsCollection: {
     flexDirection: 'row',
     gap: scale(10),
-    paddingBlock: scale(12),
-    paddingHorizontal: scale(6),
+  },
+  actionButton: {
+    backgroundColor: colors.transparent,
+    borderRadius: scale(99),
   },
 } satisfies ThemedStyles);

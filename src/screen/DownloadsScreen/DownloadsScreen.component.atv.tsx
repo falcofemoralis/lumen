@@ -1,4 +1,5 @@
 import { DownloadTask } from '@kesha-antonov/react-native-background-downloader';
+import { FocusContext, useFocusable } from '@noriginmedia/norigin-spatial-navigation-react-native-tvos';
 import { InfoBlock } from 'Component/InfoBlock';
 import { Loader } from 'Component/Loader';
 import { Page } from 'Component/Page';
@@ -11,24 +12,31 @@ import { ThemedImage } from 'Component/ThemedImage';
 import { ThemedOverlay } from 'Component/ThemedOverlay';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { ThemedPressable } from 'Component/ThemedPressable';
+import { ThemedScrollView } from 'Component/ThemedScrollView';
 import { ThemedSimpleList } from 'Component/ThemedSimpleList';
 import { ListItem } from 'Component/ThemedSimpleList/ThemedSimpleList.type';
 import { ThemedText } from 'Component/ThemedText';
-import { useLayout } from 'Hooks/useLayout';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
-import { EllipsisVertical, Pause, Play, RotateCcw, Trash2 } from 'lucide-react-native';
+import Copy from 'lucide-react-native/icons/copy';
+import EllipsisVertical from 'lucide-react-native/icons/ellipsis-vertical';
+import Link from 'lucide-react-native/icons/link';
+import Pause from 'lucide-react-native/icons/pause';
+import Play from 'lucide-react-native/icons/play';
+import RotateCcw from 'lucide-react-native/icons/rotate-ccw';
+import Trash2 from 'lucide-react-native/icons/trash-2';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { Slider } from 'react-native-awesome-slider';
 import Animated, { FadeOut, LinearTransition, useSharedValue } from 'react-native-reanimated';
-import { DefaultFocus, SpatialNavigationView } from 'react-tv-space-navigation';
+import NotificationStore from 'Store/Notification.store';
 import { useAppTheme } from 'Theme/context';
 import { ThemedStyles } from 'Theme/types';
 import { DownloadFilmInterface } from 'Type/DownloadFile.interface';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
-import { formatBytes } from 'Util/Download';
+import { copyToClipboard } from 'Util/Clipboard';
+import { formatBytes, getDownloadErrorMessage, hasDownloadedVideo } from 'Util/Download';
 
 import { NUMBER_OF_COLUMNS_TV } from './DownloadsScreen.config';
 import { componentStyles } from './DownloadsScreen.style.atv';
@@ -38,7 +46,6 @@ const DownloadItemTask = ({
   task,
   styles,
   deleteTask,
-  deleteFile,
   restartTask,
   toggleTask,
   completeTask,
@@ -48,14 +55,19 @@ const DownloadItemTask = ({
   const [total, setTotal] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [progressPercentage, setProgressPercentage] = useState(0);
+  // `task.state` is mutated in place by the downloader, and the task object the
+  // list holds keeps its identity across a pause/resume -- so a render never
+  // picks the change up. Mirror the state the screen cares about here instead.
+  const [isPaused, setIsPaused] = useState(task.state === 'PAUSED');
+  const sourceOverlayRef = useRef<ThemedOverlayRef>(null);
 
   const progress = useSharedValue(0);
   const minimumValue = useSharedValue(0);
   const maximumValue = useSharedValue(100);
 
   const {
-    metadata: { taskFileName } = {},
-  } = task as DownloadTask & { metadata?: { taskFileName?: string } };
+    metadata: { taskFileName, url } = {},
+  } = task as DownloadTask & { metadata?: { taskFileName?: string, url?: string } };
 
   const processTask = (taskArg: DownloadTask) => {
     taskArg
@@ -70,13 +82,12 @@ const DownloadItemTask = ({
       .done(() => {
         completeTask(task);
       })
-      .error(({ error: err }) => {
-        deleteFile(task);
-        setError(err ?? t('Download failed'));
-        setDownloaded(0);
-        setTotal(0);
-        setProgressPercentage(0);
-        progress.value = 0;
+      .error(({ error: err, errorCode }) => {
+        // The partial file deliberately stays on disk. The native downloader has
+        // already spent its retry window reconnecting before reporting this, and
+        // restarting resumes from the last byte instead of re-fetching the film
+        // from zero -- so the progress shown here stays put too.
+        setError(getDownloadErrorMessage(err, errorCode));
       });
   };
 
@@ -86,10 +97,67 @@ const DownloadItemTask = ({
 
   const handleTaskRestart = () => {
     setError(null);
+    setIsPaused(false);
     const newTask = restartTask(task);
     if (newTask) {
+      // Handlers first: restartTask hands the task over unstarted for this reason
       processTask(newTask);
+      newTask.start();
     }
+  };
+
+  const handleToggle = async (isActive: boolean) => {
+    setIsPaused(!isActive);
+
+    try {
+      await toggleTask(task.id, isActive);
+    } catch {
+      setIsPaused(isActive);
+    }
+  };
+
+  const handleCopySource = () => {
+    if (!url) {
+      return;
+    }
+
+    copyToClipboard(url);
+    NotificationStore.displayMessage(t('Link copied'));
+  };
+
+  // A source url is long enough to blow the task row apart, so it lives in an
+  // overlay of its own where it can wrap and be copied.
+  const renderSourceOverlay = () => {
+    if (!url) {
+      return null;
+    }
+
+    return (
+      <ThemedOverlay ref={ sourceOverlayRef } containerStyle={ styles.sourceOverlayContainer }>
+        <View style={ styles.sourceOverlay }>
+          <ThemedText style={ styles.sourceTitle }>
+            { t('Download link') }
+          </ThemedText>
+          { /* Deliberately not a ThemedScrollView: on TV it forces height 100%
+               on itself, which pushes the copy button out of the overlay's
+               clipped content box -- and it can only be scrolled by focusing a
+               child, which plain text never is. Cap the lines instead; the point
+               of the overlay is to copy the link, not to read all of it. */ }
+          <ThemedText
+            style={ styles.sourceText }
+            numberOfLines={ 6 }
+          >
+            { url }
+          </ThemedText>
+          <ThemedButton
+            autofocus
+            title={ t('Copy link') }
+            IconComponent={ Copy }
+            onPress={ handleCopySource }
+          />
+        </View>
+      </ThemedOverlay>
+    );
   };
 
   const renderContent = () => {
@@ -129,23 +197,21 @@ const DownloadItemTask = ({
   };
 
   const renderToggleActions = () => {
-    if (task.state === 'FAILED') {
+    if (error) {
       return null;
     }
 
-    return task.state === 'PAUSED' ? (
+    return isPaused ? (
       <ThemedButton
         style={ styles.actionsBtn }
-        onPress={ () => toggleTask(task.id, true) }
+        onPress={ () => handleToggle(true) }
         IconComponent={ Play }
-        withAnimation
       />
     ) : (
       <ThemedButton
         style={ styles.actionsBtn }
-        onPress={ () => toggleTask(task.id, false) }
+        onPress={ () => handleToggle(false) }
         IconComponent={ Pause }
-        withAnimation
       />
     );
   };
@@ -158,14 +224,19 @@ const DownloadItemTask = ({
             style={ styles.actionsBtn }
             onPress={ handleTaskRestart }
             IconComponent={ RotateCcw }
-            withAnimation
+          />
+        ) }
+        { url && (
+          <ThemedButton
+            style={ styles.actionsBtn }
+            onPress={ () => sourceOverlayRef.current?.open() }
+            IconComponent={ Link }
           />
         ) }
         <ThemedButton
           style={ styles.actionsBtn }
           onPress={ () => deleteTask(task) }
           IconComponent={ Trash2 }
-          withAnimation
         />
         { renderToggleActions() }
       </View>
@@ -199,35 +270,40 @@ const DownloadItemTask = ({
       layout={ LinearTransition }
       style={ styles.taskContainer }
     >
-      <SpatialNavigationView
-        direction="horizontal"
-        style={ [
-          styles.taskRow,
-        ] }
-      >
+      { renderSourceOverlay() }
+      <View style={ styles.taskRow }>
         <View style={ styles.taskContent }>
           { renderContent() }
           { renderActions() }
         </View>
-      </SpatialNavigationView>
+      </View>
       { renderProgressBar() }
     </Animated.View>
   );
 };
 
+// The zoom is applied to the row -- not to the item -- so it also covers the
+// gap and grows the row as one block. `hasFocusedChild` keeps it applied while
+// focus moves between the item and the actions button, and the button
+// counter-scales so it keeps its fixed square size.
 const DownloadItem = (props: DownloadItemProps & { styles: ThemedStyles<typeof componentStyles> }) => {
   const {
     item,
     styles,
+    isLastRow,
     openFolder,
     deleteFilm,
     handleVideoSelect,
     deleteTask,
   } = props;
-  const { width: containerWidth } = useLayout();
+  const { ref, focusKey, hasFocusedChild } = useFocusable<object, View>({
+    trackChildren: true,
+    saveLastFocusedChild: false,
+  });
   const playerVideoSelectorOverlayRef = useRef<PlayerVideoSelectorRef>(null);
   const actionsOverlayRef = useRef<ThemedOverlayRef>(null);
   const tasksOverlayRef = useRef<ThemedOverlayRef>(null);
+  const { scale } = useAppTheme();
 
   const {
     film: {
@@ -239,6 +315,21 @@ const DownloadItem = (props: DownloadItemProps & { styles: ThemedStyles<typeof c
     bytesTotal,
     tasks,
   } = item;
+
+  // Files that are still downloading are not part of the film's voices yet, so
+  // there is nothing to hand to the player -- tell the user to wait instead of
+  // opening an empty selector.
+  const isPlayable = hasDownloadedVideo(item);
+
+  const handlePress = useCallback(() => {
+    if (!isPlayable) {
+      NotificationStore.displayMessage(t('Film is still downloading'));
+
+      return;
+    }
+
+    playerVideoSelectorOverlayRef.current?.open();
+  }, [isPlayable]);
 
   const handleActions = useCallback((action: ListItem) => {
     if (action.value === 'open') {
@@ -257,6 +348,20 @@ const DownloadItem = (props: DownloadItemProps & { styles: ThemedStyles<typeof c
     playerVideoSelectorOverlayRef.current?.close();
   }, [item, handleVideoSelect]);
 
+  // Deleting one of several tasks leaves the list worth looking at, so keep the
+  // overlays up and let the row drop out of it. Only the last task takes the
+  // overlays down with it -- what is left behind then is an empty-state block.
+  const handleDeleteTask = useCallback((task: DownloadTask) => {
+    deleteTask(task);
+
+    if (tasks.length > 1) {
+      return;
+    }
+
+    tasksOverlayRef.current?.close();
+    actionsOverlayRef.current?.close();
+  }, [deleteTask, tasks.length]);
+
   const renderPlayerVideoSelector = () => {
     const { film } = item;
 
@@ -267,6 +372,47 @@ const DownloadItem = (props: DownloadItemProps & { styles: ThemedStyles<typeof c
         onSelect={ handleSelect }
         isOffline
       />
+    );
+  };
+
+  const renderTasksOverlayContent = () => {
+    if (!tasks.length) {
+      return (
+        <InfoBlock
+          title={ t('No active tasks') }
+          subtitle={ t('You have no active tasks') }
+        />
+      );
+    }
+
+    // A film downloading a whole season has more task rows than the overlay can
+    // show. The scroll view is driven by child focus, which the rows' own action
+    // buttons provide, and needs a bounded height of its own to scroll at all --
+    // the overlay's maxHeight is a percentage the scroll view cannot resolve
+    // against, so without this the rows just spill out of the clipped box.
+    return (
+      <ThemedScrollView
+        style={ styles.tasks }
+        containerStyle={ styles.tasksScroll }
+      >
+        { tasks.map((task) => (
+          <DownloadItemTask
+            { ...props }
+            key={ task.id }
+            task={ task }
+            styles={ styles }
+            deleteTask={ handleDeleteTask }
+          />
+        )) }
+      </ThemedScrollView>
+    );
+  };
+
+  const renderTasksOverlay = () => {
+    return (
+      <ThemedOverlay ref={ tasksOverlayRef } containerStyle={ styles.tasksOverlay }>
+        { renderTasksOverlayContent() }
+      </ThemedOverlay>
     );
   };
 
@@ -298,126 +444,72 @@ const DownloadItem = (props: DownloadItemProps & { styles: ThemedStyles<typeof c
     );
   };
 
-  const renderPoster = (isFocused: boolean) => {
+  const renderContent = (isFocused: boolean) => {
     return (
-      <View style={ [styles.poster, styles.posterContainer, isFocused && styles.posterContainerFocused] }>
-        <ThemedImage
-          style={ styles.poster }
-          src={ `file://${poster}` }
-          cachePolicy='none'
-        />
-      </View>
-    );
-  };
-
-  const renderContent = () => {
-    return (
-      <View style={ styles.cardContent }>
-        <ThemedText style={ styles.title }>
-          { title }
-        </ThemedText>
-        <ThemedText>
-          { originalTitle }
-        </ThemedText>
-        <ThemedText>
-          { formatBytes(bytesTotal || 0) }
-        </ThemedText>
-        { tasks && tasks.length > 0 && (
-          <Loader isLoading />
-        ) }
-      </View>
-    );
-  };
-
-  const renderActionsBtn = () => {
-    return (
-      <ThemedButton
-        style={ styles.actionsBtn }
-        onPress={ () => actionsOverlayRef.current?.open() }
-        IconComponent={ EllipsisVertical }
-        withAnimation
-      />
-    );
-  };
-
-  const handleDeleteTask = useCallback((task: DownloadTask) => {
-    deleteTask(task);
-    tasksOverlayRef.current?.close();
-    actionsOverlayRef.current?.close();
-  }, [deleteTask]);
-
-  const renderTasksOverlayContent = () => {
-    if (!tasks.length) {
-      return (
-        <InfoBlock
-          title={ t('No active tasks') }
-          subtitle={ t('You have no active tasks') }
-        />
-      );
-    }
-
-    return (
-      <DefaultFocus>
-        <View style={ styles.tasks }>
-          { tasks.map((task) => (
-            <DownloadItemTask
-              { ...props }
-              key={ task.id }
-              task={ task }
-              styles={ styles }
-              deleteTask={ handleDeleteTask }
-            />
-          )) }
+      <Animated.View
+        style={ [
+          styles.fill,
+          styles.item,
+          isFocused && styles.itemFocused,
+        ] }
+      >
+        <View style={ [styles.poster, styles.posterContainer, isFocused && styles.posterContainerFocused] }>
+          <ThemedImage
+            style={ styles.poster }
+            src={ `file://${poster}` }
+            cachePolicy='none'
+          />
         </View>
-      </DefaultFocus>
-    );
-  };
-
-  const renderTasksOverlay = () => {
-    return (
-      <ThemedOverlay ref={ tasksOverlayRef } containerStyle={ styles.tasksOverlay }>
-        { renderTasksOverlayContent() }
-      </ThemedOverlay>
+        <View style={ styles.itemContent }>
+          <ThemedText style={ styles.title }>
+            { title }
+          </ThemedText>
+          <ThemedText>
+            { originalTitle }
+          </ThemedText>
+          <ThemedText>
+            { formatBytes(bytesTotal || 0) }
+          </ThemedText>
+          { tasks.length > 0 && (
+            <View style={ styles.downloading }>
+              <Loader isLoading />
+              <ThemedText>
+                { t('Downloading') }
+              </ThemedText>
+            </View>
+          ) }
+        </View>
+      </Animated.View>
     );
   };
 
   return (
-    <SpatialNavigationView
-      direction="horizontal"
-      alignInGrid
-      style={ [
-        styles.rowStyle,
-        { width: containerWidth },
-      ] }
-    >
-      <ThemedPressable
-        onPress={ () => playerVideoSelectorOverlayRef.current?.open() }
+    <FocusContext.Provider value={ focusKey }>
+      <Animated.View
+        ref={ ref }
+        style={ [styles.row, isLastRow && styles.lastRow, hasFocusedChild && styles.rowFocused] }
+        tvFocusable={ false }
       >
-        { ({ isFocused }) => {
-          return (
-            <Animated.View
-              style={ [
-                styles.item,
-                isFocused && styles.itemFocused,
-              ] }
-            >
-              { renderPlayerVideoSelector() }
-              { renderActionsOverlay() }
-              <View
-                style={ [
-                  styles.card,
-                  { width: containerWidth * 0.6 },
-                ] }
-              >
-                { renderPoster(isFocused) }
-                { renderContent() }
-              </View>
-            </Animated.View>
-          );
-        } }
-      </ThemedPressable>
-      { renderActionsBtn() }
-    </SpatialNavigationView>
+        { renderPlayerVideoSelector() }
+        { renderActionsOverlay() }
+        <ThemedPressable
+          style={ styles.fill }
+          contentStyle={ styles.fill }
+          onPress={ handlePress }
+        >
+          { ({ isFocused }) => renderContent(isFocused) }
+        </ThemedPressable>
+        <ThemedButton
+          style={ [styles.actionButton, hasFocusedChild && styles.actionButtonUnzoomed] }
+          contentStyle={ styles.actionButtonContent }
+          IconComponent={ EllipsisVertical }
+          onPress={ () => actionsOverlayRef.current?.open() }
+          iconProps={ {
+            size: scale(20),
+          } }
+        />
+      </Animated.View>
+    </FocusContext.Provider>
   );
 };
 
@@ -429,7 +521,6 @@ export const DownloadsScreenComponent = (props: DownloadsScreenComponentProps) =
     isLoading,
     handleRefresh,
   } = props;
-  const { theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
 
   const renderItem = useCallback(({ item, index }: ThemedGridRowProps<DownloadFilmInterface>) => {
@@ -439,9 +530,10 @@ export const DownloadsScreenComponent = (props: DownloadsScreenComponentProps) =
         index={ index }
         item={ item }
         styles={ styles }
+        isLastRow={ index === downloadedFilms.length - 1 }
       />
     );
-  }, [styles, props]);
+  }, [styles, props, downloadedFilms.length]);
 
   const renderContent = () => {
     if (isLoading) {
@@ -460,38 +552,32 @@ export const DownloadsScreenComponent = (props: DownloadsScreenComponentProps) =
             title={ t('No downloads') }
             subtitle={ t('You have not downloaded any films yet') }
           />
-          <DefaultFocus>
-            <ThemedButton
-              style={ styles.refreshBtn }
-              onPress={ () => handleRefresh(true) }
-            >
-              { t('Refresh downloads') }
-            </ThemedButton>
-          </DefaultFocus>
+          <ThemedButton
+            title={ t('Refresh downloads') }
+            autofocus
+            style={ styles.refreshBtn }
+            onPress={ () => handleRefresh(true) }
+          />
         </View>
       );
     }
 
     return (
-      <DefaultFocus>
-        <ThemedGrid
-          style={ styles.grid }
-          rowStyle={ styles.rowStyle }
-          data={ downloadedFilms }
-          numberOfColumns={ NUMBER_OF_COLUMNS_TV }
-          itemSize={ theme.dimensions.height / 3 }
-          renderItem={ renderItem }
-          onNextLoad={ handleRefresh }
-          tvOptimized
-        />
-      </DefaultFocus>
+      <ThemedGrid
+        autofocus
+        style={ styles.grid }
+        rowStyle={ styles.rowStyle }
+        data={ downloadedFilms }
+        numberOfColumns={ NUMBER_OF_COLUMNS_TV }
+        renderItem={ renderItem }
+        onNextLoad={ handleRefresh }
+        scrollBehavior='stick-to-center'
+      />
     );
   };
 
   return (
-    <Page
-      checkConnection={ false }
-    >
+    <Page checkConnection={ false }>
       { renderContent() }
     </Page>
   );

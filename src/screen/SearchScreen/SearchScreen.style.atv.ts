@@ -1,9 +1,15 @@
 import { Theme, ThemedStyles } from 'Theme/types';
 
 export const componentStyles = ({ scale, colors, text }: Theme) => ({
+  headerCollapse: {
+    overflow: 'hidden',
+    zIndex: 10,
+  },
   container: {
+    width: '100%',
     flexDirection: 'column',
     zIndex: 10,
+    marginTop: scale(8),
     marginBottom: scale(16),
   },
   searchContainer: {
@@ -14,7 +20,11 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   actionBtn: {
     width: scale(48),
     height: scale(48),
+    borderRadius: scale(99),
+  },
+  actionBtnContent: {
     justifyContent: 'center',
+    alignItems: 'center',
   },
   searchBarContainer: {
     flex: 1,
@@ -31,7 +41,10 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     height: scale(48),
   },
   suggestions: {
-    gap: scale(12),
+    gap: scale(8),
+  },
+  suggestion: {
+    borderRadius: scale(99),
   },
   speakActive: {
     backgroundColor: colors.secondary,
@@ -50,8 +63,11 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     alignItems: 'center',
   },
   categoriesOverlay: {
-    width: '40%',
+    width: '50%',
     padding: scale(16),
+    // Three label + dropdown pairs plus the submit button come out just over the
+    // overlay's default 50% cap, so the button was clipped by its overflow:hidden.
+    maxHeight: '80%',
   },
   categories: {
     flexDirection: 'column',

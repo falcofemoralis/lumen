@@ -1,0 +1,35 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="expo.modules.tvchannels">
+
+    <!--
+      Required to insert/update rows in the TvProvider (channels and preview programs).
+      It is a normal permission, granted at install time, and it is simply not held on
+      devices that ship without the TvProvider (i.e. phones), where the module reports
+      itself as unsupported anyway.
+    -->
+    <uses-permission android:name="com.android.providers.tv.permission.WRITE_EPG_DATA" />
+
+    <!-- Lets the periodic sync job be `setPersisted`, so it survives a reboot. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <application>
+        <service
+            android:name="expo.modules.tvchannels.TvChannelsSyncJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="false" />
+
+        <!--
+          Broadcast by the launcher once after the app is installed or updated, which
+          is the one moment channels can be created without the user opening the app.
+        -->
+        <receiver
+            android:name="expo.modules.tvchannels.TvChannelsInitializeReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.media.tv.action.INITIALIZE_PROGRAMS" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
+    </application>
+
+</manifest>

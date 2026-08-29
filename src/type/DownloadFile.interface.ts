@@ -28,6 +28,11 @@ export interface DownloadFileInterface {
   episodeId?: string;
   voiceId?: string;
   bytesTotal?: number | null;
+  // Set while the file is being downloaded and cleared once it completes, so a
+  // half written file left behind by a failed download is never offered for
+  // playback. Absent on entries written before this flag existed -- those are all
+  // completed downloads, since a failure used to delete its file.
+  isPartial?: boolean;
   task?: DownloadTask;
 }
 

@@ -2,23 +2,21 @@
   "name": "Lumen App",
   "slug": "lumen",
   "scheme": "lumen",
-  "version": "1.5.7",
+  "version": "1.6.0",
   "userInterfaceStyle": "automatic",
   "icon": "./assets/images/app-icon-all.png",
-  "updates": {
-    "fallbackToCacheTimeout": 0
-  },
   "assetBundlePatterns": [
     "**/*"
   ],
   "android": {
     "icon": "./assets/images/app-icon-all.png",
+    "backgroundColor": "#000000",
     "package": "com.falcofemoralis.lumen",
     "adaptiveIcon": {
       "foregroundImage": "./assets/images/app-icon-android-adaptive-foreground.png",
       "backgroundImage": "./assets/images/app-icon-android-adaptive-background.png"
     },
-    "versionCode": 23,
+    "versionCode": 24,
     "googleServicesFile": "./google-services.json",
     "permissions": [
       "android.permission.MANAGE_EXTERNAL_STORAGE",
@@ -58,7 +56,10 @@
     ]
   },
   "plugins": [
+    "./plugins/withAbiSplits.js",
+    "./plugins/withTrimmedNativeLibs.js",
     "./plugins/withReactNativeKeyevent.js",
+    "./plugins/withTvSearchable.js",
     [
       "@react-native-tvos/config-tv",
       {
@@ -91,15 +92,9 @@
           "usesCleartextTraffic": true,
           "enableMinifyInReleaseBuilds": true,
           "enableShrinkResourcesInReleaseBuilds": true,
-          "usePrecompiledHeaders": true
+          "usePrecompiledHeaders": true,
+          "useLegacyPackaging": true
         }
-      }
-    ],
-    [
-      "expo-video",
-      {
-        "supportsBackgroundPlayback": true,
-        "supportsPictureInPicture": true
       }
     ],
     [
@@ -112,7 +107,19 @@
     "@react-native-firebase/app",
     "@kesha-antonov/react-native-background-downloader",
     "expo-image",
-    "expo-status-bar"
+    "expo-status-bar",
+    "./plugins/withVideoPlaybackService.js",
+    [
+      "react-native-video",
+      {
+        "enableAndroidPictureInPicture": true,
+        "enableBackgroundAudio": true,
+        "androidExtensions": {
+          "useExoplayerDash": true,
+          "useExoplayerHls": true
+        }
+      }
+    ]
   ],
   "experiments": {
     "tsconfigPaths": true,

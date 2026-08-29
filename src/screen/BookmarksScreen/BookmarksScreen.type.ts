@@ -1,17 +1,10 @@
-import { PagerItemInterface, PagerItemsInterface } from 'Component/FilmPager/FilmPager.type';
-import { FilmListInterface } from 'Type/FilmList.interface';
-import { MenuItemInterface } from 'Type/MenuItem.interface';
+import { FilmPagerHandlers } from 'Component/FilmPager/FilmPager.type';
+import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
+import { MutableRefObject } from 'react';
 
-export interface BookmarksScreenComponentProps {
+export interface BookmarksScreenComponentProps extends FilmPagerHandlers {
   isLoading: boolean;
-  pagerItems: PagerItemsInterface;
-  onLoadFilms: (
-    menuItem: MenuItemInterface,
-    currentPage: number,
-    isRefresh: boolean
-  ) => Promise<FilmListInterface>;
-  onUpdateFilms: (
-    key: string,
-    item: PagerItemInterface
-  ) => void;
+  isLocalLibrary: boolean;
+  manageCategoriesOverlayRef: MutableRefObject<ThemedOverlayRef | null>;
+  openManageCategories: () => void;
 }

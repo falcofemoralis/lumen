@@ -1,46 +1,31 @@
-import { useConfigContext } from 'Context/ConfigContext';
-import { memo, useCallback, useState } from 'react';
+import { useIsTV } from 'Context/ConfigContext';
+import { memo } from 'react';
 
 import ThemedMultiListComponent from './ThemedMultiList.component';
 import ThemedMultiListComponentTV from './ThemedMultiList.component.atv';
-import { ListItem, ThemedMultiListContainerProps } from './ThemedMultiList.type';
+import { ThemedMultiListContainerProps } from './ThemedMultiList.type';
 
+// Fully controlled: the items are rendered exactly as handed over, so what is on
+// screen is whatever the caller last passed. Labels that carry a `(n)` tally are
+// the caller's to keep current -- a copy kept here could only be seeded once, and
+// went stale the moment the overlay holding it was torn down and remounted.
 export function ThemedMultiListContainer({
   data,
   header,
   noItemsTitle,
   noItemsSubtitle,
+  searchComponent,
   onChange,
 }: ThemedMultiListContainerProps) {
-  const { isTV } = useConfigContext();
-  const [values, setValues] = useState<ListItem[]>(data);
-
-  const handleOnChange = useCallback((value: string, isChecked: boolean) => {
-    onChange(value, isChecked);
-
-    setValues(values.map((item) => {
-      if (item.value === value) {
-        const labelMatch = item.label.match(/(.*?)\((\d+)\)$/);
-        const label = labelMatch ? labelMatch[1] : item.label;
-        const number = labelMatch ? parseInt(labelMatch[2], 10) : 0;
-
-        return {
-          ...item,
-          isChecked,
-          label: `${label}(${isChecked ? number + 1 : number - 1})`,
-        };
-      }
-
-      return item;
-    }));
-  }, [onChange, values]);
+  const isTV = useIsTV();
 
   const containerProps = {
-    values,
+    values: data,
     header,
     noItemsTitle,
     noItemsSubtitle,
-    handleOnChange,
+    searchComponent,
+    handleOnChange: onChange,
   };
 
   // eslint-disable-next-line max-len
@@ -51,7 +36,8 @@ function propsAreEqual(
   prevProps: ThemedMultiListContainerProps,
   props: ThemedMultiListContainerProps
 ) {
-  return JSON.stringify(prevProps.data) === JSON.stringify(props.data);
+  return JSON.stringify(prevProps.data) === JSON.stringify(props.data)
+    && prevProps.searchComponent === props.searchComponent;
 }
 
 export default memo(ThemedMultiListContainer, propsAreEqual);

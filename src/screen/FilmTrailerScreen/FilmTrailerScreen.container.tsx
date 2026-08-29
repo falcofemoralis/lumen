@@ -1,16 +1,15 @@
+import { useQuery } from '@tanstack/react-query';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
-import { useConfigContext } from 'Context/ConfigContext';
-import { useNavigationContext } from 'Context/NavigationContext';
+import { useIsTV } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
-import * as NavigationBar from 'expo-navigation-bar';
-import * as StatusBar from 'expo-status-bar';
 import { FILM_TRAILER_SCREEN } from 'Navigation/navigationRoutes';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { AppState } from 'react-native';
-import NotificationStore from 'Store/Notification.store';
 import RouterStore from 'Store/Router.store';
 import { FilmInterface } from 'Type/Film.interface';
+import { hideSystemBars, showSystemBars } from 'Util/Device';
 import { navigationRef } from 'Util/Navigation';
+import { queryKeys, STALE_TIME } from 'Util/Query';
 
 import FilmTrailerScreenComponent from './FilmTrailerScreen.component';
 import FilmTrailerScreenComponentTV from './FilmTrailerScreen.component.atv';
@@ -29,66 +28,28 @@ export const FilmTrailerScreen = () => {
 export const FilmTrailerScreenContainer = ({
   film,
 }: FilmTrailerScreenContainerProps) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [trailerUrl, setTrailerUrl] = useState<string | null>(null);
   const { currentService } = useServiceContext();
-  const { isTV } = useConfigContext();
+  const isTV = useIsTV();
   const overlayRef = useRef<ThemedOverlayRef | null>(null);
-  const loadingRef = useRef(false);
-  const { lockNavigation, unlockNavigation } = useNavigationContext();
+
+  const { data: trailerUrl = null, isLoading } = useQuery({
+    queryKey: queryKeys.filmTrailer(film.id),
+    queryFn: () => currentService.getFilmTrailer(film.id),
+    staleTime: STALE_TIME.LONG,
+  });
 
   useEffect(() => {
-    loadTrailer();
-
-    if (isTV) {
-      lockNavigation();
-    }
-
-    return () => {
-      if (isTV) {
-        unlockNavigation();
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    NavigationBar.setVisibilityAsync('hidden');
-    StatusBar.setStatusBarHidden(true, 'slide');
+    hideSystemBars('slide');
 
     const focusSubscription = AppState.addEventListener('focus', () => {
-      NavigationBar.setVisibilityAsync('hidden');
-      StatusBar.setStatusBarHidden(true, 'none');
+      hideSystemBars('none');
     });
 
     return () => {
-      NavigationBar.setVisibilityAsync('visible');
-      StatusBar.setStatusBarHidden(false, 'slide');
+      showSystemBars('slide');
       focusSubscription.remove();
     };
   }, []);
-
-  const loadTrailer = async () => {
-    const { id } = film;
-
-    if (loadingRef.current || trailerUrl) {
-      return;
-    }
-
-    loadingRef.current = true;
-
-    try {
-      setIsLoading(true);
-
-      const url = await currentService.getFilmTrailer(id);
-
-      setTrailerUrl(url);
-    } catch (error) {
-      NotificationStore.displayError(error as Error);
-    } finally {
-      setIsLoading(false);
-      loadingRef.current = false;
-    }
-  };
 
   const backHandler = () => {
     navigationRef.goBack();
@@ -101,8 +62,9 @@ export const FilmTrailerScreenContainer = ({
     backHandler,
   };
 
-  // eslint-disable-next-line max-len
-  return isTV ? <FilmTrailerScreenComponentTV { ...containerProps } /> : <FilmTrailerScreenComponent { ...containerProps } />;
+  return isTV
+    ? <FilmTrailerScreenComponentTV { ...containerProps } />
+    : <FilmTrailerScreenComponent { ...containerProps } />;
 };
 
 export default FilmTrailerScreen;

@@ -3,13 +3,14 @@ import {
   createNavigationContainerRef,
   NavigationState,
   PartialState,
+  StackActions,
 } from '@react-navigation/native';
 import { BACK_HANDLER_DELAY } from 'Component/Page/Page.config';
-import { useConfigContext } from 'Context/ConfigContext';
+import { useIsTV } from 'Context/ConfigContext';
 import { t } from 'i18n/translate';
 import { AppStackParamList } from 'Navigation/navigationTypes';
 import { useEffect, useRef } from 'react';
-import { BackHandler, Platform } from 'react-native';
+import { BackHandler } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
 import { setTimeoutSafe } from 'Util/Misc';
 
@@ -40,8 +41,6 @@ export function getActiveRouteName(state: NavigationState | PartialState<Navigat
   return getActiveRouteName(route.state as NavigationState<AppStackParamList>);
 }
 
-const iosExit = () => false;
-
 /**
  * Hook that handles Android back button presses and forwards those on to
  * the navigation or allows exiting the app.
@@ -52,8 +51,8 @@ const iosExit = () => false;
 export function useBackButtonHandler(canExit: (routeName: string) => boolean) {
   // The reason we're using a ref here is because we need to be able
   // to update the canExit function without re-setting up all the listeners
-  const canExitRef = useRef(Platform.OS !== 'android' ? iosExit : canExit);
-  const { isTV } = useConfigContext();
+  const canExitRef = useRef(canExit);
+  const isTV = useIsTV();
   const backPressedOnceRef = useRef(false);
 
   useEffect(() => {
@@ -88,7 +87,6 @@ export function useBackButtonHandler(canExit: (routeName: string) => boolean) {
           }, BACK_HANDLER_DELAY);
         } else {
           BackHandler.exitApp();
-
         }
 
         return true;
@@ -127,6 +125,21 @@ export function navigate(name: unknown, params?: unknown) {
 }
 
 /**
+ * Pushes a new screen onto the stack without the navigation prop, so the
+ * previous screen stays underneath and the user can go back.
+ *
+ * The push action bubbles down to the focused stack navigator (the active
+ * tab's ViewNavigator), which is the one that owns the View/Author screens.
+ * @param {string} name - The name of the route to push.
+ * @param {object} params - The params to pass to the route.
+ */
+export function push(name: string, params?: object) {
+  if (navigationRef.isReady()) {
+    navigationRef.dispatch(StackActions.push(name, params));
+  }
+}
+
+/**
  * This function is used to go back in a navigation stack, if it's possible to go back.
  * If the navigation stack can't go back, nothing happens.
  * The navigationRef variable is a React ref that references a navigation object.
@@ -135,5 +148,18 @@ export function navigate(name: unknown, params?: unknown) {
 export function goBack() {
   if (navigationRef.isReady() && navigationRef.canGoBack()) {
     navigationRef.goBack();
+  }
+}
+
+/**
+ * resetRoot will reset the root navigation state to the given params.
+ * @param {Parameters<typeof navigationRef.resetRoot>[0]} state - The state to reset the root to.
+ * @returns {void}
+ */
+export function resetRoot(
+  state: Parameters<typeof navigationRef.resetRoot>[0] = { index: 0, routes: [] }
+) {
+  if (navigationRef.isReady()) {
+    navigationRef.resetRoot(state);
   }
 }

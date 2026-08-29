@@ -1,6 +1,8 @@
-import { SettingItem } from 'Screen/SettingsScreen/SettingsScreen.type';
+import { SettingCommonProps } from 'Component/SettingBase/SettingBase.type';
+import { ImageSourcePropType } from 'react-native';
 
-export type SettingLinkComponentProps = {
-  setting: SettingItem;
-  onUpdate: (setting: SettingItem, value: string) => Promise<boolean>;
+export type SettingLinkComponentProps = SettingCommonProps & {
+  /** Shown as a QR overlay on TV instead of opening the link. */
+  imageLink?: ImageSourcePropType;
+  onPress: () => Promise<void> | void;
 };

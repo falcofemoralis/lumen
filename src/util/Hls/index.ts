@@ -32,7 +32,7 @@ export const createMasterPlaylist = (streams: FilmStreamInterface[]) => {
 
 export const getQualityFromResolution = (width: number, height: number) => {
   const item = Object.entries(PARAMS_MAP).find(([_, value]) => {
-    if (value.includes(`RESOLUTION=${width}x${height}`)) {
+    if (value.includes(`RESOLUTION=${width}`)) {
       return true;
     }
 

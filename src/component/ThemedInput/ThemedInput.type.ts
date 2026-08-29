@@ -7,9 +7,10 @@ export interface ThemedInputContainerProps extends TextInputProps {
   style?: StyleProp<TextStyle> | undefined;
   containerStyle?: StyleProp<ViewStyle> | undefined;
   editable?: boolean;
-  withAnimation?: boolean;
+  // TV related
   ref?: RefObject<TextInput | null>;
+  autofocus?: boolean;
+  focusKey?: string;
 }
 
-export interface ThemedInputComponentProps extends ThemedInputContainerProps {
-}
+export type ThemedInputComponentProps = ThemedInputContainerProps;

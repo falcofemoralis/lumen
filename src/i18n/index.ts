@@ -1,6 +1,6 @@
 import 'intl-pluralrules';
 
-import i18n from 'i18next';
+import i18n, { changeLanguage, init, use as i18nUse } from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import { storage } from 'Util/Storage';
 
@@ -10,7 +10,7 @@ import ru from './ru';
 import uk from './uk';
 
 const fallbackLocale = 'ru';
-const STORAGE_KEY = 'user-language';
+export const LANGUAGE_STORAGE_KEY = 'user-language';
 
 export const transformKey = (key: string) => key.replace(/\s/g, '_').replace(/[!?,.:]/g, '_');
 
@@ -26,7 +26,7 @@ const resources = {
 
 export type Language = keyof typeof resources;
 
-const isSupportedLanguage = (lang: string): lang is Language => {
+export const isSupportedLanguage = (lang: string): lang is Language => {
   return Object.keys(resources).includes(lang);
 };
 
@@ -35,7 +35,7 @@ const isSupportedLanguage = (lang: string): lang is Language => {
  */
 export const getStoredLanguage = (): Language => {
   try {
-    const savedLanguage = storage.getConfigStorage().loadString(STORAGE_KEY);
+    const savedLanguage = storage.getConfigStorage().loadString(LANGUAGE_STORAGE_KEY);
     if (savedLanguage && isSupportedLanguage(savedLanguage)) {
       return savedLanguage;
     }
@@ -51,8 +51,8 @@ export const getStoredLanguage = (): Language => {
  */
 export const setLanguage = async (lang: Language) => {
   try {
-    storage.getConfigStorage().saveString(STORAGE_KEY, lang);
-    await i18n.changeLanguage(lang);
+    storage.getConfigStorage().saveString(LANGUAGE_STORAGE_KEY, lang);
+    await changeLanguage(lang);
   } catch (error) {
     console.error('Error saving language to storage:', error);
   }
@@ -72,11 +72,11 @@ export const getCurrentLanguage = (): Language => {
 };
 
 export const initI18n = async () => {
-  i18n.use(initReactI18next);
+  i18nUse(initReactI18next);
 
   const savedLng = getStoredLanguage();
 
-  await i18n.init({
+  await init({
     resources,
     lng: savedLng,
     fallbackLng: fallbackLocale,

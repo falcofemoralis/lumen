@@ -1,3 +1,5 @@
+import { setFocus } from '@noriginmedia/norigin-spatial-navigation-core';
+import { FocusContext, useFocusable } from '@noriginmedia/norigin-spatial-navigation-react-native-tvos';
 import { BookmarksOverlay } from 'Component/BookmarksOverlay';
 import { CommentsOverlay } from 'Component/CommentsOverlay';
 import { Loader } from 'Component/Loader';
@@ -5,7 +7,6 @@ import { PlayerClock } from 'Component/PlayerClock';
 import { PlayerDuration } from 'Component/PlayerDuration';
 import { PlayerDurationEnd } from 'Component/PlayerDurationEnd';
 import { PlayerProgressBar } from 'Component/PlayerProgressBar';
-import { PlayerSubtitles } from 'Component/PlayerSubtitles';
 import { PlayerVideoSelector } from 'Component/PlayerVideoSelector';
 import { ThemedDropdown } from 'Component/ThemedDropdown';
 import { ThemedPressable } from 'Component/ThemedPressable';
@@ -13,46 +14,46 @@ import { ThemedText } from 'Component/ThemedText';
 import { useConfigContext } from 'Context/ConfigContext';
 import { usePlayerContext } from 'Context/PlayerContext';
 import { LinearGradient } from 'expo-linear-gradient';
-import { VideoView } from 'expo-video';
+import { useLatest } from 'Hooks/useLatest';
+import { useRestartableTimeout } from 'Hooks/useRestartableTimeout';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
+import Bookmark from 'lucide-react-native/icons/bookmark';
+import BookmarkCheck from 'lucide-react-native/icons/bookmark-check';
+import ClosedCaption from 'lucide-react-native/icons/closed-caption';
+import Gauge from 'lucide-react-native/icons/gauge';
+import ListVideo from 'lucide-react-native/icons/list-video';
+import Maximize2 from 'lucide-react-native/icons/maximize-2';
+import MessageSquareText from 'lucide-react-native/icons/message-square-text';
+import Pause from 'lucide-react-native/icons/pause';
+import Play from 'lucide-react-native/icons/play';
+import Settings2 from 'lucide-react-native/icons/settings-2';
+import SkipBack from 'lucide-react-native/icons/skip-back';
+import SkipForward from 'lucide-react-native/icons/skip-forward';
+import Undo2 from 'lucide-react-native/icons/undo-2';
 import {
-  Bookmark,
-  BookmarkCheck,
-  ClosedCaption,
-  Gauge,
-  ListVideo,
-  Maximize2,
-  MessageSquareText,
-  Pause,
-  Play,
-  Settings2,
-  SkipBack,
-  SkipForward,
-  Undo2,
-} from 'lucide-react-native';
-import {
+  ComponentProps,
   ComponentType,
-  Ref,
+  useCallback,
   useEffect,
-  useRef,
+  useEffectEvent,
   useState,
 } from 'react';
 import {
   BackHandler,
   View,
 } from 'react-native';
+import { Pressable } from 'react-native-gesture-handler';
 import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import { VideoView } from 'react-native-video';
 import { scheduleOnRN } from 'react-native-worklets';
-import {
-  DefaultFocus,
-  SpatialNavigationNodeRef,
-  SpatialNavigationView,
-} from 'react-tv-space-navigation';
 import { useAppTheme } from 'Theme/context';
-import { ClosedCaptionFilled } from 'Theme/icons';
-import { setTimeoutSafe } from 'Util/Misc';
-import { formatVideoTrackInfo, getPlayerAvailableQualityItems } from 'Util/Player';
+import { AutoFrameRateIcon, ClosedCaptionFilled } from 'Theme/icons';
+import {
+  formatVideoTrackInfo,
+  getPlayerAvailableQualityItems,
+  getScheduleEpisodeName,
+} from 'Util/Player';
 import RemoteControlManager from 'Util/RemoteControl/RemoteControlManager';
 import { SupportedKeys } from 'Util/RemoteControl/SupportedKeys';
 
@@ -63,13 +64,70 @@ import {
   PLAYER_CONTROLS_ANIMATION,
   PLAYER_CONTROLS_TIMEOUT,
   RewindDirection,
+  SUBTITLES_OFF,
 } from './Player.config';
 import { componentStyles } from './Player.style.atv';
 import { PlayerComponentProps } from './Player.type';
 
+const TOP_ACTION_FOCUS_KEY = 'player-top-action';
+const PROGRESS_THUMB_FOCUS_KEY = 'player-progress-thumb';
+const BOTTOM_ACTION_FOCUS_KEY = 'player-bottom-action';
+
+// a real component rather than a render helper, so that handlers reach it as props
+// instead of as call arguments (see react-hooks/refs)
+const PlayerAction = ({
+  IconComponent,
+  el,
+  action,
+  focusKey,
+  onInteraction,
+}: {
+  IconComponent: ComponentType<any>;
+  el: FocusedElement;
+  action?: () => void;
+  focusKey?: string;
+  onInteraction: (action?: () => void) => void;
+}) => {
+  const { scale, theme } = useAppTheme();
+  const styles = useThemedStyles(componentStyles);
+  const { updateFocusedElement } = usePlayerContext();
+
+  return (
+    <ThemedPressable
+      focusKey={ focusKey }
+      onPress={ () => onInteraction(action) }
+      onFocus={ () => updateFocusedElement(el) }
+      style={ styles.actionPressable }
+    >
+      { ({ isFocused }) => (
+        <View
+          style={ [
+            styles.action,
+            isFocused && styles.focusedAction,
+          ] }
+        >
+          <IconComponent
+            size={ scale(26) }
+            color={ theme.colors.iconOnContrast }
+          />
+        </View>
+      ) }
+    </ThemedPressable>
+  );
+};
+
+type PlayerRowActionProps = Omit<ComponentProps<typeof PlayerAction>, 'el'>;
+
+const PlayerTopAction = (props: PlayerRowActionProps) => (
+  <PlayerAction { ...props } el={ FocusedElement.TOP_ACTION } />
+);
+
+const PlayerBottomAction = (props: PlayerRowActionProps) => (
+  <PlayerAction { ...props } el={ FocusedElement.BOTTOM_ACTION } />
+);
+
 export function PlayerComponent({
   player,
-  status,
   isPlaying,
   video,
   film,
@@ -88,7 +146,11 @@ export function PlayerComponent({
   isOffline,
   overlayQuality,
   selectedAspectRatio,
-  isLoading,
+  isVideoLoading,
+  hasPlaybackError,
+  isAutoFrameRateSupported,
+  isAutoFrameRateEnabled,
+  toggleAutoFrameRate,
   togglePlayPause,
   rewindPosition,
   openQualitySelector,
@@ -109,23 +171,33 @@ export function PlayerComponent({
   backwardToStart,
   handleAspectRatioChange,
 }: PlayerComponentProps) {
-  const { playerStopPlayOnButtonTV, playerStopPlayShowInterfaceTV } = useConfigContext();
-  const { scale, theme } = useAppTheme();
+  const {
+    playerStopPlayOnButtonTV,
+    playerStopPlayShowInterfaceTV,
+    playerShowEpisodeName,
+  } = useConfigContext();
+  const { theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
   const { focusedElement, updateFocusedElement } = usePlayerContext();
   const [showControls, setShowControls] = useState(false);
   const [hideActions, setHideActions] = useState(false);
+  const [isScrubbing, setIsScrubbing] = useState(false);
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
-  const controlsTimeout = useRef<number | null>(null);
-  const topActionRef = useRef<SpatialNavigationNodeRef | null>(null);
-  const middleActionRef = useRef<SpatialNavigationNodeRef | null>(null);
-  const bottomActionRef = useRef<SpatialNavigationNodeRef | null>(null);
-  const isPlayingRef = useRef(isPlaying);
-  const showControlsRef = useRef(showControls);
-  const isOverlayOpenRef = useRef(isOverlayOpen);
-  const isComponentMounted = useRef(true);
-  const focusedElementRef = useRef(focusedElement);
-  const hideActionsRef = useRef(hideActions);
+  const controlsTimeout = useRestartableTimeout();
+  const { ref: topRowRef, focusKey: topRowFocusKey } = useFocusable();
+  const { ref: bottomRowRef, focusKey: bottomRowFocusKey } = useFocusable();
+
+  // the remote listeners below are registered once per player and the auto hide
+  // timeout fires seconds after it was armed, so both have to read the current
+  // values at call time instead of closing over the render that created them
+  const getIsPlaying = useLatest(isPlaying);
+  const getShowControls = useLatest(showControls);
+  const getIsOverlayOpen = useLatest(isOverlayOpen);
+  const getFocusedElement = useLatest(focusedElement);
+  const getHideActions = useLatest(hideActions);
+  const getIsScrubbing = useLatest(isScrubbing);
+  const onTogglePlayPause = useEffectEvent(() => togglePlayPause());
+  const onBackwardToStart = useEffectEvent(() => backwardToStart());
 
   const controlsAnimation = useAnimatedStyle(() => ({
     opacity: withTiming(
@@ -139,65 +211,114 @@ export function PlayerComponent({
     ),
   }));
 
-  const closeControls = () => {
-    setShowControls(false);
+  const focusProgressThumb = useCallback(() => {
     updateFocusedElement(FocusedElement.PROGRESS_THUMB);
-    middleActionRef.current?.focus();
-  };
+    setFocus(PROGRESS_THUMB_FOCUS_KEY);
+  }, [updateFocusedElement]);
 
-  const setControlsTimeout = () => {
-    if (controlsTimeout.current) {
-      clearTimeout(controlsTimeout.current);
-    }
+  const closeControls = useCallback(() => {
+    setShowControls(false);
+    focusProgressThumb();
+  }, [focusProgressThumb]);
 
-    controlsTimeout.current = setTimeoutSafe(() => {
-      if (!isComponentMounted.current) return;
+  const openControls = useCallback(() => {
+    // the seek-only layout outlives the controls that were hidden in it, so put
+    // the action rows back before anything is drawn
+    setHideActions(false);
+    setShowControls(true);
+    focusProgressThumb();
+  }, [focusProgressThumb]);
 
-      if (isPlayingRef.current
-          && showControlsRef.current
-          && !isOverlayOpenRef.current
+  const setControlsTimeout = useCallback(() => {
+    controlsTimeout.start(() => {
+      if (getIsPlaying()
+          && getShowControls()
+          && !getIsOverlayOpen()
+          && !getIsScrubbing()
       ) {
         closeControls();
       }
     }, PLAYER_CONTROLS_TIMEOUT);
-  };
-
-  useEffect(() => {
-    isOverlayOpenRef.current = isOverlayOpen;
-    showControlsRef.current = showControls;
-    focusedElementRef.current = focusedElement;
-    hideActionsRef.current = hideActions;
-    isPlayingRef.current = isPlaying;
-  }, [showControls, isOverlayOpen, focusedElement, hideActions, isPlaying]);
-
-  useEffect(() => {
-    return () => {
-      isComponentMounted.current = false;
-    };
-  }, []);
+  }, [controlsTimeout, getIsPlaying, getShowControls, getIsOverlayOpen, getIsScrubbing, closeControls]);
 
   useEffect(() => {
     setControlsTimeout();
-  }, [isPlaying, isOverlayOpen, player]);
+  }, [isPlaying, isOverlayOpen, player, setControlsTimeout]);
+
+  // Air-mouse and touch presses never reach `RemoteControlManager` -- it is fed
+  // by key events alone -- so none of the key handling below runs for them. The
+  // controls are opened, kept alive and closed from these two instead.
+  const handleUserInteraction = useCallback((action?: () => void) => {
+    setControlsTimeout();
+
+    action?.();
+  }, [setControlsTimeout]);
+
+  // A pointer drag gets the same stripped down layout holding LEFT/RIGHT does:
+  // the action rows out of the way, the storyboard preview in their place. The
+  // flag also holds the auto hide off, so a slow drag cannot have the controls
+  // pulled out from under it.
+  const handleScrubbing = useCallback((value: boolean) => {
+    setIsScrubbing(value);
+    setHideActions(value);
+  }, []);
+
+  const handleSurfacePress = useCallback(() => {
+    if (getIsOverlayOpen()) {
+      return;
+    }
+
+    if (getShowControls()) {
+      closeControls();
+
+      return;
+    }
+
+    focusProgressThumb();
+
+    // A press on the picture is the pointer's OK button, so it answers to the
+    // same two settings the ENTER branch below does - otherwise the player would
+    // do one thing for the remote and another for the air-mouse.
+    if (playerStopPlayOnButtonTV) {
+      togglePlayPause();
+
+      if (!playerStopPlayShowInterfaceTV) {
+        return;
+      }
+    }
+
+    openControls();
+    setControlsTimeout();
+  }, [
+    getIsOverlayOpen,
+    getShowControls,
+    closeControls,
+    openControls,
+    focusProgressThumb,
+    setControlsTimeout,
+    togglePlayPause,
+    playerStopPlayOnButtonTV,
+    playerStopPlayShowInterfaceTV,
+  ]);
 
   useEffect(() => {
     const keyDownListener = (type: SupportedKeys) => {
-      if (!isComponentMounted.current || isOverlayOpenRef.current) return false;
+      if (getIsOverlayOpen()) return false;
 
       if (type === SupportedKeys.BACKWARD) {
-        backwardToStart();
+        onBackwardToStart();
 
         return true;
       }
 
-      if (!showControlsRef.current) {
+      if (!getShowControls()) {
         if (type === SupportedKeys.BACK) {
           return true;
         }
 
         if (type === SupportedKeys.UP) {
           updateFocusedElement(FocusedElement.TOP_ACTION);
-          topActionRef.current?.focus();
+          setFocus(TOP_ACTION_FOCUS_KEY);
         }
 
         if (type === SupportedKeys.ENTER
@@ -205,7 +326,7 @@ export function PlayerComponent({
           || type === SupportedKeys.RIGHT
         ) {
           updateFocusedElement(FocusedElement.PROGRESS_THUMB);
-          middleActionRef.current?.focus();
+          setFocus(PROGRESS_THUMB_FOCUS_KEY);
 
           if (type === SupportedKeys.LEFT || type === SupportedKeys.RIGHT) {
             setHideActions(true);
@@ -217,11 +338,11 @@ export function PlayerComponent({
 
         if (type === SupportedKeys.DOWN) {
           updateFocusedElement(FocusedElement.BOTTOM_ACTION);
-          bottomActionRef.current?.focus();
+          setFocus(BOTTOM_ACTION_FOCUS_KEY);
         }
 
         if (playerStopPlayOnButtonTV && type === SupportedKeys.ENTER) {
-          togglePlayPause();
+          onTogglePlayPause();
 
           if (playerStopPlayShowInterfaceTV) {
             setShowControls(true);
@@ -235,13 +356,27 @@ export function PlayerComponent({
         return false;
       }
 
-      if (focusedElementRef.current === FocusedElement.PROGRESS_THUMB) {
+      if (getFocusedElement() === FocusedElement.PROGRESS_THUMB) {
         if (type === SupportedKeys.ENTER) {
-          togglePlayPause();
+          onTogglePlayPause();
         }
 
-        if ((type === SupportedKeys.UP || type === SupportedKeys.DOWN) && hideActionsRef.current) {
-          setHideActions(false);
+        if (type === SupportedKeys.UP || type === SupportedKeys.DOWN) {
+          // Reveal the action rows if they were hidden while seeking, then move
+          // focus onto the row explicitly. We can't rely on norigin's geometry
+          // navigation here: the row was just un-hidden (opacity/reflow) and
+          // navigating from the stale layout drops focus. Consume the event so
+          // the layout adapter doesn't also run a conflicting geometry pass.
+          if (getHideActions()) {
+            setHideActions(false);
+          }
+
+          const isUp = type === SupportedKeys.UP;
+
+          updateFocusedElement(isUp ? FocusedElement.TOP_ACTION : FocusedElement.BOTTOM_ACTION);
+          setFocus(isUp ? TOP_ACTION_FOCUS_KEY : BOTTOM_ACTION_FOCUS_KEY);
+
+          return true;
         }
 
         if (type === SupportedKeys.LEFT || type === SupportedKeys.RIGHT) {
@@ -250,19 +385,47 @@ export function PlayerComponent({
         }
       }
 
+      // Vertical navigation for the action rows is handled explicitly. The
+      // inward hop lands on the thumb (a small element positioned at the current
+      // progress %, so it rarely overlaps the focused action vertically and
+      // norigin's geometry navigation skips it). The outward key is swallowed:
+      // there is nothing focusable above the top row / below the bottom row, so
+      // letting norigin run would navigate focus out and drop it. Either way we
+      // consume both vertical keys; LEFT/RIGHT stay geometry-driven so in-row
+      // navigation keeps working.
+      // eslint-disable-next-line max-len
+      if (getFocusedElement() === FocusedElement.TOP_ACTION && (type === SupportedKeys.UP || type === SupportedKeys.DOWN)) {
+        if (type === SupportedKeys.DOWN) {
+          updateFocusedElement(FocusedElement.PROGRESS_THUMB);
+          setFocus(PROGRESS_THUMB_FOCUS_KEY);
+        }
+
+        return true;
+      }
+
+      // eslint-disable-next-line max-len
+      if (getFocusedElement() === FocusedElement.BOTTOM_ACTION && (type === SupportedKeys.UP || type === SupportedKeys.DOWN)) {
+        if (type === SupportedKeys.UP) {
+          updateFocusedElement(FocusedElement.PROGRESS_THUMB);
+          setFocus(PROGRESS_THUMB_FOCUS_KEY);
+        }
+
+        return true;
+      }
+
       return false;
     };
 
     const keyUpListener = (_type: SupportedKeys) => {
-      if (!isComponentMounted.current) return false;
-
       setControlsTimeout();
 
       return false;
     };
 
     const backAction = () => {
-      if (showControlsRef.current) {
+      if (getShowControls()) {
+        updateFocusedElement(FocusedElement.PROGRESS_THUMB);
+        setFocus(PROGRESS_THUMB_FOCUS_KEY);
         setShowControls(false);
 
         return true;
@@ -283,13 +446,20 @@ export function PlayerComponent({
       RemoteControlManager.removeKeydownListener(remoteControlDownListener);
       RemoteControlManager.removeKeyupListener(remoteControlUpListener);
       backHandler.remove();
-
-      if (controlsTimeout.current) {
-        clearTimeout(controlsTimeout.current);
-        controlsTimeout.current = null;
-      }
     };
-  }, [player]);
+    // everything the listeners read goes through a stable getter on purpose -
+    // re-subscribing the remote on each render drops key events mid-press
+  }, [
+    player,
+    setControlsTimeout,
+    getShowControls,
+    getIsOverlayOpen,
+    getFocusedElement,
+    getHideActions,
+    updateFocusedElement,
+    playerStopPlayOnButtonTV,
+    playerStopPlayShowInterfaceTV,
+  ]);
 
   const handleOpenComments = () => {
     closeControls();
@@ -298,6 +468,24 @@ export function PlayerComponent({
     setTimeout(() => {
       openCommentsOverlay();
     }, 250);
+  };
+
+  const renderEpisodeName = () => {
+    if (!playerShowEpisodeName) {
+      return null;
+    }
+
+    const episodeName = getScheduleEpisodeName(film, voice);
+
+    if (!episodeName) {
+      return null;
+    }
+
+    return (
+      <ThemedText style={ styles.episodeName } numberOfLines={ 1 }>
+        { episodeName }
+      </ThemedText>
+    );
   };
 
   const renderTitle = () => {
@@ -316,6 +504,7 @@ export function PlayerComponent({
             }) }
           </ThemedText>
         ) }
+        { renderEpisodeName() }
       </View>
     );
   };
@@ -345,44 +534,6 @@ export function PlayerComponent({
     );
   };
 
-  const renderAction = (
-    IconComponent: ComponentType<any>,
-    el: FocusedElement,
-    action?: () => void,
-    ref?: Ref<SpatialNavigationNodeRef>
-  ) => (
-    <ThemedPressable
-      spatialRef={ ref }
-      onPress={ action }
-      onFocus={ () => updateFocusedElement(el) }
-    >
-      { ({ isFocused }) => (
-        <View
-          style={ [
-            styles.action,
-            isFocused && styles.focusedAction,
-          ] }
-        >
-          <IconComponent
-            size={ scale(26) }
-            color={ theme.colors.iconOnContrast }
-          />
-        </View>
-      ) }
-    </ThemedPressable>
-  );
-
-  const renderTopAction = (
-    icon: ComponentType<any>,
-    action?: () => void,
-    ref?: Ref<SpatialNavigationNodeRef>
-  ) => renderAction(
-    icon,
-    FocusedElement.TOP_ACTION,
-    action,
-    ref
-  );
-
   const renderTopActionLine = () => {
     return (
       <View style={ styles.topActionLine }>
@@ -395,39 +546,66 @@ export function PlayerComponent({
     );
   };
 
-  const renderBottomAction = (
-    icon: ComponentType<any>,
-    action?: () => void,
-    ref?: Ref<SpatialNavigationNodeRef>
-  ) => renderAction(
-    icon,
-    FocusedElement.BOTTOM_ACTION,
-    action,
-    ref
-  );
+  // a video that is not ready to play yet gets a spinner in place of the icon,
+  // rather than a play button that only starts once the loading is done
+  const getPlayPauseIcon = () => {
+    if (isVideoLoading) {
+      return Loader;
+    }
+
+    return isPlaying ? Pause : Play;
+  };
 
   const renderTopActions = () => (
-    <SpatialNavigationView
-      direction="horizontal"
+    <View
       style={ {
         ...styles.controlsRowLine,
         ...(hideActions ? styles.controlsRowHidden : {}),
       } }
     >
-      <View style={ styles.controlsRow }>
-        { renderTopAction(isPlaying || status === 'loading' ? Pause : Play, togglePlayPause, topActionRef) }
-        { film.hasSeasons && (
-          <>
-            { renderTopAction(SkipBack, () => handleNewEpisode(RewindDirection.BACKWARD)) }
-            { renderTopAction(SkipForward, () => handleNewEpisode(RewindDirection.FORWARD)) }
-          </>
-        ) }
-        { renderTopAction(Gauge, openSpeedSelector) }
-        { !isOffline && renderTopAction(MessageSquareText, handleOpenComments) }
-        { renderTopAction(Undo2, backwardToStart) }
-      </View>
+      <FocusContext.Provider value={ topRowFocusKey }>
+        <View ref={ topRowRef } style={ styles.controlsRow }>
+          <PlayerTopAction
+            IconComponent={ getPlayPauseIcon() }
+            action={ togglePlayPause }
+            focusKey={ TOP_ACTION_FOCUS_KEY }
+            onInteraction={ handleUserInteraction }
+          />
+          { film.hasSeasons && (
+            <>
+              <PlayerTopAction
+                IconComponent={ SkipBack }
+                action={ () => handleNewEpisode(RewindDirection.BACKWARD) }
+                onInteraction={ handleUserInteraction }
+              />
+              <PlayerTopAction
+                IconComponent={ SkipForward }
+                action={ () => handleNewEpisode(RewindDirection.FORWARD) }
+                onInteraction={ handleUserInteraction }
+              />
+            </>
+          ) }
+          <PlayerTopAction
+            IconComponent={ Gauge }
+            action={ openSpeedSelector }
+            onInteraction={ handleUserInteraction }
+          />
+          { !isOffline && (
+            <PlayerTopAction
+              IconComponent={ MessageSquareText }
+              action={ handleOpenComments }
+              onInteraction={ handleUserInteraction }
+            />
+          ) }
+          <PlayerTopAction
+            IconComponent={ Undo2 }
+            action={ backwardToStart }
+            onInteraction={ handleUserInteraction }
+          />
+        </View>
+      </FocusContext.Provider>
       { renderTopActionLine() }
-    </SpatialNavigationView>
+    </View>
   );
 
   const renderProgressBar = () => {
@@ -439,31 +617,13 @@ export function PlayerComponent({
         storyboardUrl={ storyboardUrl }
         calculateCurrentTime={ calculateCurrentTime }
         seekToPosition={ seekToPosition }
-        thumbRef={ middleActionRef }
+        thumbFocusKey={ PROGRESS_THUMB_FOCUS_KEY }
         onFocus={ () => updateFocusedElement(FocusedElement.PROGRESS_THUMB) }
         rewindPosition={ rewindPosition }
         togglePlayPause={ togglePlayPause }
         hideActions={ hideActions }
-      />
-    );
-  };
-
-  const renderSubtitles = () => {
-    if (!selectedSubtitle) {
-      return null;
-    }
-
-    const { url } = selectedSubtitle;
-
-    if (!url) {
-      return null;
-    }
-
-    return (
-      <PlayerSubtitles
-        player={ player }
-        subtitleUrl={ url }
-        isOffline={ isOffline }
+        handleIsScrolling={ handleScrubbing }
+        handleUserInteraction={ handleUserInteraction }
       />
     );
   };
@@ -480,23 +640,60 @@ export function PlayerComponent({
 
     return (
       <View style={ styles.bottomActions }>
-        <SpatialNavigationView
-          direction="horizontal"
-          style={ {
-            ...styles.controlsRow,
-            ...(hideActions ? styles.controlsRowHidden : {}),
-          } }
-        >
-          { renderBottomAction(Settings2, openQualitySelector, bottomActionRef) }
-          { isPlaylistSelector && renderBottomAction(ListVideo, openVideoSelector) }
-          { subtitles.length > 0 && renderBottomAction(
-            // eslint-disable-next-line max-len
-            selectedSubtitle?.languageCode === '' ? ClosedCaption : ClosedCaptionFilled({ color: theme.colors.iconOnContrast }),
-            openSubtitleSelector
-          ) }
-          { !isOffline && renderBottomAction(isFilmBookmarked ? BookmarkCheck : Bookmark, openBookmarksOverlay) }
-          { renderBottomAction(Maximize2, handleAspectRatioChange) }
-        </SpatialNavigationView>
+        <FocusContext.Provider value={ bottomRowFocusKey }>
+          <View
+            ref={ bottomRowRef }
+            style={ {
+              ...styles.controlsRow,
+              ...(hideActions ? styles.controlsRowHidden : {}),
+            } }
+          >
+            <PlayerBottomAction
+              IconComponent={ Settings2 }
+              action={ openQualitySelector }
+              focusKey={ BOTTOM_ACTION_FOCUS_KEY }
+              onInteraction={ handleUserInteraction }
+            />
+            { isPlaylistSelector && (
+              <PlayerBottomAction
+                IconComponent={ ListVideo }
+                action={ openVideoSelector }
+                onInteraction={ handleUserInteraction }
+              />
+            ) }
+            { subtitles.length > 0 && (
+              <PlayerBottomAction
+                IconComponent={ !selectedSubtitle?.languageCode
+                  ? ClosedCaption
+                  : ClosedCaptionFilled({ color: theme.colors.iconOnContrast }) }
+                action={ openSubtitleSelector }
+                onInteraction={ handleUserInteraction }
+              />
+            ) }
+            { !isOffline && (
+              <PlayerBottomAction
+                IconComponent={ isFilmBookmarked ? BookmarkCheck : Bookmark }
+                action={ openBookmarksOverlay }
+                onInteraction={ handleUserInteraction }
+              />
+            ) }
+            <PlayerBottomAction
+              IconComponent={ Maximize2 }
+              action={ handleAspectRatioChange }
+              onInteraction={ handleUserInteraction }
+            />
+            { isAutoFrameRateSupported && (
+              <PlayerBottomAction
+                IconComponent={ AutoFrameRateIcon({
+                  color: theme.colors.iconOnContrast,
+                  isFilled: isAutoFrameRateEnabled,
+                }) }
+                action={ toggleAutoFrameRate }
+                onInteraction={ handleUserInteraction }
+              />
+            ) }
+          </View>
+        </FocusContext.Provider>
         { renderDuration() }
       </View>
     );
@@ -513,23 +710,59 @@ export function PlayerComponent({
     </Animated.View>
   );
 
+  // `box-none` rather than `auto`: a pointer press that misses a button lands on
+  // the tap surface below and closes the controls, instead of being swallowed by
+  // the empty space around them. While they are down they take no presses at all
+  // - faded out is still touchable, and a click would otherwise hit a button
+  // nobody can see.
   const renderControls = () => (
-    <Animated.View style={ [styles.controls, controlsAnimation] }>
+    <Animated.View
+      style={ [styles.controls, controlsAnimation] }
+      pointerEvents={ showControls ? 'box-none' : 'none' }
+    >
       { renderTopInfo() }
       { renderTopActions() }
-      <DefaultFocus>
-        { renderProgressBar() }
-      </DefaultFocus>
+      { renderProgressBar() }
       { renderBottomActions() }
     </Animated.View>
   );
 
+  // Air-mouse / touch equivalent of pressing OK on the remote: a press anywhere
+  // on the picture brings the controls up, and one that lands outside them again
+  // puts them away.
+  const renderTapSurface = () => (
+    <Pressable
+      style={ styles.tapSurface }
+      onPress={ handleSurfacePress }
+      focusable={ false }
+    />
+  );
+
+  // the play/pause action carries the spinner while the controls are up, so the
+  // full screen one only steps in once they are gone
   const renderLoader = () => (
     <Loader
-      isLoading={ isLoading || status === 'loading' }
+      isLoading={ isVideoLoading && (!showControls || hideActions) }
       fullScreen
     />
   );
+
+  const renderError = () => {
+    if (!hasPlaybackError) {
+      return null;
+    }
+
+    return (
+      <View style={ styles.error }>
+        <ThemedText style={ styles.errorText }>
+          { t('Failed to load the video') }
+        </ThemedText>
+        <ThemedText style={ styles.errorHint }>
+          { t('Check your connection or try another quality') }
+        </ThemedText>
+      </View>
+    );
+  };
 
   const renderQualitySelector = () => {
     return (
@@ -572,11 +805,14 @@ export function PlayerComponent({
         asOverlay
         overlayRef={ subtitleOverlayRef }
         header={ t('Subtitles') }
-        value={ selectedSubtitle?.languageCode }
-        data={ subtitles.map((subtitle) => ({
-          label: subtitle.name,
-          value: subtitle.languageCode,
-        })) }
+        value={ selectedSubtitle?.languageCode ?? SUBTITLES_OFF.value }
+        data={ [
+          SUBTITLES_OFF,
+          ...subtitles.map((subtitle) => ({
+            label: subtitle.name,
+            value: subtitle.languageCode,
+          })),
+        ] }
         onChange={ handleSubtitleChange }
         onClose={ closeOverlay }
       />
@@ -642,14 +878,16 @@ export function PlayerComponent({
       <VideoView
         style={ styles.video }
         player={ player }
-        contentFit={ selectedAspectRatio }
-        nativeControls={ false }
-        allowsPictureInPicture={ false }
+        resizeMode={ selectedAspectRatio }
+        controls={ false }
+        pictureInPicture={ false }
       />
-      { renderSubtitles() }
+      { renderError() }
+      { renderTapSurface() }
       { renderBackground() }
       { renderControls() }
       { renderLoader() }
+      { renderError() }
       { renderModals() }
     </Animated.View>
   );

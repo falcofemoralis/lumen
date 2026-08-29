@@ -1,14 +1,19 @@
 import { ConfirmOverlay } from 'Component/ConfirmOverlay';
 import { InfoBlock } from 'Component/InfoBlock';
+import { LoginForm } from 'Component/LoginForm';
 import { Page } from 'Component/Page';
 import { ThemedGrid } from 'Component/ThemedGrid';
 import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
 import { ThemedImage } from 'Component/ThemedImage';
 import { ThemedPressable } from 'Component/ThemedPressable';
 import { ThemedText } from 'Component/ThemedText';
+import { useConfigContext } from 'Context/ConfigContext';
+import { useServiceContext } from 'Context/ServiceContext';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
-import { Eye, EyeOff, Trash2 } from 'lucide-react-native';
+import Eye from 'lucide-react-native/icons/eye';
+import EyeOff from 'lucide-react-native/icons/eye-off';
+import Trash2 from 'lucide-react-native/icons/trash-2';
 import { memo, useCallback } from 'react';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -123,6 +128,8 @@ export function RecentScreenComponent({
 }: RecentScreenComponentProps) {
   const styles = useThemedStyles(componentStyles);
   const { top } = useSafeAreaInsets();
+  const { isSignedIn } = useServiceContext();
+  const { isLocalLibrary } = useConfigContext();
 
   const renderItem = useCallback(
     ({ item, index }: ThemedGridRowProps<RecentItemInterface>) => (
@@ -135,7 +142,7 @@ export function RecentScreenComponent({
         openHideConfirmOverlay={ openHideConfirmOverlay }
       />
     ),
-    [handleOnPress, styles]
+    [handleOnPress, openHideConfirmOverlay, removeItem, styles]
   );
 
   const renderHeader = useCallback(() => {
@@ -168,9 +175,12 @@ export function RecentScreenComponent({
     );
   };
 
-  return (
-    <Page>
-      { renderConfirmOverlay() }
+  const renderContent = () => {
+    if (!isSignedIn && !isLocalLibrary) {
+      return <LoginForm />;
+    }
+
+    return (
       <ThemedGrid
         data={ items }
         numberOfColumns={ NUMBER_OF_COLUMNS }
@@ -179,6 +189,13 @@ export function RecentScreenComponent({
         ListHeaderComponent={ renderHeader }
         ListEmptyComponent={ renderEmpty }
       />
+    );
+  };
+
+  return (
+    <Page>
+      { renderConfirmOverlay() }
+      { renderContent() }
     </Page>
   );
 }

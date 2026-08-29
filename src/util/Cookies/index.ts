@@ -84,6 +84,24 @@ export const setCookies = (hostname: string, res: Response) => {
   cookiesManager.set(hostname, validNewCookies);
 };
 
+/**
+ * Seeds a cookie the server never sent us. `customFetch` builds the `Cookie`
+ * header from the jar and overwrites whatever a caller passed in its headers,
+ * so this is the only way to add one for an endpoint that gates on it.
+ */
+export const setCookie = (hostname: string, name: string, value: string) => {
+  const cookies = cookiesManager.get(hostname) || {};
+
+  if (cookies[name]?.value === value) {
+    return;
+  }
+
+  cookiesManager.set(hostname, {
+    ...cookies,
+    [name]: { name, value },
+  });
+};
+
 export const buildCookies = (hostname: string) => {
   return buildCookieString(cookiesManager.get(hostname) || {});
 };

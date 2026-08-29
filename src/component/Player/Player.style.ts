@@ -123,20 +123,33 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     fontWeight: '700',
     color: colors.textOnContrast,
   },
+  episodeName: {
+    color: colors.textOnContrast,
+    opacity: 0.8,
+  },
   subtitle: {
     color: colors.textOnContrast,
   },
   commentsOverlayModal: {
     backgroundColor: colors.transparent,
+    // the overlay's default gutter would keep the panel off the screen edge
+    paddingHorizontal: 0,
   },
   commentsOverlay: {
     width: '100%',
     height: '100%',
   },
+  // Overrides the overlay's landscape placement (a small card inset 10% from the
+  // right): here the panel is the full-height side sheet the video shrinks for,
+  // so it is flush with the right edge, with only its left corners rounded.
   commentsOverlayContent: {
     height: '100%',
     maxHeight: '100%',
+    width: '50%',
     maxWidth: '50%',
+    borderTopRightRadius: 0,
+    borderBottomRightRadius: 0,
+    borderRightWidth: 0,
   },
   commentsOverlayList: {
     height: '100%',
@@ -172,6 +185,47 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   doubleTapText: {
     fontSize: scale(text.sm.fontSize),
     fontWeight: '700',
+  },
+  // `left` is animated: which side the level lands on depends on where the finger came
+  // down, which is not fixed once a single gesture is allowed to own the whole width
+  slideIndicator: {
+    position: 'absolute',
+    top: '50%',
+    transform: [{ translateX: '-50%' }, { translateY: '-50%' }],
+    opacity: 0,
+    pointerEvents: 'none',
+  },
+  // fixed rather than sized to its contents: the label below runs from "0%" to "100%",
+  // and a pill that measured itself against that would grow as the finger moved. Wide
+  // enough for the widest of those in any of the app's languages, which is what the
+  // label's `numberOfLines` is there to hold it to
+  slideIndicatorContainer: {
+    width: scale(64),
+    alignItems: 'center',
+    gap: scale(8),
+    paddingBlock: scale(12),
+    paddingInline: scale(10),
+    borderRadius: scale(24),
+    backgroundColor: colors.modal,
+  },
+  slideIndicatorTrack: {
+    width: scale(4),
+    height: scale(80),
+    borderRadius: scale(4),
+    backgroundColor: '#ffffff55',
+    justifyContent: 'flex-end',
+    overflow: 'hidden',
+  },
+  slideIndicatorFill: {
+    width: '100%',
+    borderRadius: scale(4),
+    backgroundColor: colors.secondary,
+  },
+  slideIndicatorText: {
+    fontSize: scale(text.sm.fontSize),
+    fontWeight: '700',
+    color: colors.textOnContrast,
+    textAlign: 'center',
   },
   longTapAction: {
     position: 'absolute',
@@ -223,6 +277,29 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   },
   backButtonContent: {
     padding: scale(12),
+  },
+  error: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: [{ translateX: '-50%' }, { translateY: '-50%' }],
+    alignItems: 'center',
+    gap: scale(4),
+    paddingBlock: scale(12),
+    paddingInline: scale(24),
+    borderRadius: scale(12),
+    backgroundColor: colors.modal,
+    zIndex: 10,
+  },
+  errorText: {
+    fontSize: scale(text.lg.fontSize),
+    fontWeight: '700',
+    color: colors.textOnContrast,
+    textAlign: 'center',
+  },
+  errorHint: {
+    color: colors.textOnContrast,
+    textAlign: 'center',
   },
 } satisfies ThemedStyles);
 

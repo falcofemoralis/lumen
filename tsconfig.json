@@ -38,7 +38,6 @@
       "Theme/*": ["./src/theme/*"],
       "Type/*": ["./src/type/*"],
       "Util/*": ["./src/util/*"],
-      "react-tv-space-navigation": ["./src/libs/react-tv-space-navigation"],
       "Modules/*": ["./modules/*"]
     },
     "typeRoots": [

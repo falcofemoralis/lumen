@@ -100,11 +100,10 @@ export function CollectionScreenComponent({
 
   return (
     <Page>
-      <Wrapper>
+      <Wrapper style={ styles.wrapper }>
         <ThemedGrid
           data={ items }
           numberOfColumns={ NUMBER_OF_COLUMNS }
-          itemSize={ scale(115) }
           renderItem={ renderItem }
           onNextLoad={ onNextLoad }
           ListHeaderComponent={ renderHeader }
