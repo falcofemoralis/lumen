@@ -6,8 +6,8 @@ import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import Plus from 'lucide-react-native/icons/plus';
-import { useRef } from 'react';
-import { TextInput, View } from 'react-native';
+import { useRef, useState } from 'react';
+import { View } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
 import { ThemedStyles } from 'Theme/types';
 
@@ -20,33 +20,34 @@ const CustomSelectModalComponent = ({
   styles,
   onSelect,
 }: ThemedCustomSelectComponentProps & { styles: ThemedStyles<typeof componentStyles> }) => {
-  const valueRef = useRef(value);
-  const textRef = useRef<TextInput>(null);
+  // Controlled on purpose: an uncontrolled input keeps the native `text` prop
+  // frozen at the initial value, and the focus style flips the text `color`,
+  // which makes Fabric rebuild the attributed string from that stale prop and
+  // wipe whatever was typed the moment focus leaves the field.
+  const [text, setText] = useState(value);
   const dropdownRef = useRef<ThemedOverlayRef>(null);
 
   const handleSelect = () => {
-    if (!valueRef.current) {
+    if (!text) {
       NotificationStore.displayError(t('Please select or type a value'));
 
       return;
     }
 
-    onSelect(valueRef.current);
+    onSelect(text);
   };
 
   const handleDropdownChange = (item: { value: string }) => {
-    valueRef.current = item.value;
-    textRef.current?.setNativeProps({ text: item.value });
+    setText(item.value);
     dropdownRef.current?.close();
   };
 
   return (
     <View style={ styles.modalView }>
       <ThemedInput
-        ref={ textRef }
         placeholder={ t('Type or select value') }
-        defaultValue={ value }
-        onChangeText={ (text) => (valueRef.current = text) }
+        value={ text }
+        onChangeText={ setText }
       />
       <ThemedDropdown
         onChange={ handleDropdownChange }
