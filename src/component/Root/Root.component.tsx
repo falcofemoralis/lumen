@@ -4,6 +4,7 @@ import {
   setConfig as setDownloaderConfig,
 } from '@kesha-antonov/react-native-background-downloader';
 import { AppUpdater } from 'Component/AppUpdater';
+import { CloudflareSolver } from 'Component/CloudflareSolver';
 import { Portal } from 'Component/ThemedPortal';
 import { useAppUpdaterContext } from 'Context/AppUpdaterContext';
 import { useConfigContext } from 'Context/ConfigContext';
@@ -102,6 +103,13 @@ export const Root = ({ children }: { children: ReactNode }) => {
     <Portal.Host>
       <AppUpdater />
       { children }
+      { /*
+         * Draws nothing until a request hits a Cloudflare bot check - see the container.
+         * Last, and so painted over the page: unlike the updater above it puts its own
+         * view up rather than portaling one, and the request behind it is blocked until
+         * the user has answered it.
+         */ }
+      <CloudflareSolver />
     </Portal.Host>
   );
 };

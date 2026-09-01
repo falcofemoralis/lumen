@@ -424,6 +424,9 @@ const ru: Translations = {
   'The app has to be restarted for the imported settings to take effect.': 'Чтобы импортированные настройки применились, приложение нужно перезапустить.',
   'Restart': 'Перезапустить',
   'Later': 'Позже',
+  'Verifying that you are not a robot': 'Проверяем, что вы не робот',
+  'This can take a few seconds': 'Это может занять несколько секунд',
+  'Complete the check to continue, or press Back to cancel': 'Пройдите проверку, чтобы продолжить, или нажмите «Назад» для отмены',
 };
 
 export default ru;

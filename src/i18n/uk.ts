@@ -424,6 +424,9 @@ const uk: Translations = {
   'The app has to be restarted for the imported settings to take effect.': 'Щоб імпортовані налаштування застосувалися, застосунок потрібно перезапустити.',
   'Restart': 'Перезапустити',
   'Later': 'Пізніше',
+  'Verifying that you are not a robot': 'Перевіряємо, що ви не робот',
+  'This can take a few seconds': 'Це може зайняти кілька секунд',
+  'Complete the check to continue, or press Back to cancel': 'Пройдіть перевірку, щоб продовжити, або натисніть «Назад» для скасування',
 };
 
 export default uk;

@@ -422,6 +422,9 @@ const en = {
   'The app has to be restarted for the imported settings to take effect.': 'The app has to be restarted for the imported settings to take effect.',
   'Restart': 'Restart',
   'Later': 'Later',
+  'Verifying that you are not a robot': 'Verifying that you are not a robot',
+  'This can take a few seconds': 'This can take a few seconds',
+  'Complete the check to continue, or press Back to cancel': 'Complete the check to continue, or press Back to cancel',
 };
 
 export default en;

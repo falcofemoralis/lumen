@@ -14,14 +14,6 @@
  *   `expo.webp.enabled` are read by RN's own gradle plugin, which is what pulls
  *   the `com.facebook.fresco:animated-gif` / `:webpsupport` artifacts in.
  *
- * - libzstd-kmp.so, from `com.squareup.zstd:zstd-kmp-okio`, which expo core hangs
- *   off `TransparentCompressionInterceptor` in ExpoFetchModule. That interceptor
- *   is only reachable through `expo/fetch`, and our single import of it lives in
- *   devtools/FetchInterceptor.ts behind an `if (__DEV__)` in App.tsx. The
- *   dependency cannot simply be excluded - the :expo module needs it to compile -
- *   so the .so is dropped at packaging time instead, which leaves every class in
- *   place and only fails if something actually decodes a zstd response body.
- *
  *   Careful: that makes this a tripwire. If `expo/fetch` ever moves into
  *   production code, its interceptor advertises `Accept-Encoding: zstd` on every
  *   request, and the first server that takes it up on the offer throws
@@ -53,7 +45,6 @@ const { withGradleProperties } = require('@expo/config-plugins');
 const PROPERTIES = {
   'expo.gif.enabled': 'false',
   'expo.webp.enabled': 'false',
-  'android.packagingOptions.excludes': '**/libzstd-kmp.so',
 };
 
 const withTrimmedNativeLibs = (config) => withGradleProperties(config, (modConfig) => {
