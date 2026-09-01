@@ -219,6 +219,7 @@ const uk: Translations = {
   'Download link': 'Посилання завантаження',
   'Copy link': 'Копіювати посилання',
   'Link copied': 'Посилання скопійовано',
+  'No app can open this link, so it was copied instead': 'Немає застосунку, який може відкрити це посилання, тому його скопійовано',
   'Parallel downloads': 'Паралельні завантаження',
   'How many files are downloaded at the same time. The rest wait in a queue.': 'Скільки файлів завантажується одночасно. Решта чекає в черзі.',
   'Poster download failed: {{error}}': 'Не вдалося завантажити постер: {{error}}',

@@ -219,6 +219,7 @@ const ru: Translations = {
   'Download link': 'Ссылка загрузки',
   'Copy link': 'Копировать ссылку',
   'Link copied': 'Ссылка скопирована',
+  'No app can open this link, so it was copied instead': 'Нет приложения, которое может открыть эту ссылку, поэтому она скопирована',
   'Parallel downloads': 'Параллельные загрузки',
   'How many files are downloaded at the same time. The rest wait in a queue.': 'Сколько файлов загружается одновременно. Остальные ждут в очереди.',
   'Poster download failed: {{error}}': 'Не удалось загрузить постер: {{error}}',

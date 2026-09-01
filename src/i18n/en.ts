@@ -217,6 +217,7 @@ const en = {
   'Download link': 'Download link',
   'Copy link': 'Copy link',
   'Link copied': 'Link copied',
+  'No app can open this link, so it was copied instead': 'No app can open this link, so it was copied instead',
   'Parallel downloads': 'Parallel downloads',
   'How many files are downloaded at the same time. The rest wait in a queue.': 'How many files are downloaded at the same time. The rest wait in a queue.',
   'Poster download failed: {{error}}': 'Poster download failed: {{error}}',
