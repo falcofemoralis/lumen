@@ -191,6 +191,14 @@ export function NavigationBarComponent({
     focusBoundaryDirections: ['left'],
     saveLastFocusedChild: false,
     preferredChildFocusKey: activeTabName ? getTabFocusKey(activeTabName) : undefined,
+    // Norigin navigates *from* the focused node, so with nothing focused at all a
+    // D-Pad press is simply dropped -- the app is then stuck with no way back to
+    // the menu. That happens whenever the screen the app starts on renders no
+    // focusable at all (an empty state: no notifications, no recent items ...),
+    // and again any time focus is lost. `forceFocus` makes the sidebar the
+    // recovery target: the first arrow press lands on the active tab instead of
+    // going nowhere.
+    forceFocus: true,
   });
 
   useEffect(() => {
