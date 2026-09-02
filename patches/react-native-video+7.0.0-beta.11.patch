@@ -1,0 +1,12 @@
+diff --git a/node_modules/react-native-video/android/gradle.properties b/node_modules/react-native-video/android/gradle.properties
+index ee17bac..c2be218 100644
+--- a/node_modules/react-native-video/android/gradle.properties
++++ b/node_modules/react-native-video/android/gradle.properties
+@@ -8,6 +8,6 @@ RNVideo_ndkversion=27.1.12297006
+ RNVideo_useExoplayerDash=true
+ RNVideo_useExoplayerHls=true
+
+-RNVideo_media3Version=1.4.1
++RNVideo_media3Version=1.11.0
+ RNVideo_androidxCoreVersion=1.13.1
+ RNVideo_androidxActivityVersion=1.9.3
