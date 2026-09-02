@@ -27,11 +27,13 @@ const parseEpisodeNumber = (value: string | undefined): number | null => {
  * The name the schedule gives the episode that is currently playing, for the player to
  * show under the title. Returns undefined whenever there is nothing to be sure about:
  * a film rather than a series, a film with no schedule, or a schedule that does not
- * list this episode yet.
+ * list this episode yet. With `withDate` the air date the schedule lists for that
+ * episode is appended as "name (date)" - dropped when the row carries no date.
  */
 export const getScheduleEpisodeName = (
   film: FilmInterface,
-  voice: FilmVoiceInterface
+  voice: FilmVoiceInterface,
+  withDate = false
 ): string | undefined => {
   const { hasSeasons, schedule = [] } = film;
   const { lastSeasonId, lastEpisodeId } = voice;
@@ -57,7 +59,13 @@ export const getScheduleEpisodeName = (
     return undefined;
   }
 
-  const { episodeName, episodeNameOriginal } = item;
+  const { episodeName, episodeNameOriginal, date } = item;
+  const name = episodeName || episodeNameOriginal || undefined;
+  const airDate = date?.trim();
 
-  return episodeName || episodeNameOriginal || undefined;
+  if (!name || !withDate || !airDate) {
+    return name;
+  }
+
+  return `${name} (${airDate})`;
 };

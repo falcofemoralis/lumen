@@ -253,6 +253,9 @@ const en = {
   'Show episode name': 'Show episode name',
   'Show the name the schedule gives the episode under the title in the player.':
     'Show the name the schedule gives the episode under the title in the player.',
+  'Show episode date': 'Show episode date',
+  'Append the air date to the episode name, as "name (date)".':
+    'Append the air date to the episode name, as "name (date)".',
   'Auto next episode': 'Auto next episode',
   'Toggle auto next episode.': 'Toggle auto next episode.',
   'Keep time on voice change': 'Keep time on voice change',

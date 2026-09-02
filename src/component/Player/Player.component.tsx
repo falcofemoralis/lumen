@@ -180,6 +180,7 @@ export function PlayerComponent({
     playerRewindSeconds,
     playerBackwardRewindSeconds,
     playerShowEpisodeName,
+    playerShowEpisodeDate,
   } = useConfigContext();
   const [showControls, setShowControls] = useState(false);
   const [isScrolling, setIsScrolling] = useState(false);
@@ -363,7 +364,7 @@ export function PlayerComponent({
       return null;
     }
 
-    const episodeName = getScheduleEpisodeName(film, voice);
+    const episodeName = getScheduleEpisodeName(film, voice, playerShowEpisodeDate);
 
     if (!episodeName) {
       return null;

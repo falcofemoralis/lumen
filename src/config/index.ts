@@ -31,6 +31,7 @@ export type DeviceConfigType = {
   playerShowBufferTime: boolean;
   playerShowEndTime: boolean;
   playerShowEpisodeName: boolean;
+  playerShowEpisodeDate: boolean;
   playerSubtitlesCustomStyle: boolean;
   playerSubtitlesSizeScale: number;
   playerSubtitlesColor: string;
@@ -94,6 +95,7 @@ export const defaultConfig: DeviceConfigType = {
   playerShowBufferTime: false,
   playerShowEndTime: false,
   playerShowEpisodeName: false,
+  playerShowEpisodeDate: false,
   playerSubtitlesCustomStyle: false,
   playerSubtitlesSizeScale: DEFAULT_SUBTITLES_SIZE_SCALE,
   playerSubtitlesColor: DEFAULT_SUBTITLES_COLOR,
@@ -188,6 +190,7 @@ export const CONFIG_KEY_SECTIONS = {
   playerShowBufferTime: BACKUP_SECTION.SETTINGS_PLAYER,
   playerShowEndTime: BACKUP_SECTION.SETTINGS_PLAYER,
   playerShowEpisodeName: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerShowEpisodeDate: BACKUP_SECTION.SETTINGS_PLAYER,
   playerSubtitlesCustomStyle: BACKUP_SECTION.SETTINGS_PLAYER,
   playerSubtitlesSizeScale: BACKUP_SECTION.SETTINGS_PLAYER,
   playerSubtitlesColor: BACKUP_SECTION.SETTINGS_PLAYER,

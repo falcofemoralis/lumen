@@ -255,6 +255,9 @@ const uk: Translations = {
   'Show episode name': 'Показувати назву серії',
   'Show the name the schedule gives the episode under the title in the player.':
     'Назву поточної серії з розкладу виходу серій буде показано у плеєрі під назвою серіалу.',
+  'Show episode date': 'Показувати дату виходу серії',
+  'Append the air date to the episode name, as "name (date)".':
+    'Дату виходу серії буде додано до її назви у форматі «назва (дата)».',
   'Auto next episode': 'Автоматично включати наступну серію',
   'Toggle auto next episode.': 'Після завершення серії автоматично буде включатись наступна.',
   'Keep time on voice change': 'Зберігати час при зміні озвучення',

@@ -24,6 +24,7 @@ import ArrowRight from 'lucide-react-native/icons/arrow-right';
 import AudioLines from 'lucide-react-native/icons/audio-lines';
 import BookImage from 'lucide-react-native/icons/book-image';
 import Brush from 'lucide-react-native/icons/brush';
+import CalendarDays from 'lucide-react-native/icons/calendar-days';
 import Subtitles from 'lucide-react-native/icons/captions';
 import CircleGauge from 'lucide-react-native/icons/circle-gauge';
 import CircleQuestionMark from 'lucide-react-native/icons/circle-question-mark';
@@ -113,6 +114,7 @@ export function SettingsScreenComponent({
   playerShowBufferTime,
   playerShowEndTime,
   playerShowEpisodeName,
+  playerShowEpisodeDate,
   playerSubtitlesCustomStyle,
   playerSubtitlesSizeScale,
   playerSubtitlesColor,
@@ -640,6 +642,14 @@ export function SettingsScreenComponent({
         IconComponent={ Tag }
         value={ playerShowEpisodeName }
         onChange={ (value) => onConfigUpdate('playerShowEpisodeName', value) }
+      />
+      <SettingSwitch
+        title={ t('Show episode date') }
+        subtitle={ t('Append the air date to the episode name, as "name (date)".') }
+        IconComponent={ CalendarDays }
+        value={ playerShowEpisodeDate }
+        isEnabled={ playerShowEpisodeName }
+        onChange={ (value) => onConfigUpdate('playerShowEpisodeDate', value) }
       />
       <SettingSelect
         title={ t('Player buffer time settings') }

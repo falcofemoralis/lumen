@@ -191,6 +191,7 @@ export function PlayerComponent({
     playerStopPlayOnButtonTV,
     playerStopPlayShowInterfaceTV,
     playerShowEpisodeName,
+    playerShowEpisodeDate,
   } = useConfigContext();
   const { theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
@@ -491,7 +492,7 @@ export function PlayerComponent({
       return null;
     }
 
-    const episodeName = getScheduleEpisodeName(film, voice);
+    const episodeName = getScheduleEpisodeName(film, voice, playerShowEpisodeDate);
 
     if (!episodeName) {
       return null;
