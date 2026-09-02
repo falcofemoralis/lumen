@@ -36,6 +36,7 @@ import Download from 'lucide-react-native/icons/download';
 import ExternalLink from 'lucide-react-native/icons/external-link';
 import EyeOff from 'lucide-react-native/icons/eye-off';
 import FastForward from 'lucide-react-native/icons/fast-forward';
+import Film from 'lucide-react-native/icons/film';
 import FolderCog from 'lucide-react-native/icons/folder-cog';
 import FolderDown from 'lucide-react-native/icons/folder-down';
 import FolderLock from 'lucide-react-native/icons/folder-lock';
@@ -121,6 +122,7 @@ export function SettingsScreenComponent({
   playerSubtitlesBackgroundColor,
   playerSubtitlesEdgeType,
   playerSubtitlesBottomOffset,
+  playerStoryboard,
   playerStoryboardAdjacentFrames,
   isFirestore,
   securedSettings,
@@ -558,10 +560,18 @@ export function SettingsScreenComponent({
         onChange={ (value) => onConfigUpdate('playerBackwardRewindSeconds', Number(value)) }
       />
       <SettingSwitch
+        title={ t('Preview frames') }
+        subtitle={ t('Show a frame of the video at the position being sought to.') }
+        IconComponent={ Film }
+        value={ playerStoryboard }
+        onChange={ (value) => onConfigUpdate('playerStoryboard', value) }
+      />
+      <SettingSwitch
         title={ t('Adjacent preview frames') }
         subtitle={ t('Show the previous and the next preview frame beside the current one while seeking.') }
         IconComponent={ Images }
         value={ playerStoryboardAdjacentFrames }
+        isEnabled={ playerStoryboard }
         onChange={ (value) => onConfigUpdate('playerStoryboardAdjacentFrames', value) }
       />
       <SettingSelect

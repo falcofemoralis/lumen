@@ -175,6 +175,9 @@ const en = {
   'No items': 'No items',
   'Player forward rewind seconds': 'Player forward rewind seconds',
   'Player backward rewind seconds': 'Player backward rewind seconds',
+  'Preview frames': 'Preview frames',
+  'Show a frame of the video at the position being sought to.':
+    'Show a frame of the video at the position being sought to.',
   'Adjacent preview frames': 'Adjacent preview frames',
   'Show the previous and the next preview frame beside the current one while seeking.':
     'Show the previous and the next preview frame beside the current one while seeking.',

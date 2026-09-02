@@ -177,6 +177,9 @@ const uk: Translations = {
   'No items': 'Список порожній',
   'Player forward rewind seconds': 'Секунди перемотки вперед',
   'Player backward rewind seconds': 'Секунди перемотки назад',
+  'Preview frames': 'Кадри попереднього перегляду',
+  'Show a frame of the video at the position being sought to.':
+    'Під час перемотки показувати кадр відео з позиції, до якої вона веде.',
   'Adjacent preview frames': 'Сусідні кадри попереднього перегляду',
   'Show the previous and the next preview frame beside the current one while seeking.':
     'Під час перемотки поряд із поточним кадром попереднього перегляду буде показано попередній і наступний.',

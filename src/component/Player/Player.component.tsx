@@ -181,6 +181,7 @@ export function PlayerComponent({
     playerBackwardRewindSeconds,
     playerShowEpisodeName,
     playerShowEpisodeDate,
+    playerStoryboard,
   } = useConfigContext();
   const [showControls, setShowControls] = useState(false);
   const [isScrolling, setIsScrolling] = useState(false);
@@ -547,12 +548,14 @@ export function PlayerComponent({
   );
 
   const renderProgressBar = () => {
+    // without a url nothing downstream fetches or parses the storyboard, which is
+    // exactly what switching it off should cost
     const { storyboardUrl } = video;
 
     return (
       <PlayerProgressBar
         player={ player }
-        storyboardUrl={ storyboardUrl }
+        storyboardUrl={ playerStoryboard ? storyboardUrl : undefined }
         seekToPosition={ seekToPosition }
         calculateCurrentTime={ calculateCurrentTime }
         handleIsScrolling={ handleIsScrolling }

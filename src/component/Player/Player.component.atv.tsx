@@ -192,6 +192,7 @@ export function PlayerComponent({
     playerStopPlayShowInterfaceTV,
     playerShowEpisodeName,
     playerShowEpisodeDate,
+    playerStoryboard,
   } = useConfigContext();
   const { theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
@@ -626,12 +627,14 @@ export function PlayerComponent({
   );
 
   const renderProgressBar = () => {
+    // without a url nothing downstream fetches or parses the storyboard, which is
+    // exactly what switching it off should cost
     const { storyboardUrl } = video;
 
     return (
       <PlayerProgressBar
         player={ player }
-        storyboardUrl={ storyboardUrl }
+        storyboardUrl={ playerStoryboard ? storyboardUrl : undefined }
         calculateCurrentTime={ calculateCurrentTime }
         seekToPosition={ seekToPosition }
         thumbFocusKey={ PROGRESS_THUMB_FOCUS_KEY }
