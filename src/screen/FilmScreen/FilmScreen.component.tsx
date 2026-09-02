@@ -24,6 +24,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import ArrowRight from 'lucide-react-native/icons/arrow-right';
+import BellOff from 'lucide-react-native/icons/bell-off';
 import Bookmark from 'lucide-react-native/icons/bookmark';
 import BookmarkCheck from 'lucide-react-native/icons/bookmark-check';
 import Clapperboard from 'lucide-react-native/icons/clapperboard';
@@ -58,6 +59,7 @@ import { isBookmarked } from 'Util/Film';
 import { noopFn } from 'Util/Function';
 import { openLinkInBrowser } from 'Util/Link';
 
+import { NOTIFICATION_ACTION_HIDE, NOTIFICATION_ACTION_REMOVE } from './FilmScreen.config';
 import { componentStyles } from './FilmScreen.style';
 import { FilmScreenThumbnail } from './FilmScreen.thumbnail';
 import { FilmScreenComponentProps } from './FilmScreen.type';
@@ -107,6 +109,8 @@ export function FilmScreenComponent({
   playerVideoDownloaderOverlayRef,
   isDeepLink,
   ratingOverlayRef,
+  notificationsOverlayRef,
+  canUnsubscribeNotifications,
   shouldDisplayContinueWatching,
   isContinueWatchingLoading,
   showVotesCount,
@@ -124,6 +128,8 @@ export function FilmScreenComponent({
   handleDownloadSelect,
   openTrailerOverlay,
   openRatingOverlay,
+  openNotificationsOverlay,
+  unsubscribeFromNotifications,
   handleRatingSelect,
   continueWatching,
 }: FilmScreenComponentProps) {
@@ -322,6 +328,13 @@ export function FilmScreenComponent({
         IconComponent={ Download }
         action={ openVideoDownloader }
       />
+      { canUnsubscribeNotifications && (
+        <MiddleAction
+          styles={ styles }
+          IconComponent={ BellOff }
+          action={ openNotificationsOverlay }
+        />
+      ) }
     </View>
   );
 
@@ -568,6 +581,34 @@ export function FilmScreenComponent({
     );
   };
 
+  // Both entries drop the film out of the continue-watching list, which is what the
+  // site notifies about -- removing it outright, or marking it watched.
+  const renderNotificationsOverlay = () => {
+    if (!canUnsubscribeNotifications) {
+      return null;
+    }
+
+    return (
+      <ThemedDropdown
+        overlayRef={ notificationsOverlayRef }
+        header={ t('Unsubscribe from notifications') }
+        data={ [
+          {
+            label: t('Remove'),
+            value: NOTIFICATION_ACTION_REMOVE,
+          },
+          {
+            label: t('Hide'),
+            value: NOTIFICATION_ACTION_HIDE,
+          },
+        ] }
+        onChange={ (item) => unsubscribeFromNotifications(item.value) }
+        closeOnChange
+        asOverlay
+      />
+    );
+  };
+
   // Owns the sheet itself, so it can hand the composer to TrueSheet as the
   // floating footer that stays on screen at a partly open detent.
   const renderCommentsOverlay = () => (
@@ -597,6 +638,7 @@ export function FilmScreenComponent({
         { renderBookmarksOverlay() }
         { renderPlayerVideoDownloader() }
         { renderRatingOverlay() }
+        { renderNotificationsOverlay() }
         { renderCommentsOverlay() }
         { renderScheduleOverlay() }
       </>

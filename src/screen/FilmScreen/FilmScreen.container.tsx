@@ -41,7 +41,10 @@ import { openActor, openCategory, openFilm } from 'Util/Router';
 
 import FilmScreenComponent from './FilmScreen.component';
 import FilmScreenComponentTV from './FilmScreen.component.atv';
-import { MINIMUM_SCHEDULE_ITEMS } from './FilmScreen.config';
+import {
+  MINIMUM_SCHEDULE_ITEMS,
+  NOTIFICATION_ACTION_REMOVE,
+} from './FilmScreen.config';
 import { FilmScreenContainerProps } from './FilmScreen.type';
 
 export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
@@ -67,6 +70,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
   const descriptionOverlayRef = useRef<ThemedOverlayRef>(null);
   const playerVideoDownloaderOverlayRef = useRef<PlayerVideoSelectorRef>(null);
   const ratingOverlayRef = useRef<ThemedOverlayRef>(null);
+  const notificationsOverlayRef = useRef<ThemedOverlayRef>(null);
 
   // fallback to deep link url
   let link = linkArg;
@@ -555,6 +559,50 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     postRating({ id: film.id, rating });
   };
 
+  // The account is notified about new episodes of whatever it keeps in the
+  // continue-watching list, so both ways out of that list are also the two ways to
+  // stop the notifications - the same calls the recent screen makes.
+  const canUnsubscribeNotifications = isSignedIn && !isLocalLibrary;
+
+  const { mutate: unsubscribeNotifications } = useMutation({
+    mutationFn: async ({ id, action }: { id: string, action: string }) => {
+      if (action === NOTIFICATION_ACTION_REMOVE) {
+        await currentService.removeRecent(id);
+
+        return;
+      }
+
+      await currentService.hideRecent(id);
+    },
+    onSuccess: () => {
+      // the service keeps the parsed continue list around to page through it
+      // locally, so it has to be dropped for the change to show up there
+      currentService.unloadRecentScreen();
+      queryClient.invalidateQueries({ queryKey: queryKeys.recent() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.notifications() });
+
+      NotificationStore.displayMessage(t('Unsubscribed from notifications'));
+    },
+  });
+
+  const openNotificationsOverlay = () => {
+    if (!canUnsubscribeNotifications) {
+      NotificationStore.displayMessage(t('Sign In to an Account'));
+
+      return;
+    }
+
+    notificationsOverlayRef.current?.open();
+  };
+
+  const unsubscribeFromNotifications = (action: string) => {
+    if (!film) {
+      return;
+    }
+
+    unsubscribeNotifications({ id: film.id, action });
+  };
+
   const shouldDisplayContinueWatching = useMemo(() => {
     if (!film || !isContinueBtnEnabled) {
       return false;
@@ -717,6 +765,8 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     playerVideoDownloaderOverlayRef,
     isDeepLink,
     ratingOverlayRef,
+    notificationsOverlayRef,
+    canUnsubscribeNotifications,
     isContinueWatchingLoading,
     showVotesCount,
     showRecommendations,
@@ -734,6 +784,8 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     openTrailerOverlay,
     handleRatingSelect,
     openRatingOverlay,
+    openNotificationsOverlay,
+    unsubscribeFromNotifications,
     openComments,
     openDescription,
     openSchedule,
