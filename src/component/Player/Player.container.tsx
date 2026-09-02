@@ -96,6 +96,7 @@ export function PlayerContainer({
     isLocalLibrary,
     playerSaveQuality,
     playerAutoNextEpisode,
+    playerKeepTimeOnVoiceChange,
     playerBufferTimeSetting,
     playerBackBufferTimeSetting,
     playerDefaultAspectRatio,
@@ -402,7 +403,8 @@ export function PlayerContainer({
   const updatePlayerStream = (
     videoArg: FilmVideoInterface,
     qualityArg: string,
-    voiceArg: FilmVoiceInterface
+    voiceArg: FilmVoiceInterface,
+    carriedTime?: number
   ) => {
     // a new source gets its own chance to load - whatever failed before is not
     // the state of what is about to play
@@ -426,8 +428,9 @@ export function PlayerContainer({
     // the position nor resumes on its own. The position is read back the same
     // way the initial load does it - the callers save the current one first, so
     // a quality switch lands where playback was, and an episode switch lands on
-    // whatever was watched of that episode.
-    const resumeTime = getVideoTime(newVoice, getSavedTime(film));
+    // whatever was watched of that episode. `carriedTime` overrides that lookup
+    // for a voice switch that is asked to stay where playback was.
+    const resumeTime = carriedTime ?? getVideoTime(newVoice, getSavedTime(film));
 
     player.replaceSourceAsync(
       buildVideoSource(newStream.url, newStream.quality, videoArg, newVoice)
@@ -448,7 +451,34 @@ export function PlayerContainer({
       });
   };
 
+  /**
+   * A voice is a separate encode of the same episode, so its timeline is the same
+   * one - give or take the intro and the outro the studio put on it, which is why
+   * carrying the position over is a setting and not the default. It only applies
+   * to a switch that stays on the same episode: another episode has a position of
+   * its own, and there is nothing to carry from the one being left behind.
+   */
+  const getCarriedTime = (newVoice: FilmVoiceInterface) => {
+    if (!playerKeepTimeOnVoiceChange || newVoice.id === selectedVoice.id) {
+      return undefined;
+    }
+
+    if (film.hasSeasons && (
+      newVoice.lastSeasonId !== selectedVoice.lastSeasonId
+      || newVoice.lastEpisodeId !== selectedVoice.lastEpisodeId
+    )) {
+      return undefined;
+    }
+
+    const { currentTime } = player;
+
+    return currentTime > 0 ? currentTime : undefined;
+  };
+
   const changePlayerVideo = (newVideo: FilmVideoInterface, newVoice: FilmVoiceInterface) => {
+    // read before anything else touches the player - the source is about to be replaced
+    const carriedTime = getCarriedTime(newVoice);
+
     if (isLocalLibrary) {
       if (!isOffline) {
         upsertLocalHistoryItem(film, newVoice);
@@ -467,7 +497,7 @@ export function PlayerContainer({
     resetUpdateTimeTimeout();
     setSelectedSubtitle(newVideo.subtitles?.find(({ isDefault }) => isDefault));
     updateSelectedVoice(film.id, newVoice);
-    updatePlayerStream(newVideo, selectedQuality, newVoice);
+    updatePlayerStream(newVideo, selectedQuality, newVoice, carriedTime);
   };
 
   const handleNewEpisode = async (direction: RewindDirection) => {

@@ -64,6 +64,7 @@ import Sparkles from 'lucide-react-native/icons/sparkles';
 import StepForward from 'lucide-react-native/icons/step-forward';
 import Sun from 'lucide-react-native/icons/sun';
 import Tag from 'lucide-react-native/icons/tag';
+import Timer from 'lucide-react-native/icons/timer';
 import TvMinimalPlay from 'lucide-react-native/icons/tv-minimal-play';
 import UserCog from 'lucide-react-native/icons/user-cog';
 import Users from 'lucide-react-native/icons/users';
@@ -127,6 +128,7 @@ export function SettingsScreenComponent({
   downloadsMaxParallel,
   downloadsMaxParallelOptions,
   playerAutoNextEpisode,
+  playerKeepTimeOnVoiceChange,
   playerLongPressSpeed,
   playerVolumeGesture,
   playerBrightnessGesture,
@@ -573,6 +575,13 @@ export function SettingsScreenComponent({
         IconComponent={ StepForward }
         value={ playerAutoNextEpisode }
         onChange={ (value) => onConfigUpdate('playerAutoNextEpisode', value) }
+      />
+      <SettingSwitch
+        title={ t('Keep time on voice change') }
+        subtitle={ t('Switching the voice keeps the current position instead of the one saved for it.') }
+        IconComponent={ Timer }
+        value={ playerKeepTimeOnVoiceChange }
+        onChange={ (value) => onConfigUpdate('playerKeepTimeOnVoiceChange', value) }
       />
       <SettingSelect
         title={ t('Player long press speed') }
