@@ -6,6 +6,7 @@ import { getCurrentLanguage, Language, setLanguage } from 'i18n/index';
 import { t } from 'i18n/translate';
 import { reactNativeAfr } from 'Modules/react-native-afr';
 import { reactNativeDownloads } from 'Modules/react-native-downloads';
+import { reactNativeLoudness } from 'Modules/react-native-loudness';
 import { reactNativeTvChannels } from 'Modules/react-native-tv-channels';
 import { reactNativeTvSearch } from 'Modules/react-native-tv-search';
 import { useCallback, useMemo, useState } from 'react';
@@ -99,6 +100,10 @@ export function SettingsScreenContainer() {
   // a phone panel has a fixed refresh rate there is no point matching a video to, and
   // below Android 6 there is no display mode API to ask
   const isAutoFrameRateSupported = useMemo(() => reactNativeAfr.isSupported(), []);
+
+  // audio effects are optional for a device to implement, and the cheaper TV boxes ship
+  // without any - there is nothing to offer there
+  const isVolumeNormalizationSupported = useMemo(() => reactNativeLoudness.isSupported(), []);
 
   const onConfigUpdate = (key: keyof DeviceConfigType, value: unknown) => {
     setConfig(key, value);
@@ -280,6 +285,7 @@ export function SettingsScreenContainer() {
     isTvChannelsSupported,
     isTvSearchSupported,
     isAutoFrameRateSupported,
+    isVolumeNormalizationSupported,
     onConfigUpdate,
     onTvChannelsAddToHome,
     onLanguageChange,

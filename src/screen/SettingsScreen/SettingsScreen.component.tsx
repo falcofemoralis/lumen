@@ -21,6 +21,7 @@ import ArrowDown10 from 'lucide-react-native/icons/arrow-down-1-0';
 import ArrowDownUp from 'lucide-react-native/icons/arrow-down-up';
 import ArrowLeftRight from 'lucide-react-native/icons/arrow-left-right';
 import ArrowRight from 'lucide-react-native/icons/arrow-right';
+import AudioLines from 'lucide-react-native/icons/audio-lines';
 import BookImage from 'lucide-react-native/icons/book-image';
 import Brush from 'lucide-react-native/icons/brush';
 import Subtitles from 'lucide-react-native/icons/captions';
@@ -92,6 +93,7 @@ import {
   PLAYER_SUBTITLES_COLOR_OPTIONS,
   PLAYER_SUBTITLES_EDGE_OPTIONS,
   PLAYER_SUBTITLES_SIZE_OPTIONS,
+  PLAYER_VOLUME_NORMALIZATION_OPTIONS,
   TELEGRAM_LINK,
   THEME_SCHEME_OPTIONS,
 } from './SettingsScreen.config';
@@ -129,6 +131,9 @@ export function SettingsScreenComponent({
   playerVolumeGesture,
   playerBrightnessGesture,
   playerSwapGestureSides,
+  playerVolumeNormalizationEnabled,
+  playerVolumeNormalizationStrength,
+  isVolumeNormalizationSupported,
   sortVoicesByRating,
   playerBufferTimeSetting,
   playerBackBufferTimeSetting,
@@ -644,6 +649,24 @@ export function SettingsScreenComponent({
         value={ playerBackBufferTimeSetting.toString() }
         options={ PLAYER_BACK_BUFFER_TIME_OPTIONS }
         onChange={ (value) => onConfigUpdate('playerBackBufferTimeSetting', Number(value)) }
+      />
+      <SettingSwitch
+        title={ t('Volume normalization') }
+        subtitle={ t('Adds a button to the player that makes loud scenes quieter and quiet dialogue louder.') }
+        IconComponent={ AudioLines }
+        value={ playerVolumeNormalizationEnabled }
+        isHidden={ !isVolumeNormalizationSupported }
+        onChange={ (value) => onConfigUpdate('playerVolumeNormalizationEnabled', value) }
+      />
+      <SettingSelect
+        title={ t('Normalization strength') }
+        subtitle={ t('How close together the loudest and the quietest parts are brought.') }
+        IconComponent={ Gauge }
+        value={ playerVolumeNormalizationStrength }
+        options={ PLAYER_VOLUME_NORMALIZATION_OPTIONS }
+        isHidden={ !isVolumeNormalizationSupported }
+        isEnabled={ playerVolumeNormalizationEnabled }
+        onChange={ (value) => onConfigUpdate('playerVolumeNormalizationStrength', value) }
       />
       { renderSubtitlesStyle() }
     </ThemedScrollView>

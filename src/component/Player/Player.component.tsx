@@ -59,7 +59,7 @@ import Animated, {
 import { VideoView } from 'react-native-video';
 import { scheduleOnRN } from 'react-native-worklets';
 import { useAppTheme } from 'Theme/context';
-import { ClosedCaptionFilled } from 'Theme/icons';
+import { ClosedCaptionFilled, VolumeNormalizationIcon } from 'Theme/icons';
 import { hideSystemBars, showSystemBars } from 'Util/Device';
 import {
   formatVideoTrackInfo,
@@ -139,6 +139,9 @@ export function PlayerComponent({
   overlayQuality,
   isVideoLoading,
   hasPlaybackError,
+  isVolumeNormalizationSupported,
+  isVolumeNormalizationEnabled,
+  toggleVolumeNormalization,
   togglePlayPause,
   seekToPosition,
   calculateCurrentTime,
@@ -608,6 +611,16 @@ export function PlayerComponent({
               <PlayerAction
                 IconComponent={ Forward }
                 action={ handleShare }
+                onInteraction={ handleUserInteraction }
+              />
+            ) }
+            { isVolumeNormalizationSupported && (
+              <PlayerAction
+                IconComponent={ VolumeNormalizationIcon({
+                  color: theme.colors.iconOnContrast,
+                  isFilled: isVolumeNormalizationEnabled,
+                }) }
+                action={ toggleVolumeNormalization }
                 onInteraction={ handleUserInteraction }
               />
             ) }

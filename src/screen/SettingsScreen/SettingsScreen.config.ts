@@ -7,6 +7,7 @@ import {
   SUBTITLES_SIZE_SCALES,
 } from 'Component/Player/Player.config';
 import { t } from 'i18n/translate';
+import { LoudnessStrength } from 'Modules/react-native-loudness';
 import { SubtitleEdgeType } from 'Modules/react-native-subtitle-style';
 import {
   ACCOUNT_SCREEN,
@@ -510,6 +511,32 @@ export const PLAYER_SUBTITLES_EDGE_OPTIONS = [
     value: SubtitleEdgeType.DEPRESSED,
     get label() {
       return t('Depressed');
+    },
+  },
+];
+
+/**
+ * How hard volume normalization compresses. `off` is not among them: the switch beside
+ * this is what turns the feature off, and a level called off inside it would be a second
+ * way to say the same thing.
+ */
+export const PLAYER_VOLUME_NORMALIZATION_OPTIONS = [
+  {
+    value: LoudnessStrength.LIGHT,
+    get label() {
+      return t('Gentle');
+    },
+  },
+  {
+    value: LoudnessStrength.MEDIUM,
+    get label() {
+      return t('Moderate');
+    },
+  },
+  {
+    value: LoudnessStrength.STRONG,
+    get label() {
+      return t('Strong');
     },
   },
 ];

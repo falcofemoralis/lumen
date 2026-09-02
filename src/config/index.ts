@@ -6,6 +6,7 @@ import {
   DEFAULT_SUBTITLES_COLOR,
   DEFAULT_SUBTITLES_EDGE_TYPE,
   DEFAULT_SUBTITLES_SIZE_SCALE,
+  DEFAULT_VOLUME_NORMALIZATION_STRENGTH,
 } from 'Component/Player/Player.config';
 import { HOME_SCREEN } from 'Navigation/navigationRoutes';
 import { BACKUP_SECTION } from 'Type/Backup.interface';
@@ -45,6 +46,9 @@ export type DeviceConfigType = {
   playerAutoNextEpisode: boolean;
   playerAutoFrameRateEnabled: boolean;
   playerAutoFrameRate: boolean;
+  playerVolumeNormalizationEnabled: boolean;
+  playerVolumeNormalization: boolean;
+  playerVolumeNormalizationStrength: string;
   playerLongPressSpeed: number;
   playerVolumeGesture: boolean;
   playerBrightnessGesture: boolean;
@@ -106,6 +110,9 @@ export const defaultConfig: DeviceConfigType = {
   playerAutoNextEpisode: true,
   playerAutoFrameRateEnabled: false,
   playerAutoFrameRate: false,
+  playerVolumeNormalizationEnabled: false,
+  playerVolumeNormalization: false,
+  playerVolumeNormalizationStrength: DEFAULT_VOLUME_NORMALIZATION_STRENGTH,
   playerLongPressSpeed: 1.5,
   playerVolumeGesture: false,
   playerBrightnessGesture: false,
@@ -166,6 +173,9 @@ export const CONFIG_KEY_SECTIONS = {
   playerAutoNextEpisode: BACKUP_SECTION.SETTINGS_PLAYER,
   playerAutoFrameRateEnabled: BACKUP_SECTION.SETTINGS_PLAYER,
   playerAutoFrameRate: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerVolumeNormalizationEnabled: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerVolumeNormalization: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerVolumeNormalizationStrength: BACKUP_SECTION.SETTINGS_PLAYER,
   playerLongPressSpeed: BACKUP_SECTION.SETTINGS_PLAYER,
   playerVolumeGesture: BACKUP_SECTION.SETTINGS_PLAYER,
   playerBrightnessGesture: BACKUP_SECTION.SETTINGS_PLAYER,

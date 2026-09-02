@@ -50,7 +50,7 @@ import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated'
 import { VideoView } from 'react-native-video';
 import { scheduleOnRN } from 'react-native-worklets';
 import { useAppTheme } from 'Theme/context';
-import { AutoFrameRateIcon, ClosedCaptionFilled } from 'Theme/icons';
+import { AutoFrameRateIcon, ClosedCaptionFilled, VolumeNormalizationIcon } from 'Theme/icons';
 import {
   formatVideoTrackInfo,
   getPlayerAvailableQualityItems,
@@ -157,6 +157,9 @@ export function PlayerComponent({
   isAutoFrameRateSupported,
   isAutoFrameRateEnabled,
   toggleAutoFrameRate,
+  isVolumeNormalizationSupported,
+  isVolumeNormalizationEnabled,
+  toggleVolumeNormalization,
   togglePlayPause,
   rewindPosition,
   openQualitySelector,
@@ -705,6 +708,16 @@ export function PlayerComponent({
                   isFilled: isAutoFrameRateEnabled,
                 }) }
                 action={ toggleAutoFrameRate }
+                onInteraction={ handleUserInteraction }
+              />
+            ) }
+            { isVolumeNormalizationSupported && (
+              <PlayerBottomAction
+                IconComponent={ VolumeNormalizationIcon({
+                  color: theme.colors.iconOnContrast,
+                  isFilled: isVolumeNormalizationEnabled,
+                }) }
+                action={ toggleVolumeNormalization }
                 onInteraction={ handleUserInteraction }
               />
             ) }

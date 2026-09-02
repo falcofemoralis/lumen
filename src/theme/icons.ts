@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { createLucideIcon } from './createLucideIcon';
+import { createLucideIcon, IconNode } from './createLucideIcon';
 
 export const ClosedCaptionFilled = ({ color }: { color: string }) => {
   return createLucideIcon('ClosedCaptionFilled', [
@@ -54,6 +54,53 @@ export const AutoFrameRateIcon = ({ color, isFilled }: { color: string; isFilled
   return createLucideIcon('AutoFrameRate', [
     ['rect', { ...AFR_BADGE, fill: isFilled ? color : 'none', key: 'ipm5vs' }],
     ['text', { ...AFR_LABEL, fill: isFilled ? 'black' : color, key: '1kd8ba' }],
+  ]);
+};
+
+/**
+ * Levels that have been evened out: four bars of nearly the same height, where an
+ * untouched signal would be a tall one next to a short one.
+ *
+ * They sit on the same badge as [AutoFrameRateIcon] so the two read as the same kind of
+ * control where they sit next to each other in the player. Drawn rather than borrowed
+ * from lucide for that reason alone - `AudioLines` on its own would be the odd one out.
+ */
+const VOLUME_NORMALIZATION_BARS = [
+  { x: '6', half: 3 },
+  { x: '10', half: 4.25 },
+  { x: '14', half: 4.25 },
+  { x: '18', half: 3 },
+] as const;
+
+/** Half the badge's height, i.e. where a bar of half-height `h` starts and ends. */
+const BADGE_CENTER = 12;
+
+/**
+ * Volume normalization, drawn the way the auto frame rate icon is: an outlined badge
+ * with solid bars while it is off, and the whole badge filled with the bars knocked out
+ * of it once it is on.
+ *
+ * Takes the colour rather than reading it off the icon's own `color` prop, for the reason
+ * [AutoFrameRateIcon] does - that one only ever reaches `stroke`, and a filled badge
+ * needs it in `fill`.
+ */
+export const VolumeNormalizationIcon = ({ color, isFilled }: { color: string; isFilled: boolean }) => {
+  return createLucideIcon('VolumeNormalization', [
+    ['rect', { ...AFR_BADGE, fill: isFilled ? color : 'none', key: 'v9ocdm' }],
+    // the stroke width and the round caps are the icon's own defaults, so only the
+    // colour has to be said here - and it has to, because a filled badge knocks the
+    // bars out of itself rather than drawing them in the icon's colour
+    ...VOLUME_NORMALIZATION_BARS.map(({ x, half }): IconNode[number] => ([
+      'line',
+      {
+        x1: x,
+        x2: x,
+        y1: String(BADGE_CENTER - half),
+        y2: String(BADGE_CENTER + half),
+        stroke: isFilled ? 'black' : color,
+        key: `bar-${ x }`,
+      },
+    ])),
   ]);
 };
 

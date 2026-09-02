@@ -82,6 +82,19 @@ export const DEFAULT_SUBTITLES_COLOR = '#FFFFFF';
 export const DEFAULT_SUBTITLES_BACKGROUND_COLOR = '#FF000000';
 export const DEFAULT_SUBTITLES_EDGE_TYPE = 'outline';
 
+/**
+ * How hard volume normalization compresses, as the settings store it.
+ *
+ * A plain string rather than the native module's `LoudnessStrength`, for the same reason
+ * the subtitle edge type above is one: everything this file is imported from has to stay
+ * loadable outside the app, and that enum sits next to a `requireNativeModule` call.
+ * `useVolumeNormalization` is what turns the one into the other.
+ *
+ * The middle setting is the default because it is the one that sounds like the film:
+ * enough to make a night-time watch workable, not so much that the mix stops breathing.
+ */
+export const DEFAULT_VOLUME_NORMALIZATION_STRENGTH = 'medium';
+
 /** What a vertical slide over one half of the player adjusts. */
 export enum PlayerSlideControl {
   VOLUME = 'VOLUME',

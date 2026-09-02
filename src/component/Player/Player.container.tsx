@@ -11,6 +11,7 @@ import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { useAutoFrameRateAction } from 'Hooks/useAutoFrameRate';
 import { useLocalBookmarks } from 'Hooks/useLocalLibrary';
 import { useVideoPlayerState } from 'Hooks/useVideoPlayerState';
+import { useVolumeNormalizationAction } from 'Hooks/useVolumeNormalization';
 import { t } from 'i18n/translate';
 import {
   useCallback,
@@ -172,6 +173,12 @@ export function PlayerContainer({
     isAutoFrameRateEnabled,
     toggleAutoFrameRate,
   } = useAutoFrameRateAction();
+
+  const {
+    isVolumeNormalizationSupported,
+    isVolumeNormalizationEnabled,
+    toggleVolumeNormalization,
+  } = useVolumeNormalizationAction();
 
   // in local mode the bookmark state is derived reactively from the local store
   const isFilmBookmarkedValue = isLocalLibrary
@@ -1021,6 +1028,9 @@ export function PlayerContainer({
     isAutoFrameRateSupported,
     isAutoFrameRateEnabled,
     toggleAutoFrameRate,
+    isVolumeNormalizationSupported,
+    isVolumeNormalizationEnabled,
+    toggleVolumeNormalization,
     togglePlayPause,
     rewindPosition,
     seekToPosition,

@@ -1,0 +1,11 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="expo.modules.loudness">
+
+    <!--
+      Attaching an `AudioEffect` to a playback session needs this. It is a normal
+      permission - granted at install time, never prompted for - and it says nothing
+      about recording: the effect only ever sees the app's own output.
+    -->
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+
+</manifest>

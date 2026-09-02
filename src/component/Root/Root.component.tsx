@@ -15,6 +15,7 @@ import { useAwake } from 'Hooks/useAwake';
 import { useSubtitleStyle } from 'Hooks/useSubtitleStyle';
 import { useTvChannels } from 'Hooks/useTvChannels';
 import { useTvSearch } from 'Hooks/useTvSearch';
+import { useVolumeNormalization } from 'Hooks/useVolumeNormalization';
 import { ReactNode, useEffect } from 'react';
 import NotificationStore from 'Store/Notification.store';
 import { Installer } from 'Util/App/installer';
@@ -29,6 +30,9 @@ export const Root = ({ children }: { children: ReactNode }) => {
     tvSearchEnabled,
     playerAutoFrameRateEnabled,
     playerAutoFrameRate,
+    playerVolumeNormalizationEnabled,
+    playerVolumeNormalization,
+    playerVolumeNormalizationStrength,
   } = useConfigContext();
   const { isSignedIn } = useServiceContext();
   const { fetchUserData } = useServiceContext();
@@ -39,6 +43,10 @@ export const Root = ({ children }: { children: ReactNode }) => {
   useTvChannels(tvChannelsEnabled);
   useTvSearch(tvSearchEnabled);
   useAutoFrameRate(playerAutoFrameRateEnabled && playerAutoFrameRate);
+  useVolumeNormalization(
+    playerVolumeNormalizationEnabled && playerVolumeNormalization,
+    playerVolumeNormalizationStrength
+  );
   useSubtitleStyle();
 
   // Deferred: an update banner is not what the user opened the app for, so it has no

@@ -59,6 +59,10 @@ export interface PlayerComponentProps {
   isAutoFrameRateSupported: boolean;
   isAutoFrameRateEnabled: boolean;
   toggleAutoFrameRate: () => void;
+  // false on a device with no audio effects, and while the setting is off
+  isVolumeNormalizationSupported: boolean;
+  isVolumeNormalizationEnabled: boolean;
+  toggleVolumeNormalization: () => void;
   togglePlayPause: (state?: boolean, stopEvents?: boolean) => void;
   rewindPosition: (type: RewindDirection, seconds: number) => void;
   seekToPosition: (percent: number) => void;
