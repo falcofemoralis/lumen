@@ -299,6 +299,8 @@ const ru: Translations = {
   'Player rewind buffer': 'Буфер перемотки назад',
   'How much played video is kept in memory so rewinding does not reload it.':
     'Сколько просмотренного видео хранится в памяти, чтобы перемотка назад не перезагружала его. Больший буфер занимает больше памяти.',
+  'Subtitles style': 'Стиль субтитров',
+  'Custom style': 'Свой стиль',
   'Custom subtitles style': 'Свой стиль субтитров',
   'Style the subtitles here instead of following the system captioning settings.':
     'Оформлять субтитры здесь, а не по системным настройкам субтитров. Пока включено, цвета и размеры шрифта, заданные внутри дорожки субтитров, не учитываются.',

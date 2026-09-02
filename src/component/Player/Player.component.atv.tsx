@@ -8,6 +8,7 @@ import { PlayerClock } from 'Component/PlayerClock';
 import { PlayerDuration } from 'Component/PlayerDuration';
 import { PlayerDurationEnd } from 'Component/PlayerDurationEnd';
 import { PlayerProgressBar } from 'Component/PlayerProgressBar';
+import { PlayerSubtitlesStyleSelector } from 'Component/PlayerSubtitlesStyleSelector';
 import { PlayerVideoSelector } from 'Component/PlayerVideoSelector';
 import { ThemedDropdown } from 'Component/ThemedDropdown';
 import { ThemedPressable } from 'Component/ThemedPressable';
@@ -32,6 +33,7 @@ import Server from 'lucide-react-native/icons/server';
 import Settings2 from 'lucide-react-native/icons/settings-2';
 import SkipBack from 'lucide-react-native/icons/skip-back';
 import SkipForward from 'lucide-react-native/icons/skip-forward';
+import Type from 'lucide-react-native/icons/type';
 import Undo2 from 'lucide-react-native/icons/undo-2';
 import {
   ComponentProps,
@@ -138,6 +140,7 @@ export function PlayerComponent({
   selectedSubtitle,
   qualityOverlayRef,
   subtitleOverlayRef,
+  subtitlesStyleOverlayRef,
   playerVideoSelectorOverlayRef,
   commentsOverlayRef,
   bookmarksOverlayRef,
@@ -168,6 +171,7 @@ export function PlayerComponent({
   openVideoSelector,
   handleVideoSelect,
   openSubtitleSelector,
+  openSubtitlesStyleSelector,
   handleSubtitleChange,
   calculateCurrentTime,
   seekToPosition,
@@ -673,14 +677,23 @@ export function PlayerComponent({
                 onInteraction={ handleUserInteraction }
               />
             ) }
+            { /* the track to show, and next to it the look it is drawn in - both gone
+                 when the video carries no subtitles at all */ }
             { subtitles.length > 0 && (
-              <PlayerBottomAction
-                IconComponent={ !selectedSubtitle?.languageCode
-                  ? ClosedCaption
-                  : ClosedCaptionFilled({ color: theme.colors.iconOnContrast }) }
-                action={ openSubtitleSelector }
-                onInteraction={ handleUserInteraction }
-              />
+              <>
+                <PlayerBottomAction
+                  IconComponent={ !selectedSubtitle?.languageCode
+                    ? ClosedCaption
+                    : ClosedCaptionFilled({ color: theme.colors.iconOnContrast }) }
+                  action={ openSubtitleSelector }
+                  onInteraction={ handleUserInteraction }
+                />
+                <PlayerBottomAction
+                  IconComponent={ Type }
+                  action={ openSubtitlesStyleSelector }
+                  onInteraction={ handleUserInteraction }
+                />
+              </>
             ) }
             { !isOffline && (
               <PlayerBottomAction
@@ -848,6 +861,21 @@ export function PlayerComponent({
     );
   };
 
+  const renderSubtitlesStyleSelector = () => {
+    const { subtitles = [] } = video;
+
+    if (!subtitles.length) {
+      return null;
+    }
+
+    return (
+      <PlayerSubtitlesStyleSelector
+        overlayRef={ subtitlesStyleOverlayRef }
+        onClose={ closeOverlay }
+      />
+    );
+  };
+
   const renderCommentsOverlay = () => (
     <CommentsOverlay
       overlayRef={ commentsOverlayRef }
@@ -909,6 +937,7 @@ export function PlayerComponent({
       { renderQualitySelector() }
       { renderPlayerVideoSelector() }
       { renderSubtitlesSelector() }
+      { renderSubtitlesStyleSelector() }
       { renderCommentsOverlay() }
       { renderBookmarksOverlay() }
       { renderSpeedSelector() }

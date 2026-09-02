@@ -151,6 +151,7 @@ export function PlayerContainer({
   const durationRef = useRef<number>(0);
   const qualityOverlayRef = useRef<ThemedOverlayRef>(null);
   const subtitleOverlayRef = useRef<ThemedOverlayRef>(null);
+  const subtitlesStyleOverlayRef = useRef<ThemedOverlayRef>(null);
   const playerVideoSelectorOverlayRef = useRef<PlayerVideoSelectorRef>(null);
   const commentsOverlayRef = useRef<ThemedOverlayRef>(null);
   const bookmarksOverlayRef = useRef<ThemedOverlayRef>(null);
@@ -768,6 +769,13 @@ export function PlayerContainer({
     openOverlay();
   };
 
+  // Nothing is handed to it: the look of the subtitles is a setting, and the selector
+  // reads and writes it itself - see PlayerSubtitlesStyleSelector.
+  const openSubtitlesStyleSelector = () => {
+    subtitlesStyleOverlayRef.current?.open();
+    openOverlay();
+  };
+
   const openCommentsOverlay = () => {
     commentsOverlayRef.current?.open();
     openOverlay();
@@ -1008,6 +1016,7 @@ export function PlayerContainer({
     selectedSubtitle,
     qualityOverlayRef,
     subtitleOverlayRef,
+    subtitlesStyleOverlayRef,
     playerVideoSelectorOverlayRef,
     commentsOverlayRef,
     bookmarksOverlayRef,
@@ -1042,6 +1051,7 @@ export function PlayerContainer({
     handleVideoSelect,
     setPlayerRate,
     openSubtitleSelector,
+    openSubtitlesStyleSelector,
     handleSubtitleChange,
     handleSpeedChange,
     openSpeedSelector,

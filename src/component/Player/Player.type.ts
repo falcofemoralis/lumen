@@ -38,6 +38,7 @@ export interface PlayerComponentProps {
   selectedSubtitle?: SubtitleInterface;
   qualityOverlayRef: RefObject<ThemedOverlayRef | null>;
   subtitleOverlayRef: RefObject<ThemedOverlayRef | null>;
+  subtitlesStyleOverlayRef: RefObject<ThemedOverlayRef | null>;
   playerVideoSelectorOverlayRef: RefObject<PlayerVideoSelectorRef | null>;
   commentsOverlayRef: RefObject<ThemedOverlayRef | null>;
   bookmarksOverlayRef: RefObject<ThemedOverlayRef | null>;
@@ -74,6 +75,7 @@ export interface PlayerComponentProps {
   handleVideoSelect: (video: FilmVideoInterface, voice: FilmVoiceInterface) => void;
   setPlayerRate: (rate: number) => void;
   openSubtitleSelector: () => void;
+  openSubtitlesStyleSelector: () => void;
   handleSubtitleChange: (item: DropdownItem) => void;
   handleSpeedChange: (item: DropdownItem) => void;
   openSpeedSelector: () => void;

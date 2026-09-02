@@ -6,6 +6,7 @@ import { PlayerClock } from 'Component/PlayerClock';
 import { PlayerDuration } from 'Component/PlayerDuration';
 import { PlayerDurationEnd } from 'Component/PlayerDurationEnd';
 import { PlayerProgressBar } from 'Component/PlayerProgressBar';
+import { PlayerSubtitlesStyleSelector } from 'Component/PlayerSubtitlesStyleSelector';
 import { PlayerVideoSelector } from 'Component/PlayerVideoSelector';
 import { ThemedDropdown } from 'Component/ThemedDropdown';
 import { ThemedPressable } from 'Component/ThemedPressable';
@@ -40,6 +41,7 @@ import Server from 'lucide-react-native/icons/server';
 import Settings2 from 'lucide-react-native/icons/settings-2';
 import SkipBack from 'lucide-react-native/icons/skip-back';
 import SkipForward from 'lucide-react-native/icons/skip-forward';
+import Type from 'lucide-react-native/icons/type';
 import {
   ComponentType,
   Fragment,
@@ -122,6 +124,7 @@ export function PlayerComponent({
   selectedSubtitle,
   qualityOverlayRef,
   subtitleOverlayRef,
+  subtitlesStyleOverlayRef,
   playerVideoSelectorOverlayRef,
   commentsOverlayRef,
   bookmarksOverlayRef,
@@ -152,6 +155,7 @@ export function PlayerComponent({
   handleVideoSelect,
   rewindPosition,
   openSubtitleSelector,
+  openSubtitlesStyleSelector,
   handleSubtitleChange,
   handleSpeedChange,
   openSpeedSelector,
@@ -415,6 +419,9 @@ export function PlayerComponent({
     </View>
   );
 
+  // The track to show and the look it is drawn in: two actions rather than one, since
+  // the style is worth reaching for while a subtitle is already up. Both are gone when
+  // the video carries no subtitles at all.
   const renderSubtitlesActions = () => {
     const { subtitles = [] } = video;
 
@@ -423,13 +430,20 @@ export function PlayerComponent({
     }
 
     return (
-      <PlayerAction
-        IconComponent={ !selectedSubtitle?.languageCode
-          ? ClosedCaption
-          : ClosedCaptionFilled({ color: theme.colors.iconOnContrast }) }
-        action={ openSubtitleSelector }
-        onInteraction={ handleUserInteraction }
-      />
+      <Fragment>
+        <PlayerAction
+          IconComponent={ !selectedSubtitle?.languageCode
+            ? ClosedCaption
+            : ClosedCaptionFilled({ color: theme.colors.iconOnContrast }) }
+          action={ openSubtitleSelector }
+          onInteraction={ handleUserInteraction }
+        />
+        <PlayerAction
+          IconComponent={ Type }
+          action={ openSubtitlesStyleSelector }
+          onInteraction={ handleUserInteraction }
+        />
+      </Fragment>
     );
   };
 
@@ -824,6 +838,21 @@ export function PlayerComponent({
     );
   };
 
+  const renderSubtitlesStyleSelector = () => {
+    const { subtitles = [] } = video;
+
+    if (!subtitles.length) {
+      return null;
+    }
+
+    return (
+      <PlayerSubtitlesStyleSelector
+        overlayRef={ subtitlesStyleOverlayRef }
+        onClose={ closeOverlay }
+      />
+    );
+  };
+
   const renderCommentsOverlay = () => (
     <CommentsOverlay
       overlayRef={ commentsOverlayRef }
@@ -886,6 +915,7 @@ export function PlayerComponent({
       { renderQualitySelector() }
       { renderPlayerVideoSelector() }
       { renderSubtitlesSelector() }
+      { renderSubtitlesStyleSelector() }
       { renderCommentsOverlay() }
       { renderBookmarksOverlay() }
       { renderSpeedSelector() }
