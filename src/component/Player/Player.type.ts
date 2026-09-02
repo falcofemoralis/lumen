@@ -42,6 +42,10 @@ export interface PlayerComponentProps {
   commentsOverlayRef: RefObject<ThemedOverlayRef | null>;
   bookmarksOverlayRef: RefObject<ThemedOverlayRef | null>;
   speedOverlayRef: RefObject<ThemedOverlayRef | null>;
+  cdnOverlayRef: RefObject<ThemedOverlayRef | null>;
+  selectedCDN: string;
+  isAutomaticCDN: boolean;
+  cdnOptions: string[];
   selectedSpeed: number;
   selectedAspectRatio: ResizeMode;
   isLocked: boolean;
@@ -69,6 +73,9 @@ export interface PlayerComponentProps {
   handleSubtitleChange: (item: DropdownItem) => void;
   handleSpeedChange: (item: DropdownItem) => void;
   openSpeedSelector: () => void;
+  openCDNSelector: () => void;
+  handleCDNChange: (value: string) => void;
+  handleAutomaticCDNChange: (value: boolean) => void;
   handleAspectRatioChange: () => void;
   openCommentsOverlay: () => void;
   openBookmarksOverlay: () => void;

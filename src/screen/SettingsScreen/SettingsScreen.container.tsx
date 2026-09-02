@@ -1,3 +1,4 @@
+import { useFocusEffect } from '@react-navigation/native';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import * as Application from 'expo-application';
@@ -43,6 +44,13 @@ export function SettingsScreenContainer() {
   const [automaticCDN, setAutomaticCDN] = useState(currentService.getConfig('autoCdn'));
   const [cdn, setCdn] = useState(currentService.getCDN());
   const [userAgent, setUserAgent] = useState(currentService.getConfig('userAgentNew'));
+
+  // the player carries the same two settings, so what is on screen has to catch up
+  // with the service config every time the screen comes back into view
+  useFocusEffect(useCallback(() => {
+    setAutomaticCDN(currentService.getConfig('autoCdn'));
+    setCdn(currentService.getCDN());
+  }, [currentService]));
 
   const providerOptions = useMemo(
     () => currentService.defaultProviders,

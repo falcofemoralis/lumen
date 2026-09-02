@@ -48,6 +48,7 @@ const en = {
   'Try again later': 'Try again later',
   'Provider': 'Provider',
   'CDN': 'CDN',
+  'CDN server': 'CDN server',
   'Automatic': 'Automatic',
   'Useragent': 'Useragent',
   'Invalid URL': 'Invalid URL',

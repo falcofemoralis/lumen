@@ -50,6 +50,7 @@ const uk: Translations = {
   'Try again later': 'Спробуйте ще раз трохи пізніше',
   'Provider': 'Дзеркало',
   'CDN': 'CDN (Адреса сервера, з якого завантажуються відео)',
+  'CDN server': 'CDN сервер',
   'Automatic': 'Автоматично',
   'Useragent': 'Useragent',
   'Invalid URL': 'Це посилання не працює',

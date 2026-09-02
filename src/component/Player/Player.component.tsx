@@ -1,6 +1,7 @@
 import { BookmarksOverlay } from 'Component/BookmarksOverlay';
 import { CommentsOverlay } from 'Component/CommentsOverlay';
 import { Loader } from 'Component/Loader';
+import { PlayerCDNSelector } from 'Component/PlayerCDNSelector';
 import { PlayerClock } from 'Component/PlayerClock';
 import { PlayerDuration } from 'Component/PlayerDuration';
 import { PlayerDurationEnd } from 'Component/PlayerDurationEnd';
@@ -35,6 +36,7 @@ import Pause from 'lucide-react-native/icons/pause';
 import PictureInPicture2 from 'lucide-react-native/icons/picture-in-picture-2';
 import Play from 'lucide-react-native/icons/play';
 import Rewind from 'lucide-react-native/icons/rewind';
+import Server from 'lucide-react-native/icons/server';
 import Settings2 from 'lucide-react-native/icons/settings-2';
 import SkipBack from 'lucide-react-native/icons/skip-back';
 import SkipForward from 'lucide-react-native/icons/skip-forward';
@@ -124,6 +126,10 @@ export function PlayerComponent({
   commentsOverlayRef,
   bookmarksOverlayRef,
   speedOverlayRef,
+  cdnOverlayRef,
+  selectedCDN,
+  isAutomaticCDN,
+  cdnOptions,
   selectedSpeed,
   selectedAspectRatio,
   isLocked,
@@ -146,6 +152,9 @@ export function PlayerComponent({
   handleSubtitleChange,
   handleSpeedChange,
   openSpeedSelector,
+  openCDNSelector,
+  handleCDNChange,
+  handleAutomaticCDNChange,
   handleAspectRatioChange,
   openBookmarksOverlay,
   openCommentsOverlay,
@@ -567,6 +576,13 @@ export function PlayerComponent({
               isLocked && styles.bottomActionsRowLocked,
             ] }
           >
+            { !isOffline && (
+              <PlayerAction
+                IconComponent={ Server }
+                action={ openCDNSelector }
+                onInteraction={ handleUserInteraction }
+              />
+            ) }
             { isPlaylistSelector && (
               <PlayerAction
                 IconComponent={ ListVideo }
@@ -834,6 +850,24 @@ export function PlayerComponent({
     />
   );
 
+  const renderCDNSelector = () => {
+    if (isOffline) {
+      return null;
+    }
+
+    return (
+      <PlayerCDNSelector
+        overlayRef={ cdnOverlayRef }
+        cdn={ selectedCDN }
+        cdnOptions={ cdnOptions }
+        isAutomatic={ isAutomaticCDN }
+        onAutomaticChange={ handleAutomaticCDNChange }
+        onChange={ handleCDNChange }
+        onClose={ closeOverlay }
+      />
+    );
+  };
+
   const renderModals = () => (
     <>
       { renderQualitySelector() }
@@ -842,6 +876,7 @@ export function PlayerComponent({
       { renderCommentsOverlay() }
       { renderBookmarksOverlay() }
       { renderSpeedSelector() }
+      { renderCDNSelector() }
     </>
   );
 

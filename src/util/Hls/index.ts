@@ -11,6 +11,19 @@ const PARAMS_MAP: Record<string, string> = {
   '360p': 'BANDWIDTH=500000,RESOLUTION=480x360',
 };
 
+// djb2 over the playlist, so that a set of streams always lands on the same file and
+// two different ones never share it - the player is handed the file by its path, and
+// a source swapped for one at the very same path is not a source that changed
+const hashPlaylist = (playlist: string) => {
+  let hash = 5381;
+
+  for (let i = 0; i < playlist.length; i++) {
+    hash = ((hash << 5) + hash + playlist.charCodeAt(i)) | 0;
+  }
+
+  return (hash >>> 0).toString(36);
+};
+
 export const createMasterPlaylist = (streams: FilmStreamInterface[]) => {
   let master = '#EXTM3U\n\n';
 
@@ -23,7 +36,7 @@ export const createMasterPlaylist = (streams: FilmStreamInterface[]) => {
     master += `#EXT-X-STREAM-INF:${params}\n${q.url}\n\n`;
   });
 
-  const file = new File(Paths.cache, 'master.m3u8');
+  const file = new File(Paths.cache, `master-${hashPlaylist(master)}.m3u8`);
 
   file.write(master);
 

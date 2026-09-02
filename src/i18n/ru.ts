@@ -50,6 +50,7 @@ const ru: Translations = {
   'Try again later': 'Повторите попытку чуть позже',
   'Provider': 'Зеркало',
   'CDN': 'CDN (Адрес сервера с которого загружаются видео)',
+  'CDN server': 'CDN сервер',
   'Automatic': 'Автоматически',
   'Useragent': 'Useragent',
   'Invalid URL': 'Эта ссылка не рабочая',
