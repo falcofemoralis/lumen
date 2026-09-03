@@ -48,6 +48,7 @@ const en = {
   'Try again later': 'Try again later',
   'Provider': 'Provider',
   'CDN': 'CDN',
+  'CDN server': 'CDN server',
   'Automatic': 'Automatic',
   'Useragent': 'Useragent',
   'Invalid URL': 'Invalid URL',
@@ -174,6 +175,9 @@ const en = {
   'No items': 'No items',
   'Player forward rewind seconds': 'Player forward rewind seconds',
   'Player backward rewind seconds': 'Player backward rewind seconds',
+  'Preview frames': 'Preview frames',
+  'Show a frame of the video at the position being sought to.':
+    'Show a frame of the video at the position being sought to.',
   'Adjacent preview frames': 'Adjacent preview frames',
   'Show the previous and the next preview frame beside the current one while seeking.':
     'Show the previous and the next preview frame beside the current one while seeking.',
@@ -217,6 +221,7 @@ const en = {
   'Download link': 'Download link',
   'Copy link': 'Copy link',
   'Link copied': 'Link copied',
+  'No app can open this link, so it was copied instead': 'No app can open this link, so it was copied instead',
   'Parallel downloads': 'Parallel downloads',
   'How many files are downloaded at the same time. The rest wait in a queue.': 'How many files are downloaded at the same time. The rest wait in a queue.',
   'Poster download failed: {{error}}': 'Poster download failed: {{error}}',
@@ -251,8 +256,13 @@ const en = {
   'Show episode name': 'Show episode name',
   'Show the name the schedule gives the episode under the title in the player.':
     'Show the name the schedule gives the episode under the title in the player.',
+  'Show episode date': 'Show episode date',
+  'Append the air date to the episode name, as "name (date)".':
+    'Append the air date to the episode name, as "name (date)".',
   'Auto next episode': 'Auto next episode',
   'Toggle auto next episode.': 'Toggle auto next episode.',
+  'Keep time on voice change': 'Keep time on voice change',
+  'Switching the voice keeps the current position instead of the one saved for it.': 'Switching the voice keeps the current position instead of the one saved for it.',
   'Frame rate matching (AFR)': 'Frame rate matching (AFR)',
   'Adds a button to the player that matches the TV refresh rate to the video.': 'Adds a button to the player that switches the TV to a refresh rate fitting the video, removing the judder of 24fps films on a 60Hz screen. The picture blanks for a moment on each switch, and not every TV supports it.',
   'Frame rate matching off': 'Frame rate matching off',
@@ -262,6 +272,15 @@ const en = {
   'This video has no fixed frame rate': 'This video has no fixed frame rate',
   'Play the video to match its frame rate': 'Play the video to match its frame rate',
   'Frame rate matching is not available on this device': 'Frame rate matching is not available on this device',
+  'Volume normalization': 'Volume normalization',
+  'Adds a button to the player that makes loud scenes quieter and quiet dialogue louder.': 'Adds a button to the player that evens out the volume: loud scenes are held back and quiet dialogue is lifted, so a film stays watchable at one setting. It can do nothing when the sound is passed through to a receiver undecoded.',
+  'Normalization strength': 'Normalization strength',
+  'How close together the loudest and the quietest parts are brought.': 'How close together the loudest and the quietest parts are brought. The stronger it is, the less the film sounds the way it was mixed.',
+  'Gentle': 'Gentle',
+  'Moderate': 'Moderate',
+  'Strong': 'Strong',
+  'Volume normalization on': 'Volume normalization on',
+  'Volume normalization off': 'Volume normalization off',
   'Player long press speed': 'Player long press speed',
   'Volume gesture': 'Volume gesture',
   'Slide up and down on the right half of the player to change the volume.':
@@ -286,6 +305,7 @@ const en = {
   'Player rewind buffer': 'Player rewind buffer',
   'How much played video is kept in memory so rewinding does not reload it.':
     'How much played video is kept in memory so rewinding does not reload it. Longer buffers use more memory.',
+  'Subtitles style': 'Subtitles style',
   'Custom subtitles style': 'Custom subtitles style',
   'Style the subtitles here instead of following the system captioning settings.':
     'Style the subtitles here instead of following the system captioning settings. The colors and font sizes written into a subtitle track are ignored while this is on.',
@@ -422,6 +442,9 @@ const en = {
   'The app has to be restarted for the imported settings to take effect.': 'The app has to be restarted for the imported settings to take effect.',
   'Restart': 'Restart',
   'Later': 'Later',
+  'Verifying that you are not a robot': 'Verifying that you are not a robot',
+  'This can take a few seconds': 'This can take a few seconds',
+  'Complete the check to continue, or press Back to cancel': 'Complete the check to continue, or press Back to cancel',
 };
 
 export default en;

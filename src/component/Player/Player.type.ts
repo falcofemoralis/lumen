@@ -38,10 +38,15 @@ export interface PlayerComponentProps {
   selectedSubtitle?: SubtitleInterface;
   qualityOverlayRef: RefObject<ThemedOverlayRef | null>;
   subtitleOverlayRef: RefObject<ThemedOverlayRef | null>;
+  subtitlesStyleOverlayRef: RefObject<ThemedOverlayRef | null>;
   playerVideoSelectorOverlayRef: RefObject<PlayerVideoSelectorRef | null>;
   commentsOverlayRef: RefObject<ThemedOverlayRef | null>;
   bookmarksOverlayRef: RefObject<ThemedOverlayRef | null>;
   speedOverlayRef: RefObject<ThemedOverlayRef | null>;
+  cdnOverlayRef: RefObject<ThemedOverlayRef | null>;
+  selectedCDN: string;
+  isAutomaticCDN: boolean;
+  cdnOptions: string[];
   selectedSpeed: number;
   selectedAspectRatio: ResizeMode;
   isLocked: boolean;
@@ -55,6 +60,10 @@ export interface PlayerComponentProps {
   isAutoFrameRateSupported: boolean;
   isAutoFrameRateEnabled: boolean;
   toggleAutoFrameRate: () => void;
+  // false on a device with no audio effects, and while the setting is off
+  isVolumeNormalizationSupported: boolean;
+  isVolumeNormalizationEnabled: boolean;
+  toggleVolumeNormalization: () => void;
   togglePlayPause: (state?: boolean, stopEvents?: boolean) => void;
   rewindPosition: (type: RewindDirection, seconds: number) => void;
   seekToPosition: (percent: number) => void;
@@ -66,9 +75,13 @@ export interface PlayerComponentProps {
   handleVideoSelect: (video: FilmVideoInterface, voice: FilmVoiceInterface) => void;
   setPlayerRate: (rate: number) => void;
   openSubtitleSelector: () => void;
+  openSubtitlesStyleSelector: () => void;
   handleSubtitleChange: (item: DropdownItem) => void;
   handleSpeedChange: (item: DropdownItem) => void;
   openSpeedSelector: () => void;
+  openCDNSelector: () => void;
+  handleCDNChange: (value: string) => void;
+  handleAutomaticCDNChange: (value: boolean) => void;
   handleAspectRatioChange: () => void;
   openCommentsOverlay: () => void;
   openBookmarksOverlay: () => void;

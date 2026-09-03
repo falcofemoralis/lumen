@@ -50,6 +50,7 @@ const uk: Translations = {
   'Try again later': 'Спробуйте ще раз трохи пізніше',
   'Provider': 'Дзеркало',
   'CDN': 'CDN (Адреса сервера, з якого завантажуються відео)',
+  'CDN server': 'CDN сервер',
   'Automatic': 'Автоматично',
   'Useragent': 'Useragent',
   'Invalid URL': 'Це посилання не працює',
@@ -176,6 +177,9 @@ const uk: Translations = {
   'No items': 'Список порожній',
   'Player forward rewind seconds': 'Секунди перемотки вперед',
   'Player backward rewind seconds': 'Секунди перемотки назад',
+  'Preview frames': 'Кадри попереднього перегляду',
+  'Show a frame of the video at the position being sought to.':
+    'Під час перемотки показувати кадр відео з позиції, до якої вона веде.',
   'Adjacent preview frames': 'Сусідні кадри попереднього перегляду',
   'Show the previous and the next preview frame beside the current one while seeking.':
     'Під час перемотки поряд із поточним кадром попереднього перегляду буде показано попередній і наступний.',
@@ -219,6 +223,7 @@ const uk: Translations = {
   'Download link': 'Посилання завантаження',
   'Copy link': 'Копіювати посилання',
   'Link copied': 'Посилання скопійовано',
+  'No app can open this link, so it was copied instead': 'Немає застосунку, який може відкрити це посилання, тому його скопійовано',
   'Parallel downloads': 'Паралельні завантаження',
   'How many files are downloaded at the same time. The rest wait in a queue.': 'Скільки файлів завантажується одночасно. Решта чекає в черзі.',
   'Poster download failed: {{error}}': 'Не вдалося завантажити постер: {{error}}',
@@ -253,8 +258,13 @@ const uk: Translations = {
   'Show episode name': 'Показувати назву серії',
   'Show the name the schedule gives the episode under the title in the player.':
     'Назву поточної серії з розкладу виходу серій буде показано у плеєрі під назвою серіалу.',
+  'Show episode date': 'Показувати дату виходу серії',
+  'Append the air date to the episode name, as "name (date)".':
+    'Дату виходу серії буде додано до її назви у форматі «назва (дата)».',
   'Auto next episode': 'Автоматично включати наступну серію',
   'Toggle auto next episode.': 'Після завершення серії автоматично буде включатись наступна.',
+  'Keep time on voice change': 'Зберігати час при зміні озвучення',
+  'Switching the voice keeps the current position instead of the one saved for it.': 'При зміні озвучення відтворення продовжиться з поточної позиції, а не зі збереженої для вибраного озвучення.',
   'Frame rate matching (AFR)': 'Підлаштування частоти оновлення (AFR)',
   'Adds a button to the player that matches the TV refresh rate to the video.': 'Додає в плеєр кнопку, яка перемикає телевізор на частоту оновлення, кратну частоті кадрів відео - це прибирає ривки під час перегляду 24-кадрових фільмів на 60 Гц. Під час кожного перемикання екран ненадовго гасне, і підтримують це не всі телевізори.',
   'Frame rate matching off': 'Підлаштування частоти вимкнено',
@@ -264,6 +274,15 @@ const uk: Translations = {
   'This video has no fixed frame rate': 'У цього відео немає постійної частоти кадрів',
   'Play the video to match its frame rate': 'Запустіть відео, щоб підлаштувати частоту',
   'Frame rate matching is not available on this device': 'Підлаштування частоти оновлення недоступне на цьому пристрої',
+  'Volume normalization': 'Нормалізація гучності',
+  'Adds a button to the player that makes loud scenes quieter and quiet dialogue louder.': 'Додає в плеєр кнопку, яка вирівнює гучність: гучні сцени стають тихішими, а тихі діалоги гучнішими, і фільм можна дивитися на одній гучності. Не працює, якщо звук іде на ресивер без декодування.',
+  'Normalization strength': 'Сила нормалізації',
+  'How close together the loudest and the quietest parts are brought.': 'Наскільки зближуються найгучніші та найтихіші місця. Що сильніше, то менше фільм звучить так, як його зведено.',
+  'Gentle': 'Слабка',
+  'Moderate': 'Помірна',
+  'Strong': 'Сильна',
+  'Volume normalization on': 'Нормалізацію гучності увімкнено',
+  'Volume normalization off': 'Нормалізацію гучності вимкнено',
   'Player long press speed': 'Швидкість перемотки при довгому натисканні',
   'Volume gesture': 'Жест гучності',
   'Slide up and down on the right half of the player to change the volume.':
@@ -288,6 +307,7 @@ const uk: Translations = {
   'Player rewind buffer': 'Буфер перемотування назад',
   'How much played video is kept in memory so rewinding does not reload it.':
     'Скільки переглянутого відео зберігається в пам’яті, щоб перемотування назад не перезавантажувало його. Більший буфер займає більше пам’яті.',
+  'Subtitles style': 'Стиль субтитрів',
   'Custom subtitles style': 'Власний стиль субтитрів',
   'Style the subtitles here instead of following the system captioning settings.':
     'Оформлювати субтитри тут, а не за системними налаштуваннями субтитрів. Поки увімкнено, кольори та розміри шрифту, задані всередині доріжки субтитрів, не враховуються.',
@@ -424,6 +444,9 @@ const uk: Translations = {
   'The app has to be restarted for the imported settings to take effect.': 'Щоб імпортовані налаштування застосувалися, застосунок потрібно перезапустити.',
   'Restart': 'Перезапустити',
   'Later': 'Пізніше',
+  'Verifying that you are not a robot': 'Перевіряємо, що ви не робот',
+  'This can take a few seconds': 'Це може зайняти кілька секунд',
+  'Complete the check to continue, or press Back to cancel': 'Пройдіть перевірку, щоб продовжити, або натисніть «Назад» для скасування',
 };
 
 export default uk;

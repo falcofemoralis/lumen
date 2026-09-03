@@ -3,10 +3,12 @@ import { FocusContext, useFocusable } from '@noriginmedia/norigin-spatial-naviga
 import { BookmarksOverlay } from 'Component/BookmarksOverlay';
 import { CommentsOverlay } from 'Component/CommentsOverlay';
 import { Loader } from 'Component/Loader';
+import { PlayerCDNSelector } from 'Component/PlayerCDNSelector';
 import { PlayerClock } from 'Component/PlayerClock';
 import { PlayerDuration } from 'Component/PlayerDuration';
 import { PlayerDurationEnd } from 'Component/PlayerDurationEnd';
 import { PlayerProgressBar } from 'Component/PlayerProgressBar';
+import { PlayerSubtitlesStyleSelector } from 'Component/PlayerSubtitlesStyleSelector';
 import { PlayerVideoSelector } from 'Component/PlayerVideoSelector';
 import { ThemedDropdown } from 'Component/ThemedDropdown';
 import { ThemedPressable } from 'Component/ThemedPressable';
@@ -27,9 +29,11 @@ import Maximize2 from 'lucide-react-native/icons/maximize-2';
 import MessageSquareText from 'lucide-react-native/icons/message-square-text';
 import Pause from 'lucide-react-native/icons/pause';
 import Play from 'lucide-react-native/icons/play';
+import Server from 'lucide-react-native/icons/server';
 import Settings2 from 'lucide-react-native/icons/settings-2';
 import SkipBack from 'lucide-react-native/icons/skip-back';
 import SkipForward from 'lucide-react-native/icons/skip-forward';
+import Type from 'lucide-react-native/icons/type';
 import Undo2 from 'lucide-react-native/icons/undo-2';
 import {
   ComponentProps,
@@ -48,7 +52,7 @@ import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated'
 import { VideoView } from 'react-native-video';
 import { scheduleOnRN } from 'react-native-worklets';
 import { useAppTheme } from 'Theme/context';
-import { AutoFrameRateIcon, ClosedCaptionFilled } from 'Theme/icons';
+import { AutoFrameRateIcon, ClosedCaptionFilled, VolumeNormalizationIcon } from 'Theme/icons';
 import {
   formatVideoTrackInfo,
   getPlayerAvailableQualityItems,
@@ -136,10 +140,15 @@ export function PlayerComponent({
   selectedSubtitle,
   qualityOverlayRef,
   subtitleOverlayRef,
+  subtitlesStyleOverlayRef,
   playerVideoSelectorOverlayRef,
   commentsOverlayRef,
   bookmarksOverlayRef,
   speedOverlayRef,
+  cdnOverlayRef,
+  selectedCDN,
+  isAutomaticCDN,
+  cdnOptions,
   selectedSpeed,
   isOverlayOpen,
   isFilmBookmarked,
@@ -151,6 +160,9 @@ export function PlayerComponent({
   isAutoFrameRateSupported,
   isAutoFrameRateEnabled,
   toggleAutoFrameRate,
+  isVolumeNormalizationSupported,
+  isVolumeNormalizationEnabled,
+  toggleVolumeNormalization,
   togglePlayPause,
   rewindPosition,
   openQualitySelector,
@@ -159,11 +171,15 @@ export function PlayerComponent({
   openVideoSelector,
   handleVideoSelect,
   openSubtitleSelector,
+  openSubtitlesStyleSelector,
   handleSubtitleChange,
   calculateCurrentTime,
   seekToPosition,
   handleSpeedChange,
   openSpeedSelector,
+  openCDNSelector,
+  handleCDNChange,
+  handleAutomaticCDNChange,
   openBookmarksOverlay,
   openCommentsOverlay,
   closeOverlay,
@@ -175,6 +191,9 @@ export function PlayerComponent({
     playerStopPlayOnButtonTV,
     playerStopPlayShowInterfaceTV,
     playerShowEpisodeName,
+    playerShowEpisodeDate,
+    playerStoryboard,
+    playerSubtitlesCustomStyle,
   } = useConfigContext();
   const { theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
@@ -470,12 +489,25 @@ export function PlayerComponent({
     }, 250);
   };
 
+  // The controls stand where the subtitles are drawn, so they go away with the same
+  // press that opens the panel - the point of styling them from here is watching the
+  // change land on the picture. closeControls also parks focus on the progress thumb,
+  // which is where it belongs once the overlay hands it back: the action row that
+  // opened it is no longer on screen. They stay away on close, one key from coming back.
+  const handleOpenSubtitlesStyle = () => {
+    closeControls();
+
+    setTimeout(() => {
+      openSubtitlesStyleSelector();
+    }, PLAYER_CONTROLS_ANIMATION);
+  };
+
   const renderEpisodeName = () => {
     if (!playerShowEpisodeName) {
       return null;
     }
 
-    const episodeName = getScheduleEpisodeName(film, voice);
+    const episodeName = getScheduleEpisodeName(film, voice, playerShowEpisodeDate);
 
     if (!episodeName) {
       return null;
@@ -609,12 +641,14 @@ export function PlayerComponent({
   );
 
   const renderProgressBar = () => {
+    // without a url nothing downstream fetches or parses the storyboard, which is
+    // exactly what switching it off should cost
     const { storyboardUrl } = video;
 
     return (
       <PlayerProgressBar
         player={ player }
-        storyboardUrl={ storyboardUrl }
+        storyboardUrl={ playerStoryboard ? storyboardUrl : undefined }
         calculateCurrentTime={ calculateCurrentTime }
         seekToPosition={ seekToPosition }
         thumbFocusKey={ PROGRESS_THUMB_FOCUS_KEY }
@@ -661,14 +695,28 @@ export function PlayerComponent({
                 onInteraction={ handleUserInteraction }
               />
             ) }
+            { /* The track to show, and next to it the look it is drawn in. Neither is
+                 there for a video that carries no subtitles, and the style is only
+                 offered while the app is the one styling them - with the setting off the
+                 subtitles follow the TV's captioning settings, and nothing picked here
+                 would show. */ }
             { subtitles.length > 0 && (
-              <PlayerBottomAction
-                IconComponent={ !selectedSubtitle?.languageCode
-                  ? ClosedCaption
-                  : ClosedCaptionFilled({ color: theme.colors.iconOnContrast }) }
-                action={ openSubtitleSelector }
-                onInteraction={ handleUserInteraction }
-              />
+              <>
+                <PlayerBottomAction
+                  IconComponent={ !selectedSubtitle?.languageCode
+                    ? ClosedCaption
+                    : ClosedCaptionFilled({ color: theme.colors.iconOnContrast }) }
+                  action={ openSubtitleSelector }
+                  onInteraction={ handleUserInteraction }
+                />
+                { playerSubtitlesCustomStyle && (
+                  <PlayerBottomAction
+                    IconComponent={ Type }
+                    action={ handleOpenSubtitlesStyle }
+                    onInteraction={ handleUserInteraction }
+                  />
+                ) }
+              </>
             ) }
             { !isOffline && (
               <PlayerBottomAction
@@ -682,6 +730,13 @@ export function PlayerComponent({
               action={ handleAspectRatioChange }
               onInteraction={ handleUserInteraction }
             />
+            { !isOffline && (
+              <PlayerBottomAction
+                IconComponent={ Server }
+                action={ openCDNSelector }
+                onInteraction={ handleUserInteraction }
+              />
+            ) }
             { isAutoFrameRateSupported && (
               <PlayerBottomAction
                 IconComponent={ AutoFrameRateIcon({
@@ -689,6 +744,16 @@ export function PlayerComponent({
                   isFilled: isAutoFrameRateEnabled,
                 }) }
                 action={ toggleAutoFrameRate }
+                onInteraction={ handleUserInteraction }
+              />
+            ) }
+            { isVolumeNormalizationSupported && (
+              <PlayerBottomAction
+                IconComponent={ VolumeNormalizationIcon({
+                  color: theme.colors.iconOnContrast,
+                  isFilled: isVolumeNormalizationEnabled,
+                }) }
+                action={ toggleVolumeNormalization }
                 onInteraction={ handleUserInteraction }
               />
             ) }
@@ -819,6 +884,23 @@ export function PlayerComponent({
     );
   };
 
+  // gated on the same two things the action that opens it is, so an overlay that
+  // cannot be reached is not mounted either
+  const renderSubtitlesStyleSelector = () => {
+    const { subtitles = [] } = video;
+
+    if (!subtitles.length || !playerSubtitlesCustomStyle) {
+      return null;
+    }
+
+    return (
+      <PlayerSubtitlesStyleSelector
+        overlayRef={ subtitlesStyleOverlayRef }
+        onClose={ closeOverlay }
+      />
+    );
+  };
+
   const renderCommentsOverlay = () => (
     <CommentsOverlay
       overlayRef={ commentsOverlayRef }
@@ -857,14 +939,34 @@ export function PlayerComponent({
     />
   );
 
+  const renderCDNSelector = () => {
+    if (isOffline) {
+      return null;
+    }
+
+    return (
+      <PlayerCDNSelector
+        overlayRef={ cdnOverlayRef }
+        cdn={ selectedCDN }
+        cdnOptions={ cdnOptions }
+        isAutomatic={ isAutomaticCDN }
+        onAutomaticChange={ handleAutomaticCDNChange }
+        onChange={ handleCDNChange }
+        onClose={ closeOverlay }
+      />
+    );
+  };
+
   const renderModals = () => (
     <>
       { renderQualitySelector() }
       { renderPlayerVideoSelector() }
       { renderSubtitlesSelector() }
+      { renderSubtitlesStyleSelector() }
       { renderCommentsOverlay() }
       { renderBookmarksOverlay() }
       { renderSpeedSelector() }
+      { renderCDNSelector() }
     </>
   );
 

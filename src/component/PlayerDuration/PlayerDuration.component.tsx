@@ -18,15 +18,10 @@ export const PlayerDurationComponent = () => {
   const { playerShowBufferTime } = useConfigContext();
 
   const getRenderedTime = () => {
-    let base = `${currentTime} / ${durationTime}`;
+    const showBuffer = playerShowBufferTime && bufferedTime && bufferedTime !== '0';
+    const current = showBuffer ? `${currentTime}+${bufferedTime}` : `${currentTime}`;
 
-    if (playerShowBufferTime && bufferedTime && bufferedTime !== '0') {
-      base = base.concat(`+${bufferedTime}`);
-    }
-
-    base = base.concat(` (${remainingTime})`);
-
-    return base;
+    return `${current} / ${durationTime} (${remainingTime})`;
   };
 
   return (

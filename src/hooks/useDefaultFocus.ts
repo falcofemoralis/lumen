@@ -1,4 +1,4 @@
-import { doesFocusableExist, setFocus } from '@noriginmedia/norigin-spatial-navigation-core';
+import { doesFocusableExist, getCurrentFocusKey, setFocus } from '@noriginmedia/norigin-spatial-navigation-core';
 import { NavigationContext } from '@react-navigation/native';
 import { useNavigationContext } from 'Context/NavigationContext';
 import { useIsInsideOverlay, useOverlayContext } from 'Context/OverlayContext';
@@ -13,7 +13,9 @@ const MAX_CLAIM_ATTEMPTS = 20;
 /**
  * Focuses `focusKey` when the enclosing navigation screen gains focus -- on the
  * first load and again every time the user returns to the screen (back from a
- * film view, reload after an error boundary, tab re-entry, screen reveal ...).
+ * film view, reload after an error boundary, tab re-entry, screen reveal ...),
+ * unless the user had already moved focus elsewhere inside the screen before
+ * leaving it, in which case they are put back where they were instead.
  *
  * Claims focus at most once per screen visit, so it never steals focus back
  * while the screen stays focused (menu tab switches, pagination, re-renders).
@@ -63,6 +65,11 @@ export function useDefaultFocus(focusKey: string, enabled = true) {
   const rafRef = useRef<number | null>(null);
   const attemptsRef = useRef(0);
 
+  // Where focus sat inside the screen when the user left it, so returning lands
+  // there instead of on the default target. Consumed by the first claim of the
+  // visit; `null` once used, or when there is nothing of ours to restore.
+  const restoreFocusKeyRef = useRef<string | null>(null);
+
   const cancelPendingClaim = useCallback(() => {
     if (rafRef.current !== null) {
       cancelAnimationFrame(rafRef.current);
@@ -90,6 +97,31 @@ export function useDefaultFocus(focusKey: string, enabled = true) {
         cancelPendingClaim();
 
         return;
+      }
+
+      /**
+       * The user is coming back to a screen they had already navigated inside
+       * (opened a film from a grid card, then pressed back). Norigin does not
+       * restore that focus on its own -- the focused card never unmounted, the
+       * screen it belongs to simply stopped being the focused route -- and
+       * claiming the default target here would drag the user back to the top of
+       * the screen (e.g. the pager menu) every single time. Put them back on
+       * what they left instead, and count it as this visit's claim.
+       */
+      const restoreFocusKey = restoreFocusKeyRef.current;
+
+      if (restoreFocusKey) {
+        restoreFocusKeyRef.current = null;
+
+        // A target that is gone (the screen reloaded, the grid was refreshed
+        // under it) leaves nothing to go back to -- fall through to the default.
+        if (restoreFocusKey !== focusKeyRef.current && doesFocusableExist(restoreFocusKey)) {
+          hasClaimedRef.current = true;
+          cancelPendingClaim();
+          setFocus(restoreFocusKey);
+
+          return;
+        }
       }
 
       if (doesFocusableExist(focusKeyRef.current)) {
@@ -146,6 +178,14 @@ export function useDefaultFocus(focusKey: string, enabled = true) {
 
     const onBlur = () => {
       isScreenFocusedRef.current = false;
+
+      // Remember what the user was on, to come back to it. Focus that had
+      // already left the screen is not ours to restore: a tab switch leaves
+      // from the sidebar and an overlay owns focus while it is up, and coming
+      // back to either of those instead of the screen's own default target is
+      // exactly the wrong place to land.
+      restoreFocusKeyRef.current = isDeferredRef.current ? null : getCurrentFocusKey() ?? null;
+
       cancelPendingClaim();
     };
 

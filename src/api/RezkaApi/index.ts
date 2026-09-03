@@ -16,6 +16,7 @@ import { ProfileInterface } from 'Type/Profile.interface';
 import { RatingInterface } from 'Type/Rating.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { VoiceRatingInterface } from 'Type/VoiceRating.interface';
+import { clearWebCookies, getClearanceUserAgent, isSolvingCloudflare } from 'Util/Cloudflare';
 import { buildCookies, cookiesManager, setCookie } from 'Util/Cookies';
 import { decodeHtml } from 'Util/Html';
 import { safeJsonParse } from 'Util/Json';
@@ -53,6 +54,9 @@ import {
 
 const REZKA_CONFIG = 'rezkaConfig';
 const REZKA_PROFILE = 'rezkaProfile';
+
+/** How long a provider gets to answer before it is called invalid. */
+const VALIDATE_URL_TIMEOUT_MS = 10000;
 
 /** The shared service contract plus the internals only Rezka itself uses */
 type RezkaApiInterface = ApiInterface & {
@@ -160,8 +164,15 @@ const RezkaApi: RezkaApiInterface = {
   },
 
   getHeaders(includeHeaders) {
+    const { hostname } = new URL(this.getProvider());
+
     const headers: Record<string, string> = {
-      'User-Agent': this.getConfig('userAgentNew'),
+      // A provider behind Cloudflare pins its clearance cookie to the user agent that
+      // earned it, so once one has been solved for this host that string wins over the
+      // configured one -- sending anything else would be challenged all over again. It
+      // is the configured user agent with only its browser version corrected, so the
+      // site still answers with the layout the parser expects.
+      'User-Agent': getClearanceUserAgent(hostname) ?? this.getConfig('userAgentNew'),
     };
 
     if (this.getConfig('officialMode')) {
@@ -172,7 +183,6 @@ const RezkaApi: RezkaApiInterface = {
     // Requests made outside of customFetch (e.g. the native player) don't get
     // the cookie jar applied for them, so attach it explicitly on demand.
     if (includeHeaders) {
-      const { hostname } = new URL(this.getProvider());
       const cookies = buildCookies(hostname);
 
       if (cookies) {
@@ -217,7 +227,28 @@ const RezkaApi: RezkaApiInterface = {
 
   async validateUrl(url) {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    // Checked on a repeat rather than fired once. A provider behind Cloudflare is
+    // challenged on first contact and the solve happens inside this very call -- it
+    // can sit for as long as the user takes over a checkbox. Aborting through that
+    // would reject a provider that does work, and work on the very next attempt,
+    // since the clearance it earned is kept either way. So the deadline stands aside
+    // while a challenge is being worked and starts counting again once it is done.
+    let wasSolving = false;
+
+    const timeoutId = setInterval(() => {
+      const isSolving = isSolvingCloudflare();
+
+      // The tick after a challenge is skipped as well, so the request that is re-sent
+      // once it is passed gets a full window of its own rather than whatever happened
+      // to be left of the one the challenge was answered in.
+      if (isSolving || wasSolving) {
+        wasSolving = isSolving;
+
+        return;
+      }
+
+      controller.abort();
+    }, VALIDATE_URL_TIMEOUT_MS);
 
     try {
       await executeGet(
@@ -231,7 +262,7 @@ const RezkaApi: RezkaApiInterface = {
       console.error(error);
       throw new Error(t('Invalid URL'));
     } finally {
-      clearTimeout(timeoutId);
+      clearInterval(timeoutId);
     }
   },
 
@@ -282,6 +313,9 @@ const RezkaApi: RezkaApiInterface = {
 
   async logout() {
     cookiesManager.reset();
+    // The WebView keeps a jar of its own -- whatever a bot check left in it belongs to
+    // the session being signed out of, and the next solve should start from nothing.
+    clearWebCookies();
     storage.getMiscStorage().remove(REZKA_PROFILE);
   },
 

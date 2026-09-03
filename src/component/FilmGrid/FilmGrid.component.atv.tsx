@@ -194,12 +194,7 @@ function FilmGridList({
 
   // Focus scrolling of its own rather than the list's: FlashList can only hand
   // an animated scroll to the platform, at the platform's speed.
-  const {
-    attachScrollRef,
-    handleScroll,
-    scrollToOffset,
-    scrollToRow,
-  } = useFocusScroll(listRef, {
+  const { scrollToOffset, scrollToRow } = useFocusScroll(listRef, {
     viewPosition: FOCUSED_ROW_VIEW_POSITION,
     isAnimated: isScrollAnimated,
   });
@@ -340,10 +335,7 @@ function FilmGridList({
   // container itself, leaving nothing focused. Wait for the first draw.
   const [isDrawn, setIsDrawn] = useState(false);
 
-  const handleLoad = useCallback(() => {
-    attachScrollRef();
-    setIsDrawn(true);
-  }, [attachScrollRef]);
+  const handleLoad = useCallback(() => setIsDrawn(true), []);
 
   // Focus the grid (restoring the last focused card via saveLastFocusedChild)
   // whenever the screen loads or is returned to. Enabled only once real films
@@ -556,7 +548,6 @@ function FilmGridList({
             keyExtractor={ keyExtractor }
             getItemType={ getItemType }
             onLoad={ handleLoad }
-            onScroll={ handleScroll }
             scrollEventThrottle={ FOCUS_SCROLL_EVENT_THROTTLE }
             onEndReached={ handleScrollEnd }
             onEndReachedThreshold={ 0.5 }

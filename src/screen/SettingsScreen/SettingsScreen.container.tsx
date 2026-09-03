@@ -1,3 +1,4 @@
+import { useFocusEffect } from '@react-navigation/native';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import * as Application from 'expo-application';
@@ -5,6 +6,7 @@ import { getCurrentLanguage, Language, setLanguage } from 'i18n/index';
 import { t } from 'i18n/translate';
 import { reactNativeAfr } from 'Modules/react-native-afr';
 import { reactNativeDownloads } from 'Modules/react-native-downloads';
+import { reactNativeLoudness } from 'Modules/react-native-loudness';
 import { reactNativeTvChannels } from 'Modules/react-native-tv-channels';
 import { reactNativeTvSearch } from 'Modules/react-native-tv-search';
 import { useCallback, useMemo, useState } from 'react';
@@ -43,6 +45,13 @@ export function SettingsScreenContainer() {
   const [automaticCDN, setAutomaticCDN] = useState(currentService.getConfig('autoCdn'));
   const [cdn, setCdn] = useState(currentService.getCDN());
   const [userAgent, setUserAgent] = useState(currentService.getConfig('userAgentNew'));
+
+  // the player carries the same two settings, so what is on screen has to catch up
+  // with the service config every time the screen comes back into view
+  useFocusEffect(useCallback(() => {
+    setAutomaticCDN(currentService.getConfig('autoCdn'));
+    setCdn(currentService.getCDN());
+  }, [currentService]));
 
   const providerOptions = useMemo(
     () => currentService.defaultProviders,
@@ -91,6 +100,10 @@ export function SettingsScreenContainer() {
   // a phone panel has a fixed refresh rate there is no point matching a video to, and
   // below Android 6 there is no display mode API to ask
   const isAutoFrameRateSupported = useMemo(() => reactNativeAfr.isSupported(), []);
+
+  // audio effects are optional for a device to implement, and the cheaper TV boxes ship
+  // without any - there is nothing to offer there
+  const isVolumeNormalizationSupported = useMemo(() => reactNativeLoudness.isSupported(), []);
 
   const onConfigUpdate = (key: keyof DeviceConfigType, value: unknown) => {
     setConfig(key, value);
@@ -272,6 +285,7 @@ export function SettingsScreenContainer() {
     isTvChannelsSupported,
     isTvSearchSupported,
     isAutoFrameRateSupported,
+    isVolumeNormalizationSupported,
     onConfigUpdate,
     onTvChannelsAddToHome,
     onLanguageChange,

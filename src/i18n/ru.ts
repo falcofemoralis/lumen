@@ -50,6 +50,7 @@ const ru: Translations = {
   'Try again later': 'Повторите попытку чуть позже',
   'Provider': 'Зеркало',
   'CDN': 'CDN (Адрес сервера с которого загружаются видео)',
+  'CDN server': 'CDN сервер',
   'Automatic': 'Автоматически',
   'Useragent': 'Useragent',
   'Invalid URL': 'Эта ссылка не рабочая',
@@ -176,6 +177,9 @@ const ru: Translations = {
   'No items': 'Список пустой',
   'Player forward rewind seconds': 'Секунды перемотки вперед',
   'Player backward rewind seconds': 'Секунды перемотки назад',
+  'Preview frames': 'Кадры предпросмотра',
+  'Show a frame of the video at the position being sought to.':
+    'При перемотке показывать кадр видео из той позиции, к которой она ведёт.',
   'Adjacent preview frames': 'Соседние кадры предпросмотра',
   'Show the previous and the next preview frame beside the current one while seeking.':
     'При перемотке рядом с текущим кадром предпросмотра будут показаны предыдущий и следующий.',
@@ -219,6 +223,7 @@ const ru: Translations = {
   'Download link': 'Ссылка загрузки',
   'Copy link': 'Копировать ссылку',
   'Link copied': 'Ссылка скопирована',
+  'No app can open this link, so it was copied instead': 'Нет приложения, которое может открыть эту ссылку, поэтому она скопирована',
   'Parallel downloads': 'Параллельные загрузки',
   'How many files are downloaded at the same time. The rest wait in a queue.': 'Сколько файлов загружается одновременно. Остальные ждут в очереди.',
   'Poster download failed: {{error}}': 'Не удалось загрузить постер: {{error}}',
@@ -253,8 +258,13 @@ const ru: Translations = {
   'Show episode name': 'Показывать название серии',
   'Show the name the schedule gives the episode under the title in the player.':
     'Название текущей серии из расписания выхода серий будет показано в плеере под названием сериала.',
+  'Show episode date': 'Показывать дату выхода серии',
+  'Append the air date to the episode name, as "name (date)".':
+    'Дата выхода серии будет добавлена к её названию в формате «название (дата)».',
   'Auto next episode': 'Автоматически включать следующую серию',
   'Toggle auto next episode.': 'После окончания серии автоматически будет включаться следующая.',
+  'Keep time on voice change': 'Сохранять время при смене озвучки',
+  'Switching the voice keeps the current position instead of the one saved for it.': 'При смене озвучки воспроизведение продолжится с текущей позиции, а не с сохранённой для выбранной озвучки.',
   'Frame rate matching (AFR)': 'Подстройка частоты обновления (AFR)',
   'Adds a button to the player that matches the TV refresh rate to the video.': 'Добавляет в плеер кнопку, которая переключает телевизор на частоту обновления, кратную частоте кадров видео - это убирает рывки при просмотре 24-кадровых фильмов на 60 Гц. При каждом переключении экран ненадолго гаснет, и поддерживают это не все телевизоры.',
   'Frame rate matching off': 'Подстройка частоты выключена',
@@ -264,6 +274,15 @@ const ru: Translations = {
   'This video has no fixed frame rate': 'У этого видео нет постоянной частоты кадров',
   'Play the video to match its frame rate': 'Запустите видео, чтобы подстроить частоту',
   'Frame rate matching is not available on this device': 'Подстройка частоты обновления недоступна на этом устройстве',
+  'Volume normalization': 'Нормализация громкости',
+  'Adds a button to the player that makes loud scenes quieter and quiet dialogue louder.': 'Добавляет в плеер кнопку, которая выравнивает громкость: громкие сцены становятся тише, а тихие диалоги громче, и фильм можно смотреть на одной громкости. Не работает, если звук уходит на ресивер без декодирования.',
+  'Normalization strength': 'Сила нормализации',
+  'How close together the loudest and the quietest parts are brought.': 'Насколько сближаются самые громкие и самые тихие места. Чем сильнее, тем меньше фильм звучит так, как его свели.',
+  'Gentle': 'Слабая',
+  'Moderate': 'Средняя',
+  'Strong': 'Сильная',
+  'Volume normalization on': 'Нормализация громкости включена',
+  'Volume normalization off': 'Нормализация громкости выключена',
   'Player long press speed': 'Скорость перемотки при долгом нажатии',
   'Volume gesture': 'Жест громкости',
   'Slide up and down on the right half of the player to change the volume.':
@@ -288,6 +307,7 @@ const ru: Translations = {
   'Player rewind buffer': 'Буфер перемотки назад',
   'How much played video is kept in memory so rewinding does not reload it.':
     'Сколько просмотренного видео хранится в памяти, чтобы перемотка назад не перезагружала его. Больший буфер занимает больше памяти.',
+  'Subtitles style': 'Стиль субтитров',
   'Custom subtitles style': 'Свой стиль субтитров',
   'Style the subtitles here instead of following the system captioning settings.':
     'Оформлять субтитры здесь, а не по системным настройкам субтитров. Пока включено, цвета и размеры шрифта, заданные внутри дорожки субтитров, не учитываются.',
@@ -424,6 +444,9 @@ const ru: Translations = {
   'The app has to be restarted for the imported settings to take effect.': 'Чтобы импортированные настройки применились, приложение нужно перезапустить.',
   'Restart': 'Перезапустить',
   'Later': 'Позже',
+  'Verifying that you are not a robot': 'Проверяем, что вы не робот',
+  'This can take a few seconds': 'Это может занять несколько секунд',
+  'Complete the check to continue, or press Back to cancel': 'Пройдите проверку, чтобы продолжить, или нажмите «Назад» для отмены',
 };
 
 export default ru;

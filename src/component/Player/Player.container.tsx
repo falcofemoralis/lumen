@@ -11,6 +11,7 @@ import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { useAutoFrameRateAction } from 'Hooks/useAutoFrameRate';
 import { useLocalBookmarks } from 'Hooks/useLocalLibrary';
 import { useVideoPlayerState } from 'Hooks/useVideoPlayerState';
+import { useVolumeNormalizationAction } from 'Hooks/useVolumeNormalization';
 import { t } from 'i18n/translate';
 import {
   useCallback,
@@ -95,6 +96,7 @@ export function PlayerContainer({
     isLocalLibrary,
     playerSaveQuality,
     playerAutoNextEpisode,
+    playerKeepTimeOnVoiceChange,
     playerBufferTimeSetting,
     playerBackBufferTimeSetting,
     playerDefaultAspectRatio,
@@ -103,7 +105,14 @@ export function PlayerContainer({
   const navigation = useNavigation();
   const { updateSelectedVoice } = usePlayerContext();
   const { resetProgressStatus, updateProgressStatus } = usePlayerProgressActions();
-  const { isSignedIn, profile, currentService, prepareShareBody } = useServiceContext();
+  const {
+    isSignedIn,
+    profile,
+    currentService,
+    prepareShareBody,
+    updateCDN,
+    updateAutomaticCDN,
+  } = useServiceContext();
 
   const storedQuality = useMemo(() => qualityProp ?? getPlayerQuality(), [qualityProp]);
   const defaultQuality = useMemo(() => getQualityFromStreams(video, storedQuality), [video, storedQuality]);
@@ -117,6 +126,8 @@ export function PlayerContainer({
   const [selectedSubtitle, setSelectedSubtitle] = useState<SubtitleInterface|undefined>(
     selectedVideo.subtitles?.find(({ isDefault }) => isDefault)
   );
+  const [selectedCDN, setSelectedCDN] = useState<string>(currentService.getCDN());
+  const [isAutomaticCDN, setIsAutomaticCDN] = useState<boolean>(currentService.getConfig('autoCdn'));
   const [selectedSpeed, setSelectedSpeed] = useState<number>(playerDefaultSpeed);
   const [selectedAspectRatio, setSelectedAspectRatio] = useState<ResizeMode>(
     getAspectRatio(playerDefaultAspectRatio)
@@ -141,10 +152,12 @@ export function PlayerContainer({
   const durationRef = useRef<number>(0);
   const qualityOverlayRef = useRef<ThemedOverlayRef>(null);
   const subtitleOverlayRef = useRef<ThemedOverlayRef>(null);
+  const subtitlesStyleOverlayRef = useRef<ThemedOverlayRef>(null);
   const playerVideoSelectorOverlayRef = useRef<PlayerVideoSelectorRef>(null);
   const commentsOverlayRef = useRef<ThemedOverlayRef>(null);
   const bookmarksOverlayRef = useRef<ThemedOverlayRef>(null);
   const speedOverlayRef = useRef<ThemedOverlayRef>(null);
+  const cdnOverlayRef = useRef<ThemedOverlayRef>(null);
 
   const firestoreSavedTimeRef = useRef(false);
   const firestoreDb = useMemo(() => (
@@ -155,11 +168,19 @@ export function PlayerContainer({
 
   const localBookmarks = useLocalBookmarks();
 
+  const cdnOptions = useMemo(() => currentService.defaultCDNs, [currentService]);
+
   const {
     isAutoFrameRateSupported,
     isAutoFrameRateEnabled,
     toggleAutoFrameRate,
   } = useAutoFrameRateAction();
+
+  const {
+    isVolumeNormalizationSupported,
+    isVolumeNormalizationEnabled,
+    toggleVolumeNormalization,
+  } = useVolumeNormalizationAction();
 
   // in local mode the bookmark state is derived reactively from the local store
   const isFilmBookmarkedValue = isLocalLibrary
@@ -382,7 +403,8 @@ export function PlayerContainer({
   const updatePlayerStream = (
     videoArg: FilmVideoInterface,
     qualityArg: string,
-    voiceArg: FilmVoiceInterface
+    voiceArg: FilmVoiceInterface,
+    carriedTime?: number
   ) => {
     // a new source gets its own chance to load - whatever failed before is not
     // the state of what is about to play
@@ -390,7 +412,11 @@ export function PlayerContainer({
     // the cached duration belongs to the outgoing source
     durationRef.current = 0;
 
-    const newStream = getPlayerStream(videoArg, getQualityFromStreams(videoArg, qualityArg));
+    // `auto` is not a stream of its own - the player is handed the same generated
+    // master playlist the initial source is built from and negotiates the track itself
+    const newStream = qualityArg === AUTO_QUALITY.value && !isOffline
+      ? { url: createMasterPlaylist(videoArg.streams).uri, quality: qualityArg }
+      : getPlayerStream(videoArg, getQualityFromStreams(videoArg, qualityArg));
 
     // a miss is reported as a null url, not a missing object
     if (!newStream.url) {
@@ -402,8 +428,9 @@ export function PlayerContainer({
     // the position nor resumes on its own. The position is read back the same
     // way the initial load does it - the callers save the current one first, so
     // a quality switch lands where playback was, and an episode switch lands on
-    // whatever was watched of that episode.
-    const resumeTime = getVideoTime(newVoice, getSavedTime(film));
+    // whatever was watched of that episode. `carriedTime` overrides that lookup
+    // for a voice switch that is asked to stay where playback was.
+    const resumeTime = carriedTime ?? getVideoTime(newVoice, getSavedTime(film));
 
     player.replaceSourceAsync(
       buildVideoSource(newStream.url, newStream.quality, videoArg, newVoice)
@@ -424,7 +451,34 @@ export function PlayerContainer({
       });
   };
 
+  /**
+   * A voice is a separate encode of the same episode, so its timeline is the same
+   * one - give or take the intro and the outro the studio put on it, which is why
+   * carrying the position over is a setting and not the default. It only applies
+   * to a switch that stays on the same episode: another episode has a position of
+   * its own, and there is nothing to carry from the one being left behind.
+   */
+  const getCarriedTime = (newVoice: FilmVoiceInterface) => {
+    if (!playerKeepTimeOnVoiceChange || newVoice.id === selectedVoice.id) {
+      return undefined;
+    }
+
+    if (film.hasSeasons && (
+      newVoice.lastSeasonId !== selectedVoice.lastSeasonId
+      || newVoice.lastEpisodeId !== selectedVoice.lastEpisodeId
+    )) {
+      return undefined;
+    }
+
+    const { currentTime } = player;
+
+    return currentTime > 0 ? currentTime : undefined;
+  };
+
   const changePlayerVideo = (newVideo: FilmVideoInterface, newVoice: FilmVoiceInterface) => {
+    // read before anything else touches the player - the source is about to be replaced
+    const carriedTime = getCarriedTime(newVoice);
+
     if (isLocalLibrary) {
       if (!isOffline) {
         upsertLocalHistoryItem(film, newVoice);
@@ -443,7 +497,7 @@ export function PlayerContainer({
     resetUpdateTimeTimeout();
     setSelectedSubtitle(newVideo.subtitles?.find(({ isDefault }) => isDefault));
     updateSelectedVoice(film.id, newVoice);
-    updatePlayerStream(newVideo, selectedQuality, newVoice);
+    updatePlayerStream(newVideo, selectedQuality, newVoice, carriedTime);
   };
 
   const handleNewEpisode = async (direction: RewindDirection) => {
@@ -745,6 +799,13 @@ export function PlayerContainer({
     openOverlay();
   };
 
+  // Nothing is handed to it: the look of the subtitles is a setting, and the selector
+  // reads and writes it itself - see PlayerSubtitlesStyleSelector.
+  const openSubtitlesStyleSelector = () => {
+    subtitlesStyleOverlayRef.current?.open();
+    openOverlay();
+  };
+
   const openCommentsOverlay = () => {
     commentsOverlayRef.current?.open();
     openOverlay();
@@ -764,6 +825,95 @@ export function PlayerContainer({
   const openSpeedSelector = () => {
     speedOverlayRef.current?.open();
     openOverlay();
+  };
+
+  const openCDNSelector = () => {
+    cdnOverlayRef.current?.open();
+    openOverlay();
+  };
+
+  /**
+   * The CDN is a service wide setting, so picking one here is the same change the
+   * settings screen makes - the player only reloads what it is playing on top of it.
+   *
+   * The stream urls are rewritten to the configured CDN while they are parsed
+   * (`modifyCDN`), so the addresses of another one - the provider's own among them -
+   * can only be had by asking the service for the streams again. A CDN that does not
+   * answer takes the config back with it, rather than leaving the player on a setting
+   * nothing plays with.
+   */
+  const reloadStreamsForCDN = async (revertCDN: () => void) => {
+    try {
+      setIsLoading(true);
+
+      const { lastSeasonId = '', lastEpisodeId = '' } = selectedVoice;
+
+      const newVideo = film.hasSeasons
+        ? await currentService.getFilmStreamsByEpisodeId(film, selectedVoice, lastSeasonId, lastEpisodeId)
+        : await currentService.getFilmStreamsByVoice(film, selectedVoice);
+
+      if (!newVideo.streams.length) {
+        throw new Error(t('Failed to load the video'));
+      }
+
+      updateTime();
+      setSelectedVideo(newVideo);
+      // the same subtitle carried over to the track of the reloaded video
+      setSelectedSubtitle(
+        newVideo.subtitles?.find(({ languageCode }) => languageCode === selectedSubtitle?.languageCode)
+      );
+      updatePlayerStream(newVideo, selectedQuality, selectedVoice);
+    } catch (error) {
+      NotificationStore.displayError(error as Error);
+
+      revertCDN();
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // the selector stays up: with the automatic mode off, the CDN to use is the next
+  // thing to pick in it
+  const handleAutomaticCDNChange = (value: boolean) => {
+    setIsAutomaticCDN(value);
+    updateAutomaticCDN(value);
+
+    reloadStreamsForCDN(() => {
+      setIsAutomaticCDN(!value);
+      updateAutomaticCDN(!value);
+    });
+  };
+
+  const handleCDNChange = (value: string) => {
+    // `updateCDN` stores it without the trailing slash, and the two have to agree -
+    // this is what the selector shows as the current CDN
+    const cdn = value.trim().replace(/\/+$/, '');
+
+    cdnOverlayRef.current?.close();
+
+    if (cdn === selectedCDN) {
+      return;
+    }
+
+    // a typed in address is only rehosted onto if it parses as a URL (`modifyCDN`),
+    // and a bare host would otherwise fail as a video that does not load
+    try {
+      void new URL(cdn);
+    } catch {
+      NotificationStore.displayError(t('Invalid URL'));
+
+      return;
+    }
+
+    const prevCDN = selectedCDN;
+
+    setSelectedCDN(cdn);
+    updateCDN(cdn);
+
+    reloadStreamsForCDN(() => {
+      setSelectedCDN(prevCDN);
+      updateCDN(prevCDN);
+    });
   };
 
   const handleQualityChange = (item: DropdownItem) => {
@@ -896,10 +1046,15 @@ export function PlayerContainer({
     selectedSubtitle,
     qualityOverlayRef,
     subtitleOverlayRef,
+    subtitlesStyleOverlayRef,
     playerVideoSelectorOverlayRef,
     commentsOverlayRef,
     bookmarksOverlayRef,
     speedOverlayRef,
+    cdnOverlayRef,
+    selectedCDN,
+    isAutomaticCDN,
+    cdnOptions,
     selectedSpeed,
     selectedAspectRatio,
     isLocked,
@@ -912,6 +1067,9 @@ export function PlayerContainer({
     isAutoFrameRateSupported,
     isAutoFrameRateEnabled,
     toggleAutoFrameRate,
+    isVolumeNormalizationSupported,
+    isVolumeNormalizationEnabled,
+    toggleVolumeNormalization,
     togglePlayPause,
     rewindPosition,
     seekToPosition,
@@ -923,9 +1081,13 @@ export function PlayerContainer({
     handleVideoSelect,
     setPlayerRate,
     openSubtitleSelector,
+    openSubtitlesStyleSelector,
     handleSubtitleChange,
     handleSpeedChange,
     openSpeedSelector,
+    openCDNSelector,
+    handleCDNChange,
+    handleAutomaticCDNChange,
     handleAspectRatioChange,
     openCommentsOverlay,
     openBookmarksOverlay,

@@ -23,6 +23,7 @@ export type SettingsScreenComponentProps = {
   isTvChannelsSupported: boolean
   isTvSearchSupported: boolean
   isAutoFrameRateSupported: boolean
+  isVolumeNormalizationSupported: boolean
   onConfigUpdate: (key: keyof DeviceConfigType, value: unknown) => void
   onTvChannelsAddToHome: () => Promise<void>
   onLanguageChange: (value: string) => Promise<void>

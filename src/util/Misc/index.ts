@@ -41,6 +41,31 @@ export const setIntervalSafe = (callback: () => void, ms?: number): number | nul
 export const wait = (ms: number): Promise<void> => new Promise((resolve) => { setTimeoutSafe(resolve, ms); });
 
 /**
+ * One header out of whatever shape a caller passed its headers in -- `Headers`, a
+ * list of pairs, or a plain object all reach `fetch` and none of them is indexable
+ * the same way. Matched case-insensitively, as a header name is.
+ */
+export const headerValue = (headers: HeadersInit | undefined, name: string): string | undefined => {
+  if (!headers) {
+    return undefined;
+  }
+
+  const lower = name.toLowerCase();
+
+  if (headers instanceof Headers) {
+    return headers.get(name) ?? undefined;
+  }
+
+  if (Array.isArray(headers)) {
+    return headers.find(([key]) => key.toLowerCase() === lower)?.[1];
+  }
+
+  const key = Object.keys(headers).find((k) => k.toLowerCase() === lower);
+
+  return key ? (headers as Record<string, string>)[key] : undefined;
+};
+
+/**
  * A comparable number for a `major.minor.patch` version. Each segment gets its
  * own decimal band, so multi-digit segments still order correctly (a plain digit
  * concatenation made 1.5.10 look newer than 1.6.0).

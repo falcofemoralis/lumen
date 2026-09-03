@@ -3,11 +3,9 @@ import {
   DEFAULT_SPEEDS,
   getAspectRatioLabel,
   MAX_QUALITY,
-  SUBTITLES_BOTTOM_OFFSETS,
-  SUBTITLES_SIZE_SCALES,
 } from 'Component/Player/Player.config';
 import { t } from 'i18n/translate';
-import { SubtitleEdgeType } from 'Modules/react-native-subtitle-style';
+import { LoudnessStrength } from 'Modules/react-native-loudness';
 import {
   ACCOUNT_SCREEN,
   BOOKMARKS_SCREEN,
@@ -394,122 +392,39 @@ export const PLAYER_BACK_BUFFER_TIME_OPTIONS = [
   }),
 ];
 
-// Both of these are relative to the height of the player rather than absolute, so they
-// are shown as what they are: 100% is the size the player draws by default, and the
-// offset is how much of the picture stands between the subtitles and its bottom edge.
-export const PLAYER_SUBTITLES_SIZE_OPTIONS = SUBTITLES_SIZE_SCALES.map((scale) => ({
-  value: scale.toString(),
-  label: `${Math.round(scale * 100)}%`,
-}));
+// The player styles the subtitles from the very same settings, so the choices are
+// declared next to the overlay it offers them in and re-exported here - the settings
+// screen and the player must not drift into offering different ones.
+export {
+  PLAYER_SUBTITLES_BACKGROUND_OPTIONS,
+  PLAYER_SUBTITLES_BOTTOM_OFFSET_OPTIONS,
+  PLAYER_SUBTITLES_COLOR_OPTIONS,
+  PLAYER_SUBTITLES_EDGE_OPTIONS,
+  PLAYER_SUBTITLES_SIZE_OPTIONS,
+} from 'Component/PlayerSubtitlesStyleSelector/PlayerSubtitlesStyleSelector.config';
 
-export const PLAYER_SUBTITLES_BOTTOM_OFFSET_OPTIONS = SUBTITLES_BOTTOM_OFFSETS.map((offset) => ({
-  value: offset.toString(),
-  label: `${Math.round(offset * 100)}%`,
-}));
-
-// #AARRGGBB, i.e. the alpha comes first - the native side hands these to
-// `Color.parseColor`, which reads them the Android way rather than the CSS way.
-export const PLAYER_SUBTITLES_COLOR_OPTIONS = [
+/**
+ * How hard volume normalization compresses. `off` is not among them: the switch beside
+ * this is what turns the feature off, and a level called off inside it would be a second
+ * way to say the same thing.
+ */
+export const PLAYER_VOLUME_NORMALIZATION_OPTIONS = [
   {
-    value: '#FFFFFF',
+    value: LoudnessStrength.LIGHT,
     get label() {
-      return t('White');
+      return t('Gentle');
     },
   },
   {
-    value: '#FFFF00',
+    value: LoudnessStrength.MEDIUM,
     get label() {
-      return t('Yellow');
+      return t('Moderate');
     },
   },
   {
-    value: '#00FFFF',
+    value: LoudnessStrength.STRONG,
     get label() {
-      return t('Cyan');
-    },
-  },
-  {
-    value: '#00FF00',
-    get label() {
-      return t('Green');
-    },
-  },
-  {
-    value: '#BFBFBF',
-    get label() {
-      return t('Grey');
-    },
-  },
-  {
-    value: '#000000',
-    get label() {
-      return t('Black');
-    },
-  },
-];
-
-export const PLAYER_SUBTITLES_BACKGROUND_OPTIONS = [
-  {
-    value: '#00000000',
-    get label() {
-      return t('None');
-    },
-  },
-  {
-    value: '#80000000',
-    get label() {
-      return t('Translucent black');
-    },
-  },
-  {
-    value: '#FF000000',
-    get label() {
-      return t('Black');
-    },
-  },
-  {
-    value: '#80808080',
-    get label() {
-      return t('Translucent grey');
-    },
-  },
-  {
-    value: '#FFFFFFFF',
-    get label() {
-      return t('White');
-    },
-  },
-];
-
-export const PLAYER_SUBTITLES_EDGE_OPTIONS = [
-  {
-    value: SubtitleEdgeType.NONE,
-    get label() {
-      return t('None');
-    },
-  },
-  {
-    value: SubtitleEdgeType.OUTLINE,
-    get label() {
-      return t('Outline');
-    },
-  },
-  {
-    value: SubtitleEdgeType.DROP_SHADOW,
-    get label() {
-      return t('Drop shadow');
-    },
-  },
-  {
-    value: SubtitleEdgeType.RAISED,
-    get label() {
-      return t('Raised');
-    },
-  },
-  {
-    value: SubtitleEdgeType.DEPRESSED,
-    get label() {
-      return t('Depressed');
+      return t('Strong');
     },
   },
 ];

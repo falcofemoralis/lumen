@@ -1,5 +1,7 @@
 import NotificationStore from 'Store/Notification.store';
 import { buildCookies, cookiesManager, isCookieExpired, setCookies } from 'Util/Cookies';
+import { headerValue } from 'Util/Misc';
+import { getUrlOrigin } from 'Util/Url';
 
 import { parseChallenge, solvePow } from './challenge';
 
@@ -10,38 +12,6 @@ const PASS_CHALLENGE_PATH = '/.within.website/x/cmd/anubis/api/pass-challenge';
 const VERIFICATION_COOKIE = 'techaro.lol-anubis-cookie-verification';
 
 const delay = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
-
-function headerValue(headers: HeadersInit | undefined, name: string): string | undefined {
-  if (!headers) {
-    return undefined;
-  }
-
-  const lower = name.toLowerCase();
-
-  if (headers instanceof Headers) {
-    return headers.get(name) ?? undefined;
-  }
-
-  if (Array.isArray(headers)) {
-    return headers.find(([key]) => key.toLowerCase() === lower)?.[1];
-  }
-
-  const key = Object.keys(headers).find((k) => k.toLowerCase() === lower);
-
-  return key ? (headers as Record<string, string>)[key] : undefined;
-}
-
-// RN's URL implementation doesn't reliably expose `.origin`, so derive the
-// scheme+authority defensively.
-function getOrigin(url: URL, rawUrl: string): string {
-  if (url.protocol && url.host) {
-    return `${url.protocol}//${url.host}`;
-  }
-
-  const match = rawUrl.match(/^(https?:\/\/[^/]+)/i);
-
-  return match ? match[1] : rawUrl;
-}
 
 function buildPassChallengeUrl(
   origin: string,
@@ -94,7 +64,7 @@ export async function solveAnubis(originalUrl: string, bodyText: string, headers
     return false;
   }
 
-  const origin = getOrigin(url, originalUrl);
+  const origin = getUrlOrigin(originalUrl);
   const { hostname } = url;
 
   // Another request may already have solved it.

@@ -115,11 +115,7 @@ export const ThemedGridComponent = ({
 
   // Focus scrolling of its own rather than the list's: FlashList can only hand
   // an animated scroll to the platform, at the platform's speed.
-  const {
-    attachScrollRef,
-    handleScroll,
-    scrollToRow,
-  } = useFocusScroll(listRef, { viewPosition });
+  const { scrollToRow } = useFocusScroll(listRef, { viewPosition });
 
   const scrollToIndex = useCallback((index: number) => {
     // Only scroll when the focused row changes -- moving between cells within a
@@ -201,8 +197,6 @@ export const ThemedGridComponent = ({
           data={ data }
           renderItem={ renderCell }
           numColumns={ numberOfColumns }
-          onLoad={ attachScrollRef }
-          onScroll={ handleScroll }
           scrollEventThrottle={ FOCUS_SCROLL_EVENT_THROTTLE }
           onEndReached={ handleScrollEnd }
           onEndReachedThreshold={ 0.25 }

@@ -21,8 +21,10 @@ import ArrowDown10 from 'lucide-react-native/icons/arrow-down-1-0';
 import ArrowDownUp from 'lucide-react-native/icons/arrow-down-up';
 import ArrowLeftRight from 'lucide-react-native/icons/arrow-left-right';
 import ArrowRight from 'lucide-react-native/icons/arrow-right';
+import AudioLines from 'lucide-react-native/icons/audio-lines';
 import BookImage from 'lucide-react-native/icons/book-image';
 import Brush from 'lucide-react-native/icons/brush';
+import CalendarDays from 'lucide-react-native/icons/calendar-days';
 import Subtitles from 'lucide-react-native/icons/captions';
 import CircleGauge from 'lucide-react-native/icons/circle-gauge';
 import CircleQuestionMark from 'lucide-react-native/icons/circle-question-mark';
@@ -34,6 +36,7 @@ import Download from 'lucide-react-native/icons/download';
 import ExternalLink from 'lucide-react-native/icons/external-link';
 import EyeOff from 'lucide-react-native/icons/eye-off';
 import FastForward from 'lucide-react-native/icons/fast-forward';
+import Film from 'lucide-react-native/icons/film';
 import FolderCog from 'lucide-react-native/icons/folder-cog';
 import FolderDown from 'lucide-react-native/icons/folder-down';
 import FolderLock from 'lucide-react-native/icons/folder-lock';
@@ -63,6 +66,7 @@ import Sparkles from 'lucide-react-native/icons/sparkles';
 import StepForward from 'lucide-react-native/icons/step-forward';
 import Sun from 'lucide-react-native/icons/sun';
 import Tag from 'lucide-react-native/icons/tag';
+import Timer from 'lucide-react-native/icons/timer';
 import TvMinimalPlay from 'lucide-react-native/icons/tv-minimal-play';
 import UserCog from 'lucide-react-native/icons/user-cog';
 import Users from 'lucide-react-native/icons/users';
@@ -92,6 +96,7 @@ import {
   PLAYER_SUBTITLES_COLOR_OPTIONS,
   PLAYER_SUBTITLES_EDGE_OPTIONS,
   PLAYER_SUBTITLES_SIZE_OPTIONS,
+  PLAYER_VOLUME_NORMALIZATION_OPTIONS,
   TELEGRAM_LINK,
   THEME_SCHEME_OPTIONS,
 } from './SettingsScreen.config';
@@ -110,12 +115,14 @@ export function SettingsScreenComponent({
   playerShowBufferTime,
   playerShowEndTime,
   playerShowEpisodeName,
+  playerShowEpisodeDate,
   playerSubtitlesCustomStyle,
   playerSubtitlesSizeScale,
   playerSubtitlesColor,
   playerSubtitlesBackgroundColor,
   playerSubtitlesEdgeType,
   playerSubtitlesBottomOffset,
+  playerStoryboard,
   playerStoryboardAdjacentFrames,
   isFirestore,
   securedSettings,
@@ -125,10 +132,14 @@ export function SettingsScreenComponent({
   downloadsMaxParallel,
   downloadsMaxParallelOptions,
   playerAutoNextEpisode,
+  playerKeepTimeOnVoiceChange,
   playerLongPressSpeed,
   playerVolumeGesture,
   playerBrightnessGesture,
   playerSwapGestureSides,
+  playerVolumeNormalizationEnabled,
+  playerVolumeNormalizationStrength,
+  isVolumeNormalizationSupported,
   sortVoicesByRating,
   playerBufferTimeSetting,
   playerBackBufferTimeSetting,
@@ -549,10 +560,18 @@ export function SettingsScreenComponent({
         onChange={ (value) => onConfigUpdate('playerBackwardRewindSeconds', Number(value)) }
       />
       <SettingSwitch
+        title={ t('Preview frames') }
+        subtitle={ t('Show a frame of the video at the position being sought to.') }
+        IconComponent={ Film }
+        value={ playerStoryboard }
+        onChange={ (value) => onConfigUpdate('playerStoryboard', value) }
+      />
+      <SettingSwitch
         title={ t('Adjacent preview frames') }
         subtitle={ t('Show the previous and the next preview frame beside the current one while seeking.') }
         IconComponent={ Images }
         value={ playerStoryboardAdjacentFrames }
+        isEnabled={ playerStoryboard }
         onChange={ (value) => onConfigUpdate('playerStoryboardAdjacentFrames', value) }
       />
       <SettingSelect
@@ -568,6 +587,13 @@ export function SettingsScreenComponent({
         IconComponent={ StepForward }
         value={ playerAutoNextEpisode }
         onChange={ (value) => onConfigUpdate('playerAutoNextEpisode', value) }
+      />
+      <SettingSwitch
+        title={ t('Keep time on voice change') }
+        subtitle={ t('Switching the voice keeps the current position instead of the one saved for it.') }
+        IconComponent={ Timer }
+        value={ playerKeepTimeOnVoiceChange }
+        onChange={ (value) => onConfigUpdate('playerKeepTimeOnVoiceChange', value) }
       />
       <SettingSelect
         title={ t('Player long press speed') }
@@ -627,6 +653,14 @@ export function SettingsScreenComponent({
         value={ playerShowEpisodeName }
         onChange={ (value) => onConfigUpdate('playerShowEpisodeName', value) }
       />
+      <SettingSwitch
+        title={ t('Show episode date') }
+        subtitle={ t('Append the air date to the episode name, as "name (date)".') }
+        IconComponent={ CalendarDays }
+        value={ playerShowEpisodeDate }
+        isEnabled={ playerShowEpisodeName }
+        onChange={ (value) => onConfigUpdate('playerShowEpisodeDate', value) }
+      />
       <SettingSelect
         title={ t('Player buffer time settings') }
         IconComponent={ Loader }
@@ -644,6 +678,24 @@ export function SettingsScreenComponent({
         value={ playerBackBufferTimeSetting.toString() }
         options={ PLAYER_BACK_BUFFER_TIME_OPTIONS }
         onChange={ (value) => onConfigUpdate('playerBackBufferTimeSetting', Number(value)) }
+      />
+      <SettingSwitch
+        title={ t('Volume normalization') }
+        subtitle={ t('Adds a button to the player that makes loud scenes quieter and quiet dialogue louder.') }
+        IconComponent={ AudioLines }
+        value={ playerVolumeNormalizationEnabled }
+        isHidden={ !isVolumeNormalizationSupported }
+        onChange={ (value) => onConfigUpdate('playerVolumeNormalizationEnabled', value) }
+      />
+      <SettingSelect
+        title={ t('Normalization strength') }
+        subtitle={ t('How close together the loudest and the quietest parts are brought.') }
+        IconComponent={ Gauge }
+        value={ playerVolumeNormalizationStrength }
+        options={ PLAYER_VOLUME_NORMALIZATION_OPTIONS }
+        isHidden={ !isVolumeNormalizationSupported }
+        isEnabled={ playerVolumeNormalizationEnabled }
+        onChange={ (value) => onConfigUpdate('playerVolumeNormalizationStrength', value) }
       />
       { renderSubtitlesStyle() }
     </ThemedScrollView>

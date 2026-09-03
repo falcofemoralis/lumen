@@ -4,6 +4,7 @@ import {
   setConfig as setDownloaderConfig,
 } from '@kesha-antonov/react-native-background-downloader';
 import { AppUpdater } from 'Component/AppUpdater';
+import { CloudflareSolver } from 'Component/CloudflareSolver';
 import { Portal } from 'Component/ThemedPortal';
 import { useAppUpdaterContext } from 'Context/AppUpdaterContext';
 import { useConfigContext } from 'Context/ConfigContext';
@@ -14,6 +15,7 @@ import { useAwake } from 'Hooks/useAwake';
 import { useSubtitleStyle } from 'Hooks/useSubtitleStyle';
 import { useTvChannels } from 'Hooks/useTvChannels';
 import { useTvSearch } from 'Hooks/useTvSearch';
+import { useVolumeNormalization } from 'Hooks/useVolumeNormalization';
 import { ReactNode, useEffect } from 'react';
 import NotificationStore from 'Store/Notification.store';
 import { Installer } from 'Util/App/installer';
@@ -28,6 +30,9 @@ export const Root = ({ children }: { children: ReactNode }) => {
     tvSearchEnabled,
     playerAutoFrameRateEnabled,
     playerAutoFrameRate,
+    playerVolumeNormalizationEnabled,
+    playerVolumeNormalization,
+    playerVolumeNormalizationStrength,
   } = useConfigContext();
   const { isSignedIn } = useServiceContext();
   const { fetchUserData } = useServiceContext();
@@ -38,6 +43,10 @@ export const Root = ({ children }: { children: ReactNode }) => {
   useTvChannels(tvChannelsEnabled);
   useTvSearch(tvSearchEnabled);
   useAutoFrameRate(playerAutoFrameRateEnabled && playerAutoFrameRate);
+  useVolumeNormalization(
+    playerVolumeNormalizationEnabled && playerVolumeNormalization,
+    playerVolumeNormalizationStrength
+  );
   useSubtitleStyle();
 
   // Deferred: an update banner is not what the user opened the app for, so it has no
@@ -102,6 +111,13 @@ export const Root = ({ children }: { children: ReactNode }) => {
     <Portal.Host>
       <AppUpdater />
       { children }
+      { /*
+         * Draws nothing until a request hits a Cloudflare bot check - see the container.
+         * Last, and so painted over the page: unlike the updater above it puts its own
+         * view up rather than portaling one, and the request behind it is blocked until
+         * the user has answered it.
+         */ }
+      <CloudflareSolver />
     </Portal.Host>
   );
 };

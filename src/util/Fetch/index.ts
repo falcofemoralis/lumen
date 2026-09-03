@@ -1,4 +1,5 @@
 import { isAnubisChallenge, solveAnubis } from 'Util/Anubis';
+import { isCloudflareChallenge, solveCloudflare, withClearanceUserAgent } from 'Util/Cloudflare';
 import { buildCookies, setCookies } from 'Util/Cookies';
 
 // Rebuild a Response from an already-read body so callers can still read it.
@@ -36,13 +37,34 @@ export async function customFetch(
 
   const bodyText = await res.text();
 
-  // Anubis serves its proof-of-work interstitial (HTTP 200) in place of the
-  // requested content. Solve it once, then transparently re-drive the request.
-  if (!retried && isAnubisChallenge(bodyText)) {
-    const solved = await solveAnubis(url, bodyText, init?.headers);
+  // A bot check stands in for the content that was asked for -- Anubis serves its
+  // proof-of-work interstitial as an HTTP 200, Cloudflare mostly a 403. Either way the
+  // fix is the same: pass it once, which leaves a cookie in the jar, then transparently
+  // re-drive the request. `retried` bounds it to a single attempt, so a clearance that
+  // is refused fails the request instead of looping.
+  if (!retried) {
+    if (isAnubisChallenge(bodyText)) {
+      const solved = await solveAnubis(url, bodyText, init?.headers);
 
-    if (solved) {
-      return customFetch(input, init, true);
+      if (solved) {
+        return customFetch(input, init, true);
+      }
+    }
+
+    if (isCloudflareChallenge(bodyText, res.status, res.headers)) {
+      const solved = await solveCloudflare(url, init?.headers);
+
+      if (solved) {
+        // Not the headers we came in with: Cloudflare pins the clearance to the user
+        // agent that earned it, and these were built before there was a challenge to
+        // earn one for. Sending the stale one back with the new cookie is refused, and
+        // the one retry there is would be spent on it.
+        return customFetch(
+          input,
+          { ...init, headers: withClearanceUserAgent(init?.headers, hostname) },
+          true
+        );
+      }
     }
   }
 

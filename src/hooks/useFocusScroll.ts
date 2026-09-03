@@ -1,29 +1,24 @@
 import { FlashListRef } from '@shopify/flash-list';
-import { RefObject, useCallback } from 'react';
-import { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
-import Animated, {
-  Easing,
-  scrollTo,
-  useAnimatedRef,
-  useDerivedValue,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated';
+import { CubicBezier, reactNativeFocusScroll } from 'Modules/react-native-focus-scroll';
+import { RefObject, useCallback, useRef } from 'react';
 
 /**
  * How long a focus-driven row change takes to glide into place, in ms.
  *
- * Keep it at or below the time it takes to press the next key: a scroll still
- * running when the next row is entered is retargeted mid-flight, which reads as
- * one continuous glide, but only while the two are of a similar length.
+ * Keep it at or below the time it takes to press the next key: a scroll of the
+ * previous row still running when the next one is entered is called off where it
+ * had got to, and a much longer scroll would spend every press being replaced
+ * before it had covered any ground.
  */
 export const FOCUS_SCROLL_DURATION = 250;
 
 /**
+ * The easing curve, as the two control points of a cubic bezier.
+ *
  * Leaves quickly and settles slowly: the row is under the user's eye by the time
  * the animation is half done, and the tail only carries the rest of the list.
  */
-export const FOCUS_SCROLL_EASING = Easing.bezier(0.25, 0.1, 0.25, 1);
+export const FOCUS_SCROLL_EASING: CubicBezier = [0.25, 0.1, 0.25, 1];
 
 /**
  * How often, in ms, the list is told where it has scrolled to.
@@ -41,6 +36,9 @@ export const FOCUS_SCROLL_EASING = Easing.bezier(0.25, 0.1, 0.25, 1);
  * worth of pixels, or the buffer runs out before the list is told to refill it.
  */
 export const FOCUS_SCROLL_EVENT_THROTTLE = 50;
+
+/** Scrolls that may come back undriven before the native path is given up on. */
+const MAX_DRIVER_FAILURES = 2;
 
 type FocusScrollParams = {
   /**
@@ -60,56 +58,27 @@ type FocusScrollParams = {
 /**
  * Scrolling a TV list by focus, at a speed of the app's choosing.
  *
- * FlashList's `animated: true` hands the move to the platform, which on Android
- * is a fixed ~250ms with a fixed interpolator and no way to ask for anything
- * else. This drives the list's scroll view directly from the UI thread instead,
- * animating the offset with Reanimated -- so duration and easing are ours.
+ * FlashList's `animated: true` hands the move to the platform, which on Android is
+ * a fixed ~250ms with a fixed interpolator and no way to ask for anything else, so
+ * the scroll goes through `react-native-focus-scroll` instead: the same underlying
+ * animation, with this file's duration and easing curve.
  *
- * It dispatches the same native `scrollTo` command the list's own scrolling
- * uses, so the scroll events FlashList recycles on still arrive as usual.
+ * Everything about it stays on the UI thread -- JS asks once per row change and is
+ * out of the loop until the next one -- and the scroll events FlashList recycles on
+ * are emitted natively as usual.
  *
- * Wire all three of the returned handlers up to the list:
- *
- * ```tsx
- * <FlashList
- *   ref={ listRef }
- *   onLoad={ attachScrollRef }
- *   onScroll={ handleScroll }
- *   scrollEventThrottle={ FOCUS_SCROLL_EVENT_THROTTLE }
- * />
- * ```
+ * Where that is not available (another platform, a native build without the module,
+ * a view that cannot be resolved) the list's own scrolling takes over, permanently
+ * rather than per scroll: whatever stopped it working will not stop being true.
  */
 export function useFocusScroll<T>(
   listRef: RefObject<FlashListRef<T> | null>,
   { viewPosition, isAnimated = true }: FocusScrollParams
 ) {
-  /**
-   * The list's scroll view, held as an animated ref so the scroll can be driven
-   * from the UI thread. FlashList's imperative handle is not a host component,
-   * but it exposes `getNativeScrollRef`, which is what Reanimated resolves a
-   * shadow node from -- see `attachScrollRef`.
-   */
-  const scrollRef = useAnimatedRef<Animated.ScrollView>();
-  /** Where the list is scrolled to, and what the focus scroll animates. */
-  const scrollOffset = useSharedValue(0);
-  /** Whether that animation is the one currently moving the list. */
-  const isScrolling = useSharedValue(false);
-
-  /**
-   * Meant for the list's `onLoad`: by the first draw the scroll view is mounted,
-   * so this is the earliest point its host instance can be handed to the animated
-   * ref. Attaching the ref to FlashList itself would resolve the same way --
-   * Reanimated unwraps `getNativeScrollRef` -- but only if it is already mounted
-   * by then, which is not guaranteed at the moment React attaches the list's own
-   * ref.
-   */
-  const attachScrollRef = useCallback(() => {
-    const nativeScrollRef = listRef.current?.getNativeScrollRef();
-
-    if (nativeScrollRef) {
-      scrollRef(nativeScrollRef as unknown as Animated.ScrollView);
-    }
-  }, [listRef, scrollRef]);
+  /** Set once the scrolls coming back undriven stop looking like a coincidence. */
+  const isDriverBrokenRef = useRef(false);
+  /** Consecutive scrolls the native side could not carry out. */
+  const failedScrollsRef = useRef(0);
 
   /**
    * Where the list has to be scrolled to for `index` to sit at its focused
@@ -133,35 +102,51 @@ export function useFocusScroll<T>(
     const contentHeight = list.getChildContainerDimensions().height + firstItemOffset;
     const offset = layout.y - (viewportHeight - layout.height) * viewPosition + firstItemOffset;
 
-    // The native scroll clamps itself, but the animation has to clamp too, or it
-    // would run on past the end of the list and leave `scrollOffset` describing a
-    // position the list is not in -- which the next row change would start from.
-    return Math.min(Math.max(offset, 0), Math.max(contentHeight - viewportHeight, 0));
+    // The native scroll clamps to the content anyway; this only keeps the number
+    // handed over honest.
+    const maxOffset = contentHeight - viewportHeight;
+
+    return maxOffset > 0
+      ? Math.min(Math.max(offset, 0), maxOffset)
+      : Math.max(offset, 0);
   }, [listRef, viewPosition]);
 
   const scrollToOffset = useCallback((offset: number) => {
-    if (!isAnimated) {
-      listRef.current?.scrollToOffset({ offset, animated: false });
-      scrollOffset.value = offset;
+    const scrollTag = listRef.current?.getScrollableNode();
+
+    if (!isAnimated
+      || isDriverBrokenRef.current
+      || !reactNativeFocusScroll.isSupported
+      || typeof scrollTag !== 'number') {
+      listRef.current?.scrollToOffset({ offset, animated: isAnimated });
 
       return;
     }
 
-    isScrolling.value = true;
-    // Deliberately animating from wherever `scrollOffset` currently is rather
-    // than from the list's reported offset: on a held key the previous scroll is
-    // still running, and picking up its in-flight value retargets it into one
-    // continuous glide instead of restarting from a frame or two ago.
-    scrollOffset.value = withTiming(offset, {
-      duration: FOCUS_SCROLL_DURATION,
-      easing: FOCUS_SCROLL_EASING,
-    }, (finished) => {
-      // An unfinished animation was replaced by the next row's, which owns the
-      // scroll from here and will clear this itself.
-      if (finished) {
-        isScrolling.value = false;
-      }
-    });
+    reactNativeFocusScroll
+      .scrollTo(scrollTag, offset, FOCUS_SCROLL_DURATION, FOCUS_SCROLL_EASING)
+      .then((hasScrolled) => {
+        if (hasScrolled) {
+          failedScrollsRef.current = 0;
+
+          return;
+        }
+
+        // The view behind the tag was gone by the time the scroll reached the UI
+        // thread, so nothing was animated: get the user where they were going.
+        // One of these is a race with a list being torn down and is no reason to
+        // stop trying; a run of them is a build that cannot do this at all.
+        failedScrollsRef.current += 1;
+        isDriverBrokenRef.current = failedScrollsRef.current >= MAX_DRIVER_FAILURES;
+
+        listRef.current?.scrollToOffset({ offset, animated: true });
+      })
+      .catch(() => {
+        // A rejection is the native side saying it is not going to work, rather
+        // than that it did not this time.
+        isDriverBrokenRef.current = true;
+        listRef.current?.scrollToOffset({ offset, animated: true });
+      });
   }, [listRef, isAnimated]);
 
   const scrollToRow = useCallback((index: number) => {
@@ -177,30 +162,5 @@ export function useFocusScroll<T>(
     scrollToOffset(offset);
   }, [listRef, getRowOffset, scrollToOffset, isAnimated, viewPosition]);
 
-  // Touch scrolls and the list's own offset corrections move the list without
-  // going through the animation, so keep its idea of the position current --
-  // otherwise the next row change starts its glide from somewhere the list has
-  // long left. Ignored while animating: that is where the value comes from.
-  const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    if (isScrolling.value) {
-      return;
-    }
-
-    // Shared values are written from two callbacks here, and the immutability
-    // rule only allows the first of them -- see `scrollToOffset` above.
-    // eslint-disable-next-line react-hooks/immutability
-    scrollOffset.value = event.nativeEvent.contentOffset.y;
-  }, []);
-
-  // The scroll itself: every frame of the animation is pushed to the scroll view
-  // from the UI thread.
-  useDerivedValue(() => {
-    if (!isScrolling.value) {
-      return;
-    }
-
-    scrollTo(scrollRef, 0, scrollOffset.value, false);
-  });
-
-  return { attachScrollRef, handleScroll, scrollToOffset, scrollToRow };
+  return { scrollToOffset, scrollToRow };
 }

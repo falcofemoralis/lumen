@@ -6,6 +6,7 @@ import {
   DEFAULT_SUBTITLES_COLOR,
   DEFAULT_SUBTITLES_EDGE_TYPE,
   DEFAULT_SUBTITLES_SIZE_SCALE,
+  DEFAULT_VOLUME_NORMALIZATION_STRENGTH,
 } from 'Component/Player/Player.config';
 import { HOME_SCREEN } from 'Navigation/navigationRoutes';
 import { BACKUP_SECTION } from 'Type/Backup.interface';
@@ -30,12 +31,14 @@ export type DeviceConfigType = {
   playerShowBufferTime: boolean;
   playerShowEndTime: boolean;
   playerShowEpisodeName: boolean;
+  playerShowEpisodeDate: boolean;
   playerSubtitlesCustomStyle: boolean;
   playerSubtitlesSizeScale: number;
   playerSubtitlesColor: string;
   playerSubtitlesBackgroundColor: string;
   playerSubtitlesEdgeType: string;
   playerSubtitlesBottomOffset: number;
+  playerStoryboard: boolean;
   playerStoryboardAdjacentFrames: boolean;
   themeScheme?: string;
   downloadsPath?: string;
@@ -43,8 +46,12 @@ export type DeviceConfigType = {
   downloadsSavePoster: boolean;
   downloadsMaxParallel: number;
   playerAutoNextEpisode: boolean;
+  playerKeepTimeOnVoiceChange: boolean;
   playerAutoFrameRateEnabled: boolean;
   playerAutoFrameRate: boolean;
+  playerVolumeNormalizationEnabled: boolean;
+  playerVolumeNormalization: boolean;
+  playerVolumeNormalizationStrength: string;
   playerLongPressSpeed: number;
   playerVolumeGesture: boolean;
   playerBrightnessGesture: boolean;
@@ -89,12 +96,14 @@ export const defaultConfig: DeviceConfigType = {
   playerShowBufferTime: false,
   playerShowEndTime: false,
   playerShowEpisodeName: false,
+  playerShowEpisodeDate: false,
   playerSubtitlesCustomStyle: false,
   playerSubtitlesSizeScale: DEFAULT_SUBTITLES_SIZE_SCALE,
   playerSubtitlesColor: DEFAULT_SUBTITLES_COLOR,
   playerSubtitlesBackgroundColor: DEFAULT_SUBTITLES_BACKGROUND_COLOR,
   playerSubtitlesEdgeType: DEFAULT_SUBTITLES_EDGE_TYPE,
   playerSubtitlesBottomOffset: DEFAULT_SUBTITLES_BOTTOM_OFFSET,
+  playerStoryboard: true,
   playerStoryboardAdjacentFrames: false,
   themeScheme: undefined,
   downloadsPath: undefined,
@@ -104,8 +113,12 @@ export const defaultConfig: DeviceConfigType = {
   playerSaveQuality: true,
   playerAskQuality: false,
   playerAutoNextEpisode: true,
+  playerKeepTimeOnVoiceChange: false,
   playerAutoFrameRateEnabled: false,
   playerAutoFrameRate: false,
+  playerVolumeNormalizationEnabled: false,
+  playerVolumeNormalization: false,
+  playerVolumeNormalizationStrength: DEFAULT_VOLUME_NORMALIZATION_STRENGTH,
   playerLongPressSpeed: 1.5,
   playerVolumeGesture: false,
   playerBrightnessGesture: false,
@@ -164,8 +177,12 @@ export const CONFIG_KEY_SECTIONS = {
   playerDefaultAspectRatio: BACKUP_SECTION.SETTINGS_PLAYER,
   playerDefaultSpeed: BACKUP_SECTION.SETTINGS_PLAYER,
   playerAutoNextEpisode: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerKeepTimeOnVoiceChange: BACKUP_SECTION.SETTINGS_PLAYER,
   playerAutoFrameRateEnabled: BACKUP_SECTION.SETTINGS_PLAYER,
   playerAutoFrameRate: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerVolumeNormalizationEnabled: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerVolumeNormalization: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerVolumeNormalizationStrength: BACKUP_SECTION.SETTINGS_PLAYER,
   playerLongPressSpeed: BACKUP_SECTION.SETTINGS_PLAYER,
   playerVolumeGesture: BACKUP_SECTION.SETTINGS_PLAYER,
   playerBrightnessGesture: BACKUP_SECTION.SETTINGS_PLAYER,
@@ -175,12 +192,14 @@ export const CONFIG_KEY_SECTIONS = {
   playerShowBufferTime: BACKUP_SECTION.SETTINGS_PLAYER,
   playerShowEndTime: BACKUP_SECTION.SETTINGS_PLAYER,
   playerShowEpisodeName: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerShowEpisodeDate: BACKUP_SECTION.SETTINGS_PLAYER,
   playerSubtitlesCustomStyle: BACKUP_SECTION.SETTINGS_PLAYER,
   playerSubtitlesSizeScale: BACKUP_SECTION.SETTINGS_PLAYER,
   playerSubtitlesColor: BACKUP_SECTION.SETTINGS_PLAYER,
   playerSubtitlesBackgroundColor: BACKUP_SECTION.SETTINGS_PLAYER,
   playerSubtitlesEdgeType: BACKUP_SECTION.SETTINGS_PLAYER,
   playerSubtitlesBottomOffset: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerStoryboard: BACKUP_SECTION.SETTINGS_PLAYER,
   playerStoryboardAdjacentFrames: BACKUP_SECTION.SETTINGS_PLAYER,
   playerBufferTimeSetting: BACKUP_SECTION.SETTINGS_PLAYER,
   playerBackBufferTimeSetting: BACKUP_SECTION.SETTINGS_PLAYER,
