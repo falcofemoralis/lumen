@@ -23,7 +23,6 @@ import { useLayout } from 'Hooks/useLayout';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import ArrowRight from 'lucide-react-native/icons/arrow-right';
-import BellOff from 'lucide-react-native/icons/bell-off';
 import Bookmark from 'lucide-react-native/icons/bookmark';
 import BookmarkCheck from 'lucide-react-native/icons/bookmark-check';
 import Clapperboard from 'lucide-react-native/icons/clapperboard';
@@ -42,7 +41,6 @@ import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { isBookmarked } from 'Util/Film';
 import { noopFn } from 'Util/Function';
 
-import { NOTIFICATION_ACTION_HIDE, NOTIFICATION_ACTION_REMOVE } from './FilmScreen.config';
 import { componentStyles } from './FilmScreen.style.atv';
 import { FilmScreenThumbnail } from './FilmScreen.thumbnail.atv';
 import { FilmScreenComponentProps } from './FilmScreen.type';
@@ -57,8 +55,6 @@ export function FilmScreenComponent({
   descriptionOverlayRef,
   playerVideoDownloaderOverlayRef,
   ratingOverlayRef,
-  notificationsOverlayRef,
-  canUnsubscribeNotifications,
   shouldDisplayContinueWatching,
   showVotesCount,
   showRecommendations,
@@ -74,8 +70,6 @@ export function FilmScreenComponent({
   handleDownloadSelect,
   openTrailerOverlay,
   openRatingOverlay,
-  openNotificationsOverlay,
-  unsubscribeFromNotifications,
   openComments,
   openDescription,
   openSchedule,
@@ -161,7 +155,6 @@ export function FilmScreenComponent({
           { renderAction(isBookmarked(film) ? BookmarkCheck : Bookmark, t('Bookmark'), openBookmarks) }
           { renderAction(Download, t('Download'), openVideoDownloader) }
           { isSignedIn && renderAction(Star, t('Rate'), openRatingOverlay, film.isRatingPosted) }
-          { canUnsubscribeNotifications && renderAction(BellOff, t('Unsubscribe'), openNotificationsOverlay) }
         </View>
       </ThemedScrollView>
     </View>
@@ -587,34 +580,6 @@ export function FilmScreenComponent({
     );
   };
 
-  // Both entries drop the film out of the continue-watching list, which is what the
-  // site notifies about -- removing it outright, or marking it watched.
-  const renderNotificationsOverlay = () => {
-    if (!canUnsubscribeNotifications) {
-      return null;
-    }
-
-    return (
-      <ThemedDropdown
-        overlayRef={ notificationsOverlayRef }
-        header={ t('Unsubscribe from notifications') }
-        data={ [
-          {
-            label: t('Remove'),
-            value: NOTIFICATION_ACTION_REMOVE,
-          },
-          {
-            label: t('Hide'),
-            value: NOTIFICATION_ACTION_HIDE,
-          },
-        ] }
-        onChange={ (item) => unsubscribeFromNotifications(item.value) }
-        closeOnChange
-        asOverlay
-      />
-    );
-  };
-
   const renderModals = () => (
     <>
       { renderPlayerVideoSelector() }
@@ -624,7 +589,6 @@ export function FilmScreenComponent({
       { renderDescriptionOverlay() }
       { renderPlayerVideoDownloader() }
       { renderRatingOverlay() }
-      { renderNotificationsOverlay() }
     </>
   );
 

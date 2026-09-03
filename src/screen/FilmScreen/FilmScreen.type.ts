@@ -24,8 +24,6 @@ export interface FilmScreenComponentProps {
   playerVideoDownloaderOverlayRef: RefObject<PlayerVideoSelectorRef | null>;
   isDeepLink: boolean;
   ratingOverlayRef: RefObject<ThemedOverlayRef | null>;
-  notificationsOverlayRef: RefObject<ThemedOverlayRef | null>;
-  canUnsubscribeNotifications: boolean;
   shouldDisplayContinueWatching: boolean;
   isContinueWatchingLoading: boolean;
   showVotesCount: boolean;
@@ -44,8 +42,6 @@ export interface FilmScreenComponentProps {
   openTrailerOverlay: () => void;
   handleRatingSelect: (rating: number) => void;
   openRatingOverlay: () => void;
-  openNotificationsOverlay: () => void;
-  unsubscribeFromNotifications: (action: string) => void;
   openComments: () => void;
   openDescription: () => void;
   openSchedule: () => void;
