@@ -15,9 +15,6 @@ export type PlayerSubtitlesStyleSettingValue = PlayerSubtitlesStyleSetting & {
 };
 
 export interface PlayerSubtitlesStyleSelectorComponentProps extends PlayerSubtitlesStyleSelectorProps {
-  /** Off hands the subtitles back to the device's own captioning settings. */
-  isCustomStyle: boolean;
   settings: PlayerSubtitlesStyleSettingValue[];
-  onCustomStyleChange: (value: boolean) => void;
   onChange: (setting: PlayerSubtitlesStyleSettingValue, item: DropdownItem) => void;
 }

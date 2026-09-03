@@ -5,7 +5,6 @@ import { ThemedOverlay } from 'Component/ThemedOverlay';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { ThemedScrollView } from 'Component/ThemedScrollView';
 import { ThemedText } from 'Component/ThemedText';
-import { ThemedToggle } from 'Component/ThemedToggle';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import { useRef } from 'react';
@@ -21,11 +20,9 @@ import {
 // a ref of its own instead of one shared by whichever row was drawn last
 const SubtitlesStyleRow = ({
   setting,
-  isEnabled,
   onChange,
 }: {
   setting: PlayerSubtitlesStyleSettingValue;
-  isEnabled: boolean;
   onChange: (setting: PlayerSubtitlesStyleSettingValue, item: DropdownItem) => void;
 }) => {
   const styles = useThemedStyles(componentStyles);
@@ -36,17 +33,13 @@ const SubtitlesStyleRow = ({
 
   return (
     <View style={ styles.row }>
-      <ThemedText
-        style={ [styles.rowLabel, !isEnabled && styles.rowDisabled] }
-        numberOfLines={ 2 }
-      >
+      <ThemedText style={ styles.rowLabel } numberOfLines={ 2 }>
         { label }
       </ThemedText>
       <ThemedButton
         title={ selectedOption?.label ?? value }
         style={ styles.rowInput }
         contentStyle={ styles.rowInputContent }
-        disabled={ !isEnabled }
         onPress={ () => overlayRef.current?.open() }
       />
       <ThemedDropdown
@@ -64,9 +57,7 @@ const SubtitlesStyleRow = ({
 
 export const PlayerSubtitlesStyleSelectorComponent = ({
   overlayRef,
-  isCustomStyle,
   settings,
-  onCustomStyleChange,
   onChange,
   onClose,
 }: PlayerSubtitlesStyleSelectorComponentProps) => {
@@ -86,17 +77,6 @@ export const PlayerSubtitlesStyleSelectorComponent = ({
         <ThemedText style={ styles.title }>
           { t('Subtitles style') }
         </ThemedText>
-        <View style={ styles.row }>
-          <ThemedText style={ styles.rowLabel }>
-            { t('Custom style') }
-          </ThemedText>
-          <ThemedToggle
-            containerStyle={ styles.toggle }
-            inputWrapperStyle={ styles.toggleInput }
-            value={ isCustomStyle }
-            onValueChange={ onCustomStyleChange }
-          />
-        </View>
         { /* the panel sits in the landscape player, where there is not always room for
              all of it - the rows scroll rather than being clipped by the overlay */ }
         <ThemedScrollView
@@ -107,7 +87,6 @@ export const PlayerSubtitlesStyleSelectorComponent = ({
             <SubtitlesStyleRow
               key={ setting.key }
               setting={ setting }
-              isEnabled={ isCustomStyle }
               onChange={ onChange }
             />
           )) }

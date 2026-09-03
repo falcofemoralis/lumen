@@ -193,6 +193,7 @@ export function PlayerComponent({
     playerShowEpisodeName,
     playerShowEpisodeDate,
     playerStoryboard,
+    playerSubtitlesCustomStyle,
   } = useConfigContext();
   const { theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
@@ -488,6 +489,19 @@ export function PlayerComponent({
     }, 250);
   };
 
+  // The controls stand where the subtitles are drawn, so they go away with the same
+  // press that opens the panel - the point of styling them from here is watching the
+  // change land on the picture. closeControls also parks focus on the progress thumb,
+  // which is where it belongs once the overlay hands it back: the action row that
+  // opened it is no longer on screen. They stay away on close, one key from coming back.
+  const handleOpenSubtitlesStyle = () => {
+    closeControls();
+
+    setTimeout(() => {
+      openSubtitlesStyleSelector();
+    }, PLAYER_CONTROLS_ANIMATION);
+  };
+
   const renderEpisodeName = () => {
     if (!playerShowEpisodeName) {
       return null;
@@ -681,8 +695,11 @@ export function PlayerComponent({
                 onInteraction={ handleUserInteraction }
               />
             ) }
-            { /* the track to show, and next to it the look it is drawn in - both gone
-                 when the video carries no subtitles at all */ }
+            { /* The track to show, and next to it the look it is drawn in. Neither is
+                 there for a video that carries no subtitles, and the style is only
+                 offered while the app is the one styling them - with the setting off the
+                 subtitles follow the TV's captioning settings, and nothing picked here
+                 would show. */ }
             { subtitles.length > 0 && (
               <>
                 <PlayerBottomAction
@@ -692,11 +709,13 @@ export function PlayerComponent({
                   action={ openSubtitleSelector }
                   onInteraction={ handleUserInteraction }
                 />
-                <PlayerBottomAction
-                  IconComponent={ Type }
-                  action={ openSubtitlesStyleSelector }
-                  onInteraction={ handleUserInteraction }
-                />
+                { playerSubtitlesCustomStyle && (
+                  <PlayerBottomAction
+                    IconComponent={ Type }
+                    action={ handleOpenSubtitlesStyle }
+                    onInteraction={ handleUserInteraction }
+                  />
+                ) }
               </>
             ) }
             { !isOffline && (
@@ -865,10 +884,12 @@ export function PlayerComponent({
     );
   };
 
+  // gated on the same two things the action that opens it is, so an overlay that
+  // cannot be reached is not mounted either
   const renderSubtitlesStyleSelector = () => {
     const { subtitles = [] } = video;
 
-    if (!subtitles.length) {
+    if (!subtitles.length || !playerSubtitlesCustomStyle) {
       return null;
     }
 

@@ -306,7 +306,6 @@ const en = {
   'How much played video is kept in memory so rewinding does not reload it.':
     'How much played video is kept in memory so rewinding does not reload it. Longer buffers use more memory.',
   'Subtitles style': 'Subtitles style',
-  'Custom style': 'Custom style',
   'Custom subtitles style': 'Custom subtitles style',
   'Style the subtitles here instead of following the system captioning settings.':
     'Style the subtitles here instead of following the system captioning settings. The colors and font sizes written into a subtitle track are ignored while this is on.',

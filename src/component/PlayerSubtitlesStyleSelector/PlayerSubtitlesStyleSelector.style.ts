@@ -36,11 +36,6 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   rowLabel: {
     flex: 1,
   },
-  // what the switch being off looks like, the same dimming a disabled setting gets on
-  // the settings screen
-  rowDisabled: {
-    opacity: 0.5,
-  },
   rowInput: {
     flex: 1,
     backgroundColor: colors.backgroundLighter,
@@ -48,12 +43,5 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   rowInputContent: {
     justifyContent: 'flex-start',
     padding: scale(8),
-  },
-  toggle: {
-    flex: 1,
-  },
-  toggleInput: {
-    width: '100%',
-    justifyContent: 'flex-end',
   },
 } satisfies ThemedStyles);

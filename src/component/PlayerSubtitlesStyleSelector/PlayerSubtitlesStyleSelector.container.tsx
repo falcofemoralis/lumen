@@ -17,6 +17,9 @@ import {
  * `useSubtitleStyle`, which is mounted app-wide and re-applies to the players that
  * already exist - so a change made in this overlay lands on the picture behind it right
  * away, which is the whole point of having it in the player.
+ *
+ * Whether the subtitles are styled by the app at all stays a settings screen decision:
+ * the player only offers this while the custom style is on, so there is no switch here.
  */
 export function PlayerSubtitlesStyleSelectorContainer({
   overlayRef,
@@ -24,7 +27,7 @@ export function PlayerSubtitlesStyleSelectorContainer({
 }: PlayerSubtitlesStyleSelectorProps) {
   const isTV = useIsTV();
   const config = useConfigContext();
-  const { setConfig, playerSubtitlesCustomStyle } = config;
+  const { setConfig } = config;
 
   // The labels are getters, so spreading them here is what translates them - during a
   // render, i.e. after i18n has been initialised and again after a language change.
@@ -39,15 +42,9 @@ export function PlayerSubtitlesStyleSelectorContainer({
     setConfig(setting.key, setting.isNumeric ? Number(item.value) : item.value);
   };
 
-  const handleCustomStyleChange = (value: boolean) => {
-    setConfig('playerSubtitlesCustomStyle', value);
-  };
-
   const containerProps = {
     overlayRef,
-    isCustomStyle: playerSubtitlesCustomStyle,
     settings,
-    onCustomStyleChange: handleCustomStyleChange,
     onChange: handleChange,
     onClose,
   };

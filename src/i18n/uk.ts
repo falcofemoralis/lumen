@@ -308,7 +308,6 @@ const uk: Translations = {
   'How much played video is kept in memory so rewinding does not reload it.':
     'Скільки переглянутого відео зберігається в пам’яті, щоб перемотування назад не перезавантажувало його. Більший буфер займає більше пам’яті.',
   'Subtitles style': 'Стиль субтитрів',
-  'Custom style': 'Власний стиль',
   'Custom subtitles style': 'Власний стиль субтитрів',
   'Style the subtitles here instead of following the system captioning settings.':
     'Оформлювати субтитри тут, а не за системними налаштуваннями субтитрів. Поки увімкнено, кольори та розміри шрифту, задані всередині доріжки субтитрів, не враховуються.',

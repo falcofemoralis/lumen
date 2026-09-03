@@ -26,23 +26,11 @@ export const componentStyles = ({ scale, text }: Theme) => ({
   rowLabel: {
     flex: 1,
   },
-  // what the switch being off looks like, the same dimming a disabled setting gets on
-  // the settings screen
-  rowDisabled: {
-    opacity: 0.5,
-  },
   rowInput: {
     flex: 1,
   },
   rowInputContent: {
     flex: 1,
     justifyContent: 'flex-start',
-  },
-  toggle: {
-    flex: 1,
-  },
-  toggleInput: {
-    width: '100%',
-    justifyContent: 'flex-end',
   },
 } satisfies ThemedStyles);
