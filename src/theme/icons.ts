@@ -66,39 +66,93 @@ export const AutoFrameRateIcon = ({ color, isFilled }: { color: string; isFilled
  * from lucide for that reason alone - `AudioLines` on its own would be the odd one out.
  */
 const VOLUME_NORMALIZATION_BARS = [
-  { x: '6', half: 3 },
-  { x: '10', half: 4.25 },
-  { x: '14', half: 4.25 },
-  { x: '18', half: 3 },
+  { x: 6, half: 3 },
+  { x: 10, half: 4.25 },
+  { x: 14, half: 4.25 },
+  { x: 18, half: 3 },
 ] as const;
 
-/** Half the badge's height, i.e. where a bar of half-height `h` starts and ends. */
+/** The badge's vertical middle, i.e. what a bar of half-height `h` is centred on. */
 const BADGE_CENTER = 12;
+
+/** Drawn as rounded rectangles rather than stroked lines, so they can also be holes. */
+const BAR_WIDTH = 2;
+
+const barGeometry = ({ x, half }: { x: number; half: number }) => ({
+  x: x - BAR_WIDTH / 2,
+  y: BADGE_CENTER - half,
+  width: BAR_WIDTH,
+  height: half * 2,
+  radius: BAR_WIDTH / 2,
+});
+
+/**
+ * A rounded rectangle written out as path commands.
+ *
+ * `rect` cannot be a subpath of anything, and the filled state below is one path made of
+ * five rectangles - which is the only way to punch a hole rather than paint over one.
+ */
+const roundedRectPath = (x: number, y: number, width: number, height: number, radius: number) => {
+  const horizontal = width - radius * 2;
+  const vertical = height - radius * 2;
+
+  return `M${ x + radius },${ y }`
+    + `h${ horizontal }a${ radius },${ radius } 0 0 1 ${ radius },${ radius }`
+    + `v${ vertical }a${ radius },${ radius } 0 0 1 ${ -radius },${ radius }`
+    + `h${ -horizontal }a${ radius },${ radius } 0 0 1 ${ -radius },${ -radius }`
+    + `v${ -vertical }a${ radius },${ radius } 0 0 1 ${ radius },${ -radius }z`;
+};
 
 /**
  * Volume normalization, drawn the way the auto frame rate icon is: an outlined badge
  * with solid bars while it is off, and the whole badge filled with the bars knocked out
  * of it once it is on.
  *
+ * Knocked out literally, unlike [AutoFrameRateIcon], which paints its letters black on
+ * the filled badge. Black is not what is behind this icon - the player controls sit on a
+ * gradient over the film - so a black bar reads as a smudge rather than as a gap. One
+ * path holding the badge and the four bars, filled `evenodd`, makes the bars holes: the
+ * badge is the only thing painted, and the picture shows through the rest.
+ *
  * Takes the colour rather than reading it off the icon's own `color` prop, for the reason
  * [AutoFrameRateIcon] does - that one only ever reaches `stroke`, and a filled badge
  * needs it in `fill`.
  */
 export const VolumeNormalizationIcon = ({ color, isFilled }: { color: string; isFilled: boolean }) => {
+  const bars = VOLUME_NORMALIZATION_BARS.map(barGeometry);
+
+  if (isFilled) {
+    const badge = roundedRectPath(2, 5, 20, 14, 2);
+    const holes = bars
+      .map(({ x, y, width, height, radius }) => roundedRectPath(x, y, width, height, radius))
+      .join('');
+
+    return createLucideIcon('VolumeNormalization', [
+      ['path', {
+        d: badge + holes,
+        fill: color,
+        fillRule: 'evenodd',
+        stroke: 'none',
+        key: 'v9ocdm',
+      }],
+    ]);
+  }
+
   return createLucideIcon('VolumeNormalization', [
-    ['rect', { ...AFR_BADGE, fill: isFilled ? color : 'none', key: 'v9ocdm' }],
-    // the stroke width and the round caps are the icon's own defaults, so only the
-    // colour has to be said here - and it has to, because a filled badge knocks the
-    // bars out of itself rather than drawing them in the icon's colour
-    ...VOLUME_NORMALIZATION_BARS.map(({ x, half }): IconNode[number] => ([
-      'line',
+    ['rect', { ...AFR_BADGE, fill: 'none', key: 'v9ocdm' }],
+    ...bars.map(({
+      x, y, width, height, radius,
+    }, index): IconNode[number] => ([
+      'rect',
       {
-        x1: x,
-        x2: x,
-        y1: String(BADGE_CENTER - half),
-        y2: String(BADGE_CENTER + half),
-        stroke: isFilled ? 'black' : color,
-        key: `bar-${ x }`,
+        x: String(x),
+        y: String(y),
+        width: String(width),
+        height: String(height),
+        rx: String(radius),
+        fill: color,
+        stroke: 'none',
+        key: `bar-${ index }`,
       },
     ])),
   ]);

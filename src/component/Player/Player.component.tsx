@@ -433,15 +433,8 @@ export function PlayerComponent({
     </View>
   );
 
-  /**
-   * The track to show and the look it is drawn in: two actions rather than one, since
-   * the style is worth reaching for while a subtitle is already up.
-   *
-   * Neither is there for a video that carries no subtitles, and the style is only
-   * offered while the app is the one styling them - with the setting off the subtitles
-   * follow the device's captioning settings, and nothing picked here would show.
-   */
-  const renderSubtitlesActions = () => {
+  // not there for a video that carries no subtitles
+  const renderSubtitlesAction = () => {
     const { subtitles = [] } = video;
 
     if (!subtitles.length) {
@@ -449,22 +442,36 @@ export function PlayerComponent({
     }
 
     return (
-      <Fragment>
-        <PlayerAction
-          IconComponent={ !selectedSubtitle?.languageCode
-            ? ClosedCaption
-            : ClosedCaptionFilled({ color: theme.colors.iconOnContrast }) }
-          action={ openSubtitleSelector }
-          onInteraction={ handleUserInteraction }
-        />
-        { playerSubtitlesCustomStyle && (
-          <PlayerAction
-            IconComponent={ Type }
-            action={ handleOpenSubtitlesStyle }
-            onInteraction={ handleUserInteraction }
-          />
-        ) }
-      </Fragment>
+      <PlayerAction
+        IconComponent={ !selectedSubtitle?.languageCode
+          ? ClosedCaption
+          : ClosedCaptionFilled({ color: theme.colors.iconOnContrast }) }
+        action={ openSubtitleSelector }
+        onInteraction={ handleUserInteraction }
+      />
+    );
+  };
+
+  /**
+   * The look the subtitles are drawn in - an action of its own, since it is worth
+   * reaching for while a subtitle is already up.
+   *
+   * Only offered while the app is the one styling them - with the setting off the
+   * subtitles follow the device's captioning settings, and nothing picked here would show.
+   */
+  const renderSubtitlesStyleAction = () => {
+    const { subtitles = [] } = video;
+
+    if (!subtitles.length || !playerSubtitlesCustomStyle) {
+      return null;
+    }
+
+    return (
+      <PlayerAction
+        IconComponent={ Type }
+        action={ handleOpenSubtitlesStyle }
+        onInteraction={ handleUserInteraction }
+      />
     );
   };
 
@@ -495,7 +502,7 @@ export function PlayerComponent({
             action={ openQualitySelector }
             onInteraction={ handleUserInteraction }
           />
-          { renderSubtitlesActions() }
+          { renderSubtitlesAction() }
         </View>
         <PlayerAction
           IconComponent={ !isLocked ? LockKeyholeOpen : LockKeyhole }
@@ -661,6 +668,7 @@ export function PlayerComponent({
                 onInteraction={ handleUserInteraction }
               />
             ) }
+            { renderSubtitlesStyleAction() }
             <PlayerAction
               IconComponent={ Maximize2 }
               action={ handleAspectRatioChange }
