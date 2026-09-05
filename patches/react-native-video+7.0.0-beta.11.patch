@@ -59,3 +59,27 @@ index 02b03aa..1acc926 100644
    val factory = OkHttpDataSource.Factory(client)
  
    val headers: Map<String, String>? = source.config.headers
+diff --git a/node_modules/react-native-video/android/src/main/java/com/twg/video/core/services/playback/VideoPlaybackService.kt b/node_modules/react-native-video/android/src/main/java/com/twg/video/core/services/playback/VideoPlaybackService.kt
+index 0c693ec..ca0aa39 100644
+--- a/node_modules/react-native-video/android/src/main/java/com/twg/video/core/services/playback/VideoPlaybackService.kt
++++ b/node_modules/react-native-video/android/src/main/java/com/twg/video/core/services/playback/VideoPlaybackService.kt
+@@ -120,6 +120,19 @@ class VideoPlaybackService : MediaSessionService() {
+     } catch (_: Exception) {
+       Log.e(TAG, "Failed to stop foreground service!")
+     }
++
++    // stopForeground only removes the notification that currently owns the
++    // service's foreground state. media3 takes that slot over with its own
++    // notification (DefaultMediaNotificationProvider.DEFAULT_NOTIFICATION_ID) as
++    // soon as playback starts, which displaces the placeholder without removing
++    // it - so it has to be cancelled by id. It is setOngoing(true), so a user
++    // who is left with it cannot swipe it away either.
++    try {
++      (getSystemService(NOTIFICATION_SERVICE) as NotificationManager)
++        .cancel(PLACEHOLDER_NOTIFICATION_ID)
++    } catch (_: Exception) {
++      Log.e(TAG, "Failed to cancel the placeholder notification!")
++    }
+   }
+ 
+   @MainThread
