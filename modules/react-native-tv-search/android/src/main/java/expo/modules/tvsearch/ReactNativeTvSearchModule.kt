@@ -74,6 +74,10 @@ class ReactNativeTvSearchModule : Module() {
 
         store.writeRows(queryKey, results.map { it.toRow() })
 
+        // first, and before the notification: there is a binder thread parked inside
+        // `query()` on exactly this, and everything it needs is now in the store
+        TvSearchLiveQuery.releaseWaiters(queryKey)
+
         val authority = TvSearchSuggestionProvider.findAuthority(context)
 
         if (authority != null) {

@@ -39,15 +39,14 @@ class ReactNativeTvSearch {
   /**
    * Mirrors the user's setting natively.
    *
-   * The provider runs before there is a JS runtime to ask, so it reads a persisted
-   * flag instead - which means this has to be called for the feature to do anything at
-   * all. Switching it off also drops the cached results.
+   * The provider runs before there is a JS runtime to ask, so it reads a persisted flag
+   * instead. Switching it off also drops the cached results.
+   *
+   * Deliberately not skipped on devices where `isSupported` is false: the flag starts
+   * out on, so a device that should never answer a search has to be able to say so.
+   * Skipping here would leave it on forever exactly where it is wrong.
    */
   async setEnabled(isEnabled: boolean): Promise<void> {
-    if (!this.isSupported()) {
-      return;
-    }
-
     await ReactNativeTvSearchModule.setEnabled(isEnabled);
   }
 

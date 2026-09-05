@@ -47,12 +47,17 @@ internal class TvSearchStore private constructor(context: Context) : SQLiteOpenH
    * Kept in preferences rather than asked of JS, because the provider has to decide
    * whether to do anything at all *before* there is a JS runtime to ask - booting one
    * per keystroke only to have it report the feature is off is precisely what this
-   * avoids. Only JS ever writes it, so it stays off until the app has run once - which
-   * is what keeps a freshly installed app the user has not opened yet from being
-   * started by the launcher's search box, whatever the setting defaults to.
+   * avoids.
+   *
+   * Defaults to on, so search works straight after an update rather than only once the
+   * app has been opened again - a user who updates and goes looking from the home
+   * screen has no reason to know the app must run first. The cost is that an install
+   * nobody has opened yet answers a search by starting the app to find out it is not
+   * configured; the JS task writes `false` when it bails for that reason, so it happens
+   * once rather than on every search.
    */
   var isEnabled: Boolean
-    get() = preferences.getBoolean(KEY_ENABLED, false)
+    get() = preferences.getBoolean(KEY_ENABLED, true)
     set(value) = preferences.edit().putBoolean(KEY_ENABLED, value).apply()
 
   companion object {
