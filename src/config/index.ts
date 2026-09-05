@@ -1,5 +1,6 @@
 import {
   ASPECT_RATIO_OPTIONS,
+  DEFAULT_SLIDE_STEP,
   DEFAULT_SPEED,
   DEFAULT_SUBTITLES_BACKGROUND_COLOR,
   DEFAULT_SUBTITLES_BOTTOM_OFFSET,
@@ -56,6 +57,9 @@ export type DeviceConfigType = {
   playerVolumeGesture: boolean;
   playerBrightnessGesture: boolean;
   playerSwapGestureSides: boolean;
+  playerGestureStep: number;
+  playerSaveBrightness: boolean;
+  playerSavedBrightness?: number;
   sortVoicesByRating: boolean;
   playerStopPlayOnButtonTV: boolean;
   playerStopPlayShowInterfaceTV: boolean;
@@ -123,6 +127,12 @@ export const defaultConfig: DeviceConfigType = {
   playerVolumeGesture: false,
   playerBrightnessGesture: false,
   playerSwapGestureSides: false,
+  playerGestureStep: DEFAULT_SLIDE_STEP,
+  playerSaveBrightness: false,
+  // the level the player was last left at, written by the gesture rather than by the
+  // settings. Undefined until a slide has happened, which is what tells the player to
+  // open at the system brightness instead
+  playerSavedBrightness: undefined,
   playerStopPlayOnButtonTV: false,
   playerStopPlayShowInterfaceTV: true,
   playerBufferTimeSetting: undefined,
@@ -187,6 +197,9 @@ export const CONFIG_KEY_SECTIONS = {
   playerVolumeGesture: BACKUP_SECTION.SETTINGS_PLAYER,
   playerBrightnessGesture: BACKUP_SECTION.SETTINGS_PLAYER,
   playerSwapGestureSides: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerGestureStep: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerSaveBrightness: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerSavedBrightness: BACKUP_SECTION.SETTINGS_PLAYER,
   playerStopPlayOnButtonTV: BACKUP_SECTION.SETTINGS_PLAYER,
   playerStopPlayShowInterfaceTV: BACKUP_SECTION.SETTINGS_PLAYER,
   playerShowBufferTime: BACKUP_SECTION.SETTINGS_PLAYER,

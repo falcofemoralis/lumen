@@ -291,6 +291,14 @@ const en = {
   'Swap gesture sides': 'Swap gesture sides',
   'Put the volume on the left half of the player and the brightness on the right.':
     'Put the volume on the left half of the player and the brightness on the right.',
+  'Gesture step': 'Gesture step',
+  'How far the volume or the brightness moves for the same swipe.':
+    'How far the volume or the brightness moves for the same swipe. A higher step crosses the whole'
+    + ' range in a shorter slide.',
+  'Remember brightness': 'Remember brightness',
+  'Open the player at the brightness it was last left at.':
+    'Open the player at the brightness it was last left at, rather than at the screen brightness'
+    + ' of the rest of the system.',
   'Sort voices by rating': 'Sort voices by rating',
   'Toggle sorting voices by rating.': 'Toggle sorting voices by rating.',
   'Show votes count': 'Show votes count',

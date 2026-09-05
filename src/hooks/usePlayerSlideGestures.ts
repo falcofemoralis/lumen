@@ -1,12 +1,12 @@
 import {
   PlayerSlideControl,
   SLIDE_ACTIVATION_DISTANCE,
+  SLIDE_APPLY_STEPS,
   SLIDE_FAIL_DISTANCE,
   SLIDE_INDICATOR_ANIMATION,
   SLIDE_INDICATOR_OFFSET,
   SLIDE_INDICATOR_TIMEOUT,
   SLIDE_RANGE_RATIO,
-  SLIDE_STEPS,
 } from 'Component/Player/Player.config';
 import { useConfigContext } from 'Context/ConfigContext';
 import * as Brightness from 'expo-brightness';
@@ -32,6 +32,11 @@ import { noopFn } from 'Util/Function';
  * keys still work while the player is open, and the next slide has to carry on from
  * where they left off rather than from where this last looked.
  *
+ * Brightness can be seeded from the level the last player was left at instead of from
+ * the screen, which is the point of the setting behind it: the override is handed back
+ * on the way out, so without somewhere to remember it every film would start at the
+ * system brightness and have to be dimmed again.
+ *
  * The gesture is built before the effects that seed those values on purpose: writing to
  * a shared value that an effect above has already touched is what react-hooks/immutability
  * is there to catch.
@@ -41,6 +46,10 @@ export const usePlayerSlideGestures = (isEnabled: boolean) => {
     playerVolumeGesture,
     playerBrightnessGesture,
     playerSwapGestureSides,
+    playerGestureStep,
+    playerSaveBrightness,
+    playerSavedBrightness,
+    setConfig,
   } = useConfigContext();
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
 
@@ -72,7 +81,17 @@ export const usePlayerSlideGestures = (isEnabled: boolean) => {
     Brightness.setBrightnessAsync(value).catch(noopFn);
   }, []);
 
-  const slideRange = screenHeight * SLIDE_RANGE_RATIO;
+  // written when the finger lifts rather than as it moves: a slide crosses dozens of
+  // steps, and every one of those would otherwise be a write to storage
+  const rememberBrightness = useCallback((value: number) => {
+    if (!playerSaveBrightness) {
+      return;
+    }
+
+    setConfig('playerSavedBrightness', value);
+  }, [playerSaveBrightness, setConfig]);
+
+  const slideRange = (screenHeight * SLIDE_RANGE_RATIO) / playerGestureStep;
 
   const slideGesture = Gesture.Pan()
     .enabled(isVolumeEnabled || isBrightnessEnabled)
@@ -114,7 +133,7 @@ export const usePlayerSlideGestures = (isEnabled: boolean) => {
         brightness.value = value;
       }
 
-      const step = Math.round(value * SLIDE_STEPS);
+      const step = Math.round(value * SLIDE_APPLY_STEPS);
 
       if (step === appliedStep.value) {
         return;
@@ -131,14 +150,28 @@ export const usePlayerSlideGestures = (isEnabled: boolean) => {
         return;
       }
 
-      const opacity = control === PlayerSlideControl.VOLUME ? volumeOpacity : brightnessOpacity;
+      const isVolume = control === PlayerSlideControl.VOLUME;
+      const opacity = isVolume ? volumeOpacity : brightnessOpacity;
 
       activeControl.value = null;
       opacity.value = withDelay(
         SLIDE_INDICATOR_TIMEOUT,
         withTiming(0, { duration: SLIDE_INDICATOR_ANIMATION })
       );
+
+      if (!isVolume) {
+        scheduleOnRN(rememberBrightness, brightness.value);
+      }
     });
+
+  // seeding the level the player opens at, which for a remembered one means putting it
+  // back on the screen as well. It has to sit below the gesture: a shared value may not
+  // be written under a hook that has already closed over it, and the slide writes this
+  const restoreBrightness = useCallback((value: number) => {
+    brightness.value = value;
+
+    applyValue(PlayerSlideControl.BRIGHTNESS, value);
+  }, [applyValue]);
 
   useEffect(() => {
     if (!playerVolumeGesture) {
@@ -168,11 +201,20 @@ export const usePlayerSlideGestures = (isEnabled: boolean) => {
       return noopFn;
     }
 
-    Brightness.getBrightnessAsync()
-      .then((value) => {
-        brightness.value = value;
-      })
-      .catch(noopFn);
+    // a remembered level is applied rather than measured. Reading the screen would only
+    // ever give back the system brightness the last unmount handed it, which is exactly
+    // the level the setting exists to stop the player opening at.
+    // `playerSavedBrightness` is deliberately not a dependency: it is written by the
+    // slide below, and re-running on it would hand the brightness back mid-film.
+    if (playerSaveBrightness && playerSavedBrightness !== undefined) {
+      restoreBrightness(playerSavedBrightness);
+    } else {
+      Brightness.getBrightnessAsync()
+        .then((value) => {
+          brightness.value = value;
+        })
+        .catch(noopFn);
+    }
 
     // the override belongs to the activity rather than to this screen, so leaving the
     // player without handing it back would dim the rest of the app along with it
@@ -184,7 +226,7 @@ export const usePlayerSlideGestures = (isEnabled: boolean) => {
       hasSetBrightness.value = false;
       Brightness.restoreSystemBrightnessAsync().catch(noopFn);
     };
-  }, [playerBrightnessGesture]);
+  }, [playerBrightnessGesture, playerSaveBrightness]);
 
   return {
     slideGesture,

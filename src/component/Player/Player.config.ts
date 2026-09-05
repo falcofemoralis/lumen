@@ -105,11 +105,21 @@ export enum PlayerSlideControl {
 }
 
 /**
- * How much of the player's height a finger travels to cross the whole 0..1 range.
- * Less than all of it, so the ends stay in reach of a thumb that started somewhere
- * comfortable rather than at the very edge of the screen.
+ * How much of the player's height a finger travels to cross the whole 0..1 range, at
+ * the default step. Less than all of it, so the ends stay in reach of a thumb that
+ * started somewhere comfortable rather than at the very edge of the screen.
  */
 export const SLIDE_RANGE_RATIO = 0.75;
+
+/**
+ * How far a slide moves the level for the same finger travel, as a multiple of the
+ * ratio above - the travel is divided by it, so 2x crosses the range in half the
+ * distance. What a comfortable one is depends on the hand and on the screen, which is
+ * why it is a setting rather than a number picked here.
+ */
+export const DEFAULT_SLIDE_STEP = 1;
+
+export const SLIDE_STEP_MULTIPLIERS = [0.5, 0.75, 1, 1.5, 2, 2.5, 3];
 
 /** Vertical travel before a slide takes the touch away from the taps it shares the player with. */
 export const SLIDE_ACTIVATION_DISTANCE = 12;
@@ -118,11 +128,12 @@ export const SLIDE_ACTIVATION_DISTANCE = 12;
 export const SLIDE_FAIL_DISTANCE = 20;
 
 /**
- * Steps the range is applied to the device in. The bar follows the finger frame by
- * frame on the UI thread; the device only hears about a step it is not already on,
- * which keeps a full drag to a few dozen native calls rather than one per frame.
+ * Steps the range is applied to the device in - not to be confused with the step above,
+ * which is how fast the finger crosses it. The bar follows the finger frame by frame on
+ * the UI thread; the device only hears about a step it is not already on, which keeps a
+ * full drag to a few dozen native calls rather than one per frame.
  */
-export const SLIDE_STEPS = 50;
+export const SLIDE_APPLY_STEPS = 50;
 
 export const SLIDE_INDICATOR_ANIMATION = 150;
 

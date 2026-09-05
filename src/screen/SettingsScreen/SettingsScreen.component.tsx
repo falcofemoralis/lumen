@@ -53,6 +53,7 @@ import LoaderCircle from 'lucide-react-native/icons/loader-circle';
 import Maximize2 from 'lucide-react-native/icons/maximize-2';
 import MessageSquarePlus from 'lucide-react-native/icons/message-square-plus';
 import MoveRight from 'lucide-react-native/icons/move-right';
+import MoveVertical from 'lucide-react-native/icons/move-vertical';
 import PaintBucket from 'lucide-react-native/icons/paint-bucket';
 import Palette from 'lucide-react-native/icons/palette';
 import Pin from 'lucide-react-native/icons/pin';
@@ -87,6 +88,7 @@ import {
   PLAYER_ASPECT_RATIO_OPTIONS,
   PLAYER_BACK_BUFFER_TIME_OPTIONS,
   PLAYER_BUFFER_TIME_OPTIONS,
+  PLAYER_GESTURE_STEP_OPTIONS,
   PLAYER_LONG_PRESS_SPEED_OPTIONS,
   PLAYER_QUALITY_OPTIONS,
   PLAYER_REWIND_OPTIONS,
@@ -137,6 +139,8 @@ export function SettingsScreenComponent({
   playerVolumeGesture,
   playerBrightnessGesture,
   playerSwapGestureSides,
+  playerGestureStep,
+  playerSaveBrightness,
   playerVolumeNormalizationEnabled,
   playerVolumeNormalizationStrength,
   isVolumeNormalizationSupported,
@@ -624,6 +628,23 @@ export function SettingsScreenComponent({
         value={ playerSwapGestureSides }
         isEnabled={ playerVolumeGesture && playerBrightnessGesture }
         onChange={ (value) => onConfigUpdate('playerSwapGestureSides', value) }
+      />
+      <SettingSelect
+        title={ t('Gesture step') }
+        subtitle={ t('How far the volume or the brightness moves for the same swipe.') }
+        IconComponent={ MoveVertical }
+        value={ playerGestureStep.toString() }
+        options={ PLAYER_GESTURE_STEP_OPTIONS }
+        isEnabled={ playerVolumeGesture || playerBrightnessGesture }
+        onChange={ (value) => onConfigUpdate('playerGestureStep', Number(value)) }
+      />
+      <SettingSwitch
+        title={ t('Remember brightness') }
+        subtitle={ t('Open the player at the brightness it was last left at.') }
+        IconComponent={ Pin }
+        value={ playerSaveBrightness }
+        isEnabled={ playerBrightnessGesture }
+        onChange={ (value) => onConfigUpdate('playerSaveBrightness', value) }
       />
       <SettingSelect
         title={ t('Player default speed') }
