@@ -50,6 +50,9 @@ export const LONG_PRESS_DURATION = 250;
 
 export const SAVE_TIME_EVERY_MS = 30000;
 
+/** Below this many seconds a position is not worth saving - see `updateTime`. */
+export const MIN_SAVED_TIME = 1;
+
 export const PLAYER_CONTROLS_TIMEOUT = 3000;
 export const PLAYER_CONTROLS_ANIMATION = 150;
 

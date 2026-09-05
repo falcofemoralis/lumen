@@ -5,8 +5,57 @@ index ee17bac..c2be218 100644
 @@ -8,6 +8,6 @@ RNVideo_ndkversion=27.1.12297006
  RNVideo_useExoplayerDash=true
  RNVideo_useExoplayerHls=true
-
+ 
 -RNVideo_media3Version=1.4.1
 +RNVideo_media3Version=1.11.0
  RNVideo_androidxCoreVersion=1.13.1
  RNVideo_androidxActivityVersion=1.9.3
+diff --git a/node_modules/react-native-video/android/src/main/java/com/twg/video/core/player/DataSourceFactoryUtils.kt b/node_modules/react-native-video/android/src/main/java/com/twg/video/core/player/DataSourceFactoryUtils.kt
+index 02b03aa..1acc926 100644
+--- a/node_modules/react-native-video/android/src/main/java/com/twg/video/core/player/DataSourceFactoryUtils.kt
++++ b/node_modules/react-native-video/android/src/main/java/com/twg/video/core/player/DataSourceFactoryUtils.kt
+@@ -11,8 +11,21 @@ import com.facebook.react.modules.network.CookieJarContainer
+ import com.facebook.react.modules.network.ForwardingCookieHandler
+ import com.facebook.react.modules.network.OkHttpClientProvider
+ import com.margelo.nitro.video.HybridVideoPlayerSourceSpec
++import java.util.concurrent.TimeUnit
+ import okhttp3.JavaNetCookieJar
+ 
++// media3's own defaults for DefaultHttpDataSource. React Native's shared client
++// is built with every timeout set to zero - an infinite one - which is workable
++// for the short requests the app makes itself but not for a media socket. A
++// paused player stops reading as soon as its buffer is full, and an idle
++// connection is routinely dropped by a NAT or a CDN without either end being
++// told; resuming then blocks in a read that never returns, so ExoPlayer neither
++// retries nor reports an error and playback simply runs out the buffer and
++// freezes. With a finite timeout the same situation surfaces as an IOException,
++// which ExoPlayer recovers from by reconnecting.
++private const val MEDIA_CONNECT_TIMEOUT_MS = 8000L
++private const val MEDIA_READ_TIMEOUT_MS = 8000L
++
+ fun buildBaseDataSourceFactory(context: Context, source: HybridVideoPlayerSourceSpec): DefaultDataSource.Factory {
+   return if (source.uri.startsWith("http")) {
+     DefaultDataSource.Factory(context, buildHttpDataSourceFactory(context, source))
+@@ -23,13 +36,20 @@ fun buildBaseDataSourceFactory(context: Context, source: HybridVideoPlayerSource
+ 
+ @OptIn(UnstableApi::class)
+ fun buildHttpDataSourceFactory(context: Context, source: HybridVideoPlayerSourceSpec): OkHttpDataSource.Factory {
+-  val client = OkHttpClientProvider.getOkHttpClient()
++  val sharedClient = OkHttpClientProvider.getOkHttpClient()
+ 
+   if (context is ReactContext) {
+     val handler = ForwardingCookieHandler(context)
+-    (client.cookieJar as CookieJarContainer).setCookieJar(JavaNetCookieJar(handler))
++    (sharedClient.cookieJar as CookieJarContainer).setCookieJar(JavaNetCookieJar(handler))
+   }
+ 
++  // derived rather than built from scratch, so the cookie jar set above, the
++  // dispatcher and the connection pool stay the ones the rest of the app uses
++  val client = sharedClient.newBuilder()
++    .connectTimeout(MEDIA_CONNECT_TIMEOUT_MS, TimeUnit.MILLISECONDS)
++    .readTimeout(MEDIA_READ_TIMEOUT_MS, TimeUnit.MILLISECONDS)
++    .build()
++
+   val factory = OkHttpDataSource.Factory(client)
+ 
+   val headers: Map<String, String>? = source.config.headers
