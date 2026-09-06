@@ -2,7 +2,7 @@ import { DEFAULT_SERVICE, services } from 'Api/index';
 import { getGlobalConfig } from 'Context/ConfigContext';
 import NotificationStore from 'Store/Notification.store';
 
-import { runTvSearchQuery } from '.';
+import { runTvSearchQuery, setTvSearchEnabled } from '.';
 
 /** Must match `TASK_KEY` in TvSearchLiveQuery.kt. */
 export const TV_SEARCH_QUERY_TASK = 'TvSearchQuery';
@@ -24,6 +24,13 @@ export const tvSearchQueryTask = async ({ query }: { query: string }): Promise<v
   // searching before onboarding has settled on a provider only produces a 404, and
   // the launcher would show the failure as "no results" for the app
   if (!isTV || !isConfigured || !tvSearchEnabled || !query) {
+    // The native flag starts out on, so that search works right after an update rather
+    // than only once the app has been opened again. On an install nobody has opened
+    // that assumption is wrong, and this is the first moment anything can tell: turning
+    // it off stops the next search from starting the app for nothing. Opening the app
+    // turns it back on, since that is when the setting is known for real.
+    await setTvSearchEnabled(false);
+
     return;
   }
 

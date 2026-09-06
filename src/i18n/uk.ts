@@ -293,6 +293,13 @@ const uk: Translations = {
   'Swap gesture sides': 'Поміняти сторони жестів',
   'Put the volume on the left half of the player and the brightness on the right.':
     'Гучність буде на лівій половині плеєра, а яскравість - на правій.',
+  'Gesture step': 'Крок жесту',
+  'How far the volume or the brightness moves for the same swipe.':
+    'На скільки змінюється гучність або яскравість за той самий рух пальця. Чим більший крок, тим'
+    + ' коротше треба провести, щоб пройти весь діапазон.',
+  'Remember brightness': 'Запам\'ятовувати яскравість',
+  'Open the player at the brightness it was last left at.':
+    'Плеєр відкриватиметься з тією яскравістю, на якій ви його закрили, а не з системною.',
   'Sort voices by rating': 'Сортувати озвучки за рейтингом',
   'Toggle sorting voices by rating.': 'Перемкнути сортування озвучок за рейтингом. Озвучки з найвищим рейтингом будуть показані на початку списку.',
   'Show votes count': 'Показувати кількість голосів',

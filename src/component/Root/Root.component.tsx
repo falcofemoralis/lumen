@@ -26,6 +26,7 @@ export const Root = ({ children }: { children: ReactNode }) => {
     checkForUpdates,
     isLocalLibrary,
     downloadsMaxParallel,
+    isConfigured,
     tvChannelsEnabled,
     tvSearchEnabled,
     playerAutoFrameRateEnabled,
@@ -41,7 +42,9 @@ export const Root = ({ children }: { children: ReactNode }) => {
 
   useAwake();
   useTvChannels(tvChannelsEnabled);
-  useTvSearch(tvSearchEnabled);
+  // gated on onboarding too: a search before a provider has been settled on only 404s,
+  // and the searcher shows that as "this app found nothing" rather than as a failure
+  useTvSearch(tvSearchEnabled && isConfigured);
   useAutoFrameRate(playerAutoFrameRateEnabled && playerAutoFrameRate);
   useVolumeNormalization(
     playerVolumeNormalizationEnabled && playerVolumeNormalization,

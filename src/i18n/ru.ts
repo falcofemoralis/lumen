@@ -293,6 +293,13 @@ const ru: Translations = {
   'Swap gesture sides': 'Поменять стороны жестов',
   'Put the volume on the left half of the player and the brightness on the right.':
     'Громкость будет на левой половине плеера, а яркость - на правой.',
+  'Gesture step': 'Шаг жеста',
+  'How far the volume or the brightness moves for the same swipe.':
+    'На сколько меняется громкость или яркость за одно и то же движение пальца. Чем больше шаг,'
+    + ' тем короче нужно провести, чтобы пройти весь диапазон.',
+  'Remember brightness': 'Запоминать яркость',
+  'Open the player at the brightness it was last left at.':
+    'Плеер будет открываться с той яркостью, на которой вы его закрыли, а не с системной.',
   'Sort voices by rating': 'Сортировать озвучки по рейтингу',
   'Toggle sorting voices by rating.': 'Переключить сортировку озвучек по рейтингу. Озвучки с высшим рейтингом будут показаны в начале списка.',
   'Show votes count': 'Показывать количество голосов',

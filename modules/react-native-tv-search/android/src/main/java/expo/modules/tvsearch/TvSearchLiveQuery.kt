@@ -10,21 +10,27 @@ import com.facebook.react.bridge.ReactContext
 import com.facebook.react.jstasks.HeadlessJsTaskConfig
 import com.facebook.react.jstasks.HeadlessJsTaskContext
 import com.facebook.react.jstasks.HeadlessJsTaskEventListener
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 /**
  * Runs the real search - the JS one, the same `service.search()` the search screen
- * calls - on behalf of [TvSearchSuggestionProvider], which cannot wait for it.
+ * calls - on behalf of [TvSearchSuggestionProvider].
  *
- * The provider fires and forgets: this brings up a headless JS runtime if the app is
- * not already running, hands it the `TvSearchQuery` task, and JS publishes what it
- * finds back through [ReactNativeTvSearchModule.publishResults], which is what
- * notifies the search UI.
+ * The provider blocks on [awaitResults] until this publishes, which is not an
+ * optimisation but the only thing that works. Returning from `query()` and letting the
+ * search finish in the background looks reasonable and fails completely: with no bound
+ * component left, the process drops straight to cached, and Android 12+ freezes it
+ * (`ActivityManager: freezing ... com.falcofemoralis.lumen`) before the JS runtime has
+ * even started. The task never runs, nothing is ever published, and every caller sees
+ * an empty cursor forever. A process serving a synchronous binder transaction is not
+ * cached, so holding the binder thread is what keeps the runtime alive long enough to
+ * answer - and it is what every other TV app doing this does.
  *
- * Two things keep that from being ruinously expensive. The system search UI queries
- * the provider on every keystroke, so requests are debounced and only the last query
- * typed is actually searched; and only one search runs at a time, with a newer request
- * replacing whatever was queued behind it rather than piling up. A search the user has
- * already typed past is worth nothing by the time it would return.
+ * Only one search runs at a time, and a newer query replaces whatever was queued behind
+ * it rather than piling up: the search UI queries on every keystroke, and a query the
+ * user has already typed past is worth nothing by the time it would return. Waiters on
+ * a query that gets superseded are woken immediately rather than left to time out.
  */
 internal object TvSearchLiveQuery : HeadlessJsTaskEventListener {
   /** Must match the name the JS side registers with `AppRegistry.registerHeadlessTask`. */
@@ -32,18 +38,11 @@ internal object TvSearchLiveQuery : HeadlessJsTaskEventListener {
 
   /**
    * A search is one request plus a parse, but it may have to solve a proof-of-work
-   * challenge and pick a working mirror first. Generous, since the only cost of a slow
-   * search is that its results arrive after the user has stopped looking - while
-   * cutting one short throws away work that was nearly done.
+   * challenge and pick a working mirror first. Generous, since this only bounds the
+   * runtime's own housekeeping - what the caller actually waits for is the far shorter
+   * timeout it passes to [awaitResults].
    */
   private const val TASK_TIMEOUT_MS = 60L * 1000
-
-  /**
-   * How long typing has to pause before the query is searched for real. Long enough
-   * that a word typed at a normal pace is one search rather than one per letter, short
-   * enough to feel like it reacts to the user stopping.
-   */
-  private const val DEBOUNCE_MS = 450L
 
   private val handler = Handler(Looper.getMainLooper())
   private val lock = Any()
@@ -55,28 +54,97 @@ internal object TvSearchLiveQuery : HeadlessJsTaskEventListener {
 
   private var taskContext: HeadlessJsTaskContext? = null
   private var runningTaskId: Int? = null
+  private var runningQueryKey: String? = null
+
+  /** Binder threads parked in [awaitResults], by the query key they are waiting on. */
+  private val waiters = mutableMapOf<String, MutableSet<CountDownLatch>>()
 
   private val runPendingTask = Runnable { runPending() }
 
-  /** Queues [query] to be searched, replacing any query still waiting to start. */
-  fun request(context: Context, query: String) {
+  /**
+   * Searches [query] and blocks until the results are published or [timeoutMs] passes.
+   *
+   * Must never be called from the main thread: the JS runtime is started on it, so
+   * blocking there would deadlock against the very thing being waited for.
+   *
+   * @return whether results were published in time. On `false` the caller still reads
+   *   the store - a search that timed out here may have been a slow one that lands a
+   *   moment later, and the next caller gets it from the cache.
+   */
+  fun awaitResults(context: Context, query: String, timeoutMs: Long): Boolean {
+    val queryKey = TvSearchStore.normalize(query)
+    val latch = CountDownLatch(1)
+
     synchronized(lock) {
-      applicationContext = context.applicationContext
-      pendingQuery = query
+      waiters.getOrPut(queryKey) { mutableSetOf() }.add(latch)
     }
 
-    // called from a binder thread; the react host has to be driven from the UI thread
+    request(context, query)
+
+    return try {
+      latch.await(timeoutMs, TimeUnit.MILLISECONDS)
+    } catch (e: InterruptedException) {
+      Thread.currentThread().interrupt()
+
+      false
+    } finally {
+      synchronized(lock) {
+        val latches = waiters[queryKey]
+
+        if (latches != null) {
+          latches.remove(latch)
+
+          if (latches.isEmpty()) {
+            waiters.remove(queryKey)
+          }
+        }
+      }
+    }
+  }
+
+  /** Wakes everything parked on [queryKey]. Called once its results are in the store. */
+  fun releaseWaiters(queryKey: String) {
+    val latches = synchronized(lock) { waiters[queryKey]?.toList() } ?: return
+
+    latches.forEach { it.countDown() }
+  }
+
+  /** Queues [query] to be searched, replacing any query still waiting to start. */
+  private fun request(context: Context, query: String) {
+    val superseded = synchronized(lock) {
+      applicationContext = context.applicationContext
+
+      val previous = pendingQuery
+
+      pendingQuery = query
+
+      previous?.let { TvSearchStore.normalize(it) }?.takeIf { it != TvSearchStore.normalize(query) }
+    }
+
+    // it will never be searched now, so anything waiting on it would only sit there
+    // until its timeout - it is woken to read whatever the cache holds instead
+    superseded?.let { releaseWaiters(it) }
+
+    // called from a binder thread; the react host has to be driven from the UI thread.
+    // Posted rather than delayed: a caller is blocked on this, and the single pending
+    // slot above already collapses a burst of keystrokes into one search.
     handler.removeCallbacks(runPendingTask)
-    handler.postDelayed(runPendingTask, DEBOUNCE_MS)
+    handler.post(runPendingTask)
   }
 
   /** Drops a query that has not started yet, ex. because the feature was switched off. */
   fun cancelPending() {
     handler.removeCallbacks(runPendingTask)
 
-    synchronized(lock) {
+    val dropped = synchronized(lock) {
+      val pending = pendingQuery?.let { TvSearchStore.normalize(it) }
+
       pendingQuery = null
+
+      pending
     }
+
+    dropped?.let { releaseWaiters(it) }
   }
 
   private fun runPending() {
@@ -95,7 +163,15 @@ internal object TvSearchLiveQuery : HeadlessJsTaskEventListener {
       context to query
     }
 
-    val reactHost = (context as? ReactApplication)?.reactHost ?: return
+    val reactHost = (context as? ReactApplication)?.reactHost
+
+    if (reactHost == null) {
+      // nothing will ever publish for this one, so it must not hold anyone up
+      releaseWaiters(TvSearchStore.normalize(query))
+
+      return
+    }
+
     val reactContext = reactHost.currentReactContext
 
     if (reactContext != null) {
@@ -140,6 +216,7 @@ internal object TvSearchLiveQuery : HeadlessJsTaskEventListener {
 
       synchronized(lock) {
         runningTaskId = taskId
+        runningQueryKey = TvSearchStore.normalize(query)
       }
     }
   }
@@ -147,20 +224,28 @@ internal object TvSearchLiveQuery : HeadlessJsTaskEventListener {
   override fun onHeadlessJsTaskStart(taskId: Int) = Unit
 
   override fun onHeadlessJsTaskFinish(taskId: Int) {
-    val hasPending = synchronized(lock) {
+    val (finishedKey, hasPending) = synchronized(lock) {
       if (taskId != runningTaskId) {
         return
       }
 
+      val finishedKey = runningQueryKey
+
       taskContext?.removeTaskEventListener(this)
       taskContext = null
       runningTaskId = null
+      runningQueryKey = null
 
-      pendingQuery != null
+      finishedKey to (pendingQuery != null)
     }
 
+    // the task is done whether or not it published - it may have found nothing, thrown,
+    // or bailed because the app is not configured yet. Either way the wait is over, and
+    // leaving a caller to time out on a search that already finished is the worst of it.
+    finishedKey?.let { releaseWaiters(it) }
+
     // whatever the user typed while this one was running, searched now that the slot
-    // is free - without the debounce, which their typing already paid for
+    // is free
     if (hasPending) {
       handler.post(runPendingTask)
     }

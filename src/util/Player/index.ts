@@ -345,10 +345,24 @@ export const applyPlayerRate = (player: VideoPlayer, rate: number) => {
   player.rate = rate;
 };
 
+// same reason as the rate above - seeking is a property write, not a method
+export const applyPlayerTime = (player: VideoPlayer, time: number) => {
+  player.currentTime = time;
+};
+
+// what the player is set to once, for the session it is created for
+export const applyPlayerDefaults = (player: VideoPlayer, rate: number) => {
+  player.loop = false;
+  player.rate = rate;
+  // hands the player a media session, which is what makes the headset button,
+  // the notification and the lock screen controls reach it
+  player.showNotificationControls = true;
+};
+
 // expo-video took a single forward buffer duration in seconds. react-native-video
 // configures ExoPlayer's load control in milliseconds, so the same number drives
-// `maxBufferMs` on Android and `preferredForwardBufferDurationMs` on iOS. The
-// minimum is kept below the maximum, otherwise ExoPlayer rejects the config.
+// `maxBufferMs` on Android and `preferredForwardBufferDurationMs` on iOS. It is
+// a target the player holds rather than one it drains away from - see below.
 export const getBufferConfig = (
   quality: string,
   bufferTimeSetting?: number,
@@ -363,8 +377,20 @@ export const getBufferConfig = (
   // than the forward buffer already costs, which is what the clamp is for.
   const backBufferMs = Math.min(backBufferTimeSetting ?? 0, forwardSeconds) * 1000;
 
+  // ExoPlayer treats the two durations as a hysteresis band: it fills up to
+  // `maxBufferMs`, stops, and only resumes once the buffer has drained below
+  // `minBufferMs`. A band means the buffer spends most of its time at less than
+  // what was asked for - half of it, with the usual min = max / 2 - which is the
+  // opposite of what someone raising this setting wants. Pinning the two
+  // together removes the band: loading restarts the moment the buffer dips below
+  // the target, so it is held there rather than falling to half between refills.
+  //
+  // The player still stops short of the target for a stream whose bitrate would
+  // put that many seconds past ExoPlayer's own memory ceiling (~137 MiB of
+  // samples), which is the point of that ceiling - `getBufferTime` lowers the
+  // target on small devices for the same reason.
   return {
-    minBufferMs: bufferMs / 2,
+    minBufferMs: bufferMs,
     maxBufferMs: bufferMs,
     preferredForwardBufferDurationMs: bufferMs,
     backBufferDurationMs: backBufferMs,

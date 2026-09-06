@@ -61,7 +61,7 @@ dependencies {
   // `Format`, `C` and `ExoPlayer.setVideoChangeFrameRateStrategy` are touched here, all
   // of which have been stable since media3 1.0 - a newer runtime version needs no change,
   // and this only has to be bumped if the module stops compiling.
-  def media3Version = rootProject.ext.has("media3Version") ? rootProject.ext.get("media3Version") : "1.4.1"
+  def media3Version = rootProject.ext.has("media3Version") ? rootProject.ext.get("media3Version") : "1.11.0"
   compileOnly "androidx.media3:media3-common:$media3Version"
   compileOnly "androidx.media3:media3-exoplayer:$media3Version"
   compileOnly "androidx.media3:media3-ui:$media3Version"

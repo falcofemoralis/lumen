@@ -45,7 +45,7 @@ const SETTINGS_DESCRIPTION_STRING = 'tv_search_settings_description';
  * system does not ask at all, which matters more than usual here: a short query matches
  * most of the catalogue and costs a full scrape to find that out.
  */
-const SUGGEST_THRESHOLD = 3;
+const SUGGEST_THRESHOLD = 2;
 
 const getAuthority = (config) => `${config.android?.package ?? config.package}${AUTHORITY_SUFFIX}`;
 
@@ -113,20 +113,18 @@ const withSearchableManifest = (config) => withAndroidManifest(config, (modConfi
       $: {
         'android:name': PROVIDER_NAME,
         'android:authorities': authority,
-        // the global search app lives in another process, so it can only reach the
-        // provider if it is exported
+        // search runs in another process, so it can only reach the provider if it is
+        // exported
         'android:exported': 'true',
       },
-      // ...which is why reads are gated on GLOBAL_SEARCH, a permission only the system
-      // search app holds. Every path the provider serves starts with /search.
-      'path-permission': [
-        {
-          $: {
-            'android:pathPrefix': '/search',
-            'android:readPermission': 'android.permission.GLOBAL_SEARCH',
-          },
-        },
-      ],
+      // NOTE: no `path-permission` gating reads on android.permission.GLOBAL_SEARCH.
+      // That permission is signature|privileged, so requiring it admits the system
+      // search app and nothing else - it locks out ATV Поиск, USearch on Ugoos and
+      // every third-party launcher, which is most of where a TV user actually searches.
+      // What the provider hands out is a title, a year, a poster url and a deep link
+      // into this app, none of it private. The one thing an unprotected provider does
+      // give away is that any installed app can make this one run a search, so keep the
+      // work behind it cheap and the results public - which they are.
     },
   ];
 

@@ -38,12 +38,25 @@ class TvSearchSuggestionProvider : ContentProvider() {
 
   companion object {
     /**
-     * Queries shorter than this are not searched. `android:searchSuggestThreshold` in
-     * searchable.xml already keeps the system from asking, so this only covers a
-     * caller that asks anyway - a one or two letter query matches most of the catalogue
-     * and costs a full scrape to find that out.
+     * Queries shorter than this are not searched. Two rather than three so that short
+     * titles ("Оно", "Иди") are reachable at all; a single letter matches most of the
+     * catalogue and costs a full scrape to find that out. Kept in step with
+     * `android:searchSuggestThreshold` in searchable.xml, which stops the system asking
+     * in the first place - this only covers a caller that asks anyway.
      */
-    private const val MIN_QUERY_LENGTH = 3
+    private const val MIN_QUERY_LENGTH = 2
+
+    /**
+     * How long a caller is made to wait for a live search before it is answered from
+     * the cache instead.
+     *
+     * A cold start has to boot the JS runtime, solve a proof-of-work challenge and
+     * fetch, so the first search of a session can overrun this and come back empty; it
+     * still lands in the store, so retyping the same thing answers instantly. Chosen to
+     * stay under the timeouts search UIs apply to a suggestion provider - hanging on
+     * past those gets the app dropped from the results rather than shown late.
+     */
+    private const val LIVE_QUERY_TIMEOUT_MS = 8L * 1000
 
     /** Cards the search UI is offered for one query, if it does not ask for fewer. */
     private const val DEFAULT_LIMIT = 10
@@ -129,6 +142,14 @@ class TvSearchSuggestionProvider : ContentProvider() {
 
     val limit = uri.getQueryParameter("limit")?.toIntOrNull()?.takeIf { it > 0 } ?: DEFAULT_LIMIT
 
+    // Blocks this binder thread until the search publishes. Every caller that matters
+    // makes a single `query()` call and renders what comes back, so returning early and
+    // relying on the notification below to bring them back is not an option - and the
+    // process would be frozen before the search ran anyway, see TvSearchLiveQuery.
+    if (!store.isFresh(queryKey, RESULT_TTL_MS)) {
+      TvSearchLiveQuery.awaitResults(context, query.trim(), LIVE_QUERY_TIMEOUT_MS)
+    }
+
     store.readRows(queryKey, limit).forEachIndexed { index, row ->
       cursor.addRow(
         // spelled out: the row mixes ints, strings and nulls, and an inferred array
@@ -150,13 +171,10 @@ class TvSearchSuggestionProvider : ContentProvider() {
     val authority = findAuthority(context)
 
     if (authority != null) {
+      // Kept even though the rows are already in the cursor: a search that outran the
+      // timeout above still lands in the store afterwards, and a launcher that requeries
+      // on change picks it up without the user typing again.
       cursor.setNotificationUri(context.contentResolver, notificationUri(authority, queryKey))
-    }
-
-    // nothing to gain from re-scraping a query that was just searched; the cursor above
-    // already holds what it found
-    if (!store.isFresh(queryKey, RESULT_TTL_MS)) {
-      TvSearchLiveQuery.request(context, query.trim())
     }
 
     return cursor

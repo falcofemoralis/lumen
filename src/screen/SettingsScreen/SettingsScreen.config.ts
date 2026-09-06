@@ -3,6 +3,7 @@ import {
   DEFAULT_SPEEDS,
   getAspectRatioLabel,
   MAX_QUALITY,
+  SLIDE_STEP_MULTIPLIERS,
 } from 'Component/Player/Player.config';
 import { t } from 'i18n/translate';
 import { LoudnessStrength } from 'Modules/react-native-loudness';
@@ -350,6 +351,11 @@ export const PLAYER_LONG_PRESS_SPEED_OPTIONS = Array.from({ length: 12 }, (_, in
 });
 
 export const PLAYER_SPEED_OPTIONS = DEFAULT_SPEEDS.map((value) => ({
+  value: value.toString(),
+  label: `${value.toString()}x`,
+}));
+
+export const PLAYER_GESTURE_STEP_OPTIONS = SLIDE_STEP_MULTIPLIERS.map((value) => ({
   value: value.toString(),
   label: `${value.toString()}x`,
 }));

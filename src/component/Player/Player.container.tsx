@@ -40,7 +40,9 @@ import { createMasterPlaylist, getQualityFromResolution } from 'Util/Hls';
 import { upsertLocalHistoryItem } from 'Util/LocalLibrary';
 import { setIntervalSafe } from 'Util/Misc';
 import {
+  applyPlayerDefaults,
   applyPlayerRate,
+  applyPlayerTime,
   getBufferConfig,
   getExternalSubtitles,
   getFirestoreSavedTime,
@@ -67,6 +69,7 @@ import {
   FIRESTORE_DB,
   getAspectRatio,
   MAX_QUALITY,
+  MIN_SAVED_TIME,
   RewindDirection,
   SAVE_TIME_EVERY_MS,
   SUBTITLES_OFF,
@@ -158,6 +161,18 @@ export function PlayerContainer({
   const bookmarksOverlayRef = useRef<ThemedOverlayRef>(null);
   const speedOverlayRef = useRef<ThemedOverlayRef>(null);
   const cdnOverlayRef = useRef<ThemedOverlayRef>(null);
+
+  // which player has already been started - see startPlayback. Deliberately the
+  // player and not a flag: react-native-video can release its native player and
+  // build another one without this screen unmounting, and a flag would then read
+  // as "already started" for a player that has never been touched.
+  const startedPlayerRef = useRef<VideoPlayer | null>(null);
+  // where playback actually got to, kept in memory because the stored position
+  // only catches up every SAVE_TIME_EVERY_MS - a replacement player restores
+  // from whichever of the two is further along
+  const lastPositionRef = useRef<number>(0);
+  // the quality whose failure has already been acted on - see handlePlaybackError
+  const handledErrorQuality = useRef<string | null>(null);
 
   const firestoreSavedTimeRef = useRef(false);
   const firestoreDb = useMemo(() => (
@@ -257,21 +272,66 @@ export function PlayerContainer({
     () => buildVideoSource(videoUrl ?? EMPTY_VIDEO_URL, selectedQuality, video, voice)
   );
 
-  const player = useVideoPlayer(initialVideoSource, (p) => {
-    const savedTime = getSavedTime(film);
-
-    p.loop = false;
-    p.currentTime = getVideoTime(selectedVoice, savedTime);
-    p.rate = playerDefaultSpeed;
-    // hands the player a media session, which is what makes the headset button,
-    // the notification and the lock screen controls reach it
-    p.showNotificationControls = true;
-    p.play();
-
-    initFirestoreSavedTime(p, savedTime);
-  });
+  // No setup callback. react-native-video creates *and* prepares the native
+  // player while this component renders, and only then attaches the listeners
+  // the callback is delivered through - `onLoadStart` and the move to `loading`
+  // are both emitted before there is anything to hear them. What is left is the
+  // next status change, so the callback effectively arrives when the source
+  // becomes ready, and not at all if the source got there first. Everything it
+  // used to do is applied from the effects below, which can also read the player
+  // back rather than only be told about it.
+  const player = useVideoPlayer(initialVideoSource);
 
   const { status, isPlaying, isBuffering } = useVideoPlayerState(player);
+
+  useEffect(() => {
+    applyPlayerDefaults(player, playerDefaultSpeed);
+  }, [player, playerDefaultSpeed]);
+
+  /**
+   * Seeks to where this episode was left off and starts playing. ExoPlayer does
+   * not autoplay on its own and a seek is only honoured once the source reports
+   * a timeline, so both have to wait for the player to be ready rather than
+   * happen at creation - a seek issued earlier is dropped, which is what left
+   * playback paused at zero.
+   *
+   * Ready is reached once per source, but a rebuffer reaches it again and every
+   * later source switch restores its own position, so this only ever runs for
+   * the first one.
+   */
+  const startPlayback = useCallback(() => {
+    if (startedPlayerRef.current === player) {
+      return;
+    }
+
+    startedPlayerRef.current = player;
+
+    const savedTime = getSavedTime(film);
+    // a player built to replace one that was already playing starts from where
+    // that one got to, which the stored position is usually behind
+    const time = Math.max(getVideoTime(selectedVoice, savedTime), lastPositionRef.current);
+
+    if (time > 0) {
+      applyPlayerTime(player, time);
+    }
+
+    player.play();
+
+    initFirestoreSavedTime(player, savedTime);
+  }, [player, film, selectedVoice, initFirestoreSavedTime]);
+
+  // ready is normally announced through onLoad...
+  useEvent(player, 'onLoad', startPlayback);
+
+  // ...but a source that gets there before this component has subscribed emitted
+  // that event into nothing, and the status it left behind is the only trace.
+  // Reading it back here, with the subscription above already in place, leaves no
+  // window for the two to miss each other.
+  useEffect(() => {
+    if (player.status === 'readyToPlay') {
+      startPlayback();
+    }
+  }, [player, startPlayback]);
 
   // the native player reports every failure as an error status, so a player that
   // is playable again - the lower quality took over, or the source recovered on
@@ -288,6 +348,17 @@ export function PlayerContainer({
     const { currentTime, duration } = player;
     if (!duration) {
       // video is not loaded yet, do not update time to avoid progress being null
+      return;
+    }
+
+    // A position of zero is never worth writing down, and writing it is actively
+    // harmful: the duration is known from the moment the source is ready, which
+    // is before the restore has landed, so anything that saves in that window -
+    // a pause, leaving the screen - replaces a real saved position with the
+    // start of the episode, and every later launch then begins from zero. What
+    // is given up is remembering that someone stopped in the first second, which
+    // is what starting from the beginning does anyway.
+    if (currentTime < MIN_SAVED_TIME) {
       return;
     }
 
@@ -411,6 +482,11 @@ export function PlayerContainer({
     setPlaybackFailed(false);
     // the cached duration belongs to the outgoing source
     durationRef.current = 0;
+    // ...and so does the position playback had reached in it
+    lastPositionRef.current = 0;
+    // this restores a position and resumes on its own below, so the ready the
+    // replaced source reaches is not one startPlayback has anything left to do at
+    startedPlayerRef.current = player;
 
     // `auto` is not a stream of its own - the player is handed the same generated
     // master playlist the initial source is built from and negotiates the track itself
@@ -601,6 +677,7 @@ export function PlayerContainer({
     // bufferDuration is the buffer ahead of the playhead, everything else here
     // works with an absolute position
     bufferedPosition.current = currentTime + bufferDuration;
+    lastPositionRef.current = currentTime;
 
     if (stopEventsRef.current) {
       return;
@@ -638,7 +715,17 @@ export function PlayerContainer({
    * Every failure steps one quality down until the lowest one is reached, and
    * only then the error is shown. Downloaded files have nothing to fall back to.
    */
-  const handlePlaybackError = (error: VideoRuntimeError) => {
+  const handlePlaybackError = (error?: VideoRuntimeError) => {
+    // A failed call and the error status it leaves behind are one failure
+    // arriving twice, and stepping down twice for it would skip over a quality
+    // the device might well have managed. The guard is lifted by the next source
+    // that loads, so a quality the user comes back to later gets its own try.
+    if (handledErrorQuality.current === selectedQuality) {
+      return;
+    }
+
+    handledErrorQuality.current = selectedQuality;
+
     // the message is for the log only, the user gets a plain text instead
     console.error('Player error:', error?.message);
 
@@ -660,7 +747,18 @@ export function PlayerContainer({
     updatePlayerStream(selectedVideo, lowerQuality, selectedVoice);
   };
 
+  // `onError` only ever carries a failure of a call we made ourselves - a rejected
+  // replaceSourceAsync and the like. A playback failure does not come through it:
+  // react-native-video's Android player records a PlaybackException by setting its
+  // status and emits nothing at all (`onPlayerError` in HybridVideoPlayer.kt), so
+  // the status is the only trace a decoder or a network failure leaves behind.
+  // Both are the same failure as far as recovering from it goes.
   useEvent(player, 'onError', handlePlaybackError);
+  useEvent(player, 'onStatusChange', (newStatus) => {
+    if (newStatus === 'error') {
+      handlePlaybackError();
+    }
+  });
 
   // headphones pulled out or a bluetooth headset walking out of range - carrying
   // on would blast the film out of the device speaker
@@ -689,6 +787,8 @@ export function PlayerContainer({
 
   useEvent(player, 'onLoad', ({ width, height }) => {
     setPlaybackFailed(false);
+    // a source that loads clears the failure the previous one was held against
+    handledErrorQuality.current = null;
     updateVideoSize(width, height);
     applySubtitle(selectedSubtitle);
   });
