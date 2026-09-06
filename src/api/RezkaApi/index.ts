@@ -102,7 +102,7 @@ const RezkaApi: RezkaApiInterface = {
     'https://stream.voidboost.link',
     'https://stream.voidboost.club',
   ],
-  defaultUserAgent: `Mozilla/5.0 (Linux; Android ${Device.osVersion}; ${Device.manufacturer} ${Device.modelName}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36`,
+  defaultUserAgent: `Mozilla/5.0 (Linux; Android ${Device.osVersion}; ${Device.manufacturer} ${Device.modelName}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36`,
   officialMirror: 'https://hdrzk.org',
   config: null,
   supportEmail: 'mirror@hdrezka.org',
