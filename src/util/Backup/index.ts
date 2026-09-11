@@ -13,7 +13,7 @@ import {
 } from 'Type/Backup.interface';
 import { NotificationItemInterface } from 'Type/Notification.interface';
 import { getLocalComments, LOCAL_COMMENTS_KEY } from 'Util/LocalComments';
-import { getLocalBookmarks, LOCAL_BOOKMARKS_KEY } from 'Util/LocalLibrary';
+import { getLocalBookmarks, getLocalHistory, LOCAL_BOOKMARKS_KEY, LOCAL_HISTORY_KEY } from 'Util/LocalLibrary';
 import { getPlayerQuality, updatePlayerQuality } from 'Util/Player';
 import { storage } from 'Util/Storage';
 
@@ -32,6 +32,7 @@ import {
   sanitizeConfig,
   sanitizeNotifications,
   sanitizeServiceConfig,
+  sanitizeWatchHistory,
   SERVICE_CONFIG_KEYS,
   SETTINGS_SECTIONS,
   SettingsSection,
@@ -122,6 +123,8 @@ const collectSection = (section: BACKUP_SECTION, service: ApiInterface): BackupD
   switch (section) {
     case BACKUP_SECTION.BOOKMARKS:
       return { [BACKUP_SECTION.BOOKMARKS]: getLocalBookmarks() };
+    case BACKUP_SECTION.WATCH_HISTORY:
+      return { [BACKUP_SECTION.WATCH_HISTORY]: getLocalHistory() };
     case BACKUP_SECTION.COMMENTS:
       return { [BACKUP_SECTION.COMMENTS]: getLocalComments() };
     case BACKUP_SECTION.NOTIFICATIONS:
@@ -214,6 +217,14 @@ export const applyBackup = (data: BackupDataInterface, service: ApiInterface): B
     applied.push(BACKUP_SECTION.BOOKMARKS);
   }
 
+  if (data[BACKUP_SECTION.WATCH_HISTORY]) {
+    storage.getLocalLibraryStorage().save(
+      LOCAL_HISTORY_KEY,
+      sanitizeWatchHistory(data[BACKUP_SECTION.WATCH_HISTORY])
+    );
+    applied.push(BACKUP_SECTION.WATCH_HISTORY);
+  }
+
   if (data[BACKUP_SECTION.COMMENTS]) {
     storage.getCommentsStorage().save(
       LOCAL_COMMENTS_KEY,
@@ -242,6 +253,8 @@ export const countBackupSection = (section: BACKUP_SECTION): number | undefined 
     // the films, not the entries: one bookmarked in two categories is still one film
     case BACKUP_SECTION.BOOKMARKS:
       return Object.keys(getLocalBookmarks().films).length;
+    case BACKUP_SECTION.WATCH_HISTORY:
+      return getLocalHistory().length;
     case BACKUP_SECTION.COMMENTS:
       return getLocalComments().length;
     case BACKUP_SECTION.NOTIFICATIONS:

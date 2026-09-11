@@ -438,6 +438,7 @@ const en = {
   'Player settings': 'Player settings',
   'Other settings': 'Other settings',
   'Local bookmarks': 'Local bookmarks',
+  'Watch history': 'Watch history',
   'My comments': 'My comments',
   'The account is never part of a backup.': 'The account is never part of a backup.',
   'Saved to {{fileName}}': 'Saved to {{fileName}}',

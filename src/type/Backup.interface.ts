@@ -2,7 +2,7 @@ import type { ApiInterfaceConfig } from 'Api/type';
 import type { DeviceConfigType } from 'src/config';
 
 import { LocalCommentInterface } from './LocalComment.interface';
-import { LocalBookmarksBlob } from './LocalLibrary.interface';
+import { LocalBookmarksBlob, LocalHistoryItemInterface } from './LocalLibrary.interface';
 import { NotificationItemInterface } from './Notification.interface';
 
 /**
@@ -18,6 +18,7 @@ export enum BACKUP_SECTION {
   SETTINGS_PLAYER = 'settingsPlayer',
   SETTINGS_OTHER = 'settingsOther',
   BOOKMARKS = 'bookmarks',
+  WATCH_HISTORY = 'watchHistory',
   COMMENTS = 'comments',
   NOTIFICATIONS = 'notifications',
 }
@@ -48,6 +49,7 @@ export interface BackupDataInterface {
   [BACKUP_SECTION.SETTINGS_PLAYER]?: BackupSettingsInterface;
   [BACKUP_SECTION.SETTINGS_OTHER]?: BackupSettingsInterface;
   [BACKUP_SECTION.BOOKMARKS]?: LocalBookmarksBlob;
+  [BACKUP_SECTION.WATCH_HISTORY]?: LocalHistoryItemInterface[];
   [BACKUP_SECTION.COMMENTS]?: LocalCommentInterface[];
   [BACKUP_SECTION.NOTIFICATIONS]?: NotificationItemInterface[];
 }

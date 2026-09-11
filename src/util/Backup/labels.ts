@@ -19,6 +19,8 @@ export const getBackupSectionTitle = (section: BACKUP_SECTION): string => {
       return t('Other settings');
     case BACKUP_SECTION.BOOKMARKS:
       return t('Local bookmarks');
+    case BACKUP_SECTION.WATCH_HISTORY:
+      return t('Watch history');
     case BACKUP_SECTION.COMMENTS:
       return t('My comments');
     case BACKUP_SECTION.NOTIFICATIONS:

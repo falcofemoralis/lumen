@@ -7,7 +7,11 @@ import {
 } from 'Type/Backup.interface';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { LocalCommentInterface } from 'Type/LocalComment.interface';
-import { LocalBookmarksBlob, LocalCategoryInterface } from 'Type/LocalLibrary.interface';
+import {
+  LocalBookmarksBlob,
+  LocalCategoryInterface,
+  LocalHistoryItemInterface,
+} from 'Type/LocalLibrary.interface';
 import { NotificationItemInterface } from 'Type/Notification.interface';
 import { safeJsonParse } from 'Util/Json';
 
@@ -35,6 +39,7 @@ export type SettingsSection = typeof SETTINGS_SECTIONS[number];
 export const BACKUP_SECTIONS = [
   ...SETTINGS_SECTIONS,
   BACKUP_SECTION.BOOKMARKS,
+  BACKUP_SECTION.WATCH_HISTORY,
   BACKUP_SECTION.COMMENTS,
   BACKUP_SECTION.NOTIFICATIONS,
 ];
@@ -235,6 +240,21 @@ export const sanitizeBookmarks = (raw: unknown): LocalBookmarksBlob | null => {
 
   return { categories, films };
 };
+
+const isHistoryItem = (value: unknown): value is LocalHistoryItemInterface => (
+  isRecord(value)
+  && typeof value.id === 'string'
+  && typeof value.link === 'string'
+  && typeof value.poster === 'string'
+  && typeof value.title === 'string'
+  && typeof value.updatedAt === 'number'
+  && typeof value.isWatched === 'boolean'
+);
+
+/** The watch history ("watch later" / continue-watching) list with malformed entries dropped. */
+export const sanitizeWatchHistory = (raw: unknown): LocalHistoryItemInterface[] => (
+  Array.isArray(raw) ? raw.filter(isHistoryItem) : []
+);
 
 const isComment = (value: unknown): value is LocalCommentInterface => (
   isRecord(value)
