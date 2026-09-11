@@ -7,9 +7,17 @@ class StorageWrapper {
     this.mmkvStorage = store;
   }
 
-  getMMKVInstance(): MMKV {
-    return this.mmkvStorage;
-  }
+	getMMKVInstance(): MMKV {
+		return this.mmkvStorage;
+	}
+
+	getKeys(): string[] {
+		try {
+			return this.mmkvStorage.getAllKeys();
+		} catch {
+			return [];
+		}
+	}
 
   /**
    * Loads a string from storage.

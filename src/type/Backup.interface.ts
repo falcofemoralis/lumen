@@ -1,8 +1,12 @@
-import type { ApiInterfaceConfig } from 'Api/type';
+﻿import type { ApiInterfaceConfig } from 'Api/type';
 import type { DeviceConfigType } from 'src/config';
 
+import { SavedTime } from 'Component/Player/Player.type';
 import { LocalCommentInterface } from './LocalComment.interface';
-import { LocalBookmarksBlob, LocalHistoryItemInterface } from './LocalLibrary.interface';
+import {
+  LocalBookmarksBlob,
+  LocalHistoryItemInterface,
+} from './LocalLibrary.interface';
 import { NotificationItemInterface } from './Notification.interface';
 
 /**
@@ -21,6 +25,7 @@ export enum BACKUP_SECTION {
   WATCH_HISTORY = 'watchHistory',
   COMMENTS = 'comments',
   NOTIFICATIONS = 'notifications',
+  PLAYER_TIME = 'playerTime',
 }
 
 /**
@@ -52,6 +57,7 @@ export interface BackupDataInterface {
   [BACKUP_SECTION.WATCH_HISTORY]?: LocalHistoryItemInterface[];
   [BACKUP_SECTION.COMMENTS]?: LocalCommentInterface[];
   [BACKUP_SECTION.NOTIFICATIONS]?: NotificationItemInterface[];
+  [BACKUP_SECTION.PLAYER_TIME]?: SavedTime[];
 }
 
 export interface BackupFileInterface {

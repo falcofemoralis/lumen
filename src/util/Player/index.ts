@@ -109,6 +109,22 @@ export const getSavedTime = (film: FilmInterface): SavedTime | null => {
   return savedTime;
 };
 
+export const getAllSavedTimes = (): SavedTime[] => {
+  const playerStorage = storage.getPlayerStorage();
+
+  return playerStorage
+    .getKeys()
+    .filter((key) => key.startsWith(`${PLAYER_SAVED_TIME_STORAGE_KEY}-`))
+    .map((key) => playerStorage.load<SavedTime | null>(key))
+    .filter((savedTime): savedTime is SavedTime => Boolean(savedTime));
+};
+
+export const setSavedTimeById = (savedTime: SavedTime): void => {
+  const key = `${PLAYER_SAVED_TIME_STORAGE_KEY}-${savedTime.filmId}`;
+
+  storage.getPlayerStorage().save(key, savedTime);
+};
+
 export const getVideoTime = (voice: FilmVoiceInterface, savedTime: SavedTime | null) => {
   if (!savedTime) {
     return 0;
