@@ -125,6 +125,22 @@ export const setSavedTimeById = (savedTime: SavedTime): void => {
   storage.getPlayerStorage().save(key, savedTime);
 };
 
+export const replaceAllSavedTimes = (savedTimes: SavedTime[]): void => {
+  const playerStorage = storage.getPlayerStorage();
+
+  playerStorage
+    .getKeys()
+    .filter((key) => key.startsWith(`${PLAYER_SAVED_TIME_STORAGE_KEY}-`))
+    .forEach((key) => playerStorage.remove(key));
+
+  savedTimes.forEach((savedTime) => {
+    playerStorage.save(
+      `${PLAYER_SAVED_TIME_STORAGE_KEY}-${savedTime.filmId}`,
+      savedTime
+    );
+  });
+};
+
 export const getVideoTime = (voice: FilmVoiceInterface, savedTime: SavedTime | null) => {
   if (!savedTime) {
     return 0;

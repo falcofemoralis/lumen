@@ -440,6 +440,7 @@ const ru: Translations = {
   'Other settings': 'Прочие настройки',
   'Local bookmarks': 'Локальные закладки',
   'Watch history': 'История просмотра',
+  'Playback progress': 'Прогресс воспроизведения',
   'My comments': 'Мои комментарии',
   'The account is never part of a backup.': 'Данные аккаунта в копию не попадают.',
   'Saved to {{fileName}}': 'Сохранено в {{fileName}}',

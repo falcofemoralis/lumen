@@ -18,7 +18,7 @@ import { getLocalBookmarks, getLocalHistory, LOCAL_BOOKMARKS_KEY, LOCAL_HISTORY_
 import {
   getAllSavedTimes,
   getPlayerQuality,
-  setSavedTimeById,
+  replaceAllSavedTimes,
   updatePlayerQuality,
 } from 'Util/Player';
 import { storage } from 'Util/Storage';
@@ -312,7 +312,7 @@ export const applyBackup = (
         (savedTime): savedTime is SavedTime => savedTime !== null
       );
 
-    savedTimes.forEach(setSavedTimeById);
+    replaceAllSavedTimes(savedTimes);
 
     applied.push(BACKUP_SECTION.PLAYER_TIME);
   }

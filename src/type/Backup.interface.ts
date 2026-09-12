@@ -1,4 +1,4 @@
-﻿import type { ApiInterfaceConfig } from 'Api/type';
+import type { ApiInterfaceConfig } from 'Api/type';
 import type { DeviceConfigType } from 'src/config';
 
 import { SavedTime } from 'Component/Player/Player.type';
