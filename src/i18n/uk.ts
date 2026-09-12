@@ -439,6 +439,8 @@ const uk: Translations = {
   'Player settings': 'Налаштування плеєра',
   'Other settings': 'Інші налаштування',
   'Local bookmarks': 'Локальні закладки',
+  'Watch history': 'Історія перегляду',
+  'Playback progress': 'Прогрес відтворення',
   'My comments': 'Мої коментарі',
   'The account is never part of a backup.': 'Дані акаунта до копії не потрапляють.',
   'Saved to {{fileName}}': 'Збережено у {{fileName}}',

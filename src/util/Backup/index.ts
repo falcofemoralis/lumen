@@ -12,9 +12,15 @@ import {
   BackupSettingsInterface,
 } from 'Type/Backup.interface';
 import { NotificationItemInterface } from 'Type/Notification.interface';
+import { SavedTime } from 'Component/Player/Player.type';
 import { getLocalComments, LOCAL_COMMENTS_KEY } from 'Util/LocalComments';
-import { getLocalBookmarks, LOCAL_BOOKMARKS_KEY } from 'Util/LocalLibrary';
-import { getPlayerQuality, updatePlayerQuality } from 'Util/Player';
+import { getLocalBookmarks, getLocalHistory, LOCAL_BOOKMARKS_KEY, LOCAL_HISTORY_KEY } from 'Util/LocalLibrary';
+import {
+  getAllSavedTimes,
+  getPlayerQuality,
+  replaceAllSavedTimes,
+  updatePlayerQuality,
+} from 'Util/Player';
 import { storage } from 'Util/Storage';
 
 import {
@@ -31,13 +37,16 @@ import {
   sanitizeComments,
   sanitizeConfig,
   sanitizeNotifications,
+  sanitizeSavedTime,
   sanitizeServiceConfig,
+  sanitizeWatchHistory,
   SERVICE_CONFIG_KEYS,
   SETTINGS_SECTIONS,
   SettingsSection,
 } from './logic';
 
 export { formatBackupSections, getBackupSectionTitle } from './labels';
+
 export {
   BACKUP_SECTIONS,
   buildBackupFileName,
@@ -62,10 +71,16 @@ const PICKER_CANCELLED_CODE = 'ERR_PICKER_CANCELLED';
 
 // json files handed around between devices are not always reported as such by the
 // provider that serves them, so the picker is opened for what they are mistaken for too
-const BACKUP_PICKER_MIME_TYPES = [BACKUP_MIME_TYPE, 'text/plain', 'application/octet-stream'];
+const BACKUP_PICKER_MIME_TYPES = [
+  BACKUP_MIME_TYPE,
+  'text/plain',
+  'application/octet-stream',
+];
 
 const isPickerCancelled = (error: unknown): boolean => (
-  !!error && typeof error === 'object' && (error as { code?: string }).code === PICKER_CANCELLED_CODE
+  !!error
+  && typeof error === 'object'
+  && (error as { code?: string }).code === PICKER_CANCELLED_CODE
 );
 
 /**
@@ -90,15 +105,22 @@ const collectSettings = (
   service: ApiInterface
 ): BackupSettingsInterface => {
   const settings: BackupSettingsInterface = {
-    config: sanitizeConfig(getStoredConfig(), defaultConfig, getSectionConfigKeys(section)),
+    config: sanitizeConfig(
+      getStoredConfig(),
+      defaultConfig,
+      getSectionConfigKeys(section)
+    ),
   };
 
   if (section === BACKUP_SECTION.SETTINGS_NETWORK) {
-    const serviceConfig = SERVICE_CONFIG_KEYS.reduce((acc: Record<string, unknown>, key) => {
-      acc[key] = service.getConfig(key);
+    const serviceConfig = SERVICE_CONFIG_KEYS.reduce(
+      (acc: Record<string, unknown>, key) => {
+        acc[key] = service.getConfig(key);
 
-      return acc;
-    }, {});
+        return acc;
+      },
+      {}
+    );
 
     settings.service = sanitizeServiceConfig(serviceConfig);
   }
@@ -114,18 +136,42 @@ const collectSettings = (
   return settings;
 };
 
-const collectSection = (section: BACKUP_SECTION, service: ApiInterface): BackupDataInterface => {
+const collectSection = (
+  section: BACKUP_SECTION,
+  service: ApiInterface
+): BackupDataInterface => {
   if (isSettingsSection(section)) {
-    return { [section]: collectSettings(section, service) };
+    return {
+      [section]: collectSettings(section, service),
+    };
   }
 
   switch (section) {
     case BACKUP_SECTION.BOOKMARKS:
-      return { [BACKUP_SECTION.BOOKMARKS]: getLocalBookmarks() };
+      return {
+        [BACKUP_SECTION.BOOKMARKS]: getLocalBookmarks(),
+      };
+
+    case BACKUP_SECTION.WATCH_HISTORY:
+      return {
+        [BACKUP_SECTION.WATCH_HISTORY]: getLocalHistory(),
+      };
+
+    case BACKUP_SECTION.PLAYER_TIME:
+      return {
+        [BACKUP_SECTION.PLAYER_TIME]: getAllSavedTimes(),
+      };
+
     case BACKUP_SECTION.COMMENTS:
-      return { [BACKUP_SECTION.COMMENTS]: getLocalComments() };
+      return {
+        [BACKUP_SECTION.COMMENTS]: getLocalComments(),
+      };
+
     case BACKUP_SECTION.NOTIFICATIONS:
-      return { [BACKUP_SECTION.NOTIFICATIONS]: getStoredNotifications() };
+      return {
+        [BACKUP_SECTION.NOTIFICATIONS]: getStoredNotifications(),
+      };
+
     default:
       return {};
   }
@@ -139,10 +185,13 @@ export const collectBackup = (
   version: BACKUP_FORMAT_VERSION,
   appVersion: Application.nativeApplicationVersion ?? undefined,
   createdAt: Date.now(),
-  data: sections.reduce((acc: BackupDataInterface, section) => ({
-    ...acc,
-    ...collectSection(section, service),
-  }), {}),
+  data: sections.reduce(
+    (acc: BackupDataInterface, section) => ({
+      ...acc,
+      ...collectSection(section, service),
+    }),
+    {}
+  ),
 });
 
 /**
@@ -161,29 +210,49 @@ const applySettings = (
 ) => {
   // each group is sanitized against its own keys, so what is stored under one of them
   // can only ever land in the settings that group is made of
-  const config = sections.reduce((acc: Record<string, unknown>, section) => ({
-    ...acc,
-    ...sanitizeConfig(data[section]?.config, defaultConfig, getSectionConfigKeys(section)),
-  }), {});
+  const config = sections.reduce(
+    (acc: Record<string, unknown>, section) => ({
+      ...acc,
+      ...sanitizeConfig(
+        data[section]?.config,
+        defaultConfig,
+        getSectionConfigKeys(section)
+      ),
+    }),
+    {}
+  );
 
   storage.getConfigStorage().save(
     DEVICE_CONFIG,
-    mergeConfig(getStoredConfig(), config, defaultConfig, getSectionsConfigKeys(sections))
+    mergeConfig(
+      getStoredConfig(),
+      config,
+      defaultConfig,
+      getSectionsConfigKeys(sections)
+    )
   );
 
-  const { service: serviceConfig } = data[BACKUP_SECTION.SETTINGS_NETWORK] ?? {};
+  const { service: serviceConfig } =
+    data[BACKUP_SECTION.SETTINGS_NETWORK] ?? {};
 
-  Object.entries(sanitizeServiceConfig(serviceConfig)).forEach(([key, value]) => {
-    service.setConfig(key as keyof ApiInterfaceConfig, value);
-  });
+  Object.entries(sanitizeServiceConfig(serviceConfig)).forEach(
+    ([key, value]) => {
+      service.setConfig(key as keyof ApiInterfaceConfig, value);
+    }
+  );
 
-  const { language } = data[BACKUP_SECTION.SETTINGS_APPEARANCE] ?? {};
+  const { language } =
+    data[BACKUP_SECTION.SETTINGS_APPEARANCE] ?? {};
 
   if (language && isSupportedLanguage(language)) {
-    storage.getConfigStorage().saveString(LANGUAGE_STORAGE_KEY, language);
+    storage.getConfigStorage().saveString(
+      LANGUAGE_STORAGE_KEY,
+      language
+    );
   }
 
-  const { playerQuality } = data[BACKUP_SECTION.SETTINGS_PLAYER] ?? {};
+  const { playerQuality } =
+    data[BACKUP_SECTION.SETTINGS_PLAYER] ?? {};
 
   if (playerQuality) {
     updatePlayerQuality(playerQuality);
@@ -197,36 +266,76 @@ const applySettings = (
  *
  * @returns the sections that were actually applied.
  */
-export const applyBackup = (data: BackupDataInterface, service: ApiInterface): BACKUP_SECTION[] => {
+export const applyBackup = (
+  data: BackupDataInterface,
+  service: ApiInterface
+): BACKUP_SECTION[] => {
   const applied: BACKUP_SECTION[] = [];
 
-  const settingsSections = SETTINGS_SECTIONS.filter((section) => !!data[section]);
+  const settingsSections = SETTINGS_SECTIONS.filter(
+    (section) => !!data[section]
+  );
 
   if (settingsSections.length) {
     applySettings(data, settingsSections, service);
     applied.push(...settingsSections);
   }
 
-  const bookmarks = sanitizeBookmarks(data[BACKUP_SECTION.BOOKMARKS]);
+  const bookmarks = sanitizeBookmarks(
+    data[BACKUP_SECTION.BOOKMARKS]
+  );
 
   if (bookmarks) {
-    storage.getLocalLibraryStorage().save(LOCAL_BOOKMARKS_KEY, bookmarks);
+    storage.getLocalLibraryStorage().save(
+      LOCAL_BOOKMARKS_KEY,
+      bookmarks
+    );
+
     applied.push(BACKUP_SECTION.BOOKMARKS);
+  }
+
+  if (data[BACKUP_SECTION.WATCH_HISTORY]) {
+    storage.getLocalLibraryStorage().save(
+      LOCAL_HISTORY_KEY,
+      sanitizeWatchHistory(
+        data[BACKUP_SECTION.WATCH_HISTORY]
+      )
+    );
+
+    applied.push(BACKUP_SECTION.WATCH_HISTORY);
+  }
+
+  if (data[BACKUP_SECTION.PLAYER_TIME]) {
+    const savedTimes = data[BACKUP_SECTION.PLAYER_TIME]
+      .map(sanitizeSavedTime)
+      .filter(
+        (savedTime): savedTime is SavedTime => savedTime !== null
+      );
+
+    replaceAllSavedTimes(savedTimes);
+
+    applied.push(BACKUP_SECTION.PLAYER_TIME);
   }
 
   if (data[BACKUP_SECTION.COMMENTS]) {
     storage.getCommentsStorage().save(
       LOCAL_COMMENTS_KEY,
-      sanitizeComments(data[BACKUP_SECTION.COMMENTS])
+      sanitizeComments(
+        data[BACKUP_SECTION.COMMENTS]
+      )
     );
+
     applied.push(BACKUP_SECTION.COMMENTS);
   }
 
   if (data[BACKUP_SECTION.NOTIFICATIONS]) {
     storage.getMiscStorage().save(
       NOTIFICATIONS_STORAGE,
-      sanitizeNotifications(data[BACKUP_SECTION.NOTIFICATIONS])
+      sanitizeNotifications(
+        data[BACKUP_SECTION.NOTIFICATIONS]
+      )
     );
+
     applied.push(BACKUP_SECTION.NOTIFICATIONS);
   }
 
@@ -237,15 +346,26 @@ export const applyBackup = (data: BackupDataInterface, service: ApiInterface): B
  * How many entries a section holds, for the counts shown next to it while exporting,
  * or `undefined` for the settings groups -- there is nothing there to count.
  */
-export const countBackupSection = (section: BACKUP_SECTION): number | undefined => {
+export const countBackupSection = (
+  section: BACKUP_SECTION
+): number | undefined => {
   switch (section) {
     // the films, not the entries: one bookmarked in two categories is still one film
     case BACKUP_SECTION.BOOKMARKS:
       return Object.keys(getLocalBookmarks().films).length;
+
+    case BACKUP_SECTION.WATCH_HISTORY:
+      return getLocalHistory().length;
+
+    case BACKUP_SECTION.PLAYER_TIME:
+      return getAllSavedTimes().length;
+
     case BACKUP_SECTION.COMMENTS:
       return getLocalComments().length;
+
     case BACKUP_SECTION.NOTIFICATIONS:
       return getStoredNotifications().length;
+
     default:
       return undefined;
   }
@@ -257,11 +377,18 @@ export const countBackupSection = (section: BACKUP_SECTION): number | undefined 
  * decoded tail is used when it still looks like the file that was asked for (android
  * numbers a name that is already taken), and the requested name otherwise.
  */
-const resolveSavedName = (uri: string, requestedName: string): string => {
+const resolveSavedName = (
+  uri: string,
+  requestedName: string
+): string => {
   try {
-    const tail = decodeURIComponent(uri).split(/[/:]/).pop() ?? '';
+    const tail = decodeURIComponent(uri)
+      .split(/[/:]/)
+      .pop() ?? '';
 
-    return tail.toLowerCase().endsWith('.json') ? tail : requestedName;
+    return tail.toLowerCase().endsWith('.json')
+      ? tail
+      : requestedName;
   } catch {
     return requestedName;
   }
@@ -289,28 +416,44 @@ export const exportBackup = async (
   }
 
   const requestedName = buildBackupFileName(new Date());
-  const file = directory.createFile(requestedName, BACKUP_MIME_TYPE);
+  const file = directory.createFile(
+    requestedName,
+    BACKUP_MIME_TYPE
+  );
 
   file.write(JSON.stringify(backup, null, 2));
 
-  return { status: 'ok', fileName: resolveSavedName(file.uri, requestedName) };
+  return {
+    status: 'ok',
+    fileName: resolveSavedName(
+      file.uri,
+      requestedName
+    ),
+  };
 };
 
 /**
  * Asks for a file with the system picker and reads a backup out of it.
  */
 export const readBackup = async (): Promise<BackupReadResult> => {
-  const picked = await File.pickFileAsync({ mimeTypes: BACKUP_PICKER_MIME_TYPES });
+  const picked = await File.pickFileAsync({
+    mimeTypes: BACKUP_PICKER_MIME_TYPES,
+  });
 
   if (picked.canceled) {
     return { status: 'cancelled' };
   }
 
-  const backup = parseBackupFile(await picked.result.text());
+  const backup = parseBackupFile(
+    await picked.result.text()
+  );
 
   if (!backup) {
     return { status: 'invalid' };
   }
 
-  return { status: 'ok', backup };
+  return {
+    status: 'ok',
+    backup,
+  };
 };
