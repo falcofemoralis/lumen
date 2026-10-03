@@ -35,6 +35,9 @@ export function SettingsScreenContainer() {
     updateUserAgent,
     reLogin,
     validateUrl,
+    secondaryAccount,
+    loginSecondary,
+    logoutSecondary,
   } = useServiceContext();
   const { theme, themeScheme, setThemeContextOverride } = useAppTheme();
   const [appLanguage, setAppLanguage] = useState(getCurrentLanguage());
@@ -242,6 +245,20 @@ export function SettingsScreenContainer() {
     updateUserAgent(value);
   }, [updateUserAgent]);
 
+  const onSecondaryLogin = useCallback(async (name: string, password: string) => {
+    try {
+      await loginSecondary(name, password);
+
+      NotificationStore.displayMessage(t('Successfully logged in!'));
+    } catch (error) {
+      NotificationStore.displayError(error as Error);
+
+      return false;
+    }
+
+    return true;
+  }, [loginSecondary]);
+
   const onPlayerQualityChange = useCallback((value: string) => {
     setPlayerQuality(value);
     updatePlayerQuality(value);
@@ -276,6 +293,7 @@ export function SettingsScreenContainer() {
     automaticCDN,
     cdn,
     userAgent,
+    secondaryAccount,
     providerOptions,
     cdnOptions,
     homeMenuOptions,
@@ -297,6 +315,8 @@ export function SettingsScreenContainer() {
     onAutomaticCDNChange,
     onCDNChange,
     onUserAgentChange,
+    onSecondaryLogin,
+    onSecondaryLogout: logoutSecondary,
     onPlayerQualityChange,
   };
 

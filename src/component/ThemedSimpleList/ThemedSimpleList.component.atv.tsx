@@ -94,9 +94,11 @@ export const ThemedListComponent = ({
   const itemKeysRef = useRef(new Map<number, string>());
   const selectedIndexRef = useRef(selectedIndex);
   const [selectedFocusKey, setSelectedFocusKey] = useState<string>();
+  const [hasRows, setHasRows] = useState(false);
 
   const registerItem = useCallback<RegisterItem>((index, itemFocusKey) => {
     itemKeysRef.current.set(index, itemFocusKey);
+    setHasRows(true);
 
     if (index === selectedIndexRef.current) {
       setSelectedFocusKey(itemFocusKey);
@@ -136,11 +138,22 @@ export const ThemedListComponent = ({
   // already there, which is why it only ever misses the first time.) Take the
   // claim once the selected row has registered, but only while it is still
   // parked here: a row that already holds focus must keep it.
+  //
+  // The same goes for data that arrives after the list is shown (an overlay
+  // filling it in on open): the claim landed here while there were no rows at
+  // all. A list with nothing selected re-claims itself instead, which Norigin
+  // now resolves to the first row.
   useEffect(() => {
-    if (selectedFocusKey && getCurrentFocusKey() === focusKey) {
-      setFocus(selectedFocusKey);
+    if (!hasRows || getCurrentFocusKey() !== focusKey) {
+      return;
     }
-  }, [selectedFocusKey, focusKey]);
+
+    if (selectedFocusKey) {
+      setFocus(selectedFocusKey);
+    } else if (selectedIndex === -1) {
+      setFocus(focusKey);
+    }
+  }, [hasRows, selectedFocusKey, selectedIndex, focusKey]);
 
   const scrollTo: FocusHandler<ListItemExtraProps> = useCallback((_layout, props) => {
     if (props?.index === undefined) {

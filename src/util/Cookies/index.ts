@@ -32,16 +32,21 @@ export function isCookieExpired(cookie: setCookieParser.Cookie): boolean {
   return false;
 }
 
+type CookiesStorage = ReturnType<typeof storage.getCookiesStorage>;
+
 export class CookiesManager {
   private cookieMap = new Map<string, Record<string, setCookieParser.Cookie>>();
 
-  constructor() {
+  private getStorage: () => CookiesStorage;
+
+  constructor(getStorage: () => CookiesStorage = () => storage.getCookiesStorage()) {
     this.cookieMap = new Map();
+    this.getStorage = getStorage;
   }
 
   public get(hostname: string) {
     if (!this.cookieMap.has(hostname)) {
-      const dbCookies = storage.getCookiesStorage().load(hostname) || {};
+      const dbCookies = this.getStorage().load<Record<string, setCookieParser.Cookie>>(hostname) || {};
       this.cookieMap.set(hostname, dbCookies);
     }
 
@@ -50,19 +55,26 @@ export class CookiesManager {
 
   public set(hostname: string, cookies: Record<string, setCookieParser.Cookie>) {
     this.cookieMap.set(hostname, cookies);
-    storage.getCookiesStorage().save(hostname, cookies);
+    this.getStorage().save(hostname, cookies);
   }
 
   public reset() {
-    storage.getCookiesStorage().clear();
+    this.getStorage().clear();
     this.cookieMap.clear();
   }
 }
 
 export const cookiesManager = new CookiesManager();
 
-export const setCookies = (hostname: string, res: Response) => {
-  const existingCookies = cookiesManager.get(hostname) || {};
+/**
+ * The session of the second account -- the one only some requests are made as (see
+ * `RezkaApi.getSecondaryCookieJar`). Kept in a storage of its own, so signing either
+ * account in or out never touches the other one's cookies.
+ */
+export const secondaryCookiesManager = new CookiesManager(() => storage.getSecondaryCookiesStorage());
+
+export const setCookies = (hostname: string, res: Response, jar: CookiesManager = cookiesManager) => {
+  const existingCookies = jar.get(hostname) || {};
 
   const newCookies = parseCookies(res.headers.get('Set-Cookie') || '');
 
@@ -81,7 +93,7 @@ export const setCookies = (hostname: string, res: Response) => {
       {} as Record<string, setCookieParser.Cookie>
     );
 
-  cookiesManager.set(hostname, validNewCookies);
+  jar.set(hostname, validNewCookies);
 };
 
 /**

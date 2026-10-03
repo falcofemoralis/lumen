@@ -1,4 +1,5 @@
 import { ActorCardInterface } from 'Type/ActorCard.interface';
+import { BookmarkInterface } from 'Type/Bookmark.interface';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { FilmListInterface } from 'Type/FilmList.interface';
 import { FilmStreamInterface } from 'Type/FilmStream.interface';
@@ -277,6 +278,20 @@ export const parseSubtitles = (
 
   return subtitles;
 };
+
+/**
+ * The bookmark categories of a film page, each marked with whether the film is in it --
+ * for the account the page was requested as.
+ */
+export const parseFilmBookmarks = (root: HTMLElementInterface): BookmarkInterface[] => (
+  root.querySelectorAll('.hd-label-row').map(
+    (el) => ({
+      id: el.querySelector('input')?.attributes.value ?? '',
+      title: el.querySelector('label')?.rawText ?? '',
+      isBookmarked: el.querySelector('input')?.attributes.checked === 'checked',
+    })
+  )
+);
 
 export const parseActorCard = (
   node: HTMLElementInterface,

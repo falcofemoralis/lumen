@@ -1,6 +1,40 @@
 import { isAnubisChallenge, solveAnubis } from 'Util/Anubis';
 import { isCloudflareChallenge, solveCloudflare, withClearanceUserAgent } from 'Util/Cloudflare';
-import { buildCookies, setCookies } from 'Util/Cookies';
+import { isCloudflareCookie } from 'Util/Cloudflare/challenge';
+import {
+  buildCookies,
+  buildCookieString,
+  CookiesManager,
+  cookiesManager,
+  setCookies,
+} from 'Util/Cookies';
+
+export type CustomFetchInit = RequestInit & {
+  /** Whose session the request is made with. The main account's when left out. */
+  cookieJar?: CookiesManager;
+};
+
+const isBotCheckCookie = (name: string) => isCloudflareCookie(name) || name.includes('anubis');
+
+/**
+ * The `Cookie` header for a request made with the given jar.
+ *
+ * A bot check is passed once per device, and its clearance always lands in the main jar
+ * (both solvers write there). Another jar only holds an account's session, so it borrows
+ * the clearances from the main one -- they win over any it picked up itself, which keeps
+ * a clearance the solver just replaced from being shadowed by a stale copy.
+ */
+function buildRequestCookies(hostname: string, jar: CookiesManager): string {
+  if (jar === cookiesManager) {
+    return buildCookies(hostname);
+  }
+
+  const clearances = Object.fromEntries(
+    Object.entries(cookiesManager.get(hostname) || {}).filter(([name]) => isBotCheckCookie(name))
+  );
+
+  return buildCookieString({ ...(jar.get(hostname) || {}), ...clearances });
+}
 
 // Rebuild a Response from an already-read body so callers can still read it.
 function rebuildResponse(res: Response, bodyText: string): Response {
@@ -17,23 +51,24 @@ function rebuildResponse(res: Response, bodyText: string): Response {
 // A wrapper around fetch since RN messes up handling of cookies
 export async function customFetch(
   input: RequestInfo | URL,
-  init?: RequestInit | undefined,
+  init?: CustomFetchInit | undefined,
   retried = false
 ): Promise<Response> {
   const url = input instanceof Request ? input.url : input.toString();
   const { hostname } = new URL(url);
+  const { cookieJar = cookiesManager, ...requestInit } = init || {};
 
   const res = await fetch(input, {
-    ...init,
+    ...requestInit,
     headers: {
       ...(init?.headers || {}),
-      Cookie: buildCookies(hostname),
+      Cookie: buildRequestCookies(hostname, cookieJar),
     },
     credentials: 'omit', // Omit cookies and handle ourselves
     keepalive: true,
   });
 
-  setCookies(hostname, res);
+  setCookies(hostname, res, cookieJar);
 
   const bodyText = await res.text();
 

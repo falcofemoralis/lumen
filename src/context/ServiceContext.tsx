@@ -25,9 +25,12 @@ import { storage } from 'Util/Storage';
 import { getGlobalConfig } from './ConfigContext';
 
 export const CREDENTIALS_STORAGE = 'CREDENTIALS_STORAGE';
+export const SECONDARY_CREDENTIALS_STORAGE = 'SECONDARY_CREDENTIALS_STORAGE';
 export const NOTIFICATIONS_STORAGE = 'NOTIFICATIONS_STORAGE';
 export const USER_DATA_STORAGE_CACHE = 'USER_DATA_STORAGE_CACHE';
 export const USER_DATA_STORAGE_CACHE_TTL = 1000 * 60 * 60; // 1 hour
+
+type Credentials = { name: string; password: string };
 
 export interface ServiceContextInterface {
   isSignedIn: boolean;
@@ -38,6 +41,10 @@ export interface ServiceContextInterface {
   removeProfile: () => void;
   login: (name: string, password: string) => Promise<void>;
   logout: (forceLogout?: boolean) => void;
+  /** The login of the second account, null while it is not signed in */
+  secondaryAccount: string | null;
+  loginSecondary: (name: string, password: string) => Promise<void>;
+  logoutSecondary: () => void;
   updateProvider: (value: string) => Promise<void>;
   updateCDN: (value: string) => Promise<void>;
   updateUserAgent: (value: string) => void;
@@ -62,6 +69,9 @@ const ServiceContext = createContext<ServiceContextInterface>({
   removeProfile: () => {},
   login: async () => {},
   logout: () => {},
+  secondaryAccount: null,
+  loginSecondary: async () => {},
+  logoutSecondary: () => {},
   updateProvider: async () => {},
   updateCDN: async () => {},
   updateUserAgent: () => {},
@@ -84,6 +94,11 @@ export const ServiceProvider = ({ children }: { children: ReactNode }) => {
   const [currentService, setSelectedService] = useState<ApiInterface>(services[selectedServiceId]);
   const [isSignedIn, setIsSignedIn] = useState<boolean>(currentService.isSignedIn());
   const [badgeData, setBadgeData] = useState<BadgeData>({});
+  const [secondaryAccount, setSecondaryAccount] = useState<string | null>(() => (
+    currentService.isSecondarySignedIn()
+      ? storage.getMiscStorage().load<Credentials>(SECONDARY_CREDENTIALS_STORAGE)?.name ?? ''
+      : null
+  ));
 
   const profileKey = useMemo(() => queryKeys.profile(selectedServiceId), [selectedServiceId]);
 
@@ -100,6 +115,9 @@ export const ServiceProvider = ({ children }: { children: ReactNode }) => {
     setSelectedServiceId(service);
     setSelectedService(newService);
     setIsSignedIn(newService.isSignedIn());
+    setSecondaryAccount(newService.isSecondarySignedIn()
+      ? storage.getMiscStorage().load<Credentials>(SECONDARY_CREDENTIALS_STORAGE)?.name ?? ''
+      : null);
   }, []);
 
   /**
@@ -151,15 +169,57 @@ export const ServiceProvider = ({ children }: { children: ReactNode }) => {
   }, [currentService, removeProfile]);
 
   /**
+   * Login to the second account of the current service, the one the streams are requested as
+   * @param {string} name - The username
+   * @param {string} password - The password
+   */
+  const loginSecondary = useCallback(async (name: string, password: string) => {
+    await currentService.loginSecondary(name, password);
+
+    // kept for relogin, the same as the main account's
+    storage.getMiscStorage().save(SECONDARY_CREDENTIALS_STORAGE, { name, password });
+
+    setSecondaryAccount(name);
+  }, [currentService]);
+
+  /**
+   * Logout from the second account, the streams are requested as the main one again
+   */
+  const logoutSecondary = useCallback(() => {
+    currentService.logoutSecondary();
+
+    storage.getMiscStorage().remove(SECONDARY_CREDENTIALS_STORAGE);
+
+    setSecondaryAccount(null);
+  }, [currentService]);
+
+  /**
    * Re-login to the current service using the stored credentials. This is useful when the provider is changed, so we can re-login to get the new profile and other data.
    */
   const reLogin = useCallback(async () => {
-    const data = storage.getMiscStorage().load<{ name: string; password: string }>(CREDENTIALS_STORAGE);
+    const data = storage.getMiscStorage().load<Credentials>(CREDENTIALS_STORAGE);
+    const secondaryData = storage.getMiscStorage().load<Credentials>(SECONDARY_CREDENTIALS_STORAGE);
 
     currentService.logout();
 
     if (data && data.name && data.password) {
       await login(data.name, data.password);
+    }
+
+    if (secondaryData && secondaryData.name && secondaryData.password) {
+      currentService.logoutSecondary();
+
+      // the main account decides whether the provider works - a second one that is
+      // refused only leaves the streams to the main account, so it is reported and
+      // its credentials are kept for the next relogin
+      try {
+        await currentService.loginSecondary(secondaryData.name, secondaryData.password);
+
+        setSecondaryAccount(secondaryData.name);
+      } catch (error) {
+        setSecondaryAccount(null);
+        NotificationStore.displayError(error as Error);
+      }
     }
   }, [currentService, login]);
 
@@ -360,6 +420,9 @@ export const ServiceProvider = ({ children }: { children: ReactNode }) => {
     removeProfile,
     login,
     logout,
+    secondaryAccount,
+    loginSecondary,
+    logoutSecondary,
     updateProvider,
     updateCDN,
     updateUserAgent,
@@ -382,6 +445,9 @@ export const ServiceProvider = ({ children }: { children: ReactNode }) => {
     removeProfile,
     login,
     logout,
+    secondaryAccount,
+    loginSecondary,
+    logoutSecondary,
     updateProvider,
     updateCDN,
     updateUserAgent,

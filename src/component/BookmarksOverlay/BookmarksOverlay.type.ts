@@ -17,5 +17,6 @@ export interface BookmarksOverlayComponentProps {
   isLocalLibrary: boolean;
   postBookmark: (id: string, isChecked: boolean) => void;
   createCategory: (title: string) => boolean;
+  onOpen: () => void;
   onClose?: () => void;
 }

@@ -17,7 +17,7 @@ import { RatingInterface } from 'Type/Rating.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { VoiceRatingInterface } from 'Type/VoiceRating.interface';
 import { clearWebCookies, getClearanceUserAgent, isSolvingCloudflare } from 'Util/Cloudflare';
-import { buildCookies, cookiesManager, setCookie } from 'Util/Cookies';
+import { buildCookies, CookiesManager, cookiesManager, secondaryCookiesManager, setCookie } from 'Util/Cookies';
 import { decodeHtml } from 'Util/Html';
 import { safeJsonParse } from 'Util/Json';
 import { HTMLElementInterface, parseHtml } from 'Util/Parser';
@@ -43,6 +43,7 @@ import {
   formatDuration,
   getStaticUrl,
   parseActorCard,
+  parseFilmBookmarks,
   parseFilmCard,
   parseFilmsListRoot,
   parseFilmType,
@@ -65,10 +66,15 @@ type RezkaApiInterface = ApiInterface & {
   loadConfig: () => ApiInterfaceConfig;
 
   // connection
-  getRequest: (query: string, variables?: Variables) => Promise<string>;
-  postRequest: (query: string, variables?: Variables) => Promise<string>;
+  getRequest: (query: string, variables?: Variables, cookieJar?: CookiesManager) => Promise<string>;
+  postRequest: (query: string, variables?: Variables, cookieJar?: CookiesManager) => Promise<string>;
   fetchPage: (query: string, variables?: Variables) => Promise<HTMLElementInterface>;
-  postJson: <T>(query: string, variables?: Variables) => Promise<T | null>;
+  postJson: <T>(query: string, variables?: Variables, cookieJar?: CookiesManager) => Promise<T | null>;
+
+  // account
+  hasSession: (cookieJar: CookiesManager) => boolean;
+  requestLogin: (name: string, password: string, cookieJar?: CookiesManager) => Promise<void>;
+  getSecondaryCookieJar: () => CookiesManager | undefined;
 
   // utils
   parseContent: (content: string) => HTMLElementInterface;
@@ -193,21 +199,25 @@ const RezkaApi: RezkaApiInterface = {
     return headers;
   },
 
-  async getRequest(query, variables = {}) {
+  async getRequest(query, variables = {}, cookieJar) {
     return executeGet(
       query,
       this.getProvider(),
       this.getHeaders(),
-      variables
+      variables,
+      undefined,
+      cookieJar
     );
   },
 
-  async postRequest(query, variables = {} ) {
+  async postRequest(query, variables = {}, cookieJar) {
     return executePostFormData(
       `${query}/?t=${Date.now()}`,
       this.getProvider(),
       this.getHeaders(),
-      variables
+      variables,
+      undefined,
+      cookieJar
     );
   },
 
@@ -217,8 +227,8 @@ const RezkaApi: RezkaApiInterface = {
     return this.parseContent(res);
   },
 
-  async postJson<T>(query: string, variables: Variables = {}) {
-    const result = await this.postRequest(query, variables);
+  async postJson<T>(query: string, variables: Variables = {}, cookieJar?: CookiesManager) {
+    const result = await this.postRequest(query, variables, cookieJar);
 
     const json = safeJsonParse<T>(result);
 
@@ -285,27 +295,31 @@ const RezkaApi: RezkaApiInterface = {
 
   /** Account */
 
-  isSignedIn() {
+  hasSession(cookieJar) {
     const { hostname } = new URL(this.getProvider());
-    const cookies = cookiesManager.get(hostname);
+    const cookies = cookieJar.get(hostname);
 
-    if (!cookies || !cookies['dle_password']) {
-      return false;
-    }
-
-    return !!cookies['dle_password'].value;
+    return !!cookies?.['dle_password']?.value;
   },
 
-  async login(name, password) {
+  isSignedIn() {
+    return this.hasSession(cookiesManager);
+  },
+
+  async requestLogin(name, password, cookieJar) {
     const data = await this.postJson<JSONResult>('/ajax/login/', {
       login_name: name,
       login_password: password,
       login_not_save: '0',
-    });
+    }, cookieJar);
 
     if (!data?.success) {
       throw new Error(this.stripHtmlFromMessage(data?.message));
     }
+  },
+
+  async login(name, password) {
+    await this.requestLogin(name, password);
 
     // the stored profile belongs to the account of the previous session
     storage.getMiscStorage().remove(REZKA_PROFILE);
@@ -317,6 +331,26 @@ const RezkaApi: RezkaApiInterface = {
     // the session being signed out of, and the next solve should start from nothing.
     clearWebCookies();
     storage.getMiscStorage().remove(REZKA_PROFILE);
+  },
+
+  isSecondarySignedIn() {
+    return this.hasSession(secondaryCookiesManager);
+  },
+
+  async loginSecondary(name, password) {
+    await this.requestLogin(name, password, secondaryCookiesManager);
+  },
+
+  logoutSecondary() {
+    secondaryCookiesManager.reset();
+  },
+
+  /**
+   * The jar the requests that may be made as the second account go out with -- none
+   * (so the main account's) while the second one is not signed in on this provider.
+   */
+  getSecondaryCookieJar() {
+    return this.isSecondarySignedIn() ? secondaryCookiesManager : undefined;
   },
 
   /**
@@ -826,10 +860,14 @@ const RezkaApi: RezkaApiInterface = {
   },
 
   async getFilm(link) {
+    // the page carries the player payload, so it is requested as the second account
+    // when there is one -- see `getFilmBookmarks` for what that costs
+    const cookieJar = this.getSecondaryCookieJar();
+
     // the raw response is kept around: the player payload is only reachable by
     // string search (see below), and re-serializing the parsed tree to get it
     // back would rebuild the whole document for nothing
-    const res = await this.getRequest(link, {});
+    const res = await this.getRequest(link, {}, cookieJar);
     const root = this.parseContent(res);
 
     // base data
@@ -973,7 +1011,7 @@ const RezkaApi: RezkaApiInterface = {
           isDirector: el.attributes['data-director'],
           isAds: el.attributes['data-ad'],
           isActive: el.attributes.class.includes('active'),
-          isPremium: el.attributes.class.includes('b-prem_translator'),
+          isPremium: false, //el.attributes.class.includes('b-prem_translator'),
         };
 
         if (voice.isPremium) {
@@ -1128,13 +1166,9 @@ const RezkaApi: RezkaApiInterface = {
       (el) => parseFilmCard(el)
     );
 
-    film.bookmarks = root.querySelectorAll('.hd-label-row').map(
-      (el) => ({
-        id: el.querySelector('input')?.attributes.value ?? '',
-        title: el.querySelector('label')?.rawText ?? '',
-        isBookmarked: el.querySelector('input')?.attributes.checked === 'checked',
-      })
-    );
+    // a page served to the second account lists that account's categories, so they are
+    // left unknown here and read for the main one once they are needed
+    film.bookmarks = cookieJar ? undefined : parseFilmBookmarks(root);
 
     const voicesRatingHtml = root.querySelector('.b-rgstats__help')?.attributes.title;
     if (voicesRatingHtml) {
@@ -1156,6 +1190,16 @@ const RezkaApi: RezkaApiInterface = {
     }
 
     return film;
+  },
+
+  /**
+   * The bookmark categories of a film for the main account. `getFilm` leaves them out
+   * when the page went to the second account, and this reads them off the page again.
+   */
+  async getFilmBookmarks(link) {
+    const root = await this.fetchPage(link);
+
+    return parseFilmBookmarks(root);
   },
 
   async getFilmTrailer(filmId) {
@@ -1216,7 +1260,7 @@ const RezkaApi: RezkaApiInterface = {
       is_ads: isAds,
       is_director: isDirector,
       action: 'get_movie',
-    });
+    }, this.getSecondaryCookieJar());
 
     if (!json?.success) {
       throw new Error(json?.message);
@@ -1243,7 +1287,7 @@ const RezkaApi: RezkaApiInterface = {
       season: seasonId,
       episode: episodeId,
       action: 'get_stream',
-    });
+    }, this.getSecondaryCookieJar());
 
     if (!json?.success) {
       throw new Error(json?.message);

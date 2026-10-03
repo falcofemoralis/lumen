@@ -85,6 +85,11 @@ export interface ApiInterface {
   login: (name: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   getProfile: (id?: string) => Promise<ProfileInterface>;
+
+  // secondary account - only the film page and its streams are requested as it
+  isSecondarySignedIn: () => boolean;
+  loginSecondary: (name: string, password: string) => Promise<void>;
+  logoutSecondary: () => void;
   getUserData: () => Promise<UserDataInterface>;
   getFilmsFromNotifications: (notifications: NotificationInterface[]) => Promise<NotificationInterface[]>;
   getProfileLink: (profile: ProfileInterface) => string;
@@ -121,6 +126,7 @@ export interface ApiInterface {
     sort?: string
   ) => Promise<FilmListInterface>;
   getFilm: (link: string) => Promise<FilmInterface | null>;
+  getFilmBookmarks: (link: string) => Promise<BookmarkInterface[]>;
   getFilmTrailer: (filmId: string) => Promise<string | null>;
   getFilmSeasons: (film: FilmInterface, voice: FilmVoiceInterface) => Promise<FilmVoiceInterface>;
   getFilmStreamsByVoice: (

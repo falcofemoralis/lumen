@@ -14,6 +14,7 @@ export type SettingsScreenComponentProps = {
   automaticCDN: boolean
   cdn: string
   userAgent: string
+  secondaryAccount: string | null
   providerOptions: string[]
   cdnOptions: string[]
   homeMenuOptions: SettingItemOption[]
@@ -35,6 +36,8 @@ export type SettingsScreenComponentProps = {
   onAutomaticCDNChange: (value: boolean) => void
   onCDNChange: (value: string) => Promise<boolean>
   onUserAgentChange: (value: string) => void
+  onSecondaryLogin: (name: string, password: string) => Promise<boolean>
+  onSecondaryLogout: () => void
   onPlayerQualityChange: (value: string) => void
 } & ConfigProps;
 

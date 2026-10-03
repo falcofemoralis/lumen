@@ -1,6 +1,7 @@
 import { Header } from 'Component/Header';
 import { Page } from 'Component/Page';
 import { getAspectRatio } from 'Component/Player/Player.config';
+import { SettingAccount } from 'Component/SettingAccount';
 import { SettingBase } from 'Component/SettingBase';
 import { SettingCustomSelect } from 'Component/SettingCustomSelect';
 import { SettingExport } from 'Component/SettingExport';
@@ -70,6 +71,7 @@ import Tag from 'lucide-react-native/icons/tag';
 import Timer from 'lucide-react-native/icons/timer';
 import TvMinimalPlay from 'lucide-react-native/icons/tv-minimal-play';
 import UserCog from 'lucide-react-native/icons/user-cog';
+import UserRoundPlus from 'lucide-react-native/icons/user-round-plus';
 import Users from 'lucide-react-native/icons/users';
 import Volume2 from 'lucide-react-native/icons/volume-2';
 import { reactNativeDownloads } from 'Modules/react-native-downloads';
@@ -169,6 +171,7 @@ export function SettingsScreenComponent({
   automaticCDN,
   cdn,
   userAgent,
+  secondaryAccount,
   providerOptions,
   cdnOptions,
   homeMenuOptions,
@@ -184,6 +187,8 @@ export function SettingsScreenComponent({
   onAutomaticCDNChange,
   onCDNChange,
   onUserAgentChange,
+  onSecondaryLogin,
+  onSecondaryLogout,
   onPlayerQualityChange,
 }: SettingsScreenComponentProps) {
   const { handleTap } = useTripleTap();
@@ -428,6 +433,14 @@ export function SettingsScreenComponent({
         IconComponent={ UserCog }
         value={ userAgent }
         onChange={ onUserAgentChange }
+      />
+      <SettingAccount
+        title={ t('Second account') }
+        subtitle={ t('Videos are requested as this account, everything else stays with the main one.') }
+        IconComponent={ UserRoundPlus }
+        account={ secondaryAccount }
+        onLogin={ onSecondaryLogin }
+        onLogout={ onSecondaryLogout }
       />
     </ThemedScrollView>
   );

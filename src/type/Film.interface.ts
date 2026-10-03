@@ -39,6 +39,7 @@ export interface FilmInterface {
   schedule?: ScheduleInterface[];
   franchise?: FranchiseItem[];
   related?: FilmCardInterface[];
+  /** Unknown (left out) when the page was not requested as the main account */
   bookmarks?: BookmarkInterface[];
   includedIn?: InfoListInterface[];
   fromCollections?: InfoListInterface[];

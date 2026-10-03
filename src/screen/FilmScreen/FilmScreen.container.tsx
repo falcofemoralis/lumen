@@ -160,8 +160,9 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
         applyLocalScheduleMarks(loadedFilm);
       }
 
-      // in local mode the account watch-state is not updated, so local saved time drives it
-      if (!isSignedIn || isLocalLibrary) {
+      // in local mode the account watch-state is not updated, so local saved time drives it -
+      // and a page served to the second account carries that account's watch-state, not the user's
+      if (!isSignedIn || isLocalLibrary || currentService.isSecondarySignedIn()) {
         await updateFilmVoiceData(loadedFilm);
       }
 

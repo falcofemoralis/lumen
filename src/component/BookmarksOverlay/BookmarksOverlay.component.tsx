@@ -20,6 +20,7 @@ export const BookmarksOverlayComponent = ({
   isLocalLibrary,
   postBookmark,
   createCategory,
+  onOpen,
   onClose,
 }: BookmarksOverlayComponentProps) => {
   const styles = useThemedStyles(componentStyles);
@@ -102,6 +103,7 @@ export const BookmarksOverlayComponent = ({
     <ThemedOverlay
       ref={ overlayRef }
       contentContainerStyle={ styles.overlayContent }
+      onOpen={ onOpen }
       onClose={ handleClose }
       useKeyboardAdjustment
     >

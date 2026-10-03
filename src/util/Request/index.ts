@@ -1,4 +1,5 @@
 import { t } from 'i18n/translate';
+import { CookiesManager } from 'Util/Cookies';
 import { customFetch } from 'Util/Fetch';
 
 export type Variables = Record<string, string>;
@@ -42,23 +43,27 @@ export const formatURI = (query: string, variables: Variables, url: string): str
 export const getFetch = (
   uri: string,
   headers: HeadersInit,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  cookieJar?: CookiesManager
 ): Promise<Response> => customFetch(uri, {
   method: 'GET',
   signal,
   headers,
+  cookieJar,
 });
 
 export const postFetch = (
   uri: string,
   headers: HeadersInit,
   body: BodyInit,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  cookieJar?: CookiesManager
 ): Promise<Response> => customFetch(uri, {
   method: 'POST',
   body,
   signal,
   headers,
+  cookieJar,
 });
 
 export const parseResponse = async (response: Response): Promise<string> => {
@@ -87,7 +92,8 @@ export const executeGet = async (
   endpoint: string,
   headers: HeadersInit,
   params: Variables,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  cookieJar?: CookiesManager
 ): Promise<string> => {
   const uri = formatURI(query, params, endpoint);
 
@@ -96,7 +102,7 @@ export const executeGet = async (
       'Content-Type': 'application/json',
       'Accept': 'application/json',
       ...headers,
-    }, signal);
+    }, signal, cookieJar);
 
     handleRequestError(response);
 
@@ -119,7 +125,8 @@ export const executePostFormData = async (
   endpoint: string,
   headers: HeadersInit,
   formData: Variables,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  cookieJar?: CookiesManager
 ): Promise<string> => {
   const uri = formatURI(query, {}, endpoint);
 
@@ -137,7 +144,7 @@ export const executePostFormData = async (
     const response = await postFetch(uri, {
       'Content-Type': 'multipart/form-data',
       ...headers,
-    }, formDataObject, signal);
+    }, formDataObject, signal, cookieJar);
 
     handleRequestError(response);
 

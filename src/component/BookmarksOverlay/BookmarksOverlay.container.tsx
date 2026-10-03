@@ -50,17 +50,24 @@ export const BookmarksOverlayContainer = ({
   // film object, so the toggles made here are remembered locally instead of mutating the
   // prop - the label included, since it carries the category size the toggle just changed
   const [overrides, setOverrides] = useState<Record<string, BookmarkOverride>>({});
+  const [loadedBookmarks, setLoadedBookmarks] = useState<BookmarkInterface[] | null>(null);
   const [syncedFilmId, setSyncedFilmId] = useState(film.id);
 
   if (syncedFilmId !== film.id) {
     setSyncedFilmId(film.id);
     setOverrides({});
+    setLoadedBookmarks(null);
   }
+
+  // left out of a film page that went to the second account, and read for the main one
+  // the first time the overlay is opened - the player holds a snapshot of the film that
+  // the cache write below never reaches, so what was read is kept here as well
+  const bookmarks = film.bookmarks ?? loadedBookmarks;
 
   // the film screen renders its own cached copy of the film and the player is handed a
   // snapshot of it, so the toggle is written back into the cache - otherwise coming back
   // from the player shows the film as not bookmarked and invites a second toggle
-  const syncCachedFilm = (bookmarks: BookmarkInterface[]) => {
+  const syncCachedFilm = (newBookmarks: BookmarkInterface[]) => {
     queryClient.setQueriesData<FilmInterface | null>(
       // film details live under ['film', link]; trailer/comments keys share the prefix
       { predicate: ({ queryKey }) => queryKey[0] === 'film' && queryKey.length === 2 },
@@ -69,9 +76,31 @@ export const BookmarksOverlayContainer = ({
           return prevFilm;
         }
 
-        return { ...prevFilm, bookmarks };
+        return { ...prevFilm, bookmarks: newBookmarks };
       }
     );
+  };
+
+  const { mutate: loadBookmarks, isPending: isBookmarksLoading } = useMutation({
+    mutationFn: (target: FilmInterface) => currentService.getFilmBookmarks(target.link),
+    onSuccess: (result, target) => {
+      // the overlay may have been handed another film while the page was loading
+      if (target.id !== film.id) {
+        return;
+      }
+
+      setLoadedBookmarks(result);
+      syncCachedFilm(result);
+      onBookmarkChange?.({ ...film, bookmarks: result });
+    },
+  });
+
+  const handleOpen = () => {
+    if (isLocalLibrary || bookmarks || isBookmarksLoading) {
+      return;
+    }
+
+    loadBookmarks(film);
   };
 
   const { mutate: toggleBookmark, isPending: isLoading } = useMutation({
@@ -83,7 +112,6 @@ export const BookmarksOverlayContainer = ({
         : currentService.removeBookmark(id, bookmarkId);
     },
     onSuccess: (_result, { bookmarkId, isChecked }) => {
-      const { bookmarks } = film;
       const bookmark = bookmarks?.find((b) => b.id === bookmarkId);
 
       if (bookmarks && bookmark) {
@@ -135,9 +163,7 @@ export const BookmarksOverlayContainer = ({
       }));
     }
 
-    const { bookmarks = [] } = film;
-
-    return bookmarks.map((bookmark) => {
+    return (bookmarks ?? []).map((bookmark) => {
       const override = overrides[bookmark.id];
 
       return {
@@ -152,10 +178,11 @@ export const BookmarksOverlayContainer = ({
     postBookmark,
     overlayRef,
     film,
-    isLoading,
+    isLoading: isLoading || isBookmarksLoading,
     items: prepareItems(),
     isLocalLibrary,
     createCategory,
+    onOpen: handleOpen,
     onClose,
   };
 

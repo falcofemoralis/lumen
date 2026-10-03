@@ -97,6 +97,7 @@ class StorageWrapper {
 class Storage {
   private configStorage: StorageWrapper|null = null;
   private cookiesStorage: StorageWrapper|null = null;
+  private secondaryCookiesStorage: StorageWrapper|null = null;
   private playerStorage: StorageWrapper|null = null;
   private miscStorage: StorageWrapper|null = null;
   private downloadsStorage: StorageWrapper|null = null;
@@ -117,6 +118,14 @@ class Storage {
     }
 
     return this.cookiesStorage;
+  }
+
+  getSecondaryCookiesStorage() {
+    if (!this.secondaryCookiesStorage) {
+      this.secondaryCookiesStorage = new StorageWrapper(createMMKV({ id: 'cookiesSecondary' }));
+    }
+
+    return this.secondaryCookiesStorage;
   }
 
   getPlayerStorage() {
