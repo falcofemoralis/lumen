@@ -104,3 +104,15 @@ key.txt
 modules/react-native-downloads/android/build
 !modules/react-native-apk-installer/android/
 modules/react-native-apk-installer/android/build
+# Local backups and diagnostics
+*.bak
+*.bak-*
+*.corrupted-backup
+*.restore-diff.txt
+*.pre-zona-recovery-*
+*.zona-before-final-patch
+*.zona-head-backup
+test-verification.log
+zona-catalog-inspection.html
+zona-inspect-*.js
+zona_*.log
