@@ -1,8 +1,9 @@
 import { ACTOR_SCREEN, CATEGORY_SCREEN, FILM_SCREEN } from 'Navigation/navigationRoutes';
 import NotificationStore from 'Store/Notification.store';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
+import { getRegisteredUnifiedFilm, sourceResolver } from '../../source';
 
-type FilmInput = Pick<FilmCardInterface, 'link' | 'poster'>;
+type FilmInput = Pick<FilmCardInterface, 'link' | 'poster'> & Partial<Pick<FilmCardInterface, 'id'>>;
 
 export const openFilm = (film: FilmInput, navigation: any) => {
   const { link, poster } = film;
@@ -13,9 +14,18 @@ export const openFilm = (film: FilmInput, navigation: any) => {
     return;
   }
 
+  const unifiedFilm = getRegisteredUnifiedFilm(link);
+  const preferredSource = unifiedFilm ? sourceResolver.getPreferredSource(unifiedFilm) : null;
+  const preferredLink = unifiedFilm?.sources.find((source) => source.source === preferredSource)?.link ?? link;
+
   navigation.push(
     FILM_SCREEN,
-    { link, thumbnailPoster: poster } as never
+    {
+      link: preferredLink,
+      libraryFilmId: film.id,
+      thumbnailPoster: poster,
+      unifiedFilm,
+    } as never
   );
 };
 

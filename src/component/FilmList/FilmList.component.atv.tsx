@@ -147,7 +147,8 @@ function FilmListRow({
                 style={ styles.poster }
                 src={ film.poster }
               />
-              <FilmRating filmId={ film.id } />
+              <FilmRating filmId={ film.id } ratings={ film.ratings }
+              ratingSourceType={ film.ratingSourceType } ratingFilmId={ film.ratingFilmId } />
             </View>
 
             <View style={ styles.itemContent }>

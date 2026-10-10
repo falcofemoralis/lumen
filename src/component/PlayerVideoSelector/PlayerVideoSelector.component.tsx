@@ -70,7 +70,7 @@ export function PlayerVideoSelectorComponent({
   };
 
   const renderVoices = () => {
-    if (voices.length <= 1) {
+    if (voices.length === 0) {
       return null;
     }
 
@@ -327,6 +327,7 @@ export function PlayerVideoSelectorComponent({
   );
 
   const renderContent = () => {
+    if (film.hasSeasons && isLoading && !seasons.length) return null;
     if (isOffline && !seasons.length && (voices.length > 0 && !voices[0].video?.streams?.length)) {
       return renderEmpty();
     }

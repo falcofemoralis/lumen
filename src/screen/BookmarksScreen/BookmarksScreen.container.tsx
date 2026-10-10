@@ -6,6 +6,7 @@ import { useConfigContext } from 'Context/ConfigContext';
 import { useNetworkContext } from 'Context/NetworkContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useLocalBookmarks } from 'Hooks/useLocalLibrary';
+import { usePreferredFilmCards } from 'Hooks/usePreferredFilmCards';
 import { useCallback, useMemo, useRef } from 'react';
 import { LocalBookmarksBlob } from 'Type/LocalLibrary.interface';
 import { MenuItemInterface } from 'Type/MenuItem.interface';
@@ -112,9 +113,10 @@ export function BookmarksScreenContainer() {
     manageCategoriesOverlayRef.current?.open();
   };
 
+  const preferredPagerItems = usePreferredFilmCards(isLocalLibrary ? localPagerItems : displayPagerItems, true);
   const containerProps = {
     isLoading: isLocalLibrary ? false : !isSignedIn || isBookmarksLoading,
-    pagerItems: isLocalLibrary ? localPagerItems : displayPagerItems,
+    pagerItems: preferredPagerItems,
     isLocalLibrary,
     tabPosition,
     displayMode: bookmarksDisplayMode,

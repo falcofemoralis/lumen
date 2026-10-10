@@ -33,8 +33,13 @@ export const FilmTrailerScreenContainer = ({
   const overlayRef = useRef<ThemedOverlayRef | null>(null);
 
   const { data: trailerUrl = null, isLoading } = useQuery({
-    queryKey: queryKeys.filmTrailer(film.id),
-    queryFn: () => currentService.getFilmTrailer(film.id),
+    queryKey: [...queryKeys.filmTrailer(film.id), film.link],
+    queryFn: () => {
+      const trailerFilm = film.metadataSourceFilm ?? film;
+      return /^https?:\/\/[^/]*\.zona\.im\//.test(trailerFilm.link)
+        ? Promise.resolve(null)
+        : currentService.getFilmTrailer(trailerFilm.id);
+    },
     staleTime: STALE_TIME.LONG,
   });
 
@@ -58,6 +63,7 @@ export const FilmTrailerScreenContainer = ({
   const containerProps = {
     overlayRef,
     trailerUrl,
+    sourceLabel: film.metadataSourceFilm ? 'HDRezka' : undefined,
     isLoading,
     backHandler,
   };

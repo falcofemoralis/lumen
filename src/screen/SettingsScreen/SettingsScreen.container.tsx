@@ -12,6 +12,7 @@ import { reactNativeTvSearch } from 'Modules/react-native-tv-search';
 import { useCallback, useMemo, useState } from 'react';
 import { TEST_URL } from 'Screen/WelcomeScreen/WelcomeScreen.config';
 import { DeviceConfigType } from 'src/config';
+import { getHomeMenu } from '../../config/HomeMenu';
 import NotificationStore from 'Store/Notification.store';
 import { useAppTheme } from 'Theme/context';
 import { ThemeContextModeT } from 'Theme/types';
@@ -64,7 +65,7 @@ export function SettingsScreenContainer() {
   );
 
   const homeMenuOptions = useMemo(
-    () => currentService.getHomeMenu().map(({ id, title }) => ({ value: id, label: title })),
+    () => getHomeMenu(currentService.getHomeMenu()).map(({ id, title }) => ({ value: id, label: title })),
     [currentService]
   );
 

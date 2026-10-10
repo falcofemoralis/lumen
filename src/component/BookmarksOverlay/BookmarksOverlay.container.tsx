@@ -76,7 +76,7 @@ export const BookmarksOverlayContainer = ({
 
   const { mutate: toggleBookmark, isPending: isLoading } = useMutation({
     mutationFn: ({ bookmarkId, isChecked }: { bookmarkId: string, isChecked: boolean }) => {
-      const { id } = film;
+      const { id } = film.metadataSourceFilm ?? film;
 
       return isChecked
         ? currentService.addBookmark(id, bookmarkId)
@@ -113,6 +113,10 @@ export const BookmarksOverlayContainer = ({
       return;
     }
 
+    if (!film.metadataSourceFilm && /^https?:\/\/[^/]*\.zona\.im\//.test(film.link)) {
+      NotificationStore.displayMessage('Для этого фильма доступны локальные закладки');
+      return;
+    }
     toggleBookmark({ bookmarkId, isChecked });
   };
 
@@ -131,7 +135,7 @@ export const BookmarksOverlayContainer = ({
       return localBookmarks.categories.map((category) => ({
         label: `${category.title} (${category.filmIds.length})`,
         value: category.id,
-        isChecked: category.filmIds.includes(film.id),
+        isChecked: category.filmIds.includes(film.libraryId ?? film.id),
       }));
     }
 

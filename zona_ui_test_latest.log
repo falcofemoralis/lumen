@@ -1,0 +1,868 @@
+﻿  10-09 23:17:17.068   894  2789 I PlatformConfigurator: (REDACTED) Failed to propagate package %s, retryCount %d
+> 10-09 23:17:17.072  2351  2552 I ReactNativeJS: '[ZONA SEASON DATA]', { seasonSlug: '1',
+> 10-09 23:17:17.072  2351  2552 I ReactNativeJS:   seasonPart: 1,
+> 10-09 23:17:17.072  2351  2552 I ReactNativeJS:   episodeCount: 12,
+> 10-09 23:17:17.072  2351  2552 I ReactNativeJS:   episodes: 
+> 10-09 23:17:17.072  2351  2552 I ReactNativeJS:    [ { part: 1, slug: '1', title: '╨í╨╡╤Ç╨╕╤Å 01' },
+> 10-09 23:17:17.072  2351  2552 I ReactNativeJS:      { part: 2, slug: '2', title: '╨í╨╡╤Ç╨╕╤Å 02' },
+> 10-09 23:17:17.072  2351  2552 I ReactNativeJS:      { part: 3, slug: '3', title: '╨í╨╡╤Ç╨╕╤Å 03' },
+> 10-09 23:17:17.072  2351  2552 I ReactNativeJS:      { part: 4, slug: '4', title: '╨í╨╡╤Ç╨╕╤Å 04' },
+> 10-09 23:17:17.072  2351  2552 I ReactNativeJS:      { part: 5, slug: '5', title: '╨í╨╡╤Ç╨╕╤Å 05' },
+> 10-09 23:17:17.072  2351  2552 I ReactNativeJS:      { part: 6, slug: '6', title: '╨í╨╡╤Ç╨╕╤Å 06' },
+> 10-09 23:17:17.072  2351  2552 I ReactNativeJS:      { part: 7, slug: '7', title: '╨í╨╡╤Ç╨╕╤Å 07' },
+> 10-09 23:17:17.072  2351  2552 I ReactNativeJS:      { part: 8, slug: '8', title: '╨í╨╡╤Ç╨╕╤Å 08' },
+> 10-09 23:17:17.072  2351  2552 I ReactNativeJS:      { part: 9, slug: '9', title: '╨í╨╡╤Ç╨╕╤Å 09' },
+> 10-09 23:17:17.072  2351  2552 I ReactNativeJS:      { part: 10, slug: '10', title: '╨í╨╡╤Ç╨╕╤Å 10' },
+> 10-09 23:17:17.072  2351  2552 I ReactNativeJS:      { part: 11, slug: '11', title: '╨í╨╡╤Ç╨╕╤Å 11' },
+> 10-09 23:17:17.072  2351  2552 I ReactNativeJS:      { part: 12, slug: '12', title: '╨í╨╡╤Ç╨╕╤Å 12' } ] }
+  10-09 23:17:17.084   426  3768 E DatabaseUtils: Writing exception to parcel
+  10-09 23:17:17.084   426  3768 E DatabaseUtils: java.lang.SecurityException: Permission denial: writing to settings requires:android.permission.WRITE_DEVICE_CONFIG
+  10-09 23:17:17.084   426  3768 E DatabaseUtils: 	at com.android.providers.settings.SettingsProvider.enforceWritePermission(SettingsProvider.java:2268)
+  10-09 23:17:21.042  3151  3151 I com.topjohnwu.magisk:root:0: System.exit called, status: 0
+> 10-09 23:17:21.042  3151  3151 I AndroidRuntime: VM exiting with result code 0.
+  10-09 23:17:21.042   232   232 I Zygote  : Process 3069 exited due to signal 9 (Killed)
+  10-09 23:17:21.045   426   557 D CompatibilityChangeReporter: Compat change id reported: 218533173; UID 10090; state: ENABLED
+  10-09 23:17:21.046   426   557 D CompatibilityChangeReporter: Compat change id reported: 218533173; UID 10071; state: ENABLED
+  10-09 23:17:21.362   426   454 I libprocessgroup: Successfully killed process cgroup uid 10079 pid 3323 in 0ms
+> 10-09 23:17:21.373  2351  2552 I ReactNativeJS: '[ATV Page layout]', { x: 0, y: 0, width: 1307, height: 905, isMenuOpen: false }
+> 10-09 23:17:21.374  2351  2552 I ReactNativeJS: '[ATV Page window]', { x: 116, y: 0, width: 1307, height: 905 }
+> 10-09 23:17:21.374  2351  2552 I ReactNativeJS: '[ATV ScrollView]', { width: 1307, height: 82 }
+> 10-09 23:17:21.375  2351  2552 I ReactNativeJS: '[ATV ScrollView contentView]', { width: 1829, height: 82 }
+  10-09 23:17:21.377  2351  2552 I MMKV    : <MMKV_IO.cpp:609::writeActualSize> [cookies] increase sequence to 80, crc 1311113346, actualSize 1364
+  10-09 23:17:21.377  2351  2552 I MMKV    : <MMKV.cpp:1208::sync> MMKV::sync, SyncFlag = 1
+  10-09 23:17:21.389   894  1242 I NetworkScheduler.Stats: (REDACTED) Task %s/%s started execution. cause:%s exec_start_elapsed_seconds: %s
+  10-09 23:17:22.388   894  1216 I NetworkScheduler.Stats: (REDACTED) Task %s/%s started execution. cause:%s exec_start_elapsed_seconds: %s
+> 10-09 23:17:22.389  2351  2552 I ReactNativeJS: '[ZONA STREAM VOICES] DISCOVERY', [ { translation: '╨₧╤Ç╨╕╨│╨╕╨╜╨░╨╗ [Rus]', language: 'o' },
+> 10-09 23:17:22.389  2351  2552 I ReactNativeJS:   { translation: '[{"0":"╨á╤â╤ü. ╨₧╤Ç╨╕╨│╨╕╨╜╨░╨╗╤î╨╜╤ï╨╣"}]', language: '' },
+> 10-09 23:17:22.389  2351  2552 I ReactNativeJS:   { translation: '╨¥╨╡ ╤é╤Ç╨╡╨▒╤â╨╡╤é╤ü╤Å', language: '' } ]
+> 10-09 23:17:22.391  2351  2552 I ReactNativeJS: '[ZONA VOICE DISCOVERY]', { link: 'https://w1.zona.im/tvseries/mazhor',
+> 10-09 23:17:22.391  2351  2552 I ReactNativeJS:   hasSeasons: true,
+> 10-09 23:17:22.391  2351  2552 I ReactNativeJS:   streamCount: 7,
+> 10-09 23:17:22.391  2351  2552 I ReactNativeJS:   voices: 
+> 10-09 23:17:22.391  2351  2552 I ReactNativeJS:    [ { id: 'zona:%D0%BE%D1%80%D0%B8%D0%B3%D0%B8%D0%BD%D0%B0%D0%BB%20%5Brus%5D%7Co',
+> 10-09 23:17:22.391  2351  2552 I ReactNativeJS:        identifier: 'zona:%D0%BE%D1%80%D0%B8%D0%B3%D0%B8%D0%BD%D0%B0%D0%BB%20%5Brus%5D%7Co',
+> 10-09 23:17:22.391  2351  2552 I ReactNativeJS:        title: '╨₧╤Ç╨╕╨│╨╕╨╜╨░╨╗ [Rus]',
+> 10-09 23:17:22.391  2351  2552 I ReactNativeJS:        isActive: true },
+> 10-09 23:17:22.391  2351  2552 I ReactNativeJS:      { id: 'zona:%D1%80%D1%83%D1%81.%20%D0%BE%D1%80%D0%B8%D0%B3%D0%B8%D0%BD%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9%7C',
+> 10-09 23:17:22.391  2351  2552 I ReactNativeJS:        identifier: 'zona:%D1%80%D1%83%D1%81.%20%D0%BE%D1%80%D0%B8%D0%B3%D0%B8%D0%BD%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9%7C',
+> 10-09 23:17:22.391  2351  2552 I ReactNativeJS:        title: '╨á╤â╤ü. ╨₧╤Ç╨╕╨│╨╕╨╜╨░╨╗╤î╨╜╤ï╨╣',
+> 10-09 23:17:22.391  2351  2552 I ReactNativeJS:        isActive: false },
+> 10-09 23:17:22.391  2351  2552 I ReactNativeJS:      { id: 'zona:%D0%BD%D0%B5%20%D1%82%D1%80%D0%B5%D0%B1%D1%83%D0%B5%D1%82%D1%81%D1%8F%7C',
+> 10-09 23:17:22.391  2351  2552 I ReactNativeJS:        identifier: 'zona:%D0%BD%D0%B5%20%D1%82%D1%80%D0%B5%D0%B1%D1%83%D0%B5%D1%82%D1%81%D1%8F%7C',
+> 10-09 23:17:22.391  2351  2552 I ReactNativeJS:        title: '╨¥╨╡ ╤é╤Ç╨╡╨▒╤â╨╡╤é╤ü╤Å',
+> 10-09 23:17:22.391  2351  2552 I ReactNativeJS:        isActive: false } ] }
+> 10-09 23:17:22.391  2351  2552 I ReactNativeJS: '[ZONA FULL ADAPTER TEST] VOICES', [ { id: 'zona:%D0%BE%D1%80%D0%B8%D0%B3%D0%B8%D0%BD%D0%B0%D0%BB%20%5Brus%5D%7Co',
+> 10-09 23:17:22.391  2351  2552 I ReactNativeJS:     identifier: 'zona:%D0%BE%D1%80%D0%B8%D0%B3%D0%B8%D0%BD%D0%B0%D0%BB%20%5Brus%5D%7Co',
+> 10-09 23:17:22.391  2351  2552 I ReactNativeJS:     title: '╨₧╤Ç╨╕╨│╨╕╨╜╨░╨╗ [Rus]',
+> 10-09 23:17:22.391  2351  2552 I ReactNativeJS:     isActive: true },
+> 10-09 23:17:22.391  2351  2552 I ReactNativeJS:   { id: 'zona:%D1%80%D1%83%D1%81.%20%D0%BE%D1%80%D0%B8%D0%B3%D0%B8%D0%BD%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9%7C',
+> 10-09 23:17:22.391  2351  2552 I ReactNativeJS:     identifier: 'zona:%D1%80%D1%83%D1%81.%20%D0%BE%D1%80%D0%B8%D0%B3%D0%B8%D0%BD%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9%7C',
+> 10-09 23:17:22.391  2351  2552 I ReactNativeJS:     title: '╨á╤â╤ü. ╨₧╤Ç╨╕╨│╨╕╨╜╨░╨╗╤î╨╜╤ï╨╣',
+> 10-09 23:17:22.391  2351  2552 I ReactNativeJS:     isActive: false },
+> 10-09 23:17:22.391  2351  2552 I ReactNativeJS:   { id: 'zona:%D0%BD%D0%B5%20%D1%82%D1%80%D0%B5%D0%B1%D1%83%D0%B5%D1%82%D1%81%D1%8F%7C',
+> 10-09 23:17:22.391  2351  2552 I ReactNativeJS:     identifier: 'zona:%D0%BD%D0%B5%20%D1%82%D1%80%D0%B5%D0%B1%D1%83%D0%B5%D1%82%D1%81%D1%8F%7C',
+> 10-09 23:17:22.391  2351  2552 I ReactNativeJS:     title: '╨¥╨╡ ╤é╤Ç╨╡╨▒╤â╨╡╤é╤ü╤Å',
+> 10-09 23:17:22.391  2351  2552 I ReactNativeJS:     isActive: false } ]
+> 10-09 23:17:22.391  2351  2552 I ReactNativeJS: '[ZONA FULL ADAPTER TEST] SELECTED VOICE', { id: 'zona:%D0%BE%D1%80%D0%B8%D0%B3%D0%B8%D0%BD%D0%B0%D0%BB%20%5Brus%5D%7Co',
+> 10-09 23:17:22.391  2351  2552 I ReactNativeJS:   identifier: 'zona:%D0%BE%D1%80%D0%B8%D0%B3%D0%B8%D0%BD%D0%B0%D0%BB%20%5Brus%5D%7Co',
+> 10-09 23:17:22.391  2351  2552 I ReactNativeJS:   title: '╨₧╤Ç╨╕╨│╨╕╨╜╨░╨╗ [Rus]',
+> 10-09 23:17:22.391  2351  2552 I ReactNativeJS:   isCamrip: '0',
+> 10-09 23:17:22.391  2351  2552 I ReactNativeJS:   isDirector: '0',
+> 10-09 23:17:22.391  2351  2552 I ReactNativeJS:   isAds: '0',
+> 10-09 23:17:22.391  2351  2552 I ReactNativeJS:   isPremium: false,
+> 10-09 23:17:22.391  2351  2552 I ReactNativeJS:   isActive: true }
+  10-09 23:17:22.596   894  1896 D TrafficStats: tagSocket(321) with statsTag=0x4005500, statsUid=-1
+  10-09 23:17:22.826   894  2844 I Auth.Api.Credentials: [AuthorizeOperation] Operation started. [CONTEXT service_id=219 ]
+  10-09 23:17:22.828   894  1750 I Auth.Api.Credentials: [GenerateCallerVerificationTokenOperation] Operation started. [CONTEXT service_id=179 ]
+  10-09 23:17:24.078  2351  2495 D EGL_emulation: app_time_stats: avg=24.40ms min=2.50ms max=359.64ms count=36
+> 10-09 23:17:24.111  2351  2351 D Glide   : Finished loading BitmapDrawable from DATA_DISK_CACHE for https://img3.zonafilm.ru/images/film_240/820/820638.jpg with size [181x274] in 220.1419 ms
+> 10-09 23:17:24.115  2351  2351 D Glide   : Finished loading BitmapDrawable from DATA_DISK_CACHE for https://img3.zonafilm.ru/images/film_240/988/988790.jpg with size [182x274] in 220.59009999999998 ms
+> 10-09 23:17:24.116  2351  2351 D Glide   : Finished loading BitmapDrawable from DATA_DISK_CACHE for https://img2.zonafilm.ru/images/film_240/3/3781.jpg with size [182x274] in 220.61339999999998 ms
+> 10-09 23:17:24.139  2351  2351 D Glide   : Finished loading BitmapDrawable from DATA_DISK_CACHE for https://img1.zonafilm.ru/images/film_240/839/839024.jpg with size [182x274] in 240.6248 ms
+> 10-09 23:17:24.140  2351  2351 D Glide   : Finished loading BitmapDrawable from DATA_DISK_CACHE for https://img4.zonafilm.ru/images/film_240/5078/5078983.jpg with size [182x274] in 239.97199999999998 ms
+> 10-09 23:17:24.141  2351  2351 D Glide   : Finished loading BitmapDrawable from DATA_DISK_CACHE for https://img4.zonafilm.ru/images/film_240/1445/1445143.jpg with size [182x274] in 239.1771 ms
+> 10-09 23:17:24.141  2351  2351 D Glide   : Finished loading BitmapDrawable from DATA_DISK_CACHE for https://img2.zonafilm.ru/images/film_240/6707/6707633.jpg with size [181x274] in 238.1225 ms
+> 10-09 23:17:24.142  2351  2351 D Glide   : Finished loading BitmapDrawable from DATA_DISK_CACHE for https://img2.zonafilm.ru/images/film_240/6299/6299421.jpg with size [182x274] in 237.315 ms
+> 10-09 23:17:24.142  2351  2351 D Glide   : Finished loading BitmapDrawable from DATA_DISK_CACHE for https://img4.zonafilm.ru/images/film_240/5310/5310875.jpg with size [182x274] in 236.2068 ms
+> 10-09 23:17:24.143  2351  2351 D Glide   : Finished loading BitmapDrawable from DATA_DISK_CACHE for https://img4.zonafilm.ru/images/film_240/199/199975.jpg with size [182x274] in 233.2513 ms
+> 10-09 23:17:24.143  2351  2351 D Glide   : Finished loading BitmapDrawable from DATA_DISK_CACHE for https://img3.zonafilm.ru/images/film_240/557/557806.jpg with size [182x274] in 231.8459 ms
+> 10-09 23:17:24.144  2351  2351 D Glide   : Finished loading BitmapDrawable from DATA_DISK_CACHE for https://img3.zonafilm.ru/images/film_240/1407/1407526.jpg with size [182x274] in 230.48399999999998 ms
+> 10-09 23:17:24.145  2351  2351 D Glide   : Finished loading BitmapDrawable from DATA_DISK_CACHE for https://img1.zonafilm.ru/images/film_240/1283/1283716.jpg with size [181x274] in 229.19709999999998 ms
+> 10-09 23:17:24.145  2351  2351 D Glide   : Finished loading BitmapDrawable from DATA_DISK_CACHE for https://img2.zonafilm.ru/images/film_240/695/695565.jpg with size [182x274] in 228.5309 ms
+> 10-09 23:17:24.146  2351  2351 D Glide   : Finished loading BitmapDrawable from DATA_DISK_CACHE for https://img4.zonafilm.ru/images/film_240/5387/5387327.jpg with size [182x274] in 227.3963 ms
+> 10-09 23:17:24.147  2351  2351 D Glide   : Finished loading BitmapDrawable from DATA_DISK_CACHE for https://img3.zonafilm.ru/images/film_240/840/840974.jpg with size [182x274] in 227.0211 ms
+> 10-09 23:17:24.148  2351  2351 D Glide   : Finished loading BitmapDrawable from DATA_DISK_CACHE for https://img4.zonafilm.ru/images/film_240/5502/5502531.jpg with size [182x274] in 226.7543 ms
+  10-09 23:17:24.149  2351  2351 D Glide   : Finished loading BitmapDrawable from DATA_DISK_CACHE for https://static.hdrezka.ac/i/2021/4/20/gee304e73263cgq35i33f.jpeg with size [182x274] in 226.5787 ms
+  10-09 23:17:24.150  2351  2351 D Glide   : Finished loading BitmapDrawable from DATA_DISK_CACHE for https://static.hdrezka.ac/i/2024/3/26/tac831fcd483fyi12j19u.jpg with size [181x274] in 226.3251 ms
+  10-09 23:17:24.150  2351  2351 D Glide   : Finished loading BitmapDrawable from DATA_DISK_CACHE for https://static.hdrezka.ac/i/2026/6/24/j953778fe93c7af16f36d.jpg with size [182x274] in 225.6311 ms
+  10-09 23:17:25.436   894   894 I GmsThreadNetwork: (REDACTED) [BorderAgentScannerImpl] Failed to parse mDNS response (receivedPacketNumber = %d, errorCode = %d)
+> 10-09 23:17:25.496  2351  2552 I ReactNativeJS: '[ATV Page layout]', { x: 0, y: 0, width: 1307, height: 905, isMenuOpen: false }
+> 10-09 23:17:25.496  2351  2552 I ReactNativeJS: '[ATV Page window]', { x: 116, y: 0, width: 1307, height: 905 }
+> 10-09 23:17:25.519  2351  2552 I ReactNativeJS: '[ZONA SEASON DATA]', { seasonSlug: '2',
+> 10-09 23:17:25.519  2351  2552 I ReactNativeJS:   seasonPart: 2,
+> 10-09 23:17:25.519  2351  2552 I ReactNativeJS:   episodeCount: 12,
+> 10-09 23:17:25.519  2351  2552 I ReactNativeJS:   episodes: 
+> 10-09 23:17:25.519  2351  2552 I ReactNativeJS:    [ { part: 1, slug: '1', title: '╨í╨╡╤Ç╨╕╤Å 13' },
+> 10-09 23:17:25.519  2351  2552 I ReactNativeJS:      { part: 2, slug: '2', title: '╨í╨╡╤Ç╨╕╤Å 14' },
+> 10-09 23:17:25.519  2351  2552 I ReactNativeJS:      { part: 3, slug: '3', title: '╨í╨╡╤Ç╨╕╤Å 15' },
+> 10-09 23:17:25.519  2351  2552 I ReactNativeJS:      { part: 4, slug: '4', title: '╨í╨╡╤Ç╨╕╤Å 16' },
+> 10-09 23:17:25.519  2351  2552 I ReactNativeJS:      { part: 5, slug: '5', title: '╨í╨╡╤Ç╨╕╤Å 17' },
+> 10-09 23:17:25.519  2351  2552 I ReactNativeJS:      { part: 6, slug: '6', title: '╨í╨╡╤Ç╨╕╤Å 18' },
+> 10-09 23:17:25.519  2351  2552 I ReactNativeJS:      { part: 7, slug: '7', title: '╨í╨╡╤Ç╨╕╤Å 19' },
+> 10-09 23:17:25.519  2351  2552 I ReactNativeJS:      { part: 8, slug: '8', title: '╨í╨╡╤Ç╨╕╤Å 20' },
+> 10-09 23:17:25.519  2351  2552 I ReactNativeJS:      { part: 9, slug: '9', title: '╨í╨╡╤Ç╨╕╤Å 21' },
+> 10-09 23:17:25.519  2351  2552 I ReactNativeJS:      { part: 10, slug: '10', title: '╨í╨╡╤Ç╨╕╤Å 22' },
+> 10-09 23:17:25.519  2351  2552 I ReactNativeJS:      { part: 11, slug: '11', title: '╨í╨╡╤Ç╨╕╤Å 23' },
+> 10-09 23:17:25.519  2351  2552 I ReactNativeJS:      { part: 12, slug: '12', title: '╨í╨╡╤Ç╨╕╤Å 24' } ] }
+  10-09 23:17:25.527   426   916 E TaskPersister: File error accessing recents directory (directory doesn't exist?).
+> 10-09 23:17:25.535  2351  2552 I ReactNativeJS: '[ZONA SEASON DATA]', { seasonSlug: '5',
+> 10-09 23:17:25.535  2351  2552 I ReactNativeJS:   seasonPart: 5,
+> 10-09 23:17:25.535  2351  2552 I ReactNativeJS:   episodeCount: 8,
+> 10-09 23:17:25.535  2351  2552 I ReactNativeJS:   episodes: 
+> 10-09 23:17:25.535  2351  2552 I ReactNativeJS:    [ { part: 1, slug: '1', title: '╨í╨╡╤Ç╨╕╤Å 49' },
+> 10-09 23:17:25.535  2351  2552 I ReactNativeJS:      { part: 2, slug: '2', title: '╨í╨╡╤Ç╨╕╤Å 50' },
+> 10-09 23:17:25.535  2351  2552 I ReactNativeJS:      { part: 3, slug: '3', title: '╨í╨╡╤Ç╨╕╤Å 51' },
+> 10-09 23:17:25.535  2351  2552 I ReactNativeJS:      { part: 4, slug: '4', title: '╨í╨╡╤Ç╨╕╤Å 52' },
+> 10-09 23:17:25.535  2351  2552 I ReactNativeJS:      { part: 5, slug: '5', title: '╨í╨╡╤Ç╨╕╤Å 53' },
+> 10-09 23:17:25.535  2351  2552 I ReactNativeJS:      { part: 6, slug: '6', title: '╨í╨╡╤Ç╨╕╤Å 54' },
+> 10-09 23:17:25.535  2351  2552 I ReactNativeJS:      { part: 7, slug: '7', title: '╨í╨╡╤Ç╨╕╤Å 55' },
+> 10-09 23:17:25.535  2351  2552 I ReactNativeJS:      { part: 8, slug: '8', title: '╨í╨╡╤Ç╨╕╤Å 56' } ] }
+  10-09 23:17:25.725   894  3392 I Auth.Api.Credentials: [AuthorizeOperation] Operation started. [CONTEXT service_id=219 ]
+  10-09 23:17:25.726   894  3392 I Auth.Api.Credentials: [GenerateCallerVerificationTokenOperation] Operation started. [CONTEXT service_id=179 ]
+  10-09 23:17:25.730   894  3392 I Auth.Api.Credentials: (REDACTED) [GenerateCallerVerificationTokenOperation] Operation succeeded with result: %s.
+  10-09 23:17:25.744   894  3068 I Auth.Api.Credentials: (REDACTED) [AuthorizeOperation] Operation succeeded with result: %s.
+> 10-09 23:17:25.767  2351  2552 I ReactNativeJS: '[ZONA SEASON DATA]', { seasonSlug: '1',
+> 10-09 23:17:25.767  2351  2552 I ReactNativeJS:   seasonPart: 1,
+> 10-09 23:17:25.767  2351  2552 I ReactNativeJS:   episodeCount: 12,
+> 10-09 23:17:25.767  2351  2552 I ReactNativeJS:   episodes: 
+> 10-09 23:17:25.767  2351  2552 I ReactNativeJS:    [ { part: 1, slug: '1', title: '╨í╨╡╤Ç╨╕╤Å 01' },
+> 10-09 23:17:25.767  2351  2552 I ReactNativeJS:      { part: 2, slug: '2', title: '╨í╨╡╤Ç╨╕╤Å 02' },
+> 10-09 23:17:25.767  2351  2552 I ReactNativeJS:      { part: 3, slug: '3', title: '╨í╨╡╤Ç╨╕╤Å 03' },
+> 10-09 23:17:25.767  2351  2552 I ReactNativeJS:      { part: 4, slug: '4', title: '╨í╨╡╤Ç╨╕╤Å 04' },
+> 10-09 23:17:25.767  2351  2552 I ReactNativeJS:      { part: 5, slug: '5', title: '╨í╨╡╤Ç╨╕╤Å 05' },
+> 10-09 23:17:25.767  2351  2552 I ReactNativeJS:      { part: 6, slug: '6', title: '╨í╨╡╤Ç╨╕╤Å 06' },
+> 10-09 23:17:25.767  2351  2552 I ReactNativeJS:      { part: 7, slug: '7', title: '╨í╨╡╤Ç╨╕╤Å 07' },
+> 10-09 23:17:25.767  2351  2552 I ReactNativeJS:      { part: 8, slug: '8', title: '╨í╨╡╤Ç╨╕╤Å 08' },
+> 10-09 23:17:25.767  2351  2552 I ReactNativeJS:      { part: 9, slug: '9', title: '╨í╨╡╤Ç╨╕╤Å 09' },
+> 10-09 23:17:25.767  2351  2552 I ReactNativeJS:      { part: 10, slug: '10', title: '╨í╨╡╤Ç╨╕╤Å 10' },
+> 10-09 23:17:25.767  2351  2552 I ReactNativeJS:      { part: 11, slug: '11', title: '╨í╨╡╤Ç╨╕╤Å 11' },
+> 10-09 23:17:25.767  2351  2552 I ReactNativeJS:      { part: 12, slug: '12', title: '╨í╨╡╤Ç╨╕╤Å 12' } ] }
+> 10-09 23:17:25.988  2351  2552 I ReactNativeJS: '[ZONA SEASON DATA]', { seasonSlug: '4',
+> 10-09 23:17:25.988  2351  2552 I ReactNativeJS:   seasonPart: 4,
+> 10-09 23:17:25.988  2351  2552 I ReactNativeJS:   episodeCount: 8,
+> 10-09 23:17:25.988  2351  2552 I ReactNativeJS:   episodes: 
+> 10-09 23:17:25.988  2351  2552 I ReactNativeJS:    [ { part: 1, slug: '1', title: '╨í╨╡╤Ç╨╕╤Å 41' },
+> 10-09 23:17:25.988  2351  2552 I ReactNativeJS:      { part: 2, slug: '2', title: '╨í╨╡╤Ç╨╕╤Å 42' },
+> 10-09 23:17:25.988  2351  2552 I ReactNativeJS:      { part: 3, slug: '3', title: '╨í╨╡╤Ç╨╕╤Å 43' },
+> 10-09 23:17:25.988  2351  2552 I ReactNativeJS:      { part: 4, slug: '4', title: '╨í╨╡╤Ç╨╕╤Å 44' },
+> 10-09 23:17:25.988  2351  2552 I ReactNativeJS:      { part: 5, slug: '5', title: '╨í╨╡╤Ç╨╕╤Å 45' },
+> 10-09 23:17:25.988  2351  2552 I ReactNativeJS:      { part: 6, slug: '6', title: '╨í╨╡╤Ç╨╕╤Å 46' },
+> 10-09 23:17:25.988  2351  2552 I ReactNativeJS:      { part: 7, slug: '7', title: '╨í╨╡╤Ç╨╕╤Å 47' },
+> 10-09 23:17:25.988  2351  2552 I ReactNativeJS:      { part: 8, slug: '8', title: '╨í╨╡╤Ç╨╕╤Å 48' } ] }
+> 10-09 23:17:26.002  2351  2552 I ReactNativeJS: '[ZONA SEASON DATA]', { seasonSlug: '3',
+> 10-09 23:17:26.002  2351  2552 I ReactNativeJS:   seasonPart: 3,
+> 10-09 23:17:26.002  2351  2552 I ReactNativeJS:   episodeCount: 16,
+> 10-09 23:17:26.002  2351  2552 I ReactNativeJS:   episodes: 
+> 10-09 23:17:26.002  2351  2552 I ReactNativeJS:    [ { part: 1, slug: '1', title: '╨í╨╡╤Ç╨╕╤Å 25' },
+> 10-09 23:17:26.002  2351  2552 I ReactNativeJS:      { part: 2, slug: '2', title: '╨í╨╡╤Ç╨╕╤Å 26' },
+> 10-09 23:17:26.002  2351  2552 I ReactNativeJS:      { part: 3, slug: '3', title: '╨í╨╡╤Ç╨╕╤Å 27' },
+> 10-09 23:17:26.002  2351  2552 I ReactNativeJS:      { part: 4, slug: '4', title: '╨í╨╡╤Ç╨╕╤Å 28' },
+> 10-09 23:17:26.002  2351  2552 I ReactNativeJS:      { part: 5, slug: '5', title: '╨í╨╡╤Ç╨╕╤Å 29' },
+> 10-09 23:17:26.002  2351  2552 I ReactNativeJS:      { part: 6, slug: '6', title: '╨í╨╡╤Ç╨╕╤Å 30' },
+> 10-09 23:17:26.002  2351  2552 I ReactNativeJS:      { part: 7, slug: '7', title: '╨í╨╡╤Ç╨╕╤Å 31' },
+> 10-09 23:17:26.002  2351  2552 I ReactNativeJS:      { part: 8, slug: '8', title: '╨í╨╡╤Ç╨╕╤Å 32' },
+> 10-09 23:17:26.002  2351  2552 I ReactNativeJS:      { part: 9, slug: '9', title: '╨í╨╡╤Ç╨╕╤Å 33' },
+> 10-09 23:17:26.002  2351  2552 I ReactNativeJS:      { part: 10, slug: '10', title: '╨í╨╡╤Ç╨╕╤Å 34' },
+> 10-09 23:17:26.002  2351  2552 I ReactNativeJS:      { part: 11, slug: '11', title: '╨í╨╡╤Ç╨╕╤Å 35' },
+> 10-09 23:17:26.002  2351  2552 I ReactNativeJS:      { part: 12, slug: '12', title: '╨í╨╡╤Ç╨╕╤Å 36' },
+> 10-09 23:17:26.002  2351  2552 I ReactNativeJS:      { part: 13, slug: '13', title: '╨í╨╡╤Ç╨╕╤Å 37' },
+> 10-09 23:17:26.002  2351  2552 I ReactNativeJS:      { part: 14, slug: '14', title: '╨í╨╡╤Ç╨╕╤Å 38' },
+> 10-09 23:17:26.002  2351  2552 I ReactNativeJS:      { part: 15, slug: '15', title: '╨í╨╡╤Ç╨╕╤Å 39' },
+> 10-09 23:17:26.002  2351  2552 I ReactNativeJS:      { part: 16, slug: '16', title: '╨í╨╡╤Ç╨╕╤Å 40' } ] }
+> 10-09 23:17:26.002  2351  2552 I ReactNativeJS: '[ZONA FULL ADAPTER TEST] SEASONS', [ { seasonId: '1', name: '╨í╨╡╨╖╨╛╨╜ 1', episodes: 12 },
+> 10-09 23:17:26.002  2351  2552 I ReactNativeJS:   { seasonId: '2', name: '╨í╨╡╨╖╨╛╨╜ 2', episodes: 12 },
+> 10-09 23:17:26.002  2351  2552 I ReactNativeJS:   { seasonId: '3', name: '╨í╨╡╨╖╨╛╨╜ 3', episodes: 16 },
+> 10-09 23:17:26.002  2351  2552 I ReactNativeJS:   { seasonId: '4', name: '╨í╨╡╨╖╨╛╨╜ 4', episodes: 8 },
+> 10-09 23:17:26.002  2351  2552 I ReactNativeJS:   { seasonId: '5', name: '╨í╨╡╨╖╨╛╨╜ 5', episodes: 8 } ]
+> 10-09 23:17:26.002  2351  2552 I ReactNativeJS: '[ZONA FULL ADAPTER TEST] EPISODE', { seasonId: '1',
+> 10-09 23:17:26.002  2351  2552 I ReactNativeJS:   seasonName: '╨í╨╡╨╖╨╛╨╜ 1',
+> 10-09 23:17:26.002  2351  2552 I ReactNativeJS:   episodeId: '1',
+> 10-09 23:17:26.002  2351  2552 I ReactNativeJS:   episodeName: '╨í╨╡╤Ç╨╕╤Å 01' }
+> 10-09 23:17:26.002  2351  2552 I ReactNativeJS: '[ZONA PLAYBACK EPISODE REQUEST]', { link: 'https://w1.zona.im/tvseries/mazhor',
+> 10-09 23:17:26.002  2351  2552 I ReactNativeJS:   kinopoiskId: 820638,
+> 10-09 23:17:26.002  2351  2552 I ReactNativeJS:   seasonId: '1',
+> 10-09 23:17:26.002  2351  2552 I ReactNativeJS:   episodeId: '1',
+> 10-09 23:17:26.002  2351  2552 I ReactNativeJS:   episodeKey: 'S01E01' }
+  10-09 23:17:26.098  2351  2495 D EGL_emulation: app_time_stats: avg=25.54ms min=1.43ms max=365.55ms count=36
+  10-09 23:17:26.416   894  1240 I GmsThreadNetwork: [BorderAgentScannerImpl] Stopping mDNS service browser [CONTEXT service_id=305 ]
+  10-09 23:17:26.417   894  1109 I AOSP-MdnsDiscoveryManag: (REDACTED) %s
+  10-09 23:17:28.205   426   451 D OomAdjuster: Not killing cached processes
+> 10-09 23:17:28.340  2351  2552 I ReactNativeJS: '[ZONA STREAM VOICES] EPISODE', [ { translation: '╨₧╤Ç╨╕╨│╨╕╨╜╨░╨╗ [Rus]', language: 'o' },
+> 10-09 23:17:28.340  2351  2552 I ReactNativeJS:   { translation: '[{"0":"╨á╤â╤ü. ╨₧╤Ç╨╕╨│╨╕╨╜╨░╨╗╤î╨╜╤ï╨╣"}]', language: '' },
+> 10-09 23:17:28.340  2351  2552 I ReactNativeJS:   { translation: '╨¥╨╡ ╤é╤Ç╨╡╨▒╤â╨╡╤é╤ü╤Å', language: '' } ]
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS: '[ZONA PLAYBACK EPISODE RAW STREAMS]', { link: 'https://w1.zona.im/tvseries/mazhor',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:   seasonId: '1',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:   episodeId: '1',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:   episodeKey: 'S01E01',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:   count: 7,
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:   streams: 
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:    [ { url: 'https://nl202.cdnsqu.com/s/FHvB12YN4hjGjMot-CiK5WiUFBQUFBQUFBQUFBUnRRVDBnZ0JV.rV4eIs5DZR2n0NQeA9ENQzi-J_XJF0UBmRBIYA/mazhor.rus.2014-nf19/s01e01_480.mp4?am1',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        resolution: '480p',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        quality: 'MEDIUM',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        translation: '╨₧╤Ç╨╕╨│╨╕╨╜╨░╨╗ [Rus]',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        language: 'o',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        isTrailer: false,
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        subtitles: 0 },
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:      { url: 'https://hye1eaipby4w.interkh.com/08_24_22/08/24/15/NQPIZUPI/5DMCWQHS.mp4/master.m3u8?fckz2=bda62910ad2f337&ha=41bc99caa056ccd&hc=0335a414a1236f3&hi=465b726fb9474e8&ht=b3d7984c9ee3265&hu=902afbf50ed959e&hui=4d9f79711eb917b&t=1792437448',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        resolution: 'HLS',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        quality: 'MEDIUM',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        translation: '[{"0":"╨á╤â╤ü. ╨₧╤Ç╨╕╨│╨╕╨╜╨░╨╗╤î╨╜╤ï╨╣"}]',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        language: '',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        isTrailer: false,
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        subtitles: 0 },
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:      { url: 'https://hye1eaipby4w.interkh.com/08_22/24/23/C3NDRKTM/904326.mpd?fckz2=bda62910ad2f337&ha=41bc99caa056ccd&hc=0335a414a1236f3&hi=465b726fb9474e8&ht=b3d7984c9ee3265&hu=902afbf50ed959e&hui=3a6ddd372b9f322&t=1792437448',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        resolution: 'DASH',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        quality: 'MEDIUM',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        translation: '[{"0":"╨á╤â╤ü. ╨₧╤Ç╨╕╨│╨╕╨╜╨░╨╗╤î╨╜╤ï╨╣"}]',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        language: '',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        isTrailer: false,
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        subtitles: 0 },
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:      { url: 'https://b-401.sevstar933krop.com/stream2/b-401/3b483d4ffb74e9f2003d699898ca2c0d/MJTMsp1RshGTygnMNRUR2N2MSlnWXZEdMNDZzQWe5MDZzMmdZJTO1R2RWVHZDljekhkSsl1VwYnWtx2cihVT21EVZlnWEpFaPRkSo1keSlWTEFFeapmSo10VZdXTX5UbZpGaqplarRjTElVP:1791577048:94.20.42.182:68e19ac30ebc1d4502e4d8462f12fa4cd99cd911a707385de142f7f8bffc4d7d:az:==wTUFVdNpWQ15ERJVXTUdWe/360/index.m3u8',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        resolution: '360p',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        quality: 'MEDIUM',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        translation: '╨¥╨╡ ╤é╤Ç╨╡╨▒╤â╨╡╤é╤ü╤Å',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        language: '',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        isTrailer: false,
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        subtitles: 0 },
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:      { url: 'https://b-401.sevstar933krop.com/stream2/b-401/3b483d4ffb74e9f2003d699898ca2c0d/MJTMsp1RshGTygnMNRUR2N2MSlnWXZEdMNDZzQWe5MDZzMmdZJTO1R2RWVHZDljekhkSsl1VwYnWtx2cihVT21EVZlnWEpFaPRkSo1keSlWTEFFeapmSo10VZdXTX5UbZpGaqplarRjTElVP:1791577048:94.20.42.182:68e19ac30ebc1d4502e4d8462f12fa4cd99cd911a707385de142f7f8bffc4d7d:az:==wTUFVdNpWQ15ERJVXTUdWe/480/index.m3u8',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        resolution: '480p',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        quality: 'MEDIUM',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        translation: '╨¥╨╡ ╤é╤Ç╨╡╨▒╤â╨╡╤é╤ü╤Å',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        language: '',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        isTrailer: false,
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        subtitles: 0 },
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:      { url: 'https://b-401.sevstar933krop.com/stream2/b-401/3b483d4ffb74e9f2003d699898ca2c0d/MJTMsp1RshGTygnMNRUR2N2MSlnWXZEdMNDZzQWe5MDZzMmdZJTO1R2RWVHZDljekhkSsl1VwYnWtx2cihVT21EVZlnWEpFaPRkSo1keSlWTEFFeapmSo10VZdXTX5UbZpGaqplarRjTElVP:1791577048:94.20.42.182:68e19ac30ebc1d4502e4d8462f12fa4cd99cd911a707385de142f7f8bffc4d7d:az:==wTUFVdNpWQ15ERJVXTUdWe/720/index.m3u8',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        resolution: '720p',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        quality: 'MEDIUM',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        translation: '╨¥╨╡ ╤é╤Ç╨╡╨▒╤â╨╡╤é╤ü╤Å',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        language: '',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        isTrailer: false,
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        subtitles: 0 },
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:      { url: 'https://b-401.sevstar933krop.com/stream2/b-401/3b483d4ffb74e9f2003d699898ca2c0d/MJTMsp1RshGTygnMNRUR2N2MSlnWXZEdMNDZzQWe5MDZzMmdZJTO1R2RWVHZDljekhkSsl1VwYnWtx2cihVT21EVZlnWEpFaPRkSo1keSlWTEFFeapmSo10VZdXTX5UbZpGaqplarRjTElVP:1791577048:94.20.42.182:68e19ac30ebc1d4502e4d8462f12fa4cd99cd911a707385de142f7f8bffc4d7d:az:==wTUFVdNpWQ15ERJVXTUdWe/1080/index.m3u8',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        resolution: '1080p',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        quality: 'MEDIUM',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        translation: '╨¥╨╡ ╤é╤Ç╨╡╨▒╤â╨╡╤é╤ü╤Å',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        language: '',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        isTrailer: false,
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        subtitles: 0 } ] }
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS: '[ZONA PLAYBACK EPISODE NORMALIZED]', { link: 'https://w1.zona.im/tvseries/mazhor',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:   seasonId: '1',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:   episodeId: '1',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:   episodeKey: 'S01E01',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:   voice: 
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:    { id: 'zona:%D0%BE%D1%80%D0%B8%D0%B3%D0%B8%D0%BD%D0%B0%D0%BB%20%5Brus%5D%7Co',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:      identifier: 'zona:%D0%BE%D1%80%D0%B8%D0%B3%D0%B8%D0%BD%D0%B0%D0%BB%20%5Brus%5D%7Co',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:      title: '╨₧╤Ç╨╕╨│╨╕╨╜╨░╨╗ [Rus]' },
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:   streams: 
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:    [ { url: 'https://nl202.cdnsqu.com/s/FHvB12YN4hjGjMot-CiK5WiUFBQUFBQUFBQUFBUnRRVDBnZ0JV.rV4eIs5DZR2n0NQeA9ENQzi-J_XJF0UBmRBIYA/mazhor.rus.2014-nf19/s01e01_480.mp4?am1',
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:        quality: '480p' } ],
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:   subtitles: [] }
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS: '[ZONA FULL ADAPTER TEST] VIDEO', { streams: 1,
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:   qualities: [ '480p' ],
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS:   firstUrl: 'https://nl202.cdnsqu.com/s/FHvB12YN4hjGjMot-CiK5WiUFBQUFBQUFBQUFBUnRRVDBnZ0JV.rV4eIs5DZR2n0NQeA9ENQzi-J_XJF0UBmRBIYA/mazhor.rus.2014-nf19/s01e01_480.mp4?am1' }
+> 10-09 23:17:28.343  2351  2552 I ReactNativeJS: [ZONA FULL ADAPTER TEST] SUCCESS
+> 10-09 23:17:28.875  2351  2552 I ReactNativeJS: '[ZONA SEASON DATA]', { seasonSlug: '2',
+> 10-09 23:17:28.875  2351  2552 I ReactNativeJS:   seasonPart: 2,
+> 10-09 23:17:28.875  2351  2552 I ReactNativeJS:   episodeCount: 12,
+> 10-09 23:17:28.875  2351  2552 I ReactNativeJS:   episodes: 
+> 10-09 23:17:28.875  2351  2552 I ReactNativeJS:    [ { part: 1, slug: '1', title: '╨í╨╡╤Ç╨╕╤Å 13' },
+> 10-09 23:17:28.875  2351  2552 I ReactNativeJS:      { part: 2, slug: '2', title: '╨í╨╡╤Ç╨╕╤Å 14' },
+> 10-09 23:17:28.875  2351  2552 I ReactNativeJS:      { part: 3, slug: '3', title: '╨í╨╡╤Ç╨╕╤Å 15' },
+> 10-09 23:17:28.875  2351  2552 I ReactNativeJS:      { part: 4, slug: '4', title: '╨í╨╡╤Ç╨╕╤Å 16' },
+> 10-09 23:17:28.875  2351  2552 I ReactNativeJS:      { part: 5, slug: '5', title: '╨í╨╡╤Ç╨╕╤Å 17' },
+> 10-09 23:17:28.875  2351  2552 I ReactNativeJS:      { part: 6, slug: '6', title: '╨í╨╡╤Ç╨╕╤Å 18' },
+> 10-09 23:17:28.875  2351  2552 I ReactNativeJS:      { part: 7, slug: '7', title: '╨í╨╡╤Ç╨╕╤Å 19' },
+> 10-09 23:17:28.875  2351  2552 I ReactNativeJS:      { part: 8, slug: '8', title: '╨í╨╡╤Ç╨╕╤Å 20' },
+> 10-09 23:17:28.875  2351  2552 I ReactNativeJS:      { part: 9, slug: '9', title: '╨í╨╡╤Ç╨╕╤Å 21' },
+> 10-09 23:17:28.875  2351  2552 I ReactNativeJS:      { part: 10, slug: '10', title: '╨í╨╡╤Ç╨╕╤Å 22' },
+> 10-09 23:17:28.875  2351  2552 I ReactNativeJS:      { part: 11, slug: '11', title: '╨í╨╡╤Ç╨╕╤Å 23' },
+> 10-09 23:17:28.875  2351  2552 I ReactNativeJS:      { part: 12, slug: '12', title: '╨í╨╡╤Ç╨╕╤Å 24' } ] }
+  10-09 23:17:29.055  5185  5200 V ClearcutMetricXmitter: Transmission is done.
+  10-09 23:17:29.055  5185  5200 V ClearcutMetricXmitter: Transmission is done.
+  10-09 23:17:29.056  5185  5200 V ClearcutMetricXmitter: Transmission is done.
+  10-09 23:17:29.101   894  3392 I Auth.Api.Credentials: (REDACTED) [AuthorizeOperation] Operation succeeded with result: %s.
+> 10-09 23:17:29.275  2351  2552 I ReactNativeJS: '[ZONA SEASON DATA]', { seasonSlug: '4',
+> 10-09 23:17:29.275  2351  2552 I ReactNativeJS:   seasonPart: 4,
+> 10-09 23:17:29.275  2351  2552 I ReactNativeJS:   episodeCount: 8,
+> 10-09 23:17:29.275  2351  2552 I ReactNativeJS:   episodes: 
+> 10-09 23:17:29.275  2351  2552 I ReactNativeJS:    [ { part: 1, slug: '1', title: '╨í╨╡╤Ç╨╕╤Å 41' },
+> 10-09 23:17:29.275  2351  2552 I ReactNativeJS:      { part: 2, slug: '2', title: '╨í╨╡╤Ç╨╕╤Å 42' },
+> 10-09 23:17:29.275  2351  2552 I ReactNativeJS:      { part: 3, slug: '3', title: '╨í╨╡╤Ç╨╕╤Å 43' },
+> 10-09 23:17:29.275  2351  2552 I ReactNativeJS:      { part: 4, slug: '4', title: '╨í╨╡╤Ç╨╕╤Å 44' },
+> 10-09 23:17:29.275  2351  2552 I ReactNativeJS:      { part: 5, slug: '5', title: '╨í╨╡╤Ç╨╕╤Å 45' },
+> 10-09 23:17:29.275  2351  2552 I ReactNativeJS:      { part: 6, slug: '6', title: '╨í╨╡╤Ç╨╕╤Å 46' },
+> 10-09 23:17:29.275  2351  2552 I ReactNativeJS:      { part: 7, slug: '7', title: '╨í╨╡╤Ç╨╕╤Å 47' },
+> 10-09 23:17:29.275  2351  2552 I ReactNativeJS:      { part: 8, slug: '8', title: '╨í╨╡╤Ç╨╕╤Å 48' } ] }
+> 10-09 23:17:29.300  2351  2552 I ReactNativeJS: '[ZONA SEASON DATA]', { seasonSlug: '3',
+> 10-09 23:17:29.300  2351  2552 I ReactNativeJS:   seasonPart: 3,
+> 10-09 23:17:29.300  2351  2552 I ReactNativeJS:   episodeCount: 16,
+> 10-09 23:17:29.300  2351  2552 I ReactNativeJS:   episodes: 
+> 10-09 23:17:29.300  2351  2552 I ReactNativeJS:    [ { part: 1, slug: '1', title: '╨í╨╡╤Ç╨╕╤Å 25' },
+> 10-09 23:17:29.300  2351  2552 I ReactNativeJS:      { part: 2, slug: '2', title: '╨í╨╡╤Ç╨╕╤Å 26' },
+> 10-09 23:17:29.300  2351  2552 I ReactNativeJS:      { part: 3, slug: '3', title: '╨í╨╡╤Ç╨╕╤Å 27' },
+> 10-09 23:17:29.300  2351  2552 I ReactNativeJS:      { part: 4, slug: '4', title: '╨í╨╡╤Ç╨╕╤Å 28' },
+> 10-09 23:17:29.300  2351  2552 I ReactNativeJS:      { part: 5, slug: '5', title: '╨í╨╡╤Ç╨╕╤Å 29' },
+> 10-09 23:17:29.300  2351  2552 I ReactNativeJS:      { part: 6, slug: '6', title: '╨í╨╡╤Ç╨╕╤Å 30' },
+> 10-09 23:17:29.300  2351  2552 I ReactNativeJS:      { part: 7, slug: '7', title: '╨í╨╡╤Ç╨╕╤Å 31' },
+> 10-09 23:17:29.300  2351  2552 I ReactNativeJS:      { part: 8, slug: '8', title: '╨í╨╡╤Ç╨╕╤Å 32' },
+> 10-09 23:17:29.300  2351  2552 I ReactNativeJS:      { part: 9, slug: '9', title: '╨í╨╡╤Ç╨╕╤Å 33' },
+> 10-09 23:17:29.300  2351  2552 I ReactNativeJS:      { part: 10, slug: '10', title: '╨í╨╡╤Ç╨╕╤Å 34' },
+> 10-09 23:17:29.300  2351  2552 I ReactNativeJS:      { part: 11, slug: '11', title: '╨í╨╡╤Ç╨╕╤Å 35' },
+> 10-09 23:17:29.300  2351  2552 I ReactNativeJS:      { part: 12, slug: '12', title: '╨í╨╡╤Ç╨╕╤Å 36' },
+> 10-09 23:17:29.300  2351  2552 I ReactNativeJS:      { part: 13, slug: '13', title: '╨í╨╡╤Ç╨╕╤Å 37' },
+> 10-09 23:17:29.300  2351  2552 I ReactNativeJS:      { part: 14, slug: '14', title: '╨í╨╡╤Ç╨╕╤Å 38' },
+> 10-09 23:17:29.300  2351  2552 I ReactNativeJS:      { part: 15, slug: '15', title: '╨í╨╡╤Ç╨╕╤Å 39' },
+> 10-09 23:17:29.300  2351  2552 I ReactNativeJS:      { part: 16, slug: '16', title: '╨í╨╡╤Ç╨╕╤Å 40' } ] }
+> 10-09 23:17:29.315  2351  2552 I ReactNativeJS: '[ZONA SEASON DATA]', { seasonSlug: '1',
+> 10-09 23:17:29.315  2351  2552 I ReactNativeJS:   seasonPart: 1,
+> 10-09 23:17:29.315  2351  2552 I ReactNativeJS:   episodeCount: 12,
+> 10-09 23:17:29.315  2351  2552 I ReactNativeJS:   episodes: 
+> 10-09 23:17:29.315  2351  2552 I ReactNativeJS:    [ { part: 1, slug: '1', title: '╨í╨╡╤Ç╨╕╤Å 01' },
+> 10-09 23:17:29.315  2351  2552 I ReactNativeJS:      { part: 2, slug: '2', title: '╨í╨╡╤Ç╨╕╤Å 02' },
+> 10-09 23:17:29.315  2351  2552 I ReactNativeJS:      { part: 3, slug: '3', title: '╨í╨╡╤Ç╨╕╤Å 03' },
+> 10-09 23:17:29.315  2351  2552 I ReactNativeJS:      { part: 4, slug: '4', title: '╨í╨╡╤Ç╨╕╤Å 04' },
+> 10-09 23:17:29.315  2351  2552 I ReactNativeJS:      { part: 5, slug: '5', title: '╨í╨╡╤Ç╨╕╤Å 05' },
+> 10-09 23:17:29.315  2351  2552 I ReactNativeJS:      { part: 6, slug: '6', title: '╨í╨╡╤Ç╨╕╤Å 06' },
+> 10-09 23:17:29.315  2351  2552 I ReactNativeJS:      { part: 7, slug: '7', title: '╨í╨╡╤Ç╨╕╤Å 07' },
+> 10-09 23:17:29.315  2351  2552 I ReactNativeJS:      { part: 8, slug: '8', title: '╨í╨╡╤Ç╨╕╤Å 08' },
+> 10-09 23:17:29.315  2351  2552 I ReactNativeJS:      { part: 9, slug: '9', title: '╨í╨╡╤Ç╨╕╤Å 09' },
+> 10-09 23:17:29.315  2351  2552 I ReactNativeJS:      { part: 10, slug: '10', title: '╨í╨╡╤Ç╨╕╤Å 10' },
+> 10-09 23:17:29.315  2351  2552 I ReactNativeJS:      { part: 11, slug: '11', title: '╨í╨╡╤Ç╨╕╤Å 11' },
+> 10-09 23:17:29.315  2351  2552 I ReactNativeJS:      { part: 12, slug: '12', title: '╨í╨╡╤Ç╨╕╤Å 12' } ] }
+> 10-09 23:17:29.322  2351  2552 I ReactNativeJS: '[ZONA SEASON DATA]', { seasonSlug: '5',
+> 10-09 23:17:29.322  2351  2552 I ReactNativeJS:   seasonPart: 5,
+> 10-09 23:17:29.322  2351  2552 I ReactNativeJS:   episodeCount: 8,
+> 10-09 23:17:29.322  2351  2552 I ReactNativeJS:   episodes: 
+> 10-09 23:17:29.322  2351  2552 I ReactNativeJS:    [ { part: 1, slug: '1', title: '╨í╨╡╤Ç╨╕╤Å 49' },
+> 10-09 23:17:29.322  2351  2552 I ReactNativeJS:      { part: 2, slug: '2', title: '╨í╨╡╤Ç╨╕╤Å 50' },
+> 10-09 23:17:29.322  2351  2552 I ReactNativeJS:      { part: 3, slug: '3', title: '╨í╨╡╤Ç╨╕╤Å 51' },
+> 10-09 23:17:29.322  2351  2552 I ReactNativeJS:      { part: 4, slug: '4', title: '╨í╨╡╤Ç╨╕╤Å 52' },
+> 10-09 23:17:29.322  2351  2552 I ReactNativeJS:      { part: 5, slug: '5', title: '╨í╨╡╤Ç╨╕╤Å 53' },
+> 10-09 23:17:29.322  2351  2552 I ReactNativeJS:      { part: 6, slug: '6', title: '╨í╨╡╤Ç╨╕╤Å 54' },
+> 10-09 23:17:29.322  2351  2552 I ReactNativeJS:      { part: 7, slug: '7', title: '╨í╨╡╤Ç╨╕╤Å 55' },
+> 10-09 23:17:29.322  2351  2552 I ReactNativeJS:      { part: 8, slug: '8', title: '╨í╨╡╤Ç╨╕╤Å 56' } ] }
+> 10-09 23:17:29.425  2351  2552 I ReactNativeJS: '[ATV Page layout]', { x: 0, y: 14, width: 1307, height: 891, isMenuOpen: false }
+> 10-09 23:17:29.425  2351  2552 I ReactNativeJS: '[ATV Page window]', { x: 116, y: 14, width: 1307, height: 891 }
+> 10-09 23:17:29.425  2351  2552 I ReactNativeJS: '[ATV ScrollView]', { width: 1253, height: 891 }
+> 10-09 23:17:29.425  2351  2552 I ReactNativeJS: '[ATV ScrollView contentView]', { width: 1253, height: 754 }
+> 10-09 23:17:29.425  2351  2552 I ReactNativeJS: '[ATV ScrollView]', { width: 1364, height: 75 }
+> 10-09 23:17:29.425  2351  2552 I ReactNativeJS: '[ATV ScrollView contentView]', { width: 1364, height: 75 }
+> 10-09 23:17:29.425  2351  2552 I ReactNativeJS: '[ATV ScrollView]', { width: 780, height: 0 }
+> 10-09 23:17:29.426  2351  2552 I ReactNativeJS: '[ATV ScrollView contentView]', { width: 0, height: 0 }
+> 10-09 23:17:29.426  2351  2552 I ReactNativeJS: '[ATV ScrollView]', { width: 649, height: 36 }
+> 10-09 23:17:29.426  2351  2552 I ReactNativeJS: '[ATV ScrollView contentView]', { width: 0, height: 36 }
+> 10-09 23:17:29.426  2351  2552 I ReactNativeJS: '[ATV ScrollView]', { width: 682, height: 36 }
+> 10-09 23:17:29.426  2351  2552 I ReactNativeJS: '[ATV ScrollView contentView]', { width: 0, height: 36 }
+> 10-09 23:17:29.445  2351  2351 D Glide   : Finished loading BitmapDrawable from DATA_DISK_CACHE for https://img3.zonapic.com/images/film_240/820/820638.jpg with size [376x566] in 12.086699999999999 ms
+> 10-09 23:17:29.453  2351  2552 I ReactNativeJS: '[ATV ScrollView]', { width: 1253, height: 75 }
+  10-09 23:17:29.684   894  2867 I ChimeraPrvdrProxy: Shutting down chimera ContentProvider com.google.android.gms.reminders.provider.RemindersChimeraProvider
+  10-09 23:17:30.195   894  2844 I Auth.Api.Credentials: [AuthorizeOperation] Operation started. [CONTEXT service_id=219 ]
+  10-09 23:17:30.196   894  2844 I Auth.Api.Credentials: [GenerateCallerVerificationTokenOperation] Operation started. [CONTEXT service_id=179 ]
+  10-09 23:17:33.944   894   894 D BoundBrokerSvc: onUnbind: Intent { act=com.google.android.gms.pay.service.BIND dat=chimera-action:/... cmp=com.google.android.gms/.chimera.GmsApiService }
+> 10-09 23:17:33.965  2351  2552 I ReactNativeJS: '[ZONA PLAYER] VOICE DISCOVERY START', { link: 'https://w1.zona.im/tvseries/mazhor',
+> 10-09 23:17:33.965  2351  2552 I ReactNativeJS:   id: 'mazhor',
+> 10-09 23:17:33.965  2351  2552 I ReactNativeJS:   hasVoices: true,
+> 10-09 23:17:33.965  2351  2552 I ReactNativeJS:   hasSeasons: true,
+> 10-09 23:17:33.965  2351  2552 I ReactNativeJS:   syntheticVoice: 'zona' }
+  10-09 23:17:33.995   894   894 D BoundBrokerSvc: onUnbind: Intent { act=com.google.android.gms.onboardingconsent.api.ConsentManagerApiService.START dat=chimera-action:/... cmp=com.google.android.gms/.chimera.GmsApiService }
+  10-09 23:17:34.644   894  1750 I Auth.Api.Credentials: [AuthorizeOperation] Operation started. [CONTEXT service_id=219 ]
+  10-09 23:17:34.645   894  1127 I Auth.Api.Credentials: [GenerateCallerVerificationTokenOperation] Operation started. [CONTEXT service_id=179 ]
+  10-09 23:17:35.604  5271  5347 W HollywoodAppstore.DummyAndroidAccountAccessor: Could not retrieve any account from the Account Cache, regardless of index.
+> 10-09 23:17:35.609  5271  5340 W ...nticatorPluginHelper: AmazonAuthenticatorPlugin is not supported
+  10-09 23:17:35.611  5271  5352 I ....device.framework.ab: Get DataStorage instance for initialization
+  10-09 23:17:35.611  5271  5352 I ....device.framework.ab: Initialize DataStorage instance
+  10-09 23:17:35.611  5271  5352 I ....device.framework.ab: Setup DataStorage instance
+  10-09 23:17:35.682  5271  5340 D AndroidUIToolkit: AlarmStartup took 10 ms  (TIME)
+> 10-09 23:17:35.703  2351  2552 I ReactNativeJS: '[ZONA SEASON DATA]', { seasonSlug: '1',
+> 10-09 23:17:35.703  2351  2552 I ReactNativeJS:   seasonPart: 1,
+> 10-09 23:17:35.703  2351  2552 I ReactNativeJS:   episodeCount: 12,
+> 10-09 23:17:35.703  2351  2552 I ReactNativeJS:   episodes: 
+> 10-09 23:17:35.703  2351  2552 I ReactNativeJS:    [ { part: 1, slug: '1', title: '╨í╨╡╤Ç╨╕╤Å 01' },
+> 10-09 23:17:35.703  2351  2552 I ReactNativeJS:      { part: 2, slug: '2', title: '╨í╨╡╤Ç╨╕╤Å 02' },
+> 10-09 23:17:35.703  2351  2552 I ReactNativeJS:      { part: 3, slug: '3', title: '╨í╨╡╤Ç╨╕╤Å 03' },
+> 10-09 23:17:35.703  2351  2552 I ReactNativeJS:      { part: 4, slug: '4', title: '╨í╨╡╤Ç╨╕╤Å 04' },
+> 10-09 23:17:35.703  2351  2552 I ReactNativeJS:      { part: 5, slug: '5', title: '╨í╨╡╤Ç╨╕╤Å 05' },
+> 10-09 23:17:35.703  2351  2552 I ReactNativeJS:      { part: 6, slug: '6', title: '╨í╨╡╤Ç╨╕╤Å 06' },
+> 10-09 23:17:35.703  2351  2552 I ReactNativeJS:      { part: 7, slug: '7', title: '╨í╨╡╤Ç╨╕╤Å 07' },
+> 10-09 23:17:35.703  2351  2552 I ReactNativeJS:      { part: 8, slug: '8', title: '╨í╨╡╤Ç╨╕╤Å 08' },
+> 10-09 23:17:35.703  2351  2552 I ReactNativeJS:      { part: 9, slug: '9', title: '╨í╨╡╤Ç╨╕╤Å 09' },
+> 10-09 23:17:35.703  2351  2552 I ReactNativeJS:      { part: 10, slug: '10', title: '╨í╨╡╤Ç╨╕╤Å 10' },
+> 10-09 23:17:35.703  2351  2552 I ReactNativeJS:      { part: 11, slug: '11', title: '╨í╨╡╤Ç╨╕╤Å 11' },
+> 10-09 23:17:35.703  2351  2552 I ReactNativeJS:      { part: 12, slug: '12', title: '╨í╨╡╤Ç╨╕╤Å 12' } ] }
+  10-09 23:17:35.709   894  3392 I Auth.Api.Credentials: [AuthorizeOperation] Operation started. [CONTEXT service_id=219 ]
+  10-09 23:17:35.711   894  3079 I Auth.Api.Credentials: [GenerateCallerVerificationTokenOperation] Operation started. [CONTEXT service_id=179 ]
+  10-09 23:17:35.714   894  3392 I Auth.Api.Credentials: (REDACTED) [GenerateCallerVerificationTokenOperation] Operation succeeded with result: %s.
+  10-09 23:17:38.481  2351  2552 I MMKV    : <MMKV.cpp:1208::sync> MMKV::sync, SyncFlag = 1
+> 10-09 23:17:38.509  2351  2552 I ReactNativeJS: '[ZONA STREAM VOICES] DISCOVERY', [ { translation: '╨₧╤Ç╨╕╨│╨╕╨╜╨░╨╗ [Rus]', language: 'o' },
+> 10-09 23:17:38.509  2351  2552 I ReactNativeJS:   { translation: '[{"0":"╨á╤â╤ü. ╨₧╤Ç╨╕╨│╨╕╨╜╨░╨╗╤î╨╜╤ï╨╣"}]', language: '' },
+> 10-09 23:17:38.509  2351  2552 I ReactNativeJS:   { translation: '╨¥╨╡ ╤é╤Ç╨╡╨▒╤â╨╡╤é╤ü╤Å', language: '' } ]
+> 10-09 23:17:38.510  2351  2552 I ReactNativeJS: '[ZONA VOICE DISCOVERY]', { link: 'https://w1.zona.im/tvseries/mazhor',
+> 10-09 23:17:38.510  2351  2552 I ReactNativeJS:   hasSeasons: true,
+> 10-09 23:17:38.510  2351  2552 I ReactNativeJS:   streamCount: 7,
+> 10-09 23:17:38.510  2351  2552 I ReactNativeJS:   voices: 
+> 10-09 23:17:38.510  2351  2552 I ReactNativeJS:    [ { id: 'zona:%D0%BE%D1%80%D0%B8%D0%B3%D0%B8%D0%BD%D0%B0%D0%BB%20%5Brus%5D%7Co',
+> 10-09 23:17:38.510  2351  2552 I ReactNativeJS:        identifier: 'zona:%D0%BE%D1%80%D0%B8%D0%B3%D0%B8%D0%BD%D0%B0%D0%BB%20%5Brus%5D%7Co',
+> 10-09 23:17:38.510  2351  2552 I ReactNativeJS:        title: '╨₧╤Ç╨╕╨│╨╕╨╜╨░╨╗ [Rus]',
+> 10-09 23:17:38.510  2351  2552 I ReactNativeJS:        isActive: true },
+> 10-09 23:17:38.510  2351  2552 I ReactNativeJS:      { id: 'zona:%D1%80%D1%83%D1%81.%20%D0%BE%D1%80%D0%B8%D0%B3%D0%B8%D0%BD%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9%7C',
+> 10-09 23:17:38.510  2351  2552 I ReactNativeJS:        identifier: 'zona:%D1%80%D1%83%D1%81.%20%D0%BE%D1%80%D0%B8%D0%B3%D0%B8%D0%BD%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9%7C',
+> 10-09 23:17:38.510  2351  2552 I ReactNativeJS:        title: '╨á╤â╤ü. ╨₧╤Ç╨╕╨│╨╕╨╜╨░╨╗╤î╨╜╤ï╨╣',
+> 10-09 23:17:38.510  2351  2552 I ReactNativeJS:        isActive: false },
+> 10-09 23:17:38.510  2351  2552 I ReactNativeJS:      { id: 'zona:%D0%BD%D0%B5%20%D1%82%D1%80%D0%B5%D0%B1%D1%83%D0%B5%D1%82%D1%81%D1%8F%7C',
+> 10-09 23:17:38.510  2351  2552 I ReactNativeJS:        identifier: 'zona:%D0%BD%D0%B5%20%D1%82%D1%80%D0%B5%D0%B1%D1%83%D0%B5%D1%82%D1%81%D1%8F%7C',
+> 10-09 23:17:38.510  2351  2552 I ReactNativeJS:        title: '╨¥╨╡ ╤é╤Ç╨╡╨▒╤â╨╡╤é╤ü╤Å',
+> 10-09 23:17:38.510  2351  2552 I ReactNativeJS:        isActive: false } ] }
+> 10-09 23:17:38.510  2351  2552 I ReactNativeJS: '[ZONA PLAYER] VOICE DISCOVERY RESULT', { link: 'https://w1.zona.im/tvseries/mazhor',
+> 10-09 23:17:38.510  2351  2552 I ReactNativeJS:   count: 3,
+> 10-09 23:17:38.510  2351  2552 I ReactNativeJS:   voices: 
+> 10-09 23:17:38.510  2351  2552 I ReactNativeJS:    [ { id: 'zona:%D0%BE%D1%80%D0%B8%D0%B3%D0%B8%D0%BD%D0%B0%D0%BB%20%5Brus%5D%7Co',
+> 10-09 23:17:38.510  2351  2552 I ReactNativeJS:        identifier: 'zona:%D0%BE%D1%80%D0%B8%D0%B3%D0%B8%D0%BD%D0%B0%D0%BB%20%5Brus%5D%7Co',
+> 10-09 23:17:38.510  2351  2552 I ReactNativeJS:        title: '╨₧╤Ç╨╕╨│╨╕╨╜╨░╨╗ [Rus]' },
+> 10-09 23:17:38.510  2351  2552 I ReactNativeJS:      { id: 'zona:%D1%80%D1%83%D1%81.%20%D0%BE%D1%80%D0%B8%D0%B3%D0%B8%D0%BD%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9%7C',
+> 10-09 23:17:38.510  2351  2552 I ReactNativeJS:        identifier: 'zona:%D1%80%D1%83%D1%81.%20%D0%BE%D1%80%D0%B8%D0%B3%D0%B8%D0%BD%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9%7C',
+> 10-09 23:17:38.510  2351  2552 I ReactNativeJS:        title: '╨á╤â╤ü. ╨₧╤Ç╨╕╨│╨╕╨╜╨░╨╗╤î╨╜╤ï╨╣' },
+> 10-09 23:17:38.510  2351  2552 I ReactNativeJS:      { id: 'zona:%D0%BD%D0%B5%20%D1%82%D1%80%D0%B5%D0%B1%D1%83%D0%B5%D1%82%D1%81%D1%8F%7C',
+> 10-09 23:17:38.510  2351  2552 I ReactNativeJS:        identifier: 'zona:%D0%BD%D0%B5%20%D1%82%D1%80%D0%B5%D0%B1%D1%83%D0%B5%D1%82%D1%81%D1%8F%7C',
+> 10-09 23:17:38.510  2351  2552 I ReactNativeJS:        title: '╨¥╨╡ ╤é╤Ç╨╡╨▒╤â╨╡╤é╤ü╤Å' } ] }
+  10-09 23:17:38.523   894  3068 I Auth.Api.Credentials: [AuthorizeOperation] Operation started. [CONTEXT service_id=219 ]
+  10-09 23:17:38.525   894  1747 I Auth.Api.Credentials: [GenerateCallerVerificationTokenOperation] Operation started. [CONTEXT service_id=179 ]
+  10-09 23:17:38.530   894  1747 I Auth.Api.Credentials: (REDACTED) [GenerateCallerVerificationTokenOperation] Operation succeeded with result: %s.
+  10-09 23:17:38.600   894   894 D BoundBrokerSvc: onUnbind: Intent { act=com.google.android.gms.people.contactssync.service.START dat=chimera-action:/... cmp=com.google.android.gms/.chimera.GmsBoundBrokerService }
+> 10-09 23:17:38.675  2351  2552 I ReactNativeJS: '[ATV ScrollView contentView]', { width: 1113, height: 75 }
+> 10-09 23:17:38.690  2351  2552 I ReactNativeJS: '[ATV ScrollView]', { width: 1113, height: 75 }
+  10-09 23:17:38.696   426  1727 D OomAdjuster: Not killing cached processes
+> 10-09 23:17:38.816  2351  2552 I ReactNativeJS: '[ATV ScrollView]', { width: 490, height: 480 }
+> 10-09 23:17:38.816  2351  2552 I ReactNativeJS: '[ATV ScrollView contentView]', { width: 490, height: 248 }
+  10-09 23:17:39.603  2351  2495 D EGL_emulation: app_time_stats: avg=16.31ms min=2.15ms max=94.12ms count=54
+  10-09 23:17:40.604  2351  2495 D EGL_emulation: app_time_stats: avg=16.67ms min=15.36ms max=18.20ms count=60
+  10-09 23:17:40.619  5271  5271 D CompatibilityChangeReporter: Compat change id reported: 194532703; UID 10089; state: DISABLED
+  10-09 23:17:42.792   894  1747 I Auth.Api.Credentials: (REDACTED) [AuthorizeOperation] Operation succeeded with result: %s.
+> 10-09 23:17:43.526  2351  2552 I ReactNativeJS: '[ZONA SEASON DATA]', { seasonSlug: '1',
+> 10-09 23:17:43.526  2351  2552 I ReactNativeJS:   seasonPart: 1,
+> 10-09 23:17:43.526  2351  2552 I ReactNativeJS:   episodeCount: 12,
+> 10-09 23:17:43.526  2351  2552 I ReactNativeJS:   episodes: 
+> 10-09 23:17:43.526  2351  2552 I ReactNativeJS:    [ { part: 1, slug: '1', title: '╨í╨╡╤Ç╨╕╤Å 01' },
+> 10-09 23:17:43.526  2351  2552 I ReactNativeJS:      { part: 2, slug: '2', title: '╨í╨╡╤Ç╨╕╤Å 02' },
+> 10-09 23:17:43.526  2351  2552 I ReactNativeJS:      { part: 3, slug: '3', title: '╨í╨╡╤Ç╨╕╤Å 03' },
+> 10-09 23:17:43.526  2351  2552 I ReactNativeJS:      { part: 4, slug: '4', title: '╨í╨╡╤Ç╨╕╤Å 04' },
+> 10-09 23:17:43.526  2351  2552 I ReactNativeJS:      { part: 5, slug: '5', title: '╨í╨╡╤Ç╨╕╤Å 05' },
+> 10-09 23:17:43.526  2351  2552 I ReactNativeJS:      { part: 6, slug: '6', title: '╨í╨╡╤Ç╨╕╤Å 06' },
+> 10-09 23:17:43.526  2351  2552 I ReactNativeJS:      { part: 7, slug: '7', title: '╨í╨╡╤Ç╨╕╤Å 07' },
+> 10-09 23:17:43.526  2351  2552 I ReactNativeJS:      { part: 8, slug: '8', title: '╨í╨╡╤Ç╨╕╤Å 08' },
+> 10-09 23:17:43.526  2351  2552 I ReactNativeJS:      { part: 9, slug: '9', title: '╨í╨╡╤Ç╨╕╤Å 09' },
+> 10-09 23:17:43.526  2351  2552 I ReactNativeJS:      { part: 10, slug: '10', title: '╨í╨╡╤Ç╨╕╤Å 10' },
+> 10-09 23:17:43.526  2351  2552 I ReactNativeJS:      { part: 11, slug: '11', title: '╨í╨╡╤Ç╨╕╤Å 11' },
+> 10-09 23:17:43.526  2351  2552 I ReactNativeJS:      { part: 12, slug: '12', title: '╨í╨╡╤Ç╨╕╤Å 12' } ] }
+> 10-09 23:17:43.536  2351  2552 I ReactNativeJS: '[ZONA SEASON DATA]', { seasonSlug: '4',
+> 10-09 23:17:43.536  2351  2552 I ReactNativeJS:   seasonPart: 4,
+> 10-09 23:17:43.536  2351  2552 I ReactNativeJS:   episodeCount: 8,
+> 10-09 23:17:43.536  2351  2552 I ReactNativeJS:   episodes: 
+> 10-09 23:17:43.536  2351  2552 I ReactNativeJS:    [ { part: 1, slug: '1', title: '╨í╨╡╤Ç╨╕╤Å 41' },
+> 10-09 23:17:43.536  2351  2552 I ReactNativeJS:      { part: 2, slug: '2', title: '╨í╨╡╤Ç╨╕╤Å 42' },
+> 10-09 23:17:43.536  2351  2552 I ReactNativeJS:      { part: 3, slug: '3', title: '╨í╨╡╤Ç╨╕╤Å 43' },
+> 10-09 23:17:43.536  2351  2552 I ReactNativeJS:      { part: 4, slug: '4', title: '╨í╨╡╤Ç╨╕╤Å 44' },
+> 10-09 23:17:43.536  2351  2552 I ReactNativeJS:      { part: 5, slug: '5', title: '╨í╨╡╤Ç╨╕╤Å 45' },
+> 10-09 23:17:43.536  2351  2552 I ReactNativeJS:      { part: 6, slug: '6', title: '╨í╨╡╤Ç╨╕╤Å 46' },
+> 10-09 23:17:43.536  2351  2552 I ReactNativeJS:      { part: 7, slug: '7', title: '╨í╨╡╤Ç╨╕╤Å 47' },
+> 10-09 23:17:43.536  2351  2552 I ReactNativeJS:      { part: 8, slug: '8', title: '╨í╨╡╤Ç╨╕╤Å 48' } ] }
+  10-09 23:17:43.610  2351  2495 D EGL_emulation: app_time_stats: avg=16.66ms min=14.99ms max=18.80ms count=60
+> 10-09 23:17:43.868  2351  2552 I ReactNativeJS: '[ZONA SEASON DATA]', { seasonSlug: '2',
+> 10-09 23:17:43.868  2351  2552 I ReactNativeJS:   seasonPart: 2,
+> 10-09 23:17:43.868  2351  2552 I ReactNativeJS:   episodeCount: 12,
+> 10-09 23:17:43.868  2351  2552 I ReactNativeJS:   episodes: 
+> 10-09 23:17:43.868  2351  2552 I ReactNativeJS:    [ { part: 1, slug: '1', title: '╨í╨╡╤Ç╨╕╤Å 13' },
+> 10-09 23:17:43.868  2351  2552 I ReactNativeJS:      { part: 2, slug: '2', title: '╨í╨╡╤Ç╨╕╤Å 14' },
+> 10-09 23:17:43.868  2351  2552 I ReactNativeJS:      { part: 3, slug: '3', title: '╨í╨╡╤Ç╨╕╤Å 15' },
+> 10-09 23:17:43.868  2351  2552 I ReactNativeJS:      { part: 4, slug: '4', title: '╨í╨╡╤Ç╨╕╤Å 16' },
+> 10-09 23:17:43.868  2351  2552 I ReactNativeJS:      { part: 5, slug: '5', title: '╨í╨╡╤Ç╨╕╤Å 17' },
+> 10-09 23:17:43.868  2351  2552 I ReactNativeJS:      { part: 6, slug: '6', title: '╨í╨╡╤Ç╨╕╤Å 18' },
+> 10-09 23:17:43.868  2351  2552 I ReactNativeJS:      { part: 7, slug: '7', title: '╨í╨╡╤Ç╨╕╤Å 19' },
+> 10-09 23:17:43.868  2351  2552 I ReactNativeJS:      { part: 8, slug: '8', title: '╨í╨╡╤Ç╨╕╤Å 20' },
+> 10-09 23:17:43.868  2351  2552 I ReactNativeJS:      { part: 9, slug: '9', title: '╨í╨╡╤Ç╨╕╤Å 21' },
+> 10-09 23:17:43.868  2351  2552 I ReactNativeJS:      { part: 10, slug: '10', title: '╨í╨╡╤Ç╨╕╤Å 22' },
+> 10-09 23:17:43.868  2351  2552 I ReactNativeJS:      { part: 11, slug: '11', title: '╨í╨╡╤Ç╨╕╤Å 23' },
+> 10-09 23:17:43.868  2351  2552 I ReactNativeJS:      { part: 12, slug: '12', title: '╨í╨╡╤Ç╨╕╤Å 24' } ] }
+  10-09 23:17:43.875   894  3068 I Auth.Api.Credentials: [AuthorizeOperation] Operation started. [CONTEXT service_id=219 ]
+  10-09 23:17:43.876   894  3079 I Auth.Api.Credentials: [GenerateCallerVerificationTokenOperation] Operation started. [CONTEXT service_id=179 ]
+  10-09 23:17:43.878   426  1829 D OomAdjuster: Not killing cached processes
+  10-09 23:17:43.880   894  3068 I Auth.Api.Credentials: (REDACTED) [GenerateCallerVerificationTokenOperation] Operation succeeded with result: %s.
+> 10-09 23:17:43.885  2351  2552 I ReactNativeJS: '[ZONA SEASON DATA]', { seasonSlug: '3',
+> 10-09 23:17:43.885  2351  2552 I ReactNativeJS:   seasonPart: 3,
+> 10-09 23:17:43.885  2351  2552 I ReactNativeJS:   episodeCount: 16,
+> 10-09 23:17:43.885  2351  2552 I ReactNativeJS:   episodes: 
+> 10-09 23:17:43.885  2351  2552 I ReactNativeJS:    [ { part: 1, slug: '1', title: '╨í╨╡╤Ç╨╕╤Å 25' },
+> 10-09 23:17:43.885  2351  2552 I ReactNativeJS:      { part: 2, slug: '2', title: '╨í╨╡╤Ç╨╕╤Å 26' },
+> 10-09 23:17:43.885  2351  2552 I ReactNativeJS:      { part: 3, slug: '3', title: '╨í╨╡╤Ç╨╕╤Å 27' },
+> 10-09 23:17:43.885  2351  2552 I ReactNativeJS:      { part: 4, slug: '4', title: '╨í╨╡╤Ç╨╕╤Å 28' },
+> 10-09 23:17:43.885  2351  2552 I ReactNativeJS:      { part: 5, slug: '5', title: '╨í╨╡╤Ç╨╕╤Å 29' },
+> 10-09 23:17:43.885  2351  2552 I ReactNativeJS:      { part: 6, slug: '6', title: '╨í╨╡╤Ç╨╕╤Å 30' },
+> 10-09 23:17:43.885  2351  2552 I ReactNativeJS:      { part: 7, slug: '7', title: '╨í╨╡╤Ç╨╕╤Å 31' },
+> 10-09 23:17:43.885  2351  2552 I ReactNativeJS:      { part: 8, slug: '8', title: '╨í╨╡╤Ç╨╕╤Å 32' },
+> 10-09 23:17:43.885  2351  2552 I ReactNativeJS:      { part: 9, slug: '9', title: '╨í╨╡╤Ç╨╕╤Å 33' },
+> 10-09 23:17:43.885  2351  2552 I ReactNativeJS:      { part: 10, slug: '10', title: '╨í╨╡╤Ç╨╕╤Å 34' },
+> 10-09 23:17:43.885  2351  2552 I ReactNativeJS:      { part: 11, slug: '11', title: '╨í╨╡╤Ç╨╕╤Å 35' },
+> 10-09 23:17:43.885  2351  2552 I ReactNativeJS:      { part: 12, slug: '12', title: '╨í╨╡╤Ç╨╕╤Å 36' },
+> 10-09 23:17:43.885  2351  2552 I ReactNativeJS:      { part: 13, slug: '13', title: '╨í╨╡╤Ç╨╕╤Å 37' },
+> 10-09 23:17:43.885  2351  2552 I ReactNativeJS:      { part: 14, slug: '14', title: '╨í╨╡╤Ç╨╕╤Å 38' },
+> 10-09 23:17:43.885  2351  2552 I ReactNativeJS:      { part: 15, slug: '15', title: '╨í╨╡╤Ç╨╕╤Å 39' },
+> 10-09 23:17:43.885  2351  2552 I ReactNativeJS:      { part: 16, slug: '16', title: '╨í╨╡╤Ç╨╕╤Å 40' } ] }
+  10-09 23:17:43.895   894  5153 I Auth.Api.Credentials: (REDACTED) [AuthorizeOperation] Operation succeeded with result: %s.
+> 10-09 23:17:43.903  2351  2552 I ReactNativeJS: '[ZONA SEASON DATA]', { seasonSlug: '5',
+> 10-09 23:17:43.903  2351  2552 I ReactNativeJS:   seasonPart: 5,
+> 10-09 23:17:43.903  2351  2552 I ReactNativeJS:   episodeCount: 8,
+> 10-09 23:17:43.903  2351  2552 I ReactNativeJS:   episodes: 
+> 10-09 23:17:43.903  2351  2552 I ReactNativeJS:    [ { part: 1, slug: '1', title: '╨í╨╡╤Ç╨╕╤Å 49' },
+> 10-09 23:17:43.903  2351  2552 I ReactNativeJS:      { part: 2, slug: '2', title: '╨í╨╡╤Ç╨╕╤Å 50' },
+> 10-09 23:17:43.903  2351  2552 I ReactNativeJS:      { part: 3, slug: '3', title: '╨í╨╡╤Ç╨╕╤Å 51' },
+> 10-09 23:17:43.903  2351  2552 I ReactNativeJS:      { part: 4, slug: '4', title: '╨í╨╡╤Ç╨╕╤Å 52' },
+> 10-09 23:17:43.903  2351  2552 I ReactNativeJS:      { part: 5, slug: '5', title: '╨í╨╡╤Ç╨╕╤Å 53' },
+> 10-09 23:17:43.903  2351  2552 I ReactNativeJS:      { part: 6, slug: '6', title: '╨í╨╡╤Ç╨╕╤Å 54' },
+> 10-09 23:17:43.903  2351  2552 I ReactNativeJS:      { part: 7, slug: '7', title: '╨í╨╡╤Ç╨╕╤Å 55' },
+> 10-09 23:17:43.903  2351  2552 I ReactNativeJS:      { part: 8, slug: '8', title: '╨í╨╡╤Ç╨╕╤Å 56' } ] }
+> 10-09 23:17:43.940  2351  2552 I ReactNativeJS: '[ATV ScrollView contentView]', { width: 490, height: 252 }
+  10-09 23:17:44.102   946  2197 D UserInputRedirectionHandler: moveTaskToFront: 18
+  10-09 23:17:44.103   426  1829 E CellBroadcastUtils: getDefaultCellBroadcastReceiverPackageName: no package found
+  10-09 23:17:44.619  2351  2495 D EGL_emulation: app_time_stats: avg=16.67ms min=2.35ms max=266.31ms count=46
+  10-09 23:17:46.573   894  1747 I Auth.Api.Credentials: (REDACTED) [AuthorizeOperation] Operation succeeded with result: %s.
+> 10-09 23:17:46.678  2351  2552 I ReactNativeJS: '[ZONA PLAYER] HANDLE SELECT VOICE', { link: 'https://w1.zona.im/tvseries/mazhor',
+> 10-09 23:17:46.678  2351  2552 I ReactNativeJS:   id: 'mazhor',
+> 10-09 23:17:46.678  2351  2552 I ReactNativeJS:   voiceId: 'zona:%D0%BE%D1%80%D0%B8%D0%B3%D0%B8%D0%BD%D0%B0%D0%BB%20%5Brus%5D%7Co',
+> 10-09 23:17:46.678  2351  2552 I ReactNativeJS:   foundVoice: 'zona:%D0%BE%D1%80%D0%B8%D0%B3%D0%B8%D0%BD%D0%B0%D0%BB%20%5Brus%5D%7Co',
+> 10-09 23:17:46.678  2351  2552 I ReactNativeJS:   hasSeasons: true,
+> 10-09 23:17:46.678  2351  2552 I ReactNativeJS:   voices: 
+> 10-09 23:17:46.678  2351  2552 I ReactNativeJS:    [ 'zona:%D0%BE%D1%80%D0%B8%D0%B3%D0%B8%D0%BD%D0%B0%D0%BB%20%5Brus%5D%7Co',
+> 10-09 23:17:46.678  2351  2552 I ReactNativeJS:      'zona:%D1%80%D1%83%D1%81.%20%D0%BE%D1%80%D0%B8%D0%B3%D0%B8%D0%BD%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9%7C',
+> 10-09 23:17:46.678  2351  2552 I ReactNativeJS:      'zona:%D0%BD%D0%B5%20%D1%82%D1%80%D0%B5%D0%B1%D1%83%D0%B5%D1%82%D1%81%D1%8F%7C' ] }
+  10-09 23:17:46.918  2351  2495 D EGL_emulation: app_time_stats: avg=13.15ms min=2.12ms max=202.07ms count=41
+  10-09 23:17:47.421   894  3068 I Auth.Api.Credentials: [AuthorizeOperation] Operation started. [CONTEXT service_id=219 ]
+  10-09 23:17:47.422   894  3068 I Auth.Api.Credentials: [GenerateCallerVerificationTokenOperation] Operation started. [CONTEXT service_id=179 ]
+  10-09 23:17:48.935  2351  2495 D EGL_emulation: app_time_stats: avg=16.67ms min=13.99ms max=19.52ms count=60
+> 10-09 23:17:49.365  2351  2552 I ReactNativeJS: '[ZONA SEASON DATA]', { seasonSlug: '4',
+> 10-09 23:17:49.365  2351  2552 I ReactNativeJS:   seasonPart: 4,
+> 10-09 23:17:49.365  2351  2552 I ReactNativeJS:   episodeCount: 8,
+> 10-09 23:17:49.365  2351  2552 I ReactNativeJS:   episodes: 
+> 10-09 23:17:49.365  2351  2552 I ReactNativeJS:    [ { part: 1, slug: '1', title: '╨í╨╡╤Ç╨╕╤Å 41' },
+> 10-09 23:17:49.365  2351  2552 I ReactNativeJS:      { part: 2, slug: '2', title: '╨í╨╡╤Ç╨╕╤Å 42' },
+> 10-09 23:17:49.365  2351  2552 I ReactNativeJS:      { part: 3, slug: '3', title: '╨í╨╡╤Ç╨╕╤Å 43' },
+> 10-09 23:17:49.365  2351  2552 I ReactNativeJS:      { part: 4, slug: '4', title: '╨í╨╡╤Ç╨╕╤Å 44' },
+> 10-09 23:17:49.365  2351  2552 I ReactNativeJS:      { part: 5, slug: '5', title: '╨í╨╡╤Ç╨╕╤Å 45' },
+> 10-09 23:17:49.365  2351  2552 I ReactNativeJS:      { part: 6, slug: '6', title: '╨í╨╡╤Ç╨╕╤Å 46' },
+> 10-09 23:17:49.365  2351  2552 I ReactNativeJS:      { part: 7, slug: '7', title: '╨í╨╡╤Ç╨╕╤Å 47' },
+> 10-09 23:17:49.365  2351  2552 I ReactNativeJS:      { part: 8, slug: '8', title: '╨í╨╡╤Ç╨╕╤Å 48' } ] }
+> 10-09 23:17:49.377  2351  2552 I ReactNativeJS: '[ZONA SEASON DATA]', { seasonSlug: '5',
+> 10-09 23:17:49.377  2351  2552 I ReactNativeJS:   seasonPart: 5,
+> 10-09 23:17:49.377  2351  2552 I ReactNativeJS:   episodeCount: 8,
+> 10-09 23:17:49.377  2351  2552 I ReactNativeJS:   episodes: 
+> 10-09 23:17:49.377  2351  2552 I ReactNativeJS:    [ { part: 1, slug: '1', title: '╨í╨╡╤Ç╨╕╤Å 49' },
+> 10-09 23:17:49.377  2351  2552 I ReactNativeJS:      { part: 2, slug: '2', title: '╨í╨╡╤Ç╨╕╤Å 50' },
+> 10-09 23:17:49.377  2351  2552 I ReactNativeJS:      { part: 3, slug: '3', title: '╨í╨╡╤Ç╨╕╤Å 51' },
+> 10-09 23:17:49.377  2351  2552 I ReactNativeJS:      { part: 4, slug: '4', title: '╨í╨╡╤Ç╨╕╤Å 52' },
+> 10-09 23:17:49.377  2351  2552 I ReactNativeJS:      { part: 5, slug: '5', title: '╨í╨╡╤Ç╨╕╤Å 53' },
+> 10-09 23:17:49.377  2351  2552 I ReactNativeJS:      { part: 6, slug: '6', title: '╨í╨╡╤Ç╨╕╤Å 54' },
+> 10-09 23:17:49.377  2351  2552 I ReactNativeJS:      { part: 7, slug: '7', title: '╨í╨╡╤Ç╨╕╤Å 55' },
+> 10-09 23:17:49.377  2351  2552 I ReactNativeJS:      { part: 8, slug: '8', title: '╨í╨╡╤Ç╨╕╤Å 56' } ] }
+  10-09 23:17:49.569   426   443 D CompatibilityChangeReporter: Compat change id reported: 135634846; UID 10068; state: DISABLED
+  10-09 23:17:49.569   426   443 D CompatibilityChangeReporter: Compat change id reported: 177438394; UID 10068; state: DISABLED
+  10-09 23:17:49.569   426   443 D CompatibilityChangeReporter: Compat change id reported: 135772972; UID 10068; state: DISABLED
+  10-09 23:17:49.575   426   453 I ActivityManager: Start proc 5402:com.android.permissioncontroller/u0a68 for service {com.android.permissioncontroller/com.android.permissioncontroller.permission.service.PermissionControllerServiceImpl}
+> 10-09 23:17:49.585  2351  2552 I ReactNativeJS: '[ZONA SEASON DATA]', { seasonSlug: '3',
+> 10-09 23:17:49.585  2351  2552 I ReactNativeJS:   seasonPart: 3,
+> 10-09 23:17:49.585  2351  2552 I ReactNativeJS:   episodeCount: 16,
+> 10-09 23:17:49.585  2351  2552 I ReactNativeJS:   episodes: 
+> 10-09 23:17:49.585  2351  2552 I ReactNativeJS:    [ { part: 1, slug: '1', title: '╨í╨╡╤Ç╨╕╤Å 25' },
+> 10-09 23:17:49.585  2351  2552 I ReactNativeJS:      { part: 2, slug: '2', title: '╨í╨╡╤Ç╨╕╤Å 26' },
+> 10-09 23:17:49.585  2351  2552 I ReactNativeJS:      { part: 3, slug: '3', title: '╨í╨╡╤Ç╨╕╤Å 27' },
+> 10-09 23:17:49.585  2351  2552 I ReactNativeJS:      { part: 4, slug: '4', title: '╨í╨╡╤Ç╨╕╤Å 28' },
+> 10-09 23:17:49.585  2351  2552 I ReactNativeJS:      { part: 5, slug: '5', title: '╨í╨╡╤Ç╨╕╤Å 29' },
+> 10-09 23:17:49.585  2351  2552 I ReactNativeJS:      { part: 6, slug: '6', title: '╨í╨╡╤Ç╨╕╤Å 30' },
+> 10-09 23:17:49.585  2351  2552 I ReactNativeJS:      { part: 7, slug: '7', title: '╨í╨╡╤Ç╨╕╤Å 31' },
+> 10-09 23:17:49.585  2351  2552 I ReactNativeJS:      { part: 8, slug: '8', title: '╨í╨╡╤Ç╨╕╤Å 32' },
+> 10-09 23:17:49.585  2351  2552 I ReactNativeJS:      { part: 9, slug: '9', title: '╨í╨╡╤Ç╨╕╤Å 33' },
+> 10-09 23:17:49.585  2351  2552 I ReactNativeJS:      { part: 10, slug: '10', title: '╨í╨╡╤Ç╨╕╤Å 34' },
+> 10-09 23:17:49.585  2351  2552 I ReactNativeJS:      { part: 11, slug: '11', title: '╨í╨╡╤Ç╨╕╤Å 35' },
+> 10-09 23:17:49.585  2351  2552 I ReactNativeJS:      { part: 12, slug: '12', title: '╨í╨╡╤Ç╨╕╤Å 36' },
+> 10-09 23:17:49.585  2351  2552 I ReactNativeJS:      { part: 13, slug: '13', title: '╨í╨╡╤Ç╨╕╤Å 37' },
+> 10-09 23:17:49.585  2351  2552 I ReactNativeJS:      { part: 14, slug: '14', title: '╨í╨╡╤Ç╨╕╤Å 38' },
+> 10-09 23:17:49.585  2351  2552 I ReactNativeJS:      { part: 15, slug: '15', title: '╨í╨╡╤Ç╨╕╤Å 39' },
+> 10-09 23:17:49.585  2351  2552 I ReactNativeJS:      { part: 16, slug: '16', title: '╨í╨╡╤Ç╨╕╤Å 40' } ] }
+  10-09 23:17:49.586  5402  5402 E ssioncontroller: Not starting debugger since process cannot load the jdwp agent.
+  10-09 23:17:49.592   894  1747 I Auth.Api.Credentials: [AuthorizeOperation] Operation started. [CONTEXT service_id=219 ]
+  10-09 23:17:49.593   894  3079 I Auth.Api.Credentials: [GenerateCallerVerificationTokenOperation] Operation started. [CONTEXT service_id=179 ]
+  10-09 23:17:49.639   426  1829 D CompatibilityChangeReporter: Compat change id reported: 161145287; UID 10068; state: DISABLED
+> 10-09 23:17:49.663  2351  2552 I ReactNativeJS: '[ZONA SEASON DATA]', { seasonSlug: '1',
+> 10-09 23:17:49.663  2351  2552 I ReactNativeJS:   seasonPart: 1,
+> 10-09 23:17:49.663  2351  2552 I ReactNativeJS:   episodeCount: 12,
+> 10-09 23:17:49.663  2351  2552 I ReactNativeJS:   episodes: 
+> 10-09 23:17:49.663  2351  2552 I ReactNativeJS:    [ { part: 1, slug: '1', title: '╨í╨╡╤Ç╨╕╤Å 01' },
+> 10-09 23:17:49.663  2351  2552 I ReactNativeJS:      { part: 2, slug: '2', title: '╨í╨╡╤Ç╨╕╤Å 02' },
+> 10-09 23:17:49.663  2351  2552 I ReactNativeJS:      { part: 3, slug: '3', title: '╨í╨╡╤Ç╨╕╤Å 03' },
+> 10-09 23:17:49.663  2351  2552 I ReactNativeJS:      { part: 4, slug: '4', title: '╨í╨╡╤Ç╨╕╤Å 04' },
+> 10-09 23:17:49.663  2351  2552 I ReactNativeJS:      { part: 5, slug: '5', title: '╨í╨╡╤Ç╨╕╤Å 05' },
+> 10-09 23:17:49.663  2351  2552 I ReactNativeJS:      { part: 6, slug: '6', title: '╨í╨╡╤Ç╨╕╤Å 06' },
+> 10-09 23:17:49.663  2351  2552 I ReactNativeJS:      { part: 7, slug: '7', title: '╨í╨╡╤Ç╨╕╤Å 07' },
+> 10-09 23:17:49.663  2351  2552 I ReactNativeJS:      { part: 8, slug: '8', title: '╨í╨╡╤Ç╨╕╤Å 08' },
+> 10-09 23:17:49.663  2351  2552 I ReactNativeJS:      { part: 9, slug: '9', title: '╨í╨╡╤Ç╨╕╤Å 09' },
+> 10-09 23:17:49.663  2351  2552 I ReactNativeJS:      { part: 10, slug: '10', title: '╨í╨╡╤Ç╨╕╤Å 10' },
+> 10-09 23:17:49.663  2351  2552 I ReactNativeJS:      { part: 11, slug: '11', title: '╨í╨╡╤Ç╨╕╤Å 11' },
+> 10-09 23:17:49.663  2351  2552 I ReactNativeJS:      { part: 12, slug: '12', title: '╨í╨╡╤Ç╨╕╤Å 12' } ] }
+> 10-09 23:17:49.681  2351  2552 I ReactNativeJS: '[ZONA SEASON DATA]', { seasonSlug: '2',
+> 10-09 23:17:49.681  2351  2552 I ReactNativeJS:   seasonPart: 2,
+> 10-09 23:17:49.681  2351  2552 I ReactNativeJS:   episodeCount: 12,
+> 10-09 23:17:49.681  2351  2552 I ReactNativeJS:   episodes: 
+> 10-09 23:17:49.681  2351  2552 I ReactNativeJS:    [ { part: 1, slug: '1', title: '╨í╨╡╤Ç╨╕╤Å 13' },
+> 10-09 23:17:49.681  2351  2552 I ReactNativeJS:      { part: 2, slug: '2', title: '╨í╨╡╤Ç╨╕╤Å 14' },
+> 10-09 23:17:49.681  2351  2552 I ReactNativeJS:      { part: 3, slug: '3', title: '╨í╨╡╤Ç╨╕╤Å 15' },
+> 10-09 23:17:49.681  2351  2552 I ReactNativeJS:      { part: 4, slug: '4', title: '╨í╨╡╤Ç╨╕╤Å 16' },
+> 10-09 23:17:49.681  2351  2552 I ReactNativeJS:      { part: 5, slug: '5', title: '╨í╨╡╤Ç╨╕╤Å 17' },
+> 10-09 23:17:49.681  2351  2552 I ReactNativeJS:      { part: 6, slug: '6', title: '╨í╨╡╤Ç╨╕╤Å 18' },
+> 10-09 23:17:49.681  2351  2552 I ReactNativeJS:      { part: 7, slug: '7', title: '╨í╨╡╤Ç╨╕╤Å 19' },
+> 10-09 23:17:49.681  2351  2552 I ReactNativeJS:      { part: 8, slug: '8', title: '╨í╨╡╤Ç╨╕╤Å 20' },
+> 10-09 23:17:49.681  2351  2552 I ReactNativeJS:      { part: 9, slug: '9', title: '╨í╨╡╤Ç╨╕╤Å 21' },
+> 10-09 23:17:49.681  2351  2552 I ReactNativeJS:      { part: 10, slug: '10', title: '╨í╨╡╤Ç╨╕╤Å 22' },
+> 10-09 23:17:49.681  2351  2552 I ReactNativeJS:      { part: 11, slug: '11', title: '╨í╨╡╤Ç╨╕╤Å 23' },
+> 10-09 23:17:49.681  2351  2552 I ReactNativeJS:      { part: 12, slug: '12', title: '╨í╨╡╤Ç╨╕╤Å 24' } ] }
+  10-09 23:17:50.170   946  2197 D UserInputRedirectionHandler: moveTaskToFront: 18
+  10-09 23:17:50.170   426  2156 E CellBroadcastUtils: getDefaultCellBroadcastReceiverPackageName: no package found
+> 10-09 23:17:50.279  2351  2552 I ReactNativeJS: '[ZONA PLAYBACK EPISODE REQUEST]', { link: 'https://w1.zona.im/tvseries/mazhor',
+> 10-09 23:17:50.279  2351  2552 I ReactNativeJS:   kinopoiskId: 820638,
+> 10-09 23:17:50.279  2351  2552 I ReactNativeJS:   seasonId: '1',
+> 10-09 23:17:50.279  2351  2552 I ReactNativeJS:   episodeId: '1',
+> 10-09 23:17:50.279  2351  2552 I ReactNativeJS:   episodeKey: 'S01E01' }
+  10-09 23:17:50.289  2351  2495 D EGL_emulation: app_time_stats: avg=22.09ms min=2.67ms max=570.72ms count=48
+  10-09 23:17:50.465   894  3392 I Auth.Api.Credentials: [AuthorizeOperation] Operation started. [CONTEXT service_id=219 ]
+  10-09 23:17:50.466   894  2844 I Auth.Api.Credentials: [GenerateCallerVerificationTokenOperation] Operation started. [CONTEXT service_id=179 ]
+  10-09 23:17:52.433   894  1127 I Auth.Api.Credentials: (REDACTED) [AuthorizeOperation] Operation succeeded with result: %s.
+> 10-09 23:17:52.622  2351  2552 I ReactNativeJS: '[ZONA STREAM VOICES] EPISODE', [ { translation: '╨₧╤Ç╨╕╨│╨╕╨╜╨░╨╗ [Rus]', language: 'o' },
+> 10-09 23:17:52.622  2351  2552 I ReactNativeJS:   { translation: '[{"0":"╨á╤â╤ü. ╨₧╤Ç╨╕╨│╨╕╨╜╨░╨╗╤î╨╜╤ï╨╣"}]', language: '' },
+> 10-09 23:17:52.622  2351  2552 I ReactNativeJS:   { translation: '╨¥╨╡ ╤é╤Ç╨╡╨▒╤â╨╡╤é╤ü╤Å', language: '' } ]
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS: '[ZONA PLAYBACK EPISODE RAW STREAMS]', { link: 'https://w1.zona.im/tvseries/mazhor',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:   seasonId: '1',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:   episodeId: '1',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:   episodeKey: 'S01E01',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:   count: 7,
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:   streams: 
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:    [ { url: 'https://nl202.cdnsqu.com/s/FHvB12YN4hjGjMot-CiK5WiUFBQUFBQUFBQUFBUnRRVDBnZ0JV.rV4eIs5DZR2n0NQeA9ENQzi-J_XJF0UBmRBIYA/mazhor.rus.2014-nf19/s01e01_480.mp4?am1',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        resolution: '480p',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        quality: 'MEDIUM',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        translation: '╨₧╤Ç╨╕╨│╨╕╨╜╨░╨╗ [Rus]',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        language: 'o',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        isTrailer: false,
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        subtitles: 0 },
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:      { url: 'https://hye1eaipby4w.interkh.com/08_24_22/08/24/15/NQPIZUPI/5DMCWQHS.mp4/master.m3u8?fckz2=cae8d5744a56744&ha=41bc99caa056ccd&hc=0335a414a1236f3&hi=465b726fb9474e8&ht=170a5592e08542f&hu=902afbf50ed959e&hui=4d9f79711eb917b&t=1792437472',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        resolution: 'HLS',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        quality: 'MEDIUM',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        translation: '[{"0":"╨á╤â╤ü. ╨₧╤Ç╨╕╨│╨╕╨╜╨░╨╗╤î╨╜╤ï╨╣"}]',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        language: '',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        isTrailer: false,
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        subtitles: 0 },
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:      { url: 'https://hye1eaipby4w.interkh.com/08_22/24/23/C3NDRKTM/904326.mpd?fckz2=cae8d5744a56744&ha=41bc99caa056ccd&hc=0335a414a1236f3&hi=465b726fb9474e8&ht=170a5592e08542f&hu=902afbf50ed959e&hui=3a6ddd372b9f322&t=1792437472',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        resolution: 'DASH',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        quality: 'MEDIUM',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        translation: '[{"0":"╨á╤â╤ü. ╨₧╤Ç╨╕╨│╨╕╨╜╨░╨╗╤î╨╜╤ï╨╣"}]',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        language: '',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        isTrailer: false,
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        subtitles: 0 },
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:      { url: 'https://b-401.sevstar933krop.com/stream2/b-401/3b483d4ffb74e9f2003d699898ca2c0d/MJTMsp1RshGTygnMNRUR2N2MSlnWXZEdMNDZzQWe5MDZzMmdZJTO1R2RWVHZDljekhkSsl1VwYnWtx2cihVT21EVZlnWEpFaPRkSo1keSlWTEFFeapmSo10VZdXTX5UbZpGaqplarRjTElVP:1791577073:94.20.42.182:68e19ac30ebc1d4502e4d8462f12fa4cd99cd911a707385de142f7f8bffc4d7d:az:==wTUFVdNpWQ15ERJVXTUdWe/360/index.m3u8',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        resolution: '360p',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        quality: 'MEDIUM',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        translation: '╨¥╨╡ ╤é╤Ç╨╡╨▒╤â╨╡╤é╤ü╤Å',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        language: '',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        isTrailer: false,
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        subtitles: 0 },
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:      { url: 'https://b-401.sevstar933krop.com/stream2/b-401/3b483d4ffb74e9f2003d699898ca2c0d/MJTMsp1RshGTygnMNRUR2N2MSlnWXZEdMNDZzQWe5MDZzMmdZJTO1R2RWVHZDljekhkSsl1VwYnWtx2cihVT21EVZlnWEpFaPRkSo1keSlWTEFFeapmSo10VZdXTX5UbZpGaqplarRjTElVP:1791577073:94.20.42.182:68e19ac30ebc1d4502e4d8462f12fa4cd99cd911a707385de142f7f8bffc4d7d:az:==wTUFVdNpWQ15ERJVXTUdWe/480/index.m3u8',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        resolution: '480p',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        quality: 'MEDIUM',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        translation: '╨¥╨╡ ╤é╤Ç╨╡╨▒╤â╨╡╤é╤ü╤Å',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        language: '',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        isTrailer: false,
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        subtitles: 0 },
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:      { url: 'https://b-401.sevstar933krop.com/stream2/b-401/3b483d4ffb74e9f2003d699898ca2c0d/MJTMsp1RshGTygnMNRUR2N2MSlnWXZEdMNDZzQWe5MDZzMmdZJTO1R2RWVHZDljekhkSsl1VwYnWtx2cihVT21EVZlnWEpFaPRkSo1keSlWTEFFeapmSo10VZdXTX5UbZpGaqplarRjTElVP:1791577073:94.20.42.182:68e19ac30ebc1d4502e4d8462f12fa4cd99cd911a707385de142f7f8bffc4d7d:az:==wTUFVdNpWQ15ERJVXTUdWe/720/index.m3u8',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        resolution: '720p',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        quality: 'MEDIUM',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        translation: '╨¥╨╡ ╤é╤Ç╨╡╨▒╤â╨╡╤é╤ü╤Å',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        language: '',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        isTrailer: false,
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        subtitles: 0 },
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:      { url: 'https://b-401.sevstar933krop.com/stream2/b-401/3b483d4ffb74e9f2003d699898ca2c0d/MJTMsp1RshGTygnMNRUR2N2MSlnWXZEdMNDZzQWe5MDZzMmdZJTO1R2RWVHZDljekhkSsl1VwYnWtx2cihVT21EVZlnWEpFaPRkSo1keSlWTEFFeapmSo10VZdXTX5UbZpGaqplarRjTElVP:1791577073:94.20.42.182:68e19ac30ebc1d4502e4d8462f12fa4cd99cd911a707385de142f7f8bffc4d7d:az:==wTUFVdNpWQ15ERJVXTUdWe/1080/index.m3u8',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        resolution: '1080p',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        quality: 'MEDIUM',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        translation: '╨¥╨╡ ╤é╤Ç╨╡╨▒╤â╨╡╤é╤ü╤Å',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        language: '',
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        isTrailer: false,
+> 10-09 23:17:52.624  2351  2552 I ReactNativeJS:        subtitles: 0 } ] }
+> 10-09 23:17:52.625  2351  2552 I ReactNativeJS: '[ZONA PLAYBACK EPISODE NORMALIZED]', { link: 'https://w1.zona.im/tvseries/mazhor',
+> 10-09 23:17:52.625  2351  2552 I ReactNativeJS:   seasonId: '1',
+> 10-09 23:17:52.625  2351  2552 I ReactNativeJS:   episodeId: '1',
+> 10-09 23:17:52.625  2351  2552 I ReactNativeJS:   episodeKey: 'S01E01',
+> 10-09 23:17:52.625  2351  2552 I ReactNativeJS:   voice: 
+> 10-09 23:17:52.625  2351  2552 I ReactNativeJS:    { id: 'zona:%D0%BE%D1%80%D0%B8%D0%B3%D0%B8%D0%BD%D0%B0%D0%BB%20%5Brus%5D%7Co',
+> 10-09 23:17:52.625  2351  2552 I ReactNativeJS:      identifier: 'zona:%D0%BE%D1%80%D0%B8%D0%B3%D0%B8%D0%BD%D0%B0%D0%BB%20%5Brus%5D%7Co',
+> 10-09 23:17:52.625  2351  2552 I ReactNativeJS:      title: '╨₧╤Ç╨╕╨│╨╕╨╜╨░╨╗ [Rus]' },
+> 10-09 23:17:52.625  2351  2552 I ReactNativeJS:   streams: 
+> 10-09 23:17:52.625  2351  2552 I ReactNativeJS:    [ { url: 'https://nl202.cdnsqu.com/s/FHvB12YN4hjGjMot-CiK5WiUFBQUFBQUFBQUFBUnRRVDBnZ0JV.rV4eIs5DZR2n0NQeA9ENQzi-J_XJF0UBmRBIYA/mazhor.rus.2014-nf19/s01e01_480.mp4?am1',
+> 10-09 23:17:52.625  2351  2552 I ReactNativeJS:        quality: '480p' } ],
+> 10-09 23:17:52.625  2351  2552 I ReactNativeJS:   subtitles: [] }
+> 10-09 23:17:52.671  2351  2351 I ExoPlayerImpl: Init f88575b [AndroidXMedia3/1.4.1] [windows_x86_64, Subsystem for Android(TM), Microsoft Corporation, 33]
+  10-09 23:17:52.685   426  3767 D MediaMetricsManagerService: failed to get player_metrics_app_blocklist from DeviceConfig
+  10-09 23:17:52.685   426  3767 V MediaMetricsManagerService: Logging level blocked: Failed to get PLAYER_METRICS_APP_BLOCKLIST.
+> 10-09 23:17:52.686  2351  2351 I ExoPlayerImpl: Init 9ffbf36 [AndroidXMedia3/1.4.1] [windows_x86_64, Subsystem for Android(TM), Microsoft Corporation, 33]
+  10-09 23:17:52.691   426  3767 D MediaMetricsManagerService: failed to get player_metrics_app_blocklist from DeviceConfig
+  10-09 23:17:52.691   426  3767 V MediaMetricsManagerService: Logging level blocked: Failed to get PLAYER_METRICS_APP_BLOCKLIST.
+  10-09 23:17:52.692   426  3767 D MediaMetricsManagerService: failed to get player_metrics_app_blocklist from DeviceConfig
+  10-09 23:17:53.003   946  2222 V SystemMediaControlsRedirectionHandler: Playback state changed for: com.falcofemoralis.lumen state: 2 enabled buttons: 7339671
+> 10-09 23:17:53.031  2351  2552 I ReactNativeJS: '[ATV Page layout]', { x: 0, y: 0, width: 1423, height: 905, isMenuOpen: false }
+> 10-09 23:17:53.031  2351  2552 I ReactNativeJS: '[ATV Page window]', { x: 0, y: 0, width: 1423, height: 905 }
+  10-09 23:17:53.041  2351  5441 D TrafficStats: tagSocket(207) with statsTag=0xffffffff, statsUid=-1
+  10-09 23:17:53.069  2351  2351 W OnBackInvokedCallback: OnBackInvokedCallback is not enabled for the application.
+  10-09 23:17:53.069  2351  2351 W OnBackInvokedCallback: Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+> 10-09 23:17:53.103  2351  2552 I ReactNativeJS: '[ATV ScrollView]', { width: 1364, height: 75 }
+> 10-09 23:17:53.103  2351  2552 I ReactNativeJS: '[ATV ScrollView contentView]', { width: 1364, height: 75 }
+> 10-09 23:17:53.194  2351  2552 I ReactNativeJS: '[ATV ScrollView]', { width: 1253, height: 75 }
+  10-09 23:17:53.196  2351  2351 W Reanimated: synchronouslyUpdateUIProps failed for tag 3812
+  10-09 23:17:53.196  2351  2351 W Reanimated: java.lang.reflect.InvocationTargetException
+  10-09 23:17:53.196  2351  2351 W Reanimated: 	at java.lang.reflect.Method.invoke(Native Method)
+  10-09 23:17:54.169   946  2222 V SystemMediaControlsRedirectionHandler: Media data changed for: com.falcofemoralis.lumen artist: ╨₧╤Ç╨╕╨│╨╕╨╜╨░╨╗ [Rus] albumArtist: <NA> title: ╨£╨░╨╢╨╛╤Ç
+> 10-09 23:17:54.171  2351  5434 I DMCodecAdapterFactory: Creating an asynchronous MediaCodec adapter for track type video
+  10-09 23:17:54.175  2351  5449 I OMXClient: IOmx service obtained
+  10-09 23:17:54.175   374   374 I OMXStore: makeComponentInstance(OMX.android.latte.h264.decoder) in android.hardwar process
+  10-09 23:17:54.175   374   374 I android.hardware.media.omx@1.0-service: makeComponentInstance 'OMX.android.latte.h264.decoder'
+  10-09 23:17:54.178   426  1829 V MediaMetricsManagerService: Logging level blocked: Failed to get PLAYER_METRICS_APP_BLOCKLIST.
+> 10-09 23:17:54.178  2351  5448 I MediaCodec: MediaCodec will operate in async mode
+> 10-09 23:17:54.179  2351  5448 D MediaCodec: flushMediametrics
+  10-09 23:17:54.179   733   733 I WsaTaskManager: onTaskInfoChanged taskId: 19
+  10-09 23:17:54.179   733   733 I WsaTaskManager: onTaskInfoChanged taskId: 18
+  10-09 23:17:54.179  2351  5448 D SurfaceUtils: connecting to surface 0x71b4b39c6520, reason connectToSurface
+> 10-09 23:17:54.179  2351  5448 I MediaCodec: [OMX.android.latte.h264.decoder] setting surface generation to 2407425
+  10-09 23:17:54.179  2351  5448 D SurfaceUtils: disconnecting from surface 0x71b4b39c6520, reason connectToSurface(reconnect)
+  10-09 23:17:54.179  2351  5448 D SurfaceUtils: connecting to surface 0x71b4b39c6520, reason connectToSurface(reconnect)
+  10-09 23:17:54.180   374   374 W OMXNodeInstance: [0xf4800940:android.latte.h264.decoder] component does not support metadata mode; using fallback
+  10-09 23:17:54.230   266   266 W SurfaceFlinger: couldn't log to binary event log: overflow.
+> 10-09 23:17:54.234  2351  5434 D MediaCodec: keep callback message for reclaim
+  10-09 23:17:54.259  2351  5449 D SurfaceUtils: disconnecting from surface 0x71b4b39c6520, reason setNativeWindowSizeFormatAndUsage
+  10-09 23:17:54.259  2351  5449 D SurfaceUtils: connecting to surface 0x71b4b39c6520, reason setNativeWindowSizeFormatAndUsage
+  10-09 23:17:54.259  2351  5449 D SurfaceUtils: set up nativeWindow 0x71b4b39c6520 for 720x404, color 0x23, rotation 0, usage 0x402900
+  10-09 23:17:54.312   370   391 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+> 10-09 23:17:54.314  2351  5434 I DMCodecAdapterFactory: Creating an asynchronous MediaCodec adapter for track type audio
+  10-09 23:17:54.317  2351  5455 I OMXClient: IOmx service obtained
+  10-09 23:17:54.317   374   374 I OMXStore: makeComponentInstance(OMX.google.aac.decoder) in android.hardwar process
+> 10-09 23:17:54.319  2351  5455 I MediaCodec: MediaCodec will operate in async mode
+> 10-09 23:17:54.320  2351  5455 D MediaCodec: flushMediametrics
+  10-09 23:17:54.321   374   374 E OMXNodeInstance: setConfig(0xf4801430:google.aac.decoder, ConfigPriority(0x6f800002)) ERROR: Undefined(0x80001001)
+  10-09 23:17:54.321  2351  5455 I ACodec  : codec does not support config priority (err -2147483648)
+  10-09 23:17:54.322   374   374 E OMXNodeInstance: getConfig(0xf4801430:google.aac.decoder, ConfigAndroidVendorExtension(0x6f100004)) ERROR: Undefined(0x80001001)
+  10-09 23:17:54.322   374   374 D SoftAAC2: get OMX_IndexParamAudioAndroidAacDrcPresentation
+> 10-09 23:17:54.323  2351  5434 D MediaCodec: keep callback message for reclaim
+  10-09 23:17:54.335   374  5456 I SoftAAC2: Reconfiguring decoder: 0->44100 Hz, 0->1 channels
+  10-09 23:17:54.336   374   422 D SoftAAC2: get OMX_IndexParamAudioAndroidAacDrcPresentation
+  10-09 23:17:54.345   261  5167 W AudioFlinger: createTrack_l(): mismatch between requested flags (00000008) and output flags (00000002)
+  10-09 23:17:54.656   894  1127 I Auth.Api.Credentials: (REDACTED) [AuthorizeOperation] Operation succeeded with result: %s.
+> 10-09 23:17:54.678  2351  2351 I MediaSessionImpl: Release 6cb28d9 [AndroidXMedia3/1.4.1] [windows_x86_64, Subsystem for Android(TM), Microsoft Corporation, 33] [media3.common, media3.exoplayer, media3.decoder, media3.datasource.okhttp, media3.datasource, media3.ui, media3.session, media3.extractor]
+  10-09 23:17:54.678   426  3767 I MediaSessionStack: removeSession | record: com.falcofemoralis.lumen/androidx.media3.session.id.RNVideoPlaybackService_64528649 (userId=0)
+  10-09 23:17:54.678   426  3767 D MediaSessionService: Media button session is changed to null
+  10-09 23:17:54.678   946  2222 V SystemMediaControlsRedirectionHandler: Receive onActiveSessionChanged controller list size: 0
+> 10-09 23:17:54.678  2351  2351 I MediaController: Release 63c7995 [AndroidXMedia3/1.4.1] [windows_x86_64, Subsystem for Android(TM), Microsoft Corporation, 33] [media3.common, media3.exoplayer, media3.decoder, media3.datasource.okhttp, media3.datasource, media3.ui, media3.session, media3.extractor]
+  10-09 23:17:54.678   946  2222 V SystemMediaControlsRedirectionHandler: Removed media session for package: com.falcofemoralis.lumen
+  10-09 23:17:54.679   946  2222 V SystemMediaControlsRedirectionHandler: Send media controls enabled for package: com.falcofemoralis.lumen enabled: false
+  10-09 23:17:54.679   946  2222 V SystemMediaControlsRedirectionHandler: Receive onActiveSessionChanged end
+  10-09 23:17:54.683   426   426 D CompatibilityChangeReporter: Compat change id reported: 195579280; UID 10054; state: ENABLED
+> 10-09 23:17:54.683  2351  2351 I ExoPlayerImpl: Release 9ffbf36 [AndroidXMedia3/1.4.1] [windows_x86_64, Subsystem for Android(TM), Microsoft Corporation, 33] [media3.common, media3.exoplayer, media3.decoder, media3.datasource.okhttp, media3.datasource, media3.ui, media3.session, media3.extractor]
+  10-09 23:17:54.683   426   426 D CompatibilityChangeReporter: Compat change id reported: 175319604; UID 10058; state: ENABLED
+  10-09 23:17:54.683   426   426 D CompatibilityChangeReporter: Compat change id reported: 195579280; UID 10058; state: DISABLED
+  10-09 23:17:54.684   733   733 D NotificationListener: Notification removal detected by a notification listener
+  10-09 23:17:54.684   733   733 D NotificationListener: This notification uses Notification.Style. Template name: android.app.Notification$MediaStyle
+> 10-09 23:17:54.685  2351  5434 D MediaCodec: keep callback message for reclaim
+> 10-09 23:17:54.688  2351  5434 D MediaCodec: keep callback message for reclaim
+  10-09 23:17:54.689  2351  5448 D SurfaceUtils: connecting to surface 0x71b4b39ca940, reason connectToSurface
+> 10-09 23:17:54.690  2351  5448 I MediaCodec: [OMX.android.latte.h264.decoder] setting surface generation to 2407426
+  10-09 23:17:54.690  2351  5448 D SurfaceUtils: disconnecting from surface 0x71b4b39ca940, reason connectToSurface(reconnect)
+  10-09 23:17:54.690  2351  5448 D SurfaceUtils: connecting to surface 0x71b4b39ca940, reason connectToSurface(reconnect)
+  10-09 23:17:54.691  2351  5449 D SurfaceUtils: disconnecting from surface 0x71b4b39ca940, reason setNativeWindowSizeFormatAndUsage
+  10-09 23:17:54.691  2351  5448 E Surface : freeAllBuffers: 1 buffers were freed while being dequeued!
+> 10-09 23:17:54.697  2351  2351 I ExoPlayerImpl: Init 98c49d [AndroidXMedia3/1.4.1] [windows_x86_64, Subsystem for Android(TM), Microsoft Corporation, 33]
+> 10-09 23:17:54.699  2351  5455 D MediaCodec: flushMediametrics
+> 10-09 23:17:54.700  2351  5455 D MediaCodec: flushMediametrics
+  10-09 23:17:54.703  2351  5448 D SurfaceUtils: disconnecting from surface 0x71b4b39ca940, reason disconnectFromSurface
+> 10-09 23:17:54.704  2351  5448 D MediaCodec: flushMediametrics
+> 10-09 23:17:54.705  2351  5448 D MediaCodec: flushMediametrics
+  10-09 23:17:54.714   426  2156 D MediaMetricsManagerService: failed to get player_metrics_app_blocklist from DeviceConfig
+  10-09 23:17:54.714   426  2156 V MediaMetricsManagerService: Logging level blocked: Failed to get PLAYER_METRICS_APP_BLOCKLIST.
+  10-09 23:17:54.716   426  2156 D MediaMetricsManagerService: failed to get player_metrics_app_blocklist from DeviceConfig
+  10-09 23:17:54.716   426  2156 V MediaMetricsManagerService: Logging level blocked: Failed to get PLAYER_METRICS_APP_BLOCKLIST.
+> 10-09 23:17:54.717  2351  2351 I ExoPlayerImpl: Init b61bd12 [AndroidXMedia3/1.4.1] [windows_x86_64, Subsystem for Android(TM), Microsoft Corporation, 33]
+  10-09 23:17:54.722   426  2156 D MediaMetricsManagerService: failed to get player_metrics_app_blocklist from DeviceConfig
+  10-09 23:17:54.722   426  2156 V MediaMetricsManagerService: Logging level blocked: Failed to get PLAYER_METRICS_APP_BLOCKLIST.
+  10-09 23:17:54.723   426  2156 D MediaMetricsManagerService: failed to get player_metrics_app_blocklist from DeviceConfig
+  10-09 23:17:54.732   426   426 I NotificationService: Cannot find enqueued record for key: 0|com.falcofemoralis.lumen|1001|null|10097
+> 10-09 23:17:54.774  2351  2351 W ExoPlayerImplInternal: Ignoring messages sent after release.
+  10-09 23:17:54.775  2351  2351 D PictureInPictureUtils: Successfully set PiP params
+  10-09 23:17:54.800  2351  2351 I MediaSessionImpl: Init 30f17ed [AndroidXMedia3/1.4.1] [windows_x86_64, Subsystem for Android(TM), Microsoft Corporation, 33]
+  10-09 23:17:54.802  2351  2351 W MediaSessionCompat: Couldn't find a unique registered media button receiver in the given context.
+  10-09 23:17:55.705   946  2222 V SystemMediaControlsRedirectionHandler: Media data changed for: com.falcofemoralis.lumen artist: ╨₧╤Ç╨╕╨│╨╕╨╜╨░╨╗ [Rus] albumArtist: <NA> title: ╨£╨░╨╢╨╛╤Ç
+> 10-09 23:17:55.707  2351  5464 I DMCodecAdapterFactory: Creating an asynchronous MediaCodec adapter for track type video
+  10-09 23:17:55.707   894  5400 I Auth.Api.Credentials: (REDACTED) [AuthorizeOperation] Operation succeeded with result: %s.
+  10-09 23:17:55.709  2351  5471 I OMXClient: IOmx service obtained
+  10-09 23:17:55.710   374   422 I OMXStore: makeComponentInstance(OMX.android.latte.h264.decoder) in android.hardwar process
+  10-09 23:17:55.710   374   422 I LatteOMXDecoder: created LatteOMXDecoder 93 object 0xf1d01fb0
+> 10-09 23:17:55.713  2351  5470 I MediaCodec: MediaCodec will operate in async mode
+> 10-09 23:17:55.713  2351  5470 D MediaCodec: flushMediametrics
+  10-09 23:17:55.713  2351  5470 D SurfaceUtils: connecting to surface 0x71b4b39aaa50, reason connectToSurface
+> 10-09 23:17:55.713  2351  5470 I MediaCodec: [OMX.android.latte.h264.decoder] setting surface generation to 2407427
+  10-09 23:17:55.713  2351  5470 D SurfaceUtils: disconnecting from surface 0x71b4b39aaa50, reason connectToSurface(reconnect)
+  10-09 23:17:55.713  2351  5470 D SurfaceUtils: connecting to surface 0x71b4b39aaa50, reason connectToSurface(reconnect)
+  10-09 23:17:55.714   374   422 W OMXNodeInstance: [0xf4801430:android.latte.h264.decoder] component does not support metadata mode; using fallback
+  10-09 23:17:55.722   374   374 E OMXNodeInstance: getConfig(0xf4801430:android.latte.h264.decoder, ??(0x7f000003)) ERROR: UnsupportedSetting(0x80001019)
+> 10-09 23:17:55.723  2351  5464 D MediaCodec: keep callback message for reclaim
+  10-09 23:17:55.731  2351  5471 D SurfaceUtils: disconnecting from surface 0x71b4b39aaa50, reason setNativeWindowSizeFormatAndUsage
+  10-09 23:17:55.732  2351  5471 D SurfaceUtils: connecting to surface 0x71b4b39aaa50, reason setNativeWindowSizeFormatAndUsage
+  10-09 23:17:55.732  2351  5471 D SurfaceUtils: set up nativeWindow 0x71b4b39aaa50 for 720x404, color 0x23, rotation 0, usage 0x402900
+  10-09 23:17:55.754   370   391 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+> 10-09 23:17:55.757  2351  5464 I DMCodecAdapterFactory: Creating an asynchronous MediaCodec adapter for track type audio
+  10-09 23:17:55.759  2351  5476 I OMXClient: IOmx service obtained
+  10-09 23:17:55.759   426  2156 D MediaMetricsManagerService: failed to get player_metrics_app_blocklist from DeviceConfig
+  10-09 23:17:55.759   426  2156 V MediaMetricsManagerService: Logging level blocked: Failed to get PLAYER_METRICS_APP_BLOCKLIST.
+  10-09 23:17:55.760   946  2222 V SystemMediaControlsRedirectionHandler: Playback state changed for: com.falcofemoralis.lumen state: 2 enabled buttons: 7339999
+> 10-09 23:17:55.762  2351  5476 I MediaCodec: MediaCodec will operate in async mode
+> 10-09 23:17:55.762  2351  5476 D MediaCodec: flushMediametrics
+  10-09 23:17:55.764   374   374 E OMXNodeInstance: setConfig(0xf4801660:google.aac.decoder, ConfigPriority(0x6f800002)) ERROR: Undefined(0x80001001)
+  10-09 23:17:55.765  2351  5476 I ACodec  : codec does not support config priority (err -2147483648)
+  10-09 23:17:55.765   374   374 E OMXNodeInstance: getConfig(0xf4801660:google.aac.decoder, ConfigAndroidVendorExtension(0x6f100004)) ERROR: Undefined(0x80001001)
+  10-09 23:17:55.766   374   374 D SoftAAC2: get OMX_IndexParamAudioAndroidAacDrcPresentation
+> 10-09 23:17:55.767  2351  5464 D MediaCodec: keep callback message for reclaim
+  10-09 23:17:55.771   374  5472 I LatteOMXDecoder: Latte decoder version 4.0
+  10-09 23:17:55.779   374  5477 I SoftAAC2: Reconfiguring decoder: 0->44100 Hz, 0->1 channels
+  10-09 23:17:55.780   374   374 D SoftAAC2: get OMX_IndexParamAudioAndroidAacDrcPresentation
+  10-09 23:17:57.791   894  3392 I Auth.Api.Credentials: (REDACTED) [AuthorizeOperation] Operation succeeded with result: %s.
+> 10-09 23:17:58.517  2351  2351 I MediaSessionImpl: Release 30f17ed [AndroidXMedia3/1.4.1] [windows_x86_64, Subsystem for Android(TM), Microsoft Corporation, 33] [media3.common, media3.exoplayer, media3.decoder, media3.datasource.okhttp, media3.datasource, media3.ui, media3.session, media3.extractor]
+  10-09 23:17:58.517   426  2156 I MediaSessionStack: removeSession | record: com.falcofemoralis.lumen/androidx.media3.session.id.RNVideoPlaybackService_43838037 (userId=0)
+  10-09 23:17:58.518   426  2156 D MediaSessionService: Media button session is changed to null
+> 10-09 23:17:58.518  2351  2351 I MediaController: Release 76b78b3 [AndroidXMedia3/1.4.1] [windows_x86_64, Subsystem for Android(TM), Microsoft Corporation, 33] [media3.common, media3.exoplayer, media3.decoder, media3.datasource.okhttp, media3.datasource, media3.ui, media3.session, media3.extractor]
+  10-09 23:17:58.518   946  2222 V SystemMediaControlsRedirectionHandler: Receive onActiveSessionChanged controller list size: 0
+  10-09 23:17:58.518   946  2222 V SystemMediaControlsRedirectionHandler: Removed media session for package: com.falcofemoralis.lumen
+  10-09 23:17:58.518   946  2222 V SystemMediaControlsRedirectionHandler: Send media controls enabled for package: com.falcofemoralis.lumen enabled: false
+  10-09 23:17:58.521   733   733 D NotificationListener: This notification uses Notification.Style. Template name: android.app.Notification$MediaStyle
+> 10-09 23:17:58.522  2351  2351 I ExoPlayerImpl: Release b61bd12 [AndroidXMedia3/1.4.1] [windows_x86_64, Subsystem for Android(TM), Microsoft Corporation, 33] [media3.common, media3.exoplayer, media3.decoder, media3.datasource.okhttp, media3.datasource, media3.ui, media3.session, media3.extractor]
+> 10-09 23:17:58.524  2351  5464 D MediaCodec: keep callback message for reclaim
+> 10-09 23:17:58.527  2351  5464 D MediaCodec: keep callback message for reclaim
+  10-09 23:17:58.528  2351  5470 D SurfaceUtils: connecting to surface 0x71b4b39d3180, reason connectToSurface
+> 10-09 23:17:58.528  2351  5470 I MediaCodec: [OMX.android.latte.h264.decoder] setting surface generation to 2407428
+  10-09 23:17:58.528  2351  5470 D SurfaceUtils: disconnecting from surface 0x71b4b39d3180, reason connectToSurface(reconnect)
+  10-09 23:17:58.528  2351  5470 D SurfaceUtils: connecting to surface 0x71b4b39d3180, reason connectToSurface(reconnect)
+  10-09 23:17:58.543  2351  5471 D SurfaceUtils: disconnecting from surface 0x71b4b39d3180, reason setNativeWindowSizeFormatAndUsage
+  10-09 23:17:58.549  2351  5470 D SurfaceUtils: disconnecting from surface 0x71b4b39d3180, reason disconnectFromSurface
+> 10-09 23:17:58.550  2351  5476 D MediaCodec: flushMediametrics
+> 10-09 23:17:58.551  2351  5476 D MediaCodec: flushMediametrics
+> 10-09 23:17:58.552  2351  5470 D MediaCodec: flushMediametrics
+> 10-09 23:17:58.552  2351  5470 D MediaCodec: flushMediametrics
+  10-09 23:17:58.559  2351  2495 D EGL_emulation: app_time_stats: avg=163.96ms min=1.12ms max=1617.50ms count=10
+  10-09 23:17:58.561   426  2156 D MediaMetricsManagerService: failed to get player_metrics_app_blocklist from DeviceConfig
+  10-09 23:17:58.562   426  2156 V MediaMetricsManagerService: Logging level blocked: Failed to get PLAYER_METRICS_APP_BLOCKLIST.

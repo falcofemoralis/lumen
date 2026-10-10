@@ -1,4 +1,5 @@
 import { FilmType } from 'Type/FilmType.type';
+import { decode } from 'html-entities';
 
 import {
   ContentSource,
@@ -26,7 +27,7 @@ const normalizeExternalId = (value: string): string => (
 );
 
 const normalizeTitle = (value: string): string => (
-  value
+  decode(value)
     .normalize('NFKC')
     .toLowerCase()
     .replace(/\u0451/g, '\u0435')
@@ -40,23 +41,19 @@ const getContentIdentity = (film: UnifiedFilm): string | null => {
     return null;
   }
 
-  const title = normalizeTitle(film.originalTitle ?? film.title);
+  const title = normalizeTitle(film.title);
 
   if (!title) {
     return null;
   }
 
-  return [
-    title,
-    film.year,
-    film.type,
-  ].join('|');
+  return [title, film.year, film.type].join('|');
 };
 
 const getFilmExternalIds = (
   film: UnifiedFilm,
 ): UnifiedExternalId[] => film.sources.flatMap(
-  (source) => source.externalIds
+  (source) => source.externalIds,
 );
 
 const getExternalIdsByType = (
@@ -66,13 +63,13 @@ const getExternalIdsByType = (
   getFilmExternalIds(film)
     .filter((externalId) => externalId.type === type)
     .map((externalId) => normalizeExternalId(externalId.value))
-    .filter(Boolean)
+    .filter(Boolean),
 );
 
-const hasMatchingExternalId = (
+const getFirstSharedExternalIdType = (
   first: UnifiedFilm,
   second: UnifiedFilm,
-): boolean => {
+): UnifiedExternalIdType | null => {
   for (const type of EXTERNAL_ID_PRIORITY) {
     const firstIds = getExternalIdsByType(first, type);
     const secondIds = getExternalIdsByType(second, type);
@@ -81,41 +78,44 @@ const hasMatchingExternalId = (
       continue;
     }
 
-    for (const id of firstIds) {
-      if (secondIds.has(id)) {
-        return true;
-      }
-    }
+    return type;
+  }
 
+  return null;
+};
+
+const hasMatchingExternalId = (
+  first: UnifiedFilm,
+  second: UnifiedFilm,
+): boolean => {
+  const type = getFirstSharedExternalIdType(first, second);
+
+  if (!type) {
     return false;
   }
 
-  return false;
+  const firstIds = getExternalIdsByType(first, type);
+  const secondIds = getExternalIdsByType(second, type);
+
+  return Array.from(firstIds).some((id) => secondIds.has(id));
 };
 
 const hasConflictingExternalId = (
   first: UnifiedFilm,
   second: UnifiedFilm,
 ): boolean => {
-  for (const type of EXTERNAL_ID_PRIORITY) {
-    const firstIds = getExternalIdsByType(first, type);
-    const secondIds = getExternalIdsByType(second, type);
+  const type = getFirstSharedExternalIdType(first, second);
 
-    if (!firstIds.size || !secondIds.size) {
-      continue;
-    }
-
-    const hasSharedId = Array.from(firstIds).some(
-      (id) => secondIds.has(id),
-    );
-
-    if (!hasSharedId) {
-      return true;
-    }
+  if (!type) {
+    return false;
   }
 
-  return false;
+  const firstIds = getExternalIdsByType(first, type);
+  const secondIds = getExternalIdsByType(second, type);
+
+  return !Array.from(firstIds).some((id) => secondIds.has(id));
 };
+
 const hasSameSourceIdentity = (
   first: UnifiedFilm,
   second: UnifiedFilm,
@@ -126,7 +126,8 @@ const hasSameSourceIdentity = (
         continue;
       }
 
-      if (firstSource.link === secondSource.link) {
+      if ((firstSource.link && firstSource.link === secondSource.link)
+        || (firstSource.nativeId && firstSource.nativeId === secondSource.nativeId)) {
         return true;
       }
     }
@@ -158,7 +159,18 @@ const hasSameIdentity = (
     return false;
   }
 
-  return firstIdentity === secondIdentity;
+  if (first.originalTitle && second.originalTitle
+    && normalizeTitle(first.originalTitle) !== normalizeTitle(second.originalTitle)) {
+    return false;
+  }
+  const matchingOriginalTitle = Boolean(
+    first.originalTitle && second.originalTitle
+    && normalizeTitle(first.originalTitle)
+    && normalizeTitle(first.originalTitle) === normalizeTitle(second.originalTitle),
+  );
+  return firstIdentity === secondIdentity || (
+    matchingOriginalTitle && first.year === second.year && first.type === second.type
+  );
 };
 
 const cloneSource = (
@@ -172,9 +184,22 @@ const mergeSources = (
   target: UnifiedFilm,
   incoming: UnifiedFilm,
 ): void => {
+  if (!target.ratings && incoming.ratings) {
+    target.ratings = { ...incoming.ratings };
+  } else if (target.ratings && incoming.ratings) {
+    target.ratings = {
+      ...incoming.ratings,
+      ...Object.fromEntries(Object.entries(target.ratings).filter(([, value]) => value !== undefined)),
+    };
+  }
+
+  if (!target.info && incoming.info) {
+    target.info = incoming.info;
+  }
+
   incoming.sources.forEach((source) => {
     const existingSource = target.sources.find(
-      (item) => item.source === source.source,
+      (item) => item.source === source.source && item.link === source.link,
     );
 
     if (!existingSource) {
@@ -183,6 +208,7 @@ const mergeSources = (
       return;
     }
 
+    existingSource.nativeId ??= source.nativeId;
     source.externalIds.forEach((externalId) => {
       const normalizedValue = normalizeExternalId(externalId.value);
       const alreadyExists = existingSource.externalIds.some(
@@ -206,6 +232,10 @@ export class SourceResolver {
     this.adapters = new Map(
       adapters.map((adapter) => [adapter.source, adapter]),
     );
+  }
+
+  isSameFilm(first: UnifiedFilm, second: UnifiedFilm): boolean {
+    return hasSameIdentity(first, second);
   }
 
   getAdapter(source: ContentSource): SourceAdapter | undefined {
@@ -264,3 +294,5 @@ export class SourceResolver {
     return result;
   }
 }
+
+

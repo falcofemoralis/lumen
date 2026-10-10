@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { useFilmPager } from 'Component/FilmPager/useFilmPager';
+import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
+import { FilmPagerQueryData, useFilmPager } from 'Component/FilmPager/useFilmPager';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useIsTV } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
@@ -17,6 +17,10 @@ import { safeJsonParse } from 'Util/Json';
 import { setTimeoutSafe } from 'Util/Misc';
 import { navigate } from 'Util/Navigation';
 import { queryKeys, STALE_TIME } from 'Util/Query';
+import { unifiedSearchService, ContentSource } from '../../source';
+import { ContentFilters, matchesContentFilters } from '../../source/search/ContentFilters';
+import { FilmType } from 'Type/FilmType.type';
+import { FILM_COUNTRY_OPTIONS } from '../SettingsScreen/SettingsScreen.config';
 import { openCategory } from 'Util/Router';
 import { storage } from 'Util/Storage';
 import { consumeTvSearchRequest, subscribeToTvSearchRequests } from 'Util/TvSearch/request';
@@ -44,12 +48,55 @@ export function SearchScreenContainer() {
   const debounce = useRef<number | null>(null);
   const { currentService } = useServiceContext();
   const searchMenuItems = useMemo(() => [SEARCH_MENU_ITEM], []);
+  const queryClient = useQueryClient();
+  const [yearFrom, setYearFrom] = useState('');
+  const [yearTo, setYearTo] = useState('');
+  const [includedCountries, setIncludedCountries] = useState<string[]>([]);
+  const [allowedCountries, setAllowedCountries] = useState(FILM_COUNTRY_OPTIONS.map((country) => country.value));
+  const [activeFilters, setActiveFilters] = useState<(ContentFilters & {
+    query: string; path: string; zonaPath: string;
+  }) | null>(null);
+  const resultKey = activeFilters ? 'filters:' + JSON.stringify(activeFilters) : query;
 
   const { pagerItems, isLoading, onPreLoad, onNextLoad } = useFilmPager({
-    queryKey: queryKeys.films.search(query),
+    queryKey: queryKeys.films.search(resultKey),
     menuItems: searchMenuItems,
-    fetchFilms: (_menuItem, page) => currentService.search(query, page),
-    enabled: !!query,
+    fetchFilms: (menuItem, page, sort) => unifiedSearchService.search(resultKey, page, (updates) => {
+      if (!updates.length) return;
+      queryClient.setQueryData<FilmPagerQueryData>(
+        [...queryKeys.films.search(resultKey), menuItem.id, sort ?? null],
+        (previous) => previous ? {
+          ...previous,
+          films: previous.films.map((card) => (
+            updates.find((update) => update.previousLink === card.link)?.card ?? card
+          )),
+        } : previous,
+      );
+    }, activeFilters ? {
+      loadSource: (adapter, sourcePage) => activeFilters.query
+        ? adapter.search(activeFilters.query, sourcePage)
+        : adapter.source === ContentSource.ZONA
+          ? adapter.getFilms!(activeFilters.zonaPath, sourcePage)
+          : currentService.getFilms(sourcePage, activeFilters.path, {}),
+      prepareCard: async (card, adapter) => {
+        const film = await adapter.getFilm(card.link);
+        if (!film || !matchesContentFilters(film, activeFilters)) return null;
+        return {
+          ...card, type: film.type, originalTitle: film.originalTitle,
+          externalIds: film.externalIds, subtitle: film.releaseDate ?? card.subtitle,
+          ratings: { ...card.ratings, ...Object.fromEntries((film.ratings ?? []).flatMap((rating) =>
+            rating.name === 'IMDb' ? [['imdb', rating.rating]]
+              : rating.name === 'Кинопоиск' ? [['kinopoisk', rating.rating]] : [])) },
+          info: film.seriesInfo ?? card.info,
+        };
+      },
+    } : undefined, (partial) => {
+      queryClient.setQueryData<FilmPagerQueryData>(
+        [...queryKeys.films.search(resultKey), menuItem.id, sort ?? null],
+        { films: partial.films, currentPage: 1, totalPages: 1 },
+      );
+    }),
+    enabled: !!query || !!activeFilters,
   });
   const confirmationOverlayRef = useRef<ThemedOverlayRef>(null);
 
@@ -63,6 +110,8 @@ export function SearchScreenContainer() {
     queryKey: queryKeys.search.suggestions(suggestionQuery),
     queryFn: () => currentService.searchSuggestions(suggestionQuery),
     enabled: !!suggestionQuery,
+    retry: false,
+    meta: { silent: true },
     // keep the previous list visible while the next one is in flight
     placeholderData: keepPreviousData,
     staleTime: STALE_TIME.MEDIUM,
@@ -70,7 +119,12 @@ export function SearchScreenContainer() {
 
   const { data: categories = null, isLoading: isCategoriesLoading } = useQuery({
     queryKey: queryKeys.search.additionalContent(),
-    queryFn: () => currentService.loadAdditionalContent(),
+    queryFn: () => currentService.loadAdditionalContent().catch(() => [
+      { name: 'Фильмы', genres: [{ name: 'Все жанры', value: '/films/' }], years: [] },
+      { name: 'Сериалы', genres: [{ name: 'Все жанры', value: '/series/' }], years: [] },
+      { name: 'Мультфильмы', genres: [{ name: 'Все жанры', value: '/cartoons/' }], years: [] },
+      { name: 'Аниме', genres: [{ name: 'Все жанры', value: '/animation/' }], years: [] },
+    ]),
     // the overlay is what triggers the (one time) load
     enabled: isAdditionalContentRequested,
     staleTime: Infinity,
@@ -116,6 +170,7 @@ export function SearchScreenContainer() {
   };
 
   const onApplySuggestion = async (q: string) => {
+    setActiveFilters(null);
     if (!q) {
       return;
     }
@@ -179,6 +234,7 @@ export function SearchScreenContainer() {
   };
 
   const resetSearch = () => {
+    setActiveFilters(null);
     // clearing the query changes the films query key, so the shown films reset automatically
     if (query) {
       setQuery('');
@@ -229,21 +285,32 @@ export function SearchScreenContainer() {
   };
 
   const handleApplyAdditionalContent = () => {
-    additionalContentOverlayRef.current?.close();
-
-    let url = '';
-
-    if (selectedYear === '-1') {
-      url = (selectedGenre ?? '').replace('/best', '');
-    } else if (selectedYear === '0') {
-      url = selectedGenre ?? '';
-    } else {
-      url = `${selectedGenre}${selectedYear}`;
+    if (yearFrom && yearTo && Number(yearFrom) > Number(yearTo)) {
+      NotificationStore.displayMessage('Начальный год не должен быть больше конечного');
+      return;
     }
-
-    openCategory(url, navigation);
+    const category = selectedCategory?.name.toLowerCase() ?? '';
+    const type = category.includes('аниме') ? FilmType.ANIME
+      : category.includes('мульт') ? FilmType.CARTOON
+        : category.includes('сериал') ? FilmType.SERIES
+          : category.includes('фильм') ? FilmType.FILM : undefined;
+    const genreName = selectedCategory?.genres.find((genre) => genre.value === selectedGenre)?.name;
+    const genre = genreName && !/все|all/i.test(genreName) ? genreName : undefined;
+    setActiveFilters({
+      query: enteredText.trim(),
+      path: yearFrom && yearFrom === yearTo && selectedGenre?.includes('/best')
+        ? selectedGenre + yearFrom : (selectedGenre ?? '/films/').replace('/best', ''),
+      zonaPath: 'https://w1.zona.im/' + (type === FilmType.SERIES ? 'tvseries'
+        : type === FilmType.CARTOON ? 'movies/filter/genre-multfilm'
+          : type === FilmType.ANIME ? 'movies/filter/genre-anime' : 'movies'),
+      from: yearFrom ? Number(yearFrom) : undefined,
+      to: yearTo ? Number(yearTo) : undefined,
+      type, genre,
+      includedCountries,
+      excludedCountries: FILM_COUNTRY_OPTIONS.filter((country) => !allowedCountries.includes(country.value)).map((country) => country.value),
+    });
+    additionalContentOverlayRef.current?.close();
   };
-
   const handleOpenCollections = () => {
     navigate(COLLECTION_SCREEN);
   };
@@ -282,9 +349,13 @@ export function SearchScreenContainer() {
   };
 
   const containerProps = {
+    yearFrom, yearTo, includedCountries, allowedCountries,
+    countryOptions: FILM_COUNTRY_OPTIONS,
+    setYearFrom, setYearTo, setIncludedCountries, setAllowedCountries,
+    filtersApplied: Boolean(activeFilters),
     suggestions,
     pagerItems,
-    query,
+    query: activeFilters ? resultKey : query,
     recognizing,
     enteredText,
     isLoading,

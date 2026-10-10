@@ -22,11 +22,13 @@ export type CommentsRef = {
 export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>(
   ({ film, loaderFullScreen, style, initialLoad, disableRefresh, sheetRef }, ref) => {
     const { isTV, commentPostingMobile, commentPostingTV } = useConfigContext();
-    const { id } = film;
+    const commentFilm = film.metadataSourceFilm ?? film;
+    const { id } = commentFilm;
+    const isZonaWithoutComments = /^https?:\/\/[^/]*\.zona\.im\//.test(commentFilm.link);
     const { isSignedIn, currentService } = useServiceContext();
     // Posting needs an account, and the user can switch the whole thing off per
     // device - this gates the composer and every reply entry point with it.
-    const canPostComments = isSignedIn && (isTV ? commentPostingTV : commentPostingMobile);
+    const canPostComments = !isZonaWithoutComments && isSignedIn && (isTV ? commentPostingTV : commentPostingMobile);
     // comments are only fetched once the overlay that hosts them is opened
     const [isStarted, setIsStarted] = useState(!!initialLoad);
     // the comment the mobile composer is currently answering
@@ -39,8 +41,10 @@ export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>
       updateItems,
       refresh,
     } = usePaginatedQuery<CommentInterface>({
-      queryKey: queryKeys.comments(id),
-      fetchPage: (page) => currentService.getComments(id, page),
+      queryKey: [...queryKeys.comments(id), commentFilm.link],
+      fetchPage: (page) => isZonaWithoutComments
+        ? Promise.resolve({ items: [], totalPages: 1 })
+        : currentService.getComments(id, page),
       enabled: isStarted,
     });
 
@@ -131,6 +135,8 @@ export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>
     }, [canPostComments]);
 
     const containerProps = {
+      sourceLabel: film.metadataSourceFilm ? 'HDRezka'
+        : isZonaWithoutComments ? 'недоступны: фильм не сопоставлен с HDRezka' : undefined,
       comments,
       style,
       isLoading: isFetching,

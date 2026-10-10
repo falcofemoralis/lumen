@@ -14,6 +14,7 @@ export type PlayerVideoSelectorContainerProps = {
   onSelect: (video: FilmVideoInterface, voice: FilmVoiceInterface, quality?: string) => void;
   onClose?: () => void;
   onDownloadSelect?: (links: DownloadLinkInterface[]) => void;
+  onVoicesUpdate?: (voices: FilmVoiceInterface[]) => void;
 };
 
 export type PlayerVideoSelectorComponentProps = {

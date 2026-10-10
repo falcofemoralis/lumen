@@ -9,43 +9,84 @@ import {
   saveCachedFilmRatings,
 } from 'Util/RatingStore';
 import { queryKeys } from 'Util/Query';
+import { ContentSource } from '../source/types/ContentSource';
+import RezkaSourceAdapter from '../source/adapters/RezkaSourceAdapter';
+import ZonaSourceAdapter from '../source/adapters/ZonaSourceAdapter';
 
 const RATING_CACHE_TTL = 7 * 24 * 60 * 60 * 1000;
 
-export const useFilmRatings = (filmId?: string, isVisible = true) => {
+const hasPositiveRating = (value: unknown): value is number => (
+  typeof value === 'number'
+  && Number.isFinite(value)
+  && value > 0
+);
+
+const hasExternalRatings = (
+  ratings?: FilmRatingsInterface,
+): boolean => (
+  hasPositiveRating(ratings?.imdb)
+  || hasPositiveRating(ratings?.kinopoisk)
+);
+
+const isUnifiedFilmId = (filmId?: string): boolean => (
+  Boolean(filmId && /^(EXTERNAL|CONTENT|ZONA|REZKA):/.test(filmId))
+);
+
+export const useFilmRatings = (
+  filmId?: string,
+  isVisible = true,
+  suppliedRatings?: FilmRatingsInterface,
+  ratingSourceType?: ContentSource,
+  ratingFilmId?: string,
+) => {
   const { showRatings } = useConfigContext();
   const { isInternetAvailable } = useNetworkContext();
   const { currentService } = useServiceContext();
 
-  const serviceType = currentService.type;
+  const serviceType = ratingSourceType ?? currentService.type;
+  const cacheFilmId = ratingFilmId ?? filmId ?? '';
 
-  const cached = filmId
-    ? getCachedFilmRatings(serviceType, filmId)
+  const cached = cacheFilmId
+    ? getCachedFilmRatings(serviceType, cacheFilmId)
     : null;
+
+  const hasSuppliedExternalRatings = hasExternalRatings(suppliedRatings);
+  const isUnifiedId = isUnifiedFilmId(filmId);
+
+  const initialRatings = hasSuppliedExternalRatings
+    ? suppliedRatings
+    : cached?.ratings ?? suppliedRatings;
 
   const enabled = (
     Boolean(filmId)
     && showRatings
     && isInternetAvailable
     && isVisible
+    && !hasSuppliedExternalRatings
+    && (!isUnifiedId || Boolean(ratingSourceType && ratingFilmId))
   );
 
   const query = useQuery<FilmRatingsInterface>({
-    queryKey: queryKeys.filmRatings(serviceType, filmId ?? ''),
+    queryKey: queryKeys.filmRatings(serviceType, cacheFilmId),
     queryFn: () => enqueueRatingRequest(
-      `${serviceType}:${filmId ?? ''}`,
+      `${serviceType}:${cacheFilmId}`,
       async () => {
-        const ratings = await currentService.getFilmRatings(filmId ?? '');
+        const ratings = ratingSourceType === ContentSource.REZKA && ratingFilmId
+          ? await RezkaSourceAdapter.getFilmRatings!(ratingFilmId)
+          : ratingSourceType === ContentSource.ZONA && ratingFilmId
+            ? await ZonaSourceAdapter.getFilmRatings!(ratingFilmId)
+            : await currentService.getFilmRatings(filmId ?? '');
 
         if (Object.keys(ratings).length > 0) {
-          saveCachedFilmRatings(serviceType, filmId ?? '', ratings);
+          saveCachedFilmRatings(serviceType, cacheFilmId, ratings);
         }
 
         return ratings;
       },
     ),
     enabled,
-    initialData: cached?.ratings,
+    meta: { silent: true },
+    initialData: initialRatings,
     initialDataUpdatedAt: cached?.checked
       ? cached.updatedAt
       : 0,
@@ -57,14 +98,39 @@ export const useFilmRatings = (filmId?: string, isVisible = true) => {
     refetchOnReconnect: false,
   });
 
+  // initialData only seeds a query once; a later search page can enrich this card.
+  const imdbRating = hasPositiveRating(suppliedRatings?.imdb)
+    ? suppliedRatings.imdb
+    : query.data?.imdb;
+  const kinopoiskRating = hasPositiveRating(suppliedRatings?.kinopoisk)
+    ? suppliedRatings.kinopoisk
+    : query.data?.kinopoisk;
+
+  const hasImdbRating = (
+    typeof imdbRating === 'number'
+    && Number.isFinite(imdbRating)
+    && imdbRating > 0
+  );
+
+  const hasKinopoiskRating = (
+    !suppliedRatings?.imdbPending
+    && typeof kinopoiskRating === 'number'
+    && Number.isFinite(kinopoiskRating)
+    && kinopoiskRating > 0
+  );
+
   const rating = showRatings
-    ? query.data?.imdb ?? query.data?.kinopoisk
+    ? hasImdbRating
+      ? imdbRating
+      : hasKinopoiskRating
+        ? kinopoiskRating
+        : undefined
     : undefined;
 
   const ratingSource = showRatings
-    ? query.data?.imdb !== undefined
+    ? hasImdbRating
       ? 'IMDb'
-      : query.data?.kinopoisk !== undefined
+      : hasKinopoiskRating
         ? 'KP'
         : undefined
     : undefined;

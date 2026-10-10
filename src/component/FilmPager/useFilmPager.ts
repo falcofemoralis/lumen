@@ -61,7 +61,7 @@ export function useFilmPager({
 
   const getItemKey = (menuItem: MenuItemInterface) => [...queryKey, menuItem.id, getSort(menuItem) ?? null];
 
-  const { dataList, isLoading } = useQueries({
+  const { dataList, isLoading, isError } = useQueries({
     queries: menuItems.map((menuItem, index) => {
       const sort = getSort(menuItem);
 
@@ -89,6 +89,7 @@ export function useFilmPager({
     // failures are reported once by the query client's global error handler
     combine: (results) => ({
       dataList: results.map(({ data }) => data),
+      isError: results.some((result) => result.isError && !result.data),
       isLoading: results.some(({ isLoading: isQueryLoading }) => isQueryLoading),
     }),
   });
@@ -233,6 +234,7 @@ export function useFilmPager({
     selectedSorting,
     initialPage: initialIndex,
     isLoading,
+    isError,
     onPreLoad,
     onNextLoad,
     handleSelectSorting,

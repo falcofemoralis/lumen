@@ -125,6 +125,7 @@ function rowPropsAreEqual(prevProps: CommentItemProps, props: CommentItemProps) 
 const MemoCommentItem = memo(CommentItem, rowPropsAreEqual);
 
 export const CommentsComponent = ({
+  sourceLabel,
   comments,
   style,
   isLoading,
@@ -253,6 +254,7 @@ export const CommentsComponent = ({
       >
         <Wrapper style={ [styles.sheetContent, { paddingBottom: footerHeight }] }>
           { /* pull-to-refresh would eat the downward drag the sheet needs to dismiss */ }
+          { sourceLabel ? <ThemedText>{ 'Комментарии · ' + sourceLabel }</ThemedText> : null }
           { renderList() }
         </Wrapper>
       </ThemedBottomSheet>
@@ -263,6 +265,7 @@ export const CommentsComponent = ({
   // player's full-height side panel, where the keyboard covers the bottom half.
   return (
     <View style={ [styles.wrapper, style] }>
+      { sourceLabel ? <ThemedText>{ 'Комментарии · ' + sourceLabel }</ThemedText> : null }
       { renderForm(false) }
       { renderList() }
     </View>

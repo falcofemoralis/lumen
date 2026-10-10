@@ -38,6 +38,8 @@ import { navigate } from 'Util/Navigation';
 import { getPlayerQuality, getSavedTime } from 'Util/Player';
 import { queryKeys } from 'Util/Query';
 import { openActor, openCategory, openFilm } from 'Util/Router';
+import { sourcePlaybackRouter, sourceRouter } from '../../source';
+import { withDeadline } from '../../source/request';
 
 import FilmScreenComponent from './FilmScreen.component';
 import FilmScreenComponentTV from './FilmScreen.component.atv';
@@ -45,7 +47,7 @@ import { MINIMUM_SCHEDULE_ITEMS } from './FilmScreen.config';
 import { FilmScreenContainerProps } from './FilmScreen.type';
 
 export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
-  const { link: linkArg, thumbnailPoster } = (route.params ?? {}) as { link: string, thumbnailPoster?: string };
+  const { link: linkArg, thumbnailPoster, libraryFilmId } = (route.params ?? {}) as { link: string, thumbnailPoster?: string, libraryFilmId?: string };
   const {
     isTV,
     downloadsPath,
@@ -77,6 +79,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
   }
 
   const localHistory = useLocalHistory();
+  const localBookmarks = useLocalBookmarks();
 
   const updateFilmVoiceData = async (data: FilmInterface | null) => {
     // logged in users already use service built-in system
@@ -130,8 +133,21 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
       ?? (!hasLastVoice ? data.voices[0] : undefined);
 
     if (data.hasSeasons && activeVoice && !activeVoice.seasons) {
-      const result = await currentService.getFilmSeasons(data, activeVoice);
-      activeVoice.seasons = result.seasons;
+      const playbackAdapter =
+        sourcePlaybackRouter.getAdapterForFilmLink(data.link);
+
+      const result = playbackAdapter
+        ? await playbackAdapter.getFilmSeasons(data, activeVoice)
+        : await currentService.getFilmSeasons(data, activeVoice);
+
+      data.voices = data.voices.map((voice) =>
+        voice.id === activeVoice.id
+          ? {
+              ...voice,
+              seasons: result.seasons,
+            }
+          : voice,
+      );
     }
   };
 
@@ -160,12 +176,28 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
 
   const filmQueryKey = useMemo(() => queryKeys.film(link), [link]);
 
-  const { data: film = null } = useQuery({
+  const { data: film = null, isError: isFilmLoadError, refetch: retryFilmLoad } = useQuery({
     queryKey: filmQueryKey,
     enabled: !!link,
+    retry: 0,
     queryFn: async () => {
-      const loadedFilm = await currentService.getFilm(link);
-
+      const sourceAdapter = sourceRouter.getAdapterForLink(link);
+      const sourceFilm = await withDeadline(sourceAdapter
+        ? sourceAdapter.getFilm(link)
+        : currentService.getFilm(link), 20_000);
+      if (!sourceFilm) throw new Error('Не удалось загрузить данные фильма. Повторите попытку.');
+      const baseFilm = {
+        ...sourceFilm,
+        libraryId: isLocalLibrary && libraryFilmId && localBookmarks.films[libraryFilmId]
+          ? libraryFilmId : sourceFilm.id,
+      };
+      if (isLocalLibrary) applyLocalScheduleMarks(baseFilm);
+      if (!isSignedIn || isLocalLibrary) await updateFilmVoiceData(baseFilm);
+      // Supplemental metadata must not hold the main Zona page behind a spinner.
+      queryClient.setQueryData(filmQueryKey, baseFilm);
+      const loadedFilm = await sourceRouter.resolvePreferredFilm(baseFilm);
+      const liveFilm = queryClient.getQueryData<FilmInterface>(filmQueryKey);
+      if (liveFilm?.link === loadedFilm.link) loadedFilm.voices = liveFilm.voices;
       if (isLocalLibrary && loadedFilm) {
         applyLocalScheduleMarks(loadedFilm);
       }
@@ -187,7 +219,25 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     [queryClient, filmQueryKey]
   );
 
-  const localBookmarks = useLocalBookmarks();
+  const handleVoicesUpdate = useCallback(
+    (voices: FilmVoiceInterface[]) => {
+      if (voices.length === 0) {
+        return;
+      }
+
+      updateFilm((prevFilm) => (
+        prevFilm
+          ? {
+              ...prevFilm,
+              voices,
+              hasVoices: true,
+            }
+          : prevFilm
+      ));
+    },
+    [updateFilm],
+  );
+
 
   const isFilmInRecentQuery = useQuery({
     queryKey: [queryKeys.recent(), link],
@@ -237,7 +287,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
       return film;
     }
 
-    return { ...film, bookmarks: getLocalBookmarksForFilm(localBookmarks, film.id) };
+    return { ...film, bookmarks: getLocalBookmarksForFilm(localBookmarks, film.libraryId ?? film.id) };
   }, [film, isLocalLibrary, localBookmarks]);
 
   const handleVideoSelect = (video: FilmVideoInterface, voice: FilmVoiceInterface, quality?: string) => {
@@ -282,6 +332,10 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
   }, [navigation]);
 
   const handleSelectActor = useCallback((actorLink: string) => {
+    if (!actorLink) {
+      NotificationStore.displayMessage('Страница этого человека недоступна в подключённых источниках');
+      return;
+    }
     openActor(actorLink, navigation);
   }, [navigation]);
 
@@ -428,7 +482,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     }
 
     links.forEach((linkItem) => {
-      const { url, quality, subtitles = [], seasonId, episodeId, voice } = linkItem;
+      const { url, quality, headers, subtitles = [], seasonId, episodeId, voice } = linkItem;
       const taskName = [];
 
       if (seasonId) {
@@ -503,6 +557,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
       const task = createDownloadTask({
         id: TaskIdStorage.getOrCreate(destination, {
           url: taskUrl,
+          headers,
           destination,
           folder: folderPath,
           film: {
@@ -526,6 +581,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
           voiceId: voice?.id,
         }),
         url: taskUrl,
+        headers,
         destination,
         metadata: {
           taskFileName: taskName.join(' '),
@@ -587,7 +643,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
         return {
           ...prevFilm,
           isRatingPosted: true,
-          mainRating: {
+          mainRating: prevFilm.metadataSourceFilm ? prevFilm.mainRating : {
             text: `${result.num} (${result.votes})`,
             name: 'Rezka',
             rating: Number(result.num),
@@ -603,7 +659,12 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
       return;
     }
 
-    postRating({ id: film.id, rating });
+    const ratingFilm = film.metadataSourceFilm ?? film;
+    if (/^https?:\/\/[^/]*\.zona\.im\//.test(ratingFilm.link)) {
+      NotificationStore.displayMessage('Оценка доступна для фильмов, найденных в HDRezka');
+      return;
+    }
+    postRating({ id: ratingFilm.id, rating });
   };
 
   const shouldDisplayContinueWatching = isFilmInRecent;
@@ -626,10 +687,16 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
       }
 
       const updatedVoice = { ...voice };
+      const playbackAdapter =
+        sourcePlaybackRouter.getAdapterForFilmLink(film.link);
 
       if (!film.hasSeasons) {
         // for movies, fetch the video for the voice
-        return { video: await currentService.getFilmStreamsByVoice(film, voice), voice: updatedVoice };
+        const video = playbackAdapter
+          ? await playbackAdapter.getFilmStreamsByVoice(film, voice)
+          : await currentService.getFilmStreamsByVoice(film, voice);
+
+        return { video, voice: updatedVoice };
       }
 
       if (!lastSeasonId || !lastEpisodeId) {
@@ -639,7 +706,19 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
       }
 
       // for series, fetch the video for the specific episode
-      const video = await currentService.getFilmStreamsByEpisodeId(film, voice, lastSeasonId, lastEpisodeId);
+      const video = playbackAdapter
+        ? await playbackAdapter.getFilmStreamsByEpisodeId(
+            film,
+            voice,
+            lastSeasonId,
+            lastEpisodeId,
+          )
+        : await currentService.getFilmStreamsByEpisodeId(
+            film,
+            voice,
+            lastSeasonId,
+            lastEpisodeId,
+          );
 
       updatedVoice.lastSeasonId = lastSeasonId;
       updatedVoice.lastEpisodeId = lastEpisodeId;
@@ -732,6 +811,8 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
 
   const containerProps = {
     film: filmValue,
+    isLoadError: isFilmLoadError,
+    retryLoad: () => { void retryFilmLoad(); },
     thumbnailPoster,
     visibleScheduleItems,
     playerVideoSelectorOverlayRef,
@@ -748,6 +829,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     showAgeRating,
     playFilm,
     handleVideoSelect,
+    handleVoicesUpdate,
     handleSelectFilm,
     handleSelectActor,
     handleSelectCategory,
@@ -770,3 +852,4 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
 }
 
 export default FilmScreenContainer;
+

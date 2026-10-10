@@ -31,7 +31,7 @@ export function FilmCardComponent({
   const { theme, scale } = useAppTheme();
   const showPendingReleaseBadge = useShowPendingReleaseBadge();
 
-  const renderType = () => (
+  const renderType = () => (filmCard.contentTypePending ? null :
     <ThemedText
       style={ [
         styles.typeText,
@@ -130,6 +130,9 @@ export function FilmCardComponent({
         { renderPoster() }
         <FilmRating
           filmId={ filmCard.id }
+          ratings={ filmCard.ratings }
+          ratingSourceType={ filmCard.ratingSourceType }
+          ratingFilmId={ filmCard.ratingFilmId }
           isVisible={ isRatingVisible }
         />
         { renderAdditionContainer() }
@@ -144,3 +147,6 @@ export function FilmCardComponent({
 }
 
 export default FilmCardComponent;
+
+
+

@@ -1,5 +1,6 @@
 import { collection, CollectionReference, getFirestore } from '@react-native-firebase/firestore';
 import { useMutation } from '@tanstack/react-query';
+import { sourcePlaybackRouter } from '../../source';
 import { FIRESTORE_DB } from 'Component/Player/Player.config';
 import { FirestoreDocument, SavedTime } from 'Component/Player/Player.type';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
@@ -35,6 +36,7 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
       onSelect,
       onClose,
       onDownloadSelect,
+      onVoicesUpdate,
     },
     ref
   ) => {
@@ -81,33 +83,59 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
     const selectedVideosRef = useRef<FilmVideoInterface | null>(null);
     const selectedVoicesRef = useRef<FilmVoiceInterface | null>(null);
 
+    const zonaVoiceDiscoveryRef = useRef(false);
+
+    useEffect(() => {
+      zonaVoiceDiscoveryRef.current = false;
+    }, [film.link]);
+
     const isMountedRef = useRef(false);
 
+    const [isVoiceDiscoveryLoading, setIsVoiceDiscoveryLoading] = useState(false);
+    const [isSelectorOpen, setIsSelectorOpen] = useState(false);
     useImperativeHandle(ref, () => ({
-      open: () => {
-        const { hasVoices, hasSeasons } = film;
-
-        if (hasVoices || hasSeasons) {
-          overlayRef.current?.open();
-
-          return;
+      open: async () => {
+        setIsSelectorOpen(true);
+        overlayRef.current?.open();
+        const playbackAdapter = sourcePlaybackRouter.getAdapterForFilmLink(film.link);
+        if (isOffline || !playbackAdapter || zonaVoiceDiscoveryRef.current) return;
+        zonaVoiceDiscoveryRef.current = true;
+        setIsVoiceDiscoveryLoading(true);
+        try {
+          const discovered = await playbackAdapter.getFilmVoices(film);
+          if (discovered.length) {
+            const current = getContextVoice() ?? selectedVoice;
+            const next = discovered.find((voice) => voice.identifier === current?.identifier)
+              ?? discovered.find((voice) => voice.isActive) ?? discovered[0];
+            setSelectedVoice(next);
+            onVoicesUpdate?.(discovered);
+          } else {
+            zonaVoiceDiscoveryRef.current = false;
+          }
+        } catch (error) {
+          zonaVoiceDiscoveryRef.current = false;
+          NotificationStore.displayError(error as Error);
+        } finally {
+          setIsVoiceDiscoveryLoading(false);
+          zonaVoiceDiscoveryRef.current = false;
         }
-
-        const voice = voices[0];
-        const { video } = voice;
-
-        if (!video) {
-          NotificationStore.displayMessage(t('No video streams available'));
-
-          return;
-        }
-
-        handleSelectVideo(video, voice);
       },
-      close: () => {
-        overlayRef.current?.close();
-      },
+      close: () => { setIsSelectorOpen(false); overlayRef.current?.close(); },
     }));
+    const supplementedLinkRef = useRef<string | undefined>(undefined);
+    useEffect(() => {
+      const supplementalLink = film.metadataSourceFilm?.link;
+      if (!isSelectorOpen || isVoiceDiscoveryLoading || !supplementalLink
+        || supplementedLinkRef.current === supplementalLink) return;
+      const adapter = sourcePlaybackRouter.getAdapterForFilmLink(film.link);
+      if (!adapter || isOffline) return;
+      supplementedLinkRef.current = supplementalLink;
+      let cancelled = false;
+      void adapter.getFilmVoices(film).then((updated) => {
+        if (!cancelled && updated.length) onVoicesUpdate?.(updated);
+      }).catch(() => { supplementedLinkRef.current = undefined; });
+      return () => { cancelled = true; supplementedLinkRef.current = undefined; };
+    }, [film.link, film.metadataSourceFilm?.link, isSelectorOpen, isVoiceDiscoveryLoading, isOffline, onVoicesUpdate]);
 
     const getContextVoice = () => {
       const { id } = film;
@@ -182,7 +210,12 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
 
       const savedSelection = getSavedSelection(savedVoice, saved);
 
-      setSelectedVoice(savedVoice);
+      const activeVoice = voiceInput?.id === savedVoice.id ? voiceInput : getContextVoice();
+      setSelectedVoice((previous) => ({
+        ...savedVoice,
+        seasons: activeVoice?.id === savedVoice.id && activeVoice.seasons?.length ? activeVoice.seasons
+          : previous.id === savedVoice.id && previous.seasons?.length ? previous.seasons : savedVoice.seasons,
+      }));
       setSelectedSeasonId(savedSelection.seasonId);
       setSelectedEpisodeId(savedSelection.episodeId);
     };
@@ -211,12 +244,22 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
     useEffect(() => {
       const voice = getContextVoice();
 
-      if (voice) {
-        setSelectedVoice(voice);
-        setSelectedSeasonId(voice.lastSeasonId);
-        setSelectedEpisodeId(voice.lastEpisodeId);
+      if (!voice) {
+        return;
       }
-    }, [contextVoice]);
+
+      const currentVoice = voices.find(
+        ({ identifier }) => identifier === voice.identifier,
+      );
+
+      if (!currentVoice) {
+        return;
+      }
+
+      setSelectedVoice({ ...currentVoice, ...voice, seasons: voice.seasons?.length ? voice.seasons : currentVoice.seasons });
+      setSelectedSeasonId(voice.lastSeasonId ?? currentVoice.lastSeasonId);
+      setSelectedEpisodeId(voice.lastEpisodeId ?? currentVoice.lastEpisodeId);
+    }, [contextVoice, voices]);
 
     /**
      * Sync selectedVoice when film.voices is updated
@@ -228,12 +271,30 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
         return;
       }
 
-      const updatedVoice = voices.find(({ identifier }) => identifier === selectedVoice.identifier);
+      const updatedVoice = voices.find(
+        ({ identifier }) => identifier === selectedVoice.identifier,
+      );
 
       if (updatedVoice && updatedVoice !== selectedVoice) {
-        setSelectedVoice(updatedVoice);
+        setSelectedVoice((previous) => ({
+          ...updatedVoice,
+          seasons: updatedVoice.seasons?.length ? updatedVoice.seasons : previous.seasons,
+          lastSeasonId: previous.lastSeasonId ?? updatedVoice.lastSeasonId,
+          lastEpisodeId: previous.lastEpisodeId ?? updatedVoice.lastEpisodeId,
+        }));
       }
-    }, [film]);
+    }, [voices, selectedVoice.identifier]);
+
+    useEffect(() => {
+      if (!voiceInput) return;
+      setSelectedVoice((previous) => ({
+        ...voiceInput,
+        seasons: voiceInput.seasons?.length ? voiceInput.seasons
+          : previous.id === voiceInput.id ? previous.seasons : undefined,
+      }));
+      setSelectedSeasonId(voiceInput.lastSeasonId);
+      setSelectedEpisodeId(voiceInput.lastEpisodeId);
+    }, [voiceInput]);
 
     const getSeasons = (): SeasonInterface[] => {
       const { seasons = [] } = selectedVoice ?? {};
@@ -250,6 +311,10 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
     };
 
     const handleSelectVideo = (video: FilmVideoInterface, voice: FilmVoiceInterface) => {
+      if (!video.streams?.length) {
+        NotificationStore.displayMessage(t('No video streams available'));
+        return;
+      }
       if (isDownloader) {
         if (!downloadVideosRef.current || !downloadVoicesRef.current) {
           downloadVideosRef.current = {};
@@ -289,11 +354,18 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
 
     /** Movies: resolve the single video for a voice and hand it straight to the player */
     const { mutate: loadVoiceVideo, isPending: isVoiceVideoLoading } = useMutation({
-      mutationFn: (voice: FilmVoiceInterface) => (
-        isOffline
-          ? Promise.resolve(voice.video)
-          : currentService.getFilmStreamsByVoice(film, voice)
-      ),
+      mutationFn: async (voice: FilmVoiceInterface) => {
+        if (isOffline) {
+          return voice.video;
+        }
+
+        const playbackAdapter =
+          sourcePlaybackRouter.getAdapterForFilmLink(film.link);
+
+        return playbackAdapter
+          ? playbackAdapter.getFilmStreamsByVoice(film, voice)
+          : currentService.getFilmStreamsByVoice(film, voice);
+      },
       onSuccess: (video, voice) => {
         if (video) {
           handleSelectVideo(video, voice);
@@ -304,9 +376,18 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
     /** Series: resolve the season list for a voice and preselect its first episode */
     const [isAutoLoadingSeasons, setIsAutoLoadingSeasons] = useState(false);
     const { mutate: loadVoiceSeasons, isPending: isVoiceSeasonsLoading } = useMutation({
-      mutationFn: (voice: FilmVoiceInterface) => (
-        isOffline ? Promise.resolve(voice) : currentService.getFilmSeasons(film, voice)
-      ),
+      mutationFn: async (voice: FilmVoiceInterface) => {
+        if (isOffline) {
+          return voice;
+        }
+
+        const playbackAdapter =
+          sourcePlaybackRouter.getAdapterForFilmLink(film.link);
+
+        return playbackAdapter
+          ? playbackAdapter.getFilmSeasons(film, voice)
+          : currentService.getFilmSeasons(film, voice);
+      },
       onSuccess: (updatedVoice) => {
         setIsAutoLoadingSeasons(false);
         setSelectedVoice(updatedVoice);
@@ -366,18 +447,22 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
     useEffect(() => {
       if (
         isOffline
+        || !isSelectorOpen
+        || isVoiceDiscoveryLoading
         || !film.hasSeasons
         || !selectedVoice?.id
-        || selectedVoice.seasons?.length
-        || autoLoadedSeasonsVoiceRef.current === selectedVoice.id
+        || selectedVoice.seasons?.some((season) =>
+          season.seasonId === (selectedSeasonId ?? selectedVoice.lastSeasonId ?? selectedVoice.seasons?.[0]?.seasonId)
+          && season.episodes?.length)
+        || autoLoadedSeasonsVoiceRef.current === selectedVoice.id + ':' + (selectedSeasonId ?? '')
       ) {
         return;
       }
 
-      autoLoadedSeasonsVoiceRef.current = selectedVoice.id;
+      autoLoadedSeasonsVoiceRef.current = selectedVoice.id + ':' + (selectedSeasonId ?? '');
       setIsAutoLoadingSeasons(true);
       loadVoiceSeasons(selectedVoice);
-    }, [film.hasSeasons, isOffline, loadVoiceSeasons, selectedVoice]);
+    }, [film.hasSeasons, isOffline, isSelectorOpen, isVoiceDiscoveryLoading, loadVoiceSeasons, selectedVoice, selectedSeasonId]);
     const { mutate: loadEpisodeVideo, isPending: isEpisodeVideoLoading } = useMutation({
       mutationFn: ({
         voice,
@@ -392,7 +477,12 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
           );
         }
 
-        return currentService.getFilmStreamsByEpisodeId(film, voice, seasonId, episodeId);
+        const playbackAdapter =
+          sourcePlaybackRouter.getAdapterForFilmLink(film.link);
+
+        return playbackAdapter
+          ? playbackAdapter.getFilmStreamsByEpisodeId(film, voice, seasonId, episodeId)
+          : currentService.getFilmStreamsByEpisodeId(film, voice, seasonId, episodeId);
       },
       onSuccess: (video, { voice, seasonId, episodeId }) => {
         if (!video) {
@@ -483,6 +573,7 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
     };
 
     const onOverlayOpen = () => {
+      autoLoadedSeasonsVoiceRef.current = null;
       if (isOffline) {
         return;
       }
@@ -502,13 +593,24 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
         for (const key of selectedEpisodes) {
           const [seasonId, episodeId] = key.split(',');
 
-          videos[key] = await currentService
-            .getFilmStreamsByEpisodeId(
-              film,
-              selectedVoice,
-              seasonId,
-              episodeId
-            );
+          const playbackAdapter =
+            sourcePlaybackRouter.getAdapterForFilmLink(film.link);
+
+          videos[key] = await (
+            playbackAdapter
+              ? playbackAdapter.getFilmStreamsByEpisodeId(
+                  film,
+                  selectedVoice,
+                  seasonId,
+                  episodeId
+                )
+              : currentService.getFilmStreamsByEpisodeId(
+                  film,
+                  selectedVoice,
+                  seasonId,
+                  episodeId
+                )
+          );
 
           voicesByKey[key] = {
             ...selectedVoice,
@@ -586,6 +688,7 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
         links.push({
           url: stream.url,
           quality: stream.quality,
+          headers: stream.headers,
           subtitles: video.subtitles,
           seasonId: voice?.lastSeasonId,
           episodeId: voice?.lastEpisodeId,
@@ -642,7 +745,7 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
       return sorted;
     }, [voices, sortVoicesByRating, film]);
 
-    const isLoading = isVoiceVideoLoading
+    const isLoading = isVoiceDiscoveryLoading || isVoiceVideoLoading
       || isVoiceSeasonsLoading
       || isEpisodeVideoLoading
       || isDownloadLoading
@@ -673,7 +776,7 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
       handleSelectEpisode,
       calculateProgressThreshold,
       onOverlayOpen,
-      onClose,
+      onClose: () => { setIsSelectorOpen(false); onClose?.(); },
       handleEpisodesDownload,
       handleDownload,
       handleQualitySelect,

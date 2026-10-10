@@ -13,6 +13,7 @@ export interface LocalBookmarksBlob {
 }
 
 export interface LocalHistoryItemInterface {
+  filmCard?: FilmCardInterface;
   id: string; // film id
   link: string;
   poster: string;

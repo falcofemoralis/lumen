@@ -100,6 +100,7 @@ const TabButton = memo(({
 export const FilmPagerComponent = ({
   pagerItems,
   displayMode,
+  renderPageContent,
   disableEmptyComponent,
   isEmpty,
   hideGrid,
@@ -305,6 +306,8 @@ export const FilmPagerComponent = ({
       return null;
     }
 
+    if (renderPageContent) return renderPageContent(pagerItem, idx);
+
     const { films, pagination } = pagerItem;
     const filmItems = (films ?? []).map((film) => ({ film }));
 
@@ -334,7 +337,7 @@ export const FilmPagerComponent = ({
       />
     );
   // eslint-disable-next-line max-len
-  }, [renderedIndexes, initialPage, displayMode, disableEmptyComponent, disableStatusbarSafeArea, isEmpty, hideGrid, ListEmptyComponent, centerEmptyComponent, onNextLoad, showScrollToTopButton, activeIndex]);
+  }, [renderedIndexes, initialPage, renderPageContent, displayMode, disableEmptyComponent, disableStatusbarSafeArea, isEmpty, hideGrid, ListEmptyComponent, centerEmptyComponent, onNextLoad, showScrollToTopButton, activeIndex]);
 
   const pages = useMemo(() => (pagerItems).map((item, idx) => (
     <Wrapper key={ item.menuItem.id }>

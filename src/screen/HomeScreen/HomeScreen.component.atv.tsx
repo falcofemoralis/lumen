@@ -10,6 +10,7 @@ export function HomeScreenComponent({
   return (
     <Page>
       <FilmPager
+        key={ pagerHandlers.pagerItems.map((item) => item.menuItem.id).join('|') }
         { ...pagerHandlers }
         menuDefaultFocus
         tabPosition={ tabPosition }

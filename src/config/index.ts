@@ -37,6 +37,9 @@ export type DeviceConfigType = {
   hiddenCountries: string[];
   initialRoute: string;
   homeDefaultTab: string;
+  homeTabOrder: string[];
+  hiddenHomeTabs: string[];
+  showEpisodeUpdateCount: boolean;
   tabPosition: TabPosition;
   homeDisplayMode: FilmDisplayMode;
   bookmarksDisplayMode: FilmDisplayMode;
@@ -107,6 +110,9 @@ export type DeviceConfigType = {
 }
 
 export const migrateLegacyConfig = <T extends Record<string, unknown>>(raw: T): T => {
+  if (!Object.prototype.hasOwnProperty.call(raw, 'homeTabOrder') && typeof raw.homeDefaultTab === 'string' && raw.homeDefaultTab) {
+    raw = { ...raw, homeTabOrder: [raw.homeDefaultTab] };
+  }
   if (
     !Object.prototype.hasOwnProperty.call(raw, 'showRatings')
     && Object.prototype.hasOwnProperty.call(raw, 'ratingSource')
@@ -139,6 +145,9 @@ export const defaultConfig: DeviceConfigType = {
   hiddenCountries: [],
   initialRoute: HOME_SCREEN,
   homeDefaultTab: '',
+  homeTabOrder: [],
+  hiddenHomeTabs: [],
+  showEpisodeUpdateCount: true,
   tabPosition: 'bottom',
   homeDisplayMode: 'grid',
   bookmarksDisplayMode: 'grid',
@@ -220,6 +229,9 @@ export const CONFIG_KEY_SECTIONS = {
   hiddenMobileNavigationTabs: BACKUP_SECTION.SETTINGS_APPEARANCE,
   initialRoute: BACKUP_SECTION.SETTINGS_APPEARANCE,
   homeDefaultTab: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  homeTabOrder: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  hiddenHomeTabs: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  showEpisodeUpdateCount: BACKUP_SECTION.SETTINGS_APPEARANCE,
   tabPosition: BACKUP_SECTION.SETTINGS_APPEARANCE,
   homeDisplayMode: BACKUP_SECTION.SETTINGS_APPEARANCE,
   bookmarksDisplayMode: BACKUP_SECTION.SETTINGS_APPEARANCE,

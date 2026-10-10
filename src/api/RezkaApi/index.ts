@@ -24,6 +24,7 @@ import { HTMLElementInterface, parseHtml } from 'Util/Parser';
 import { processPromisesBatch } from 'Util/Promise';
 import { executeGet, executePostEncoded, executePostFormData, formatURI, NotFoundError, Variables } from 'Util/Request';
 import { storage } from 'Util/Storage';
+import { RezkaReadQueue } from 'Util/RezkaReadQueue';
 import { updateUrlHost } from 'Util/Url';
 
 import { collectSeriesUpdateRows, parseSeriesUpdateBlocks } from './seriesUpdates';
@@ -53,6 +54,7 @@ import {
   parseSubtitles,
 } from './utils';
 
+const rezkaReadQueue = new RezkaReadQueue(1500, 25000, () => !isSolvingCloudflare());
 const REZKA_CONFIG = 'rezkaConfig';
 const REZKA_PROFILE = 'rezkaProfile';
 
@@ -112,9 +114,9 @@ type RezkaApiInterface = ApiInterface & {
   loadConfig: () => ApiInterfaceConfig;
 
   // connection
-  getRequest: (query: string, variables?: Variables) => Promise<string>;
+  getRequest: (query: string, variables?: Variables, options?: { background?: boolean }) => Promise<string>;
   postRequest: (query: string, variables?: Variables) => Promise<string>;
-  fetchPage: (query: string, variables?: Variables) => Promise<HTMLElementInterface>;
+  fetchPage: (query: string, variables?: Variables, options?: { background?: boolean }) => Promise<HTMLElementInterface>;
   postJson: <T>(query: string, variables?: Variables) => Promise<T | null>;
 
   // utils
@@ -240,27 +242,26 @@ const RezkaApi: RezkaApiInterface = {
     return headers;
   },
 
-  async getRequest(query, variables = {}) {
-    return executeGet(
-      query,
-      this.getProvider(),
-      this.getHeaders(),
-      variables
-    );
+  async getRequest(query, variables = {}, options?: { background?: boolean }) {
+    const provider = this.getProvider();
+    const headers = this.getHeaders();
+    const key = JSON.stringify(['GET', provider, query, variables, headers]);
+    return rezkaReadQueue.run(key, (signal) => executeGet(query, provider, headers, variables, signal), options?.background);
   },
 
-  async postRequest(query, variables = {} ) {
-    return executePostFormData(
-      `${query}/?t=${Date.now()}`,
-      this.getProvider(),
-      this.getHeaders(),
-      variables
-    );
+  async postRequest(query, variables = {}) {
+    const provider = this.getProvider();
+    const headers = this.getHeaders();
+    const execute = (signal?: AbortSignal) => executePostFormData(`${query}/?t=${Date.now()}`, provider, headers, variables, signal);
+    const ratings = query === '/engine/ajax/quick_content.php';
+    const suggestions = query === '/engine/ajax/search.php';
+    return ratings || suggestions
+      ? rezkaReadQueue.run(JSON.stringify(['POST', provider, query, variables, headers]), execute, ratings, suggestions ? 'suggestions' : undefined)
+      : execute();
   },
 
-  async fetchPage(query, variables = {}) {
-    const res = await this.getRequest(query, variables);
-
+  async fetchPage(query, variables = {}, options) {
+    const res = await this.getRequest(query, variables, options);
     return this.parseContent(res);
   },
 
@@ -890,11 +891,11 @@ const RezkaApi: RezkaApiInterface = {
     return parseFilmsListRoot(content);
   },
 
-  async getFilm(link) {
+  async getFilm(link, options) {
     // the raw response is kept around: the player payload is only reachable by
     // string search (see below), and re-serializing the parsed tree to get it
     // back would rebuild the whole document for nothing
-    const res = await this.getRequest(link, {});
+    const res = await this.getRequest(link, {}, options);
     const root = this.parseContent(res);
 
     // base data
@@ -1499,13 +1500,13 @@ const RezkaApi: RezkaApiInterface = {
 
   /** Search */
 
-  async search(query, page) {
+  async search(query, page, options) {
     const root = await this.fetchPage('/search/', {
       do: 'search',
       subaction: 'search',
       q: query,
       page: String(page),
-    });
+    }, options);
 
     return parseFilmsListRoot(root);
   },

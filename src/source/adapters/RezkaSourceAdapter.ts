@@ -27,39 +27,53 @@ const RezkaSourceAdapter: SourceAdapter = {
   source: ContentSource.REZKA,
   name: 'HDRezka',
 
-  async getFilm(link: string): Promise<FilmInterface | null> {
-    return RezkaApi.getFilm(link);
+  async getFilm(link: string, options?: { background?: boolean }): Promise<FilmInterface | null> {
+    return RezkaApi.getFilm(link, options);
+  },
+
+  async getFilmRatings(filmId: string) {
+    return RezkaApi.getFilmRatings(filmId);
   },
 
   async search(
     query: string,
     page: number,
+    options?: { background?: boolean },
   ): Promise<FilmListInterface> {
-    return RezkaApi.search(query, page);
+    return RezkaApi.search(query, page, options);
   },
 
   normalizeFilmCard(film: FilmCardInterface): UnifiedFilm {
     const yearMatch = `${film.subtitle} ${film.info ?? ''}`.match(/\b(19|20)\d{2}\b/);
     const year = yearMatch ? Number(yearMatch[0]) : undefined;
 
+    const externalIds: UnifiedExternalId[] = [];
+    for (const [key, type] of [['imdb', UnifiedExternalIdType.IMDB], ['tmdb', UnifiedExternalIdType.TMDB], ['kinopoisk', UnifiedExternalIdType.KINOPOISK]] as const) {
+      const value = film.externalIds?.[key];
+      if (value) externalIds.push({ type, value });
+    }
     return {
       id: createUnifiedFilmId(
-        [],
-        undefined,
+        externalIds,
+        film.originalTitle,
         film.title,
         year,
         film.type,
         `REZKA:${film.id}`,
       ),
       title: film.title,
+      originalTitle: film.originalTitle,
       year,
       type: film.type,
       poster: film.poster,
+      ratings: film.ratings,
+      info: film.info,
       sources: [
         {
           source: ContentSource.REZKA,
-          externalIds: [],
+          externalIds,
           link: film.link,
+          nativeId: film.id,
         },
       ],
     };
@@ -90,6 +104,7 @@ const RezkaSourceAdapter: SourceAdapter = {
           source: ContentSource.REZKA,
           externalIds,
           link: film.link,
+          nativeId: film.id,
         },
       ],
     };

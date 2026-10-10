@@ -1,4 +1,5 @@
 import { FilmType } from 'Type/FilmType.type';
+import { FilmRatingsInterface } from 'Type/FilmRatings.interface';
 
 import { ContentSource } from './ContentSource';
 
@@ -20,6 +21,7 @@ export interface UnifiedFilmSource {
   source: ContentSource;
   externalIds: UnifiedExternalId[];
   link: string;
+  nativeId?: string;
 }
 
 const normalizeUnifiedIdentityValue = (value: string): string => (
@@ -83,6 +85,9 @@ export interface UnifiedFilm {
 
   description?: string;
   releaseDate?: string;
+  info?: string;
+  ratings?: FilmRatingsInterface;
 
   sources: UnifiedFilmSource[];
 }
+

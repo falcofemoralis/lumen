@@ -122,7 +122,7 @@ export interface ApiInterface {
     params?: ApiParams,
     sort?: string
   ) => Promise<FilmListInterface>;
-  getFilm: (link: string) => Promise<FilmInterface | null>;
+  getFilm: (link: string, options?: { background?: boolean }) => Promise<FilmInterface | null>;
   getFilmTrailer: (filmId: string) => Promise<string | null>;
   getFilmRatings: (filmId: string) => Promise<FilmRatingsInterface>;
   getFilmSeasons: (film: FilmInterface, voice: FilmVoiceInterface) => Promise<FilmVoiceInterface>;
@@ -147,7 +147,7 @@ export interface ApiInterface {
   getCollections: (page: number) => Promise<ApiPaginatedInterface<ContentCollectionInterface>>;
 
   // search
-  search: (query: string, page: number) => Promise<FilmListInterface>;
+  search: (query: string, page: number, options?: { background?: boolean }) => Promise<FilmListInterface>;
   searchSuggestions: (query: string) => Promise<string[]>;
   loadAdditionalContent: () => Promise<SearchableCategoryInterface[]>;
 

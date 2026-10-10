@@ -1,3 +1,6 @@
+import { withDeadline } from '../source/request';
+import { SourceBlockedError } from './Request/sourceFailure';
+
 export class RatingRequestDroppedError extends Error {
   constructor() {
     super('Rating request dropped because the queue is full.');
@@ -16,6 +19,10 @@ const MAX_CONCURRENT = 1;
 const MAX_PENDING = 5;
 const MIN_REQUEST_INTERVAL = 500;
 const NEW_REQUESTS_BEFORE_OLD = 5;
+
+const FAILURE_COOLDOWN = 30_000;
+const cooldowns = new Map<string, { until: number; error: unknown }>();
+const requestGroup = (key: string) => key.startsWith('ZONA:') || /^bookmark-metadata:https?:\/\/[^/]*\.zona\.im\//.test(key) ? 'ZONA' : key.startsWith('ANIXART:') ? 'ANIXART' : 'REZKA';
 
 let activeRequests = 0;
 let lastRequestStartedAt = 0;
@@ -49,6 +56,15 @@ const takeNextTask = (): QueueTask<unknown> | undefined => {
 };
 
 const drainQueue = async () => {
+  for (let index = queue.length - 1; index >= 0; index--) {
+    const task = queue[index];
+    const blocked = cooldowns.get(requestGroup(task.key));
+    if (blocked && Date.now() < blocked.until) {
+      queue.splice(index, 1);
+      pendingRequests.delete(task.key);
+      task.reject(blocked.error);
+    }
+  }
   if (isDraining) {
     return;
   }
@@ -77,9 +93,13 @@ const drainQueue = async () => {
       activeRequests += 1;
       lastRequestStartedAt = Date.now();
 
-      void task.execute()
+      void withDeadline(task.execute(), 20_000)
         .then(task.resolve)
-        .catch(task.reject)
+        .catch((error) => {
+          cooldowns.set(requestGroup(task.key), { until: error instanceof SourceBlockedError ? error.retryAt ?? Date.now() + 5 * 60_000 : Date.now() + FAILURE_COOLDOWN, error });
+
+          task.reject(error);
+        })
         .finally(() => {
           activeRequests -= 1;
           pendingRequests.delete(task.key);
@@ -99,6 +119,8 @@ export const enqueueRatingRequest = <T>(
   key: string,
   execute: () => Promise<T>,
 ): Promise<T> => {
+  const blocked = cooldowns.get(requestGroup(key));
+  if (blocked && Date.now() < blocked.until) return Promise.reject(blocked.error);
   const existingRequest = pendingRequests.get(key);
 
   if (existingRequest) {

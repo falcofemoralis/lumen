@@ -1,0 +1,30 @@
+import assert from 'node:assert/strict';
+import { test } from 'node:test';
+import { ZonaCardTypeCache } from '../../src/source/search/ZonaCardTypeCache';
+import { FilmType } from '../../src/type/FilmType.type';
+import { FilmCardInterface } from '../../src/type/FilmCard.interface';
+const card: FilmCardInterface = { id: 'a', link: 'https://w1.zona.im/movies/a', type: FilmType.FILM, contentTypePending: true, title: 'A', poster: 'fresh', subtitle: '', ratings: { imdb: 8 } };
+test('confirmed Zona types survive restart and unblock Home without replacing fresh catalog data', () => {
+  const data = new Map<string, unknown>();
+  const store = { load: <T>(key: string) => (data.get(key) ?? null) as T | null, save: (key: string, value: unknown) => { data.set(key, JSON.parse(JSON.stringify(value))); return true; } };
+  let now = 1000;
+  const cache = new ZonaCardTypeCache(store, () => now);
+  cache.remember({ ...card, type: FilmType.CARTOON, contentTypePending: false, poster: 'old' });
+  const restored = new ZonaCardTypeCache(store, () => now);
+  const result = restored.peek(card);
+  assert.equal(result.type, FilmType.CARTOON);
+  assert.equal(result.contentTypePending, false);
+  assert.equal(result.poster, 'fresh');
+  assert.deepEqual(result.ratings, { imdb: 8 });
+  now += 7 * 24 * 60 * 60 * 1000;
+  assert.equal(restored.peek(card).contentTypePending, true);
+});
+test('unverified types and Rezka cards cannot populate the Zona type cache', () => {
+  const data = new Map<string, unknown>();
+  const store = { load: <T>(key: string) => (data.get(key) ?? null) as T | null, save: (key: string, value: unknown) => { data.set(key, value); return true; } };
+  const cache = new ZonaCardTypeCache(store);
+  cache.remember(card);
+  cache.remember({ ...card, link: 'https://rezka.test/a', contentTypePending: false });
+  assert.equal(data.size, 0);
+  assert.equal(cache.peek(card), card);
+});

@@ -1,4 +1,4 @@
-﻿import { FilmPager } from 'Component/FilmPager';
+import { FilmPager } from 'Component/FilmPager';
 import { ThemedButton } from 'Component/ThemedButton';
 import { Page } from 'Component/Page';
 import { useConfigContext } from 'Context/ConfigContext';
@@ -23,6 +23,7 @@ export function HomeScreenComponent({
   return (
     <Page>
       <FilmPager
+        key={ pagerHandlers.pagerItems.map((item) => item.menuItem.id).join('|') }
         { ...pagerHandlers }
         tabPosition={ tabPosition }
         tabBarRightPadding={ newHomeInterface ? 9 : undefined }

@@ -21,7 +21,7 @@ import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from 'Theme/context';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
-import { FilmType } from 'Type/FilmType.type';
+import { recentToFilmCard } from 'Util/Film';
 
 import { componentStyles } from './RecentScreen.style';
 import { RecentScreenThumbnail } from './RecentScreen.thumbnail';
@@ -45,31 +45,15 @@ export function RecentScreenComponent({
 }: RecentScreenComponentProps) {
   const styles = useThemedStyles(componentStyles);
   const { isSignedIn, badgeData } = useServiceContext();
-  const { isLocalLibrary, showRecentNotifications } = useConfigContext();
+  const { isLocalLibrary, showRecentNotifications, newHomeInterface } = useConfigContext();
 
   const filmItems = useMemo(() => (
-    items.map((item): FilmCardInterface => ({
-      id: item.id,
-      link: item.link,
-      type: FilmType.FILM,
-      poster: item.image,
-      title: item.name,
-      subtitle: item.date,
-      info: item.info,
-    }))
+    items.map(recentToFilmCard)
   ), [items]);
 
   const listItems = useMemo(() => (
     items.map((item) => ({
-      film: {
-        id: item.id,
-        link: item.link,
-        type: FilmType.FILM,
-        poster: item.image,
-        title: item.name,
-        subtitle: item.date,
-        info: item.info,
-      },
+      film: recentToFilmCard(item),
       isWatched: item.isWatched,
       additionalInfo: item.additionalInfo,
     }))
@@ -248,7 +232,7 @@ export function RecentScreenComponent({
     <Page>
       { renderConfirmOverlay() }
       { renderContent() }
-      { showRecentNotifications && (
+      { showRecentNotifications && !newHomeInterface && (
         <>
           <ThemedPressable
             style={ [

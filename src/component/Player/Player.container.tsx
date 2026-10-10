@@ -38,6 +38,8 @@ import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { isBookmarked } from 'Util/Film';
 import { createMasterPlaylist, getQualityFromResolution } from 'Util/Hls';
 import { upsertLocalHistoryItem } from 'Util/LocalLibrary';
+import { ContentSource, sourcePlaybackRouter } from '../../source';
+import { resolveAdjacentEpisode } from 'Util/Player/episodeNavigation';
 import { setIntervalSafe } from 'Util/Misc';
 import {
   applyPlayerDefaults,
@@ -236,6 +238,35 @@ export function PlayerContainer({
     }
   }, [firestoreDb, profile, film, selectedVoice]);
 
+  const getStreamHeaders = useCallback((
+    videoArg: FilmVideoInterface,
+    qualityArg: string,
+  ): Record<string, string> | undefined => {
+    if (isOffline) {
+      return undefined;
+    }
+
+    const streams = videoArg.streams;
+    if (!streams.length) {
+      return currentService.getHeaders(true);
+    }
+
+    const firstHeaders = streams[0].headers;
+    const headersAreCompatible = streams.every(
+      (stream) => JSON.stringify(stream.headers ?? null) === JSON.stringify(firstHeaders ?? null),
+    );
+
+    if (qualityArg === AUTO_QUALITY.value && headersAreCompatible) {
+      return firstHeaders ?? currentService.getHeaders(true);
+    }
+
+    const selectedStream = qualityArg === AUTO_QUALITY.value
+      ? streams[streams.length - 1]
+      : getPlayerStream(videoArg, getQualityFromStreams(videoArg, qualityArg));
+
+    return (selectedStream && 'headers' in selectedStream ? selectedStream.headers : undefined) ?? currentService.getHeaders(true);
+  }, [isOffline, currentService]);
+
   const videoUrl = useMemo(() => {
     if (isOffline) {
       const { url } = getPlayerStream(video, selectedQuality);
@@ -245,7 +276,16 @@ export function PlayerContainer({
     }
 
     if (selectedQuality === AUTO_QUALITY.value) {
-      return createMasterPlaylist(video.streams).uri;
+      const firstHeaders = video.streams[0]?.headers;
+      const headersAreCompatible = video.streams.every(
+        (stream) => JSON.stringify(stream.headers ?? null) === JSON.stringify(firstHeaders ?? null),
+      );
+
+      if (headersAreCompatible && sourcePlaybackRouter.getAdapterForFilmLink(film.link)?.source !== ContentSource.ZONA) {
+        return createMasterPlaylist(video.streams).uri;
+      }
+
+      return video.streams[video.streams.length - 1]?.url ?? null;
     }
 
     return getPlayerStream(video, selectedQuality).url;
@@ -261,13 +301,13 @@ export function PlayerContainer({
     bufferConfig: getBufferConfig(quality, playerBufferTimeSetting, playerBackBufferTimeSetting),
     externalSubtitles: getExternalSubtitles(videoArg, isOffline),
     metadata: getPlayerMetadata(film, voiceArg),
-    headers: currentService.getHeaders(true),
+    headers: getStreamHeaders(videoArg, quality),
   }), [
     playerBufferTimeSetting,
     playerBackBufferTimeSetting,
     isOffline,
     film,
-    currentService,
+    getStreamHeaders,
   ]);
 
   // react-native-video's `useVideoPlayer` rebuilds the native player whenever the
@@ -496,11 +536,17 @@ export function PlayerContainer({
     // replaced source reaches is not one startPlayback has anything left to do at
     startedPlayerRef.current = player;
 
-    // `auto` is not a stream of its own - the player is handed the same generated
-    // master playlist the initial source is built from and negotiates the track itself
-    const newStream = qualityArg === AUTO_QUALITY.value && !isOffline
+    // Use adaptive playback only when all variants can share their headers.
+    // Otherwise select a concrete stream so its own headers can be applied.
+    const firstHeaders = videoArg.streams[0]?.headers;
+    const headersAreCompatible = videoArg.streams.every(
+      (stream) => JSON.stringify(stream.headers ?? null) === JSON.stringify(firstHeaders ?? null),
+    );
+    const newStream = qualityArg === AUTO_QUALITY.value && !isOffline && headersAreCompatible && sourcePlaybackRouter.getAdapterForFilmLink(film.link)?.source !== ContentSource.ZONA
       ? { url: createMasterPlaylist(videoArg.streams).uri, quality: qualityArg }
-      : getPlayerStream(videoArg, getQualityFromStreams(videoArg, qualityArg));
+      : qualityArg === AUTO_QUALITY.value && !isOffline
+        ? videoArg.streams[videoArg.streams.length - 1] ?? { url: null, quality: qualityArg }
+        : getPlayerStream(videoArg, getQualityFromStreams(videoArg, qualityArg));
 
     // a miss is reported as a null url, not a missing object
     if (!newStream.url) {
@@ -593,12 +639,22 @@ export function PlayerContainer({
 
     for (let attempt = 0; attempt < 2; attempt += 1) {
       try {
-        const newVideo = await currentService.getFilmStreamsByEpisodeId(
-          film,
-          voiceArg,
-          seasonId,
-          episodeId
-        );
+        const playbackAdapter =
+          sourcePlaybackRouter.getAdapterForFilmLink(film.link);
+
+        const newVideo = playbackAdapter
+          ? await playbackAdapter.getFilmStreamsByEpisodeId(
+              film,
+              voiceArg,
+              seasonId,
+              episodeId,
+            )
+          : await currentService.getFilmStreamsByEpisodeId(
+              film,
+              voiceArg,
+              seasonId,
+              episodeId,
+            );
 
         if (newVideo?.streams?.length) {
           return newVideo;
@@ -620,102 +676,34 @@ export function PlayerContainer({
   };
 
   const handleNewEpisode = async (direction: RewindDirection): Promise<boolean> => {
-    if (episodeTransitionRef.current) {
-      return false;
-    }
-
-    const { hasSeasons } = film;
-
-    if (!hasSeasons) {
-      return false;
-    }
-
-    const { seasons = [], lastSeasonId, lastEpisodeId } = selectedVoice;
-    const seasonIndex = seasons.findIndex((s) => s.seasonId === lastSeasonId);
-
-    if (seasonIndex === -1) {
-      return false;
-    }
-
-    const season = seasons[seasonIndex];
-    const { episodes = [] } = season;
-
-    const episodeIndex = episodes.findIndex(
-      (e) => e.episodeId === lastEpisodeId
-    );
-
-    if (episodeIndex === -1) {
-      return false;
-    }
-
-    let newEpisodeIndex = episodeIndex;
-    let newSeasonIndex = seasonIndex;
-
-    if (direction === RewindDirection.BACKWARD) {
-      newEpisodeIndex -= 1;
-
-      if (newEpisodeIndex < 0) {
-        newSeasonIndex -= 1;
-
-        if (newSeasonIndex < 0) {
-          NotificationStore.displayMessage(t('No more episodes available'));
-
-          return false;
-        }
-
-        const { episodes: np = [] } = seasons[newSeasonIndex];
-
-        newEpisodeIndex = np.length - 1;
-      }
-    } else {
-      newEpisodeIndex += 1;
-
-      if (newEpisodeIndex > episodes.length - 1) {
-        newSeasonIndex += 1;
-
-        if (newSeasonIndex > seasons.length - 1) {
-          NotificationStore.displayMessage(t('No more episodes available'));
-
-          return false;
-        }
-
-        newEpisodeIndex = 0;
-      }
-    }
-
-    const { seasonId } = seasons[newSeasonIndex];
-    const { episodeId } = episodes[newEpisodeIndex];
-
+    if (episodeTransitionRef.current || !film.hasSeasons) return false;
     episodeTransitionRef.current = true;
-
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-
-      const newVideo = await getFreshEpisodeVideo(
+      const adapter = sourcePlaybackRouter.getAdapterForFilmLink(film.link);
+      const target = await resolveAdjacentEpisode(
         selectedVoice,
-        seasonId,
-        episodeId
+        direction === RewindDirection.BACKWARD ? -1 : 1,
+        isOffline ? undefined : (voice) => adapter
+          ? adapter.getFilmSeasons(film, voice) : currentService.getFilmSeasons(film, voice),
       );
-
-      const newVoice = {
-        ...selectedVoice,
-        lastSeasonId: seasonId,
-        lastEpisodeId: episodeId,
-      };
-
-      changePlayerVideo(newVideo, newVoice);
-
+      if (!target) {
+        NotificationStore.displayMessage(t('No more episodes available'));
+        return false;
+      }
+      const newVideo = isOffline ? target.video
+        : await getFreshEpisodeVideo(target.voice, target.seasonId, target.episodeId);
+      if (!newVideo?.streams?.length) throw new Error(t('Failed to load the video'));
+      changePlayerVideo(newVideo, target.voice);
       return true;
     } catch (error) {
       NotificationStore.displayError(error as Error);
-
       return false;
     } finally {
       episodeTransitionRef.current = false;
       setIsLoading(false);
     }
   };
-
   useEffect(() => {
     const subscription = AppState.addEventListener('change', async (nextState) => {
       if (nextState !== 'active') {
@@ -749,6 +737,9 @@ export function PlayerContainer({
           Number.isFinite(player.currentTime) ? player.currentTime : 0
         );
 
+        const playbackAdapter =
+          sourcePlaybackRouter.getAdapterForFilmLink(film.link);
+
         const newVideo = film.hasSeasons
           ? selectedVoice.lastSeasonId && selectedVoice.lastEpisodeId
             ? await getFreshEpisodeVideo(
@@ -757,7 +748,9 @@ export function PlayerContainer({
                 selectedVoice.lastEpisodeId
               )
             : null
-          : await currentService.getFilmStreamsByVoice(film, selectedVoice);
+          : playbackAdapter
+            ? await playbackAdapter.getFilmStreamsByVoice(film, selectedVoice)
+            : await currentService.getFilmStreamsByVoice(film, selectedVoice);
 
         if (!newVideo?.streams?.length) {
           return;
@@ -1084,9 +1077,16 @@ export function PlayerContainer({
 
       const { lastSeasonId = '', lastEpisodeId = '' } = selectedVoice;
 
+      const playbackAdapter =
+        sourcePlaybackRouter.getAdapterForFilmLink(film.link);
+
       const newVideo = film.hasSeasons
-        ? await currentService.getFilmStreamsByEpisodeId(film, selectedVoice, lastSeasonId, lastEpisodeId)
-        : await currentService.getFilmStreamsByVoice(film, selectedVoice);
+        ? playbackAdapter
+          ? await playbackAdapter.getFilmStreamsByEpisodeId(film, selectedVoice, lastSeasonId, lastEpisodeId)
+          : await currentService.getFilmStreamsByEpisodeId(film, selectedVoice, lastSeasonId, lastEpisodeId)
+        : playbackAdapter
+          ? await playbackAdapter.getFilmStreamsByVoice(film, selectedVoice)
+          : await currentService.getFilmStreamsByVoice(film, selectedVoice);
 
       if (!newVideo.streams.length) {
         throw new Error(t('Failed to load the video'));

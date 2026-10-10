@@ -11,6 +11,7 @@ import { FilmViewSection } from 'Component/FilmViewSection';
 import { Header } from 'Component/Header';
 import { Loader } from 'Component/Loader';
 import { Page } from 'Component/Page';
+import { SourceLoadError } from 'Component/SourceLoadError';
 import { PlayerVideoSelector } from 'Component/PlayerVideoSelector';
 import { ThemedBottomSheetRef } from 'Component/ThemedBottomSheet/ThemedBottomSheet.type';
 import { ThemedButton } from 'Component/ThemedButton';
@@ -100,6 +101,8 @@ const MiddleAction = ({
 
 export function FilmScreenComponent({
   film,
+  isLoadError,
+  retryLoad,
   thumbnailPoster,
   visibleScheduleItems,
   playerVideoSelectorOverlayRef,
@@ -114,6 +117,7 @@ export function FilmScreenComponent({
   showAgeRating,
   playFilm,
   handleVideoSelect,
+  handleVoicesUpdate,
   handleSelectFilm,
   handleSelectActor,
   handleSelectCategory,
@@ -168,6 +172,7 @@ export function FilmScreenComponent({
   }, []);
 
   if (!film) {
+    if (isLoadError) return <Page><SourceLoadError onRetry={ retryLoad } /></Page>;
     return (
       <Page>
         <FilmScreenThumbnail top={ top } styles={ styles } />
@@ -530,6 +535,7 @@ export function FilmScreenComponent({
         ref={ playerVideoSelectorOverlayRef }
         film={ film }
         onSelect={ handleVideoSelect }
+      onVoicesUpdate={ handleVoicesUpdate }
       />
     );
   };
@@ -664,6 +670,7 @@ export function FilmScreenComponent({
     return (
       <View style={ styles.mainInfo }>
         { renderRatings() }
+        { renderInfoText(film.seriesInfo) }
         { renderInfoText(releaseDate, t('Release date')) }
         { renderInfoText(duration, t('Time')) }
         { renderDirectors() }
@@ -701,7 +708,7 @@ export function FilmScreenComponent({
         <ThemedText
           style={ styles.text }
         >
-          { showVotesCount ? ` ${rating} (${votes})` : ` ${rating}` }
+          { showVotesCount && votes !== undefined ? ` ${Number(rating.toFixed(2))} (${votes})` : ` ${Number(rating.toFixed(2))}` }
         </ThemedText>
       </Text>
     );

@@ -17,7 +17,7 @@ import { useCallback, useMemo } from 'react';
 import { View } from 'react-native';
 import { useAppTheme } from 'Theme/context';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
-import { FilmType } from 'Type/FilmType.type';
+import { recentToFilmCard } from 'Util/Film';
 
 import { ITEMS_ON_SCREEN_TV } from './RecentScreen.config';
 import { componentStyles } from './RecentScreen.style.atv';
@@ -44,28 +44,12 @@ export function RecentScreenComponent({
   const { isLocalLibrary } = useConfigContext();
 
   const filmItems = useMemo(() => (
-    items.map((item): FilmCardInterface => ({
-      id: item.id,
-      link: item.link,
-      type: FilmType.FILM,
-      poster: item.image,
-      title: item.name,
-      subtitle: item.date,
-      info: item.info,
-    }))
+    items.map(recentToFilmCard)
   ), [items]);
 
   const listItems = useMemo(() => (
     items.map((item) => ({
-      film: {
-        id: item.id,
-        link: item.link,
-        type: FilmType.FILM,
-        poster: item.image,
-        title: item.name,
-        subtitle: item.date,
-        info: item.info,
-      },
+      film: recentToFilmCard(item),
       isWatched: item.isWatched,
       additionalInfo: item.additionalInfo,
     }))

@@ -1,4 +1,4 @@
-﻿import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useMutation } from '@tanstack/react-query';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
@@ -16,6 +16,7 @@ import { RecentItemInterface } from 'Type/RecentItem.interface';
 import NotificationStore from 'Store/Notification.store';
 import RouterStore from 'Store/Router.store';
 import { removeLocalHistoryItem, setLocalHistoryWatched } from 'Util/LocalLibrary';
+import { sourcePlaybackRouter } from '../../source';
 import { navigate } from 'Util/Navigation';
 import { getSavedTime } from 'Util/Player';
 import { getLastSavedEpisode } from 'Util/Player/savedTimeUtil';
@@ -23,10 +24,11 @@ import { queryKeys } from 'Util/Query';
 import { openFilm } from 'Util/Router';
 
 import RecentScreenComponent from './RecentScreen.component';
+import { RecentHub } from './RecentScreen.hub';
 import RecentScreenComponentTV from './RecentScreen.component.atv';
 
 export function RecentScreenContainer() {
-  const { isTV, isLocalLibrary, recentDisplayMode } = useConfigContext();
+  const { isTV, isLocalLibrary, recentDisplayMode, newHomeInterface } = useConfigContext();
   const { isSignedIn, currentService } = useServiceContext();
   const localHistory = useLocalHistory();
   const navigation = useNavigation<NativeStackNavigationProp<AppStackParamList>>();
@@ -58,6 +60,7 @@ export function RecentScreenContainer() {
       id: historyItem.id,
       link: historyItem.link,
       image: historyItem.poster,
+      filmCard: historyItem.filmCard,
       name: historyItem.title,
       date: new Date(historyItem.updatedAt).toLocaleDateString(locale, {
         day: 'numeric',
@@ -127,12 +130,22 @@ export function RecentScreenContainer() {
           lastEpisodeId: episodeId,
         };
 
-        const video = await currentService.getFilmStreamsByEpisodeId(
-          film,
-          selectedVoice,
-          seasonId,
-          episodeId
-        );
+        const playbackAdapter =
+          sourcePlaybackRouter.getAdapterForFilmLink(film.link);
+
+        const video = playbackAdapter
+          ? await playbackAdapter.getFilmStreamsByEpisodeId(
+              film,
+              selectedVoice,
+              seasonId,
+              episodeId,
+            )
+          : await currentService.getFilmStreamsByEpisodeId(
+              film,
+              selectedVoice,
+              seasonId,
+              episodeId,
+            );
 
         return {
           film,
@@ -141,7 +154,12 @@ export function RecentScreenContainer() {
         };
       }
 
-      const video = await currentService.getFilmStreamsByVoice(film, voice);
+      const playbackAdapter =
+        sourcePlaybackRouter.getAdapterForFilmLink(film.link);
+
+      const video = playbackAdapter
+        ? await playbackAdapter.getFilmStreamsByVoice(film, voice)
+        : await currentService.getFilmStreamsByVoice(film, voice);
 
       return {
         film,
@@ -277,9 +295,10 @@ export function RecentScreenContainer() {
     openNotifications,
   };
 
-  return isTV ? <RecentScreenComponentTV { ...containerProps } /> : <RecentScreenComponent { ...containerProps } />;
+  if (isTV) return <RecentScreenComponentTV { ...containerProps } />;
+  const content = <RecentScreenComponent { ...containerProps } />;
+  return newHomeInterface ? <RecentHub>{ content }</RecentHub> : content;
 
 }
 
 export default RecentScreenContainer;
-

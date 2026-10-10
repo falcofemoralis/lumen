@@ -20,6 +20,9 @@ export interface FilmInterface {
 
   // additional data
   originalTitle?: string;
+  libraryId?: string;
+  metadataSourceFilm?: FilmInterface;
+  metadataSourceName?: string;
   releaseDate?: string;
   countries?: CollectionItemInterface[];
   genres?: CollectionItemInterface[];

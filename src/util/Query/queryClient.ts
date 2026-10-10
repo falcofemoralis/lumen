@@ -2,6 +2,7 @@ import { MutationCache, QueryCache, QueryClient } from '@tanstack/react-query';
 
 import { RatingRequestDroppedError } from 'Util/RatingRequestQueue';
 import { reportQueryError } from './errorHandler';
+import { shouldRetrySourceQuery } from '../Request/sourceFailure';
 
 export const STALE_TIME = {
   /** Lists the user pulls to refresh; refetched whenever a screen is re-entered */
@@ -47,7 +48,7 @@ export const createQueryClient = () => new QueryClient({
       staleTime: STALE_TIME.NONE,
       gcTime: GC_TIME,
       // the scrapers fail fast on a dead provider; a single retry is enough
-      retry: 1,
+      retry: shouldRetrySourceQuery,
       // there is no window to focus on TV, and AppState churn should not refetch
       refetchOnWindowFocus: false,
       refetchOnReconnect: true,

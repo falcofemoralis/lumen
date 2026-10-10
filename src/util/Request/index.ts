@@ -1,4 +1,5 @@
 import { t } from 'i18n/translate';
+import { SourceBlockedError } from './sourceFailure';
 import { customFetch } from 'Util/Fetch';
 
 export type Variables = Record<string, string>;
@@ -74,7 +75,7 @@ export const handleRequestError = (response: Response): void => {
   }
 
   if (response.status === 403) {
-    throw new Error(t('You are blocked'));
+    throw new SourceBlockedError(t('You are blocked'));
   }
 
   if (response.status === 404) {
@@ -106,7 +107,7 @@ export const executeGet = async (
   } catch (error) {
     // kept as is, callers check for it -- everything else keeps the stringified
     // shape the connection error handler matches on
-    if (error instanceof NotFoundError) {
+    if (error instanceof NotFoundError || error instanceof SourceBlockedError) {
       throw error;
     }
 
@@ -147,7 +148,7 @@ export const executePostFormData = async (
   } catch (error) {
     // kept as is, callers check for it -- everything else keeps the stringified
     // shape the connection error handler matches on
-    if (error instanceof NotFoundError) {
+    if (error instanceof NotFoundError || error instanceof SourceBlockedError) {
       throw error;
     }
 
@@ -180,7 +181,7 @@ export const executePostJson = async (
   } catch (error) {
     // kept as is, callers check for it -- everything else keeps the stringified
     // shape the connection error handler matches on
-    if (error instanceof NotFoundError) {
+    if (error instanceof NotFoundError || error instanceof SourceBlockedError) {
       throw error;
     }
 
@@ -225,7 +226,7 @@ export const executePostEncoded = async (
   } catch (error) {
     // kept as is, callers check for it -- everything else keeps the stringified
     // shape the connection error handler matches on
-    if (error instanceof NotFoundError) {
+    if (error instanceof NotFoundError || error instanceof SourceBlockedError) {
       throw error;
     }
 

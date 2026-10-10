@@ -1,10 +1,12 @@
-﻿import { Theme, ThemedStyles } from 'Theme/types';
+import { Theme, ThemedStyles } from 'Theme/types';
 
 export const componentStyles = ({ scale, colors, text }: Theme) => ({
   overlay: {
     width: scale(320),
+    maxHeight: '85%',
   },
   container: {
+    flexShrink: 1,
     padding: scale(8),
     flexDirection: 'column',
     gap: scale(12),
@@ -18,7 +20,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   // hands down (its own `maxHeight: '50%'`) and leaves the actions row outside
   // the clipped content box.
   list: {
-    height: 'auto',
+    height: scale(160),
     flexShrink: 1,
     maxHeight: scale(180),
   },
@@ -81,6 +83,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     fontSize: scale(text.sm.fontSize),
   },
   actions: {
+    flexShrink: 0,
     width: '100%',
     flexDirection: 'row',
     gap: scale(8),

@@ -6,6 +6,7 @@ import { SubtitleInterface } from './FilmVideo.interface';
 export interface DownloadFileInterface {
   id: string; // uuid
   url: string;
+  headers?: Record<string, string>;
   destination: string;
   folder: string;
   film: Pick<FilmInterface,

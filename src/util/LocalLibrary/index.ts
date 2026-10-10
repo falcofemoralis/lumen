@@ -9,6 +9,7 @@ import {
 } from 'Type/LocalLibrary.interface';
 import { NotificationInterface } from 'Type/Notification.interface';
 import { uuid } from 'Util/Download';
+import { filmToFilmCard } from 'Util/Film';
 import { storage } from 'Util/Storage';
 import { mutateCloudSync, mutateCloudSyncBatch } from 'Util/CloudSync';
 
@@ -319,6 +320,7 @@ const saveLocalHistory = (items: LocalHistoryItemInterface[]) => {
  */
 export const upsertLocalHistoryItem = (film: FilmInterface, voice: FilmVoiceInterface) => {
   const item: LocalHistoryItemInterface = {
+    filmCard: filmToFilmCard(film),
     id: film.id,
     link: film.link,
     poster: film.poster,

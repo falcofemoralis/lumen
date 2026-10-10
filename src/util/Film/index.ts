@@ -1,5 +1,8 @@
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
+import { ContentSource } from '../../source/types/ContentSource';
+import { RecentItemInterface } from 'Type/RecentItem.interface';
+import { FilmType } from 'Type/FilmType.type';
 
 export const isBookmarked = (film: FilmInterface) => {
   const { bookmarks = [] } = film;
@@ -36,11 +39,39 @@ export const isFilmCardHidden = (
 };
 
 export const filmToFilmCard = (film: FilmInterface): FilmCardInterface => ({
-  id: film.id,
+  id: film.libraryId ?? film.id,
   link: film.link,
   type: film.type,
   poster: film.poster,
   title: film.title,
   subtitle: film.releaseDate ?? '',
+  info: film.seriesInfo,
+  originalTitle: film.originalTitle,
+  externalIds: film.externalIds,
+  ratingSourceType: film.metadataSourceFilm ? ContentSource.REZKA
+    : /^https?:\/\/[^/]*\.zona\.im\//.test(film.link) ? ContentSource.ZONA : ContentSource.REZKA,
+  ratingFilmId: film.metadataSourceFilm?.id
+    ?? (/^https?:\/\/[^/]*\.zona\.im\//.test(film.link) ? film.link : film.id),
+  ratings: film.ratings?.reduce<NonNullable<FilmCardInterface['ratings']>>((result, rating) => {
+    if (rating.name === 'IMDb') result.imdb = rating.rating;
+    if (rating.name === 'Кинопоиск') result.kinopoisk = rating.rating;
+    return result;
+  }, {}),
   isPendingRelease: film.isPendingRelease,
 });
+/** Legacy history records recover the rating source from their native URL. */
+export const recentToFilmCard = (item: RecentItemInterface): FilmCardInterface => {
+  const zona = /^https?:\/\/[^/]*\.zona\.im\//.test(item.link);
+  return {
+    ...item.filmCard,
+    id: item.id,
+    link: item.link,
+    type: item.filmCard?.type ?? FilmType.FILM,
+    poster: item.image,
+    title: item.name,
+    subtitle: item.date,
+    info: item.info,
+    ratingSourceType: item.filmCard?.ratingSourceType ?? (zona ? ContentSource.ZONA : undefined),
+    ratingFilmId: item.filmCard?.ratingFilmId ?? (zona ? item.link : undefined),
+  };
+};

@@ -3,6 +3,16 @@ import { RefObject } from 'react';
 import { SearchableCategoryInterface } from 'Type/SearchableCategoryInterface.interface';
 
 export interface SearchScreenComponentProps extends FilmPagerHandlers {
+  yearFrom: string;
+  yearTo: string;
+  includedCountries: string[];
+  allowedCountries: string[];
+  countryOptions: { value: string; label: string }[];
+  setYearFrom: (value: string) => void;
+  setYearTo: (value: string) => void;
+  setIncludedCountries: (values: string[]) => void;
+  setAllowedCountries: (values: string[]) => void;
+  filtersApplied: boolean;
   suggestions: string[];
   pagerItems: PagerItemInterface[];
   query: string;

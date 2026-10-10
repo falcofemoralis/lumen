@@ -127,6 +127,12 @@ export function SettingsScreenComponent({
   newHomeInterface,
   showRecentNotifications,
   homeDefaultTab,
+  homeTabOrder,
+  hiddenHomeTabs,
+  showEpisodeUpdateCount,
+  homeDisplayMode,
+  bookmarksDisplayMode,
+  recentDisplayMode,
   tabPosition,
   numberOfColumnsMobile,
   hiddenCountries,
@@ -226,7 +232,7 @@ export function SettingsScreenComponent({
   } = useCloudSyncContext();
   const styles = useThemedStyles(componentStyles);
   const [currentGroup, setCurrentGroup] = useState<SETTING_GROUP | null>(takeHandedOverGroup);
-  const [navigationOrderEditor, setNavigationOrderEditor] = useState<'tv' | 'mobile' | null>(null);
+  const [navigationOrderEditor, setNavigationOrderEditor] = useState<'tv' | 'mobile' | 'home' | null>(null);
 
   const handleOpenGroup = useCallback((group: SETTING_GROUP) => {
     setCurrentGroup(group);
@@ -387,12 +393,11 @@ export function SettingsScreenComponent({
         options={ MOBILE_SCREENS }
         onChange={ (value) => onConfigUpdate('initialRoute', value) }
       />
-      <SettingSelect
+      <SettingBase
         title={ t('Default home tab') }
+        subtitle="Измените порядок и видимость вкладок. Первая видимая вкладка открывается при запуске."
         IconComponent={ House }
-        value={ homeDefaultTab || homeMenuOptions[0]?.value || '' }
-        options={ homeMenuOptions }
-        onChange={ (value) => onConfigUpdate('homeDefaultTab', value) }
+        onPress={ () => setNavigationOrderEditor('home') }
       />
       <SettingSelect
         title={ t('Tab position') }
@@ -421,6 +426,36 @@ export function SettingsScreenComponent({
         value={ numberOfColumnsMobile.toString() }
         options={ COLUMNS_MOBILE_OPTIONS }
         onChange={ (value) => onConfigUpdate('numberOfColumnsMobile', Number(value)) }
+      />
+      <SettingSelect
+        title={ t('Home display mode') }
+        IconComponent={ Grid3x2 }
+        value={ homeDisplayMode }
+        options={ [
+          { value: 'grid', label: t('Grid') },
+          { value: 'list', label: t('List') },
+        ] }
+        onChange={ (value) => onConfigUpdate('homeDisplayMode', value) }
+      />
+      <SettingSelect
+        title={ t('Bookmarks display mode') }
+        IconComponent={ Grid3x2 }
+        value={ bookmarksDisplayMode }
+        options={ [
+          { value: 'grid', label: t('Grid') },
+          { value: 'list', label: t('List') },
+        ] }
+        onChange={ (value) => onConfigUpdate('bookmarksDisplayMode', value) }
+      />
+      <SettingSelect
+        title={ t('Recent display mode') }
+        IconComponent={ Grid3x2 }
+        value={ recentDisplayMode }
+        options={ [
+          { value: 'grid', label: t('Grid') },
+          { value: 'list', label: t('List') },
+        ] }
+        onChange={ (value) => onConfigUpdate('recentDisplayMode', value) }
       />
       <SettingMultiSelect
         title={ t('Hidden countries') }
@@ -451,6 +486,13 @@ export function SettingsScreenComponent({
         IconComponent={ Users }
         value={ showVotesCount }
         onChange={ (value) => onConfigUpdate('showVotesCount', value) }
+      />
+      <SettingSwitch
+        title="Количество обновлений серий"
+        subtitle="Показывать число обновлений в скобках рядом с вкладкой «Обновление серий» в новом мобильном интерфейсе."
+        IconComponent={ CalendarDays }
+        value={ showEpisodeUpdateCount }
+        onChange={ (value) => onConfigUpdate('showEpisodeUpdateCount', value) }
       />
       <SettingSwitch
         title={ t('Show bookmark counts') }
@@ -987,6 +1029,19 @@ export function SettingsScreenComponent({
     }
   };
 
+  if (navigationOrderEditor === 'home') {
+    return (
+      <NavigationOrderSetting
+        title={ t('Default home tab') }
+        items={ homeMenuOptions.map((item) => ({ ...item, IconComponent: House })) }
+        value={ homeTabOrder }
+        hiddenItems={ hiddenHomeTabs }
+        onChange={ (value) => onConfigUpdate('homeTabOrder', value) }
+        onHiddenItemsChange={ (value) => onConfigUpdate('hiddenHomeTabs', value) }
+        onBack={ () => setNavigationOrderEditor(null) }
+      />
+    );
+  }
   if (navigationOrderEditor) {
     const isTVNavigation = navigationOrderEditor === 'tv';
 

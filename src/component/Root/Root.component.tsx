@@ -1,10 +1,11 @@
-import {
+﻿import {
   completeHandler,
   getExistingDownloadTasks,
   setConfig as setDownloaderConfig,
 } from '@kesha-antonov/react-native-background-downloader';
 import { AppUpdater } from 'Component/AppUpdater';
 import { CloudflareSolver } from 'Component/CloudflareSolver';
+import { ZonaStreamProvider } from 'Component/ZonaStreamProvider';
 import { Portal } from 'Component/ThemedPortal';
 import { useAppUpdaterContext } from 'Context/AppUpdaterContext';
 import { useConfigContext } from 'Context/ConfigContext';
@@ -16,10 +17,13 @@ import { useSubtitleStyle } from 'Hooks/useSubtitleStyle';
 import { useTvChannels } from 'Hooks/useTvChannels';
 import { useTvSearch } from 'Hooks/useTvSearch';
 import { useVolumeNormalization } from 'Hooks/useVolumeNormalization';
-import { ReactNode, useEffect } from 'react';
+import { ReactNode, useEffect, useRef } from 'react';
 import NotificationStore from 'Store/Notification.store';
 import { Installer } from 'Util/App/installer';
 import { runAfterStartup } from 'Util/Startup';
+import { sourcePlaybackRouter, sourceRouter } from '../../source';
+
+
 
 export const Root = ({ children }: { children: ReactNode }) => {
   const {
@@ -36,10 +40,10 @@ export const Root = ({ children }: { children: ReactNode }) => {
     playerVolumeNormalizationStrength,
   } = useConfigContext();
   const { isSignedIn } = useServiceContext();
+  const zonaFullAdapterTestStarted = useRef(false);
   const { fetchUserData } = useServiceContext();
   const { checkVersion } = useAppUpdaterContext();
   const { isInternetAvailable } = useNetworkContext();
-
   useAwake();
   useTvChannels(tvChannelsEnabled);
   // gated on onboarding too: a search before a provider has been settled on only 404s,
@@ -92,6 +96,161 @@ export const Root = ({ children }: { children: ReactNode }) => {
     setDownloaderConfig({ maxParallelDownloads: downloadsMaxParallel });
   }, [downloadsMaxParallel]);
 
+  useEffect(() => {
+    if (zonaFullAdapterTestStarted.current) {
+      return;
+    }
+
+    zonaFullAdapterTestStarted.current = true;
+
+    void (async () => {
+      const testLink = 'https://w1.zona.im/tvseries/mazhor';
+
+      console.log('[ZONA FULL ADAPTER TEST] START');
+      console.log('[ZONA FULL ADAPTER TEST] LINK', testLink);
+
+      try {
+        const sourceAdapter = sourceRouter.getAdapterForLink(testLink);
+
+        if (!sourceAdapter) {
+          throw new Error('Zona source adapter was not resolved');
+        }
+
+        console.log(
+          '[ZONA FULL ADAPTER TEST] SOURCE ADAPTER',
+          sourceAdapter.name,
+          sourceAdapter.source,
+        );
+
+        const film = await sourceAdapter.getFilm(testLink);
+
+        if (!film) {
+          throw new Error('Zona getFilm() returned null');
+        }
+
+        console.log('[ZONA FULL ADAPTER TEST] FILM', {
+          id: film.id,
+          title: film.title,
+          link: film.link,
+          type: film.type,
+          externalIds: film.externalIds,
+        });
+
+        const kinopoiskId = Number(film.externalIds?.kinopoisk);
+
+        if (!Number.isFinite(kinopoiskId) || kinopoiskId <= 0) {
+          throw new Error(
+            `Invalid Kinopoisk ID: ${String(film.externalIds?.kinopoisk)}`,
+          );
+        }
+
+        console.log(
+          '[ZONA FULL ADAPTER TEST] KINOPOISK ID',
+          kinopoiskId,
+        );
+
+        const playbackAdapter =
+          sourcePlaybackRouter.getAdapterForFilmLink(film.link);
+
+        if (!playbackAdapter) {
+          throw new Error('Zona playback adapter was not resolved');
+        }
+
+        console.log(
+          '[ZONA FULL ADAPTER TEST] PLAYBACK ADAPTER',
+          playbackAdapter.source,
+        );
+
+        const voices =
+          await playbackAdapter.getFilmVoices(film);
+
+        console.log(
+          '[ZONA FULL ADAPTER TEST] VOICES',
+          voices.map(voice => ({
+            id: voice.id,
+            identifier: voice.identifier,
+            title: voice.title,
+            isActive: voice.isActive,
+          })),
+        );
+
+        if (voices.length === 0) {
+          throw new Error('Zona returned no voices');
+        }
+
+        const selectedVoice =
+          voices.find(voice => voice.isActive) ?? voices[0];
+
+        console.log(
+          '[ZONA FULL ADAPTER TEST] SELECTED VOICE',
+          selectedVoice,
+        );
+
+        const voiceWithSeasons =
+          await playbackAdapter.getFilmSeasons(
+            film,
+            selectedVoice,
+          );
+
+        const seasons = voiceWithSeasons.seasons ?? [];
+
+        console.log(
+          '[ZONA FULL ADAPTER TEST] SEASONS',
+          seasons.map(season => ({
+            seasonId: season.seasonId,
+            name: season.name,
+            episodes: season.episodes.length,
+          })),
+        );
+
+        if (seasons.length === 0) {
+          throw new Error('Zona returned no seasons');
+        }
+
+        const season = seasons[0];
+
+        if (season.episodes.length === 0) {
+          throw new Error(
+            `Zona season ${season.seasonId} returned no episodes`,
+          );
+        }
+
+        const episode = season.episodes[0];
+
+        console.log('[ZONA FULL ADAPTER TEST] EPISODE', {
+          seasonId: season.seasonId,
+          seasonName: season.name,
+          episodeId: episode.episodeId,
+          episodeName: episode.name,
+        });
+
+        const video =
+          await playbackAdapter.getFilmStreamsByEpisodeId(
+            film,
+            voiceWithSeasons,
+            season.seasonId,
+            episode.episodeId,
+          );
+
+        console.log('[ZONA FULL ADAPTER TEST] VIDEO', {
+          streams: video.streams?.length ?? 0,
+          qualities: video.streams?.map(stream => stream.quality),
+          firstUrl: video.streams?.[0]?.url,
+        });
+
+        if (!video.streams?.length) {
+          throw new Error(
+            'Zona playback returned no normalized streams',
+          );
+        }
+
+        console.log('[ZONA FULL ADAPTER TEST] SUCCESS');
+      } catch (error) {
+        console.error('[ZONA FULL ADAPTER TEST] FAILED', error);
+      }
+    })();
+  }, []);
+
   useEffect( () => {
     getExistingDownloadTasks().then(tasks => {
       tasks.forEach(task => {
@@ -121,8 +280,12 @@ export const Root = ({ children }: { children: ReactNode }) => {
          * the user has answered it.
          */ }
       <CloudflareSolver />
+      <ZonaStreamProvider />
     </Portal.Host>
   );
 };
 
 export default Root;
+
+
+

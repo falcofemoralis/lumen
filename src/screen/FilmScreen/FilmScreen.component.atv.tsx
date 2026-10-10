@@ -8,6 +8,7 @@ import { FilmViewScheduleItem } from 'Component/FilmViewScheduleItem';
 import { FilmViewScheduleOverlay } from 'Component/FilmViewScheduleOverlay';
 import { FilmViewSection } from 'Component/FilmViewSection';
 import { Page } from 'Component/Page';
+import { SourceLoadError } from 'Component/SourceLoadError';
 import { PlayerVideoSelector } from 'Component/PlayerVideoSelector';
 import { Rating } from 'Component/Rating';
 import { ThemedButton } from 'Component/ThemedButton';
@@ -47,6 +48,8 @@ import { FilmScreenComponentProps } from './FilmScreen.type';
 
 export function FilmScreenComponent({
   film,
+  isLoadError,
+  retryLoad,
   visibleScheduleItems,
   playerVideoSelectorOverlayRef,
   scheduleOverlayRef,
@@ -61,6 +64,7 @@ export function FilmScreenComponent({
   showAgeRating,
   playFilm,
   handleVideoSelect,
+  handleVoicesUpdate,
   handleSelectFilm,
   handleSelectActor,
   handleSelectCategory,
@@ -85,6 +89,7 @@ export function FilmScreenComponent({
   const [actionsWidth, setActionsWidth] = useState(0);
 
   if (!film) {
+    if (isLoadError) return <Page><SourceLoadError onRetry={ retryLoad } /></Page>;
     return (
       <Page>
         <FilmScreenThumbnail styles={ styles } />
@@ -257,7 +262,7 @@ export function FilmScreenComponent({
     return (
       <View style={ styles.ratingsRow }>
         { allRatings.map(({ name, rating, votes }) => renderInfoText(
-          showVotesCount ? `${rating} (${votes})` : `${rating}`,
+          showVotesCount && votes !== undefined ? `${Number(rating.toFixed(2))} (${votes})` : `${Number(rating.toFixed(2))}`,
           name
         )) }
       </View>
@@ -363,6 +368,7 @@ export function FilmScreenComponent({
         ) }
         { renderGenres() }
         <View style={ styles.additionalInfo }>
+          { renderInfoText(film.seriesInfo) }
           { renderInfoText(releaseDate) }
           { renderInfoText(duration) }
           { renderRating() }
@@ -389,6 +395,7 @@ export function FilmScreenComponent({
         ref={ playerVideoSelectorOverlayRef }
         film={ film }
         onSelect={ handleVideoSelect }
+      onVoicesUpdate={ handleVoicesUpdate }
       />
     );
   };
