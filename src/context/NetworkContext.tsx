@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { NetworkStateType, useNetworkState } from 'expo-network';
+import { getNetworkStateAsync, NetworkState, NetworkStateType, useNetworkState } from 'expo-network';
 import {
   createContext,
   ReactNode,
@@ -7,8 +7,11 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
+import { AppState } from 'react-native';
+import { isNetworkFailure } from 'Util/NetworkRecovery';
 import { setConnectionErrorHandler } from 'Util/Query';
 
 import { useConfigContext } from './ConfigContext';
@@ -39,7 +42,12 @@ const NetworkContext = createContext<NetworkContextInterface>({
 export const NetworkProvider = ({ children }: { children: ReactNode }) => {
   const { strictConnectionCheck } = useConfigContext();
   const queryClient = useQueryClient();
-  const { isConnected, isInternetReachable, type } = useNetworkState();
+  const observedNetwork = useNetworkState();
+  const [verifiedNetwork, setVerifiedNetwork] = useState<NetworkState | null>(null);
+  const { isConnected, isInternetReachable, type } = verifiedNetwork ?? observedNetwork;
+  useEffect(() => setVerifiedNetwork(null), [
+    observedNetwork.isConnected, observedNetwork.isInternetReachable, observedNetwork.type,
+  ]);
   const [errorOccurred, setErrorOccurred] = useState<boolean>(false);
   const [wasOnline, setWasOnline] = useState<boolean>(false);
 
@@ -71,8 +79,9 @@ export const NetworkProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
-    queryClient.resetQueries({
-      predicate: ({ state }) => state.status === 'error',
+    queryClient.refetchQueries({
+      type: 'active',
+      predicate: ({ state }) => state.status === 'error' && isNetworkFailure(state.error),
     });
   }, [isOnline, queryClient]);
 
@@ -132,17 +141,55 @@ export const NetworkProvider = ({ children }: { children: ReactNode }) => {
     return () => clearTimeout(timeout);
   }, [isOffline]);
 
+  const lastRecovery = useRef(0);
+  const recoveryTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const recoverConnection = useCallback(async () => {
+    try {
+      const network = await getNetworkStateAsync();
+      setVerifiedNetwork(network);
+      if (!network.isConnected || network.isInternetReachable === false) {
+        setErrorOccurred(true);
+        return;
+      }
+      setErrorOccurred(false);
+      if (AppState.currentState !== 'active' || Date.now() - lastRecovery.current < 60000) return;
+      if (!queryClient.getQueryCache().getAll().some((query) =>
+        query.isActive() && query.state.status === 'error' && isNetworkFailure(query.state.error))) return;
+      lastRecovery.current = Date.now();
+      await queryClient.refetchQueries({
+        type: 'active',
+        predicate: ({ state }) => state.status === 'error' && isNetworkFailure(state.error),
+      });
+    } catch {
+      // A failed native probe is not proof that every source is offline.
+      setErrorOccurred(false);
+    }
+  }, [queryClient]);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') void recoverConnection();
+    });
+    return () => {
+      subscription.remove();
+      clearTimeout(recoveryTimer.current);
+    };
+  }, [recoverConnection]);
+
   const handleConnectionError = useCallback((error: Error) => {
     const msg = error instanceof Error ? error.message : String(error);
 
-    if (msg === 'TypeError: Network request failed') {
-      setErrorOccurred(true);
+    if (isNetworkFailure(msg)) {
+      // A single unreachable host must not disable and re-enable every query.
+      if (!isOnline) setErrorOccurred(true);
+      clearTimeout(recoveryTimer.current);
+      recoveryTimer.current = setTimeout(() => void recoverConnection(), 1500);
 
       return true;
     }
 
     return false;
-  }, []);
+  }, [recoverConnection, isOnline]);
 
   // failed queries and mutations report through the query client, which lives outside
   // React - give it a way back into the offline state

@@ -1,4 +1,6 @@
 import { FilmInterface } from 'Type/Film.interface';
+import { isSourceEnabled } from '../types/SourceSelection';
+import { ContentSource } from '../types/ContentSource';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { SourcePlaybackAdapter } from './SourcePlaybackAdapter';
 
@@ -9,10 +11,10 @@ const voiceKey = (voice: FilmVoiceInterface) => (
   voice.title.normalize('NFKC').toLowerCase().replace(/ё/g, 'е').replace(/[^a-zа-я0-9]+/g, ' ').trim()
   + ':' + voice.isCamrip + ':' + voice.isDirector
 );
-export const supplementVoices = (zona: FilmVoiceInterface[], rezka: FilmVoiceInterface[]) => {
+export const supplementVoices = (zona: FilmVoiceInterface[], rezka: FilmVoiceInterface[], sourceName = 'Zona') => {
   const available = new Set(zona.map(voiceKey));
   return [
-    ...zona.map((voice) => ({ ...voice, title: voice.title + ' (Zona)' })),
+    ...zona.map((voice) => ({ ...voice, title: voice.title + ' (' + sourceName + ')' })),
     ...rezka.filter((voice) => !available.has(voiceKey(voice))).map((voice) => ({
       ...voice, id: 'rezka:' + voice.id, identifier: 'rezka:' + voice.identifier,
       nativeVoiceId: voice.id, playbackSource: 'REZKA' as const, isActive: false,
@@ -22,10 +24,11 @@ export const supplementVoices = (zona: FilmVoiceInterface[], rezka: FilmVoiceInt
 };
 
 export const createSupplementedPlaybackAdapter = (
-  zona: SourcePlaybackAdapter, rezka: RezkaPlayback,
+  zona: SourcePlaybackAdapter, rezka: RezkaPlayback, sourceName = 'Zona',
 ): SourcePlaybackAdapter => {
   const discovery = new Map<string, { time: number; value: Promise<FilmVoiceInterface[]> }>();
   const native = (film: FilmInterface, voice: FilmVoiceInterface) => {
+    if (!isSourceEnabled(ContentSource.REZKA)) throw new Error('HDRezka is disabled');
     const sourceFilm = film.metadataSourceFilm;
     const sourceVoice = sourceFilm?.voices.find((item) => item.id === voice.nativeVoiceId);
     if (!sourceFilm || !sourceVoice) throw new Error('HDRezka voice is unavailable for this film');
@@ -45,7 +48,7 @@ export const createSupplementedPlaybackAdapter = (
         });
         discovery.set(key, { time: Date.now(), value });
       }
-      const result = supplementVoices(await value, film.metadataSourceFilm?.voices ?? []);
+      const result = supplementVoices(await value, isSourceEnabled(ContentSource.REZKA) ? film.metadataSourceFilm?.voices ?? [] : [], sourceName);
       if (!result.length) throw new Error('No playable voices found');
       return result;
     },    async getFilmSeasons(film, voice) {

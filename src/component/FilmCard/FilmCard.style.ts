@@ -17,6 +17,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     borderRadius: scale(12),
   },
   poster: {
+    width: '100%',
     aspectRatio: `${POSTER_ASPECT_WIDTH} / ${POSTER_ASPECT_HEIGHT}`,
   },
   posterPendingRelease: {

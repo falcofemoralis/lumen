@@ -1,4 +1,5 @@
 import { FilmType } from 'Type/FilmType.type';
+import { isSourceEnabled } from '../types/SourceSelection';
 import { decode } from 'html-entities';
 
 import {
@@ -193,10 +194,28 @@ const mergeSources = (
     };
   }
 
+  if (incoming.subtitle && (!target.subtitle ||
+    incoming.subtitle.split(',').length > target.subtitle.split(',').length)) {
+    target.subtitle = incoming.subtitle;
+  }
+
   if (!target.info && incoming.info) {
     target.info = incoming.info;
   }
 
+  // Anixart owns the animation classification and presentation when it arrives
+  // after a supplemental source, including during pagination.
+  if (incoming.sources.some((source) => source.source === ContentSource.ANIXART)
+    && !target.sources.some((source) => source.source === ContentSource.ANIXART)) {
+    target.type = incoming.type;
+    target.title = incoming.title;
+    target.originalTitle = incoming.originalTitle ?? target.originalTitle;
+    target.poster = incoming.poster || target.poster;
+    target.info = incoming.info ?? target.info;
+    target.contentTypePending = incoming.contentTypePending;
+  }
+  if (target.isPendingRelease === false || incoming.isPendingRelease === false) target.isPendingRelease = false;
+  else target.isPendingRelease ??= incoming.isPendingRelease;
   incoming.sources.forEach((source) => {
     const existingSource = target.sources.find(
       (item) => item.source === source.source && item.link === source.link,
@@ -245,11 +264,11 @@ export class SourceResolver {
   getAvailableSources(
     film: UnifiedFilm,
   ): ContentSource[] {
-    const priority = film.type === FilmType.ANIME
+    const priority = (film.type === FilmType.ANIME || film.type === FilmType.DONGHUA)
       ? CONTENT_SOURCE_PRIORITY.ANIME
       : CONTENT_SOURCE_PRIORITY.DEFAULT;
 
-    return priority.filter((source) => (
+    return priority.filter((source) => (isSourceEnabled(source) &&
       film.sources.some((item) => item.source === source)
     ));
   }

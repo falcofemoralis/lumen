@@ -1,4 +1,4 @@
-﻿export enum ContentSource {
+export enum ContentSource {
   ZONA = 'ZONA',
   ANIXART = 'ANIXART',
   REZKA = 'REZKA',
@@ -11,13 +11,12 @@ export const CONTENT_SOURCE_PRIORITY = {
   ],
   ANIME: [
     ContentSource.ANIXART,
-    ContentSource.ZONA,
     ContentSource.REZKA,
   ],
 } as const;
 
 export const CONTENT_SOURCE_URLS: Record<ContentSource, string> = {
   [ContentSource.ZONA]: 'https://w1.zona.im',
-  [ContentSource.ANIXART]: 'https://anixart.tv',
+  [ContentSource.ANIXART]: 'https://anixart-app.com',
   [ContentSource.REZKA]: '',
 };

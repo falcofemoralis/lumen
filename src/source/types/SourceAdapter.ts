@@ -16,7 +16,7 @@ export interface SourceAdapter {
    *
    * Playback data belongs exclusively to the selected source.
    */
-  getFilm(link: string, options?: { deferSeriesInfo?: boolean; background?: boolean }): Promise<FilmInterface | null>;
+  getFilm(link: string, options?: { deferSeriesInfo?: boolean; background?: boolean; includeRelated?: boolean; includeSeriesInfo?: boolean }): Promise<FilmInterface | null>;
 
   /**
    * Load external ratings using the source-native film ID.
@@ -26,7 +26,7 @@ export interface SourceAdapter {
   /**
    * Search within this source.
    */
-  search(query: string, page: number, options?: { background?: boolean }): Promise<FilmListInterface>;
+  search(query: string, page: number, options?: { background?: boolean; onProgress?: (result: FilmListInterface) => void }): Promise<FilmListInterface>;
   /** Lightweight candidates; callers must verify identity using full details. */
   searchCandidates?(query: string, page: number): Promise<FilmListInterface>;
 

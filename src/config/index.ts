@@ -35,6 +35,7 @@ export type DeviceConfigType = {
   numberOfColumnsTV: number;
   recentTwoColumnsTV: boolean;
   hiddenCountries: string[];
+  enabledSources: string[];
   initialRoute: string;
   homeDefaultTab: string;
   homeTabOrder: string[];
@@ -143,6 +144,7 @@ export const defaultConfig: DeviceConfigType = {
   numberOfColumnsTV: 6,
   recentTwoColumnsTV: false,
   hiddenCountries: [],
+  enabledSources: ['ZONA', 'REZKA', 'ANIXART'],
   initialRoute: HOME_SCREEN,
   homeDefaultTab: '',
   homeTabOrder: [],
@@ -241,6 +243,7 @@ export const CONFIG_KEY_SECTIONS = {
   numberOfColumnsTV: BACKUP_SECTION.SETTINGS_APPEARANCE,
   recentTwoColumnsTV: BACKUP_SECTION.SETTINGS_APPEARANCE,
   hiddenCountries: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  enabledSources: BACKUP_SECTION.SETTINGS_APPEARANCE,
   isLocalLibrary: BACKUP_SECTION.SETTINGS_APPEARANCE,
   isLowMode: BACKUP_SECTION.SETTINGS_APPEARANCE,
   isTVAwake: BACKUP_SECTION.SETTINGS_APPEARANCE,

@@ -150,16 +150,14 @@ export function SearchScreenComponent(props: SearchScreenComponentProps) {
     additionalContentOverlayRef,
     categories,
     selectedCategory,
-    selectedGenre,
-    selectedYear,
+
     isCategoriesLoading,
     confirmationOverlayRef,
     onPreLoad,
     onNextLoad,
     handleApplyAdditionalContent,
     setSelectedCategory,
-    setSelectedGenre,
-    setSelectedYear,
+
     handleRemoveSuggestion,
     removeSuggestion,
   } = props;
@@ -252,6 +250,7 @@ export function SearchScreenComponent(props: SearchScreenComponentProps) {
       <ThemedOverlay
         ref={ additionalContentOverlayRef }
         containerStyle={ styles.categoriesOverlay }
+        contentContainerStyle={ { maxHeight: '85%' } }
       >
         { renderCategories() }
       </ThemedOverlay>

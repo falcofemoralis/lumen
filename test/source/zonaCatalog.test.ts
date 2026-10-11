@@ -32,6 +32,8 @@ test('catalog decodes nested multi-record RSC and returns the requested page and
     assert.equal(second.films[0].type, FilmType.CARTOON);
     assert.deepEqual(second.films[0].ratings, { imdb: 7.9, kinopoisk: 8.2 });
     assert.equal(second.films[0].externalIds?.kinopoisk, '430');
+    assert.equal(second.films[0].subtitle, '2001, США, мультфильм');
+    assert.equal(requests.length, 2);
     assert.match(requests[1], /page=2/);
   } finally { globalThis.fetch = originalFetch; }
 });
@@ -109,4 +111,46 @@ test('deferred series metadata classifies the poster before any season request',
     await Zona.getFilm('https://w1.zona.im/tvseries/fast-series');
     assert.equal(requests, 2);
   } finally { globalThis.fetch = originalFetch; }
+});test('a known cartoon catalog keeps instant posters and marks missing subtitle metadata for background enrichment', async () => {
+  const originalFetch = globalThis.fetch;
+  let requests = 0;
+  globalThis.fetch = async () => {
+    requests++;
+    return new Response(script('5:' + JSON.stringify({
+      entities: [{ ...data, slug: 'cartoon-caption', meta: undefined }], initialPage: 1,
+    })));
+  };
+  try {
+    const result = await getZonaCatalogFilms('https://w1.zona.im/movies/filter/genre-multfilm', 1, { deferMetadata: true });
+    assert.equal(requests, 1);
+    assert.equal(result.films[0].type, FilmType.CARTOON);
+    assert.equal(result.films[0].contentTypePending, false);
+    assert.equal(result.films[0].ratings?.imdbPending, true);
+  } finally { globalThis.fetch = originalFetch; }
+});
+
+
+test('completed Zona series keeps explicit status even when seasons are absent', async () => {
+  const originalFetch = globalThis.fetch;
+  Object.assign(globalThis, { __DEV__: false });
+  globalThis.fetch = async () => new Response(script('a:' + JSON.stringify({
+    data: { ...data, slug: 'completed-without-seasons', series_ended: 1, seasons: [] }, entityType: 'series',
+  })));
+  try {
+    const film = await Zona.getFilm('https://w1.zona.im/tvseries/completed-without-seasons');
+    assert.equal(film?.seriesInfo, 'завершён');
+  } finally { globalThis.fetch = originalFetch; }
+});
+test('Zona zero completion flag does not invent an ongoing status for completed legacy series', async () => {
+  const original = globalThis.fetch;
+  globalThis.fetch = async input => new Response(script('a:' + JSON.stringify({
+    entityType: 'series', data: { ...data, slug: 'unknown-completion', series_ended: 0, end_year: 0,
+      seasons: [{ slug: '6', part: 6, episode_count: 13, is_banned: false }],
+      episodes: String(input).includes('/season-6') ? [{ slug: '13', part: 13, title: 'Finale', is_banned: false }] : undefined },
+  })));
+  try {
+    const film = await Zona.getFilm('https://w1.zona.im/tvseries/unknown-completion');
+    assert.match(film!.seriesInfo!, /Сезон 6.*серия 13/);
+    assert.doesNotMatch(film!.seriesInfo!, /выходит|заверш/i);
+  } finally { globalThis.fetch = original; }
 });

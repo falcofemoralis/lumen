@@ -153,6 +153,7 @@ export function FilmListComponent({
   onNextLoad,
   ListHeaderComponent,
   ListEmptyComponent,
+  disableStatusbarSafeArea,
   onContinueWatching,
   onRemove,
   onToggleWatched,
@@ -176,8 +177,8 @@ export function FilmListComponent({
   );
 
   const renderHeader = useCallback(
-    () => <View style={ { height: top } } />,
-    [top],
+    () => <View style={ { height: disableStatusbarSafeArea ? 0 : top } } />,
+    [top, disableStatusbarSafeArea],
   );
 
   return (

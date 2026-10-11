@@ -770,12 +770,13 @@ export function FilmScreenComponent({
       { renderModals() }
       <Animated.ScrollView
         ref={ scrollRef }
+        contentContainerStyle={ { flexGrow: 1 } }
         scrollEnabled={ !!film }
         onScroll={ scrollHandler }
         scrollEventThrottle={ 16 }
         showsVerticalScrollIndicator={ false }
       >
-        <View>
+        <View style={ styles.contentContainer }>
           { renderPosterBackground() }
           { renderContent() }
         </View>

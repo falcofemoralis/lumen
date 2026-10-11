@@ -1,5 +1,7 @@
 import { parse, splitCookiesString, type Cookie } from 'set-cookie-parser';
 import { storage } from 'Util/Storage';
+import { isCookieExpired } from './lifecycle';
+export { isCookieExpired } from './lifecycle';
 
 export function parseCookies(cookieString: string): Record<string, Cookie> {
   const cookies: Record<string, Cookie> = {};
@@ -12,6 +14,7 @@ export function parseCookies(cookieString: string): Record<string, Cookie> {
   // set-cookie-parser splits it correctly even when cookie names contain
   // '.' or '-' (e.g. techaro.lol-anubis-auth), which a plain regex cannot.
   parse(splitCookiesString(cookieString), { decodeValues: false }).forEach((cookie) => {
+    if (cookie.maxAge !== undefined) cookie.expires = new Date(Date.now() + Number(cookie.maxAge) * 1000);
     cookies[cookie.name] = cookie;
   });
 
@@ -24,13 +27,7 @@ export function buildCookieString(cookies: Record<string, Cookie>): string {
     .join('; ');
 }
 
-export function isCookieExpired(cookie: Cookie): boolean {
-  if (cookie.expires) {
-    return new Date(cookie.expires) <= new Date();
-  }
 
-  return false;
-}
 
 export class CookiesManager {
   private cookieMap = new Map<string, Record<string, Cookie>>();
@@ -45,12 +42,19 @@ export class CookiesManager {
       this.cookieMap.set(hostname, dbCookies);
     }
 
-    return this.cookieMap.get(hostname);
+    const cookies = this.cookieMap.get(hostname) || {};
+    const valid = Object.fromEntries(Object.entries(cookies).filter(([, cookie]) => !isCookieExpired(cookie)));
+    if (Object.keys(valid).length !== Object.keys(cookies).length) this.set(hostname, valid);
+    return valid;
   }
 
   public set(hostname: string, cookies: Record<string, Cookie>) {
     this.cookieMap.set(hostname, cookies);
     storage.getCookiesStorage().save(hostname, cookies);
+  }
+
+  public getHosts(): string[] {
+    return Array.from(new Set([...storage.getCookiesStorage().getKeys(), ...this.cookieMap.keys()]));
   }
 
   public reset() {

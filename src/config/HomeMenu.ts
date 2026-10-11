@@ -6,7 +6,9 @@ export const getHomeMenu = (serviceMenu: MenuItemInterface[]): MenuItemInterface
   { id: 'zona-movies', title: 'Фильмы', path: 'https://w1.zona.im/movies' },
   { id: 'zona-series', title: 'Сериалы', path: 'https://w1.zona.im/tvseries' },
   { id: 'zona-cartoons', title: 'Мультфильмы', path: 'https://w1.zona.im/movies/filter/genre-multfilm' },
-  { id: 'zona-anime', title: 'Аниме', path: 'https://w1.zona.im/movies/filter/genre-anime' },
+  { id: 'zona-anime', title: 'Аниме', path: 'https://anixart-app.com/catalog?country=' + encodeURIComponent('Япония') },
+  { id: 'anixart-donghua', title: 'Дунхуа', path: 'https://anixart-app.com/catalog?country=' + encodeURIComponent('Китай') },
+  { id: 'anixart-ova', title: 'OVA', path: 'https://anixart-app.com/catalog?category_id=3' },
   ...serviceMenu,
 ];
 
@@ -24,6 +26,7 @@ export const matchesHomeTab = (tabId: string, card: Pick<FilmCardInterface, 'typ
     'zona-series': FilmType.SERIES,
     'zona-cartoons': FilmType.CARTOON,
     'zona-anime': FilmType.ANIME,
+    'anixart-donghua': FilmType.DONGHUA,
   };
   const expected = types[tabId];
   return !expected || (!card.contentTypePending && card.type === expected);

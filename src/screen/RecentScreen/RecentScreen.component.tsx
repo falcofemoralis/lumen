@@ -183,6 +183,7 @@ export function RecentScreenComponent({
       return (
         <FilmList
           items={ listItems }
+          disableStatusbarSafeArea={ newHomeInterface }
           ListEmptyComponent={ renderEmpty }
           onNextLoad={ onNextLoad }
           onFilmPress={ (film) => {
@@ -220,6 +221,7 @@ export function RecentScreenComponent({
     return (
       <FilmGrid
         films={ filmItems }
+        disableStatusbarSafeArea={ newHomeInterface }
         isEmpty={ !items.length }
         ListEmptyComponent={ renderEmpty }
         onNextLoad={ onNextLoad }

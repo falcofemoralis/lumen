@@ -10,6 +10,7 @@ export interface FilmCardInterface {
   title: string;
   subtitle: string;
   info?: string;
+  isEpisodic?: boolean;
   contentTypePending?: boolean;
   originalTitle?: string;
   externalIds?: { imdb?: string; tmdb?: string; kinopoisk?: string };

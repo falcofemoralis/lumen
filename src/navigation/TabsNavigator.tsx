@@ -429,7 +429,7 @@ export function TabsNavigator() {
   // isLocalLibrary fail
   const {
     isTV,
-    initialRoute,
+
     isLocalLibrary,
     tvNavigationOrder,
     mobileNavigationOrder,
@@ -491,7 +491,7 @@ export function TabsNavigator() {
     <View style={ { flex: 1 } }>
       <Tab.Navigator
         tabBar={ (props) => <NavigationBar { ...props } /> }
-        initialRouteName={ `${initialRoute}-tab` }
+        initialRouteName={ HOME_SCREEN + '-tab' }
         screenOptions={ {
           tabBarPosition: isTV ? 'left' : 'bottom',
           popToTopOnBlur: isTV, // it will redirect to the first screen of the stack when focusing a tab, ex. user navigated to the film screen, and when he focuses again the home tab, it will go back to the home screen

@@ -50,6 +50,8 @@ const getMutationMap = (
     case 'bookmark-membership':
       return state.bookmarks.memberships;
 
+    case 'card-cache':
+      return state.cardCache ??= {};
     case 'history':
       return state.history;
 
@@ -188,6 +190,10 @@ export const mutateCloudSyncBatch = (
     return normalizedMutations;
   }
 
+  if (state.cardCache && Object.keys(state.cardCache).length > 6100) {
+    const keys = Object.keys(state.cardCache).sort((a, b) => state.cardCache![b].meta.updatedAt - state.cardCache![a].meta.updatedAt);
+    keys.slice(6100).forEach(key => delete state.cardCache![key]);
+  }
   state.revision += changedMutations.length;
   saveCloudSyncState(state);
 

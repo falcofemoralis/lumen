@@ -1,3 +1,4 @@
+import { posterSeriesInfo } from 'Util/Film/posterStatus';
 import { FilmRating } from 'Component/FilmRating';
 import { ThemedImage } from 'Component/ThemedImage';
 import { ThemedText } from 'Component/ThemedText';
@@ -24,12 +25,12 @@ export function FilmCardComponent({
     poster,
     title,
     subtitle,
-    info,
     isPendingRelease,
   } = filmCard;
   const styles = useThemedStyles(componentStyles);
   const { theme, scale } = useAppTheme();
   const showPendingReleaseBadge = useShowPendingReleaseBadge();
+  const info = posterSeriesInfo(filmCard);
 
   const renderType = () => (filmCard.contentTypePending ? null :
     <ThemedText
@@ -62,6 +63,7 @@ export function FilmCardComponent({
   const renderPoster = () => (
     <ThemedImage
       style={ [styles.poster, isPendingRelease && styles.posterPendingRelease] }
+      cachePolicy='memory-disk'
       src={ poster }
     />
   );

@@ -31,6 +31,8 @@ export interface UseFilmPagerOptions {
   ) => Promise<FilmListInterface>;
   /** Seed films for an item without fetching (e.g. bookmarks payload already contains the first list) */
   getInitialFilms?: (menuItem: MenuItemInterface) => FilmListInterface | undefined;
+  /** Persisted catalogs are displayed immediately, then refreshed in the background. */
+  initialDataUpdatedAt?: number;
   /** Tab the pager opens on; it is the one fetched before anything is selected */
   initialIndex?: number;
   enabled?: boolean;
@@ -44,6 +46,7 @@ export function useFilmPager({
   sorting,
   fetchFilms,
   getInitialFilms,
+  initialDataUpdatedAt,
   initialIndex = 0,
   enabled = true,
   prefetchAdjacent = false,
@@ -80,6 +83,7 @@ export function useFilmPager({
             ? { films: initialFilms.films, currentPage: 1, totalPages: initialFilms.totalPages }
             : undefined;
         },
+        initialDataUpdatedAt,
         // fetching while offline only parks the query in `error` with no data - wait for
         // the connection instead, react-query then fetches the tab on its own
         enabled: enabled && isInternetAvailable && (startedItems[menuItem.id] ?? index === initialIndex),

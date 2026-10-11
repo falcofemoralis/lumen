@@ -86,6 +86,9 @@ export interface UnifiedFilm {
   description?: string;
   releaseDate?: string;
   info?: string;
+  contentTypePending?: boolean;
+  isPendingRelease?: boolean;
+  subtitle?: string;
   ratings?: FilmRatingsInterface;
 
   sources: UnifiedFilmSource[];

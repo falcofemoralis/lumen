@@ -113,7 +113,7 @@ export const BookmarksOverlayContainer = ({
       return;
     }
 
-    if (!film.metadataSourceFilm && /^https?:\/\/[^/]*\.zona\.im\//.test(film.link)) {
+    if (!film.metadataSourceFilm && /^https?:\/\/(?:[^/]*\.zona\.im|anixart-app\.com)\//.test(film.link)) {
       NotificationStore.displayMessage('Для этого фильма доступны локальные закладки');
       return;
     }

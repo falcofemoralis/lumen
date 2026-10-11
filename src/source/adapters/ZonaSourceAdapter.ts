@@ -1,6 +1,7 @@
 import { ActorCardInterface } from 'Type/ActorCard.interface';
 import { CollectionItemInterface } from 'Type/CollectionItem';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
+import { buildFilmSubtitle, subtitleFromFilm } from 'Util/Film/subtitle';
 import { FilmListInterface } from 'Type/FilmList.interface';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmType } from 'Type/FilmType.type';
@@ -82,7 +83,7 @@ interface ZonaFilmData {
   episodes?: ZonaEpisodeData[];
   meta?: {
     id?: number;
-    media_id?: number;
+    media_id?: number | null;
     embed_url?: string;
     actors?: Array<{
       name: string;
@@ -365,11 +366,11 @@ export const getZonaSeasonEpisodes = async (
 const getZonaSeriesInfo = async (
   entity: ZonaRscEntity,
 ): Promise<string | undefined> => {
-  if (
-    entity.entityType !== 'series'
-    || !(entity.data.seasons ?? []).length
-  ) {
+  if (entity.entityType !== 'series') {
     return undefined;
+  }
+  if (!(entity.data.seasons ?? []).length) {
+    return entity.data.series_ended === 1 ? 'завершён' : undefined;
   }
 
   const seasons = (entity.data.seasons ?? [])
@@ -408,15 +409,14 @@ const getZonaSeriesInfo = async (
     .sort((a, b) => a.part - b.part);
 
   const latestEpisode = releasedEpisodes[releasedEpisodes.length - 1];
-  const status = entity.data.series_ended === 1
-    ? 'завершён'
-    : 'выходит';
+  // Zero is also used for unknown status by Zona, including completed series.
+  const status = entity.data.series_ended === 1 ? 'завершён' : undefined;
 
   if (!latestEpisode) {
-    return `Сезон ${latestSeason.part} • ${status}`;
+    return [`Сезон ${latestSeason.part}`, status].filter(Boolean).join(' • ');
   }
 
-  return `Сезон ${latestSeason.part} • серия ${latestEpisode.part} • ${status}`;
+  return [`Сезон ${latestSeason.part}`, `серия ${latestEpisode.part}`, status].filter(Boolean).join(' • ');
 };
 
 const parseZonaFilmData = (
@@ -586,6 +586,10 @@ const parseZonaFilmData = (
     ratingScale: 10,
     ratings: ratings.length ? ratings : undefined,
     mainRating,
+    // Uploaded media/quality are availability evidence; a catalog entry alone is not.
+    isPendingRelease: (typeof data.meta?.media_id === 'number' && data.meta.media_id > 0)
+      || Boolean(data.best_quality?.trim()) ? false
+        : data.release_date && new Date(data.release_date).getTime() > Date.now() ? true : undefined,
     voices: [zonaVoice],
     hasVoices: true,
     hasSeasons: entityType === 'series',
@@ -709,6 +713,7 @@ const extractZonaSearchCards = (
 const fetchZonaSearch = async (
   query: string,
   enrich = true,
+  onProgress?: (result: FilmListInterface) => void,
 ): Promise<FilmListInterface> => {
   const normalizedQuery = query.trim();
 
@@ -723,15 +728,27 @@ const fetchZonaSearch = async (
   const html = await fetchZonaText(url);
   const films = extractZonaSearchCards(html);
   if (!enrich) return { films, totalPages: 1 };
+  onProgress?.({ films: films.map(film => ({
+    ...film, contentTypePending: true,
+    ratings: { ...film.ratings, imdbPending: !film.ratings?.imdb },
+  })), totalPages: 1 });
 
-  const enrichedFilms = await Promise.all(
-    films.map(async (film) => {
+  const enrichedFilms = films.map(film => ({
+    ...film, contentTypePending: true,
+    ratings: { ...film.ratings, imdbPending: !film.ratings?.imdb },
+  }));
+  let next = 0;
+  await Promise.all(Array.from({ length: Math.min(4, films.length) }, async () => {
+    while (next < films.length) {
+      const index = next++;
+      const film = films[index];
+      const enrichFilm = async (): Promise<FilmCardInterface> => {
       try {
         const entity = await getZonaMetadata(film.link);
 
 
         if (!entity) {
-          return film;
+          return enrichedFilms[index];
         }
 
         const imdb = (
@@ -759,12 +776,14 @@ const fetchZonaSearch = async (
         return {
           ...film,
           type: classifyZonaContent(entity.entityType, entity.data),
+          contentTypePending: false,
           originalTitle: entity.data.title_original ?? film.originalTitle,
+          subtitle: subtitleFromFilm(parseZonaFilmData(entity.data, entity.entityType)),
           externalIds: {
             ...film.externalIds,
             ...(entity.data.kp_id ? { kinopoisk: String(entity.data.kp_id) } : {}),
           },
-          ratings,
+          ratings: { ...ratings, imdbPending: false },
           info,
         };
       } catch (error) {
@@ -776,10 +795,15 @@ const fetchZonaSearch = async (
           );
         }
 
-        return film;
+        return enrichedFilms[index];
       }
-    }),
-  );
+      };
+      const enriched = await enrichFilm();
+      enrichedFilms[index] = { ...enriched, contentTypePending: Boolean(enriched.contentTypePending),
+        ratings: { ...enriched.ratings, imdbPending: Boolean(enriched.ratings?.imdbPending) } };
+      onProgress?.({ films: enrichedFilms.slice(), totalPages: 1 });
+    }
+  }));
 
   return {
     films: enrichedFilms,
@@ -831,7 +855,7 @@ export const getZonaCatalogFilms = async (
       if (catalog.initialPage && catalog.initialPage !== page) {
         throw new Error('Zona returned a different catalog page');
       }
-      const entityType = url.pathname.startsWith('/tvseries') ? 'series' : 'movie';
+      const entityType = url.pathname.includes('/tvseries') ? 'series' : 'movie';
       const films: FilmCardInterface[] = new Array(catalog.entities.length);
       let next = 0;
       await Promise.all(Array.from({ length: Math.min(4, catalog.entities.length) }, async () => {
@@ -845,15 +869,15 @@ export const getZonaCatalogFilms = async (
             : url.pathname.includes('genre-multfilm') ? FilmType.CARTOON : film.type;
           films[index] = {
             id: film.id, link: film.link, title: film.title, originalTitle: film.originalTitle,
-            poster: film.poster, type,
+            poster: film.poster, type, isPendingRelease: film.isPendingRelease,
             contentTypePending: Boolean(options?.deferMetadata && !data.meta?.tags?.length && !url.pathname.includes('genre-anime') && !url.pathname.includes('genre-multfilm')),
-            subtitle: [data.year, ...(film.countries ?? []).map((country) => country.name)].filter(Boolean).join(', '),
+            subtitle: buildFilmSubtitle(data.year, film.countries?.map((country) => country.name), film.genres?.map((genre) => genre.name)),
             info: entityType === 'series' && entity ? await getZonaSeriesInfo(entity) : undefined,
             externalIds: film.externalIds,
             ratingSourceType: ContentSource.ZONA,
             ratingFilmId: film.link,
             ratings: {
-              ...(options?.deferMetadata && !data.meta?.tags?.length && !url.pathname.includes('genre-anime') && !url.pathname.includes('genre-multfilm') ? { imdbPending: true } : {}),
+              ...(options?.deferMetadata && !data.meta?.tags?.length ? { imdbPending: true } : {}),
               ...(data.rating_imdb && data.rating_imdb > 0 ? { imdb: data.rating_imdb } : {}),
               ...(data.rating_kp && data.rating_kp > 0 ? { kinopoisk: data.rating_kp } : {}),
             },
@@ -895,6 +919,9 @@ const ZonaSourceAdapter: SourceAdapter = {
 
     if (entity.entityType === 'series' && !options?.deferSeriesInfo) {
       film.seriesInfo = await getZonaSeriesInfo(entity);
+      if (film.seriesInfo && /серия \d+/.test(film.seriesInfo)) {
+        film.isPendingRelease = false;
+      }
     }
 
     return film;
@@ -907,8 +934,9 @@ const ZonaSourceAdapter: SourceAdapter = {
   async search(
     query: string,
     _page: number,
+    options?: { background?: boolean; onProgress?: (result: FilmListInterface) => void },
   ): Promise<FilmListInterface> {
-    return _page === 1 ? fetchZonaSearch(query) : { films: [], totalPages: 1 };
+    return _page === 1 ? fetchZonaSearch(query, true, options?.onProgress) : { films: [], totalPages: 1 };
   },
 
   normalizeFilmCard(film: FilmCardInterface): UnifiedFilm {
@@ -938,6 +966,9 @@ const ZonaSourceAdapter: SourceAdapter = {
       type: film.type,
       poster: film.poster,
       info: film.info,
+      contentTypePending: film.contentTypePending,
+      isPendingRelease: film.isPendingRelease,
+      subtitle: film.subtitle,
       ratings: film.ratings,
       sources: [
         {
@@ -973,6 +1004,7 @@ const ZonaSourceAdapter: SourceAdapter = {
       largePoster: film.largePoster,
       description: film.description,
       releaseDate: film.releaseDate,
+      subtitle: subtitleFromFilm(film),
       ratings: film.ratings?.reduce<NonNullable<UnifiedFilm['ratings']>>(
         (result, rating) => {
           if (rating.name === 'IMDb') {

@@ -10,8 +10,10 @@ import {
 } from 'Util/RatingStore';
 import { queryKeys } from 'Util/Query';
 import { ContentSource } from '../source/types/ContentSource';
+import { isSourceEnabled } from '../source/types/SourceSelection';
 import RezkaSourceAdapter from '../source/adapters/RezkaSourceAdapter';
 import ZonaSourceAdapter from '../source/adapters/ZonaSourceAdapter';
+import { sourceRouter } from '../source';
 
 const RATING_CACHE_TTL = 7 * 24 * 60 * 60 * 1000;
 
@@ -62,22 +64,29 @@ export const useFilmRatings = (
     && showRatings
     && isInternetAvailable
     && isVisible
-    && !hasSuppliedExternalRatings
+    && isSourceEnabled(serviceType as ContentSource) && !hasSuppliedExternalRatings
     && (!isUnifiedId || Boolean(ratingSourceType && ratingFilmId))
   );
 
   const query = useQuery<FilmRatingsInterface>({
     queryKey: queryKeys.filmRatings(serviceType, cacheFilmId),
-    queryFn: () => enqueueRatingRequest(
+    queryFn: () => ratingSourceType === ContentSource.ZONA && ratingFilmId
+      ? ZonaSourceAdapter.getFilmRatings!(ratingFilmId).then(ratings => {
+        if (Object.keys(ratings).length) saveCachedFilmRatings(serviceType, cacheFilmId, ratings);
+        return ratings;
+      })
+      : enqueueRatingRequest(
       `${serviceType}:${cacheFilmId}`,
       async () => {
         const ratings = ratingSourceType === ContentSource.REZKA && ratingFilmId
           ? await RezkaSourceAdapter.getFilmRatings!(ratingFilmId)
+          : ratingSourceType === ContentSource.ANIXART && ratingFilmId
+            ? await sourceRouter.getAnixartExternalRatings(ratingFilmId)
           : ratingSourceType === ContentSource.ZONA && ratingFilmId
             ? await ZonaSourceAdapter.getFilmRatings!(ratingFilmId)
             : await currentService.getFilmRatings(filmId ?? '');
 
-        if (Object.keys(ratings).length > 0) {
+        if (Object.keys(ratings).length > 0 || ratingSourceType === ContentSource.ANIXART) {
           saveCachedFilmRatings(serviceType, cacheFilmId, ratings);
         }
 

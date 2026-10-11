@@ -11,6 +11,7 @@ class RemoteControlManager implements RemoteControlManagerInterface {
   private eventEmitter = new CustomEventEmitter<{ keyDown: SupportedKeys, keyUp: SupportedKeys }>();
 
   private isEnterKeyDownPressed = false;
+  private isSpaceKeyDownPressed = false;
 
   private longEnterTimeout: number | null = null;
 
@@ -27,6 +28,11 @@ class RemoteControlManager implements RemoteControlManagerInterface {
   };
 
   private handleKeyDown = (keyEvent: { keyCode: number }) => {
+    if (keyEvent.keyCode === 62) {
+      if (!this.isSpaceKeyDownPressed) this.eventEmitter.emit('keyDown', SupportedKeys.SPACE);
+      this.isSpaceKeyDownPressed = true;
+      return;
+    }
     const mappedKey = {
       21: SupportedKeys.LEFT, // KEYCODE_DPAD_LEFT
       22: SupportedKeys.RIGHT, // KEYCODE_DPAD_RIGHT
@@ -61,6 +67,11 @@ class RemoteControlManager implements RemoteControlManagerInterface {
   };
 
   private handleKeyUp = (keyEvent: { keyCode: number }) => {
+    if (keyEvent.keyCode === 62) {
+      this.isSpaceKeyDownPressed = false;
+      this.eventEmitter.emit('keyUp', SupportedKeys.SPACE);
+      return;
+    }
     const mappedKey = {
       21: SupportedKeys.LEFT,
       22: SupportedKeys.RIGHT,

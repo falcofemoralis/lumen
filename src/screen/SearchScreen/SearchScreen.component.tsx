@@ -21,7 +21,8 @@ import History from 'lucide-react-native/icons/rotate-ccw-clock';
 import Search from 'lucide-react-native/icons/search';
 import Settings2 from 'lucide-react-native/icons/settings-2';
 import X from 'lucide-react-native/icons/x';
-import { ScrollView, View } from 'react-native';
+import { useState } from 'react';
+import { ScrollView, useWindowDimensions, View } from 'react-native';
 import { useAppTheme } from 'Theme/context';
 
 import { componentStyles } from './SearchScreen.style';
@@ -40,8 +41,7 @@ export function SearchScreenComponent(props: SearchScreenComponentProps) {
     additionalContentOverlayRef,
     categories,
     selectedCategory,
-    selectedGenre,
-    selectedYear,
+
     isCategoriesLoading,
     confirmationOverlayRef,
     onChangeText,
@@ -57,20 +57,21 @@ export function SearchScreenComponent(props: SearchScreenComponentProps) {
     handleApplyAdditionalContent,
     handleOpenCollections,
     setSelectedCategory,
-    setSelectedGenre,
-    setSelectedYear,
+
     isRemovableSuggestion,
     handleRemoveSuggestion,
     removeSuggestion,
 } = props;
   const { scale, theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
+  const { height } = useWindowDimensions();
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   const renderSearchBar = () => (
     <View style={ styles.searchBarContainer }>
       <ThemedPressable
         style={ styles.actionBtnSearch }
-        onPress={ handleApplySearch }
+        onPress={ () => { setIsSearchFocused(false); handleApplySearch(); } }
       >
         <Search
           style={ styles.actionBtnIcon }
@@ -83,7 +84,9 @@ export function SearchScreenComponent(props: SearchScreenComponentProps) {
         containerStyle={ styles.searchBar }
         placeholder={ t('Search') }
         onChangeText={ (text) => onChangeText(text) }
-        onSubmitEditing={ ({ nativeEvent: { text } }) => onApplySearch(text) }
+        onFocus={ () => setIsSearchFocused(true) }
+        onBlur={ () => setIsSearchFocused(false) }
+        onSubmitEditing={ ({ nativeEvent: { text } }) => { setIsSearchFocused(false); onApplySearch(text); } }
         value={ enteredText }
         placeholderTextColor={ theme.colors.text }
         selectionColor={ theme.colors.primary }
@@ -141,16 +144,16 @@ export function SearchScreenComponent(props: SearchScreenComponentProps) {
   );
 
   const renderSuggestions = () => {
-    if (!suggestions.length) {
+    if (!isSearchFocused || !suggestions.length) {
       return null;
     }
 
     return (
-      <ScrollView style={ { maxHeight: scale(120) } }><View style={ styles.suggestionsContainer }>
+      <ScrollView keyboardShouldPersistTaps="handled" style={ { maxHeight: Math.min(scale(300), height * 0.4) } }><View style={ styles.suggestionsContainer }>
         { suggestions.map((suggestion) => (
           <ThemedPressable
             key={ suggestion }
-            onPress={ () => onApplySuggestion(suggestion) }
+            onPress={ () => { setIsSearchFocused(false); onApplySuggestion(suggestion); } }
             // Only history entries can be removed -- the service's suggestions
             // must not bring up the confirmation at all.
             onLongPress={ isRemovableSuggestion(suggestion)
@@ -204,7 +207,7 @@ export function SearchScreenComponent(props: SearchScreenComponentProps) {
   const renderCategories = () => <SearchFilters { ...props } />;
   const renderCategoriesModal = () => {
     return (
-      <ThemedOverlay ref={ additionalContentOverlayRef }>
+      <ThemedOverlay ref={ additionalContentOverlayRef } contentContainerStyle={ { maxHeight: '80%' } }>
         { renderCategories() }
       </ThemedOverlay>
     );

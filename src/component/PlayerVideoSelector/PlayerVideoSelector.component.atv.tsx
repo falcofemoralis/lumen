@@ -317,7 +317,7 @@ export function PlayerVideoSelectorComponent({
 
     return (
       <View style={ styles.compactSelectorsContainer }>
-        <ThemedDropdown
+        { !(seasons.length === 1 && seasons[0].isOnlyEpisodes) && <ThemedDropdown
           data={ seasons.map(({ seasonId, name }) => ({
             label: name,
             value: seasonId,
@@ -327,7 +327,7 @@ export function PlayerVideoSelectorComponent({
           header={ t('Season') }
           style={ styles.compactSelector }
           closeOnChange
-        />
+        /> }
         <ThemedDropdown
           data={ episodes.map(({ episodeId, name }) => ({
             label: name,

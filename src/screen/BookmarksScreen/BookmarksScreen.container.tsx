@@ -1,6 +1,9 @@
-import { useQuery } from '@tanstack/react-query';
+import { enqueueBookmarkRequest } from '../../source/search/BookmarkRequests';
+import { scanBookmarkFolders } from '../../source/search/BookmarkFolderScan';
+import { BOOKMARK_METADATA_TTL } from '../../source/search/BookmarkMetadataCache';
+import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { PagerItemInterface } from 'Component/FilmPager/FilmPager.type';
-import { useFilmPager } from 'Component/FilmPager/useFilmPager';
+import { FilmPagerQueryData, useFilmPager } from 'Component/FilmPager/useFilmPager';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useNetworkContext } from 'Context/NetworkContext';
@@ -59,6 +62,28 @@ export function BookmarksScreenContainer() {
     queryKey: queryKeys.bookmarks(),
     queryFn: () => currentService.getBookmarks(),
     enabled: isRemote && isInternetAvailable,
+  });
+
+  const queryClient = useQueryClient();
+  // The provider initially embeds only the first folder. Visit all folders/pages in the background.
+  useQuery({
+    queryKey: ['bookmark-folder-scan', bookmarks?.map(item => item.id + ':' + item.title).join('|')],
+    enabled: isRemote && isInternetAvailable && !!bookmarks?.length,
+    staleTime: BOOKMARK_METADATA_TTL,
+    retry: false,
+    queryFn: async () => {
+      const key = (id: string) => [...queryKeys.films.bookmarks(), id, null];
+      await scanBookmarkFolders(bookmarks ?? [],
+        id => {
+          const state = queryClient.getQueryState(key(id));
+          return state && Date.now() - state.dataUpdatedAt < BOOKMARK_METADATA_TTL
+            ? queryClient.getQueryData<FilmPagerQueryData>(key(id)) : undefined;
+        },
+        (id, data) => { queryClient.setQueryData(key(id), data); },
+        (bookmark, page) => enqueueBookmarkRequest('bookmark-pages:' + bookmark.id + ':' + page,
+          () => currentService.getBookmarkedFilms(bookmark, page)));
+      return true;
+    },
   });
 
   const menuItems = useMemo(

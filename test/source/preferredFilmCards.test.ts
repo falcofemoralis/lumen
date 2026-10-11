@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { preferredCardForDisplay, preferredCardsSignature, preferredCardsSnapshot } from '../../src/source/search/PreferredFilmCards';
+import { preferredCardForDisplay, preferredCardsSignature, preferredCardsSnapshot, shouldRefreshZonaSeries, cardsAcrossFolders } from '../../src/source/search/PreferredFilmCards';
 import { matchesHomeTab } from '../../src/config/HomeMenu';
 import { FilmType } from '../../src/type/FilmType.type';
 import { FilmCardInterface } from '../../src/type/FilmCard.interface';
@@ -44,4 +44,24 @@ test('unchanged displayed cards retain object identity during updates to another
   const enriched = { ...original, ratings: { imdb: 8 } };
   assert.equal(preferredCardForDisplay(original), original);
   assert.equal(preferredCardForDisplay(original, enriched), enriched);
+});
+test('Home refreshes partial and stale series status without repeating requests on pagination', () => {
+  const series = { ...card('series'), link: 'https://w1.zona.im/tvseries/series', type: FilmType.SERIES };
+  for (const info of [undefined, 'Сезон 1', 'В ожидании', 'Сезон 1 • серия 4 • выходит', 'завершён']) {
+    assert.equal(shouldRefreshZonaSeries({ ...series, info }, undefined, 1000), true);
+    assert.equal(shouldRefreshZonaSeries({ ...series, info }, 1000, 2000), false);
+    assert.equal(shouldRefreshZonaSeries({ ...series, info }, 1000, 301000), true);
+  }
+  assert.equal(shouldRefreshZonaSeries({ ...series, contentTypePending: true }), false);
+  assert.equal(shouldRefreshZonaSeries(card('movie')), false);
+});
+test('bookmark refresh visits every folder fairly and checks shared films once', () => {
+  const folders = [
+    { films: [card('a'), card('b'), card('c')] },
+    { films: [card('d'), card('a')] },
+    { films: [card('e')] },
+    { films: null },
+  ];
+  assert.deepEqual(cardsAcrossFolders(folders).map(value => value.id), ['a', 'd', 'e', 'b', 'c']);
+  assert.deepEqual(cardsAcrossFolders([]), []);
 });

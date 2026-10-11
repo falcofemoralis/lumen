@@ -46,7 +46,8 @@ test('a missing current episode is not replaced with an arbitrary first episode'
 
 test('Home keeps every source menu and applies order and visibility without duplicates', () => {
   const items = getHomeMenu([{ id: 'popular', title: 'Популярное', path: '/new' }]);
-  assert.equal(items.length, 5);
+  assert.equal(items.length, 7);
+  assert.ok(items.some((item) => item.id === 'anixart-donghua'));
   const visible = arrangeHomeMenu(items, ['zona-anime', 'popular', 'zona-anime', 'gone'], ['zona-series']);
   assert.equal(visible[0].id, 'zona-anime');
   assert.equal(visible[1].id, 'popular');

@@ -1,21 +1,33 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useFocusEffect, useIsFocused, useRoute } from '@react-navigation/native';
 import { storage } from 'Util/Storage';
-import { enqueueRatingRequest } from 'Util/RatingRequestQueue';
+import { enqueueBookmarkRequest } from '../source/search/BookmarkRequests';
+import { publishExistingCardCaches } from 'Util/CloudSync/cardCache';
+import { cardCacheRevision, subscribeCardCache } from '../source/search/CardCacheSync';
 import { BookmarkMetadataCache } from '../source/search/BookmarkMetadataCache';
-import { useCallback, useMemo, useRef } from 'react';
+import { useSyncExternalStore, useCallback, useMemo, useRef } from 'react';
 import { PagerItemInterface } from 'Component/FilmPager/FilmPager.type';
 import { useNetworkContext } from 'Context/NetworkContext';
+import { useConfigContext } from 'Context/ConfigContext';
+import { sourceForLink } from '../source/types/SourceSelection';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { sourceRouter } from '../source';
+import { HomeCardCache } from '../source/search/HomeCardCache';
 import { ZonaCardTypeCache } from '../source/search/ZonaCardTypeCache';
-import { preferredCardForDisplay, preferredCardsSignature, preferredCardsSnapshot } from '../source/search/PreferredFilmCards';
+import { preferredCardForDisplay, preferredCardsSignature, preferredCardsSnapshot, shouldRefreshZonaSeries, cardsAcrossFolders } from '../source/search/PreferredFilmCards';
 
+publishExistingCardCaches();
 let bookmarkCache: BookmarkMetadataCache | undefined;
 const getBookmarkCache = () => bookmarkCache ??= new BookmarkMetadataCache(
-  storage.getMiscStorage(), (card) => enqueueRatingRequest('bookmark-metadata:' + card.link, () => sourceRouter.resolvePreferredCard(card, true)),
+  storage.getMiscStorage(), async card => {
+    const primary = await sourceRouter.resolveBookmarkPrimary(card);
+    if (primary) return primary;
+    return enqueueBookmarkRequest('bookmark-metadata:' + card.link, () => sourceRouter.resolvePreferredCard(card, true));
+  },
 );
 
+let homeCache: HomeCardCache | undefined;
+export const getHomeCardCache = () => homeCache ??= new HomeCardCache(storage.getMiscStorage());
 let typeCache: ZonaCardTypeCache | undefined;
 const getTypeCache = () => typeCache ??= new ZonaCardTypeCache(storage.getMiscStorage());
 const isZonaCard = (card: FilmCardInterface) => /^https?:\/\/[^/]*\.zona\.im\//.test(card.link);
@@ -31,22 +43,29 @@ const resolveCard = (card: FilmCardInterface) => {
   return value;
 };
 
-export const usePreferredFilmCards = (items: PagerItemInterface[], persistWeekly = false): PagerItemInterface[] => {
+export const usePreferredFilmCards = (items: PagerItemInterface[], persistWeekly = false, persistHome = false): PagerItemInterface[] => {
+  const cacheRevision = useSyncExternalStore(subscribeCardCache, cardCacheRevision);
   const { isInternetAvailable } = useNetworkContext();
+  const { enabledSources } = useConfigContext();
   const isFocused = useIsFocused();
   const route = useRoute();
+  const seriesCheckedRef = useRef(new Map<string, number>());
+  const networkRef = useRef(isInternetAvailable);
+  networkRef.current = isInternetAvailable;
   const focusedRef = useRef(isFocused);
   focusedRef.current = isFocused;
-  const cards = useMemo(() => items.flatMap((item) => item.films ?? []), [items]);
+  const cards = useMemo(() => cardsAcrossFolders(items), [items]);
   const queryClient = useQueryClient();
   const signature = preferredCardsSignature(cards);
   const knownCardsRef = useRef(new Map<string, FilmCardInterface>());
+  const previousRevision = useRef(cacheRevision);
+  if (previousRevision.current !== cacheRevision) { knownCardsRef.current.clear(); seriesCheckedRef.current.clear(); previousRevision.current = cacheRevision; }
   const displayedCardsRef = useRef(new Map<string, { original: FilmCardInterface; enriched: FilmCardInterface; weekly: boolean; displayed: FilmCardInterface }>());
-  const queryKey = useMemo(() => ['preferred-film-cards', route.key, persistWeekly, signature], [route.key, signature, persistWeekly]);
+  const queryKey = useMemo(() => ['preferred-film-cards', route.key, persistWeekly, signature, persistHome, cacheRevision, enabledSources.join(',')], [route.key, signature, persistWeekly, persistHome, cacheRevision, enabledSources]);
   const queryKeyRef = useRef(queryKey);
   queryKeyRef.current = queryKey;
   const snapshot = () => preferredCardsSnapshot(cards, knownCardsRef.current,
-    persistWeekly ? (card) => getBookmarkCache().peek(card) : (card) => getTypeCache().peek(card));
+    persistWeekly ? (card) => getBookmarkCache().peek(card) : (card) => persistHome ? getTypeCache().peek(getHomeCardCache().peek(card)) : getTypeCache().peek(card));
   const { data: preferred } = useQuery({
     queryKey,
     initialData: snapshot,
@@ -57,34 +76,40 @@ export const usePreferredFilmCards = (items: PagerItemInterface[], persistWeekly
       const pending = cards.filter((card) => resolved.get(card.link)?.contentTypePending);
       const remaining = cards.filter((card) => !resolved.get(card.link)?.contentTypePending);
       const prioritized = [...pending, ...remaining];
-      let next = 0;
-      await Promise.all(Array.from({ length: Math.min(persistWeekly ? 1 : 4, cards.length) }, async () => {
-        while (next < cards.length && focusedRef.current) {
-          const original = prioritized[next++];
+      const lanes = persistWeekly ? [{ cards: prioritized, workers: 4 }] : [
+        { cards: prioritized.filter(card => isZonaCard(card) && card.link.includes('/tvseries/')), workers: 2 },
+        { cards: prioritized.filter(card => !(isZonaCard(card) && card.link.includes('/tvseries/'))), workers: 2 },
+      ];
+      await Promise.all(lanes.map(async lane => {
+        let next = 0;
+        await Promise.all(Array.from({ length: Math.min(lane.workers, lane.cards.length) }, async () => {
+        while (next < lane.cards.length && networkRef.current && (persistWeekly || focusedRef.current)) {
+          const original = lane.cards[next++];
           const card = persistWeekly ? original : resolved.get(original.link)!;
           const updated = await (persistWeekly ? getBookmarkCache().resolve(card)
-            : isZonaCard(card) && !card.contentTypePending && !card.ratings?.imdbPending ? Promise.resolve(card) : resolveCard(card));
+            : persistHome && getHomeCardCache().isFresh(original) ? Promise.resolve(card) : persistHome ? sourceRouter.resolvePreferredCard(card, true, { deferSeriesInfo: true }).catch(() => card) : (card.ratingSourceType === 'ANIXART' || (isZonaCard(card) && !card.contentTypePending && !card.ratings?.imdbPending)) ? Promise.resolve(card) : resolveCard(card));
           if (!persistWeekly) getTypeCache().remember(updated);
+          if (persistHome && updated !== card && !getHomeCardCache().isFresh(original) && !isZonaCard(updated)) getHomeCardCache().remember(original, updated);
+          if (persistHome && updated !== card && isZonaCard(updated) && !updated.link.includes('/tvseries/')) getHomeCardCache().remember(original, updated);
           knownCardsRef.current.set(original.link, updated);
           resolved.set(original.link, updated);
           queryClient.setQueryData(queryKey, new Map(resolved));
-        }
-      }));
-      // Season/episode requests run after classification, so they cannot hold posters back.
-      if (!persistWeekly) {
-        const series = [...resolved.entries()].filter(([, card]) => isZonaCard(card) && card.link.includes('/tvseries/') && !card.contentTypePending && !card.info);
-        let index = 0;
-        await Promise.all(Array.from({ length: Math.min(4, series.length) }, async () => {
-          while (index < series.length && focusedRef.current) {
-            const [originalLink, card] = series[index++];
-            const updated = await sourceRouter.resolvePreferredCard(card);
-            knownCardsRef.current.set(originalLink, updated);
-            resolved.set(originalLink, updated);
-            cache.set(card.link, { time: Date.now(), value: Promise.resolve(updated) });
-            queryClient.setQueryData(queryKey, new Map(resolved));
+          // Publish the poster first; this card's episodes must not wait for the whole catalog.
+          if (!persistWeekly && !(persistHome && getHomeCardCache().isFresh(original)) && focusedRef.current && shouldRefreshZonaSeries(updated, seriesCheckedRef.current.get(updated.link))) {
+            // Also throttle failed requests, so focus/pagination cannot create a retry storm.
+            seriesCheckedRef.current.set(updated.link, Date.now());
+            try {
+              const detailed = await sourceRouter.resolvePreferredCard(updated, true);
+              knownCardsRef.current.set(original.link, detailed);
+              resolved.set(original.link, detailed);
+              if (persistHome) getHomeCardCache().remember(original, detailed);
+              cache.set(updated.link, { time: Date.now(), value: Promise.resolve(detailed) });
+              queryClient.setQueryData(queryKey, new Map(resolved));
+            } catch { /* Keep the visible card; retry on a later refresh. */ }
           }
+        }
         }));
-      }
+      }));
       return resolved;
     },
     staleTime: persistWeekly ? 0 : 5 * 60 * 1000,

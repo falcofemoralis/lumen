@@ -1,4 +1,5 @@
 import { FilmInterface } from 'Type/Film.interface';
+import { subtitleFromFilm } from './subtitle';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { ContentSource } from '../../source/types/ContentSource';
 import { RecentItemInterface } from 'Type/RecentItem.interface';
@@ -44,11 +45,12 @@ export const filmToFilmCard = (film: FilmInterface): FilmCardInterface => ({
   type: film.type,
   poster: film.poster,
   title: film.title,
-  subtitle: film.releaseDate ?? '',
+  subtitle: subtitleFromFilm(film),
   info: film.seriesInfo,
   originalTitle: film.originalTitle,
   externalIds: film.externalIds,
   ratingSourceType: film.metadataSourceFilm ? ContentSource.REZKA
+    : film.link.startsWith('https://anixart-app.com/release/') ? ContentSource.ANIXART
     : /^https?:\/\/[^/]*\.zona\.im\//.test(film.link) ? ContentSource.ZONA : ContentSource.REZKA,
   ratingFilmId: film.metadataSourceFilm?.id
     ?? (/^https?:\/\/[^/]*\.zona\.im\//.test(film.link) ? film.link : film.id),

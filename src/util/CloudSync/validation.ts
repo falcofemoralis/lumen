@@ -91,6 +91,7 @@ export const isValidCloudSyncState = (
     isRecordMap(state.playerTime) &&
     isRecordMap(state.scheduleMarks) &&
     isRecordMap(state.comments) &&
+    (state.cardCache === undefined || isRecordMap(state.cardCache)) &&
     isSettingsState(state.settings)
   );
 };

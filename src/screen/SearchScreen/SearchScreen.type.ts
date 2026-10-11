@@ -3,14 +3,18 @@ import { RefObject } from 'react';
 import { SearchableCategoryInterface } from 'Type/SearchableCategoryInterface.interface';
 
 export interface SearchScreenComponentProps extends FilmPagerHandlers {
+  selectedFormats: string[];
+  formatOptions: { value: string; label: string }[];
+  setSelectedFormats: (values: string[]) => void;
   yearFrom: string;
   yearTo: string;
-  includedCountries: string[];
+  selectedGenres: string[];
+  genreOptions: { value: string; label: string }[];
   allowedCountries: string[];
   countryOptions: { value: string; label: string }[];
   setYearFrom: (value: string) => void;
   setYearTo: (value: string) => void;
-  setIncludedCountries: (values: string[]) => void;
+  setSelectedGenres: (values: string[]) => void;
   setAllowedCountries: (values: string[]) => void;
   filtersApplied: boolean;
   suggestions: string[];
@@ -22,15 +26,13 @@ export interface SearchScreenComponentProps extends FilmPagerHandlers {
   additionalContentOverlayRef: RefObject<any>;
   categories: SearchableCategoryInterface[] | null;
   selectedCategory: SearchableCategoryInterface | null;
-  selectedGenre: string | null;
-  selectedYear: string | null;
+
   isCategoriesLoading: boolean;
   confirmationOverlayRef: RefObject<any>;
   handleApplyAdditionalContent: () => void;
   handleOpenCollections: () => void;
   setSelectedCategory: (category: SearchableCategoryInterface) => void;
-  setSelectedGenre: (genre: string) => void;
-  setSelectedYear: (year: string) => void;
+
   onChangeText: (q: string) => void;
   onApplySearch: (q: string) => void;
   onApplySuggestion: (q: string) => void;

@@ -23,6 +23,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     transitionProperty: 'none' as const,
   },
   posterWrapper: {
+    width: '100%',
     position: 'relative',
     flexDirection: 'column',
     borderBottomRightRadius: scale(8),
@@ -34,6 +35,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     borderBottomLeftRadius: 0,
   },
   poster: {
+    width: '100%',
     aspectRatio: `${POSTER_ASPECT_WIDTH} / ${POSTER_ASPECT_HEIGHT}`,
   },
   info: {

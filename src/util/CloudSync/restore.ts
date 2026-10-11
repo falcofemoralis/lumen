@@ -1,3 +1,4 @@
+import { restoreCloudCardCache } from './cardCache';
 import { DeviceConfigType } from 'src/config';
 import { getCloudSyncSettingFromId } from 'src/config/cloudSync';
 import { getGlobalConfig } from 'Context/ConfigContext';
@@ -454,4 +455,5 @@ export const restoreCloudSyncState = (
   restoreScheduleMarks(state);
   restoreComments(state);
   restoreSettings(state);
+  restoreCloudCardCache(state);
 };

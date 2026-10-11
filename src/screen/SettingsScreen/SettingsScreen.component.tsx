@@ -1,4 +1,5 @@
 import ListVideo from 'lucide-react-native/icons/list-video';
+import Layers from 'lucide-react-native/icons/layers';
 import { Header } from 'Component/Header';
 import { Page } from 'Component/Page';
 import { getAspectRatio } from 'Component/Player/Player.config';
@@ -68,7 +69,7 @@ import Palette from 'lucide-react-native/icons/palette';
 import Pin from 'lucide-react-native/icons/pin';
 import RefreshCw from 'lucide-react-native/icons/refresh-cw';
 import Rewind from 'lucide-react-native/icons/rewind';
-import Route from 'lucide-react-native/icons/route';
+
 import Settings2 from 'lucide-react-native/icons/settings-2';
 import ShieldAlert from 'lucide-react-native/icons/shield-alert';
 import ShieldCheck from 'lucide-react-native/icons/shield-check';
@@ -96,7 +97,7 @@ import {
   FILM_COUNTRY_OPTIONS,
   GITHUB_LINK,
   MOBILE_NAVIGATION_OPTIONS,
-  MOBILE_SCREENS,
+
   PLAYER_ASPECT_RATIO_OPTIONS,
   PLAYER_BACK_BUFFER_TIME_OPTIONS,
   PLAYER_BUFFER_TIME_OPTIONS,
@@ -121,7 +122,7 @@ import { SETTING_GROUP, SettingsScreenComponentProps } from './SettingsScreen.ty
 import { useTripleTap } from './useTripleTap';
 
 export function SettingsScreenComponent({
-  initialRoute,
+
   showRatings,
   showAccountAvatar,
   newHomeInterface,
@@ -136,6 +137,7 @@ export function SettingsScreenComponent({
   tabPosition,
   numberOfColumnsMobile,
   hiddenCountries,
+  enabledSources,
   playerRewindSeconds,
   playerBackwardRewindSeconds,
   playerShowBufferTime,
@@ -208,6 +210,7 @@ export function SettingsScreenComponent({
   downloadsPathOptions,
   appVersion,
   onConfigUpdate,
+  onResetChallengeCookies,
   onLanguageChange,
   onThemeSchemeChange,
   onLocalLibraryChange,
@@ -386,13 +389,7 @@ export function SettingsScreenComponent({
         options={ APP_LANGUAGE_OPTIONS }
         onChange={ handleLanguageChange }
       />
-      <SettingSelect
-        title={ t('Initial route') }
-        IconComponent={ Route }
-        value={ initialRoute }
-        options={ MOBILE_SCREENS }
-        onChange={ (value) => onConfigUpdate('initialRoute', value) }
-      />
+
       <SettingBase
         title={ t('Default home tab') }
         subtitle="Измените порядок и видимость вкладок. Первая видимая вкладка открывается при запуске."
@@ -456,6 +453,14 @@ export function SettingsScreenComponent({
           { value: 'list', label: t('List') },
         ] }
         onChange={ (value) => onConfigUpdate('recentDisplayMode', value) }
+      />
+      <SettingMultiSelect
+        title={ t('Content sources') }
+        subtitle={ t('Checked sources are used in catalogs, search and bookmark updates.') }
+        IconComponent={ Layers }
+        values={ enabledSources }
+        options={ [{ value: 'ZONA', label: 'Zona' }, { value: 'REZKA', label: 'HDRezka' }, { value: 'ANIXART', label: 'Anixart' }] }
+        onChange={ values => onConfigUpdate('enabledSources', values) }
       />
       <SettingMultiSelect
         title={ t('Hidden countries') }
@@ -614,6 +619,13 @@ export function SettingsScreenComponent({
         } }
         withLoader
         onChange={ onCDNChange }
+      />
+      <SettingLink
+        title={ t('Reset challenge cookies') }
+        subtitle={ t('Renew site checks without signing out. Checks normally renew automatically.') }
+        IconComponent={ RefreshCw }
+        withLoader
+        onPress={ onResetChallengeCookies }
       />
       <SettingSwitch
         title={ t('Strict connection check') }

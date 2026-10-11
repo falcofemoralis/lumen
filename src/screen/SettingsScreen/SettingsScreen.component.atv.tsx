@@ -39,6 +39,7 @@ import DatabaseBackup from 'lucide-react-native/icons/database-backup';
 import Dock from 'lucide-react-native/icons/dock';
 import Download from 'lucide-react-native/icons/download';
 import ListVideo from 'lucide-react-native/icons/list-video';
+import Layers from 'lucide-react-native/icons/layers';
 import MoveVertical from 'lucide-react-native/icons/move-vertical';
 import ExternalLink from 'lucide-react-native/icons/external-link';
 import EyeOff from 'lucide-react-native/icons/eye-off';
@@ -68,7 +69,7 @@ import MonitorCog from 'lucide-react-native/icons/monitor-cog';
 import Pin from 'lucide-react-native/icons/pin';
 import RefreshCw from 'lucide-react-native/icons/refresh-cw';
 import Rewind from 'lucide-react-native/icons/rewind';
-import Route from 'lucide-react-native/icons/route';
+
 import Rows3 from 'lucide-react-native/icons/rows-3';
 import Search from 'lucide-react-native/icons/search';
 import Settings2 from 'lucide-react-native/icons/settings-2';
@@ -111,14 +112,14 @@ import {
   TV_NAVIGATION_OPTIONS,
   SCROLL_TOP_BUTTON_CORNER_TV_OPTIONS,
   THEME_SCHEME_OPTIONS,
-  TV_SCREENS,
+
 } from './SettingsScreen.config';
 import { handOverGroup, takeHandedOverGroup } from './SettingsScreen.reload';
 import { componentStyles } from './SettingsScreen.style.atv';
 import { SETTING_GROUP, SettingsScreenComponentProps } from './SettingsScreen.type';
 
 export function SettingsScreenComponent({
-  initialRoute,
+
   showRatings,
   showAccountAvatar,
   homeDefaultTab,
@@ -132,6 +133,7 @@ export function SettingsScreenComponent({
   numberOfColumnsTV,
   recentTwoColumnsTV,
   hiddenCountries,
+  enabledSources,
   playerRewindSeconds,
   playerBackwardRewindSeconds,
   playerShowBufferTime,
@@ -208,6 +210,7 @@ export function SettingsScreenComponent({
   playerStopPlayShowInterfaceTV,
   appVersion,
   onConfigUpdate,
+  onResetChallengeCookies,
   onLanguageChange,
   onThemeSchemeChange,
   onLocalLibraryChange,
@@ -371,13 +374,7 @@ export function SettingsScreenComponent({
         options={ APP_LANGUAGE_OPTIONS }
         onChange={ handleLanguageChange }
       />
-      <SettingSelect
-        title={ t('Initial route') }
-        IconComponent={ Route }
-        value={ initialRoute }
-        options={ TV_SCREENS }
-        onChange={ (value) => onConfigUpdate('initialRoute', value) }
-      />
+
       <SettingBase
         title={ t('Default home tab') }
         subtitle="Измените порядок и видимость вкладок. Первая видимая вкладка открывается при запуске."
@@ -441,6 +438,14 @@ export function SettingsScreenComponent({
           { value: 'list', label: t('List') },
         ] }
         onChange={ (value) => onConfigUpdate('recentDisplayMode', value) }
+      />
+      <SettingMultiSelect
+        title={ t('Content sources') }
+        subtitle={ t('Checked sources are used in catalogs, search and bookmark updates.') }
+        IconComponent={ Layers }
+        values={ enabledSources }
+        options={ [{ value: 'ZONA', label: 'Zona' }, { value: 'REZKA', label: 'HDRezka' }, { value: 'ANIXART', label: 'Anixart' }] }
+        onChange={ values => onConfigUpdate('enabledSources', values) }
       />
       <SettingMultiSelect
         title={ t('Hidden countries') }
@@ -645,6 +650,13 @@ export function SettingsScreenComponent({
         } }
         withLoader
         onChange={ onCDNChange }
+      />
+      <SettingLink
+        title={ t('Reset challenge cookies') }
+        subtitle={ t('Renew site checks without signing out. Checks normally renew automatically.') }
+        IconComponent={ RefreshCw }
+        withLoader
+        onPress={ onResetChallengeCookies }
       />
       <SettingSwitch
         title={ t('Strict connection check') }

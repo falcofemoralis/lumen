@@ -22,7 +22,7 @@ const NEW_REQUESTS_BEFORE_OLD = 5;
 
 const FAILURE_COOLDOWN = 30_000;
 const cooldowns = new Map<string, { until: number; error: unknown }>();
-const requestGroup = (key: string) => key.startsWith('ZONA:') || /^bookmark-metadata:https?:\/\/[^/]*\.zona\.im\//.test(key) ? 'ZONA' : key.startsWith('ANIXART:') ? 'ANIXART' : 'REZKA';
+const requestGroup = (key: string) => key.startsWith('ZONA:') || /^bookmark-metadata:https?:\/\/[^/]*\.zona\.im\//.test(key) ? 'ZONA' : key.startsWith('ANIXART:') || key.startsWith('bookmark-metadata:https://anixart-app.com/') ? 'ANIXART' : 'REZKA';
 
 let activeRequests = 0;
 let lastRequestStartedAt = 0;

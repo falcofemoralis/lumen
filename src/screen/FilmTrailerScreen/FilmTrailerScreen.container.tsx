@@ -36,7 +36,7 @@ export const FilmTrailerScreenContainer = ({
     queryKey: [...queryKeys.filmTrailer(film.id), film.link],
     queryFn: () => {
       const trailerFilm = film.metadataSourceFilm ?? film;
-      return /^https?:\/\/[^/]*\.zona\.im\//.test(trailerFilm.link)
+      return /^https?:\/\/(?:[^/]*\.zona\.im|anixart-app\.com)\//.test(trailerFilm.link)
         ? Promise.resolve(null)
         : currentService.getFilmTrailer(trailerFilm.id);
     },

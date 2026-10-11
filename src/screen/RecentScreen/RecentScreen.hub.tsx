@@ -14,7 +14,7 @@ import DownloadsScreen from '../DownloadsScreen/DownloadsScreen.container';
 
 export const RecentHub = ({ children }: { children: ReactNode }) => {
 
-  const { showEpisodeUpdateCount } = useConfigContext();
+  const { showEpisodeUpdateCount, tabPosition } = useConfigContext();
   const { badgeData } = useServiceContext();
   const { data } = useQuery<{ items: unknown[] }[]>({ queryKey: queryKeys.notifications(), enabled: false });
   const count = data?.reduce((sum, group) => sum + group.items.length, 0) ?? badgeData[ACCOUNT_TAB] ?? 0;
@@ -29,7 +29,7 @@ export const RecentHub = ({ children }: { children: ReactNode }) => {
   return (
     <FilmPager
       pagerItems={ pagerItems }
-      tabPosition="top"
+      tabPosition={ tabPosition }
       onPreLoad={ () => {} }
       onNextLoad={ async () => {} }
       renderPageContent={ (_item, index) => (

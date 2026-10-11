@@ -8,6 +8,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { PlayerVideoSelectorRef } from 'Component/PlayerVideoSelector/PlayerVideoSelector.container';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useConfigContext } from 'Context/ConfigContext';
+import { isSourceEnabled, sourceForLink } from '../../source/types/SourceSelection';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useLocalBookmarks, useLocalHistory } from 'Hooks/useLocalLibrary';
 import { t } from 'i18n/translate';
@@ -181,9 +182,10 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     enabled: !!link,
     retry: 0,
     queryFn: async () => {
+      if (!isSourceEnabled(sourceForLink(link))) throw new Error('Источник отключён в настройках.');
       const sourceAdapter = sourceRouter.getAdapterForLink(link);
       const sourceFilm = await withDeadline(sourceAdapter
-        ? sourceAdapter.getFilm(link)
+        ? sourceAdapter.getFilm(link, { includeRelated: true })
         : currentService.getFilm(link), 20_000);
       if (!sourceFilm) throw new Error('Не удалось загрузить данные фильма. Повторите попытку.');
       const baseFilm = {
@@ -318,7 +320,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
 
     const { voices } = film;
 
-    if (voices.length <= 0) {
+    if (voices.length <= 0 && !sourcePlaybackRouter.getAdapterForFilmLink(film.link)) {
       NotificationStore.displayMessage(t('No video available'));
 
       return;
@@ -660,7 +662,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     }
 
     const ratingFilm = film.metadataSourceFilm ?? film;
-    if (/^https?:\/\/[^/]*\.zona\.im\//.test(ratingFilm.link)) {
+    if (/^https?:\/\/(?:[^/]*\.zona\.im|anixart-app\.com)\//.test(ratingFilm.link)) {
       NotificationStore.displayMessage('Оценка доступна для фильмов, найденных в HDRezka');
       return;
     }

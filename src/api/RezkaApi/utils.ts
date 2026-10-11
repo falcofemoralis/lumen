@@ -1,3 +1,4 @@
+import { filmPosterUrl } from 'Util/Film/posterImage';
 import { ActorCardInterface } from 'Type/ActorCard.interface';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { FilmListInterface } from 'Type/FilmList.interface';
@@ -112,7 +113,8 @@ export const parseFilmCard = (el: HTMLElementInterface): FilmCardInterface => {
   const linkFull = el.querySelector('.b-content__inline_item-link a')?.attributes.href ?? '';
   const link = removeUrlHost(linkFull);
   const type = parseFilmType(el.querySelector('.cat')?.attributes.class);
-  const poster = el.querySelector('.b-content__inline_item-cover img')?.attributes.src ?? '';
+  const image = el.querySelector('.b-content__inline_item-cover img');
+  const poster = filmPosterUrl(image?.attributes);
   const title = el.querySelector('.b-content__inline_item-link a')?.rawText ?? '';
   const subtitle = el.querySelector('.b-content__inline_item-link div')?.rawText ?? '';
   const info = (el.querySelector('.b-content__inline_item-cover .info')?.rawText ?? '').replaceAll(

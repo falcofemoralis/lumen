@@ -22,6 +22,8 @@ export function FilmViewRelatedItemComponent({
 
   return (
     <ThemedPressable
+      style={ styles.relatedItem }
+      contentStyle={ styles.relatedItemContent }
       onPress={ onSelect }
     >
       { ({ isFocused }) => (
@@ -36,7 +38,4 @@ export function FilmViewRelatedItemComponent({
   );
 }
 
-export default memo(
-  FilmViewRelatedItemComponent,
-  (prevProps, nextProps) => prevProps.item.id === nextProps.item.id
-);
+export default memo(FilmViewRelatedItemComponent);

@@ -2,6 +2,7 @@ import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { FilmListInterface } from 'Type/FilmList.interface';
 
 import { ContentSource } from '../types/ContentSource';
+import { isSourceEnabled, enabledSourceKey } from '../types/SourceSelection';
 import { SourceAdapter } from '../types/SourceAdapter';
 import { UnifiedFilm } from '../types/UnifiedFilm';
 import { SourceResolver } from '../resolver/SourceResolver';
@@ -13,6 +14,7 @@ export interface UnifiedSearchOptions {
 }
 
 const SEARCH_SOURCES = [
+  ContentSource.ANIXART,
   ContentSource.ZONA,
   ContentSource.REZKA,
 ] as const;
@@ -49,18 +51,18 @@ const toFilmCard = (
     : undefined;
 
   const ratingSource = film.sources.find(
-    (source) => source.source === ContentSource.REZKA && source.nativeId,
-  ) ?? film.sources.find(
-    (source) => source.source === ContentSource.ZONA && source.nativeId,
-  );
+    source => source.source === preferredSource && source.nativeId,
+  ) ?? film.sources.find(source => source.nativeId && isSourceEnabled(source.source));
   return {
     id: film.id,
     link: preferredLink ?? film.sources[0]?.link ?? '',
     type: film.type,
     poster: film.poster,
     title: film.title,
-    subtitle: film.year ? String(film.year) : '',
+    subtitle: film.subtitle || (film.year ? String(film.year) : ''),
     info: film.info,
+    contentTypePending: film.contentTypePending,
+    isPendingRelease: film.isPendingRelease,
     ratings: film.ratings,
     ratingSourceType: ratingSource?.source,
     ratingFilmId: ratingSource?.nativeId,
@@ -83,7 +85,7 @@ export const createUnifiedSearchService = (
       options?: UnifiedSearchOptions,
       onProgress?: (result: FilmListInterface) => void,
     ): Promise<FilmListInterface> {
-      const normalizedQuery = query.trim();
+      const normalizedQuery = query.trim() ? query.trim() + ':sources:' + enabledSourceKey() : '';
 
       if (!normalizedQuery) {
         return {
@@ -94,17 +96,28 @@ export const createUnifiedSearchService = (
 
       const state = getQueryState(normalizedQuery, page);
 
+      const searchSources = SEARCH_SOURCES.filter((source) => Boolean(getAdapter(source)) && isSourceEnabled(source));
+      if (!searchSources.length) return { films: [], totalPages: 1 };
       const partial = new Map<ContentSource, UnifiedFilm[]>();
+      const presentationIds = new Map<string, string>();
+      const normalizeCard = (adapter: SourceAdapter, card: FilmCardInterface) => {
+        const film = adapter.normalizeFilmCard(card);
+        const key = adapter.source + ':' + card.link;
+        const previous = presentationIds.get(key);
+        if (previous) film.id = previous;
+        else presentationIds.set(key, film.id);
+        return film;
+      };
       const publish = (adapter: SourceAdapter, result: FilmListInterface) => {
         if (page !== 1 || !onProgress) return result;
-        partial.set(adapter.source, result.films.map((card) => adapter.normalizeFilmCard(card)));
-        const films = sourceResolver.deduplicate(Array.from(partial.values()).flat());
+        partial.set(adapter.source, result.films.map((card) => normalizeCard(adapter, card)));
+        const films = sourceResolver.deduplicate(searchSources.flatMap(source => partial.get(source) ?? []));
         films.forEach(registerUnifiedFilm);
         onProgress({ films: films.map((film) => toFilmCard(film, sourceResolver)), totalPages: 1 });
         return result;
       };
       const results = await Promise.all(
-        SEARCH_SOURCES.map(async (source) => {
+        searchSources.map(async (source) => {
           const adapter = getAdapter(source);
 
           if (!adapter) {
@@ -115,7 +128,7 @@ export const createUnifiedSearchService = (
           }
 
           try {
-            const result = options ? await options.loadSource(adapter, page) : await adapter.search(normalizedQuery, page);
+            const result = options ? await options.loadSource(adapter, page) : await adapter.search(query.trim(), page, { onProgress: partialResult => publish(adapter, partialResult) });
             if (!options) return publish(adapter, result);
             const prepared: (FilmCardInterface | null)[] = new Array(result.films.length);
             let next = 0;
@@ -136,13 +149,13 @@ export const createUnifiedSearchService = (
         throw (results[0] as { error: unknown }).error;
       }
       const unifiedFilms = results.flatMap((result, resultIndex) => {
-        const adapter = getAdapter(SEARCH_SOURCES[resultIndex]);
+        const adapter = getAdapter(searchSources[resultIndex]);
 
         if (!adapter) {
           return [];
         }
 
-        return result.films.map((film) => adapter.normalizeFilmCard(film));
+        return result.films.map((film) => normalizeCard(adapter, film));
       });
 
       const previousFilms = state.films;

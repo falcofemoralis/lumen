@@ -23,11 +23,12 @@ export async function customFetch(
   const url = input instanceof Request ? input.url : input.toString();
   const { hostname } = new URL(url);
 
+  const sentCookies = buildCookies(hostname);
   const res = await fetch(input, {
     ...init,
     headers: {
       ...(init?.headers || {}),
-      Cookie: buildCookies(hostname),
+      Cookie: sentCookies,
     },
     credentials: 'omit', // Omit cookies and handle ourselves
     keepalive: true,
@@ -44,7 +45,7 @@ export async function customFetch(
   // is refused fails the request instead of looping.
   if (!retried) {
     if (isAnubisChallenge(bodyText)) {
-      const solved = await solveAnubis(url, bodyText, init?.headers);
+      const solved = await solveAnubis(url, bodyText, init?.headers, sentCookies);
 
       if (solved) {
         return customFetch(input, init, true);

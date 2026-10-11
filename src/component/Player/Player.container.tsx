@@ -20,7 +20,9 @@ import {
   useRef,
   useState,
 } from 'react';
-import { AppState, BackHandler, Share } from 'react-native';
+import { AppState, BackHandler, Keyboard, Share, TextInput } from 'react-native';
+import RemoteControlManager from 'Util/RemoteControl/RemoteControlManager';
+import { SupportedKeys } from 'Util/RemoteControl/SupportedKeys';
 import {
   BandwidthData,
   onProgressData,
@@ -960,6 +962,19 @@ export function PlayerContainer({
       player.play();
     }
   };
+
+  const keyboardToggleRef = useRef(togglePlayPause);
+  keyboardToggleRef.current = togglePlayPause;
+  useEffect(() => {
+    RemoteControlManager.subscribe();
+    const listener = RemoteControlManager.addKeydownListener(key => {
+      if (key !== SupportedKeys.SPACE || !navigation.isFocused()
+        || AppState.currentState !== 'active' || Keyboard.isVisible() || TextInput.State.currentlyFocusedInput()) return false;
+      keyboardToggleRef.current();
+      return true;
+    });
+    return () => RemoteControlManager.removeKeydownListener(listener);
+  }, [navigation]);
 
   const getDuration = useCallback(() => {
     if (durationRef.current > 0) {

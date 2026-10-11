@@ -40,7 +40,7 @@ const makeAdapter = (source: ContentSource, films: FilmInterface[]): SourceAdapt
 
 test('Zona preference keeps library ID and supplements people and votes from matched Rezka', async () => {
   clearUnifiedFilmRegistry();
-  const zona = makeFilm(true);
+  const zona = { ...makeFilm(true), countries: [{ name: 'США' }], genres: [{ name: 'мультфильм' }] };
   const rezka = makeFilm(false);
   const z = makeAdapter(ContentSource.ZONA, [zona]);
   const r = makeAdapter(ContentSource.REZKA, [rezka]);
@@ -62,8 +62,9 @@ test('Zona preference keeps library ID and supplements people and votes from mat
   assert.equal(getRegisteredUnifiedFilm(zona.link)?.sources.length, 2);
   const card = await router.resolvePreferredCard({ ...rezka, subtitle: '2001' });
   assert.equal(card.id, rezka.id);
+  assert.equal(card.subtitle, '2001, США, мультфильм');
   assert.equal(card.link, zona.link);
-  assert.equal(card.ratingFilmId, rezka.id);
+  assert.equal(card.ratingFilmId, zona.link);
 });
 
 test('conflicting external IDs, ambiguous matches and absent Zona keep Rezka', async () => {
@@ -91,4 +92,70 @@ test('Zona-only metadata has no invented vote counts or supplemental source', as
   const result = await router.resolvePreferredFilm(zona);
   assert.equal(result.metadataSourceFilm, undefined);
   assert.equal(result.ratings?.[0].votes, undefined);
+});
+
+test('bookmark pending badge follows confirmed availability in native and matched sources', async () => {
+  clearUnifiedFilmRegistry();
+  const zona = { ...makeFilm(true, '-available'), isPendingRelease: false };
+  const rezka = { ...makeFilm(false, '-available'), isPendingRelease: true };
+  const router = new SourceRouter([makeAdapter(ContentSource.ZONA, [zona]), makeAdapter(ContentSource.REZKA, [rezka])]);
+  const oldCard = { ...rezka, subtitle: '2001', isPendingRelease: true };
+  assert.equal((await router.resolvePreferredCard(oldCard)).isPendingRelease, false);
+  assert.equal((await router.resolvePreferredCard({ ...oldCard, link: zona.link })).isPendingRelease, false);
+  const unknown = { ...zona, link: zona.link + '-unknown', isPendingRelease: undefined };
+  const native = new SourceRouter([makeAdapter(ContentSource.ZONA, [unknown])]);
+  assert.equal((await native.resolvePreferredCard({ ...oldCard, link: unknown.link })).isPendingRelease, true);
+  const releasedRezka = { ...rezka, isPendingRelease: false };
+  const fallback = new SourceRouter([makeAdapter(ContentSource.REZKA, [releasedRezka])]);
+  assert.equal((await fallback.resolvePreferredCard(oldCard)).isPendingRelease, false);
+});
+
+test('matched primary card keeps supplemental episode status when primary metadata lacks it', async () => {
+  clearUnifiedFilmRegistry();
+  const zona = { ...makeFilm(true, '-episodes'), type: FilmType.SERIES };
+  const rezka = { ...makeFilm(false, '-episodes'), type: FilmType.SERIES,
+    seriesInfo: 'Сезон 2 • серия 7 • выходит' };
+  const router = new SourceRouter([makeAdapter(ContentSource.ZONA, [zona]), makeAdapter(ContentSource.REZKA, [rezka])]);
+  const result = await router.resolvePreferredCard({ ...rezka, subtitle: '2001', info: undefined });
+  assert.equal(result.link, zona.link);
+  assert.equal(result.info, rezka.seriesInfo);
+});
+test('bookmark migration checks stored metadata against Zona without loading Rezka first', async () => {
+  clearUnifiedFilmRegistry();
+  const rezka = makeFilm(false, '-fast-bookmark'), zona = makeFilm(true, '-fast-bookmark');
+  const r = makeAdapter(ContentSource.REZKA, [rezka]);
+  let rezkaRequests = 0;
+  r.getFilm = async () => { rezkaRequests++; throw new Error('Must not load Rezka'); };
+  const router = new SourceRouter([r, makeAdapter(ContentSource.ZONA, [zona])]);
+  const result = await router.resolveBookmarkPrimary({ ...rezka, ratings: undefined, subtitle: '2001' });
+  assert.equal(result?.link, zona.link);
+  assert.equal(result?.poster, zona.poster);
+  assert.equal(rezkaRequests, 0);
+});
+test('preferred Zona page restores franchise, schedule and related posters from a verified Rezka match', async () => {
+  clearUnifiedFilmRegistry();
+  const zona = makeFilm(true, '-sections');
+  const rezka = { ...makeFilm(false, '-sections'),
+    franchise: [{ name: 'Part 2', year: '2004', rating: '7', link: '/part2' }],
+    schedule: [{ name: 'Season 1', items: [{ id: '1', name: '1', episodeName: 'Episode', date: '2026-01-01' }] }],
+    related: [{ id: 'related', link: '/related', title: 'Related', poster: 'https://img.test/related.jpg', type: FilmType.FILM, subtitle: '2020' }],
+  };
+  const router = new SourceRouter([makeAdapter(ContentSource.ZONA, [zona]), makeAdapter(ContentSource.REZKA, [rezka])]);
+  const enriched = await router.resolvePreferredFilm(rezka);
+  assert.equal(enriched.link, zona.link);
+  assert.deepEqual(enriched.franchise, rezka.franchise);
+  assert.deepEqual(enriched.schedule, rezka.schedule);
+  assert.equal(enriched.related?.[0].poster, rezka.related[0].poster);
+  const native = { ...zona, franchise: [{ name: 'Native', year: '2001', rating: '8', link: '' }], schedule: rezka.schedule, related: rezka.related };
+  const nativeRouter = new SourceRouter([makeAdapter(ContentSource.ZONA, [native]), makeAdapter(ContentSource.REZKA, [rezka])]);
+  assert.equal((await nativeRouter.resolvePreferredFilm(rezka)).franchise?.[0].name, 'Native');
+});
+test('unknown Zona series completion is supplemented from verified Rezka without replacing season and episode', async () => {
+  clearUnifiedFilmRegistry();
+  const zona = { ...makeFilm(true, '-completion'), type: FilmType.SERIES, hasSeasons: true, seriesInfo: 'Сезон 6 • серия 13' };
+  const rezka = { ...makeFilm(false, '-completion'), type: FilmType.SERIES, hasSeasons: true, seriesInfo: '6 сезон, 13 серия, сериал завершён' };
+  const router = new SourceRouter([makeAdapter(ContentSource.ZONA, [zona]), makeAdapter(ContentSource.REZKA, [rezka])]);
+  const result = await router.resolvePreferredCard({ ...zona, ratings: undefined, subtitle: '2001' }, true);
+  assert.equal(result.info, 'Сезон 6 • серия 13 • завершён');
+  assert.equal(result.link, zona.link);
 });

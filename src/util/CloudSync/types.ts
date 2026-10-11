@@ -12,6 +12,7 @@ export type CloudSyncEntityType =
   | 'player-time'
   | 'schedule-mark'
   | 'comment'
+  | 'card-cache'
   | 'setting'
 ;
 
@@ -56,6 +57,8 @@ export interface CloudSyncState {
 
   comments: Record<string, CloudRecord<unknown> | CloudTombstone>;
 
+  /** Optional for compatibility with existing version 1 replicas. */
+  cardCache?: Record<string, CloudRecord<unknown> | CloudTombstone>;
   settings: CloudSettingsState;
 }
 
@@ -94,7 +97,8 @@ export interface CloudSyncMutation {
     | 'player-time'
     | 'schedule-mark'
     | 'comment'
-    | 'setting'
+    | 'card-cache'
+  | 'setting'
   ;
   id: string;
   value?: unknown;

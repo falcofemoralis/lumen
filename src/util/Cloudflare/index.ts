@@ -275,6 +275,8 @@ async function doSolve(
   const origin = getUrlOrigin(originalUrl);
 
   dropCloudflareCookies(hostname);
+  const nativeCookies = parseCookieHeader(await reactNativeWebCookies.getCookies(origin));
+  await reactNativeWebCookies.removeCookies(origin, Object.keys(nativeCookies).filter(isCloudflareCookie));
 
   // The version the app claims is corrected to the browser that is really installed
   // before the challenge ever sees it -- see `reconcileUserAgentVersion`. Both sides

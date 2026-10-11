@@ -1,4 +1,5 @@
 import { ContentSource } from '../types/ContentSource';
+import { isSourceEnabled, sourceForLink } from '../types/SourceSelection';
 import { SourcePlaybackAdapter } from './SourcePlaybackAdapter';
 
 export class SourcePlaybackRouter {
@@ -11,14 +12,16 @@ export class SourcePlaybackRouter {
   }
 
   getAdapter(source: ContentSource): SourcePlaybackAdapter | null {
-    return this.adapters.get(source) ?? null;
+    return isSourceEnabled(source) ? this.adapters.get(source) ?? null : null;
   }
 
   getAdapterForFilmLink(
     link: string,
   ): SourcePlaybackAdapter | null {
+    if (!isSourceEnabled(sourceForLink(link))) throw new Error('Content source is disabled in settings');
     try {
       const url = new URL(link);
+      if (url.hostname === 'anixart-app.com') return this.getAdapter(ContentSource.ANIXART);
 
       if (
         url.hostname === 'w1.zona.im' ||

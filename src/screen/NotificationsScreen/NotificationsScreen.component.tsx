@@ -30,7 +30,7 @@ export function NotificationsScreenComponent({
 
   return (
     <Page>
-      <Wrapper>
+      <Wrapper style={ { marginHorizontal: 0 } }>
         <View style={ styles.container }>
           <FilmGrid
             sections={ data }

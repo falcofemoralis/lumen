@@ -25,6 +25,7 @@ export type SettingsScreenComponentProps = {
   isAutoFrameRateSupported: boolean
   isVolumeNormalizationSupported: boolean
   onConfigUpdate: (key: keyof DeviceConfigType, value: unknown) => void
+  onResetChallengeCookies: () => Promise<void>
   onTvChannelsAddToHome: () => Promise<void>
   onLanguageChange: (value: string) => Promise<void>
   onThemeSchemeChange: (value: string) => void

@@ -120,6 +120,7 @@ export const mergeCloudSyncState = (
       ),
     },
 
+    cardCache: mergeMap(local.cardCache ?? {}, remote.cardCache ?? {}),
     history: mergeMap(local.history, remote.history),
     playerTime: mergeMap(local.playerTime, remote.playerTime),
     scheduleMarks: mergeMap(local.scheduleMarks, remote.scheduleMarks),
