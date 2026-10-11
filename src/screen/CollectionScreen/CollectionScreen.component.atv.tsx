@@ -50,10 +50,10 @@ export function CollectionScreenComponent({
               ] }
             >
               <ThemedText style={ styles.amount }>
-                { amount }
+                { amount > 0 ? amount : '' }
               </ThemedText>
               <ThemedText style={ styles.text }>
-                { title }
+                { item.source ? item.source + ' · ' + title : title }
               </ThemedText>
               <ThemedImage src={ image } style={ styles.image } />
             </View>

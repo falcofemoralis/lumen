@@ -675,6 +675,8 @@ export function FilmScreenComponent({
         { renderInfoText(duration, t('Time')) }
         { renderDirectors() }
         { renderCollection(countries, t('Country'), handleSelectCategory) }
+        { renderCollection(film.studios ?? [], t('Studio'), handleSelectCategory) }
+        { renderCollection(film.authors ?? [], t('Author'), handleSelectCategory) }
         { showAgeRating && renderInfoText(age, t('Age')) }
       </View>
     );

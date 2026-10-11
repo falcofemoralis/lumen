@@ -40,21 +40,17 @@ function CollectionItem({
       contentStyle={ styles.item }
     >
       <ThemedText style={ styles.amount }>
-        { amount }
+        { amount > 0 ? amount : '' }
       </ThemedText>
       <ThemedText style={ styles.text }>
-        { title }
+        { item.source ? item.source + ' · ' + title : title }
       </ThemedText>
       <ThemedImage src={ image } style={ styles.image } />
     </ThemedPressable>
   );
 }
 
-function rowPropsAreEqual(prevProps: RecentGridRowProps, props: RecentGridRowProps) {
-  return prevProps.item.title === props.item.title;
-}
-
-const MemoizedCollectionItem = memo(CollectionItem, rowPropsAreEqual);
+const MemoizedCollectionItem = memo(CollectionItem);
 
 export function CollectionScreenComponent({
   items,

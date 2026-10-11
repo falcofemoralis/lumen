@@ -28,6 +28,7 @@ const getYear = (film: FilmInterface): number | undefined => {
 const RezkaSourceAdapter: SourceAdapter = {
   source: ContentSource.REZKA,
   name: 'HDRezka',
+  getCollections: page => RezkaApi.getCollections(page),
 
   async getFilm(link: string, options?: { background?: boolean; includeSeriesInfo?: boolean }): Promise<FilmInterface | null> {
     const film = await RezkaApi.getFilm(link, options);

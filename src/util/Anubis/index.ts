@@ -1,16 +1,16 @@
 import NotificationStore from 'Store/Notification.store';
+import { reactNativeWebCookies } from 'Modules/react-native-web-cookies';
 import { buildCookies, cookiesManager, setCookies } from 'Util/Cookies';
 import { headerValue } from 'Util/Misc';
 import { getUrlOrigin } from 'Util/Url';
 import { hasFreshAnubisClearance } from 'Util/Cookies/lifecycle';
+import { runBoundedChallenge } from 'Util/Request/boundedChallenge';
 
-import { parseChallenge, solvePow } from './challenge';
+import { anubisPassCookies, freshAnubisAuthCookies, parseChallenge, solvePow } from './challenge';
 
 export { isAnubisChallenge } from './challenge';
 
 const PASS_CHALLENGE_PATH = '/.within.website/x/cmd/anubis/api/pass-challenge';
-// Anubis sets this cookie's value to the challenge id; pass-challenge requires it.
-const VERIFICATION_COOKIE = 'techaro.lol-anubis-cookie-verification';
 
 const delay = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -67,11 +67,10 @@ export async function solveAnubis(originalUrl: string, bodyText: string, headers
   }
   cookiesManager.set(hostname, Object.fromEntries(Object.entries(jar).filter(([name]) =>
     !name.includes('anubis') || name.includes('verification'))));
-  const attempt = doSolve(origin, hostname, bodyText, originalUrl, headers).finally(() => inFlight.delete(hostname));
-
-  inFlight.set(hostname, attempt);
-
-  return attempt;
+  const controller = new AbortController();
+  return runBoundedChallenge(inFlight, hostname,
+    () => doSolve(origin, hostname, bodyText, originalUrl, headers, rejectedCookies, controller.signal),
+    35_000, () => controller.abort());
 }
 
 async function doSolve(
@@ -79,7 +78,9 @@ async function doSolve(
   hostname: string,
   bodyText: string,
   originalUrl: string,
-  headers?: HeadersInit
+  headers?: HeadersInit,
+  rejectedCookies = '',
+  signal?: AbortSignal
 ): Promise<boolean> {
   const userAgent = headerValue(headers, 'User-Agent');
   const baseHeaders: Record<string, string> = userAgent ? { 'User-Agent': userAgent } : {};
@@ -124,12 +125,7 @@ async function doSolve(
   }
 
   const passUrl = buildPassChallengeUrl(origin, basePrefix, params);
-  // Anubis sets the verification cookie's value to the challenge id and requires
-  // it echoed here. Send exactly that — no other cookies.
-  const requestHeaders: Record<string, string> = {
-    ...baseHeaders,
-    Cookie: `${VERIFICATION_COOKIE}=${id}`,
-  };
+  // Keep account cookies, but pin verification to the challenge being solved.
 
   try {
     // Do NOT follow the 302 — the clearance cookie is on it, and following would
@@ -137,15 +133,28 @@ async function doSolve(
     const passRes = await fetch(passUrl, {
       method: 'GET',
       headers: {
-        ...requestHeaders,
-        Cookie: buildCookies(hostname),
+        ...baseHeaders,
+        Cookie: anubisPassCookies(buildCookies(hostname), id),
       },
       credentials: 'omit',
       redirect: 'manual',
+      signal,
       keepalive: true,
     });
 
+    if (signal?.aborted) return false;
     setCookies(hostname, passRes);
+    if (!hasFreshAnubisClearance(cookiesManager.get(hostname) || {}, rejectedCookies)) {
+      // Android/WSA may follow the redirect natively before exposing its headers.
+      const nativeCookies = await reactNativeWebCookies.getCookies(originalUrl).catch(() => '');
+      if (signal?.aborted) return false;
+      const recovered = freshAnubisAuthCookies(nativeCookies, rejectedCookies);
+      if (Object.keys(recovered).length) cookiesManager.set(hostname, {
+        ...cookiesManager.get(hostname),
+        ...Object.fromEntries(Object.entries(recovered).map(([name, value]) =>
+          [name, { name, value, expires: new Date(Date.now() + 60 * 60_000) }])),
+      });
+    }
   } catch (error) {
     NotificationStore.displayError(`[Anubis] pass-challenge request failed${ error}`);
 

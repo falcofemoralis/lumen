@@ -115,3 +115,25 @@ test('one failed metadata request does not discard the other cards of that sourc
   assert.equal(result.films[0].link, 'progress-zona');
   assert.equal(getRegisteredUnifiedFilm('progress-rezka')?.sources.length, 2);
 });
+
+test('search verifies different localized subtitles using detail IDs without merging unrelated titles', async () => {
+  const zFilm = { ...film(ContentSource.ZONA, 'variant-z', '5610132'), title: 'Вышка 2', originalTitle: 'Fall 2: Deadpoint', year: 2026, type: FilmType.FILM };
+  const rFilm = { ...film(ContentSource.REZKA, 'variant-r'), title: 'Вышка 2: Мёртвая зона', year: 2026, type: FilmType.FILM };
+  const z = adapter(ContentSource.ZONA, [[zFilm]]), r = adapter(ContentSource.REZKA, [[rFilm]]);
+  let requests = 0;
+  r.getFilm = async () => { requests++; return { id: 'variant-r', link: 'variant-r', title: rFilm.title, poster: '', type: FilmType.FILM, voices: [], hasSeasons: false, hasVoices: false }; };
+  r.normalizeFilm = () => ({ ...rFilm, originalTitle: 'Fall 2: Deadpoint', sources: [{ ...rFilm.sources[0], externalIds: [{ type: Id.KINOPOISK, value: '5610132' }] }] });
+  const service = createUnifiedSearchService([z, r], new SourceResolver([z, r]));
+  const result = await service.search('subtitle-verification', 1);
+  assert.equal(result.films.length, 1);
+  assert.equal(result.films[0].link, 'variant-z');
+  assert.equal(result.films[0].externalIds?.kinopoisk, '5610132');
+  assert.equal(requests, 1);
+  assert.equal(getRegisteredUnifiedFilm('variant-r')?.sources.length, 2);
+  r.normalizeFilm = () => ({ ...rFilm, originalTitle: 'Other movie', sources: [{ ...rFilm.sources[0], externalIds: [{ type: Id.KINOPOISK, value: '999' }] }] });
+  // Use fresh rows, since normalization returns mutable fixture objects.
+  zFilm.sources = [{ ...zFilm.sources[0], externalIds: [{ type: Id.KINOPOISK, value: '5610132' }] }];
+  rFilm.originalTitle = undefined;
+  rFilm.sources = [{ source: ContentSource.REZKA, link: 'variant-r', nativeId: 'variant-r', externalIds: [] }];
+  assert.equal((await service.search('subtitle-conflict', 1)).films.length, 2);
+});

@@ -35,3 +35,13 @@ test('verification cookies do not count as clearance and persisted expiry surviv
   assert.equal(isCookieExpired(JSON.parse(JSON.stringify({ name: 'cf_clearance', value: 'old', expires: new Date(0) }))), true);
   assert.equal(isCookieExpired({ name: 'session', value: 'account' }), false);
 });
+test('server failures recover only after their cooldown, without refetching valid cached data', async () => {
+  const { isRecoverableSourceFailure } = await import('../src/util/NetworkRecovery');
+  const { SourceBlockedError } = await import('../src/util/Request/sourceFailure');
+  const blocked = new SourceBlockedError('blocked');
+  blocked.retryAt = 5000;
+  assert.equal(isRecoverableSourceFailure(blocked, 4999), false);
+  assert.equal(isRecoverableSourceFailure(blocked, 5000), true);
+  assert.equal(isRecoverableSourceFailure(new Error('Not found'), 5000), false);
+  assert.equal(isRecoverableSourceFailure(new Error('Network request failed'), 5000), true);
+});

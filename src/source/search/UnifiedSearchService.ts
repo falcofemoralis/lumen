@@ -6,6 +6,8 @@ import { isSourceEnabled, enabledSourceKey } from '../types/SourceSelection';
 import { SourceAdapter } from '../types/SourceAdapter';
 import { UnifiedFilm } from '../types/UnifiedFilm';
 import { SourceResolver } from '../resolver/SourceResolver';
+import { isTitleVariantCandidate } from '../resolver/titleCandidates';
+import { withDeadline } from '../request';
 import { registerUnifiedFilm } from './UnifiedFilmRegistry';
 
 export interface UnifiedSearchOptions {
@@ -59,6 +61,9 @@ const toFilmCard = (
     type: film.type,
     poster: film.poster,
     title: film.title,
+    originalTitle: film.originalTitle,
+    externalIds: Object.fromEntries(film.sources.flatMap(source => source.externalIds).flatMap(id =>
+      id.type === 'IMDB' ? [['imdb', id.value]] : id.type === 'TMDB' ? [['tmdb', id.value]] : id.type === 'KINOPOISK' ? [['kinopoisk', id.value]] : [])),
     subtitle: film.subtitle || (film.year ? String(film.year) : ''),
     info: film.info,
     contentTypePending: film.contentTypePending,
@@ -157,6 +162,26 @@ export const createUnifiedSearchService = (
 
         return result.films.map((film) => normalizeCard(adapter, film));
       });
+
+      // Only ambiguous localized subtitles need a detail request. Never merge by a prefix alone.
+      const candidates = unifiedFilms.filter(film => film.sources.some(source => source.source === ContentSource.REZKA)
+        && [...state.films, ...unifiedFilms].some(other => other !== film
+          && other.sources.some(source => source.source !== ContentSource.REZKA)
+          && !sourceResolver.isSameFilm(film, other) && isTitleVariantCandidate(film, other)));
+      if (candidates.length <= 3) await Promise.all(candidates.map(async film => {
+        const adapter = getAdapter(ContentSource.REZKA);
+        const source = film.sources.find(source => source.source === ContentSource.REZKA);
+        if (!adapter || !source) return;
+        const details = await withDeadline(adapter.getFilm(source.link, { background: true }), 12_000).catch(() => null);
+        if (!details) return;
+        const metadata = adapter.normalizeFilm(details);
+        // Preserve already displayed identity, ratings and the other source links.
+        film.originalTitle = metadata.originalTitle ?? film.originalTitle;
+        film.year = metadata.year ?? film.year;
+        film.type = metadata.type;
+        const externalIds = metadata.sources.find(item => item.source === ContentSource.REZKA)?.externalIds;
+        if (externalIds?.length) source.externalIds = externalIds;
+      }));
 
       const previousFilms = state.films;
       state.films = sourceResolver.deduplicate([

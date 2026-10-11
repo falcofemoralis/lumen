@@ -1,4 +1,5 @@
 import { ActorCardInterface } from 'Type/ActorCard.interface';
+import { getZonaCollections } from './ZonaCollections';
 import { CollectionItemInterface } from 'Type/CollectionItem';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { buildFilmSubtitle, subtitleFromFilm } from 'Util/Film/subtitle';
@@ -49,6 +50,7 @@ interface ZonaEpisodeData {
 interface ZonaFilmData {
   slug: string;
   title: string;
+  type?: 'movie' | 'series';
   title_original?: string | null;
   title_eng?: string | null;
   description?: string;
@@ -99,8 +101,8 @@ interface ZonaFilmData {
       type: string;
     }>;
     studios?: unknown[];
-    sequels?: unknown[];
-    relations?: unknown[];
+    sequels?: ZonaFilmData[];
+    relations?: ZonaFilmData[];
   };
 }
 
@@ -583,6 +585,25 @@ const parseZonaFilmData = (
     genres,
     countries,
     externalIds,
+    franchise: (data.meta?.sequels ?? [])
+      .filter(item => item.slug && item.title && (item.type === 'movie' || item.type === 'series'))
+      .map(item => ({
+        name: item.title, year: item.year ? String(item.year) : '',
+        rating: typeof item.rating === 'number' ? String(Number(item.rating.toFixed(2))) : '',
+        link: ZONA_BASE_URL + '/' + (item.type === 'series' ? 'tvseries' : 'movies') + '/' + item.slug,
+      })),
+    related: (data.meta?.relations ?? [])
+      .filter(item => item.slug && item.title && (item.type === 'movie' || item.type === 'series'))
+      .map(item => ({
+        id: 'ZONA:' + item.slug,
+        link: ZONA_BASE_URL + '/' + (item.type === 'series' ? 'tvseries' : 'movies') + '/' + item.slug,
+        title: item.title, poster: item.cover_url ?? '',
+        type: classifyZonaContent(item.type!, item),
+        isEpisodic: item.type === 'series',
+        subtitle: item.year ? String(item.year) : '',
+        ratingSourceType: ContentSource.ZONA,
+        ratings: { imdb: item.rating_imdb ?? undefined, kinopoisk: item.rating_kp ?? undefined },
+      })),
     ratingScale: 10,
     ratings: ratings.length ? ratings : undefined,
     mainRating,
@@ -837,6 +858,9 @@ export const getZonaCatalogFilms = async (
     if ('entities' in value && Array.isArray(value.entities)) {
       return value as { entities: ZonaFilmData[]; isNextPage?: boolean; initialPage?: number };
     }
+    if ('collectionSlug' in value && 'data' in value && Array.isArray(value.data)) {
+      return { entities: value.data as ZonaFilmData[], initialPage: 'initialPage' in value ? Number(value.initialPage) : 1, isNextPage: false };
+    }
     for (const child of Object.values(value)) {
       const found = findCatalog(child);
       if (found) return found;
@@ -855,13 +879,14 @@ export const getZonaCatalogFilms = async (
       if (catalog.initialPage && catalog.initialPage !== page) {
         throw new Error('Zona returned a different catalog page');
       }
-      const entityType = url.pathname.includes('/tvseries') ? 'series' : 'movie';
+      const defaultEntityType = url.pathname.includes('/tvseries') ? 'series' : 'movie';
       const films: FilmCardInterface[] = new Array(catalog.entities.length);
       let next = 0;
       await Promise.all(Array.from({ length: Math.min(4, catalog.entities.length) }, async () => {
         while (next < catalog.entities.length) {
           const index = next++;
           const data = catalog.entities[index];
+          const entityType = data.type ?? defaultEntityType;
           const link = ZONA_BASE_URL + '/' + (entityType === 'series' ? 'tvseries' : 'movies') + '/' + data.slug;
           const entity = options?.deferMetadata || data.meta?.tags?.length ? null : await getZonaMetadata(link);
           const film = parseZonaFilmData(entity?.data ?? data, entity?.entityType ?? entityType);
@@ -893,6 +918,7 @@ export const getZonaCatalogFilms = async (
 };
 
 const ZonaSourceAdapter: SourceAdapter = {
+  getCollections: getZonaCollections,
   getFilms: getZonaCatalogFilms,
   async getFilmRatings(filmId: string) {
     const link = filmId.startsWith('https://') ? filmId : ZONA_BASE_URL + '/movies/' + filmId;
@@ -916,6 +942,26 @@ const ZonaSourceAdapter: SourceAdapter = {
       entity.data,
       entity.entityType,
     );
+
+    const seasonSlug = entity.seasonSlug ?? entity.defaultSeasonSlug;
+    const season = entity.data.seasons?.find(item => item.slug === seasonSlug);
+    const datedEpisodes = (entity.data.episodes ?? [])
+      .filter(item => !item.is_banned && item.release_date && Number.isFinite(Date.parse(item.release_date)))
+      .sort((a, b) => a.part - b.part);
+    if (entity.entityType === 'series' && season && datedEpisodes.length) {
+      film.schedule = [{
+        name: 'Сезон ' + season.part,
+        items: datedEpisodes.map(episode => ({
+          id: season.slug + ':' + episode.slug,
+          name: 'Серия ' + episode.part,
+          episodeName: episode.title,
+          episodeNameOriginal: episode.title_original ?? undefined,
+          date: episode.release_date!,
+          releaseDate: episode.release_date,
+          isReleased: Date.parse(episode.release_date!) <= Date.now(),
+        })),
+      }];
+    }
 
     if (entity.entityType === 'series' && !options?.deferSeriesInfo) {
       film.seriesInfo = await getZonaSeriesInfo(entity);

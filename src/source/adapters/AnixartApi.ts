@@ -5,7 +5,7 @@ export const ANIXART_BASE_URL = 'https://anixart-app.com';
 const API_URL = 'https://api-s.anixsekai.com';
 export interface AnixartRelease {
   id: number; title_ru: string; title_original?: string; image: string;
-  year?: string; country?: string; genres?: string; description?: string; director?: string;
+  year?: string; country?: string; genres?: string; description?: string; director?: string; studio?: string; author?: string;
   category?: { id: number; name: string }; status?: { id: number; name: string };
   status_id?: number; category_id?: number;
   episodes_released?: number; episodes_total?: number; grade?: number; vote_count?: number;

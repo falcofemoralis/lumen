@@ -8,7 +8,7 @@ export class RezkaReadQueue {
   private lastStarted = 0;
   private blockedUntil = 0;
   private blockedError: unknown;
-  constructor(private interval = 1500, private timeout = 25000, private canTimeout = () => true, private now = () => Date.now()) {}
+  constructor(private interval = 1500, private timeout = 25000, private canTimeout = () => true, private now = () => Date.now(), private hardTimeout = Math.max(timeout, 4 * 60_000)) {}
   run<T>(key: string, execute: (signal: AbortSignal) => Promise<T>, background = false, group?: string): Promise<T> {
     if (this.now() < this.blockedUntil) return Promise.reject(this.blockedError);
     const existing = this.pending.get(key);
@@ -44,9 +44,12 @@ export class RezkaReadQueue {
         const controller = new AbortController();
         let timer: ReturnType<typeof setTimeout> | undefined;
         let deferred = false;
+        const deadlineStartedAt = Date.now();
         const deadline = new Promise<never>((_, reject) => {
           const check = () => {
-            if (!this.canTimeout()) { deferred = true; timer = setTimeout(check, 1000); }
+            const remaining = this.hardTimeout - (Date.now() - deadlineStartedAt);
+            if (remaining <= 0) { controller.abort(); reject(new Error('HDRezka не ответила вовремя.')); }
+            else if (!this.canTimeout()) { deferred = true; timer = setTimeout(check, Math.min(1000, remaining)); }
             else if (deferred) { deferred = false; timer = setTimeout(check, this.timeout); }
             else { controller.abort(); reject(new Error('HDRezka не ответила вовремя.')); }
           };

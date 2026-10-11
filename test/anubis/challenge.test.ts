@@ -75,3 +75,16 @@ test('solvePow returns the smallest satisfying nonce', () => {
     );
   }
 });
+
+test('pass request uses its own challenge id and preserves account cookies', async () => {
+  const { anubisPassCookies } = await import('../../src/util/Anubis/challenge');
+  assert.equal(anubisPassCookies('dle_user_id=123; techaro.lol-anubis-cookie-verification=other; techaro.lol-anubis-auth=old', 'current'),
+    'dle_user_id=123; techaro.lol-anubis-cookie-verification=current');
+});
+
+test('native redirect clearance recovery cannot resurrect the rejected clearance', async () => {
+  const { freshAnubisAuthCookies } = await import('../../src/util/Anubis/challenge');
+  const name = 'techaro.lol-anubis-auth';
+  assert.deepEqual(freshAnubisAuthCookies(name + '=old; language=ru; techaro.lol-anubis-cookie-verification=id', name + '=old'), {});
+  assert.deepEqual(freshAnubisAuthCookies(name + '=new=token; language=ru', name + '=old'), { [name]: 'new=token' });
+});

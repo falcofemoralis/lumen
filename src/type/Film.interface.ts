@@ -26,6 +26,8 @@ export interface FilmInterface {
   releaseDate?: string;
   countries?: CollectionItemInterface[];
   genres?: CollectionItemInterface[];
+  studios?: CollectionItemInterface[];
+  authors?: CollectionItemInterface[];
   seriesInfo?: string;
   largePoster?: string;
   ratings?: RatingInterface[]; // type = rating + votes

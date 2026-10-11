@@ -28,6 +28,7 @@ import { RezkaReadQueue } from 'Util/RezkaReadQueue';
 import { updateUrlHost } from 'Util/Url';
 
 import { collectSeriesUpdateRows, parseSeriesUpdateBlocks } from './seriesUpdates';
+import { parseSeriesTranslatorId } from './seriesTranslator';
 import {
   CommentResult,
   CommentsResult,
@@ -1112,15 +1113,9 @@ const RezkaApi: RezkaApiInterface = {
             video,
           });
         } else {
-          const startIndex = stringedDoc.indexOf('initCDNSeriesEvents');
-          let endIndex = stringedDoc.indexOf('{"id"', startIndex);
-          if (endIndex === -1) {
-            endIndex = stringedDoc.indexOf('{"url"', startIndex);
-          }
-          const subString = stringedDoc.substring(startIndex, endIndex);
-
-          film.voices.push({
-            id: subString.split(',')[1].replaceAll(' ', ''),
+          const translatorId = parseSeriesTranslatorId(stringedDoc);
+          if (translatorId) film.voices.push({
+            id: translatorId,
             identifier: '',
             title: '',
             isCamrip: '0',

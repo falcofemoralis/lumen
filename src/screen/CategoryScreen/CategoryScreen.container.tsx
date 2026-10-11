@@ -17,7 +17,7 @@ export function CategoryScreenContainer({ route }: CategoryScreenContainerProps)
   const { currentService } = useServiceContext();
   const sourceAdapter = sourceRouter.getAdapterForLink(link);
   const menuItems = useMemo(() => sourceAdapter?.getFilms
-    ? [{ id: 'zona-category', title: 'Zona', path: link, isHidden: true }]
+    ? [{ id: 'zona-category', title: sourceAdapter.name, path: link, isHidden: true }]
     : currentService.getCategoryMenu(link), [currentService, link, sourceAdapter]);
 
   const { pagerItems, isError, onPreLoad, onNextLoad } = useFilmPager({

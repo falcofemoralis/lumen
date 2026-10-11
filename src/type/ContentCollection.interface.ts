@@ -4,4 +4,5 @@ export interface ContentCollectionInterface {
   image: string;
   url: string;
   amount: number;
+  source?: string;
 }

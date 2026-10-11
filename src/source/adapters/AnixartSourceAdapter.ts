@@ -1,4 +1,5 @@
 import { FilmCardInterface } from 'Type/FilmCard.interface';
+import { getAnixartCollections } from './AnixartCollections';
 import { buildFilmSubtitle, subtitleFromFilm } from 'Util/Film/subtitle';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmType } from 'Type/FilmType.type';
@@ -40,9 +41,11 @@ export const anixartToFilm = (release: AnixartRelease): FilmInterface => ({
   ...anixartToCard(release), ratings: [], releaseDate: release.year, description: release.description, age: anixartAgeRating(release.age_rating),
   countries: release.country ? release.country.split(/[,;]/).map((name) => ({ name: name.trim(), link: ANIXART_BASE_URL + '/catalog?country=' + encodeURIComponent(name.trim()) })) : [],
   genres: Array.from(new Set(release.genres?.split(/[,;]/).map((name) => name.trim()).filter(Boolean) ?? [])).map((name) => ({ name, link: ANIXART_BASE_URL + '/catalog?genre=' + encodeURIComponent(name) })),
+  studios: release.studio?.split(/[,;]/).map(name => name.trim()).filter(Boolean).map(name => ({ name, link: ANIXART_BASE_URL + '/catalog?studio=' + encodeURIComponent(name) })),
+  authors: release.author?.split(/[,;]/).map(name => name.trim()).filter(Boolean).map(name => ({ name, link: ANIXART_BASE_URL + '/catalog?author=' + encodeURIComponent(name) })),
   seriesInfo: seriesInfo(release), duration: release.duration ? `${release.duration} мин` : undefined,
   mainRating: release.grade ? { name: 'Anixart', rating: release.grade * 2, votes: release.vote_count, text: 'Anixart' } : undefined,
-  directors: release.director ? release.director.split(/[,;]/).map(name => ({ name: name.trim(), photo: '', isDirector: true })).filter(person => person.name) : undefined,
+  directors: release.director ? release.director.split(/[,;]/).map(name => ({ name: name.trim(), photo: '', isDirector: true, link: ANIXART_BASE_URL + '/catalog?director=' + encodeURIComponent(name.trim()) })).filter(person => person.name) : undefined,
   voices: [], hasVoices: true, hasSeasons: releaseCategory(release) !== 2,
   isRestricted: release.is_play_disabled || release.is_deleted,
   franchise: release.related_releases?.filter(item => !item.is_deleted)
@@ -69,6 +72,7 @@ const normalize = (card: FilmCardInterface): UnifiedFilm => {
   };
 };
 const AnixartSourceAdapter: SourceAdapter = {
+  getCollections: getAnixartCollections,
   source: ContentSource.ANIXART, name: 'Anixart',
   async getFilm(link, options) {
     const id = anixartReleaseId(link);
@@ -81,12 +85,20 @@ const AnixartSourceAdapter: SourceAdapter = {
     if (url.hostname !== 'anixart-app.com') throw new Error('Invalid Anixart catalog');
     const country = url.searchParams.get('country');
     const genre = url.searchParams.get('genre');
+    const director = url.searchParams.get('director');
+    const studio = url.searchParams.get('studio');
+    const author = url.searchParams.get('author');
+    const collectionId = url.pathname.match(/^\/collection\/(\d+)\/?$/)?.[1];
     const category = url.searchParams.get('category_id') === '3' ? 3 : undefined;
     const homeTab = url.searchParams.get('homeTab');
     const homeFilter = homeTab === 'soon' ? { status_id: 3, sort: 2 }
       : homeTab === 'popular' ? { sort: 3 }
         : homeTab === 'slider' ? { sort: 3, start_year: new Date().getFullYear() - 1 } : { sort: 0 };
-    const data = homeTab === 'watching'
+    const data = collectionId
+      ? await requestAnixart('/collection/' + collectionId + '/releases/' + Math.max(0, page - 1))
+      : director || studio || author
+      ? await requestAnixart('/search/releases/' + Math.max(0, page - 1), { query: director || studio || author, searchBy: director ? 2 : studio ? 1 : 3 })
+      : homeTab === 'watching'
       ? await requestAnixart('/discover/watching/' + Math.max(0, page - 1))
       : await requestAnixart('/filter/' + Math.max(0, page - 1) + '?extended_mode=true', {
         ...(homeTab ? homeFilter : {}),

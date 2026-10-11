@@ -376,6 +376,8 @@ export function FilmScreenComponent({
         { renderRatings() }
         { renderDirectors() }
         { renderCollection(countries, t('Country'), handleSelectCategory) }
+        { renderCollection(film.studios ?? [], t('Studio'), handleSelectCategory) }
+        { renderCollection(film.authors ?? [], t('Author'), handleSelectCategory) }
         { renderAge() }
         { renderDescription() }
       </ThemedGroup>

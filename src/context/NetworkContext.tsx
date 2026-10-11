@@ -11,7 +11,7 @@ import {
   useState,
 } from 'react';
 import { AppState } from 'react-native';
-import { isNetworkFailure } from 'Util/NetworkRecovery';
+import { isNetworkFailure, isRecoverableSourceFailure } from 'Util/NetworkRecovery';
 import { setConnectionErrorHandler } from 'Util/Query';
 
 import { useConfigContext } from './ConfigContext';
@@ -81,7 +81,7 @@ export const NetworkProvider = ({ children }: { children: ReactNode }) => {
 
     queryClient.refetchQueries({
       type: 'active',
-      predicate: ({ state }) => state.status === 'error' && isNetworkFailure(state.error),
+      predicate: ({ state }) => state.status === 'error' && isRecoverableSourceFailure(state.error),
     });
   }, [isOnline, queryClient]);
 
@@ -154,11 +154,11 @@ export const NetworkProvider = ({ children }: { children: ReactNode }) => {
       setErrorOccurred(false);
       if (AppState.currentState !== 'active' || Date.now() - lastRecovery.current < 60000) return;
       if (!queryClient.getQueryCache().getAll().some((query) =>
-        query.isActive() && query.state.status === 'error' && isNetworkFailure(query.state.error))) return;
+        query.isActive() && query.state.status === 'error' && isRecoverableSourceFailure(query.state.error))) return;
       lastRecovery.current = Date.now();
       await queryClient.refetchQueries({
         type: 'active',
-        predicate: ({ state }) => state.status === 'error' && isNetworkFailure(state.error),
+        predicate: ({ state }) => state.status === 'error' && isRecoverableSourceFailure(state.error),
       });
     } catch {
       // A failed native probe is not proof that every source is offline.
@@ -170,11 +170,17 @@ export const NetworkProvider = ({ children }: { children: ReactNode }) => {
     const subscription = AppState.addEventListener('change', (state) => {
       if (state === 'active') void recoverConnection();
     });
+    // Checks local query state only; refetches after a provider's cooldown, never during it.
+    const recoveryPoll = setInterval(() => {
+      if (AppState.currentState === 'active' && queryClient.getQueryCache().getAll().some(query =>
+        query.isActive() && query.state.status === 'error' && isRecoverableSourceFailure(query.state.error))) void recoverConnection();
+    }, 30_000);
     return () => {
       subscription.remove();
+      clearInterval(recoveryPoll);
       clearTimeout(recoveryTimer.current);
     };
-  }, [recoverConnection]);
+  }, [recoverConnection, queryClient]);
 
   const handleConnectionError = useCallback((error: Error) => {
     const msg = error instanceof Error ? error.message : String(error);

@@ -4,6 +4,7 @@ import { cookiesManager } from 'Util/Cookies';
 import { headerValue } from 'Util/Misc';
 import { storage } from 'Util/Storage';
 import { getUrlOrigin } from 'Util/Url';
+import { runBoundedChallenge } from 'Util/Request/boundedChallenge';
 
 import {
   CLEARANCE_COOKIE,
@@ -56,7 +57,8 @@ export type CloudflareSolveOutcome = 'passed' | 'failed' | 'cancelled';
  */
 export type CloudflareSolver = (
   origin: string,
-  userAgent?: string
+  userAgent?: string,
+  signal?: AbortSignal
 ) => Promise<CloudflareSolveOutcome>;
 
 let solver: CloudflareSolver | null = null;
@@ -162,7 +164,7 @@ function dropCloudflareCookies(hostname: string): void {
  * Safe to call repeatedly; the solver component polls it to spot the moment the
  * challenge is passed, which can be before the page it redirects to has finished.
  */
-export async function harvestClearance(url: string): Promise<boolean> {
+export async function harvestClearance(url: string, signal?: AbortSignal): Promise<boolean> {
   let hostname: string;
 
   try {
@@ -172,6 +174,7 @@ export async function harvestClearance(url: string): Promise<boolean> {
   }
 
   const raw = await reactNativeWebCookies.getCookies(url);
+  if (signal?.aborted) return false;
   const webCookies = parseCookieHeader(raw);
   const jar = { ...(cookiesManager.get(hostname) || {}) };
 
@@ -244,17 +247,17 @@ export async function solveCloudflare(originalUrl: string, headers?: HeadersInit
     return pending;
   }
 
-  const attempt = doSolve(originalUrl, hostname, headers).finally(() => inFlight.delete(hostname));
-
-  inFlight.set(hostname, attempt);
-
-  return attempt;
+  const controller = new AbortController();
+  return runBoundedChallenge(inFlight, hostname,
+    () => doSolve(originalUrl, hostname, headers, controller.signal),
+    SOLVE_TIMEOUT_MS + 10_000, () => controller.abort());
 }
 
 async function doSolve(
   originalUrl: string,
   hostname: string,
-  headers?: HeadersInit
+  headers?: HeadersInit,
+  signal?: AbortSignal
 ): Promise<boolean> {
   if (!solver) {
     NotificationStore.displayError('[Cloudflare] no solver available for the challenge');
@@ -276,6 +279,7 @@ async function doSolve(
 
   dropCloudflareCookies(hostname);
   const nativeCookies = parseCookieHeader(await reactNativeWebCookies.getCookies(origin));
+  if (signal?.aborted) return false;
   await reactNativeWebCookies.removeCookies(origin, Object.keys(nativeCookies).filter(isCloudflareCookie));
 
   // The version the app claims is corrected to the browser that is really installed
@@ -287,12 +291,14 @@ async function doSolve(
     await reactNativeWebCookies.getDefaultUserAgent()
   );
 
-  const outcome = await solver(origin, userAgent);
+  if (signal?.aborted) return false;
+  const outcome = await solver(origin, userAgent, signal);
+  if (signal?.aborted) return false;
 
   // Harvest whatever happened. A solve that gave up on the clock can still have been
   // handed a cookie on the way, and that cookie is the only thing that actually
   // decides this -- the verdict above only says what the page looked like.
-  const cleared = await harvestClearance(origin);
+  const cleared = await harvestClearance(origin, signal);
 
   if (cleared && userAgent) {
     // Kept with the cookie, because the cookie is only good while it is sent back with

@@ -2,6 +2,8 @@ import { Translations } from './en';
 
 /* eslint-disable max-len */
 const ru: Translations = {
+  'Studio': 'Студия',
+  'Author': 'Автор',
   'Content sources': 'Источники контента',
   'Checked sources are used in catalogs, search and bookmark updates.': 'Отмеченные источники используются в каталогах, поиске и при обновлении закладок. Снимите галочку, чтобы отключить источник.',
   'Empty format selection means all formats.': 'Если ничего не выбрано, поиск включает все форматы.',

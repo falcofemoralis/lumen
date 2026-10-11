@@ -1,6 +1,7 @@
 import { isAnubisChallenge, solveAnubis } from 'Util/Anubis';
 import { isCloudflareChallenge, solveCloudflare, withClearanceUserAgent } from 'Util/Cloudflare';
 import { buildCookies, setCookies } from 'Util/Cookies';
+import { SourceBlockedError } from 'Util/Request/sourceFailure';
 
 // Rebuild a Response from an already-read body so callers can still read it.
 function rebuildResponse(res: Response, bodyText: string): Response {
@@ -69,5 +70,8 @@ export async function customFetch(
     }
   }
 
+  if (isAnubisChallenge(bodyText) || isCloudflareChallenge(bodyText, res.status, res.headers)) {
+    throw new SourceBlockedError('Источник не смог завершить проверку соединения. Повторите попытку позже.');
+  }
   return rebuildResponse(res, bodyText);
 }

@@ -250,3 +250,34 @@ test('standalone Anixart films have no episodic poster status, including flat ca
   assert.match(anixartToCard(release).info!, /Серия 2.*Выходит/);
   assert.match(anixartToCard({ ...release, status: { id: 1, name: 'Вышел' } }).info!, /Завершён/);
 });
+test('Anixart director opens a native paginated filmography rather than a missing Rezka person', async () => {
+  const saved = globalThis.fetch;
+  const calls: { url: string; body?: string }[] = [];
+  globalThis.fetch = async (input, init) => {
+    calls.push({ url: String(input), body: init?.body as string });
+    return Response.json({ code: 0, content: [release], total_page_count: 3 });
+  };
+  try {
+    const link = anixartToFilm({ ...release, director: 'Масухара Мицуюки' }).directors?.[0].link;
+    assert.ok(link);
+    const list = await Anixart.getFilms!(link, 2);
+    assert.ok(calls[0].url.endsWith('/search/releases/1'));
+    assert.deepEqual(JSON.parse(calls[0].body!), { query: 'Масухара Мицуюки', searchBy: 2 });
+    assert.equal(list.totalPages, 3);
+    assert.equal(list.films[0].id, 'ANIXART:' + release.id);
+  } finally { globalThis.fetch = saved; }
+});
+
+test('Anixart studios and authors link to their own catalog search modes', async () => {
+  const saved = globalThis.fetch;
+  const modes: number[] = [];
+  globalThis.fetch = async (_input, init) => { modes.push(JSON.parse(String(init?.body)).searchBy); return Response.json({ code: 0, content: [] }); };
+  try {
+    const film = anixartToFilm({ ...release, studio: 'Native Studio', author: 'Native Author' });
+    assert.equal(film.studios?.[0].name, 'Native Studio');
+    assert.equal(film.authors?.[0].name, 'Native Author');
+    await Anixart.getFilms!(film.studios![0].link, 1);
+    await Anixart.getFilms!(film.authors![0].link, 1);
+    assert.deepEqual(modes, [1, 3]);
+  } finally { globalThis.fetch = saved; }
+});

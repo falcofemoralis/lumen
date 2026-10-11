@@ -2,6 +2,8 @@ import { Translations } from './en';
 
 /* eslint-disable max-len */
 const uk: Translations = {
+  'Studio': 'Студія',
+  'Author': 'Автор',
   'Content sources': 'Джерела контенту',
   'Checked sources are used in catalogs, search and bookmark updates.': 'Позначені джерела використовуються в каталогах, пошуку та оновленні закладок. Зніміть позначку, щоб вимкнути джерело.',
   'Empty format selection means all formats.': 'Якщо нічого не вибрано, пошук включає всі формати.',

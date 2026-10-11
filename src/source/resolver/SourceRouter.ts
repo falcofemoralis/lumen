@@ -6,6 +6,7 @@ import { subtitleFromFilm } from 'Util/Film/subtitle';
 import { ContentSource } from '../types/ContentSource';
 import { isSourceEnabled, sourceForLink } from '../types/SourceSelection';
 import { SourceResolver } from './SourceResolver';
+import { isTitleVariantCandidate } from './titleCandidates';
 import { getRegisteredUnifiedFilm, registerUnifiedFilm } from '../search/UnifiedFilmRegistry';
 import { SourceAdapter } from '../types/SourceAdapter';
 import { withDeadline } from '../request';
@@ -22,10 +23,10 @@ export class SourceRouter {
 
   private readonly matches = new Map<string, { time: number; value: Promise<FilmInterface | null> }>();
 
-  async getFilmForSource(film: FilmInterface, source: ContentSource, strict = false, background = false): Promise<FilmInterface | null> {
+  async getFilmForSource(film: FilmInterface, source: ContentSource, strict = false, background = false, includeSeriesInfo = false): Promise<FilmInterface | null> {
     const target = this.getAdapter(source);
     if (!target) return null;
-    const key = film.link + ':' + source + ':' + strict;
+    const key = film.link + ':' + source + ':' + strict + ':' + includeSeriesInfo;
     const cached = this.matches.get(key);
     if (cached && Date.now() - cached.time < 5 * 60 * 1000) return cached.value;
     const value = withDeadline((async () => {
@@ -36,14 +37,17 @@ export class SourceRouter {
       const registered = getRegisteredUnifiedFilm(film.link);
       const registeredSource = registered?.sources.find((item) => item.source === source);
       const candidates = registeredSource
-        ? [await target.getFilm(registeredSource.link, { background, includeSeriesInfo: source === ContentSource.REZKA && film.hasSeasons })]
+        ? [await target.getFilm(registeredSource.link, { background, includeSeriesInfo: includeSeriesInfo && source === ContentSource.REZKA && film.hasSeasons })]
         : await (async () => {
-          const result = await (target.searchCandidates ? target.searchCandidates(film.title, 1) : target.search(film.title, 1, { background }));
+          const search = (query: string) => target.searchCandidates ? target.searchCandidates(query, 1) : target.search(query, 1, { background });
+          let result = await search(film.title);
+          const shortTitle = film.title.split(':')[0].trim();
+          if (!result.films.length && shortTitle !== film.title) result = await search(shortTitle);
           const titleKey = (title: string) => title.normalize('NFKC').toLowerCase()
             .replace(/ё/g, 'е').replace(/[^a-zа-я0-9]+/g, ' ').trim();
           const cards = result.films.filter((card) => {
             const normalized = target.normalizeFilmCard(card);
-            return resolver.isSameFilm(base, normalized) || (
+            return resolver.isSameFilm(base, normalized) || isTitleVariantCandidate(base, normalized) || (
               base.year && base.year === normalized.year && (
                 titleKey(base.title) === titleKey(normalized.title)
                 || ((baseAdapter.source === ContentSource.ANIXART || target.source === ContentSource.ANIXART)
@@ -53,7 +57,7 @@ export class SourceRouter {
             );
           });
           if (cards.length > 3) return [];
-          const detailed = await Promise.all(cards.map((card) => target.getFilm(card.link, { background, includeSeriesInfo: source === ContentSource.REZKA && film.hasSeasons })));
+          const detailed = await Promise.all(cards.map((card) => target.getFilm(card.link, { background, includeSeriesInfo: includeSeriesInfo && source === ContentSource.REZKA && film.hasSeasons })));
           return detailed.filter((candidate) => candidate && resolver.isSameFilm(base, target.normalizeFilm(candidate)));
         })();
       const candidate = candidates.length === 1 ? candidates[0] : null;
@@ -115,7 +119,7 @@ export class SourceRouter {
     const enrichPeople = (people: FilmInterface['actors'], additional: FilmInterface['actors']) => (
       (people?.length ? people : additional ?? []).map((person) => {
         const matches = (additional ?? []).filter((item) => normalizeName(item.name) === normalizeName(person.name));
-        return matches.length === 1 ? { ...person, link: matches[0].link ?? person.link } : person;
+        return matches.length === 1 ? { ...person, link: person.link ?? matches[0].link } : person;
       })
     );
     return {
@@ -129,8 +133,8 @@ export class SourceRouter {
       franchise: zonaFilm.franchise?.length ? zonaFilm.franchise : rezkaFilm.franchise,
       schedule: zonaFilm.schedule?.length ? zonaFilm.schedule : rezkaFilm.schedule,
       related: zonaFilm.related?.length ? zonaFilm.related : rezkaFilm.related,
-      actors: enrichPeople(zonaFilm.actors, rezkaFilm.actors),
-      directors: enrichPeople(zonaFilm.directors, rezkaFilm.directors),
+      actors: primary === ContentSource.ZONA && rezkaFilm.actors?.length ? rezkaFilm.actors : enrichPeople(zonaFilm.actors, rezkaFilm.actors),
+      directors: primary === ContentSource.ZONA && rezkaFilm.directors?.length ? rezkaFilm.directors : enrichPeople(zonaFilm.directors, rezkaFilm.directors),
       ratings: ratings.length ? ratings : undefined,
     };
   }
@@ -178,7 +182,7 @@ export class SourceRouter {
           && details.hasSeasons && details.seriesInfo && !seriesStatusLabel(details.seriesInfo)) {
           const native = details;
           const extra = await enqueueBookmarkRequest('bookmark-series-status:' + native.link,
-            () => this.getFilmForSource(native, ContentSource.REZKA, false, true)).catch(() => null);
+            () => this.getFilmForSource(native, ContentSource.REZKA, false, true, true)).catch(() => null);
           details = { ...native, seriesInfo: supplementSeriesStatus(native.seriesInfo, extra?.seriesInfo) };
         }
         const nativeSource = details ? this.getAdapterForLink(details.link)?.source ?? adapter.source : adapter.source;

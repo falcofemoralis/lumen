@@ -159,3 +159,42 @@ test('unknown Zona series completion is supplemented from verified Rezka without
   assert.equal(result.info, 'Сезон 6 • серия 13 • завершён');
   assert.equal(result.link, zona.link);
 });
+test('localized subtitle candidates are verified in detail before supplementing a native Zona page', async () => {
+  clearUnifiedFilmRegistry();
+  const zona = { ...makeFilm(true, '-localized'), title: 'Вышка 2', originalTitle: 'Fall 2: Deadpoint', releaseDate: '2026', type: FilmType.FILM, externalIds: { kinopoisk: '5610132' } };
+  const rezka = { ...makeFilm(false, '-localized'), title: 'Вышка 2: Мёртвая зона', originalTitle: 'Fall 2: Deadpoint', releaseDate: '2026', type: FilmType.FILM, externalIds: { kinopoisk: '5610132' }, franchise: [{ name: 'Вышка', year: '2022', rating: '6', link: '/fall' }] };
+  const r = makeAdapter(ContentSource.REZKA, [rezka]);
+  const search = r.search;
+  r.search = async (...args) => { const result = await search(...args); return { ...result, films: result.films.map(card => ({ ...card, originalTitle: undefined, externalIds: undefined })) }; };
+  const router = new SourceRouter([makeAdapter(ContentSource.ZONA, [zona]), r]);
+  const result = await router.resolvePreferredFilm(zona);
+  assert.equal(result.metadataSourceFilm?.link, rezka.link);
+  assert.deepEqual(result.franchise, rezka.franchise);
+  assert.equal(result.link, zona.link);
+  const different = { ...rezka, externalIds: { kinopoisk: '999' }, originalTitle: 'Unrelated title' };
+  const unmatched = await new SourceRouter([makeAdapter(ContentSource.ZONA, [zona]), makeAdapter(ContentSource.REZKA, [different])]).resolvePreferredFilm(zona);
+  assert.equal(unmatched.metadataSourceFilm, undefined);
+});
+test('native Zona page supplements sections without waiting for a second Rezka status search', async () => {
+  clearUnifiedFilmRegistry();
+  const zona = { ...makeFilm(true, '-native-series'), type: FilmType.SERIES, hasSeasons: true, actors: [{ name: 'Native spelling', photo: '' }] };
+  const rezka = { ...makeFilm(false, '-native-series'), type: FilmType.SERIES, hasSeasons: true,
+    directors: [{ name: 'Director', photo: '', link: '/person/director' }],
+    schedule: [{ name: 'Season 1', items: [] }], franchise: [{ name: 'Part', year: '2001', rating: '', link: '/part' }] };
+  const r = makeAdapter(ContentSource.REZKA, [rezka]);
+  r.getFilm = async (_link, options) => { assert.equal(options?.includeSeriesInfo, false); return rezka; };
+  const result = await new SourceRouter([makeAdapter(ContentSource.ZONA, [zona]), r]).resolvePreferredFilm(zona);
+  assert.deepEqual(result.schedule, rezka.schedule);
+  assert.deepEqual(result.franchise, rezka.franchise);
+  assert.deepEqual(result.actors, rezka.actors);
+  assert.deepEqual(result.directors, rezka.directors);
+});
+
+test('supplementing Anixart metadata preserves its native director catalog link', async () => {
+  clearUnifiedFilmRegistry();
+  const native = { ...makeFilm(true, '-anix-director'), link: 'https://anixart-app.com/release/900', type: FilmType.ANIME,
+    directors: [{ name: 'Director', photo: '', link: 'https://anixart-app.com/catalog?director=Director' }] };
+  const rezka = { ...makeFilm(false, '-anix-director'), type: FilmType.ANIME, directors: [{ name: 'Director', photo: '', link: '/person/director' }] };
+  const result = await new SourceRouter([makeAdapter(ContentSource.ANIXART, [native]), makeAdapter(ContentSource.REZKA, [rezka])]).resolvePreferredFilm(native);
+  assert.equal(result.directors?.[0].link, native.directors[0].link);
+});

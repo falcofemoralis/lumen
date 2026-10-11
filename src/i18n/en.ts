@@ -1,5 +1,7 @@
 /* eslint-disable max-len */
 const en = {
+  'Studio': 'Studio',
+  'Author': 'Author',
   'Content sources': 'Content sources',
   'Checked sources are used in catalogs, search and bookmark updates.': 'Checked sources are used in catalogs, search and bookmark updates.',
   'Empty format selection means all formats.': 'Empty selection means all formats.',

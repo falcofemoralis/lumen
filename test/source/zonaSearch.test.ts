@@ -110,3 +110,35 @@ test('Zona publishes search cards and ready ratings while another detail request
     assert.equal((await task).films[1].ratings?.imdb, 7.6);
   } finally { releaseSlow(); clearTimeout(timer); globalThis.fetch = saved; }
 });
+test('Zona supplies native parts, recommendations and dated season without Rezka or extra reads', async () => {
+  const previous = globalThis.fetch;
+  let requests = 0;
+  const data = {
+    slug: 'native-sections-test', title: 'Native', seasons: [{ slug: '2', part: 2 }],
+    episodes: [
+      { slug: '1', part: 1, title: 'First', release_date: '2020-01-01', is_banned: false },
+      { slug: '2', part: 2, title: 'Future', release_date: '2099-01-01', is_banned: false },
+      { slug: '3', part: 3, title: 'Unknown', release_date: 'invalid', is_banned: false },
+    ],
+    meta: {
+      sequels: [{ slug: 'native-part', title: 'Part', year: 2020, rating: 8.149999999999999, type: 'movie' }],
+      relations: [{ slug: 'native-related', title: 'Related', cover_url: 'https://example.com/poster.jpg', type: 'series' }],
+    },
+  };
+  globalThis.fetch = async () => {
+    requests++;
+    return new Response('<script>self.__next_f.push([1,' + JSON.stringify(
+      '6:' + JSON.stringify({ data, entityType: 'series', defaultSeasonSlug: '2' })
+    ) + '])</script>');
+  };
+  try {
+    const film = await Zona.getFilm('https://w1.zona.im/tvseries/native-sections-test', { deferSeriesInfo: true });
+    assert.equal(film?.franchise?.[0].rating, '8.15');
+    assert.equal(film?.franchise?.[0].link, 'https://w1.zona.im/movies/native-part');
+    assert.equal(film?.related?.[0].poster, 'https://example.com/poster.jpg');
+    assert.equal(film?.related?.[0].link, 'https://w1.zona.im/tvseries/native-related');
+    assert.equal(film?.schedule?.[0].name, 'Сезон 2');
+    assert.deepEqual(film?.schedule?.[0].items.map(item => item.isReleased), [true, false]);
+    assert.equal(requests, 1);
+  } finally { globalThis.fetch = previous; }
+});

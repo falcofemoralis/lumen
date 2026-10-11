@@ -13,6 +13,7 @@ import { SourcePlaybackRouter } from './playback/SourcePlaybackRouter';
 import { SourceResolver } from './resolver/SourceResolver';
 import { SourceRouter } from './resolver/SourceRouter';
 import { createUnifiedSearchService } from './search';
+import { createUnifiedCollectionsService } from './search/UnifiedCollectionsService';
 
 export const sourceAdapters = [
   AnixartSourceAdapter,
@@ -22,6 +23,7 @@ export const sourceAdapters = [
 
 export const sourceResolver = new SourceResolver(sourceAdapters);
 export const sourceRouter = new SourceRouter(sourceAdapters);
+export const unifiedCollectionsService = createUnifiedCollectionsService(sourceAdapters);
 
 export const unifiedSearchService = createUnifiedSearchService(
   sourceAdapters,
