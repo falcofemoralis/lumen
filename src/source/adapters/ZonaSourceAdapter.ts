@@ -568,6 +568,7 @@ const parseZonaFilmData = (
     type,
     title: data.title,
     originalTitle: data.title_original ?? undefined,
+    year: data.year,
     poster: data.cover_url ?? '',
     largePoster: data.backdrop_url,
     description: data.description,

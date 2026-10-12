@@ -12,6 +12,22 @@ export class HomeCardCache {
     if (this.revision !== cardCacheRevision()) { this.saved = this.store.load<Saved>(KEY) ?? { cards: {}, catalogs: {} }; this.revision = cardCacheRevision(); }
   }
   private saved: Saved;
+  private saveTimer?: ReturnType<typeof setTimeout>;
+  private lastSavedAt = 0;
+  private persist() {
+    if (Date.now() - this.lastSavedAt >= 250) {
+      if (this.saveTimer) clearTimeout(this.saveTimer);
+      this.saveTimer = undefined;
+      this.store.save(KEY, this.saved);
+      this.lastSavedAt = Date.now();
+    } else if (!this.saveTimer) {
+      this.saveTimer = setTimeout(() => {
+        this.saveTimer = undefined;
+        this.store.save(KEY, this.saved);
+        this.lastSavedAt = Date.now();
+      }, 250);
+    }
+  }
   constructor(private store: { load<T>(key: string): T | null; save(key: string, value: unknown): boolean }, private now = () => Date.now()) {
     const value = store.load<Saved>(KEY);
     this.saved = { cards: value?.cards ?? {}, catalogs: value?.catalogs ?? {} };
@@ -24,7 +40,7 @@ export class HomeCardCache {
   isFresh(card: FilmCardInterface): boolean {
     this.refreshCloud();
     const entry = this.saved.cards[card.link];
-    return !!entry && entry.sources === enabledSourceKey() && (!entry.card.link.includes('.zona.im/tvseries/') || entry.statusVersion === 2) && this.now() - entry.checked < HOME_STATUS_TTL;
+    return !!entry && entry.sources === enabledSourceKey() && (!entry.card.link.includes('.zona.im/tvseries/') || (entry.statusVersion === 2 && Boolean(entry.card.info?.trim()))) && this.now() - entry.checked < HOME_STATUS_TTL;
   }
   remember(original: FilmCardInterface, resolved: FilmCardInterface): void {
     this.refreshCloud();
@@ -33,7 +49,7 @@ export class HomeCardCache {
     publishCardCache('home-cards', original.link, this.saved.cards[original.link], this.saved.cards[original.link].checked);
     const keys = Object.keys(this.saved.cards);
     if (keys.length > 3000) keys.sort((a, b) => this.saved.cards[a].checked - this.saved.cards[b].checked).slice(0, keys.length - 3000).forEach(key => delete this.saved.cards[key]);
-    this.store.save(KEY, this.saved);
+    this.persist();
   }
   catalog(id: string): FilmListInterface | undefined { this.refreshCloud(); const entry = this.saved.catalogs[enabledSourceKey() + ':' + id]; return entry && ('list' in entry ? entry.list : entry); }
   rememberCatalog(id: string, list: FilmListInterface): void {

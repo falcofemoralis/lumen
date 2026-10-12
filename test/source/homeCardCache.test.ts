@@ -19,3 +19,15 @@ test('Home restores posters and statuses across restart, refreshes after a day a
   assert.equal(restart.isFresh(card), false);
   assert.match(restart.peek(card).info!, /завершён/);
 });
+test('a Zona series without episode status stays eligible for metadata refresh', () => {
+  const data = new Map<string, unknown>();
+  const cache = new HomeCardCache({
+    load: <T>(key: string) => (data.get(key) ?? null) as T | null,
+    save: (key, value) => { data.set(key, value); return true; },
+  });
+  const series = { id: 'status', title: 'Series', subtitle: '2020', poster: 'poster.jpg', type: FilmType.SERIES, link: 'https://w1.zona.im/tvseries/missing-status', info: undefined };
+  cache.remember(series, series);
+  assert.equal(cache.isFresh(series), false);
+  cache.remember(series, { ...series, info: 'Сезон 2 • серия 8 • завершён' });
+  assert.equal(cache.isFresh(series), true);
+});

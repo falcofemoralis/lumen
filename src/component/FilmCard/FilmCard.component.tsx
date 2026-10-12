@@ -64,6 +64,7 @@ export function FilmCardComponent({
     <ThemedImage
       style={ [styles.poster, isPendingRelease && styles.posterPendingRelease] }
       cachePolicy='memory-disk'
+      transition={ 0 }
       src={ poster }
     />
   );

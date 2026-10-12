@@ -1,3 +1,4 @@
+import { matchingOriginalTitles } from './titleCandidates';
 import { FilmType } from 'Type/FilmType.type';
 import { isSourceEnabled } from '../types/SourceSelection';
 import { decode } from 'html-entities';
@@ -161,13 +162,13 @@ const hasSameIdentity = (
   }
 
   if (first.originalTitle && second.originalTitle
-    && normalizeTitle(first.originalTitle) !== normalizeTitle(second.originalTitle)) {
+    && !matchingOriginalTitles(first.originalTitle, second.originalTitle)) {
     return false;
   }
   const matchingOriginalTitle = Boolean(
     first.originalTitle && second.originalTitle
     && normalizeTitle(first.originalTitle)
-    && normalizeTitle(first.originalTitle) === normalizeTitle(second.originalTitle),
+    && matchingOriginalTitles(first.originalTitle, second.originalTitle),
   );
   return firstIdentity === secondIdentity || (
     matchingOriginalTitle && first.year === second.year && first.type === second.type

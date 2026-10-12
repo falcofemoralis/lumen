@@ -16,6 +16,22 @@ export class BookmarkMetadataCache {
   }
   private entries: Entries;
   private pending = new Map<string, Promise<FilmCardInterface>>();
+  private saveTimer?: ReturnType<typeof setTimeout>;
+  private lastSavedAt = 0;
+  private persist() {
+    if (Date.now() - this.lastSavedAt >= 250) {
+      if (this.saveTimer) clearTimeout(this.saveTimer);
+      this.saveTimer = undefined;
+      this.store.save(BOOKMARK_METADATA_KEY, this.entries);
+      this.lastSavedAt = Date.now();
+    } else if (!this.saveTimer) {
+      this.saveTimer = setTimeout(() => {
+        this.saveTimer = undefined;
+        this.store.save(BOOKMARK_METADATA_KEY, this.entries);
+        this.lastSavedAt = Date.now();
+      }, 250);
+    }
+  }
   constructor(
     private store: { load<T>(key: string): T | null; save(key: string, value: unknown): boolean },
     private resolveCard: (card: FilmCardInterface) => Promise<FilmCardInterface>,
@@ -27,7 +43,7 @@ export class BookmarkMetadataCache {
   peek(card: FilmCardInterface): FilmCardInterface {
     this.refreshCloud();
     const cached = this.entries[card.link]?.card;
-    return cached?.link ? { ...cached, id: card.id } : card;
+    return cached?.link ? cached.id === card.id ? cached : { ...cached, id: card.id } : card;
   }
   resolve(card: FilmCardInterface): Promise<FilmCardInterface> {
     this.refreshCloud();
@@ -58,7 +74,7 @@ export class BookmarkMetadataCache {
         keys.sort((a, b) => this.entries[a].updatedAt - this.entries[b].updatedAt)
           .slice(0, keys.length - 3000).forEach((key) => { delete this.entries[key]; });
       }
-      this.store.save(BOOKMARK_METADATA_KEY, this.entries);
+      this.persist();
       publishCardCache('bookmarks', card.link, this.entries[card.link], this.entries[card.link].updatedAt);
       return { ...resolved, id: card.id };
     }).catch(() => this.peek(card)).finally(() => { this.pending.delete(card.link); });

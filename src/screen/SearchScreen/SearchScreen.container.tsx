@@ -18,7 +18,7 @@ import { setTimeoutSafe } from 'Util/Misc';
 import { navigate } from 'Util/Navigation';
 import { queryKeys, STALE_TIME } from 'Util/Query';
 import { unifiedSearchService, ContentSource } from '../../source';
-import { ContentFilters, getGenreCatalogPath, matchesContentFilters } from '../../source/search/ContentFilters';
+import { ContentFilters, getGenreCatalogPaths, getZonaFilteredCatalogPaths, matchesContentFilters } from '../../source/search/ContentFilters';
 import { FilmType } from 'Type/FilmType.type';
 import { TYPE_LABELS } from 'Component/FilmCard/FilmCard.config';
 import { isSourceEnabled } from '../../source/types/SourceSelection';
@@ -104,7 +104,7 @@ export function SearchScreenContainer() {
               : adapter.getFilms!('https://anixart-app.com/catalog' + (activeFilters.types?.length === 1 ? '?country=' + encodeURIComponent(activeFilters.types[0] === FilmType.DONGHUA ? 'Китай' : 'Япония') : ''), sourcePage))
           : combineCatalogs(activeFilters.paths.map(path => () => currentService.getFilms(sourcePage, path, {}))),
       prepareCard: async (card, adapter) => {
-        const film = await adapter.getFilm(card.link);
+        const film = await adapter.getFilm(card.link, { deferSeriesInfo: true });
         if (!film || !matchesContentFilters(film, activeFilters)) return null;
         return {
           ...card, type: film.type, originalTitle: film.originalTitle,
@@ -316,7 +316,7 @@ export function SearchScreenContainer() {
     }
     const types = selectedFormats as FilmType[];
     const selectedCategories = (categories ?? []).filter(category => !types.length || types.includes(formatType(category.name)!));
-    const paths = Array.from(new Set(selectedCategories.map(category => getGenreCatalogPath(category.genres, selectedGenres))));
+    const paths = Array.from(new Set(selectedCategories.flatMap(category => getGenreCatalogPaths(category.genres, selectedGenres))));
     const zonaPaths = !types.length ? ['https://w1.zona.im/movies', 'https://w1.zona.im/tvseries']
       : Array.from(new Set(types.flatMap(type => type === FilmType.SERIES ? ['https://w1.zona.im/tvseries']
         : type === FilmType.CARTOON ? ['https://w1.zona.im/movies/filter/genre-multfilm', 'https://w1.zona.im/tvseries/filter/genre-multfilm']
@@ -325,7 +325,7 @@ export function SearchScreenContainer() {
 
     setActiveFilters({
       query: enteredText.trim(),
-      paths, zonaPaths,
+      paths, zonaPaths: getZonaFilteredCatalogPaths(zonaPaths, { from: yearFrom ? Number(yearFrom) : undefined, to: yearTo ? Number(yearTo) : undefined, genres: selectedGenres }),
       from: yearFrom ? Number(yearFrom) : undefined,
       to: yearTo ? Number(yearTo) : undefined,
       types, genres: selectedGenres,

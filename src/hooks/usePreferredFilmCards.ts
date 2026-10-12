@@ -73,44 +73,74 @@ export const usePreferredFilmCards = (items: PagerItemInterface[], persistWeekly
     enabled: isFocused && isInternetAvailable && cards.length > 0,
     queryFn: async () => {
       const resolved = snapshot();
+      // Cached folders can contain thousands of cards. Publish once per batch,
+      // and yield the JS thread so taps and swipes can run during refresh.
+      let lastPublished = Date.now();
+      let dirty = false;
+      const publish = async (force = false) => {
+        dirty = true;
+        if (!force && Date.now() - lastPublished < 150) return;
+        const activeKey = queryKeyRef.current;
+        queryClient.setQueryData<Map<string, FilmCardInterface>>(activeKey, previous =>
+          new Map([...(previous ?? []), ...knownCardsRef.current]));
+        lastPublished = Date.now();
+        dirty = false;
+        await new Promise<void>(resolve => setTimeout(resolve, 0));
+      };
       const pending = cards.filter((card) => resolved.get(card.link)?.contentTypePending);
       const remaining = cards.filter((card) => !resolved.get(card.link)?.contentTypePending);
       const prioritized = [...pending, ...remaining];
-      const lanes = persistWeekly ? [{ cards: prioritized, workers: 4 }] : [
-        { cards: prioritized.filter(card => isZonaCard(card) && card.link.includes('/tvseries/')), workers: 2 },
-        { cards: prioritized.filter(card => !(isZonaCard(card) && card.link.includes('/tvseries/'))), workers: 2 },
-      ];
+      const statusLanes = [Promise.resolve(), Promise.resolve()];
+      let nextStatus = 0;
+      const scheduleStatus = (job: () => Promise<void>) => {
+        const index = nextStatus++ % statusLanes.length;
+        statusLanes[index] = statusLanes[index].then(async () => {
+          if (networkRef.current && focusedRef.current) await job();
+        });
+      };
+      const lanes = [{ cards: prioritized, workers: 4 }];
       await Promise.all(lanes.map(async lane => {
         let next = 0;
         await Promise.all(Array.from({ length: Math.min(lane.workers, lane.cards.length) }, async () => {
         while (next < lane.cards.length && networkRef.current && (persistWeekly || focusedRef.current)) {
           const original = lane.cards[next++];
           const card = persistWeekly ? original : resolved.get(original.link)!;
-          const updated = await (persistWeekly ? getBookmarkCache().resolve(card)
-            : persistHome && getHomeCardCache().isFresh(original) ? Promise.resolve(card) : persistHome ? sourceRouter.resolvePreferredCard(card, true, { deferSeriesInfo: true }).catch(() => card) : (card.ratingSourceType === 'ANIXART' || (isZonaCard(card) && !card.contentTypePending && !card.ratings?.imdbPending)) ? Promise.resolve(card) : resolveCard(card));
+          let updated = await (persistWeekly ? getBookmarkCache().resolve(card)
+            : persistHome && getHomeCardCache().isFresh(original) ? Promise.resolve(card) : persistHome ? resolveCard(card).catch(() => card) : (card.ratingSourceType === 'ANIXART' || (isZonaCard(card) && !card.contentTypePending && !card.ratings?.imdbPending)) ? Promise.resolve(card) : resolveCard(card));
+          const previousCard = knownCardsRef.current.get(original.link);
+          // A partial refresh must not erase already verified episode information.
+          if (!updated.info && previousCard?.info && previousCard.link === updated.link) {
+            updated = { ...updated, info: previousCard.info };
+          }
           if (!persistWeekly) getTypeCache().remember(updated);
           if (persistHome && updated !== card && !getHomeCardCache().isFresh(original) && !isZonaCard(updated)) getHomeCardCache().remember(original, updated);
           if (persistHome && updated !== card && isZonaCard(updated) && !updated.link.includes('/tvseries/')) getHomeCardCache().remember(original, updated);
           knownCardsRef.current.set(original.link, updated);
           resolved.set(original.link, updated);
-          queryClient.setQueryData(queryKey, new Map(resolved));
+          await publish();
           // Publish the poster first; this card's episodes must not wait for the whole catalog.
           if (!persistWeekly && !(persistHome && getHomeCardCache().isFresh(original)) && focusedRef.current && shouldRefreshZonaSeries(updated, seriesCheckedRef.current.get(updated.link))) {
             // Also throttle failed requests, so focus/pagination cannot create a retry storm.
             seriesCheckedRef.current.set(updated.link, Date.now());
+            scheduleStatus(async () => {
             try {
               const detailed = await sourceRouter.resolvePreferredCard(updated, true);
               knownCardsRef.current.set(original.link, detailed);
               resolved.set(original.link, detailed);
               if (persistHome) getHomeCardCache().remember(original, detailed);
               cache.set(updated.link, { time: Date.now(), value: Promise.resolve(detailed) });
-              queryClient.setQueryData(queryKey, new Map(resolved));
+              await publish();
             } catch { /* Keep the visible card; retry on a later refresh. */ }
+            });
           }
         }
         }));
       }));
-      return resolved;
+      // Episode enrichment cannot block classification of the following rows.
+      if (dirty) await publish(true);
+      await Promise.all(statusLanes);
+      if (dirty) await publish(true);
+      return new Map([...resolved, ...knownCardsRef.current]);
     },
     staleTime: persistWeekly ? 0 : 5 * 60 * 1000,
   });

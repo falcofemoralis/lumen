@@ -45,7 +45,7 @@ export class SourceRouter {
           if (!result.films.length && shortTitle !== film.title) result = await search(shortTitle);
           const titleKey = (title: string) => title.normalize('NFKC').toLowerCase()
             .replace(/ё/g, 'е').replace(/[^a-zа-я0-9]+/g, ' ').trim();
-          const cards = result.films.filter((card) => {
+          const selectCards = (result: { films: FilmCardInterface[] }) => result.films.filter((card) => {
             const normalized = target.normalizeFilmCard(card);
             return resolver.isSameFilm(base, normalized) || isTitleVariantCandidate(base, normalized) || (
               base.year && base.year === normalized.year && (
@@ -56,6 +56,16 @@ export class SourceRouter {
               )
             );
           });
+          let cards = selectCards(result);
+          // Localized anime titles may differ completely. Search the exact original
+          // aliases only when the localized query produced no viable candidates.
+          if (!cards.length && film.originalTitle) {
+            for (const title of film.originalTitle.split(/\s+[\/|]\s+/).slice(0, 2)) {
+              const originalResult = await search(title.trim());
+              cards = selectCards(originalResult);
+              if (cards.length) break;
+            }
+          }
           if (cards.length > 3) return [];
           const detailed = await Promise.all(cards.map((card) => target.getFilm(card.link, { background, includeSeriesInfo: includeSeriesInfo && source === ContentSource.REZKA && film.hasSeasons })));
           return detailed.filter((candidate) => candidate && resolver.isSameFilm(base, target.normalizeFilm(candidate)));

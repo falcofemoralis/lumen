@@ -192,3 +192,18 @@ test('complete pending and ongoing bookmarks stay cached for a week without requ
     assert.equal(calls, 2);
   }
 });
+test('bulk bookmark refresh coalesces full-cache disk writes and keeps fresh card identity', async () => {
+  let writes = 0;
+  const cache = new BookmarkMetadataCache({
+    load: <T>() => null as T | null,
+    save: () => { writes++; return true; },
+  }, async card => ({ ...card, isEpisodic: false }));
+  const cards = Array.from({ length: 300 }, (_, index) => ({
+    ...card, link: 'bulk-' + index, type: FilmType.FILM,
+  }));
+  for (const item of cards) await cache.resolve(item);
+  assert.ok(writes < 10, 'a burst must not serialize the entire cache per card');
+  assert.equal(cache.peek(cards[0]), cache.peek(cards[0]));
+  await new Promise(resolve => setTimeout(resolve, 300));
+  assert.ok(writes >= 2, 'the last batch is persisted');
+});

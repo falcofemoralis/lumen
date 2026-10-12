@@ -2,6 +2,7 @@ import { DownloadTask } from '@kesha-antonov/react-native-background-downloader'
 import { InfoBlock } from 'Component/InfoBlock';
 import { Loader } from 'Component/Loader';
 import { Page } from 'Component/Page';
+import { useConfigContext } from 'Context/ConfigContext';
 import { PlayerVideoSelector } from 'Component/PlayerVideoSelector';
 import { PlayerVideoSelectorRef } from 'Component/PlayerVideoSelector/PlayerVideoSelector.container';
 import { ThemedButton } from 'Component/ThemedButton';
@@ -448,11 +449,12 @@ export const DownloadsScreenComponent = (props: DownloadsScreenComponentProps) =
     handleRefresh,
   } = props;
   const { top } = useSafeAreaInsets();
+  const { newHomeInterface, tabPosition } = useConfigContext();
   const styles = useThemedStyles(componentStyles);
-
+  const headerInset = newHomeInterface && tabPosition === 'top' ? 0 : top;
   const renderHeader = useCallback(() => {
-    return <View style={ { height: top } } />;
-  }, [top]);
+    return <View style={ { height: headerInset } } />;
+  }, [headerInset]);
 
   const renderItem = useCallback(({ item, index }: ThemedGridRowProps<DownloadFilmInterface>) => {
     return (

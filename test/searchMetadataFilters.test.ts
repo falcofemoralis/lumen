@@ -71,3 +71,43 @@ test('several selected formats match any chosen type; empty selection includes e
   assert.equal(matchesContentFilters({ ...base, type: FilmType.ANIME }, filters), false);
   assert.equal(matchesContentFilters({ ...base, type: FilmType.DONGHUA }, { ...filters, types: [] }), true);
 });
+test('filtered native pagination skips empty pages and retains cursor beyond its bounded batch', async () => {
+  const { loadFilteredPages } = await import('../src/source/search/FilteredPages');
+  const cursor = { next: 1, exhausted: false };
+  const pages: number[] = [];
+  const card = anixartToCard(release);
+  const load = async (page: number) => { pages.push(page); return { films: [card], totalPages: 5 }; };
+  let seen = 0;
+  const prepare = async () => ++seen === 5 ? card : null;
+  const first = await loadFilteredPages(cursor, 1, load, prepare);
+  assert.equal(first.films.length, 0);
+  assert.equal(first.totalPages, 2);
+  const second = await loadFilteredPages(cursor, 2, load, prepare);
+  assert.equal(second.films[0].link, card.link);
+  assert.equal(second.totalPages, 2);
+  assert.deepEqual(pages, [1, 2, 3, 4, 5]);
+});
+
+test('multi-genre catalog requests include every chosen genre and remove duplicates', async () => {
+  const { getGenreCatalogPaths } = await import('../src/source/search/ContentFilters');
+  const options = [{ name: 'Все жанры', value: '/films/' },
+    { name: 'Комедии', value: '/films/comedy/' }, { name: 'Драмы', value: '/films/drama/' }];
+  assert.deepEqual(getGenreCatalogPaths(options, ['комедия', 'Драмы']), ['/films/comedy/', '/films/drama/']);
+});
+
+test('year range uses the catalog year rather than a later premiere date', () => {
+  assert.equal(matchesContentFilters({ ...film, year: 2019, releaseDate: '2020-02-01' },
+    { ...filters, from: 2019, to: 2019 }), true);
+  assert.equal(matchesContentFilters({ ...film, year: 2019, releaseDate: '2020-02-01' },
+    { ...filters, from: 2020, to: 2020 }), false);
+});
+
+test('Zona horror/year filters are sent natively rather than scanning current releases', async () => {
+  const { getZonaFilteredCatalogPaths } = await import('../src/source/search/ContentFilters');
+  assert.deepEqual(getZonaFilteredCatalogPaths(['https://w1.zona.im/movies'],
+    { genres: ['Ужасы'], from: 2008, to: 2016 }),
+  ['https://w1.zona.im/movies/filter/genre-uzhasy/year-2000s-to-2016']);
+  assert.equal(getZonaFilteredCatalogPaths(['https://w1.zona.im/movies/filter/genre-multfilm'],
+    { genres: ['Ужасы'], from: 2013, to: 2013 })[0],
+  'https://w1.zona.im/movies/filter/genre-multfilm/year-2013');
+});

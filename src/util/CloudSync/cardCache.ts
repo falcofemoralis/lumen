@@ -1,8 +1,19 @@
 import { storage } from 'Util/Storage';
 import { restoreCardCaches, setCardCachePublisher } from '../../source/search/CardCacheSync';
-import { mutateCloudSync, mutateCloudSyncBatch } from './mutations';
+import { mutateCloudSyncBatch } from './mutations';
 import { CloudSyncMutation, CloudSyncState } from './types';
-setCardCachePublisher((value, updatedAt) => mutateCloudSync({ entity: 'card-cache', id: JSON.stringify([value.kind, value.key]), value, updatedAt }));
+const pendingCacheMutations = new Map<string, CloudSyncMutation>();
+let publishTimer: ReturnType<typeof setTimeout> | undefined;
+setCardCachePublisher((value, updatedAt) => {
+  const id = JSON.stringify([value.kind, value.key]);
+  pendingCacheMutations.set(id, { entity: 'card-cache', id, value, updatedAt });
+  if (!publishTimer) publishTimer = setTimeout(() => {
+    publishTimer = undefined;
+    const batch = Array.from(pendingCacheMutations.values());
+    pendingCacheMutations.clear();
+    mutateCloudSyncBatch(batch);
+  }, 250);
+});
 export const restoreCloudCardCache = (state: CloudSyncState) => restoreCardCaches(state.cardCache ?? {}, storage.getMiscStorage());
 export const publishExistingCardCaches = () => {
   const mutations: CloudSyncMutation[] = [];

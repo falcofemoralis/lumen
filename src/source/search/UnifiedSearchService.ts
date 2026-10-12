@@ -1,3 +1,4 @@
+import { loadFilteredPages, FilteredPageCursor } from './FilteredPages';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { FilmListInterface } from 'Type/FilmList.interface';
 
@@ -24,16 +25,16 @@ const SEARCH_SOURCES = [
 const queryStates = new Map<
   string,
   {
-    films: UnifiedFilm[];
+    films: UnifiedFilm[]; cursors: Map<ContentSource, FilteredPageCursor>;
   }
 >();
 
 const getQueryState = (
   query: string,
   page: number,
-): { films: UnifiedFilm[] } => {
+): { films: UnifiedFilm[]; cursors: Map<ContentSource, FilteredPageCursor> } => {
   if (page === 1 || !queryStates.has(query)) {
-    const state = { films: [] as UnifiedFilm[] };
+    const state = { films: [] as UnifiedFilm[], cursors: new Map<ContentSource, FilteredPageCursor>() };
     queryStates.set(query, state);
 
     return state;
@@ -133,17 +134,13 @@ export const createUnifiedSearchService = (
           }
 
           try {
-            const result = options ? await options.loadSource(adapter, page) : await adapter.search(query.trim(), page, { onProgress: partialResult => publish(adapter, partialResult) });
-            if (!options) return publish(adapter, result);
-            const prepared: (FilmCardInterface | null)[] = new Array(result.films.length);
-            let next = 0;
-            await Promise.all(Array.from({ length: Math.min(4, result.films.length) }, async () => {
-              while (next < result.films.length) {
-                const index = next++;
-                prepared[index] = await options.prepareCard(result.films[index], adapter).catch(() => null);
-              }
-            }));
-            return publish(adapter, { ...result, films: prepared.filter((card): card is FilmCardInterface => Boolean(card)) });
+            if (!options) return publish(adapter, await adapter.search(query.trim(), page, { onProgress: partialResult => publish(adapter, partialResult) }));
+            const cursor = state.cursors.get(source) ?? { next: 1, exhausted: false };
+            state.cursors.set(source, cursor);
+            const result = await loadFilteredPages(cursor, page,
+              sourcePage => options.loadSource(adapter, sourcePage),
+              card => options.prepareCard(card, adapter));
+            return publish(adapter, result);
           } catch (error) {
             return { films: [], totalPages: page, error };
           }

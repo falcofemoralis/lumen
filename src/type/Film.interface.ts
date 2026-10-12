@@ -24,6 +24,7 @@ export interface FilmInterface {
   metadataSourceFilm?: FilmInterface;
   metadataSourceName?: string;
   releaseDate?: string;
+  year?: number;
   countries?: CollectionItemInterface[];
   genres?: CollectionItemInterface[];
   studios?: CollectionItemInterface[];

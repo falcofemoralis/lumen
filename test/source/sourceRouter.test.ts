@@ -198,3 +198,21 @@ test('supplementing Anixart metadata preserves its native director catalog link'
   const result = await new SourceRouter([makeAdapter(ContentSource.ANIXART, [native]), makeAdapter(ContentSource.REZKA, [rezka])]).resolvePreferredFilm(native);
   assert.equal(result.directors?.[0].link, native.directors[0].link);
 });
+
+test('Anixart original aliases match Rezka despite localized subtitle and keep both sources', async () => {
+  clearUnifiedFilmRegistry();
+  const anime = { ...makeFilm(true, '-anime-alias'), link: 'https://anixart-app.com/release/901',
+    title: 'Иное название', originalTitle: 'Example Anime / Another Original', type: FilmType.ANIME,
+    releaseDate: '2020', externalIds: undefined };
+  const rezka = { ...makeFilm(false, '-anime-alias'), title: 'Другое название: Начало',
+    originalTitle: 'Example Anime', type: FilmType.ANIME, releaseDate: '2020', externalIds: undefined };
+  const a = makeAdapter(ContentSource.ANIXART, [anime]);
+  const r = makeAdapter(ContentSource.REZKA, [rezka]);
+  const search = r.search;
+  r.search = async (query, ...rest) => query === anime.title ? { films: [], totalPages: 1 } : search(query, ...rest);
+  const router = new SourceRouter([a, r]);
+  assert.equal((await router.getFilmForSource(anime, ContentSource.REZKA))?.link, rezka.link);
+  const different = { ...rezka, originalTitle: 'Example Anime 2' };
+  assert.equal(await new SourceRouter([a, makeAdapter(ContentSource.REZKA, [different])])
+    .getFilmForSource(anime, ContentSource.REZKA), null);
+});

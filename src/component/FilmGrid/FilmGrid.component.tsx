@@ -142,7 +142,7 @@ export function FilmGridComponent({
         filmActions={ filmActions }
       />
     );
-  }, [styles, handleOnPress, visibleFilmIds]);
+  }, [styles, handleOnPress, visibleFilmIds, filmActions]);
 
   // Headers and cards differ wildly in height, so recycle them separately --
   // and so do real cards and their loading placeholders.
@@ -269,7 +269,7 @@ export function FilmGridComponent({
         onScroll={ isScrollToTopButtonActive ? onScroll : undefined }
         scrollEventThrottle={ isScrollToTopButtonActive ? 100 : undefined }
         onEndReached={ handleScrollEnd }
-        onEndReachedThreshold={ 0.25 }
+        onEndReachedThreshold={ 0.75 }
         numColumns={ numberOfColumns }
         overrideItemLayout={ overrideItemLayout }
         ItemSeparatorComponent={ ItemSeparator }
@@ -280,7 +280,8 @@ export function FilmGridComponent({
         contentContainerStyle={ contentContainerStyle }
         refreshControl={ refreshControl }
         showsVerticalScrollIndicator={ false }
-        removeClippedSubviews={ true }
+        removeClippedSubviews={ false }
+        drawDistance={ 800 }
       />
 
       { isScrollToTopButtonActive && (

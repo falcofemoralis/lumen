@@ -124,9 +124,11 @@ export const FilmPagerComponent = ({
   const { AnimatedPagerView, ref: pagerViewRef } = usePagerView({ pagesAmount: 10 });
   const [activeIndex, setActiveIndex] = useState(initialPage);
   const [activeTab, setActiveTab] = useState(initialPage);
+  const activeTabRef = useRef(initialPage);
   const scrollViewRef = useRef<ScrollView>(null);
   const tabWidthsRef = useRef<number[]>([]);
   const scrollState = useRef<'idle' | 'dragging' | 'settling'>('idle');
+  const isSwipingRef = useRef(false);
   // the tab bar starts scrolled to the initial tab, which can only happen once
   // the widths before it are measured
   const initialScrollDoneRef = useRef(initialPage === 0);
@@ -171,7 +173,8 @@ export const FilmPagerComponent = ({
   }, [initialPage]);
 
   const updateActiveTab = useCallback((index: number) => {
-    if (index !== activeTab) {
+    if (index !== activeTabRef.current) {
+      activeTabRef.current = index;
       setActiveTab(index);
       scrollViewRef.current?.scrollTo({ x: getTabOffset(index), animated: true });
     }
@@ -188,7 +191,7 @@ export const FilmPagerComponent = ({
 
       return { key: tabsKey, indexes };
     });
-  }, [activeTab, tabsKey]);
+  }, [tabsKey]);
 
   const handleTabPress = useCallback((index: number) => {
     pagerViewRef.current?.setPage(index);
@@ -216,27 +219,17 @@ export const FilmPagerComponent = ({
   const handlePageScroll = useCallback((e: NativeSyntheticEvent<OnPageScrollEventData>) => {
     const { offset, position } = e.nativeEvent;
 
-    if (scrollState.current !== 'dragging') {
-      return;
-    }
-
-    if (position === activeIndex) {
-      if (offset >= 0.5) {
-        updateActiveTab(activeIndex + 1);
-      } else {
-        updateActiveTab(activeIndex);
-      }
-    } else {
-      if (offset <= 0.5) {
-        updateActiveTab(activeIndex - 1);
-      } else {
-        updateActiveTab(activeIndex);
-      }
-    }
-  }, [activeIndex, updateActiveTab]);
+    if (!isSwipingRef.current || scrollState.current === 'idle' || !pagerItems.length) return;
+    // Native position + offset works in both directions, including settling
+    // after a quick swipe and returning to the original page after cancellation.
+    const index = Math.max(0, Math.min(pagerItems.length - 1, Math.round(position + offset)));
+    updateActiveTab(index);
+  }, [pagerItems.length, updateActiveTab]);
 
   const handlePageScrollStateChanged = useCallback((e: NativeSyntheticEvent<OnPageScrollStateChangedEventData>) => {
     scrollState.current = e.nativeEvent.pageScrollState;
+    if (scrollState.current === 'dragging') isSwipingRef.current = true;
+    else if (scrollState.current === 'idle') isSwipingRef.current = false;
   }, []);
 
   const renderScrollableTabBar = useMemo(() => (
