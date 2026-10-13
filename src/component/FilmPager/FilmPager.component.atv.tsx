@@ -181,6 +181,7 @@ const TopMenu = memo(({
 
 export function FilmPagerComponent({
   pagerItems,
+  renderPageContent,
   displayMode,
   disableEmptyComponent,
   isEmpty,
@@ -320,6 +321,7 @@ export function FilmPagerComponent({
       return null;
     }
 
+    if (renderPageContent) return renderPageContent(pagerItem, idx);
     const { films, pagination } = pagerItem;
     const filmItems = (films ?? []).map((film) => ({ film }));
 
@@ -357,6 +359,7 @@ export function FilmPagerComponent({
     isEmpty,
     ListEmptyComponent,
     onNextLoad,
+    renderPageContent,
     renderedIndexes,
     showScrollToTopButton,
   ]);

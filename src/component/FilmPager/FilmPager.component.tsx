@@ -333,7 +333,7 @@ export const FilmPagerComponent = ({
   }, [renderedIndexes, initialPage, renderPageContent, displayMode, disableEmptyComponent, disableStatusbarSafeArea, isEmpty, hideGrid, ListEmptyComponent, centerEmptyComponent, onNextLoad, showScrollToTopButton, activeIndex]);
 
   const pages = useMemo(() => (pagerItems).map((item, idx) => (
-    <Wrapper key={ item.menuItem.id }>
+    <Wrapper key={ item.menuItem.id } style={ renderPageContent ? { flex: 1, minHeight: 0 } : undefined }>
       { renderPage(item, idx) }
     </Wrapper>
   )), [pagerItems, renderPage]);

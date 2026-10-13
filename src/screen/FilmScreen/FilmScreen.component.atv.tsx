@@ -4,6 +4,7 @@ import { FilmViewActor } from 'Component/FilmViewActor';
 import { FilmViewFranchiseItem } from 'Component/FilmViewFranchiseItem';
 import { FilmViewInfoListOverlay } from 'Component/FilmViewInfoListOverlay';
 import { FilmViewRelatedItem } from 'Component/FilmViewRelatedItem';
+import { POSTER_ASPECT_HEIGHT, POSTER_ASPECT_WIDTH } from 'Component/FilmCard/FilmCard.config';
 import { FilmViewScheduleItem } from 'Component/FilmViewScheduleItem';
 import { FilmViewScheduleOverlay } from 'Component/FilmViewScheduleOverlay';
 import { FilmViewSection } from 'Component/FilmViewSection';
@@ -34,12 +35,13 @@ import Play from 'lucide-react-native/icons/play';
 import ShieldOff from 'lucide-react-native/icons/shield-off';
 import Star from 'lucide-react-native/icons/star';
 import { ComponentType, useState } from 'react';
-import { useWindowDimensions, View } from 'react-native';
+import { Platform, useWindowDimensions, View } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
 import { useAppTheme } from 'Theme/context';
 import { CollectionItemInterface } from 'Type/CollectionItem';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { isBookmarked } from 'Util/Film';
+import { getFranchiseChronology } from 'Util/Film/franchise';
 import { noopFn } from 'Util/Function';
 
 import { componentStyles } from './FilmScreen.style.atv';
@@ -481,7 +483,7 @@ export function FilmScreenComponent({
   };
 
   const renderFranchise = () => {
-    const { franchise = [] } = film;
+    const franchise = getFranchiseChronology(film.franchise);
 
     if (!franchise.length) {
       return null;
@@ -533,6 +535,7 @@ export function FilmScreenComponent({
         <ThemedScrollView
           horizontal
           style={ styles.relatedList }
+          containerStyle={ Platform.OS === 'web' ? { flexGrow: 0, flexShrink: 0, height: scale(100 * POSTER_ASPECT_HEIGHT / POSTER_ASPECT_WIDTH + 90) } : undefined }
         >
           { related.map((item, idx) => (
             <FilmViewRelatedItem
@@ -603,7 +606,7 @@ export function FilmScreenComponent({
 
   return (
     <Page style={ styles.page }>
-      <Wrapper>
+      <Wrapper style={ Platform.OS === 'web' ? { flex: 1, minHeight: 0 } : undefined }>
         { renderModals() }
         <ThemedScrollView autofocus>
           { renderActions() }

@@ -85,7 +85,7 @@ import Users from 'lucide-react-native/icons/users';
 import Volume2 from 'lucide-react-native/icons/volume-2';
 import { reactNativeDownloads } from 'Modules/react-native-downloads';
 import { useCallback, useEffect, useState } from 'react';
-import { BackHandler, View } from 'react-native';
+import { BackHandler, Platform, View } from 'react-native';
 import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated';
 import { GithubIcon, TelegramIcon } from 'Theme/icons';
 import { openLinkInBrowser } from 'Util/Link';
@@ -134,6 +134,7 @@ export function SettingsScreenComponent({
   homeDisplayMode,
   bookmarksDisplayMode,
   recentDisplayMode,
+  recentTabsInterface,
   tabPosition,
   numberOfColumnsMobile,
   hiddenCountries,
@@ -322,6 +323,26 @@ export function SettingsScreenComponent({
 
   const renderAppearance = () => (
     <ThemedScrollView>
+      { (isTV || Platform.OS === 'web') && (
+      <SettingSwitch
+        title={ t('Show Downloads icon') }
+        subtitle={ t('Show the Downloads icon in the navigation bar.') }
+        IconComponent={ Download }
+        value={ !(isTV ? hiddenTVNavigationTabs : hiddenMobileNavigationTabs).includes('Downloads') }
+        onChange={ (value) => {
+          const key = isTV ? 'hiddenTVNavigationTabs' : 'hiddenMobileNavigationTabs';
+          const hidden = isTV ? hiddenTVNavigationTabs : hiddenMobileNavigationTabs;
+          onConfigUpdate(key, value ? hidden.filter(item => item !== 'Downloads') : [...new Set([...hidden, 'Downloads'])]);
+        } }
+      />
+      ) }
+      <SettingSwitch
+        title={ t('Recent tabs interface') }
+        subtitle={ t('Show Continue watching, Episode updates and Downloads as tabs.') }
+        IconComponent={ Layers }
+        value={ recentTabsInterface }
+        onChange={ (value) => onConfigUpdate('recentTabsInterface', value) }
+      />
       <SettingSelect
         title={ t('Theme scheme') }
         IconComponent={ Brush }

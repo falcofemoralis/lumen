@@ -93,7 +93,7 @@ export function RecentScreenComponent({
           style={ buttonStyle }
         >
           <Play
-            size={ scale(18) }
+            size={ scale(24) }
             color={ theme.colors.icon }
           />
         </ThemedPressable>
@@ -103,7 +103,7 @@ export function RecentScreenComponent({
           style={ buttonStyle }
         >
           <Trash2
-            size={ scale(18) }
+            size={ scale(24) }
             color={ theme.colors.icon }
           />
         </ThemedPressable>
@@ -114,12 +114,12 @@ export function RecentScreenComponent({
         >
           { item.isWatched ? (
             <EyeOff
-              size={ scale(18) }
+              size={ scale(24) }
               color={ theme.colors.icon }
             />
           ) : (
             <Eye
-              size={ scale(18) }
+              size={ scale(24) }
               color={ theme.colors.icon }
             />
           ) }

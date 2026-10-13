@@ -1,6 +1,9 @@
+import { Platform } from 'react-native';
 import { Theme } from 'Theme/types';
 
-export const componentStyles = ({ scale, text }: Theme) => ({
+export const componentStyles = ({ scale: baseScale, text }: Theme) => {
+  const scale = (value: number) => baseScale(value * (Platform.OS === 'web' ? 1.3 : 1));
+  return ({
   container: {
     position: 'absolute' as const,
     top: 0,
@@ -20,3 +23,4 @@ export const componentStyles = ({ scale, text }: Theme) => ({
     lineHeight: scale(text.xxs.fontSize * 0.7 + 2),
   },
 });
+};

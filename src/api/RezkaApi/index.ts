@@ -25,6 +25,9 @@ import { processPromisesBatch } from 'Util/Promise';
 import { executeGet, executePostEncoded, executePostFormData, formatURI, NotFoundError, Variables } from 'Util/Request';
 import { storage } from 'Util/Storage';
 import { RezkaReadQueue } from 'Util/RezkaReadQueue';
+import { getGlobalConfig } from 'Context/ConfigContext';
+import { createPublicReadFallback } from 'Util/Request/publicReadFallback';
+const publicUpdatesRead = createPublicReadFallback<HTMLElementInterface>();
 import { updateUrlHost } from 'Util/Url';
 
 import { collectSeriesUpdateRows, parseSeriesUpdateBlocks } from './seriesUpdates';
@@ -411,7 +414,17 @@ const RezkaApi: RezkaApiInterface = {
   },
 
   async getUserData() {
-    const root = await this.fetchPage('/');
+    // Local subscriptions need the public update list, not account data. A
+    // blocked official endpoint must not hide updates from an available mirror.
+    const root = getGlobalConfig().isLocalLibrary
+      ? await publicUpdatesRead(() => this.fetchPage('/'), async signal => {
+          const mirror = this.defaultProviders.find(provider => new URL(provider).hostname !== new URL(this.getProvider()).hostname)!;
+          const headers = { ...this.getHeaders() };
+          delete headers['X-Hdrezka-Android-App'];
+          delete headers['X-Hdrezka-Android-App-Version'];
+          return this.parseContent(await executeGet('/', mirror, headers, {}, signal));
+        })
+      : await this.fetchPage('/');
 
     // tracked rows only (the account's subscriptions, marked server-side)
     const notifications = parseSeriesUpdateBlocks(root, (el) => el.querySelectorAll('.tracked'));
@@ -433,7 +446,7 @@ const RezkaApi: RezkaApiInterface = {
 
   async getFilmsFromNotifications(notifications) {
     const links = notifications.reduce((acc, notification) => {
-      acc.push(...notification.items.map((item) => item.link));
+      acc.push(...notification.items.filter(item => !item.film).map((item) => item.link));
 
       return acc;
     }, [] as string[]);
@@ -517,7 +530,7 @@ const RezkaApi: RezkaApiInterface = {
 
     return notifications.map((notification) => {
       const items = notification.items.map((item) => {
-        const film = { ...films[item.link] } as FilmCardInterface;
+        const film = { ...(item.film ?? films[item.link]) } as FilmCardInterface;
         film.info = item.info;
 
         return {

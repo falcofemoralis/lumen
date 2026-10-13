@@ -116,14 +116,14 @@ const NavigationOrderSettingComponent = ({
                   </ThemedText>
                 </View>
 
-                <View style={ styles.actions } onLayout={ event => { const layout = event.nativeEvent.layout; event.currentTarget.measureInWindow((x, y, width, height) => { console.log('[ATV NavigationOrder actions]', { local: layout, window: { x, y, width, height } }); }); } }>
+                <View style={ styles.actions }>
                   <ThemedButton
                     disabled={ !hiddenItems.includes(item.value) && orderedItems.filter(orderedItem => !hiddenItems.includes(orderedItem.value)).length <= 1 }
                     style={ styles.button }
                     contentStyle={ styles.buttonContent }
                     IconComponent={ hiddenItems.includes(item.value) ? EyeOff : Eye }
                     iconColor={ styles.buttonIcon.color }
-                    iconProps={ { size: styles.buttonIcon.width } }
+                    iconProps={ { size: styles.buttonIcon.width, style: styles.buttonIcon } }
                     onPress={ () => toggleItemVisibility(item.value) }
                   />
                   <ThemedButton
@@ -132,7 +132,7 @@ const NavigationOrderSettingComponent = ({
                     contentStyle={ styles.buttonContent }
                     IconComponent={ ChevronUp }
                     iconColor={ styles.buttonIcon.color }
-                    iconProps={ { size: styles.buttonIcon.width } }
+                    iconProps={ { size: styles.buttonIcon.width, style: styles.buttonIcon } }
                     onPress={ () => moveItem(index, -1) }
                   />
 
@@ -142,7 +142,7 @@ const NavigationOrderSettingComponent = ({
                     contentStyle={ styles.buttonContent }
                     IconComponent={ ChevronDown }
                     iconColor={ styles.buttonIcon.color }
-                    iconProps={ { size: styles.buttonIcon.width } }
+                    iconProps={ { size: styles.buttonIcon.width, style: styles.buttonIcon } }
                     onPress={ () => moveItem(index, 1) }
                   />
                 </View>

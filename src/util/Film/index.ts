@@ -4,6 +4,7 @@ import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { ContentSource } from '../../source/types/ContentSource';
 import { RecentItemInterface } from 'Type/RecentItem.interface';
 import { FilmType } from 'Type/FilmType.type';
+import { getRegisteredUnifiedFilm } from '../../source/search/UnifiedFilmRegistry';
 
 export const isBookmarked = (film: FilmInterface) => {
   const { bookmarks = [] } = film;
@@ -49,6 +50,7 @@ export const filmToFilmCard = (film: FilmInterface): FilmCardInterface => ({
   info: film.seriesInfo,
   originalTitle: film.originalTitle,
   externalIds: film.externalIds,
+  sources: getRegisteredUnifiedFilm(film.link)?.sources,
   ratingSourceType: film.metadataSourceFilm ? ContentSource.REZKA
     : film.link.startsWith('https://anixart-app.com/release/') ? ContentSource.ANIXART
     : /^https?:\/\/[^/]*\.zona\.im\//.test(film.link) ? ContentSource.ZONA : ContentSource.REZKA,

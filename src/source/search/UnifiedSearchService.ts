@@ -63,6 +63,7 @@ const toFilmCard = (
     poster: film.poster,
     title: film.title,
     originalTitle: film.originalTitle,
+    sources: film.sources,
     externalIds: Object.fromEntries(film.sources.flatMap(source => source.externalIds).flatMap(id =>
       id.type === 'IMDB' ? [['imdb', id.value]] : id.type === 'TMDB' ? [['tmdb', id.value]] : id.type === 'KINOPOISK' ? [['kinopoisk', id.value]] : [])),
     subtitle: film.subtitle || (film.year ? String(film.year) : ''),

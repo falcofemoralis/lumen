@@ -49,7 +49,7 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { AppState, useWindowDimensions, View } from 'react-native';
+import { AppState, Platform, useWindowDimensions, View } from 'react-native';
 import {
   Gesture,
   GestureDetector,
@@ -770,7 +770,25 @@ export function PlayerComponent({
     </Fragment>
   );
 
-  const renderControls = () => (
+  const renderControls = () => Platform.OS === 'web' ? (
+    <View style={ styles.controlsContainer } pointerEvents="box-none">
+      <GestureDetector gesture={ Gesture.Race(doubleTap, singleTap, longPressGesture, slideGesture) }>
+        <View style={ { position: 'absolute', inset: 0 } } />
+      </GestureDetector>
+      <Animated.View
+        pointerEvents={ showControls ? 'box-none' : 'none' }
+        style={ [styles.controls, controlsAnimation] }>
+        { renderTopActions() }
+        { renderMiddleControls() }
+        { renderBottomActions() }
+      </Animated.View>
+      <View pointerEvents="none" style={ { position: 'absolute', inset: 0 } }>
+        { renderDoubleTapAction() }
+        { renderLongTapAction() }
+        { renderSlideIndicators() }
+      </View>
+    </View>
+  ) : (
     <GestureDetector
       gesture={ Gesture.Race(
         doubleTap,
@@ -967,6 +985,7 @@ export function PlayerComponent({
 
   return (
     <View
+      nativeID={ Platform.OS === 'web' ? 'lumen-player' : undefined }
       style={ [
         styles.container,
         isCommentsOpen && { width: screenWidth * 0.45 },
@@ -979,6 +998,11 @@ export function PlayerComponent({
         resizeMode={ selectedAspectRatio }
         controls={ false }
         pictureInPicture={ isPipSupported }
+        { ...Platform.OS === 'web' ? { episodeNavigation: {
+          enabled: film.hasSeasons,
+          previous: () => handleNewEpisode(RewindDirection.BACKWARD),
+          next: () => handleNewEpisode(RewindDirection.FORWARD),
+        } } : {} }
       />
       { renderError() }
       { renderControls() }

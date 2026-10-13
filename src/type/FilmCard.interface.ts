@@ -1,6 +1,7 @@
 import { FilmType } from './FilmType.type';
 import { FilmRatingsInterface } from './FilmRatings.interface';
 import { ContentSource } from '../source/types/ContentSource';
+import type { UnifiedFilmSource } from '../source/types/UnifiedFilm';
 
 export interface FilmCardInterface {
   id: string;
@@ -14,6 +15,7 @@ export interface FilmCardInterface {
   contentTypePending?: boolean;
   originalTitle?: string;
   externalIds?: { imdb?: string; tmdb?: string; kinopoisk?: string };
+  sources?: UnifiedFilmSource[];
   ratings?: FilmRatingsInterface;
   ratingSourceType?: ContentSource;
   ratingFilmId?: string;

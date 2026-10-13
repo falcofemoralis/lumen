@@ -28,7 +28,7 @@ const normalizeExternalId = (value: string): string => (
   value.trim().toLowerCase()
 );
 
-const normalizeTitle = (value: string): string => (
+export const normalizeTitle = (value: string): string => (
   decode(value)
     .normalize('NFKC')
     .toLowerCase()

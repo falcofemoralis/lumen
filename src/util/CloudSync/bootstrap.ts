@@ -1,4 +1,5 @@
 import { CONFIG_KEY_SECTIONS, DeviceConfigType, migrateLegacyConfig } from 'src/config';
+import { getCloudSyncSettingId } from 'src/config/cloudSync';
 import { DEVICE_CONFIG } from 'Context/ConfigContext';
 import { SavedTimestamp } from 'Component/Player/Player.type';
 import {
@@ -158,7 +159,8 @@ export const createLocalCloudSyncState = (): CloudSyncState => {
         return;
       }
 
-      const id = String(key);
+      const id = getCloudSyncSettingId(key);
+      if (!id) return;
 
       state.settings.values[id] = value;
       state.settings.metadata[id] = createMeta(bootstrapTimestamp);

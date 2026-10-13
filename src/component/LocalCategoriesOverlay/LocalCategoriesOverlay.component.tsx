@@ -132,7 +132,7 @@ const LocalCategoryRow = ({
         contentStyle={ styles.rowDeleteContent }
         IconComponent={ Trash2 }
         iconProps={ {
-          size: scale(16),
+          size: scale(24),
           color: textColor,
         } }
         onPress={ () => onDelete(category.id) }

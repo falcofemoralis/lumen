@@ -12,11 +12,12 @@ import { t } from 'i18n/translate';
 import { NOTIFICATIONS_SCREEN, PLAYER_SCREEN } from 'Navigation/navigationRoutes';
 import { AppStackParamList } from 'Navigation/navigationTypes';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { Platform } from 'react-native';
 import { RecentItemInterface } from 'Type/RecentItem.interface';
 import NotificationStore from 'Store/Notification.store';
 import RouterStore from 'Store/Router.store';
 import { removeLocalHistoryItem, setLocalHistoryWatched } from 'Util/LocalLibrary';
-import { sourcePlaybackRouter } from '../../source';
+import { sourcePlaybackRouter, sourceRouter } from '../../source';
 import { navigate } from 'Util/Navigation';
 import { getSavedTime } from 'Util/Player';
 import { getLastSavedEpisode } from 'Util/Player/savedTimeUtil';
@@ -28,7 +29,7 @@ import { RecentHub } from './RecentScreen.hub';
 import RecentScreenComponentTV from './RecentScreen.component.atv';
 
 export function RecentScreenContainer() {
-  const { isTV, isLocalLibrary, recentDisplayMode, newHomeInterface } = useConfigContext();
+  const { isTV, isLocalLibrary, recentDisplayMode, newHomeInterface, recentTabsInterface } = useConfigContext();
   const { isSignedIn, currentService } = useServiceContext();
   const localHistory = useLocalHistory();
   const navigation = useNavigation<NativeStackNavigationProp<AppStackParamList>>();
@@ -90,7 +91,8 @@ export function RecentScreenContainer() {
 
   const { mutate: continueWatching } = useMutation({
     mutationFn: async (item: RecentItemInterface) => {
-      const film = await currentService.getFilm(item.link);
+      const adapter = sourceRouter.getAdapterForLink(item.link);
+      const film = adapter ? await adapter.getFilm(item.link) : await currentService.getFilm(item.link);
 
       if (!film) {
         throw new Error(t('No video available'));
@@ -108,6 +110,8 @@ export function RecentScreenContainer() {
         throw new Error(t('No video available'));
       }
 
+      const playback = sourcePlaybackRouter.getAdapterForFilmLink(film.link);
+      if (playback) film.voices = await playback.getFilmVoices(film);
       const voiceData = saved?.voices?.[lastVoiceId] ?? null;
       const voice = film.voices.find(({ id }) => id === lastVoiceId);
 
@@ -281,7 +285,7 @@ export function RecentScreenContainer() {
     displayMode: recentDisplayMode,
     isSignedIn,
     items: isLocalLibrary ? localItems : items,
-    isLoading,
+    isLoading: !isLocalLibrary && isLoading,
     hideConfirmOverlayRef,
     removeConfirmOverlayRef,
     onNextLoad: handleNextLoad,
@@ -295,9 +299,11 @@ export function RecentScreenContainer() {
     openNotifications,
   };
 
-  if (isTV) return <RecentScreenComponentTV { ...containerProps } />;
-  const content = <RecentScreenComponent { ...containerProps } />;
-  return newHomeInterface ? <RecentHub>{ content }</RecentHub> : content;
+  const content = isTV
+    ? <RecentScreenComponentTV { ...containerProps } />
+    : <RecentScreenComponent { ...containerProps } />;
+  return (isTV || Platform.OS === 'web' ? recentTabsInterface : newHomeInterface || recentTabsInterface)
+    ? <RecentHub>{ content }</RecentHub> : content;
 
 }
 

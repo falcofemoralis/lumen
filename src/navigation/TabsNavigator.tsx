@@ -88,28 +88,31 @@ const renderTVTabs = (
   transformX: number,
   isSnapping: boolean,
 ) => {
+  const accountRoute = isLocalLibrary ? DOWNLOADS_SCREEN : ACCOUNT_TAB;
   const fallbackOrder = [
-    ACCOUNT_TAB,
+    accountRoute,
     NOTIFICATIONS_TAB,
     HOME_TAB,
     RECENT_TAB,
     SEARCH_TAB,
     BOOKMARKS_TAB,
+    ...(!isLocalLibrary ? [DOWNLOADS_SCREEN] : []),
     SETTINGS_SCREEN,
   ];
 
   const availableRoutes = [
-    ACCOUNT_TAB,
+    accountRoute,
     NOTIFICATIONS_TAB,
     HOME_TAB,
     RECENT_TAB,
     SEARCH_TAB,
     BOOKMARKS_TAB,
+    ...(!isLocalLibrary ? [DOWNLOADS_SCREEN] : []),
     SETTINGS_SCREEN,
   ];
 
   const navigationOrder = normalizeNavigationOrder(
-    tvNavigationOrder,
+    tvNavigationOrder.map(route => isLocalLibrary && route === ACCOUNT_TAB ? DOWNLOADS_SCREEN : route),
     availableRoutes,
     fallbackOrder,
   ).filter(route => !hiddenNavigationTabs.includes(route));

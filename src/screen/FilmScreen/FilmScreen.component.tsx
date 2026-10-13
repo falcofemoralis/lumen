@@ -37,6 +37,7 @@ import ShieldOff from 'lucide-react-native/icons/shield-off';
 import Star from 'lucide-react-native/icons/star';
 import { ComponentType, useCallback, useRef } from 'react';
 import {
+  Platform,
   ScrollView,
   Text,
   useWindowDimensions,
@@ -56,6 +57,7 @@ import { CollectionItemInterface } from 'Type/CollectionItem';
 import { RatingInterface } from 'Type/Rating.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { isBookmarked } from 'Util/Film';
+import { getFranchiseChronology } from 'Util/Film/franchise';
 import { noopFn } from 'Util/Function';
 import { openLinkInBrowser } from 'Util/Link';
 
@@ -456,7 +458,7 @@ export function FilmScreenComponent({
   };
 
   const renderFranchise = () => {
-    const { franchise = [] } = film;
+    const franchise = getFranchiseChronology(film.franchise);
 
     if (!franchise.length) {
       return null;
@@ -492,7 +494,8 @@ export function FilmScreenComponent({
     return (
       <Wrapper>
         <FilmViewSection title={ t('Related') }>
-          <ScrollView horizontal showsHorizontalScrollIndicator={ false }>
+          <ScrollView horizontal showsHorizontalScrollIndicator={ false }
+            style={ Platform.OS === 'web' ? { flexGrow: 0, flexShrink: 0, height: scale(100 * POSTER_ASPECT_HEIGHT / POSTER_ASPECT_WIDTH + 70) } : undefined }>
             <View style={ styles.relatedList }>
               { related.map((item, idx) => (
                 <FilmViewRelatedItem

@@ -104,10 +104,18 @@ export function solvePow(randomData: string, difficulty: number): PowSolution {
 }
 
 // Never replay another concurrent challenge's verification cookie.
-export const anubisPassCookies = (cookies: string, challengeId: string): string => [
-  ...cookies.split(';').map(part => part.trim()).filter(part => part && !part.split('=')[0].includes('anubis')),
-  'techaro.lol-anubis-cookie-verification=' + challengeId,
-].join('; ');
+export const anubisPassCookies = (cookies: string, challengeId: string): string => {
+  const parts = cookies.split(';').map(part => part.trim()).filter(Boolean);
+  // v1.27 namespaces these names per deployment. Pin the current challenge ID,
+  // but retain the server-issued name rather than synthesizing the legacy name.
+  const verificationNames = parts.map(part => part.split('=')[0])
+    .filter(name => name.includes('anubis-cookie-verification'));
+  const names = verificationNames.length ? [...new Set(verificationNames)] : ['techaro.lol-anubis-cookie-verification'];
+  return [
+    ...parts.filter(part => !part.split('=')[0].includes('anubis')),
+    ...names.map(name => name + '=' + challengeId),
+  ].join('; ');
+};
 
 // A native redirect can hide Set-Cookie from JS. Ignore rejected or unrelated cookies.
 export const freshAnubisAuthCookies = (cookies: string, rejected: string): Record<string, string> =>

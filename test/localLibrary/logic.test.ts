@@ -364,3 +364,17 @@ test('filterUpdatesForLocalLibrary returns nothing for an empty library and neve
 
   assert.deepEqual(filterUpdatesForLocalLibrary(updatesFixture(), blob, []), []);
 });
+
+test('Episode updates reuse cached primary cards when notifications refer to a supplementary source', () => {
+  const card={...filmCard('zona-show'),link:'https://w1.zona.im/tvseries/show',sources:[{source:'REZKA' as any,link:'https://rezka.ag/series/123-show.html',nativeId:'123',externalIds:[]}]};
+  const library=toggleBookmark(blobWithCategories('Favorites'),card,'cat1',true);
+  const updates=[{date:'today',items:[{name:'Show',link:'https://hdrezka.ag/series/123-show.html',info:'(1 сезон) - 3 серия'}]}];
+  const result=filterUpdatesForLocalLibrary(updates,library,[]);
+  assert.equal(result.length,1); assert.equal(result[0].items[0].film?.link,card.link);
+  assert.equal(result[0].items[0].info,'(1 сезон) - 3 серия');
+});
+test('Source badges on saved voice titles do not hide matching episode releases', () => {
+  assert.equal(normalizeVoiceTitle('HDrezka Studio (Zona)'),normalizeVoiceTitle('HDrezka Studio'));
+  assert.equal(normalizeVoiceTitle('Studio (Украинский) (HDRezka)'),normalizeVoiceTitle('Studio (Украинский)'));
+  assert.notEqual(normalizeVoiceTitle('Studio (Украинский)'),normalizeVoiceTitle('Studio'));
+});

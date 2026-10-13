@@ -129,6 +129,7 @@ export function SettingsScreenComponent({
   homeDisplayMode,
   bookmarksDisplayMode,
   recentDisplayMode,
+  recentTabsInterface,
   tabPosition,
   numberOfColumnsTV,
   recentTwoColumnsTV,
@@ -316,6 +317,24 @@ export function SettingsScreenComponent({
 
   const renderAppearance = () => (
     <ThemedScrollView>
+      <SettingSwitch
+        title={ t('Show Downloads icon') }
+        subtitle={ t('Show the Downloads icon in the navigation bar.') }
+        IconComponent={ Download }
+        value={ !(isTV ? hiddenTVNavigationTabs : hiddenMobileNavigationTabs).includes('Downloads') }
+        onChange={ (value) => {
+          const key = isTV ? 'hiddenTVNavigationTabs' : 'hiddenMobileNavigationTabs';
+          const hidden = isTV ? hiddenTVNavigationTabs : hiddenMobileNavigationTabs;
+          onConfigUpdate(key, value ? hidden.filter(item => item !== 'Downloads') : [...new Set([...hidden, 'Downloads'])]);
+        } }
+      />
+      <SettingSwitch
+        title={ t('Recent tabs interface') }
+        subtitle={ t('Show Continue watching, Episode updates and Downloads as tabs.') }
+        IconComponent={ Layers }
+        value={ recentTabsInterface }
+        onChange={ (value) => onConfigUpdate('recentTabsInterface', value) }
+      />
       <SettingSelect
         title={ t('Theme scheme') }
         IconComponent={ Brush }

@@ -8,6 +8,7 @@ import {
 } from 'Type/LocalLibrary.interface';
 import { NotificationInterface, NotificationItemInterface } from 'Type/Notification.interface';
 import { safeJsonParse } from 'Util/Json';
+import { matchingBookmarkIds, mergeBookmarkSources } from './identity';
 
 export const MAX_LOCAL_HISTORY_ITEMS = 200;
 
@@ -139,16 +140,24 @@ export const toggleBookmark = (
     return blob;
   }
 
+  const matches = matchingBookmarkIds(blob, filmCard);
+  const canonicalId = matches.find(id => category.filmIds.includes(id)) ?? matches[0] ?? filmCard.id;
+  const matchedIds = new Set([...matches, filmCard.id]);
   const filmIds = isBookmarked
-    ? [filmCard.id, ...category.filmIds.filter((id) => id !== filmCard.id)]
-    : category.filmIds.filter((id) => id !== filmCard.id);
-
-  const categories = blob.categories.map((c) => (c.id === categoryId ? { ...c, filmIds } : c));
-
+    ? [canonicalId, ...category.filmIds.filter(id => !matchedIds.has(id))]
+    : category.filmIds.filter(id => !matchedIds.has(id));
+  const categories = blob.categories.map(c => c.id === categoryId ? { ...c, filmIds } : c);
+  const stored = blob.films[canonicalId];
+  const incoming = Object.fromEntries(Object.entries(filmCard).filter(([, value]) => value !== undefined)) as FilmCardInterface;
+  const sources = mergeBookmarkSources(stored, filmCard);
   const films = isBookmarked
-    ? { ...blob.films, [filmCard.id]: filmCard }
+    ? collectReferencedFilms(categories, { ...blob.films, [canonicalId]: {
+        ...stored, ...(stored ? incoming : filmCard), id: canonicalId,
+        ...(stored?.externalIds || filmCard.externalIds ? { externalIds: { ...stored?.externalIds, ...filmCard.externalIds } } : {}),
+        ...(stored?.ratings || filmCard.ratings ? { ratings: { ...stored?.ratings, ...filmCard.ratings } } : {}),
+        ...(sources.length > 1 || stored?.sources || filmCard.sources ? { sources } : {}),
+      } })
     : collectReferencedFilms(categories, blob.films);
-
   return { categories, films };
 };
 
@@ -157,12 +166,15 @@ export const toggleBookmark = (
  */
 export const bookmarksForFilm = (
   blob: LocalBookmarksBlob,
-  filmId: string
-): BookmarkInterface[] => blob.categories.map((category) => ({
-  id: category.id,
-  title: category.title,
-  isBookmarked: category.filmIds.includes(filmId),
-}));
+  filmId: string,
+  filmCard?: FilmCardInterface
+): BookmarkInterface[] => {
+  const ids = new Set(filmCard ? matchingBookmarkIds(blob, filmCard) : [filmId]);
+  return blob.categories.map(category => ({
+    id: category.id, title: category.title,
+    isBookmarked: category.filmIds.some(id => ids.has(id)),
+  }));
+};
 
 export const filmsForCategory = (
   blob: LocalBookmarksBlob,
@@ -235,8 +247,8 @@ export const collectLocalFilmLinks = (
   history: LocalHistoryItemInterface[]
 ): Set<string> => new Set(
   [
-    ...Object.values(bookmarks.films).map((film) => film.link),
-    ...history.map((item) => item.link),
+    ...Object.values(bookmarks.films).flatMap((film) => [film.link, ...(film.sources ?? []).map(source => source.link)]),
+    ...history.flatMap((item) => [item.link, ...(item.filmCard?.sources ?? []).map(source => source.link)]),
   ].filter(Boolean).map(normalizeFilmLink)
 );
 
@@ -269,7 +281,7 @@ export const extractVoiceFromInfo = (info: string): string => {
  * "(Украинский)" stay, so they count as different voices.
  */
 export const normalizeVoiceTitle = (voice: string): string => {
-  const collapsed = voice.trim().replace(/\s+/g, ' ').toLowerCase();
+  const collapsed = voice.trim().replace(/\s*\((?:Zona|HDRezka|Anixart)\)\s*$/i, '').replace(/\s+/g, ' ').toLowerCase();
   const unwrapped = collapsed.match(/^\((.*)\)$/);
 
   return (unwrapped ? unwrapped[1] : collapsed).trim();
@@ -317,6 +329,12 @@ export const filterUpdatesForLocalLibrary = (
   history: LocalHistoryItemInterface[]
 ): NotificationInterface[] => {
   const localLinks = collectLocalFilmLinks(bookmarks, history);
+  const cachedCards = new Map<string, FilmCardInterface>();
+  for (const film of [...Object.values(bookmarks.films), ...history.flatMap(item => item.filmCard ? [item.filmCard] : [])]) {
+    for (const link of [film.link, ...(film.sources ?? []).map(source => source.link)]) {
+      if (link) cachedCards.set(normalizeFilmLink(link), film);
+    }
+  }
 
   if (!localLinks.size) {
     return [];
@@ -326,7 +344,10 @@ export const filterUpdatesForLocalLibrary = (
 
   history.forEach((item) => {
     if (item.link && item.voiceTitle) {
-      watchedVoiceByLink.set(normalizeFilmLink(item.link), item.voiceTitle);
+      const card = item.filmCard ?? cachedCards.get(normalizeFilmLink(item.link));
+      for (const link of [item.link, ...(card?.sources ?? []).map(source => source.link)]) {
+        if (link) watchedVoiceByLink.set(normalizeFilmLink(link), item.voiceTitle);
+      }
     }
   });
 
@@ -336,7 +357,7 @@ export const filterUpdatesForLocalLibrary = (
       items: dedupeUpdateItems(
         group.items.filter((item) => !!item.link && localLinks.has(normalizeFilmLink(item.link))),
         watchedVoiceByLink
-      ),
+      ).map(item => ({ ...item, film: item.film ?? cachedCards.get(normalizeFilmLink(item.link)) })),
     }))
     .filter((group) => group.items.length > 0);
 };

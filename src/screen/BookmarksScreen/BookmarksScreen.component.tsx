@@ -9,7 +9,7 @@ import { useServiceContext } from 'Context/ServiceContext';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import FolderCog from 'lucide-react-native/icons/folder-cog';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { useAppTheme } from 'Theme/context';
 
 import { componentStyles } from './BookmarksScreen.style';
@@ -62,7 +62,7 @@ export function BookmarksScreenComponent({
                 title={ t('Manage categories') }
                 IconComponent={ FolderCog }
                 iconProps={ {
-                  size: scale(18),
+                  size: scale(Platform.OS === 'web' ? 28 : 18),
                   color: theme.colors.text,
                 } }
                 onPress={ openManageCategories }
@@ -86,7 +86,7 @@ export function BookmarksScreenComponent({
               contentStyle={ { width: '100%', padding: 0, backgroundColor: 'transparent' } }
               IconComponent={ FolderCog }
               iconProps={ {
-                size: scale(20),
+                size: scale(Platform.OS === 'web' ? 28 : 20),
                 color: theme.colors.text,
               } }
               onPress={ openManageCategories }

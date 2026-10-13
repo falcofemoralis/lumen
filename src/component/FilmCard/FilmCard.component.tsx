@@ -1,5 +1,6 @@
 import { posterSeriesInfo } from 'Util/Film/posterStatus';
 import { FilmRating } from 'Component/FilmRating';
+import { BookmarkBadge } from './BookmarkBadge';
 import { ThemedImage } from 'Component/ThemedImage';
 import { ThemedText } from 'Component/ThemedText';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
@@ -19,6 +20,7 @@ export function FilmCardComponent({
   style,
   isHidden,
   isRatingVisible,
+  isBookmarked,
 }: FilmCardComponentProps) {
   const {
     type,
@@ -131,6 +133,7 @@ export function FilmCardComponent({
     <View style={ [styles.card, style] }>
       <View style={ styles.posterWrapper }>
         { renderPoster() }
+        <BookmarkBadge visible={ isBookmarked } />
         <FilmRating
           filmId={ filmCard.id }
           ratings={ filmCard.ratings }

@@ -70,6 +70,8 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     height: scale(28),
   },
   rowDeleteContent: {
+    paddingHorizontal: 0,
+    paddingVertical: 0,
     padding: 0,
   },
   input: {

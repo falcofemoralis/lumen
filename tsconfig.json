@@ -56,6 +56,10 @@
   ],
   "exclude": [
     "node_modules",
-    "test/**/*"
+    "test/**/*",
+    "windows/data/**/*",
+    "windows/smoke-data-*/**/*",
+    "windows/web/**/*",
+    "dist/**/*"
   ]
 }

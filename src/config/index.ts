@@ -91,6 +91,7 @@ export type DeviceConfigType = {
   playerAskQuality: boolean;
   playerCompactSelector: boolean;
   newHomeInterface: boolean;
+  recentTabsInterface: boolean;
   showRecentNotifications: boolean;
   strictConnectionCheck: boolean;
   playerDefaultAspectRatio: string;
@@ -178,6 +179,7 @@ export const defaultConfig: DeviceConfigType = {
   playerAskQuality: false,
   playerCompactSelector: false,
   newHomeInterface: false,
+  recentTabsInterface: false,
   showRecentNotifications: true,
   playerAutoNextEpisode: true,
   playerKeepTimeOnVoiceChange: false,
@@ -273,6 +275,7 @@ export const CONFIG_KEY_SECTIONS = {
   playerAskQuality: BACKUP_SECTION.SETTINGS_PLAYER,
   playerCompactSelector: BACKUP_SECTION.SETTINGS_PLAYER,
   newHomeInterface: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  recentTabsInterface: BACKUP_SECTION.SETTINGS_APPEARANCE,
   showRecentNotifications: BACKUP_SECTION.SETTINGS_APPEARANCE,
   playerRewindSeconds: BACKUP_SECTION.SETTINGS_PLAYER,
   playerBackwardRewindSeconds: BACKUP_SECTION.SETTINGS_PLAYER,

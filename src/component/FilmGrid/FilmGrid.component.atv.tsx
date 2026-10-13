@@ -14,6 +14,7 @@ import { useDefaultFocus } from 'Hooks/useDefaultFocus';
 import { FOCUS_SCROLL_EVENT_THROTTLE, useFocusScroll } from 'Hooks/useFocusScroll';
 import { useLatest } from 'Hooks/useLatest';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
+import { usePosterPrefetch } from 'Hooks/usePosterPrefetch';
 import { memo, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { NativeScrollEvent, NativeSyntheticEvent, View } from 'react-native';
 import { Pressable } from 'react-native-gesture-handler';
@@ -199,16 +200,19 @@ function FilmGridList({
     itemVisiblePercentThreshold: 50,
   }), []);
 
+  const prefetchPosters = usePosterPrefetch(data, numberOfColumns);
   const onViewableItemsChanged = useCallback(({
     viewableItems,
   }: { viewableItems: ViewToken<FilmGridItem>[] }) => {
+    const indexes = viewableItems.filter(token => token.isViewable && token.index !== null).map(token => token.index!);
+    if (indexes.length) prefetchPosters(Math.max(...indexes));
     setVisibleFilmIds(new Set(
       viewableItems
         .filter((token) => token.isViewable && token.item.type === FilmGridItemType.FILM)
         .map((token) => token.item.type === FilmGridItemType.FILM ? token.item.film.id : '')
         .filter(Boolean),
     ));
-  }, []);
+  }, [prefetchPosters]);
   // An animated scroll runs over several frames while the row being entered is
   // still mounting its cards and the focus engine is measuring them; on weak
   // hardware the two compete and the move feels sluggish, so low mode jumps.

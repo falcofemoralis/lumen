@@ -255,48 +255,22 @@ export const toggleLocalBookmark = (
     return;
   }
 
-  const mutations = isBookmarked
-    ? updatedCategory.filmIds.flatMap((filmId) => {
-        const film = updatedBlob.films[filmId];
-
-        return film
-          ? [{
-              entity: 'bookmark-membership' as const,
-              id: getBookmarkMembershipId(categoryId, filmId),
-              value: {
-                categoryId,
-                filmId,
-                position: updatedCategory.filmIds.indexOf(filmId),
-                film,
-              },
-            }]
-          : [];
-      })
-    : [
-        {
-          entity: 'bookmark-membership' as const,
-          id: getBookmarkMembershipId(categoryId, filmCard.id),
-          deleted: true,
-        },
-        ...updatedCategory.filmIds.flatMap((filmId) => {
-          const film = updatedBlob.films[filmId];
-
-          return film
-            ? [{
-                entity: 'bookmark-membership' as const,
-                id: getBookmarkMembershipId(categoryId, filmId),
-                value: {
-                  categoryId,
-                  filmId,
-                  position: updatedCategory.filmIds.indexOf(filmId),
-                  film,
-                },
-              }]
-            : [];
-        }),
-      ];
-
-  mutateCloudSyncBatch(mutations);
+  const deletedIds = category.filmIds.filter(id => !updatedCategory.filmIds.includes(id));
+  mutateCloudSyncBatch([
+    ...deletedIds.map(filmId => ({
+      entity: 'bookmark-membership' as const,
+      id: getBookmarkMembershipId(categoryId, filmId),
+      deleted: true,
+    })),
+    ...updatedCategory.filmIds.flatMap((filmId, position) => {
+      const film = updatedBlob.films[filmId];
+      return film ? [{
+        entity: 'bookmark-membership' as const,
+        id: getBookmarkMembershipId(categoryId, filmId),
+        value: { categoryId, filmId, position, film },
+      }] : [];
+    }),
+  ]);
 };
 
 export const getLocalHistory = (): LocalHistoryItemInterface[] => (

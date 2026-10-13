@@ -54,13 +54,6 @@ export function PageComponent({
       <FocusContext.Provider value={ focusKey }>
         <View
           ref={ ref }
-          onLayout={ event => {
-            const layout = event.nativeEvent.layout;
-            console.log('[ATV Page layout]', { ...layout, isMenuOpen });
-            event.currentTarget.measureInWindow((x, y, width, height) => {
-              console.log('[ATV Page window]', { x, y, width, height });
-            });
-          } }
           style={ [
             styles.container,
             isMenuOpen && styles.containerOpened,

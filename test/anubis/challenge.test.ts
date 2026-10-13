@@ -88,3 +88,9 @@ test('native redirect clearance recovery cannot resurrect the rejected clearance
   assert.deepEqual(freshAnubisAuthCookies(name + '=old; language=ru; techaro.lol-anubis-cookie-verification=id', name + '=old'), {});
   assert.deepEqual(freshAnubisAuthCookies(name + '=new=token; language=ru', name + '=old'), { [name]: 'new=token' });
 });
+
+test('Anubis v1.27 pass request uses the verification cookie name issued by the server', async () => {
+  const { anubisPassCookies } = await import('../../src/util/Anubis/challenge');
+  assert.equal(anubisPassCookies('dle_user_id=123; techaro.lol-anubis-cookie-verification-d82da6a5=other; techaro.lol-anubis-auth-d82da6a5=old', 'current'),
+    'dle_user_id=123; techaro.lol-anubis-cookie-verification-d82da6a5=current');
+});

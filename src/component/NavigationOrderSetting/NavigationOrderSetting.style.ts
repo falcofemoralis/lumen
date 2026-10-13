@@ -17,9 +17,10 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     minWidth: 0,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: scale(2),
+    gap: scale(12),
   },
   itemIcon: {
+    flexShrink: 0,
     width: scale(24),
     height: scale(24),
     color: colors.textSecondary,
@@ -42,10 +43,14 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     height: scale(40),
   },
   buttonContent: {
+    paddingHorizontal: 0,
+    paddingVertical: 0,
+    padding: 0,
     justifyContent: 'center',
     alignItems: 'center',
   },
   buttonIcon: {
+    flexShrink: 0,
     width: scale(24),
     height: scale(24),
     color: colors.text,

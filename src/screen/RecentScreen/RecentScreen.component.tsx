@@ -17,7 +17,7 @@ import Bell from 'lucide-react-native/icons/bell';
 import { ACCOUNT_TAB } from 'Navigation/navigationRoutes';
 import { t } from 'i18n/translate';
 import { useCallback, useMemo } from 'react';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from 'Theme/context';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
@@ -45,7 +45,9 @@ export function RecentScreenComponent({
 }: RecentScreenComponentProps) {
   const styles = useThemedStyles(componentStyles);
   const { isSignedIn, badgeData } = useServiceContext();
-  const { isLocalLibrary, showRecentNotifications, newHomeInterface } = useConfigContext();
+  const { isLocalLibrary, showRecentNotifications, newHomeInterface, recentTabsInterface } = useConfigContext();
+
+  const usesRecentTabs = Platform.OS === 'web' ? recentTabsInterface : newHomeInterface || recentTabsInterface;
 
   const filmItems = useMemo(() => (
     items.map(recentToFilmCard)
@@ -98,7 +100,7 @@ export function RecentScreenComponent({
           style={ buttonStyle }
         >
           <Play
-            size={ scale(18) }
+            size={ scale(24) }
             color={ theme.colors.icon }
           />
         </ThemedPressable>
@@ -108,7 +110,7 @@ export function RecentScreenComponent({
           style={ buttonStyle }
         >
           <Trash2
-            size={ scale(18) }
+            size={ scale(24) }
             color={ theme.colors.icon }
           />
         </ThemedPressable>
@@ -119,12 +121,12 @@ export function RecentScreenComponent({
         >
           { item.isWatched ? (
             <EyeOff
-              size={ scale(18) }
+              size={ scale(24) }
               color={ theme.colors.icon }
             />
           ) : (
             <Eye
-              size={ scale(18) }
+              size={ scale(24) }
               color={ theme.colors.icon }
             />
           ) }
@@ -183,7 +185,7 @@ export function RecentScreenComponent({
       return (
         <FilmList
           items={ listItems }
-          disableStatusbarSafeArea={ newHomeInterface }
+          disableStatusbarSafeArea={ usesRecentTabs }
           ListEmptyComponent={ renderEmpty }
           onNextLoad={ onNextLoad }
           onFilmPress={ (film) => {
@@ -221,7 +223,7 @@ export function RecentScreenComponent({
     return (
       <FilmGrid
         films={ filmItems }
-        disableStatusbarSafeArea={ newHomeInterface }
+        disableStatusbarSafeArea={ usesRecentTabs }
         isEmpty={ !items.length }
         ListEmptyComponent={ renderEmpty }
         onNextLoad={ onNextLoad }
@@ -234,7 +236,7 @@ export function RecentScreenComponent({
     <Page>
       { renderConfirmOverlay() }
       { renderContent() }
-      { showRecentNotifications && !newHomeInterface && (
+      { showRecentNotifications && !usesRecentTabs && (
         <>
           <ThemedPressable
             style={ [

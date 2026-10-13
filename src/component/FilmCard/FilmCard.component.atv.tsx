@@ -1,5 +1,6 @@
 import { posterSeriesInfo } from 'Util/Film/posterStatus';
 import { FilmRating } from 'Component/FilmRating';
+import { BookmarkBadge } from './BookmarkBadge';
 import { ThemedImage } from 'Component/ThemedImage';
 import { ThemedText } from 'Component/ThemedText';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
@@ -22,6 +23,8 @@ export function FilmCardComponent({
   disableScaleAnimation,
   disableScaleTransition,
   isHidden,
+  isBookmarked,
+  isRatingVisible,
 }: FilmCardComponentProps) {
   const {
     type,
@@ -71,6 +74,7 @@ export function FilmCardComponent({
         isPendingRelease && styles.posterPendingRelease,
       ] }
       src={ poster }
+      transition={ 0 }
       // Grid cells are recycled constantly while browsing, and the same posters
       // come back the moment focus turns around. Keeping the decoded bitmaps in
       // memory spares a disk read and a decode per card -- the bulk of what it
@@ -165,7 +169,8 @@ export function FilmCardComponent({
         ] }
       >
         { renderPoster() }
-        <FilmRating filmId={ filmCard.id } ratings={ filmCard.ratings } ratingSourceType={ filmCard.ratingSourceType } ratingFilmId={ filmCard.ratingFilmId } />
+        <BookmarkBadge visible={ isBookmarked } />
+        <FilmRating filmId={ filmCard.id } ratings={ filmCard.ratings } ratingSourceType={ filmCard.ratingSourceType } ratingFilmId={ filmCard.ratingFilmId } isVisible={ isRatingVisible } />
         { renderAdditionContainer() }
         { renderPendingReleaseBadge() }
       </View>

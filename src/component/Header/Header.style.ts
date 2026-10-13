@@ -1,6 +1,9 @@
+import { Platform } from 'react-native';
 import { Theme, ThemedStyles } from 'Theme/types';
 
-export const componentStyles = ({ scale, colors, text }: Theme) => ({
+export const componentStyles = ({ scale: baseScale, colors, text }: Theme) => {
+  const scale = (value: number) => baseScale(value * (Platform.OS === 'web' ? 1.3 : 1));
+  return ({
   topActions: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -31,3 +34,4 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     fontWeight: 'bold',
   },
 } satisfies ThemedStyles);
+};

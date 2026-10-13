@@ -21,9 +21,9 @@ export function NotificationsScreenContainer() {
         return [];
       }
 
+      const films = await currentService.getFilmsFromNotifications(notifications);
       resetNotifications();
-
-      return currentService.getFilmsFromNotifications(notifications);
+      return films;
     },
     enabled: isSignedIn || isLocalLibrary,
     // resolving every notification into a film card is expensive, so keep the

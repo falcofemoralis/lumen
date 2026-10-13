@@ -24,4 +24,5 @@ export type FilmCardComponentProps = FilmCardContainerProps & {
    * grid but shows nothing about the film -- no poster, title, or subtitle.
    */
   isHidden?: boolean;
+  isBookmarked?: boolean;
 };

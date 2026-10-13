@@ -19,6 +19,7 @@ import {
 import { NavigationOrderItem } from 'Component/NavigationOrderSetting/NavigationOrderSetting.type';
 
 export const getTVNavigationOrderItems = (): NavigationOrderItem[] => [
+  { value: DOWNLOADS_SCREEN, label: t('Downloads'), IconComponent: Download },
   {
     value: NOTIFICATIONS_TAB,
     label: t('Notifications'),

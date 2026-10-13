@@ -1,4 +1,4 @@
-﻿import { ThemedButton } from 'Component/ThemedButton';
+import { ThemedButton } from 'Component/ThemedButton';
 import { ThemedInput } from 'Component/ThemedInput';
 import { ThemedOverlay } from 'Component/ThemedOverlay';
 import { ThemedPressable } from 'Component/ThemedPressable';
@@ -102,7 +102,7 @@ const LocalCategoryRowTV = ({
         contentStyle={ styles.rowDeleteContent }
         IconComponent={ Trash2 }
         iconProps={ {
-          size: scale(14),
+          size: scale(24),
         } }
         onPress={ () => onDelete(category.id) }
       />

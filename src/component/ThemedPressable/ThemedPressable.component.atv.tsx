@@ -3,7 +3,7 @@ import { useScrollContext } from 'Component/ThemedScrollView/ScrollContext';
 import { useDefaultFocus } from 'Hooks/useDefaultFocus';
 import { useLongEnterPress } from 'Hooks/useLongEnterPress';
 import { ReactElement } from 'react';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { Pressable } from 'react-native-gesture-handler';
 import { useAppTheme } from 'Theme/context';
 
@@ -107,7 +107,11 @@ export const ThemedPressableComponent = ({
         unstable_pressDelay={ pressDelay }
         hitSlop={ hitSlop }
         style={ [{
-          flex: 1,
+          flex: Platform.OS === 'web' ? undefined : 1,
+          flexGrow: Platform.OS === 'web' ? 1 : undefined,
+          flexShrink: Platform.OS === 'web' ? 1 : undefined,
+          flexBasis: Platform.OS === 'web' ? 'auto' : undefined,
+          alignSelf: 'stretch',
           flexDirection: 'row',
           justifyContent: 'center',
           alignItems: 'center',

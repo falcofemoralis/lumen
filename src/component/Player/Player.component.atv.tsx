@@ -47,6 +47,7 @@ import {
 } from 'react';
 import {
   BackHandler,
+  Platform,
   View,
 } from 'react-native';
 import { Pressable } from 'react-native-gesture-handler';
@@ -1002,6 +1003,7 @@ export function PlayerComponent({
 
   return (
     <Animated.View
+      nativeID={ Platform.OS === 'web' ? 'lumen-player' : undefined }
       style={ [
         styles.container,
         isCommentsOpen && styles.containerWithComments,
@@ -1014,6 +1016,11 @@ export function PlayerComponent({
         resizeMode={ selectedAspectRatio }
         controls={ false }
         pictureInPicture={ isPipSupported }
+        { ...Platform.OS === 'web' ? { episodeNavigation: {
+          enabled: film.hasSeasons,
+          previous: () => handleNewEpisode(RewindDirection.BACKWARD),
+          next: () => handleNewEpisode(RewindDirection.FORWARD),
+        } } : {} }
       />
       { renderError() }
       { renderTapSurface() }

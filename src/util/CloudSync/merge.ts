@@ -1,3 +1,4 @@
+import { getCloudSyncSettingFromId } from '../../config/cloudSync';
 import {
   CloudEntityMeta,
   CloudRecord,
@@ -79,10 +80,12 @@ export const mergeCloudSyncState = (
   const localUpdated = local.updatedAt ?? 0;
   const remoteUpdated = remote.updatedAt ?? 0;
 
-  const settingsValues = { ...local.settings.values };
-  const settingsMetadata = { ...local.settings.metadata };
+  const eligible = (id: string) => getCloudSyncSettingFromId(id)?.scope !== 'local';
+  const settingsValues = Object.fromEntries(Object.entries(local.settings.values).filter(([id]) => eligible(id)));
+  const settingsMetadata = Object.fromEntries(Object.entries(local.settings.metadata).filter(([id]) => eligible(id)));
 
   for (const [key, remoteMeta] of Object.entries(remote.settings.metadata)) {
+    if (!eligible(key)) continue;
     const localMeta = settingsMetadata[key];
 
     if (!localMeta || compareMeta(localMeta, remoteMeta) < 0) {

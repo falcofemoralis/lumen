@@ -8,7 +8,7 @@ import { useServiceContext } from 'Context/ServiceContext';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import FolderCog from 'lucide-react-native/icons/folder-cog';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { useAppTheme } from 'Theme/context';
 
 import { componentStyles } from './BookmarksScreen.style.atv';
@@ -41,7 +41,7 @@ export function BookmarksScreenComponent({
       autofocus={ autofocus }
       IconComponent={ FolderCog }
       iconProps={ {
-        size: scale(18),
+        size: scale(Platform.OS === 'web' ? 28 : 18),
       } }
       iconColor='#FFFFFF'
       iconColorFocused='#FFFFFF'

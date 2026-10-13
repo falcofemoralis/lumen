@@ -9,6 +9,7 @@ import { Portal } from 'Component/ThemedPortal';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useIsScreenFocused } from 'Hooks/useIsScreenFocused';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
+import { usePosterPrefetch } from 'Hooks/usePosterPrefetch';
 import { ComponentType, memo, ReactElement, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { NativeScrollEvent, NativeSyntheticEvent, Pressable, RefreshControl, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -110,16 +111,19 @@ export function FilmGridComponent({
     itemVisiblePercentThreshold: 50,
   }), []);
 
+  const prefetchPosters = usePosterPrefetch(data, numberOfColumns);
   const onViewableItemsChanged = useCallback(({
     viewableItems,
   }: { viewableItems: ViewToken<FilmGridItem>[] }) => {
+    const indexes = viewableItems.filter(token => token.isViewable && token.index !== null).map(token => token.index!);
+    if (indexes.length) prefetchPosters(Math.max(...indexes));
     setVisibleFilmIds(new Set(
       viewableItems
         .filter((token) => token.isViewable && token.item.type === FilmGridItemType.FILM)
         .map((token) => token.item.type === FilmGridItemType.FILM ? token.item.film.id : '')
         .filter(Boolean),
     ));
-  }, []);
+  }, [prefetchPosters]);
 
   const renderItem = useCallback(({ item }: { item: FilmGridItem }) => {
     if (item.type === FilmGridItemType.HEADER) {

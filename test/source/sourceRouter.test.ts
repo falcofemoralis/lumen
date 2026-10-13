@@ -216,3 +216,18 @@ test('Anixart original aliases match Rezka despite localized subtitle and keep b
   assert.equal(await new SourceRouter([a, makeAdapter(ContentSource.REZKA, [different])])
     .getFilmForSource(anime, ContentSource.REZKA), null);
 });
+
+test('Unavailable Rezka cannot erase native Zona franchise, schedule or related cards', async () => {
+  clearUnifiedFilmRegistry();
+  const film = { ...makeFilm(true),
+    franchise: [{ name: 'Native part', year: '2001', rating: '8', link: '/native-part' }],
+    related: [{ id: 'native', link: 'https://w1.zona.im/movies/native', title: 'Native related', poster: 'https://img.test/native.jpg', subtitle: '2001', type: FilmType.FILM }],
+    schedule: [{ name: 'Season 1', items: [] }] };
+  const rezka = makeAdapter(ContentSource.REZKA, []);
+  rezka.search = async () => { throw new Error('Service Temporarily Unavailable'); };
+  const router = new SourceRouter([makeAdapter(ContentSource.ZONA, [film]), rezka]);
+  const result = await router.resolvePreferredFilm(film);
+  assert.deepEqual(result.related, film.related);
+  assert.deepEqual(result.franchise, film.franchise);
+  assert.deepEqual(result.schedule, film.schedule);
+});
