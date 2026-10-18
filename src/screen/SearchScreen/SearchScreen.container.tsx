@@ -18,7 +18,7 @@ import { setTimeoutSafe } from 'Util/Misc';
 import { navigate } from 'Util/Navigation';
 import { queryKeys, STALE_TIME } from 'Util/Query';
 import { unifiedSearchService, ContentSource } from '../../source';
-import { ContentFilters, getGenreCatalogPaths, getZonaFilteredCatalogPaths, matchesContentFilters } from '../../source/search/ContentFilters';
+import { ContentFilters, getSearchGenreOptions, getGenreCatalogPaths, getZonaFilteredCatalogPaths, matchesContentFilters } from '../../source/search/ContentFilters';
 import { FilmType } from 'Type/FilmType.type';
 import { TYPE_LABELS } from 'Component/FilmCard/FilmCard.config';
 import { isSourceEnabled } from '../../source/types/SourceSelection';
@@ -165,10 +165,9 @@ export function SearchScreenContainer() {
 
   const formatOptions = [FilmType.FILM, FilmType.SERIES, FilmType.CARTOON, FilmType.ANIME, FilmType.DONGHUA]
     .map(type => ({ value: type, label: t(TYPE_LABELS[type]) }));
-  const genreOptions = useMemo(() => Array.from(new Map((categories ?? [])
+  const genreOptions = useMemo(() => getSearchGenreOptions((categories ?? [])
     .filter(category => !selectedFormats.length || selectedFormats.includes(formatType(category.name) ?? ''))
-    .flatMap(category => category.genres.filter((genre, index) => index > 0 && genre.value && !/все|all|любые/i.test(genre.name)))
-    .map(genre => [genre.name.toLowerCase(), { label: genre.name, value: genre.name }])).values()), [categories, selectedFormats]);
+    .flatMap(category => category.genres)), [categories, selectedFormats]);
 
   useEffect(() => () => {
     if (debounce.current) {

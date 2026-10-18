@@ -39,7 +39,8 @@ export function CollectionScreenComponent({
     return (
       <ThemedPressable
         onPress={ () => handleOnPress(item) }
-        style={ { height: height + scale(ROW_GAP) } }
+        style={ styles.card }
+        contentStyle={ styles.cardContent }
       >
         { ({ isFocused }) => {
           return (
@@ -55,13 +56,13 @@ export function CollectionScreenComponent({
               <ThemedText style={ styles.text }>
                 { item.source ? item.source + ' · ' + title : title }
               </ThemedText>
-              <ThemedImage src={ image } style={ styles.image } />
+              <ThemedImage src={ image } style={ styles.image } cachePolicy="memory-disk" transition={ 0 } />
             </View>
           );
         } }
       </ThemedPressable>
     );
-  }, [handleOnPress, height, scale, styles]);
+  }, [handleOnPress, styles]);
 
   const renderContent = () => {
     if (isLoading) {

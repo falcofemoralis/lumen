@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import { FilmType } from '../src/type/FilmType.type';
 import { FilmInterface } from '../src/type/Film.interface';
 import { buildFilmSubtitle, subtitleFromFilm } from '../src/util/Film/subtitle';
-import { getGenreCatalogPath, matchesContentFilters } from '../src/source/search/ContentFilters';
+import { getGenreCatalogPath, getSearchGenreOptions, matchesContentFilters } from '../src/source/search/ContentFilters';
 import Anixart, { anixartToCard, anixartToFilm } from '../src/source/adapters/AnixartSourceAdapter';
 import { SourceResolver } from '../src/source/resolver/SourceResolver';
 import { createUnifiedSearchService } from '../src/source/search/UnifiedSearchService';
@@ -110,4 +110,15 @@ test('Zona horror/year filters are sent natively rather than scanning current re
   assert.equal(getZonaFilteredCatalogPaths(['https://w1.zona.im/movies/filter/genre-multfilm'],
     { genres: ['Ужасы'], from: 2013, to: 2013 })[0],
   'https://w1.zona.im/movies/filter/genre-multfilm/year-2013');
+});
+
+test('genre selection stays available when the Rezka menu is unavailable or empty', () => {
+  for (const genres of [[], [{ name: 'Все жанры', value: '/films/' }]]) {
+    const options = getSearchGenreOptions(genres);
+    assert.ok(options.some(option => option.value === 'Ужасы'));
+    assert.ok(options.some(option => option.value === 'Комедия'));
+    assert.ok(!options.some(option => /все жанры/i.test(option.label)));
+  }
+  const options = getSearchGenreOptions([{ name: 'Драмы', value: '/drama/' }, { name: 'Драма', value: '/drama/' }]);
+  assert.equal(options.length, 1);
 });

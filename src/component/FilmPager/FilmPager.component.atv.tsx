@@ -227,7 +227,19 @@ export function FilmPagerComponent({
       ? renderedTabs.indexes
       : EMPTY_INDEXES;
 
+  const preloadTab = useCallback((index: number) => {
+    const item = pagerItems[index];
+    if (!item) return;
+    if (loadedTabsRef.current.key !== tabsKey) {
+      loadedTabsRef.current = { key: tabsKey, indexes: new Set([initialPage]) };
+    }
+    if (index === initialPage || loadedTabsRef.current.indexes.has(index)) return;
+    loadedTabsRef.current.indexes.add(index);
+    onPreLoad(item);
+  }, [pagerItems, tabsKey, initialPage, onPreLoad]);
+
   const updateActiveTab = useCallback((index: number) => {
+    preloadTab(index);
     if (index < 0 || index >= pagerItems.length) {
       return;
     }
@@ -249,7 +261,7 @@ export function FilmPagerComponent({
         indexes,
       };
     });
-  }, [pagerItems.length, tabsKey]);
+  }, [pagerItems.length, tabsKey, preloadTab]);
 
   const handleTabSelect = useCallback((index: number) => {
     if (index === activeIndex) {
@@ -266,32 +278,7 @@ export function FilmPagerComponent({
     const { position } = event.nativeEvent;
 
     updateActiveTab(position);
-
-    if (loadedTabsRef.current.key !== tabsKey) {
-      loadedTabsRef.current = {
-        key: tabsKey,
-        indexes: new Set([initialPage]),
-      };
-    }
-
-    const { indexes } = loadedTabsRef.current;
-
-    if (!indexes.has(position) && position !== initialPage) {
-      const pagerItem = pagerItems[position];
-
-      if (pagerItem) {
-        onPreLoad(pagerItem);
-      }
-
-      indexes.add(position);
-    }
-  }, [
-    initialPage,
-    onPreLoad,
-    pagerItems,
-    tabsKey,
-    updateActiveTab,
-  ]);
+  }, [updateActiveTab]);
 
   const handlePageScroll = useCallback((
     event: NativeSyntheticEvent<OnPageScrollEventData>,

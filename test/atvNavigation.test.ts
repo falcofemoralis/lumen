@@ -246,3 +246,52 @@ test('Native category controls override the nested pressable flex shorthand', ()
     assert.equal(nativeStyle.flexBasis, 'auto');
   }
 });
+test('Both native pagers preload a selected tab before the page animation completes and only once', () => {
+  for (const file of ['FilmPager.component.tsx', 'FilmPager.component.atv.tsx']) {
+    const loaded: string[] = [];
+    const pager = { current: { setPage() {} } };
+    const mod = compile('src/component/FilmPager/' + file, name => {
+      if (name === 'react') return { memo: (fn: Function) => fn, useCallback: (fn: Function) => fn,
+        useMemo: (fn: Function) => fn(), useRef: (current: unknown) => ({ current }),
+        useState: (initial: unknown) => [typeof initial === 'function' ? initial() : initial, () => {}], useId: () => 'pager' };
+      if (name === 'react-native') return { View: 'View', ScrollView: 'ScrollView' };
+      if (name === 'react-native-gesture-handler') return { Pressable: 'Pressable' };
+      if (name === 'react-native-reanimated') return { __esModule: true, default: { Text: 'Text' } };
+      if (name === 'react-native-safe-area-context') return { useSafeAreaInsets: () => ({ top: 0 }) };
+      if (name === 'react-native-pager-view') return { usePagerView: () => ({ AnimatedPagerView: 'Pager', ref: pager }) };
+      if (name === 'Theme/context') return { useAppTheme: () => ({ scale: (n: number) => n, theme: { dimensions: {}, colors: {} } }) };
+      if (name === 'Hooks/useThemedStyles') return { useThemedStyles: () => ({}) };
+      if (name.startsWith('Component/')) { const key = name.split('/')[1]; return { [key]: key }; }
+      return {};
+    });
+    const tree = mod.FilmPagerComponent({ tabPosition: 'top', pagerItems: ['first', 'second'].map(id => ({
+      menuItem: { id, title: id }, films: [], pagination: { currentPage: 1, totalPages: 1 },
+    })), onPreLoad: (item: any) => loaded.push(item.menuItem.id) });
+    const nodes: any[] = [];
+    const visit = (node: any) => {
+      if (!node || typeof node !== 'object') return;
+      nodes.push(node);
+      for (const child of [node.props?.children].flat(Infinity)) visit(child);
+    };
+    visit(tree);
+    const tab = nodes.find(node => node.props?.onTabSelect);
+    const button = nodes.find(node => node.props?.menuItem?.id === 'second' && node.props?.onPress);
+    if (tab) tab.props.onTabSelect(1); else button.props.onPress();
+    assert.deepEqual(loaded, ['second'], file);
+    nodes.find(node => node.type === 'Pager').props.onPageSelected({ nativeEvent: { position: 1 } });
+    assert.deepEqual(loaded, ['second'], file);
+  }
+});
+test('Collection cards fill a bounded landscape cell instead of relying on intrinsic image width', () => {
+  for (const suffix of ['', '.atv']) {
+    const mod = compile('src/screen/CollectionScreen/CollectionScreen.style' + suffix + '.ts', () => ({}));
+    const styles = mod.componentStyles({ scale: (n: number) => n, colors: {}, text: { xs: {}, xxs: {} } });
+    assert.equal(styles.card.width, '100%');
+    assert.equal(styles.card.aspectRatio, 208 / 120);
+    assert.equal(styles.item.width, '100%');
+    if (suffix) {
+      assert.equal(styles.item.height, '100%');
+      assert.equal(styles.cardContent.flex, 1);
+    }
+  }
+});

@@ -70,6 +70,20 @@ const ZONA_GENRE_SLUGS: Record<string, string> = {
   'семейный': 'semeinyi', 'военный': 'voennyi', 'исторический': 'istoriya',
   'документальный': 'dokumentalnyi', 'биография': 'biografiya', 'вестерн': 'vestern',
 };
+export const getSearchGenreOptions = (genres: { name: string; value: string }[]) => {
+  const options = new Map<string, { label: string; value: string }>();
+  for (const genre of genres) {
+    if (!genre.value || /все|all|любые/i.test(genre.name)) continue;
+    options.set(normalizeGenreName(genre.name), { label: genre.name, value: genre.name });
+  }
+  if (!options.size) {
+    for (const name of Object.keys(ZONA_GENRE_SLUGS)) {
+      const label = name[0].toUpperCase() + name.slice(1);
+      options.set(name, { label, value: label });
+    }
+  }
+  return Array.from(options.values());
+};
 export const getZonaFilteredCatalogPaths = (paths: string[], filters: Pick<ContentFilters, 'from' | 'to' | 'genres'>): string[] => {
   const selected = filters.genres ?? [];
   const slugs = selected.map(genre => ZONA_GENRE_SLUGS[normalizeGenreName(genre)]);

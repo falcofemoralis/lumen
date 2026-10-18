@@ -576,6 +576,7 @@ function FilmGridList({
             ListHeaderComponent={ listHeader }
             ListEmptyComponent={ disableEmptyComponent || hideGrid ? null : ListEmptyComponent }
             showsVerticalScrollIndicator={ false }
+            removeClippedSubviews={ false }
           />
         
         { showScrollToTopButton && (

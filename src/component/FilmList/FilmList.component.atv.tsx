@@ -146,6 +146,8 @@ function FilmListRow({
               <ThemedImage
                 style={ styles.poster }
                 src={ film.poster }
+                cachePolicy="memory-disk"
+                transition={ 0 }
               />
               <FilmRating filmId={ film.id } ratings={ film.ratings }
               ratingSourceType={ film.ratingSourceType } ratingFilmId={ film.ratingFilmId } />
