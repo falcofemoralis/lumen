@@ -7,7 +7,9 @@ export function createPosterPrefetchQueue(load: (url: string) => Promise<boolean
     while (active < concurrency && pending.length) {
       const url = pending.shift()!;
       active++;
-      Promise.resolve().then(() => load(url)).catch(() => false).finally(() => { active--; pump(); });
+      Promise.resolve().then(() => load(url)).catch(() => false)
+        .then(loaded => { if (!loaded) seen.delete(url); })
+        .finally(() => { active--; pump(); });
     }
   };
   return (urls: string[]) => {

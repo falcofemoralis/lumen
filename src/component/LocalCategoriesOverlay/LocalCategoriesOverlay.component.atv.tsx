@@ -18,6 +18,7 @@ import {
   LocalCategoriesOverlayComponentProps,
   LocalCategoryRowInterface,
 } from './LocalCategoriesOverlay.type';
+import { LocalCategoryDragHandle, LocalCategoryDragRow } from './LocalCategoryDragRow';
 
 const NEW_CATEGORY_FOCUS_KEY = 'LOCAL_CATEGORIES_NEW_CATEGORY';
 
@@ -25,6 +26,7 @@ interface LocalCategoryRowTVProps {
   category: LocalCategoryRowInterface;
   index: number;
   itemCount: number;
+  categoryIds: string[];
   scale: (value: number) => number;
   styles: ReturnType<typeof componentStyles>;
   onDelete: (categoryId: string) => void;
@@ -35,6 +37,7 @@ const LocalCategoryRowTV = ({
   category,
   index,
   itemCount,
+  categoryIds,
   scale,
   styles,
   onDelete,
@@ -68,45 +71,53 @@ const LocalCategoryRowTV = ({
   };
 
   return (
-    <View style={ [styles.row, isMoving && styles.rowMoving] }>
-      <ThemedPressable
-        focusKey={ `LOCAL_CATEGORY_${category.id}` }
-        onLongPress={ handleLongPress }
-        onArrowPress={ handleArrowPress }
-        style={ styles.rowDrag }
-        contentStyle={ styles.rowDragContent }
-      >
-        <View style={ styles.rowHandle }>
-          <GripVertical
-            size={ scale(18) }
-            color={
-              isMoving
-                ? theme.colors.primary
-                : theme.colors.text
-            }
-          />
-        </View>
+    <LocalCategoryDragRow categoryId={ category.id } categoryIds={ categoryIds } onReorder={ onReorder }>
+      <View style={ [styles.row, isMoving && styles.rowMoving] }>
+        <ThemedPressable
+          focusKey={ `LOCAL_CATEGORY_${category.id}` }
+          onLongPress={ handleLongPress }
+          onArrowPress={ handleArrowPress }
+          style={ ({ isFocused }) => [styles.rowDrag, isFocused && styles.rowDragFocused] }
+          contentStyle={ styles.rowDragContent }
+        >
+          { ({ isFocused }) => (
+            <>
+              <View style={ styles.rowHandle }>
+                <LocalCategoryDragHandle categoryId={ category.id }>
+                  <GripVertical
+                    size={ scale(18) }
+                    color={
+                      isMoving
+                        ? theme.colors.primary
+                        : isFocused ? theme.colors.iconFocused : theme.colors.icon
+                    }
+                  />
+                </LocalCategoryDragHandle>
+              </View>
 
-        <ThemedText style={ styles.rowTitle }>
-          { category.title }
-        </ThemedText>
+              <ThemedText style={ [styles.rowTitle, isFocused && styles.rowTextFocused] }>
+                { category.title }
+              </ThemedText>
 
-        <ThemedText style={ styles.rowCount }>
-          { category.count }
-        </ThemedText>
-      </ThemedPressable>
+              <ThemedText style={ [styles.rowCount, isFocused && styles.rowTextFocused] }>
+                { category.count }
+              </ThemedText>
+            </>
+          ) }
+        </ThemedPressable>
 
-      <ThemedButton
-        title=""
-        style={ styles.rowDelete }
-        contentStyle={ styles.rowDeleteContent }
-        IconComponent={ Trash2 }
-        iconProps={ {
-          size: scale(24),
-        } }
-        onPress={ () => onDelete(category.id) }
-      />
-    </View>
+        <ThemedButton
+          title=""
+          style={ styles.rowDelete }
+          contentStyle={ styles.rowDeleteContent }
+          IconComponent={ Trash2 }
+          iconProps={ {
+            size: scale(24),
+          } }
+          onPress={ () => onDelete(category.id) }
+        />
+      </View>
+    </LocalCategoryDragRow>
   );
 };
 
@@ -144,6 +155,7 @@ export const LocalCategoriesOverlayComponent = ({
             category={ category }
             index={ index }
             itemCount={ categories.length }
+            categoryIds={ categories.map(({ id }) => id) }
             scale={ scale }
             styles={ styles }
             onDelete={ requestDelete }

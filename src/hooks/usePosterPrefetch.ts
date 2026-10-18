@@ -8,8 +8,10 @@ const prefetch = createPosterPrefetchQueue(url => Image.prefetch(url, { cachePol
 
 export function usePosterPrefetch(data: FilmGridItem[], columns: number) {
   const latest = useRef({ data, columns });
+  const lastVisibleRef = useRef(-1);
   latest.current = { data, columns };
-  const ahead = useCallback((lastVisible = -1) => {
+  const ahead = useCallback((lastVisible = lastVisibleRef.current) => {
+    lastVisibleRef.current = lastVisible;
     if (Platform.OS !== 'android') return;
     const { data, columns } = latest.current;
     const posters = data.slice(lastVisible + 1, lastVisible + 1 + columns * 3)

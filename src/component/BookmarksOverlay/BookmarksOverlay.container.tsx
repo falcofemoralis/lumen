@@ -10,6 +10,7 @@ import { ContentSource } from '../../source/types/ContentSource';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { t } from 'i18n/translate';
 import { useState } from 'react';
+import { Platform } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
 import { BookmarkInterface } from 'Type/Bookmark.interface';
 import { FilmInterface } from 'Type/Film.interface';
@@ -92,7 +93,19 @@ export const BookmarksOverlayContainer = ({
         ? currentService.addBookmark(id, bookmarkId)
         : currentService.removeBookmark(id, bookmarkId);
     },
-    onSuccess: (_result, { bookmarkId, isChecked }) => {
+    onMutate: async ({ bookmarkId, isChecked }) => {
+      await Promise.all([
+        queryClient.cancelQueries({ queryKey: queryKeys.bookmarks() }),
+        queryClient.cancelQueries({ queryKey: queryKeys.films.bookmarks() }),
+        queryClient.cancelQueries({ queryKey: ['film', film.link], exact: true }),
+      ]);
+      const previous = queryClient.getQueriesData({ predicate: query =>
+        query.queryKey[0] === 'bookmarks'
+        || (query.queryKey[0] === 'films' && query.queryKey[1] === 'bookmarks')
+        || (query.queryKey[0] === 'film' && query.queryKey.length === 2
+          && (query.state.data as FilmInterface | undefined)?.id === film.id),
+      });
+      const previousOverrides = overrides;
       const bookmarks = mergeBookmarkFlags(film.bookmarks, getLocalBookmarksForFilm(bookmarkLibrary, film.id, filmToFilmCard(film)));
       const bookmark = bookmarks?.find((b) => b.id === bookmarkId);
 
@@ -119,9 +132,17 @@ export const BookmarksOverlayContainer = ({
         queryClient.setQueryData<BookmarkInterface[]>(queryKeys.bookmarks(), old => old?.map(item => item.id === bookmarkId && item.filmList
           ? { ...item, filmList: { ...item.filmList, films: cards } } : item));
       }
-      // the bookmarks tab lists the same categories, so it has to re-read them
-      queryClient.invalidateQueries({ queryKey: queryKeys.bookmarks() });
-      queryClient.invalidateQueries({ queryKey: queryKeys.films.bookmarks() });
+
+      return { previous, previousOverrides };
+    },
+    onError: (_error, _variables, context) => {
+      context?.previous.forEach(([key, data]) => queryClient.setQueryData(key, data));
+      if (context) setOverrides(context.previousOverrides);
+      onBookmarkChange?.(film);
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.bookmarks(), refetchType: 'none' });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.films.bookmarks(), refetchType: 'none' });
     },
   });
 
@@ -185,7 +206,7 @@ export const BookmarksOverlayContainer = ({
   };
 
   // eslint-disable-next-line max-len
-  return isTV ? <BookmarksOverlayComponentTV { ...containerProps } /> : <BookmarksOverlayComponent { ...containerProps } />;
+  return isTV && Platform.OS !== 'web' ? <BookmarksOverlayComponentTV { ...containerProps } /> : <BookmarksOverlayComponent { ...containerProps } />;
 };
 
 export default BookmarksOverlayContainer;

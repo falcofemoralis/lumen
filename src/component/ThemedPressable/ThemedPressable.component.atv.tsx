@@ -29,6 +29,7 @@ export const ThemedPressableComponent = ({
   extraProps,
   focusKey,
   autofocus = false,
+  focusOnPress = true,
 }: ThemedPressableComponentProps) => {
   const { scrollTo } = useScrollContext();
   const { theme } = useAppTheme();
@@ -46,7 +47,12 @@ export const ThemedPressableComponent = ({
     onBlur,
     onArrowPress,
     extraProps,
-    onEnterPress: onEnterPress ?? onPress,
+    focusable: !disabled,
+    onEnterPress: () => {
+      if (!disabled) {
+        (onEnterPress ?? onPress)?.();
+      }
+    },
   });
 
   useDefaultFocus(realFocusKey, autofocus);
@@ -58,7 +64,9 @@ export const ThemedPressableComponent = ({
   // from. It is a no-op for the d-pad path: `onEnterPress` fires on a node that
   // is focused already.
   const handlePress = () => {
-    focusSelf();
+    if (disabled) return;
+
+    if (focusOnPress) focusSelf();
     onPress?.();
   };
 

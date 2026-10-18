@@ -14,4 +14,5 @@ export type NavigationOrderSettingProps = {
   onChange: (value: string[]) => void;
   onHiddenItemsChange: (value: string[]) => void;
   onBack: () => void;
+  embedded?: boolean;
 };

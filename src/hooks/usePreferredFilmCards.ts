@@ -38,8 +38,9 @@ const resolveCard = (card: FilmCardInterface) => {
   const value = sourceRouter.resolvePreferredCard(card, false, { deferSeriesInfo: true }).then((resolved) => {
     if (resolved === card || resolved.contentTypePending) cache.delete(card.link);
     return resolved;
-  });
+  }).catch(error => { cache.delete(card.link); throw error; });
   cache.set(card.link, { time: Date.now(), value });
+  while (cache.size > 512) cache.delete(cache.keys().next().value!);
   return value;
 };
 
@@ -71,13 +72,14 @@ export const usePreferredFilmCards = (items: PagerItemInterface[], persistWeekly
     initialData: snapshot,
     initialDataUpdatedAt: 0,
     enabled: isFocused && isInternetAvailable && cards.length > 0,
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
       const resolved = snapshot();
       // Cached folders can contain thousands of cards. Publish once per batch,
       // and yield the JS thread so taps and swipes can run during refresh.
       let lastPublished = Date.now();
       let dirty = false;
       const publish = async (force = false) => {
+        if (signal.aborted) return;
         dirty = true;
         if (!force && Date.now() - lastPublished < 150) return;
         const activeKey = queryKeyRef.current;
@@ -95,18 +97,19 @@ export const usePreferredFilmCards = (items: PagerItemInterface[], persistWeekly
       const scheduleStatus = (job: () => Promise<void>) => {
         const index = nextStatus++ % statusLanes.length;
         statusLanes[index] = statusLanes[index].then(async () => {
-          if (networkRef.current && focusedRef.current) await job();
+          if (!signal.aborted && networkRef.current && focusedRef.current) await job();
         });
       };
       const lanes = [{ cards: prioritized, workers: 4 }];
       await Promise.all(lanes.map(async lane => {
         let next = 0;
         await Promise.all(Array.from({ length: Math.min(lane.workers, lane.cards.length) }, async () => {
-        while (next < lane.cards.length && networkRef.current && (persistWeekly || focusedRef.current)) {
+          while (!signal.aborted && next < lane.cards.length && networkRef.current && (persistWeekly || focusedRef.current)) {
           const original = lane.cards[next++];
           const card = persistWeekly ? original : resolved.get(original.link)!;
           let updated = await (persistWeekly ? getBookmarkCache().resolve(card)
             : persistHome && getHomeCardCache().isFresh(original) ? Promise.resolve(card) : persistHome ? resolveCard(card).catch(() => card) : (card.ratingSourceType === 'ANIXART' || (isZonaCard(card) && !card.contentTypePending && !card.ratings?.imdbPending)) ? Promise.resolve(card) : resolveCard(card));
+            if (signal.aborted) break;
           const previousCard = knownCardsRef.current.get(original.link);
           // A partial refresh must not erase already verified episode information.
           if (!updated.info && previousCard?.info && previousCard.link === updated.link) {
@@ -125,6 +128,7 @@ export const usePreferredFilmCards = (items: PagerItemInterface[], persistWeekly
             scheduleStatus(async () => {
             try {
               const detailed = await sourceRouter.resolvePreferredCard(updated, true);
+                  if (signal.aborted) return;
               knownCardsRef.current.set(original.link, detailed);
               resolved.set(original.link, detailed);
               if (persistHome) getHomeCardCache().remember(original, detailed);

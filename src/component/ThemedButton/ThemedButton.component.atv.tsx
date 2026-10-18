@@ -31,6 +31,7 @@ export default function ThemedButton({
   rightImageStyle,
   autofocus,
   focusKey,
+  extraProps,
   textStyleFocused,
   topAdditionalElement,
   bottomAdditionalElement,
@@ -42,6 +43,8 @@ export default function ThemedButton({
   return (
     <ThemedPressable
       onPress={ onPress }
+      disabled={ disabled }
+      extraProps={ extraProps }
       onLongPress={ onLongPress }
       onFocus={ onFocus }
       onEnterPress={ onEnterPress }

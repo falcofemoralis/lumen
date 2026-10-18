@@ -42,6 +42,7 @@ export type DeviceConfigType = {
   hiddenHomeTabs: string[];
   showEpisodeUpdateCount: boolean;
   tabPosition: TabPosition;
+  tvTabPosition: TabPosition;
   homeDisplayMode: FilmDisplayMode;
   bookmarksDisplayMode: FilmDisplayMode;
   showBookmarkCounts: boolean;
@@ -152,6 +153,7 @@ export const defaultConfig: DeviceConfigType = {
   hiddenHomeTabs: [],
   showEpisodeUpdateCount: true,
   tabPosition: 'bottom',
+  tvTabPosition: 'top',
   homeDisplayMode: 'grid',
   bookmarksDisplayMode: 'grid',
   showBookmarkCounts: false,
@@ -237,6 +239,7 @@ export const CONFIG_KEY_SECTIONS = {
   hiddenHomeTabs: BACKUP_SECTION.SETTINGS_APPEARANCE,
   showEpisodeUpdateCount: BACKUP_SECTION.SETTINGS_APPEARANCE,
   tabPosition: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  tvTabPosition: BACKUP_SECTION.SETTINGS_APPEARANCE,
   homeDisplayMode: BACKUP_SECTION.SETTINGS_APPEARANCE,
   bookmarksDisplayMode: BACKUP_SECTION.SETTINGS_APPEARANCE,
   showBookmarkCounts: BACKUP_SECTION.SETTINGS_APPEARANCE,

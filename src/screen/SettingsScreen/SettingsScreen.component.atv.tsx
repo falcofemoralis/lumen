@@ -1,4 +1,8 @@
 import { Page } from 'Component/Page';
+import { ThemedOverlay } from 'Component/ThemedOverlay';
+import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
+import { ThemedButton } from 'Component/ThemedButton';
+import { ThemedText } from 'Component/ThemedText';
 import { getAspectRatio } from 'Component/Player/Player.config';
 import { SettingBase } from 'Component/SettingBase';
 import { SettingCustomSelect } from 'Component/SettingCustomSelect';
@@ -84,7 +88,7 @@ import UserCog from 'lucide-react-native/icons/user-cog';
 import UserRound from 'lucide-react-native/icons/user-round';
 import Users from 'lucide-react-native/icons/users';
 import { reactNativeDownloads } from 'Modules/react-native-downloads';
-import { useCallback, useDeferredValue, useState } from 'react';
+import { useCallback, useDeferredValue, useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { GithubIcon, TelegramIcon } from 'Theme/icons';
 import { openLinkInBrowser } from 'Util/Link';
@@ -130,7 +134,7 @@ export function SettingsScreenComponent({
   bookmarksDisplayMode,
   recentDisplayMode,
   recentTabsInterface,
-  tabPosition,
+  tvTabPosition,
   numberOfColumnsTV,
   recentTwoColumnsTV,
   hiddenCountries,
@@ -239,6 +243,10 @@ export function SettingsScreenComponent({
     () => takeHandedOverGroup() ?? SETTING_GROUP.APPEARANCE
   );
   const [navigationOrderEditor, setNavigationOrderEditor] = useState<'tv' | 'mobile' | 'home' | null>(null);
+  const navigationOrderOverlayRef = useRef<ThemedOverlayRef>(null);
+  useEffect(() => {
+    if (navigationOrderEditor) navigationOrderOverlayRef.current?.open();
+  }, [navigationOrderEditor]);
 
   /**
    * The group switches on FOCUS, so every D-Pad move in the menu swaps the whole
@@ -403,9 +411,9 @@ export function SettingsScreenComponent({
       <SettingSelect
         title={ t('Tab position') }
         IconComponent={ MoveVertical }
-        value={ tabPosition }
+        value={ tvTabPosition }
         options={ TAB_POSITION_OPTIONS }
-        onChange={ (value) => onConfigUpdate('tabPosition', value) }
+        onChange={ (value) => onConfigUpdate('tvTabPosition', value) }
       />
       <SettingSwitch
         title={ t('Show ratings') }
@@ -1028,17 +1036,18 @@ export function SettingsScreenComponent({
     </ThemedScrollView>
   );
 
-  const renderCurrentGroup = () => {
+  const renderOrderEditor = () => {
     if (navigationOrderEditor === 'home') {
       return (
         <NavigationOrderSetting
+          embedded
           title={ t('Default home tab') }
           items={ homeMenuOptions.map((item) => ({ ...item, IconComponent: House })) }
           value={ homeTabOrder }
           hiddenItems={ hiddenHomeTabs }
           onChange={ (value) => onConfigUpdate('homeTabOrder', value) }
           onHiddenItemsChange={ (value) => onConfigUpdate('hiddenHomeTabs', value) }
-          onBack={ () => setNavigationOrderEditor(null) }
+          onBack={ () => navigationOrderOverlayRef.current?.close() }
         />
       );
     }
@@ -1047,6 +1056,7 @@ export function SettingsScreenComponent({
 
       return (
         <NavigationOrderSetting
+          embedded
           title={ isTVNavigation ? t('TV navigation order') : t('Mobile navigation order') }
           items={
             isTVNavigation
@@ -1067,11 +1077,15 @@ export function SettingsScreenComponent({
               value,
             )
           }
-          onBack={ () => setNavigationOrderEditor(null) }
+          onBack={ () => navigationOrderOverlayRef.current?.close() }
         />
       );
     }
 
+    return null;
+  };
+
+  const renderCurrentGroup = () => {
     switch (deferredGroup) {
       case SETTING_GROUP.APPEARANCE:
         return renderAppearance();
@@ -1111,6 +1125,23 @@ export function SettingsScreenComponent({
           { renderCurrentGroup() }
         </View>
       </View>
+      <ThemedOverlay
+        ref={ navigationOrderOverlayRef }
+        onClose={ () => setNavigationOrderEditor(null) }
+        preferredChildFocusKey="settings-order-close"
+        contentContainerStyle={ { width: '85%', maxWidth: 900, height: '85%', maxHeight: '90%', gap: 12 } }
+      >
+        <ThemedText style={ { textAlign: 'center', padding: 12 } }>
+          { navigationOrderEditor === 'home' ? t('Default home tab')
+            : navigationOrderEditor === 'tv' ? t('TV navigation order') : t('Mobile navigation order') }
+        </ThemedText>
+        { renderOrderEditor() }
+        <ThemedButton
+          title={ t('Back') }
+          focusKey="settings-order-close"
+          onPress={ () => navigationOrderOverlayRef.current?.close() }
+        />
+      </ThemedOverlay>
     </Page>
   );
 }

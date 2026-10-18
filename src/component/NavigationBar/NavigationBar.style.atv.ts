@@ -16,6 +16,7 @@ export const NAVIGATION_BAR_ANIMATION_DURATION_MS = 300;
 
 export const componentStyles = ({ scale, colors, text }: Theme) => ({
   bar: {
+    overflow: 'hidden',
     position: 'absolute',
     left: 0,
     top: 0,
@@ -60,12 +61,6 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     justifyContent: 'flex-start',
     padding: scale(12),
     borderRadius: scale(24),
-  },
-  tabSelected: {
-    backgroundColor: colors.tertiary,
-  },
-  tabFocused: {
-    backgroundColor: colors.backgroundFocused,
   },
   tabIcon: {
     width: scale(20),

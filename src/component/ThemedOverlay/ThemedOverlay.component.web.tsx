@@ -1,7 +1,6 @@
 import KeyboardAdjuster from 'Component/KeyboardAdjuster/KeyboardAdjuster.component';
 import { Portal } from 'Component/ThemedPortal';
 import { useIsScreenFocused } from 'Hooks/useIsScreenFocused';
-import { useLandscape } from 'Hooks/useLandscape';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { memo, ReactNode, useEffect, useRef } from 'react';
 import { BackHandler, Pressable, StyleProp, StyleSheet, ViewStyle } from 'react-native';
@@ -45,7 +44,6 @@ function OverlayContent({
   handleModalRequestClose,
 }: OverlayContentProps) {
   const styles = useThemedStyles(componentStyles);
-  const isLandscape = useLandscape();
 
   // Fade in on open; fade out when isOpened flips false. The container keeps the
   // overlay mounted (contentVisible) for ANIMATION_DURATION after close, so the
@@ -113,9 +111,8 @@ function OverlayContent({
           onPress={ noopFn }
           style={ [
             styles.contentContainerStyle,
-            isLandscape && styles.contentContainerStyleLandscape,
-            contentContainerStyle,
             { alignSelf: 'center', width: '90%', maxWidth: 760, maxHeight: '85%' },
+            contentContainerStyle,
           ] }
         >
           { contentVisible && children }

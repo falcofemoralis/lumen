@@ -1,13 +1,14 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationBar } from 'Component/NavigationBar';
 import {
-  NAVIGATION_BAR_ANIMATION_DURATION_MS,
   NAVIGATION_BAR_TV_WIDTH,
   NAVIGATION_BAR_TV_WIDTH_OPENED,
+  NAVIGATION_BAR_ANIMATION_DURATION_MS,
 } from 'Component/NavigationBar/NavigationBar.style.atv';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useNavigationContext } from 'Context/NavigationContext';
-import { setTimeoutSafe } from 'Util/Misc';
+import { ReactNode } from 'react';
+import Animated from 'react-native-reanimated';
 import { t } from 'i18n/translate';
 import Bell from 'lucide-react-native/icons/bell';
 import Download from 'lucide-react-native/icons/download';
@@ -17,7 +18,6 @@ import History from 'lucide-react-native/icons/rotate-ccw-clock';
 import Search from 'lucide-react-native/icons/search';
 import Settings from 'lucide-react-native/icons/settings';
 import UserRound from 'lucide-react-native/icons/user-round';
-import { useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { AccountScreen } from 'Screen/AccountScreen';
 import AccountScreenContainer from 'Screen/AccountScreen/AccountScreen.container';
@@ -78,15 +78,34 @@ const MobileAccountNavigator = createAccountNavigator(ACCOUNT_SCREEN, AccountScr
 // NOTE: these are plain render functions, not components. `Tab.Navigator` only accepts
 // `Screen`, `Group` or `Fragment` as its direct children, so the group has to be returned
 // inline instead of being wrapped in a component.
+function TVScene({ children }: { children: ReactNode }) {
+  const { isMenuOpen } = useNavigationContext();
+  const { scale } = useAppTheme();
+
+  return (
+    <Animated.View
+      nativeID="atv-navigation-scene"
+      style={ {
+        flex: 1,
+        marginLeft: isMenuOpen ? scale(NAVIGATION_BAR_TV_WIDTH_OPENED - NAVIGATION_BAR_TV_WIDTH) : 0,
+        transitionProperty: 'marginLeft',
+        transitionDuration: `${NAVIGATION_BAR_ANIMATION_DURATION_MS}ms`,
+        transitionTimingFunction: 'ease-in-out',
+      } }
+    >
+      { children }
+    </Animated.View>
+  );
+}
+
+const renderTVScene = ({ children }: { children: ReactNode }) => <TVScene>{ children }</TVScene>;
+
 const renderTVTabs = (
   theme: Theme,
   scale: (value: number) => number,
   isLocalLibrary: boolean,
   tvNavigationOrder: string[],
   hiddenNavigationTabs: string[],
-  layoutMenuOpen: boolean,
-  transformX: number,
-  isSnapping: boolean,
 ) => {
   const accountRoute = isLocalLibrary ? DOWNLOADS_SCREEN : ACCOUNT_TAB;
   const fallbackOrder = [
@@ -232,30 +251,12 @@ const renderTVTabs = (
 
   return (
     <Tab.Group
+      screenLayout={ renderTVScene }
       screenOptions={ {
         headerShown: false,
         sceneStyle: {
           backgroundColor: theme.colors.background,
-          // Hybrid: the real width (marginLeft, a layout property) only ever
-          // snaps -- it is set to its final value once the sidebar's own
-          // transition has finished, so FlashList relayouts once per toggle
-          // instead of on every animation frame. The animation itself runs on
-          // `transform`, which Yoga does not treat as a layout property, so
-          // it costs nothing to animate every frame. TabsNavigator keeps
-          // `transform` and `marginLeft` in lockstep so the snap is invisible:
-          // by the time marginLeft flips, transform has already animated to
-          // the exact same on-screen position.
-          marginLeft: scale(layoutMenuOpen ? NAVIGATION_BAR_TV_WIDTH_OPENED : NAVIGATION_BAR_TV_WIDTH),
-          transform: [{ translateX: transformX }],
-          // Suppressed for exactly the render where marginLeft snaps: that
-          // render also resets transformX to 0, and animating that jump would
-          // start a second, spurious 300ms transition right as the layout
-          // change lands -- the one moment this must be instant.
-          ...(isSnapping ? {} : {
-            transitionProperty: 'transform',
-            transitionDuration: `${NAVIGATION_BAR_ANIMATION_DURATION_MS}ms`,
-            transitionTimingFunction: 'ease-in-out',
-          }),
+          marginLeft: scale(NAVIGATION_BAR_TV_WIDTH),
         },
       } }
     >
@@ -441,54 +442,7 @@ export function TabsNavigator() {
     newHomeInterface,
   } = useConfigContext();
   const { theme, scale } = useAppTheme();
-  const { isMenuOpen } = useNavigationContext();
 
-  // The layout-affecting margin only ever snaps to its final value -- see the
-  // comment on `sceneStyle` in `renderTVTabs` for why. It starts in sync with
-  // `isMenuOpen` so the very first render (no prior animation to wait out) is
-  // correct without a snap.
-  const [layoutMenuOpen, setLayoutMenuOpen] = useState(isMenuOpen);
-  // True for exactly the render that performs the snap -- see the comment on
-  // `sceneStyle` in `renderTVTabs`. Reset on the very next render via a
-  // microtask-free effect so a fresh toggle immediately after a snap still
-  // animates normally.
-  const [isSnapping, setIsSnapping] = useState(false);
-  const snapTimeoutIdRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    if (snapTimeoutIdRef.current !== null) {
-      clearTimeout(snapTimeoutIdRef.current);
-    }
-
-    snapTimeoutIdRef.current = setTimeoutSafe(() => {
-      setIsSnapping(true);
-      setLayoutMenuOpen(isMenuOpen);
-    }, NAVIGATION_BAR_ANIMATION_DURATION_MS);
-
-    return () => {
-      if (snapTimeoutIdRef.current !== null) {
-        clearTimeout(snapTimeoutIdRef.current);
-      }
-    };
-  }, [isMenuOpen]);
-
-  useEffect(() => {
-    if (!isSnapping) {
-      return;
-    }
-
-    setIsSnapping(false);
-  }, [isSnapping]);
-
-  // Position relative to the *current* (possibly stale) layout margin, so the
-  // content always renders where it visually belongs regardless of which side
-  // of the snap `layoutMenuOpen` is on.
-  const sidebarWidthDiff = scale(NAVIGATION_BAR_TV_WIDTH_OPENED) - scale(NAVIGATION_BAR_TV_WIDTH);
-  const transformX = isMenuOpen === layoutMenuOpen
-    ? 0
-    : isMenuOpen
-      ? sidebarWidthDiff
-      : -sidebarWidthDiff;
 
   return (
     <View style={ { flex: 1 } }>
@@ -501,7 +455,7 @@ export function TabsNavigator() {
           headerShown: false,
         } }
       >
-        { isTV ? renderTVTabs(theme, scale, isLocalLibrary, tvNavigationOrder, hiddenTVNavigationTabs, layoutMenuOpen, transformX, isSnapping) : renderMobileTabs(theme, mobileNavigationOrder, hiddenMobileNavigationTabs, newHomeInterface) }
+        { isTV ? renderTVTabs(theme, scale, isLocalLibrary, tvNavigationOrder, hiddenTVNavigationTabs) : renderMobileTabs(theme, mobileNavigationOrder, hiddenMobileNavigationTabs, newHomeInterface) }
       </Tab.Navigator>
       { isTV && <SceneMask /> }
     </View>

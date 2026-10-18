@@ -7,6 +7,7 @@ contextBridge.exposeInMainWorld('lumen', {
   downloadStart: invoke('download:start'), downloadList: invoke('download:list'), downloadAction: invoke('download:action'), downloadConfig: invoke('download:config'),
   onDownload: callback => { const listener = (_, value) => callback(value); ipcRenderer.on('download:event', listener); return () => ipcRenderer.removeListener('download:event', listener); },
   storageLoad: id => ipcRenderer.sendSync('storage:load', id), storageSave: (id, value) => ipcRenderer.sendSync('storage:save', id, value),
+  storageSaveAsync: invoke('storage:save-async'),
   diagnostic: ipcRenderer.sendSync('diagnostic'),
   application: ipcRenderer.sendSync('application'),
   flushCookies: invoke('cookies:flush'),

@@ -1,3 +1,4 @@
+import { sameGridCardProps } from './FilmGrid.memo';
 import { getCurrentFocusKey, NextFocusResolver, setFocus } from '@noriginmedia/norigin-spatial-navigation-core';
 import { FocusContext, FocusHandler, useFocusable } from '@noriginmedia/norigin-spatial-navigation-react-native-tvos';
 import { FlashList, FlashListRef, ViewToken } from '@shopify/flash-list';
@@ -151,7 +152,7 @@ function FilmGridItemCard({
 }
 
 const MemoizedHeader = memo(FilmGridHeader);
-const MemoizedGridItem = memo(FilmGridItemCard);
+const MemoizedGridItem = memo(FilmGridItemCard, sameGridCardProps);
 
 // Where a focused row is parked vertically: just below the top edge, leaving the
 // row above it visible as a hint that there is more up there.
@@ -206,11 +207,14 @@ function FilmGridList({
   }: { viewableItems: ViewToken<FilmGridItem>[] }) => {
     const indexes = viewableItems.filter(token => token.isViewable && token.index !== null).map(token => token.index!);
     if (indexes.length) prefetchPosters(Math.max(...indexes));
-    setVisibleFilmIds(new Set(
+    const nextVisible = new Set(
       viewableItems
         .filter((token) => token.isViewable && token.item.type === FilmGridItemType.FILM)
         .map((token) => token.item.type === FilmGridItemType.FILM ? token.item.film.id : '')
-        .filter(Boolean),
+        .filter(Boolean)
+    );
+    setVisibleFilmIds(previous => (
+      previous.size === nextVisible.size && [...nextVisible].every(id => previous.has(id)) ? previous : nextVisible
     ));
   }, [prefetchPosters]);
   // An animated scroll runs over several frames while the row being entered is

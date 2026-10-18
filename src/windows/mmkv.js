@@ -1,9 +1,16 @@
 import { useSyncExternalStore, useCallback } from 'react';
+import { createBufferedWriter } from './storage-buffer';
 const instances = new Map();
 export const createMMKV = ({ id = 'default' } = {}) => {
   if (instances.has(id)) return instances.get(id);
   const data = window.lumen.storageLoad(id), listeners = new Set();
-  const changed = key => { window.lumen.storageSave(id, data); listeners.forEach(fn => fn(key)); };
+  const writer = createBufferedWriter(
+    value => window.lumen.storageSaveAsync(id, value),
+    value => window.lumen.storageSave(id, value)
+  );
+  window.addEventListener('pagehide', () => writer.flushSync());
+  window.addEventListener('beforeunload', () => writer.flushSync());
+  const changed = key => { writer.changed(data); listeners.forEach(fn => fn(key)); };
   const store = {
     getString: key => typeof data[key] === 'string' ? data[key] : undefined,
     getBoolean: key => data[key], getNumber: key => data[key],

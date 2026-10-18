@@ -1,3 +1,4 @@
+import { fetchTextResponse } from '../util/Request/textTransport';
 export const withDeadline = async <T>(
   operation: Promise<T>,
   milliseconds: number,
@@ -15,11 +16,17 @@ export const withDeadline = async <T>(
   finally { if (timer !== undefined) clearTimeout(timer); }
 };
 
+const pendingZonaText = new Map<string, Promise<string>>();
 export const fetchZonaText = (url: string, milliseconds = 12_000): Promise<string> => {
-  const controller = new AbortController();
-  return withDeadline((async () => {
-    const response = await fetch(url, { signal: controller.signal });
+  const key = milliseconds + ':' + url;
+  const existing = pendingZonaText.get(key);
+  if (existing) return existing;
+  const operation = fetchTextResponse(url, {}, milliseconds, 'Zona не ответила вовремя. Повторите попытку.').then(({ response, text }) => {
     if (!response.ok) throw new Error('Zona: HTTP ' + response.status);
-    return response.text();
-  })(), milliseconds, 'Zona не ответила вовремя. Повторите попытку.', () => controller.abort());
+
+    return text;
+  }).finally(() => pendingZonaText.delete(key));
+  pendingZonaText.set(key, operation);
+
+return operation;
 };

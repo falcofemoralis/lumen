@@ -90,39 +90,37 @@ export function RecentScreenComponent({
       >
         <ThemedPressable
           onPress={ () => handleContinueWatching(item) }
-          style={ buttonStyle }
+          style={ ({ isFocused }) => [buttonStyle, isFocused && { backgroundColor: theme.colors.backgroundFocused }] }
         >
-          <Play
-            size={ scale(24) }
-            color={ theme.colors.icon }
-          />
+          { ({ isFocused }) => (
+            <Play
+              size={ scale(24) }
+              color={ isFocused ? theme.colors.iconFocused : theme.colors.icon }
+            />
+          ) }
         </ThemedPressable>
 
         <ThemedPressable
           onPress={ () => openRemoveConfirmOverlay(item) }
-          style={ buttonStyle }
+          style={ ({ isFocused }) => [buttonStyle, isFocused && { backgroundColor: theme.colors.backgroundFocused }] }
         >
-          <Trash2
-            size={ scale(24) }
-            color={ theme.colors.icon }
-          />
+          { ({ isFocused }) => (
+            <Trash2
+              size={ scale(24) }
+              color={ isFocused ? theme.colors.iconFocused : theme.colors.icon }
+            />
+          ) }
         </ThemedPressable>
 
         <ThemedPressable
           onPress={ () => openHideConfirmOverlay(item) }
-          style={ buttonStyle }
+          style={ ({ isFocused }) => [buttonStyle, isFocused && { backgroundColor: theme.colors.backgroundFocused }] }
         >
-          { item.isWatched ? (
-            <EyeOff
-              size={ scale(24) }
-              color={ theme.colors.icon }
-            />
-          ) : (
-            <Eye
-              size={ scale(24) }
-              color={ theme.colors.icon }
-            />
-          ) }
+          { ({ isFocused }) => {
+            const Icon = item.isWatched ? EyeOff : Eye;
+
+            return <Icon size={ scale(24) } color={ isFocused ? theme.colors.iconFocused : theme.colors.icon } />;
+          } }
         </ThemedPressable>
       </View>
     );
@@ -134,6 +132,8 @@ export function RecentScreenComponent({
     scale,
     theme.colors.button,
     theme.colors.icon,
+    theme.colors.iconFocused,
+    theme.colors.backgroundFocused,
   ]);
 
   const renderEmpty = () => {

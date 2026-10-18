@@ -1,3 +1,4 @@
+import { sameGridCardProps } from './FilmGrid.memo';
 import { FlashList, FlashListRef, ViewToken } from '@shopify/flash-list';
 import { FilmCard } from 'Component/FilmCard';
 import { FilmCardThumbnail } from 'Component/FilmCard/FilmCard.thumbnail';
@@ -74,7 +75,7 @@ function FilmGridItemCard({
 }
 
 const MemoizedHeader = memo(FilmGridHeader);
-const MemoizedGridItem = memo(FilmGridItemCard);
+const MemoizedGridItem = memo(FilmGridItemCard, sameGridCardProps);
 
 export function FilmGridComponent({
   data,
@@ -117,11 +118,14 @@ export function FilmGridComponent({
   }: { viewableItems: ViewToken<FilmGridItem>[] }) => {
     const indexes = viewableItems.filter(token => token.isViewable && token.index !== null).map(token => token.index!);
     if (indexes.length) prefetchPosters(Math.max(...indexes));
-    setVisibleFilmIds(new Set(
+    const nextVisible = new Set(
       viewableItems
         .filter((token) => token.isViewable && token.item.type === FilmGridItemType.FILM)
         .map((token) => token.item.type === FilmGridItemType.FILM ? token.item.film.id : '')
-        .filter(Boolean),
+        .filter(Boolean)
+    );
+    setVisibleFilmIds(previous => (
+      previous.size === nextVisible.size && [...nextVisible].every(id => previous.has(id)) ? previous : nextVisible
     ));
   }, [prefetchPosters]);
 

@@ -13,7 +13,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     borderRadius: scale(16),
   },
   settingFocused: {
-    backgroundColor: colors.transparent,
+    backgroundColor: colors.backgroundFocused,
     borderRadius: scale(16),
   },
   settingHidden: {
@@ -37,7 +37,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     fontWeight: '700',
   },
   settingTitleFocused: {
-    color: '#FFFFFF',
+    color: colors.textFocused,
   },
   settingSubtitle: {
     fontSize: scale(text.sm.fontSize),
@@ -45,7 +45,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     opacity: 0.8,
   },
   settingSubtitleFocused: {
-    color: '#FFFFFF',
+    color: colors.textFocused,
   },
   settingIcon: {
     flexShrink: 0,

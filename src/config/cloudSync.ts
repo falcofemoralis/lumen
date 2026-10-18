@@ -17,6 +17,7 @@ const LOCAL_ONLY_SETTINGS = new Set<keyof DeviceConfigType>([
   'hiddenHomeTabs',
   'initialRoute',
   'tabPosition',
+  'tvTabPosition',
   'homeDisplayMode',
   'bookmarksDisplayMode',
   'recentDisplayMode',

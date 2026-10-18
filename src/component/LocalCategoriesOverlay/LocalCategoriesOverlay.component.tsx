@@ -7,8 +7,8 @@ import { t } from 'i18n/translate';
 import GripVertical from 'lucide-react-native/icons/grip-vertical';
 import Plus from 'lucide-react-native/icons/plus';
 import Trash2 from 'lucide-react-native/icons/trash-2';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { ScrollView, View } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   runOnJS,
   useAnimatedStyle,
@@ -21,11 +21,13 @@ import {
   LocalCategoriesOverlayComponentProps,
   LocalCategoryRowInterface,
 } from './LocalCategoriesOverlay.type';
+import { LocalCategoryDragHandle, LocalCategoryDragRow } from './LocalCategoryDragRow';
 
 interface LocalCategoryRowProps {
   category: LocalCategoryRowInterface;
   index: number;
   itemCount: number;
+  categoryIds: string[];
   scale: (value: number) => number;
   textColor: string;
   movingColor: string;
@@ -38,6 +40,7 @@ const LocalCategoryRow = ({
   category,
   index,
   itemCount,
+  categoryIds,
   scale,
   textColor,
   movingColor,
@@ -102,42 +105,46 @@ const LocalCategoryRow = ({
   }));
 
   return (
-    <Animated.View
-      style={ [styles.row, styles.rowMoving, animatedStyle] }
-      onLayout={ (event) => {
-        rowHeight.value = event.nativeEvent.layout.height;
-      } }
-    >
-      <GestureDetector gesture={ gesture }>
-        <View style={ styles.rowDragContent }>
-          <View style={ styles.rowHandle }>
-            <GripVertical
-              size={ scale(18) }
-              color={ textColor }
-            />
-          </View>
-
-          <ThemedText style={ styles.rowTitle }>
-            { category.title }
-          </ThemedText>
-
-          <ThemedText style={ styles.rowCount }>
-            { category.count }
-          </ThemedText>
-        </View>
-      </GestureDetector>
-
-      <ThemedButton
-        style={ styles.rowDelete }
-        contentStyle={ styles.rowDeleteContent }
-        IconComponent={ Trash2 }
-        iconProps={ {
-          size: scale(24),
-          color: textColor,
+    <LocalCategoryDragRow categoryId={ category.id } categoryIds={ categoryIds } onReorder={ onReorder }>
+      <Animated.View
+        style={ [styles.row, styles.rowMoving, animatedStyle] }
+        onLayout={ (event) => {
+          rowHeight.value = event.nativeEvent.layout.height;
         } }
-        onPress={ () => onDelete(category.id) }
-      />
-    </Animated.View>
+      >
+        <GestureDetector gesture={ gesture }>
+          <View style={ styles.rowDragContent }>
+            <View style={ styles.rowHandle }>
+              <LocalCategoryDragHandle categoryId={ category.id }>
+                <GripVertical
+                  size={ scale(18) }
+                  color={ textColor }
+                />
+              </LocalCategoryDragHandle>
+            </View>
+
+            <ThemedText style={ styles.rowTitle }>
+              { category.title }
+            </ThemedText>
+
+            <ThemedText style={ styles.rowCount }>
+              { category.count }
+            </ThemedText>
+          </View>
+        </GestureDetector>
+
+        <ThemedButton
+          style={ styles.rowDelete }
+          contentStyle={ styles.rowDeleteContent }
+          IconComponent={ Trash2 }
+          iconProps={ {
+            size: scale(24),
+            color: textColor,
+          } }
+          onPress={ () => onDelete(category.id) }
+        />
+      </Animated.View>
+    </LocalCategoryDragRow>
   );
 };
 export const LocalCategoriesOverlayComponent = ({
@@ -174,6 +181,7 @@ export const LocalCategoriesOverlayComponent = ({
             category={ category }
             index={ index }
             itemCount={ categories.length }
+            categoryIds={ categories.map(({ id }) => id) }
             scale={ scale }
             textColor={ theme.colors.text }
             movingColor={ theme.colors.primary }

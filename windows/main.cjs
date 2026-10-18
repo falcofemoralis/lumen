@@ -1,5 +1,7 @@
 const { app, BrowserWindow, ipcMain, session, shell, protocol, net } = require('electron');
 const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto');
+const desktopIdentity = require('./shell-identity.cjs');
+if (process.platform === 'win32') app.setAppUserModelId(desktopIdentity.APP_ID);
 protocol.registerSchemesAsPrivileged([{ scheme: 'lumen-file', privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true, stream: true } }, { scheme: 'lumen', privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true } }, { scheme: 'lumen-media', privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true, stream: true } }]);
 const portableRoot = process.env.PORTABLE_EXECUTABLE_DIR || (app.isPackaged ? path.dirname(app.getPath('exe')) : __dirname);
 const dataRoot = process.env.LUMEN_SMOKE_MODE ? path.join(__dirname, 'smoke-data-' + (process.env.LUMEN_SMOKE_MODE === 'downloads' ? 'offline' : process.env.LUMEN_SMOKE_MODE)) : path.join(portableRoot, 'data');
@@ -19,7 +21,7 @@ try {
 } catch { /* First launch config is created by onboarding. */ }
 if (['home','film','sources','anime','rezka','updates','offline','downloads','desktop-info','desktop-google','desktop-ui'].includes(process.env.LUMEN_SMOKE_MODE)) fs.writeFileSync(path.join(dataRoot, 'config.json'), JSON.stringify({
   ...(process.env.LUMEN_SMOKE_REZKA_MIRROR ? { rezkaConfig: JSON.stringify({officialMode: false, provider: process.env.LUMEN_SMOKE_REZKA_MIRROR}) } : {}),
-  deviceConfig: JSON.stringify({ isConfigured: true, showRatings: true, isTV: process.env.LUMEN_SMOKE_TV === '1', isLocalLibrary: true, enabledSources: ['ZONA','REZKA','ANIXART'], newHomeInterface: true, recentTabsInterface: true, tabPosition: 'top', numberOfColumnsMobile: 6 })
+  deviceConfig: JSON.stringify({ ...(process.env.LUMEN_SMOKE_SIDEBAR === '1' ? { accentColor: '#FF8800' } : {}), ...(process.env.LUMEN_SMOKE_ATV_AUDIT === '1' ? { recentDisplayMode: 'grid' } : {}), isConfigured: true, showRatings: true, isTV: process.env.LUMEN_SMOKE_TV === '1', isLocalLibrary: true, enabledSources: ['ZONA','REZKA','ANIXART'], newHomeInterface: true, recentTabsInterface: true, tabPosition: 'top', numberOfColumnsMobile: 6 })
 }));
 if (process.env.LUMEN_SMOKE_MODE === 'desktop-ui') fs.writeFileSync(path.join(dataRoot, 'localLibrary.json'), JSON.stringify({
   localBookmarks: JSON.stringify({ categories: [{ id: 'ui-one', title: 'Первая папка', filmIds: [], createdAt: 1 }, { id: 'ui-two', title: 'Вторая папка', filmIds: [], createdAt: 2 }], films: {} }),
@@ -47,7 +49,6 @@ const handle = (name, fn) => ipcMain.handle(name, (event, ...args) => { assertSe
 const proxyURL = (id, url) => 'lumen-media://' + id + '/?url=' + encodeURIComponent(url);
 app.whenReady().then(async () => {
   require('electron').Menu.setApplicationMenu(null);
-  app.setAppUserModelId('com.falcofemoralis.lumen.windows');
   protocol.handle('lumen', request => {
     const url = new URL(request.url), root = path.join(__dirname, 'web');
     const file = path.resolve(root, '.' + decodeURIComponent(url.pathname === '/' ? '/index.html' : url.pathname));
@@ -84,7 +85,12 @@ app.whenReady().then(async () => {
   main = new BrowserWindow({ width: 1280, height: 850, minWidth: 800, minHeight: 550, backgroundColor: '#000000', frame: false, show: false, autoHideMenuBar: true,
     icon: path.join(__dirname, '../assets/images/app-icon-all.png'),
     webPreferences: { preload: path.join(__dirname, 'preload.cjs'), contextIsolation: true, nodeIntegration: false, sandbox: true, autoplayPolicy: 'no-user-gesture-required' } });
-  if (process.env.PORTABLE_EXECUTABLE_FILE) main.setAppDetails({ appId: 'com.falcofemoralis.lumen.windows', relaunchCommand: '"' + process.env.PORTABLE_EXECUTABLE_FILE + '"', relaunchDisplayName: 'Lumen' });
+  if (process.platform === 'win32' && app.isPackaged) {
+    const launcher = process.env.PORTABLE_EXECUTABLE_FILE || app.getPath('exe');
+    main.setAppDetails(desktopIdentity.windowDetails(launcher));
+    try { desktopIdentity.ensureShortcut({ shell, fs, executable: launcher, root: portableRoot }); }
+    catch (error) { console.warn('[Desktop] Could not create Lumen shortcut:', error.message); }
+  }
   main.webContents.on('console-message', event => console.log('RENDERER: ' + event.message));
   if (process.env.LUMEN_SMOKE_TEST) {
     main.webContents.debugger.attach('1.3');
@@ -131,6 +137,12 @@ app.whenReady().then(async () => {
     try { const file = storagePath(id); fs.writeFileSync(file + '.tmp', JSON.stringify(value)); fs.renameSync(file + '.tmp', file); event.returnValue = true; }
     catch { event.returnValue = false; }
   });
+  handle('storage:save-async', (id, value) => {
+    const file = storagePath(id);
+    fs.writeFileSync(file + '.tmp', JSON.stringify(value));
+    fs.renameSync(file + '.tmp', file);
+    return true;
+  });
   handle('cookies:get', async url => (await session.defaultSession.cookies.get({ url: remoteURL(url) })).map(cookie => cookie.name + '=' + cookie.value).join('; '));
   handle('cookies:flush', () => session.defaultSession.cookies.flushStore());
   handle('cookies:clear', async () => { await session.defaultSession.clearStorageData({ storages: ['cookies'] }); return true; });
@@ -167,6 +179,11 @@ app.whenReady().then(async () => {
   await main.loadURL('lumen://app/'); main.show();
   if (process.env.LUMEN_SMOKE_MODE === 'desktop-ui') {
     const run = async () => {
+      if (app.isPackaged) {
+        const shortcut = shell.readShortcutLink(path.join(portableRoot, 'Lumen.lnk'));
+        if (shortcut.appUserModelId !== desktopIdentity.APP_ID || shortcut.target !== (process.env.PORTABLE_EXECUTABLE_FILE || app.getPath('exe'))) throw new Error('Desktop shortcut identity regression');
+        console.log('UI_SHORTCUT_IDENTITY ' + JSON.stringify({ id: shortcut.appUserModelId, target: shortcut.target }));
+      }
       const evaluate = script => main.webContents.executeJavaScript(script);
       const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
       const swipe = async () => {
@@ -176,6 +193,172 @@ app.whenReady().then(async () => {
         main.webContents.sendInputEvent({ type: 'mouseUp', x: point.x - 200, y: point.y, button: 'left', clickCount: 1 });
         await pause(500);
       };
+      if (process.env.LUMEN_SMOKE_DETAIL_DRAG === '1') {
+        const history = JSON.parse(JSON.parse(fs.readFileSync(path.join(dataRoot, 'localLibrary.json'), 'utf8')).localHistory);
+        const card = history[0].filmCard;
+        const link = 'https://w1.zona.im/movies/ui-detail-drag';
+        const film = { ...card, id: 'ui-detail-drag', link, title: 'Проверка перетаскивания', description: 'Описание для проверки выделения.', voices: [], ratings: [], hasSeasons: false, hasVoices: false,
+          actors: Array.from({length:20},(_,i)=>({name:'Актёр '+(i+1),photo:card.poster,link:'/person-'+i})), directors: [],
+          related: Array.from({length:20},(_,i)=>({...card,id:'related-'+i,title:'Похожий '+(i+1),link:'/related-'+i})) };
+        await evaluate('window.lumenDiagnostics.previewFilm('+JSON.stringify(film)+')'); await pause(900);
+        const results = [];
+        for (const text of ['Актёр 3','Похожий 3']) {
+          await evaluate(`(()=>{const leaf=[...document.querySelectorAll('[data-lumen-selectable]')].find(e=>e.textContent===${JSON.stringify(text)});leaf.closest('[data-lumen-drag-scroll]').scrollIntoView({block:'center'});})()`);
+          await pause(600);
+          const point = await evaluate(`(()=>{const leaf=[...document.querySelectorAll('[data-lumen-selectable]')].find(e=>e.textContent===${JSON.stringify(text)});const row=leaf.closest('[data-lumen-drag-scroll]');row.dataset.dragTest='active';const r=leaf.getBoundingClientRect();return {x:Math.round(r.x+r.width/2),y:Math.round(r.y+r.height/2),before:row.scrollLeft,select:getComputedStyle(leaf).userSelect};})()`);
+          if (point.select!=='none') throw new Error('Carousel text remains selectable');
+          main.webContents.sendInputEvent({type:'mouseDown',x:point.x,y:point.y,button:'left',clickCount:1});
+          for(let i=1;i<=4;i++) {main.webContents.sendInputEvent({type:'mouseMove',x:point.x-i*30,y:point.y,button:'left'});await pause(50);}
+          main.webContents.sendInputEvent({type:'mouseUp',x:point.x-120,y:point.y,button:'left',clickCount:1});
+          await pause(400);
+          const after = await evaluate("document.querySelector('[data-drag-test=active]').scrollLeft");
+          if(after<=point.before)throw new Error('Carousel mouse drag did not scroll: '+text);
+          if(await evaluate('window.lumenDiagnostics.currentRouteLink()')!==link)throw new Error('Carousel drag opened a card');
+          await evaluate("document.querySelector('[data-drag-test=active]').removeAttribute('data-drag-test')");
+          results.push({text,before:point.before,after});
+        }
+        const descriptionSelect=await evaluate("getComputedStyle([...document.querySelectorAll('[data-lumen-selectable]')].find(e=>e.textContent==='Описание для проверки выделения.')).userSelect");
+        if(descriptionSelect!=='text')throw new Error('Description selection was disabled');
+        console.log('UI_DETAIL_DRAG '+JSON.stringify({results,descriptionSelect,tv:process.env.LUMEN_SMOKE_TV==='1'}));
+        return;
+      }
+      if (process.env.LUMEN_SMOKE_SIDEBAR === '1') {
+        const click = async id => {
+          const point = await evaluate(`(()=>{const e=document.getElementById(${JSON.stringify(id)});const r=e.getBoundingClientRect();return {x:Math.round(r.x+r.width/2),y:Math.round(r.y+r.height/2)};})()`);
+          main.webContents.sendInputEvent({type:'mouseDown',...point,button:'left',clickCount:1});
+          main.webContents.sendInputEvent({type:'mouseUp',...point,button:'left',clickCount:1});
+          await pause(700);
+        };
+        const snapshot = () => evaluate(`(()=>{const bar=document.getElementById('atv-navigation-sidebar').getBoundingClientRect();const scene=[...document.querySelectorAll('#atv-navigation-scene')].find(e=>e.getBoundingClientRect().width>0).getBoundingClientRect();const tabs=[...document.querySelectorAll('[id^="sidebar-item-"]')].map(e=>({id:e.id,bg:getComputedStyle(e).backgroundColor,stroke:e.querySelector('svg')?.getAttribute('stroke')}));return {width:bar.width,x:scene.x,right:scene.right,sceneWidth:scene.width,viewport:innerWidth,tabs};})()`);
+        const before = await snapshot();
+        await click('sidebar-item-Bookmarks-tab');
+        const clicked = await snapshot();
+        if (clicked.width !== before.width) throw new Error('Sidebar expanded after icon click');
+        if (clicked.tabs.filter(t=>t.stroke?.toLowerCase()==='#ff8800').length !== 1 || !clicked.tabs.some(t=>t.id==='sidebar-item-Bookmarks-tab' && t.stroke?.toLowerCase()==='#ff8800')) throw new Error('Sidebar icon accent selection regression');
+        if (clicked.tabs.some(t=>t.bg!=='rgba(0, 0, 0, 0)')) throw new Error('Sidebar retained colored backgrounds');
+        await click('sidebar-menu-toggle');
+        const opened = await snapshot();
+        if (opened.width <= before.width || Math.abs(opened.x-opened.width)>1) throw new Error('Sidebar does not push the scene');
+        if (opened.right > opened.viewport + 1) throw new Error('Sidebar clips the scene right edge: '+JSON.stringify(opened));
+        await click('sidebar-menu-toggle');
+        const closed = await snapshot();
+        if (closed.width !== before.width || Math.abs(closed.x-before.x)>1) throw new Error('Sidebar scene did not return');
+        await evaluate('window.lumenDiagnostics.focusSidebar()'); await pause(700);
+        const remote = await snapshot();
+        if (remote.width <= before.width || remote.tabs.filter(t=>t.stroke?.toLowerCase()==='#ff8800').length!==1) throw new Error('Remote sidebar focus regression');
+        console.log('UI_SIDEBAR '+JSON.stringify({before,clicked,opened,closed,remote}));
+        return;
+      }
+      if (process.env.LUMEN_SMOKE_FOLDER_DRAG === '1') {
+        await evaluate("window.lumenDiagnostics.tab('Bookmarks-tab')"); await pause(800);
+        const opened = await evaluate(`(()=>{const icon=[...document.querySelectorAll('svg circle[cx="18"][cy="18"][r="3"]')].map(e=>e.closest('svg')).find(e=>e.getBoundingClientRect().width>0);if(!icon)return false;icon.dispatchEvent(new MouseEvent('click',{bubbles:true}));return true;})()`);
+        if (!opened) throw new Error('Folder manager not found');
+        await pause(800);
+        const order = () => evaluate("[...document.querySelectorAll('[data-lumen-folder-drop]')].map(e=>e.dataset.lumenFolderDrop)");
+        const before = await order();
+        const dragFolder = async (source, target) => {
+          const points = await evaluate(`(()=>{const point=e=>{const r=e.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}};return {from:point(document.querySelector('[data-lumen-folder-drag-handle="'+${JSON.stringify(source)}+'"]')),to:point(document.querySelector('[data-lumen-folder-drop="'+${JSON.stringify(target)}+'"]'))};})()`);
+          let dragData;
+          const intercept = (_event, method, params) => { if (method === 'Input.dragIntercepted') dragData = params.data; };
+          main.webContents.debugger.on('message', intercept);
+          try {
+            await main.webContents.debugger.sendCommand('Input.setInterceptDrags', { enabled: true });
+            await main.webContents.debugger.sendCommand('Input.dispatchMouseEvent', { type: 'mouseMoved', ...points.from });
+            await main.webContents.debugger.sendCommand('Input.dispatchMouseEvent', { type: 'mousePressed', ...points.from, button: 'left', buttons: 1, clickCount: 1 });
+            await main.webContents.debugger.sendCommand('Input.dispatchMouseEvent', { type: 'mouseMoved', x: points.from.x + 12, y: points.from.y + 12, button: 'left', buttons: 1 });
+            await main.webContents.debugger.sendCommand('Input.dispatchMouseEvent', { type: 'mouseMoved', ...points.to, button: 'left', buttons: 1 });
+            for (let attempt = 0; !dragData && attempt < 10; attempt++) await pause(100);
+            if (!dragData?.items.some(item => item.mimeType === 'application/x-lumen-bookmark-category')) throw new Error('Mouse did not start a native folder drag');
+            for (const type of ['dragEnter', 'dragOver', 'drop']) await main.webContents.debugger.sendCommand('Input.dispatchDragEvent', { type, ...points.to, data: dragData });
+            await main.webContents.debugger.sendCommand('Input.dispatchMouseEvent', { type: 'mouseReleased', ...points.to, button: 'left', buttons: 0, clickCount: 1 });
+          } finally {
+            main.webContents.debugger.off('message', intercept);
+            await main.webContents.debugger.sendCommand('Input.setInterceptDrags', { enabled: false });
+          }
+          await pause(600);
+        };
+        await dragFolder('ui-one', 'ui-two');
+        const after = await order();
+        if (after.join('|') !== 'ui-two|ui-one') throw new Error('Folder drop did not reorder the list');
+        const saved = JSON.parse(JSON.parse(fs.readFileSync(path.join(dataRoot, 'localLibrary.json'), 'utf8')).localBookmarks).categories.map(item => item.id);
+        if (saved.join('|') !== after.join('|')) throw new Error('Folder drag order was not persisted');
+        await dragFolder('ui-one', 'ui-two');
+        const restored = await order();
+        if (restored.join('|') !== before.join('|')) throw new Error('Reverse folder drop did not restore the order');
+        console.log('UI_FOLDER_DRAG '+JSON.stringify({before,after,saved,restored,tv:process.env.LUMEN_SMOKE_TV==='1'}));
+        return;
+      }
+      if (process.env.LUMEN_SMOKE_ATV_REVIEW === '1') {
+        const previousFocus = await evaluate('window.lumenDiagnostics.currentFocus()');
+        const geometry = () => evaluate(`JSON.stringify({width:document.getElementById('atv-navigation-sidebar').getBoundingClientRect().width,x:[...document.querySelectorAll('[data-lumen-pager]')].find(e=>e.getBoundingClientRect().width>0)?.getBoundingClientRect().x})`);
+        const before = JSON.parse(await geometry());
+        await evaluate('window.lumenDiagnostics.focusSidebar()'); await pause(700);
+        const opened = JSON.parse(await geometry());
+        if (opened.width <= before.width || Math.abs(opened.x - opened.width) > 1) throw new Error('ATV sidebar focus/geometry regression');
+        await evaluate('window.lumenDiagnostics.focus(' + JSON.stringify(previousFocus) + ')'); await pause(700);
+        const closed = JSON.parse(await geometry());
+        if (closed.width !== before.width) throw new Error('ATV sidebar did not close after focus left');
+        await evaluate('window.lumenDiagnostics.settings()'); await pause(1000);
+        const clickText = async text => {
+          await evaluate(`(()=>{const e=[...document.querySelectorAll('*')].find(e=>e.childElementCount===0&&e.textContent===${JSON.stringify(text)});if(e)e.scrollIntoView({block:'center'});})()`);
+          await pause(500);
+          const point = await evaluate(`(()=>{const e=[...document.querySelectorAll('*')].find(e=>e.childElementCount===0&&e.textContent===${JSON.stringify(text)});if(!e)throw new Error('Missing setting');e.scrollIntoView({block:'center'});const r=e.getBoundingClientRect();return {x:Math.round(r.x+r.width/2),y:Math.round(r.y+r.height/2)};})()`);
+          main.webContents.sendInputEvent({type:'mouseDown',...point,button:'left',clickCount:1});
+          main.webContents.sendInputEvent({type:'mouseUp',...point,button:'left',clickCount:1});
+        };
+        await clickText('Порядок вкладок на ТВ'); await pause(700);
+        const modalFocus = await evaluate('window.lumenDiagnostics.currentFocus()');
+        if (modalFocus !== 'settings-order-close') throw new Error('ATV ordering modal did not claim close focus');
+        fs.writeFileSync(path.join(__dirname,'ui-atv-order-modal-proof.png'),(await main.webContents.capturePage()).toPNG());
+        main.webContents.sendInputEvent({type:'keyDown',keyCode:'Escape'});main.webContents.sendInputEvent({type:'keyUp',keyCode:'Escape'});await pause(700);
+        const restoredFocus = await evaluate('window.lumenDiagnostics.currentFocus()');
+        if (!restoredFocus || restoredFocus === modalFocus) throw new Error('ATV ordering modal did not restore focus');
+        console.log('UI_ATV_REVIEW '+JSON.stringify({before,opened,closed,previousFocus,modalFocus,restoredFocus}));
+        fs.writeFileSync(path.join(__dirname,'ui-atv-settings-focus-proof.png'),(await main.webContents.capturePage()).toPNG());
+        if (process.env.LUMEN_SMOKE_ATV_AUDIT === '1') {
+          const key = async code => {
+            main.webContents.sendInputEvent({ type: 'keyDown', keyCode: code });
+            main.webContents.sendInputEvent({ type: 'keyUp', keyCode: code });
+            await pause(300);
+          };
+          const restoredInfo = await evaluate('window.lumenDiagnostics.focusInfo()');
+          if (!restoredInfo.text?.includes('Порядок вкладок на ТВ')) throw new Error('ATV modal closed the screen instead of restoring its trigger');
+          await clickText('Источники контента'); await pause(800);
+          const sourceEntry = await evaluate('window.lumenDiagnostics.focusInfo()');
+          await key('Down');
+          const sourceDown = await evaluate('window.lumenDiagnostics.focusInfo()');
+          await key('Up');
+          const sourceUp = await evaluate('window.lumenDiagnostics.focusInfo()');
+          console.log('UI_ATV_SOURCES '+JSON.stringify({sourceEntry,sourceDown,sourceUp}));
+          if (sourceDown.key === sourceUp.key) throw new Error('ATV source list cannot navigate');
+          await key('Escape'); await pause(500);
+          await clickText('Тема приложения'); await pause(800);
+          const themeEntry = await evaluate('window.lumenDiagnostics.focusInfo()');
+          if (!themeEntry.text?.includes('Как в системе')) throw new Error('ATV theme dropdown did not open');
+          await key('Down');
+          const themeDown = await evaluate('window.lumenDiagnostics.focusInfo()');
+          if (themeDown.key === themeEntry.key) throw new Error('ATV theme dropdown cannot navigate');
+          await key('Escape'); await pause(500);
+          await evaluate("window.lumenDiagnostics.tab('Bookmarks-tab')"); await pause(700);
+          const managerOpened = await evaluate(`(()=>{const icon=[...document.querySelectorAll('svg circle[cx="18"][cy="18"][r="3"]')].map(e=>e.closest('svg')).find(e=>e.getBoundingClientRect().width>0);if(!icon)return false;icon.dispatchEvent(new MouseEvent('click',{bubbles:true}));return true;})()`);
+          if (!managerOpened) throw new Error('ATV folder manager missing');
+          await pause(600);
+          const managerEntry = await evaluate('window.lumenDiagnostics.focusInfo()');
+          if (managerEntry.width < 120) throw new Error('ATV new category label is clipped');
+          await key('Up');
+          const managerUp = await evaluate('window.lumenDiagnostics.focusInfo()');
+          if (managerEntry.key === managerUp.key) throw new Error('ATV folder manager cannot navigate');
+          await key('Escape'); await pause(500);
+          await evaluate("window.lumenDiagnostics.tab('Recent-tab')"); await pause(800);
+          const recent = await evaluate('window.lumenDiagnostics.focusInfo()');
+          await key('Right');
+          const recentRight = await evaluate('window.lumenDiagnostics.focusInfo()');
+          if (recentRight.key === recent.key) throw new Error('ATV Recent focus did not move');
+          console.log('UI_ATV_AUDIT '+JSON.stringify({themeEntry,themeDown,managerEntry,managerUp,recent,recentRight}));
+          fs.writeFileSync(path.join(__dirname,'ui-atv-audit-proof.png'),(await main.webContents.capturePage()).toPNG());
+        }
+        return;
+      }
       await swipe();
       console.log('UI_HOME_SWIPE ' + await evaluate("JSON.stringify([...document.querySelectorAll('[data-lumen-pager]')].map(e=>e.dataset.lumenPage))"));
       await evaluate("window.lumenDiagnostics.tab('Bookmarks-tab')"); await pause(700); await swipe();
@@ -200,6 +383,15 @@ app.whenReady().then(async () => {
       await evaluate('window.lumenDiagnostics.previewFilm(' + JSON.stringify(sectionFilm) + ')'); await pause(700);
       console.log('UI_NATIVE_SECTIONS ' + await evaluate("JSON.stringify({rows:[...document.querySelectorAll('[data-lumen-selectable]')].filter(e=>e.textContent==='Ранняя часть'||e.textContent==='Поздняя часть').map(e=>({name:e.textContent,width:e.parentElement.getBoundingClientRect().width,height:e.parentElement.getBoundingClientRect().height})),related:(()=>{const h=[...document.querySelectorAll('[data-lumen-selectable]')].find(e=>e.textContent==='Смотреть также');return h?[...h.parentElement.querySelectorAll('img')].map(e=>({height:e.getBoundingClientRect().height,width:e.getBoundingClientRect().width,complete:e.complete})):[]})()})"));
       fs.writeFileSync(path.join(__dirname, 'ui-sections-proof.png'), (await main.webContents.capturePage()).toPNG());
+      const bookmarkOpened = await evaluate(`(()=>{const icon=[...document.querySelectorAll('svg path')].find(e=>e.getAttribute('d')?.startsWith('M17 3a2')&&e.getBoundingClientRect().width>0);if(!icon)return false;icon.dispatchEvent(new MouseEvent('click',{bubbles:true}));return true;})()`);
+      await pause(400);
+      const bookmarkPanel = await evaluate(`(()=>{const panel=document.getElementById('lumen-bookmarks-panel');if(!panel)return null;const r=panel.getBoundingClientRect();return {width:r.width,height:r.height,viewport:innerHeight,text:panel.innerText,opacity:(()=>{const values=[];for(let e=panel;e;e=e.parentElement)values.push(getComputedStyle(e).opacity);return values;})()};})()`);
+      if (!bookmarkOpened || !bookmarkPanel || bookmarkPanel.width>600 || bookmarkPanel.height>bookmarkPanel.viewport-50 || !bookmarkPanel.text.includes('Новая категория')) throw new Error('Desktop bookmark panel layout regression');
+      console.log('UI_BOOKMARK_PANEL '+JSON.stringify(bookmarkPanel));
+      main.webContents.invalidate(); await pause(500);
+      fs.writeFileSync(path.join(__dirname,'ui-bookmark-panel-proof.png'),(await main.webContents.capturePage()).toPNG());
+      if (process.env.LUMEN_SMOKE_BOOKMARKS_ONLY === '1') return;
+      main.webContents.sendInputEvent({type:'keyDown',keyCode:'Escape'});main.webContents.sendInputEvent({type:'keyUp',keyCode:'Escape'});await pause(300);
       main.webContents.sendInputEvent({ type: 'keyDown', keyCode: 'Escape' }); main.webContents.sendInputEvent({ type: 'keyUp', keyCode: 'Escape' }); await pause(300);
       const records = JSON.parse(JSON.parse(fs.readFileSync(path.join(__dirname, 'smoke-data-offline/downloads.json'), 'utf8')).taskIds);
       const item = Object.values(records).find(item => fs.existsSync(item.destination));
@@ -402,7 +594,7 @@ app.whenReady().then(async () => {
       fs.writeFileSync(process.env.LUMEN_SMOKE_OUTPUT.replace(/\.json$/, '.png'), (await main.webContents.capturePage()).toPNG());
     }
     fs.writeFileSync(path.join(__dirname, 'smoke.png'), (await main.webContents.capturePage()).toPNG()); app.exit(0);
-  }, process.env.LUMEN_SMOKE_MODE === 'desktop-ui' ? 42000 : process.env.LUMEN_SMOKE_MODE === 'desktop-info' ? 26000 : ['film','sources'].includes(process.env.LUMEN_SMOKE_MODE) ? 55000 : ['anime','rezka','updates'].includes(process.env.LUMEN_SMOKE_MODE) ? 35000 : process.env.LUMEN_SMOKE_MODE === 'offline' ? 80000 : 15000);
+  }, process.env.LUMEN_SMOKE_DETAIL_DRAG === '1' ? 25000 : process.env.LUMEN_SMOKE_FOLDER_DRAG === '1' ? 30000 : process.env.LUMEN_SMOKE_ATV_AUDIT === '1' ? 35000 : process.env.LUMEN_SMOKE_BOOKMARKS_ONLY === '1' ? 15000 : process.env.LUMEN_SMOKE_MODE === 'desktop-ui' ? 42000 : process.env.LUMEN_SMOKE_MODE === 'desktop-info' ? 26000 : ['film','sources'].includes(process.env.LUMEN_SMOKE_MODE) ? 55000 : ['anime','rezka','updates'].includes(process.env.LUMEN_SMOKE_MODE) ? 35000 : process.env.LUMEN_SMOKE_MODE === 'offline' ? 80000 : 15000);
 });
 app.on('before-quit', () => { for (const child of children.values()) if (!child.isDestroyed()) child.destroy(); });
 app.on('window-all-closed', () => app.quit());

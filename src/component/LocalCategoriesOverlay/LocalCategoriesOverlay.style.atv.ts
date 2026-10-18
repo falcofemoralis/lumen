@@ -43,6 +43,13 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   rowDrag: {
     flex: 1,
   },
+  rowDragFocused: {
+    backgroundColor: colors.backgroundFocused,
+    borderRadius: scale(4),
+  },
+  rowTextFocused: {
+    color: colors.textFocused,
+  },
   rowDragContent: {
     flex: 1,
     flexDirection: 'row',
@@ -92,7 +99,9 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     justifyContent: 'flex-end',
   },
   button: {
-    flex: 0,
+    flexGrow: 0,
+    flexShrink: 1,
+    flexBasis: 'auto',
     paddingInline: scale(20),
   },
   buttonPrimary: {

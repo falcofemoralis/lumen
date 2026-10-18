@@ -21,6 +21,7 @@ import { usePictureInPicture } from 'Hooks/usePictureInPicture';
 import { useRestartableTimeout } from 'Hooks/useRestartableTimeout';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
+import ArrowLeft from 'lucide-react-native/icons/arrow-left';
 import Bookmark from 'lucide-react-native/icons/bookmark';
 import BookmarkCheck from 'lucide-react-native/icons/bookmark-check';
 import ClosedCaption from 'lucide-react-native/icons/closed-caption';
@@ -188,6 +189,7 @@ export function PlayerComponent({
   closeOverlay,
   onBookmarkChange,
   backwardToStart,
+  handleBackButtonPress,
   handleAspectRatioChange,
 }: PlayerComponentProps) {
   const {
@@ -621,6 +623,13 @@ export function PlayerComponent({
     >
       <FocusContext.Provider value={ topRowFocusKey }>
         <View ref={ topRowRef } style={ styles.controlsRow }>
+          { Platform.OS === 'web' && (
+            <PlayerTopAction
+              IconComponent={ ArrowLeft }
+              action={ handleBackButtonPress }
+              onInteraction={ handleUserInteraction }
+            />
+          ) }
           <PlayerTopAction
             IconComponent={ getPlayPauseIcon() }
             action={ togglePlayPause }

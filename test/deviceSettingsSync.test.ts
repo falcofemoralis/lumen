@@ -4,7 +4,7 @@ import { getCloudSyncSettingId, getCloudSyncSettingFromId } from '../src/config/
 import { mergeCloudSyncState } from '../src/util/CloudSync/merge';
 import type { CloudSyncState } from '../src/util/CloudSync/types';
 test('Display density, navigation, device paths and hardware settings stay on each installation', () => {
-  for (const key of ['numberOfColumnsMobile','numberOfColumnsTV','homeTabOrder','hiddenHomeTabs','tabPosition','homeDisplayMode','bookmarksDisplayMode','mobileNavigationOrder','tvNavigationOrder','recentTabsInterface','downloadsPath','playerSavedBrightness','playerBufferTimeSetting'] as const) {
+  for (const key of ['numberOfColumnsMobile','numberOfColumnsTV','homeTabOrder','hiddenHomeTabs','tabPosition','tvTabPosition','homeDisplayMode','bookmarksDisplayMode','mobileNavigationOrder','tvNavigationOrder','recentTabsInterface','downloadsPath','playerSavedBrightness','playerBufferTimeSetting'] as const) {
     assert.equal(getCloudSyncSettingId(key),null,key);
     for(const prefix of ['', 'mobile:', 'atv:']) assert.equal(getCloudSyncSettingFromId(prefix+key)?.scope,'local',prefix+key);
   }

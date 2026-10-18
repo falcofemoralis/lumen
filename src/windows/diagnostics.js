@@ -1,13 +1,23 @@
 import { TaskIdStorage } from 'Util/Download';
+import { getCurrentFocusKey, setFocus, SpatialNavigation } from '@noriginmedia/norigin-spatial-navigation-core';
 import RezkaApi from '../api/RezkaApi';
 import AnixartSourceAdapter from '../source/adapters/AnixartSourceAdapter';
 import AnixartPlaybackAdapter from '../source/playback/AnixartPlaybackAdapter';
 import RouterStore from '../store/Router.store';
-import { navigate } from '../util/Navigation';
-import { PLAYER_SCREEN, DOWNLOADS_SCREEN, SETTINGS_SCREEN } from '../navigation/navigationRoutes';
+import { navigate, navigationRef } from '../util/Navigation';
+import { PLAYER_SCREEN, DOWNLOADS_SCREEN, SETTINGS_SCREEN, HOME_TAB } from '../navigation/navigationRoutes';
 import { sourceAdapters, sourcePlaybackRouter } from '../source';
 if (window.lumen.diagnostic) {
   window.lumenDiagnostics = {
+    currentFocus: () => getCurrentFocusKey(),
+    currentRouteLink: () => navigationRef.getCurrentRoute()?.params?.link,
+    async focusInfo() {
+      const key = getCurrentFocusKey();
+      const layout = await SpatialNavigation.getNodeLayoutByFocusKey(key);
+      return { key, text: layout.node?.textContent?.slice(0, 160), x: layout.x, y: layout.y, width: layout.width, height: layout.height };
+    },
+    focus: key => setFocus(key),
+    focusSidebar: () => setFocus('sidebar-tab-' + HOME_TAB),
     settings() { navigate(SETTINGS_SCREEN); },
     tab(screen) { navigate('Tabs', { screen }); },
     local(session) { RouterStore.pushData(PLAYER_SCREEN, session); navigate(PLAYER_SCREEN); },

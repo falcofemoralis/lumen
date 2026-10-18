@@ -203,7 +203,7 @@ export function FilmScreenComponent({
     const { genres = [] } = film;
 
     return (
-      <ScrollView horizontal showsHorizontalScrollIndicator={ false }>
+      <ScrollView horizontal { ...(Platform.OS === 'web' ? { dataSet: { lumenDragScroll: 'horizontal' } } : {}) } showsHorizontalScrollIndicator={ false }>
         <View style={ styles.genres }>
           { genres.map(({ name, link }) => (
             <ThemedPressable
@@ -411,7 +411,7 @@ export function FilmScreenComponent({
     return (
       <Wrapper>
         <FilmViewSection title={ t('Actors') }>
-          <ScrollView horizontal showsHorizontalScrollIndicator={ false }>
+          <ScrollView horizontal { ...(Platform.OS === 'web' ? { dataSet: { lumenDragScroll: 'horizontal' } } : {}) } showsHorizontalScrollIndicator={ false }>
             <View style={ styles.actorsList }>
               { persons.map((actor, index) => (
                 <FilmViewActor
@@ -494,7 +494,7 @@ export function FilmScreenComponent({
     return (
       <Wrapper>
         <FilmViewSection title={ t('Related') }>
-          <ScrollView horizontal showsHorizontalScrollIndicator={ false }
+          <ScrollView horizontal { ...(Platform.OS === 'web' ? { dataSet: { lumenDragScroll: 'horizontal' } } : {}) } showsHorizontalScrollIndicator={ false }
             style={ Platform.OS === 'web' ? { flexGrow: 0, flexShrink: 0, height: scale(100 * POSTER_ASPECT_HEIGHT / POSTER_ASPECT_WIDTH + 70) } : undefined }>
             <View style={ styles.relatedList }>
               { related.map((item, idx) => (

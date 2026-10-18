@@ -2,7 +2,7 @@ import { FocusableComponentLayout } from '@noriginmedia/norigin-spatial-navigati
 import { FocusContext, FocusHandler, useFocusable } from '@noriginmedia/norigin-spatial-navigation-react-native-tvos';
 import { useDefaultFocus } from 'Hooks/useDefaultFocus';
 import { useCallback, useRef } from 'react';
-import { LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent, StyleSheet, View } from 'react-native';
+import { LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent, Platform, StyleSheet, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 
 import { ScrollContext, useScrollContext } from './ScrollContext';
@@ -146,17 +146,18 @@ export const ThemedScrollViewComponent = ({
         <ScrollView
           ref={ scrollRef }
           horizontal={ horizontal }
+          { ...(Platform.OS === 'web' && horizontal ? { dataSet: { lumenDragScroll: 'horizontal' } } : {}) }
           tvFocusable={ false }
           style={ [{ width: '100%', height: '100%' }, containerStyle] }
           contentContainerStyle={ contentContainerStyle }
           showsHorizontalScrollIndicator={ false }
           showsVerticalScrollIndicator={ false }
           scrollEventThrottle={ 16 }
-          onLayout={ event => { const { width, height } = event.nativeEvent.layout; console.log('[ATV ScrollView]', { width, height }); handleLayout(event); } }
+          onLayout={ handleLayout }
           onContentSizeChange={ handleContentSizeChange }
           onScroll={ handleScroll }
         >
-          <View ref={ ref } style={ [{ flexDirection: horizontal ? 'row' : 'column' }, style] } onLayout={ event => { const { width, height } = event.nativeEvent.layout; console.log('[ATV ScrollView contentView]', { width, height }); } }>
+          <View ref={ ref } style={ [{ flexDirection: horizontal ? 'row' : 'column' }, style] }>
             { children }
           </View>
         </ScrollView>

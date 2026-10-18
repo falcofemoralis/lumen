@@ -24,8 +24,12 @@ const NavigationOrderSettingComponent = ({
   onChange,
   onHiddenItemsChange,
   onBack,
+  embedded = false,
 }: NavigationOrderSettingProps) => {
   const styles = useThemedStyles(componentStyles);
+  const iconSizeStyle = useMemo(() => ({
+    width: styles.buttonIcon.width, height: styles.buttonIcon.height, flexShrink: 0,
+  }), [styles]);
 
   const orderedItems = useMemo(() => {
     const itemsByValue = new Map(items.map(item => [item.value, item]));
@@ -84,18 +88,11 @@ const NavigationOrderSettingComponent = ({
     );
   }, [hiddenItems, onHiddenItemsChange, orderedItems]);
 
-  return (
-    <Page checkConnection={ false }>
-      <ThemedSafeArea>
-        <Header
-          title={ title }
-          disableBackRipple
-          onBack={ onBack }
-        />
-
+  const list = (
         <ThemedScrollView
           contentContainerStyle={ styles.container }
-          autofocus
+          containerStyle={ embedded ? { flex: 1, height: undefined, minHeight: 0 } : undefined }
+          autofocus={ !embedded }
         >
           { orderedItems.map((item, index) => {
             const { IconComponent } = item;
@@ -123,7 +120,7 @@ const NavigationOrderSettingComponent = ({
                     contentStyle={ styles.buttonContent }
                     IconComponent={ hiddenItems.includes(item.value) ? EyeOff : Eye }
                     iconColor={ styles.buttonIcon.color }
-                    iconProps={ { size: styles.buttonIcon.width, style: styles.buttonIcon } }
+                    iconProps={ { size: styles.buttonIcon.width, style: iconSizeStyle } }
                     onPress={ () => toggleItemVisibility(item.value) }
                   />
                   <ThemedButton
@@ -132,7 +129,7 @@ const NavigationOrderSettingComponent = ({
                     contentStyle={ styles.buttonContent }
                     IconComponent={ ChevronUp }
                     iconColor={ styles.buttonIcon.color }
-                    iconProps={ { size: styles.buttonIcon.width, style: styles.buttonIcon } }
+                    iconProps={ { size: styles.buttonIcon.width, style: iconSizeStyle } }
                     onPress={ () => moveItem(index, -1) }
                   />
 
@@ -142,7 +139,7 @@ const NavigationOrderSettingComponent = ({
                     contentStyle={ styles.buttonContent }
                     IconComponent={ ChevronDown }
                     iconColor={ styles.buttonIcon.color }
-                    iconProps={ { size: styles.buttonIcon.width, style: styles.buttonIcon } }
+                    iconProps={ { size: styles.buttonIcon.width, style: iconSizeStyle } }
                     onPress={ () => moveItem(index, 1) }
                   />
                 </View>
@@ -150,6 +147,14 @@ const NavigationOrderSettingComponent = ({
             );
           }) }
         </ThemedScrollView>
+  );
+  if (embedded) return list;
+
+  return (
+    <Page checkConnection={ false }>
+      <ThemedSafeArea>
+        <Header title={ title } disableBackRipple onBack={ onBack } />
+        { list }
       </ThemedSafeArea>
     </Page>
   );

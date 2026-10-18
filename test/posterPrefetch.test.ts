@@ -28,3 +28,12 @@ test('A rapid poster scroll cannot create an unbounded background queue', async 
   for (let i = 0; i < 10; i++) await tick();
   assert.equal(count, 24);
 });
+test('Failed poster downloads can be retried instead of being marked cached', async () => {
+  let calls = 0;
+  const queue = createPosterPrefetchQueue(async () => ++calls > 1);
+  queue(['https://cdn.test/failure.jpg']); await tick();
+  queue(['https://cdn.test/failure.jpg']); await tick();
+  assert.equal(calls, 2);
+  queue(['https://cdn.test/failure.jpg']); await tick();
+  assert.equal(calls, 2);
+});

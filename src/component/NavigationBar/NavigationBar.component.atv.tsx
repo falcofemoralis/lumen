@@ -46,6 +46,7 @@ type NavigationTabProps = {
   badgeCount: number,
   profile?: ProfileInterface | null,
   isActiveTab: boolean,
+  hasSidebarFocus: boolean,
   isMenuOpened: boolean,
   onTabSelect: (name: string) => void,
   onTabFocus: (name: string) => void,
@@ -60,6 +61,7 @@ const NavigationTab = ({
   badgeCount,
   profile,
   isActiveTab,
+  hasSidebarFocus,
   isMenuOpened,
   onTabSelect,
   onTabFocus,
@@ -72,8 +74,8 @@ const NavigationTab = ({
   const renderLabel = (isFocused: boolean) => {
     if (typeof label === 'function') {
       return label({
-        focused: isActiveTab,
-        color: isActiveTab ? theme.colors.textSecondary : '#8F9190',
+        focused: isFocused,
+        color: isFocused ? theme.colors.primary : theme.colors.text,
         position: 'below-icon',
         children: '',
       });
@@ -89,7 +91,7 @@ const NavigationTab = ({
           <IconComponent
             style={ styles.tabIcon }
             size={ styles.tabIcon.width }
-            color={ isActiveTab ? theme.colors.textSecondary : '#8F9190' }
+            color={ isFocused ? theme.colors.primary : theme.colors.icon }
           />
         ) }
         { badgeCount > 0 && (
@@ -104,7 +106,7 @@ const NavigationTab = ({
           style={ [
             styles.tabText,
             {
-              color: isActiveTab ? theme.colors.textSecondary : '#8F9190',
+              color: isFocused ? theme.colors.primary : theme.colors.text,
             },
           ] }
         >
@@ -141,7 +143,7 @@ const NavigationTab = ({
             >
               <UserRound
                 size={ styles.tabIcon.width }
-                color={ isActiveTab ? theme.colors.textSecondary : '#8F9190' }
+                color={ isFocused ? theme.colors.primary : theme.colors.icon }
               />
             </View>
           ) }
@@ -152,7 +154,7 @@ const NavigationTab = ({
               styles.tabText,
               styles.profileNameText,
               {
-                color: isActiveTab ? theme.colors.textSecondary : '#8F9190',
+                color: isFocused ? theme.colors.primary : theme.colors.text,
               },
             ] }
           >
@@ -174,6 +176,7 @@ const NavigationTab = ({
   return (
     <ThemedPressable
       focusKey={ getTabFocusKey(name) }
+      focusOnPress={ false }
       onFocus={ () => onTabFocus(name) }
       onPress={ () => onTabSelect(name) }
       onEnterPress={ () => onTabSelect(name) }
@@ -182,12 +185,9 @@ const NavigationTab = ({
     >
       { ({ isFocused }) => (
         <View
-          style={ [
-            styles.tab,
-
-          ] }
+          nativeID={ `sidebar-item-${name}` } style={ styles.tab }
         >
-          { name === ACCOUNT_TAB ? renderAccountTab(isFocused) : renderDefaultTab(isFocused) }
+          { name === ACCOUNT_TAB ? renderAccountTab(isFocused || (!hasSidebarFocus && isActiveTab)) : renderDefaultTab(isFocused || (!hasSidebarFocus && isActiveTab)) }
         </View>
       ) }
     </ThemedPressable>
@@ -209,9 +209,11 @@ export function NavigationBarComponent({
   const { scale, theme } = useAppTheme();
   const { top, bottom, left } = useSafeAreaInsets();
 
-  const { ref, focusKey } = useFocusable({
+  const { ref, focusKey, hasFocusedChild } = useFocusable({
     focusKey: SIDEBAR_FOCUS_KEY,
     trackChildren: true,
+    onFocus: () => toggleMenu(true),
+    onBlur: () => toggleMenu(false),
     isFocusBoundary: true,
     focusBoundaryDirections: ['left'],
     saveLastFocusedChild: false,
@@ -222,12 +224,13 @@ export function NavigationBarComponent({
   });
 
   const onTabSelect = useCallback((name: string) => {
+    toggleMenu(false);
     onPress(name);
-  }, [onPress]);
+  }, [onPress, toggleMenu]);
 
   const onTabFocus = useCallback((_name: string) => {
-    // Focus only moves between sidebar items. It must never change the route.
-  }, []);
+    toggleMenu(true);
+  }, [toggleMenu]);
 
   const { topTabs, middleTabs, bottomTabs } = useMemo(() => {
     const tt = [] as NavigationRoute<ParamListBase, string>[];
@@ -270,6 +273,7 @@ export function NavigationBarComponent({
         badgeCount={ badgeData[route.name] || 0 }
         profile={ route.name === ACCOUNT_TAB ? profile : undefined }
         isActiveTab={ state.index === index }
+        hasSidebarFocus={ hasFocusedChild }
         isMenuOpened={ isMenuOpen }
         onTabSelect={ onTabSelect }
         onTabFocus={ onTabFocus }
@@ -286,6 +290,7 @@ export function NavigationBarComponent({
     <FocusContext.Provider value={ focusKey }>
       <Animated.View
         ref={ ref }
+        nativeID="atv-navigation-sidebar"
         style={ [
           styles.bar,
           {
@@ -299,6 +304,7 @@ export function NavigationBarComponent({
       >
         <ThemedPressable
           focusKey={ SIDEBAR_TOGGLE_FOCUS_KEY }
+          focusOnPress={ false }
           onPress={ handleToggleMenu }
           style={ styles.toggleButton }
           contentStyle={ styles.toggleButtonContent }
@@ -308,6 +314,7 @@ export function NavigationBarComponent({
 
             return (
               <View
+                nativeID="sidebar-menu-toggle"
                 style={[
                   styles.toggleButtonInner,
                   !isMenuOpen && styles.toggleButtonInnerCollapsed,
@@ -315,13 +322,13 @@ export function NavigationBarComponent({
               >
                 <ToggleIcon
                   size={ styles.toggleIcon.width }
-                  color='#8F9190'
+                  color={ isFocused ? theme.colors.primary : theme.colors.icon }
                 />
                 { isMenuOpen && (
                   <ThemedText
                     style={ [
                       styles.toggleText,
-                      isFocused && styles.toggleTextFocused,
+                      isFocused && { color: theme.colors.primary },
                     ] }
                   >
                     Свернуть

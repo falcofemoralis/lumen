@@ -70,8 +70,8 @@ export const parseResponse = async (response: Response): Promise<string> => {
 };
 
 export const handleRequestError = (response: Response): void => {
-  if (response.status === 503 || response.status === 500) {
-    throw new Error(response.statusText);
+  if (response.status >= 500) {
+    throw new Error(`HTTP ${response.status}: ${response.statusText || 'Source unavailable'}`);
   }
 
   if (response.status === 403) {

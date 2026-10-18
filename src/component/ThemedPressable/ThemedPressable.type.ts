@@ -28,6 +28,7 @@ export type ThemedPressableContainerProps ={
   extraProps?: any;
   focusKey?: string;
   autofocus?: boolean;
+  focusOnPress?: boolean;
 }
 
 export type ThemedPressableComponentProps = ThemedPressableContainerProps;
