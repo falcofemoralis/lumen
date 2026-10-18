@@ -223,6 +223,7 @@ app.whenReady().then(async () => {
         return;
       }
       if (process.env.LUMEN_SMOKE_SIDEBAR === '1') {
+        if (process.env.LUMEN_SMOKE_SMALL_UI === '1') {main.setSize(800,480);await pause(700);}
         const click = async id => {
           const point = await evaluate(`(()=>{const e=document.getElementById(${JSON.stringify(id)});const r=e.getBoundingClientRect();return {x:Math.round(r.x+r.width/2),y:Math.round(r.y+r.height/2)};})()`);
           main.webContents.sendInputEvent({type:'mouseDown',...point,button:'left',clickCount:1});
@@ -246,6 +247,12 @@ app.whenReady().then(async () => {
         await evaluate('window.lumenDiagnostics.focusSidebar()'); await pause(700);
         const remote = await snapshot();
         if (remote.width <= before.width || remote.tabs.filter(t=>t.stroke?.toLowerCase()==='#ff8800').length!==1) throw new Error('Remote sidebar focus regression');
+        if (process.env.LUMEN_SMOKE_SMALL_UI === '1') {
+          await evaluate("window.lumenDiagnostics.focus('sidebar-tab-Settings')");await pause(700);
+          const settingsBounds=await evaluate("(()=>{const item=document.getElementById('sidebar-item-Settings').getBoundingClientRect(),bar=document.getElementById('atv-navigation-sidebar').getBoundingClientRect();return {itemBottom:item.bottom,barBottom:bar.bottom};})()");
+          if(settingsBounds.itemBottom>settingsBounds.barBottom+1)throw new Error('Small sidebar clips its last item');
+          console.log('UI_SMALL_SIDEBAR '+JSON.stringify(settingsBounds));
+        }
         console.log('UI_SIDEBAR '+JSON.stringify({before,clicked,opened,closed,remote}));
         return;
       }

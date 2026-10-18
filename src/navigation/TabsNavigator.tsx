@@ -8,7 +8,8 @@ import {
 import { useConfigContext } from 'Context/ConfigContext';
 import { useNavigationContext } from 'Context/NavigationContext';
 import { ReactNode } from 'react';
-import Animated from 'react-native-reanimated';
+import Animated, { LinearTransition } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { t } from 'i18n/translate';
 import Bell from 'lucide-react-native/icons/bell';
 import Download from 'lucide-react-native/icons/download';
@@ -78,6 +79,8 @@ const MobileAccountNavigator = createAccountNavigator(ACCOUNT_SCREEN, AccountScr
 // NOTE: these are plain render functions, not components. `Tab.Navigator` only accepts
 // `Screen`, `Group` or `Fragment` as its direct children, so the group has to be returned
 // inline instead of being wrapped in a component.
+const TV_SCENE_LAYOUT = LinearTransition.duration(NAVIGATION_BAR_ANIMATION_DURATION_MS);
+
 function TVScene({ children }: { children: ReactNode }) {
   const { isMenuOpen } = useNavigationContext();
   const { scale } = useAppTheme();
@@ -85,12 +88,10 @@ function TVScene({ children }: { children: ReactNode }) {
   return (
     <Animated.View
       nativeID="atv-navigation-scene"
+      layout={ TV_SCENE_LAYOUT }
       style={ {
         flex: 1,
         marginLeft: isMenuOpen ? scale(NAVIGATION_BAR_TV_WIDTH_OPENED - NAVIGATION_BAR_TV_WIDTH) : 0,
-        transitionProperty: 'marginLeft',
-        transitionDuration: `${NAVIGATION_BAR_ANIMATION_DURATION_MS}ms`,
-        transitionTimingFunction: 'ease-in-out',
       } }
     >
       { children }
@@ -106,6 +107,7 @@ const renderTVTabs = (
   isLocalLibrary: boolean,
   tvNavigationOrder: string[],
   hiddenNavigationTabs: string[],
+  safeAreaLeft: number,
 ) => {
   const accountRoute = isLocalLibrary ? DOWNLOADS_SCREEN : ACCOUNT_TAB;
   const fallbackOrder = [
@@ -256,7 +258,7 @@ const renderTVTabs = (
         headerShown: false,
         sceneStyle: {
           backgroundColor: theme.colors.background,
-          marginLeft: scale(NAVIGATION_BAR_TV_WIDTH),
+          marginLeft: scale(NAVIGATION_BAR_TV_WIDTH) + safeAreaLeft,
         },
       } }
     >
@@ -442,6 +444,7 @@ export function TabsNavigator() {
     newHomeInterface,
   } = useConfigContext();
   const { theme, scale } = useAppTheme();
+  const { left: safeAreaLeft } = useSafeAreaInsets();
 
 
   return (
@@ -455,7 +458,7 @@ export function TabsNavigator() {
           headerShown: false,
         } }
       >
-        { isTV ? renderTVTabs(theme, scale, isLocalLibrary, tvNavigationOrder, hiddenTVNavigationTabs) : renderMobileTabs(theme, mobileNavigationOrder, hiddenMobileNavigationTabs, newHomeInterface) }
+        { isTV ? renderTVTabs(theme, scale, isLocalLibrary, tvNavigationOrder, hiddenTVNavigationTabs, safeAreaLeft) : renderMobileTabs(theme, mobileNavigationOrder, hiddenMobileNavigationTabs, newHomeInterface) }
       </Tab.Navigator>
       { isTV && <SceneMask /> }
     </View>

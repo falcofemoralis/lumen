@@ -111,7 +111,7 @@ export const executeGet = async (
       throw error;
     }
 
-    throw new Error(error as string);
+    throw error instanceof Error ? error : new Error(String(error));
   }
 };
 

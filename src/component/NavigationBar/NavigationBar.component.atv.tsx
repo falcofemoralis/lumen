@@ -15,9 +15,9 @@ import PanelLeft from 'lucide-react-native/icons/panel-left';
 import PanelRight from 'lucide-react-native/icons/panel-right';
 import UserRound from 'lucide-react-native/icons/user-round';
 import { ComponentType, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Image, View } from 'react-native';
+import { Image, Platform, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated from 'react-native-reanimated';
+import Animated, { LinearTransition } from 'react-native-reanimated';
 import { useAppTheme } from 'Theme/context';
 import { ThemedStyles } from 'Theme/types';
 import { ProfileInterface } from 'Type/Profile.interface';
@@ -27,9 +27,12 @@ import {
   componentStyles,
   NAVIGATION_BAR_ANIMATION_DURATION_MS,
   NAVIGATION_BAR_TV_WIDTH_PADDING,
+  NAVIGATION_BAR_TV_WIDTH,
+  NAVIGATION_BAR_TV_WIDTH_OPENED,
 } from './NavigationBar.style.atv';
 import { NavigationBarComponentProps } from './NavigationBar.type';
 
+const SIDEBAR_LAYOUT = LinearTransition.duration(NAVIGATION_BAR_ANIMATION_DURATION_MS);
 export const SIDEBAR_FOCUS_KEY = 'SIDEBAR';
 const SIDEBAR_TOGGLE_FOCUS_KEY = 'SIDEBAR_TOGGLE';
 const TAB_SELECT_DEBOUNCE_MS = 400;
@@ -291,15 +294,21 @@ export function NavigationBarComponent({
       <Animated.View
         ref={ ref }
         nativeID="atv-navigation-sidebar"
+        layout={ Platform.OS === 'web' ? undefined : SIDEBAR_LAYOUT }
         style={ [
           styles.bar,
           {
             paddingTop: top,
             paddingBottom: bottom,
             paddingLeft: scale(NAVIGATION_BAR_TV_WIDTH_PADDING) + left,
-            transitionDuration: `${NAVIGATION_BAR_ANIMATION_DURATION_MS}ms`,
+            ...(Platform.OS === 'web' ? {
+              transitionProperty: 'width',
+              transitionDuration: `${NAVIGATION_BAR_ANIMATION_DURATION_MS}ms`,
+              transitionTimingFunction: 'ease-in-out',
+            } : {}),
           },
           isMenuOpen && styles.barOpened,
+          { width: scale(isMenuOpen ? NAVIGATION_BAR_TV_WIDTH_OPENED : NAVIGATION_BAR_TV_WIDTH) + left },
         ] }
       >
         <ThemedPressable
@@ -341,11 +350,12 @@ export function NavigationBarComponent({
 
         <ThemedScrollView
           style={ styles.tabs }
+          containerStyle={ { flex: 1, minHeight: 0, height: undefined } }
           contentContainerStyle={ styles.tabsContent }
         >
           { topTabs.map((route) => renderTab(route)) }
 
-          <View style={ styles.middleTabs }>
+          <View style={ [styles.middleTabs, { minHeight: middleTabs.length * scale(56) }] }>
             { middleTabs.map((route) => renderTab(route)) }
           </View>
 

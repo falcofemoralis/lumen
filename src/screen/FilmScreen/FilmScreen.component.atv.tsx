@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import { BookmarksOverlay } from 'Component/BookmarksOverlay';
 import { CommentsOverlay } from 'Component/CommentsOverlay';
 import { FilmViewActor } from 'Component/FilmViewActor';
@@ -9,6 +10,7 @@ import { FilmViewScheduleItem } from 'Component/FilmViewScheduleItem';
 import { FilmViewScheduleOverlay } from 'Component/FilmViewScheduleOverlay';
 import { FilmViewSection } from 'Component/FilmViewSection';
 import { Page } from 'Component/Page';
+import { Header } from 'Component/Header';
 import { SourceLoadError } from 'Component/SourceLoadError';
 import { PlayerVideoSelector } from 'Component/PlayerVideoSelector';
 import { Rating } from 'Component/Rating';
@@ -24,6 +26,7 @@ import { useServiceContext } from 'Context/ServiceContext';
 import { useLayout } from 'Hooks/useLayout';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
+import ArrowLeft from 'lucide-react-native/icons/arrow-left';
 import ArrowRight from 'lucide-react-native/icons/arrow-right';
 import Bookmark from 'lucide-react-native/icons/bookmark';
 import BookmarkCheck from 'lucide-react-native/icons/bookmark-check';
@@ -82,6 +85,7 @@ export function FilmScreenComponent({
   handleRatingSelect,
   continueWatching,
 }: FilmScreenComponentProps) {
+  const navigation = useNavigation();
   const { scale, theme } = useAppTheme();
   const { isSignedIn } = useServiceContext();
   const styles = useThemedStyles(componentStyles);
@@ -91,9 +95,10 @@ export function FilmScreenComponent({
   const [actionsWidth, setActionsWidth] = useState(0);
 
   if (!film) {
-    if (isLoadError) return <Page><SourceLoadError onRetry={ retryLoad } /></Page>;
+    if (isLoadError) return <Page>{ Platform.OS === 'web' && <Header disableBackRipple /> }<SourceLoadError onRetry={ retryLoad } /></Page>;
     return (
       <Page>
+        { Platform.OS === 'web' && <Header disableBackRipple /> }
         <FilmScreenThumbnail styles={ styles } />
       </Page>
     );
@@ -155,6 +160,16 @@ export function FilmScreenComponent({
           style={ styles.actions }
           onLayout={ (e) => setActionsWidth(e.nativeEvent.layout.width) }
         >
+          { Platform.OS === 'web' && (
+            <ThemedButton
+              title=""
+              onPress={ () => navigation.goBack() }
+              IconComponent={ ArrowLeft }
+              iconProps={ { size: scale(24), color: '#fff' } }
+              style={ [styles.actionButton, { backgroundColor: 'transparent' }] }
+              styleFocused={ { backgroundColor: 'transparent' } }
+            />
+          ) }
           { shouldDisplayContinueWatching && renderAction(ArrowRight, t('Continue Watching'), continueWatching) }
           { renderPlayButton() }
           { renderAction(MessageSquareText, t('Comments'), openComments) }

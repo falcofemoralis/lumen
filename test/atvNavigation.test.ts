@@ -61,15 +61,18 @@ test('Sidebar focus opens the drawer and blur closes it; focused tab is highligh
     if (name === 'Context/ServiceContext') return { useServiceContext: () => ({ badgeData: {}, isSignedIn: true }) };
     if (name === 'Context/ConfigContext') return { useConfigContext: () => ({ showAccountAvatar: true }) };
     if (name === 'Hooks/useThemedStyles') return { useThemedStyles: () => styles };
-    if (name === 'react-native-safe-area-context') return { useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0 }) };
+    if (name === 'react-native-safe-area-context') return { useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 24 }) };
     if (name === 'Theme/context') return { useAppTheme: () => ({ scale: (v: number) => v, theme: { colors: { primary: '#ff8800', icon: '#aaa', text: '#eee' } } }) };
-    if (name === 'react-native-reanimated') return { __esModule: true, default: { View: 'AnimatedView' } };
-    if (name === 'react-native') return { View: 'View', Image: 'Image' };
+    if (name === 'react-native-reanimated') return { __esModule: true, default: { View: 'AnimatedView' }, LinearTransition: { duration: () => ({}) } };
+    if (name === 'react-native') return { View: 'View', Image: 'Image', Platform: { OS: 'android' } };
     if (name === 'Component/ThemedPressable') return { ThemedPressable: 'Pressable' };
-    if (name.endsWith('NavigationBar.style.atv')) return {};
+    if (name.endsWith('NavigationBar.style.atv')) return { NAVIGATION_BAR_TV_WIDTH: 68, NAVIGATION_BAR_TV_WIDTH_OPENED: 164, NAVIGATION_BAR_TV_WIDTH_PADDING: 12 };
     return {};
   });
-  mod.NavigationBarComponent({ state: { index: 0, routes: [{ name: 'home', key: 'home' }] }, descriptors: { home: { options: {} } } });
+  const bar = mod.NavigationBarComponent({ state: { index: 0, routes: [{ name: 'home', key: 'home' }] }, descriptors: { home: { options: {} } } });
+  const barStyle = Object.assign({}, ...bar.props.children.props.style.filter(Boolean));
+  assert.equal(barStyle.width, 92);
+  assert.equal(barStyle.paddingLeft, 36);
   focusOptions.onFocus(); focusOptions.onBlur();
   assert.deepEqual(transitions, [true, false]);
   const iconColor = (active: boolean, focused: boolean, sidebarFocused: boolean) => {
@@ -120,6 +123,9 @@ test('ATV category rows expose a visible remote focus state', () => {
   });
   const tree = mod.LocalCategoriesOverlayComponent({ categories: [{ id: 'one', title: 'Films', count: 1 }], mode: 'list' });
   const fragment = tree.props.children.props.children[1];
+  const createIcon = fragment.props.children[1].props.children.props.iconProps;
+  assert.equal(createIcon.width, 14);
+  assert.equal(createIcon.height, 14);
   const rowElement = fragment.props.children[0].props.children[1][0];
   const row = rowElement.type(rowElement.props);
   const pressable = row.props.children.props.children[0];
@@ -181,4 +187,62 @@ test('Sidebar pointer presses can navigate without claiming remote focus', () =>
   normal.props.children[1].props.onPress();
   assert.equal(presses, 2);
   assert.equal(claims, 1);
+});
+test('Storyboard previews never intercept player button pointer events', () => {
+  const mod = compile('src/component/PlayerStoryboard/PlayerStoryboard.component.tsx', name => {
+    if (name === 'react') return { memo: (fn: Function) => fn, useEffect() {}, useState: (value: unknown) => [value, () => {}] };
+    if (name === 'react-native') return { View: 'View' };
+    if (name === 'Theme/context') return { useAppTheme: () => ({ theme: { colors: {} } }) };
+    if (name === 'Context/ConfigContext') return { useConfigContext: () => ({ playerStoryboardAdjacentFrames: false }), useIsTV: () => true };
+    if (name.endsWith('PlayerStoryboard.config')) return require('../src/component/PlayerStoryboard/PlayerStoryboard.config');
+    return {};
+  });
+  const preview = mod.default({ storyboardUrl: 'fixture.vtt', currentTime: 0 });
+  assert.equal(preview.props.pointerEvents, 'none');
+});
+test('Category manager action buttons retain their height in every dialog mode', () => {
+  const styleModule = compile('src/component/LocalCategoriesOverlay/LocalCategoriesOverlay.style.atv.ts', () => ({}));
+  const styles = styleModule.componentStyles({ scale: (n: number) => n, colors: {}, text: { lg: {}, md: {}, sm: {} } });
+  const mod = compile('src/component/LocalCategoriesOverlay/LocalCategoriesOverlay.component.atv.tsx', name => {
+    if (name === 'react') return { useState: () => [false, () => {}] };
+    if (name === 'react-native') return { View: 'View' };
+    if (name === 'Theme/context') return { useAppTheme: () => ({ scale: (n: number) => n }) };
+    if (name === 'Hooks/useThemedStyles') return { useThemedStyles: () => styles };
+    if (name === 'i18n/translate') return { t: (value: string) => value };
+    if (name.startsWith('Component/')) { const key = name.split('/')[1]; return { [key]: key }; }
+    return {};
+  });
+  for (const mode of ['list', 'create', 'confirmDelete']) {
+    const tree = mod.LocalCategoriesOverlayComponent({ categories: [], mode });
+    const content = tree.props.children.props.children[1];
+    const children = content.props.children;
+    const actions = children[children.length - 1];
+    const buttons = Array.isArray(actions.props.children) ? actions.props.children : [actions.props.children];
+    for (const button of buttons) {
+      const outer = Object.assign({}, ...[button.props.style].flat());
+      assert.equal(outer.minHeight, 44, mode);
+      assert.equal(outer.flexShrink, 0, mode);
+      assert.equal(button.props.contentStyle, styles.button);
+    }
+  }
+});
+test('Native category controls override the nested pressable flex shorthand', () => {
+  const styleModule = compile('src/component/LocalCategoriesOverlay/LocalCategoriesOverlay.style.atv.ts', () => ({}));
+  const styles = styleModule.componentStyles({ scale: (n: number) => n, colors: {}, text: { lg: {}, md: {}, sm: {} } });
+  const mod = compile('src/component/ThemedPressable/ThemedPressable.component.atv.tsx', name => {
+    if (name.includes('norigin-spatial-navigation')) return { useFocusable: () => ({ focusKey: 'category' }) };
+    if (name.includes('ScrollContext')) return { useScrollContext: () => ({}) };
+    if (name === 'Hooks/useDefaultFocus') return { useDefaultFocus() {} };
+    if (name === 'Hooks/useLongEnterPress') return { useLongEnterPress() {} };
+    if (name === 'Theme/context') return { useAppTheme: () => ({ theme: { colors: {} } }) };
+    if (name === 'react-native') return { View: 'View', Platform: { OS: 'android' } };
+    if (name === 'react-native-gesture-handler') return { Pressable: 'Pressable' };
+    return {};
+  });
+  for (const contentStyle of [styles.button, styles.rowDragContent]) {
+    const tree = mod.ThemedPressableComponent({ contentStyle });
+    const nativeStyle = Object.assign({}, ...tree.props.children[1].props.style.flat());
+    assert.equal(nativeStyle.flex, 0);
+    assert.equal(nativeStyle.flexBasis, 'auto');
+  }
 });

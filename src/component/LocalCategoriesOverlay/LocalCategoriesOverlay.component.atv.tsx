@@ -172,8 +172,12 @@ export const LocalCategoriesOverlayComponent = ({
           IconComponent={ Plus }
           iconProps={ {
             size: scale(14),
+            width: scale(14),
+            height: scale(14),
+            style: { width: scale(14), height: scale(14), flexShrink: 0 },
           } }
           onPress={ startCreate }
+          style={ styles.buttonContainer }
           contentStyle={ styles.button }
         />
       </View>
@@ -194,6 +198,7 @@ export const LocalCategoriesOverlayComponent = ({
         <ThemedButton
           title={ t('Cancel') }
           onPress={ cancelCreate }
+          style={ styles.buttonContainer }
           contentStyle={ styles.button }
         />
 
@@ -201,7 +206,7 @@ export const LocalCategoriesOverlayComponent = ({
           title={ t('Create') }
           onPress={ submitCreate }
           disabled={ isCreateDisabled }
-          style={ styles.buttonPrimary }
+          style={ [styles.buttonContainer, styles.buttonPrimary] }
           contentStyle={ styles.button }
         />
       </View>
@@ -223,13 +228,14 @@ export const LocalCategoriesOverlayComponent = ({
           title={ t('Cancel') }
           autofocus
           onPress={ cancelDelete }
+          style={ styles.buttonContainer }
           contentStyle={ styles.button }
         />
 
         <ThemedButton
           title={ t('Accept') }
           onPress={ confirmDelete }
-          style={ styles.buttonPrimary }
+          style={ [styles.buttonContainer, styles.buttonPrimary] }
           contentStyle={ styles.button }
         />
       </View>

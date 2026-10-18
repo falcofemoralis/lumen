@@ -26,9 +26,6 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     justifyContent: 'center',
     alignItems: 'flex-start',
     zIndex: NAVIGATION_BAR_Z_INDEX,
-    transitionProperty: 'width',
-    transitionDuration: `${NAVIGATION_BAR_ANIMATION_DURATION_MS}ms`,
-    transitionTimingFunction: 'ease-in-out',
     backgroundColor: colors.background,
   },
   barOpened: {

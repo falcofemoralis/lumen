@@ -45,3 +45,17 @@ test('server failures recover only after their cooldown, without refetching vali
   assert.equal(isRecoverableSourceFailure(new Error('Not found'), 5000), false);
   assert.equal(isRecoverableSourceFailure(new Error('Network request failed'), 5000), true);
 });
+
+test('Zona timeout and temporary gateway failures recover without retrying permanent errors', async () => {
+  const { isRecoverableSourceFailure } = await import('../src/util/NetworkRecovery');
+  for (const message of ['Zona не ответила вовремя. Повторите попытку.', 'Zona: HTTP 503', 'HTTP 504: Gateway Timeout', 'Error: Error: Network request failed']) {
+    assert.equal(isRecoverableSourceFailure(new Error(message)), true, message);
+  }
+  for (const message of ['Zona: HTTP 404', 'HTTP 401', 'HTTP 403', 'HTTP 429', 'Request aborted', 'Invalid response']) {
+    assert.equal(isRecoverableSourceFailure(new Error(message)), false, message);
+  }
+  const { SourceBlockedError } = await import('../src/util/Request/sourceFailure');
+  const blocked = new SourceBlockedError('HTTP 503');
+  blocked.retryAt = 5000;
+  assert.equal(isRecoverableSourceFailure(blocked, 4999), false);
+});

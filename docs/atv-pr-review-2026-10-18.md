@@ -66,3 +66,15 @@ Verification: 251 tests and TypeScript pass. The Windows interaction run with an
 - Replace the sidebar scene's translation with an animated layout margin. Translation had moved the scene right without reducing its width, putting the right edge at 1376 in a 1280-pixel window. The regression interaction test now checks the scene's right edge too. After the fix: x=164, width=1116, right=1280; collapse restores x=68.
 - The shared TV scene layout change applies to Android TV as well. Native TV runtime remains untested without a connected device.
 - Updated15 packages the accumulated Windows changes, including the Back arrow added to TV-mode player controls in Updated14. Earlier builds are preserved.
+## Follow-up after Updated15 (source changes only)
+
+No EXE or APK was packaged after the user's request to build locally. Updated15 was already complete before these follow-up changes.
+
+- Constrain the ATV category manager's Plus icon by width, height and style; cap panel width and replace logical-only button padding with explicit horizontal/vertical padding.
+- Account for the left safe-area inset in both sidebar width and scene margin. The sidebar scroll viewport now fits below the toggle, and its middle group cannot collapse over other items on a short screen.
+- Use layout transitions for native sidebar width and scene layout instead of per-frame CSS layout changes. Windows retains its width transition for sidebar labels; the scene uses a layout transition.
+- Add the existing Header Back control to Windows TV film details, loading and error states. Windows mobile already has that control.
+- Storyboard previews are non-interactive even when transparent. Their absolute layout previously overlapped the upper portions of player controls and could intercept pointer presses. The regression test failed without pointerEvents="none" and passes with it.
+- Preserve original GET Error objects and recognize Zona timeouts and HTTP 502/503/504 as recoverable. Existing active-query recovery and its 60-second limit remain in place. Permanent errors, cancellations and unexpired block cooldowns are not automatically retried. The user's specific Zona disconnection was not reproduced without its error message.
+
+Validation: 254 automated tests and TypeScript passed. Isolated Windows TV checks passed for sidebar/menu focus, ordering modal, source/theme selectors, folders and Recent navigation. On the smallest tested Windows window, focusing Settings scrolled its bottom to 538 within the sidebar's bottom of 550. Native safe-area behavior is covered by a component test using a 24-pixel left inset. Physical Android TV, native Plus rendering and perceived animation smoothness still need device testing.

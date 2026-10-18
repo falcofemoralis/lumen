@@ -3,6 +3,7 @@ import { Theme, ThemedStyles } from 'Theme/types';
 export const componentStyles = ({ scale, colors, text }: Theme) => ({
   overlay: {
     width: scale(320),
+    maxWidth: '90%',
     maxHeight: '85%',
   },
   container: {
@@ -51,7 +52,9 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     color: colors.textFocused,
   },
   rowDragContent: {
-    flex: 1,
+    flex: 0,
+    flexBasis: 'auto',
+    minHeight: scale(40),
     flexDirection: 'row',
     alignItems: 'center',
     gap: scale(12),
@@ -98,11 +101,20 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     gap: scale(8),
     justifyContent: 'flex-end',
   },
+  buttonContainer: {
+    minHeight: scale(44),
+    flexShrink: 0,
+    justifyContent: 'center',
+  },
   button: {
+    flex: 0,
+    minHeight: scale(44),
     flexGrow: 0,
-    flexShrink: 1,
+    flexShrink: 0,
     flexBasis: 'auto',
-    paddingInline: scale(20),
+    paddingHorizontal: scale(16),
+    paddingVertical: scale(10),
+    alignItems: 'center',
   },
   buttonPrimary: {
     backgroundColor: colors.primary,
