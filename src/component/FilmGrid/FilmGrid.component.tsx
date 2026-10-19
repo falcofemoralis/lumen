@@ -1,3 +1,4 @@
+import { useRetainedScroll } from 'Hooks/useRetainedScroll';
 import { sameGridCardProps } from './FilmGrid.memo';
 import { FlashList, FlashListRef, ViewToken } from '@shopify/flash-list';
 import { FilmCard } from 'Component/FilmCard';
@@ -105,6 +106,7 @@ export function FilmGridComponent({
   const isScreenFocused = useIsScreenFocused();
   const isScrollToTopButtonActive = showScrollToTopButton && scrollToTopButtonEnabled && isScreenFocused;
   const listRef = useRef<FlashListRef<FilmGridItem>>(null);
+  const retained = useRetainedScroll(listRef);
   const [visibleFilmIds, setVisibleFilmIds] = useState<Set<string>>(new Set());
   const [isScrolledDown, setIsScrolledDown] = useState(false);
 
@@ -241,8 +243,9 @@ export function FilmGridComponent({
   ]);
 
   const onScroll = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    retained.onScroll(e);
     setIsScrolledDown(e.nativeEvent.contentOffset.y > SCROLL_SHOW_THRESHOLD);
-  }, []);
+  }, [retained.onScroll]);
 
   // A tab that lost activity should not keep showing the button once it is
   // no longer tracking scroll -- otherwise a stale 	rue from an earlier
@@ -268,14 +271,15 @@ export function FilmGridComponent({
     <>
       <FlashList
         ref={ listRef }
+        onLayout={ retained.enabled ? retained.onLayout : undefined }
         data={ data }
         renderItem={ renderItem }
         keyExtractor={ keyExtractor }
         getItemType={ getItemType }
         viewabilityConfig={ viewabilityConfig }
         onViewableItemsChanged={ onViewableItemsChanged }
-        onScroll={ isScrollToTopButtonActive ? onScroll : undefined }
-        scrollEventThrottle={ isScrollToTopButtonActive ? 100 : undefined }
+        onScroll={ retained.enabled || isScrollToTopButtonActive ? onScroll : undefined }
+        scrollEventThrottle={ retained.enabled || isScrollToTopButtonActive ? 100 : undefined }
         onEndReached={ handleScrollEnd }
         onEndReachedThreshold={ 0.75 }
         numColumns={ numberOfColumns }

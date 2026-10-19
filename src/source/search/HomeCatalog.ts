@@ -17,7 +17,7 @@ export const homeCatalogLinks = (tab: string, source: ContentSource): string[] =
 /** Per-tab loader: stop exhausted catalogs and preserve healthy sources on failure. */
 export const createHomeCatalogLoader = () => {
   const pages = new Map<string, number>();
-  return async (tab: string, adapter: SourceAdapter, page: number, supplement?: () => Promise<FilmListInterface>): Promise<FilmListInterface> => {
+  return async (tab: string, adapter: SourceAdapter, page: number, supplement?: () => Promise<FilmListInterface>, onProgress?: (result: FilmListInterface) => void): Promise<FilmListInterface> => {
     if (adapter.source === ContentSource.REZKA && supplement) {
       const key = tab + ':rezka';
       if (page === 1) pages.delete(key);
@@ -28,11 +28,19 @@ export const createHomeCatalogLoader = () => {
     }
     const tabId = tab.split(':')[0];
     const links = homeCatalogLinks(tabId, adapter.source);
+    const partials = new Map<string, FilmListInterface>();
+    const publish = (link: string, result: FilmListInterface) => {
+      partials.set(link, result);
+      onProgress?.({ films: [...partials.values()].flatMap(value => tabId === 'soon'
+        ? value.films.filter(card => card.isPendingRelease) : value.films), totalPages: 1 });
+    };
     const results = await Promise.allSettled(links.map(async link => {
       if (page === 1) pages.delete(tab + ':' + link);
       if (page > (pages.get(tab + ':' + link) ?? Infinity)) return { films: [], totalPages: page };
       if (!adapter.getFilms) throw new Error('Source catalog unavailable');
-      const result = await adapter.getFilms(link, page, { deferMetadata: true });
+      const result = await adapter.getFilms(link, page, { deferMetadata: true,
+        onProgress: page === 1 ? result => publish(link, result) : undefined });
+      if (page === 1) publish(link, result);
       // Zona updates pages repeat their first batch regardless of ?page.
       const totalPages = link.includes('/updates/') ? 1 : result.totalPages;
       pages.set(tab + ':' + link, totalPages);

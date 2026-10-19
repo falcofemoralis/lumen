@@ -7,6 +7,8 @@ import AnixartSourceAdapter from './adapters/AnixartSourceAdapter';
 import AnixartPlaybackAdapter from './playback/AnixartPlaybackAdapter';
 import { createSupplementedPlaybackAdapter } from './playback/createSupplementedPlaybackAdapter';
 import ZonaSourceAdapter from './adapters/ZonaSourceAdapter';
+import { setZonaDesktopOptions } from './adapters/ZonaDesktopCatalog';
+setZonaDesktopOptions(() => ({ enabled: true, adult: getGlobalConfig().zonaShowAdult }));
 import RezkaSourceAdapter from './adapters/RezkaSourceAdapter';
 import ZonaPlaybackAdapter from './playback/ZonaPlaybackAdapter';
 import { SourcePlaybackRouter } from './playback/SourcePlaybackRouter';

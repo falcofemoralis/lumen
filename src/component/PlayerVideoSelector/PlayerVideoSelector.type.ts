@@ -36,6 +36,7 @@ export type PlayerVideoSelectorComponentProps = {
   streamQualities: string[] | null;
   playerAskQuality: boolean;
   playerCompactSelector: boolean;
+  hasHiddenPremiumVoices: boolean;
   handleSelectVoice: (voiceId: string) => void;
   setSelectedSeasonId: (id: string) => void;
   handleSelectSeason: (seasonId: string) => void;

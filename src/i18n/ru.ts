@@ -528,6 +528,24 @@ const ru: Translations = {
   'Bottom left': 'Снизу слева',
   'Bottom right': 'Снизу справа',
   'Sync now': 'Синхронизировать сейчас',
-  'Synchronize your data with Google Drive.': 'Синхронизировать данные с Google Drive.',};
+  'Synchronize your data with Google Drive.': 'Синхронизировать данные с Google Drive.',
+  'Hide paid voices': 'Скрывать платные озвучки',
+  'Hide paid HDRezka voices until they become free.': 'Скрывать платные озвучки HDRezka, пока они не станут бесплатными.',
+  'No available voices': 'Нет доступных озвучек',
+  'Paid voices are hidden. You can show them in player settings.': 'Платные озвучки скрыты. Их можно включить в настройках плеера.',
+
+  'Live broadcast': 'Прямой эфир',
+  'TV and radio': 'ТВ и радио',
+  'TV shows': 'Телешоу и передачи',
+  'Radio': 'Радио',
+  'TV channels': 'Телеканалы',
+  'Stream': 'Поток',
+  'Zona is disabled': 'Zona отключена',
+  'TV and radio tab order': 'Порядок вкладок ТВ и радио',
+  'TV and radio display mode': 'Вид списков ТВ и радио',
+  'Show adult Zona content': 'Показывать контент Zona 18+',
+  'Include 18+ titles and channels from Zona.': 'Включать произведения и каналы Zona для взрослых.',
+  'This title is available as catalog information only.': 'Для этого произведения доступна только информация каталога.',
+};
 
 export default ru;

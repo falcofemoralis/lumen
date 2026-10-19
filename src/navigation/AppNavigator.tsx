@@ -15,6 +15,7 @@ import { useMemo } from 'react';
 import { ErrorScreen } from 'Screen/ErrorScreen';
 import { FilmTrailerScreen } from 'Screen/FilmTrailerScreen';
 import { PlayerScreen } from 'Screen/PlayerScreen';
+import BroadcastPlayer from 'Screen/BroadcastScreen/BroadcastPlayer';
 import { DownloadsScreen } from 'Screen/DownloadsScreen';
 import { MyCommentsScreen } from 'Screen/MyCommentsScreen';
 import { NotificationsScreen } from 'Screen/NotificationsScreen';
@@ -84,6 +85,7 @@ const AppStack = () => {
         name={ ERROR_SCREEN }
         component={ ErrorScreen }
       />
+      <Stack.Screen name="BroadcastPlayer" component={ BroadcastPlayer } />
       <Stack.Screen
         name={ PLAYER_SCREEN }
         component={ PlayerScreen }

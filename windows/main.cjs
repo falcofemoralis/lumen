@@ -21,7 +21,7 @@ try {
 } catch { /* First launch config is created by onboarding. */ }
 if (['home','film','sources','anime','rezka','updates','offline','downloads','desktop-info','desktop-google','desktop-ui'].includes(process.env.LUMEN_SMOKE_MODE)) fs.writeFileSync(path.join(dataRoot, 'config.json'), JSON.stringify({
   ...(process.env.LUMEN_SMOKE_REZKA_MIRROR ? { rezkaConfig: JSON.stringify({officialMode: false, provider: process.env.LUMEN_SMOKE_REZKA_MIRROR}) } : {}),
-  deviceConfig: JSON.stringify({ ...(process.env.LUMEN_SMOKE_SIDEBAR === '1' ? { accentColor: '#FF8800' } : {}), ...(process.env.LUMEN_SMOKE_ATV_AUDIT === '1' ? { recentDisplayMode: 'grid' } : {}), isConfigured: true, showRatings: true, isTV: process.env.LUMEN_SMOKE_TV === '1', isLocalLibrary: true, enabledSources: ['ZONA','REZKA','ANIXART'], newHomeInterface: true, recentTabsInterface: true, tabPosition: 'top', numberOfColumnsMobile: 6 })
+  deviceConfig: JSON.stringify({ ...(process.env.LUMEN_SMOKE_BROADCAST_LIST === '1' ? { broadcastDisplayMode: 'list' } : {}), ...(process.env.LUMEN_SMOKE_SIDEBAR === '1' ? { accentColor: '#FF8800' } : {}), ...(process.env.LUMEN_SMOKE_ATV_AUDIT === '1' ? { recentDisplayMode: 'grid' } : {}), isConfigured: true, showRatings: true, isTV: process.env.LUMEN_SMOKE_TV === '1', isLocalLibrary: true, enabledSources: ['ZONA','REZKA','ANIXART'], newHomeInterface: true, recentTabsInterface: true, tabPosition: 'top', numberOfColumnsMobile: 6 })
 }));
 if (process.env.LUMEN_SMOKE_MODE === 'desktop-ui') fs.writeFileSync(path.join(dataRoot, 'localLibrary.json'), JSON.stringify({
   localBookmarks: JSON.stringify({ categories: [{ id: 'ui-one', title: 'Первая папка', filmIds: [], createdAt: 1 }, { id: 'ui-two', title: 'Вторая папка', filmIds: [], createdAt: 2 }], films: {} }),
@@ -186,6 +186,75 @@ app.whenReady().then(async () => {
       }
       const evaluate = script => main.webContents.executeJavaScript(script);
       const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
+      if (process.env.LUMEN_SMOKE_BROADCAST === '1') {
+        await evaluate("window.lumenDiagnostics.tab('Broadcast-tab')");
+        await pause(1800);
+        const click = async text => {
+          const found = await evaluate(`(()=>{const text=${JSON.stringify(text)};const e=[...document.querySelectorAll('*')].find(e=>e.textContent===text&&e.children.length===0&&e.getBoundingClientRect().width>0);if(!e)return false;e.click();return true})()`);
+          if(!found)throw new Error('Missing broadcast tab: '+text);
+          await pause(6000);
+          console.log('BROADCAST_TAB '+text+' '+await evaluate('document.body.innerText.slice(-1800)'));
+        };
+        console.log('BROADCAST_INITIAL '+await evaluate('document.body.innerText.slice(-1800)'));
+        const scroll = async key => {
+          const saved = await evaluate(`(()=>{const nodes=[...document.querySelectorAll('div')].filter(e=>e.getBoundingClientRect().height>100&&e.scrollHeight>e.clientHeight+500&&['auto','scroll'].includes(getComputedStyle(e).overflowY));const e=nodes.at(-1);if(!e)return null;e.scrollTop=1200;e.dispatchEvent(new Event('scroll'));window.__broadcastScroll??={};window.__broadcastScroll[${JSON.stringify(key)}]={e,offset:e.scrollTop};return e.scrollTop})()`);
+          console.log('BROADCAST_SCROLL_SET '+key+' '+saved);
+          if(!(saved>500))throw new Error('No scrollable broadcast list '+key);
+          await pause(500);
+        };
+        const checkScroll = async key => {
+          const saved = await evaluate(`(()=>{const s=window.__broadcastScroll[${JSON.stringify(key)}];return {connected:s.e.isConnected,actual:s.e.scrollTop,expected:s.offset}})()`);
+          console.log('BROADCAST_SCROLL_RETURN '+key+' '+JSON.stringify(saved));
+          if(!saved.connected||Math.abs(saved.actual-saved.expected)>50)throw new Error('Broadcast scroll reset '+key);
+        };
+        await pause(2000);
+        if(process.env.LUMEN_SMOKE_BROADCAST_LOGOS === '1') {
+          for(const [title,file] of [['Радио','radio'],['Телеканалы','tv']]) {
+            await click(title);await pause(500);
+            const logos=await evaluate("(()=>{const p=[...document.querySelectorAll('[data-lumen-pager]')].filter(e=>e.getBoundingClientRect().height>0).at(-1);const pane=p.children[Number(p.dataset.lumenPage)];return [...pane.querySelectorAll('img')].map(e=>({src:e.src,loaded:e.naturalWidth>0,width:e.getBoundingClientRect().width,height:e.getBoundingClientRect().height})).filter(e=>e.height>5&&e.width>5)})()");
+            console.log('BROADCAST_LOGOS '+title+' '+JSON.stringify(logos.slice(-20)));
+            if(!logos.some(logo=>logo.loaded))throw new Error('No visible loaded logos '+title);
+            await main.webContents.capturePage().then(image=>fs.writeFileSync(path.join(__dirname,'smoke-broadcast-logos-'+file+'.png'),image.toPNG()));
+          }
+          console.log('BROADCAST_LOGOS_PASS');return;
+        }
+        await scroll('shows');
+        await click('Радио');
+        await main.webContents.capturePage().then(image=>fs.writeFileSync(path.join(__dirname,'smoke-broadcast-radio.png'),image.toPNG()));
+        await scroll('radio');
+        await click('Телешоу и передачи'); await checkScroll('shows');
+        await click('Радио'); await checkScroll('radio');
+        await click('Телеканалы');
+        await scroll('tv');
+        await click('Радио');
+        await click('Телеканалы'); await checkScroll('tv');
+        await main.webContents.capturePage().then(image=>fs.writeFileSync(path.join(__dirname,'smoke-broadcast-tv.png'),image.toPNG()));
+        await click('10 канал');
+        const deadline = Date.now() + 15000;
+        let playback;
+        do {
+          playback = await evaluate("(()=>{const v=document.querySelector('video');return v?{ready:v.readyState,paused:v.paused,error:v.error?.message,width:v.videoWidth}:null})()");
+          if(playback?.ready >= 2 || playback?.error)break;
+          await pause(500);
+        } while(Date.now() < deadline);
+        console.log('BROADCAST_PLAYBACK '+JSON.stringify(playback));
+        if(!playback || playback.ready < 2 || playback.error)throw new Error('TV playback not ready');
+        const ownPlayer = await evaluate("({own:!!document.querySelector('#lumen-player'),native:document.querySelector('video')?.controls})");
+        console.log('BROADCAST_OWN_PLAYER '+JSON.stringify(ownPlayer));
+        if(!ownPlayer.own || ownPlayer.native)throw new Error('Broadcast not using Lumen controls');
+        await main.webContents.capturePage().then(image=>fs.writeFileSync(path.join(__dirname,'smoke-broadcast-player.png'),image.toPNG()));
+        main.webContents.sendInputEvent({type:'keyDown',keyCode:'Escape'});main.webContents.sendInputEvent({type:'keyUp',keyCode:'Escape'});
+        await pause(1000);await checkScroll('tv');
+        await evaluate('window.lumenDiagnostics.settings()');await pause(1500);
+        const settings = await evaluate('document.body.innerText');
+        for(const label of ['Порядок вкладок ТВ и радио','Вид списков ТВ и радио','Показывать контент Zona 18+']) {
+          if(!settings.includes(label))throw new Error('Missing setting '+label);
+        }
+        await click('Порядок вкладок ТВ и радио');
+        await main.webContents.capturePage().then(image=>fs.writeFileSync(path.join(__dirname,'smoke-broadcast-settings.png'),image.toPNG()));
+        console.log('BROADCAST_UI_PASS');
+        return;
+      }
       const swipe = async () => {
         const point = await evaluate("(()=>{const e=[...document.querySelectorAll('[data-lumen-pager]')].find(e=>e.getBoundingClientRect().width>0); const r=e.getBoundingClientRect(); return {x:Math.round(r.x+r.width*.65),y:Math.round(r.y+r.height*.4)};})()");
         main.webContents.sendInputEvent({ type: 'mouseDown', ...point, button: 'left', clickCount: 1 });
@@ -601,7 +670,7 @@ app.whenReady().then(async () => {
       fs.writeFileSync(process.env.LUMEN_SMOKE_OUTPUT.replace(/\.json$/, '.png'), (await main.webContents.capturePage()).toPNG());
     }
     fs.writeFileSync(path.join(__dirname, 'smoke.png'), (await main.webContents.capturePage()).toPNG()); app.exit(0);
-  }, process.env.LUMEN_SMOKE_DETAIL_DRAG === '1' ? 25000 : process.env.LUMEN_SMOKE_FOLDER_DRAG === '1' ? 30000 : process.env.LUMEN_SMOKE_ATV_AUDIT === '1' ? 35000 : process.env.LUMEN_SMOKE_BOOKMARKS_ONLY === '1' ? 15000 : process.env.LUMEN_SMOKE_MODE === 'desktop-ui' ? 42000 : process.env.LUMEN_SMOKE_MODE === 'desktop-info' ? 26000 : ['film','sources'].includes(process.env.LUMEN_SMOKE_MODE) ? 55000 : ['anime','rezka','updates'].includes(process.env.LUMEN_SMOKE_MODE) ? 35000 : process.env.LUMEN_SMOKE_MODE === 'offline' ? 80000 : 15000);
+  }, process.env.LUMEN_SMOKE_BROADCAST === '1' ? 110000 : process.env.LUMEN_SMOKE_DETAIL_DRAG === '1' ? 25000 : process.env.LUMEN_SMOKE_FOLDER_DRAG === '1' ? 30000 : process.env.LUMEN_SMOKE_ATV_AUDIT === '1' ? 35000 : process.env.LUMEN_SMOKE_BOOKMARKS_ONLY === '1' ? 15000 : process.env.LUMEN_SMOKE_MODE === 'desktop-ui' ? 42000 : process.env.LUMEN_SMOKE_MODE === 'desktop-info' ? 26000 : ['film','sources'].includes(process.env.LUMEN_SMOKE_MODE) ? 55000 : ['anime','rezka','updates'].includes(process.env.LUMEN_SMOKE_MODE) ? 35000 : process.env.LUMEN_SMOKE_MODE === 'offline' ? 80000 : 15000);
 });
 app.on('before-quit', () => { for (const child of children.values()) if (!child.isDestroyed()) child.destroy(); });
 app.on('window-all-closed', () => app.quit());

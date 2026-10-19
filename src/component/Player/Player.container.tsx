@@ -95,6 +95,7 @@ export function PlayerContainer({
   film,
   voice,
   isOffline,
+  isLive = false,
   quality: qualityProp,
 }: PlayerContainerProps) {
   const {
@@ -188,10 +189,10 @@ export function PlayerContainer({
   // prevents foreground stream recovery from racing another source replacement
   const firestoreSavedTimeRef = useRef(false);
   const firestoreDb = useMemo(() => (
-    isFirestore && isSignedIn && !isOffline && !isLocalLibrary
+    isFirestore && isSignedIn && !isOffline && !isLocalLibrary && !isLive
       ? collection(getFirestore(), FIRESTORE_DB) as CollectionReference<FirestoreDocument>
       : null
-  ), [isSignedIn, isFirestore, isOffline, isLocalLibrary]);
+  ), [isSignedIn, isFirestore, isOffline, isLocalLibrary, isLive]);
 
   const localBookmarks = useLocalBookmarks();
 
@@ -218,10 +219,10 @@ export function PlayerContainer({
   // start here, episode/voice change in changePlayerVideo (props are stable for
   // the lifetime of a player session, and the upsert dedupes by film id)
   useEffect(() => {
-    if (isLocalLibrary && !isOffline) {
+    if (isLocalLibrary && !isOffline && !isLive) {
       upsertLocalHistoryItem(film, voice);
     }
-  }, [film, voice, isOffline, isLocalLibrary]);
+  }, [film, voice, isOffline, isLocalLibrary, isLive]);
 
   const initFirestoreSavedTime = useCallback(async (p: VideoPlayer, savedTime: SavedTime | null) => {
     if (firestoreSavedTimeRef.current || !firestoreDb || !profile) {
@@ -249,6 +250,12 @@ export function PlayerContainer({
     }
 
     const streams = videoArg.streams;
+    if (isLive) {
+      const selected = qualityArg === AUTO_QUALITY.value ? streams[streams.length - 1]
+        : getPlayerStream(videoArg, getQualityFromStreams(videoArg, qualityArg));
+
+      return selected && 'headers' in selected ? selected.headers ?? {} : {};
+    }
     if (!streams.length) {
       return currentService.getHeaders(true);
     }
@@ -267,7 +274,7 @@ export function PlayerContainer({
       : getPlayerStream(videoArg, getQualityFromStreams(videoArg, qualityArg));
 
     return (selectedStream && 'headers' in selectedStream ? selectedStream.headers : undefined) ?? currentService.getHeaders(true);
-  }, [isOffline, currentService]);
+  }, [isOffline, currentService, isLive]);
 
   const videoUrl = useMemo(() => {
     if (isOffline) {
@@ -283,7 +290,8 @@ export function PlayerContainer({
         (stream) => JSON.stringify(stream.headers ?? null) === JSON.stringify(firstHeaders ?? null),
       );
 
-      if (headersAreCompatible && sourcePlaybackRouter.getAdapterForFilmLink(film.link)?.source !== ContentSource.ZONA) {
+      if (!isLive && headersAreCompatible
+        && sourcePlaybackRouter.getAdapterForFilmLink(film.link)?.source !== ContentSource.ZONA) {
         return createMasterPlaylist(video.streams).uri;
       }
 
@@ -291,7 +299,7 @@ export function PlayerContainer({
     }
 
     return getPlayerStream(video, selectedQuality).url;
-  }, [selectedQuality, video, isOffline]);
+  }, [selectedQuality, video, isOffline, isLive]);
 
   const buildVideoSource = useCallback((
     url: string,
@@ -356,10 +364,10 @@ export function PlayerContainer({
 
     startedPlayerRef.current = player;
 
-    const savedTime = getSavedTime(film);
+    const savedTime = isLive ? null : getSavedTime(film);
     // a player built to replace one that was already playing starts from where
     // that one got to, which the stored position is usually behind
-    const time = Math.max(getVideoTime(selectedVoice, savedTime), lastPositionRef.current);
+    const time = isLive ? 0 : Math.max(getVideoTime(selectedVoice, savedTime), lastPositionRef.current);
 
     if (time > 0) {
       applyPlayerTime(player, time);
@@ -368,7 +376,7 @@ export function PlayerContainer({
     player.play();
 
     initFirestoreSavedTime(player, savedTime);
-  }, [player, film, selectedVoice, initFirestoreSavedTime]);
+  }, [player, film, selectedVoice, initFirestoreSavedTime, isLive]);
 
   // ready is normally announced through onLoad...
   useEvent(player, 'onLoad', startPlayback);
@@ -395,6 +403,7 @@ export function PlayerContainer({
   const isVideoLoading = !hasPlaybackError && (isLoading || isBuffering || status === 'loading');
 
   const updateTime = useCallback(() => {
+    if (isLive) return;
     const { currentTime, duration } = player;
     if (!duration) {
       // video is not loaded yet, do not update time to avoid progress being null
@@ -426,7 +435,7 @@ export function PlayerContainer({
         progress
       );
     }
-  }, [player, selectedVoice, firestoreDb, profile, film]);
+  }, [player, selectedVoice, firestoreDb, profile, film, isLive]);
 
   const removeUpdateTimeTimeout = useCallback(() => {
     if (updateTimeTimeout.current) {
@@ -544,7 +553,8 @@ export function PlayerContainer({
     const headersAreCompatible = videoArg.streams.every(
       (stream) => JSON.stringify(stream.headers ?? null) === JSON.stringify(firstHeaders ?? null),
     );
-    const newStream = qualityArg === AUTO_QUALITY.value && !isOffline && headersAreCompatible && sourcePlaybackRouter.getAdapterForFilmLink(film.link)?.source !== ContentSource.ZONA
+    const newStream = qualityArg === AUTO_QUALITY.value && !isOffline && !isLive && headersAreCompatible
+      && sourcePlaybackRouter.getAdapterForFilmLink(film.link)?.source !== ContentSource.ZONA
       ? { url: createMasterPlaylist(videoArg.streams).uri, quality: qualityArg }
       : qualityArg === AUTO_QUALITY.value && !isOffline
         ? videoArg.streams[videoArg.streams.length - 1] ?? { url: null, quality: qualityArg }
@@ -562,7 +572,7 @@ export function PlayerContainer({
     // a quality switch lands where playback was, and an episode switch lands on
     // whatever was watched of that episode. `carriedTime` overrides that lookup
     // for a voice switch that is asked to stay where playback was.
-    const resumeTime = carriedTime ?? getVideoTime(newVoice, getSavedTime(film));
+    const resumeTime = isLive ? 0 : carriedTime ?? getVideoTime(newVoice, getSavedTime(film));
 
     player.replaceSourceAsync(
       buildVideoSource(newStream.url, newStream.quality, videoArg, newVoice)
@@ -738,6 +748,11 @@ export function PlayerContainer({
           lastPositionRef.current,
           Number.isFinite(player.currentTime) ? player.currentTime : 0
         );
+        if (isLive) {
+          updatePlayerStream(selectedVideo, selectedQuality, selectedVoice);
+
+          return;
+        }
 
         const playbackAdapter =
           sourcePlaybackRouter.getAdapterForFilmLink(film.link);
@@ -775,6 +790,8 @@ export function PlayerContainer({
     film,
     getFreshEpisodeVideo,
     hasPlaybackError,
+    isLive,
+    selectedVideo,
     isOffline,
     player,
     selectedQuality,
@@ -784,6 +801,7 @@ export function PlayerContainer({
   ]);
 
   const onPlaybackEnd = (currentTime: number, duration: number) => {
+    if (isLive) return;
     if (currentTime < duration - 1) {
       return;
     }
@@ -805,6 +823,7 @@ export function PlayerContainer({
   };
 
   useEvent(player, 'onProgress', ({ currentTime, bufferDuration }: onProgressData) => {
+    if (isLive) return;
     // bufferDuration is the buffer ahead of the playhead, everything else here
     // works with an absolute position
     bufferedPosition.current = currentTime + bufferDuration;
@@ -1002,14 +1021,16 @@ export function PlayerContainer({
   }, [getDuration]);
 
   const seekToPosition = useCallback((percent: number) => {
+    if (isLive) return;
     const newTime = calculateCurrentTime(percent);
 
     updateProgressStatus(newTime, bufferedPosition.current, getDuration(), player.rate);
 
     player.seekTo(newTime);
-  }, [calculateCurrentTime, getDuration, updateProgressStatus, player]);
+  }, [calculateCurrentTime, getDuration, updateProgressStatus, player, isLive]);
 
   const rewindPosition = async (type: RewindDirection, seconds: number) => {
+    if (isLive) return;
     const { currentTime, duration } = player;
 
     const seekTime = type === RewindDirection.BACKWARD ? seconds * -1 : seconds;
@@ -1179,7 +1200,7 @@ export function PlayerContainer({
     setOverlayQuality(quality);
     setSelectedQuality(getQualityFromStreams(selectedVideo, quality));
 
-    if (playerSaveQuality) {
+    if (playerSaveQuality && !isLive) {
       updatePlayerQuality(quality);
     }
 
@@ -1312,6 +1333,7 @@ export function PlayerContainer({
     isOverlayOpen,
     isFilmBookmarked: isFilmBookmarkedValue,
     isOffline,
+    isLive,
     overlayQuality,
     isVideoLoading,
     hasPlaybackError,

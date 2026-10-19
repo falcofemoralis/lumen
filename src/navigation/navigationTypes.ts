@@ -25,6 +25,7 @@ export type AppStackParamList = {
   Tabs: NavigatorScreenParams<TabsParamList>
   Error: undefined
   Player: undefined
+  BroadcastPlayer: { broadcast: import('../source/adapters/ZonaBroadcasts').ZonaBroadcast }
   FilmTrailer: undefined
   Settings: undefined
   Notifications: undefined

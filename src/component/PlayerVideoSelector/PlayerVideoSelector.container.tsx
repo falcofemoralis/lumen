@@ -16,6 +16,7 @@ import { EpisodeInterface, FilmVoiceInterface, SeasonInterface } from 'Type/Film
 import { getFirestoreSavedTime, getSavedTime, setSavedTime as setSavedTimeStorage } from 'Util/Player';
 import { combineSavedTime } from 'Util/Player/savedTimeUtil';
 
+import { visibleVoices } from './PlayerVideoSelector.voices';
 import PlayerVideoSelectorComponent from './PlayerVideoSelector.component';
 import FilmVideoSelectorComponentTV from './PlayerVideoSelector.component.atv';
 import { formatDownloadKey, PROGRESS_THRESHOLD_MAX, PROGRESS_THRESHOLD_MIN } from './PlayerVideoSelector.config';
@@ -40,7 +41,7 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
     },
     ref
   ) => {
-    const { voices = [] } = film;
+    const { voices: allVoices = [] } = film;
     const {
       isTV,
       isFirestore,
@@ -48,11 +49,14 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
       playerAskQuality,
       playerCompactSelector,
       sortVoicesByRating,
+      hidePremiumVoices,
     } = useConfigContext();
+    const voices = useMemo(() => visibleVoices(allVoices, hidePremiumVoices && !isOffline),
+      [allVoices, hidePremiumVoices, isOffline]);
     const { selectedVoice: contextVoice, updateSelectedVoice } = usePlayerContext();
     const [selectedVoice, setSelectedVoice] = useState<FilmVoiceInterface>(
       // eslint-disable-next-line max-len
-      voiceInput ?? (voices.length > 0 ? voices.find(({ isActive }) => isActive) ?? voices[0] : {} as FilmVoiceInterface)
+      (voiceInput && (!hidePremiumVoices || !voiceInput.isPremium || isOffline) ? voiceInput : undefined) ?? (voices.length > 0 ? voices.find(({ isActive }) => isActive) ?? voices[0] : {} as FilmVoiceInterface)
     );
     const { isSignedIn, profile, currentService } = useServiceContext();
 
@@ -105,8 +109,9 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
           const discovered = await playbackAdapter.getFilmVoices(film);
           if (discovered.length) {
             const current = getContextVoice() ?? selectedVoice;
-            const next = discovered.find((voice) => voice.identifier === current?.identifier)
-              ?? discovered.find((voice) => voice.isActive) ?? discovered[0];
+            const available = visibleVoices(discovered, hidePremiumVoices);
+            const next = available.find((voice) => voice.identifier === current?.identifier)
+              ?? available.find((voice) => voice.isActive) ?? available[0] ?? {} as FilmVoiceInterface;
             setSelectedVoice(next);
             onVoicesUpdate?.(discovered);
           } else {
@@ -142,7 +147,7 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
 
       const { filmId, voice } = contextVoice || {};
 
-      if (filmId === id && voice) {
+      if (filmId === id && voice && (!hidePremiumVoices || !voice.isPremium || isOffline)) {
         return voice;
       }
 
@@ -265,9 +270,18 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
      * Sync selectedVoice when film.voices is updated
      */
     useEffect(() => {
-      if (voices.length === 0 || !isMountedRef.current) {
+      if (!isMountedRef.current
+        || (voices.length === 0 && !(hidePremiumVoices && !isOffline && selectedVoice.isPremium))) {
         isMountedRef.current = true;
 
+        return;
+      }
+
+      if (hidePremiumVoices && !isOffline && selectedVoice.isPremium) {
+        const next = voices.find(voice => voice.isActive) ?? voices[0] ?? {} as FilmVoiceInterface;
+        setSelectedVoice(next);
+        setSelectedSeasonId(next.lastSeasonId);
+        setSelectedEpisodeId(next.lastEpisodeId);
         return;
       }
 
@@ -283,10 +297,10 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
           lastEpisodeId: previous.lastEpisodeId ?? updatedVoice.lastEpisodeId,
         }));
       }
-    }, [voices, selectedVoice.identifier]);
+    }, [voices, selectedVoice.identifier, selectedVoice.isPremium, hidePremiumVoices, isOffline]);
 
     useEffect(() => {
-      if (!voiceInput) return;
+      if (!voiceInput || (hidePremiumVoices && voiceInput.isPremium && !isOffline)) return;
       setSelectedVoice((previous) => ({
         ...voiceInput,
         seasons: voiceInput.seasons?.length ? voiceInput.seasons
@@ -294,7 +308,7 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
       }));
       setSelectedSeasonId(voiceInput.lastSeasonId);
       setSelectedEpisodeId(voiceInput.lastEpisodeId);
-    }, [voiceInput]);
+    }, [voiceInput, hidePremiumVoices, isOffline]);
 
     const getSeasons = (): SeasonInterface[] => {
       const { seasons = [] } = selectedVoice ?? {};
@@ -451,6 +465,7 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
         || isVoiceDiscoveryLoading
         || !film.hasSeasons
         || !selectedVoice?.id
+        || (hidePremiumVoices && selectedVoice.isPremium)
         || selectedVoice.seasons?.some((season) =>
           season.seasonId === (selectedSeasonId ?? selectedVoice.lastSeasonId ?? selectedVoice.seasons?.[0]?.seasonId)
           && season.episodes?.length)
@@ -462,7 +477,7 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
       autoLoadedSeasonsVoiceRef.current = selectedVoice.id + ':' + (selectedSeasonId ?? '');
       setIsAutoLoadingSeasons(true);
       loadVoiceSeasons(selectedVoice);
-    }, [film.hasSeasons, isOffline, isSelectorOpen, isVoiceDiscoveryLoading, loadVoiceSeasons, selectedVoice, selectedSeasonId]);
+    }, [film.hasSeasons, hidePremiumVoices, isOffline, isSelectorOpen, isVoiceDiscoveryLoading, loadVoiceSeasons, selectedVoice, selectedSeasonId]);
     const { mutate: loadEpisodeVideo, isPending: isEpisodeVideoLoading } = useMutation({
       mutationFn: ({
         voice,
@@ -755,6 +770,7 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
       overlayRef,
       film,
       voices: sortedVoices,
+      hasHiddenPremiumVoices: hidePremiumVoices && !isOffline && allVoices.some(voice => voice.isPremium),
       isLoading,
       selectedVoice,
       selectedSeasonId,

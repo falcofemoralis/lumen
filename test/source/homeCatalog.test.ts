@@ -80,3 +80,44 @@ test('Zona updates stop after the first batch even when its page advertises more
   assert.equal((await load('new', zona, 2)).films.length, 0);
   assert.equal(requests, 2);
 });
+test('Home publishes fast catalog cards while the additional catalog is still loading', async () => {
+  const zona = adapter(ContentSource.ZONA);
+  let release!: () => void;
+  const gate = new Promise<void>(resolve => { release = resolve; });
+  zona.getFilms = async (link, _page, options) => {
+    options?.onProgress?.({ films: [card(link + '/web')], totalPages: 2 });
+    await gate;
+    return { films: [card(link + '/web'), card(link + '/extra')], totalPages: 2 };
+  };
+  const snapshots: string[][] = [];
+  const loading = createHomeCatalogLoader()('popular', zona, 1, undefined,
+    result => snapshots.push(result.films.map(value => value.link)));
+  assert.equal(snapshots.at(-1)?.length, 2, 'both catalogs appear before enrichment finishes');
+  release();
+  const result = await loading;
+  assert.equal(result.films.length, 4);
+  assert.equal(snapshots.at(-1)?.length, 4);
+});
+
+test('catalog progress preserves source restrictions and pagination deltas', async () => {
+  const zona = adapter(ContentSource.ZONA), rezka = adapter(ContentSource.REZKA);
+  let otherRequests = 0;
+  rezka.search = async () => { otherRequests++; throw Error('should not request'); };
+  const service = createUnifiedSearchService([zona, rezka], new SourceResolver([zona, rezka]));
+  let progress = 0;
+  const options = {
+    sources: [ContentSource.ZONA],
+    loadSource: async (_source: SourceAdapter, page: number, publish?: (result: { films: ReturnType<typeof card>[]; totalPages: number }) => void) => {
+      publish?.({ films: [card('website')], totalPages: 2 });
+      await new Promise(resolve => setTimeout(resolve, 5));
+      return { films: [card('website'), card('desktop')], totalPages: 2 };
+    },
+    prepareCard: async (value: ReturnType<typeof card>) => value,
+  };
+  const first = await service.search('native-progress-delta', 1, undefined, options, () => { progress++; });
+  assert.ok(progress > 0);
+  assert.equal(first.films.length, 1, 'matching external IDs merge before display');
+  const second = await service.search('native-progress-delta', 2, undefined, options);
+  assert.equal(second.films.length, 0, 'a later occurrence does not append another card');
+  assert.equal(otherRequests, 0);
+});

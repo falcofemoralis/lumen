@@ -128,6 +128,7 @@ export function FilmScreenComponent({
   );
 
   const renderPlayButton = () => {
+    if (film.catalogOnly && !film.metadataSourceFilm?.voices.length) return renderAction(Clock, t('No video available'), undefined, true);
     const { isPendingRelease, isRestricted } = film;
 
     if (isPendingRelease) {
@@ -172,10 +173,10 @@ export function FilmScreenComponent({
           ) }
           { shouldDisplayContinueWatching && renderAction(ArrowRight, t('Continue Watching'), continueWatching) }
           { renderPlayButton() }
-          { renderAction(MessageSquareText, t('Comments'), openComments) }
-          { renderAction(Clapperboard, t('Trailer'), openTrailerOverlay) }
+          { renderAction(MessageSquareText, t('Comments'), openComments, film.catalogOnly && !film.metadataSourceFilm) }
+          { renderAction(Clapperboard, t('Trailer'), openTrailerOverlay, film.catalogOnly && !film.metadataSourceFilm) }
           { renderAction(isBookmarked(film) ? BookmarkCheck : Bookmark, t('Bookmark'), openBookmarks) }
-          { renderAction(Download, t('Download'), openVideoDownloader) }
+          { renderAction(Download, t('Download'), openVideoDownloader, film.catalogOnly && !film.metadataSourceFilm?.voices.length) }
           { isSignedIn && renderAction(Star, t('Rate'), openRatingOverlay, film.isRatingPosted) }
         </View>
       </ThemedScrollView>

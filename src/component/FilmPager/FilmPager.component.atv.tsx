@@ -308,7 +308,7 @@ export function FilmPagerComponent({
       return null;
     }
 
-    if (renderPageContent) return renderPageContent(pagerItem, idx);
+    if (renderPageContent) return renderPageContent(pagerItem, idx, idx === activeIndex);
     const { films, pagination } = pagerItem;
     const filmItems = (films ?? []).map((film) => ({ film }));
 
@@ -347,6 +347,7 @@ export function FilmPagerComponent({
     ListEmptyComponent,
     onNextLoad,
     renderPageContent,
+    activeIndex,
     renderedIndexes,
     showScrollToTopButton,
   ]);

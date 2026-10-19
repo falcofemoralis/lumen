@@ -16,7 +16,7 @@ export const FILM_TYPE_COLORS = {
   [FilmType.SERIES]: '#df565a',
   [FilmType.ANIME]: '#696969',
   [FilmType.DONGHUA]: '#755090',
-  [FilmType.TV_SHOW]: '##909215',
+  [FilmType.TV_SHOW]: '#909215',
 };
 
 // The `Ban` mark a hidden card shows in place of its poster.

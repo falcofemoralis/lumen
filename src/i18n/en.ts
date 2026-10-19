@@ -527,7 +527,25 @@ const en = {
   'Bottom left': 'Bottom left',
   'Bottom right': 'Bottom right',
   'Sync now': 'Sync now',
-  'Synchronize your data with Google Drive.': 'Synchronize your data with Google Drive.',};
+  'Synchronize your data with Google Drive.': 'Synchronize your data with Google Drive.',
+  'Hide paid voices': 'Hide paid voices',
+  'Hide paid HDRezka voices until they become free.': 'Hide paid HDRezka voices until they become free.',
+  'No available voices': 'No available voices',
+  'Paid voices are hidden. You can show them in player settings.': 'Paid voices are hidden. You can show them in player settings.',
+
+  'Live broadcast': 'Live broadcast',
+  'TV and radio': 'TV and radio',
+  'TV shows': 'TV shows',
+  'Radio': 'Radio',
+  'TV channels': 'TV channels',
+  'Stream': 'Stream',
+  'Zona is disabled': 'Zona is disabled',
+  'TV and radio tab order': 'TV and radio tab order',
+  'TV and radio display mode': 'TV and radio display mode',
+  'Show adult Zona content': 'Show adult Zona content',
+  'Include 18+ titles and channels from Zona.': 'Include 18+ titles and channels from Zona.',
+  'This title is available as catalog information only.': 'This title is available as catalog information only.',
+};
 
 export default en;
 export type Translations = typeof en

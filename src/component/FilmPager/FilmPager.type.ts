@@ -18,7 +18,7 @@ export interface FilmPagerHandlers {
 
 export interface FilmPagerContainerProps extends FilmPagerHandlers {
   /** Optional screen content inside a mobile pager tab. */
-  renderPageContent?: (item: PagerItemInterface, index: number) => ReactNode;
+  renderPageContent?: (item: PagerItemInterface, index: number, isActive: boolean) => ReactNode;
   disableEmptyComponent?: boolean;
   isEmpty?: boolean;
   hideGrid?: boolean;

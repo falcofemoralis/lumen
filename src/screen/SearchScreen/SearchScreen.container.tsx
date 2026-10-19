@@ -52,7 +52,7 @@ const loadUserSuggestions = (): string[] => (
 
 export function SearchScreenContainer() {
   const isTV = useIsTV();
-  const { enabledSources } = useConfigContext();
+  const { enabledSources, zonaShowAdult } = useConfigContext();
   // a search handed to the app from outside (the Android TV search box) is waiting by
   // the time this mounts, since opening the screen is how it got here
   const [query, setQuery] = useState(consumeTvSearchRequest);
@@ -78,7 +78,7 @@ export function SearchScreenContainer() {
   const resultKey = (activeFilters ? 'filters:' + JSON.stringify(activeFilters) : query) + ':sources:' + enabledSources.join(',');
 
   const { pagerItems, isLoading, onPreLoad, onNextLoad } = useFilmPager({
-    queryKey: queryKeys.films.search(resultKey),
+    queryKey: [...queryKeys.films.search(resultKey), zonaShowAdult],
     menuItems: searchMenuItems,
     fetchFilms: (menuItem, page, sort) => unifiedSearchService.search(activeFilters ? resultKey : query, page, (updates) => {
       if (!updates.length) return;

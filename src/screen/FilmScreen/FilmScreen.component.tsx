@@ -313,11 +313,13 @@ export function FilmScreenComponent({
         styles={ styles }
         IconComponent={ Clapperboard }
         action={ openTrailerOverlay }
+        disabled={ film.catalogOnly && !film.metadataSourceFilm }
       />
       <MiddleAction
         styles={ styles }
         IconComponent={ MessageSquareText }
         action={ openComments }
+        disabled={ film.catalogOnly && !film.metadataSourceFilm }
       />
       <MiddleAction
         styles={ styles }
@@ -328,11 +330,13 @@ export function FilmScreenComponent({
         styles={ styles }
         IconComponent={ Download }
         action={ openVideoDownloader }
+        disabled={ film.catalogOnly && !film.metadataSourceFilm }
       />
     </View>
   );
 
   const renderPlay = () => {
+    if (film.catalogOnly && !film.metadataSourceFilm?.voices.length) return <Wrapper><ThemedText>{ t('This title is available as catalog information only.') }</ThemedText></Wrapper>;
     const { isPendingRelease, isRestricted } = film;
 
     if (isPendingRelease) {

@@ -20,7 +20,9 @@ import {
   createUnifiedFilmId,
 } from '../types/UnifiedFilm';
 import { SourceAdapter } from '../types/SourceAdapter';
-import { fetchZonaText } from '../request';
+import { fetchZonaText, withDeadline } from '../request';
+import { zonaDesktopImage, supplementZonaDetails, zonaDesktopIdForLink, zonaDesktopOptions, getZonaDesktopDetail, getZonaDesktopCategory, zonaDesktopCatalogForLink,
+  zonaDesktopSearch, mergeZonaCards } from './ZonaDesktopCatalog';
 
 const ZONA_BASE_URL = 'https://w1.zona.im';
 
@@ -55,6 +57,7 @@ interface ZonaFilmData {
   title_eng?: string | null;
   description?: string;
   parts?: number;
+  is_trailer?: boolean;
   cover_url?: string;
   backdrop_url?: string;
   backdrop_id?: number | null;
@@ -143,6 +146,7 @@ const classifyZonaContent = (
   if (genres.some((tag) => tag.slug === 'multfilm' || tag.title.toLowerCase() === 'мультфильм')) {
     return FilmType.CARTOON;
   }
+  if (genres.some(tag => ['realnoe-tv', 'tok-shou', 'igra', 'novosti'].includes(tag.slug))) return FilmType.TV_SHOW;
   return entityType === 'series' ? FilmType.SERIES : FilmType.FILM;
 };
 
@@ -569,7 +573,7 @@ const parseZonaFilmData = (
     title: data.title,
     originalTitle: data.title_original ?? undefined,
     year: data.year,
-    poster: data.cover_url ?? '',
+    poster: data.cover_url || (data.kp_id ? zonaDesktopImage(data.kp_id) : ''),
     largePoster: data.backdrop_url,
     description: data.description,
     releaseDate: data.release_date ?? data.release_date_ru ?? (data.year ? String(data.year) : undefined),
@@ -845,10 +849,16 @@ const getZonaMetadata = (link: string) => {
   return value;
 };
 
+export const isZonaWebAvailable = (data: Pick<ZonaFilmData,
+  'parts' | 'is_trailer' | 'statuses' | 'meta' | 'best_quality'>): boolean => (
+  !data.is_trailer && !data.statuses?.dmca && !data.statuses?.memorandum
+  && ((data.parts ?? 0) > 0 || (data.meta?.media_id ?? 0) > 0 || Boolean(data.best_quality?.trim()))
+);
+
 export const getZonaCatalogFilms = async (
   link: string,
   page: number,
-  options?: { deferMetadata?: boolean },
+  options?: { deferMetadata?: boolean; onlyAvailable?: boolean },
 ): Promise<FilmListInterface> => {
   const url = new URL(link);
   if (!url.hostname.endsWith('.zona.im')) throw new Error('Invalid Zona catalog URL');
@@ -880,6 +890,7 @@ export const getZonaCatalogFilms = async (
       if (catalog.initialPage && catalog.initialPage !== page) {
         throw new Error('Zona returned a different catalog page');
       }
+      if (options?.onlyAvailable) catalog.entities = catalog.entities.filter(isZonaWebAvailable);
       const defaultEntityType = url.pathname.includes('/tvseries') ? 'series' : 'movie';
       const films: FilmCardInterface[] = new Array(catalog.entities.length);
       let next = 0;
@@ -918,9 +929,35 @@ export const getZonaCatalogFilms = async (
   throw new Error('Zona catalog metadata not found');
 };
 
+const searchZonaWithDesktop = async (
+  query: string, page: number, enrich: boolean, onProgress?: (result: FilmListInterface) => void
+): Promise<FilmListInterface> => {
+  if (!zonaDesktopOptions().enabled) return page === 1 ? fetchZonaSearch(query, enrich, onProgress)
+    : { films: [], totalPages: 1 };
+  const website = page === 1 ? fetchZonaSearch(query, enrich, onProgress) : Promise.resolve({ films: [], totalPages: 1 });
+  const native = zonaDesktopSearch(query, page);
+  const [web, desktop] = await Promise.allSettled([website, native]);
+  if (web.status === 'rejected' && desktop.status === 'rejected') throw web.reason;
+  const first = web.status === 'fulfilled' ? web.value : { films: [], totalPages: 1 };
+  const extra = desktop.status === 'fulfilled' ? desktop.value : { films: [], totalPages: 1 };
+  return { films: mergeZonaCards(first.films, extra.films), totalPages: Math.max(first.totalPages, extra.totalPages) };
+};
+
 const ZonaSourceAdapter: SourceAdapter = {
   getCollections: getZonaCollections,
-  getFilms: getZonaCatalogFilms,
+  async getFilms(link, page, options) {
+    if (new URL(link).pathname === '/catalog') return getZonaDesktopCategory(link, page);
+    if (!zonaDesktopOptions().enabled) return getZonaCatalogFilms(link, page, options);
+    const web = getZonaCatalogFilms(link, page, options).then(result => {
+      options?.onProgress?.(result);
+      return result;
+    });
+    const [website, desktop] = await Promise.allSettled([web, Promise.resolve().then(() => zonaDesktopCatalogForLink(link, page))]);
+    if (website.status === 'rejected' && desktop.status === 'rejected') throw website.reason;
+    const primary = website.status === 'fulfilled' ? website.value : { films: [], totalPages: page };
+    const extra = desktop.status === 'fulfilled' ? desktop.value : { films: [], totalPages: page };
+    return { films: mergeZonaCards(primary.films, extra.films), totalPages: Math.max(primary.totalPages, extra.totalPages) };
+  },
   async getFilmRatings(filmId: string) {
     const link = filmId.startsWith('https://') ? filmId : ZONA_BASE_URL + '/movies/' + filmId;
     const entity = await getZonaMetadata(link);
@@ -932,11 +969,12 @@ const ZonaSourceAdapter: SourceAdapter = {
   source: ContentSource.ZONA,
   name: 'Zona',
 
-  async getFilm(link: string, options?: { deferSeriesInfo?: boolean }): Promise<FilmInterface | null> {
+  async getFilm(link: string, options?: { deferSeriesInfo?: boolean; background?: boolean }): Promise<FilmInterface | null> {
     const entity = await getZonaMetadata(link);
 
-    if (!entity) {
-      return null;
+    if (!entity || (zonaDesktopOptions().enabled && zonaDesktopIdForLink(link) && entity.data.kp_id
+      && String(entity.data.kp_id) !== String(zonaDesktopIdForLink(link)))) {
+      return zonaDesktopOptions().enabled ? getZonaDesktopDetail(link) : null;
     }
 
     const film = parseZonaFilmData(
@@ -971,11 +1009,17 @@ const ZonaSourceAdapter: SourceAdapter = {
       }
     }
 
+    if (zonaDesktopOptions().enabled && !options?.background && film.externalIds?.kinopoisk
+      && (!film.actors?.length || !film.directors?.length || !film.poster)) {
+      const extra = await withDeadline(getZonaDesktopDetail(link, film.externalIds.kinopoisk), 1500)
+        .catch(() => null);
+      return supplementZonaDetails(film, extra);
+    }
     return film;
   },
 
   async searchCandidates(query: string, page: number): Promise<FilmListInterface> {
-    return page === 1 ? fetchZonaSearch(query, false) : { films: [], totalPages: 1 };
+    return searchZonaWithDesktop(query, page, false);
   },
 
   async search(
@@ -983,7 +1027,7 @@ const ZonaSourceAdapter: SourceAdapter = {
     _page: number,
     options?: { background?: boolean; onProgress?: (result: FilmListInterface) => void },
   ): Promise<FilmListInterface> {
-    return _page === 1 ? fetchZonaSearch(query, true, options?.onProgress) : { films: [], totalPages: 1 };
+    return searchZonaWithDesktop(query, _page, true, options?.onProgress);
   },
 
   normalizeFilmCard(film: FilmCardInterface): UnifiedFilm {

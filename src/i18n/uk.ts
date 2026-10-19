@@ -528,6 +528,24 @@ const uk: Translations = {
   'Bottom left': 'Знизу зліва',
   'Bottom right': 'Знизу справа',
   'Sync now': 'Синхронізувати зараз',
-  'Synchronize your data with Google Drive.': 'Синхронізувати дані з Google Drive.',};
+  'Synchronize your data with Google Drive.': 'Синхронізувати дані з Google Drive.',
+  'Hide paid voices': 'Приховувати платні озвучення',
+  'Hide paid HDRezka voices until they become free.': 'Приховувати платні озвучення HDRezka, доки вони не стануть безкоштовними.',
+  'No available voices': 'Немає доступних озвучень',
+  'Paid voices are hidden. You can show them in player settings.': 'Платні озвучення приховані. Їх можна увімкнути в налаштуваннях плеєра.',
+
+  'Live broadcast': 'Прямий ефір',
+  'TV and radio': 'ТБ і радіо',
+  'TV shows': 'Телешоу та передачі',
+  'Radio': 'Радіо',
+  'TV channels': 'Телеканали',
+  'Stream': 'Потік',
+  'Zona is disabled': 'Zona вимкнена',
+  'TV and radio tab order': 'Порядок вкладок ТБ і радіо',
+  'TV and radio display mode': 'Вигляд списків ТБ і радіо',
+  'Show adult Zona content': 'Показувати контент Zona 18+',
+  'Include 18+ titles and channels from Zona.': 'Включати твори й канали Zona для дорослих.',
+  'This title is available as catalog information only.': 'Для цього твору доступна лише інформація каталогу.',
+};
 
 export default uk;

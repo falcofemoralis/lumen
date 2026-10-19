@@ -10,7 +10,7 @@ import { SettingImport } from 'Component/SettingImport';
 import { SettingInput } from 'Component/SettingInput';
 import { SettingLink } from 'Component/SettingLink';
 import { NavigationOrderSetting } from 'Component/NavigationOrderSetting';
-import { getMobileNavigationOrderItems, getTVNavigationOrderItems } from '../../config/NavigationOrderOptions';
+import { getMobileNavigationOrderItems, getTVNavigationOrderItems, getBroadcastOrderItems } from '../../config/NavigationOrderOptions';
 import { SettingMultiSelect } from 'Component/SettingMultiSelect';
 import { SettingSelect } from 'Component/SettingSelect';
 
@@ -130,6 +130,10 @@ export function SettingsScreenComponent({
   homeDefaultTab,
   homeTabOrder,
   hiddenHomeTabs,
+  broadcastTabOrder,
+  hiddenBroadcastTabs,
+  broadcastDisplayMode,
+  zonaShowAdult,
   showEpisodeUpdateCount,
   homeDisplayMode,
   bookmarksDisplayMode,
@@ -178,6 +182,7 @@ export function SettingsScreenComponent({
   playerSaveQuality,
   playerAskQuality,
   playerCompactSelector,
+  hidePremiumVoices,
   strictConnectionCheck,
   playerDefaultAspectRatio,
   playerDefaultSpeed,
@@ -236,7 +241,7 @@ export function SettingsScreenComponent({
   } = useCloudSyncContext();
   const styles = useThemedStyles(componentStyles);
   const [currentGroup, setCurrentGroup] = useState<SETTING_GROUP | null>(takeHandedOverGroup);
-  const [navigationOrderEditor, setNavigationOrderEditor] = useState<'tv' | 'mobile' | 'home' | null>(null);
+  const [navigationOrderEditor, setNavigationOrderEditor] = useState<'tv' | 'mobile' | 'home' | 'broadcast' | null>(null);
 
   const handleOpenGroup = useCallback((group: SETTING_GROUP) => {
     setCurrentGroup(group);
@@ -411,6 +416,25 @@ export function SettingsScreenComponent({
         onChange={ handleLanguageChange }
       />
 
+      <SettingBase
+        title={ t('TV and radio tab order') }
+        IconComponent={ ListVideo }
+        onPress={ () => setNavigationOrderEditor('broadcast') }
+      />
+      <SettingSelect
+        title={ t('TV and radio display mode') }
+        IconComponent={ ListVideo }
+        value={ broadcastDisplayMode }
+        options={ [{ value: 'grid', label: t('Grid') }, { value: 'list', label: t('List') }] }
+        onChange={ value => onConfigUpdate('broadcastDisplayMode', value) }
+      />
+      <SettingSwitch
+        title={ t('Show adult Zona content') }
+        subtitle={ t('Include 18+ titles and channels from Zona.') }
+        IconComponent={ ListVideo }
+        value={ zonaShowAdult }
+        onChange={ value => onConfigUpdate('zonaShowAdult', value) }
+      />
       <SettingBase
         title={ t('Default home tab') }
         subtitle="Измените порядок и видимость вкладок. Первая видимая вкладка открывается при запуске."
@@ -791,6 +815,13 @@ export function SettingsScreenComponent({
         onChange={ (value) => onConfigUpdate('playerAskQuality', value) }
       />
       <SettingSwitch
+        title={ t('Hide paid voices') }
+        subtitle={ t('Hide paid HDRezka voices until they become free.') }
+        IconComponent={ ListVideo }
+        value={ hidePremiumVoices }
+        onChange={ (value) => onConfigUpdate('hidePremiumVoices', value) }
+      />
+      <SettingSwitch
         title={ t('Compact season and episode selector') }
         subtitle={ t('Use dropdowns instead of buttons to choose the season and episode.') }
         IconComponent={ ListVideo }
@@ -1062,6 +1093,13 @@ export function SettingsScreenComponent({
     }
   };
 
+  if (navigationOrderEditor === 'broadcast') {
+    return <NavigationOrderSetting title={ t('TV and radio tab order') }
+      items={ getBroadcastOrderItems() } value={ broadcastTabOrder } hiddenItems={ hiddenBroadcastTabs }
+      onChange={ value => onConfigUpdate('broadcastTabOrder', value) }
+      onHiddenItemsChange={ value => onConfigUpdate('hiddenBroadcastTabs', value) }
+      onBack={ () => setNavigationOrderEditor(null) } />;
+  }
   if (navigationOrderEditor === 'home') {
     return (
       <NavigationOrderSetting

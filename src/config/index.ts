@@ -40,6 +40,10 @@ export type DeviceConfigType = {
   homeDefaultTab: string;
   homeTabOrder: string[];
   hiddenHomeTabs: string[];
+  broadcastTabOrder: string[];
+  hiddenBroadcastTabs: string[];
+  broadcastDisplayMode: FilmDisplayMode;
+  zonaShowAdult: boolean;
   showEpisodeUpdateCount: boolean;
   tabPosition: TabPosition;
   tvTabPosition: TabPosition;
@@ -91,6 +95,7 @@ export type DeviceConfigType = {
   playerSaveQuality: boolean;
   playerAskQuality: boolean;
   playerCompactSelector: boolean;
+  hidePremiumVoices: boolean;
   newHomeInterface: boolean;
   recentTabsInterface: boolean;
   showRecentNotifications: boolean;
@@ -151,6 +156,10 @@ export const defaultConfig: DeviceConfigType = {
   homeDefaultTab: '',
   homeTabOrder: [],
   hiddenHomeTabs: [],
+  broadcastTabOrder: ['shows', 'radio', 'tv'],
+  hiddenBroadcastTabs: [],
+  broadcastDisplayMode: 'grid',
+  zonaShowAdult: false,
   showEpisodeUpdateCount: true,
   tabPosition: 'bottom',
   tvTabPosition: 'top',
@@ -180,6 +189,7 @@ export const defaultConfig: DeviceConfigType = {
   playerSaveQuality: true,
   playerAskQuality: false,
   playerCompactSelector: false,
+  hidePremiumVoices: false,
   newHomeInterface: false,
   recentTabsInterface: false,
   showRecentNotifications: true,
@@ -237,6 +247,10 @@ export const CONFIG_KEY_SECTIONS = {
   homeDefaultTab: BACKUP_SECTION.SETTINGS_APPEARANCE,
   homeTabOrder: BACKUP_SECTION.SETTINGS_APPEARANCE,
   hiddenHomeTabs: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  broadcastTabOrder: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  hiddenBroadcastTabs: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  broadcastDisplayMode: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  zonaShowAdult: BACKUP_SECTION.SETTINGS_APPEARANCE,
   showEpisodeUpdateCount: BACKUP_SECTION.SETTINGS_APPEARANCE,
   tabPosition: BACKUP_SECTION.SETTINGS_APPEARANCE,
   tvTabPosition: BACKUP_SECTION.SETTINGS_APPEARANCE,
@@ -277,6 +291,7 @@ export const CONFIG_KEY_SECTIONS = {
   playerSaveQuality: BACKUP_SECTION.SETTINGS_PLAYER,
   playerAskQuality: BACKUP_SECTION.SETTINGS_PLAYER,
   playerCompactSelector: BACKUP_SECTION.SETTINGS_PLAYER,
+  hidePremiumVoices: BACKUP_SECTION.SETTINGS_PLAYER,
   newHomeInterface: BACKUP_SECTION.SETTINGS_APPEARANCE,
   recentTabsInterface: BACKUP_SECTION.SETTINGS_APPEARANCE,
   showRecentNotifications: BACKUP_SECTION.SETTINGS_APPEARANCE,

@@ -11,7 +11,7 @@ export interface SourceAdapter {
   readonly source: ContentSource;
   readonly name: string;
   getCollections?(page: number): Promise<{ items: ContentCollectionInterface[]; totalPages: number }>;
-  getFilms?(link: string, page: number, options?: { deferMetadata?: boolean }): Promise<FilmListInterface>;
+  getFilms?(link: string, page: number, options?: { deferMetadata?: boolean; onProgress?: (result: FilmListInterface) => void }): Promise<FilmListInterface>;
 
   /**
    * Returns the source-specific film page.

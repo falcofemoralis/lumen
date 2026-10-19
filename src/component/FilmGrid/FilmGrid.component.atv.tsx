@@ -1,3 +1,4 @@
+import { useRetainedScroll } from 'Hooks/useRetainedScroll';
 import { sameGridCardProps } from './FilmGrid.memo';
 import { getCurrentFocusKey, NextFocusResolver, setFocus } from '@noriginmedia/norigin-spatial-navigation-core';
 import { FocusContext, FocusHandler, useFocusable } from '@noriginmedia/norigin-spatial-navigation-react-native-tvos';
@@ -224,6 +225,7 @@ function FilmGridList({
   const isScrollAnimated = !isLowMode;
 
   const listRef = useRef<FlashListRef<FilmGridItem>>(null);
+  const retained = useRetainedScroll(listRef);
 
   // Focus scrolling of its own rather than the list's: FlashList can only hand
   // an animated scroll to the platform, at the platform's speed.
@@ -235,8 +237,9 @@ function FilmGridList({
   const [isScrolledDown, setIsScrolledDown] = useState(false);
 
   const onScroll = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    retained.onScroll(e);
     setIsScrolledDown(e.nativeEvent.contentOffset.y > SCROLL_SHOW_THRESHOLD);
-  }, []);
+  }, [retained.onScroll]);
 
   const handleScrollToTop = useCallback(() => {
     scrollToOffset(0);
@@ -556,6 +559,7 @@ function FilmGridList({
         <View ref={ ref } style={ styles.grid } tvFocusable={ false }>
           <FlashList
             ref={ listRef }
+            onLayout={ retained.enabled ? retained.onLayout : undefined }
             data={ data }
             renderItem={ renderItem }
             keyExtractor={ keyExtractor }
@@ -563,7 +567,7 @@ function FilmGridList({
             viewabilityConfig={ viewabilityConfig }
             onViewableItemsChanged={ onViewableItemsChanged }
             onLoad={ handleLoad }
-            onScroll={ showScrollToTopButton ? onScroll : undefined }
+            onScroll={ retained.enabled || showScrollToTopButton ? onScroll : undefined }
             scrollEventThrottle={ FOCUS_SCROLL_EVENT_THROTTLE }
             onEndReached={ handleScrollEnd }
             onEndReachedThreshold={ 0.5 }

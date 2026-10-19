@@ -42,7 +42,7 @@ export const createSupplementedPlaybackAdapter = (
       const cached = discovery.get(key);
       let value = cached && Date.now() - cached.time < 60_000 ? cached.value : undefined;
       if (!value) {
-        value = zona.getFilmVoices(film).catch(() => []).then((voices) => {
+        value = (film.catalogOnly ? Promise.resolve([]) : zona.getFilmVoices(film)).catch(() => []).then((voices) => {
           if (!voices.length) discovery.delete(key);
           return voices;
         });

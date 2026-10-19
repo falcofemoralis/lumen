@@ -12,7 +12,8 @@ import { withDeadline } from '../request';
 import { registerUnifiedFilm } from './UnifiedFilmRegistry';
 
 export interface UnifiedSearchOptions {
-  loadSource: (adapter: SourceAdapter, page: number) => Promise<FilmListInterface>;
+  sources?: ContentSource[];
+  loadSource: (adapter: SourceAdapter, page: number, onProgress?: (result: FilmListInterface) => void) => Promise<FilmListInterface>;
   prepareCard: (card: FilmCardInterface, adapter: SourceAdapter) => Promise<FilmCardInterface | null>;
 }
 
@@ -103,7 +104,8 @@ export const createUnifiedSearchService = (
 
       const state = getQueryState(normalizedQuery, page);
 
-      const searchSources = SEARCH_SOURCES.filter((source) => Boolean(getAdapter(source)) && isSourceEnabled(source));
+      const searchSources = SEARCH_SOURCES.filter((source) => Boolean(getAdapter(source)) && isSourceEnabled(source)
+        && (!options?.sources || options.sources.includes(source)));
       if (!searchSources.length) return { films: [], totalPages: 1 };
       const partial = new Map<ContentSource, UnifiedFilm[]>();
       const presentationIds = new Map<string, string>();
@@ -139,7 +141,21 @@ export const createUnifiedSearchService = (
             const cursor = state.cursors.get(source) ?? { next: 1, exhausted: false };
             state.cursors.set(source, cursor);
             const result = await loadFilteredPages(cursor, page,
-              sourcePage => options.loadSource(adapter, sourcePage),
+              async sourcePage => {
+                let completed = false;
+                try {
+                  return await options.loadSource(adapter, sourcePage, sourceResult => {
+                    if (page !== 1 || sourcePage !== 1) return;
+                    void Promise.all(sourceResult.films.map(card => options.prepareCard(card, adapter))).then(cards => {
+                      if (!completed) publish(adapter, {
+                        ...sourceResult, films: cards.filter((card): card is FilmCardInterface => !!card),
+                      });
+                    }).catch(() => {});
+                  });
+                } finally {
+                  completed = true;
+                }
+              },
               card => options.prepareCard(card, adapter));
             return publish(adapter, result);
           } catch (error) {

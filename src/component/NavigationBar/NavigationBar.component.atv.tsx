@@ -92,7 +92,6 @@ const NavigationTab = ({
       <View>
         { IconComponent && (
           <IconComponent
-            style={ styles.tabIcon }
             size={ styles.tabIcon.width }
             color={ isFocused ? theme.colors.primary : theme.colors.icon }
           />

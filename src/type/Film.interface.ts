@@ -23,6 +23,7 @@ export interface FilmInterface {
   libraryId?: string;
   metadataSourceFilm?: FilmInterface;
   metadataSourceName?: string;
+  catalogOnly?: boolean;
   releaseDate?: string;
   year?: number;
   countries?: CollectionItemInterface[];

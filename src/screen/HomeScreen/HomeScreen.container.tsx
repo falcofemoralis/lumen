@@ -18,7 +18,7 @@ import HomeScreenComponentTV from './HomeScreen.component.atv';
 export function HomeScreenContainer() {
   const cacheRevision = useSyncExternalStore(subscribeCardCache, cardCacheRevision);
   const { currentService } = useServiceContext();
-  const { homeTabOrder, hiddenHomeTabs, tabPosition, homeDisplayMode, enabledSources } = useConfigContext();
+  const { homeTabOrder, hiddenHomeTabs, tabPosition, homeDisplayMode, enabledSources, zonaShowAdult } = useConfigContext();
   const isTV = useIsTV();
   const sortingOptions = useMemo(() => currentService.getFilmSortingOptions(), [currentService]);
   const menuItems = useMemo(() => arrangeHomeMenu(
@@ -29,23 +29,23 @@ export function HomeScreenContainer() {
   const loadCatalog = useMemo(() => createHomeCatalogLoader(), [currentService]);
 
   const handlers = useFilmPager({
-    queryKey: [...queryKeys.films.home(), enabledSources.join(','), cacheRevision],
+    queryKey: [...queryKeys.films.home(), enabledSources.join(','), zonaShowAdult, cacheRevision],
     menuItems,
     sorting: sortingOptions,
     initialIndex,
     prefetchAdjacent: false,
     initialDataUpdatedAt: 0,
-    getInitialFilms: menuItem => getHomeCardCache().catalog(menuItem.id + ':'),
+    getInitialFilms: menuItem => getHomeCardCache().catalog(menuItem.id + ':adult:' + zonaShowAdult + ':'),
     fetchFilms: async (menuItem: MenuItemInterface, page: number, sort?: string, isRefresh?: boolean) => {
       const result = await fetchCatalog(menuItem, page, sort, isRefresh);
-      if (page === 1) getHomeCardCache().rememberCatalog(menuItem.id + ':' + (sort ?? ''), result);
+      if (page === 1) getHomeCardCache().rememberCatalog(menuItem.id + ':adult:' + zonaShowAdult + ':' + (sort ?? ''), result);
       return result;
     },
   });
 
   async function fetchCatalog(menuItem: MenuItemInterface, page: number, sort?: string, isRefresh?: boolean) {
       if (MULTI_SOURCE_HOME_TABS.has(menuItem.id)) {
-        const itemKey = [...queryKeys.films.home(), enabledSources.join(','), cacheRevision, menuItem.id, sort ?? null];
+        const itemKey = [...queryKeys.films.home(), enabledSources.join(','), zonaShowAdult, cacheRevision, menuItem.id, sort ?? null];
         return unifiedSearchService.search('home:' + menuItem.id + ':' + (sort ?? ''), page, updates => {
           if (!updates.length) return;
           queryClient.setQueryData<FilmPagerQueryData>(itemKey, previous => previous ? {
@@ -53,8 +53,8 @@ export function HomeScreenContainer() {
             films: previous.films.map(card => updates.find(update => update.previousLink === card.link)?.card ?? card),
           } : previous);
         }, {
-          loadSource: (adapter, sourcePage) => loadCatalog(menuItem.id + (sort ? ':' + sort : ''), adapter, sourcePage,
-            () => currentService.getHomeMenuFilms({ ...menuItem, variables: { ...menuItem.variables } }, sourcePage, sort, { isRefresh })),
+          loadSource: (adapter, sourcePage, onProgress) => loadCatalog(menuItem.id + (sort ? ':' + sort : ''), adapter, sourcePage,
+            () => currentService.getHomeMenuFilms({ ...menuItem, variables: { ...menuItem.variables } }, sourcePage, sort, { isRefresh }), onProgress),
           prepareCard: async card => card,
         }, page === 1 ? partial => {
           queryClient.setQueryData<FilmPagerQueryData>(itemKey, {
@@ -65,9 +65,26 @@ export function HomeScreenContainer() {
       if (!isSourceEnabled(sourceForLink(menuItem.path))) return { films: [], totalPages: 1 };
       const adapter = sourceRouter.getAdapterForLink(menuItem.path);
       if (adapter?.getFilms) {
-        const result = await adapter.getFilms!(menuItem.path, page, { deferMetadata: true });
-        result.films.forEach((card) => registerUnifiedFilm(adapter.normalizeFilmCard(card)));
-        return result;
+        if (adapter.source !== ContentSource.ZONA) {
+          const result = await adapter.getFilms(menuItem.path, page, { deferMetadata: true });
+          result.films.forEach(card => registerUnifiedFilm(adapter.normalizeFilmCard(card)));
+          return result;
+        }
+        const itemKey = [...queryKeys.films.home(), enabledSources.join(','), zonaShowAdult,
+          cacheRevision, menuItem.id, sort ?? null];
+        return unifiedSearchService.search('home-native:' + menuItem.id + ':' + zonaShowAdult + ':' + (sort ?? ''),
+          page, updates => {
+            if (!updates.length) return;
+            queryClient.setQueryData<FilmPagerQueryData>(itemKey, previous => previous ? { ...previous,
+              films: previous.films.map(card => updates.find(update => update.previousLink === card.link)?.card ?? card),
+            } : previous);
+          }, {
+            sources: [ContentSource.ZONA],
+            loadSource: (source, sourcePage, onProgress) => source.getFilms!(menuItem.path, sourcePage,
+              { deferMetadata: true, onProgress }),
+            prepareCard: async card => card,
+          }, page === 1 ? partial => queryClient.setQueryData<FilmPagerQueryData>(itemKey,
+            { films: partial.films, currentPage: 1, totalPages: 1 }) : undefined);
       }
       return currentService.getHomeMenuFilms(menuItem, page, sort, { isRefresh });
   }

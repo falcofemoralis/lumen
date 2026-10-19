@@ -1,3 +1,6 @@
+import Tv from 'lucide-react-native/icons/tv';
+import Radio from 'lucide-react-native/icons/radio';
+import Clapperboard from 'lucide-react-native/icons/clapperboard';
 import Bell from 'lucide-react-native/icons/bell';
 import Download from 'lucide-react-native/icons/download';
 import FolderHeart from 'lucide-react-native/icons/folder-heart';
@@ -14,6 +17,7 @@ import {
   NOTIFICATIONS_TAB,
   RECENT_TAB,
   SEARCH_TAB,
+  BROADCAST_TAB,
   ACCOUNT_TAB,
 } from 'Navigation/navigationRoutes';
 import { NavigationOrderItem } from 'Component/NavigationOrderSetting/NavigationOrderSetting.type';
@@ -40,6 +44,7 @@ export const getTVNavigationOrderItems = (): NavigationOrderItem[] => [
     label: t('Search'),
     IconComponent: Search,
   },
+  { value: BROADCAST_TAB, label: t('TV and radio'), IconComponent: Tv },
   {
     value: BOOKMARKS_TAB,
     label: t('Bookmarks'),
@@ -58,6 +63,7 @@ export const getMobileNavigationOrderItems = (includeAccount = false): Navigatio
     label: t('Search'),
     IconComponent: Search,
   },
+  { value: BROADCAST_TAB, label: t('TV and radio'), IconComponent: Tv },
   {
     value: BOOKMARKS_TAB,
     label: t('Bookmarks'),
@@ -83,4 +89,10 @@ export const getMobileNavigationOrderItems = (includeAccount = false): Navigatio
     label: t('Account'),
     IconComponent: UserRound,
   }] : []),
+];
+
+export const getBroadcastOrderItems = (): NavigationOrderItem[] => [
+  { value: 'shows', label: t('TV shows'), IconComponent: Clapperboard },
+  { value: 'radio', label: t('Radio'), IconComponent: Radio },
+  { value: 'tv', label: t('TV channels'), IconComponent: Tv },
 ];

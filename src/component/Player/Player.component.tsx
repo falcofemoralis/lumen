@@ -139,6 +139,7 @@ export function PlayerComponent({
   isOverlayOpen,
   isFilmBookmarked,
   isOffline,
+  isLive = false,
   overlayQuality,
   isVideoLoading,
   hasPlaybackError,
@@ -577,12 +578,17 @@ export function PlayerComponent({
 
   const renderTopActionLine = () => (
     <View style={ styles.actionLine }>
-      <PlayerDurationEnd />
-      <PlayerDuration />
+      { isLive ? <ThemedText>{ t('Live broadcast') }</ThemedText> : (
+        <>
+          <PlayerDurationEnd />
+          <PlayerDuration />
+        </>
+      ) }
     </View>
   );
 
   const renderProgressBar = () => {
+    if (isLive) return null;
     // without a url nothing downstream fetches or parses the storyboard, which is
     // exactly what switching it off should cost
     const { storyboardUrl } = video;
@@ -632,7 +638,7 @@ export function PlayerComponent({
               isLocked && styles.bottomActionsRowLocked,
             ] }
           >
-            { !isOffline && (
+            { (!isOffline && !isLive) && (
               <PlayerAction
                 IconComponent={ Server }
                 action={ openCDNSelector }
@@ -646,21 +652,21 @@ export function PlayerComponent({
                 onInteraction={ handleUserInteraction }
               />
             ) }
-            { !isOffline && (
+            { (!isOffline && !isLive) && (
               <PlayerAction
                 IconComponent={ MessageSquareText }
                 action={ handleOpenComments }
                 onInteraction={ handleUserInteraction }
               />
             ) }
-            { !isOffline && (
+            { (!isOffline && !isLive) && (
               <PlayerAction
                 IconComponent={ isFilmBookmarked ? BookmarkCheck : Bookmark }
                 action={ openBookmarksOverlay }
                 onInteraction={ handleUserInteraction }
               />
             ) }
-            { !isOffline && (
+            { (!isOffline && !isLive) && (
               <PlayerAction
                 IconComponent={ Forward }
                 action={ handleShare }
@@ -846,9 +852,10 @@ export function PlayerComponent({
       <ThemedDropdown
         asOverlay
         overlayRef={ qualityOverlayRef }
-        header={ t('Quality') }
+        header={ t(isLive ? 'Stream' : 'Quality') }
         value={ overlayQuality }
-        data={ getPlayerAvailableQualityItems(video) }
+        data={ isLive ? video.streams.map((stream, index) => ({ value: stream.quality,
+          label: t('Stream') + ' ' + (index + 1) })) : getPlayerAvailableQualityItems(video) }
         onChange={ handleQualityChange }
         onClose={ closeOverlay }
       />
@@ -953,7 +960,7 @@ export function PlayerComponent({
   );
 
   const renderCDNSelector = () => {
-    if (isOffline) {
+    if (isOffline || isLive) {
       return null;
     }
 
@@ -976,8 +983,8 @@ export function PlayerComponent({
       { renderPlayerVideoSelector() }
       { renderSubtitlesSelector() }
       { renderSubtitlesStyleSelector() }
-      { renderCommentsOverlay() }
-      { renderBookmarksOverlay() }
+      { !isLive && renderCommentsOverlay() }
+      { !isLive && renderBookmarksOverlay() }
       { renderSpeedSelector() }
       { renderCDNSelector() }
     </>

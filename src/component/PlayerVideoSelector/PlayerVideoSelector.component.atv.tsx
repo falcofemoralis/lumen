@@ -11,17 +11,19 @@ import { ThemedScrollView } from 'Component/ThemedScrollView';
 import { ThemedSimpleList } from 'Component/ThemedSimpleList';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { EpisodeInterface, SeasonInterface } from 'Type/FilmVoice.interface';
 import { getVideoProgress } from 'Util/Player';
 
 import { formatDownloadKey } from './PlayerVideoSelector.config';
 import { componentStyles } from './PlayerVideoSelector.style.atv';
 import { PlayerVideoSelectorComponentProps } from './PlayerVideoSelector.type';
+import { voicePremiumIcon } from './PlayerVideoSelector.voices';
 
 export function PlayerVideoSelectorComponent({
   overlayRef,
   voices,
+  hasHiddenPremiumVoices,
   isLoading,
   selectedVoice,
   selectedSeasonId,
@@ -79,7 +81,7 @@ export function PlayerVideoSelectorComponent({
             data={ voices.map((voice) => ({
               label: voice.title,
               value: voice.identifier,
-              startIcon: voice.premiumIcon,
+              startIcon: voicePremiumIcon(voice, Platform.OS),
               endIcon: voice.img,
             })) }
             value={ selectedVoice.identifier }
@@ -99,7 +101,7 @@ export function PlayerVideoSelectorComponent({
         data={ voices.map((voice) => ({
           label: voice.title,
           value: voice.identifier,
-          startIcon: voice.premiumIcon,
+          startIcon: voicePremiumIcon(voice, Platform.OS),
           endIcon: voice.img,
         })) }
         value={ selectedVoice.identifier }
@@ -388,6 +390,10 @@ export function PlayerVideoSelectorComponent({
   };
 
   const renderContent = () => {
+    if (!isLoading && !voices.length && hasHiddenPremiumVoices) {
+      return <InfoBlock title={ t('No available voices') }
+        subtitle={ t('Paid voices are hidden. You can show them in player settings.') } />;
+    }
     if (film.hasSeasons && isLoading && !seasons.length) return null;
     if (isOffline && !seasons.length && (voices.length > 0 && !voices[0].video?.streams?.length)) {
       return renderEmpty();

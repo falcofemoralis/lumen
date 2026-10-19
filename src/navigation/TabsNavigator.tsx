@@ -25,6 +25,9 @@ import AccountScreenContainer from 'Screen/AccountScreen/AccountScreen.container
 import { BookmarksScreen } from 'Screen/BookmarksScreen';
 import { DownloadsScreen } from 'Screen/DownloadsScreen';
 import { HomeScreen } from 'Screen/HomeScreen';
+import BroadcastScreen from 'Screen/BroadcastScreen/BroadcastScreen';
+import Tv from 'lucide-react-native/icons/tv';
+import { BROADCAST_SCREEN, BROADCAST_TAB } from './navigationRoutes';
 import { NotificationsScreen } from 'Screen/NotificationsScreen';
 import { RecentScreen } from 'Screen/RecentScreen';
 import { SearchScreen } from 'Screen/SearchScreen';
@@ -64,6 +67,7 @@ const HomeNavigator = createFilmNavigator(HOME_SCREEN, HomeScreen, [
     component: SettingsScreen,
   },
 ]);
+const BroadcastNavigator = createFilmNavigator(BROADCAST_SCREEN, BroadcastScreen);
 const SearchNavigator = createFilmNavigator(SEARCH_SCREEN, SearchScreen);
 const BookmarksNavigator = createFilmNavigator(BOOKMARKS_SCREEN, BookmarksScreen);
 const RecentNavigator = createFilmNavigator(RECENT_SCREEN, RecentScreen, [
@@ -117,6 +121,7 @@ const renderTVTabs = (
     RECENT_TAB,
     SEARCH_TAB,
     BOOKMARKS_TAB,
+    BROADCAST_TAB,
     ...(!isLocalLibrary ? [DOWNLOADS_SCREEN] : []),
     SETTINGS_SCREEN,
   ];
@@ -128,6 +133,7 @@ const renderTVTabs = (
     RECENT_TAB,
     SEARCH_TAB,
     BOOKMARKS_TAB,
+    BROADCAST_TAB,
     ...(!isLocalLibrary ? [DOWNLOADS_SCREEN] : []),
     SETTINGS_SCREEN,
   ];
@@ -207,6 +213,10 @@ const renderTVTabs = (
           />
         );
 
+      case BROADCAST_TAB:
+        return <Tab.Screen key={ BROADCAST_TAB } name={ BROADCAST_TAB } component={ BroadcastNavigator }
+          options={ { tabBarLabel: t('TV and radio'), tabBarIcon: Tv } } />;
+
       case SEARCH_TAB:
         return (
           <Tab.Screen
@@ -276,6 +286,7 @@ const renderMobileTabs = (
     HOME_TAB,
     SEARCH_TAB,
     BOOKMARKS_TAB,
+    BROADCAST_TAB,
     RECENT_TAB,
     NOTIFICATIONS_TAB,
     DOWNLOADS_SCREEN,
@@ -286,6 +297,7 @@ const renderMobileTabs = (
     HOME_TAB,
     SEARCH_TAB,
     BOOKMARKS_TAB,
+    BROADCAST_TAB,
     RECENT_TAB,
     NOTIFICATIONS_TAB,
     DOWNLOADS_SCREEN,
@@ -312,6 +324,10 @@ const renderMobileTabs = (
             } }
           />
         );
+
+      case BROADCAST_TAB:
+        return <Tab.Screen key={ BROADCAST_TAB } name={ BROADCAST_TAB } component={ BroadcastNavigator }
+          options={ { tabBarLabel: t('TV and radio'), tabBarIcon: Tv } } />;
 
       case SEARCH_TAB:
         return (
