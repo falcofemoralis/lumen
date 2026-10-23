@@ -21,6 +21,11 @@ import { sourcePlaybackRouter, sourceRouter } from '../../source';
 import { navigate } from 'Util/Navigation';
 import { getSavedTime } from 'Util/Player';
 import { getLastSavedEpisode } from 'Util/Player/savedTimeUtil';
+import { resolveEpisodeSelection } from 'Util/Player/episodeSelection';
+import { matchesHistoryFilm } from 'Util/LocalLibrary/history';
+import { filmToFilmCard } from 'Util/Film';
+import { bookmarkFilmIdentity } from 'Util/LocalLibrary/identity';
+import { registerUnifiedFilm } from '../../source/search/UnifiedFilmRegistry';
 import { queryKeys } from 'Util/Query';
 import { openFilm } from 'Util/Router';
 
@@ -50,6 +55,12 @@ export function RecentScreenContainer() {
     currentService.unloadRecentScreen();
   }, [currentService]);
 
+  useEffect(() => {
+    for (const item of localHistory) {
+      if (item.filmCard) registerUnifiedFilm(bookmarkFilmIdentity(item.filmCard));
+    }
+  }, [localHistory]);
+
   const localItems = useMemo((): RecentItemInterface[] => {
     if (!isLocalLibrary) {
       return [];
@@ -70,10 +81,10 @@ export function RecentScreenContainer() {
       }),
       info: [
         historyItem.voiceTitle,
-        historyItem.seasonId && historyItem.episodeId
+        (historyItem.seasonNumber ?? historyItem.seasonId) && (historyItem.episodeNumber ?? historyItem.episodeId)
           ? t('Season {{season}} - Episode {{episode}}', {
-            season: historyItem.seasonId,
-            episode: historyItem.episodeId,
+            season: historyItem.seasonNumber ?? historyItem.seasonId,
+            episode: historyItem.episodeNumber ?? historyItem.episodeId,
           })
           : undefined,
       ].filter(Boolean).join(' - '),
@@ -99,21 +110,21 @@ export function RecentScreenContainer() {
       }
 
       const saved = getSavedTime(film);
-      const historyItem = localHistory.find(
-        (historyEntry) =>
-          historyEntry.id === film.id || historyEntry.link === item.link
-      );
+      const historyItem = isLocalLibrary
+        ? localHistory.find(entry => matchesHistoryFilm(entry, filmToFilmCard(film))) : undefined;
 
-      const lastVoiceId = saved?.lastVoiceId ?? historyItem?.voiceId;
+      const lastVoiceId = historyItem?.voiceId ?? saved?.lastVoiceId;
 
-      if (!lastVoiceId) {
+      if (!lastVoiceId && !historyItem) {
         throw new Error(t('No video available'));
       }
 
       const playback = sourcePlaybackRouter.getAdapterForFilmLink(film.link);
       if (playback) film.voices = await playback.getFilmVoices(film);
-      const voiceData = saved?.voices?.[lastVoiceId] ?? null;
-      const voice = film.voices.find(({ id }) => id === lastVoiceId);
+      const voiceData = (lastVoiceId ? saved?.voices?.[lastVoiceId] : null) ?? null;
+      const voice = film.voices.find(({ id }) => id === lastVoiceId)
+        ?? film.voices.find(entry => entry.title === historyItem?.voiceTitle)
+        ?? film.voices.find(entry => entry.isActive) ?? film.voices[0];
 
       if (!voice) {
         throw new Error(t('No video available'));
@@ -121,15 +132,16 @@ export function RecentScreenContainer() {
 
       if (film.hasSeasons) {
         const savedEpisode = getLastSavedEpisode(voiceData);
-        const seasonId = savedEpisode.seasonId ?? historyItem?.seasonId;
-        const episodeId = savedEpisode.episodeId ?? historyItem?.episodeId;
-
-        if (!seasonId || !episodeId) {
-          throw new Error(t('Current season or episode not saved.'));
-        }
+        const seasons = playback
+          ? await playback.getFilmSeasons(film, voice)
+          : await currentService.getFilmSeasons(film, voice);
+        const position = resolveEpisodeSelection(seasons, historyItem ?? savedEpisode,
+          historyItem ? historyItem.link === film.link && historyItem.voiceId === voice.id : true);
+        if (!position) throw new Error(t('Current season or episode not saved.'));
+        const { seasonId, episodeId } = position;
 
         const selectedVoice = {
-          ...voice,
+          ...seasons,
           lastSeasonId: seasonId,
           lastEpisodeId: episodeId,
         };

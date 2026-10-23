@@ -42,6 +42,8 @@ import { getPlayerQuality, getSavedTime } from 'Util/Player';
 import { getLastSavedEpisode } from 'Util/Player/savedTimeUtil';
 import { queryKeys } from 'Util/Query';
 import { filmToFilmCard } from 'Util/Film';
+import { matchesHistoryFilm } from 'Util/LocalLibrary/history';
+import { resolveEpisodeSelection } from 'Util/Player/episodeSelection';
 import { openActor, openCategory, openFilm } from 'Util/Router';
 import { sourcePlaybackRouter, sourceRouter } from '../../source';
 import { withDeadline } from '../../source/request';
@@ -95,7 +97,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
 
     const savedTime = getSavedTime(data);
     const localHistoryItem = isLocalLibrary
-      ? localHistory.find((item) => item.id === data.id)
+      ? localHistory.find((item) => matchesHistoryFilm(item, filmToFilmCard(data)))
       : undefined;
 
     const lastVoiceId = savedTime?.lastVoiceId ?? localHistoryItem?.voiceId;
@@ -112,6 +114,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
       ? savedTime?.voices?.[lastVoiceId]
       : undefined;
     const historySelection = localHistoryItem?.voiceId === lastVoiceId
+      && localHistoryItem.link === data.link
       ? localHistoryItem
       : undefined;
 
@@ -274,7 +277,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     }
 
     if (isLocalLibrary) {
-      return localHistory.some((item) => item.link === link);
+      return localHistory.some((item) => matchesHistoryFilm(item, filmToFilmCard(film)));
     }
 
     return isFilmInRecentQuery.data === true;
@@ -757,7 +760,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
       return;
     }
 
-    const history = localHistory.find(item => item.id === film.id || item.link === film.link || item.link === link);
+    const history = localHistory.find(item => matchesHistoryFilm(item, filmToFilmCard(film)));
     const savedTime = getSavedTime(film) ?? (history?.voiceId ? {
       filmId: film.id,
       lastVoiceId: history.voiceId,
@@ -824,11 +827,17 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
       return;
     }
 
-    resumeVoice({
-      voice,
-      lastSeasonId: getLastSavedEpisode(lastVoiceData).seasonId,
-      lastEpisodeId: getLastSavedEpisode(lastVoiceData).episodeId,
-    });
+    if (film.hasSeasons) {
+      try {
+        const loaded = playback ? await playback.getFilmSeasons(film, voice) : await currentService.getFilmSeasons(film, voice);
+        const position = resolveEpisodeSelection(loaded, history ?? getLastSavedEpisode(lastVoiceData),
+          history ? history.link === film.link && history.voiceId === voice.id : true);
+        if (!position) { playFilm(); return; }
+        resumeVoice({ voice: loaded, lastSeasonId: position.seasonId, lastEpisodeId: position.episodeId });
+      } catch (error) { NotificationStore.displayError(error as Error); }
+      return;
+    }
+    resumeVoice({ voice });
   };
 
   const containerProps = {

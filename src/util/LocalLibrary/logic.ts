@@ -9,6 +9,7 @@ import {
 import { NotificationInterface, NotificationItemInterface } from 'Type/Notification.interface';
 import { safeJsonParse } from 'Util/Json';
 import { matchingBookmarkIds, mergeBookmarkSources } from './identity';
+import { deduplicateHistory } from './history';
 
 export const MAX_LOCAL_HISTORY_ITEMS = 200;
 
@@ -32,7 +33,7 @@ export const parseBookmarksBlob = (raw: string | null | undefined): LocalBookmar
 export const parseHistoryList = (raw: string | null | undefined): LocalHistoryItemInterface[] => {
   const items = safeJsonParse<LocalHistoryItemInterface[]>(raw);
 
-  return Array.isArray(items) ? items : [];
+  return Array.isArray(items) ? deduplicateHistory(items) : [];
 };
 
 export const parseScheduleMarks = (raw: string | null | undefined): LocalScheduleMarks => {
@@ -197,10 +198,7 @@ export const filmsForCategory = (
 export const upsertHistoryItem = (
   items: LocalHistoryItemInterface[],
   item: LocalHistoryItemInterface
-): LocalHistoryItemInterface[] => [
-  item,
-  ...items.filter((i) => i.id !== item.id),
-].slice(0, MAX_LOCAL_HISTORY_ITEMS);
+): LocalHistoryItemInterface[] => deduplicateHistory([item, ...items]).slice(0, MAX_LOCAL_HISTORY_ITEMS);
 
 export const removeHistoryItem = (
   items: LocalHistoryItemInterface[],

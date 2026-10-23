@@ -18,6 +18,9 @@ export interface LocalHistoryItemInterface {
   link: string;
   poster: string;
   title: string;
+  historyIds?: string[];
+  seasonNumber?: number;
+  episodeNumber?: number;
   voiceId?: string;
   voiceTitle?: string;
   seasonId?: string;

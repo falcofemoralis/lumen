@@ -10,6 +10,7 @@ import {
 import { NotificationInterface } from 'Type/Notification.interface';
 import { uuid } from 'Util/Download';
 import { filmToFilmCard } from 'Util/Film';
+import { episodePosition } from 'Util/Player/episodeSelection';
 import { storage } from 'Util/Storage';
 import { mutateCloudSync, mutateCloudSyncBatch } from 'Util/CloudSync';
 
@@ -301,29 +302,31 @@ export const upsertLocalHistoryItem = (film: FilmInterface, voice: FilmVoiceInte
     title: film.title,
     voiceId: voice.id,
     voiceTitle: voice.title,
-    seasonId: voice.lastSeasonId,
-    episodeId: voice.lastEpisodeId,
+    ...episodePosition(voice, voice.lastSeasonId, voice.lastEpisodeId),
     updatedAt: Date.now(),
     isWatched: false,
   };
 
-  saveLocalHistory(upsertHistoryItem(getLocalHistory(), item));
+  const history = getLocalHistory();
+  const updated = upsertHistoryItem(history, item);
+  saveLocalHistory(updated);
 
-  mutateCloudSync({
-    entity: 'history',
-    id: item.id,
-    value: item,
-  });
+  const merged = updated.find(entry => entry.id === item.id) ?? item;
+  mutateCloudSyncBatch([
+    ...(merged.historyIds ?? []).filter(id => id !== merged.id).map(id => ({
+      entity: 'history' as const, id, deleted: true,
+    })),
+    { entity: 'history', id: merged.id, value: merged },
+  ]);
 };
 
 export const removeLocalHistoryItem = (filmId: string) => {
-  saveLocalHistory(removeHistoryItem(getLocalHistory(), filmId));
-
-  mutateCloudSync({
-    entity: 'history',
-    id: filmId,
-    deleted: true,
-  });
+  const history = getLocalHistory();
+  const existing = history.find(item => item.id === filmId);
+  saveLocalHistory(removeHistoryItem(history, filmId));
+  mutateCloudSyncBatch([...new Set([filmId, ...(existing?.historyIds ?? [])])].map(id => ({
+    entity: 'history', id, deleted: true,
+  })));
 };
 
 export const setLocalHistoryWatched = (filmId: string, isWatched: boolean) => {
