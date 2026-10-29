@@ -1,5 +1,6 @@
 import { collection, CollectionReference, getFirestore } from '@react-native-firebase/firestore';
 import { useMutation } from '@tanstack/react-query';
+import { sourcePlaybackRouter } from '../../source';
 import { FIRESTORE_DB } from 'Component/Player/Player.config';
 import { FirestoreDocument, SavedTime } from 'Component/Player/Player.type';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
@@ -14,7 +15,12 @@ import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { EpisodeInterface, FilmVoiceInterface, SeasonInterface } from 'Type/FilmVoice.interface';
 import { getFirestoreSavedTime, getSavedTime, setSavedTime as setSavedTimeStorage } from 'Util/Player';
 import { combineSavedTime } from 'Util/Player/savedTimeUtil';
+import { episodePosition, resolveEpisodeSelection } from 'Util/Player/episodeSelection';
+import { getLocalHistory } from 'Util/LocalLibrary';
+import { matchesHistoryFilm } from 'Util/LocalLibrary/history';
+import { filmToFilmCard } from 'Util/Film';
 
+import { visibleVoices } from './PlayerVideoSelector.voices';
 import PlayerVideoSelectorComponent from './PlayerVideoSelector.component';
 import FilmVideoSelectorComponentTV from './PlayerVideoSelector.component.atv';
 import { formatDownloadKey, PROGRESS_THRESHOLD_MAX, PROGRESS_THRESHOLD_MIN } from './PlayerVideoSelector.config';
@@ -35,15 +41,26 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
       onSelect,
       onClose,
       onDownloadSelect,
+      onVoicesUpdate,
     },
     ref
   ) => {
-    const { voices = [] } = film;
-    const { isTV, isFirestore, isLocalLibrary, playerAskQuality, sortVoicesByRating } = useConfigContext();
+    const { voices: allVoices = [] } = film;
+    const {
+      isTV,
+      isFirestore,
+      isLocalLibrary,
+      playerAskQuality,
+      playerCompactSelector,
+      sortVoicesByRating,
+      hidePremiumVoices,
+    } = useConfigContext();
+    const voices = useMemo(() => visibleVoices(allVoices, hidePremiumVoices && !isOffline),
+      [allVoices, hidePremiumVoices, isOffline]);
     const { selectedVoice: contextVoice, updateSelectedVoice } = usePlayerContext();
     const [selectedVoice, setSelectedVoice] = useState<FilmVoiceInterface>(
       // eslint-disable-next-line max-len
-      voiceInput ?? (voices.length > 0 ? voices.find(({ isActive }) => isActive) ?? voices[0] : {} as FilmVoiceInterface)
+      (voiceInput && (!hidePremiumVoices || !voiceInput.isPremium || isOffline) ? voiceInput : undefined) ?? (voices.length > 0 ? voices.find(({ isActive }) => isActive) ?? voices[0] : {} as FilmVoiceInterface)
     );
     const { isSignedIn, profile, currentService } = useServiceContext();
 
@@ -74,46 +91,158 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
     const selectedVideosRef = useRef<FilmVideoInterface | null>(null);
     const selectedVoicesRef = useRef<FilmVoiceInterface | null>(null);
 
+    const zonaVoiceDiscoveryRef = useRef(false);
+
+    useEffect(() => {
+      zonaVoiceDiscoveryRef.current = false;
+    }, [film.link]);
+
     const isMountedRef = useRef(false);
 
+    const [isVoiceDiscoveryLoading, setIsVoiceDiscoveryLoading] = useState(false);
+    const [isSelectorOpen, setIsSelectorOpen] = useState(false);
     useImperativeHandle(ref, () => ({
-      open: () => {
-        const { hasVoices, hasSeasons } = film;
-
-        if (hasVoices || hasSeasons) {
-          overlayRef.current?.open();
-
-          return;
+      open: async () => {
+        setIsSelectorOpen(true);
+        overlayRef.current?.open();
+        const playbackAdapter = sourcePlaybackRouter.getAdapterForFilmLink(film.link);
+        if (isOffline || !playbackAdapter || zonaVoiceDiscoveryRef.current) return;
+        zonaVoiceDiscoveryRef.current = true;
+        setIsVoiceDiscoveryLoading(true);
+        try {
+          const discovered = await playbackAdapter.getFilmVoices(film);
+          if (discovered.length) {
+            const current = getContextVoice() ?? selectedVoice;
+            const available = visibleVoices(discovered, hidePremiumVoices);
+            const next = available.find((voice) => voice.identifier === current?.identifier)
+              ?? available.find((voice) => voice.isActive) ?? available[0] ?? {} as FilmVoiceInterface;
+            setSelectedVoice({
+              ...next, seasonNumber: getSavedSelection(next, savedTime ?? getSavedTime(film)).seasonNumber,
+            });
+            onVoicesUpdate?.(discovered);
+          } else {
+            zonaVoiceDiscoveryRef.current = false;
+          }
+        } catch (error) {
+          zonaVoiceDiscoveryRef.current = false;
+          NotificationStore.displayError(error as Error);
+        } finally {
+          setIsVoiceDiscoveryLoading(false);
+          zonaVoiceDiscoveryRef.current = false;
         }
-
-        const voice = voices[0];
-        const { video } = voice;
-
-        if (!video) {
-          NotificationStore.displayMessage(t('No video streams available'));
-
-          return;
-        }
-
-        handleSelectVideo(video, voice);
       },
-      close: () => {
-        overlayRef.current?.close();
-      },
+      close: () => { setIsSelectorOpen(false); overlayRef.current?.close(); },
     }));
+    const supplementedLinkRef = useRef<string | undefined>(undefined);
+    useEffect(() => {
+      const supplementalLink = film.metadataSourceFilm?.link;
+      if (!isSelectorOpen || isVoiceDiscoveryLoading || !supplementalLink
+        || supplementedLinkRef.current === supplementalLink) return;
+      const adapter = sourcePlaybackRouter.getAdapterForFilmLink(film.link);
+      if (!adapter || isOffline) return;
+      supplementedLinkRef.current = supplementalLink;
+      let cancelled = false;
+      void adapter.getFilmVoices(film).then((updated) => {
+        if (!cancelled && updated.length) onVoicesUpdate?.(updated);
+      }).catch(() => { supplementedLinkRef.current = undefined; });
+      return () => { cancelled = true; supplementedLinkRef.current = undefined; };
+    }, [film.link, film.metadataSourceFilm?.link, isSelectorOpen, isVoiceDiscoveryLoading, isOffline, onVoicesUpdate]);
 
     const getContextVoice = () => {
       const { id } = film;
 
       const { filmId, voice } = contextVoice || {};
 
-      if (filmId === id && voice) {
+      if (filmId === id && voice && (!hidePremiumVoices || !voice.isPremium || isOffline)) {
         return voice;
       }
 
       return null;
     };
 
+    const getSavedVoiceData = (saved: SavedTime | null, voiceId: string) => (
+      saved?.voices?.[voiceId] ?? null
+    );
+
+    const getSavedSelection = (
+      voice: FilmVoiceInterface,
+      saved: SavedTime | null
+    ) => {
+      const voiceData = getSavedVoiceData(saved, voice.id);
+      const history = isLocalLibrary && !isOffline
+        ? getLocalHistory().find(item => matchesHistoryFilm(item, filmToFilmCard(film))) : undefined;
+      const previousVoice = saved?.lastVoiceId ? voices.find(item => item.id === saved.lastVoiceId) : undefined;
+      const previousData = saved?.lastVoiceId ? getSavedVoiceData(saved, saved.lastVoiceId) : undefined;
+      const position = history ?? (previousVoice
+        ? episodePosition(previousVoice, previousData?.lastSeasonId, previousData?.lastEpisodeId) : {});
+      const mapped = resolveEpisodeSelection(voice, position, history?.link === film.link && history.voiceId === voice.id);
+      const seasonNumber = position.seasonNumber
+        ?? episodePosition(previousVoice ?? voice, position.seasonId, position.episodeId).seasonNumber;
+      if (mapped) return { ...mapped, sameVoice: true, seasonNumber };
+      return {
+        seasonId: voiceData?.lastSeasonId ?? history?.seasonId ?? voice.lastSeasonId,
+        episodeId: voiceData?.lastEpisodeId ?? history?.episodeId ?? voice.lastEpisodeId,
+        seasonNumber,
+        sameVoice: Boolean(voiceData) || (!history && !previousData)
+          || (history?.link === film.link && history.voiceId === voice.id),
+      };
+    };
+
+    const persistSelection = (
+      voice: FilmVoiceInterface,
+      seasonId?: string,
+      episodeId?: string
+    ) => {
+      const currentSavedTime = savedTime ?? getSavedTime(film);
+
+      const nextSavedTime: SavedTime = currentSavedTime
+        ? {
+          ...currentSavedTime,
+          voices: { ...currentSavedTime.voices },
+        }
+        : {
+          filmId: film.id,
+          voices: {},
+          lastVoiceId: null,
+        };
+
+      const previousVoiceData = nextSavedTime.voices[voice.id];
+
+      nextSavedTime.voices[voice.id] = {
+        timestamps: previousVoiceData?.timestamps ?? {},
+        lastSeasonId: seasonId ?? previousVoiceData?.lastSeasonId,
+        lastEpisodeId: episodeId ?? previousVoiceData?.lastEpisodeId,
+      };
+
+      nextSavedTime.lastVoiceId = voice.id;
+
+      setSavedTime(nextSavedTime);
+      setSavedTimeStorage(nextSavedTime, film);
+    };
+
+    const applySavedSelection = (saved: SavedTime | null) => {
+      if (!saved?.lastVoiceId) {
+        return;
+      }
+
+      const savedVoice = voices.find(({ id }) => id === saved.lastVoiceId);
+
+      if (!savedVoice) {
+        return;
+      }
+
+      const savedSelection = getSavedSelection(savedVoice, saved);
+
+      const activeVoice = voiceInput?.id === savedVoice.id ? voiceInput : getContextVoice();
+      setSelectedVoice((previous) => ({
+        ...savedVoice,
+        seasonNumber: savedSelection.seasonNumber,
+        seasons: activeVoice?.id === savedVoice.id && activeVoice.seasons?.length ? activeVoice.seasons
+          : previous.id === savedVoice.id && previous.seasons?.length ? previous.seasons : savedVoice.seasons,
+      }));
+      setSelectedSeasonId(savedSelection.seasonId);
+      setSelectedEpisodeId(savedSelection.episodeId);
+    };
     const initFirestoreSavedTime = async () => {
       if (firestoreSavedTimeRef.current || !firestoreDb || !profile) {
         return;
@@ -128,6 +257,7 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
         if (combinedSavedTime) {
           setSavedTime(combinedSavedTime);
           setSavedTimeStorage(combinedSavedTime, film);
+          applySavedSelection(combinedSavedTime);
         }
       }
     };
@@ -138,29 +268,67 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
     useEffect(() => {
       const voice = getContextVoice();
 
-      if (voice) {
-        setSelectedVoice(voice);
-        setSelectedSeasonId(voice.lastSeasonId);
-        setSelectedEpisodeId(voice.lastEpisodeId);
+      if (!voice) {
+        return;
       }
-    }, [contextVoice]);
+
+      const currentVoice = voices.find(
+        ({ identifier }) => identifier === voice.identifier,
+      );
+
+      if (!currentVoice) {
+        return;
+      }
+
+      setSelectedVoice({ ...currentVoice, ...voice, seasons: voice.seasons?.length ? voice.seasons : currentVoice.seasons });
+      setSelectedSeasonId(voice.lastSeasonId ?? currentVoice.lastSeasonId);
+      setSelectedEpisodeId(voice.lastEpisodeId ?? currentVoice.lastEpisodeId);
+    }, [contextVoice, voices]);
 
     /**
      * Sync selectedVoice when film.voices is updated
      */
     useEffect(() => {
-      if (voices.length === 0 || !isMountedRef.current) {
+      if (!isMountedRef.current
+        || (voices.length === 0 && !(hidePremiumVoices && !isOffline && selectedVoice.isPremium))) {
         isMountedRef.current = true;
 
         return;
       }
 
-      const updatedVoice = voices.find(({ identifier }) => identifier === selectedVoice.identifier);
+      if (hidePremiumVoices && !isOffline && selectedVoice.isPremium) {
+        const next = voices.find(voice => voice.isActive) ?? voices[0] ?? {} as FilmVoiceInterface;
+        setSelectedVoice(next);
+        setSelectedSeasonId(next.lastSeasonId);
+        setSelectedEpisodeId(next.lastEpisodeId);
+        return;
+      }
+
+      const updatedVoice = voices.find(
+        ({ identifier }) => identifier === selectedVoice.identifier,
+      );
 
       if (updatedVoice && updatedVoice !== selectedVoice) {
-        setSelectedVoice(updatedVoice);
+        setSelectedVoice((previous) => ({
+          ...updatedVoice,
+          seasonNumber: previous.seasonNumber ?? updatedVoice.seasonNumber,
+          seasons: updatedVoice.seasons?.length ? updatedVoice.seasons : previous.seasons,
+          lastSeasonId: previous.lastSeasonId ?? updatedVoice.lastSeasonId,
+          lastEpisodeId: previous.lastEpisodeId ?? updatedVoice.lastEpisodeId,
+        }));
       }
-    }, [film]);
+    }, [voices, selectedVoice.identifier, selectedVoice.isPremium, hidePremiumVoices, isOffline]);
+
+    useEffect(() => {
+      if (!voiceInput || (hidePremiumVoices && voiceInput.isPremium && !isOffline)) return;
+      setSelectedVoice((previous) => ({
+        ...voiceInput,
+        seasons: voiceInput.seasons?.length ? voiceInput.seasons
+          : previous.id === voiceInput.id ? previous.seasons : undefined,
+      }));
+      setSelectedSeasonId(voiceInput.lastSeasonId);
+      setSelectedEpisodeId(voiceInput.lastEpisodeId);
+    }, [voiceInput, hidePremiumVoices, isOffline]);
 
     const getSeasons = (): SeasonInterface[] => {
       const { seasons = [] } = selectedVoice ?? {};
@@ -171,12 +339,18 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
     const getEpisodes = (): EpisodeInterface[] => {
       const { seasons = [] } = selectedVoice ?? {};
 
-      const { episodes = [] } = seasons.find(({ seasonId }) => seasonId === selectedSeasonId) ?? {};
+      const season = seasons.find(({ seasonId }) => seasonId === selectedSeasonId)
+        ?? (seasons.length === 1 && seasons[0].isOnlyEpisodes ? seasons[0] : undefined);
+      const { episodes = [] } = season ?? {};
 
       return episodes;
     };
 
     const handleSelectVideo = (video: FilmVideoInterface, voice: FilmVoiceInterface) => {
+      if (!video.streams?.length) {
+        NotificationStore.displayMessage(t('No video streams available'));
+        return;
+      }
       if (isDownloader) {
         if (!downloadVideosRef.current || !downloadVoicesRef.current) {
           downloadVideosRef.current = {};
@@ -216,11 +390,18 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
 
     /** Movies: resolve the single video for a voice and hand it straight to the player */
     const { mutate: loadVoiceVideo, isPending: isVoiceVideoLoading } = useMutation({
-      mutationFn: (voice: FilmVoiceInterface) => (
-        isOffline
-          ? Promise.resolve(voice.video)
-          : currentService.getFilmStreamsByVoice(film, voice)
-      ),
+      mutationFn: async (voice: FilmVoiceInterface) => {
+        if (isOffline) {
+          return voice.video;
+        }
+
+        const playbackAdapter =
+          sourcePlaybackRouter.getAdapterForFilmLink(film.link);
+
+        return playbackAdapter
+          ? playbackAdapter.getFilmStreamsByVoice(film, voice)
+          : currentService.getFilmStreamsByVoice(film, voice);
+      },
       onSuccess: (video, voice) => {
         if (video) {
           handleSelectVideo(video, voice);
@@ -229,11 +410,22 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
     });
 
     /** Series: resolve the season list for a voice and preselect its first episode */
+    const [isAutoLoadingSeasons, setIsAutoLoadingSeasons] = useState(false);
     const { mutate: loadVoiceSeasons, isPending: isVoiceSeasonsLoading } = useMutation({
-      mutationFn: (voice: FilmVoiceInterface) => (
-        isOffline ? Promise.resolve(voice) : currentService.getFilmSeasons(film, voice)
-      ),
+      mutationFn: async (voice: FilmVoiceInterface) => {
+        if (isOffline) {
+          return voice;
+        }
+
+        const playbackAdapter =
+          sourcePlaybackRouter.getAdapterForFilmLink(film.link);
+
+        return playbackAdapter
+          ? playbackAdapter.getFilmSeasons(film, voice)
+          : currentService.getFilmSeasons(film, voice);
+      },
       onSuccess: (updatedVoice) => {
+        setIsAutoLoadingSeasons(false);
         setSelectedVoice(updatedVoice);
 
         if (isDownloader) {
@@ -242,15 +434,75 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
 
         const { seasons = [] } = updatedVoice;
 
-        if (seasons.length > 0) {
-          const season = seasons[0];
-          const { seasonId, episodes: [{ episodeId }] = [] } = season;
-          setSelectedSeasonId(seasonId);
-          setSelectedEpisodeId(episodeId);
+        if (seasons.length === 0) {
+          persistSelection(updatedVoice);
+          return;
         }
+
+        const currentSavedTime = savedTime ?? getSavedTime(film);
+        const savedSelection = getSavedSelection(updatedVoice, currentSavedTime);
+        if (seasons.length === 1 && seasons[0].isOnlyEpisodes) {
+          setSelectedVoice({ ...updatedVoice, seasonNumber: selectedVoice.seasonNumber ?? savedSelection.seasonNumber });
+        }
+
+        const currentPosition = episodePosition(selectedVoice, selectedSeasonId, selectedEpisodeId);
+        const current = resolveEpisodeSelection(updatedVoice, currentPosition,
+          selectedVoice.identifier === updatedVoice.identifier);
+        const switchingVoice = selectedVoice.identifier !== updatedVoice.identifier;
+        const restored = switchingVoice && selectedEpisodeId
+          ? current : current ?? resolveEpisodeSelection(updatedVoice, savedSelection, savedSelection.sameVoice);
+        const hadPosition = Boolean(selectedEpisodeId || savedSelection.episodeId);
+        if (!restored && hadPosition) {
+          setSelectedSeasonId(seasons.length === 1 && seasons[0].isOnlyEpisodes ? seasons[0].seasonId : undefined);
+          setSelectedEpisodeId(undefined);
+          NotificationStore.displayMessage(t('Current season or episode not saved.'));
+          return;
+        }
+        const seasonId = restored?.seasonId ?? seasons[0].seasonId;
+        const episodeId = restored?.episodeId ?? seasons[0].episodes[0]?.episodeId;
+        if (seasons.length === 1 && seasons[0].isOnlyEpisodes) {
+          const seasonNumber = selectedVoice.identifier === updatedVoice.identifier && !selectedVoice.seasonNumber
+            ? savedSelection.seasonNumber ?? currentPosition.seasonNumber
+            : currentPosition.seasonNumber ?? savedSelection.seasonNumber;
+          setSelectedVoice({ ...updatedVoice, seasonNumber });
+        }
+
+        setSelectedSeasonId(seasonId);
+        setSelectedEpisodeId(episodeId);
+
+        persistSelection(updatedVoice, seasonId, episodeId);
+      },
+      onError: () => {
+        setIsAutoLoadingSeasons(false);
       },
     });
 
+    const autoLoadedSeasonsVoiceRef = useRef<string | null>(null);
+
+    /**
+     * Cloud Sync can restore a selected voice without its season/episode data.
+     * Resolve seasons automatically for series before the selector needs them.
+     */
+    useEffect(() => {
+      if (
+        isOffline
+        || !isSelectorOpen
+        || isVoiceDiscoveryLoading
+        || !film.hasSeasons
+        || !selectedVoice?.id
+        || (hidePremiumVoices && selectedVoice.isPremium)
+        || selectedVoice.seasons?.some((season) =>
+          season.seasonId === (selectedSeasonId ?? selectedVoice.lastSeasonId ?? selectedVoice.seasons?.[0]?.seasonId)
+          && season.episodes?.length)
+        || autoLoadedSeasonsVoiceRef.current === selectedVoice.id + ':' + (selectedSeasonId ?? '')
+      ) {
+        return;
+      }
+
+      autoLoadedSeasonsVoiceRef.current = selectedVoice.id + ':' + (selectedSeasonId ?? '');
+      setIsAutoLoadingSeasons(true);
+      loadVoiceSeasons(selectedVoice);
+    }, [film.hasSeasons, hidePremiumVoices, isOffline, isSelectorOpen, isVoiceDiscoveryLoading, loadVoiceSeasons, selectedVoice, selectedSeasonId]);
     const { mutate: loadEpisodeVideo, isPending: isEpisodeVideoLoading } = useMutation({
       mutationFn: ({
         voice,
@@ -265,7 +517,12 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
           );
         }
 
-        return currentService.getFilmStreamsByEpisodeId(film, voice, seasonId, episodeId);
+        const playbackAdapter =
+          sourcePlaybackRouter.getAdapterForFilmLink(film.link);
+
+        return playbackAdapter
+          ? playbackAdapter.getFilmStreamsByEpisodeId(film, voice, seasonId, episodeId)
+          : currentService.getFilmStreamsByEpisodeId(film, voice, seasonId, episodeId);
       },
       onSuccess: (video, { voice, seasonId, episodeId }) => {
         if (!video) {
@@ -293,6 +550,7 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
 
       if (!hasSeasons) {
         setSelectedVoice(voice);
+        persistSelection(voice);
         loadVoiceVideo(voice);
 
         return;
@@ -304,6 +562,19 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
       setTimeout(() => {
         loadVoiceSeasons(voice);
       }, 0);
+    };
+
+    const handleSelectSeason = (seasonId: string) => {
+      setSelectedSeasonId(seasonId);
+
+      const season = (selectedVoice.seasons ?? []).find(
+        ({ seasonId: currentSeasonId }) => currentSeasonId === seasonId
+      );
+
+      const episodeId = season?.episodes?.[0]?.episodeId;
+
+      setSelectedEpisodeId(episodeId);
+      persistSelection(selectedVoice, seasonId, episodeId);
     };
 
     const handleSelectEpisode = (episodeId: string) => {
@@ -319,10 +590,14 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
       }
 
       setSelectedEpisodeId(episodeId);
+      const onlySeason = selectedVoice.seasons?.length === 1 && selectedVoice.seasons[0].isOnlyEpisodes
+        ? selectedVoice.seasons[0].seasonId : undefined;
+      const seasonId = onlySeason ?? selectedSeasonId ?? '1';
 
+      persistSelection(selectedVoice, seasonId, episodeId);
       loadEpisodeVideo({
+        seasonId,
         voice: selectedVoice,
-        seasonId: selectedSeasonId ?? '1',
         episodeId,
       });
     };
@@ -340,10 +615,22 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
     };
 
     const onOverlayOpen = () => {
-      if (!isOffline) {
-        setSavedTime(getSavedTime(film));
-        initFirestoreSavedTime();
+      autoLoadedSeasonsVoiceRef.current = null;
+      if (isOffline) {
+        return;
       }
+
+      const storedSavedTime = getSavedTime(film);
+
+      setSavedTime(storedSavedTime);
+      applySavedSelection(storedSavedTime);
+      if (!storedSavedTime?.lastVoiceId || !voices.some(voice => voice.id === storedSavedTime.lastVoiceId)) {
+        const selection = getSavedSelection(selectedVoice, storedSavedTime);
+        setSelectedVoice(previous => ({ ...previous, seasonNumber: selection.seasonNumber }));
+        setSelectedSeasonId(selection.seasonId);
+        setSelectedEpisodeId(selection.episodeId);
+      }
+      initFirestoreSavedTime();
     };
 
     const { mutate: loadEpisodesToDownload, isPending: isDownloadLoading } = useMutation({
@@ -354,13 +641,24 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
         for (const key of selectedEpisodes) {
           const [seasonId, episodeId] = key.split(',');
 
-          videos[key] = await currentService
-            .getFilmStreamsByEpisodeId(
-              film,
-              selectedVoice,
-              seasonId,
-              episodeId
-            );
+          const playbackAdapter =
+            sourcePlaybackRouter.getAdapterForFilmLink(film.link);
+
+          videos[key] = await (
+            playbackAdapter
+              ? playbackAdapter.getFilmStreamsByEpisodeId(
+                  film,
+                  selectedVoice,
+                  seasonId,
+                  episodeId
+                )
+              : currentService.getFilmStreamsByEpisodeId(
+                  film,
+                  selectedVoice,
+                  seasonId,
+                  episodeId
+                )
+          );
 
           voicesByKey[key] = {
             ...selectedVoice,
@@ -438,6 +736,7 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
         links.push({
           url: stream.url,
           quality: stream.quality,
+          headers: stream.headers,
           subtitles: video.subtitles,
           seasonId: voice?.lastSeasonId,
           episodeId: voice?.lastEpisodeId,
@@ -494,15 +793,17 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
       return sorted;
     }, [voices, sortVoicesByRating, film]);
 
-    const isLoading = isVoiceVideoLoading
+    const isLoading = isVoiceDiscoveryLoading || isVoiceVideoLoading
       || isVoiceSeasonsLoading
       || isEpisodeVideoLoading
-      || isDownloadLoading;
+      || isDownloadLoading
+      || isAutoLoadingSeasons;
 
     const containerProps = {
       overlayRef,
       film,
       voices: sortedVoices,
+      hasHiddenPremiumVoices: hidePremiumVoices && !isOffline && allVoices.some(voice => voice.isPremium),
       isLoading,
       selectedVoice,
       selectedSeasonId,
@@ -517,12 +818,14 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
       qualityOverlayRef,
       streamQualities,
       playerAskQuality,
+      playerCompactSelector,
       handleSelectVoice,
+      handleSelectSeason,
       setSelectedSeasonId,
       handleSelectEpisode,
       calculateProgressThreshold,
       onOverlayOpen,
-      onClose,
+      onClose: () => { setIsSelectorOpen(false); onClose?.(); },
       handleEpisodesDownload,
       handleDownload,
       handleQualitySelect,

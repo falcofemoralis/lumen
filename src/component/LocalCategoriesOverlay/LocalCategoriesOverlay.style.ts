@@ -24,6 +24,23 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     gap: scale(12),
     paddingVertical: scale(4),
   },
+  rowDragContent: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: scale(12),
+  },
+  rowMoving: {
+    borderWidth: scale(2),
+    borderColor: 'transparent',
+    borderRadius: scale(4),
+  },
+  rowHandle: {
+    width: scale(24),
+    height: scale(32),
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   rowTitle: {
     flex: 1,
     fontSize: scale(text.md.fontSize),

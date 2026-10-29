@@ -1,10 +1,12 @@
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
-import { ComponentType, ReactElement } from 'react';
+import { FilmDisplayMode, TabPosition } from '../../config';
+import { ComponentType, ReactElement, ReactNode } from 'react';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { MenuItemInterface } from 'Type/MenuItem.interface';
 import { PaginationInterface } from 'Type/Pagination.interface';
 
 export interface FilmPagerHandlers {
+  displayMode?: FilmDisplayMode;
   pagerItems: PagerItemInterface[];
   sorting?: DropdownItem[];
   selectedSorting?: Record<string, DropdownItem> | null;
@@ -15,6 +17,8 @@ export interface FilmPagerHandlers {
 }
 
 export interface FilmPagerContainerProps extends FilmPagerHandlers {
+  /** Optional screen content inside a mobile pager tab. */
+  renderPageContent?: (item: PagerItemInterface, index: number, isActive: boolean) => ReactNode;
   disableEmptyComponent?: boolean;
   isEmpty?: boolean;
   hideGrid?: boolean;
@@ -26,15 +30,24 @@ export interface FilmPagerContainerProps extends FilmPagerHandlers {
   disableStatusbarSafeArea?: boolean;
   // TV related
   menuDefaultFocus?: boolean;
+  tabPosition?: TabPosition;
+  TabBarActionComponent?: ReactNode;
+  /** Optional right padding for the tab bar outer container. */
+  tabBarRightPadding?: number;
+  /** Optional focusable control rendered after the TV tab list. */
+  menuTrailingComponent?: ReactNode;
   // Fires when grid focus enters/leaves the first row, so the screen can
   // collapse its own headers alongside the pager menu.
   onAtTopChange?: (atTop: boolean) => void;
+  /** Shows a floating button that scrolls the active tab's grid back to the top. */
+  showScrollToTopButton?: boolean;
 }
 
 export type FilmPagerComponentProps = FilmPagerContainerProps;
 
 export interface PagerItemInterface {
   menuItem: MenuItemInterface;
+  displayTitle?: string;
   films: FilmCardInterface[] | null;
   pagination: PaginationInterface;
 }

@@ -24,9 +24,14 @@ import { HTMLElementInterface, parseHtml } from 'Util/Parser';
 import { processPromisesBatch } from 'Util/Promise';
 import { executeGet, executePostEncoded, executePostFormData, formatURI, NotFoundError, Variables } from 'Util/Request';
 import { storage } from 'Util/Storage';
+import { RezkaReadQueue } from 'Util/RezkaReadQueue';
+import { getGlobalConfig } from 'Context/ConfigContext';
+import { createPublicReadFallback } from 'Util/Request/publicReadFallback';
+const publicUpdatesRead = createPublicReadFallback<HTMLElementInterface>();
 import { updateUrlHost } from 'Util/Url';
 
 import { collectSeriesUpdateRows, parseSeriesUpdateBlocks } from './seriesUpdates';
+import { parseSeriesTranslatorId } from './seriesTranslator';
 import {
   CommentResult,
   CommentsResult,
@@ -43,6 +48,7 @@ import {
   formatDuration,
   getStaticUrl,
   parseActorCard,
+  parseExternalIdsFromUrl,
   parseFilmCard,
   parseFilmsListRoot,
   parseFilmType,
@@ -52,8 +58,55 @@ import {
   parseSubtitles,
 } from './utils';
 
+const rezkaReadQueue = new RezkaReadQueue(1500, 25000, () => !isSolvingCloudflare());
 const REZKA_CONFIG = 'rezkaConfig';
 const REZKA_PROFILE = 'rezkaProfile';
+
+const pendingReleaseFilmIds = new Set<string>();
+let pendingReleaseFilmIdsLoaded = false;
+let pendingReleaseFilmIdsPromise: Promise<void> | null = null;
+
+const loadPendingReleaseFilmIds = async (api: RezkaApiInterface): Promise<void> => {
+  if (pendingReleaseFilmIdsLoaded) {
+    return;
+  }
+
+  if (pendingReleaseFilmIdsPromise) {
+    return pendingReleaseFilmIdsPromise;
+  }
+
+  pendingReleaseFilmIdsPromise = (async () => {
+    const firstPage = await api.getFilms(1, '/announce');
+
+    firstPage.films.forEach((film) => {
+      pendingReleaseFilmIds.add(film.id);
+    });
+
+    for (let page = 2; page <= firstPage.totalPages; page += 1) {
+      const filmsPage = await api.getFilms(page, '/announce');
+
+      filmsPage.films.forEach((film) => {
+        pendingReleaseFilmIds.add(film.id);
+      });
+    }
+
+    pendingReleaseFilmIdsLoaded = true;
+  })();
+
+  try {
+    await pendingReleaseFilmIdsPromise;
+  } finally {
+    pendingReleaseFilmIdsPromise = null;
+  }
+};
+
+const applyPendingReleaseFlags = (
+  films: FilmCardInterface[]
+): FilmCardInterface[] => films.map((film) => ({
+  ...film,
+  isPendingRelease:
+    film.isPendingRelease || pendingReleaseFilmIds.has(film.id),
+}));
 
 /** How long a provider gets to answer before it is called invalid. */
 const VALIDATE_URL_TIMEOUT_MS = 10000;
@@ -65,9 +118,9 @@ type RezkaApiInterface = ApiInterface & {
   loadConfig: () => ApiInterfaceConfig;
 
   // connection
-  getRequest: (query: string, variables?: Variables) => Promise<string>;
+  getRequest: (query: string, variables?: Variables, options?: { background?: boolean }) => Promise<string>;
   postRequest: (query: string, variables?: Variables) => Promise<string>;
-  fetchPage: (query: string, variables?: Variables) => Promise<HTMLElementInterface>;
+  fetchPage: (query: string, variables?: Variables, options?: { background?: boolean }) => Promise<HTMLElementInterface>;
   postJson: <T>(query: string, variables?: Variables) => Promise<T | null>;
 
   // utils
@@ -193,27 +246,26 @@ const RezkaApi: RezkaApiInterface = {
     return headers;
   },
 
-  async getRequest(query, variables = {}) {
-    return executeGet(
-      query,
-      this.getProvider(),
-      this.getHeaders(),
-      variables
-    );
+  async getRequest(query, variables = {}, options?: { background?: boolean }) {
+    const provider = this.getProvider();
+    const headers = this.getHeaders();
+    const key = JSON.stringify(['GET', provider, query, variables, headers]);
+    return rezkaReadQueue.run(key, (signal) => executeGet(query, provider, headers, variables, signal), options?.background);
   },
 
-  async postRequest(query, variables = {} ) {
-    return executePostFormData(
-      `${query}/?t=${Date.now()}`,
-      this.getProvider(),
-      this.getHeaders(),
-      variables
-    );
+  async postRequest(query, variables = {}) {
+    const provider = this.getProvider();
+    const headers = this.getHeaders();
+    const execute = (signal?: AbortSignal) => executePostFormData(`${query}/?t=${Date.now()}`, provider, headers, variables, signal);
+    const ratings = query === '/engine/ajax/quick_content.php';
+    const suggestions = query === '/engine/ajax/search.php';
+    return ratings || suggestions
+      ? rezkaReadQueue.run(JSON.stringify(['POST', provider, query, variables, headers]), execute, ratings, suggestions ? 'suggestions' : undefined)
+      : execute();
   },
 
-  async fetchPage(query, variables = {}) {
-    const res = await this.getRequest(query, variables);
-
+  async fetchPage(query, variables = {}, options) {
+    const res = await this.getRequest(query, variables, options);
     return this.parseContent(res);
   },
 
@@ -362,7 +414,17 @@ const RezkaApi: RezkaApiInterface = {
   },
 
   async getUserData() {
-    const root = await this.fetchPage('/');
+    // Local subscriptions need the public update list, not account data. A
+    // blocked official endpoint must not hide updates from an available mirror.
+    const root = getGlobalConfig().isLocalLibrary
+      ? await publicUpdatesRead(() => this.fetchPage('/'), async signal => {
+          const mirror = this.defaultProviders.find(provider => new URL(provider).hostname !== new URL(this.getProvider()).hostname)!;
+          const headers = { ...this.getHeaders() };
+          delete headers['X-Hdrezka-Android-App'];
+          delete headers['X-Hdrezka-Android-App-Version'];
+          return this.parseContent(await executeGet('/', mirror, headers, {}, signal));
+        })
+      : await this.fetchPage('/');
 
     // tracked rows only (the account's subscriptions, marked server-side)
     const notifications = parseSeriesUpdateBlocks(root, (el) => el.querySelectorAll('.tracked'));
@@ -384,7 +446,7 @@ const RezkaApi: RezkaApiInterface = {
 
   async getFilmsFromNotifications(notifications) {
     const links = notifications.reduce((acc, notification) => {
-      acc.push(...notification.items.map((item) => item.link));
+      acc.push(...notification.items.filter(item => !item.film).map((item) => item.link));
 
       return acc;
     }, [] as string[]);
@@ -468,7 +530,7 @@ const RezkaApi: RezkaApiInterface = {
 
     return notifications.map((notification) => {
       const items = notification.items.map((item) => {
-        const film = { ...films[item.link] } as FilmCardInterface;
+        const film = { ...(item.film ?? films[item.link]) } as FilmCardInterface;
         film.info = item.info;
 
         return {
@@ -548,7 +610,12 @@ const RezkaApi: RezkaApiInterface = {
   async getBookmarkedFilms(bookmark, page) {
     const { id } = bookmark;
 
-    const filmsList = await this.getFilms(page, `/favorites/${id}`);
+    const [filmsList] = await Promise.all([
+      this.getFilms(page, `/favorites/${id}`),
+      loadPendingReleaseFilmIds(this),
+    ]);
+
+    filmsList.films = applyPendingReleaseFlags(filmsList.films);
 
     return filmsList;
   },
@@ -693,7 +760,10 @@ const RezkaApi: RezkaApiInterface = {
     if (key === '.b-newest_slider__wrapper') {
       const films: FilmCardInterface[] = [];
 
-      const res = await this.postRequest(path, variables);
+      const [res] = await Promise.all([
+        this.postRequest(path, variables),
+        loadPendingReleaseFilmIds(this),
+      ]);
 
       const root = this.parseContent(`<div>${res}</div>`);
 
@@ -708,7 +778,7 @@ const RezkaApi: RezkaApiInterface = {
       });
 
       return {
-        films,
+        films: applyPendingReleaseFlags(films),
         totalPages: 1,
       };
     }
@@ -717,6 +787,16 @@ const RezkaApi: RezkaApiInterface = {
       ...params,
       key,
     });
+
+    if (menuItem.id === 'soon') {
+      filmsList.films.forEach((film) => {
+        pendingReleaseFilmIds.add(film.id);
+      });
+    } else {
+      await loadPendingReleaseFilmIds(this);
+    }
+
+    filmsList.films = applyPendingReleaseFlags(filmsList.films);
 
     return filmsList;
   },
@@ -825,11 +905,11 @@ const RezkaApi: RezkaApiInterface = {
     return parseFilmsListRoot(content);
   },
 
-  async getFilm(link) {
+  async getFilm(link, options) {
     // the raw response is kept around: the player payload is only reachable by
     // string search (see below), and re-serializing the parsed tree to get it
     // back would rebuild the whole document for nothing
-    const res = await this.getRequest(link, {});
+    const res = await this.getRequest(link, {}, options);
     const root = this.parseContent(res);
 
     // base data
@@ -874,6 +954,30 @@ const RezkaApi: RezkaApiInterface = {
               } as RatingInterface;
             });
 
+            const externalIds = film.ratings.reduce(
+              (ids, rating) => {
+                const parsedIds = parseExternalIdsFromUrl(rating.link);
+
+                if (parsedIds.imdb && !ids.imdb) {
+                  ids.imdb = parsedIds.imdb;
+                }
+
+                if (parsedIds.tmdb && !ids.tmdb) {
+                  ids.tmdb = parsedIds.tmdb;
+                }
+
+                if (parsedIds.kinopoisk && !ids.kinopoisk) {
+                  ids.kinopoisk = parsedIds.kinopoisk;
+                }
+
+                return ids;
+              },
+              {} as NonNullable<FilmInterface['externalIds']>
+            );
+
+            if (externalIds.imdb || externalIds.tmdb || externalIds.kinopoisk) {
+              film.externalIds = externalIds;
+            }
             break;
           case 'Входит в списки':
             film.includedIn = value.childNodes.reduce((acc: InfoListInterface[], node, idx) => {
@@ -1022,15 +1126,9 @@ const RezkaApi: RezkaApiInterface = {
             video,
           });
         } else {
-          const startIndex = stringedDoc.indexOf('initCDNSeriesEvents');
-          let endIndex = stringedDoc.indexOf('{"id"', startIndex);
-          if (endIndex === -1) {
-            endIndex = stringedDoc.indexOf('{"url"', startIndex);
-          }
-          const subString = stringedDoc.substring(startIndex, endIndex);
-
-          film.voices.push({
-            id: subString.split(',')[1].replaceAll(' ', ''),
+          const translatorId = parseSeriesTranslatorId(stringedDoc);
+          if (translatorId) film.voices.push({
+            id: translatorId,
             identifier: '',
             title: '',
             isCamrip: '0',
@@ -1156,6 +1254,27 @@ const RezkaApi: RezkaApiInterface = {
     }
 
     return film;
+  },
+
+  async getFilmRatings(filmId) {
+    const content = await this.postRequest('/engine/ajax/quick_content.php', {
+      id: filmId,
+      is_touch: '1',
+    });
+
+    const root = parseHtml(content);
+
+    if (root.querySelector('.error-code')) {
+      return {};
+    }
+
+    const imdb = Number(root.querySelector('.imdb b')?.rawText);
+    const kinopoisk = Number(root.querySelector('.kp b')?.rawText);
+
+    return {
+      ...(Number.isFinite(imdb) && imdb > 0 ? { imdb } : {}),
+      ...(Number.isFinite(kinopoisk) && kinopoisk > 0 ? { kinopoisk } : {}),
+    };
   },
 
   async getFilmTrailer(filmId) {
@@ -1389,13 +1508,13 @@ const RezkaApi: RezkaApiInterface = {
 
   /** Search */
 
-  async search(query, page) {
+  async search(query, page, options) {
     const root = await this.fetchPage('/search/', {
       do: 'search',
       subaction: 'search',
       q: query,
       page: String(page),
-    });
+    }, options);
 
     return parseFilmsListRoot(root);
   },

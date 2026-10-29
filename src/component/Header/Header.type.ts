@@ -9,4 +9,5 @@ export type HeaderComponentProps = {
   isDeepLink?: boolean;
   /** Overrides the default navigation.goBack() behaviour. */
   onBack?: () => void;
+  disableBackRipple?: boolean;
 };

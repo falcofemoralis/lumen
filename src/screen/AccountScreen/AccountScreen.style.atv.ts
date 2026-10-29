@@ -28,6 +28,8 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     borderColor: colors.icon,
     borderWidth: scale(3),
     borderRadius: scale(99),
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   profileInfoPremium: {
     position: 'absolute',

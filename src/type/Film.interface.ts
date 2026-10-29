@@ -20,9 +20,16 @@ export interface FilmInterface {
 
   // additional data
   originalTitle?: string;
+  libraryId?: string;
+  metadataSourceFilm?: FilmInterface;
+  metadataSourceName?: string;
+  catalogOnly?: boolean;
   releaseDate?: string;
+  year?: number;
   countries?: CollectionItemInterface[];
   genres?: CollectionItemInterface[];
+  studios?: CollectionItemInterface[];
+  authors?: CollectionItemInterface[];
   seriesInfo?: string;
   largePoster?: string;
   ratings?: RatingInterface[]; // type = rating + votes
@@ -49,6 +56,12 @@ export interface FilmInterface {
   lastVoiceId?: string;
   hasVoices: boolean;
   hasSeasons: boolean;
+
+  externalIds?: {
+    imdb?: string;
+    tmdb?: string;
+    kinopoisk?: string;
+  };
 
   // onlyMovie; // voices[0] = {...video} hasSeasons: false hasVoices: false
   // onlyVoices; // voices[0,1,2] = {...}   hasSeasons: false hasVoices: true

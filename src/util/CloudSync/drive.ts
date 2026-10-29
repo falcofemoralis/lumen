@@ -1,0 +1,201 @@
+import {
+  GoogleOneTapSignIn,
+} from 'react-native-nitro-google-signin';
+import {
+  CLOUD_SYNC_FILE_NAME,
+  CLOUD_SYNC_FILE_PREFIX,
+  DriveFile,
+  GOOGLE_DRIVE_APPDATA_SCOPE,
+} from './types';
+
+const DRIVE_API = 'https://www.googleapis.com/drive/v3';
+const DRIVE_UPLOAD_API = 'https://www.googleapis.com/upload/drive/v3';
+
+const getAccessToken = async (): Promise<string> => {
+  const result = await GoogleOneTapSignIn.getTokens();
+
+  if (!result.accessToken) {
+    throw new Error('Google Drive access token is unavailable.');
+  }
+
+  return result.accessToken;
+};
+
+const driveRequest = async (
+  url: string,
+  init: RequestInit = {},
+  retry = true
+): Promise<Response> => {
+  const token = await getAccessToken();
+
+  const response = await fetch(url, {
+    ...init,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      ...(init.body
+        ? { 'Content-Type': 'application/json; charset=utf-8' }
+        : {}),
+      ...(init.headers ?? {}),
+    },
+  });
+
+  if (response.status === 401 && retry) {
+    await GoogleOneTapSignIn.clearCachedAccessToken(token);
+    return driveRequest(url, init, false);
+  }
+
+  if (!response.ok) {
+    const body = await response.text().catch(() => '');
+    throw new Error(
+      `Google Drive request failed (${response.status}): ${body || response.statusText}`
+    );
+  }
+
+  return response;
+};
+
+export const requestGoogleDriveScope = async (): Promise<void> => {
+  const result = await GoogleOneTapSignIn.requestScopes([
+    GOOGLE_DRIVE_APPDATA_SCOPE,
+  ]);
+
+  if (!result?.accessToken) {
+    throw new Error('Google Drive permission was not granted.');
+  }
+};
+
+export const listCloudFiles = async (): Promise<DriveFile[]> => {
+  const query = encodeURIComponent(
+    "'appDataFolder' in parents and trashed=false"
+  );
+
+  const files: DriveFile[] = [];
+  let pageToken: string | null = null;
+
+  do {
+    const pageTokenQuery = pageToken
+      ? `&pageToken=${encodeURIComponent(pageToken)}`
+      : '';
+
+    const response = await driveRequest(
+      `${DRIVE_API}/files?q=${query}&spaces=appDataFolder&fields=nextPageToken,files(id,name,modifiedTime)${pageTokenQuery}`
+    );
+
+    const data = (await response.json()) as {
+      files?: DriveFile[];
+      nextPageToken?: string;
+    };
+
+    files.push(...(data.files ?? []));
+    pageToken = data.nextPageToken ?? null;
+  } while (pageToken);
+
+  return files;
+};
+
+const sortCloudFiles = (files: DriveFile[]): DriveFile[] =>
+  files.sort((a, b) => {
+    const aTime = a.modifiedTime
+      ? Date.parse(a.modifiedTime)
+      : 0;
+    const bTime = b.modifiedTime
+      ? Date.parse(b.modifiedTime)
+      : 0;
+
+    if (aTime !== bTime) {
+      return bTime - aTime;
+    }
+
+    return a.id.localeCompare(b.id);
+  });
+
+export const findCloudFiles = async (
+  fileName: string
+): Promise<DriveFile[]> => {
+  const files = await listCloudFiles();
+
+  return sortCloudFiles(
+    files.filter(file => file.name === fileName)
+  );
+};
+
+export const findCloudSyncFiles = async (): Promise<DriveFile[]> => {
+  const files = await listCloudFiles();
+
+  return sortCloudFiles(
+    files.filter(
+      file =>
+        file.name === CLOUD_SYNC_FILE_NAME ||
+        new RegExp(
+          `^${CLOUD_SYNC_FILE_PREFIX}[a-z0-9-]+\.json$`
+        ).test(file.name)
+    )
+  );
+};
+
+export const getCloudSyncReplicaFileName = (
+  deviceId: string
+): string => `${CLOUD_SYNC_FILE_PREFIX}${deviceId}.json`;
+
+
+export const downloadCloudFile = async <T>(
+  fileId: string
+): Promise<T> => {
+  const response = await driveRequest(
+    `${DRIVE_API}/files/${encodeURIComponent(fileId)}?alt=media`
+  );
+
+  return response.json() as Promise<T>;
+};
+
+export const uploadCloudFile = async <T>(
+  fileName: string,
+  data: T
+): Promise<DriveFile> => {
+  const metadata = JSON.stringify({
+    name: fileName,
+    parents: ['appDataFolder'],
+    mimeType: 'application/json',
+  });
+
+  const boundary = `lumen-${Date.now()}`;
+  const body =
+    `--${boundary}\r\n` +
+    'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
+    `${metadata}\r\n` +
+    `--${boundary}\r\n` +
+    'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
+    `${JSON.stringify(data)}\r\n` +
+    `--${boundary}--`;
+
+  const response = await driveRequest(
+    `${DRIVE_UPLOAD_API}/files?uploadType=multipart&fields=id,name,modifiedTime`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': `multipart/related; boundary=${boundary}`,
+      },
+      body,
+    }
+  );
+
+  return response.json() as Promise<DriveFile>;
+};
+
+export const updateCloudFile = async <T>(
+  fileId: string,
+  data: T
+): Promise<DriveFile> => {
+  const response = await driveRequest(
+    `${DRIVE_UPLOAD_API}/files/${encodeURIComponent(fileId)}?uploadType=media&fields=id,name,modifiedTime`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }
+  );
+
+  return response.json() as Promise<DriveFile>;
+};
+
+
+export const getCloudSyncFileName = (): string => CLOUD_SYNC_FILE_NAME;

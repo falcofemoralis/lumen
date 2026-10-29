@@ -13,11 +13,12 @@ import {
   useEffect,
   useMemo,
 } from 'react';
-import { Dimensions, StyleProp, useColorScheme, useWindowDimensions } from 'react-native';
+import { StyleProp, useColorScheme, useWindowDimensions } from 'react-native';
 import { moderateScale } from 'react-native-size-matters';
 
 import { setImperativeTheming } from './context.utils';
 import { darkTheme, lightTheme } from './theme';
+import { getAccentColor } from './accentColors';
 import type {
   AllowedStylesT,
   ImmutableThemeContextModeT,
@@ -73,7 +74,7 @@ export const ThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = ({
   // The operating system theme:
   const systemColorScheme = useColorScheme();
   // Our saved theme context: can be "light", "dark", or undefined (system theme)
-  const { themeScheme, isConfigured, isTV, setConfig } = useConfigContext();
+  const { themeScheme, isConfigured, isTV, accentColor, setConfig } = useConfigContext();
   const dimensions = useWindowDimensions();
 
   /**
@@ -89,7 +90,7 @@ export const ThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = ({
     [setConfig]
   );
 
-  const tvScale = useMemo(() => (Dimensions.get('screen').width / 960), []);
+  const tvScale = useMemo(() => Math.max(dimensions.height / 540, 1), [dimensions.height]);
 
   const scale = useCallback((number: number) => {
     if (!isConfigured) {
@@ -128,8 +129,12 @@ export const ThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = ({
       ...selected,
       scale,
       dimensions,
+      colors: {
+        ...selected.colors,
+        primary: getAccentColor(accentColor, themeContext),
+      },
     };
-  }, [themeContext, scale, dimensions]);
+  }, [accentColor, themeContext, scale, dimensions]);
 
   useEffect(() => {
     setImperativeTheming(theme);

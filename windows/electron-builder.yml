@@ -1,0 +1,28 @@
+asar: false
+npmRebuild: false
+electronDist: windows/node_modules/electron/dist
+electronVersion: 42.11.12
+appId: com.falcofemoralis.lumen.windows
+productName: Lumen
+directories:
+  output: dist/windows-portable
+files:
+  - windows/*.cjs
+  - windows/lumen.ico
+  - windows/google-desktop-client.json
+  - "!windows/node_modules/**/*"
+  - "!node_modules/**/*"
+  - windows/web/**/*
+  - assets/images/app-icon-all.png
+extraMetadata:
+  main: windows/main.cjs
+  version: 1.6.2
+win:
+  icon: windows/lumen.ico
+  signExecutable: false
+  target:
+    - target: portable
+      arch: [x64]
+  artifactName: Lumen-Windows-x64-Portable.exe
+portable:
+  requestExecutionLevel: user

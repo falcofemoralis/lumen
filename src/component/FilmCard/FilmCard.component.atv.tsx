@@ -1,8 +1,13 @@
+import { posterSeriesInfo } from 'Util/Film/posterStatus';
+import { FilmRating } from 'Component/FilmRating';
+import { BookmarkBadge } from './BookmarkBadge';
 import { ThemedImage } from 'Component/ThemedImage';
 import { ThemedText } from 'Component/ThemedText';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
+import { useShowPendingReleaseBadge } from 'Context/ConfigContext';
 import { t } from 'i18n/translate';
 import Ban from 'lucide-react-native/icons/ban';
+import Timer from 'lucide-react-native/icons/timer';
 import { View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useAppTheme } from 'Theme/context';
@@ -18,19 +23,23 @@ export function FilmCardComponent({
   disableScaleAnimation,
   disableScaleTransition,
   isHidden,
+  isBookmarked,
+  isRatingVisible,
 }: FilmCardComponentProps) {
   const {
     type,
     poster,
     title,
     subtitle,
-    info,
     isPendingRelease,
   } = filmCard;
   const styles = useThemedStyles(componentStyles);
   const { theme, scale } = useAppTheme();
+  const showPendingReleaseBadge = useShowPendingReleaseBadge();
+  const info = posterSeriesInfo(filmCard);
 
-  const renderType = () => (
+
+  const renderType = () => (filmCard.contentTypePending ? null :
     <ThemedText
       style={ [
         styles.typeText,
@@ -65,6 +74,7 @@ export function FilmCardComponent({
         isPendingRelease && styles.posterPendingRelease,
       ] }
       src={ poster }
+      transition={ 0 }
       // Grid cells are recycled constantly while browsing, and the same posters
       // come back the moment focus turns around. Keeping the decoded bitmaps in
       // memory spares a disk read and a decode per card -- the bulk of what it
@@ -72,6 +82,18 @@ export function FilmCardComponent({
       cachePolicy="memory-disk"
     />
   );
+
+  const renderPendingReleaseBadge = () => {
+    if (!isPendingRelease || !showPendingReleaseBadge) {
+      return null;
+    }
+
+    return (
+      <View style={ styles.pendingReleaseBadge }>
+        <Timer size={ scale(18) } color={ theme.colors.textOnContrast } />
+      </View>
+    );
+  };
 
   const renderAdditionContainer = () => (
     <View style={ styles.additionContainer }>
@@ -147,7 +169,10 @@ export function FilmCardComponent({
         ] }
       >
         { renderPoster() }
+        <BookmarkBadge visible={ isBookmarked } />
+        <FilmRating filmId={ filmCard.id } ratings={ filmCard.ratings } ratingSourceType={ filmCard.ratingSourceType } ratingFilmId={ filmCard.ratingFilmId } isVisible={ isRatingVisible } />
         { renderAdditionContainer() }
+        { renderPendingReleaseBadge() }
       </View>
       <View
         style={ [
@@ -163,3 +188,5 @@ export function FilmCardComponent({
 }
 
 export default FilmCardComponent;
+
+

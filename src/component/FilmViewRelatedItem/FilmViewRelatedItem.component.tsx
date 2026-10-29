@@ -32,7 +32,4 @@ export function FilmViewRelatedItemComponent({
   );
 }
 
-export default memo(
-  FilmViewRelatedItemComponent,
-  (prevProps, nextProps) => prevProps.item.id === nextProps.item.id
-);
+export default memo(FilmViewRelatedItemComponent);

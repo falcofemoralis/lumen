@@ -1,8 +1,8 @@
 import { useNavigation } from '@react-navigation/native';
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { useFilmPager } from 'Component/FilmPager/useFilmPager';
+import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
+import { FilmPagerQueryData, useFilmPager } from 'Component/FilmPager/useFilmPager';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
-import { useIsTV } from 'Context/ConfigContext';
+import { useConfigContext, useIsTV } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import {
   ExpoSpeechRecognitionModule,
@@ -17,6 +17,27 @@ import { safeJsonParse } from 'Util/Json';
 import { setTimeoutSafe } from 'Util/Misc';
 import { navigate } from 'Util/Navigation';
 import { queryKeys, STALE_TIME } from 'Util/Query';
+import { unifiedSearchService, ContentSource } from '../../source';
+import { ContentFilters, getSearchGenreOptions, getGenreCatalogPaths, getZonaFilteredCatalogPaths, matchesContentFilters } from '../../source/search/ContentFilters';
+import { FilmType } from 'Type/FilmType.type';
+import { TYPE_LABELS } from 'Component/FilmCard/FilmCard.config';
+import { isSourceEnabled } from '../../source/types/SourceSelection';
+
+const formatType = (name: string): FilmType | undefined => {
+  const category = name.toLowerCase();
+  return category.includes('дунхуа') ? FilmType.DONGHUA : category.includes('аниме') ? FilmType.ANIME
+    : category.includes('мульт') ? FilmType.CARTOON : category.includes('сериал') ? FilmType.SERIES
+      : category.includes('фильм') ? FilmType.FILM : undefined;
+};
+const combineCatalogs = async (loads: (() => Promise<{ films: import('Type/FilmCard.interface').FilmCardInterface[]; totalPages: number }>)[]) => {
+  const results = await Promise.allSettled(loads.map(load => load()));
+  const successful = results.flatMap(result => result.status === 'fulfilled' ? [result.value] : []);
+  if (results.length && !successful.length) throw (results[0] as PromiseRejectedResult).reason;
+  return { films: successful.flatMap(result => result.films), totalPages: Math.max(1, ...successful.map(result => result.totalPages)) };
+};
+import { subtitleFromFilm } from 'Util/Film/subtitle';
+import { t } from 'i18n/translate';
+import { FILM_COUNTRY_OPTIONS } from '../SettingsScreen/SettingsScreen.config';
 import { openCategory } from 'Util/Router';
 import { storage } from 'Util/Storage';
 import { consumeTvSearchRequest, subscribeToTvSearchRequests } from 'Util/TvSearch/request';
@@ -31,6 +52,7 @@ const loadUserSuggestions = (): string[] => (
 
 export function SearchScreenContainer() {
   const isTV = useIsTV();
+  const { enabledSources, zonaShowAdult } = useConfigContext();
   // a search handed to the app from outside (the Android TV search box) is waiting by
   // the time this mounts, since opening the screen is how it got here
   const [query, setQuery] = useState(consumeTvSearchRequest);
@@ -44,25 +66,76 @@ export function SearchScreenContainer() {
   const debounce = useRef<number | null>(null);
   const { currentService } = useServiceContext();
   const searchMenuItems = useMemo(() => [SEARCH_MENU_ITEM], []);
+  const queryClient = useQueryClient();
+  const [yearFrom, setYearFrom] = useState('');
+  const [selectedFormats, setSelectedFormats] = useState<string[]>([]);
+  const [yearTo, setYearTo] = useState('');
+  const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
+  const [allowedCountries, setAllowedCountries] = useState(FILM_COUNTRY_OPTIONS.map((country) => country.value));
+  const [activeFilters, setActiveFilters] = useState<(ContentFilters & {
+    query: string; paths: string[]; zonaPaths: string[];
+  }) | null>(null);
+  const resultKey = (activeFilters ? 'filters:' + JSON.stringify(activeFilters) : query) + ':sources:' + enabledSources.join(',');
 
   const { pagerItems, isLoading, onPreLoad, onNextLoad } = useFilmPager({
-    queryKey: queryKeys.films.search(query),
+    queryKey: [...queryKeys.films.search(resultKey), zonaShowAdult],
     menuItems: searchMenuItems,
-    fetchFilms: (_menuItem, page) => currentService.search(query, page),
-    enabled: !!query,
+    fetchFilms: (menuItem, page, sort) => unifiedSearchService.search(activeFilters ? resultKey : query, page, (updates) => {
+      if (!updates.length) return;
+      queryClient.setQueryData<FilmPagerQueryData>(
+        [...queryKeys.films.search(resultKey), menuItem.id, sort ?? null],
+        (previous) => previous ? {
+          ...previous,
+          films: previous.films.map((card) => (
+            updates.find((update) => update.previousLink === card.link)?.card ?? card
+          )),
+        } : previous,
+      );
+    }, activeFilters ? {
+      loadSource: (adapter, sourcePage) => activeFilters.allowedCountries?.length === 0
+        ? Promise.resolve({ films: [], totalPages: 1 })
+        : activeFilters.query
+        ? adapter.search(activeFilters.query, sourcePage)
+        : adapter.source === ContentSource.ZONA
+          ? combineCatalogs(activeFilters.zonaPaths.map(path => () => adapter.getFilms!(path, sourcePage)))
+          : adapter.source === ContentSource.ANIXART
+            ? (activeFilters.types?.length && !activeFilters.types.some(type => [FilmType.ANIME, FilmType.DONGHUA].includes(type))
+              ? Promise.resolve({ films: [], totalPages: 1 })
+              : adapter.getFilms!('https://anixart-app.com/catalog' + (activeFilters.types?.length === 1 ? '?country=' + encodeURIComponent(activeFilters.types[0] === FilmType.DONGHUA ? 'Китай' : 'Япония') : ''), sourcePage))
+          : combineCatalogs(activeFilters.paths.map(path => () => currentService.getFilms(sourcePage, path, {}))),
+      prepareCard: async (card, adapter) => {
+        const film = await adapter.getFilm(card.link, { deferSeriesInfo: true });
+        if (!film || !matchesContentFilters(film, activeFilters)) return null;
+        return {
+          ...card, type: film.type, originalTitle: film.originalTitle,
+          externalIds: film.externalIds, subtitle: subtitleFromFilm(film) || card.subtitle,
+          ratings: { ...card.ratings, ...Object.fromEntries((film.ratings ?? []).flatMap((rating) =>
+            rating.name === 'IMDb' ? [['imdb', rating.rating]]
+              : rating.name === 'Кинопоиск' ? [['kinopoisk', rating.rating]] : [])) },
+          info: film.seriesInfo ?? card.info,
+        };
+      },
+    } : undefined, (partial) => {
+      queryClient.setQueryData<FilmPagerQueryData>(
+        [...queryKeys.films.search(resultKey), menuItem.id, sort ?? null],
+        { films: partial.films, currentPage: 1, totalPages: 1 },
+      );
+    }),
+    enabled: !!query || !!activeFilters,
   });
   const confirmationOverlayRef = useRef<ThemedOverlayRef>(null);
 
   const additionalContentOverlayRef = useRef<ThemedOverlayRef>(null);
   const [isAdditionalContentRequested, setIsAdditionalContentRequested] = useState(false);
   const [selectedCategoryName, setSelectedCategoryName] = useState<string | null>(null);
-  const [pickedGenre, setPickedGenre] = useState<string | null>(null);
-  const [pickedYear, setPickedYear] = useState<string | null>(null);
+
 
   const { data: remoteSuggestions } = useQuery({
     queryKey: queryKeys.search.suggestions(suggestionQuery),
     queryFn: () => currentService.searchSuggestions(suggestionQuery),
-    enabled: !!suggestionQuery,
+    enabled: !!suggestionQuery && isSourceEnabled(ContentSource.REZKA),
+    retry: false,
+    meta: { silent: true },
     // keep the previous list visible while the next one is in flight
     placeholderData: keepPreviousData,
     staleTime: STALE_TIME.MEDIUM,
@@ -70,14 +143,18 @@ export function SearchScreenContainer() {
 
   const { data: categories = null, isLoading: isCategoriesLoading } = useQuery({
     queryKey: queryKeys.search.additionalContent(),
-    queryFn: () => currentService.loadAdditionalContent(),
+    queryFn: () => (isSourceEnabled(ContentSource.REZKA) ? currentService.loadAdditionalContent() : Promise.reject(new Error('HDRezka disabled'))).catch(() => [
+      { name: 'Фильмы', genres: [{ name: 'Все жанры', value: '/films/' }], years: [] },
+      { name: 'Сериалы', genres: [{ name: 'Все жанры', value: '/series/' }], years: [] },
+      { name: 'Мультфильмы', genres: [{ name: 'Все жанры', value: '/cartoons/' }], years: [] },
+      { name: 'Аниме', genres: [{ name: 'Все жанры', value: '/animation/' }], years: [] },
+    ]).then((items) => [...items, { name: 'Дунхуа', genres: items.find((item) => /аниме/i.test(item.name))?.genres ?? [{ name: 'Все жанры', value: '/animation/' }], years: [] }]),
     // the overlay is what triggers the (one time) load
     enabled: isAdditionalContentRequested,
     staleTime: Infinity,
   });
 
-  // the pickers default to the first category and its first genre/year, so the
-  // selection is derived rather than seeded once the content arrives
+  // Derive the default category when its options arrive.
   const selectedCategory = useMemo(() => {
     if (!categories?.length) {
       return null;
@@ -86,8 +163,11 @@ export function SearchScreenContainer() {
     return categories.find(({ name }) => name === selectedCategoryName) ?? categories[0];
   }, [categories, selectedCategoryName]);
 
-  const selectedGenre = pickedGenre ?? selectedCategory?.genres[0]?.value ?? null;
-  const selectedYear = pickedYear ?? selectedCategory?.years[0]?.value ?? null;
+  const formatOptions = [FilmType.FILM, FilmType.SERIES, FilmType.CARTOON, FilmType.ANIME, FilmType.DONGHUA]
+    .map(type => ({ value: type, label: t(TYPE_LABELS[type]) }));
+  const genreOptions = useMemo(() => getSearchGenreOptions((categories ?? [])
+    .filter(category => !selectedFormats.length || selectedFormats.includes(formatType(category.name) ?? ''))
+    .flatMap(category => category.genres)), [categories, selectedFormats]);
 
   useEffect(() => () => {
     if (debounce.current) {
@@ -116,6 +196,7 @@ export function SearchScreenContainer() {
   };
 
   const onApplySuggestion = async (q: string) => {
+    setActiveFilters(null);
     if (!q) {
       return;
     }
@@ -179,6 +260,7 @@ export function SearchScreenContainer() {
   };
 
   const resetSearch = () => {
+    setActiveFilters(null);
     // clearing the query changes the films query key, so the shown films reset automatically
     if (query) {
       setQuery('');
@@ -223,27 +305,35 @@ export function SearchScreenContainer() {
 
   const handleSelectCategory = (cat: SearchableCategoryInterface) => {
     setSelectedCategoryName(cat.name);
-    // clearing the picks falls back to the new category's first genre/year
-    setPickedGenre(null);
-    setPickedYear(null);
+    setSelectedGenres([]);
   };
 
   const handleApplyAdditionalContent = () => {
-    additionalContentOverlayRef.current?.close();
-
-    let url = '';
-
-    if (selectedYear === '-1') {
-      url = (selectedGenre ?? '').replace('/best', '');
-    } else if (selectedYear === '0') {
-      url = selectedGenre ?? '';
-    } else {
-      url = `${selectedGenre}${selectedYear}`;
+    if (yearFrom && yearTo && Number(yearFrom) > Number(yearTo)) {
+      NotificationStore.displayMessage(t('The start year must not exceed the end year'));
+      return;
     }
+    const types = selectedFormats as FilmType[];
+    const selectedCategories = (categories ?? []).filter(category => !types.length || types.includes(formatType(category.name)!));
+    const paths = Array.from(new Set(selectedCategories.flatMap(category => getGenreCatalogPaths(category.genres, selectedGenres))));
+    const zonaPaths = !types.length ? ['https://w1.zona.im/movies', 'https://w1.zona.im/tvseries']
+      : Array.from(new Set(types.flatMap(type => type === FilmType.SERIES ? ['https://w1.zona.im/tvseries']
+        : type === FilmType.CARTOON ? ['https://w1.zona.im/movies/filter/genre-multfilm', 'https://w1.zona.im/tvseries/filter/genre-multfilm']
+          : [FilmType.ANIME, FilmType.DONGHUA].includes(type) ? ['https://w1.zona.im/movies/filter/genre-anime', 'https://w1.zona.im/tvseries/filter/genre-anime']
+            : ['https://w1.zona.im/movies'])));
 
-    openCategory(url, navigation);
+    setActiveFilters({
+      query: enteredText.trim(),
+      paths, zonaPaths: getZonaFilteredCatalogPaths(zonaPaths, { from: yearFrom ? Number(yearFrom) : undefined, to: yearTo ? Number(yearTo) : undefined, genres: selectedGenres }),
+      from: yearFrom ? Number(yearFrom) : undefined,
+      to: yearTo ? Number(yearTo) : undefined,
+      types, genres: selectedGenres,
+      includedCountries: [],
+      allowedCountries: allowedCountries.length === FILM_COUNTRY_OPTIONS.length ? undefined : allowedCountries,
+      excludedCountries: FILM_COUNTRY_OPTIONS.filter((country) => !allowedCountries.includes(country.value)).map((country) => country.value),
+    });
+    additionalContentOverlayRef.current?.close();
   };
-
   const handleOpenCollections = () => {
     navigate(COLLECTION_SCREEN);
   };
@@ -282,24 +372,26 @@ export function SearchScreenContainer() {
   };
 
   const containerProps = {
+    selectedFormats, formatOptions, setSelectedFormats, yearFrom, yearTo, selectedGenres, genreOptions, allowedCountries,
+    countryOptions: FILM_COUNTRY_OPTIONS,
+    setYearFrom, setYearTo, setSelectedGenres, setAllowedCountries,
+    filtersApplied: Boolean(activeFilters),
     suggestions,
     pagerItems,
-    query,
+    query: activeFilters ? resultKey : query,
     recognizing,
     enteredText,
     isLoading,
     additionalContentOverlayRef,
     categories,
     selectedCategory,
-    selectedGenre,
-    selectedYear,
+
     isCategoriesLoading,
     confirmationOverlayRef,
     handleApplyAdditionalContent,
     handleOpenCollections,
     setSelectedCategory: handleSelectCategory,
-    setSelectedGenre: setPickedGenre,
-    setSelectedYear: setPickedYear,
+
     onChangeText,
     onApplySearch,
     onApplySuggestion,

@@ -2,6 +2,7 @@ import { FilmInterface } from 'Type/Film.interface';
 import { LocalCommentInterface } from 'Type/LocalComment.interface';
 import { uuid } from 'Util/Download';
 import { storage } from 'Util/Storage';
+import { mutateCloudSync } from 'Util/CloudSync';
 
 import { parseCommentsList, prependComment, removeComment } from './logic';
 
@@ -19,6 +20,10 @@ const saveLocalComments = (items: LocalCommentInterface[]) => {
   getCommentsStorage().save(LOCAL_COMMENTS_KEY, items);
 };
 
+export const replaceLocalComments = (items: LocalCommentInterface[]): void => {
+  saveLocalComments(items);
+};
+
 /**
  * Records a comment the user has just posted. Called after the service accepted
  * it, so the list only ever holds comments that actually went through.
@@ -30,7 +35,7 @@ export const addLocalComment = (
 ) => {
   const createdAt = Date.now();
 
-  saveLocalComments(prependComment(getLocalComments(), {
+  const comment: LocalCommentInterface = {
     // `uuid` is short enough to repeat, the timestamp keeps the pair unique
     id: `${createdAt}-${uuid()}`,
     filmId: film.id,
@@ -40,9 +45,24 @@ export const addLocalComment = (
     text,
     replyToUsername,
     createdAt,
-  }));
+  };
+
+  saveLocalComments(prependComment(getLocalComments(), comment));
+
+  mutateCloudSync({
+    entity: 'comment',
+    id: comment.id,
+    value: comment,
+    updatedAt: comment.createdAt,
+  });
 };
 
 export const removeLocalComment = (commentId: string) => {
   saveLocalComments(removeComment(getLocalComments(), commentId));
+
+  mutateCloudSync({
+    entity: 'comment',
+    id: commentId,
+    deleted: true,
+  });
 };

@@ -1,4 +1,8 @@
 import { Page } from 'Component/Page';
+import { ThemedOverlay } from 'Component/ThemedOverlay';
+import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
+import { ThemedButton } from 'Component/ThemedButton';
+import { ThemedText } from 'Component/ThemedText';
 import { getAspectRatio } from 'Component/Player/Player.config';
 import { SettingBase } from 'Component/SettingBase';
 import { SettingCustomSelect } from 'Component/SettingCustomSelect';
@@ -6,18 +10,23 @@ import { SettingExport } from 'Component/SettingExport';
 import { SettingImport } from 'Component/SettingImport';
 import { SettingInput } from 'Component/SettingInput';
 import { SettingLink } from 'Component/SettingLink';
+import { NavigationOrderSetting } from 'Component/NavigationOrderSetting';
+import { getMobileNavigationOrderItems, getTVNavigationOrderItems, getBroadcastOrderItems } from '../../config/NavigationOrderOptions';
 import { SettingMultiSelect } from 'Component/SettingMultiSelect';
 import { SettingSelect } from 'Component/SettingSelect';
 import { SettingSwitch } from 'Component/SettingSwitch';
 import { SettingText } from 'Component/SettingText';
 import { ThemedScrollView } from 'Component/ThemedScrollView';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
+import { useCloudSyncContext } from 'Context/CloudSyncContext';
+import { normalizeAccentColor } from 'Theme/accentColors';
 import { t } from 'i18n/translate';
 import ALargeSmall from 'lucide-react-native/icons/a-large-small';
 import AlignVerticalJustifyEnd from 'lucide-react-native/icons/align-vertical-justify-end';
 import ArrowDown10 from 'lucide-react-native/icons/arrow-down-1-0';
 import ArrowDownUp from 'lucide-react-native/icons/arrow-down-up';
 import ArrowRight from 'lucide-react-native/icons/arrow-right';
+import ArrowUp from 'lucide-react-native/icons/arrow-up';
 import AudioLines from 'lucide-react-native/icons/audio-lines';
 import Blend from 'lucide-react-native/icons/blend';
 import BookImage from 'lucide-react-native/icons/book-image';
@@ -33,6 +42,9 @@ import Columns2 from 'lucide-react-native/icons/columns-2';
 import DatabaseBackup from 'lucide-react-native/icons/database-backup';
 import Dock from 'lucide-react-native/icons/dock';
 import Download from 'lucide-react-native/icons/download';
+import ListVideo from 'lucide-react-native/icons/list-video';
+import Layers from 'lucide-react-native/icons/layers';
+import MoveVertical from 'lucide-react-native/icons/move-vertical';
 import ExternalLink from 'lucide-react-native/icons/external-link';
 import EyeOff from 'lucide-react-native/icons/eye-off';
 import FastForward from 'lucide-react-native/icons/fast-forward';
@@ -52,16 +64,16 @@ import Loader from 'lucide-react-native/icons/loader';
 import LoaderCircle from 'lucide-react-native/icons/loader-circle';
 import Maximize2 from 'lucide-react-native/icons/maximize-2';
 import MessageSquarePlus from 'lucide-react-native/icons/message-square-plus';
-import MonitorCog from 'lucide-react-native/icons/monitor-cog';
 import MonitorPlay from 'lucide-react-native/icons/monitor-play';
 import MonitorUp from 'lucide-react-native/icons/monitor-up';
 import MoveRight from 'lucide-react-native/icons/move-right';
 import PaintBucket from 'lucide-react-native/icons/paint-bucket';
 import Palette from 'lucide-react-native/icons/palette';
+import MonitorCog from 'lucide-react-native/icons/monitor-cog';
 import Pin from 'lucide-react-native/icons/pin';
 import RefreshCw from 'lucide-react-native/icons/refresh-cw';
 import Rewind from 'lucide-react-native/icons/rewind';
-import Route from 'lucide-react-native/icons/route';
+
 import Rows3 from 'lucide-react-native/icons/rows-3';
 import Search from 'lucide-react-native/icons/search';
 import Settings2 from 'lucide-react-native/icons/settings-2';
@@ -73,9 +85,10 @@ import Tag from 'lucide-react-native/icons/tag';
 import Timer from 'lucide-react-native/icons/timer';
 import TvMinimalPlay from 'lucide-react-native/icons/tv-minimal-play';
 import UserCog from 'lucide-react-native/icons/user-cog';
+import UserRound from 'lucide-react-native/icons/user-round';
 import Users from 'lucide-react-native/icons/users';
 import { reactNativeDownloads } from 'Modules/react-native-downloads';
-import { useCallback, useDeferredValue, useState } from 'react';
+import { useCallback, useDeferredValue, useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { GithubIcon, TelegramIcon } from 'Theme/icons';
 import { openLinkInBrowser } from 'Util/Link';
@@ -83,6 +96,7 @@ import { openLinkInBrowser } from 'Util/Link';
 import {
   APP_LANGUAGE_OPTIONS,
   COLUMNS_TV_OPTIONS,
+  TAB_POSITION_OPTIONS,
   FILM_COUNTRY_OPTIONS,
   GITHUB_LINK,
   PLAYER_ASPECT_RATIO_OPTIONS,
@@ -98,19 +112,37 @@ import {
   PLAYER_SUBTITLES_SIZE_OPTIONS,
   PLAYER_VOLUME_NORMALIZATION_OPTIONS,
   TELEGRAM_LINK,
+  MOBILE_NAVIGATION_OPTIONS,
+  TV_NAVIGATION_OPTIONS,
+  SCROLL_TOP_BUTTON_CORNER_TV_OPTIONS,
   THEME_SCHEME_OPTIONS,
-  TV_SCREENS,
+
 } from './SettingsScreen.config';
 import { handOverGroup, takeHandedOverGroup } from './SettingsScreen.reload';
 import { componentStyles } from './SettingsScreen.style.atv';
 import { SETTING_GROUP, SettingsScreenComponentProps } from './SettingsScreen.type';
 
 export function SettingsScreenComponent({
-  initialRoute,
+
+  showRatings,
+  showAccountAvatar,
   homeDefaultTab,
+  homeTabOrder,
+  hiddenHomeTabs,
+  broadcastTabOrder,
+  hiddenBroadcastTabs,
+  broadcastDisplayMode,
+  zonaShowAdult,
+  showEpisodeUpdateCount,
+  homeDisplayMode,
+  bookmarksDisplayMode,
+  recentDisplayMode,
+  recentTabsInterface,
+  tvTabPosition,
   numberOfColumnsTV,
   recentTwoColumnsTV,
   hiddenCountries,
+  enabledSources,
   playerRewindSeconds,
   playerBackwardRewindSeconds,
   playerShowBufferTime,
@@ -135,11 +167,14 @@ export function SettingsScreenComponent({
   playerAutoNextEpisode,
   playerKeepTimeOnVoiceChange,
   sortVoicesByRating,
+  scrollToTopButtonCornerTV,
   playerBufferTimeSetting,
   playerBackBufferTimeSetting,
   checkForUpdates,
   playerSaveQuality,
   playerAskQuality,
+  playerCompactSelector,
+  hidePremiumVoices,
   strictConnectionCheck,
   playerDefaultAspectRatio,
   playerDefaultSpeed,
@@ -147,6 +182,7 @@ export function SettingsScreenComponent({
   isLocalLibrary,
   commentPostingTV,
   showVotesCount,
+  showBookmarkCounts,
   showRecommendations,
   showAgeRating,
   tvChannelsEnabled,
@@ -160,6 +196,12 @@ export function SettingsScreenComponent({
   isVolumeNormalizationSupported,
   theme,
   themeScheme,
+  isTV,
+  accentColor,
+  tvNavigationOrder,
+  hiddenTVNavigationTabs,
+  mobileNavigationOrder,
+  hiddenMobileNavigationTabs,
   appLanguage,
   playerQuality,
   officialMode,
@@ -178,6 +220,7 @@ export function SettingsScreenComponent({
   playerStopPlayShowInterfaceTV,
   appVersion,
   onConfigUpdate,
+  onResetChallengeCookies,
   onLanguageChange,
   onThemeSchemeChange,
   onLocalLibraryChange,
@@ -191,9 +234,24 @@ export function SettingsScreenComponent({
   onTvChannelsAddToHome,
 }: SettingsScreenComponentProps) {
   const styles = useThemedStyles(componentStyles);
+  const {
+    connected: cloudSyncConnected,
+    email: cloudSyncEmail,
+    lastSyncAt: cloudSyncLastSyncAt,
+    lastError: cloudSyncLastError,
+    syncing: cloudSyncSyncing,
+    connect: connectCloudSync,
+    disconnect: disconnectCloudSync,
+    syncNow: syncCloudSync,
+  } = useCloudSyncContext();
   const [currentGroup, setCurrentGroup] = useState<SETTING_GROUP>(
     () => takeHandedOverGroup() ?? SETTING_GROUP.APPEARANCE
   );
+  const [navigationOrderEditor, setNavigationOrderEditor] = useState<'tv' | 'mobile' | 'home' | 'broadcast' | null>(null);
+  const navigationOrderOverlayRef = useRef<ThemedOverlayRef>(null);
+  useEffect(() => {
+    if (navigationOrderEditor) navigationOrderOverlayRef.current?.open();
+  }, [navigationOrderEditor]);
 
   /**
    * The group switches on FOCUS, so every D-Pad move in the menu swaps the whole
@@ -259,8 +317,37 @@ export function SettingsScreenComponent({
     </ThemedScrollView>
   );
 
+  const onAccentColorInput = async (value: string) => {
+    const normalized = normalizeAccentColor(value.startsWith('#') ? value : '#' + value);
+
+    if (!normalized) {
+      return false;
+    }
+
+    onConfigUpdate('accentColor', normalized);
+    return true;
+  };
+
   const renderAppearance = () => (
     <ThemedScrollView>
+      <SettingSwitch
+        title={ t('Show Downloads icon') }
+        subtitle={ t('Show the Downloads icon in the navigation bar.') }
+        IconComponent={ Download }
+        value={ !(isTV ? hiddenTVNavigationTabs : hiddenMobileNavigationTabs).includes('Downloads') }
+        onChange={ (value) => {
+          const key = isTV ? 'hiddenTVNavigationTabs' : 'hiddenMobileNavigationTabs';
+          const hidden = isTV ? hiddenTVNavigationTabs : hiddenMobileNavigationTabs;
+          onConfigUpdate(key, value ? hidden.filter(item => item !== 'Downloads') : [...new Set([...hidden, 'Downloads'])]);
+        } }
+      />
+      <SettingSwitch
+        title={ t('Recent tabs interface') }
+        subtitle={ t('Show Continue watching, Episode updates and Downloads as tabs.') }
+        IconComponent={ Layers }
+        value={ recentTabsInterface }
+        onChange={ (value) => onConfigUpdate('recentTabsInterface', value) }
+      />
       <SettingSelect
         title={ t('Theme scheme') }
         IconComponent={ Brush }
@@ -269,25 +356,102 @@ export function SettingsScreenComponent({
         onChange={ onThemeSchemeChange }
       />
       <SettingSelect
+        title={ t('Interface mode') }
+        IconComponent={ TvMinimalPlay }
+        value={ isTV ? 'tv' : 'mobile' }
+        options={ [
+          { value: 'mobile', label: t('Mobile Version') },
+          { value: 'tv', label: t('TV Version') },
+        ] }
+        onChange={ (value) => onConfigUpdate('isTV', value === 'tv') }
+      />
+      <SettingSelect
+        title={ t('Accent color') }
+        IconComponent={ Palette }
+        value={ accentColor.startsWith('#') ? 'custom' : accentColor }
+        options={ [
+          { value: 'default', label: t('Default') },
+          { value: 'blue', label: t('Blue') },
+          { value: 'green', label: t('Green') },
+          { value: 'purple', label: t('Purple') },
+          { value: 'orange', label: t('Orange') },
+          { value: 'red', label: t('Red') },
+          { value: 'custom', label: t('Custom') },
+        ] }
+        customValue={ accentColor.startsWith('#') ? accentColor : '' }
+        customInputTitle={ t('Custom') }
+        onChange={ (value) => value === 'custom'
+          ? onConfigUpdate('accentColor', accentColor.startsWith('#') ? accentColor : '#')
+          : onConfigUpdate('accentColor', value) }
+        onCustomChange={ onAccentColorInput }
+      />
+      { isTV && (
+        <SettingBase
+          title={ t('TV navigation order') }
+          IconComponent={ TvMinimalPlay }
+          onPress={ () => setNavigationOrderEditor('tv') }
+        />
+      ) }
+      { !isTV && (
+        <SettingBase
+          title={ t('Mobile navigation order') }
+          IconComponent={ Dock }
+          onPress={ () => setNavigationOrderEditor('mobile') }
+        />
+      ) }
+      <SettingSelect
         title={ t('Interface language') }
         IconComponent={ Globe }
         value={ appLanguage }
         options={ APP_LANGUAGE_OPTIONS }
         onChange={ handleLanguageChange }
       />
-      <SettingSelect
-        title={ t('Initial route') }
-        IconComponent={ Route }
-        value={ initialRoute }
-        options={ TV_SCREENS }
-        onChange={ (value) => onConfigUpdate('initialRoute', value) }
+
+      <SettingBase
+        title={ t('TV and radio tab order') }
+        IconComponent={ ListVideo }
+        onPress={ () => setNavigationOrderEditor('broadcast') }
       />
       <SettingSelect
+        title={ t('TV and radio display mode') }
+        IconComponent={ ListVideo }
+        value={ broadcastDisplayMode }
+        options={ [{ value: 'grid', label: t('Grid') }, { value: 'list', label: t('List') }] }
+        onChange={ value => onConfigUpdate('broadcastDisplayMode', value) }
+      />
+      <SettingSwitch
+        title={ t('Show adult Zona content') }
+        subtitle={ t('Include 18+ titles and channels from Zona.') }
+        IconComponent={ ListVideo }
+        value={ zonaShowAdult }
+        onChange={ value => onConfigUpdate('zonaShowAdult', value) }
+      />
+      <SettingBase
         title={ t('Default home tab') }
+        subtitle="Измените порядок и видимость вкладок. Первая видимая вкладка открывается при запуске."
         IconComponent={ House }
-        value={ homeDefaultTab || homeMenuOptions[0]?.value || '' }
-        options={ homeMenuOptions }
-        onChange={ (value) => onConfigUpdate('homeDefaultTab', value) }
+        onPress={ () => setNavigationOrderEditor('home') }
+      />
+      <SettingSelect
+        title={ t('Tab position') }
+        IconComponent={ MoveVertical }
+        value={ tvTabPosition }
+        options={ TAB_POSITION_OPTIONS }
+        onChange={ (value) => onConfigUpdate('tvTabPosition', value) }
+      />
+      <SettingSwitch
+        title={ t('Show ratings') }
+        subtitle={ t('Show movie ratings on posters.') }
+        IconComponent={ Tag }
+        value={ showRatings }
+        onChange={ (value) => onConfigUpdate('showRatings', value) }
+      />
+      <SettingSwitch
+        title={ t('Show account avatar') }
+        subtitle={ t('Show your account avatar instead of the account icon.') }
+        IconComponent={ UserRound }
+        value={ showAccountAvatar }
+        onChange={ (value) => onConfigUpdate('showAccountAvatar', value) }
       />
       <SettingSelect
         title={ t('Columns in list') }
@@ -295,6 +459,44 @@ export function SettingsScreenComponent({
         value={ numberOfColumnsTV.toString() }
         options={ COLUMNS_TV_OPTIONS }
         onChange={ (value) => onConfigUpdate('numberOfColumnsTV', Number(value)) }
+      />
+      <SettingSelect
+        title={ t('Home display mode') }
+        IconComponent={ Grid3x2 }
+        value={ homeDisplayMode }
+        options={ [
+          { value: 'grid', label: t('Grid') },
+          { value: 'list', label: t('List') },
+        ] }
+        onChange={ (value) => onConfigUpdate('homeDisplayMode', value) }
+      />
+      <SettingSelect
+        title={ t('Bookmarks display mode') }
+        IconComponent={ Grid3x2 }
+        value={ bookmarksDisplayMode }
+        options={ [
+          { value: 'grid', label: t('Grid') },
+          { value: 'list', label: t('List') },
+        ] }
+        onChange={ (value) => onConfigUpdate('bookmarksDisplayMode', value) }
+      />
+      <SettingSelect
+        title={ t('Recent display mode') }
+        IconComponent={ Grid3x2 }
+        value={ recentDisplayMode }
+        options={ [
+          { value: 'grid', label: t('Grid') },
+          { value: 'list', label: t('List') },
+        ] }
+        onChange={ (value) => onConfigUpdate('recentDisplayMode', value) }
+      />
+      <SettingMultiSelect
+        title={ t('Content sources') }
+        subtitle={ t('Checked sources are used in catalogs, search and bookmark updates.') }
+        IconComponent={ Layers }
+        values={ enabledSources }
+        options={ [{ value: 'ZONA', label: 'Zona' }, { value: 'REZKA', label: 'HDRezka' }, { value: 'ANIXART', label: 'Anixart' }] }
+        onChange={ values => onConfigUpdate('enabledSources', values) }
       />
       <SettingMultiSelect
         title={ t('Hidden countries') }
@@ -346,6 +548,20 @@ export function SettingsScreenComponent({
         IconComponent={ Users }
         value={ showVotesCount }
         onChange={ (value) => onConfigUpdate('showVotesCount', value) }
+      />
+      <SettingSwitch
+        title="Количество обновлений серий"
+        subtitle="Показывать число обновлений в скобках рядом с вкладкой «Обновление серий» в новом мобильном интерфейсе."
+        IconComponent={ CalendarDays }
+        value={ showEpisodeUpdateCount }
+        onChange={ (value) => onConfigUpdate('showEpisodeUpdateCount', value) }
+      />
+      <SettingSwitch
+        title={ t('Show bookmark counts') }
+        subtitle={ t('Show the number of films in each bookmark category.') }
+        IconComponent={ Users }
+        value={ showBookmarkCounts }
+        onChange={ (value) => onConfigUpdate('showBookmarkCounts', value) }
       />
       <SettingSwitch
         title={ t('Recommendations') }
@@ -400,12 +616,47 @@ export function SettingsScreenComponent({
         isHidden={ !isTvSearchSupported }
         onChange={ (value) => onConfigUpdate('tvSearchEnabled', value) }
       />
+      <SettingSelect
+        title={ t('Scroll to top button') }
+        subtitle={ t('Corner of the screen the floating scroll-to-top button appears in.') }
+        IconComponent={ ArrowUp }
+        value={ scrollToTopButtonCornerTV }
+        options={ SCROLL_TOP_BUTTON_CORNER_TV_OPTIONS }
+        onChange={ (value) => onConfigUpdate('scrollToTopButtonCornerTV', value) }
+      />
     </ThemedScrollView>
   );
 
   const renderNetwork = () => (
     <ThemedScrollView>
-      <SettingSwitch
+      <SettingBase
+      title={ t('Google Drive sync') }
+      subtitle={
+        cloudSyncConnected
+          ? cloudSyncEmail
+            ? `Connected as ${cloudSyncEmail}`
+            : t('Google account connected')
+          : t('Not connected')
+      }
+      IconComponent={ cloudSyncConnected ? Cloud : CloudOff }
+      onPress={ cloudSyncConnected ? disconnectCloudSync : connectCloudSync }
+      withLoader
+    />
+    <SettingBase
+      title={ t('Sync now') }
+      subtitle={
+        cloudSyncLastError
+          ? cloudSyncLastError
+          : cloudSyncLastSyncAt
+            ? `Last synced: ${new Date(cloudSyncLastSyncAt).toLocaleString()}`
+            : t('Synchronize your data with Google Drive.')
+      }
+      IconComponent={ RefreshCw }
+      isEnabled={ cloudSyncConnected && !cloudSyncSyncing }
+      onPress={ syncCloudSync }
+      withLoader
+      isLoading={ cloudSyncSyncing }
+    />    <SettingSwitch
         title={ t('Official mode') }
         subtitle={ t('Links will be used as in the official application.') }
         IconComponent={ ShieldCheck }
@@ -450,6 +701,13 @@ export function SettingsScreenComponent({
         } }
         withLoader
         onChange={ onCDNChange }
+      />
+      <SettingLink
+        title={ t('Reset challenge cookies') }
+        subtitle={ t('Renew site checks without signing out. Checks normally renew automatically.') }
+        IconComponent={ RefreshCw }
+        withLoader
+        onPress={ onResetChallengeCookies }
       />
       <SettingSwitch
         title={ t('Strict connection check') }
@@ -591,6 +849,20 @@ export function SettingsScreenComponent({
         IconComponent={ CircleQuestionMark }
         value={ playerAskQuality }
         onChange={ (value) => onConfigUpdate('playerAskQuality', value) }
+      />
+      <SettingSwitch
+        title={ t('Hide paid voices') }
+        subtitle={ t('Hide paid HDRezka voices until they become free.') }
+        IconComponent={ ListVideo }
+        value={ hidePremiumVoices }
+        onChange={ (value) => onConfigUpdate('hidePremiumVoices', value) }
+      />
+      <SettingSwitch
+        title={ t('Compact season and episode selector') }
+        subtitle={ t('Use dropdowns instead of buttons to choose the season and episode.') }
+        IconComponent={ ListVideo }
+        value={ playerCompactSelector }
+        onChange={ (value) => onConfigUpdate('playerCompactSelector', value) }
       />
       <SettingSelect
         title={ t('Player forward rewind seconds') }
@@ -795,6 +1067,62 @@ export function SettingsScreenComponent({
     </ThemedScrollView>
   );
 
+  const renderOrderEditor = () => {
+    if (navigationOrderEditor === 'broadcast') {
+      return <NavigationOrderSetting embedded title={ t('TV and radio tab order') }
+        items={ getBroadcastOrderItems() } value={ broadcastTabOrder } hiddenItems={ hiddenBroadcastTabs }
+        onChange={ value => onConfigUpdate('broadcastTabOrder', value) }
+        onHiddenItemsChange={ value => onConfigUpdate('hiddenBroadcastTabs', value) }
+        onBack={ () => navigationOrderOverlayRef.current?.close() } />;
+    }
+    if (navigationOrderEditor === 'home') {
+      return (
+        <NavigationOrderSetting
+          embedded
+          title={ t('Default home tab') }
+          items={ homeMenuOptions.map((item) => ({ ...item, IconComponent: House })) }
+          value={ homeTabOrder }
+          hiddenItems={ hiddenHomeTabs }
+          onChange={ (value) => onConfigUpdate('homeTabOrder', value) }
+          onHiddenItemsChange={ (value) => onConfigUpdate('hiddenHomeTabs', value) }
+          onBack={ () => navigationOrderOverlayRef.current?.close() }
+        />
+      );
+    }
+    if (navigationOrderEditor) {
+      const isTVNavigation = navigationOrderEditor === 'tv';
+
+      return (
+        <NavigationOrderSetting
+          embedded
+          title={ isTVNavigation ? t('TV navigation order') : t('Mobile navigation order') }
+          items={
+            isTVNavigation
+              ? getTVNavigationOrderItems()
+              : getMobileNavigationOrderItems()
+          }
+          value={ isTVNavigation ? tvNavigationOrder : mobileNavigationOrder }
+          hiddenItems={ isTVNavigation ? hiddenTVNavigationTabs : hiddenMobileNavigationTabs }
+          onHiddenItemsChange={ (value) =>
+            onConfigUpdate(
+              isTVNavigation ? 'hiddenTVNavigationTabs' : 'hiddenMobileNavigationTabs',
+              value,
+            )
+          }
+          onChange={ (value) =>
+            onConfigUpdate(
+              isTVNavigation ? 'tvNavigationOrder' : 'mobileNavigationOrder',
+              value,
+            )
+          }
+          onBack={ () => navigationOrderOverlayRef.current?.close() }
+        />
+      );
+    }
+
+    return null;
+  };
+
   const renderCurrentGroup = () => {
     switch (deferredGroup) {
       case SETTING_GROUP.APPEARANCE:
@@ -835,6 +1163,24 @@ export function SettingsScreenComponent({
           { renderCurrentGroup() }
         </View>
       </View>
+      <ThemedOverlay
+        ref={ navigationOrderOverlayRef }
+        onClose={ () => setNavigationOrderEditor(null) }
+        preferredChildFocusKey="settings-order-close"
+        contentContainerStyle={ { width: '85%', maxWidth: 900, height: '85%', maxHeight: '90%', gap: 12 } }
+      >
+        <ThemedText style={ { textAlign: 'center', padding: 12 } }>
+          { navigationOrderEditor === 'broadcast' ? t('TV and radio tab order')
+            : navigationOrderEditor === 'home' ? t('Default home tab')
+            : navigationOrderEditor === 'tv' ? t('TV navigation order') : t('Mobile navigation order') }
+        </ThemedText>
+        { renderOrderEditor() }
+        <ThemedButton
+          title={ t('Back') }
+          focusKey="settings-order-close"
+          onPress={ () => navigationOrderOverlayRef.current?.close() }
+        />
+      </ThemedOverlay>
     </Page>
   );
 }

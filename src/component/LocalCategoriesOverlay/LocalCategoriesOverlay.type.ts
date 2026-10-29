@@ -24,6 +24,7 @@ export interface LocalCategoriesOverlayComponentProps {
   onChangeTitle: (title: string) => void;
   isCreateDisabled: boolean;
   requestDelete: (categoryId: string) => void;
+  reorderCategories: (fromIndex: number, toIndex: number) => void;
   cancelDelete: () => void;
   confirmDelete: () => void;
   resetMode: () => void;

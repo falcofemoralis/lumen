@@ -3,7 +3,7 @@ import { useScrollContext } from 'Component/ThemedScrollView/ScrollContext';
 import { useDefaultFocus } from 'Hooks/useDefaultFocus';
 import { useLongEnterPress } from 'Hooks/useLongEnterPress';
 import { ReactElement } from 'react';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { Pressable } from 'react-native-gesture-handler';
 import { useAppTheme } from 'Theme/context';
 
@@ -15,10 +15,13 @@ export const ThemedPressableComponent = ({
   onFocus,
   onBlur,
   onEnterPress,
+  onArrowPress,
   children,
   style,
   contentStyle,
+  hitSlop,
   disabled,
+  accessibilityRole,
   mode = 'light',
   pressDelay = 50,
   topAdditionalElement,
@@ -26,6 +29,7 @@ export const ThemedPressableComponent = ({
   extraProps,
   focusKey,
   autofocus = false,
+  focusOnPress = true,
 }: ThemedPressableComponentProps) => {
   const { scrollTo } = useScrollContext();
   const { theme } = useAppTheme();
@@ -41,8 +45,14 @@ export const ThemedPressableComponent = ({
       scrollTo?.(layout, props, details);
     },
     onBlur,
+    onArrowPress,
     extraProps,
-    onEnterPress: onEnterPress ?? onPress,
+    focusable: !disabled,
+    onEnterPress: () => {
+      if (!disabled) {
+        (onEnterPress ?? onPress)?.();
+      }
+    },
   });
 
   useDefaultFocus(realFocusKey, autofocus);
@@ -54,7 +64,9 @@ export const ThemedPressableComponent = ({
   // from. It is a no-op for the d-pad path: `onEnterPress` fires on a node that
   // is focused already.
   const handlePress = () => {
-    focusSelf();
+    if (disabled) return;
+
+    if (focusOnPress) focusSelf();
     onPress?.();
   };
 
@@ -96,11 +108,18 @@ export const ThemedPressableComponent = ({
         onPress={ handlePress }
         onLongPress={ onLongPress }
         disabled={ disabled }
+        accessibilityRole={ accessibilityRole }
         android_ripple={ {
           color: mode === 'light' ? theme.colors.pressableHighlight : theme.colors.pressableHighlightOpposite,
         } }
         unstable_pressDelay={ pressDelay }
+        hitSlop={ hitSlop }
         style={ [{
+          flex: Platform.OS === 'web' ? undefined : 1,
+          flexGrow: Platform.OS === 'web' ? 1 : undefined,
+          flexShrink: Platform.OS === 'web' ? 1 : undefined,
+          flexBasis: Platform.OS === 'web' ? 'auto' : undefined,
+          alignSelf: 'stretch',
           flexDirection: 'row',
           justifyContent: 'center',
           alignItems: 'center',

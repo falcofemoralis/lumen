@@ -9,6 +9,16 @@ import {
 } from 'Util/LocalLibrary';
 import { storage } from 'Util/Storage';
 
+let cachedRaw: string | undefined;
+let cachedBookmarks: LocalBookmarksBlob | undefined;
+const sharedBookmarks = (raw?: string): LocalBookmarksBlob => {
+  if (!cachedBookmarks || cachedRaw !== raw) {
+    cachedRaw = raw;
+    cachedBookmarks = parseBookmarksBlob(raw);
+  }
+  return cachedBookmarks;
+};
+
 /**
  * Reactive view of the local bookmark categories. Re-renders the consumer on any
  * local bookmark write, which is what keeps the mounted tab screens fresh.
@@ -16,7 +26,7 @@ import { storage } from 'Util/Storage';
 export const useLocalBookmarks = (): LocalBookmarksBlob => {
   const [raw] = useMMKVString(LOCAL_BOOKMARKS_KEY, storage.getLocalLibraryStorage().getMMKVInstance());
 
-  return useMemo(() => parseBookmarksBlob(raw), [raw]);
+  return useMemo(() => sharedBookmarks(raw), [raw]);
 };
 
 /**

@@ -9,6 +9,7 @@ import NotificationStore from 'Store/Notification.store';
 import { CommentInterface } from 'Type/Comment.interface';
 import { addLocalComment } from 'Util/LocalComments';
 import { queryKeys } from 'Util/Query';
+import { getAnixartComments } from '../../source/adapters/AnixartComments';
 
 import CommentsComponent from './Comments.component';
 import CommentsComponentTV from './Comments.component.atv';
@@ -22,11 +23,14 @@ export type CommentsRef = {
 export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>(
   ({ film, loaderFullScreen, style, initialLoad, disableRefresh, sheetRef }, ref) => {
     const { isTV, commentPostingMobile, commentPostingTV } = useConfigContext();
-    const { id } = film;
+    const isAnixart = /^https?:\/\/anixart-app\.com\//.test(film.link);
+    const commentFilm = isAnixart ? film : film.metadataSourceFilm ?? film;
+    const { id } = commentFilm;
+    const isZonaWithoutComments = /^https?:\/\/(?:[^/]*\.zona\.im|anixart-app\.com)\//.test(commentFilm.link);
     const { isSignedIn, currentService } = useServiceContext();
     // Posting needs an account, and the user can switch the whole thing off per
     // device - this gates the composer and every reply entry point with it.
-    const canPostComments = isSignedIn && (isTV ? commentPostingTV : commentPostingMobile);
+    const canPostComments = !isZonaWithoutComments && isSignedIn && (isTV ? commentPostingTV : commentPostingMobile);
     // comments are only fetched once the overlay that hosts them is opened
     const [isStarted, setIsStarted] = useState(!!initialLoad);
     // the comment the mobile composer is currently answering
@@ -39,8 +43,12 @@ export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>
       updateItems,
       refresh,
     } = usePaginatedQuery<CommentInterface>({
-      queryKey: queryKeys.comments(id),
-      fetchPage: (page) => currentService.getComments(id, page),
+      queryKey: [...queryKeys.comments(id), commentFilm.link],
+      fetchPage: (page, isRefresh) => isAnixart
+        ? getAnixartComments(film.link, page, isRefresh)
+        : isZonaWithoutComments
+        ? Promise.resolve({ items: [], totalPages: 1 })
+        : currentService.getComments(id, page),
       enabled: isStarted,
     });
 
@@ -68,7 +76,7 @@ export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>
     });
 
     const handlePostLike = useCallback((commentId: string) => {
-      if (!isSignedIn) {
+      if (!canPostComments) {
         return;
       }
 
@@ -79,7 +87,7 @@ export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>
       }
 
       postLike(commentId);
-    }, [isSignedIn, isTV, postLike]);
+    }, [canPostComments, isTV, postLike]);
 
     // The reply target reaches the mutation as an id only. On TV that id is the
     // one the service knows, which a split comment carries as `originalId` --
@@ -131,6 +139,8 @@ export const CommentsContainer = forwardRef<CommentsRef, CommentsContainerProps>
     }, [canPostComments]);
 
     const containerProps = {
+      sourceLabel: isAnixart ? 'Anixart' : film.metadataSourceFilm ? 'HDRezka'
+        : isZonaWithoutComments ? 'недоступны: фильм не сопоставлен с HDRezka' : undefined,
       comments,
       style,
       isLoading: isFetching,

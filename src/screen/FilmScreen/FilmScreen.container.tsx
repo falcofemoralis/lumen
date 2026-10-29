@@ -8,8 +8,11 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { PlayerVideoSelectorRef } from 'Component/PlayerVideoSelector/PlayerVideoSelector.container';
 import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useConfigContext } from 'Context/ConfigContext';
+import { isSourceEnabled, sourceForLink } from '../../source/types/SourceSelection';
 import { useServiceContext } from 'Context/ServiceContext';
-import { useLocalBookmarks } from 'Hooks/useLocalLibrary';
+import { useLocalBookmarks, useLocalHistory } from 'Hooks/useLocalLibrary';
+import { useBookmarkLibrary } from 'Hooks/useBookmarkLibrary';
+import { mergeBookmarkFlags } from 'Util/LocalLibrary/remoteBookmarks';
 import { t } from 'i18n/translate';
 import { FILM_TRAILER_SCREEN, PLAYER_SCREEN } from 'Navigation/navigationRoutes';
 import { AppStackParamList } from 'Navigation/navigationTypes';
@@ -36,8 +39,14 @@ import {
 } from 'Util/LocalLibrary';
 import { navigate } from 'Util/Navigation';
 import { getPlayerQuality, getSavedTime } from 'Util/Player';
+import { getLastSavedEpisode } from 'Util/Player/savedTimeUtil';
 import { queryKeys } from 'Util/Query';
+import { filmToFilmCard } from 'Util/Film';
+import { matchesHistoryFilm } from 'Util/LocalLibrary/history';
+import { resolveEpisodeSelection } from 'Util/Player/episodeSelection';
 import { openActor, openCategory, openFilm } from 'Util/Router';
+import { sourcePlaybackRouter, sourceRouter } from '../../source';
+import { withDeadline } from '../../source/request';
 
 import FilmScreenComponent from './FilmScreen.component';
 import FilmScreenComponentTV from './FilmScreen.component.atv';
@@ -45,7 +54,7 @@ import { MINIMUM_SCHEDULE_ITEMS } from './FilmScreen.config';
 import { FilmScreenContainerProps } from './FilmScreen.type';
 
 export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
-  const { link: linkArg, thumbnailPoster } = (route.params ?? {}) as { link: string, thumbnailPoster?: string };
+  const { link: linkArg, thumbnailPoster, libraryFilmId } = (route.params ?? {}) as { link: string, thumbnailPoster?: string, libraryFilmId?: string };
   const {
     isTV,
     downloadsPath,
@@ -76,6 +85,10 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     isDeepLink = true;
   }
 
+  const localHistory = useLocalHistory();
+  const localBookmarks = useLocalBookmarks();
+  const bookmarkLibrary = useBookmarkLibrary();
+
   const updateFilmVoiceData = async (data: FilmInterface | null) => {
     // logged in users already use service built-in system
     if (!data) {
@@ -83,45 +96,67 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     }
 
     const savedTime = getSavedTime(data);
+    const localHistoryItem = isLocalLibrary
+      ? localHistory.find((item) => matchesHistoryFilm(item, filmToFilmCard(data)))
+      : undefined;
 
-    if (!savedTime || !savedTime.voices || Object.keys(savedTime.voices).length === 0) {
+    const lastVoiceId = savedTime?.lastVoiceId ?? localHistoryItem?.voiceId;
+
+    if (!lastVoiceId) {
       return;
     }
 
-    // Find the last watched voice with saved timestamps
-    let lastVoiceId: string | null = null;
-    let lastVoiceData = null;
+    const hasLastVoice = data.voices.some((voice) => voice.id === lastVoiceId);
 
-    if (savedTime.lastVoiceId) {
-      lastVoiceId = savedTime.lastVoiceId;
-
-      const voiceData = savedTime.voices[lastVoiceId];
-      if (voiceData && voiceData.timestamps && Object.keys(voiceData.timestamps).length > 0) {
-        lastVoiceData = voiceData;
-      }
-    }
-
-    if (!lastVoiceId || !lastVoiceData) {
-      return;
-    }
+    // Cloud Sync can contain a voice that no longer exists in the current
+    // service response. Do not apply stale voice selection.
+    const lastVoiceData = hasLastVoice
+      ? savedTime?.voices?.[lastVoiceId]
+      : undefined;
+    const historySelection = localHistoryItem?.voiceId === lastVoiceId
+      && localHistoryItem.link === data.link
+      ? localHistoryItem
+      : undefined;
 
     data.voices = data.voices.map((voice) => {
       const isActive = voice.id === lastVoiceId;
 
       return {
         ...voice,
-        lastEpisodeId: isActive ? lastVoiceData.lastEpisodeId : voice.lastEpisodeId, // if we have saved voice data, then use its last saved episode is, otherwise fallback to default one
-        lastSeasonId: isActive ? lastVoiceData.lastSeasonId : voice.lastSeasonId,
+        lastEpisodeId: isActive
+          ? lastVoiceData?.lastEpisodeId
+            ?? historySelection?.episodeId
+            ?? voice.lastEpisodeId
+          : voice.lastEpisodeId,
+        lastSeasonId: isActive
+          ? lastVoiceData?.lastSeasonId
+            ?? historySelection?.seasonId
+            ?? voice.lastSeasonId
+          : voice.lastSeasonId,
         isActive,
       };
     });
 
     // load seasons if they're missing
-    const activeVoice = data.voices.find((voice) => voice.isActive);
-    if (data?.hasSeasons && activeVoice && !activeVoice.seasons) {
-      const result = await currentService.getFilmSeasons(data, activeVoice);
+    const activeVoice = data.voices.find((voice) => voice.isActive)
+      ?? (!hasLastVoice ? data.voices[0] : undefined);
 
-      activeVoice.seasons = result.seasons;
+    if (data.hasSeasons && activeVoice && !activeVoice.seasons) {
+      const playbackAdapter =
+        sourcePlaybackRouter.getAdapterForFilmLink(data.link);
+
+      const result = playbackAdapter
+        ? await playbackAdapter.getFilmSeasons(data, activeVoice)
+        : await currentService.getFilmSeasons(data, activeVoice);
+
+      data.voices = data.voices.map((voice) =>
+        voice.id === activeVoice.id
+          ? {
+              ...voice,
+              seasons: result.seasons,
+            }
+          : voice,
+      );
     }
   };
 
@@ -150,12 +185,29 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
 
   const filmQueryKey = useMemo(() => queryKeys.film(link), [link]);
 
-  const { data: film = null } = useQuery({
+  const { data: film = null, isError: isFilmLoadError, refetch: retryFilmLoad } = useQuery({
     queryKey: filmQueryKey,
     enabled: !!link,
+    retry: 0,
     queryFn: async () => {
-      const loadedFilm = await currentService.getFilm(link);
-
+      if (!isSourceEnabled(sourceForLink(link))) throw new Error('Источник отключён в настройках.');
+      const sourceAdapter = sourceRouter.getAdapterForLink(link);
+      const sourceFilm = await withDeadline(sourceAdapter
+        ? sourceAdapter.getFilm(link, { includeRelated: true })
+        : currentService.getFilm(link), 20_000);
+      if (!sourceFilm) throw new Error('Не удалось загрузить данные фильма. Повторите попытку.');
+      const baseFilm = {
+        ...sourceFilm,
+        libraryId: isLocalLibrary && libraryFilmId && localBookmarks.films[libraryFilmId]
+          ? libraryFilmId : sourceFilm.id,
+      };
+      if (isLocalLibrary) applyLocalScheduleMarks(baseFilm);
+      if (!isSignedIn || isLocalLibrary) await updateFilmVoiceData(baseFilm);
+      // Supplemental metadata must not hold the main Zona page behind a spinner.
+      queryClient.setQueryData(filmQueryKey, baseFilm);
+      const loadedFilm = await sourceRouter.resolvePreferredFilm(baseFilm);
+      const liveFilm = queryClient.getQueryData<FilmInterface>(filmQueryKey);
+      if (liveFilm?.link === loadedFilm.link) loadedFilm.voices = liveFilm.voices;
       if (isLocalLibrary && loadedFilm) {
         applyLocalScheduleMarks(loadedFilm);
       }
@@ -177,17 +229,74 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     [queryClient, filmQueryKey]
   );
 
-  const localBookmarks = useLocalBookmarks();
+  const handleVoicesUpdate = useCallback(
+    (voices: FilmVoiceInterface[]) => {
+      if (voices.length === 0) {
+        return;
+      }
+
+      updateFilm((prevFilm) => (
+        prevFilm
+          ? {
+              ...prevFilm,
+              voices,
+              hasVoices: true,
+            }
+          : prevFilm
+      ));
+    },
+    [updateFilm],
+  );
+
+
+  const isFilmInRecentQuery = useQuery({
+    queryKey: [queryKeys.recent(), link],
+    enabled: !!film && !isLocalLibrary && isContinueBtnEnabled,
+    queryFn: async () => {
+      let page = 1;
+      let result = await currentService.getRecent(page);
+
+      while (true) {
+        if (result.items.some((item) => item.link === link)) {
+          return true;
+        }
+
+        if (page >= result.totalPages) {
+          return false;
+        }
+
+        page += 1;
+        result = await currentService.getRecent(page);
+      }
+    },
+  });
+
+  const isFilmInRecent = useMemo(() => {
+    if (!film || !isContinueBtnEnabled) {
+      return false;
+    }
+
+    if (isLocalLibrary) {
+      return localHistory.some((item) => matchesHistoryFilm(item, filmToFilmCard(film)));
+    }
+
+    return isFilmInRecentQuery.data === true;
+  }, [
+    film,
+    isContinueBtnEnabled,
+    isLocalLibrary,
+    isFilmInRecentQuery.data,
+    link,
+    localHistory,
+  ]);
 
   // in local mode film.bookmarks is derived reactively from the local store, so the
   // bookmark button and overlay stay in sync with local writes (including the overlay's own)
   const filmValue = useMemo(() => {
-    if (!film || !isLocalLibrary) {
-      return film;
-    }
-
-    return { ...film, bookmarks: getLocalBookmarksForFilm(localBookmarks, film.id) };
-  }, [film, isLocalLibrary, localBookmarks]);
+    if (!film) return film;
+    const cached = getLocalBookmarksForFilm(bookmarkLibrary, film.libraryId ?? film.id, filmToFilmCard(film));
+    return { ...film, bookmarks: isLocalLibrary ? cached : mergeBookmarkFlags(film.bookmarks, cached) };
+  }, [film, isLocalLibrary, bookmarkLibrary]);
 
   const handleVideoSelect = (video: FilmVideoInterface, voice: FilmVoiceInterface, quality?: string) => {
     RouterStore.pushData(PLAYER_SCREEN, {
@@ -217,7 +326,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
 
     const { voices } = film;
 
-    if (voices.length <= 0) {
+    if (voices.length <= 0 && !sourcePlaybackRouter.getAdapterForFilmLink(film.link)) {
       NotificationStore.displayMessage(t('No video available'));
 
       return;
@@ -231,6 +340,15 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
   }, [navigation]);
 
   const handleSelectActor = useCallback((actorLink: string) => {
+    if (!actorLink) {
+      NotificationStore.displayMessage('Страница этого человека недоступна в подключённых источниках');
+      return;
+    }
+    if (actorLink.startsWith('https://anixart-app.com/catalog?director=')
+      || actorLink.startsWith('https://w1.zona.im/catalog?')) {
+      openCategory(actorLink, navigation);
+      return;
+    }
     openActor(actorLink, navigation);
   }, [navigation]);
 
@@ -377,7 +495,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     }
 
     links.forEach((linkItem) => {
-      const { url, quality, subtitles = [], seasonId, episodeId, voice } = linkItem;
+      const { url, quality, headers, subtitles = [], seasonId, episodeId, voice } = linkItem;
       const taskName = [];
 
       if (seasonId) {
@@ -452,6 +570,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
       const task = createDownloadTask({
         id: TaskIdStorage.getOrCreate(destination, {
           url: taskUrl,
+          headers,
           destination,
           folder: folderPath,
           film: {
@@ -475,6 +594,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
           voiceId: voice?.id,
         }),
         url: taskUrl,
+        headers,
         destination,
         metadata: {
           taskFileName: taskName.join(' '),
@@ -536,7 +656,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
         return {
           ...prevFilm,
           isRatingPosted: true,
-          mainRating: {
+          mainRating: prevFilm.metadataSourceFilm ? prevFilm.mainRating : {
             text: `${result.num} (${result.votes})`,
             name: 'Rezka',
             rating: Number(result.num),
@@ -552,38 +672,15 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
       return;
     }
 
-    postRating({ id: film.id, rating });
+    const ratingFilm = film.metadataSourceFilm ?? film;
+    if (/^https?:\/\/(?:[^/]*\.zona\.im|anixart-app\.com)\//.test(ratingFilm.link)) {
+      NotificationStore.displayMessage('Оценка доступна для фильмов, найденных в HDRezka');
+      return;
+    }
+    postRating({ id: ratingFilm.id, rating });
   };
 
-  const shouldDisplayContinueWatching = useMemo(() => {
-    if (!film || !isContinueBtnEnabled) {
-      return false;
-    }
-
-    const savedTime = getSavedTime(film);
-
-    if (!savedTime || !savedTime.voices || Object.keys(savedTime.voices).length === 0) {
-      return false;
-    }
-
-    // Check if there's at least one voice with saved timestamps
-    for (const voiceId of Object.keys(savedTime.voices)) {
-      const voiceData = savedTime.voices[voiceId];
-
-      if (voiceData && voiceData.timestamps && Object.keys(voiceData.timestamps).length > 0) {
-        // Check if any timestamp has meaningful progress (more than 5 seconds)
-        const hasProgress = Object.values(voiceData.timestamps).some(
-          (timestamp) => timestamp && timestamp.time > 5
-        );
-
-        if (hasProgress) {
-          return true;
-        }
-      }
-    }
-
-    return false;
-  }, [film, isContinueBtnEnabled]);
+  const shouldDisplayContinueWatching = isFilmInRecent;
 
   const {
     mutate: resumeVoice,
@@ -603,10 +700,16 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
       }
 
       const updatedVoice = { ...voice };
+      const playbackAdapter =
+        sourcePlaybackRouter.getAdapterForFilmLink(film.link);
 
       if (!film.hasSeasons) {
         // for movies, fetch the video for the voice
-        return { video: await currentService.getFilmStreamsByVoice(film, voice), voice: updatedVoice };
+        const video = playbackAdapter
+          ? await playbackAdapter.getFilmStreamsByVoice(film, voice)
+          : await currentService.getFilmStreamsByVoice(film, voice);
+
+        return { video, voice: updatedVoice };
       }
 
       if (!lastSeasonId || !lastEpisodeId) {
@@ -616,7 +719,19 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
       }
 
       // for series, fetch the video for the specific episode
-      const video = await currentService.getFilmStreamsByEpisodeId(film, voice, lastSeasonId, lastEpisodeId);
+      const video = playbackAdapter
+        ? await playbackAdapter.getFilmStreamsByEpisodeId(
+            film,
+            voice,
+            lastSeasonId,
+            lastEpisodeId,
+          )
+        : await currentService.getFilmStreamsByEpisodeId(
+            film,
+            voice,
+            lastSeasonId,
+            lastEpisodeId,
+          );
 
       updatedVoice.lastSeasonId = lastSeasonId;
       updatedVoice.lastEpisodeId = lastEpisodeId;
@@ -640,12 +755,19 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     },
   });
 
-  const continueWatching = () => {
+  const continueWatching = async () => {
     if (!film) {
       return;
     }
 
-    const savedTime = getSavedTime(film);
+    const history = localHistory.find(item => matchesHistoryFilm(item, filmToFilmCard(film)));
+    const savedTime = getSavedTime(film) ?? (history?.voiceId ? {
+      filmId: film.id,
+      lastVoiceId: history.voiceId,
+      voices: { [history.voiceId]: {
+        timestamps: {}, lastSeasonId: history.seasonId, lastEpisodeId: history.episodeId,
+      } },
+    } : null);
 
     // If no saved time, just play from the beginning
     if (!savedTime || !savedTime.voices || Object.keys(savedTime.voices).length === 0) {
@@ -662,7 +784,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
       lastVoiceId = savedTime.lastVoiceId;
 
       const voiceData = savedTime.voices[lastVoiceId];
-      if (voiceData && voiceData.timestamps && Object.keys(voiceData.timestamps).length > 0) {
+      if (voiceData) {
         lastVoiceData = voiceData;
       }
     }
@@ -686,8 +808,18 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
       return;
     }
 
+    const playback = sourcePlaybackRouter.getAdapterForFilmLink(film.link);
+    if (playback) {
+      try { film.voices = await playback.getFilmVoices(film); }
+      catch (error) { NotificationStore.displayError(error as Error); return; }
+    }
     // Find the voice object in the film
-    const voice = film.voices.find((v) => v.id === lastVoiceId);
+    let voice = film.voices.find((v) => v.id === lastVoiceId);
+
+    // see RecentScreen.container.tsx for why a lone voice can carry a different id
+    if (!voice && film.voices.length === 1) {
+      [voice] = film.voices;
+    }
 
     if (!voice) {
       playFilm();
@@ -695,18 +827,26 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
       return;
     }
 
-    // signed-in accounts track the watch state server side; local mode uses the saved time
-    const useAccountState = isSignedIn && !isLocalLibrary;
-
-    resumeVoice({
-      voice,
-      lastSeasonId: useAccountState ? voice.lastSeasonId : lastVoiceData.lastSeasonId,
-      lastEpisodeId: useAccountState ? voice.lastEpisodeId : lastVoiceData.lastEpisodeId,
-    });
+    if (film.hasSeasons) {
+      try {
+        const loaded = playback ? await playback.getFilmSeasons(film, voice) : await currentService.getFilmSeasons(film, voice);
+        const position = resolveEpisodeSelection(loaded, history ?? getLastSavedEpisode(lastVoiceData),
+          history ? history.link === film.link && history.voiceId === voice.id : true);
+        if (!position) { playFilm(); return; }
+        resumeVoice({
+          voice: { ...loaded, seasonNumber: history?.seasonNumber },
+          lastSeasonId: position.seasonId, lastEpisodeId: position.episodeId,
+        });
+      } catch (error) { NotificationStore.displayError(error as Error); }
+      return;
+    }
+    resumeVoice({ voice });
   };
 
   const containerProps = {
     film: filmValue,
+    isLoadError: isFilmLoadError,
+    retryLoad: () => { void retryFilmLoad(); },
     thumbnailPoster,
     visibleScheduleItems,
     playerVideoSelectorOverlayRef,
@@ -723,6 +863,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
     showAgeRating,
     playFilm,
     handleVideoSelect,
+    handleVoicesUpdate,
     handleSelectFilm,
     handleSelectActor,
     handleSelectCategory,
@@ -745,3 +886,4 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
 }
 
 export default FilmScreenContainer;
+

@@ -13,8 +13,10 @@ export const ThemedPressableComponent = ({
   style,
   contentStyle,
   disabled,
+  accessibilityRole,
   mode = 'light',
   pressDelay = 50,
+  disableRipple = false,
   topAdditionalElement,
   bottomAdditionalElement,
 }: ThemedPressableComponentProps) => {
@@ -54,7 +56,8 @@ export const ThemedPressableComponent = ({
         onPress={ onPress }
         onLongPress={ onLongPress }
         disabled={ disabled }
-        android_ripple={ {
+        accessibilityRole={ accessibilityRole }
+        android_ripple={ disableRipple ? null : {
           color: mode === 'light' ? theme.colors.pressableHighlight : theme.colors.pressableHighlightOpposite,
         } }
         unstable_pressDelay={ pressDelay }

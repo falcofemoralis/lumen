@@ -1,7 +1,9 @@
 /* eslint-disable max-len */
 import { useNavigation } from '@react-navigation/native';
 import { useIsTV } from 'Context/ConfigContext';
-import { useServiceContext } from 'Context/ServiceContext';
+import { useQueryClient } from '@tanstack/react-query';
+import { unifiedCollectionsService } from '../../source';
+import { enabledSourceKey } from '../../source/types/SourceSelection';
 import { usePaginatedQuery } from 'Hooks/usePaginatedQuery';
 import { ContentCollectionInterface } from 'Type/ContentCollection.interface';
 import { queryKeys } from 'Util/Query';
@@ -12,12 +14,15 @@ import CollectionScreenComponentTV from './CollectionScreen.component.atv';
 
 export function CollectionScreenContainer() {
   const isTV = useIsTV();
-  const { currentService } = useServiceContext();
+  const queryClient = useQueryClient();
+  const queryKey = [...queryKeys.collections(), enabledSourceKey()];
   const navigation = useNavigation();
 
-  const { items, isLoading, onNextLoad } = usePaginatedQuery<ContentCollectionInterface>({
-    queryKey: queryKeys.collections(),
-    fetchPage: (page) => currentService.getCollections(page),
+  const { items, isLoading, isFetching, onNextLoad } = usePaginatedQuery<ContentCollectionInterface>({
+    queryKey,
+    fetchPage: page => unifiedCollectionsService.getCollections(page, page === 1 ? partial => {
+      queryClient.setQueryData(queryKey, { pages: [partial], pageParams: [1] });
+    } : undefined),
   });
 
   const handleOnPress = (item: ContentCollectionInterface) => {
@@ -27,7 +32,7 @@ export function CollectionScreenContainer() {
   const containerProps = {
     items,
     isLoading,
-    onNextLoad,
+    onNextLoad: (isRefresh = false) => !isFetching ? onNextLoad(isRefresh) : Promise.resolve(),
     handleOnPress,
   };
 

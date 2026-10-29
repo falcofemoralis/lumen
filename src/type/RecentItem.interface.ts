@@ -1,4 +1,7 @@
+import { FilmCardInterface } from './FilmCard.interface';
+
 export interface RecentItemInterface {
+  filmCard?: FilmCardInterface;
   id: string;
   link: string;
   image: string;

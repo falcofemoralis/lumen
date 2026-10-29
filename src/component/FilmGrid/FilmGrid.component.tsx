@@ -1,16 +1,25 @@
-import { FlashList } from '@shopify/flash-list';
+import { useRetainedScroll } from 'Hooks/useRetainedScroll';
+import { sameGridCardProps } from './FilmGrid.memo';
+import { FlashList, FlashListRef, ViewToken } from '@shopify/flash-list';
 import { FilmCard } from 'Component/FilmCard';
 import { FilmCardThumbnail } from 'Component/FilmCard/FilmCard.thumbnail';
 import { Loader } from 'Component/Loader';
 import { ThemedSafeArea } from 'Component/ThemedSafeArea';
 import { ThemedText } from 'Component/ThemedText';
+import { ScrollToTopButton } from 'Component/ScrollToTopButton';
+import { Portal } from 'Component/ThemedPortal';
+import { useConfigContext } from 'Context/ConfigContext';
+import { useIsScreenFocused } from 'Hooks/useIsScreenFocused';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
-import { ComponentType, memo, ReactElement, ReactNode, useCallback, useMemo } from 'react';
-import { Pressable, RefreshControl, View } from 'react-native';
+import { usePosterPrefetch } from 'Hooks/usePosterPrefetch';
+import { ComponentType, memo, ReactElement, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { NativeScrollEvent, NativeSyntheticEvent, Pressable, RefreshControl, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from 'Theme/context';
 import { ThemedStyles } from 'Theme/types';
 
 import { componentStyles, ROW_GAP } from './FilmGrid.style';
+import { SCROLL_SHOW_THRESHOLD } from 'Component/ScrollToTopButton/ScrollToTopButton.config';
 import {
   FilmGridComponentProps,
   FilmGridHeaderProps,
@@ -35,6 +44,8 @@ const FilmGridHeader = ({
 function FilmGridItemCard({
   item,
   handleOnPress,
+  isRatingVisible,
+  filmActions,
 }: FilmGridItemProps) {
   const { isPlaceholder, film } = item;
   const { scale } = useAppTheme();
@@ -52,17 +63,20 @@ function FilmGridItemCard({
   }
 
   return (
-    <Pressable
-      style={ style }
-      onPress={ () => handleOnPress(film) }
-    >
-      <FilmCard filmCard={ film } />
-    </Pressable>
+    <View style={ style }>
+      <Pressable onPress={ () => handleOnPress(film) }>
+        <FilmCard
+          filmCard={ film }
+          isRatingVisible={ isRatingVisible }
+        />
+      </Pressable>
+      { filmActions?.(film) }
+    </View>
   );
 }
 
 const MemoizedHeader = memo(FilmGridHeader);
-const MemoizedGridItem = memo(FilmGridItemCard);
+const MemoizedGridItem = memo(FilmGridItemCard, sameGridCardProps);
 
 export function FilmGridComponent({
   data,
@@ -79,11 +93,43 @@ export function FilmGridComponent({
   ListEmptyComponent,
   centerEmptyComponent,
   handleOnPress,
+  filmActions,
   handleScrollEnd,
   handleRefresh,
+  tabPosition = 'bottom',
+  showScrollToTopButton,
 }: FilmGridComponentProps) {
   const styles = useThemedStyles(componentStyles);
   const { scale } = useAppTheme();
+  const { top: safeAreaTop } = useSafeAreaInsets();
+  const { scrollToTopButtonEnabled } = useConfigContext();
+  const isScreenFocused = useIsScreenFocused();
+  const isScrollToTopButtonActive = showScrollToTopButton && scrollToTopButtonEnabled && isScreenFocused;
+  const listRef = useRef<FlashListRef<FilmGridItem>>(null);
+  const retained = useRetainedScroll(listRef);
+  const [visibleFilmIds, setVisibleFilmIds] = useState<Set<string>>(new Set());
+  const [isScrolledDown, setIsScrolledDown] = useState(false);
+
+  const viewabilityConfig = useMemo(() => ({
+    itemVisiblePercentThreshold: 50,
+  }), []);
+
+  const prefetchPosters = usePosterPrefetch(data, numberOfColumns);
+  const onViewableItemsChanged = useCallback(({
+    viewableItems,
+  }: { viewableItems: ViewToken<FilmGridItem>[] }) => {
+    const indexes = viewableItems.filter(token => token.isViewable && token.index !== null).map(token => token.index!);
+    if (indexes.length) prefetchPosters(Math.max(...indexes));
+    const nextVisible = new Set(
+      viewableItems
+        .filter((token) => token.isViewable && token.item.type === FilmGridItemType.FILM)
+        .map((token) => token.item.type === FilmGridItemType.FILM ? token.item.film.id : '')
+        .filter(Boolean)
+    );
+    setVisibleFilmIds(previous => (
+      previous.size === nextVisible.size && [...nextVisible].every(id => previous.has(id)) ? previous : nextVisible
+    ));
+  }, [prefetchPosters]);
 
   const renderItem = useCallback(({ item }: { item: FilmGridItem }) => {
     if (item.type === FilmGridItemType.HEADER) {
@@ -99,9 +145,14 @@ export function FilmGridComponent({
       <MemoizedGridItem
         item={ item }
         handleOnPress={ handleOnPress }
+        isRatingVisible={
+          item.type === FilmGridItemType.FILM
+          && visibleFilmIds.has(item.film.id)
+        }
+        filmActions={ filmActions }
       />
     );
-  }, [styles, handleOnPress]);
+  }, [styles, handleOnPress, visibleFilmIds, filmActions]);
 
   // Headers and cards differ wildly in height, so recycle them separately --
   // and so do real cards and their loading placeholders.
@@ -143,8 +194,8 @@ export function FilmGridComponent({
   // A caller-supplied header replaces the status bar spacer -- it is expected
   // to carry the inset itself.
   const listHeader = useMemo(
-    () => renderSafeArea(ListHeaderComponent),
-    [ListHeaderComponent, renderSafeArea]
+    () => ListHeaderComponent ? renderSafeArea(ListHeaderComponent) : undefined,
+    [ListHeaderComponent, renderSafeArea],
   );
 
   // Tells a list that is still growing apart from one that has ended: a long
@@ -169,9 +220,45 @@ export function FilmGridComponent({
     );
   }, [handleScrollEnd, hasFilms, hasMorePages, isLoadingNext, styles]);
 
-  const contentContainerStyle = useMemo(() => (
-    centerEmptyComponent && !data.length ? styles.centeredEmpty : undefined
-  ), [centerEmptyComponent, data.length, styles]);
+  const contentContainerStyle = useMemo(() => {
+    const topInset = tabPosition === 'bottom' && !disableStatusbarSafeArea
+      ? safeAreaTop
+      : 0;
+
+    if (centerEmptyComponent && !data.length) {
+      return [
+        styles.centeredEmpty,
+        topInset > 0 && { paddingTop: topInset },
+      ];
+    }
+
+    return topInset > 0 ? { paddingTop: topInset } : undefined;
+  }, [
+    centerEmptyComponent,
+    data.length,
+    disableStatusbarSafeArea,
+    safeAreaTop,
+    styles,
+    tabPosition,
+  ]);
+
+  const onScroll = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    retained.onScroll(e);
+    setIsScrolledDown(e.nativeEvent.contentOffset.y > SCROLL_SHOW_THRESHOLD);
+  }, [retained.onScroll]);
+
+  // A tab that lost activity should not keep showing the button once it is
+  // no longer tracking scroll -- otherwise a stale 	rue from an earlier
+  // visit can surface again before this tab has actually been scrolled.
+  useEffect(() => {
+    if (!isScrollToTopButtonActive) {
+      setIsScrolledDown(false);
+    }
+  }, [isScrollToTopButtonActive]);
+
+  const handleScrollToTop = useCallback(() => {
+    listRef.current?.scrollToOffset({ offset: 0, animated: true });
+  }, []);
 
   const refreshControl = useMemo(() => (handleRefresh ? (
     <RefreshControl
@@ -181,25 +268,43 @@ export function FilmGridComponent({
   ) : undefined), [isRefreshing, handleRefresh]);
 
   return (
-    <FlashList
-      data={ data }
-      renderItem={ renderItem }
-      keyExtractor={ keyExtractor }
-      getItemType={ getItemType }
-      onEndReached={ handleScrollEnd }
-      onEndReachedThreshold={ 0.25 }
-      numColumns={ numberOfColumns }
-      overrideItemLayout={ overrideItemLayout }
-      ItemSeparatorComponent={ ItemSeparator }
-      stickyHeaderIndices={ stickyHeaderIndices.length ? stickyHeaderIndices : undefined }
-      ListHeaderComponent={ listHeader }
-      ListEmptyComponent={ disableEmptyComponent || hideGrid ? undefined : ListEmptyComponent }
-      ListFooterComponent={ listFooter }
-      contentContainerStyle={ contentContainerStyle }
-      refreshControl={ refreshControl }
-      showsVerticalScrollIndicator={ false }
-      removeClippedSubviews={ true }
-    />
+    <>
+      <FlashList
+        ref={ listRef }
+        onLayout={ retained.enabled ? retained.onLayout : undefined }
+        data={ data }
+        renderItem={ renderItem }
+        keyExtractor={ keyExtractor }
+        getItemType={ getItemType }
+        viewabilityConfig={ viewabilityConfig }
+        onViewableItemsChanged={ onViewableItemsChanged }
+        onScroll={ retained.enabled || isScrollToTopButtonActive ? onScroll : undefined }
+        scrollEventThrottle={ retained.enabled || isScrollToTopButtonActive ? 100 : undefined }
+        onEndReached={ handleScrollEnd }
+        onEndReachedThreshold={ 0.75 }
+        numColumns={ numberOfColumns }
+        overrideItemLayout={ overrideItemLayout }
+        ItemSeparatorComponent={ ItemSeparator }
+        stickyHeaderIndices={ stickyHeaderIndices.length ? stickyHeaderIndices : undefined }
+        ListHeaderComponent={ listHeader }
+        ListEmptyComponent={ disableEmptyComponent || hideGrid ? undefined : ListEmptyComponent }
+        ListFooterComponent={ listFooter }
+        contentContainerStyle={ contentContainerStyle }
+        refreshControl={ refreshControl }
+        showsVerticalScrollIndicator={ false }
+        removeClippedSubviews={ false }
+        drawDistance={ 800 }
+      />
+
+      { isScrollToTopButtonActive && (
+        <Portal>
+          <ScrollToTopButton
+            visible={ isScrolledDown }
+            onPress={ handleScrollToTop }
+          />
+        </Portal>
+      ) }
+    </>
   );
 }
 

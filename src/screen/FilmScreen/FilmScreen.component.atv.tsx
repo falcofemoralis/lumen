@@ -1,13 +1,17 @@
+import { useNavigation } from '@react-navigation/native';
 import { BookmarksOverlay } from 'Component/BookmarksOverlay';
 import { CommentsOverlay } from 'Component/CommentsOverlay';
 import { FilmViewActor } from 'Component/FilmViewActor';
 import { FilmViewFranchiseItem } from 'Component/FilmViewFranchiseItem';
 import { FilmViewInfoListOverlay } from 'Component/FilmViewInfoListOverlay';
 import { FilmViewRelatedItem } from 'Component/FilmViewRelatedItem';
+import { POSTER_ASPECT_HEIGHT, POSTER_ASPECT_WIDTH } from 'Component/FilmCard/FilmCard.config';
 import { FilmViewScheduleItem } from 'Component/FilmViewScheduleItem';
 import { FilmViewScheduleOverlay } from 'Component/FilmViewScheduleOverlay';
 import { FilmViewSection } from 'Component/FilmViewSection';
 import { Page } from 'Component/Page';
+import { Header } from 'Component/Header';
+import { SourceLoadError } from 'Component/SourceLoadError';
 import { PlayerVideoSelector } from 'Component/PlayerVideoSelector';
 import { Rating } from 'Component/Rating';
 import { ThemedButton } from 'Component/ThemedButton';
@@ -22,6 +26,7 @@ import { useServiceContext } from 'Context/ServiceContext';
 import { useLayout } from 'Hooks/useLayout';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
+import ArrowLeft from 'lucide-react-native/icons/arrow-left';
 import ArrowRight from 'lucide-react-native/icons/arrow-right';
 import Bookmark from 'lucide-react-native/icons/bookmark';
 import BookmarkCheck from 'lucide-react-native/icons/bookmark-check';
@@ -33,12 +38,13 @@ import Play from 'lucide-react-native/icons/play';
 import ShieldOff from 'lucide-react-native/icons/shield-off';
 import Star from 'lucide-react-native/icons/star';
 import { ComponentType, useState } from 'react';
-import { useWindowDimensions, View } from 'react-native';
+import { Platform, useWindowDimensions, View } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
 import { useAppTheme } from 'Theme/context';
 import { CollectionItemInterface } from 'Type/CollectionItem';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { isBookmarked } from 'Util/Film';
+import { getFranchiseChronology } from 'Util/Film/franchise';
 import { noopFn } from 'Util/Function';
 
 import { componentStyles } from './FilmScreen.style.atv';
@@ -47,6 +53,8 @@ import { FilmScreenComponentProps } from './FilmScreen.type';
 
 export function FilmScreenComponent({
   film,
+  isLoadError,
+  retryLoad,
   visibleScheduleItems,
   playerVideoSelectorOverlayRef,
   scheduleOverlayRef,
@@ -61,6 +69,7 @@ export function FilmScreenComponent({
   showAgeRating,
   playFilm,
   handleVideoSelect,
+  handleVoicesUpdate,
   handleSelectFilm,
   handleSelectActor,
   handleSelectCategory,
@@ -76,6 +85,7 @@ export function FilmScreenComponent({
   handleRatingSelect,
   continueWatching,
 }: FilmScreenComponentProps) {
+  const navigation = useNavigation();
   const { scale, theme } = useAppTheme();
   const { isSignedIn } = useServiceContext();
   const styles = useThemedStyles(componentStyles);
@@ -85,8 +95,10 @@ export function FilmScreenComponent({
   const [actionsWidth, setActionsWidth] = useState(0);
 
   if (!film) {
+    if (isLoadError) return <Page>{ Platform.OS === 'web' && <Header disableBackRipple /> }<SourceLoadError onRetry={ retryLoad } /></Page>;
     return (
       <Page>
+        { Platform.OS === 'web' && <Header disableBackRipple /> }
         <FilmScreenThumbnail styles={ styles } />
       </Page>
     );
@@ -116,6 +128,7 @@ export function FilmScreenComponent({
   );
 
   const renderPlayButton = () => {
+    if (film.catalogOnly && !film.metadataSourceFilm?.voices.length) return renderAction(Clock, t('No video available'), undefined, true);
     const { isPendingRelease, isRestricted } = film;
 
     if (isPendingRelease) {
@@ -148,12 +161,22 @@ export function FilmScreenComponent({
           style={ styles.actions }
           onLayout={ (e) => setActionsWidth(e.nativeEvent.layout.width) }
         >
+          { Platform.OS === 'web' && (
+            <ThemedButton
+              title=""
+              onPress={ () => navigation.goBack() }
+              IconComponent={ ArrowLeft }
+              iconProps={ { size: scale(24), color: '#fff' } }
+              style={ [styles.actionButton, { backgroundColor: 'transparent' }] }
+              styleFocused={ { backgroundColor: 'transparent' } }
+            />
+          ) }
           { shouldDisplayContinueWatching && renderAction(ArrowRight, t('Continue Watching'), continueWatching) }
           { renderPlayButton() }
-          { renderAction(MessageSquareText, t('Comments'), openComments) }
-          { renderAction(Clapperboard, t('Trailer'), openTrailerOverlay) }
+          { renderAction(MessageSquareText, t('Comments'), openComments, film.catalogOnly && !film.metadataSourceFilm) }
+          { renderAction(Clapperboard, t('Trailer'), openTrailerOverlay, film.catalogOnly && !film.metadataSourceFilm) }
           { renderAction(isBookmarked(film) ? BookmarkCheck : Bookmark, t('Bookmark'), openBookmarks) }
-          { renderAction(Download, t('Download'), openVideoDownloader) }
+          { renderAction(Download, t('Download'), openVideoDownloader, film.catalogOnly && !film.metadataSourceFilm?.voices.length) }
           { isSignedIn && renderAction(Star, t('Rate'), openRatingOverlay, film.isRatingPosted) }
         </View>
       </ThemedScrollView>
@@ -257,7 +280,7 @@ export function FilmScreenComponent({
     return (
       <View style={ styles.ratingsRow }>
         { allRatings.map(({ name, rating, votes }) => renderInfoText(
-          showVotesCount ? `${rating} (${votes})` : `${rating}`,
+          showVotesCount && votes !== undefined ? `${Number(rating.toFixed(2))} (${votes})` : `${Number(rating.toFixed(2))}`,
           name
         )) }
       </View>
@@ -363,6 +386,7 @@ export function FilmScreenComponent({
         ) }
         { renderGenres() }
         <View style={ styles.additionalInfo }>
+          { renderInfoText(film.seriesInfo) }
           { renderInfoText(releaseDate) }
           { renderInfoText(duration) }
           { renderRating() }
@@ -370,6 +394,8 @@ export function FilmScreenComponent({
         { renderRatings() }
         { renderDirectors() }
         { renderCollection(countries, t('Country'), handleSelectCategory) }
+        { renderCollection(film.studios ?? [], t('Studio'), handleSelectCategory) }
+        { renderCollection(film.authors ?? [], t('Author'), handleSelectCategory) }
         { renderAge() }
         { renderDescription() }
       </ThemedGroup>
@@ -389,6 +415,7 @@ export function FilmScreenComponent({
         ref={ playerVideoSelectorOverlayRef }
         film={ film }
         onSelect={ handleVideoSelect }
+      onVoicesUpdate={ handleVoicesUpdate }
       />
     );
   };
@@ -472,7 +499,7 @@ export function FilmScreenComponent({
   };
 
   const renderFranchise = () => {
-    const { franchise = [] } = film;
+    const franchise = getFranchiseChronology(film.franchise);
 
     if (!franchise.length) {
       return null;
@@ -524,6 +551,7 @@ export function FilmScreenComponent({
         <ThemedScrollView
           horizontal
           style={ styles.relatedList }
+          containerStyle={ Platform.OS === 'web' ? { flexGrow: 0, flexShrink: 0, height: scale(100 * POSTER_ASPECT_HEIGHT / POSTER_ASPECT_WIDTH + 90) } : undefined }
         >
           { related.map((item, idx) => (
             <FilmViewRelatedItem
@@ -594,7 +622,7 @@ export function FilmScreenComponent({
 
   return (
     <Page style={ styles.page }>
-      <Wrapper>
+      <Wrapper style={ Platform.OS === 'web' ? { flex: 1, minHeight: 0 } : undefined }>
         { renderModals() }
         <ThemedScrollView autofocus>
           { renderActions() }

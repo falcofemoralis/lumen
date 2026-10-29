@@ -17,10 +17,12 @@ import LogOut from 'lucide-react-native/icons/log-out';
 import MessageSquareText from 'lucide-react-native/icons/message-square-text';
 import Settings from 'lucide-react-native/icons/settings';
 import Star from 'lucide-react-native/icons/star';
+import UserRound from 'lucide-react-native/icons/user-round';
 import { ACCOUNT_TAB } from 'Navigation/navigationRoutes';
 import { ComponentType } from 'react';
 import { Image, ScrollView, StyleProp, TextStyle, View, ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useConfigContext } from 'Context/ConfigContext';
 import { useAppTheme } from 'Theme/context';
 
 import { componentStyles } from './AccountScreen.style';
@@ -78,6 +80,7 @@ export function AccountScreenComponent({
   openDownloads,
 }: AccountScreenComponentProps) {
   const { scale, theme } = useAppTheme();
+  const { showAccountAvatar, newHomeInterface } = useConfigContext();
   const styles = useThemedStyles(componentStyles);
   const { top } = useSafeAreaInsets();
 
@@ -109,15 +112,22 @@ export function AccountScreenComponent({
           ) : (
             <DefaultGradient style={ styles.profileInfoPremium } size={ scale(GRADIENT_SIZE_MOBILE) } />
           ) } */ }
-          { avatar ? (
-            <ThemedImage
-              src={ avatar }
-              style={ styles.profileAvatar }
-            />
+          { showAccountAvatar ? (
+            avatar ? (
+              <ThemedImage
+                src={ avatar }
+                style={ styles.profileAvatar }
+              />
+            ) : (
+              <Image
+                source={ require('../../../assets/images/no_avatar.png') }
+                style={ styles.profileAvatar }
+              />
+            )
           ) : (
-            <Image
-              source={ require('../../../assets/images/no_avatar.png') }
-              style={ styles.profileAvatar }
+            <UserRound
+              size={ scale(40) }
+              color={ theme.colors.icon }
             />
           ) }
         </View>
@@ -293,7 +303,7 @@ export function AccountScreenComponent({
       <ThemedSafeArea edges={ ['left', 'right'] }>
         <ScrollView style={ { paddingTop: top } } contentContainerStyle={ styles.scrollView }>
           <Wrapper style={ styles.wrapper }>
-            { renderTopBar() }
+            { !newHomeInterface && renderTopBar() }
             { renderContent() }
           </Wrapper>
         </ScrollView>

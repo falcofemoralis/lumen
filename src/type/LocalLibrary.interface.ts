@@ -13,10 +13,15 @@ export interface LocalBookmarksBlob {
 }
 
 export interface LocalHistoryItemInterface {
+  filmCard?: FilmCardInterface;
   id: string; // film id
   link: string;
   poster: string;
   title: string;
+  historyIds?: string[];
+  seasonNumber?: number;
+  episodeNumber?: number;
+  voiceId?: string;
   voiceTitle?: string;
   seasonId?: string;
   episodeId?: string;

@@ -1,7 +1,7 @@
 import { useQueries, useQueryClient } from '@tanstack/react-query';
 import { DropdownItem } from 'Component/ThemedDropdown/ThemedDropdown.type';
 import { useNetworkContext } from 'Context/NetworkContext';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { FilmListInterface } from 'Type/FilmList.interface';
 import { MenuItemInterface } from 'Type/MenuItem.interface';
@@ -31,9 +31,13 @@ export interface UseFilmPagerOptions {
   ) => Promise<FilmListInterface>;
   /** Seed films for an item without fetching (e.g. bookmarks payload already contains the first list) */
   getInitialFilms?: (menuItem: MenuItemInterface) => FilmListInterface | undefined;
+  /** Persisted catalogs are displayed immediately, then refreshed in the background. */
+  initialDataUpdatedAt?: number;
   /** Tab the pager opens on; it is the one fetched before anything is selected */
   initialIndex?: number;
   enabled?: boolean;
+  /** Prefetch the next tab after the active tab has loaded. */
+  prefetchAdjacent?: boolean;
 }
 
 export function useFilmPager({
@@ -42,14 +46,17 @@ export function useFilmPager({
   sorting,
   fetchFilms,
   getInitialFilms,
+  initialDataUpdatedAt,
   initialIndex = 0,
   enabled = true,
+  prefetchAdjacent = false,
 }: UseFilmPagerOptions) {
   const queryClient = useQueryClient();
   const { isInternetAvailable } = useNetworkContext();
   const [selectedSorting, setSelectedSorting] = useState<Record<string, DropdownItem>>({});
   // items become "started" once their tab has been opened; only started items are fetched
   const [startedItems, setStartedItems] = useState<Record<string, boolean>>({});
+  const [activeIndex, setActiveIndex] = useState(initialIndex);
   const loadingMoreRef = useRef<Record<string, boolean>>({});
   const refreshingRef = useRef<Record<string, boolean>>({});
 
@@ -57,7 +64,7 @@ export function useFilmPager({
 
   const getItemKey = (menuItem: MenuItemInterface) => [...queryKey, menuItem.id, getSort(menuItem) ?? null];
 
-  const { dataList, isLoading } = useQueries({
+  const { dataList, isLoading, isError } = useQueries({
     queries: menuItems.map((menuItem, index) => {
       const sort = getSort(menuItem);
 
@@ -76,6 +83,7 @@ export function useFilmPager({
             ? { films: initialFilms.films, currentPage: 1, totalPages: initialFilms.totalPages }
             : undefined;
         },
+        initialDataUpdatedAt,
         // fetching while offline only parks the query in `error` with no data - wait for
         // the connection instead, react-query then fetches the tab on its own
         enabled: enabled && isInternetAvailable && (startedItems[menuItem.id] ?? index === initialIndex),
@@ -85,6 +93,7 @@ export function useFilmPager({
     // failures are reported once by the query client's global error handler
     combine: (results) => ({
       dataList: results.map(({ data }) => data),
+      isError: results.some((result) => result.isError && !result.data),
       isLoading: results.some(({ isLoading: isQueryLoading }) => isQueryLoading),
     }),
   });
@@ -110,9 +119,60 @@ export function useFilmPager({
   }, []);
 
   const onPreLoad = useCallback((item: PagerItemInterface) => {
-    startItem(item.menuItem.id);
-  }, [startItem]);
+    const index = menuItems.findIndex(({ id }) => id === item.menuItem.id);
 
+    if (index !== -1) {
+      setActiveIndex(index);
+    }
+
+    startItem(item.menuItem.id);
+  }, [menuItems, startItem]);
+
+  useEffect(() => {
+    if (!prefetchAdjacent || !enabled || !isInternetAvailable) {
+      return;
+    }
+
+    const activeData = dataList[activeIndex];
+
+    if (!activeData) {
+      return;
+    }
+
+    const nextIndex = activeIndex + 1;
+
+    if (nextIndex >= menuItems.length) {
+      return;
+    }
+
+    const menuItem = menuItems[nextIndex];
+    const sort = getSort(menuItem);
+    const queryKey = getItemKey(menuItem);
+
+    if (queryClient.getQueryData<FilmPagerQueryData>(queryKey)) {
+      return;
+    }
+
+    void queryClient.prefetchQuery({
+      queryKey,
+      queryFn: async (): Promise<FilmPagerQueryData> => {
+        const { films, totalPages } = await fetchFilms(menuItem, 1, sort);
+
+        return { films, currentPage: 1, totalPages };
+      },
+      staleTime: FILMS_STALE_TIME,
+    });
+  }, [
+    activeIndex,
+    dataList,
+    enabled,
+    fetchFilms,
+    isInternetAvailable,
+    menuItems,
+    prefetchAdjacent,
+    queryClient,
+    selectedSorting,
+  ]);
   const loadMore = async (menuItem: MenuItemInterface) => {
     const { id } = menuItem;
     const sort = getSort(menuItem);
@@ -178,6 +238,7 @@ export function useFilmPager({
     selectedSorting,
     initialPage: initialIndex,
     isLoading,
+    isError,
     onPreLoad,
     onNextLoad,
     handleSelectSorting,

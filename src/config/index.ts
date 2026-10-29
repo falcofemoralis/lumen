@@ -13,10 +13,20 @@ import { HOME_SCREEN } from 'Navigation/navigationRoutes';
 import { BACKUP_SECTION } from 'Type/Backup.interface';
 import { BackupConfigKey, SettingsSection } from 'Util/Backup/logic';
 import { DEFAULT_MAX_PARALLEL_DOWNLOADS } from 'Util/Download';
+import { AccentColor } from 'Theme/accentColors';
+
+
+export type TabPosition = 'top' | 'bottom';
+export type FilmDisplayMode = 'grid' | 'list';
 
 export type DeviceConfigType = {
   isConfigured: boolean;
   isTV: boolean;
+  accentColor: AccentColor;
+  tvNavigationOrder: string[];
+  mobileNavigationOrder: string[];
+  hiddenTVNavigationTabs: string[];
+  hiddenMobileNavigationTabs: string[];
   isFirestore: boolean;
   securedSettings: boolean;
   isLowMode: boolean;
@@ -25,8 +35,22 @@ export type DeviceConfigType = {
   numberOfColumnsTV: number;
   recentTwoColumnsTV: boolean;
   hiddenCountries: string[];
+  enabledSources: string[];
   initialRoute: string;
   homeDefaultTab: string;
+  homeTabOrder: string[];
+  hiddenHomeTabs: string[];
+  broadcastTabOrder: string[];
+  hiddenBroadcastTabs: string[];
+  broadcastDisplayMode: FilmDisplayMode;
+  zonaShowAdult: boolean;
+  showEpisodeUpdateCount: boolean;
+  tabPosition: TabPosition;
+  tvTabPosition: TabPosition;
+  homeDisplayMode: FilmDisplayMode;
+  bookmarksDisplayMode: FilmDisplayMode;
+  showBookmarkCounts: boolean;
+  recentDisplayMode: FilmDisplayMode;
   playerRewindSeconds: number;
   playerBackwardRewindSeconds: number;
   playerShowBufferTime: boolean;
@@ -61,6 +85,8 @@ export type DeviceConfigType = {
   playerSaveBrightness: boolean;
   playerSavedBrightness?: number;
   sortVoicesByRating: boolean;
+  showRatings: boolean;
+  showAccountAvatar: boolean;
   playerStopPlayOnButtonTV: boolean;
   playerStopPlayShowInterfaceTV: boolean;
   playerBufferTimeSetting?: number;
@@ -68,6 +94,11 @@ export type DeviceConfigType = {
   checkForUpdates: boolean;
   playerSaveQuality: boolean;
   playerAskQuality: boolean;
+  playerCompactSelector: boolean;
+  hidePremiumVoices: boolean;
+  newHomeInterface: boolean;
+  recentTabsInterface: boolean;
+  showRecentNotifications: boolean;
   strictConnectionCheck: boolean;
   playerDefaultAspectRatio: string;
   playerDefaultSpeed: number;
@@ -80,11 +111,38 @@ export type DeviceConfigType = {
   showVotesCount: boolean;
   showRecommendations: boolean;
   showAgeRating: boolean;
+  showPendingReleaseBadge: boolean;
+  scrollToTopButtonEnabled: boolean;
+  scrollToTopButtonCornerMobile: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+  scrollToTopButtonCornerTV: 'off' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
 }
 
+export const migrateLegacyConfig = <T extends Record<string, unknown>>(raw: T): T => {
+  if (!Object.prototype.hasOwnProperty.call(raw, 'homeTabOrder') && typeof raw.homeDefaultTab === 'string' && raw.homeDefaultTab) {
+    raw = { ...raw, homeTabOrder: [raw.homeDefaultTab] };
+  }
+  if (
+    !Object.prototype.hasOwnProperty.call(raw, 'showRatings')
+    && Object.prototype.hasOwnProperty.call(raw, 'ratingSource')
+  ) {
+    const ratingSource = raw.ratingSource;
+
+    return {
+      ...raw,
+      showRatings: ratingSource === 'imdb' || ratingSource === 'kinopoisk',
+    } as T;
+  }
+
+  return raw;
+};
 export const defaultConfig: DeviceConfigType = {
   isConfigured: false,
   isTV: false,
+  accentColor: 'default',
+  tvNavigationOrder: [],
+  mobileNavigationOrder: [],
+  hiddenTVNavigationTabs: [],
+  hiddenMobileNavigationTabs: [],
   isFirestore: false,
   securedSettings: false,
   isLowMode: false,
@@ -93,8 +151,22 @@ export const defaultConfig: DeviceConfigType = {
   numberOfColumnsTV: 6,
   recentTwoColumnsTV: false,
   hiddenCountries: [],
+  enabledSources: ['ZONA', 'REZKA', 'ANIXART'],
   initialRoute: HOME_SCREEN,
   homeDefaultTab: '',
+  homeTabOrder: [],
+  hiddenHomeTabs: [],
+  broadcastTabOrder: ['shows', 'radio', 'tv'],
+  hiddenBroadcastTabs: [],
+  broadcastDisplayMode: 'grid',
+  zonaShowAdult: false,
+  showEpisodeUpdateCount: true,
+  tabPosition: 'bottom',
+  tvTabPosition: 'top',
+  homeDisplayMode: 'grid',
+  bookmarksDisplayMode: 'grid',
+  showBookmarkCounts: false,
+  recentDisplayMode: 'list',
   playerRewindSeconds: 10,
   playerBackwardRewindSeconds: 10,
   playerShowBufferTime: false,
@@ -116,6 +188,11 @@ export const defaultConfig: DeviceConfigType = {
   downloadsMaxParallel: DEFAULT_MAX_PARALLEL_DOWNLOADS,
   playerSaveQuality: true,
   playerAskQuality: false,
+  playerCompactSelector: false,
+  hidePremiumVoices: false,
+  newHomeInterface: false,
+  recentTabsInterface: false,
+  showRecentNotifications: true,
   playerAutoNextEpisode: true,
   playerKeepTimeOnVoiceChange: false,
   playerAutoFrameRateEnabled: false,
@@ -138,6 +215,8 @@ export const defaultConfig: DeviceConfigType = {
   playerBufferTimeSetting: undefined,
   playerBackBufferTimeSetting: 30,
   sortVoicesByRating: false,
+  showRatings: false,
+  showAccountAvatar: true,
   checkForUpdates: true,
   strictConnectionCheck: true,
   playerDefaultAspectRatio: ASPECT_RATIO_OPTIONS[0],
@@ -151,20 +230,45 @@ export const defaultConfig: DeviceConfigType = {
   showVotesCount: true,
   showRecommendations: true,
   showAgeRating: false,
+  showPendingReleaseBadge: true,
+  scrollToTopButtonEnabled: true,
+  scrollToTopButtonCornerMobile: 'bottom-right',
+  scrollToTopButtonCornerTV: 'off',
 };
 
 export const CONFIG_KEY_SECTIONS = {
   themeScheme: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  accentColor: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  tvNavigationOrder: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  mobileNavigationOrder: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  hiddenTVNavigationTabs: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  hiddenMobileNavigationTabs: BACKUP_SECTION.SETTINGS_APPEARANCE,
   initialRoute: BACKUP_SECTION.SETTINGS_APPEARANCE,
   homeDefaultTab: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  homeTabOrder: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  hiddenHomeTabs: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  broadcastTabOrder: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  hiddenBroadcastTabs: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  broadcastDisplayMode: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  zonaShowAdult: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  showEpisodeUpdateCount: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  tabPosition: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  tvTabPosition: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  homeDisplayMode: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  bookmarksDisplayMode: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  showBookmarkCounts: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  recentDisplayMode: BACKUP_SECTION.SETTINGS_APPEARANCE,
   numberOfColumnsMobile: BACKUP_SECTION.SETTINGS_APPEARANCE,
   numberOfColumnsTV: BACKUP_SECTION.SETTINGS_APPEARANCE,
   recentTwoColumnsTV: BACKUP_SECTION.SETTINGS_APPEARANCE,
   hiddenCountries: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  enabledSources: BACKUP_SECTION.SETTINGS_APPEARANCE,
   isLocalLibrary: BACKUP_SECTION.SETTINGS_APPEARANCE,
   isLowMode: BACKUP_SECTION.SETTINGS_APPEARANCE,
   isTVAwake: BACKUP_SECTION.SETTINGS_APPEARANCE,
   sortVoicesByRating: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  showRatings: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  showAccountAvatar: BACKUP_SECTION.SETTINGS_APPEARANCE,
   isContinueBtnEnabled: BACKUP_SECTION.SETTINGS_APPEARANCE,
   commentPostingMobile: BACKUP_SECTION.SETTINGS_APPEARANCE,
   commentPostingTV: BACKUP_SECTION.SETTINGS_APPEARANCE,
@@ -173,6 +277,10 @@ export const CONFIG_KEY_SECTIONS = {
   showVotesCount: BACKUP_SECTION.SETTINGS_APPEARANCE,
   showRecommendations: BACKUP_SECTION.SETTINGS_APPEARANCE,
   showAgeRating: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  showPendingReleaseBadge: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  scrollToTopButtonEnabled: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  scrollToTopButtonCornerMobile: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  scrollToTopButtonCornerTV: BACKUP_SECTION.SETTINGS_APPEARANCE,
 
   strictConnectionCheck: BACKUP_SECTION.SETTINGS_NETWORK,
 
@@ -182,6 +290,11 @@ export const CONFIG_KEY_SECTIONS = {
 
   playerSaveQuality: BACKUP_SECTION.SETTINGS_PLAYER,
   playerAskQuality: BACKUP_SECTION.SETTINGS_PLAYER,
+  playerCompactSelector: BACKUP_SECTION.SETTINGS_PLAYER,
+  hidePremiumVoices: BACKUP_SECTION.SETTINGS_PLAYER,
+  newHomeInterface: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  recentTabsInterface: BACKUP_SECTION.SETTINGS_APPEARANCE,
+  showRecentNotifications: BACKUP_SECTION.SETTINGS_APPEARANCE,
   playerRewindSeconds: BACKUP_SECTION.SETTINGS_PLAYER,
   playerBackwardRewindSeconds: BACKUP_SECTION.SETTINGS_PLAYER,
   playerDefaultAspectRatio: BACKUP_SECTION.SETTINGS_PLAYER,

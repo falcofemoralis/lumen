@@ -1,6 +1,7 @@
 import { InfoBlock } from 'Component/InfoBlock';
 import { Loader } from 'Component/Loader';
 import { Page } from 'Component/Page';
+import { ThemedText } from 'Component/ThemedText';
 import { ThemedSafeArea } from 'Component/ThemedSafeArea';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
@@ -25,6 +26,7 @@ const TrailerPlayer = ({ trailerUrl }: { trailerUrl: string }) => {
 
 export const FilmTrailerComponent = ({
   trailerUrl,
+  sourceLabel,
   isLoading,
   backHandler,
 }: FilmTrailerScreenComponentProps) => {
@@ -47,7 +49,7 @@ export const FilmTrailerComponent = ({
 
     return (
       <View style={ styles.wrapper }>
-        { /* { renderCloseButton() } */ }
+        { sourceLabel && <ThemedText style={ { position: 'absolute', top: 8, left: 8, zIndex: 1 } }>Трейлер · { sourceLabel }</ThemedText> }
         <TrailerPlayer trailerUrl={ trailerUrl } />
       </View>
     );

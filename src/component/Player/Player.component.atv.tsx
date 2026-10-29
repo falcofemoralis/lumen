@@ -17,9 +17,11 @@ import { useConfigContext } from 'Context/ConfigContext';
 import { usePlayerContext } from 'Context/PlayerContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLatest } from 'Hooks/useLatest';
+import { usePictureInPicture } from 'Hooks/usePictureInPicture';
 import { useRestartableTimeout } from 'Hooks/useRestartableTimeout';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
+import ArrowLeft from 'lucide-react-native/icons/arrow-left';
 import Bookmark from 'lucide-react-native/icons/bookmark';
 import BookmarkCheck from 'lucide-react-native/icons/bookmark-check';
 import ClosedCaption from 'lucide-react-native/icons/closed-caption';
@@ -28,6 +30,7 @@ import ListVideo from 'lucide-react-native/icons/list-video';
 import Maximize2 from 'lucide-react-native/icons/maximize-2';
 import MessageSquareText from 'lucide-react-native/icons/message-square-text';
 import Pause from 'lucide-react-native/icons/pause';
+import PictureInPicture2 from 'lucide-react-native/icons/picture-in-picture-2';
 import Play from 'lucide-react-native/icons/play';
 import Server from 'lucide-react-native/icons/server';
 import Settings2 from 'lucide-react-native/icons/settings-2';
@@ -45,6 +48,7 @@ import {
 } from 'react';
 import {
   BackHandler,
+  Platform,
   View,
 } from 'react-native';
 import { Pressable } from 'react-native-gesture-handler';
@@ -153,6 +157,7 @@ export function PlayerComponent({
   isOverlayOpen,
   isFilmBookmarked,
   isOffline,
+  isLive = false,
   overlayQuality,
   selectedAspectRatio,
   isVideoLoading,
@@ -185,6 +190,7 @@ export function PlayerComponent({
   closeOverlay,
   onBookmarkChange,
   backwardToStart,
+  handleBackButtonPress,
   handleAspectRatioChange,
 }: PlayerComponentProps) {
   const {
@@ -205,6 +211,11 @@ export function PlayerComponent({
   const controlsTimeout = useRestartableTimeout();
   const { ref: topRowRef, focusKey: topRowFocusKey } = useFocusable();
   const { ref: bottomRowRef, focusKey: bottomRowFocusKey } = useFocusable();
+  const {
+    ref: videoViewRef,
+    isSupported: isPipSupported,
+    enter: enterPictureInPicture,
+  } = usePictureInPicture(isPlaying);
 
   // the remote listeners below are registered once per player and the auto hide
   // timeout fires seconds after it was armed, so both have to read the current
@@ -528,7 +539,7 @@ export function PlayerComponent({
         <ThemedText style={ styles.title } numberOfLines={ 1 }>
           { title }
         </ThemedText>
-        { hasSeasons && (
+        { hasSeasons && voice.lastSeasonId && voice.lastEpisodeId && (
           <ThemedText style={ styles.title }>
             { t('Season {{season}} - Episode {{episode}}', {
               season: voice.lastSeasonId,
@@ -543,12 +554,21 @@ export function PlayerComponent({
 
   const renderSubtitle = () => {
     const { releaseDate, countries = [], ratings = [] } = film;
+    const rating = ratings[0]?.text;
+    const country = countries[0]?.name;
+
+    const subtitle = [
+      rating,
+      country && releaseDate ? `${country}, ${releaseDate}` : country ?? releaseDate,
+    ].filter(Boolean).join(' \u2022 ');
+
+    if (!subtitle) {
+      return null;
+    }
 
     return (
       <ThemedText style={ styles.subtitle }>
-        {
-          `${releaseDate} • ${ratings.length ? ratings[0].text : ''} • ${countries.length ? countries[0].name : ''}`
-        }
+        { subtitle }
       </ThemedText>
     );
   };
@@ -573,9 +593,16 @@ export function PlayerComponent({
           { formatVideoTrackInfo(videoTrack) }
         </ThemedText>
         <PlayerClock />
-        <PlayerDurationEnd />
+        { !isLive && <PlayerDurationEnd /> }
       </View>
     );
+  };
+
+  const enablePIP = () => {
+    setShowControls(false);
+    // let the controls unmount first, they would otherwise be captured in the
+    // picture in picture window
+    setTimeout(enterPictureInPicture, 0);
   };
 
   // a video that is not ready to play yet gets a spinner in place of the icon,
@@ -597,6 +624,13 @@ export function PlayerComponent({
     >
       <FocusContext.Provider value={ topRowFocusKey }>
         <View ref={ topRowRef } style={ styles.controlsRow }>
+          { Platform.OS === 'web' && (
+            <PlayerTopAction
+              IconComponent={ ArrowLeft }
+              action={ handleBackButtonPress }
+              onInteraction={ handleUserInteraction }
+            />
+          ) }
           <PlayerTopAction
             IconComponent={ getPlayPauseIcon() }
             action={ togglePlayPause }
@@ -617,12 +651,19 @@ export function PlayerComponent({
               />
             </>
           ) }
+          { isPipSupported && (
+            <PlayerTopAction
+              IconComponent={ PictureInPicture2 }
+              action={ enablePIP }
+              onInteraction={ handleUserInteraction }
+            />
+          ) }
           <PlayerTopAction
             IconComponent={ Gauge }
             action={ openSpeedSelector }
             onInteraction={ handleUserInteraction }
           />
-          { !isOffline && (
+          { (!isOffline && !isLive) && (
             <PlayerTopAction
               IconComponent={ MessageSquareText }
               action={ handleOpenComments }
@@ -641,6 +682,15 @@ export function PlayerComponent({
   );
 
   const renderProgressBar = () => {
+    if (isLive) return (
+      <ThemedPressable
+        focusKey={ PROGRESS_THUMB_FOCUS_KEY }
+        onPress={ () => togglePlayPause() }
+        onFocus={ () => updateFocusedElement(FocusedElement.PROGRESS_THUMB) }
+      >
+        <ThemedText>{ t('Live broadcast') }</ThemedText>
+      </ThemedPressable>
+    );
     // without a url nothing downstream fetches or parses the storyboard, which is
     // exactly what switching it off should cost
     const { storyboardUrl } = video;
@@ -663,7 +713,7 @@ export function PlayerComponent({
   };
 
   const renderDuration = () => (
-    <PlayerDuration />
+    isLive ? <ThemedText>{ t('Live broadcast') }</ThemedText> : <PlayerDuration />
   );
 
   const renderBottomActions = () => {
@@ -718,7 +768,7 @@ export function PlayerComponent({
                 ) }
               </>
             ) }
-            { !isOffline && (
+            { (!isOffline && !isLive) && (
               <PlayerBottomAction
                 IconComponent={ isFilmBookmarked ? BookmarkCheck : Bookmark }
                 action={ openBookmarksOverlay }
@@ -730,7 +780,7 @@ export function PlayerComponent({
               action={ handleAspectRatioChange }
               onInteraction={ handleUserInteraction }
             />
-            { !isOffline && (
+            { (!isOffline && !isLive) && (
               <PlayerBottomAction
                 IconComponent={ Server }
                 action={ openCDNSelector }
@@ -834,9 +884,10 @@ export function PlayerComponent({
       <ThemedDropdown
         asOverlay
         overlayRef={ qualityOverlayRef }
-        header={ t('Quality') }
+        header={ t(isLive ? 'Stream' : 'Quality') }
         value={ overlayQuality }
-        data={ getPlayerAvailableQualityItems(video) }
+        data={ isLive ? video.streams.map((stream, index) => ({ value: stream.quality,
+          label: t('Stream') + ' ' + (index + 1) })) : getPlayerAvailableQualityItems(video) }
         onChange={ handleQualityChange }
         onClose={ closeOverlay }
       />
@@ -940,7 +991,7 @@ export function PlayerComponent({
   );
 
   const renderCDNSelector = () => {
-    if (isOffline) {
+    if (isOffline || isLive) {
       return null;
     }
 
@@ -963,8 +1014,8 @@ export function PlayerComponent({
       { renderPlayerVideoSelector() }
       { renderSubtitlesSelector() }
       { renderSubtitlesStyleSelector() }
-      { renderCommentsOverlay() }
-      { renderBookmarksOverlay() }
+      { !isLive && renderCommentsOverlay() }
+      { !isLive && renderBookmarksOverlay() }
       { renderSpeedSelector() }
       { renderCDNSelector() }
     </>
@@ -972,17 +1023,24 @@ export function PlayerComponent({
 
   return (
     <Animated.View
+      nativeID={ Platform.OS === 'web' ? 'lumen-player' : undefined }
       style={ [
         styles.container,
         isCommentsOpen && styles.containerWithComments,
       ] }
     >
       <VideoView
+        ref={ videoViewRef }
         style={ styles.video }
         player={ player }
         resizeMode={ selectedAspectRatio }
         controls={ false }
-        pictureInPicture={ false }
+        pictureInPicture={ isPipSupported }
+        { ...Platform.OS === 'web' ? { episodeNavigation: {
+          enabled: film.hasSeasons,
+          previous: () => handleNewEpisode(RewindDirection.BACKWARD),
+          next: () => handleNewEpisode(RewindDirection.FORWARD),
+        } } : {} }
       />
       { renderError() }
       { renderTapSurface() }

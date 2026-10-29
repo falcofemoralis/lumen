@@ -3,8 +3,11 @@ import { Theme, ThemedStyles } from 'Theme/types';
 export const componentStyles = ({ scale, colors, text }: Theme) => ({
   overlay: {
     width: scale(320),
+    maxWidth: '90%',
+    maxHeight: '85%',
   },
   container: {
+    flexShrink: 1,
     padding: scale(8),
     flexDirection: 'column',
     gap: scale(12),
@@ -18,7 +21,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   // hands down (its own `maxHeight: '50%'`) and leaves the actions row outside
   // the clipped content box.
   list: {
-    height: 'auto',
+    height: scale(160),
     flexShrink: 1,
     maxHeight: scale(180),
   },
@@ -31,6 +34,38 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     alignItems: 'center',
     gap: scale(12),
     paddingVertical: scale(2),
+    borderWidth: scale(2),
+    borderColor: 'transparent',
+    borderRadius: scale(4),
+  },
+  rowMoving: {
+    borderColor: colors.primary,
+  },
+  rowDrag: {
+    flex: 1,
+  },
+  rowDragFocused: {
+    backgroundColor: colors.backgroundFocused,
+    borderRadius: scale(4),
+  },
+  rowTextFocused: {
+    color: colors.textFocused,
+  },
+  rowDragContent: {
+    flex: 0,
+    flexBasis: 'auto',
+    minHeight: scale(40),
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: scale(12),
+    paddingHorizontal: scale(4),
+  },
+  rowHandle: {
+    width: scale(28),
+    height: scale(28),
+    padding: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   rowTitle: {
     flex: 1,
@@ -45,6 +80,8 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     height: scale(28),
   },
   rowDeleteContent: {
+    paddingHorizontal: 0,
+    paddingVertical: 0,
     padding: 0,
   },
   input: {
@@ -58,14 +95,26 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     fontSize: scale(text.sm.fontSize),
   },
   actions: {
+    flexShrink: 0,
     width: '100%',
     flexDirection: 'row',
     gap: scale(8),
     justifyContent: 'flex-end',
   },
+  buttonContainer: {
+    minHeight: scale(44),
+    flexShrink: 0,
+    justifyContent: 'center',
+  },
   button: {
     flex: 0,
-    paddingInline: scale(20),
+    minHeight: scale(44),
+    flexGrow: 0,
+    flexShrink: 0,
+    flexBasis: 'auto',
+    paddingHorizontal: scale(16),
+    paddingVertical: scale(10),
+    alignItems: 'center',
   },
   buttonPrimary: {
     backgroundColor: colors.primary,

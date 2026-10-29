@@ -20,6 +20,7 @@ export interface CommentsContainerProps {
 }
 
 export interface CommentsComponentProps {
+  sourceLabel?: string;
   comments: CommentInterface[] | null;
   style?: StyleProp<ViewStyle> | undefined;
   isLoading: boolean;

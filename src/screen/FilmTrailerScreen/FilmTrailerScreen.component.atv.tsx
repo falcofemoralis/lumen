@@ -1,6 +1,7 @@
 import { InfoBlock } from 'Component/InfoBlock';
 import { Loader } from 'Component/Loader';
 import { Page } from 'Component/Page';
+import { ThemedText } from 'Component/ThemedText';
 import { ThemedPressable } from 'Component/ThemedPressable';
 import { t } from 'i18n/translate';
 import { TVFocusGuideView } from 'react-native';
@@ -40,6 +41,7 @@ const TrailerPlayer = ({ trailerUrl }: { trailerUrl: string }) => {
 
 export const FilmTrailerComponent = ({
   trailerUrl,
+  sourceLabel,
   isLoading,
 }: FilmTrailerScreenComponentProps) => {
   const renderContent = () => {
@@ -64,6 +66,7 @@ export const FilmTrailerComponent = ({
 
   return (
     <Page fullscreen>
+      { sourceLabel && <ThemedText>Трейлер · { sourceLabel }</ThemedText> }
       { renderContent() }
     </Page>
   );

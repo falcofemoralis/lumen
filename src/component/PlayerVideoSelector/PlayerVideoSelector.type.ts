@@ -14,6 +14,7 @@ export type PlayerVideoSelectorContainerProps = {
   onSelect: (video: FilmVideoInterface, voice: FilmVoiceInterface, quality?: string) => void;
   onClose?: () => void;
   onDownloadSelect?: (links: DownloadLinkInterface[]) => void;
+  onVoicesUpdate?: (voices: FilmVoiceInterface[]) => void;
 };
 
 export type PlayerVideoSelectorComponentProps = {
@@ -34,8 +35,11 @@ export type PlayerVideoSelectorComponentProps = {
   episodesToDownload: Record<string, boolean>;
   streamQualities: string[] | null;
   playerAskQuality: boolean;
+  playerCompactSelector: boolean;
+  hasHiddenPremiumVoices: boolean;
   handleSelectVoice: (voiceId: string) => void;
   setSelectedSeasonId: (id: string) => void;
+  handleSelectSeason: (seasonId: string) => void;
   handleSelectEpisode: (episodeId: string) => void;
   calculateProgressThreshold: (progress: number) => number;
   onOverlayOpen: () => void;

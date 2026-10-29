@@ -49,13 +49,15 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { AppState, useWindowDimensions, View } from 'react-native';
+import { AppState, Platform, useWindowDimensions, View } from 'react-native';
 import {
   Gesture,
   GestureDetector,
 } from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedStyle,
+  useSharedValue,
+  withDelay,
   withTiming,
 } from 'react-native-reanimated';
 import { VideoView } from 'react-native-video';
@@ -139,6 +141,7 @@ export function PlayerComponent({
   isOverlayOpen,
   isFilmBookmarked,
   isOffline,
+  isLive = false,
   overlayQuality,
   isVideoLoading,
   hasPlaybackError,
@@ -196,6 +199,10 @@ export function PlayerComponent({
   } = usePictureInPicture(status);
   const controlsTimeout = useRestartableTimeout();
   const doubleTapTimeout = useRestartableTimeout();
+  const doubleTapLeftOpacity = useSharedValue(0);
+  const doubleTapRightOpacity = useSharedValue(0);
+  const doubleTapLeftAnimation = useAnimatedStyle(() => ({ opacity: doubleTapLeftOpacity.value }));
+  const doubleTapRightAnimation = useAnimatedStyle(() => ({ opacity: doubleTapRightOpacity.value }));
   const {
     slideGesture,
     volumeIndicator,
@@ -289,34 +296,36 @@ export function PlayerComponent({
       : playerRewindSeconds;
 
     rewindPosition(direction, seconds);
-    setDoubleTapAction({
-      seconds: doubleTapAction?.direction === direction ? seconds + (doubleTapAction?.seconds ?? 0) : seconds,
+    setDoubleTapAction((previous) => ({
+      seconds: previous?.direction === direction ? seconds + previous.seconds : seconds,
       direction,
       isVisible: true,
-    });
-
-    doubleTapTimeout.start(() => {
-      setDoubleTapAction((prev) => prev ? { ...prev, isVisible: false } : null);
-
-      setTimeout(() => {
-        setDoubleTapAction(null);
-      }, DOUBLE_TAP_ANIMATION_DELAY);
-    }, DOUBLE_TAP_ANIMATION);
+    }));
+    const opacity = direction === RewindDirection.BACKWARD ? doubleTapLeftOpacity : doubleTapRightOpacity;
+    const other = direction === RewindDirection.BACKWARD ? doubleTapRightOpacity : doubleTapLeftOpacity;
+    other.value = 0;
+    opacity.value = 1;
+    opacity.value = withDelay(DOUBLE_TAP_ANIMATION, withTiming(0, { duration: DOUBLE_TAP_ANIMATION_DELAY }));
+    doubleTapTimeout.start(() => setDoubleTapAction(null), DOUBLE_TAP_ANIMATION + DOUBLE_TAP_ANIMATION_DELAY);
   };
 
+  const handleSingleTap = () => {
+    doubleTapTimeout.stop();
+    doubleTapLeftOpacity.value = 0;
+    doubleTapRightOpacity.value = 0;
+    setDoubleTapAction(null);
+    setShowControls(previous => !previous);
+    handleUserInteraction();
+  };
   const singleTap = Gesture.Tap()
     .maxDuration(250)
-    .onEnd(() => {
-      if (doubleTapAction) {
-        return;
-      }
-
-      scheduleOnRN(setShowControls, !showControls);
-      scheduleOnRN(handleUserInteraction);
+    .onEnd((_event, success) => {
+      if (success) scheduleOnRN(handleSingleTap);
     });
 
   const doubleTap = Gesture.Tap()
     .numberOfTaps(2)
+    .maxDelay(220)
     .maxDuration(300)
     .onEnd((e) => {
       if (isLocked) {
@@ -398,7 +407,7 @@ export function PlayerComponent({
         <ThemedText style={ styles.title } numberOfLines={ 1 }>
           { title }
         </ThemedText>
-        { hasSeasons && (
+        { hasSeasons && voice.lastSeasonId && voice.lastEpisodeId && (
           <ThemedText style={ styles.title }>
             { t('Season {{season}} - Episode {{episode}}', {
               season: voice.lastSeasonId,
@@ -413,12 +422,21 @@ export function PlayerComponent({
 
   const renderSubtitle = () => {
     const { releaseDate, countries, ratings } = film;
+    const rating = ratings?.[0]?.text;
+    const country = countries?.[0]?.name;
+
+    const subtitle = [
+      rating,
+      country && releaseDate ? `${country}, ${releaseDate}` : country ?? releaseDate,
+    ].filter(Boolean).join(' • ');
+
+    if (!subtitle) {
+      return null;
+    }
 
     return (
       <ThemedText style={ styles.subtitle }>
-        {
-          `${releaseDate} • ${ratings ? ratings[0].text : ''} • ${countries ? countries[0].name : ''}`
-        }
+        { subtitle }
       </ThemedText>
     );
   };
@@ -568,12 +586,17 @@ export function PlayerComponent({
 
   const renderTopActionLine = () => (
     <View style={ styles.actionLine }>
-      <PlayerDurationEnd />
-      <PlayerDuration />
+      { isLive ? <ThemedText>{ t('Live broadcast') }</ThemedText> : (
+        <>
+          <PlayerDurationEnd />
+          <PlayerDuration />
+        </>
+      ) }
     </View>
   );
 
   const renderProgressBar = () => {
+    if (isLive) return null;
     // without a url nothing downstream fetches or parses the storyboard, which is
     // exactly what switching it off should cost
     const { storyboardUrl } = video;
@@ -623,7 +646,7 @@ export function PlayerComponent({
               isLocked && styles.bottomActionsRowLocked,
             ] }
           >
-            { !isOffline && (
+            { (!isOffline && !isLive) && (
               <PlayerAction
                 IconComponent={ Server }
                 action={ openCDNSelector }
@@ -637,21 +660,21 @@ export function PlayerComponent({
                 onInteraction={ handleUserInteraction }
               />
             ) }
-            { !isOffline && (
+            { (!isOffline && !isLive) && (
               <PlayerAction
                 IconComponent={ MessageSquareText }
                 action={ handleOpenComments }
                 onInteraction={ handleUserInteraction }
               />
             ) }
-            { !isOffline && (
+            { (!isOffline && !isLive) && (
               <PlayerAction
                 IconComponent={ isFilmBookmarked ? BookmarkCheck : Bookmark }
                 action={ openBookmarksOverlay }
                 onInteraction={ handleUserInteraction }
               />
             ) }
-            { !isOffline && (
+            { (!isOffline && !isLive) && (
               <PlayerAction
                 IconComponent={ Forward }
                 action={ handleShare }
@@ -681,7 +704,7 @@ export function PlayerComponent({
   };
 
   const renderDoubleTapAction = () => {
-    const { seconds = 10, direction, isVisible } = doubleTapAction ?? {};
+    const { seconds = 10 } = doubleTapAction ?? {};
 
     return (
       <Fragment>
@@ -689,7 +712,7 @@ export function PlayerComponent({
           style={ [
             styles.doubleTapAction,
             styles.doubleTapActionLeft,
-            (direction === RewindDirection.BACKWARD && isVisible) && styles.doubleTapActionVisible,
+            doubleTapLeftAnimation,
           ] }
         >
           <View style={ styles.doubleTapContainer }>
@@ -705,7 +728,7 @@ export function PlayerComponent({
           style={ [
             styles.doubleTapAction,
             styles.doubleTapActionRight,
-            (direction === RewindDirection.FORWARD && isVisible) && styles.doubleTapActionVisible,
+            doubleTapRightAnimation,
           ] }
         >
           <View style={ styles.doubleTapContainer }>
@@ -761,11 +784,28 @@ export function PlayerComponent({
     </Fragment>
   );
 
-  const renderControls = () => (
+  const renderControls = () => Platform.OS === 'web' ? (
+    <View style={ styles.controlsContainer } pointerEvents="box-none">
+      <GestureDetector gesture={ Gesture.Race(Gesture.Exclusive(doubleTap, singleTap), longPressGesture, slideGesture) }>
+        <View style={ { position: 'absolute', inset: 0 } } />
+      </GestureDetector>
+      <Animated.View
+        pointerEvents={ showControls ? 'box-none' : 'none' }
+        style={ [styles.controls, controlsAnimation] }>
+        { renderTopActions() }
+        { renderMiddleControls() }
+        { renderBottomActions() }
+      </Animated.View>
+      <View pointerEvents="none" style={ { position: 'absolute', inset: 0 } }>
+        { renderDoubleTapAction() }
+        { renderLongTapAction() }
+        { renderSlideIndicators() }
+      </View>
+    </View>
+  ) : (
     <GestureDetector
       gesture={ Gesture.Race(
-        doubleTap,
-        singleTap,
+        Gesture.Exclusive(doubleTap, singleTap),
         longPressGesture,
         slideGesture
       ) }
@@ -819,9 +859,10 @@ export function PlayerComponent({
       <ThemedDropdown
         asOverlay
         overlayRef={ qualityOverlayRef }
-        header={ t('Quality') }
+        header={ t(isLive ? 'Stream' : 'Quality') }
         value={ overlayQuality }
-        data={ getPlayerAvailableQualityItems(video) }
+        data={ isLive ? video.streams.map((stream, index) => ({ value: stream.quality,
+          label: t('Stream') + ' ' + (index + 1) })) : getPlayerAvailableQualityItems(video) }
         onChange={ handleQualityChange }
         onClose={ closeOverlay }
       />
@@ -926,7 +967,7 @@ export function PlayerComponent({
   );
 
   const renderCDNSelector = () => {
-    if (isOffline) {
+    if (isOffline || isLive) {
       return null;
     }
 
@@ -949,8 +990,8 @@ export function PlayerComponent({
       { renderPlayerVideoSelector() }
       { renderSubtitlesSelector() }
       { renderSubtitlesStyleSelector() }
-      { renderCommentsOverlay() }
-      { renderBookmarksOverlay() }
+      { !isLive && renderCommentsOverlay() }
+      { !isLive && renderBookmarksOverlay() }
       { renderSpeedSelector() }
       { renderCDNSelector() }
     </>
@@ -958,6 +999,7 @@ export function PlayerComponent({
 
   return (
     <View
+      nativeID={ Platform.OS === 'web' ? 'lumen-player' : undefined }
       style={ [
         styles.container,
         isCommentsOpen && { width: screenWidth * 0.45 },
@@ -970,6 +1012,11 @@ export function PlayerComponent({
         resizeMode={ selectedAspectRatio }
         controls={ false }
         pictureInPicture={ isPipSupported }
+        { ...Platform.OS === 'web' ? { episodeNavigation: {
+          enabled: film.hasSeasons,
+          previous: () => handleNewEpisode(RewindDirection.BACKWARD),
+          next: () => handleNewEpisode(RewindDirection.FORWARD),
+        } } : {} }
       />
       { renderError() }
       { renderControls() }

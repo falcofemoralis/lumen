@@ -1,7 +1,7 @@
 import { POSTER_ASPECT_HEIGHT, POSTER_ASPECT_WIDTH } from 'Component/FilmCard/FilmCard.config';
 import { Theme, ThemedStyles } from 'Theme/types';
 
-export const componentStyles = ({ scale, colors, spacing }: Theme) => ({
+export const componentStyles = ({ scale, colors, spacing, text }: Theme) => ({
   item: {
     flexDirection: 'row',
     paddingVertical: scale(12),
@@ -58,5 +58,32 @@ export const componentStyles = ({ scale, colors, spacing }: Theme) => ({
   actionsColumn: {
     flexDirection: 'column',
     gap: scale(4),
+  },
+  recentTopAction: {
+    position: 'absolute',
+    top: 0,
+    right: scale(4),
+    width: scale(44),
+    height: scale(44),
+    zIndex: 30,
+    elevation: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  recentTopBadge: {
+    backgroundColor: colors.secondary,
+    width: scale(16),
+    height: scale(16),
+    borderRadius: scale(50),
+    color: colors.textOnContrast,
+    fontSize: scale(text.xxs.fontSize),
+    justifyContent: 'center',
+    alignItems: 'center',
+    textAlign: 'center',
+    position: 'absolute',
+    right: scale(7),
+    top: scale(3),
+    zIndex: 40,
+    elevation: 40,
   },
 } satisfies ThemedStyles);

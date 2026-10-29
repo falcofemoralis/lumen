@@ -7,9 +7,19 @@ import {
 } from 'Type/Backup.interface';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { LocalCommentInterface } from 'Type/LocalComment.interface';
-import { LocalBookmarksBlob, LocalCategoryInterface } from 'Type/LocalLibrary.interface';
+import {
+  LocalBookmarksBlob,
+  LocalCategoryInterface,
+  LocalHistoryItemInterface,
+} from 'Type/LocalLibrary.interface';
 import { NotificationItemInterface } from 'Type/Notification.interface';
 import { safeJsonParse } from 'Util/Json';
+
+import {
+  SavedTime,
+  SavedTimeVoice,
+  SavedTimestamp,
+} from 'Component/Player/Player.type';
 
 /** Stamped into every file and checked on import -- a JSON file from anywhere else is refused. */
 export const BACKUP_APP_ID = 'lumen';
@@ -35,6 +45,8 @@ export type SettingsSection = typeof SETTINGS_SECTIONS[number];
 export const BACKUP_SECTIONS = [
   ...SETTINGS_SECTIONS,
   BACKUP_SECTION.BOOKMARKS,
+  BACKUP_SECTION.WATCH_HISTORY,
+  BACKUP_SECTION.PLAYER_TIME,
   BACKUP_SECTION.COMMENTS,
   BACKUP_SECTION.NOTIFICATIONS,
 ];
@@ -236,6 +248,20 @@ export const sanitizeBookmarks = (raw: unknown): LocalBookmarksBlob | null => {
   return { categories, films };
 };
 
+const isHistoryItem = (value: unknown): value is LocalHistoryItemInterface => (
+  isRecord(value)
+  && typeof value.id === 'string'
+  && typeof value.link === 'string'
+  && typeof value.title === 'string'
+  && typeof value.updatedAt === 'number'
+  && typeof value.isWatched === 'boolean'
+);
+
+/** The watch history ("watch later" / continue-watching) list with malformed entries dropped. */
+export const sanitizeWatchHistory = (raw: unknown): LocalHistoryItemInterface[] => (
+  Array.isArray(raw) ? raw.filter(isHistoryItem) : []
+);
+
 const isComment = (value: unknown): value is LocalCommentInterface => (
   isRecord(value)
   && typeof value.id === 'string'
@@ -296,4 +322,95 @@ export const buildBackupFileName = (date: Date): string => {
   ].join('-');
 
   return `${BACKUP_FILE_PREFIX}-${stamp}-${pad(date.getHours())}${pad(date.getMinutes())}.json`;
+};
+
+const sanitizeSavedTimestamp = (
+  value: unknown
+): SavedTimestamp | null => {
+  if (!isRecord(value)) {
+    return null;
+  }
+
+  if (
+    typeof value.time !== 'number'
+    || !Number.isFinite(value.time)
+    || value.time < 0
+    || typeof value.progress !== 'number'
+    || !Number.isFinite(value.progress)
+    || value.progress < 0
+    || value.progress > 100
+  ) {
+    return null;
+  }
+
+  return {
+    time: value.time,
+    progress: value.progress,
+    ...(typeof value.deviceId === 'string'
+      ? { deviceId: value.deviceId }
+      : {}),
+  };
+};
+
+const sanitizeSavedTimeVoice = (
+  value: unknown
+): SavedTimeVoice | null => {
+  if (!isRecord(value) || !isRecord(value.timestamps)) {
+    return null;
+  }
+
+  const timestamps: Record<string, SavedTimestamp | null> = {};
+
+  Object.entries(value.timestamps).forEach(([key, timestamp]) => {
+    const sanitized = sanitizeSavedTimestamp(timestamp);
+
+    if (sanitized) {
+      timestamps[key] = sanitized;
+    }
+  });
+
+  return {
+    timestamps,
+    ...(typeof value.lastSeasonId === 'string'
+      ? { lastSeasonId: value.lastSeasonId }
+      : {}),
+    ...(typeof value.lastEpisodeId === 'string'
+      ? { lastEpisodeId: value.lastEpisodeId }
+      : {}),
+  };
+};
+
+export const sanitizeSavedTime = (
+  value: unknown
+): SavedTime | null => {
+  if (
+    !isRecord(value)
+    || typeof value.filmId !== 'string'
+    || !value.filmId
+    || !isRecord(value.voices)
+    || (value.lastVoiceId !== null && typeof value.lastVoiceId !== 'string')
+  ) {
+    return null;
+  }
+
+  const voices: Record<string, SavedTimeVoice | null> = {};
+
+  Object.entries(value.voices).forEach(([voiceId, voice]) => {
+    if (voice === null) {
+      voices[voiceId] = null;
+      return;
+    }
+
+    const sanitized = sanitizeSavedTimeVoice(voice);
+
+    if (sanitized) {
+      voices[voiceId] = sanitized;
+    }
+  });
+
+  return {
+    filmId: value.filmId,
+    voices,
+    lastVoiceId: value.lastVoiceId,
+  };
 };

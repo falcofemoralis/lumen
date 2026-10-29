@@ -269,6 +269,7 @@ const PlayerStoryboardComponent = ({
 
   return (
     <View
+      pointerEvents="none"
       style={ [
         style,
         playerStoryboardAdjacentFrames && {

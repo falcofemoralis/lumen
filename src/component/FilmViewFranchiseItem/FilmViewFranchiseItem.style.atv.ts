@@ -1,8 +1,10 @@
+import { Platform } from 'react-native';
 import { Theme, ThemedStyles } from 'Theme/types';
 
 export const componentStyles = ({ scale, text, colors }: Theme) => ({
   franchiseItem: {
     flexDirection: 'row',
+    width: Platform.OS === 'web' ? '100%' : undefined,
     gap: scale(12),
     paddingBlock: scale(12),
     paddingInline: scale(8),

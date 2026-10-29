@@ -23,6 +23,7 @@ export interface PlayerContainerProps {
   film: FilmInterface
   voice: FilmVoiceInterface;
   isOffline?: boolean;
+  isLive?: boolean;
   quality?: string;
 }
 
@@ -53,6 +54,7 @@ export interface PlayerComponentProps {
   isOverlayOpen: boolean;
   isFilmBookmarked: boolean;
   isOffline?: boolean;
+  isLive?: boolean;
   overlayQuality: string;
   isVideoLoading: boolean;
   hasPlaybackError: boolean;
@@ -130,6 +132,7 @@ export interface DoubleTapAction {
 export interface SavedTimestamp {
   time: number;
   progress: number;
+  updatedAt?: number;
   deviceId?: string;
 }
 

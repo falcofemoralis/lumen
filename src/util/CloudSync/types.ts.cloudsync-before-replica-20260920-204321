@@ -1,0 +1,113 @@
+export const CLOUD_SYNC_SCHEMA_VERSION = 1;
+
+export const CLOUD_SYNC_FILE_NAME = 'lumen-sync.json';
+export const GOOGLE_DRIVE_APPDATA_SCOPE =
+  'https://www.googleapis.com/auth/drive.appdata';
+
+export type CloudSyncEntityType =
+  | 'bookmark-category'
+  | 'bookmark-membership'
+  | 'history'
+  | 'player-time'
+  | 'schedule-mark'
+  | 'comment'
+  | 'setting'
+;
+
+export interface CloudEntityMeta {
+  updatedAt: number;
+  deviceId: string;
+  deleted?: boolean;
+}
+
+export interface CloudRecord<T> {
+  value: T;
+  meta: CloudEntityMeta;
+}
+
+export interface CloudTombstone {
+  meta: CloudEntityMeta & {
+    deleted: true;
+  };
+}
+
+export interface CloudSettingsState {
+  values: Record<string, unknown>;
+  metadata: Record<string, CloudEntityMeta>;
+}
+
+export interface CloudSyncState {
+  schemaVersion: number;
+  revision: number;
+  updatedAt: number;
+  deviceId: string;
+
+  bookmarks: {
+    categories: Record<string, CloudRecord<unknown> | CloudTombstone>;
+    memberships: Record<string, CloudRecord<unknown> | CloudTombstone>;
+  };
+
+  history: Record<string, CloudRecord<unknown> | CloudTombstone>;
+
+  playerTime: Record<string, CloudRecord<unknown> | CloudTombstone>;
+
+  scheduleMarks: Record<string, CloudRecord<unknown> | CloudTombstone>;
+
+  comments: Record<string, CloudRecord<unknown> | CloudTombstone>;
+
+  settings: CloudSettingsState;
+}
+
+export interface DriveFile {
+  id: string;
+  name: string;
+  modifiedTime?: string;
+}
+
+export interface CloudSyncEnvelope {
+  type: 'sync';
+  payload: CloudSyncState;
+}
+export interface CloudSyncStatus {
+  connected: boolean;
+  email: string | null;
+  lastSyncAt: number | null;
+  lastError: string | null;
+  syncing: boolean;
+}
+
+export interface CloudSyncMetadata {
+  deviceId: string;
+  connectedAccountEmail: string | null;
+  syncEnabled: boolean;
+  localStateBootstrapped: boolean;
+  lastSyncAt: number | null;
+  lastError: string | null;
+}
+
+export interface CloudSyncMutation {
+  entity:
+    | 'bookmark-category'
+    | 'bookmark-membership'
+    | 'history'
+    | 'player-time'
+    | 'schedule-mark'
+    | 'comment'
+    | 'setting'
+  ;
+  id: string;
+  value?: unknown;
+  deleted?: boolean;
+  updatedAt?: number;
+  deviceId?: string;
+}
+
+export type CloudSyncEvent =
+  | {
+      type: 'mutation';
+      mutation: CloudSyncMutation;
+    }
+  | {
+      type: 'flush';
+    };
+

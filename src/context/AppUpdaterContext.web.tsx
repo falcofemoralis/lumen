@@ -1,0 +1,113 @@
+import { UPDATE_LINK } from 'Component/AppUpdater/AppUpdater.config';
+import * as Application from 'expo-application';
+import {
+  createContext,
+  ReactNode,
+  use,
+  useCallback,
+  useMemo,
+  useState,
+} from 'react';
+import { UpdateInterface } from 'Type/Update.interface';
+import { noopFn } from 'Util/Function';
+import { versionStringToNumber } from 'Util/Misc';
+import { storage } from 'Util/Storage';
+
+import { useConfigContext } from './ConfigContext';
+
+const UPDATE_STORAGE_KEY = 'windows_app_update';
+
+interface AppUpdaterContextInterface {
+  update: UpdateInterface | null;
+  isUpdateRejected: boolean;
+  setUpdate: (update: UpdateInterface | null) => void;
+  checkVersion: () => Promise<void>;
+  resetUpdate: () => void;
+}
+
+const AppUpdaterContext = createContext<AppUpdaterContextInterface>({
+  update: null,
+  isUpdateRejected: false,
+  setUpdate: noopFn,
+  checkVersion: async () => {},
+  resetUpdate: noopFn,
+});
+
+export const AppUpdaterProvider = ({ children }: { children: ReactNode }) => {
+  const { isConfigured } = useConfigContext();
+  const [update, setUpdate] = useState<UpdateInterface | null>(null);
+  const [isUpdateRejected, setIsUpdateRejected] = useState(false);
+
+  const getCachedUpdate = useCallback(async () => {
+    const cachedData = storage.getMiscStorage().loadString(UPDATE_STORAGE_KEY);
+
+    if (cachedData) {
+      const { data, ttl } = JSON.parse(cachedData) as { data: UpdateInterface; ttl: number };
+
+      if (Date.now() < ttl) {
+        return data;
+      }
+    }
+
+    const response = await fetch('https://api.github.com/repos/sadikh94/lumen/releases/latest');
+    if (response.status === 404) return null;
+    if (!response.ok) throw new Error('Windows update check failed');
+    const release = await response.json() as { tag_name: string; body?: string; assets: { name: string; browser_download_url: string }[] };
+    const asset = release.assets.find(item => /windows/i.test(item.name) && /\.exe$/i.test(item.name));
+    if (!asset) return null;
+    const data: UpdateInterface = { versionName: release.tag_name.replace(/^v/, ''), description: release.body ?? '', downloadAndroidUrl: asset.browser_download_url };
+
+    storage.getMiscStorage().saveString(UPDATE_STORAGE_KEY, JSON.stringify({
+      data,
+      ttl: Date.now() + 1000 * 60 * 60, // 1 hour
+    }));
+
+    return data;
+  }, []);
+
+  const checkVersion = useCallback(async () => {
+    if (!isConfigured) {
+      return;
+    }
+
+    try{
+      const data = await getCachedUpdate();
+
+      const currentVersion = versionStringToNumber(Application.nativeApplicationVersion || '0.0.0');
+      const newVersion = versionStringToNumber(data?.versionName || '0.0.0');
+
+      if (newVersion > currentVersion) {
+        setUpdate(data);
+      }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+    }
+  }, [isConfigured, getCachedUpdate]);
+
+  const resetUpdate = useCallback(() => {
+    setUpdate(null);
+    setIsUpdateRejected(false);
+  }, []);
+
+  const value = useMemo(() => ({
+    update,
+    isUpdateRejected,
+    setUpdate,
+    checkVersion,
+    resetUpdate,
+  }), [
+    update,
+    isUpdateRejected,
+    setUpdate,
+    checkVersion,
+    resetUpdate,
+  ]);
+
+  return (
+    <AppUpdaterContext.Provider value={ value }>
+      { children }
+    </AppUpdaterContext.Provider>
+  );
+};
+
+export const useAppUpdaterContext = () => use(AppUpdaterContext);

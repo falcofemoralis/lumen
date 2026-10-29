@@ -19,7 +19,7 @@ export const FilmScreenThumbnail = ({
   const { scale, theme } = useAppTheme();
 
   return (
-    <View>
+    <View style={ styles.page }>
       <View style={ styles.upperContent }>
         <Header
           AdditionalActionIcon={ Forward }

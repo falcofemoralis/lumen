@@ -105,6 +105,7 @@
     ],
     "expo-speech-recognition",
     "@react-native-firebase/app",
+    "react-native-nitro-google-signin",
     "@kesha-antonov/react-native-background-downloader",
     "expo-image",
     "expo-status-bar",

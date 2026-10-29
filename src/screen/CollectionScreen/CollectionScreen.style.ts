@@ -7,9 +7,15 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   wrapper: {
     flex: 1,
   },
+  card: {
+    width: '100%',
+    aspectRatio: 208 / 120,
+    marginBottom: scale(ROW_GAP),
+  },
   item: {
     position: 'relative',
-    marginBottom: scale(ROW_GAP),
+    flex: 1,
+    width: '100%',
   },
   rowItem: {
     marginRight: scale(ROW_GAP),

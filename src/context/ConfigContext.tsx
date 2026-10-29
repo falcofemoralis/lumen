@@ -6,9 +6,11 @@ import {
   useMemo,
 } from 'react';
 import { useMMKVString } from 'react-native-mmkv';
-import { defaultConfig, DeviceConfigType } from 'src/config';
+import { defaultConfig, DeviceConfigType, migrateLegacyConfig } from 'src/config';
+import { getCloudSyncSettingId } from 'src/config/cloudSync';
 import { safeJsonParse } from 'Util/Json';
 import { storage } from 'Util/Storage';
+import { mutateCloudSync } from 'Util/CloudSync';
 
 export const DEVICE_CONFIG = 'deviceConfig';
 
@@ -38,23 +40,57 @@ const IsTVContext = createContext<boolean>(defaultConfig.isTV);
  */
 const HiddenCountriesContext = createContext<Set<string>>(new Set<string>());
 
+const PendingReleaseBadgeContext = createContext<boolean>(defaultConfig.showPendingReleaseBadge);
+
 // External access to global config. Avoid using it!
 let globalConfig: any = null;
 export const getGlobalConfig = (): DeviceConfigType => {
   if (!globalConfig) {
-    const storedConfig = storage.getConfigStorage().load<DeviceConfigType>(DEVICE_CONFIG);
+    const storedConfig = storage.getConfigStorage().load<Record<string, unknown>>(DEVICE_CONFIG);
 
-    // defaults first, so a key the stored blob predates is not read as undefined
+    // Migrate the old poster-rating setting before applying defaults.
     globalConfig = {
       ...defaultConfig,
       ...(globalConfig || {}),
-      ...(storedConfig || {}),
+      ...migrateLegacyConfig(storedConfig ?? {}),
     };
   }
 
   return globalConfig;
 };
 
+/**
+ * Applies a setting received from Cloud Sync without creating another
+ * Cloud Sync mutation. The MMKV write still updates ConfigProvider consumers.
+ */
+export const applyCloudConfig = (
+  key: keyof DeviceConfigType,
+  value: unknown,
+): void => {
+  if (globalConfig) {
+    if (value === undefined) {
+      delete globalConfig[key];
+    } else {
+      globalConfig[key] = value;
+    }
+  }
+
+  const storageInstance = storage.getConfigStorage();
+  const currentConfig =
+    storageInstance.load<DeviceConfigType>(DEVICE_CONFIG) ??
+    ({} as DeviceConfigType);
+
+  if (value === undefined) {
+    delete currentConfig[key];
+    storageInstance.save(DEVICE_CONFIG, currentConfig);
+    return;
+  }
+
+  storageInstance.save(DEVICE_CONFIG, {
+    ...currentConfig,
+    [key]: value,
+  });
+};
 export const ConfigProvider = ({ children }: { children: ReactNode }) => {
   const [deviceConfig, setDeviceConfig] = useMMKVString(DEVICE_CONFIG, storage.getConfigStorage().getMMKVInstance());
 
@@ -63,11 +99,11 @@ export const ConfigProvider = ({ children }: { children: ReactNode }) => {
       return defaultConfig;
     }
 
-    const parsedConfig = safeJsonParse<DeviceConfigType>(deviceConfig) ?? {};
+    const parsedConfig = safeJsonParse<Record<string, unknown>>(deviceConfig) ?? {};
 
     return {
       ...defaultConfig,
-      ...parsedConfig,
+      ...migrateLegacyConfig(parsedConfig),
     };
   }, [deviceConfig]);
 
@@ -85,7 +121,17 @@ export const ConfigProvider = ({ children }: { children: ReactNode }) => {
         [key]: value,
       });
     });
-  }, [setDeviceConfig]);
+
+    const cloudSyncId = getCloudSyncSettingId(key);
+
+    if (cloudSyncId) {
+      mutateCloudSync({
+        entity: 'setting',
+        id: cloudSyncId,
+        value,
+      });
+    }
+  }, [deviceConfig, setDeviceConfig]);
 
   const value = useMemo(() => ({
     ...config,
@@ -109,9 +155,11 @@ export const ConfigProvider = ({ children }: { children: ReactNode }) => {
   return (
     <ConfigContext.Provider value={ value }>
       <IsTVContext.Provider value={ config.isTV }>
-        <HiddenCountriesContext.Provider value={ hiddenCountries }>
-          { children }
-        </HiddenCountriesContext.Provider>
+        <PendingReleaseBadgeContext.Provider value={ config.showPendingReleaseBadge }>
+          <HiddenCountriesContext.Provider value={ hiddenCountries }>
+            { children }
+          </HiddenCountriesContext.Provider>
+        </PendingReleaseBadgeContext.Provider>
       </IsTVContext.Provider>
     </ConfigContext.Provider>
   );
@@ -135,3 +183,5 @@ export const useIsTV = () => useContext(IsTVContext);
  * `useConfigContext().hiddenCountries` -- see HiddenCountriesContext above.
  */
 export const useHiddenCountries = () => useContext(HiddenCountriesContext);
+
+export const useShowPendingReleaseBadge = () => useContext(PendingReleaseBadgeContext);

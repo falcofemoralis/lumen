@@ -6,6 +6,8 @@ export const CATEGORY_SCREEN = 'Category';
 export const ERROR_SCREEN = 'Error';
 export const FILM_SCREEN = 'Film';
 export const HOME_SCREEN = 'Home';
+export const BROADCAST_SCREEN = 'Broadcast';
+export const BROADCAST_TAB = 'Broadcast-tab';
 export const LOADER_SCREEN = 'Loader';
 export const NOTIFICATIONS_SCREEN = 'Notifications';
 export const PLAYER_SCREEN = 'Player';
@@ -31,5 +33,5 @@ export const MY_COMMENTS_TAB = `${MY_COMMENTS_SCREEN}-tab`;
 * This is a list of all the screen names that will exit the app if the back button
 * is pressed while in that screen. Only affects Android.
 */
-export const exitRoutesMobile = [HOME_SCREEN, SEARCH_SCREEN, BOOKMARKS_SCREEN, RECENT_SCREEN, ACCOUNT_SCREEN, ERROR_SCREEN];
-export const exitRoutesTV = [ACCOUNT_SCREEN, NOTIFICATIONS_SCREEN, HOME_SCREEN, RECENT_SCREEN, BOOKMARKS_SCREEN, SEARCH_SCREEN, SETTINGS_SCREEN, ERROR_SCREEN];
+export const exitRoutesMobile = [BROADCAST_SCREEN, HOME_SCREEN, SEARCH_SCREEN, BOOKMARKS_SCREEN, RECENT_SCREEN, ACCOUNT_SCREEN, ERROR_SCREEN];
+export const exitRoutesTV = [BROADCAST_SCREEN, ACCOUNT_SCREEN, NOTIFICATIONS_SCREEN, HOME_SCREEN, RECENT_SCREEN, BOOKMARKS_SCREEN, SEARCH_SCREEN, SETTINGS_SCREEN, ERROR_SCREEN];

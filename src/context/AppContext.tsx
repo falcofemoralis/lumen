@@ -8,6 +8,7 @@ import {
 
 import { AppUpdaterProvider } from './AppUpdaterContext';
 import { ConfigProvider } from './ConfigContext';
+import { CloudSyncProvider } from './CloudSyncContext';
 import { NavigationProvider } from './NavigationContext';
 import { NetworkProvider } from './NetworkContext';
 import { OverlayProvider } from './OverlayContext';
@@ -39,7 +40,8 @@ export const AppProviders = composeProviders(
   PlayerProgressProvider,
   AppUpdaterProvider,
   OverlayProvider,
-  NetworkProvider
+  NetworkProvider,
+  CloudSyncProvider
 );
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {

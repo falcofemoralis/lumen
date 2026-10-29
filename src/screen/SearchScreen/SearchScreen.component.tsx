@@ -21,53 +21,57 @@ import History from 'lucide-react-native/icons/rotate-ccw-clock';
 import Search from 'lucide-react-native/icons/search';
 import Settings2 from 'lucide-react-native/icons/settings-2';
 import X from 'lucide-react-native/icons/x';
-import { ScrollView, View } from 'react-native';
+import { useState } from 'react';
+import { ScrollView, useWindowDimensions, View } from 'react-native';
 import { useAppTheme } from 'Theme/context';
 
 import { componentStyles } from './SearchScreen.style';
 import { SearchScreenComponentProps } from './SearchScreen.type';
+import { SearchFilters } from './SearchScreen.filters';
+import { SearchEmpty } from './SearchScreen.empty';
 
-export function SearchScreenComponent({
-  suggestions,
-  pagerItems,
-  query,
-  recognizing,
-  enteredText,
-  isLoading,
-  additionalContentOverlayRef,
-  categories,
-  selectedCategory,
-  selectedGenre,
-  selectedYear,
-  isCategoriesLoading,
-  confirmationOverlayRef,
-  onChangeText,
-  onApplySearch,
-  onApplySuggestion,
-  onPreLoad,
-  onNextLoad,
-  handleStartRecognition,
-  handleApplySearch,
-  resetSearch,
-  clearSearch,
-  openAdditionalContentOverlay,
-  handleApplyAdditionalContent,
-  handleOpenCollections,
-  setSelectedCategory,
-  setSelectedGenre,
-  setSelectedYear,
-  isRemovableSuggestion,
-  handleRemoveSuggestion,
-  removeSuggestion,
-}: SearchScreenComponentProps) {
+export function SearchScreenComponent(props: SearchScreenComponentProps) {
+    const {
+    suggestions,
+    pagerItems,
+    query,
+    recognizing,
+    enteredText,
+    isLoading,
+    additionalContentOverlayRef,
+    categories,
+    selectedCategory,
+
+    isCategoriesLoading,
+    confirmationOverlayRef,
+    onChangeText,
+    onApplySearch,
+    onApplySuggestion,
+    onPreLoad,
+    onNextLoad,
+    handleStartRecognition,
+    handleApplySearch,
+    resetSearch,
+    clearSearch,
+    openAdditionalContentOverlay,
+    handleApplyAdditionalContent,
+    handleOpenCollections,
+    setSelectedCategory,
+
+    isRemovableSuggestion,
+    handleRemoveSuggestion,
+    removeSuggestion,
+} = props;
   const { scale, theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
+  const { height } = useWindowDimensions();
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   const renderSearchBar = () => (
     <View style={ styles.searchBarContainer }>
       <ThemedPressable
         style={ styles.actionBtnSearch }
-        onPress={ handleApplySearch }
+        onPress={ () => { setIsSearchFocused(false); handleApplySearch(); } }
       >
         <Search
           style={ styles.actionBtnIcon }
@@ -80,12 +84,13 @@ export function SearchScreenComponent({
         containerStyle={ styles.searchBar }
         placeholder={ t('Search') }
         onChangeText={ (text) => onChangeText(text) }
-        onSubmitEditing={ ({ nativeEvent: { text } }) => onApplySearch(text) }
+        onFocus={ () => setIsSearchFocused(true) }
+        onBlur={ () => setIsSearchFocused(false) }
+        onSubmitEditing={ ({ nativeEvent: { text } }) => { setIsSearchFocused(false); onApplySearch(text); } }
         value={ enteredText }
         placeholderTextColor={ theme.colors.text }
         selectionColor={ theme.colors.primary }
         cursorColor={ theme.colors.text }
-        onPress={ resetSearch }
       />
       { enteredText && (
         <ThemedPressable
@@ -139,16 +144,16 @@ export function SearchScreenComponent({
   );
 
   const renderSuggestions = () => {
-    if (!suggestions.length || query) {
+    if (!isSearchFocused || !suggestions.length) {
       return null;
     }
 
     return (
-      <View style={ styles.suggestionsContainer }>
+      <ScrollView keyboardShouldPersistTaps="handled" style={ { maxHeight: Math.min(scale(300), height * 0.4) } }><View style={ styles.suggestionsContainer }>
         { suggestions.map((suggestion) => (
           <ThemedPressable
             key={ suggestion }
-            onPress={ () => onApplySuggestion(suggestion) }
+            onPress={ () => { setIsSearchFocused(false); onApplySuggestion(suggestion); } }
             // Only history entries can be removed -- the service's suggestions
             // must not bring up the confirmation at all.
             onLongPress={ isRemovableSuggestion(suggestion)
@@ -175,7 +180,7 @@ export function SearchScreenComponent({
             />
           </ThemedPressable>
         )) }
-      </View>
+      </View></ScrollView>
     );
   };
 
@@ -184,16 +189,6 @@ export function SearchScreenComponent({
       return null;
     }
 
-    if (!isLoading && !pagerItems[0]?.films?.length) {
-      return (
-        <View style={ styles.noResults }>
-          <InfoBlock
-            title={ t('No results found') }
-            subtitle={ t('Try searching for something else') }
-          />
-        </View>
-      );
-    }
 
     return (
       <View style={ styles.grid }>
@@ -202,85 +197,17 @@ export function SearchScreenComponent({
           onPreLoad={ onPreLoad }
           onNextLoad={ onNextLoad }
           disableStatusbarSafeArea
+          isEmpty={ !isLoading && !pagerItems[0]?.films?.length }
+          ListEmptyComponent={ <SearchEmpty { ...props } /> }
         />
       </View>
     );
   };
 
-  const renderCategories = () => {
-    if (isCategoriesLoading) {
-      return (
-        <View style={ styles.categoriesLoader }>
-          <Loader fullScreen isLoading />
-        </View>
-      );
-    }
-
-    if (!categories?.length) {
-      return null;
-    }
-
-    return (
-      <ScrollView>
-        <View style={ styles.categories }>
-          <ThemedText>
-            { t('Choose format') }
-          </ThemedText>
-          <ThemedDropdown
-            header={ t('Format') }
-            value={ selectedCategory?.name || '' }
-            data={ categories?.map((cat) => ({
-              label: cat.name,
-              value: cat.name,
-            })) || [] }
-            onChange={ (item) => {
-              const cat = categories?.find((c) => c.name === item.value);
-
-              if (cat) {
-                setSelectedCategory(cat);
-              }
-            } }
-            closeOnChange
-          />
-          <ThemedText>
-            { t('Choose genre') }
-          </ThemedText>
-          <ThemedDropdown
-            header={ t('Genre') }
-            value={ selectedGenre || '' }
-            data={ selectedCategory?.genres.map((genre) => ({
-              label: genre.name,
-              value: genre.value,
-            })) || [] }
-            onChange={ (item) => setSelectedGenre(item.value) }
-            closeOnChange
-          />
-          <ThemedText>
-            { t('Choose year') }
-          </ThemedText>
-          <ThemedDropdown
-            header={ t('Year') }
-            value={ selectedYear || '' }
-            data={ selectedCategory?.years.map((year) => ({
-              label: year.name,
-              value: year.value,
-            })) || [] }
-            onChange={ (item) => setSelectedYear(item.value) }
-            closeOnChange
-          />
-          <ThemedButton
-            title={ t('Lets search!') }
-            style={ styles.categoriesSelectBtn }
-            onPress={ handleApplyAdditionalContent }
-          />
-        </View>
-      </ScrollView>
-    );
-  };
-
+  const renderCategories = () => <SearchFilters { ...props } />;
   const renderCategoriesModal = () => {
     return (
-      <ThemedOverlay ref={ additionalContentOverlayRef }>
+      <ThemedOverlay ref={ additionalContentOverlayRef } contentContainerStyle={ { maxHeight: '80%' } }>
         { renderCategories() }
       </ThemedOverlay>
     );

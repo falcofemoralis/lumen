@@ -1,6 +1,7 @@
 import { Theme, ThemedStyles } from 'Theme/types';
 
 export const TAB_ADDITIONAL_SIZE = 20;
+export const TAB_BAR_HEIGHT = 50;
 
 export const componentStyles = ({ scale, colors, text }: Theme) => ({
   tabBar: {
@@ -11,7 +12,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   tabs: {
     width: '100%',
     flexDirection: 'row',
-    height: scale(50),
+    height: scale(TAB_BAR_HEIGHT),
     overflow: 'hidden',
   },
   tabContainer: {

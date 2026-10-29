@@ -1,0 +1,529 @@
+import {
+  createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import {
+  GoogleOneTapSignIn,
+  isErrorWithCode,
+} from 'react-native-nitro-google-signin';
+
+const stableSerialize = (value: unknown): string => {
+  if (Array.isArray(value)) {
+    return `[${value.map(stableSerialize).join(',')}]`;
+  }
+
+  if (value && typeof value === 'object') {
+    const object = value as Record<string, unknown>;
+
+    return `{${Object.keys(object)
+      .sort()
+      .map(
+        key =>
+          `${JSON.stringify(key)}:${stableSerialize(object[key])}`,
+      )
+      .join(',')}}`;
+  }
+
+  return JSON.stringify(value) ?? 'undefined';
+};
+GoogleOneTapSignIn.configure({
+  webClientId: '735472570565-j9cifmbous56ipdvc0b95v54d1hb23kb.apps.googleusercontent.com',
+});
+
+import { useNetworkContext } from './NetworkContext';
+import {
+  CLOUD_SYNC_FILE_NAME,
+  createLocalCloudBootstrapState,
+  CloudSyncEnvelope,
+  CloudSyncState,
+  CloudSyncStatus,
+  createEmptyCloudSyncState,
+  getCloudSyncMetadata,
+  loadCloudSyncState,
+  mergeCloudSyncState,
+  requestGoogleDriveScope,
+  restoreCloudSyncState,
+  saveCloudSyncState,
+  subscribeCloudSync,
+  updateCloudSyncMetadata,
+  updateCloudFile,
+  uploadCloudFile,
+} from 'Util/CloudSync';
+import {
+  downloadCloudFile,
+  findCloudFiles,
+} from 'Util/CloudSync/drive';
+import {
+  isValidCloudSyncEnvelope,
+} from 'Util/CloudSync/validation';
+
+const SYNC_DEBOUNCE_MS = 1500;
+
+interface CloudSyncContextInterface extends CloudSyncStatus {
+  connect: () => Promise<void>;
+  disconnect: () => Promise<void>;
+  syncNow: () => Promise<void>;
+}
+
+const CloudSyncContext = createContext<CloudSyncContextInterface>({
+  connected: false,
+  email: null,
+  lastSyncAt: null,
+  lastError: null,
+  syncing: false,
+  connect: async () => {},
+  disconnect: async () => {},
+  syncNow: async () => {},
+});
+
+const getCurrentGoogleUserEmail = (): string | null => {
+  const user = GoogleOneTapSignIn.getCurrentUser();
+
+  return user?.user?.email ?? null;
+};
+
+export const CloudSyncProvider = ({
+  children,
+}: {
+  children: ReactNode;
+}) => {
+  const { isInternetAvailable } = useNetworkContext();
+
+  const initialMetadata = getCloudSyncMetadata();
+
+  const [connected, setConnected] = useState(false);
+  const [email, setEmail] = useState<string | null>(null);
+  const [lastSyncAt, setLastSyncAt] = useState<number | null>(
+    initialMetadata.lastSyncAt
+  );
+  const [lastError, setLastError] = useState<string | null>(
+    initialMetadata.lastError
+  );
+  const [syncing, setSyncing] = useState(false);
+
+  const [authChecked, setAuthChecked] = useState(false);
+
+  const syncTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const syncInProgressRef = useRef(false);
+  const pendingSyncRef = useRef(false);
+  const syncGenerationRef = useRef(0);
+  const syncNowRef = useRef<() => Promise<void>>(async () => {});
+
+  useEffect(() => {
+    const currentUser = GoogleOneTapSignIn.getCurrentUser();
+
+    if (!currentUser) {
+      updateCloudSyncMetadata({
+        connectedAccountEmail: null,
+        syncEnabled: false,
+      });
+
+      setConnected(false);
+      setEmail(null);
+      setAuthChecked(true);
+      return;
+    }
+
+    const currentEmail = currentUser.user.email;
+
+    updateCloudSyncMetadata({
+      connectedAccountEmail: currentEmail,
+      syncEnabled: true,
+    });
+
+    setConnected(true);
+    setEmail(currentEmail);
+    setAuthChecked(true);
+  }, []);
+
+  const syncNow = useCallback(async () => {
+    if (
+      !isInternetAvailable ||
+      syncInProgressRef.current ||
+      !connected
+    ) {
+      return;
+    }
+
+    pendingSyncRef.current = false;
+    syncInProgressRef.current = true;
+    const syncGeneration = syncGenerationRef.current;
+    setSyncing(true);
+    setLastError(null);
+
+    const isSyncGenerationCurrent = (): boolean =>
+      syncGenerationRef.current === syncGeneration;
+
+    try {
+      const metadata = getCloudSyncMetadata();
+
+      let mergedState =
+        loadCloudSyncState() ?? createEmptyCloudSyncState();
+
+      if (!metadata.localStateBootstrapped) {
+        const bootstrapState = createLocalCloudBootstrapState();
+
+        mergedState = mergeCloudSyncState(
+          mergedState,
+          bootstrapState,
+        );
+      }
+
+      const MAX_SYNC_ATTEMPTS = 3;
+
+      for (
+        let attempt = 0;
+        attempt < MAX_SYNC_ATTEMPTS;
+        attempt += 1
+      ) {
+        if (!isSyncGenerationCurrent()) {
+          return;
+        }
+
+        const remoteFiles =
+          await findCloudFiles(CLOUD_SYNC_FILE_NAME);
+
+        if (!isSyncGenerationCurrent()) {
+          return;
+        }
+
+        let remoteMergedState: CloudSyncState | null = null;
+
+        for (const remoteFile of remoteFiles) {
+          const remote =
+            await downloadCloudFile<unknown>(remoteFile.id);
+
+          if (!isValidCloudSyncEnvelope(remote)) {
+            throw new Error(
+              `Google Drive file "${CLOUD_SYNC_FILE_NAME}" is invalid or uses an unsupported schema version.`
+            );
+          }
+
+          remoteMergedState = remoteMergedState
+            ? mergeCloudSyncState(
+                remoteMergedState,
+                remote.payload,
+              )
+            : remote.payload;
+        }
+
+        if (remoteMergedState) {
+          mergedState = mergeCloudSyncState(
+            mergedState,
+            remoteMergedState,
+          );
+        }
+
+        const latestLocalState =
+          loadCloudSyncState() ?? createEmptyCloudSyncState();
+
+        mergedState = mergeCloudSyncState(
+          mergedState,
+          latestLocalState,
+        );
+
+        if (!isSyncGenerationCurrent()) {
+          return;
+        }
+
+        saveCloudSyncState(mergedState);
+        restoreCloudSyncState(mergedState);
+
+        updateCloudSyncMetadata({
+          localStateBootstrapped: true,
+        });
+
+        if (!isSyncGenerationCurrent()) {
+          return;
+        }
+
+        const envelope: CloudSyncEnvelope = {
+          type: 'sync',
+          payload: mergedState,
+        };
+
+        if (remoteFiles.length === 0) {
+          await uploadCloudFile(
+            CLOUD_SYNC_FILE_NAME,
+            envelope,
+          );
+        } else {
+          for (const remoteFile of remoteFiles) {
+            await updateCloudFile(
+              remoteFile.id,
+              envelope,
+            );
+          }
+        }
+
+        if (!isSyncGenerationCurrent()) {
+          return;
+        }
+
+        const verifiedFiles =
+          await findCloudFiles(CLOUD_SYNC_FILE_NAME);
+
+        if (verifiedFiles.length === 0) {
+          throw new Error(
+            `Google Drive file "${CLOUD_SYNC_FILE_NAME}" disappeared during synchronization.`
+          );
+        }
+
+        let verifiedMergedState: CloudSyncState | null = null;
+
+        for (const verifiedFile of verifiedFiles) {
+          const verifiedRemote =
+            await downloadCloudFile<unknown>(
+              verifiedFile.id,
+            );
+
+          if (!isValidCloudSyncEnvelope(verifiedRemote)) {
+            throw new Error(
+              `Google Drive file "${CLOUD_SYNC_FILE_NAME}" became invalid during synchronization.`
+            );
+          }
+
+          verifiedMergedState = verifiedMergedState
+            ? mergeCloudSyncState(
+                verifiedMergedState,
+                verifiedRemote.payload,
+              )
+            : verifiedRemote.payload;
+        }
+
+        if (!verifiedMergedState) {
+          throw new Error(
+            `Google Drive file "${CLOUD_SYNC_FILE_NAME}" could not be verified.`
+          );
+        }
+
+        const latestLocalStateAfterVerification =
+          loadCloudSyncState() ?? createEmptyCloudSyncState();
+
+        const convergedState = mergeCloudSyncState(
+          mergeCloudSyncState(
+            mergedState,
+            verifiedMergedState,
+          ),
+          latestLocalStateAfterVerification,
+        );
+
+        if (
+          stableSerialize(convergedState) ===
+          stableSerialize(mergedState)
+        ) {
+          mergedState = convergedState;
+          break;
+        }
+
+        mergedState = convergedState;
+
+        // A local mutation may have happened while Drive verification
+        // was awaiting network responses. The latest local state is
+        // merged above before deciding whether synchronization converged,
+        // so an in-flight mutation cannot be overwritten by stale data.
+
+        saveCloudSyncState(mergedState);
+        restoreCloudSyncState(mergedState);
+
+        if (attempt === MAX_SYNC_ATTEMPTS - 1) {
+          throw new Error(
+            `Google Drive file "${CLOUD_SYNC_FILE_NAME}" changed repeatedly during synchronization.`
+          );
+        }
+      }
+
+      if (!isSyncGenerationCurrent()) {
+        return;
+      }
+
+      const syncedAt = Date.now();
+
+      updateCloudSyncMetadata({
+        lastSyncAt: syncedAt,
+        lastError: null,
+      });
+
+      setLastSyncAt(syncedAt);
+      setLastError(null);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : String(error);
+
+      updateCloudSyncMetadata({
+        lastError: message,
+      });
+
+      setLastError(message);
+    } finally {
+      syncInProgressRef.current = false;
+      setSyncing(false);
+
+      if (pendingSyncRef.current) {
+        if (syncTimeoutRef.current) {
+          clearTimeout(syncTimeoutRef.current);
+        }
+
+        syncTimeoutRef.current = setTimeout(() => {
+          syncTimeoutRef.current = null;
+          void syncNowRef.current();
+        }, SYNC_DEBOUNCE_MS);
+      }
+    }
+  }, [connected, isInternetAvailable]);
+
+  syncNowRef.current = syncNow;
+
+  const scheduleSync = useCallback(() => {
+    pendingSyncRef.current = true;
+
+    if (syncTimeoutRef.current) {
+      clearTimeout(syncTimeoutRef.current);
+    }
+
+    syncTimeoutRef.current = setTimeout(() => {
+      syncTimeoutRef.current = null;
+      void syncNowRef.current();
+    }, SYNC_DEBOUNCE_MS);
+  }, []);
+
+  useEffect(() => {
+    return subscribeCloudSync(event => {
+      if (event.type === 'mutation' || event.type === 'flush') {
+        scheduleSync();
+      }
+    });
+  }, [scheduleSync]);
+
+  useEffect(() => {
+    if (!authChecked || !connected || !isInternetAvailable) {
+      return;
+    }
+
+    void syncNow();
+  }, [authChecked, connected, isInternetAvailable, syncNow]);
+
+  useEffect(() => {
+    return () => {
+      if (syncTimeoutRef.current) {
+        clearTimeout(syncTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const connect = useCallback(async () => {
+    syncGenerationRef.current += 1;
+    setLastError(null);
+
+    try {
+      await GoogleOneTapSignIn.checkPlayServices();
+
+      let user = GoogleOneTapSignIn.getCurrentUser();
+
+      if (!user) {
+        await GoogleOneTapSignIn.signIn();
+        user = GoogleOneTapSignIn.getCurrentUser();
+      }
+
+      if (!user) {
+        throw new Error('Google account sign-in was cancelled.');
+      }
+
+      await requestGoogleDriveScope();
+
+      const accountEmail = await getCurrentGoogleUserEmail();
+
+      updateCloudSyncMetadata({
+        connectedAccountEmail: accountEmail,
+        syncEnabled: true,
+        lastError: null,
+      });
+
+      setConnected(true);
+      setEmail(accountEmail);
+      setLastError(null);
+
+      if (isInternetAvailable) {
+        setTimeout(() => {
+          void syncNowRef.current();
+        }, 0);
+      }
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : String(error);
+
+      updateCloudSyncMetadata({
+        lastError: message,
+      });
+
+      setLastError(message);
+
+      throw error;
+    }
+  }, [isInternetAvailable]);
+
+  const disconnect = useCallback(async () => {
+    syncGenerationRef.current += 1;
+    pendingSyncRef.current = false;
+
+    if (syncTimeoutRef.current) {
+      clearTimeout(syncTimeoutRef.current);
+      syncTimeoutRef.current = null;
+    }
+
+    try {
+      await GoogleOneTapSignIn.signOut();
+    } catch (error) {
+      if (!isErrorWithCode(error)) {
+        throw error;
+      }
+    }
+
+    updateCloudSyncMetadata({
+      connectedAccountEmail: null,
+      syncEnabled: false,
+      lastError: null,
+    });
+
+    setConnected(false);
+    setEmail(null);
+    setLastError(null);
+  }, []);
+
+  const value = useMemo(
+    () => ({
+      connected,
+      email,
+      lastSyncAt,
+      lastError,
+      syncing,
+      connect,
+      disconnect,
+      syncNow,
+    }),
+    [
+      connected,
+      email,
+      lastSyncAt,
+      lastError,
+      syncing,
+      connect,
+      disconnect,
+      syncNow,
+    ]
+  );
+
+  return (
+    <CloudSyncContext.Provider value={ value }>
+      { children }
+    </CloudSyncContext.Provider>
+  );
+};
+
+export const useCloudSyncContext = () => useContext(CloudSyncContext);

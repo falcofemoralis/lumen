@@ -19,6 +19,7 @@ export const HeaderComponent = ({
   AdditionalActionIcon,
   isDeepLink = false,
   onBack,
+  disableBackRipple = false,
 }: HeaderComponentProps) => {
   const navigation = useNavigation<NativeStackNavigationProp<AppStackParamList>>();
   const { scale, theme } = useAppTheme();
@@ -29,8 +30,9 @@ export const HeaderComponent = ({
       <View style={ [styles.topActions, style] }>
         <View style={ styles.leftActions }>
           <ThemedPressable
-            style={ styles.topActionsButton }
+            style={ [ styles.topActionsButton, disableBackRipple && { backgroundColor: 'transparent' } ] }
             contentStyle={ styles.topActionsButtonContent }
+            disableRipple={ disableBackRipple }
             onPress={ () => {
               if (onBack) {
                 onBack();

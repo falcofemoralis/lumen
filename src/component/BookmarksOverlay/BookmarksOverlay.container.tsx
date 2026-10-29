@@ -2,13 +2,20 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useLocalBookmarks } from 'Hooks/useLocalLibrary';
+import { useBookmarkLibrary } from 'Hooks/useBookmarkLibrary';
+import { bookmarkFilmIdentity, matchingBookmarkIds } from 'Util/LocalLibrary/identity';
+import { toggleBookmark as toggleCachedBookmark } from 'Util/LocalLibrary/logic';
+import { mergeBookmarkFlags } from 'Util/LocalLibrary/remoteBookmarks';
+import { ContentSource } from '../../source/types/ContentSource';
+import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { t } from 'i18n/translate';
 import { useState } from 'react';
+import { Platform } from 'react-native';
 import NotificationStore from 'Store/Notification.store';
 import { BookmarkInterface } from 'Type/Bookmark.interface';
 import { FilmInterface } from 'Type/Film.interface';
 import { filmToFilmCard } from 'Util/Film';
-import { createLocalCategory, toggleLocalBookmark } from 'Util/LocalLibrary';
+import { createLocalCategory, getLocalBookmarksForFilm, toggleLocalBookmark } from 'Util/LocalLibrary';
 import { queryKeys } from 'Util/Query';
 
 import BookmarksOverlayComponent from './BookmarksOverlay.component';
@@ -44,6 +51,10 @@ export const BookmarksOverlayContainer = ({
   const { currentService } = useServiceContext();
   const { isTV, isLocalLibrary } = useConfigContext();
   const localBookmarks = useLocalBookmarks();
+  const bookmarkLibrary = useBookmarkLibrary();
+  const rememberedIds = matchingBookmarkIds(bookmarkLibrary, filmToFilmCard(film));
+  const rememberedNativeId = rememberedIds.flatMap(id => bookmarkFilmIdentity(bookmarkLibrary.films[id]).sources)
+    .find(source => source.source === ContentSource.REZKA && source.nativeId)?.nativeId;
   const queryClient = useQueryClient();
 
   // the overlay stays mounted between opens and the parent may keep handing back the same
@@ -76,14 +87,26 @@ export const BookmarksOverlayContainer = ({
 
   const { mutate: toggleBookmark, isPending: isLoading } = useMutation({
     mutationFn: ({ bookmarkId, isChecked }: { bookmarkId: string, isChecked: boolean }) => {
-      const { id } = film;
+      const id = film.metadataSourceFilm?.id ?? rememberedNativeId ?? film.id;
 
       return isChecked
         ? currentService.addBookmark(id, bookmarkId)
         : currentService.removeBookmark(id, bookmarkId);
     },
-    onSuccess: (_result, { bookmarkId, isChecked }) => {
-      const { bookmarks } = film;
+    onMutate: async ({ bookmarkId, isChecked }) => {
+      await Promise.all([
+        queryClient.cancelQueries({ queryKey: queryKeys.bookmarks() }),
+        queryClient.cancelQueries({ queryKey: queryKeys.films.bookmarks() }),
+        queryClient.cancelQueries({ queryKey: ['film', film.link], exact: true }),
+      ]);
+      const previous = queryClient.getQueriesData({ predicate: query =>
+        query.queryKey[0] === 'bookmarks'
+        || (query.queryKey[0] === 'films' && query.queryKey[1] === 'bookmarks')
+        || (query.queryKey[0] === 'film' && query.queryKey.length === 2
+          && (query.state.data as FilmInterface | undefined)?.id === film.id),
+      });
+      const previousOverrides = overrides;
+      const bookmarks = mergeBookmarkFlags(film.bookmarks, getLocalBookmarksForFilm(bookmarkLibrary, film.id, filmToFilmCard(film)));
       const bookmark = bookmarks?.find((b) => b.id === bookmarkId);
 
       if (bookmarks && bookmark) {
@@ -99,9 +122,27 @@ export const BookmarksOverlayContainer = ({
         onBookmarkChange?.({ ...film, bookmarks: newBookmarks });
       }
 
-      // the bookmarks tab lists the same categories, so it has to re-read them
-      queryClient.invalidateQueries({ queryKey: queryKeys.bookmarks() });
-      queryClient.invalidateQueries({ queryKey: queryKeys.films.bookmarks() });
+      const updated = toggleCachedBookmark(bookmarkLibrary, filmToFilmCard(film), bookmarkId, isChecked);
+      const updatedCategory = updated.categories.find(category => category.id === bookmarkId);
+      if (updatedCategory) {
+        const cards = updatedCategory.filmIds.map(id => updated.films[id]).filter(Boolean);
+        queryClient.setQueriesData<{ films: FilmCardInterface[] }>({
+          predicate: query => query.queryKey[0] === 'films' && query.queryKey[1] === 'bookmarks' && query.queryKey[2] === bookmarkId,
+        }, old => old ? { ...old, films: cards } : old);
+        queryClient.setQueryData<BookmarkInterface[]>(queryKeys.bookmarks(), old => old?.map(item => item.id === bookmarkId && item.filmList
+          ? { ...item, filmList: { ...item.filmList, films: cards } } : item));
+      }
+
+      return { previous, previousOverrides };
+    },
+    onError: (_error, _variables, context) => {
+      context?.previous.forEach(([key, data]) => queryClient.setQueryData(key, data));
+      if (context) setOverrides(context.previousOverrides);
+      onBookmarkChange?.(film);
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.bookmarks(), refetchType: 'none' });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.films.bookmarks(), refetchType: 'none' });
     },
   });
 
@@ -113,6 +154,10 @@ export const BookmarksOverlayContainer = ({
       return;
     }
 
+    if (!film.metadataSourceFilm && !rememberedNativeId && /^https?:\/\/(?:[^/]*\.zona\.im|anixart-app\.com)\//.test(film.link)) {
+      NotificationStore.displayMessage('Для этого фильма доступны локальные закладки');
+      return;
+    }
     toggleBookmark({ bookmarkId, isChecked });
   };
 
@@ -128,14 +173,15 @@ export const BookmarksOverlayContainer = ({
 
   const prepareItems = () => {
     if (isLocalLibrary) {
+      const memberships = new Set(getLocalBookmarksForFilm(localBookmarks, film.libraryId ?? film.id, filmToFilmCard(film)).filter(item => item.isBookmarked).map(item => item.id));
       return localBookmarks.categories.map((category) => ({
         label: `${category.title} (${category.filmIds.length})`,
         value: category.id,
-        isChecked: category.filmIds.includes(film.id),
+        isChecked: memberships.has(category.id),
       }));
     }
 
-    const { bookmarks = [] } = film;
+    const bookmarks = mergeBookmarkFlags(film.bookmarks, getLocalBookmarksForFilm(bookmarkLibrary, film.id, filmToFilmCard(film)));
 
     return bookmarks.map((bookmark) => {
       const override = overrides[bookmark.id];
@@ -160,7 +206,7 @@ export const BookmarksOverlayContainer = ({
   };
 
   // eslint-disable-next-line max-len
-  return isTV ? <BookmarksOverlayComponentTV { ...containerProps } /> : <BookmarksOverlayComponent { ...containerProps } />;
+  return isTV && Platform.OS !== 'web' ? <BookmarksOverlayComponentTV { ...containerProps } /> : <BookmarksOverlayComponent { ...containerProps } />;
 };
 
 export default BookmarksOverlayContainer;

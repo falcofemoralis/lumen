@@ -1,10 +1,14 @@
+import { useRetainedScroll } from 'Hooks/useRetainedScroll';
+import { sameGridCardProps } from './FilmGrid.memo';
 import { getCurrentFocusKey, NextFocusResolver, setFocus } from '@noriginmedia/norigin-spatial-navigation-core';
 import { FocusContext, FocusHandler, useFocusable } from '@noriginmedia/norigin-spatial-navigation-react-native-tvos';
-import { FlashList, FlashListRef } from '@shopify/flash-list';
+import { FlashList, FlashListRef, ViewToken } from '@shopify/flash-list';
 import { FilmCard } from 'Component/FilmCard';
 import { POSTER_ASPECT_HEIGHT, POSTER_ASPECT_WIDTH } from 'Component/FilmCard/FilmCard.config';
 import { INFO_HEIGHT } from 'Component/FilmCard/FilmCard.style.atv';
 import { FilmCardThumbnail } from 'Component/FilmCard/FilmCard.thumbnail.atv';
+import { ScrollToTopButton } from 'Component/ScrollToTopButton';
+import { SCROLL_SHOW_THRESHOLD } from 'Component/ScrollToTopButton/ScrollToTopButton.config';
 import { ScrollContext, useScrollContext } from 'Component/ThemedScrollView/ScrollContext';
 import { ThemedText } from 'Component/ThemedText';
 import { useConfigContext } from 'Context/ConfigContext';
@@ -12,8 +16,9 @@ import { useDefaultFocus } from 'Hooks/useDefaultFocus';
 import { FOCUS_SCROLL_EVENT_THROTTLE, useFocusScroll } from 'Hooks/useFocusScroll';
 import { useLatest } from 'Hooks/useLatest';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
+import { usePosterPrefetch } from 'Hooks/usePosterPrefetch';
 import { memo, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
-import { View } from 'react-native';
+import { NativeScrollEvent, NativeSyntheticEvent, View } from 'react-native';
 import { Pressable } from 'react-native-gesture-handler';
 import { useAppTheme } from 'Theme/context';
 import { ThemedStyles } from 'Theme/types';
@@ -57,6 +62,8 @@ function FilmGridItemCard({
   isLastRow,
   registerCard,
   handleOnPress,
+  isRatingVisible,
+  filmActions,
 }: FilmGridItemProps) {
   const { scale } = useAppTheme();
   const { scrollTo } = useScrollContext();
@@ -121,11 +128,15 @@ function FilmGridItemCard({
     }
 
     return (
-      <FilmCard
-        filmCard={ film }
-        isFocused={ focused }
-        disableScaleTransition={ isInstantZoom }
-      />
+      <View style={ { position: 'relative' } }>
+        <FilmCard
+          filmCard={ film }
+          isFocused={ focused }
+          disableScaleTransition={ isInstantZoom }
+          isRatingVisible={ isRatingVisible }
+        />
+        { filmActions?.(film) }
+      </View>
     );
   };
 
@@ -142,7 +153,7 @@ function FilmGridItemCard({
 }
 
 const MemoizedHeader = memo(FilmGridHeader);
-const MemoizedGridItem = memo(FilmGridItemCard);
+const MemoizedGridItem = memo(FilmGridItemCard, sameGridCardProps);
 
 // Where a focused row is parked vertically: just below the top edge, leaving the
 // row above it visible as a hint that there is more up there.
@@ -172,18 +183,41 @@ function FilmGridList({
   disableEmptyComponent,
   hideGrid,
   ListHeaderComponent,
-  ListMenuComponent,
   ListEmptyComponent,
   centerEmptyComponent,
   disableAutofocus,
   gridFocusKey,
   cardsFocusKey,
   handleOnPress,
+  filmActions,
   handleScrollEnd,
   onAtTopChange,
+  showScrollToTopButton,
 }: FilmGridListProps) {
   const styles = useThemedStyles(componentStyles);
   const { scale, theme: { dimensions } } = useAppTheme();
+  const [visibleFilmIds, setVisibleFilmIds] = useState<Set<string>>(new Set());
+
+  const viewabilityConfig = useMemo(() => ({
+    itemVisiblePercentThreshold: 50,
+  }), []);
+
+  const prefetchPosters = usePosterPrefetch(data, numberOfColumns);
+  const onViewableItemsChanged = useCallback(({
+    viewableItems,
+  }: { viewableItems: ViewToken<FilmGridItem>[] }) => {
+    const indexes = viewableItems.filter(token => token.isViewable && token.index !== null).map(token => token.index!);
+    if (indexes.length) prefetchPosters(Math.max(...indexes));
+    const nextVisible = new Set(
+      viewableItems
+        .filter((token) => token.isViewable && token.item.type === FilmGridItemType.FILM)
+        .map((token) => token.item.type === FilmGridItemType.FILM ? token.item.film.id : '')
+        .filter(Boolean)
+    );
+    setVisibleFilmIds(previous => (
+      previous.size === nextVisible.size && [...nextVisible].every(id => previous.has(id)) ? previous : nextVisible
+    ));
+  }, [prefetchPosters]);
   // An animated scroll runs over several frames while the row being entered is
   // still mounting its cards and the focus engine is measuring them; on weak
   // hardware the two compete and the move feels sluggish, so low mode jumps.
@@ -191,6 +225,7 @@ function FilmGridList({
   const isScrollAnimated = !isLowMode;
 
   const listRef = useRef<FlashListRef<FilmGridItem>>(null);
+  const retained = useRetainedScroll(listRef);
 
   // Focus scrolling of its own rather than the list's: FlashList can only hand
   // an animated scroll to the platform, at the platform's speed.
@@ -198,6 +233,17 @@ function FilmGridList({
     viewPosition: FOCUSED_ROW_VIEW_POSITION,
     isAnimated: isScrollAnimated,
   });
+
+  const [isScrolledDown, setIsScrolledDown] = useState(false);
+
+  const onScroll = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    retained.onScroll(e);
+    setIsScrolledDown(e.nativeEvent.contentOffset.y > SCROLL_SHOW_THRESHOLD);
+  }, [retained.onScroll]);
+
+  const handleScrollToTop = useCallback(() => {
+    scrollToOffset(0);
+  }, [scrollToOffset]);
 
   const lastIndexRef = useRef(-1);
   // Whether the focused row sits in the preload zone at the end of the grid --
@@ -413,46 +459,11 @@ function FilmGridList({
 
   const scrollContextValue = useMemo(() => ({ scrollTo }), [scrollTo]);
 
-  const menuScrollContextValue = useMemo(() => ({
-    // The menu rides in the list header and scrolls away with the content, so
-    // focus entering it only makes sense with the list back at the very top.
-    // Reaching it from the first row leaves it there already; this covers the
-    // rest (a touch scroll, an autofocused menu on a screen just opened).
-    scrollTo: () => scrollToOffset(0),
-  }), [scrollToOffset]);
+  const listHeader = useMemo(
+    () => renderListComponent(ListHeaderComponent),
+    [ListHeaderComponent],
+  );
 
-  /**
-   * The menu belongs above the first row but inside the list, so that it scrolls
-   * away with the content instead of collapsing above it. Re-parenting it to the
-   * grid container makes it a focus *sibling* of the cards rather than one of
-   * them -- see `FilmGridComponent` for why that split is what makes this work.
-   */
-  const listHeader = useMemo(() => {
-    if (!ListMenuComponent) {
-      return ListHeaderComponent;
-    }
-
-    return (
-      <>
-        { renderListComponent(ListHeaderComponent) }
-        <FocusContext.Provider value={ gridFocusKey }>
-          <ScrollContext.Provider value={ menuScrollContextValue }>
-            <View style={ styles.menu }>
-              { ListMenuComponent }
-            </View>
-          </ScrollContext.Provider>
-        </FocusContext.Provider>
-      </>
-    );
-  }, [ListMenuComponent, ListHeaderComponent, gridFocusKey, menuScrollContextValue, styles]);
-
-  // A row focused near the end cannot be pulled up to its usual position -- the
-  // list has nothing below it left to scroll -- so it stays wherever the clamped
-  // scroll left it, typically at the very bottom of the screen. Once the page
-  // that was loading adds rows underneath, put the focused row back where a
-  // focused row belongs instead of leaving the user reading from the bottom
-  // edge. Re-aligning an already aligned row is a no-op, so this only ever moves
-  // the list when the scroll really was clamped.
   const prevLengthRef = useRef(data.length);
 
   useEffect(() => {
@@ -488,9 +499,14 @@ function FilmGridList({
         isLastRow={ item.scrollIndex === lastRowIndex }
         registerCard={ registerCard }
         handleOnPress={ handleOnPress }
+        filmActions={ filmActions }
+        isRatingVisible={
+          item.type === FilmGridItemType.FILM
+          && visibleFilmIds.has(item.film.id)
+        }
       />
     );
-  }, [styles, handleOnPress, lastRowIndex, registerCard]);
+  }, [styles, handleOnPress, lastRowIndex, registerCard, visibleFilmIds, filmActions]);
 
   // Headers and cards differ wildly in height, so recycle them separately --
   // and so do real cards and their loading placeholders.
@@ -543,11 +559,15 @@ function FilmGridList({
         <View ref={ ref } style={ styles.grid } tvFocusable={ false }>
           <FlashList
             ref={ listRef }
+            onLayout={ retained.enabled ? retained.onLayout : undefined }
             data={ data }
             renderItem={ renderItem }
             keyExtractor={ keyExtractor }
             getItemType={ getItemType }
+            viewabilityConfig={ viewabilityConfig }
+            onViewableItemsChanged={ onViewableItemsChanged }
             onLoad={ handleLoad }
+            onScroll={ retained.enabled || showScrollToTopButton ? onScroll : undefined }
             scrollEventThrottle={ FOCUS_SCROLL_EVENT_THROTTLE }
             onEndReached={ handleScrollEnd }
             onEndReachedThreshold={ 0.5 }
@@ -560,7 +580,15 @@ function FilmGridList({
             ListHeaderComponent={ listHeader }
             ListEmptyComponent={ disableEmptyComponent || hideGrid ? null : ListEmptyComponent }
             showsVerticalScrollIndicator={ false }
+            removeClippedSubviews={ false }
           />
+        
+        { showScrollToTopButton && (
+          <ScrollToTopButton
+            visible={ isScrolledDown }
+            onPress={ handleScrollToTop }
+          />
+        ) }
         </View>
       </ScrollContext.Provider>
     </FocusContext.Provider>
@@ -568,47 +596,44 @@ function FilmGridList({
 }
 
 /**
- * The grid's outer focus container, with exactly two focus children: the menu
- * that rides in the list header, and the container that owns every card.
+ * The grid's outer focus container. The menu and the cards container are
+ * direct focus children, so the menu remains fixed outside the FlashList.
  *
- * Two levels rather than one flat one is what makes a menu inside the list
- * workable at all:
- *
- * - Norigin restores focus to the *parent* of a focused component that
- *   unmounts, and resolves it to the child closest to the origin once the last
- *   focused one has gone with it. Cards unmount under the user routinely (a page
- *   swap, a refresh, recycling), and in a flat tree the child closest to the
- *   origin is the menu -- every such unmount would throw the user back to the
- *   top of the list. Cards in a container of their own leave a restore nothing
- *   to land on but another card, and only the drawn ones are registered, so it
- *   lands near where the user already was.
- * - Leaving the first row upwards is answered here by identity rather than by
- *   coordinates -- which could not answer it: the menu sits physically *inside*
- *   the cards container's box, so no measurement would ever place it above.
+ * The explicit resolver handles the vertical transition between those two
+ * sections by identity rather than geometry. This is required because the
+ * menu is outside the cards container and must not be treated as a list item.
  */
 export function FilmGridComponent(props: FilmGridComponentProps) {
   const styles = useThemedStyles(componentStyles);
+  const { tabPosition = 'bottom' } = props;
   // Focus keys are global, and several grids can be mounted at once (one per
   // screen kept alive by the navigator), so they are namespaced per instance.
   const gridId = useId();
   const cardsFocusKey = `${gridId}-cards`;
 
   const resolveSectionFocus = useCallback<NextFocusResolver>((direction, currentFocusKey, siblings) => {
-    // Only the first row bubbles up this far -- the cards container answers
-    // every other row from its own geometry-free grid arithmetic.
-    if (direction === 'up' && currentFocusKey === cardsFocusKey) {
-      return siblings.find((sibling) => sibling.focusKey !== cardsFocusKey) ?? null;
+    if (currentFocusKey === cardsFocusKey) {
+      if (
+        (tabPosition === 'top' && direction === 'up')
+        || (tabPosition === 'bottom' && direction === 'down')
+      ) {
+        return siblings.find((sibling) => sibling.focusKey !== cardsFocusKey) ?? null;
+      }
     }
 
-    if (direction === 'down' && currentFocusKey !== cardsFocusKey) {
-      return siblings.find((sibling) => sibling.focusKey === cardsFocusKey) ?? null;
+    if (currentFocusKey !== cardsFocusKey) {
+      if (
+        (tabPosition === 'top' && direction === 'down')
+        || (tabPosition === 'bottom' && direction === 'up')
+      ) {
+        return siblings.find((sibling) => sibling.focusKey === cardsFocusKey) ?? null;
+      }
     }
 
-    // Everything else leaves the grid: `null` bubbles up to the screen, which is
+    // Everything else leaves the grid: null bubbles up to the screen, which is
     // what reaches the sidebar.
     return null;
-  }, [cardsFocusKey]);
-
+  }, [cardsFocusKey, tabPosition]);
   const { ref, focusKey } = useFocusable<object, View>({
     // Safe only because `nextFocusResolver` answers without needing geometry.
     measureChildrenLayout: false,
@@ -618,14 +643,28 @@ export function FilmGridComponent(props: FilmGridComponentProps) {
     preferredChildFocusKey: cardsFocusKey,
   });
 
+  const { ListMenuComponent } = props;
+
   return (
     <FocusContext.Provider value={ focusKey }>
       <View ref={ ref } style={ styles.grid } tvFocusable={ false }>
+        { ListMenuComponent && tabPosition === 'top' && (
+          <View style={ styles.menu }>
+            { ListMenuComponent }
+          </View>
+        ) }
+
         <FilmGridList
           { ...props }
           gridFocusKey={ focusKey }
           cardsFocusKey={ cardsFocusKey }
         />
+
+        { ListMenuComponent && tabPosition === 'bottom' && (
+          <View style={ styles.menu }>
+            { ListMenuComponent }
+          </View>
+        ) }
       </View>
     </FocusContext.Provider>
   );

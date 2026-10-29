@@ -6,6 +6,7 @@
 export const queryKeys = {
   film: (link: string) => ['film', link] as const,
   filmTrailer: (filmId: string) => ['film', filmId, 'trailer'] as const,
+  filmRatings: (serviceType: string, filmId: string) => ['film', serviceType, filmId, 'ratings'] as const,
   comments: (filmId: string) => ['film', filmId, 'comments'] as const,
 
   films: {

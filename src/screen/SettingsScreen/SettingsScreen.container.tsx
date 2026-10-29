@@ -12,9 +12,11 @@ import { reactNativeTvSearch } from 'Modules/react-native-tv-search';
 import { useCallback, useMemo, useState } from 'react';
 import { TEST_URL } from 'Screen/WelcomeScreen/WelcomeScreen.config';
 import { DeviceConfigType } from 'src/config';
+import { getHomeMenu } from '../../config/HomeMenu';
 import NotificationStore from 'Store/Notification.store';
 import { useAppTheme } from 'Theme/context';
 import { ThemeContextModeT } from 'Theme/types';
+import { resetChallengeCookies } from 'Util/ChallengeCookies';
 import { MAX_PARALLEL_DOWNLOADS_OPTIONS } from 'Util/Download';
 import { ensureDefaultLocalCategory } from 'Util/LocalLibrary';
 import { setTimeoutSafe } from 'Util/Misc';
@@ -64,7 +66,7 @@ export function SettingsScreenContainer() {
   );
 
   const homeMenuOptions = useMemo(
-    () => currentService.getHomeMenu().map(({ id, title }) => ({ value: id, label: title })),
+    () => getHomeMenu(currentService.getHomeMenu()).map(({ id, title }) => ({ value: id, label: title })),
     [currentService]
   );
 
@@ -266,6 +268,7 @@ export function SettingsScreenContainer() {
 
   const containerProps = {
     ...config,
+    isTV,
     theme,
     themeScheme,
     appLanguage,
@@ -287,6 +290,14 @@ export function SettingsScreenContainer() {
     isAutoFrameRateSupported,
     isVolumeNormalizationSupported,
     onConfigUpdate,
+    onResetChallengeCookies: async () => {
+      try {
+        const cleared = await resetChallengeCookies();
+        NotificationStore.displayMessage(t(cleared ? 'Challenge cookies reset' : 'Wait for the current challenge'));
+      } catch (error) {
+        NotificationStore.displayError(error instanceof Error ? error.message : String(error));
+      }
+    },
     onTvChannelsAddToHome,
     onLanguageChange,
     onThemeSchemeChange,
