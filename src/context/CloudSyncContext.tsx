@@ -1,3 +1,5 @@
+import { PLAYER_SCREEN } from 'Navigation/navigationRoutes';
+import { navigationRef } from 'Util/Navigation';
 import {
   createContext,
   ReactNode,
@@ -152,14 +154,24 @@ export const CloudSyncProvider = ({
       return;
     }
 
+    if (navigationRef.getCurrentRoute()?.name === PLAYER_SCREEN) {
+      pendingSyncRef.current = true;
+      return;
+    }
+
     pendingSyncRef.current = false;
     syncInProgressRef.current = true;
     const syncGeneration = syncGenerationRef.current;
     setSyncing(true);
     setLastError(null);
 
-    const isSyncGenerationCurrent = (): boolean =>
-      syncGenerationRef.current === syncGeneration;
+    const isSyncGenerationCurrent = (): boolean => {
+      if (navigationRef.getCurrentRoute()?.name === PLAYER_SCREEN) {
+        pendingSyncRef.current = true;
+        return false;
+      }
+      return syncGenerationRef.current === syncGeneration;
+    };
 
     try {
       const metadata = getCloudSyncMetadata();
@@ -413,6 +425,10 @@ export const CloudSyncProvider = ({
       void syncNowRef.current();
     }, SYNC_DEBOUNCE_MS);
   }, []);
+
+  useEffect(() => navigationRef.addListener('state', () => {
+    if (pendingSyncRef.current && navigationRef.getCurrentRoute()?.name !== PLAYER_SCREEN) scheduleSync();
+  }), [scheduleSync]);
 
   useEffect(() => {
     return subscribeCloudSync(event => {

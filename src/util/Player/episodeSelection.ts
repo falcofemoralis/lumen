@@ -20,7 +20,7 @@ export function episodePosition(voice: FilmVoiceInterface, seasonId?: string, ep
 
   return {
     seasonId, episodeId,
-    seasonNumber: numberFor(season?.name, seasonId),
+    seasonNumber: season?.isOnlyEpisodes ? voice.seasonNumber ?? numberFor(season.name, seasonId) : numberFor(season?.name, seasonId),
     episodeNumber: numberFor(episode?.name, episodeId),
   };
 }
@@ -34,7 +34,8 @@ export function resolveEpisodeSelection(
   const episodeNumber = position.episodeNumber ?? numberFor(undefined, position.episodeId);
   const season = (sameVoice ? seasons.find(item => item.seasonId === position.seasonId) : undefined)
     ?? (seasonNumber !== undefined
-      ? seasons.find(item => numberFor(item.name, item.seasonId) === seasonNumber) : undefined);
+      ? seasons.find(item => numberFor(item.name, item.seasonId) === seasonNumber) : undefined)
+    ?? (seasons.length === 1 && seasons[0].isOnlyEpisodes ? seasons[0] : undefined);
   if (!season) return undefined;
   const episode = (sameVoice ? season.episodes.find(item => item.episodeId === position.episodeId) : undefined)
     ?? (episodeNumber !== undefined

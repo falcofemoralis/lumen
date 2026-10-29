@@ -833,7 +833,10 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
         const position = resolveEpisodeSelection(loaded, history ?? getLastSavedEpisode(lastVoiceData),
           history ? history.link === film.link && history.voiceId === voice.id : true);
         if (!position) { playFilm(); return; }
-        resumeVoice({ voice: loaded, lastSeasonId: position.seasonId, lastEpisodeId: position.episodeId });
+        resumeVoice({
+          voice: { ...loaded, seasonNumber: history?.seasonNumber },
+          lastSeasonId: position.seasonId, lastEpisodeId: position.episodeId,
+        });
       } catch (error) { NotificationStore.displayError(error as Error); }
       return;
     }

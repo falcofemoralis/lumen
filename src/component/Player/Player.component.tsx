@@ -56,6 +56,8 @@ import {
 } from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedStyle,
+  useSharedValue,
+  withDelay,
   withTiming,
 } from 'react-native-reanimated';
 import { VideoView } from 'react-native-video';
@@ -197,6 +199,10 @@ export function PlayerComponent({
   } = usePictureInPicture(status);
   const controlsTimeout = useRestartableTimeout();
   const doubleTapTimeout = useRestartableTimeout();
+  const doubleTapLeftOpacity = useSharedValue(0);
+  const doubleTapRightOpacity = useSharedValue(0);
+  const doubleTapLeftAnimation = useAnimatedStyle(() => ({ opacity: doubleTapLeftOpacity.value }));
+  const doubleTapRightAnimation = useAnimatedStyle(() => ({ opacity: doubleTapRightOpacity.value }));
   const {
     slideGesture,
     volumeIndicator,
@@ -290,34 +296,36 @@ export function PlayerComponent({
       : playerRewindSeconds;
 
     rewindPosition(direction, seconds);
-    setDoubleTapAction({
-      seconds: doubleTapAction?.direction === direction ? seconds + (doubleTapAction?.seconds ?? 0) : seconds,
+    setDoubleTapAction((previous) => ({
+      seconds: previous?.direction === direction ? seconds + previous.seconds : seconds,
       direction,
       isVisible: true,
-    });
-
-    doubleTapTimeout.start(() => {
-      setDoubleTapAction((prev) => prev ? { ...prev, isVisible: false } : null);
-
-      setTimeout(() => {
-        setDoubleTapAction(null);
-      }, DOUBLE_TAP_ANIMATION_DELAY);
-    }, DOUBLE_TAP_ANIMATION);
+    }));
+    const opacity = direction === RewindDirection.BACKWARD ? doubleTapLeftOpacity : doubleTapRightOpacity;
+    const other = direction === RewindDirection.BACKWARD ? doubleTapRightOpacity : doubleTapLeftOpacity;
+    other.value = 0;
+    opacity.value = 1;
+    opacity.value = withDelay(DOUBLE_TAP_ANIMATION, withTiming(0, { duration: DOUBLE_TAP_ANIMATION_DELAY }));
+    doubleTapTimeout.start(() => setDoubleTapAction(null), DOUBLE_TAP_ANIMATION + DOUBLE_TAP_ANIMATION_DELAY);
   };
 
+  const handleSingleTap = () => {
+    doubleTapTimeout.stop();
+    doubleTapLeftOpacity.value = 0;
+    doubleTapRightOpacity.value = 0;
+    setDoubleTapAction(null);
+    setShowControls(previous => !previous);
+    handleUserInteraction();
+  };
   const singleTap = Gesture.Tap()
     .maxDuration(250)
-    .onEnd(() => {
-      if (doubleTapAction) {
-        return;
-      }
-
-      scheduleOnRN(setShowControls, !showControls);
-      scheduleOnRN(handleUserInteraction);
+    .onEnd((_event, success) => {
+      if (success) scheduleOnRN(handleSingleTap);
     });
 
   const doubleTap = Gesture.Tap()
     .numberOfTaps(2)
+    .maxDelay(220)
     .maxDuration(300)
     .onEnd((e) => {
       if (isLocked) {
@@ -696,7 +704,7 @@ export function PlayerComponent({
   };
 
   const renderDoubleTapAction = () => {
-    const { seconds = 10, direction, isVisible } = doubleTapAction ?? {};
+    const { seconds = 10 } = doubleTapAction ?? {};
 
     return (
       <Fragment>
@@ -704,7 +712,7 @@ export function PlayerComponent({
           style={ [
             styles.doubleTapAction,
             styles.doubleTapActionLeft,
-            (direction === RewindDirection.BACKWARD && isVisible) && styles.doubleTapActionVisible,
+            doubleTapLeftAnimation,
           ] }
         >
           <View style={ styles.doubleTapContainer }>
@@ -720,7 +728,7 @@ export function PlayerComponent({
           style={ [
             styles.doubleTapAction,
             styles.doubleTapActionRight,
-            (direction === RewindDirection.FORWARD && isVisible) && styles.doubleTapActionVisible,
+            doubleTapRightAnimation,
           ] }
         >
           <View style={ styles.doubleTapContainer }>
@@ -778,7 +786,7 @@ export function PlayerComponent({
 
   const renderControls = () => Platform.OS === 'web' ? (
     <View style={ styles.controlsContainer } pointerEvents="box-none">
-      <GestureDetector gesture={ Gesture.Race(doubleTap, singleTap, longPressGesture, slideGesture) }>
+      <GestureDetector gesture={ Gesture.Race(Gesture.Exclusive(doubleTap, singleTap), longPressGesture, slideGesture) }>
         <View style={ { position: 'absolute', inset: 0 } } />
       </GestureDetector>
       <Animated.View
@@ -797,8 +805,7 @@ export function PlayerComponent({
   ) : (
     <GestureDetector
       gesture={ Gesture.Race(
-        doubleTap,
-        singleTap,
+        Gesture.Exclusive(doubleTap, singleTap),
         longPressGesture,
         slideGesture
       ) }

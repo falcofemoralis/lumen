@@ -37,9 +37,9 @@ import NotificationStore from 'Store/Notification.store';
 import { FilmInterface } from 'Type/Film.interface';
 import { FilmVideoInterface, SubtitleInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
-import { isBookmarked } from 'Util/Film';
+import { filmToFilmCard, isBookmarked } from 'Util/Film';
 import { createMasterPlaylist, getQualityFromResolution } from 'Util/Hls';
-import { upsertLocalHistoryItem } from 'Util/LocalLibrary';
+import { getLocalBookmarksForFilm, upsertLocalHistoryItem } from 'Util/LocalLibrary';
 import { ContentSource, sourcePlaybackRouter } from '../../source';
 import { resolveAdjacentEpisode } from 'Util/Player/episodeNavigation';
 import { setIntervalSafe } from 'Util/Misc';
@@ -212,7 +212,8 @@ export function PlayerContainer({
 
   // in local mode the bookmark state is derived reactively from the local store
   const isFilmBookmarkedValue = isLocalLibrary
-    ? localBookmarks.categories.some((category) => category.filmIds.includes(film.id))
+    ? getLocalBookmarksForFilm(localBookmarks, film.libraryId ?? film.id, filmToFilmCard(film))
+      .some(bookmark => bookmark.isBookmarked)
     : isFilmBookmarked;
 
   // local history mirrors the moments the account receives saveWatch: playback
@@ -865,6 +866,16 @@ export function PlayerContainer({
    * Every failure steps one quality down until the lowest one is reached, and
    * only then the error is shown. Downloaded files have nothing to fall back to.
    */
+  const getCurrentPosition = (recovering = false) => {
+    try {
+      const time = player.currentTime;
+      if (!Number.isFinite(time) || time < 0) return lastPositionRef.current;
+      return recovering ? Math.max(time, lastPositionRef.current) : time;
+    } catch {
+      return lastPositionRef.current;
+    }
+  };
+
   const handlePlaybackError = (error?: VideoRuntimeError) => {
     // A failed call and the error status it leaves behind are one failure
     // arriving twice, and stepping down twice for it would skip over a quality
@@ -894,7 +905,7 @@ export function PlayerContainer({
     setSelectedQuality(lowerQuality);
     setOverlayQuality(lowerQuality);
 
-    updatePlayerStream(selectedVideo, lowerQuality, selectedVoice);
+    updatePlayerStream(selectedVideo, lowerQuality, selectedVoice, getCurrentPosition(true));
   };
 
   // `onError` only ever carries a failure of a call we made ourselves - a rejected
@@ -1134,7 +1145,7 @@ export function PlayerContainer({
       setSelectedSubtitle(
         newVideo.subtitles?.find(({ languageCode }) => languageCode === selectedSubtitle?.languageCode)
       );
-      updatePlayerStream(newVideo, selectedQuality, selectedVoice);
+      updatePlayerStream(newVideo, selectedQuality, selectedVoice, getCurrentPosition());
     } catch (error) {
       NotificationStore.displayError(error as Error);
 
@@ -1205,7 +1216,7 @@ export function PlayerContainer({
     }
 
     updateTime();
-    updatePlayerStream(selectedVideo, quality, selectedVoice);
+    updatePlayerStream(selectedVideo, quality, selectedVoice, getCurrentPosition());
 
     qualityOverlayRef.current?.close();
   };

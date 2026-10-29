@@ -142,6 +142,7 @@ export function RecentScreenContainer() {
 
         const selectedVoice = {
           ...seasons,
+          seasonNumber: historyItem?.seasonNumber,
           lastSeasonId: seasonId,
           lastEpisodeId: episodeId,
         };

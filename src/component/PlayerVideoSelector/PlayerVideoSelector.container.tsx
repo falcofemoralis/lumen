@@ -116,7 +116,9 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
             const available = visibleVoices(discovered, hidePremiumVoices);
             const next = available.find((voice) => voice.identifier === current?.identifier)
               ?? available.find((voice) => voice.isActive) ?? available[0] ?? {} as FilmVoiceInterface;
-            setSelectedVoice(next);
+            setSelectedVoice({
+              ...next, seasonNumber: getSavedSelection(next, savedTime ?? getSavedTime(film)).seasonNumber,
+            });
             onVoicesUpdate?.(discovered);
           } else {
             zonaVoiceDiscoveryRef.current = false;
@@ -174,10 +176,13 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
       const position = history ?? (previousVoice
         ? episodePosition(previousVoice, previousData?.lastSeasonId, previousData?.lastEpisodeId) : {});
       const mapped = resolveEpisodeSelection(voice, position, history?.link === film.link && history.voiceId === voice.id);
-      if (mapped) return { ...mapped, sameVoice: true };
+      const seasonNumber = position.seasonNumber
+        ?? episodePosition(previousVoice ?? voice, position.seasonId, position.episodeId).seasonNumber;
+      if (mapped) return { ...mapped, sameVoice: true, seasonNumber };
       return {
         seasonId: voiceData?.lastSeasonId ?? history?.seasonId ?? voice.lastSeasonId,
         episodeId: voiceData?.lastEpisodeId ?? history?.episodeId ?? voice.lastEpisodeId,
+        seasonNumber,
         sameVoice: Boolean(voiceData) || (!history && !previousData)
           || (history?.link === film.link && history.voiceId === voice.id),
       };
@@ -231,6 +236,7 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
       const activeVoice = voiceInput?.id === savedVoice.id ? voiceInput : getContextVoice();
       setSelectedVoice((previous) => ({
         ...savedVoice,
+        seasonNumber: savedSelection.seasonNumber,
         seasons: activeVoice?.id === savedVoice.id && activeVoice.seasons?.length ? activeVoice.seasons
           : previous.id === savedVoice.id && previous.seasons?.length ? previous.seasons : savedVoice.seasons,
       }));
@@ -305,6 +311,7 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
       if (updatedVoice && updatedVoice !== selectedVoice) {
         setSelectedVoice((previous) => ({
           ...updatedVoice,
+          seasonNumber: previous.seasonNumber ?? updatedVoice.seasonNumber,
           seasons: updatedVoice.seasons?.length ? updatedVoice.seasons : previous.seasons,
           lastSeasonId: previous.lastSeasonId ?? updatedVoice.lastSeasonId,
           lastEpisodeId: previous.lastEpisodeId ?? updatedVoice.lastEpisodeId,
@@ -332,7 +339,9 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
     const getEpisodes = (): EpisodeInterface[] => {
       const { seasons = [] } = selectedVoice ?? {};
 
-      const { episodes = [] } = seasons.find(({ seasonId }) => seasonId === selectedSeasonId) ?? {};
+      const season = seasons.find(({ seasonId }) => seasonId === selectedSeasonId)
+        ?? (seasons.length === 1 && seasons[0].isOnlyEpisodes ? seasons[0] : undefined);
+      const { episodes = [] } = season ?? {};
 
       return episodes;
     };
@@ -432,21 +441,31 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
 
         const currentSavedTime = savedTime ?? getSavedTime(film);
         const savedSelection = getSavedSelection(updatedVoice, currentSavedTime);
+        if (seasons.length === 1 && seasons[0].isOnlyEpisodes) {
+          setSelectedVoice({ ...updatedVoice, seasonNumber: selectedVoice.seasonNumber ?? savedSelection.seasonNumber });
+        }
 
-        const current = resolveEpisodeSelection(updatedVoice,
-          episodePosition(selectedVoice, selectedSeasonId, selectedEpisodeId), selectedVoice.identifier === updatedVoice.identifier);
+        const currentPosition = episodePosition(selectedVoice, selectedSeasonId, selectedEpisodeId);
+        const current = resolveEpisodeSelection(updatedVoice, currentPosition,
+          selectedVoice.identifier === updatedVoice.identifier);
         const switchingVoice = selectedVoice.identifier !== updatedVoice.identifier;
         const restored = switchingVoice && selectedEpisodeId
           ? current : current ?? resolveEpisodeSelection(updatedVoice, savedSelection, savedSelection.sameVoice);
         const hadPosition = Boolean(selectedEpisodeId || savedSelection.episodeId);
         if (!restored && hadPosition) {
-          setSelectedSeasonId(undefined);
+          setSelectedSeasonId(seasons.length === 1 && seasons[0].isOnlyEpisodes ? seasons[0].seasonId : undefined);
           setSelectedEpisodeId(undefined);
           NotificationStore.displayMessage(t('Current season or episode not saved.'));
           return;
         }
         const seasonId = restored?.seasonId ?? seasons[0].seasonId;
         const episodeId = restored?.episodeId ?? seasons[0].episodes[0]?.episodeId;
+        if (seasons.length === 1 && seasons[0].isOnlyEpisodes) {
+          const seasonNumber = selectedVoice.identifier === updatedVoice.identifier && !selectedVoice.seasonNumber
+            ? savedSelection.seasonNumber ?? currentPosition.seasonNumber
+            : currentPosition.seasonNumber ?? savedSelection.seasonNumber;
+          setSelectedVoice({ ...updatedVoice, seasonNumber });
+        }
 
         setSelectedSeasonId(seasonId);
         setSelectedEpisodeId(episodeId);
@@ -571,7 +590,9 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
       }
 
       setSelectedEpisodeId(episodeId);
-      const seasonId = selectedSeasonId ?? '1';
+      const onlySeason = selectedVoice.seasons?.length === 1 && selectedVoice.seasons[0].isOnlyEpisodes
+        ? selectedVoice.seasons[0].seasonId : undefined;
+      const seasonId = onlySeason ?? selectedSeasonId ?? '1';
 
       persistSelection(selectedVoice, seasonId, episodeId);
       loadEpisodeVideo({
@@ -605,6 +626,7 @@ export const PlayerVideoSelectorContainer = forwardRef<PlayerVideoSelectorRef, P
       applySavedSelection(storedSavedTime);
       if (!storedSavedTime?.lastVoiceId || !voices.some(voice => voice.id === storedSavedTime.lastVoiceId)) {
         const selection = getSavedSelection(selectedVoice, storedSavedTime);
+        setSelectedVoice(previous => ({ ...previous, seasonNumber: selection.seasonNumber }));
         setSelectedSeasonId(selection.seasonId);
         setSelectedEpisodeId(selection.episodeId);
       }

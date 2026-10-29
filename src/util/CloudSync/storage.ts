@@ -1,15 +1,18 @@
 import { storage } from 'Util/Storage';
+
+import { createCloudStateStore } from './stateStore';
 import {
   CLOUD_SYNC_SCHEMA_VERSION,
+  CloudEntityMeta,
   CloudSyncMetadata,
   CloudSyncState,
-  CloudEntityMeta,
 } from './types';
 
 const STORAGE_KEY = 'cloudSyncMetadata';
-const STATE_KEY = 'cloudSyncState';
+
 const createDeviceId = (): string => {
   const random = Math.random().toString(36).slice(2);
+
   return `${Date.now().toString(36)}-${random}`;
 };
 
@@ -82,12 +85,12 @@ export const updateCloudSyncMetadata = (
   return next;
 };
 
-export const loadCloudSyncState = (): CloudSyncState | null =>
-  getStorage().load<CloudSyncState>(STATE_KEY);
-
-export const saveCloudSyncState = (state: CloudSyncState): void => {
-  getStorage().save(STATE_KEY, state);
-};
+const stateStore = createCloudStateStore({
+  load: <T>(key: string) => getStorage().load<T>(key),
+  save: (key, value) => getStorage().save(key, value),
+});
+export const loadCloudSyncState = (): CloudSyncState | null => stateStore.load();
+export const saveCloudSyncState = (state: CloudSyncState): void => stateStore.save(state);
 
 export const createEmptyCloudSyncState = (): CloudSyncState => {
   const now = Date.now();

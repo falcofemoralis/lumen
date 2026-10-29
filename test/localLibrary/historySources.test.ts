@@ -70,3 +70,20 @@ test('equal provider IDs do not override different cross-source episode numbers'
   ] }] } as FilmVoiceInterface;
   assert.equal(resolveEpisodeSelection(different, { seasonId: '2', episodeId: '5' }), undefined);
 });
+
+test('Anixart episode-only release retains the episode when Rezka used a numbered season', () => {
+  const voice = { id: 'anixart', seasons: [{ seasonId: '1', name: 'Anime release', isOnlyEpisodes: true,
+    episodes: [{ episodeId: '7', name: '7 серия' }] }] } as FilmVoiceInterface;
+  assert.deepEqual(resolveEpisodeSelection(voice, { seasonId: '3', episodeId: '7' }), { seasonId: '1', episodeId: '7' });
+  assert.equal(resolveEpisodeSelection(voice, { seasonId: '3', episodeId: '8' }), undefined);
+});
+
+test('Anixart virtual season does not overwrite the numbered season when switching back to Rezka', () => {
+  const flat = { id: 'anixart', seasonNumber: 3, seasons: [{ seasonId: '1', name: 'Anime release', isOnlyEpisodes: true,
+    episodes: [{ episodeId: '7', name: '7 серия' }] }] } as FilmVoiceInterface;
+  const numbered = { id: 'rezka', seasons: [{ seasonId: '3', name: '3 сезон',
+    episodes: [{ episodeId: '7', name: '7 серия' }] }] } as FilmVoiceInterface;
+  const position = episodePosition(flat, '1', '7');
+  assert.equal(position.seasonNumber, 3);
+  assert.deepEqual(resolveEpisodeSelection(numbered, position), { seasonId: '3', episodeId: '7' });
+});

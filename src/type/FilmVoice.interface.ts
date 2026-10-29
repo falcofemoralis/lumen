@@ -17,6 +17,7 @@ export interface FilmVoiceInterface {
   id: string;
   playbackSource?: 'REZKA';
   nativeVoiceId?: string;
+  seasonNumber?: number;
   identifier: string; // can be voiceId + something else for correct identification
   title: string;
   img?: string;

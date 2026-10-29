@@ -45,6 +45,7 @@ export {
 
 export const LOCAL_BOOKMARKS_KEY = 'localBookmarks';
 export const LOCAL_HISTORY_KEY = 'localHistory';
+let lastBookmarkInsertionRank = 0;
 export const LOCAL_SCHEDULE_MARKS_KEY = 'localScheduleMarks';
 
 const getLocalLibraryStorage = () => storage.getLocalLibraryStorage();
@@ -257,20 +258,22 @@ export const toggleLocalBookmark = (
   }
 
   const deletedIds = category.filmIds.filter(id => !updatedCategory.filmIds.includes(id));
+  const filmId = isBookmarked ? updatedCategory.filmIds[0] : undefined;
+  const film = filmId ? updatedBlob.films[filmId] : undefined;
+  const position = Math.min(-Date.now(), lastBookmarkInsertionRank - 1);
+  if (film) lastBookmarkInsertionRank = position;
   mutateCloudSyncBatch([
     ...deletedIds.map(filmId => ({
       entity: 'bookmark-membership' as const,
       id: getBookmarkMembershipId(categoryId, filmId),
       deleted: true,
     })),
-    ...updatedCategory.filmIds.flatMap((filmId, position) => {
-      const film = updatedBlob.films[filmId];
-      return film ? [{
-        entity: 'bookmark-membership' as const,
-        id: getBookmarkMembershipId(categoryId, filmId),
-        value: { categoryId, filmId, position, film },
-      }] : [];
-    }),
+    ...(filmId && film ? [{
+      entity: 'bookmark-membership' as const,
+      id: getBookmarkMembershipId(categoryId, filmId),
+      // Newest-first rank leaves existing members untouched on other devices.
+      value: { categoryId, filmId, position, film },
+    }] : []),
   ]);
 };
 
