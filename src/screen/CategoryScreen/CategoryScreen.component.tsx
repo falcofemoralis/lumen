@@ -1,6 +1,7 @@
 import { FilmPager } from 'Component/FilmPager';
 import { InfoBlock } from 'Component/InfoBlock';
 import { Page } from 'Component/Page';
+import { SourceLoadError } from 'Component/SourceLoadError';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import { View } from 'react-native';
@@ -10,9 +11,13 @@ import { CategoryScreenComponentProps } from './CategoryScreen.type';
 
 export function CategoryScreenComponent({
   pagerItems,
+  isLoadError,
+  retryLoad,
   ...pagerHandlers
 }: CategoryScreenComponentProps) {
   const styles = useThemedStyles(componentStyles);
+
+  if (isLoadError) return <Page><SourceLoadError onRetry={ retryLoad } /></Page>;
 
   const renderEmpty = () => (
     <View style={ styles.empty }>

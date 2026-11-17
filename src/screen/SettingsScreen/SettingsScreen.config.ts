@@ -97,6 +97,24 @@ export const MOBILE_SCREENS = [
   },
 ];
 
+export const TV_NAVIGATION_OPTIONS = [
+  'Account-tab',
+  'Notifications-tab',
+  'Home-tab',
+  'Recent-tab',
+  'Search-tab',
+  'Bookmarks-tab',
+  'Settings',
+];
+
+export const MOBILE_NAVIGATION_OPTIONS = [
+  'Home-tab',
+  'Search-tab',
+  'Bookmarks-tab',
+  'Recent-tab',
+  'Account-tab',
+];
+
 export const THEME_SCHEME_OPTIONS = [
   {
     value: 'system',
@@ -114,6 +132,39 @@ export const THEME_SCHEME_OPTIONS = [
     value: 'light',
     get label() {
       return t('Light');
+    },
+  },
+];
+
+export const SCROLL_TOP_BUTTON_CORNER_TV_OPTIONS = [
+  {
+    value: 'off',
+    get label() {
+      return t('Off');
+    },
+  },
+  {
+    value: 'top-left',
+    get label() {
+      return t('Top left');
+    },
+  },
+  {
+    value: 'top-right',
+    get label() {
+      return t('Top right');
+    },
+  },
+  {
+    value: 'bottom-left',
+    get label() {
+      return t('Bottom left');
+    },
+  },
+  {
+    value: 'bottom-right',
+    get label() {
+      return t('Bottom right');
     },
   },
 ];
@@ -302,6 +353,20 @@ export const FILM_COUNTRY_OPTIONS = [
   'Ямайка',
 ].map((country) => ({ value: country, label: country }));
 
+export const TAB_POSITION_OPTIONS = [
+  {
+    value: 'bottom',
+    get label() {
+      return t('Bottom');
+    },
+  },
+  {
+    value: 'top',
+    get label() {
+      return t('Top');
+    },
+  },
+];
 export const COLUMNS_MOBILE_OPTIONS = Array.from({ length: 9 }, (_, index) => ({
   value: (index + 2).toString(),
   label: (index + 2).toString(),

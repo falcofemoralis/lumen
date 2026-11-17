@@ -27,4 +27,40 @@ config.resolver.unstable_conditionNames = ['require', 'default', 'browser'];
 // such as Firebase that use the extension cjs.
 config.resolver.sourceExts.push('cjs');
 
+const path = require('node:path');
+const windowsAliases = {
+  '@kesha-antonov/react-native-background-downloader': 'downloads.js',
+  'expo-file-system': 'files.js',
+  'Util/Download': 'download-utils.js',
+  'expo-intent-launcher': 'intents.js',
+  'expo-file-system/legacy': 'files.js',
+  'react-native-nitro-google-signin': 'google.js',
+  '@react-native-clipboard/clipboard': 'clipboard.js',
+  'expo-application': 'application.js',
+  'expo-keep-awake': 'awake.js',
+  'expo-screen-orientation': 'orientation.js',
+  'react-native-mmkv': 'mmkv.js',
+  'react-native-webview': 'webview.jsx',
+  'react-native-pager-view': 'pager.jsx',
+  'react-native-gesture-handler': 'gestures.js',
+  'react-native-video': 'video.jsx',
+  'react-native-youtube-bridge': 'youtube.jsx',
+  'react-native-keyboard-controller': 'native.jsx',
+  'react-native-keyevent': 'native.jsx',
+  'react-native-volume-manager': 'native.jsx',
+  'react-native-restart': 'native.jsx',
+  '@logicwind/react-native-exit-app': 'native.jsx',
+  '@lodev09/react-native-true-sheet': 'native.jsx',
+  '@react-native-firebase/app': 'firebase.js',
+  '@react-native-firebase/firestore': 'firebase.js',
+};
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  if (platform === 'web' && moduleName === '@noriginmedia/norigin-spatial-navigation-react-native-tvos')
+    return { type: 'sourceFile', filePath: path.join(__dirname, 'node_modules/@noriginmedia/norigin-spatial-navigation-react-native-tvos/dist/index.web.mjs') };
+  if (platform === 'web' && windowsAliases[moduleName])
+    return { type: 'sourceFile', filePath: path.join(__dirname, 'src/windows', windowsAliases[moduleName]) };
+  if (platform === 'web' && moduleName.startsWith('Modules/react-native-'))
+    return { type: 'sourceFile', filePath: path.join(__dirname, 'src/windows/native.jsx') };
+  return context.resolveRequest(context, moduleName, platform);
+};
 module.exports = config;

@@ -26,7 +26,7 @@ export const CollectionScreenThumbnail = ({
             <View
               // eslint-disable-next-line react/no-array-index-key
               key={ `collection-page-thumb-col-${jdx}` }
-              style={ styles.item }
+              style={ [styles.item, { width, height }] }
             >
               <Thumbnail
                 width={ width }

@@ -77,6 +77,13 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   voiceDropdownInput: {
     flex: 1,
   },
+  compactSelectorsContainer: {
+    gap: scale(8),
+    marginTop: scale(8),
+  },
+  compactSelector: {
+    width: '100%',
+  },
   buttonProgressContainer: {
     position: 'absolute',
     top: 0,

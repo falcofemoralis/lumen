@@ -4,7 +4,7 @@
  * Generally speaking, it will contain an auth flow (registration, login, forgot password)
  * and a "main" flow which the user will use once logged in.
  */
-import { NavigationContainer } from '@react-navigation/native';
+import { getFocusedRouteNameFromRoute, NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { DeepLinkHandler } from 'Component/DeepLinkHandler';
 import { ErrorBoundary } from 'Component/ErrorBoundary';
@@ -12,20 +12,32 @@ import { TvSearchHandler } from 'Component/TvSearchHandler';
 import { useConfigContext, useIsTV } from 'Context/ConfigContext';
 import { StatusBar } from 'expo-status-bar';
 import { useMemo } from 'react';
+import { Platform } from 'react-native';
+import BroadcastPlayer from 'Screen/BroadcastScreen/BroadcastPlayer';
+import { DownloadsScreen } from 'Screen/DownloadsScreen';
 import { ErrorScreen } from 'Screen/ErrorScreen';
 import { FilmTrailerScreen } from 'Screen/FilmTrailerScreen';
+import { MyCommentsScreen } from 'Screen/MyCommentsScreen';
+import { NotificationsScreen } from 'Screen/NotificationsScreen';
 import { PlayerScreen } from 'Screen/PlayerScreen';
+import { SettingsScreen } from 'Screen/SettingsScreen';
 import { WelcomeScreen } from 'Screen/WelcomeScreen';
 import { useAppTheme } from 'Theme/context';
 import { navigationRef, useBackButtonHandler } from 'Util/Navigation';
 
+import { createFilmNavigator } from './FilmNavigator';
 import {
   DOWNLOADS_SCREEN,
   ERROR_SCREEN,
   exitRoutesMobile,
   exitRoutesTV,
   FILM_TRAILER_SCREEN,
+  MY_COMMENTS_SCREEN,
+  MY_COMMENTS_TAB,
+  NOTIFICATIONS_SCREEN,
+  NOTIFICATIONS_TAB,
   PLAYER_SCREEN,
+  SETTINGS_SCREEN,
   TABS_SCREEN,
   WELCOME_SCREEN,
 } from './navigationRoutes';
@@ -33,6 +45,9 @@ import type { AppStackParamList, NavigationProps } from './navigationTypes';
 import { TabsNavigator } from './TabsNavigator';
 
 const Stack = createNativeStackNavigator<AppStackParamList>();
+
+const NotificationsNavigator = createFilmNavigator(NOTIFICATIONS_TAB, NotificationsScreen);
+const MyCommentsNavigator = createFilmNavigator(MY_COMMENTS_TAB, MyCommentsScreen);
 
 const AppStack = () => {
   const { isConfigured } = useConfigContext();
@@ -56,11 +71,20 @@ const AppStack = () => {
 
   return (
     <Stack.Navigator
-      screenOptions={ {
-        headerShown: false,
+      screenOptions={ ({ route }) => ({
+        headerShown: Platform.OS === 'web'
+          && [ERROR_SCREEN, SETTINGS_SCREEN, NOTIFICATIONS_SCREEN, DOWNLOADS_SCREEN, MY_COMMENTS_SCREEN]
+            .includes(route.name)
+          && (!getFocusedRouteNameFromRoute(route)
+            || [NOTIFICATIONS_TAB, MY_COMMENTS_TAB].includes(getFocusedRouteNameFromRoute(route)!)),
+        headerTitle: '',
+        headerTintColor: '#fff',
+        headerStyle: { backgroundColor: theme.colors.background },
+        headerShadowVisible: false,
+        headerBackButtonDisplayMode: 'minimal',
         navigationBarColor: theme.colors.background,
         contentStyle: { backgroundColor: theme.colors.background },
-      } }
+      }) }
       initialRouteName={ TABS_SCREEN }
     >
       <Stack.Screen
@@ -71,6 +95,7 @@ const AppStack = () => {
         name={ ERROR_SCREEN }
         component={ ErrorScreen }
       />
+      <Stack.Screen name="BroadcastPlayer" component={ BroadcastPlayer } />
       <Stack.Screen
         name={ PLAYER_SCREEN }
         component={ PlayerScreen }
@@ -78,6 +103,22 @@ const AppStack = () => {
       <Stack.Screen
         name={ FILM_TRAILER_SCREEN }
         component={ FilmTrailerScreen }
+      />
+      <Stack.Screen
+        name={ SETTINGS_SCREEN }
+        component={ SettingsScreen }
+      />
+      <Stack.Screen
+        name={ NOTIFICATIONS_SCREEN }
+        component={ NotificationsNavigator }
+      />
+      <Stack.Screen
+        name={ DOWNLOADS_SCREEN }
+        component={ DownloadsScreen }
+      />
+      <Stack.Screen
+        name={ MY_COMMENTS_SCREEN }
+        component={ MyCommentsNavigator }
       />
     </Stack.Navigator>
   );

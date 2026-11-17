@@ -27,7 +27,7 @@ export const BookmarksScreenThumbnail = () => {
         )) }
       </View>
       <View style={ { flex: 1 } }>
-        <FilmGrid films={ [] } />
+        <FilmGrid films={ [] } showScrollToTopButton />
       </View>
     </View>
   );

@@ -386,6 +386,7 @@ const CommentsList = ({
 };
 
 export const CommentsComponent = ({
+  sourceLabel,
   comments,
   style,
   isLoading,
@@ -510,6 +511,7 @@ export const CommentsComponent = ({
         setContainerWidth(width - styles.avatar.width - styles.item.gap);
       } }
     >
+      { sourceLabel ? <ThemedText>{ 'Комментарии · ' + sourceLabel }</ThemedText> : null }
       { renderMeasureText() }
       { renderForm() }
       { renderComments() }

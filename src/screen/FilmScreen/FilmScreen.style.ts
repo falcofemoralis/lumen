@@ -3,7 +3,11 @@ import { Theme, ThemedStyles } from 'Theme/types';
 
 export const componentStyles = ({ scale, colors, text, spacing }: Theme) => ({
   page: {
-    paddingBottom: scale(16),
+    flexGrow: 1,
+  },
+  contentContainer: {
+    flexGrow: 1,
+    overflow: 'hidden',
   },
   upperContent: {
     width: '100%',
@@ -15,6 +19,9 @@ export const componentStyles = ({ scale, colors, text, spacing }: Theme) => ({
   },
   bottomContent: {
     width: '100%',
+    flexGrow: 1,
+    paddingBottom: scale(16),
+    backgroundColor: colors.background,
   },
   upperContentWrapper: {
     flexDirection: 'row',

@@ -10,7 +10,7 @@ import { ThemedText } from 'Component/ThemedText';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import ArrowDownToLine from 'lucide-react-native/icons/arrow-down-to-line';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useAppTheme } from 'Theme/context';
 import { SeasonInterface } from 'Type/FilmVoice.interface';
@@ -19,15 +19,18 @@ import { getVideoProgress } from 'Util/Player';
 import { formatDownloadKey } from './PlayerVideoSelector.config';
 import { componentStyles } from './PlayerVideoSelector.style';
 import { PlayerVideoSelectorComponentProps } from './PlayerVideoSelector.type';
+import { voicePremiumIcon } from './PlayerVideoSelector.voices';
 
 export function PlayerVideoSelectorComponent({
   overlayRef,
   voices,
+  hasHiddenPremiumVoices,
   isLoading,
   selectedVoice,
   selectedSeasonId,
   selectedEpisodeId,
   handleSelectVoice,
+  handleSelectSeason,
   setSelectedSeasonId,
   seasons,
   episodes,
@@ -46,6 +49,7 @@ export function PlayerVideoSelectorComponent({
   handleDownload,
   isOffline,
   playerAskQuality,
+  playerCompactSelector,
   handleQualitySelect,
 }: PlayerVideoSelectorComponentProps) {
   const { theme, scale } = useAppTheme();
@@ -68,7 +72,7 @@ export function PlayerVideoSelectorComponent({
   };
 
   const renderVoices = () => {
-    if (voices.length <= 1) {
+    if (voices.length === 0) {
       return null;
     }
 
@@ -79,7 +83,7 @@ export function PlayerVideoSelectorComponent({
             data={ voices.map((voice) => ({
               label: voice.title,
               value: voice.identifier,
-              startIcon: voice.premiumIcon,
+              startIcon: voicePremiumIcon(voice, Platform.OS),
               endIcon: voice.img,
             })) }
             value={ selectedVoice.identifier }
@@ -100,7 +104,7 @@ export function PlayerVideoSelectorComponent({
           data={ voices.map((voice) => ({
             label: voice.title,
             value: voice.identifier,
-            startIcon: voice.premiumIcon,
+            startIcon: voicePremiumIcon(voice, Platform.OS),
             endIcon: voice.img,
           })) }
           value={ selectedVoice.identifier }
@@ -252,9 +256,51 @@ export function PlayerVideoSelectorComponent({
     );
   };
 
+  const renderCompactSeriesSelection = () => {
+    if (!seasons.length || isDownloader) {
+      return null;
+    }
+
+    const seasonValue = selectedSeasonId ?? seasons[0].seasonId;
+    const episodeValue = episodes.some(
+      ({ episodeId }) => episodeId === selectedEpisodeId
+    )
+      ? selectedEpisodeId ?? ''
+      : episodes[0]?.episodeId ?? '';
+
+    return (
+      <View style={ styles.compactSelectorsContainer }>
+        { !(seasons.length === 1 && seasons[0].isOnlyEpisodes) && <ThemedDropdown
+          data={ seasons.map(({ seasonId, name }) => ({
+            label: name,
+            value: seasonId,
+          })) }
+          value={ seasonValue }
+          onChange={ (item) => handleSelectSeason(item.value) }
+          header={ t('Season') }
+          style={ styles.compactSelector }
+          closeOnChange
+        /> }
+        <ThemedDropdown
+          data={ episodes.map(({ episodeId, name }) => ({
+            label: name,
+            value: episodeId,
+          })) }
+          value={ episodeValue }
+          onChange={ (item) => handleSelectEpisode(item.value) }
+          header={ t('Episode') }
+          style={ styles.compactSelector }
+          closeOnChange
+        />
+      </View>
+    );
+  };
   const renderSeriesSelection = () => {
     if (!seasons.length) {
       return null;
+    }
+    if (playerCompactSelector && !isDownloader) {
+      return renderCompactSeriesSelection();
     }
 
     return (
@@ -283,6 +329,11 @@ export function PlayerVideoSelectorComponent({
   );
 
   const renderContent = () => {
+    if (!isLoading && !voices.length && hasHiddenPremiumVoices) {
+      return <InfoBlock title={ t('No available voices') }
+        subtitle={ t('Paid voices are hidden. You can show them in player settings.') } />;
+    }
+    if (film.hasSeasons && isLoading && !seasons.length) return null;
     if (isOffline && !seasons.length && (voices.length > 0 && !voices[0].video?.streams?.length)) {
       return renderEmpty();
     }

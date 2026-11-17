@@ -1,6 +1,17 @@
+import { Platform } from 'react-native';
 import { Theme, ThemedStyles } from 'Theme/types';
 
-export const componentStyles = ({ scale, colors, text }: Theme) => ({
+export const componentStyles = ({ scale: baseScale, colors, text }: Theme) => {
+  const scale = (value: number) => baseScale(value * (Platform.OS === 'web' ? 1.3 : 1));
+  return ({
+  tabBarOuter: {
+    width: '100%',
+    paddingRight: scale(6.67),
+  },
+  tabBarRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   tabBarContainer: {
     position: 'relative',
     alignItems: 'center',
@@ -28,3 +39,4 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     overflow: 'hidden',
   },
 } satisfies ThemedStyles);
+};

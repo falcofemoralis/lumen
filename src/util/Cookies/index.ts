@@ -1,8 +1,10 @@
-import setCookieParser, { parse, splitCookiesString } from 'set-cookie-parser';
+import { parse, splitCookiesString, type Cookie } from 'set-cookie-parser';
 import { storage } from 'Util/Storage';
+import { isCookieExpired } from './lifecycle';
+export { isCookieExpired } from './lifecycle';
 
-export function parseCookies(cookieString: string): Record<string, setCookieParser.Cookie> {
-  const cookies: Record<string, setCookieParser.Cookie> = {};
+export function parseCookies(cookieString: string): Record<string, Cookie> {
+  const cookies: Record<string, Cookie> = {};
 
   if (!cookieString) {
     return cookies;
@@ -12,28 +14,23 @@ export function parseCookies(cookieString: string): Record<string, setCookiePars
   // set-cookie-parser splits it correctly even when cookie names contain
   // '.' or '-' (e.g. techaro.lol-anubis-auth), which a plain regex cannot.
   parse(splitCookiesString(cookieString), { decodeValues: false }).forEach((cookie) => {
+    if (cookie.maxAge !== undefined) cookie.expires = new Date(Date.now() + Number(cookie.maxAge) * 1000);
     cookies[cookie.name] = cookie;
   });
 
   return cookies;
 }
 
-export function buildCookieString(cookies: Record<string, setCookieParser.Cookie>): string {
+export function buildCookieString(cookies: Record<string, Cookie>): string {
   return Object.entries(cookies)
     .map(([name, cookie]) => `${name}=${cookie.value}`)
     .join('; ');
 }
 
-export function isCookieExpired(cookie: setCookieParser.Cookie): boolean {
-  if (cookie.expires) {
-    return new Date(cookie.expires) <= new Date();
-  }
 
-  return false;
-}
 
 export class CookiesManager {
-  private cookieMap = new Map<string, Record<string, setCookieParser.Cookie>>();
+  private cookieMap = new Map<string, Record<string, Cookie>>();
 
   constructor() {
     this.cookieMap = new Map();
@@ -41,16 +38,23 @@ export class CookiesManager {
 
   public get(hostname: string) {
     if (!this.cookieMap.has(hostname)) {
-      const dbCookies = storage.getCookiesStorage().load(hostname) || {};
+      const dbCookies = (storage.getCookiesStorage().load(hostname) || {}) as Record<string, Cookie>;
       this.cookieMap.set(hostname, dbCookies);
     }
 
-    return this.cookieMap.get(hostname);
+    const cookies = this.cookieMap.get(hostname) || {};
+    const valid = Object.fromEntries(Object.entries(cookies).filter(([, cookie]) => !isCookieExpired(cookie)));
+    if (Object.keys(valid).length !== Object.keys(cookies).length) this.set(hostname, valid);
+    return valid;
   }
 
-  public set(hostname: string, cookies: Record<string, setCookieParser.Cookie>) {
+  public set(hostname: string, cookies: Record<string, Cookie>) {
     this.cookieMap.set(hostname, cookies);
     storage.getCookiesStorage().save(hostname, cookies);
+  }
+
+  public getHosts(): string[] {
+    return Array.from(new Set([...storage.getCookiesStorage().getKeys(), ...this.cookieMap.keys()]));
   }
 
   public reset() {
@@ -78,7 +82,7 @@ export const setCookies = (hostname: string, res: Response) => {
 
         return acc;
       },
-      {} as Record<string, setCookieParser.Cookie>
+      {} as Record<string, Cookie>
     );
 
   cookiesManager.set(hostname, validNewCookies);

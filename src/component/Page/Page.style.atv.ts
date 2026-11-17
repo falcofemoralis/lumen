@@ -1,10 +1,16 @@
-import { NAVIGATION_BAR_TV_WIDTH } from 'Component/NavigationBar/NavigationBar.style.atv';
+import {
+  NAVIGATION_BAR_TV_WIDTH,
+  NAVIGATION_BAR_TV_WIDTH_OPENED,
+} from 'Component/NavigationBar/NavigationBar.style.atv';
 import { Theme, ThemedStyles } from 'Theme/types';
 
-export const componentStyles = ({ scale, dimensions, spacing, colors }: Theme) => ({
+export const componentStyles = ({ scale, dimensions, colors }: Theme) => ({
   container: {
     height: '100%',
-    width: dimensions.width - scale(NAVIGATION_BAR_TV_WIDTH),
+    flex: 1,
+  },
+  containerOpened: {
+    flex: 1,
   },
   fullscreen: {
     height: '100%',

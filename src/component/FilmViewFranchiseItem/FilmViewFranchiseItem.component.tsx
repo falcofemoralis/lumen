@@ -9,20 +9,18 @@ import { componentStyles } from './FilmViewFranchiseItem.style';
 import { FilmViewFranchiseItemComponentProps } from './FilmViewFranchiseItem.type';
 
 export function FilmViewFranchiseItemComponent({
-  film,
   item,
   idx,
   handleSelectFilm,
 }: FilmViewFranchiseItemComponentProps) {
   const styles = useThemedStyles(componentStyles);
-  const { franchise = [] } = film;
   const {
     name,
     year,
     rating,
     link,
   } = item;
-  const position = Math.abs(idx - franchise.length);
+  const position = idx + 1;
 
   const onPress = useCallback(() => {
     if (link) {
@@ -63,5 +61,10 @@ export function FilmViewFranchiseItemComponent({
 
 export default memo(
   FilmViewFranchiseItemComponent,
-  (prevProps, nextProps) => prevProps.item.link === nextProps.item.link
+  (prevProps, nextProps) => prevProps.idx === nextProps.idx
+    && prevProps.item.link === nextProps.item.link
+    && prevProps.item.name === nextProps.item.name
+    && prevProps.item.year === nextProps.item.year
+    && prevProps.item.rating === nextProps.item.rating
+    && prevProps.handleSelectFilm === nextProps.handleSelectFilm
 );

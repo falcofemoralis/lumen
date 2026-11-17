@@ -6,7 +6,7 @@ import { OverlayScopeProvider } from 'Context/OverlayContext';
 import { useIsScreenFocused } from 'Hooks/useIsScreenFocused';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { memo, ReactNode, RefObject, useEffect, useRef } from 'react';
-import { BackHandler, Pressable, StyleProp, StyleSheet, ViewStyle } from 'react-native';
+import { BackHandler, Platform, Pressable, StyleProp, StyleSheet, ViewStyle } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { noopFn } from 'Util/Function';
 
@@ -233,6 +233,23 @@ function OverlayContent({
   // listeners LIFO, so this newest one wins. Read the latest close handler from a
   // ref so the subscription stays registered once for the overlay's lifetime.
   const closeRef = useRef(handleModalRequestClose);
+
+  useEffect(() => {
+    if (Platform.OS !== 'web') return undefined;
+
+    const escape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape' || event.defaultPrevented
+        || !isScreenFocusedRef.current || !ownsFocusRef.current) return;
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      closeRef.current();
+    };
+
+    document.addEventListener('keydown', escape, true);
+
+    return () => document.removeEventListener('keydown', escape, true);
+  }, []);
 
   useEffect(() => {
     closeRef.current = handleModalRequestClose;

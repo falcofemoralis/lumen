@@ -385,6 +385,7 @@ export const DownloadsScreenContainer = () => {
       const newTask = createDownloadTask({
         id: task.id,
         url: taskInfo.url,
+        headers: taskInfo.headers,
         destination: taskInfo.destination,
         metadata: task.metadata,
       });

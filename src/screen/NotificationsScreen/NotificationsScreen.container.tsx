@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useMemo } from 'react';
@@ -7,8 +7,10 @@ import { queryKeys, STALE_TIME } from 'Util/Query';
 
 import NotificationsScreenComponent from './NotificationsScreen.component';
 import NotificationsScreenComponentTV from './NotificationsScreen.component.atv';
+import { resolveNotificationCards } from './NotificationsScreen.resolve';
 
 export function NotificationsScreenContainer() {
+  const queryClient = useQueryClient();
   const { isTV, isLocalLibrary } = useConfigContext();
   const { isSignedIn, currentService, resetNotifications, getNotifications } = useServiceContext();
 
@@ -21,9 +23,15 @@ export function NotificationsScreenContainer() {
         return [];
       }
 
+      const films = await resolveNotificationCards(
+        notifications,
+        queryClient.getQueryData(queryKeys.notifications()) ?? [],
+        (items) => currentService.getFilmsFromNotifications(items),
+        (items) => queryClient.setQueryData(queryKeys.notifications(), items)
+      );
       resetNotifications();
 
-      return currentService.getFilmsFromNotifications(notifications);
+      return films;
     },
     enabled: isSignedIn || isLocalLibrary,
     // resolving every notification into a film card is expensive, so keep the

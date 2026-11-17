@@ -1,274 +1,177 @@
-import { FocusContext, useFocusable } from '@noriginmedia/norigin-spatial-navigation-react-native-tvos';
 import { ConfirmOverlay } from 'Component/ConfirmOverlay';
+import { FilmGrid } from 'Component/FilmGrid';
+import { FilmList } from 'Component/FilmList';
 import { InfoBlock } from 'Component/InfoBlock';
 import { LoginForm } from 'Component/LoginForm';
 import { Page } from 'Component/Page';
-import { ThemedButton } from 'Component/ThemedButton';
-import { ThemedGrid } from 'Component/ThemedGrid';
-import { ThemedGridRowProps } from 'Component/ThemedGrid/ThemedGrid.type';
-import { ThemedImage } from 'Component/ThemedImage';
-import { ThemedOverlay } from 'Component/ThemedOverlay';
-import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { ThemedPressable } from 'Component/ThemedPressable';
-import { ThemedSimpleList } from 'Component/ThemedSimpleList';
-import { ListItem } from 'Component/ThemedSimpleList/ThemedSimpleList.type';
-import { ThemedText } from 'Component/ThemedText';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
-import { t } from 'i18n/translate';
-import EllipsisVertical from 'lucide-react-native/icons/ellipsis-vertical';
+import Play from 'lucide-react-native/icons/play';
+import Trash2 from 'lucide-react-native/icons/trash-2';
 import Eye from 'lucide-react-native/icons/eye';
 import EyeOff from 'lucide-react-native/icons/eye-off';
-import Trash2 from 'lucide-react-native/icons/trash-2';
-import { useCallback, useRef } from 'react';
+import { t } from 'i18n/translate';
+import { useCallback, useMemo } from 'react';
 import { View } from 'react-native';
-import Animated from 'react-native-reanimated';
 import { useAppTheme } from 'Theme/context';
-import { ThemedStyles } from 'Theme/types';
+import { FilmCardInterface } from 'Type/FilmCard.interface';
+import { recentToFilmCard } from 'Util/Film';
 
-import {
-  ITEMS_ON_SCREEN_TV,
-  NUMBER_OF_COLUMNS_TV,
-  NUMBER_OF_COLUMNS_TV_TWO_COLUMNS,
-} from './RecentScreen.config';
-import { componentStyles, componentStylesTwoColumns } from './RecentScreen.style.atv';
+import { ITEMS_ON_SCREEN_TV } from './RecentScreen.config';
+import { componentStyles } from './RecentScreen.style.atv';
 import { RecentScreenThumbnail } from './RecentScreen.thumbnail.atv';
-import { RecentGridItem, RecentScreenComponentProps } from './RecentScreen.type';
+import { RecentScreenComponentProps } from './RecentScreen.type';
 
-const ACTION_REMOVE = 'remove';
-const ACTION_HIDE = 'hide';
-
-const NAME_MAX_LINES = 2;
-const INFO_MAX_LINES = 2;
-const ACTION_ICON_SIZE = 20;
-
-type RecentRowProps = {
-  item: RecentGridItem;
-  styles: ThemedStyles<typeof componentStyles>;
-  // Two-column cells are half as wide, and a row of buttons costs width the
-  // title needs -- so there the actions collapse into one button opening a menu.
-  // A full-width row has the room to keep them all out in the open.
-  compactActions: boolean;
-  isLastRow: boolean;
-  handleOnPress: (item: RecentGridItem) => void;
-  removeItem: (item: RecentGridItem) => void;
-  openHideConfirmOverlay: (item: RecentGridItem) => void;
-};
-
-// The zoom is applied to the row -- not to the item -- so it also covers the
-// gap and grows the row as one block. `hasFocusedChild` keeps it applied while
-// focus moves between the item and the action buttons, and the buttons
-// counter-scale so they keep their fixed square size.
-function RecentRow({
-  item,
-  styles,
-  compactActions,
-  isLastRow,
+export function RecentScreenComponent({
+  displayMode,
+  items,
+  isLoading,
+  hideConfirmOverlayRef,
+  removeConfirmOverlayRef,
+  onNextLoad,
   handleOnPress,
+  handleContinueWatching,
   removeItem,
+  openRemoveConfirmOverlay,
+  confirmRemoveItem,
   openHideConfirmOverlay,
-}: RecentRowProps) {
-  const { ref, focusKey, hasFocusedChild } = useFocusable<object, View>({
-    trackChildren: true,
-    saveLastFocusedChild: false,
-  });
-  const { scale } = useAppTheme();
-  const actionsOverlayRef = useRef<ThemedOverlayRef>(null);
+  hideItem,
+}: RecentScreenComponentProps) {
+  const styles = useThemedStyles(componentStyles);
+  const { isSignedIn } = useServiceContext();
+  const { isLocalLibrary } = useConfigContext();
 
-  const {
-    image,
-    name,
-    date,
-    info,
-    additionalInfo,
-    isWatched,
-  } = item;
+  const filmItems = useMemo(() => (
+    items.map(recentToFilmCard)
+  ), [items]);
 
-  const handleAction = useCallback((action: ListItem) => {
-    actionsOverlayRef.current?.close();
+  const listItems = useMemo(() => (
+    items.map((item) => ({
+      film: recentToFilmCard(item),
+      isWatched: item.isWatched,
+      additionalInfo: item.additionalInfo,
+    }))
+  ), [items]);
 
-    if (action.value === ACTION_REMOVE) {
-      removeItem(item);
+  const recentItemsById = useMemo(
+    () => new Map(items.map((item) => [item.id, item])),
+    [items],
+  );
 
-      return;
-    }
+  const { scale, theme } = useAppTheme();
 
-    // Either toggles a watched item back on the spot or opens the screen's
-    // confirmation -- which is a second overlay, so this one has to be closing
-    // already for focus to hand over to it.
-    openHideConfirmOverlay(item);
-  }, [item, removeItem, openHideConfirmOverlay]);
+  const renderFilmActions = useCallback((film: FilmCardInterface) => {
+    const item = recentItemsById.get(film.id);
 
-  const renderActionsOverlay = () => {
-    if (!compactActions) {
+    if (!item) {
       return null;
     }
 
-    return (
-      <ThemedOverlay ref={ actionsOverlayRef }>
-        <View style={ styles.overlayActions }>
-          <ThemedSimpleList
-            data={ [
-              {
-                label: t('Remove'),
-                value: ACTION_REMOVE,
-              },
-              {
-                label: isWatched ? t('Show') : t('Hide'),
-                value: ACTION_HIDE,
-              },
-            ] }
-            onChange={ handleAction }
-          />
-        </View>
-      </ThemedOverlay>
-    );
-  };
+    const buttonStyle = {
+      width: scale(32),
+      height: scale(32),
+      borderRadius: scale(16),
+      backgroundColor: theme.colors.button,
+      alignItems: 'center' as const,
+      justifyContent: 'center' as const,
+    };
 
-  const renderActions = () => {
-    if (compactActions) {
-      return (
-        <ThemedButton
-          style={ [styles.actionButton, hasFocusedChild && styles.actionButtonUnzoomed] }
-          contentStyle={ styles.actionButtonContent }
-          IconComponent={ EllipsisVertical }
-          onPress={ () => actionsOverlayRef.current?.open() }
-          iconProps={ {
-            size: scale(ACTION_ICON_SIZE),
+    return (
+      <View
+        style={ {
+          position: 'absolute' as const,
+          top: scale(8),
+          right: scale(8),
+          zIndex: 20,
+          gap: scale(6),
+        } }
+      >
+        <ThemedPressable
+          onPress={ () => handleContinueWatching(item) }
+          style={ ({ isFocused }) => [buttonStyle, isFocused && { backgroundColor: theme.colors.backgroundFocused }] }
+        >
+          { ({ isFocused }) => (
+            <Play
+              size={ scale(24) }
+              color={ isFocused ? theme.colors.iconFocused : theme.colors.icon }
+            />
+          ) }
+        </ThemedPressable>
+
+        <ThemedPressable
+          onPress={ () => openRemoveConfirmOverlay(item) }
+          style={ ({ isFocused }) => [buttonStyle, isFocused && { backgroundColor: theme.colors.backgroundFocused }] }
+        >
+          { ({ isFocused }) => (
+            <Trash2
+              size={ scale(24) }
+              color={ isFocused ? theme.colors.iconFocused : theme.colors.icon }
+            />
+          ) }
+        </ThemedPressable>
+
+        <ThemedPressable
+          onPress={ () => openHideConfirmOverlay(item) }
+          style={ ({ isFocused }) => [buttonStyle, isFocused && { backgroundColor: theme.colors.backgroundFocused }] }
+        >
+          { ({ isFocused }) => {
+            const Icon = item.isWatched ? EyeOff : Eye;
+
+            return <Icon size={ scale(24) } color={ isFocused ? theme.colors.iconFocused : theme.colors.icon } />;
           } }
+        </ThemedPressable>
+      </View>
+    );
+  }, [
+    handleContinueWatching,
+    openHideConfirmOverlay,
+    recentItemsById,
+    openRemoveConfirmOverlay,
+    scale,
+    theme.colors.button,
+    theme.colors.icon,
+    theme.colors.iconFocused,
+    theme.colors.backgroundFocused,
+  ]);
+
+  const renderEmpty = () => {
+    if (isLoading) {
+      return (
+        <RecentScreenThumbnail
+          styles={ styles }
+          thumbnailsAmount={ ITEMS_ON_SCREEN_TV }
         />
       );
     }
 
     return (
-      <>
-        <ThemedButton
-          style={ [styles.actionButton, hasFocusedChild && styles.actionButtonUnzoomed] }
-          contentStyle={ styles.actionButtonContent }
-          IconComponent={ Trash2 }
-          onPress={ () => removeItem(item) }
-          iconProps={ {
-            size: scale(ACTION_ICON_SIZE),
-          } }
+      <View style={ styles.empty }>
+        <InfoBlock
+          title={ t('No recent items') }
+          subtitle={ t('You have not watched any films yet') }
         />
-        <ThemedButton
-          style={ [styles.actionButton, hasFocusedChild && styles.actionButtonUnzoomed] }
-          contentStyle={ styles.actionButtonContent }
-          IconComponent={ isWatched ? EyeOff : Eye }
-          onPress={ () => openHideConfirmOverlay(item) }
-          iconProps={ {
-            size: scale(ACTION_ICON_SIZE),
-          } }
-        />
-      </>
+      </View>
     );
   };
 
-  return (
-    <FocusContext.Provider value={ focusKey }>
-      <Animated.View
-        ref={ ref }
-        style={ [styles.row, isLastRow && styles.lastRow, hasFocusedChild && styles.rowFocused] }
-        tvFocusable={ false }
-      >
-        { renderActionsOverlay() }
-        <ThemedPressable
-          style={ styles.fill }
-          contentStyle={ styles.fill }
-          onPress={ () => handleOnPress(item) }
-        >
-          { ({ isFocused }) => {
-            return (
-              <Animated.View
-                style={ [
-                  styles.fill,
-                  styles.item,
-                  isFocused && styles.itemFocused,
-                  item.isWatched && styles.itemHidden,
-                ] }
-              >
-                <View style={ [styles.poster, styles.posterContainer, isFocused && styles.posterContainerFocused] }>
-                  <ThemedImage
-                    style={ styles.poster }
-                    src={ image }
-                  />
-                </View>
-                { /* The row is a fixed height and its content is centred, so
-                     text that wraps past it is clipped at both ends rather than
-                     pushing the row taller -- every line count is capped. Long
-                     titles are the common case; two lines then an ellipsis. */ }
-                <View style={ styles.itemContent }>
-                  <ThemedText
-                    style={ [styles.name, isFocused && styles.nameFocused] }
-                    numberOfLines={ NAME_MAX_LINES }
-                  >
-                    { name }
-                  </ThemedText>
-                  <ThemedText
-                    style={ [styles.date, isFocused && styles.dateFocused] }
-                    numberOfLines={ 1 }
-                  >
-                    { date }
-                  </ThemedText>
-                  { info && (
-                    <ThemedText
-                      style={ [styles.info, isFocused && styles.infoFocused] }
-                      numberOfLines={ INFO_MAX_LINES }
-                    >
-                      { info }
-                    </ThemedText>
-                  ) }
-                  { additionalInfo && (
-                    <ThemedText
-                      style={ [styles.additionalInfo, isFocused && styles.additionalInfoFocused] }
-                      numberOfLines={ INFO_MAX_LINES }
-                    >
-                      { additionalInfo }
-                    </ThemedText>
-                  ) }
-                </View>
-              </Animated.View>
-            );
-          } }
-        </ThemedPressable>
-        { renderActions() }
-      </Animated.View>
-    </FocusContext.Provider>
+  const renderConfirmOverlay = () => (
+    <>
+      <ConfirmOverlay
+        overlayRef={ hideConfirmOverlayRef }
+        title={ t('Are you sure?') }
+        message={ t('Are you sure you want to hide this item?') }
+        onConfirm={ hideItem }
+      />
+      <ConfirmOverlay
+        overlayRef={ removeConfirmOverlayRef }
+        title={ t('Are you sure?') }
+        message={ t('Are you sure you want to remove this item?') }
+        onConfirm={ confirmRemoveItem }
+      />
+    </>
   );
-}
-
-export function RecentScreenComponent({
-  items,
-  isLoading,
-  hideConfirmOverlayRef,
-  onNextLoad,
-  handleOnPress,
-  removeItem,
-  openHideConfirmOverlay,
-  hideItem,
-}: RecentScreenComponentProps) {
-  const { isSignedIn } = useServiceContext();
-  const { isLocalLibrary, recentTwoColumnsTV } = useConfigContext();
-
-  const numberOfColumns = recentTwoColumnsTV ? NUMBER_OF_COLUMNS_TV_TWO_COLUMNS : NUMBER_OF_COLUMNS_TV;
-  const styles = useThemedStyles(recentTwoColumnsTV ? componentStylesTwoColumns : componentStyles);
-
-  // Start of the last -- possibly partly filled -- row: every cell of that row
-  // has to reserve the room the focus zoom bleeds past the end of the list.
-  const lastRowStart = Math.floor(Math.max(items.length - 1, 0) / numberOfColumns) * numberOfColumns;
-
-  const renderItem = useCallback(({ item, index }: ThemedGridRowProps<RecentGridItem>) => (
-    <RecentRow
-      item={ item }
-      styles={ styles }
-      compactActions={ recentTwoColumnsTV }
-      isLastRow={ index >= lastRowStart }
-      handleOnPress={ handleOnPress }
-      removeItem={ removeItem }
-      openHideConfirmOverlay={ openHideConfirmOverlay }
-    />
-  ), [handleOnPress, openHideConfirmOverlay, removeItem, styles, recentTwoColumnsTV, lastRowStart]);
 
   const renderContent = () => {
     if (!isSignedIn && !isLocalLibrary) {
@@ -279,7 +182,7 @@ export function RecentScreenComponent({
       return (
         <RecentScreenThumbnail
           styles={ styles }
-          thumbnailsAmount={ ITEMS_ON_SCREEN_TV * numberOfColumns }
+          thumbnailsAmount={ ITEMS_ON_SCREEN_TV }
         />
       );
     }
@@ -295,31 +198,48 @@ export function RecentScreenComponent({
       );
     }
 
-    return (
-      <ThemedGrid
-        // FlashList measures its cells off the column count, so a fresh list is
-        // cheaper -- and safer -- than making it re-measure when the setting flips
-        // while the screen stays mounted.
-        key={ numberOfColumns }
-        autofocus
-        style={ styles.grid }
-        rowStyle={ styles.rowStyle }
-        data={ items }
-        numberOfColumns={ numberOfColumns }
-        renderItem={ renderItem }
-        onNextLoad={ onNextLoad }
-        scrollBehavior='stick-to-center'
-      />
-    );
-  };
+    if (displayMode === 'list') {
+      return (
+        <FilmList
+          items={ listItems }
+          onNextLoad={ onNextLoad }
+          onFilmPress={ (film) => {
+            const item = recentItemsById.get(film.id);
 
-  const renderConfirmOverlay = () => {
+            if (item) {
+              handleOnPress(item);
+            }
+          } }
+          onContinueWatching={ (item) => {
+            const recentItem = recentItemsById.get(item.film.id);
+
+            if (recentItem) {
+              handleContinueWatching(recentItem);
+            }
+          } }
+          onRemove={ (item) => {
+            const recentItem = recentItemsById.get(item.film.id);
+
+            if (recentItem) {
+              openRemoveConfirmOverlay(recentItem);
+            }
+          } }
+          onToggleWatched={ (item) => {
+            const recentItem = recentItemsById.get(item.film.id);
+
+            if (recentItem) {
+              openHideConfirmOverlay(recentItem);
+            }
+          } }
+        />
+      );
+    }
+
     return (
-      <ConfirmOverlay
-        overlayRef={ hideConfirmOverlayRef }
-        title={ t('Are you sure?') }
-        message={ t('Are you sure you want to hide this item?') }
-        onConfirm={ hideItem }
+      <FilmGrid
+        films={ filmItems }
+        onNextLoad={ onNextLoad }
+        filmActions={ renderFilmActions }
       />
     );
   };

@@ -23,7 +23,7 @@ export const CollectionScreenThumbnail = ({
           <View
             // eslint-disable-next-line react/no-array-index-key
             key={ `collection-page-thumb-col-${jdx}` }
-            style={ [styles.item, { flexGrow: 1 }, jdx % 2 === 0 && styles.rowItem] }
+            style={ [styles.card, { width, flexShrink: 1 }, jdx % 2 === 0 && styles.rowItem] }
           >
             <Thumbnail
               style={ styles.image }

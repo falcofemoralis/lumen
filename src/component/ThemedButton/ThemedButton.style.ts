@@ -16,7 +16,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     gap: scale(8),
   },
   icon: {
-    width: scale(16),
+    flexShrink: 0,
     alignSelf: 'center',
     flexDirection: 'row',
   },

@@ -4,10 +4,12 @@ export const componentStyles = ({ scale, text, colors, spacing }: Theme) => ({
   franchiseItemButton: {
   },
   franchiseItemButtonContent: {
+    width: '100%',
     paddingHorizontal: scale(spacing.wrapperPadding),
   },
   franchiseItem: {
     flexDirection: 'row',
+    width: '100%',
     gap: scale(12),
     paddingBlock: scale(12),
   },

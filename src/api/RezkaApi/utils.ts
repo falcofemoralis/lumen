@@ -1,3 +1,4 @@
+import { filmPosterUrl } from 'Util/Film/posterImage';
 import { ActorCardInterface } from 'Type/ActorCard.interface';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { FilmListInterface } from 'Type/FilmList.interface';
@@ -47,6 +48,50 @@ export const parseHelpLink = (rawLink?: string): string | undefined => {
   }
 };
 
+export const parseExternalIdsFromUrl = (
+  url?: string
+): {
+  imdb?: string;
+  tmdb?: string;
+  kinopoisk?: string;
+} => {
+  if (!url) {
+    return {};
+  }
+
+  const result: {
+    imdb?: string;
+    tmdb?: string;
+    kinopoisk?: string;
+  } = {};
+
+  const imdbMatch = url.match(
+    /(?:^|\/\/)(?:www\.)?imdb\.com\/title\/(tt\d+)(?:[/?#]|$)/i
+  );
+
+  if (imdbMatch) {
+    result.imdb = imdbMatch[1];
+  }
+
+  const tmdbMatch = url.match(
+    /(?:^|\/\/)(?:www\.)?themoviedb\.org\/(?:movie|tv)\/(\d+)(?:[/?#]|$)/i
+  );
+
+  if (tmdbMatch) {
+    result.tmdb = tmdbMatch[1];
+  }
+
+  const kinopoiskMatch = url.match(
+    /(?:^|\/\/)(?:www\.)?kinopoisk\.ru\/(?:film|series)\/(\d+)(?:[/?#]|$)/i
+  );
+
+  if (kinopoiskMatch) {
+    result.kinopoisk = kinopoiskMatch[1];
+  }
+
+  return result;
+};
+
 export const parseFilmType = (type = '') => {
   if (type.includes('films')) {
     return FilmType.FILM;
@@ -68,7 +113,8 @@ export const parseFilmCard = (el: HTMLElementInterface): FilmCardInterface => {
   const linkFull = el.querySelector('.b-content__inline_item-link a')?.attributes.href ?? '';
   const link = removeUrlHost(linkFull);
   const type = parseFilmType(el.querySelector('.cat')?.attributes.class);
-  const poster = el.querySelector('.b-content__inline_item-cover img')?.attributes.src ?? '';
+  const image = el.querySelector('.b-content__inline_item-cover img');
+  const poster = filmPosterUrl(image?.attributes);
   const title = el.querySelector('.b-content__inline_item-link a')?.rawText ?? '';
   const subtitle = el.querySelector('.b-content__inline_item-link div')?.rawText ?? '';
   const info = (el.querySelector('.b-content__inline_item-cover .info')?.rawText ?? '').replaceAll(

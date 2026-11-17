@@ -3,7 +3,7 @@ import { Language } from 'i18n/index';
 import { DeviceConfigType } from 'src/config';
 import { ThemeContextType } from 'Theme/context';
 
-type ConfigProps = Omit<DeviceConfigType, 'isTV'> & Pick<ThemeContextType, 'theme' | 'themeScheme'>
+type ConfigProps = DeviceConfigType & Pick<ThemeContextType, 'theme' | 'themeScheme'>
 
 export type SettingsScreenComponentProps = {
   appLanguage: Language
@@ -25,6 +25,7 @@ export type SettingsScreenComponentProps = {
   isAutoFrameRateSupported: boolean
   isVolumeNormalizationSupported: boolean
   onConfigUpdate: (key: keyof DeviceConfigType, value: unknown) => void
+  onResetChallengeCookies: () => Promise<void>
   onTvChannelsAddToHome: () => Promise<void>
   onLanguageChange: (value: string) => Promise<void>
   onThemeSchemeChange: (value: string) => void
@@ -45,4 +46,6 @@ export enum SETTING_GROUP {
   PLAYER = 'PLAYER',
   BACKUP = 'BACKUP',
   ABOUT = 'ABOUT',
+  TV_NAVIGATION = 'TV_NAVIGATION',
+  MOBILE_NAVIGATION = 'MOBILE_NAVIGATION',
 }

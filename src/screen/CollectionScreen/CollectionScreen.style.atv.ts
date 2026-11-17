@@ -9,9 +9,18 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   rowStyle: {
     gap: scale(ROW_GAP),
   },
+  card: {
+    width: '100%',
+    aspectRatio: 208 / 120,
+  },
+  cardContent: {
+    flex: 1,
+    width: '100%',
+  },
   item: {
     position: 'relative',
-    height: 'auto',
+    width: '100%',
+    height: '100%',
     borderRadius: scale(12),
     borderWidth: scale(2),
     borderColor: colors.transparent,
@@ -44,7 +53,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   },
   image: {
     width: '100%',
-    aspectRatio: '208 / 120',
+    height: '100%',
     borderRadius: scale(12),
   },
   empty: {

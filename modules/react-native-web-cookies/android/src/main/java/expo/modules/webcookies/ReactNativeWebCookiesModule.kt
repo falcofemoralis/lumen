@@ -41,6 +41,23 @@ class ReactNativeWebCookiesModule : Module() {
      *
      * Answers whether there was a store to clear at all.
      */
+    AsyncFunction("removeCookies") { url: String, names: List<String> ->
+      val manager = cookieManager()
+      val host = java.net.URI(url).host ?: ""
+      val parts = host.split(".")
+      for (name in names.filter { it.matches(Regex("[A-Za-z0-9_.-]+")) }) {
+        val expired = "$name=; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=/"
+        manager?.setCookie(url, expired)
+        for (index in 0 until (parts.size - 1)) {
+          val domain = parts.drop(index).joinToString(".")
+          manager?.setCookie(url, "$expired; Domain=$domain")
+          manager?.setCookie(url, "$expired; Domain=.$domain")
+        }
+      }
+      manager?.flush()
+      manager != null
+    }.runOnQueue(Queues.MAIN)
+
     AsyncFunction("clearCookies") {
       val manager = cookieManager()
 

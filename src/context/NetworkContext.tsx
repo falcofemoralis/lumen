@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { NetworkStateType, useNetworkState } from 'expo-network';
+import { getNetworkStateAsync, NetworkState, NetworkStateType, useNetworkState } from 'expo-network';
 import {
   createContext,
   ReactNode,
@@ -7,8 +7,11 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
+import { AppState } from 'react-native';
+import { isNetworkFailure, isRecoverableSourceFailure } from 'Util/NetworkRecovery';
 import { setConnectionErrorHandler } from 'Util/Query';
 
 import { useConfigContext } from './ConfigContext';
@@ -16,6 +19,9 @@ import { useConfigContext } from './ConfigContext';
 // How long to wait for the first network reading before assuming there is a connection.
 // Only a guard against the reading never landing at all - the real one arrives in a tick.
 const NETWORK_PROBE_TIMEOUT = 3000;
+// How long a known-bad reading has to persist before the offline screen shows,
+// so a resume-from-background blip doesn't trigger it.
+const OFFLINE_DEBOUNCE_MS = 3000;
 
 interface NetworkContextInterface {
   // known to be online - false while the first network reading is still pending, so
@@ -36,7 +42,12 @@ const NetworkContext = createContext<NetworkContextInterface>({
 export const NetworkProvider = ({ children }: { children: ReactNode }) => {
   const { strictConnectionCheck } = useConfigContext();
   const queryClient = useQueryClient();
-  const { isConnected, isInternetReachable, type } = useNetworkState();
+  const observedNetwork = useNetworkState();
+  const [verifiedNetwork, setVerifiedNetwork] = useState<NetworkState | null>(null);
+  const { isConnected, isInternetReachable, type } = verifiedNetwork ?? observedNetwork;
+  useEffect(() => setVerifiedNetwork(null), [
+    observedNetwork.isConnected, observedNetwork.isInternetReachable, observedNetwork.type,
+  ]);
   const [errorOccurred, setErrorOccurred] = useState<boolean>(false);
   const [wasOnline, setWasOnline] = useState<boolean>(false);
 
@@ -68,8 +79,9 @@ export const NetworkProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
-    queryClient.resetQueries({
-      predicate: ({ state }) => state.status === 'error',
+    queryClient.refetchQueries({
+      type: 'active',
+      predicate: ({ state }) => state.status === 'error' && isRecoverableSourceFailure(state.error),
     });
   }, [isOnline, queryClient]);
 
@@ -112,17 +124,78 @@ export const NetworkProvider = ({ children }: { children: ReactNode }) => {
   // pending is neither online nor offline - only a known-bad state blocks the page
   const isOffline = isNetworkStateKnown && !isInternetAvailable;
 
+  // A resume from background briefly reports a stale/incorrect reading before the
+  // real one lands, which would otherwise flash the offline screen for no reason.
+  // Debounce the transition into offline; recovery back to online stays immediate.
+  const [debouncedIsOffline, setDebouncedIsOffline] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!isOffline) {
+      setDebouncedIsOffline(false);
+
+      return undefined;
+    }
+
+    const timeout = setTimeout(() => setDebouncedIsOffline(true), OFFLINE_DEBOUNCE_MS);
+
+    return () => clearTimeout(timeout);
+  }, [isOffline]);
+
+  const lastRecovery = useRef(0);
+  const recoveryTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const recoverConnection = useCallback(async () => {
+    try {
+      const network = await getNetworkStateAsync();
+      setVerifiedNetwork(network);
+      if (!network.isConnected || network.isInternetReachable === false) {
+        setErrorOccurred(true);
+        return;
+      }
+      setErrorOccurred(false);
+      if (AppState.currentState !== 'active' || Date.now() - lastRecovery.current < 60000) return;
+      if (!queryClient.getQueryCache().getAll().some((query) =>
+        query.isActive() && query.state.status === 'error' && isRecoverableSourceFailure(query.state.error))) return;
+      lastRecovery.current = Date.now();
+      await queryClient.refetchQueries({
+        type: 'active',
+        predicate: ({ state }) => state.status === 'error' && isRecoverableSourceFailure(state.error),
+      });
+    } catch {
+      // A failed native probe is not proof that every source is offline.
+      setErrorOccurred(false);
+    }
+  }, [queryClient]);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') void recoverConnection();
+    });
+    // Checks local query state only; refetches after a provider's cooldown, never during it.
+    const recoveryPoll = setInterval(() => {
+      if (AppState.currentState === 'active' && queryClient.getQueryCache().getAll().some(query =>
+        query.isActive() && query.state.status === 'error' && isRecoverableSourceFailure(query.state.error))) void recoverConnection();
+    }, 30_000);
+    return () => {
+      subscription.remove();
+      clearInterval(recoveryPoll);
+      clearTimeout(recoveryTimer.current);
+    };
+  }, [recoverConnection, queryClient]);
+
   const handleConnectionError = useCallback((error: Error) => {
     const msg = error instanceof Error ? error.message : String(error);
 
-    if (msg === 'TypeError: Network request failed') {
-      setErrorOccurred(true);
+    if (isNetworkFailure(msg)) {
+      // A single unreachable host must not disable and re-enable every query.
+      if (!isOnline) setErrorOccurred(true);
+      clearTimeout(recoveryTimer.current);
+      recoveryTimer.current = setTimeout(() => void recoverConnection(), 1500);
 
       return true;
     }
 
     return false;
-  }, []);
+  }, [recoverConnection, isOnline]);
 
   // failed queries and mutations report through the query client, which lives outside
   // React - give it a way back into the offline state
@@ -134,11 +207,11 @@ export const NetworkProvider = ({ children }: { children: ReactNode }) => {
 
   const value = useMemo(() => ({
     isInternetAvailable,
-    isOffline,
+    isOffline: debouncedIsOffline,
     handleConnectionError,
   }), [
     isInternetAvailable,
-    isOffline,
+    debouncedIsOffline,
     handleConnectionError,
   ]);
 

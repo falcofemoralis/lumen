@@ -1,4 +1,5 @@
 import { ComponentType, ReactElement, ReactNode } from 'react';
+import { TabPosition } from '../../config';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 
 /** A group of films rendered under a title of its own. */
@@ -77,6 +78,7 @@ export interface FilmGridContainerProps {
   disableStatusbarSafeArea?: boolean;
   // TV related
   disableAutofocus?: boolean;
+  tabPosition?: TabPosition;
   /**
    * A menu belonging above the first row. Rendered inside the list -- so that it
    * scrolls away with the content rather than collapsing above it -- but kept a
@@ -85,6 +87,9 @@ export interface FilmGridContainerProps {
   ListMenuComponent?: ReactNode;
   /** Fired when grid focus enters (true) or leaves (false) the first row. */
   onAtTopChange?: (atTop: boolean) => void;
+  filmActions?: (film: FilmCardInterface) => ReactNode;
+  /** Shows a floating button that scrolls the grid back to the top after scrolling down. */
+  showScrollToTopButton?: boolean;
 }
 
 type FilmGridLayoutProps = Omit<FilmGridContainerProps, 'films' | 'sections' | 'onNextLoad'>;
@@ -133,8 +138,10 @@ export type RegisterCard = (focusKey: string, handle: FilmGridCardHandle) => () 
 
 export interface FilmGridItemProps {
   item: FilmGridFilmItem;
+  isRatingVisible: boolean;
   // TV related
   isLastRow?: boolean;
   registerCard?: RegisterCard;
   handleOnPress: (film: FilmCardInterface) => void;
+  filmActions?: (film: FilmCardInterface) => ReactNode;
 }

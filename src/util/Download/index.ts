@@ -63,7 +63,7 @@ export const TaskIdStorage = {
     // this is its first attempt or a retry of one that failed earlier
     if (mapping[destination]) {
       const { id } = mapping[destination];
-      mapping[destination] = { ...mapping[destination], isPartial: true };
+      mapping[destination] = { ...mapping[destination], ...data, isPartial: true };
       TaskIdStorage.save(mapping);
 
       return id;

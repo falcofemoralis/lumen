@@ -1,3 +1,4 @@
+import { useConfigContext } from 'Context/ConfigContext';
 import { FilmGrid } from 'Component/FilmGrid';
 import { InfoBlock } from 'Component/InfoBlock';
 import { Page } from 'Component/Page';
@@ -13,6 +14,7 @@ export function NotificationsScreenComponent({
   data,
   isLoading,
 }: NotificationsScreenComponentProps) {
+  const { tabPosition } = useConfigContext();
   if (!data.length && !isLoading) {
     return (
       <Page>
@@ -30,10 +32,11 @@ export function NotificationsScreenComponent({
 
   return (
     <Page>
-      <Wrapper>
+      <Wrapper style={ { marginHorizontal: 0 } }>
         <View style={ styles.container }>
           <FilmGrid
             sections={ data }
+            tabPosition={ tabPosition }
           />
         </View>
       </Wrapper>

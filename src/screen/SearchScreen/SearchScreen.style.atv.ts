@@ -22,6 +22,9 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     height: scale(48),
     borderRadius: scale(99),
   },
+  collectionsBtn: {
+    marginRight: scale(12),
+  },
   actionBtnContent: {
     justifyContent: 'center',
     alignItems: 'center',

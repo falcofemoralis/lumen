@@ -7,4 +7,6 @@ export interface CategoryScreenContainerProps {
 
 export interface CategoryScreenComponentProps extends FilmPagerHandlers {
   pagerItems: PagerItemInterface[];
+  isLoadError: boolean;
+  retryLoad: () => void;
 }

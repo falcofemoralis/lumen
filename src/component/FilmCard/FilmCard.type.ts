@@ -2,6 +2,8 @@ import { StyleProp, ViewStyle } from 'react-native';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 
 export interface FilmCardContainerProps {
+  /** Whether the rating request is allowed for this card. */
+  isRatingVisible?: boolean;
   filmCard: FilmCardInterface;
   style?: StyleProp<ViewStyle>;
   // TV related
@@ -22,4 +24,5 @@ export type FilmCardComponentProps = FilmCardContainerProps & {
    * grid but shows nothing about the film -- no poster, title, or subtitle.
    */
   isHidden?: boolean;
+  isBookmarked?: boolean;
 };

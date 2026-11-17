@@ -33,6 +33,12 @@ class ReactNativeWebCookies {
     return ReactNativeWebCookiesModule.getCookies(url);
   }
 
+  removeCookies(url: string, names: string[]): Promise<boolean> {
+    return ReactNativeWebCookiesModule?.removeCookies
+      ? ReactNativeWebCookiesModule.removeCookies(url, names)
+      : Promise.resolve(false);
+  }
+
   /** Drops every cookie the WebView holds, for a sign-out. */
   clearCookies(): Promise<boolean> {
     if (!ReactNativeWebCookiesModule) {

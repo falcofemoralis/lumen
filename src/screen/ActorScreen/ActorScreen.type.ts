@@ -7,5 +7,8 @@ export interface ActorScreenContainerProps {
 
 export interface ActorScreenComponentProps {
   isLoading: boolean;
+  onNextLoad?: (isRefresh: boolean) => Promise<void>;
+  isLoadError?: boolean;
+  retryLoad?: () => void;
   actor: ActorInterface | null;
 }

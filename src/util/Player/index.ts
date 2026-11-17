@@ -16,9 +16,11 @@ import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { ProfileInterface } from 'Type/Profile.interface';
 import { getFormattedDate } from 'Util/Date';
 import { getDeviceId } from 'Util/DeviceId';
+import { mutateCloudSync } from 'Util/CloudSync';
 import { safeJsonParse } from 'Util/Json';
 import { storage } from 'Util/Storage';
 
+import { getSavedTimeForFilm, withSavedEpisodePosition } from './savedTimeUtil';
 export { getScheduleEpisodeName } from './scheduleEpisode';
 
 export const PLAYER_SAVED_TIME_STORAGE_KEY = 'playerTime';
@@ -60,18 +62,16 @@ const prepareSavedTimeObject = (
     ? { ...previousSavedTime }
     : { filmId: film.id, voices: {}, lastVoiceId: null };
 
-  const voiceData = newSavedTime.voices[voice.id] ?? {} as SavedTimeVoice;
+  const voiceData = withSavedEpisodePosition(newSavedTime.voices[voice.id] ?? {} as SavedTimeVoice, voice);
 
   if (!voiceData.timestamps) {
     voiceData.timestamps = {};
   }
 
-  voiceData.lastEpisodeId = voice.lastEpisodeId;
-  voiceData.lastSeasonId = voice.lastSeasonId;
-
   voiceData.timestamps[formatTimestampKey(voice)] = {
     time,
     progress,
+    updatedAt: Date.now(),
     deviceId: getDeviceId(),
   };
 
@@ -91,6 +91,17 @@ export const updateSavedTime = (film: FilmInterface, voice: FilmVoiceInterface, 
     key,
     newSavedTime
   );
+
+  const timestampKey = formatTimestampKey(voice);
+  const timestamp = newSavedTime.voices[voice.id]?.timestamps[timestampKey];
+
+  if (timestamp && timestampKey !== '0') {
+    mutateCloudSync({
+      entity: 'player-time',
+      id: `${film.id}:${voice.id}:${timestampKey}`,
+      value: timestamp,
+    });
+  }
 };
 
 export const setSavedTime = (savedTime: SavedTime, film: FilmInterface) => {
@@ -103,10 +114,41 @@ export const setSavedTime = (savedTime: SavedTime, film: FilmInterface) => {
 };
 
 export const getSavedTime = (film: FilmInterface): SavedTime | null => {
-  const key = formatPlayerKeyTime(film);
-  const savedTime = storage.getPlayerStorage().load<SavedTime | null>(key);
+  return getSavedTimeForFilm(film, id => storage.getPlayerStorage().load<SavedTime | null>(
+    PLAYER_SAVED_TIME_STORAGE_KEY + '-' + id
+  ));
+};
 
-  return savedTime;
+export const getAllSavedTimes = (): SavedTime[] => {
+  const playerStorage = storage.getPlayerStorage();
+
+  return playerStorage
+    .getKeys()
+    .filter((key) => key.startsWith(`${PLAYER_SAVED_TIME_STORAGE_KEY}-`))
+    .map((key) => playerStorage.load<SavedTime | null>(key))
+    .filter((savedTime): savedTime is SavedTime => Boolean(savedTime));
+};
+
+export const setSavedTimeById = (savedTime: SavedTime): void => {
+  const key = `${PLAYER_SAVED_TIME_STORAGE_KEY}-${savedTime.filmId}`;
+
+  storage.getPlayerStorage().save(key, savedTime);
+};
+
+export const replaceAllSavedTimes = (savedTimes: SavedTime[]): void => {
+  const playerStorage = storage.getPlayerStorage();
+
+  playerStorage
+    .getKeys()
+    .filter((key) => key.startsWith(`${PLAYER_SAVED_TIME_STORAGE_KEY}-`))
+    .forEach((key) => playerStorage.remove(key));
+
+  savedTimes.forEach((savedTime) => {
+    playerStorage.save(
+      `${PLAYER_SAVED_TIME_STORAGE_KEY}-${savedTime.filmId}`,
+      savedTime
+    );
+  });
 };
 
 export const getVideoTime = (voice: FilmVoiceInterface, savedTime: SavedTime | null) => {

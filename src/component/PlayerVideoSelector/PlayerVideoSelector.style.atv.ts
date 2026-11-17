@@ -20,11 +20,45 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   },
   row: {
     flexDirection: 'row',
+    marginBottom: scale(10),
   },
   button: {
     marginEnd: scale(10),
     marginBottom: scale(10),
     borderRadius: scale(99),
+  },
+  season: {
+    backgroundColor: colors.chip,
+    borderRadius: scale(16),
+    marginEnd: scale(10),
+  },
+  seasonContent: {
+    padding: scale(8),
+  },
+  seasonSelected: {
+    backgroundColor: colors.primary,
+  },
+  seasonText: {
+    color: colors.chipText,
+  },
+  seasonTextSelected: {
+    color: colors.textOnTertiary,
+  },
+  episode: {
+    backgroundColor: colors.chip,
+    borderRadius: scale(16),
+    marginEnd: scale(10),
+  },
+  episodeContent: {
+    padding: scale(8),
+  },
+  episodeSelected: {
+    backgroundColor: colors.primary,
+  },
+  episodeText: {
+  },
+  episodeTextSelected: {
+    color: colors.textOnTertiary,
   },
   voicesWrapper: {
     width: '100%',
@@ -35,6 +69,14 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   },
   voicesContainer: {
     flex: 1,
+  },
+  compactSelectorsContainer: {
+    width: '100%',
+    gap: scale(10),
+    marginTop: scale(10),
+  },
+  compactSelector: {
+    width: '100%',
   },
   buttonProgressContainer: {
     position: 'absolute',
@@ -59,13 +101,10 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     top: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: colors.button,
+    backgroundColor: colors.chip,
   },
   buttonProgressMaskSelected: {
     backgroundColor: colors.primary,
-  },
-  buttonProgressMaskFocused: {
-    backgroundColor: colors.buttonFocused,
   },
   episodeDownloadSelected: {
     backgroundColor: colors.secondary,

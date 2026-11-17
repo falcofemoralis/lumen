@@ -14,7 +14,7 @@ diff --git a/node_modules/react-native-video/android/src/main/java/com/twg/video
 index 02b03aa..1acc926 100644
 --- a/node_modules/react-native-video/android/src/main/java/com/twg/video/core/player/DataSourceFactoryUtils.kt
 +++ b/node_modules/react-native-video/android/src/main/java/com/twg/video/core/player/DataSourceFactoryUtils.kt
-@@ -11,8 +11,21 @@ import com.facebook.react.modules.network.CookieJarContainer
+@@ -11,8 +11,22 @@ import com.facebook.react.modules.network.CookieJarContainer
  import com.facebook.react.modules.network.ForwardingCookieHandler
  import com.facebook.react.modules.network.OkHttpClientProvider
  import com.margelo.nitro.video.HybridVideoPlayerSourceSpec
@@ -32,11 +32,12 @@ index 02b03aa..1acc926 100644
 +// which ExoPlayer recovers from by reconnecting.
 +private const val MEDIA_CONNECT_TIMEOUT_MS = 8000L
 +private const val MEDIA_READ_TIMEOUT_MS = 8000L
++private const val TORRENT_READ_TIMEOUT_MS = 60000L
 +
  fun buildBaseDataSourceFactory(context: Context, source: HybridVideoPlayerSourceSpec): DefaultDataSource.Factory {
    return if (source.uri.startsWith("http")) {
      DefaultDataSource.Factory(context, buildHttpDataSourceFactory(context, source))
-@@ -23,13 +36,20 @@ fun buildBaseDataSourceFactory(context: Context, source: HybridVideoPlayerSource
+@@ -23,13 +37,22 @@ fun buildBaseDataSourceFactory(context: Context, source: HybridVideoPlayerSource
  
  @OptIn(UnstableApi::class)
  fun buildHttpDataSourceFactory(context: Context, source: HybridVideoPlayerSourceSpec): OkHttpDataSource.Factory {
@@ -53,7 +54,9 @@ index 02b03aa..1acc926 100644
 +  // dispatcher and the connection pool stay the ones the rest of the app uses
 +  val client = sharedClient.newBuilder()
 +    .connectTimeout(MEDIA_CONNECT_TIMEOUT_MS, TimeUnit.MILLISECONDS)
-+    .readTimeout(MEDIA_READ_TIMEOUT_MS, TimeUnit.MILLISECONDS)
++    .readTimeout(
++      if (source.uri.startsWith("http://127.0.0.1:") && source.uri.contains("/stream/"))
++        TORRENT_READ_TIMEOUT_MS else MEDIA_READ_TIMEOUT_MS, TimeUnit.MILLISECONDS)
 +    .build()
 +
    val factory = OkHttpDataSource.Factory(client)

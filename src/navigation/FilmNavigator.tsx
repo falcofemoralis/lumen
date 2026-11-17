@@ -1,4 +1,5 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { Platform } from 'react-native';
 import { ActorScreen } from 'Screen/ActorScreen';
 import { CategoryScreen } from 'Screen/CategoryScreen';
 import { CollectionScreen } from 'Screen/CollectionScreen';
@@ -7,19 +8,37 @@ import { useAppTheme } from 'Theme/context';
 
 import { ACTOR_SCREEN, CATEGORY_SCREEN, COLLECTION_SCREEN, FILM_SCREEN } from './navigationRoutes';
 
+export interface FilmNavigatorScreen {
+  name: string;
+  component: any;
+}
+
 const Stack = createNativeStackNavigator();
 
-export const FilmNavigator = ({ name, component }: { name: string, component: any }) => {
+export const FilmNavigator = ({
+  name,
+  component,
+  additionalScreens = [],
+}: {
+  name: string;
+  component: any;
+  additionalScreens?: FilmNavigatorScreen[];
+}) => {
   const { theme } = useAppTheme();
 
   return (
     <Stack.Navigator initialRouteName={ name }>
       <Stack.Group
-        screenOptions={ {
-          headerShown: false,
+        screenOptions={ ({ route }) => ({
+          headerShown: Platform.OS === 'web' && route.name !== name && route.name !== FILM_SCREEN,
+          headerTitle: '',
+          headerTintColor: '#fff',
+          headerStyle: { backgroundColor: theme.colors.background },
+          headerShadowVisible: false,
+          headerBackButtonDisplayMode: 'minimal',
           animation: 'fade',
           contentStyle: { backgroundColor: theme.colors.background },
-        } }
+        }) }
       >
         <Stack.Screen
           name={ name }
@@ -41,11 +60,28 @@ export const FilmNavigator = ({ name, component }: { name: string, component: an
           name={ COLLECTION_SCREEN }
           component={ CollectionScreen }
         />
+        { additionalScreens.map(({ name: screenName, component: ScreenComponent }) => (
+          <Stack.Screen
+            key={ screenName }
+            name={ screenName }
+            component={ ScreenComponent }
+          />
+        )) }
       </Stack.Group>
     </Stack.Navigator>
   );
 };
 
-export const createFilmNavigator = (name: string, component: any) => {
-  return () => <FilmNavigator name={ name } component={ component } />;
+export const createFilmNavigator = (
+  name: string,
+  component: any,
+  additionalScreens: FilmNavigatorScreen[] = []
+) => {
+  return () => (
+    <FilmNavigator
+      name={ name }
+      component={ component }
+      additionalScreens={ additionalScreens }
+    />
+  );
 };

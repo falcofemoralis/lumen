@@ -36,25 +36,21 @@ function CollectionItem({
   return (
     <ThemedPressable
       onPress={ () => handleOnPress(item) }
-      style={ [index % 2 === 0 && styles.rowItem] }
+      style={ [styles.card, index % 2 === 0 && styles.rowItem] }
       contentStyle={ styles.item }
     >
       <ThemedText style={ styles.amount }>
-        { amount }
+        { amount > 0 ? amount : '' }
       </ThemedText>
       <ThemedText style={ styles.text }>
-        { title }
+        { item.source ? item.source + ' · ' + title : title }
       </ThemedText>
-      <ThemedImage src={ image } style={ styles.image } />
+      <ThemedImage src={ image } style={ styles.image } cachePolicy="memory-disk" transition={ 0 } />
     </ThemedPressable>
   );
 }
 
-function rowPropsAreEqual(prevProps: RecentGridRowProps, props: RecentGridRowProps) {
-  return prevProps.item.title === props.item.title;
-}
-
-const MemoizedCollectionItem = memo(CollectionItem, rowPropsAreEqual);
+const MemoizedCollectionItem = memo(CollectionItem);
 
 export function CollectionScreenComponent({
   items,

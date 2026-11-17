@@ -6,6 +6,7 @@ export interface FilmTrailerScreenContainerProps {
 
 export interface FilmTrailerScreenComponentProps {
   trailerUrl: string | null;
+  sourceLabel?: string;
   isLoading: boolean;
   backHandler: () => void;
 }

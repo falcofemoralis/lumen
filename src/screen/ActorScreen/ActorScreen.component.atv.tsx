@@ -1,9 +1,12 @@
 import { FilmGrid } from 'Component/FilmGrid';
+import { InfoBlock } from 'Component/InfoBlock';
 import { Page } from 'Component/Page';
+import { ThemedButton } from 'Component/ThemedButton';
 import { ThemedImage } from 'Component/ThemedImage';
 import { ThemedText } from 'Component/ThemedText';
 import { Thumbnail } from 'Component/Thumbnail';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
+import { t } from 'i18n/translate';
 import { View } from 'react-native';
 import { useAppTheme } from 'Theme/context';
 
@@ -13,6 +16,9 @@ import { ActorScreenComponentProps } from './ActorScreen.type';
 export function ActorScreenComponent({
   isLoading,
   actor,
+  onNextLoad,
+  isLoadError,
+  retryLoad,
 }: ActorScreenComponentProps) {
   const { scale } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
@@ -93,6 +99,14 @@ export function ActorScreenComponent({
   );
 
   const renderMainData = () => {
+    if (isLoadError) {
+      return (
+        <View>
+          <InfoBlock title={ t('Unable to load person') } subtitle={ t('Retry') } />
+          <ThemedButton title={ t('Retry') } onPress={ retryLoad } />
+        </View>
+      );
+    }
     if (!actor || isLoading) {
       return (
         <View>
@@ -132,13 +146,16 @@ export function ActorScreenComponent({
     const { roles = [] } = actor ?? {};
 
     const data = roles.map((role) => ({
-      header: role.role,
+      header: role.role === 'Filmography' ? t('Filmography') : role.role,
       films: role.films,
     }));
 
     return (
       <FilmGrid
         sections={ data }
+        onNextLoad={ onNextLoad }
+        hasMorePages={ Boolean(actor?.filmographyPage
+          && actor.filmographyPage.currentPage < actor.filmographyPage.totalPages) }
         ListHeaderComponent={ renderMainData() }
       />
     );

@@ -1,3 +1,4 @@
+import { getGlobalConfig } from 'Context/ConfigContext';
 import { BookmarksOverlay } from 'Component/BookmarksOverlay';
 import { Comments } from 'Component/Comments';
 import { POSTER_ASPECT_HEIGHT, POSTER_ASPECT_WIDTH } from 'Component/FilmCard/FilmCard.config';
@@ -11,6 +12,7 @@ import { FilmViewSection } from 'Component/FilmViewSection';
 import { Header } from 'Component/Header';
 import { Loader } from 'Component/Loader';
 import { Page } from 'Component/Page';
+import { SourceLoadError } from 'Component/SourceLoadError';
 import { PlayerVideoSelector } from 'Component/PlayerVideoSelector';
 import { ThemedBottomSheetRef } from 'Component/ThemedBottomSheet/ThemedBottomSheet.type';
 import { ThemedButton } from 'Component/ThemedButton';
@@ -36,6 +38,7 @@ import ShieldOff from 'lucide-react-native/icons/shield-off';
 import Star from 'lucide-react-native/icons/star';
 import { ComponentType, useCallback, useRef } from 'react';
 import {
+  Platform,
   ScrollView,
   Text,
   useWindowDimensions,
@@ -55,6 +58,7 @@ import { CollectionItemInterface } from 'Type/CollectionItem';
 import { RatingInterface } from 'Type/Rating.interface';
 import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { isBookmarked } from 'Util/Film';
+import { getFranchiseChronology } from 'Util/Film/franchise';
 import { noopFn } from 'Util/Function';
 import { openLinkInBrowser } from 'Util/Link';
 
@@ -100,6 +104,8 @@ const MiddleAction = ({
 
 export function FilmScreenComponent({
   film,
+  isLoadError,
+  retryLoad,
   thumbnailPoster,
   visibleScheduleItems,
   playerVideoSelectorOverlayRef,
@@ -114,6 +120,7 @@ export function FilmScreenComponent({
   showAgeRating,
   playFilm,
   handleVideoSelect,
+  handleVoicesUpdate,
   handleSelectFilm,
   handleSelectActor,
   handleSelectCategory,
@@ -168,6 +175,7 @@ export function FilmScreenComponent({
   }, []);
 
   if (!film) {
+    if (isLoadError) return <Page><SourceLoadError onRetry={ retryLoad } /></Page>;
     return (
       <Page>
         <FilmScreenThumbnail top={ top } styles={ styles } />
@@ -196,7 +204,7 @@ export function FilmScreenComponent({
     const { genres = [] } = film;
 
     return (
-      <ScrollView horizontal showsHorizontalScrollIndicator={ false }>
+      <ScrollView horizontal { ...(Platform.OS === 'web' ? { dataSet: { lumenDragScroll: 'horizontal' } } : {}) } showsHorizontalScrollIndicator={ false }>
         <View style={ styles.genres }>
           { genres.map(({ name, link }) => (
             <ThemedPressable
@@ -306,11 +314,13 @@ export function FilmScreenComponent({
         styles={ styles }
         IconComponent={ Clapperboard }
         action={ openTrailerOverlay }
+        disabled={ film.catalogOnly && !film.metadataSourceFilm }
       />
       <MiddleAction
         styles={ styles }
         IconComponent={ MessageSquareText }
         action={ openComments }
+        disabled={ film.catalogOnly && !film.metadataSourceFilm }
       />
       <MiddleAction
         styles={ styles }
@@ -321,11 +331,13 @@ export function FilmScreenComponent({
         styles={ styles }
         IconComponent={ Download }
         action={ openVideoDownloader }
+        disabled={ film.catalogOnly && !getGlobalConfig().zonaTorrentsEnabled && !film.metadataSourceFilm }
       />
     </View>
   );
 
   const renderPlay = () => {
+    if (film.catalogOnly && !getGlobalConfig().zonaTorrentsEnabled && !film.metadataSourceFilm?.voices.length) return <Wrapper><ThemedText>{ t('This title is available as catalog information only.') }</ThemedText></Wrapper>;
     const { isPendingRelease, isRestricted } = film;
 
     if (isPendingRelease) {
@@ -404,7 +416,7 @@ export function FilmScreenComponent({
     return (
       <Wrapper>
         <FilmViewSection title={ t('Actors') }>
-          <ScrollView horizontal showsHorizontalScrollIndicator={ false }>
+          <ScrollView horizontal { ...(Platform.OS === 'web' ? { dataSet: { lumenDragScroll: 'horizontal' } } : {}) } showsHorizontalScrollIndicator={ false }>
             <View style={ styles.actorsList }>
               { persons.map((actor, index) => (
                 <FilmViewActor
@@ -451,7 +463,7 @@ export function FilmScreenComponent({
   };
 
   const renderFranchise = () => {
-    const { franchise = [] } = film;
+    const franchise = getFranchiseChronology(film.franchise);
 
     if (!franchise.length) {
       return null;
@@ -487,7 +499,8 @@ export function FilmScreenComponent({
     return (
       <Wrapper>
         <FilmViewSection title={ t('Related') }>
-          <ScrollView horizontal showsHorizontalScrollIndicator={ false }>
+          <ScrollView horizontal { ...(Platform.OS === 'web' ? { dataSet: { lumenDragScroll: 'horizontal' } } : {}) } showsHorizontalScrollIndicator={ false }
+            style={ Platform.OS === 'web' ? { flexGrow: 0, flexShrink: 0, height: scale(100 * POSTER_ASPECT_HEIGHT / POSTER_ASPECT_WIDTH + 70) } : undefined }>
             <View style={ styles.relatedList }>
               { related.map((item, idx) => (
                 <FilmViewRelatedItem
@@ -530,6 +543,7 @@ export function FilmScreenComponent({
         ref={ playerVideoSelectorOverlayRef }
         film={ film }
         onSelect={ handleVideoSelect }
+      onVoicesUpdate={ handleVoicesUpdate }
       />
     );
   };
@@ -664,10 +678,13 @@ export function FilmScreenComponent({
     return (
       <View style={ styles.mainInfo }>
         { renderRatings() }
+        { renderInfoText(film.seriesInfo) }
         { renderInfoText(releaseDate, t('Release date')) }
         { renderInfoText(duration, t('Time')) }
         { renderDirectors() }
         { renderCollection(countries, t('Country'), handleSelectCategory) }
+        { renderCollection(film.studios ?? [], t('Studio'), handleSelectCategory) }
+        { renderCollection(film.authors ?? [], t('Author'), handleSelectCategory) }
         { showAgeRating && renderInfoText(age, t('Age')) }
       </View>
     );
@@ -701,7 +718,7 @@ export function FilmScreenComponent({
         <ThemedText
           style={ styles.text }
         >
-          { showVotesCount ? ` ${rating} (${votes})` : ` ${rating}` }
+          { showVotesCount && votes !== undefined ? ` ${Number(rating.toFixed(2))} (${votes})` : ` ${Number(rating.toFixed(2))}` }
         </ThemedText>
       </Text>
     );
@@ -763,12 +780,13 @@ export function FilmScreenComponent({
       { renderModals() }
       <Animated.ScrollView
         ref={ scrollRef }
+        contentContainerStyle={ { flexGrow: 1 } }
         scrollEnabled={ !!film }
         onScroll={ scrollHandler }
         scrollEventThrottle={ 16 }
         showsVerticalScrollIndicator={ false }
       >
-        <View>
+        <View style={ styles.contentContainer }>
           { renderPosterBackground() }
           { renderContent() }
         </View>

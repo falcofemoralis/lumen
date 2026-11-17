@@ -16,7 +16,6 @@ export default function ThemedButton({
   styleDisabled,
   styleSelected,
   styleFocused,
-  styleOverride,
   textStyle,
   onPress,
   onLongPress,
@@ -30,9 +29,9 @@ export default function ThemedButton({
   leftImageStyle,
   rightImage,
   rightImageStyle,
-  extraProps,
-  focusKey,
   autofocus,
+  focusKey,
+  extraProps,
   textStyleFocused,
   topAdditionalElement,
   bottomAdditionalElement,
@@ -44,6 +43,8 @@ export default function ThemedButton({
   return (
     <ThemedPressable
       onPress={ onPress }
+      disabled={ disabled }
+      extraProps={ extraProps }
       onLongPress={ onLongPress }
       onFocus={ onFocus }
       onEnterPress={ onEnterPress }
@@ -52,7 +53,6 @@ export default function ThemedButton({
         style,
         selected && styles.selected,
         selected && styleSelected ? styleSelected: undefined,
-        styleOverride,
         isFocused && styles.focused,
         isFocused && styleFocused ? styleFocused : undefined,
         disabled && styles.disabled,
@@ -65,9 +65,8 @@ export default function ThemedButton({
       bottomAdditionalElement={ bottomAdditionalElement
         ? ({ isFocused }) => bottomAdditionalElement(isFocused, selected ?? false)
         : undefined }
-      extraProps={ extraProps }
-      focusKey={ focusKey }
       autofocus={ autofocus }
+      focusKey={ focusKey }
     >
       { ({ isFocused }) => (
         <>

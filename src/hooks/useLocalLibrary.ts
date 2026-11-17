@@ -4,10 +4,20 @@ import { LocalBookmarksBlob, LocalHistoryItemInterface } from 'Type/LocalLibrary
 import {
   LOCAL_BOOKMARKS_KEY,
   LOCAL_HISTORY_KEY,
-  parseBookmarksBlob,
+  getLocalBookmarks,
   parseHistoryList,
 } from 'Util/LocalLibrary';
 import { storage } from 'Util/Storage';
+
+let cachedRaw: string | undefined;
+let cachedBookmarks: LocalBookmarksBlob | undefined;
+const sharedBookmarks = (raw?: string): LocalBookmarksBlob => {
+  if (!cachedBookmarks || cachedRaw !== raw) {
+    cachedRaw = raw;
+    cachedBookmarks = getLocalBookmarks();
+  }
+  return cachedBookmarks;
+};
 
 /**
  * Reactive view of the local bookmark categories. Re-renders the consumer on any
@@ -16,7 +26,7 @@ import { storage } from 'Util/Storage';
 export const useLocalBookmarks = (): LocalBookmarksBlob => {
   const [raw] = useMMKVString(LOCAL_BOOKMARKS_KEY, storage.getLocalLibraryStorage().getMMKVInstance());
 
-  return useMemo(() => parseBookmarksBlob(raw), [raw]);
+  return useMemo(() => sharedBookmarks(raw), [raw]);
 };
 
 /**

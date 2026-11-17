@@ -1,4 +1,6 @@
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { Platform } from 'react-native';
 import { DownloadsScreen } from 'Screen/DownloadsScreen';
 import { MyCommentsScreen } from 'Screen/MyCommentsScreen';
 import { NotificationsScreen } from 'Screen/NotificationsScreen';
@@ -29,11 +31,18 @@ const AccountNavigator = ({ name, component }: { name: string, component: any })
   return (
     <Stack.Navigator initialRouteName={ name }>
       <Stack.Group
-        screenOptions={ {
-          headerShown: false,
+        screenOptions={ ({ route }) => ({
+          headerShown: Platform.OS === 'web' && route.name !== name
+            && (!getFocusedRouteNameFromRoute(route)
+              || [NOTIFICATIONS_TAB, MY_COMMENTS_TAB].includes(getFocusedRouteNameFromRoute(route)!)),
+          headerTitle: '',
+          headerTintColor: '#fff',
+          headerStyle: { backgroundColor: theme.colors.background },
+          headerShadowVisible: false,
+          headerBackButtonDisplayMode: 'minimal',
           animation: 'fade',
           contentStyle: { backgroundColor: theme.colors.background },
-        } }
+        }) }
       >
         <Stack.Screen
           name={ name }

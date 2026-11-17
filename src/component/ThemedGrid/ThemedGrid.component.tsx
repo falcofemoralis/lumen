@@ -1,5 +1,6 @@
-import { FlashList } from '@shopify/flash-list';
-import { useCallback } from 'react';
+import { useRetainedScroll } from 'Hooks/useRetainedScroll';
+import { FlashList, FlashListRef } from '@shopify/flash-list';
+import { useCallback, useRef } from 'react';
 import { RefreshControl } from 'react-native';
 import { noopFn } from 'Util/Function';
 
@@ -17,6 +18,8 @@ export const ThemedGridComponent = ({
   handleScrollEnd,
   handleRefresh = noopFn,
 }: ThemedGridComponentProps) => {
+  const listRef = useRef<FlashListRef<any>>(null);
+  const retained = useRetainedScroll(listRef);
   // Without a refresh control the downward drag at the top of the list is left
   // unconsumed, so a host like a bottom sheet can take it over as a dismiss gesture.
   const renderRefreshControl = useCallback(() => (disableRefresh ? undefined : (
@@ -33,6 +36,10 @@ export const ThemedGridComponent = ({
 
   return (
     <FlashList
+      ref={ listRef }
+      onScroll={ retained.enabled ? retained.onScroll : undefined }
+      onLayout={ retained.enabled ? retained.onLayout : undefined }
+      scrollEventThrottle={ retained.enabled ? 100 : undefined }
       data={ data }
       style={ style }
       numColumns={ numberOfColumns }

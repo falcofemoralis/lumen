@@ -68,32 +68,21 @@ function SwitchInput(props: SwitchInputProps) {
     (v) => typeof v === 'number'
   );
 
-  const offBackgroundColor = [
-    status === 'error' && colors.error,
-    colors.backgroundLighter,
-  ].filter(Boolean)[0];
+  const offBackgroundColor = status === 'error'
+    ? colors.error
+    : colors.backgroundLighter;
 
-  const onBackgroundColor = [
-    status === 'error' && colors.error,
-    colors.primary,
-  ].filter(Boolean)[0];
+  const onBackgroundColor = status === 'error'
+    ? colors.error
+    : colors.primary;
 
-  const knobBackgroundColor = (function () {
-    if (on) {
-      return [
-        $detailStyleOverride?.backgroundColor,
-        status === 'error' && colors.error,
-        colors.iconOnContrast,
-      ].filter(Boolean)[0];
-    }
-
-    return [
-      $innerStyleOverride?.backgroundColor,
-      status === 'error' && colors.error,
-      colors.iconOnContrast,
-    ].filter(Boolean)[0];
-
-  })();
+  const knobBackgroundColor = (
+    on
+      ? $detailStyleOverride?.backgroundColor
+        ?? (status === 'error' ? colors.error : colors.iconOnContrast)
+      : $innerStyleOverride?.backgroundColor
+        ?? (status === 'error' ? colors.error : colors.iconOnContrast)
+  ) as string;
 
   const $themedSwitchInner = useMemo(() => ({ ...styles.toggleInner, ...styles.switchInner }), [styles]);
 
@@ -170,10 +159,7 @@ function Toggle<T>(props: ToggleProps<T>) {
   const $containerStyles = [$containerStyleOverride];
   const $inputWrapperStyles = [$styles.row, styles.inputWrapper, $inputWrapperStyleOverride];
 
-  /**
-   * @param {GestureResponderEvent} e - The event object.
-   */
-  function handlePress(e: GestureResponderEvent) {
+    function handlePress(e: GestureResponderEvent) {
     if (disabled) return;
     onValueChange?.(!value);
     onPress?.(e);

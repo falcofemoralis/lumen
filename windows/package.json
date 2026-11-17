@@ -1,0 +1,1 @@
+{"name":"lumen-windows-tools","private":true,"version":"1.6.2","main":"main.cjs","devDependencies":{"electron":"^42.0.0","electron-builder":"^26.0.0"},"dependencies":{"lumen":"file:.."}}

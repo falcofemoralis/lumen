@@ -3,7 +3,11 @@ import { useLocalBookmarks } from 'Hooks/useLocalLibrary';
 import { t } from 'i18n/translate';
 import { useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
-import { createLocalCategory, deleteLocalCategory } from 'Util/LocalLibrary';
+import {
+  createLocalCategory,
+  deleteLocalCategory,
+  reorderLocalCategories,
+} from 'Util/LocalLibrary';
 
 import LocalCategoriesOverlayComponent from './LocalCategoriesOverlay.component';
 import LocalCategoriesOverlayComponentTV from './LocalCategoriesOverlay.component.atv';
@@ -92,9 +96,11 @@ export const LocalCategoriesOverlayContainer = ({
     startCreate,
     cancelCreate,
     submitCreate,
+    newTitle,
     onChangeTitle: setNewTitle,
     isCreateDisabled: !newTitle.trim(),
     requestDelete,
+    reorderCategories: reorderLocalCategories,
     cancelDelete,
     confirmDelete,
     resetMode,

@@ -3,6 +3,7 @@ import { NativeModule, requireOptionalNativeModule } from 'expo';
 declare class ReactNativeWebCookiesModule extends NativeModule {
   getCookies(url: string): Promise<string>;
   clearCookies(): Promise<boolean>;
+  removeCookies(url: string, names: string[]): Promise<boolean>;
   getDefaultUserAgent(): Promise<string>;
   flush(): Promise<void>;
 }

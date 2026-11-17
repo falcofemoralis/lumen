@@ -1,6 +1,8 @@
 import { isAnubisChallenge, solveAnubis } from 'Util/Anubis';
 import { isCloudflareChallenge, solveCloudflare, withClearanceUserAgent } from 'Util/Cloudflare';
 import { buildCookies, setCookies } from 'Util/Cookies';
+import { SourceBlockedError } from 'Util/Request/sourceFailure';
+import { fetchTextResponse } from '../Request/textTransport';
 
 // Rebuild a Response from an already-read body so callers can still read it.
 function rebuildResponse(res: Response, bodyText: string): Response {
@@ -23,19 +25,18 @@ export async function customFetch(
   const url = input instanceof Request ? input.url : input.toString();
   const { hostname } = new URL(url);
 
-  const res = await fetch(input, {
+  const sentCookies = buildCookies(hostname);
+  const { response: res, text: bodyText } = await fetchTextResponse(input, {
     ...init,
     headers: {
       ...(init?.headers || {}),
-      Cookie: buildCookies(hostname),
+      Cookie: sentCookies,
     },
     credentials: 'omit', // Omit cookies and handle ourselves
     keepalive: true,
   });
 
   setCookies(hostname, res);
-
-  const bodyText = await res.text();
 
   // A bot check stands in for the content that was asked for -- Anubis serves its
   // proof-of-work interstitial as an HTTP 200, Cloudflare mostly a 403. Either way the
@@ -44,7 +45,7 @@ export async function customFetch(
   // is refused fails the request instead of looping.
   if (!retried) {
     if (isAnubisChallenge(bodyText)) {
-      const solved = await solveAnubis(url, bodyText, init?.headers);
+      const solved = await solveAnubis(url, bodyText, init?.headers, sentCookies);
 
       if (solved) {
         return customFetch(input, init, true);
@@ -68,5 +69,8 @@ export async function customFetch(
     }
   }
 
+  if (isAnubisChallenge(bodyText) || isCloudflareChallenge(bodyText, res.status, res.headers)) {
+    throw new SourceBlockedError('Источник не смог завершить проверку соединения. Повторите попытку позже.');
+  }
   return rebuildResponse(res, bodyText);
 }

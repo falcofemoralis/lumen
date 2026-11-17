@@ -14,8 +14,10 @@ import Download from 'lucide-react-native/icons/download';
 import LogOut from 'lucide-react-native/icons/log-out';
 import MessageSquareText from 'lucide-react-native/icons/message-square-text';
 import Star from 'lucide-react-native/icons/star';
+import UserRound from 'lucide-react-native/icons/user-round';
 import { ComponentType } from 'react';
 import { Image, StyleProp, TextStyle, View, ViewStyle } from 'react-native';
+import { useConfigContext } from 'Context/ConfigContext';
 import { useAppTheme } from 'Theme/context';
 
 import { componentStyles } from './AccountScreen.style.atv';
@@ -75,7 +77,8 @@ export function AccountScreenComponent({
   openMyComments,
   openDownloads,
 }: AccountScreenComponentProps) {
-  const { scale } = useAppTheme();
+  const { scale, theme } = useAppTheme();
+  const { showAccountAvatar } = useConfigContext();
   const styles = useThemedStyles(componentStyles);
 
   const renderPremiumBadge = () => {
@@ -120,15 +123,22 @@ export function AccountScreenComponent({
           ) : (
             <DefaultGradient style={ [styles.profileInfoPremium] } size={ scale(GRADIENT_SIZE_TV) } />
           ) } */ }
-          { avatar ? (
-            <ThemedImage
-              src={ avatar }
-              style={ styles.profileAvatar }
-            />
+          { showAccountAvatar ? (
+            avatar ? (
+              <ThemedImage
+                src={ avatar }
+                style={ styles.profileAvatar }
+              />
+            ) : (
+              <Image
+                source={ require('../../../assets/images/no_avatar.png') }
+                style={ styles.profileAvatar }
+              />
+            )
           ) : (
-            <Image
-              source={ require('../../../assets/images/no_avatar.png') }
-              style={ styles.profileAvatar }
+            <UserRound
+              size={ scale(64) }
+              color={ theme.colors.icon }
             />
           ) }
         </View>

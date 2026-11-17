@@ -7,6 +7,7 @@ import {
 } from 'Component/NavigationBar/NavigationBar.style.atv';
 import { useNavigationContext } from 'Context/NavigationContext';
 import Animated, { useAnimatedStyle, withDelay, withTiming } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from 'Theme/context';
 
 // Covering the scene has to be quick -- it happens while the user is already
@@ -33,6 +34,7 @@ const LOADER_FADE_OUT_MS = 100;
 export function SceneMask() {
   const { isSceneHidden } = useNavigationContext();
   const { theme } = useAppTheme();
+  const { left } = useSafeAreaInsets();
 
   const maskStyle = useAnimatedStyle(() => ({
     opacity: withTiming(isSceneHidden.value ? 1 : 0, {
@@ -58,7 +60,7 @@ export function SceneMask() {
           // the bar is expanded whenever the mask is visible, so this lines up
           // exactly with the scene area next to it
           left: theme.scale(NAVIGATION_BAR_TV_TAB_WIDTH)
-            + theme.scale(NAVIGATION_BAR_TV_TAB_WIDTH_EXPANDED),
+            + theme.scale(NAVIGATION_BAR_TV_TAB_WIDTH_EXPANDED) + left,
           backgroundColor: theme.colors.background,
           zIndex: NAVIGATION_BAR_Z_INDEX + 1,
           alignItems: 'center',

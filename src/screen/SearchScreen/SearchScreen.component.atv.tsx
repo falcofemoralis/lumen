@@ -23,6 +23,8 @@ import { ThemedStyles } from 'Theme/types';
 
 import { componentStyles } from './SearchScreen.style.atv';
 import { SearchScreenComponentProps } from './SearchScreen.type';
+import { SearchFilters } from './SearchScreen.filters';
+import { SearchEmpty } from './SearchScreen.empty';
 
 // Derived from the text rather than the index, so the key of every suggestion
 // that survives a removal stays the same across the re-render.
@@ -93,7 +95,7 @@ const SearchHeader = memo(({
       />
       <ThemedButton
         title=""
-        style={ styles.actionBtn }
+        style={ [styles.actionBtn, styles.collectionsBtn] }
         contentStyle={ styles.actionBtnContent }
         IconComponent={ LayoutGrid }
         onPress={ handleOpenCollections }
@@ -148,16 +150,14 @@ export function SearchScreenComponent(props: SearchScreenComponentProps) {
     additionalContentOverlayRef,
     categories,
     selectedCategory,
-    selectedGenre,
-    selectedYear,
+
     isCategoriesLoading,
     confirmationOverlayRef,
     onPreLoad,
     onNextLoad,
     handleApplyAdditionalContent,
     setSelectedCategory,
-    setSelectedGenre,
-    setSelectedYear,
+
     handleRemoveSuggestion,
     removeSuggestion,
   } = props;
@@ -197,7 +197,7 @@ export function SearchScreenComponent(props: SearchScreenComponentProps) {
   // leaves the first row -- same treatment as the pager menu.
   const [headerVisible, setHeaderVisible] = useState(true);
   // Without a query there is no grid to scroll, so the header always stays up.
-  const headerExpanded = headerVisible || !query;
+  const headerExpanded = true;
   // Computed rather than measured: measuring from inside the collapsing wrapper
   // reads back the collapsed height and feeds itself.
   const headerHeight = styles.actionBtn.height + styles.container.marginBottom
@@ -244,83 +244,13 @@ export function SearchScreenComponent(props: SearchScreenComponentProps) {
     </Animated.View>
   );
 
-  const renderCategories = () => {
-    if (isCategoriesLoading) {
-      return (
-        <View style={ styles.categoriesLoader }>
-          <Loader fullScreen isLoading />
-        </View>
-      );
-    }
-
-    if (!categories?.length) {
-      return null;
-    }
-
-    return (
-      <View>
-        <View style={ styles.categories }>
-          <ThemedText>
-            { t('Choose format') }
-          </ThemedText>
-          <ThemedDropdown
-            header={ t('Format') }
-            value={ selectedCategory?.name || '' }
-            data={ categories?.map((cat) => ({
-              label: cat.name,
-              value: cat.name,
-            })) || [] }
-            onChange={ (item) => {
-              const cat = categories?.find((c) => c.name === item.value);
-
-              if (cat) {
-                setSelectedCategory(cat);
-              }
-            } }
-            closeOnChange
-          />
-          <ThemedText>
-            { t('Choose genre') }
-          </ThemedText>
-          <ThemedDropdown
-            header={ t('Genre') }
-            value={ selectedGenre || '' }
-            data={ selectedCategory?.genres.map((genre) => ({
-              label: genre.name,
-              value: genre.value,
-            })) || [] }
-            onChange={ (item) => setSelectedGenre(item.value) }
-            closeOnChange
-          />
-          <ThemedText>
-            { t('Choose year') }
-          </ThemedText>
-          <ThemedDropdown
-            header={ t('Year') }
-            value={ selectedYear || '' }
-            data={ selectedCategory?.years.map((year) => ({
-              label: year.name,
-              value: year.value,
-            })) || [] }
-            onChange={ (item) => setSelectedYear(item.value) }
-            closeOnChange
-          />
-          <ThemedButton
-            title={ t('Lets search!') }
-            autofocus
-            style={ styles.categoriesSelectBtn }
-            onPress={ handleApplyAdditionalContent }
-          />
-        </View>
-      </View>
-    );
-  };
-
+  const renderCategories = () => <SearchFilters { ...props } />;
   const renderCategoriesModal = () => {
     return (
       <ThemedOverlay
         ref={ additionalContentOverlayRef }
         containerStyle={ styles.categoriesOverlay }
+        contentContainerStyle={ { maxHeight: '85%' } }
       >
         { renderCategories() }
       </ThemedOverlay>
@@ -350,7 +280,7 @@ export function SearchScreenComponent(props: SearchScreenComponentProps) {
         onNextLoad={ onNextLoad }
         hideGrid={ !query }
         isEmpty={ !isLoading && !pagerItems[0].films?.length }
-        ListEmptyComponent={ renderEmptyBlock() }
+        ListEmptyComponent={ <SearchEmpty { ...props } /> }
         onAtTopChange={ handleAtTopChange }
       />
     </Page>

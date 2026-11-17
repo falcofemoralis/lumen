@@ -21,12 +21,27 @@ import { CloudflareSolveRequest } from './CloudflareSolver.type';
 export const CloudflareSolverContainer = () => {
   const [requests, setRequests] = useState<CloudflareSolveRequest[]>([]);
   const nextId = useRef(0);
+  const pendingRequests = useRef(new Map<number, CloudflareSolveRequest>());
 
   useEffect(() => {
-    registerCloudflareSolver((origin, userAgent) => new Promise<CloudflareSolveOutcome>((resolve) => {
+    registerCloudflareSolver((origin, userAgent, signal) => new Promise<CloudflareSolveOutcome>((resolve) => {
+      if (signal?.aborted) { resolve('failed'); return; }
       nextId.current += 1;
-
-      setRequests((current) => [...current, { id: nextId.current, origin, userAgent, resolve }]);
+      const request: CloudflareSolveRequest = {
+        id: nextId.current, origin, userAgent,
+        resolve: outcome => {
+          signal?.removeEventListener('abort', cancel);
+          pendingRequests.current.delete(request.id);
+          resolve(outcome);
+        },
+      };
+      const cancel = () => {
+        setRequests(current => current.filter(item => item.id !== request.id));
+        request.resolve('failed');
+      };
+      pendingRequests.current.set(request.id, request);
+      signal?.addEventListener('abort', cancel, { once: true });
+      setRequests(current => [...current, request]);
     }));
 
     // Leaves `Util/Cloudflare` with nothing registered, so a solve asked for while this
@@ -34,6 +49,8 @@ export const CloudflareSolverContainer = () => {
     // coming. That is the honest answer in a headless background task.
     return () => {
       registerCloudflareSolver(null);
+      for (const request of pendingRequests.current.values()) request.resolve('cancelled');
+      pendingRequests.current.clear();
     };
   }, []);
 

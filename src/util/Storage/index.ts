@@ -7,9 +7,17 @@ class StorageWrapper {
     this.mmkvStorage = store;
   }
 
-  getMMKVInstance(): MMKV {
-    return this.mmkvStorage;
-  }
+	getMMKVInstance(): MMKV {
+		return this.mmkvStorage;
+	}
+
+	getKeys(): string[] {
+		try {
+			return this.mmkvStorage.getAllKeys();
+		} catch {
+			return [];
+		}
+	}
 
   /**
    * Loads a string from storage.
@@ -102,6 +110,7 @@ class Storage {
   private downloadsStorage: StorageWrapper|null = null;
   private localLibraryStorage: StorageWrapper|null = null;
   private commentsStorage: StorageWrapper|null = null;
+  private ratingStorage: StorageWrapper|null = null;
 
   getConfigStorage() {
     if (!this.configStorage) {
@@ -157,6 +166,14 @@ class Storage {
     }
 
     return this.commentsStorage;
+  }
+
+  getRatingStorage() {
+    if (!this.ratingStorage) {
+      this.ratingStorage = new StorageWrapper(createMMKV({ id: 'ratings' }));
+    }
+
+    return this.ratingStorage;
   }
 }
 

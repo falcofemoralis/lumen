@@ -9,8 +9,7 @@ import { useServiceContext } from 'Context/ServiceContext';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import FolderCog from 'lucide-react-native/icons/folder-cog';
-import { View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Platform, View } from 'react-native';
 import { useAppTheme } from 'Theme/context';
 
 import { componentStyles } from './BookmarksScreen.style';
@@ -20,12 +19,12 @@ import { BookmarksScreenComponentProps } from './BookmarksScreen.type';
 export function BookmarksScreenComponent({
   isLoading,
   isLocalLibrary,
+  tabPosition,
   manageCategoriesOverlayRef,
   openManageCategories,
   pagerItems,
   ...pagerHandlers
 }: BookmarksScreenComponentProps) {
-  const { top } = useSafeAreaInsets();
   const { scale, theme } = useAppTheme();
   const { isSignedIn } = useServiceContext();
   const styles = useThemedStyles(componentStyles);
@@ -63,7 +62,7 @@ export function BookmarksScreenComponent({
                 title={ t('Manage categories') }
                 IconComponent={ FolderCog }
                 iconProps={ {
-                  size: scale(18),
+                  size: scale(Platform.OS === 'web' ? 28 : 18),
                   color: theme.colors.text,
                 } }
                 onPress={ openManageCategories }
@@ -76,29 +75,29 @@ export function BookmarksScreenComponent({
 
     return (
       <View style={ styles.content }>
-        { isLocalLibrary && (
-          <View style={ [styles.header, { paddingTop: top + scale(4) }] }>
+        <FilmPager
+          { ...pagerHandlers }
+          pagerItems={ pagerItems }
+          tabPosition={ tabPosition }
+          tabBarRightPadding={ 9 }
+          TabBarActionComponent={ isLocalLibrary && (
             <ThemedButton
-              style={ styles.manageButton }
-              contentStyle={ styles.manageButtonContent }
+              style={ { width: scale(44), backgroundColor: 'transparent' } }
+              contentStyle={ { width: '100%', padding: 0, backgroundColor: 'transparent' } }
               IconComponent={ FolderCog }
               iconProps={ {
-                size: scale(20),
+                size: scale(Platform.OS === 'web' ? 28 : 20),
                 color: theme.colors.text,
               } }
               onPress={ openManageCategories }
             />
-          </View>
-        ) }
-        <FilmPager
-          { ...pagerHandlers }
-          pagerItems={ pagerItems }
+          ) }
           isEmpty={ isLocalLibrary }
           ListEmptyComponent={ renderEmptyCategory() }
           centerEmptyComponent
+          showScrollToTopButton
           // the local library renders its own header above the pager, which already
           // carries the status bar inset -- the grid must not add it a second time
-          disableStatusbarSafeArea={ isLocalLibrary }
         />
       </View>
     );

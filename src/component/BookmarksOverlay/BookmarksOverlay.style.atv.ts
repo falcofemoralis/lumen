@@ -33,7 +33,9 @@ export const componentStyles = ({ scale, colors }: Theme) => ({
     paddingTop: scale(8),
   },
   button: {
-    flex: 0,
+    flexGrow: 0,
+    flexShrink: 1,
+    flexBasis: 'auto',
     paddingInline: scale(20),
   },
   buttonPrimary: {

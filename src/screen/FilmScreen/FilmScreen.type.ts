@@ -14,6 +14,8 @@ export interface FilmScreenContainerProps {
 
 export interface FilmScreenComponentProps {
   film: FilmInterface | null;
+  isLoadError: boolean;
+  retryLoad: () => void;
   thumbnailPoster?: string;
   visibleScheduleItems: ScheduleItemInterface[];
   playerVideoSelectorOverlayRef: RefObject<PlayerVideoSelectorRef | null>;
@@ -31,6 +33,7 @@ export interface FilmScreenComponentProps {
   showAgeRating: boolean;
   playFilm: () => void;
   handleVideoSelect: (video: FilmVideoInterface, voice: FilmVoiceInterface) => void;
+  handleVoicesUpdate: (voices: FilmVoiceInterface[]) => void;
   handleSelectFilm: (film: FilmInterface) => void;
   handleSelectActor: (actorLink: string) => void;
   handleSelectCategory: (categoryLink: string) => void;
@@ -47,3 +50,4 @@ export interface FilmScreenComponentProps {
   openSchedule: () => void;
   continueWatching: () => void;
 }
+

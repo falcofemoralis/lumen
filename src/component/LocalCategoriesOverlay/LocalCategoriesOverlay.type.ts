@@ -18,12 +18,14 @@ export interface LocalCategoriesOverlayComponentProps {
   categories: LocalCategoryRowInterface[];
   mode: LocalCategoriesOverlayMode;
   deleteCandidateTitle: string;
+  newTitle: string;
   startCreate: () => void;
   cancelCreate: () => void;
   submitCreate: () => void;
   onChangeTitle: (title: string) => void;
   isCreateDisabled: boolean;
   requestDelete: (categoryId: string) => void;
+  reorderCategories: (fromIndex: number, toIndex: number) => void;
   cancelDelete: () => void;
   confirmDelete: () => void;
   resetMode: () => void;

@@ -12,14 +12,31 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     height: '100%',
     width: '100%',
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    paddingHorizontal: scale(32),
-    paddingBottom: scale(8),
-    marginTop: scale(12),
-  },
+
   emptyCategory: {
     alignItems: 'center',
+  },
+  manageButton: {
+    width: scale(44),
+    height: scale(44),
+    backgroundColor: colors.transparent,
+    borderRadius: scale(12),
+  },
+  manageButtonContent: {
+    paddingHorizontal: 0,
+    paddingVertical: 0,
+    width: '100%',
+    height: '100%',
+    padding: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: scale(12),
+    backgroundColor: colors.transparent,
+  },
+  manageButtonFocused: {
+    backgroundColor: colors.transparent,
+  },
+  manageButtonText: {
+    display: 'none',
   },
 } satisfies ThemedStyles);

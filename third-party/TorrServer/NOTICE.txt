@@ -1,0 +1,12 @@
+TorrServer MatriX.147.2 (separate optional streaming process)
+Copyright: YouROK and TorrServer contributors
+License: GNU General Public License version 3. See COPYING.
+
+Official corresponding source for the exact bundled binaries:
+https://github.com/YouROK/TorrServer/tree/MatriX.147.2
+https://github.com/YouROK/TorrServer/archive/refs/tags/MatriX.147.2.tar.gz
+
+The pinned checksums and original release URLs are in scripts/prepare-torrent-engine.cjs.
+The Windows build embeds GStreamer; its runtime and component license files are
+extracted by TorrServer alongside its runtime. Preserve these notices when redistributing.
+Lumen communicates with this separate process over its loopback HTTP API.

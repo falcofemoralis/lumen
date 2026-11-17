@@ -2,9 +2,11 @@ import { NavigationRoute, ParamListBase } from '@react-navigation/native';
 import { ThemedImage } from 'Component/ThemedImage';
 import { ThemedPressable } from 'Component/ThemedPressable';
 import { ThemedText } from 'Component/ThemedText';
+import { useConfigContext } from 'Context/ConfigContext';
 import { useServiceContext } from 'Context/ServiceContext';
 import { useThemedStyles } from 'Hooks/useThemedStyles';
-import { ACCOUNT_TAB } from 'Navigation/navigationRoutes';
+import UserRound from 'lucide-react-native/icons/user-round';
+import { ACCOUNT_TAB, NOTIFICATIONS_TAB } from 'Navigation/navigationRoutes';
 import { ComponentType, useCallback } from 'react';
 import { Image, useWindowDimensions, View } from 'react-native';
 import Animated from 'react-native-reanimated';
@@ -24,6 +26,7 @@ export function NavigationBarComponent({
   const { scale, theme } = useAppTheme();
   const styles = useThemedStyles(componentStyles);
   const { badgeData } = useServiceContext();
+  const { showAccountAvatar } = useConfigContext();
   const { width } = useWindowDimensions();
   const { bottom } = useSafeAreaInsets();
 
@@ -33,6 +36,9 @@ export function NavigationBarComponent({
   ) => {
     const { options } = descriptors[route.key] ?? {};
     const { tabBarIcon: IconComponent } = options as { tabBarIcon: ComponentType<any> };
+    const badgeCount = route.name === NOTIFICATIONS_TAB
+      ? badgeData[ACCOUNT_TAB] ?? 0
+      : 0;
 
     return (
       <Animated.View style={ [styles.tab, focused && styles.tabFocused] }>
@@ -43,9 +49,14 @@ export function NavigationBarComponent({
             color={ theme.colors.icon }
           />
         ) }
+        { badgeCount > 0 && (
+          <ThemedText style={ styles.badge }>
+            { badgeCount }
+          </ThemedText>
+        ) }
       </Animated.View>
     );
-  }, [descriptors, scale, styles, theme]);
+  }, [descriptors, scale, styles, theme, badgeData]);
 
   const renderAccountTab = useCallback((
     route: NavigationRoute<ParamListBase, string>,
@@ -62,15 +73,22 @@ export function NavigationBarComponent({
             focused && styles.profileAvatarFocused,
           ] }
         >
-          { avatar ? (
-            <ThemedImage
-              src={ avatar }
-              style={ styles.profileAvatar }
-            />
+          { showAccountAvatar ? (
+            avatar ? (
+              <ThemedImage
+                src={ avatar }
+                style={ styles.profileAvatar }
+              />
+            ) : (
+              <Image
+                source={ require('../../../assets/images/no_avatar.png') }
+                style={ styles.profileAvatar }
+              />
+            )
           ) : (
-            <Image
-              source={ require('../../../assets/images/no_avatar.png') }
-              style={ styles.profileAvatar }
+            <UserRound
+              size={ scale(20) }
+              color={ theme.colors.icon }
             />
           ) }
           { badgeCount > 0 && (
@@ -81,7 +99,7 @@ export function NavigationBarComponent({
         </Animated.View>
       </Animated.View>
     );
-  }, [profile, badgeData, styles]);
+  }, [profile, badgeData, styles, showAccountAvatar]);
 
   const renderTab = useCallback((
     route: NavigationRoute<ParamListBase, string>,

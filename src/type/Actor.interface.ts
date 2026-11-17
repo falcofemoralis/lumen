@@ -9,6 +9,7 @@ export interface ActorInterface {
   birthPlace?: string;
   height?: string;
   roles: ActorRole[];
+  filmographyPage?: { currentPage: number; totalPages: number };
 }
 
 export interface ActorRole {

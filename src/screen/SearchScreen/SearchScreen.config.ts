@@ -10,4 +10,4 @@ export const SEARCH_MENU_ITEM: MenuItemInterface = {
 
 export const SEARCH_DEBOUNCE_TIME = 500;
 export const USER_SUGGESTIONS = 'suggestions';
-export const MAX_USER_SUGGESTIONS = 10;
+export const MAX_USER_SUGGESTIONS = 11;

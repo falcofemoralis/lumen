@@ -1,3 +1,4 @@
+import { useRetainedScroll } from 'Hooks/useRetainedScroll';
 import { setFocus } from '@noriginmedia/norigin-spatial-navigation-core';
 import { FocusContext, useFocusable } from '@noriginmedia/norigin-spatial-navigation-react-native-tvos';
 import { FlashList, FlashListRef } from '@shopify/flash-list';
@@ -76,6 +77,7 @@ export const ThemedGridComponent = ({
   handleScrollEnd,
 }: ThemedGridComponentProps) => {
   const listRef = useRef<FlashListRef<any>>(null);
+  const retained = useRetainedScroll(listRef);
   const lastRowRef = useRef(-1);
 
   // Live index -> focus key map of the cells FlashList currently has mounted.
@@ -194,10 +196,12 @@ export const ThemedGridComponent = ({
       <View ref={ ref } style={ { flex: 1 } } tvFocusable={ false }>
         <FlashList
           ref={ listRef }
+          onLayout={ retained.enabled ? retained.onLayout : undefined }
           data={ data }
           renderItem={ renderCell }
           numColumns={ numberOfColumns }
           scrollEventThrottle={ FOCUS_SCROLL_EVENT_THROTTLE }
+          onScroll={ retained.enabled ? retained.onScroll : undefined }
           onEndReached={ handleScrollEnd }
           onEndReachedThreshold={ 0.25 }
           ListHeaderComponent={ ListHeaderComponent }

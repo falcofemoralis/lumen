@@ -20,7 +20,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { Slider } from 'react-native-awesome-slider';
 import { useSharedValue } from 'react-native-reanimated';
 import { useAppTheme } from 'Theme/context';
@@ -34,7 +34,11 @@ import { PlayerProgressBarComponentProps } from './PlayerProgressBar.type';
 
 // The bar itself is only a few pixels tall - fine for a d-pad, which never has to
 // hit it, but far too thin to grab with an air-mouse pointer.
-const POINTER_HIT_SLOP = { top: 24, bottom: 24 };
+// The DOM hit area is absolute and can overlap the adjacent action row.
+// Keep the generous native target, but constrain the Windows mouse target.
+const POINTER_HIT_SLOP = Platform.OS === 'web'
+  ? { top: 6, bottom: 6 }
+  : { top: 24, bottom: 24 };
 
 // How long a finished drag keeps owning the thumb, waiting for the seek it asked
 // for to show up in the player's own reporting. Same grace the d-pad smart

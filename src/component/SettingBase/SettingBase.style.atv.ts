@@ -33,6 +33,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   },
   settingTitle: {
     fontSize: scale(text.sm.fontSize),
+    color: '#8F9190',
     fontWeight: '700',
   },
   settingTitleFocused: {
@@ -40,7 +41,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   },
   settingSubtitle: {
     fontSize: scale(text.sm.fontSize),
-    color: colors.textSecondary,
+    color: '#8F9190',
     opacity: 0.8,
   },
   settingSubtitleFocused: {

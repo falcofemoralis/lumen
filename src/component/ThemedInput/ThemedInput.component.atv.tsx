@@ -7,7 +7,7 @@ import Eye from 'lucide-react-native/icons/eye';
 import EyeOff from 'lucide-react-native/icons/eye-off';
 import { trapRefGlobal } from 'Navigation/NativeFocusTrap';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { TextInput, View } from 'react-native';
+import { Platform, TextInput, View } from 'react-native';
 import { useAppTheme } from 'Theme/context';
 
 import { componentStyles } from './ThemedInput.style.atv';
@@ -38,6 +38,13 @@ export const ThemedInputComponent = ({
       return;
     }
 
+    if (Platform.OS === 'web') {
+      const input = textInputRef.current;
+      if (input && TextInput.State.currentlyFocusedInput() !== input) input.focus();
+
+      return;
+    }
+
     setTimeout(() => {
       const input = textInputRef.current;
 
@@ -59,7 +66,7 @@ export const ThemedInputComponent = ({
   }, [editable, textInputRef]);
 
   const onBlur = useCallback(() => {
-    if (!editable) {
+    if (!editable || Platform.OS === 'web') {
       return;
     }
 
@@ -118,6 +125,7 @@ export const ThemedInputComponent = ({
       <View ref={ ref } style={ styles.inputContainer }>
         <TextInput
           autoComplete="off"
+          autoFocus={ Platform.OS === 'web' && autofocus }
           ref={ textInputRef }
           editable={ editable }
           placeholder={ placeholder }
