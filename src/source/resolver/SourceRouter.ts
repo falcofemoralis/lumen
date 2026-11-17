@@ -13,6 +13,7 @@ import { getRegisteredUnifiedFilm, registerUnifiedFilm } from '../search/Unified
 import { SourceAdapter } from '../types/SourceAdapter';
 import { withDeadline } from '../request';
 import { FilmType } from 'Type/FilmType.type';
+import { isRecoverableSourceFailure } from '../../util/NetworkRecovery';
 
 export class SourceRouter {
   private readonly adapters: Map<ContentSource, SourceAdapter>;
@@ -25,10 +26,10 @@ export class SourceRouter {
 
   private readonly matches = new Map<string, { time: number; value: Promise<FilmInterface | null> }>();
 
-  async getFilmForSource(film: FilmInterface, source: ContentSource, strict = false, background = false, includeSeriesInfo = false): Promise<FilmInterface | null> {
+  async getFilmForSource(film: FilmInterface, source: ContentSource, strict = false, background = false, includeSeriesInfo = false, timeout = 12_000): Promise<FilmInterface | null> {
     const target = this.getAdapter(source);
     if (!target) return null;
-    const key = film.link + ':' + source + ':' + strict + ':' + includeSeriesInfo;
+    const key = film.link + ':' + source + ':' + strict + ':' + includeSeriesInfo + ':' + timeout;
     const cached = this.matches.get(key);
     if (cached && Date.now() - cached.time < 5 * 60 * 1000) return cached.value;
     const value = withDeadline((async () => {
@@ -77,7 +78,7 @@ export class SourceRouter {
       const merged = resolver.deduplicate([base, target.normalizeFilm(candidate)]);
       merged.forEach(registerUnifiedFilm);
       return candidate;
-    })(), 12_000, 'Дополнительный источник не ответил вовремя.').catch((error) => {
+    })(), timeout, 'Дополнительный источник не ответил вовремя.').catch((error) => {
       this.matches.delete(key);
       if (strict) throw error;
       return null;
@@ -114,6 +115,12 @@ export class SourceRouter {
           if (film && resolver.isSameFilm(reference, adapter.normalizeFilm(film))) return film;
         } catch { /* Try another verified source without replacing the original error. */ }
       }
+    }
+    if (failure && sourceForLink(link) === ContentSource.ZONA && isRecoverableSourceFailure(failure)) {
+      try {
+        const film = await load(link);
+        if (film) return film;
+      } catch { /* Keep the first failure after a single read-only retry. */ }
     }
     if (failure) throw failure;
 
@@ -157,14 +164,15 @@ export class SourceRouter {
     return result;
   }
 
-  async resolvePreferredFilm(film: FilmInterface): Promise<FilmInterface> {
+  async resolvePreferredFilm(film: FilmInterface, recoverSupplement = false): Promise<FilmInterface> {
     const primary = (film.type === FilmType.ANIME || film.type === FilmType.DONGHUA) && this.getAdapter(ContentSource.ANIXART)
       ? ContentSource.ANIXART : ContentSource.ZONA;
     const isZona = this.getAdapterForLink(film.link)?.source === primary;
     const zonaFilm = isZona ? film : await this.getFilmForSource(film, primary);
     if (!zonaFilm) return film;
     const rezkaFilm = !isZona && (this.getAdapterForLink(film.link)?.source ?? ContentSource.REZKA) === ContentSource.REZKA
-      ? film : await this.getFilmForSource(zonaFilm, ContentSource.REZKA);
+      ? film : await this.getFilmForSource(zonaFilm, ContentSource.REZKA, recoverSupplement, false, false,
+          recoverSupplement ? 60_000 : 12_000);
     if (!rezkaFilm) return { ...zonaFilm, libraryId: film.libraryId ?? film.id };
     const ratingKey = (name: string) => name.normalize('NFKC').toLowerCase().replace(/ё/g, 'е').replace(/[\s:]+/g, '');
     const zonaRatings = zonaFilm.ratings ?? [];

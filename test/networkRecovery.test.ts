@@ -59,3 +59,15 @@ test('Zona timeout and temporary gateway failures recover without retrying perma
   blocked.retryAt = 5000;
   assert.equal(isRecoverableSourceFailure(blocked, 4999), false);
 });
+test('supplement and Rezka queue timeouts can recover after startup congestion', async () => {
+  const { isRecoverableSourceFailure } = await import('../src/util/NetworkRecovery');
+  assert.equal(isRecoverableSourceFailure(new Error('HDRezka не ответила вовремя.')), true);
+  assert.equal(isRecoverableSourceFailure(new Error('Дополнительный источник не ответил вовремя.')), true);
+});
+
+test('temporary provider maintenance is recoverable without treating access denials as network failures', async () => {
+  const { isRecoverableSourceFailure } = await import('../src/util/NetworkRecovery');
+  assert.equal(isRecoverableSourceFailure(new Error('Service Temporarily Unavailable')), true);
+  assert.equal(isRecoverableSourceFailure(new Error('Service Unavailable')), true);
+  assert.equal(isRecoverableSourceFailure(new Error('HTTP 403')), false);
+});

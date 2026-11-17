@@ -10,8 +10,8 @@ import { POSTER_ASPECT_HEIGHT, POSTER_ASPECT_WIDTH } from 'Component/FilmCard/Fi
 import { FilmViewScheduleItem } from 'Component/FilmViewScheduleItem';
 import { FilmViewScheduleOverlay } from 'Component/FilmViewScheduleOverlay';
 import { FilmViewSection } from 'Component/FilmViewSection';
-import { Page } from 'Component/Page';
 import { Header } from 'Component/Header';
+import { Page } from 'Component/Page';
 import { SourceLoadError } from 'Component/SourceLoadError';
 import { PlayerVideoSelector } from 'Component/PlayerVideoSelector';
 import { Rating } from 'Component/Rating';
@@ -99,7 +99,6 @@ export function FilmScreenComponent({
     if (isLoadError) return <Page>{ Platform.OS === 'web' && <Header disableBackRipple /> }<SourceLoadError onRetry={ retryLoad } /></Page>;
     return (
       <Page>
-        { Platform.OS === 'web' && <Header disableBackRipple /> }
         <FilmScreenThumbnail styles={ styles } />
       </Page>
     );

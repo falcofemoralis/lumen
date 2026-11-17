@@ -3,7 +3,7 @@ import { Thumbnail } from 'Component/Thumbnail';
 import { Wrapper } from 'Component/Wrapper';
 import { LinearGradient } from 'expo-linear-gradient';
 import Forward from 'lucide-react-native/icons/forward';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { useAppTheme } from 'Theme/context';
 import { ThemedStyles } from 'Theme/types';
 
@@ -21,10 +21,12 @@ export const FilmScreenThumbnail = ({
   return (
     <View style={ styles.page }>
       <View style={ styles.upperContent }>
-        <Header
-          AdditionalActionIcon={ Forward }
-          style={ { paddingTop: top } }
-        />
+        { Platform.OS !== 'web' && (
+          <Header
+            AdditionalActionIcon={ Forward }
+            style={ { paddingTop: top } }
+          />
+        ) }
         <Wrapper>
           <Thumbnail
             height={ scale(24) }

@@ -1265,7 +1265,7 @@ const RezkaApi: RezkaApiInterface = {
     const root = parseHtml(content);
 
     if (root.querySelector('.error-code')) {
-      return {};
+      throw new Error('HDRezka не вернула рейтинги. Повторите попытку позже.');
     }
 
     const imdb = Number(root.querySelector('.imdb b')?.rawText);

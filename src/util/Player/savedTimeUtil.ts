@@ -1,11 +1,14 @@
 import { SavedTime, SavedTimestamp, SavedTimeVoice } from 'Component/Player/Player.type';
+import type { FilmVoiceInterface } from 'Type/FilmVoice.interface';
+
+import { EpisodePosition, episodePosition } from './episodeSelection';
 
 function getLatestTimestamp(
   voice: SavedTimeVoice | null
 ): SavedTimestamp | null {
   if (!voice) return null;
 
-  return Object.values(voice.timestamps).reduce<SavedTimestamp | null>(
+  return Object.values(voice.timestamps ?? {}).reduce<SavedTimestamp | null>(
     (latest, timestamp) => {
       if (!timestamp) return latest;
 
@@ -21,7 +24,7 @@ function getLatestTimestamp(
 
 export function getLastSavedEpisode(
   voice: SavedTimeVoice | null
-): { seasonId?: string; episodeId?: string } {
+): EpisodePosition {
   if (!voice) {
     return {};
   }
@@ -30,6 +33,8 @@ export function getLastSavedEpisode(
     return {
       seasonId: voice.lastSeasonId,
       episodeId: voice.lastEpisodeId,
+      ...(voice.seasonNumber !== undefined ? { seasonNumber: voice.seasonNumber } : {}),
+      ...(voice.episodeNumber !== undefined ? { episodeNumber: voice.episodeNumber } : {}),
     };
   }
 
@@ -113,6 +118,8 @@ export function combineSavedTimeVoice(
             : voice1;
 
   const combinedVoice: SavedTimeVoice = {
+    ...(sourceVoice.seasonNumber !== undefined ? { seasonNumber: sourceVoice.seasonNumber } : {}),
+    ...(sourceVoice.episodeNumber !== undefined ? { episodeNumber: sourceVoice.episodeNumber } : {}),
     timestamps: combinedData,
   };
 
@@ -182,4 +189,23 @@ export function combineSavedTime(
     lastVoiceId:
       latestVoiceId ?? savedTime2.lastVoiceId ?? savedTime1.lastVoiceId,
   };
+}
+/** Merge persisted progress across a preferred source change without rewriting its storage. */
+export function getSavedTimeForFilm(
+  film: { id: string; libraryId?: string }, read: (id: string) => SavedTime | null
+): SavedTime | null {
+  const ids = [...new Set([film.id, film.libraryId].filter((id): id is string => Boolean(id)))];
+  const result = ids.reduce<SavedTime | null>((combined, id) => combineSavedTime(combined, read(id)), null);
+
+  return result ? { ...result, filmId: film.id } : null;
+}
+export function withSavedEpisodePosition(previous: SavedTimeVoice, voice: FilmVoiceInterface): SavedTimeVoice {
+  if (!voice.lastSeasonId || !voice.lastEpisodeId) return previous;
+  const position = voice.seasons?.length ? episodePosition(voice, voice.lastSeasonId, voice.lastEpisodeId) : {};
+  const sameSeason = previous.lastSeasonId === voice.lastSeasonId;
+  const sameEpisode = sameSeason && previous.lastEpisodeId === voice.lastEpisodeId;
+
+  return { ...previous, lastSeasonId: voice.lastSeasonId, lastEpisodeId: voice.lastEpisodeId,
+    seasonNumber: position.seasonNumber ?? (sameSeason ? previous.seasonNumber : undefined),
+    episodeNumber: position.episodeNumber ?? (sameEpisode ? previous.episodeNumber : undefined) };
 }

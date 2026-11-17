@@ -107,3 +107,52 @@ test('Recent does not reuse opaque episode IDs after the saved voice disappears'
   await assert.rejects(actions.mutationFn({ link: 'zona' }), /Current season/);
   assert.equal(played, false);
 });
+test('saved progress is recovered from a former library ID after source preference changes', async () => {
+  const { getSavedTimeForFilm } = await import('../src/util/Player/savedTimeUtil');
+  const old = { filmId: 'old', lastVoiceId: 'rezka:7', voices: {
+    'rezka:7': { lastSeasonId: '2', lastEpisodeId: '7', timestamps: { '2-7': { time: 40, progress: 0.2, updatedAt: 10 } } },
+  } };
+  const result = getSavedTimeForFilm({ id: 'zona-new', libraryId: 'old' }, id => id === 'old' ? old : null);
+  assert.equal(result?.filmId, 'zona-new');
+  assert.equal(result?.lastVoiceId, 'rezka:7');
+  assert.equal(result?.voices['rezka:7']?.lastEpisodeId, '7');
+});
+
+test('Recent keeps the clicked legacy history record when refreshed metadata cannot match it', async () => {
+  const actions = recentActions();
+  actions.film.hasSeasons = true;
+  const voice = { ...actions.voice, seasons: [{ seasonId: '2', name: 'Season 2',
+    episodes: [{ episodeId: '7', name: 'Episode 7' }] }] };
+  actions.context.isLocalLibrary = true;
+  actions.context.localHistory = [{ id: 'legacy', link: 'old-link', voiceId: voice.id, seasonId: '2', episodeId: '7' }];
+  actions.context.matchesHistoryFilm = () => false;
+  actions.context.getSavedTime = () => null;
+  actions.context.sourcePlaybackRouter.getAdapterForFilmLink = () => ({
+    getFilmVoices: async () => [voice],
+    getFilmStreamsByEpisodeId: async (_film: unknown, _voice: unknown, season: string, episode: string) => {
+      assert.equal(season, '2'); assert.equal(episode, '7');
+      return { streams: [{ url: 'legacy-episode' }] };
+    },
+  });
+  const result = await actions.mutationFn({ id: 'legacy', link: 'zona' });
+  assert.equal(result.video.streams[0].url, 'legacy-episode');
+});
+
+test('saved episode numbers survive ID rotation, partial player updates and cloud merging', async () => {
+  const { withSavedEpisodePosition, combineSavedTimeVoice } = await import('../src/util/Player/savedTimeUtil');
+  const voice = { id: 'voice', seasons: [{ seasonId: 'old-token', name: 'Season 2',
+    episodes: [{ episodeId: 'old-episode', name: 'Episode 7' }] }], lastSeasonId: 'old-token', lastEpisodeId: 'old-episode' };
+  const saved = withSavedEpisodePosition({ timestamps: {} }, voice as any);
+  const partial = withSavedEpisodePosition(
+    withSavedEpisodePosition(saved, { id: 'voice', lastSeasonId: 'old-token', lastEpisodeId: 'old-episode' } as any),
+    { id: 'voice' } as any
+  );
+  assert.equal(partial.lastEpisodeId, 'old-episode');
+  const combined = combineSavedTimeVoice({ timestamps: { '0': { time: 1, progress: 0.1, updatedAt: 1 } } },
+    { ...partial, timestamps: { 'old-token-old-episode': { time: 40, progress: 0.2, updatedAt: 2 } } })!;
+  const fresh = { ...voice, seasons: [{ seasonId: 'new-token', name: 'Season 2',
+    episodes: [{ episodeId: 'new-episode', name: 'Episode 7' }] }] };
+  assert.deepEqual(resolveEpisodeSelection(fresh as any, getLastSavedEpisode(combined), true), {
+    seasonId: 'new-token', episodeId: 'new-episode',
+  });
+});

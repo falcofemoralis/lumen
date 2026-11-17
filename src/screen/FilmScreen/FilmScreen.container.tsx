@@ -186,6 +186,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
 
   const { data: film = null, isError: isFilmLoadError, refetch: retryFilmLoad } = useQuery({
     queryKey: filmQueryKey,
+    meta: { silent: true },
     enabled: !!link,
     retry: 0,
     queryFn: async () => {
@@ -201,9 +202,13 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
       if (isLocalLibrary) applyLocalScheduleMarks(baseFilm);
       if (!isSignedIn || isLocalLibrary) await updateFilmVoiceData(baseFilm);
       // Supplemental metadata must not hold the main Zona page behind a spinner.
-      queryClient.setQueryData(filmQueryKey, baseFilm);
+      queryClient.setQueryData<FilmInterface>(filmQueryKey, previous =>
+        previous?.link === baseFilm.link && previous.metadataSourceFilm
+          ? { ...baseFilm, metadataSourceFilm: previous.metadataSourceFilm,
+              metadataSourceName: previous.metadataSourceName, ratings: previous.ratings ?? baseFilm.ratings }
+          : baseFilm);
       const loadedFilm = baseFilm.link === link
-        ? await sourceRouter.resolvePreferredFilm(baseFilm) : baseFilm;
+        ? await sourceRouter.resolvePreferredFilm(baseFilm, true) : baseFilm;
       const liveFilm = queryClient.getQueryData<FilmInterface>(filmQueryKey);
       if (liveFilm?.link === loadedFilm.link) loadedFilm.voices = liveFilm.voices;
       if (isLocalLibrary && loadedFilm) {

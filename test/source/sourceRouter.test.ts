@@ -304,3 +304,37 @@ test('native person pages retain supplied identity and paginated filmography', a
     assert.deepEqual(actor?.filmographyPage, { currentPage: 1, totalPages: 3 });
   }
 });
+
+test('Zona details retry a temporary read failure once, without retrying permanent errors', async () => {
+  const zona = makeFilm(true, '-retry');
+  const adapter = makeAdapter(ContentSource.ZONA, [zona]);
+  let calls = 0;
+  adapter.getFilm = async () => {
+    calls++;
+    if (calls === 1) throw new Error('Zona не ответила вовремя. Повторите попытку.');
+    return zona;
+  };
+  const router = new SourceRouter([adapter]);
+  assert.equal((await router.loadFilm(zona.link, async () => null))?.id, zona.id);
+  assert.equal(calls, 2);
+  calls = 0;
+  adapter.getFilm = async () => { calls++; throw new Error('Zona: HTTP 403'); };
+  await assert.rejects(router.loadFilm(zona.link, async () => null), /403/);
+  assert.equal(calls, 1);
+});
+
+test('visible pages can recover a failed Rezka supplement without discarding the native film', async () => {
+  clearUnifiedFilmRegistry();
+  const zona = makeFilm(true, '-recovery'), rezka = makeFilm(false, '-recovery');
+  const adapter = makeAdapter(ContentSource.REZKA, [rezka]);
+  let fail = true;
+  const read = adapter.getFilm;
+  adapter.getFilm = async (...args) => {
+    if (fail) throw new Error('Network request failed');
+    return read(...args);
+  };
+  const router = new SourceRouter([makeAdapter(ContentSource.ZONA, [zona]), adapter]);
+  await assert.rejects(router.resolvePreferredFilm(zona, true), /Network request failed/);
+  fail = false;
+  assert.equal((await router.resolvePreferredFilm(zona, true)).metadataSourceFilm?.id, rezka.id);
+});

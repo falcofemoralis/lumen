@@ -32,6 +32,9 @@ const RezkaSourceAdapter: SourceAdapter = {
 
   async getFilm(link: string, options?: { background?: boolean; includeSeriesInfo?: boolean }): Promise<FilmInterface | null> {
     const film = await RezkaApi.getFilm(link, options);
+    if (film && (!film.id?.trim() || !film.title?.trim())) {
+      throw new Error('HDRezka не вернула данные фильма. Повторите попытку позже.');
+    }
     if (film && options?.includeSeriesInfo && !film.seriesInfo
       && [FilmType.SERIES, FilmType.ANIME, FilmType.DONGHUA, FilmType.CARTOON].includes(film.type)) {
       const result = await RezkaApi.search(film.title, 1, { background: true });

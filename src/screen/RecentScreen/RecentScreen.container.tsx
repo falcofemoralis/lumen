@@ -111,7 +111,8 @@ export function RecentScreenContainer() {
 
       const saved = getSavedTime(film);
       const historyItem = isLocalLibrary
-        ? localHistory.find(entry => matchesHistoryFilm(entry, filmToFilmCard(film))) : undefined;
+        ? localHistory.find(entry => (Boolean(item.id) && entry.id === item.id) || entry.link === item.link)
+          ?? localHistory.find(entry => matchesHistoryFilm(entry, filmToFilmCard(film))) : undefined;
 
       const lastVoiceId = historyItem?.voiceId ?? saved?.lastVoiceId;
 
@@ -136,8 +137,8 @@ export function RecentScreenContainer() {
         const savedPosition = historyItem ? {
           seasonId: historyItem.seasonId ?? (sameVoice ? savedEpisode.seasonId : undefined),
           episodeId: historyItem.episodeId ?? (sameVoice ? savedEpisode.episodeId : undefined),
-          seasonNumber: historyItem.seasonNumber,
-          episodeNumber: historyItem.episodeNumber,
+          seasonNumber: historyItem.seasonNumber ?? (sameVoice ? savedEpisode.seasonNumber : undefined),
+          episodeNumber: historyItem.episodeNumber ?? (sameVoice ? savedEpisode.episodeNumber : undefined),
         } : savedEpisode;
         const loadSeasons = () => playback
           ? playback.getFilmSeasons(film, voice)
