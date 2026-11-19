@@ -6,6 +6,7 @@ import { storage } from 'Util/Storage';
 
 // if English isn't your default language, move Translations to the appropriate language file.
 import en, { Translations } from './en';
+import es from './es';
 import ru from './ru';
 import uk from './uk';
 
@@ -20,6 +21,7 @@ const convertResource = (obj: Record<string, string>) => {
 
 const resources = {
   en: { general: convertResource(en) },
+  es: { general: convertResource(es) },
   ru: { general: convertResource(ru) },
   uk: { general: convertResource(uk) },
 };
