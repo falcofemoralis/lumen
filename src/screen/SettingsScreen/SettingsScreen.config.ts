@@ -121,6 +121,7 @@ export const THEME_SCHEME_OPTIONS = [
 export const APP_LANGUAGE_OPTIONS = [
   { value: 'uk', label: 'Українська' },
   { value: 'en', label: 'English' },
+  { value: 'es', label: 'Español' },
   { value: 'ru', label: 'Русский' },
 ];
 
